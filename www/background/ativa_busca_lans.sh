@@ -1,0 +1,1 @@
+cd /www/background/; php -q "ativa_busca_lans.php" >>../log/ativa_busca_lans.log

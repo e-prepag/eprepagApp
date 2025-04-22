@@ -1,0 +1,5 @@
+Fluxo do mecanismo:
+
+index.php recebendo form-esqueci-minha-senha.php => registra-solicitacao.php => encaminha e-mail
+
+e-mail => verifica-solicitacao.php => atualizacao.php recebendo form-nova-senha.php => atualiza-senha.php => finaliza

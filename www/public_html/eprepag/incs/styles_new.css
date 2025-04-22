@@ -1,0 +1,209 @@
+* { margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { text-align: center; }
+
+img {border:none;}
+a { text-decoration:underline; color: #000000; } 
+a:hover { text-decoration:underline; color: #000000; }
+
+/* permite mostrar numeração e dots nas listas, reverte o "padding: 0" da primeira linha apenas para listas  */ 
+ol, ul, dl { padding: 0px 0px 0px 30px; }
+
+
+/* formularios */
+form { margin: 0px; padding: 0px; }
+select { border:solid 1px #CDDAE3; font: 11px arial; color: #000000; height:16px; }
+cite { font: 10px arial; font-style:normal; }
+
+#main { margin: 0 auto; width: 779px; text-align: left; position: relative;
+		font: 11px arial; color: #000000;
+		/*background-image:url(../imgs/rodape.gif); background-position:bottom; background-repeat:no-repeat;*/
+		min-height: 100%; /* For Modern Browsers */
+		height: auto !important; /* For Modern Browsers */
+		height: 100%; /* For IE */
+}
+
+#mainWGB { margin: 0 auto; width: 600px; text-align: left; position: relative;
+		font: 11px arial; color: #000000;
+		/*background-image:url(../imgs/rodape.gif); background-position:bottom; background-repeat:no-repeat;*/
+		min-height: 100%; /* For Modern Browsers */
+		height: auto !important; /* For Modern Browsers */
+		height: 100%; /* For IE */
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* TOPO                                                                                                             */
+/* ---------------------------------------------------------------------------------------------------------------- */
+#bannerTopo { margin: 9px 0px 0px 25px; display:block; }
+#topo { margin: 0px 24px 0px 24px; height: 95px; background-image:url(/imagens/topo_menu_bg.jpg); background-position:top; background-repeat:no-repeat; }
+#topo #logo { float: left; padding: 28px 0px 0px 15px; }
+#topo #menu { float: right; padding: 31px 15px 0px 0px; }
+#topo #menu ul { display: table; }
+#topo #menu ul li { display: inline; list-style:none; }
+
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* CONTEÚDO                                                                                                         */
+/* ---------------------------------------------------------------------------------------------------------------- */
+#conteudo_maps { padding: 1px 27px 1px 40px; }
+#conteudo_maps:after { clear: both; display: block; font: 1px/0px serif; content: "."; height: 0; visibility: hidden; }
+#conteudo { padding: 1px 27px 80px 40px; }
+#conteudo:after { clear: both; display: block; font: 1px/0px serif; content: "."; height: 0; visibility: hidden; }
+#principal { float: left; width: 410px; _padding-bottom:70px; /* For IE */ }
+
+#mens_erro { color: #CC3300; padding: 6px 0px 14px 0px; } 
+.fonte12 { font-size: 12px; }
+#bt_voltar { width:696px; text-align:center; padding: 30px 0px 30px 0px; }
+
+/* box com canto arredondado */
+.box { width:696px; background: #CDDAE3; }
+.boxtop { background: url(../imgs/ne.gif) no-repeat top right; }
+.boxtop div { height: 8px; background: url(../imgs/nw.gif) no-repeat top left; }
+.boxbottom { background: url(../imgs/se.gif) no-repeat bottom right; }
+.boxbottom div { height: 8px; background: url(../imgs/sw.gif) no-repeat bottom left; }
+.boxcontent { padding: 0px 14px 0px 14px; }
+
+/* pontos de venda */
+#pontos_busca { width:750px; padding:10px 0px 0px 0px; }
+#pontos_busca #div { margin:14px 0px 14px 23px; border-bottom:solid 1px #CDDAE3; } 
+#pontos_busca #ajuste { padding:4px 0px 0px 23px; } 
+#pontos_busca #bt { padding:30px 0px 0px 19px; } 
+
+/* pontos de venda */
+#pontos_buscaWGB { width:600px; padding:10px 0px 0px 0px; }
+#pontos_buscaWGB #div { margin:14px 0px 14px 23px; border-bottom:solid 1px #CDDAE3; } 
+#pontos_buscaWGB #ajuste { padding:4px 0px 0px 23px; } 
+#pontos_buscaWGB #bt { padding:30px 0px 0px 19px; } 
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* RODAPÉ                                                                                                           */
+/* ---------------------------------------------------------------------------------------------------------------- */
+#rodape { width:699px; margin: 0px 40px 15px 40px; clear:both; position: absolute; font: 10px arial; color: #626262; height: 40px; bottom: 0 !important; bottom: -1px; /* For Certain IE widths */ }
+#rodape #copyright { padding: 0px; line-height: 40px; float: center; width: 400px; }
+#rodape #menusecundario { padding: 0px; line-height: 40px; float:right; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* BUSCA DE LAN HOUSE                                                                                                           */
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+div.styled {
+	float: right;
+	width: 350px;
+	height: 50px;
+	position: absolute; 
+	z-index: 1; 
+	font-size: .7em; 
+	display: block; 
+	text-align: left; 
+	top: 240px; 
+	margin-left: 55em; 
+	border: 0; 
+	background-position: 0 0; 
+	*margin-left: -280px;
+}
+
+div.styledWGB {
+	float: right;
+	width: 300px;
+	height: 50px;
+	position: absolute; 
+	z-index: 1; 
+	font-size: .7em; 
+	display: block; 
+	text-align: left; 
+	margin-left: 30em; 
+	border: 0; 
+	background-position: 0 0; 
+	*margin-left: -430px;
+}
+
+div.styledCartao {
+	float: right;
+	width: 500px;
+	height: 50px;
+	position: absolute; 
+	z-index: 1; 
+	font-size: .7em; 
+	display: block; 
+	text-align: left; 
+	margin-left: 30em; 
+	border: 0; 
+	background-position: 0 0; 
+	*margin-left: -430px;
+}
+
+div.outside {
+	float: right;
+	width: 200px;
+	height: 80px;
+	position: absolute; 
+	z-index: 1; 
+	font-size: .7em; 
+	display: block; 
+	text-align: left; 
+	top: 230px; 
+	margin-left: 106em; 
+	vertical-align:top;
+	border: 0;
+	//border:solid 1px #CDDAE3; 
+	background-position: 0 0; 
+	*margin-left: 105px;
+}
+
+.titulo {
+	font-size:16px;
+	font-weight:bold;
+	vertical-align:middle;
+	color:#0146A3;
+}
+	
+.legendaoutside {
+	font-size:11px;
+	font-style:italic;
+	vertical-align:middle;
+	color:#0146A3;
+}
+
+.legendaoutsidegreen {
+	font-size:12px;
+	font-weight:bold;
+	font-style:italic;
+	vertical-align:middle;
+	color:#14872B;
+	text-decoration: none;
+}
+	
+.estiloSpan { color:#0146A3; text-decoration: none;}
+
+a { color: #14872B;text-decoration: none;}
+
+div {
+    color: #4E4E4E;
+}
+
+div td, td div{
+    color: #000000;
+}
+
+.font-10px { font-size:10px; }			
+
+.espaco {
+	font-size:2px;
+}
+
+.bgcolor-table{
+    background-color: #F4F3F0;
+}
+
+
+/*
+#bairro {
+	float: right;
+	position: absolute; 
+	display: block; 
+	top: 260px; 
+	margin-left: 50px; 
+	background-position: 0 0; 
+	*margin-left: 50px;
+}
+*/

@@ -1,0 +1,148 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 6, 2015, 5:31:41 PM
+    Author     : e-prepag
+*/
+
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+}
+
+.borda-tabela{
+    border-style: solid;
+    border-color: #ddd;
+    border-width: 1px;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.texto {
+	
+	font-size: 11px;
+        color: #337ab7;
+	text-decoration: none;
+}
+
+.botao_search
+{ 
+	 
+	font-size: 12px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+
+}
+
+.ta_formulario
+{
+	
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.ta_registra_deposito
+{
+	
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.botao_estab_historico
+{ 
+	 
+	font-size: 12px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+	width: 140px; 
+	height: 20px;
+}
+
+.menu { color: #337ab7;; text-decoration: none }
+
+.botao_dados {  
+
+font-size: 12px; 
+color: #00008C; 
+border: #00008C; 
+border-style: solid; 
+border-top-width: 1px; 
+border-right-width: 1px; 
+border-bottom-width: 1px; 
+border-left-width: 1px;
+font-weight: bold; 
+background-color: #E8EEE7;
+}
+
+.link_br {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.combo_normal {	
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form {	
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form2 {	
+	color: #666666;
+    text-transform: uppercase;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.field_normal {	
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form_courier { height: 22px; color: #666666; border: 1px solid #00008C; ; font-family: "Courier New", Courier, mono}
+
+.campos_ficha2 {  font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.field_credito {  font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.campos_ficha3 {  font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #999999; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.dropdown {  background-color: #EFEFEF;  font-weight: bolder; text-decoration: none; font-size: 12px; color: #000000; font-variant: normal}
+
+.combo {	
+    background-color: #FFFFFF;
+	
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.link_azul {  text-decoration: none; color: #00008C}
+.link_azul:hover { color: #00008C; text-decoration: underline}
+
+.txt-vermelho{color:#e04847;}
+.txt-verde{color:#009b4a;}

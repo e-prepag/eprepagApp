@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+input[type="number"] {
+	-moz-appearance: textfield;
+	/* Firefox */
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	/* Chrome, Safari e Edge */
+	margin: 0;
+}
+
+
+body {
+	margin: 0;
+}
+
+.row {
+	min-height: 100vh;
+}
+
+.image-eprepag {
+	height: auto;
+	width: 270px;
+}
+
+.container-fluid {
+	background-color: #eeeeee;
+	box-sizing: border-box;
+	min-height: 100vh;
+	margin: 0;
+}
+
+.form-resgate {
+	/*min-height: 50vh;*/
+	border-radius: 2px;
+	padding: 10px;
+	margin: 2.5%;
+	box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.8);
+	background-color: rgba(0, 0, 0, 0.95);
+	/*#7f8fa6*/
+}
+
+.height-container {
+	min-height: 35vh;
+}
+
+.border-hr {
+	border: solid 2px white;
+	width: 100%;
+	opacity: 1;
+}
+
+.diamond,
+.conta {
+	color: #ffb900;
+	transition: color .5s ease-in;
+}
+
+#conta,
+#codigo {
+	background-color: rgba(255, 255, 255, 0.08);
+	/*#333333;*/
+	color: white;
+}
+
+#conta::placeholder,
+#codigo::placeholder {
+	color: lightgray;
+}
+
+#iconecodigo,
+#iconeconta {
+	background-color: transparent;
+	width: 54px;
+	justify-content: center;
+}
+
+.input-group:hover .diamond {
+	color: #A07900;
+}
+
+.input-group:hover .conta {
+	color: #A07900;
+}
+
+.text-inform {
+	padding: 10px;
+	letter-spacing: 1.25px;
+	font-weight: bold;
+	font-size: .80em;
+	color: lightgray;
+}
+
+.text-freefire {
+	font-family: "Merriweather Sans", sans-serif;
+	color: white;
+	font-weight: 300;
+	text-transform: uppercase;
+}
+
+#confirma {
+	font-weight: bold;
+	border-color: transparent;
+	background-color: #ffb900;
+	color: white;
+	box-shadow: 2px 2px 5px rgba(255, 185, 0, 0.4);
+}
+
+#confirma:hover {
+	/* background-color: transparent; */
+	color: lightgray;
+	border-color: transparent;
+	background-color: #A07900;
+}
+
+.logo-epp {
+	width: auto;
+	height: 28px;
+	position: fixed;
+}
+
+.footer{
+	flex-direction: row;
+}
+
+@media screen and (max-width: 750px) {
+	.image-ale {
+		width: 40%;
+		/*20*/
+	}
+
+	.logo-epp {
+		height: 25px;
+		position: static;
+		margin-top: 10px;
+	}
+
+	.footer {
+		flex-direction: column;
+	}
+}
+
+@media screen and (max-width: 320px) {
+	.image-eprepag {
+		width: 240px;
+	}
+}
+
+@media screen and (max-width: 400px) {
+	#text-freefire {
+		font-size: 1.2rem !important;
+	}
+}
+
+@media screen and (min-width: 750px) {
+	.image-ale {
+		width: 12%;
+	}
+}
+
+@media screen and (min-width: 960px) {
+	.image-ale {
+		width: 10%;
+	}
+}
+
+/*@media screen and (min-width: 1600px){
+	.image-ale{
+	    width: 5%;
+   }
+}*/

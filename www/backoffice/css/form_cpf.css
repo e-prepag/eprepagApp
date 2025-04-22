@@ -1,0 +1,64 @@
+*{ margin: 0px; padding: 0px; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; }
+
+body{ font-family: Arial; font-size: 14px; }
+
+p{ margin-bottom: 6px; }
+
+.wrapper{ width: 740px; margin: auto; position: relative; text-align: left !important; }
+
+#int-header{ background: #eeeeee; height: 100px; margin-bottom: 14px; }
+#int-header #int-gamelogo{ max-width: 300px; max-height: 100px; position: absolute; top: 20px; }
+#int-header #right{ position: absolute; right: 0px; top: 20px; width: 200px; color: #333; }
+
+.int-box{ border: 1px solid #888; padding: 14px 20px; }
+
+.int-box .head-left{ display: block; float: left; width: 62%; border-right: 1px solid #888; padding-right: 4%; }
+.int-box .head-left h2{ font-size: 16px; font-weight: bold; color: #555; margin-bottom: 18px; }
+
+.int-box .head-right{ display: block; float: right; width: 37%;  }
+
+.int-box .c1{ color: #2e5984; }
+
+.int-table{ display: block; clear: both; margin-bottom: 20px; }
+.int-table > .row{ color: #258DC8; font-weight: bold; }
+.int-table > .row > div{ display: inline-block; width: 32%; }
+.int-table > .row > div:last-child{ text-align: right; }
+
+.int-table > .row-header{ color: #666; border-bottom: 1px solid #666; padding-bottom: 6px; margin-bottom: 8px; font-weight: normal; }
+
+.int-table > .row > div:nth-child(1), .int-table > .row-header > div:nth-child(1){ width: 50%; }
+.int-table > .row > div:nth-child(2), .int-table > .row-header > div:nth-child(2){ width: 30%; }
+.int-table > .row > div:nth-child(3), .int-table > .row-header > div:nth-child(3){ width: 18%; }
+
+.int-box h2{ margin-bottom: 4px; }
+.int-box h2 + p{ font-style: italic; color: #444; margin-bottom: 26px; }
+
+.int-form1{  }
+.int-form1 input[type=text]{ width: 44%; display: block; border: 1px solid #888; padding: 6px; margin-bottom: 6px; color: #555; }
+
+.int-btn1{ width: 210px; height: 34px; line-height: 34px; font-size: 18px; font-weight: bold; cursor: pointer; border: 1px solid #999; border-radius: 2px; }
+
+.grad1{ color: #fff; border: 1px solid #266307; background: #299a0b; /* Old browsers */background: -moz-linear-gradient(top, #299a0b 0%, #266307 100%); /* FF3.6+ */background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#299a0b), color-stop(100%,#266307)); /* Chrome,Safari4+ */background: -webkit-linear-gradient(top, #299a0b 0%,#266307 100%); /* Chrome10+,Safari5.1+ */background: -o-linear-gradient(top, #299a0b 0%,#266307 100%); /* Opera 11.10+ */background: -ms-linear-gradient(top, #299a0b 0%,#266307 100%); /* IE10+ */background: linear-gradient(to bottom, #299a0b 0%,#266307 100%); /* W3C */filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#299a0b', endColorstr='#266307',GradientType=0 ); /* IE6-9 */ }
+.grad2{ text-shadow: none; color: rgb(87, 87, 87); background: #dddddd; /* Old browsers */background: -moz-linear-gradient(top, #dddddd 0%, #a5a5a5 100%); /* FF3.6+ */background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dddddd), color-stop(100%,#a5a5a5)); /* Chrome,Safari4+ */background: -webkit-linear-gradient(top, #dddddd 0%,#a5a5a5 100%); /* Chrome10+,Safari5.1+ */background: -o-linear-gradient(top, #dddddd 0%,#a5a5a5 100%); /* Opera 11.10+ */background: -ms-linear-gradient(top, #dddddd 0%,#a5a5a5 100%); /* IE10+ */background: linear-gradient(to bottom, #dddddd 0%,#a5a5a5 100%); /* W3C */filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dddddd', endColorstr='#a5a5a5',GradientType=0 ); /* IE6-9 */ }
+
+.btn-question{ border-radius: 50%; background: silver; color: white; font-weight: bold; font-size: 12px; padding: 3px 6px; display: inline-block; text-decoration: none; }
+.btn-question:hover{ color: white; text-decoration: none; }
+
+.int-pagamento-compr-online{ width: 500px; }
+.int-pagamento-compr-online-logo{ width: 200px; float: left; position: relative; top: 14px; }
+.int-pagamento-compr-online-message1{ font-size: 12px !important; line-height: 18px; }
+.int-pagamento-compr-online-loading{ margin-right: 18px; }
+.int-pagamento-compr-online-btn1{ position: relative; left: -110px; width: 240px; font-style: italic; border: 0px; }
+.int-pagamento-compr-online-btn-boleto{ width: auto !important; padding: 0px 20px; position: inherit !important; }
+
+.int-bankitem{ float: left; background: #f0f0f0; border: 1px solid #D5D5D5; width: 48%; height: 98px; margin-right: 2%; margin-bottom: 14px; }
+.int-bankitem img{ display: block; margin: auto; border: 0px; padding-top: 16px; margin-bottom: 12px; }
+.int-bankitem p{ color: #444; text-align: center; font-size: 12px; margin-bottom: 2px; }
+
+select[name=seuBanco]{ -webkit-border-radius: 3px;border-radius: 3px;background: #FFF;border: 1px solid #999;color: #000;margin: 0;font-size: 11px;padding: 4px;height: 24px;font-style: italic;font-weight: bold;color: #666666; display: block; margin-bottom: 10px; }
+
+input[name=btnSeuBanco]{ margin-left: -100px; }
+
+#captcha-wrapper{ float: left; margin-right: 8px; width: 180px; }
+
+.cleanLeftMargin { margin-left: 0px !important; }

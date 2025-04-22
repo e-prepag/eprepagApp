@@ -1,0 +1,1 @@
+cd /www/background/; php -q "pagamento_online_BRD5.php" --log=pagamento_online_BRD5

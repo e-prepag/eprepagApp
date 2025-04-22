@@ -1,0 +1,1239 @@
+=================================================================================================
+DATA -> 25/11/2021 - 15:54:00 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 443 (#0)
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+* 	 subject: businessCategory=Private Organization; serialNumber=05.442.029/0001-47; jurisdictionC=BR; C=BR; ST=SAO PAULO; L=SAO PAULO; street=R SCHILLING  471; O=CASA DO CREDITO S/A - SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR; CN=contause.digital
+* 	 start date: Nov  4 18:29:22 2020 GMT
+* 	 expire date: Dec  6 18:29:22 2021 GMT
+* 	 subjectAltName: contause.digital matched
+* 	 issuer: C=BR; O=VALID CERTIFICADORA DIGITAL; CN=Valid Certificadora Digital SSL EV CA 2018
+* 	 SSL certificate verify ok.
+> POST /s5/oauth/ HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 401 Unauthorized
+< Date: Thu, 25 Nov 2021 18:54:01 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store, no-cache, must-revalidate
+< Pragma: no-cache
+< WWW-Authenticate: Bearer realm="Service"
+< Set-Cookie: PHPSESSID=863350accc3422f7b2bac8227ade7885; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 15:54:00 -> Send JSON to Get QRCode
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 443 (#0)
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+* 	 subject: businessCategory=Private Organization; serialNumber=05.442.029/0001-47; jurisdictionC=BR; C=BR; ST=SAO PAULO; L=SAO PAULO; street=R SCHILLING  471; O=CASA DO CREDITO S/A - SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR; CN=contause.digital
+* 	 start date: Nov  4 18:29:22 2020 GMT
+* 	 expire date: Dec  6 18:29:22 2021 GMT
+* 	 subjectAltName: contause.digital matched
+* 	 issuer: C=BR; O=VALID CERTIFICADORA DIGITAL; CN=Valid Certificadora Digital SSL EV CA 2018
+* 	 SSL certificate verify ok.
+> POST /s5/oauth/PIX/qrcode HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/json
+Authorization: Bearer 
+
+< HTTP/1.1 401 Unauthorized
+< Date: Thu, 25 Nov 2021 18:54:02 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Pragma: no-cache
+< Cache-Control: no-store
+< WWW-Authenticate: Bearer realm="Service", error="invalid_request", error_description="Malformed auth header"
+< Set-Cookie: PHPSESSID=07e1901c45f93c98cacd18f6a8479096; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 15:55:30 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 443 (#0)
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+* 	 subject: businessCategory=Private Organization; serialNumber=05.442.029/0001-47; jurisdictionC=BR; C=BR; ST=SAO PAULO; L=SAO PAULO; street=R SCHILLING  471; O=CASA DO CREDITO S/A - SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR; CN=contause.digital
+* 	 start date: Nov  4 18:29:22 2020 GMT
+* 	 expire date: Dec  6 18:29:22 2021 GMT
+* 	 subjectAltName: contause.digital matched
+* 	 issuer: C=BR; O=VALID CERTIFICADORA DIGITAL; CN=Valid Certificadora Digital SSL EV CA 2018
+* 	 SSL certificate verify ok.
+> POST /s5/oauth/ HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 401 Unauthorized
+< Date: Thu, 25 Nov 2021 18:55:31 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store, no-cache, must-revalidate
+< Pragma: no-cache
+< WWW-Authenticate: Bearer realm="Service"
+< Set-Cookie: PHPSESSID=2243e64c2fa2be3a930b2ea51f283ec8; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 15:57:32 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 443 (#0)
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+* 	 subject: businessCategory=Private Organization; serialNumber=05.442.029/0001-47; jurisdictionC=BR; C=BR; ST=SAO PAULO; L=SAO PAULO; street=R SCHILLING  471; O=CASA DO CREDITO S/A - SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR; CN=contause.digital
+* 	 start date: Nov  4 18:29:22 2020 GMT
+* 	 expire date: Dec  6 18:29:22 2021 GMT
+* 	 subjectAltName: contause.digital matched
+* 	 issuer: C=BR; O=VALID CERTIFICADORA DIGITAL; CN=Valid Certificadora Digital SSL EV CA 2018
+* 	 SSL certificate verify ok.
+> POST /s5/oauth/ HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 401 Unauthorized
+< Date: Thu, 25 Nov 2021 18:57:33 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store, no-cache, must-revalidate
+< Pragma: no-cache
+< WWW-Authenticate: Bearer realm="Service"
+< Set-Cookie: PHPSESSID=7b77ee88d1cf6f490e41cae14911a1d8; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 15:58:48 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 18:58:49 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=ea52c51e4b57ae9737f18720f580b4c3; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 15:59:09 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 18:59:10 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=fb1043a5a979dd8c354b39d7c53d2494; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 15:59:09 -> Send JSON to Get QRCode
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 443 (#0)
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+* 	 subject: businessCategory=Private Organization; serialNumber=05.442.029/0001-47; jurisdictionC=BR; C=BR; ST=SAO PAULO; L=SAO PAULO; street=R SCHILLING  471; O=CASA DO CREDITO S/A - SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR; CN=contause.digital
+* 	 start date: Nov  4 18:29:22 2020 GMT
+* 	 expire date: Dec  6 18:29:22 2021 GMT
+* 	 subjectAltName: contause.digital matched
+* 	 issuer: C=BR; O=VALID CERTIFICADORA DIGITAL; CN=Valid Certificadora Digital SSL EV CA 2018
+* 	 SSL certificate verify ok.
+> POST /s5/oauth/PIX/qrcode HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/json
+Authorization: Bearer b40f705912d1673ed7ed10874d448bfb3bc5ba4a
+
+< HTTP/1.1 400 Bad Request
+< Date: Thu, 25 Nov 2021 18:59:10 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store, no-cache, must-revalidate
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=37672d3307c6d8248d419fb651096e0d; path=/
+< Connection: close
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Closing connection 0
+=================================================================================================
+DATA -> 25/11/2021 - 16:00:25 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:00:26 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=37ac0c315836d47f8764769091d23912; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:00:25 -> Send JSON to Get QRCode
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 443 (#0)
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+* 	 subject: businessCategory=Private Organization; serialNumber=05.442.029/0001-47; jurisdictionC=BR; C=BR; ST=SAO PAULO; L=SAO PAULO; street=R SCHILLING  471; O=CASA DO CREDITO S/A - SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR; CN=contause.digital
+* 	 start date: Nov  4 18:29:22 2020 GMT
+* 	 expire date: Dec  6 18:29:22 2021 GMT
+* 	 subjectAltName: contause.digital matched
+* 	 issuer: C=BR; O=VALID CERTIFICADORA DIGITAL; CN=Valid Certificadora Digital SSL EV CA 2018
+* 	 SSL certificate verify ok.
+> POST /s5/oauth/PIX/qrcode HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/json
+Authorization: Bearer 1b008006a6d54c1e5451c8bbe5f0a4f678a8ba2e
+
+< HTTP/1.1 400 Bad Request
+< Date: Thu, 25 Nov 2021 19:00:26 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store, no-cache, must-revalidate
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=1c7bb1bd062aa0d029b3701bb1a5875c; path=/
+< Connection: close
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Closing connection 0
+=================================================================================================
+DATA -> 25/11/2021 - 16:03:05 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:03:06 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=f3cee14e2685b083b7f18e0f3c497de2; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:03:08 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:03:09 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=0184d0cda0299078ea8d14f3fdd46dd3; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:05:12 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:05:13 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=39db770582edaa8494b3c764c09ae0d0; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:05:57 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:05:58 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=c8a7319b5bf581f80d257ef76d1ed09b; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:05:58 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:05:59 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=f8bb8c1fd305a12fa06a35f5b711d431; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:06:14 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:06:15 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=3e2561d2d9e9ff1fbce148de5e25cbc9; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:08:13 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:08:14 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=970c54336f3db340afbc2c5554505ba0; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:08:16 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:08:17 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=4a0a4a4f36235e337d67bd8fabde9115; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:08:18 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:08:19 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=9e9818d83d6c0506ddbda3afac4b4c8c; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:10:20 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:10:21 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=e077712b3ab82e7248879fc7311a78de; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:11:33 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:11:34 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=8bc5e87c692243dd9a9c6da214366975; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:11:37 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:11:38 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=3d165d8584f66d0a752a595f197c9c72; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:11:38 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:11:41 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=9d6716a7a14b4ec9046dfc0fa84df738; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:13:34 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:13:36 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=b59e2cc2e511eaa7c65b52f07840d351; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:14:36 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:14:38 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=6b3ca5e2f4731f157a55dd270cceb057; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:14:38 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:14:39 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=fe70b1a9769582f4decc03b62d29b592; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:15:04 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:15:05 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=e45f2baa54b3c4aaccb6296368e83c49; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:16:05 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:16:06 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=deca172f4eb9e236502d4f03d49dbedc; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:16:51 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:16:52 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=4e0d77c3168c396eac70248d7fa97789; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:18:07 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:18:08 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=26b71daa2e4cea26fa228d3d6a6aff2c; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:18:30 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:18:31 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=c000332fa34b2f7deace1bdd2202ea06; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:19:19 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:19:20 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=b2b9783b8542ec9ac78f602fa4cf545f; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:01 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:02 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=aa2603e21b2d5b9d606b46fea2fd0dab; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:01 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:02 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=96ac5add491d856b8c84a31e7f8275f1; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:08 -> Request Token
+---------------------------------------------------
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:09 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:10 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=2cfb14c31c8cc71b7553bc777b99973e; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:11 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=4a333cf13e29e538b0d93decdcdb6d53; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:37 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:38 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=f3551e9fe74dff66d1a71327ff2cf9b4; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:56 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:57 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=b333ceeca4c7a161d7da97442f993ab6; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:20:58 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:20:59 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=818b835127f0148b46e1dd20afba1925; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:21:08 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:21:09 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=711db83e2346ebda1d2741308283b514; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:24:40 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:24:41 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=5433bd8cd9d88e917be485f3954677b8; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:24:55 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:24:57 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=9f0d8a4d9434147db23662d90e61203c; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 16:27:00 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 19:27:01 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=23d7c5c3e3e7f7e0c0d78ca8d3b92194; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 25/11/2021 - 17:52:53 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 25 Nov 2021 20:52:54 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=3f6b4e56ffd0d2c9791980ebe6c9b442; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 02/12/2021 - 12:01:03 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Thu, 02 Dec 2021 15:01:03 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=e21bc8db20184af64868d02569493eb6; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 10/12/2021 - 16:46:22 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Fri, 10 Dec 2021 19:46:23 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=f4b7ce0f8b228b00a35de1b8c55ff25b; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 13/12/2021 - 12:23:13 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Mon, 13 Dec 2021 15:23:13 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=37fa6c05877f0fd5877cd9c1356cacb7; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 13/12/2021 - 12:23:35 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Mon, 13 Dec 2021 15:23:36 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=a5724dbaff707d775043aaf483babac2; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact
+=================================================================================================
+DATA -> 13/12/2021 - 12:24:31 -> Request Token
+---------------------------------------------------
+*   Trying 177.53.142.187...
+* Connected to contause.digital (177.53.142.187) port 80 (#0)
+> POST /s5/oauth/seguranca/connect/token HTTP/1.1
+Host: contause.digital
+Accept: */*
+Accept-Encoding: deflate, gzip
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 114
+
+* upload completely sent off: 114 out of 114 bytes
+< HTTP/1.1 200 OK
+< Date: Mon, 13 Dec 2021 15:24:31 GMT
+< Server: Apache
+< Expires: Thu, 19 Nov 1981 08:52:00 GMT
+< Cache-Control: no-store
+< Pragma: no-cache
+< Set-Cookie: PHPSESSID=54d9df4d626ac0387e89dcf0282cc5c6; path=/
+< Transfer-Encoding: chunked
+< Content-Type: application/json
+< 
+* Connection #0 to host contause.digital left intact

@@ -1,0 +1,1 @@
+cd /www/background/; php -q "cpf_qtde_periodo.php" >>../log/cpf_qtde_periodo.log

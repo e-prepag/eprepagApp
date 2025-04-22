@@ -1,0 +1,53 @@
+* { margin: 0; padding: 0; }
+body, td, b {font-family:arial, sans serif; font-size:10}
+h3 {font-family:arial, sans serif; font-size:16}
+input {font-family:arial, sans serif; font-size:16px}
+menulink {background-color:#FF9966;}
+
+ .tabela {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        color: #666666;
+}
+
+ .tabela td {
+        font-size: 14px;
+        padding-left: 10px;
+ }
+ 
+ .report {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        color: #666666;
+}
+
+ .report td {
+        font-size: 12px;
+        padding: 0 10px;
+ }
+ 
+ .report b {
+        font-size: 12px;
+ }
+ 
+ .border {
+        border-right: 1px solid #000000;
+ }
+ 
+ .upper {
+        font-size: 14px;
+ }
+ 
+ .upper b {
+        font-size: 18px;
+ }
+ 
+ .negrito {
+        font-size: 14px;
+        font-weight: bold;
+ }
+ 

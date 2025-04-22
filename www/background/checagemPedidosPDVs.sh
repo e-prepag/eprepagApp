@@ -1,0 +1,1 @@
+cd /www/background/; php -q "checagemPedidosPDVs.php" >>../log/checagemPedidosPDVs.log

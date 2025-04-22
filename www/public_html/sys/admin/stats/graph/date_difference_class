@@ -1,0 +1,12 @@
+Class Name:dateDiff
+Description:class to calculate the difference between the two dates passed and return the difference in one(seconds, minutes, hours, days) of the formats specified
+Constructor: 
+dateDiff($firstDate,$secondDate,$interval);
+This constructor sets the values of these variables and calls the checkValid function to check the validity of the dates passed to the function.
+
+Methods:
+callDiff()
+calculates the difference between the two dates and returns the difference in the specified format
+Pre-requisite for using the class:
+Second date should be greater than the first date
+Dates passed to the function should be valid

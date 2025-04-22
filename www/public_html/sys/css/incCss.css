@@ -1,0 +1,226 @@
+
+body {
+scrollbar-face-color: #FFFFFF; 
+scrollbar-shadow-color: #00008C; 
+scrollbar-highlight-color: #FFFFFF; 
+scrollbar-3dlight-color: #00008C; 
+scrollbar-darkshadow-color: #FFFFFF; 
+scrollbar-track-color: #FFFFFF; 
+scrollbar-arrow-color: #00008C;
+}
+
+.texto {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #666666;
+	text-decoration: none;
+}
+
+.botao_search
+{ 
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 12px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+
+}
+
+.ta_formulario
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.ta_registra_deposito
+{
+	font-family: Courier New, Courier, mono;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.botao_estab_historico
+{ 
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 12px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+	width: 140px; 
+	height: 20px;
+}
+
+.menu { color: #00008C; text-decoration: none }
+
+.botao_dados {  
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 12px; 
+color: #00008C; 
+border: #00008C; 
+border-style: solid; 
+border-top-width: 1px; 
+border-right-width: 1px; 
+border-bottom-width: 1px; 
+border-left-width: 1px;
+font-weight: bold; 
+background-color: #E8EEE7;
+}
+
+.link_br {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.combo_normal {	
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form {	
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form2 {	
+	color: #666666;
+    text-transform: uppercase;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.field_normal {	
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form_courier { height: 22px; color: #666666; border: 1px solid #00008C; ; font-family: "Courier New", Courier, mono}
+
+.campos_ficha2 { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.field_credito { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.campos_ficha3 { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #999999; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.dropdown {  background-color: #EFEFEF; font-family: Arial, Helvetica, sans-serif; font-weight: bolder; text-decoration: none; font-size: 12px; color: #000000; font-variant: normal}
+
+.combo {	
+    background-color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.bg-cinza-claro { background-color: #eee;}
+.bg-cinza-escuro { background-color: #737373;}
+.bg-amarelo{background-color:#FFFF00}
+.bg-verde{background-color:#00BF66;}
+.altura-verde{height:5px !important;}
+.bg-azul{background-color: #0091C0;}
+.font-big{font-size: 20px}
+.bg-branco { background-color: #fff; }
+.bg-vermelho{background-color: #e04847;}
+.link_azul {  text-decoration: none; color: #00008C}
+.link_azul:hover { color: #00008C; text-decoration: underline}
+.top10{margin-top: 10px;}
+.w-ipt-medium{width: 100px;}
+.w-body{width: 897px !important;}
+.w66{width: 66px !important;}
+.espacamento { padding: 15px 15px;}
+.espacamento-recaptcha{padding: 2px 15px 15px 85px;}
+.espacamento-menor-esp{padding-left: 0px !important; padding-right: 0px !important; padding-top: 10px; padding-bottom: 10px;}
+.espacamento-menor-dir{padding-right: 10px !important; padding-top: 15px;}
+.espacamento-menor { padding: 10px 10px;}
+.txt-azul-claro {color: #1681b7; }
+.txt-cinza{color: #737373;}
+.txt-preto {color:#000;}
+.txt-vermelho{color:#e04847;}
+.txt-amarelo{color:#FFFF00}
+.txt-verde{color:#009b4a;}
+.txt-branco{color:#FFFFFF;}
+.fontsize-pp{font-size: 10px;}
+.fontsize-p{font-size: 12px;}
+.fontsize-13{font-size: 13px;}
+.trListagem:hover{background-color: rgb(238, 238, 238);}
+.p-top10{padding-top: 10px !important;}
+.top0{top:0 !important;}
+.mleft5{margin-left: 5px;}
+.border-left{border-left: solid 2px #DDDDDD;}
+.borda-fina{border: solid 2px #DDDDDD;}
+.borda-top{border-top:  solid 2px #DDDDDD;}
+.borda-almost-all{border-left: solid 2px #DDDDDD; border-right: solid 2px #DDDDDD; border-top:  solid 2px #DDDDDD;}
+.borda-all{border: solid 1px #1681b7;}
+.borda-cinza-top{border-top:  solid 2px #737373;}
+.border-cinza-left{border-left: solid 2px #737373;}
+.tdp5>tbody>tr>td, .tdp5>tbody>tr>th, .tdp5>tfoot>tr>td, .tdp5>tfoot>tr>th, .tdp5>thead>tr>td, .tdp5>thead>tr>th {padding:5px;}
+
+.col-tab{
+    height: 200px;
+    padding: 0px 20px;
+    background-color: white;
+}
+
+.tab-titulo{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    background-color: gray;
+    color: white;
+    font-weight: bold;
+}
+
+.tab-chave{
+    text-align: left;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    padding: 4px;
+}
+
+.tab-valor{
+    text-align: right;
+    border-bottom: 1px solid black;
+    padding: 4px;
+}
+
+.tab-total-chave{
+    text-align: right;
+    border-right: 1px solid black;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-right: 4px;
+}
+.tab-total-valor{
+    text-align: right;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-right: 4px;
+    padding-left: 0px;
+}
+
+.msgErroBexs{
+    border:1px solid #e04847;
+    border-radius: 3px;
+    background-color : #f2dede
+}
+
+.msgSucessoBexs{
+    border:1px solid #90EE90;
+    border-radius: 3px;
+    background-color : #90EE90
+}

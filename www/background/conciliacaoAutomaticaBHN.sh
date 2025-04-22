@@ -1,0 +1,1 @@
+cd /www/background/; php -q "conciliacaoAutomaticaBHN.php" --log=conciliacaoAutomaticaBHN

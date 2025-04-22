@@ -1,0 +1,109 @@
+.box-principal-class {height: 200px; vertical-align: middle; text-align: center;}
+.box-principal-login-class {height: 10px; vertical-align: middle; text-align: center;}
+
+.box-ativacao-page { margin: 0 auto; display: block; overflow: hidden; width: 575px; height: 450px; margin-top:5px; border: 0px solid #ccc; font-family: arial, sans-serif; padding-bottom: 10px;}
+.box-ativacao { float: left; display: block; overflow: hidden; width: 380px; height: auto; }
+.box-ativacao-logo-eppcash { float: left; display: block; margin: 23px 0px 0px 15px; border: 0px solid blue; clear: both;}
+
+.box-ativacao-pin { float: left; display: block; overflow: hidden; width: 388px; height: 200px; border: 1px solid #ccc; border-right: none; margin: 25px 0px 0px 6px; background: #f8f6f5;
+					-moz-border-radius: 15px; 
+					-webkit-border-radius: 15px; 
+					-khtml-border-radius: 15px; 
+					border-radius: 15px; 
+					-moz-border-top-right-radius : 0px; 
+					-moz-border-bottom-right-radius : 0px; 
+					-webkit-border-top-right-radius : 0px; 
+					-webkit-border-bottom-right-radius : 0px; 
+					-khtml-border-top-right-radius : 0px; 
+					-khtml-border-bottom-right-radius : 0px; 
+					border-top-right-radius : 0px; 
+					border-bottom-right-radius : 0px; 
+}
+
+.box-sessao-usuario { float: left; display: block; overflow: hidden; width: 170px; height: 173px; border-right: 2px dotted #ccc; margin: 15px 5px 10px 8px; }
+.box-sessao-usuario label { float: left; diplay: block; font: 16px bolder arial, sans-serif; font-weight: bold; color: #206A49; margin: 10px 0px 10px 5px; }
+.box-sessao-usuario img { float: left; display: block; margin-top: 60px; *margin-top: 40px; margin-left: 10px; }
+.box-sessao-usuario-msg { margin: 0 auto; display: block; overflow: hidden; width: 180px; height: auto;font: 11px bold arial, sans-serif; color: #494946; text-align: left; }
+.box-sessao-usuario-msg a { color:#3C6791; }
+
+.box-sessao-usuario-login { float: left; display: none; }
+.box-sessao-usuario-login-email { float: left; display: block; color:#3C6791; font: 11px bold arial, sans-serif; margin-bottom:5px;}
+#senhaLogin { float: left; display:block; width: 115px; }
+#btnLogin { float: left; display:block; padding:2px; overflow: hidden; background: #E0E0E0; border: 1px solid #bcbaba; margin-left:3px;}
+ 
+.box-sessao-usuario-login-sucesso { float: left; position: relative; background: #FFFFFF; display: none; width: 160px; border:0px solid #ccc;clear: both; margin-top: 120px; margin-left: 10px; font: 11px bold arial, sans-serif; color: #494946;}
+ 
+.box-adicionar-pin { float: left; display: block; overflow: hidden; width: 175px; height: 175px; margin: 15px 0px 10px 5px; }
+.box-adicionar-pin label { float: left; diplay: block; overflow: hidden; font: 16px bolder arial, sans-serif; font-weight: bold; color: #206A49; margin: 10px 0px 10px 5px; }
+.box-adicionar-pin span { float: left; diplay: block; overflow: hidden; font: 11px bolder arial, sans-serif; font-weight: bold; color: #206A49; margin: 60px 23px 0px 23px; text-align: justify;}
+.box-adicionar-pin-form { margin: 0 auto; display: block; overflow: hidden; width: 170px; height: 71px; font: 11px bold arial, sans-serif; color: #494946; text-align: left;}
+#btnAdicionar { float: left; display:block; margin-left: 4px; margin-top: 14px; *margin-top: 0px;}
+#pin_number { float: left; display:block; width: 165px; }
+
+.box-adicionar-pin-form-captcha-height {width: 135px; height: 60px; float:center;  margin: 0px 0px 0px 25px;}
+.box-adicionar-pin-form-captcha { float: left; display: block; overflow: hidden; width: 135px; height: auto; }
+.box-adicionar-pin-form-captcha label {  float: left; diplay: block; overflow: hidden; width: 115px; font: 11px normal arial, sans-serif; margin: 4px 0px 4px 2px; color: #494946; }
+.box-adicionar-pin-form-captcha input { float: left; display:block; margin-left: 2px; }
+.box-adicionar-pin-form-captcha img { float: right; display:block;  margin-right: 5px;}
+
+.box-ativacao-pin-right { float: left; display: block; overflow: hidden; width: 10px; height: 200px; margin: 103px 5px 0px 0px; border:1px solid #ccc; background: #f8f6f5; -moz-border-radius: 15px; -webkit-border-radius: 15px; -khtml-border-radius: 15px;	border-radius: 15px; -moz-border-top-left-radius : 0px; -moz-border-bottom-left-radius : 0px; -webkit-border-top-left-radius : 0px; -webkit-border-bottom-left-radius : 0px; -khtml-border-top-left-radius : 0px; -khtml-border-bottom-left-radius : 0px; border-top-left-radius : 0px; border-bottom-left-radius : 0px; }
+
+.box-resumo-pedido { float: left; display: block; position: relative; overflow: hidden; width: 175px; height: 350px; border: 1px solid #EEEEEE; background-color: #ECECEA; margin: 60px 0px 0px 0px; -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px; -webkit-box-shadow: #aaa9a9 2px 2px 2px; -moz-box-shadow: #aaa9a9 2px 2px 2px; box-shadow: #aaa9a9 2px 2px 2px; behavior: url(css/PIE.htc); }
+
+.box-resumo-pedido-pagar { margin: 0 auto; display: block; overflow: hidden; width: 170px; height: 96px; margin: 20px 0px 0px 0px; }
+.box-btn-pagar-height { height: 15px; }
+.btn-pagar { float: right; display: block; }
+
+.box-resumo-pins-utilizado { height: 20px; background: #f8f6f5; color: #206A49; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left;  padding: 4px; padding-bottom: 0px; display: none; overflow: hidden;}
+.box-resumo-pins-utilizado-valor { float: right; }
+
+.box-resumo-pedido-msg-confirma-pagamento { margin: 0 auto; display: none; overflow: hidden; width: 170px; height: auto; margin-top: 65px;}
+.box-resumo-pedido-msg-confirma-pagamento label { margin: 0 auto; display: block; overflow: hidden; text-align: center; color: #494946; font: 12px bold arial, sans-serif; font-weight: bold; margin-bottom: 25px;}
+.bg_color_odd { background: #f8f6f5; }
+.bg_color_even { background: #ECECEA; }
+
+.box-resumo-pedido-titulo { color: #2E659B; font: 10px normal arial, sans-serif; margin-top: 15px; text-align: center;}
+.box-resumo-pedido-titulo label { color: #2E659B; font: 12px bold arial, sans-serif; font-weight: bold; }
+.box-resumo-pedido-seu-saldo { display: block; height: 20px; background: #f8f6f5; color: #206A49; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left; margin: 10px 0px 0px 0px; padding: 4px; padding-bottom: 0px;}
+.box-resumo-pedido-seu-saldo-valor { float: right; }
+
+.box-resumo-pedido-seu-total-label { height: 20px; color: #2E659B; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left;  padding: 4px; padding-bottom: 0px;}
+.box-resumo-pedido-seu-total-valor { float: right; }
+
+.box-resumo-pedido-saldo-final { height: 20px; background: #f8f6f5; color: #206A49; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left;  padding: 4px; padding-bottom: 0px;}
+.box-resumo-pedido-saldo-final-neg { height: 20px; background: #f8f6f5; color: #B73938; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left;  padding: 4px; padding-bottom: 0px;}
+.box-resumo-pedido-saldo-final-valor { float: right; }
+
+.box-resumo-item-pin { color: #494946; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left;  padding: 4px; }
+.box-resumo-item-pin-valor { float: right; }
+.box-resumo-item-pin a { margin-left: 2px; top:0px; color: #494946; text-decoration: none; font-weight: normal; }
+
+.box-resumo-item-pin-label { padding-left:5px;}
+.box-resumo-item-pin-excluir { width: 4px; text-align: left;}
+
+/* Descomentar quando liberar o Bonus do PIN
+.box-resumo-item-pin-bonus { color: #206A49; font: 11px bold arial, sans-serif; font-weight: bold; text-align: left;  padding: 2px; padding-left:5px;}
+.box-resumo-item-pin-bonus img { margin-left: 3px; }
+.box-resumo-item-pin-bonus-valor { float: right; color: #206A49;}
+*/
+.box-ativacao-mensagem-rodape { float: left; display: block; overflow: hidden; width:300px; text-align: left; font: 11px bold arial, sans-serif; color: #494946; margin: 0px 0px 0px 10px; clear: both;}
+
+.box-msg-utilizacao { float: left; display: block; margin: 23px 10px 10px 15px; border: 0px solid blue; clear: both; color: #FF0000; font: 11px bold arial, sans-serif; font-weight: bold; text-align: justify;}
+
+#boxPopUpRegradeUso {
+			z-index: 2;
+			height: 300px;
+			width: 580px;
+			color: #000000;
+			font-size: 14px;
+			background-color: #FFFFFF;
+			border: 1px solid #444;
+			padding: 5px;
+			position: fixed;
+			top: 20%;
+			left: 26%;
+			text-align: left;
+			display: none;
+			overflow: auto;
+			}
+

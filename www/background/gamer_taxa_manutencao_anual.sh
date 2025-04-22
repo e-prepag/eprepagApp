@@ -1,0 +1,1 @@
+cd /www/background/; php -q "gamer_taxa_manutencao_anual.php" >>../log/gamer_taxa_manutencao_anual.log

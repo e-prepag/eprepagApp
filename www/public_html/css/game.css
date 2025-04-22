@@ -1,0 +1,315 @@
+/* 
+    Created on : Feb 16, 2016, 12:06:45 PM
+    Author     : e-prepag
+*/
+.titulo-verificacao{
+	font-size: 20px;
+	color: black;
+	text-align: center;
+}
+.subtitulo-verificacao{
+	font-size: 14px;
+	color: black;
+	text-align: center;
+}
+.container-form-verificacao{
+	width: min-content;
+	margin: 10px auto;
+}
+.container-input-verificacao{
+	margin: 10px 0;
+}
+
+.nav-busca{min-height: 35px !important;}
+
+.nav-busca>.active>a, .nav-busca>.active>a:focus, nav-busca>.active>a:hover{
+    color: #009b4a !important;
+    background-color: #fff !important;
+}
+
+.nav-busca>li>a {
+    background-color: #009b4a !important;
+    color: #fff !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
+.nav-busca>li>a:focus,
+.nav-busca>li>a:hover {
+    color: #009b4a !important;
+    background-color: #fff !important;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 100px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    padding: 5px 30px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: #3e8e41;
+}
+
+.dropdown-menu-left{
+    background-color: #268fbd !important;
+    border: solid 2px #14719c
+}
+.dropdown-menu-left > a{color:#fff; border: solid 1px #14719c; width: 100%;}
+.dropdown-menu-left > a:hover, .dropdown-menu-left > a:focus, .dropdown-menu-left > a:active{
+    color: #fff;
+    background-color: rgba(255, 255, 255, .2);
+}
+
+.text-left-not-xs, .text-left-not-sm, .text-left-not-md, .text-left-not-lg {
+    text-align: left;
+}
+.text-center-not-xs, .text-center-not-sm, .text-center-not-md, .text-center-not-lg {
+    text-align: center;
+}
+.text-right-not-xs, .text-right-not-sm, .text-right-not-md, .text-right-not-lg {
+    text-align: right;
+}
+.text-justify-not-xs, .text-justify-not-sm, .text-justify-not-md, .text-justify-not-lg {
+    text-align: justify;
+}
+
+/* CSS PARA LAYOUT GENEBRA */
+
+.label-title{
+	padding-left: 20px;
+	padding-top:15px;
+}
+
+#label_renovacao{
+	padding: 0;
+	font-weight: normal;
+	margin: 0;
+}
+#renovacao{
+	padding: 0;
+	margin: 0 0 15px 0;
+	display: block;
+}
+.container_apolice_anterior{
+	border: 1px solid #ccc;
+	padding: 10px 10px 15px 10px;
+	display: none; 
+    justify-content: center;
+}
+.container_apolice{
+	border: 1px solid #ccc;
+	padding: 10px 10px 15px 10px;
+	display: flex;
+	margin: 10px 0;
+    justify-content: center;
+}
+.container_title_apolice{
+	display: flex;
+	max-width: 140px;
+	min-width: 140px;
+	background-color: #268fbd;
+    align-items: center;
+	border-right: 1px solid #ccc;
+}
+.title_apolice{
+	text-align: center;
+	margin: 0 auto;
+	color: white;
+	font-size: 16px;
+}
+.col_apolice_anterior,.col_apolice{
+	width: 45%;
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.container-inputs{
+	margin: 10px 0;
+	width: 90%;
+}
+.label_anterior,.label_apolice{
+	display: block;
+	font-weight: normal;
+	color: #000;
+}
+.label_apolice_radio{
+	font-weight: normal;
+	color: #000;
+}
+.inputs_anterior,.inputs_apolice{
+	width: 100%;
+    border-radius: 0;
+    padding: 7px;
+    outline: 0;
+    border: 1px solid #ccc;
+}
+.required-input{
+    color: red;
+    font-weight: 700;
+}
+input[type="date"]{
+	padding: 0px 10px;
+}
+
+
+@media (max-width: 767px) {
+    .text-left-not-xs, .text-center-not-xs, .text-right-not-xs, .text-justify-not-xs {
+        text-align: inherit;
+    }
+    .text-left-xs {
+        text-align: left;
+    }
+    .text-center-xs {
+        text-align: center;
+    }
+    .text-right-xs {
+        text-align: right;
+    }
+    .text-justify-xs {
+        text-align: justify;
+    }
+    .container_apolice{
+        display: block;
+    }
+    .col_apolice_anterior, .col_apolice {
+        width: 100%;
+    }
+    .container_title_apolice{
+        max-width: 100%;
+        padding: 20px 0;
+    }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+    .text-left-not-sm, .text-center-not-sm, .text-right-not-sm, .text-justify-not-sm {
+        text-align: inherit;
+    }
+    .text-left-sm {
+        text-align: left;
+    }
+    .text-center-sm {
+        text-align: center;
+    }
+    .text-right-sm {
+        text-align: right;
+    }
+    .text-justify-sm {
+        text-align: justify;
+    }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+    .text-left-not-md, .text-center-not-md, .text-right-not-md, .text-justify-not-md {
+        text-align: inherit;
+    }
+    .text-left-md {
+        text-align: left;
+    }
+    .text-center-md {
+        text-align: center;
+    }
+    .text-right-md {
+        text-align: right;
+    }
+    .text-justify-md {
+        text-align: justify;
+    }
+}
+@media (min-width: 1200px) {
+    .text-left-not-lg, .text-center-not-lg, .text-right-not-lg, .text-justify-not-lg {
+        text-align: inherit;
+    }
+    .text-left-lg {
+        text-align: left;
+    }
+    .text-center-lg {
+        text-align: center;
+    }
+    .text-right-lg {
+        text-align: right;
+    }
+    .text-justify-lg {
+        text-align: justify;
+    }
+}
+
+.botao-menu{ padding-bottom: 16px !important;
+    padding-top: 4px !important;}
+
+.w100{
+    width: 100%;
+}
+.w70p{
+    width: 70px !important;
+}
+
+.h205{height: 205px;}
+
+.ico-lateral-right{position: absolute;right: 0%; top: calc(50% - 30px);}
+.ico-lateral-left{position: absolute;left: 0%; top:calc(50% - 30px);}
+
+.bg-menu-principal:hover{background-color: rgba(255, 255, 255, .2) !important; color: #fff !important;}
+
+.navbar-toggle:focus{background-color: #fff !important;}
+.navbar-toggle:focus span{background-color:#268fbd !important;}
+
+.zindex100{z-index:100;}
+
+.top15-negativo{
+    margin-top: -15px;
+}
+
+.h310{height: 310px;}
+
+.linha-prod{
+    position: relative;
+}
+
+.width100{
+    width:100%;
+}
+.width80{
+    width:80%;
+}
+.box-shadow-leve{
+    box-shadow: 2px 2px 2px black;
+}
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+}

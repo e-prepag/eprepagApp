@@ -1,0 +1,1 @@
+cd /www/background/; php -q "processa_Liberacao_Cielo.php" >>../log/processa_Liberacao_Cielo.log

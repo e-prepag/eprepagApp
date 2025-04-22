@@ -1,0 +1,1 @@
+cd /www/background/; php -q "reversalAutomaticaBHNeGift.php" --log=reversalAutomaticaBHNeGift

@@ -1,0 +1,1 @@
+cd /www/background/; php -q "cadastrabalancosLH.php" >>../log/cadastrabalancosLH.log

@@ -1,0 +1,90 @@
+.title-product{
+	text-align: center;
+	color: black;
+	font-size: 16px;
+}
+.hidden{
+	opacity: 0;
+}
+.show{
+	opacity: 1;
+}
+.container-title{
+    display: flex;
+    justify-content: center;
+	margin-bottom: 10px;
+}
+.containerMerchant{
+    width: 100%;
+}
+.container-title-icone{
+	position: relative;
+}
+.icone-question{
+    margin-top: 15px;
+    margin-left: 3px;
+    cursor: pointer;
+}
+.form-container{
+	display: flex;
+	justify-content: center;
+	margin-bottom: 10px;
+	width: 100%;
+	flex-wrap: wrap;
+}
+.form-container .container-input{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.form-container .button{
+    justify-content: end;
+    padding-bottom: 6px;
+}
+.form-container .container-input label{
+    color: #000;
+    font-weight: normal;
+}
+.form-container .container-input span{
+    font-size: 16px;
+}
+.calculo-merchant{
+	position: absolute;
+	width: 320px;
+	transition: all .7s ease-in;
+	background-color: rgba(0, 0, 0, .7);
+	padding: 10px;
+	border-radius: 5px;
+	border: solid 1px rgb(0, 0, 0);
+	left: 30px;
+	top: 8px;
+	color: #fff;
+	z-index: 3;
+}
+.form-input{
+	margin: 5px 10px;
+	border-radius: 0;
+	border: 1px solid #dddddd;
+	outline: 0;
+    padding: 8px;
+}
+
+.container-sales-product{
+	width:100%;
+	border: 1px solid #ccc;
+	margin: 10px 0;
+	padding: 0 10px 10px 10px;
+}
+.button-send{
+	padding: 10px 15px;
+}
+#code_payment, #btn_concilia {
+    width: 100%;
+    display: block;
+}
+#code_payment {
+	margin: 5px auto 0 auto;
+}
+#btn_concilia{
+	margin: 0 auto 10px auto;
+}

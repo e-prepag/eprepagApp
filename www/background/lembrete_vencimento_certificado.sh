@@ -1,0 +1,1 @@
+cd /www/background/; php -q "lembrete_vencimento_certificado.php" --log=lembrete_vencimento_certificado

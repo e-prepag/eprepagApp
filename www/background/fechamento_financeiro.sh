@@ -1,0 +1,1 @@
+cd /www/background/; php -q "financial_processing.php" >>../log/financial_processing.log

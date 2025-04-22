@@ -1,0 +1,1 @@
+cd /www/background/; php -q "verifica_problemas_consulta_cpf.php" --log=verifica_problemas_consulta_cpf

@@ -1,0 +1,1 @@
+cd /www/background/; php -q "ajuste_IP_ID_Integracao.php" --log=ajuste_IP_ID_Integracao

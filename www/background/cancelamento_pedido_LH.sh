@@ -1,0 +1,1 @@
+cd /www/background/; php -q "cancelamento_pedido_LH.php" --log=cancelamento_pedido_LH

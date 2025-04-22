@@ -1,0 +1,1 @@
+cd /www/background/; php -q "gocash_process_monitor.php" --log=gocash_process_monitor

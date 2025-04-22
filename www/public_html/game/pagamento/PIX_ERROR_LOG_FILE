@@ -1,0 +1,271 @@
+=================================================================================================
+DATA -> 25/11/2021 - 15:54:00
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_AUTH  is reachable
+Resultado: 
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/
+    [content_type] => application/json
+    [http_code] => 401
+    [header_size] => 358
+    [request_size] => 281
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.229897
+    [namelookup_time] => 0.012379
+    [connect_time] => 0.015042
+    [pretransfer_time] => 0.043077
+    [size_upload] => 114
+    [size_download] => 0
+    [speed_download] => 0
+    [speed_upload] => 495
+    [download_content_length] => -1
+    [upload_content_length] => 114
+    [starttransfer_time] => 0.229888
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 51270
+)
+
+=================================================================================================
+DATA -> 25/11/2021 - 15:54:01
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_SERVICE1000000003729754905  is reachable
+Dados da Consulta: 
+Resultado: {"error":"invalid_request","error_description":"Malformed auth header"}
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/PIX/qrcode
+    [content_type] => application/json
+    [http_code] => 401
+    [header_size] => 399
+    [request_size] => 163
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.16403
+    [namelookup_time] => 0.029739
+    [connect_time] => 0.032405
+    [pretransfer_time] => 0.057394
+    [size_upload] => 0
+    [size_download] => 71
+    [speed_download] => 432
+    [speed_upload] => 0
+    [download_content_length] => -1
+    [upload_content_length] => -1
+    [starttransfer_time] => 0.156125
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 51276
+)
+
+=================================================================================================
+DATA -> 25/11/2021 - 15:55:30
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_AUTH  is reachable
+Resultado: 
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/
+    [content_type] => application/json
+    [http_code] => 401
+    [header_size] => 358
+    [request_size] => 281
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.150471
+    [namelookup_time] => 0.012357
+    [connect_time] => 0.015485
+    [pretransfer_time] => 0.04062
+    [size_upload] => 114
+    [size_download] => 0
+    [speed_download] => 0
+    [speed_upload] => 757
+    [download_content_length] => -1
+    [upload_content_length] => 114
+    [starttransfer_time] => 0.150462
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 51812
+)
+
+=================================================================================================
+DATA -> 25/11/2021 - 15:59:09
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_SERVICE1000000001868231440  is reachable
+Dados da Consulta: 
+Resultado: {"codigo":401,"mensagem":"Falha ao executar servi\u00e7o. Erro de seguran\u00e7a (622)."}
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/PIX/qrcode
+    [content_type] => application/json
+    [http_code] => 400
+    [header_size] => 334
+    [request_size] => 203
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.120181
+    [namelookup_time] => 0.012295
+    [connect_time] => 0.015561
+    [pretransfer_time] => 0.037795
+    [size_upload] => 0
+    [size_download] => 89
+    [speed_download] => 740
+    [speed_upload] => 0
+    [download_content_length] => -1
+    [upload_content_length] => -1
+    [starttransfer_time] => 0.115026
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 53308
+)
+
+=================================================================================================
+DATA -> 25/11/2021 - 16:00:25
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_SERVICE1000000004422916127  is reachable
+Dados da Consulta: 
+Resultado: {"codigo":401,"mensagem":"Falha ao executar servi\u00e7o. Erro de seguran\u00e7a (622)."}
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/PIX/qrcode
+    [content_type] => application/json
+    [http_code] => 400
+    [header_size] => 334
+    [request_size] => 203
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.155791
+    [namelookup_time] => 0.012309
+    [connect_time] => 0.014995
+    [pretransfer_time] => 0.042341
+    [size_upload] => 0
+    [size_download] => 89
+    [speed_download] => 571
+    [speed_upload] => 0
+    [download_content_length] => -1
+    [upload_content_length] => -1
+    [starttransfer_time] => 0.146856
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 53958
+)
+
+=================================================================================================
+DATA -> 25/11/2021 - 16:03:06
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_SERVICE1000000003846739241  is reachable
+Dados da Consulta: 
+Resultado: {"codigo":401,"mensagem":"Falha ao executar servi\u00e7o. Erro de seguran\u00e7a (622)."}
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/PIX/qrcode
+    [content_type] => application/json
+    [http_code] => 400
+    [header_size] => 334
+    [request_size] => 203
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.144567
+    [namelookup_time] => 0.012477
+    [connect_time] => 0.015484
+    [pretransfer_time] => 0.039569
+    [size_upload] => 0
+    [size_download] => 89
+    [speed_download] => 615
+    [speed_upload] => 0
+    [download_content_length] => -1
+    [upload_content_length] => -1
+    [starttransfer_time] => 0.134854
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 55252
+)
+
+=================================================================================================
+DATA -> 25/11/2021 - 16:03:08
+---------------------------------
+Metodo sendJSONAuthentication no curl_exec:PIX_SERVICE_URL_SERVICE1000000009775116858  is reachable
+Dados da Consulta: 
+Resultado: {"codigo":401,"mensagem":"Falha ao executar servi\u00e7o. Erro de seguran\u00e7a (622)."}
+INFO da CONSULTA: Array
+(
+    [url] => https://contause.digital/s5/oauth/PIX/qrcode
+    [content_type] => application/json
+    [http_code] => 400
+    [header_size] => 334
+    [request_size] => 203
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.150716
+    [namelookup_time] => 0.00417
+    [connect_time] => 0.019689
+    [pretransfer_time] => 0.044283
+    [size_upload] => 0
+    [size_download] => 89
+    [speed_download] => 590
+    [speed_upload] => 0
+    [download_content_length] => -1
+    [upload_content_length] => -1
+    [starttransfer_time] => 0.141265
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 177.53.142.187
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 443
+    [local_ip] => 187.45.202.5
+    [local_port] => 55274
+)
+

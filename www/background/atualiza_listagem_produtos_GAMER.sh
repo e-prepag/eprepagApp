@@ -1,0 +1,1 @@
+cd /www/background/; php -q "atualiza_listagem_produtos_GAMER.php" --log=atualiza_listagem_produtos_GAMER

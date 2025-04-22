@@ -1,0 +1,1 @@
+cd /www/background/; php -q "crop_log_files.php"  >> /www/log/crop_log_files.log 2>> /dev/null

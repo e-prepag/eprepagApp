@@ -1,0 +1,102 @@
+body { 
+    margin: 0 auto; 
+}
+
+a:link, a:visited, a:active {
+	text-decoration:none;
+	}
+a:hover {
+	text-decoration: underline; 
+	color:#96C5F5; 
+	}
+
+.faixa {
+    width: 100%;
+    height: 25px; 
+    padding:0px 0px 0px 0px; 
+    background-color: #0F64CF; 
+    position: absolute;
+    left: 0px; 
+    top: 0px;
+    border:none;
+    clear:both;
+    z-index: -99;
+}
+
+.links {  
+    width: 790px;
+    margin: 0 auto;
+    vertical-align:middle;
+    padding-top: 4;
+    color: #FFFFFF; 
+    text-decoration: none; 
+    font-size:14px; 
+    font-family: Verdana, Arial, Serif; 
+}
+
+.seja {  
+    width: 790px;
+    height: 25px; 
+    margin: 0 auto;
+    color: #0F64CF; 
+    font-size:14px; 
+    font-family: Verdana, Arial, Serif;
+    font-weight: bold;
+    vertical-align:middle; 
+    text-align:right; 
+}
+
+.dadosparceiro {  
+    width: 790px;
+    height: 75px; 
+    margin: 0 auto;
+    vertical-align:middle; 
+    padding-top: 20;
+}
+
+.textocentral {
+    color: #0F64CF; 
+    font-size:15px; 
+    font-family: Verdana, Arial, Serif;
+    text-align: center; 
+    vertical-align:middle;
+    padding-top: 5;
+    padding-top: 30;
+    padding-left: 70;
+    float: left;
+}
+
+.principal {
+    margin-right:auto; 
+    margin-left:auto; 
+    width:850px;
+    border-right:1px solid #CCCCCC;
+    border-left:1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.imglogo { 
+    float: right;
+    padding-top: 15;
+    padding-right: 10;
+}
+
+.goodgames {
+    float: left;
+    padding-top: 15;
+}
+
+.corlink {
+    color: #FFFFFF; 
+    text-decoration: none; 
+    font-size:14px; 
+    font-family: Verdana, Arial, Serif; 
+}
+
+.corlink2 {
+    text-decoration: none; 
+    color: #0F64CF; 
+    font-size:14px; 
+    font-family: Verdana, Arial, Serif;
+    font-weight: bold;
+}

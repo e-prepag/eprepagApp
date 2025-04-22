@@ -1,0 +1,14 @@
+
+.dataGridAlawar { font: 11px Arial, Helvetica, sans-serif; color: #333; background-color: #fff; width: auto; border: 1px solid #ccc; margin-top: 5px; clear:  both; overflow: hidden; }
+
+#filterDataGridAlawar { font: 11px Arial, Helvetica, sans-serif; margin: 0 auto; display: block; border: 1px solid #ccc; width: 100%; height: auto; overflow: hidden; background: #eeeeee; clear:both; }
+		
+.dataGridPaginationInfo { float: left; display: block; width: 350px; color: #5E6972; font: 11px Arial, Helvetica, sans-serif; margin: 10px 5px 5px 5px; }		
+.dataGridPaginationTotais { float: left; display: block; width: 100%; color: #5E6972; font: 11px Arial, Helvetica, sans-serif; margin: 10px 5px 0px 0px; }		
+.dataGridPaginationTotais label { float: left; display: block; overflow: hidden; clear: both; margin-top:3px;}
+
+#dataGridGames { border-collapse: collapse; width: 100%; overflow: hidden; margin: 0 auto; display: block; font: 11px Arial, Helvetica, sans-serif; }
+#dataGridGames td, #dataGridGames th { font: 11px "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; border: 1px solid #cccccc; text-align: center; padding:5px; *padding:3px; }
+#dataGridGames th { background: #91AEBC; color: #FFFFFF; font-weight: bold;}
+#dataGridGames th a { background: #91AEBC; color: #FFFFFF; font-weight: bold;} 	 	
+#dataGridGames tbody > tr:hover { background: #C9DCE5; }

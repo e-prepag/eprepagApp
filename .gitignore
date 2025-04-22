@@ -1,0 +1,17 @@
+.env
+**/backoffice_old 
+**/log
+**/cache
+*.csv
+*.CSV
+*.RET
+*.log
+*.LOG
+*.TXT
+*.txt
+*.REM
+*.rar
+*.XML
+*.xml
+*.zip
+

@@ -1,0 +1,195 @@
+* { margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { text-align: center; }
+
+img {border:none;}
+a { text-decoration:underline; color: #000000; } 
+a:hover { text-decoration:underline; color: #000000; }
+
+/* permite mostrar numeração e dots nas listas, reverte o "padding: 0" da primeira linha apenas para listas  */ 
+ol, ul, dl { padding: 0px 0px 0px 30px; }
+
+
+/* formularios */
+form { margin: 0px; padding: 0px; }
+/*input, select { border:solid 1px #CDDAE3; font: 11px arial; color: #000000; height:16px; }*/
+/*input { vertical-align: top; font: 9px arial; color: #000000; height:16px; }*/
+select { border:solid 1px #CDDAE3; font: 11px arial; color: #000000; height:16px; }
+input[type="radio"] { border:none 0px #000000; vertical-align:middle; margin-left:2px; margin-right:5px; }
+input[type="checkbox"] { border:none 0px #000000; vertical-align:middle; margin-left:0px; padding:0px; }
+cite { font: 10px arial; font-style:normal; }
+
+#main { margin: 0 auto; width: 779px; text-align: left; position: relative;
+		font: 11px arial; color: #000000;
+		background-position:bottom; background-repeat:no-repeat;
+		min-height: 100%; /* For Modern Browsers */
+		height: auto !important; /* For Modern Browsers */
+		height: 100%; /* For IE */
+}
+
+
+
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* TOPO                                                                                                             */
+/* ---------------------------------------------------------------------------------------------------------------- */
+#bannerTopo { margin: 9px 0px 0px 25px; display:block; }
+#topo { margin: 0px 24px 0px 24px; height: 95px; background-image:url(/imagens/topo_menu_bg.jpg); background-position:top; background-repeat:no-repeat; }
+#topo #logo { float: left; padding: 28px 0px 0px 15px; }
+#topo #menu { float: right; padding: 31px 15px 0px 0px; }
+#topo #menu ul { display: table; }
+#topo #menu ul li { display: inline; list-style:none; }
+
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* CONTEÚDO                                                                                                         */
+/* ---------------------------------------------------------------------------------------------------------------- */
+#conteudo_maps { padding: 1px 27px 1px 40px; }
+#conteudo_maps:after { clear: both; display: block; font: 1px/0px serif; content: "."; height: 0; visibility: hidden; }
+#conteudo { padding: 1px 27px 80px 40px; }
+#conteudo:after { clear: both; display: block; font: 1px/0px serif; content: "."; height: 0; visibility: hidden; }
+#principal { float: left; width: 410px; _padding-bottom:70px; /* For IE */ }
+
+#mens_erro { color: #CC3300; padding: 6px 0px 14px 0px; } 
+.fonte12 { font-size: 12px; }
+#bt_voltar { width:696px; text-align:center; padding: 30px 0px 30px 0px; }
+
+/* box com canto arredondado */
+.box { width:696px; background: #CDDAE3; }
+.boxtop { background: url(../imgs/ne.gif) no-repeat top right; }
+.boxtop div { height: 8px; background: url(../imgs/nw.gif) no-repeat top left; }
+.boxbottom { background: url(../imgs/se.gif) no-repeat bottom right; }
+.boxbottom div { height: 8px; background: url(../imgs/sw.gif) no-repeat bottom left; }
+.boxcontent { padding: 0px 14px 0px 14px; }
+
+/* login */
+#restrito { float: right; width: 289px; margin:45px 0px 0px 0px; }
+#identificacao { float: left; width: 289px; margin:60px 0px 0px 25px; }
+#login { width:277px; height:86px; margin:0px; padding:34px 0px 0px 19px; color:#FFFFFF; line-height:18px; background-image:url(../imgs/login_bg.gif); background-repeat:no-repeat; }
+#login a { color: #FFFFFF; }
+#login input { width:174px; height: 14px; border:none 0px; font: 11px arial; padding: 0px 2px 0px 2px; }
+
+#login2 { width:258px; height:86px; margin:0px; padding:34px 0px 0px 19px; color:#FFFFFF; line-height:18px; background-image:url(../imgs/cad1.gif); background-repeat:no-repeat; }
+#login2 form { margin:0px; padding:0px; }
+#login2 a { color: #FFFFFF; }
+#login2 input { width:174px; height: 14px; border:none 0px; font: 11px arial; padding: 0px 2px 0px 2px; }
+
+
+#cadastrese { margin: 0px; }
+#logado { width:277px; height:86px; margin:0px; padding:16px 0px 0px 19px; color:#FFFFFF; background-image:url(../imgs/logado_bg.gif); background-repeat:no-repeat; }
+#logado #bts { padding-top:8px; }
+
+#login_revendedor { width:277px; height:86px; margin:0px; padding:34px 0px 0px 19px; color:#FFFFFF; line-height:18px; background-image:url(../imgs/login_bg_revendedor.gif); background-repeat:no-repeat; }
+#login_revendedor a { color: #FFFFFF; }
+#login_revendedor input { width:174px; height: 14px; border:none 0px; font: 11px arial; padding: 0px 2px 0px 2px; }
+#cadastrese_revendedor { margin: 0px; }
+#logado_revendedor { width:277px; height:86px; margin:0px; padding:16px 0px 0px 19px; color:#FFFFFF; background-image:url(../imgs/logado_bg_revendedor.gif); background-repeat:no-repeat; }
+#logado_revendedor #bts { padding-top:8px; }
+
+/* jogos */
+#jogo_thumb { float:left; width: 128px; height: 136px; padding: 3px 0px 3px 0px; }
+#jogo_thumb2 { float:left; width: 140px; height: 136px; padding: 3px 0px 3px 0px; }
+#jogo_thumb_logo {width: 128px; height: 76px; padding: 3px 0px 3px 0px;}
+#jogo_thumb_nome {width: 120px; height: 20px; padding: 0px 0px 0px 0px; font-weight:bold; text-align:center }
+#jogo_thumb_preco {width: 120px; height: 40px; color:#2d638c; text-align:center }
+#jogo_thumb_preco p { font-weight:bold; font-size:14px; }
+#jogo_todos { clear:both; text-align:center; padding-top:20px; }
+
+#jogo_det_logo { float:left; padding:0px; border-right:solid 1px #CDDAE3; width:154px; }
+#jogo_det_descricao { float:right; width:244px; padding-left:10px }
+#jogo_det_descricao h3 { font-size:16px; color:#2D638C; padding-bottom:0px; }
+#jogo_det_descricao #fabricante { padding-bottom:6px; }
+#jogo_det_comprar { height: 32px; font-weight:bold; border-bottom:solid 1px #CDDAE3; padding: 9px 0px 8px 0px; }
+#jogo_det_comprar p { color:#2d638c; font-size:12px; }
+
+/* carrinho de compras */
+#carrinho_topo { width:696px; height:38px; background-image:url(../imgs/carrinho_bg.gif); background-repeat:no-repeat; }
+#carrinho_topo_descricao { float:left; width: 328px; padding: 11px 0px 0px 20px; }
+#carrinho_topo_quantidade { float:left; width: 92px; text-align:center; padding: 11px 0px 0px 0px; }
+#carrinho_topo_remover { float:left; width: 77px; text-align:center; padding: 6px 0px 0px 0px;}
+#carrinho_topo_preco { float:left; width: 93px; text-align:center; padding: 6px 0px 0px 0px; }
+#carrinho_topo_total { float:left; width: 86px; text-align:center; padding: 11px 0px 0px 0px; }
+
+#carrinho_item { clear:both; width:696px; height:73px; border-bottom:solid 1px #CDDAE3; padding-top: 5px; }
+#carrinho_item_logo { float:left; width: 128px; }
+#carrinho_item_descricao { float:left; width: 220px; padding: 22px 0px 0px 0px; }
+#carrinho_item_quantidade { float:left; width: 92px; text-align:center; padding: 22px 0px 0px 0px; }
+#carrinho_item_remover { float:left; width: 77px; text-align:center; padding: 22px 0px 0px 0px; }
+#carrinho_item_preco { float:left; width: 93px; text-align:center; padding: 22px 0px 0px 0px; }
+#carrinho_item_total { float:left; width: 76px; text-align:right; padding: 22px 10px 0px 0px; }
+
+#carrinho_total { clear:both; width:683px; height:20px; background-color: #CDDAE3; padding:3px 10px 0px 3px; text-align:right; font-weight:bold; }
+#carrinho_bts { width:696px; }
+#carrinho_formas_pagamento { width:490px; float:left; padding:30px 0px 80px 7px; }
+#carrinho_site_seguro { width:200px; float:left; padding:30px 0px 80px 0px; }
+
+/* pagamento */
+#pagamento_topo_descricao { float:left; width: 405px; padding: 11px 0px 0px 20px; }
+#pagamento_item { clear:both; width:696px; height:30px; border-bottom:solid 1px #CDDAE3; padding-top: 5px; }
+#pagamento_item_descricao { float:left; width: 415px; padding: 6px 0px 6px 20px; }
+#pagamento_item_quantidade { float:left; width: 82px; text-align:center; padding: 6px 0px 6px 0px; }
+#pagamento_item_preco { float:left; width: 87px; text-align:center; padding: 6px 0px 0px 6px; }
+#pagamento_item_total { float:left; width: 76px; text-align:right; padding: 6px 10px 6px 0px; }
+#pagamento_formas_pagamento { width:686px; padding:30px 0px 0px 7px; }
+#pagamento_formas_pagamento #div { margin:4px 0px 4px 23px; border-bottom:solid 1px #CDDAE3; }
+#pagamento_formas_pagamento p { padding:2px 0px 2px 23px; }
+#pagamento_formas_pagamento #bt { padding:20px 0px 0px 19px; }
+
+#div { margin:4px 0px 4px 23px; border-bottom:solid 1px #CDDAE3; }
+
+#banco { float:left; width: 46%; margin: 0px 4px 0px 0px; padding: 10px; text-align:center; background-color:#d7e5ef; }
+#link_pagamento { clear:both; padding-top: 20px; }
+#dados_pagamento { } 
+#dados_pagamento form label { display: block; float:left; width: 190px; margin: 2px 0px 6px 0px; text-align:right }
+#dados_pagamento form br { clear:both; }
+#dados_pagamento #botao { margin-left: 190px; }
+#dados_pagamento2 label { display: block; float:left; width: 190px; margin: 2px 0px 6px 0px; text-align:right }
+#dados_pagamento2 br { clear:both; }
+#dados_pagamento2 #botao { margin-left: 190px; }
+
+/* pedidos */
+#pedido_numero { font-size:14px }
+#pedidos_busca { width:686px; padding:30px 0px 0px 7px; }
+#pedidos_busca #div { margin:4px 0px 4px 23px; border-bottom:solid 1px #CDDAE3; }
+#pedidos_busca p { padding:2px 0px 2px 23px; }
+#pedidos_busca #bt { padding:20px 0px 0px 19px; }
+
+#pedidos_topo { width:696px; height:38px; font-weight:bold; color:#FFFFFF; background-image:url(../imgs/carrinho_bg.gif); background-repeat:no-repeat; }
+#pedidos_topo_data { float:left; width:110px; padding:11px 0px 0px 20px; }
+#pedidos_topo_numero { float:left; width: 110px; padding: 11px 0px 0px 0px; }
+#pedidos_topo_valor { float:left; width: 110px; padding: 11px 0px 0px 0px;}
+#pedidos_topo_pagamento { float:left; width: 200px; padding: 11px 0px 0px 0px; }
+#pedidos_topo_status { float:left; width: 146px; padding: 11px 0px 0px 0px; }
+
+#pedidos_item { clear:both; width:696px; border-bottom:solid 1px #CDDAE3; padding:8px 0px 8px 0px;}
+#pedidos_item_data { float:left; width: 110px; padding:0px 0px 0px 20px; }
+#pedidos_item_numero { float:left; width: 110px; padding:0px; }
+#pedidos_item_valor { float:left; width: 110px; padding:0px; }
+#pedidos_item_pagamento { float:left; width: 200px; padding:0px; }
+#pedidos_item_status { float:left; width: 146px; padding:0px; }
+
+/* pontos de venda */
+#pontos_busca { width:686px; padding:10px 0px 0px 0px; }
+#pontos_busca #div { margin:14px 0px 14px 23px; border-bottom:solid 1px #CDDAE3; }
+#pontos_busca #ajuste { padding:4px 0px 0px 23px; }
+#pontos_busca #bt { padding:30px 0px 0px 19px; }
+
+#pontos_topo { width:696px; height:38px; font-weight:bold; color:#FFFFFF; background-image:url(../imgs/carrinho_bg.gif); background-repeat:no-repeat; }
+#pontos_topo_estabelecimento { float:left; width:149px; padding:11px 5px 0px 20px; }
+#pontos_topo_endereco { float:left; width: 229px; padding: 11px 5px 0px 5px; }
+#pontos_topo_bairro { float:left; width: 129px; padding: 11px 5px 0px 5px;}
+#pontos_topo_cidadeuf { float:left; width: 129px; padding: 11px 5px 0px 5px; }
+
+#pontos_item { clear:both; width:696px; border-bottom:solid 1px #CDDAE3; padding:8px 0px 8px 0px;}
+#pontos_item_estabelecimento { float:left; width: 149px; padding:0px 5px 0px 20px; }
+#pontos_item_endereco { float:left; width: 229px; padding:0px 5px 0px 5px; }
+#pontos_item_bairro { float:left; width: 129px; padding:0px 5px 0px 5px; }
+#pontos_item_cidadeuf { float:left; width: 129px; padding:0px 5px 0px 5px; }
+
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* RODAPÉ                                                                                                           */
+/* ---------------------------------------------------------------------------------------------------------------- */
+#rodape { width:699px; margin: 0px 40px 15px 40px; clear:both; position: relative; font: 10px arial; color: #626262; height: 40px; bottom: 0 !important; bottom: -1px; /* For Certain IE widths */ }
+#rodape #copyright { padding: 0px; line-height: 40px; float: center; width: 400px; }
+#rodape #menusecundario { padding: 0px; line-height: 40px; float:right; }

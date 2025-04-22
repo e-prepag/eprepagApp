@@ -1,0 +1,1 @@
+cd /www/background/; php -q "pagamento_PIX.php" --log=pagamento_PIX

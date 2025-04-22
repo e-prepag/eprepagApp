@@ -1,0 +1,1 @@
+cd /www/background/; php -q "conciliacaoPDV.php" processaAgendamentos --log=conciliacaoPDV_34 --lista=3,4

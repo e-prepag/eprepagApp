@@ -1,0 +1,1 @@
+cd /www/background/; php -q "monitor_apache.php" --log=monitor_apache

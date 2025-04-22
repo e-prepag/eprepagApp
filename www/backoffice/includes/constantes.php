@@ -1,0 +1,12 @@
+<?php
+/**
+ * Codigo para tarifas que entrará em "Taxa Extrato" (rfcb_taxa_extrato)
+ * no Relatório de conciliação bancaria
+ */
+define('TAR', 15);
+/**
+ * Codigo para o valor do extrato que entrará em
+ * "Valor Extrato venda Internet" (rfcb_valor_extrato) no
+ * Relatório de conciliação bancaria
+ */
+define('MOV', 25);

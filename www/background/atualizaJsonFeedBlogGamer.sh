@@ -1,0 +1,1 @@
+cd /www/background/; php -q "atualizaJsonFeedBlog.php" gamer --log=atualizaJsonFeedBlogGamer

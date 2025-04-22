@@ -1,0 +1,48 @@
+{
+    "files": [
+        {
+            "origem": "/var/www/log/monitoragendamentos12.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitoragendamentos12.txt"
+        },
+        {
+            "origem": "/var/www/log/monitoragendamentos34.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitoragendamentos34.txt"
+        },
+        {
+            "origem": "/var/www/log/monitoragendamentos56.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitoragendamentos56.txt"
+        },
+        {
+            "origem": "/var/www/log/monitoragendamentos78.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitoragendamentos78.txt"
+        },
+        {
+            "origem": "/var/www/log/monitoragendamentos90.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitoragendamentos90.txt"
+        },
+        {
+            "origem": "/var/www/log/monitorprocessapagtoonline5.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitorprocessapagtoonline5.txt"
+        },
+        {
+            "origem": "/var/www/log/monitorprocessapagtoonline9.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitorprocessapagtoonline9.txt"
+        },
+        {
+            "origem": "/var/www/log/monitorprocessapagtoonline10.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitorprocessapagtoonline10.txt"
+        },
+        {
+            "origem": "/var/www/log/monitorprocessapagtoonline13.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitorprocessapagtoonline13.txt"
+        },
+        {
+            "origem": "/var/www/log/monitorprocessapagtoonline.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitorprocessapagtoonline.txt"
+        },
+        {
+            "origem": "/var/www/log/monitor_concilia.txt",
+            "destino": "E-Prepag/backoffice/offweb/tarefas/log/monitor_concilia.txt"
+        }
+    ]
+}

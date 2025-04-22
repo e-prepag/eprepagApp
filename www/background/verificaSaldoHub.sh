@@ -1,0 +1,1 @@
+cd /www/background/; php -q "verificaSaldoHub.php" --log=verificaSaldoHub

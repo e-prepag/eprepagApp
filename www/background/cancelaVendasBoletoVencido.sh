@@ -1,0 +1,1 @@
+cd /www/background/; php -q "money.php" cancelaVendasBoletoVencido  >>../log/cancelaVendasBoletoVencido.log

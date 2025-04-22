@@ -1,0 +1,1 @@
+cd /www/background/; php -q "cleanUp.php" --minutes=30 --log=cleanUp

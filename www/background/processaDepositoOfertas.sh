@@ -1,0 +1,1 @@
+cd /www/background/; php -q "processaDepositoOfertas.php" >>../log/processaDepositoOfertas.log

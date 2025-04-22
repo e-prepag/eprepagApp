@@ -1,0 +1,1 @@
+cd /www/background/; php -q "totalizador_saldo_diario.php" --log=totalizador_saldo_diario

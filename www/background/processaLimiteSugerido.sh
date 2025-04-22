@@ -1,0 +1,1 @@
+cd /www/background/; php -q "corte.php" processaLimiteSugerido  >>../log/processaLimiteSugerido.log

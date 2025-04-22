@@ -1,0 +1,1 @@
+cd /www/background/; php -q "envia_email_vendas_sem_pagamentos.php" --log=envia_email_vendas_sem_pagamentos

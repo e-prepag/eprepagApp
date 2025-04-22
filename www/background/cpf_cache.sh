@@ -1,0 +1,1 @@
+cd /www/background/; php -q "cpf_cache.php" >>../log/cpf_cache.log

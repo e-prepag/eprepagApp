@@ -1,0 +1,1 @@
+cd /www/background/; php -q "pagamento_online_EPPCASH.php" --log=pagamento_online_EPPCASH

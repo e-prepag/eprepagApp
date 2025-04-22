@@ -1,0 +1,51 @@
+<html>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300&display=swap');
+
+        body {background-color: #eeeeee; font-family: 'Tajawal', sans-serif;}
+        .externa {
+            position: relative;
+            width:100%;
+            height:100%;
+        }
+        .interna {
+            left:50%;
+            top:50%;
+            margin-left:-250px; /* Metade do valor da Largura */
+            margin-top:-250px; /* Metade da valor da Altura */
+            position:absolute;
+        }
+
+        .canto {
+            background: url(epp_logo.png) no-repeat scroll left top;
+            position: fixed;
+            top: 15px;
+            height: 38px;
+            width: 156px;
+            z-index: 100;
+            left: 15px;
+        }
+
+        h2{text-align:center;}
+        h4{text-align:center; padding:0px; margin:-20px;}
+
+        .azul{color:#268fbd;}
+    </style>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Erro 500 - Erro de Servidor Interno</title>        
+    </head>
+    <body>
+        <div class="externa">  
+            <a href="https://www.e-prepag.com.br">
+                <div class="canto"></div>
+            </a>
+            <div class="interna">     
+                <img  src="/erros/imagens/500EP.png" alt="Erro 500" title="Erro 500" name="erro500">
+                <br>           
+                <h2 class="azul">Erro 500 - Erro Interno do Servidor.</h2>
+                <h4>Há um problema com o recurso que você está procurando, e ele não pode ser exibido.</h4>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,1 @@
+cd /www/background/; php -q "monitor_vg_concilia.php" --log=monitor_vg_concilia

@@ -1,0 +1,1 @@
+cd /www/background/; php -q "destravamentoAutomaticoGamersPINs.php" --log=destravamentoAutomaticoGamersPINs

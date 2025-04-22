@@ -1,0 +1,1 @@
+cd /www/background/; php -q "pagamento_online_ITAU.php" --log=pagamento_online_ITAU

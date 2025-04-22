@@ -1,0 +1,56 @@
+body
+{
+	scrollbar-face-color: #FFFFFF; 
+	scrollbar-shadow-color: #FFFFFF; 
+	scrollbar-highlight-color: #FFFFFF; 
+	scrollbar-3dlight-color: #FFFFFF; 
+	scrollbar-darkshadow-color: #FFFFFF; 
+	scrollbar-track-color: #FFFFFF; 
+	scrollbar-arrow-color: #00008C;
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 13px; 
+	color: #00008C; 
+        //margin-top:20px;
+}
+
+.menu
+{
+	color: #00008C;
+	text-decoration: none;
+}
+
+.campo_login_bko
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #999999;
+	vertical-align: middle;
+	width: auto;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+.botao_login_bko
+{ 
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 13px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+	width: 32;
+	height: 24;
+}
+
+.texto_login_bko
+{ 
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 13px; 
+	color: #00008C; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+}

@@ -1,0 +1,175 @@
+body {
+scrollbar-face-color: #FFFFFF; 
+scrollbar-shadow-color: #00008C; 
+scrollbar-highlight-color: #FFFFFF; 
+scrollbar-3dlight-color: #00008C; 
+scrollbar-darkshadow-color: #FFFFFF; 
+scrollbar-track-color: #FFFFFF; 
+scrollbar-arrow-color: #00008C;
+}
+
+.texto {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #666666;
+	text-decoration: none;
+}
+
+.texto_black {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: black;
+	text-decoration: none;
+}
+
+.texto_red {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FF0000;
+	text-decoration: none;
+}
+
+
+.texto_blue {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #0000FF;
+	text-decoration: none;
+}
+
+.texto_green {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #00FF00;
+	text-decoration: none;
+}
+
+.botao_search
+{ 
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 12px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+
+}
+
+.ta_formulario
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.ta_registra_deposito
+{
+	font-family: Courier New, Courier, mono;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.botao_estab_historico
+{ 
+	font-family: Arial, Helvetica, sans-serif; 
+	font-size: 12px; 
+	color: #FFFFFF; 
+	background-color: #A6A6A6; 
+	border: none; 
+	text-transform: none; 
+	font-weight: bold; 
+	width: 140px; 
+	height: 20px;
+}
+
+.menu { color: #00008C; text-decoration: none }
+
+.botao_dados {  
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 12px; 
+color: #00008C; 
+border: #00008C; 
+border-style: solid; 
+border-top-width: 1px; 
+border-right-width: 1px; 
+border-bottom-width: 1px; 
+border-left-width: 1px;
+font-weight: bold; 
+background-color: #E8EEE7;
+}
+
+.link_br {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.combo_normal {	
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form {	
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.formSmall {	
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	font-size: 10px;
+	border: 1px solid #00008C;
+}
+
+.form2 {	
+	color: #666666;
+    text-transform: uppercase;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.field_normal {	
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.form_courier { height: 22px; color: #666666; border: 1px solid #00008C; ; font-family: "Courier New", Courier, mono}
+
+.campos_ficha2 { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.field_credito { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.campos_ficha3 { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #999999; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+
+.dropdown {  background-color: #EFEFEF; font-family: Arial, Helvetica, sans-serif; font-weight: bolder; text-decoration: none; font-size: 12px; color: #000000; font-variant: normal}
+
+.combo {	
+    background-color: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+    text-transform: uppercase; 
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.link_azul {  text-decoration: none; color: #00008C}
+.link_azul:hover { color: #00008C; text-decoration: underline}
+
+.selSmall {
+	background-color: #FFFFFF;
+	font-family: Tahoma, sans-serif; 
+	border: #000000 1px solid;
+	font-size: 10px;
+//	color: #445566;
+}

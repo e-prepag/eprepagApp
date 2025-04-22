@@ -1,0 +1,1 @@
+cd /www/background/; php -q "monitor_conexoes_db.php" --log=monitor_conexoes_db

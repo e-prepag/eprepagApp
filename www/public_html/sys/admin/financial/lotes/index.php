@@ -1,0 +1,2 @@
+<?php
+die("Arquivo de indexação");

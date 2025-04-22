@@ -1,0 +1,1 @@
+cd /www/background/; php -q "excedentes_valor_compra_primeiro_dia.php" >>../log/excedentes_valor_compra_primeiro_dia.log

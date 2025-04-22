@@ -1,0 +1,286 @@
+/* VerifyedByVisa CSS Document */
+
+
+body {
+	background-color:#ffffff;
+	padding:0;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	color:#000000;
+	margin-left: auto;
+	margin-right: auto;
+	width: 40em;
+	margin-top:80px;	
+}
+* {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+span, form {
+	margin:0;
+	padding:0;
+}
+img {
+	border:none;
+}
+
+.clear {
+	clear:both;
+	width:0px;
+	height:0px;
+	overflow:hidden;
+}
+
+#vbv_base {
+	width:422px;
+	height:561px;
+}
+#vbv_topo {
+	height:31px;	
+}
+#vbv_tl {
+	background:url(../imgs/bkgc_lt.gif) no-repeat;
+	width:41px;
+	height:31px;
+	float:left;
+}
+#vbv_t {
+	background:url(../imgs/bkgc_t.gif) repeat-x;
+	width:340px;
+	height:31px;
+	float:left;
+}
+#vbv_tr {
+	background:url(../imgs/bkgc_rt.gif) no-repeat;
+	width:41px;
+	height:31px;
+	float:left;
+}
+#vbv_centro {
+	height:410px;
+	background:url(../imgs/bkgc_c.gif) repeat-y;
+	clear:both;
+}
+#vbv_fundo {
+	height:120px;
+	background:url(../imgs/bkgc_b.gif) no-repeat;
+	clear:both;
+}
+
+#vbv_logos {
+	width:340px;
+	height:41px;
+	margin-left:40px;
+}
+#vbv_logo_visa {
+	width:58px;
+	height:22px;
+	float:left;
+}
+#vbv_logo_ec {
+	float:right;
+}
+
+.vbv_delimitador {
+	height:1px;
+	background-image:url(../imgs/delimitador.gif);
+	background-repeat:no-repeat;
+	margin-left:12px;
+	width:395px;
+	overflow:hidden;
+	clear:both;
+}
+.spacer {
+	height:3px;
+	margin-left:12px;
+	width:395px;
+	overflow:hidden;
+	clear:both;
+}
+.vbv_resumo {
+	padding:0;
+	width:396px;
+	height:154px;
+	margin-left:12px;
+}
+.vbv_resumo a:link, .vbv_resumo a:visited {
+	color:#1a368d;
+	font-size:10px;
+	text-decoration:underline;
+	margin-top:10px;
+}
+.vbv_resumo a:hover {
+	color:#ff9900;
+}
+.vbv_resumo img {
+	margin-top:10px;
+	margin-left:26px;
+}
+.vbv_resumo h4 {
+	display:block;
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#000000;
+	margin-left:26px;
+	margin-top:10px;
+	line-height:2em;
+}
+.vbv_resumo h5 {
+	display:block;
+	padding:0;
+	margin:0;
+	font-size:12px;
+	font-weight:bold;
+	color:#00660a;
+	margin-left:26px;
+	margin-top:10px;
+	line-height:2em;
+}
+#vbv_compra {
+	margin-left:25px;
+}
+.vbv_operacao {
+	display:block;
+	background:url(../imgs/bullet.gif) 0 3px no-repeat;
+	padding-left:10px;
+	width:60px;
+	float:left;
+}
+.vbv_valor {
+	display:block;
+	width:105px;
+	float:left;
+}
+.vbv_ec_nome {
+	display:block;
+	width:290px;
+	float:left;
+}
+.vbv_mais_detalhes {
+	display:block;
+	width:115px;
+	float:right;
+}
+
+#vbv_passo {
+	clear:both;
+	width:335px;
+	line-height:2em;
+	height:40px;
+	margin:10px 0 10px 40px;
+}
+#vbv_passo span {
+	display:block;
+	margin-top:5px;
+}
+
+/* Passo: Dados do cartão */
+
+.vbv_fields {
+	width:396px;
+	height:55px;
+	background-color:#f0f0f0;
+	margin-left:13px;
+}
+.vbv_fields label {
+	display:block;
+	margin:0;
+	padding:5px 5px 5px 26px;
+}
+.vbv_fields div {
+	display:block;
+	padding:0 5px 5px 26px;
+}
+.vbv_selects {
+	width:396px;
+	height:55px;
+	background-color:#f0f0f0;
+	margin-left:13px;
+}
+.vbv_selects span {
+	display:block;
+	margin:0;
+	padding:5px 5px 5px 26px;
+}
+.vbv_selects label {
+	padding-left:26px;
+}
+.vbv_block {
+	width:32px;
+	height:16px;
+	border:#999 1px solid;
+	margin:0;
+	margin-right:5px;
+	padding-left:3px;
+}
+.vbv_cardnumer_block {
+	width:145px;
+	height:16px;
+	border:#999 1px solid;
+	margin:0;
+	margin-right:5px;
+	padding-left:3px;
+}
+.vbv_datas {
+	width:17px;
+	border:#999 1px solid;
+	padding-left:3px;
+}
+.vbv_mensagem {
+	width:346px;
+	height:220px;
+	padding-top:10px;
+	padding-bottom:5px;
+	padding-left:25px;
+	padding-right:25px;
+	background-color:#f0f0f0;
+	margin-left:13px;
+	font-size:14px;
+}
+.vbv_mensagem strong {
+	font-size:14px;
+	color:#1A368D;
+}
+
+/* Fundo */
+#vbv_codigo {
+	width:400px;
+	text-align:right;
+	line-height:2em;
+	font-family:OCR A Std, "Courier New", Courier, monospace;
+	font-size:8px;
+	color:#CCCCCC;
+	font-weight:normal;
+}
+#vbv_submit {
+	padding-top:40px;
+}
+
+/* Ajuda */
+.modal {
+	display:none; 
+	position:absolute; 
+	width:300px; 
+	background-color:#FFFFFF;	
+	top:240px; 
+	left:700px; 
+	padding:20px; 
+	border:#CCC 1px solid;
+}
+.vbv_ajuda {
+	cursor:pointer;
+}
+.vbv_erros {
+	display:none !important;
+	color:#900;
+}
+.vbv_erros_show {
+	display:inline !important;
+	color:#900;
+}
+#Enviar {
+	cursor:pointer;
+}

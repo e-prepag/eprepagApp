@@ -1,0 +1,1 @@
+cd /www/background/; php -q "notificacao_automatica_integracao.php" --log=notificacao_automatica_integracao
