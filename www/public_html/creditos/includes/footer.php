@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
     </div>
 	
 	<?php if($_SERVER["SCRIPT_FILENAME"] != "/www/public_html/cadastro-de-ponto-de-venda.php"){ ?>
@@ -16,7 +17,7 @@
 					<!-- Begin DigiCert/ClickID site seal HTML and JavaScript -->
 					<div id="DigiCertClickID_l47UPnR6" data-language="en_US">
 						<div id="DigiCertClickID_l47UPnR6Seal" class="div-divcert">
-							<img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,www.e-prepag.com" alt="DigiCert Seal" class="img-digicert">
+							<img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,<?= EPREPAG_URL_COM ?>" alt="DigiCert Seal" class="img-digicert">
 						</div>
 					</div>
 					<script type="text/javascript">
@@ -76,7 +77,7 @@
 							<p><a href="http://solucoes.e-prepag.com/" class="txt-cinza-claro2 decoration-none">Soluções em Pagamentos</a></p>
 							<p><a class="txt-cinza-claro2" href="http://blog.e-prepag.com/eprepag/">Quem somos</a></p>
 							<p><a href="http://blog.e-prepag.com/eprepag-cash-carteira-virtual/" class="txt-cinza-claro2 decoration-none">Cartão E-Prepag</a></p>
-							<p><a href="https://www.e-prepag.com.br/canal-de-denuncia.php/" class="txt-cinza-claro2 decoration-none">Canal de Denúncia</a></p>
+							<p><a href="<?= EPREPAG_URL_HTTPS ?>/canal-de-denuncia.php/" class="txt-cinza-claro2 decoration-none">Canal de Denúncia</a></p>
 						</div>
 						<div class="col-md-3 col-sm-6">
 							<p><a href="/game/termos-de-uso.php" class="txt-cinza-claro2 decoration-none" target="_blank">Termos de uso</a></p>
@@ -94,7 +95,7 @@
 							<!-- Begin DigiCert/ClickID site seal HTML and JavaScript -->
 								<div id="DigiCertClickID_l47UPnR6" data-language="en_US">
 									<div id="DigiCertClickID_l47UPnR6Seal" class="div-divcert">
-										<img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,www.e-prepag.com" alt="DigiCert Seal" class="img-digicert">
+										<img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,<?= EPREPAG_URL_COM ?>" alt="DigiCert Seal" class="img-digicert">
 									</div>
 								</div>
 								<script type="text/javascript">

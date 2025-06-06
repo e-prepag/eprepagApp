@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../../includes/constantes_url.php'; ?>
 <?php 
 set_time_limit( 300 );
 
@@ -10,7 +11,7 @@ $time_start = getmicrotime();
 
 $bdebug = false;
 
-if ($_SERVER['HTTP_REFERER'] != "https://www.e-prepag.com.br/sys/admin/vendas/agrupado/vendas_dia_maneira_antiga.php") {
+if ($_SERVER['HTTP_REFERER'] != "" . EPREPAG_URL_HTTPS . "/sys/admin/vendas/agrupado/vendas_dia_maneira_antiga.php") {
         $dd_exclui_epp_cash = 1;
 }
 

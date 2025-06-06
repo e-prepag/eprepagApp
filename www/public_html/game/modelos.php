@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php 
 require_once "../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
@@ -108,7 +109,7 @@ include DIR_WEB . "game/icludes/cabecalho.php";
 	<?php 
 //		if($prod == 53) {
 //	?_>
-//		<img border="0" src="http://www.e-prepag.com.br/prepag2/commerce/images/produtos/stardoll_compra_638x121.jpg"><br>&nbsp;
+//		<img border="0" src="EPREPAG_URL_HTTP/prepag2/commerce/images/produtos/stardoll_compra_638x121.jpg"><br>&nbsp;
 //	<_?php
 //		} else
 		if($produto->getNomeImagem() && $produto->getNomeImagem() != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $produto->getNomeImagem())) { 

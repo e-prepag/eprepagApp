@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';");
 

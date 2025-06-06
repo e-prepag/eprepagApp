@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php 		
 $sProtocol = (($_SERVER['HTTPS']=="on")?"HTTPS":"HTTP");
 $spref = "";
@@ -19,7 +20,7 @@ if(($GLOBALS['_SERVER']['HTTPS']=="on") && ($GLOBALS['_SERVER']['SERVER_PORT']==
 
 	?>
 	<div id="menu" <?php echo $styleMenu; ?>><nobr><table cellpadding='0' cellspacing='1' border='0' bordercolor='#cccccc' style='border-collapse:collapse;'><tr>
-		<td><a href='https://www.e-prepag.com' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">PORTAL E-PREPAG</a></td>
+		<td><a href='<?= EPREPAG_URL_HTTPS_COM ?>' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">PORTAL E-PREPAG</a></td>
 		<td><img src='/imagens/menu_div.gif' width='7' height='18' border='0'/></td>
 		<td><a href='/games-list-coins' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">COMPRE AQUI</a></td>
 		<td><img src='/imagens/menu_div.gif' width='7' height='18' border='0'/></td>

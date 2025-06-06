@@ -10,6 +10,7 @@ require_once "/www/includes/functions.php";
 $raiz_do_projeto = "/www/";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
+require_once "/www/includes/load_dotenv.php";
  
    // ob_start('callbackLog');
     
@@ -39,10 +40,10 @@ require_once $raiz_do_projeto . "includes/gamer/main.php";
     $nome_do_arquivo = $raiz_do_projeto."arquivos_gerados/riot/".$arq_csv;
     
     //Dados de conexão SFTP na RIOT
-    $host = getEnvVariable('SFTP_HOST'); 
-    $port = getEnvVariable('SFTP_PORT'); 
-    $username = getEnvVariable('CLIENT_ID');
-    $password = getEnvVariable('SFTP_PASSWORD');
+    $host = getenv('SFTP_HOST'); 
+    $port = getenv('SFTP_PORT'); 
+    $username = getenv('CLIENT_ID');
+    $password = getenv('SFTP_PASSWORD');
     $remoteDir = '/filesDir/';
     $localDir = '/data/';
 

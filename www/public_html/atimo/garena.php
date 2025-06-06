@@ -1,6 +1,7 @@
 <?php
 
 require_once "../../includes/functions.php";
+require_once "/www/includes/load_dotenv.php";
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,7 +10,7 @@ error_reporting(E_ALL);
 function disparo(){
 
     $dadosHash = "10006710000335";
-	$hash256 = bin2hex(hash_hmac("sha256", $dadosHash, getEnvVariable('GARENA_HASH_DEV'), true));
+	$hash256 = bin2hex(hash_hmac("sha256", $dadosHash, getenv('GARENA_HASH_DEV'), true));
 	
     $curl = curl_init();
 	curl_setopt_array($curl, [
@@ -36,7 +37,7 @@ function disparo(){
 	$test = 1;
 	
 	$dadosHash2 = "10006710000335".$role_id.$guid.$amount.$currecy.$ip;
-	$hash2562 = bin2hex(hash_hmac("sha256", $dadosHash2, getEnvVariable('GARENA_HASH_DEV'), true));
+	$hash2562 = bin2hex(hash_hmac("sha256", $dadosHash2, getenv('GARENA_HASH_DEV'), true));
 	
 	$curl1 = curl_init();
 	curl_setopt_array($curl1, [

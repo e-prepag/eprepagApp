@@ -1,6 +1,7 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
     
-    header("access-control-allow-origin: https://www.e-prepag.com.br");
+    header("access-control-allow-origin: " . EPREPAG_URL_HTTPS . "");
     require_once "/www/db/connect.php";
     require_once "/www/db/ConnectionPDO.php";
 
@@ -17,7 +18,7 @@
     $produto = $stmt->fetch(PDO::FETCH_ASSOC);
     if($produto != false){
 		$key = json_decode($produto["palavras_chaves"], true)["p1"];
-	    header("location: https://www.e-prepag.com.br/catalogo/".$key);
+	    header("location: " . EPREPAG_URL_HTTPS . "/catalogo/".$key);
 	}else{
 		
 		require_once '../../includes/constantes.php';
@@ -29,7 +30,7 @@
 		$str = serialize(["produto" => $prod]);
 		$objEncryption = new Encryption();
 		$key = $objEncryption->encrypt($str);
-		header("location: https://www.e-prepag.com.br/game/produto/detalhe.php?token=".$key);
+		header("location: " . EPREPAG_URL_HTTPS . "/game/produto/detalhe.php?token=".$key);
 	}
    
 ?>

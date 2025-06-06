@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
@@ -82,7 +83,7 @@ $pagina_titulo = "Comprovante";
             $token = date('YmdHis', strtotime("+20 day")) . "," . $venda_id . "," . $usuario_id;
             $objEncryption = new Encryption();
             $token = $objEncryption->encrypt($token);
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if (checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
             }

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 header("Location: /cadastro-de-ponto-de-venda.php");
 die;
@@ -280,7 +281,7 @@ require_once dirname(__FILE__) . '/layout/topo_login.php';
                                     </div>
                                     <div class="col-xs-4">
                                         <span class="form_obs" style="margin-left:  -30px !important;">
-                                            (Sem pontos barras ou espaços. Não tem CNPJ? <a href="https://www.e-prepag.com/solicita-o-de-cadastro-de-ponto-de-venda-por-cpf" target="_blank">Clique aqui</a>.)
+                                            (Sem pontos barras ou espaços. Não tem CNPJ? <a href="<?= EPREPAG_URL_HTTPS_COM ?>/solicita-o-de-cadastro-de-ponto-de-venda-por-cpf" target="_blank">Clique aqui</a>.)
                                         </span>
                                     </div>
 
@@ -442,7 +443,7 @@ require_once dirname(__FILE__) . '/layout/topo_login.php';
                                         Este processo de análise leva até 3 dias úteis. Se for aprovado você receberá um e-mail com as<br />
                                         instruções do serviço.<br />
                                         <br />
-                                        Caso tenha alguma dúvida por favor contacte nosso <a href="<?php echo $https;?>://www.e-prepag.com/support" target="_blank">suporte</a>.
+                                        Caso tenha alguma dúvida por favor contacte nosso <a href="<?php echo $https;?>://<?= EPREPAG_URL_COM ?>/support" target="_blank">suporte</a>.
                                     </span>
                                 </div>
                             </div>

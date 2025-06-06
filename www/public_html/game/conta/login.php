@@ -1,7 +1,8 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'",true);
 
-//header("location: https://www.e-prepag.com.br/");
+//header("location: EPREPAG_URL_HTTPS/");
 //exit;
 
 if(isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'],"/prepag2")){
@@ -29,6 +30,8 @@ if($controller->logado)
 else
     require_once RAIZ_DO_PROJETO . "public_html/game/includes/header-off.php";
 
+$msg = htmlspecialchars($msg, ENT_QUOTES);
+    
 if(isset($GLOBALS['_SESSION']['integracao_error_msg']) && $GLOBALS['_SESSION']['integracao_error_msg'] != ""){
     $msg = $GLOBALS['_SESSION']['integracao_error_msg'];
 }
@@ -91,7 +94,7 @@ if(isset($GLOBALS['_SESSION']['integracao_error_msg']) && $GLOBALS['_SESSION']['
 							<div class="g-recaptcha" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T"></div>
 						</div>
 						
-						<a class="decoration-none txt-cinza" href="https://www.e-prepag.com.br/game/conta/esqueci-minha-senha/index.php?redirected=true&origemUsuario=gamer"><em>Esqueci minha senha</em></a>
+						<a class="decoration-none txt-cinza" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/esqueci-minha-senha/index.php?redirected=true&origemUsuario=gamer"><em>Esqueci minha senha</em></a>
 		
                     </div>
                     <!-- Modal -->

@@ -10,8 +10,9 @@ require_once "/www/includes/gamer/constantes.php";
 require_once "/www/includes/main.php";
 require_once "/www/includes/inc_Pagamentos.php";
 require_once "/www/includes/functions.php";
+require_once "/www/includes/load_dotenv.php";
 
-define("ASAAS_SECRET_TOKEN", "yPuoo6j'V8#9]Fg+");
+define("ASAAS_SECRET_TOKEN", getenv('ASAAS_SECRET_TOKEN'));
 
 // Pegue o token enviado pelo Asaas no header
 
@@ -180,7 +181,7 @@ class RecebePix {
 		$token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjE4MzAxZjU3LWUyMTktNDBmYi1iY2YxLWNmY2QyOGEwN2E0ZTo6JGFhY2hfNWQ5YTU3Y2EtZjJhMC00ZjZhLTgyMDAtYTMzYTBhMjk1Yjc2';
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.asaas.com/v3/customers/$idUsuario",
+            CURLOPT_URL => getenv('ASAAS_API_URL') . "customers/$idUsuario",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

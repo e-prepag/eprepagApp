@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 session_start();
 
@@ -15,7 +16,7 @@ require_once "../../../includes/configIP.php";
 require_once "../../../includes/functions_captcha.php";
 
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 $randomcode = generateRandomCode();	
 $randomcode_translated = translateCode($randomcode);  

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "pdv/controller/CarrinhoController.class.php";
@@ -70,7 +71,7 @@ $urlDirect = ($ipSeguro === true) ? "/creditos/pagamento/": "/creditos/chave.php
                         {
 							// verificação de valor 
 							if($modelo['modelo']->getValor() < 0){
-								header("location: https://www.e-prepag.com.br/creditos/produtos.php");
+								header("location: " . EPREPAG_URL_HTTPS . "/creditos/produtos.php");
 								exit;
 							}
 							
@@ -163,7 +164,7 @@ $urlDirect = ($ipSeguro === true) ? "/creditos/pagamento/": "/creditos/chave.php
                                     $totalLiquido += $valorLiquido;
 									
 									if($prod["valor"] < 0){
-										header("location: https://www.e-prepag.com.br/creditos/produtos.php");
+										header("location: " . EPREPAG_URL_HTTPS . "/creditos/produtos.php");
 										exit;
 									}
 									
@@ -315,7 +316,7 @@ $urlDirect = ($ipSeguro === true) ? "/creditos/pagamento/": "/creditos/chave.php
                             $totalLiquido += $valorLiquido;
 							
 							if($modelo['modelo']->getValor() < 0){
-								header("location: https://www.e-prepag.com.br/creditos/produtos.php");
+								header("location: " . EPREPAG_URL_HTTPS . "/creditos/produtos.php");
 								exit;
 							}
 							
@@ -361,7 +362,7 @@ $urlDirect = ($ipSeguro === true) ? "/creditos/pagamento/": "/creditos/chave.php
                                     $totalLiquido += $valorLiquido;
 									
 									if($prod["valor"] < 0){
-										header("location: https://www.e-prepag.com.br/creditos/produtos.php");
+										header("location: " . EPREPAG_URL_HTTPS . "/creditos/produtos.php");
 										exit;
 									}
 									

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 //Alicota EPP Administradora
 $alicota_epp_adm = array(6.38);//6.38;
@@ -80,7 +81,7 @@ $pdf->SetY("-1");
 $titulo = "Remittance";
 //escreve no pdf largura,altura,conteudo,borda,quebra de linha,alinhamento
 $pdf->Cell(0, 5, $titulo, 0, 0, 'L');
-$pdf->Cell(0, 5, 'http://www.e-prepag.com.br', 0, 1, 'R', false, 'javascript:history.go(-1);');
+$pdf->Cell(0, 5, '' . EPREPAG_URL_HTTP . '', 0, 1, 'R', false, 'javascript:history.go(-1);');
 $pdf->Cell(0, 0, '', 1, 1, 'L');
 $pdf->Ln(12);
 
@@ -715,7 +716,7 @@ if (intval($_POST['grosswiredcard']) != 0 && intval($_POST['witholdingcard']) !=
         $titulo = "Remittance";
         //escreve no pdf largura,altura,conteudo,borda,quebra de linha,alinhamento
         $pdf->Cell(0, 5, $titulo, 0, 0, 'L');
-        $pdf->Cell(0, 5, 'http://www.e-prepag.com.br', 0, 1, 'R', false, 'javascript:history.go(-1);');
+        $pdf->Cell(0, 5, '' . EPREPAG_URL_HTTP . '', 0, 1, 'R', false, 'javascript:history.go(-1);');
         $pdf->Cell(0, 0, '', 1, 1, 'L');
         $pdf->Ln(12);
 

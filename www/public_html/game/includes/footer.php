@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
     <div class="container-fluid bg-cinza">
             <div class="container espacamento top50">
                 <div class="row">
@@ -55,7 +56,7 @@
                         <!-- Begin DigiCert/ClickID site seal HTML and JavaScript -->
                             <div id="DigiCertClickID_l47UPnR6" data-language="en_US">
                                 <div id="DigiCertClickID_l47UPnR6Seal" class="div-divcert">
-                                    <img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,www.e-prepag.com" alt="DigiCert Seal" class="img-digicert">
+                                    <img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,<?= EPREPAG_URL_COM ?>" alt="DigiCert Seal" class="img-digicert">
                                 </div>
                             </div>
                             <script type="text/javascript">
@@ -114,19 +115,19 @@
     });
 </script>
 <!-- Start of e-prepag Zendesk Widget script -->
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
+<!-- <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<!-- <script>
   (adsbygoogle = window.adsbygoogle || []).push({
     google_ad_client: "ca-pub-2905585494647123",
     enable_page_level_ads: true
   });
 </script>
 
-<script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(e){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("//assets.zendesk.com/embeddable_framework/main.js","e-prepag.zendesk.com");
+<script><![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(e){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("//assets.zendesk.com/embeddable_framework/main.js","e-prepag.zendesk.com");
 
 /*]]>*/</script>
 
-    <!-- End of e-prepag Zendesk Widget script -->
+End of e-prepag Zendesk Widget script -->
 	
 </body>
 </html>

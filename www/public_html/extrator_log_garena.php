@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php  
 die("Acesso Negado!");
 //error_reporting(E_ALL); 
@@ -405,7 +406,7 @@ $pdf->SetY("-1");
 $titulo="Registers LOG";
 //escreve no pdf largura,altura,conteudo,borda,quebra de linha,alinhamento
 $pdf->Cell(0,5,$titulo,0,0,'L');
-$pdf->Cell(0,5,'http://www.e-prepag.com.br',0,1,'R',false,'javascript:history.go(-1);');
+$pdf->Cell(0,5,'' . EPREPAG_URL_HTTP . '',0,1,'R',false,'javascript:history.go(-1);');
 $pdf->Cell(0,0,'',1,1,'L');
 $pdf->Ln(4);
 

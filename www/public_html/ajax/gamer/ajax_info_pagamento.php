@@ -1,8 +1,8 @@
 <?php header("Content-Type: text/html; charset=ISO-8859-1",true) ?>
 <?php
 
-// error_reporting(E_ALL); 
-// ini_set("display_errors", 1); 
+//error_reporting(E_ALL); 
+//ini_set("display_errors", 1); 
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "inc_register_globals.php";	
 
@@ -10,6 +10,7 @@ require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php";
 
 require_once RAIZ_DO_PROJETO . "db/connect.php"; 
+require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 
 ?>
 <link href="/css/styles.css" rel="stylesheet" type="text/css" />
@@ -20,16 +21,26 @@ require_once RAIZ_DO_PROJETO . "db/connect.php";
 echo date("H:i:s")."<br>";
 
 // Recupera dados do pagamento
-$sql = "SELECT * FROM tb_pag_compras WHERE numcompra='".$numcompra."' ";
-//echo "sql: $sql<br>"; 
-//echo "<br>$numcompra<br>"; 
-//$rsCompra = $conn->Execute($sql) or die("Erro 21");
-$ret = SQLexecuteQuery($sql);
-if(!$ret) {
-	echo "Erro ao recuperar transação de pagamento (1a).<br>\nnumcompra: '$numcompra'<br>\n";
-	die("Stop");
+try {
+    $pdo = ConnectionPDO::getConnection()->getLink();
+} catch (PDOException $e) {
+    die("Erro na conexão: " . $e->getMessage());
 }
-$ret_row = pg_fetch_array($ret);
+
+// Recupera dados do pagamento com prepared statement
+$sql = "SELECT * FROM tb_pag_compras WHERE numcompra = :numcompra";
+$stmt = $pdo->prepare($sql);
+
+// Substitui o parâmetro com segurança
+$stmt->bindParam(':numcompra', $numcompra, PDO::PARAM_STR);
+
+if (!$stmt->execute()) {
+    echo "Erro ao recuperar transação de pagamento (1a).<br>\nnumcompra: '$numcompra'<br>\n";
+    die("Stop");
+}
+
+// Obtém a primeira linha (como array associativo)
+$ret_row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Test for Partner Integration	=========================================================
 $b_is_partner = false;
@@ -104,8 +115,5 @@ if(($ret_row['status']==-1)   ) { //    || ($numcompra=='2009082018122931137084'
 </script>
 <?php
 }
-
-//Fechando Conexão
-pg_close($connid);
 
 ?>

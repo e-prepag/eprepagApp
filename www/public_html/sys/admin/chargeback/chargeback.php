@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 session_start();
 
@@ -50,7 +51,7 @@ session_start();
 	}
 	
 //}else{
-	//header("location: https://www.e-prepag.com.br/sys/admin/commerce/index.php");
+	//header("location: EPREPAG_URL_HTTPS/sys/admin/commerce/index.php");
 //}
 
 ?>
@@ -133,7 +134,7 @@ session_start();
 		<div class="row container height-m" style="margin: 20px 0 0 0;">
 		<?php if(isset($_POST["btnPesquisa"])){ ?>
 			<div style="text-align: left;margin: 0;">
-		        <a style="margin: 10px 0;" href="https://www.e-prepag.com.br/sys/admin/chargeback/geraExcel.php" class="btn btn-success">Excel</a>
+		        <a style="margin: 10px 0;" href="<?= EPREPAG_URL_HTTPS ?>/sys/admin/chargeback/geraExcel.php" class="btn btn-success">Excel</a>
 		    </div>
 			<div class="table-response">
 				<table class="table table-bordered bg-branco txt-preto fontsize-pp text-center">

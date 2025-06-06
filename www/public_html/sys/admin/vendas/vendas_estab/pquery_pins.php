@@ -54,8 +54,8 @@
 	
 	
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":8080/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":8080/images/anterior.gif";
+	$img_proxima  = "https://".$server_url_complete."/images/proxima.gif";
+	$img_anterior = "https://".$server_url_complete."/images/anterior.gif";
 	$max          = 6000; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -608,7 +608,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                   <td class="text-right"><?php echo ((($pgrow['vg_id']!=$vg_id_prev) || ($pgrow['vgm_valor']!=$vgm_valor_venda_prev)) ? $pgrow['quantidade'] :"")." <span class='txt-vermelho'>(".$qtde_total_tela.")</span>"; ?></td>
                                   <td class="text-right"><?php echo number_format($pgrow['vgm_valor'], 2, ',', '.') ?></div></td>
                                   <td class="text-right"><?php echo ((($pgrow['vg_id']!=$vg_id_prev) || ($pgrow['vgm_valor']!=$vgm_valor_venda_prev))? number_format(($pgrow['total_face']), 2, ',', '.')  :"-")." <span class='txt-verde'>(".number_format($valor_total_tela, 2, ',', '.').")</span>" ; ?></td>
-                                  <td class="text-center"><?php if($pgrow['vg_id']!=$vg_id_prev) { ?><a href="https://<?php $_SERVER["SERVER_NAME"] ?>:8080/<?php echo (($pgrow['canal']=="SiteLH")?"pdv":"gamer") ?>/vendas/com_venda_detalhe.php?venda_id=<?php  echo $pgrow['vg_id']; ?>" target="_blank"><?php } ?><?php echo $pgrow['vg_id']; ?><?php if($pgrow['vg_id']!=$vg_id_prev) { ?></a><?php } ?></td>
+                                  <td class="text-center"><?php if($pgrow['vg_id']!=$vg_id_prev) { ?><a href="https://<?php $server_url_complete ?>/<?php echo (($pgrow['canal']=="SiteLH")?"pdv":"gamer") ?>/vendas/com_venda_detalhe.php?venda_id=<?php  echo $pgrow['vg_id']; ?>" target="_blank"><?php } ?><?php echo $pgrow['vg_id']; ?><?php if($pgrow['vg_id']!=$vg_id_prev) { ?></a><?php } ?></td>
                                   <td class="text-right"><?php echo $pgrow['vgm_id'] ?></td>
                                   <td class="text-right"><?php echo (($dd_vendas_pins)?$pgrow['pin_codinterno']:"-"); ?></td>
                                   <td class="text-right"><?php echo (($dd_vendas_pins)?number_format($pgrow['pin_valor'], 2, ',', '.'):"-") ?></td>

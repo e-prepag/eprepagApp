@@ -1,6 +1,7 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
-header("location: https://www.e-prepag.com.br/game/conta/nova.php");
+header("location: " . EPREPAG_URL_HTTPS . "/game/conta/nova.php");
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once RAIZ_DO_PROJETO . 'consulta_cpf/config.inc.cpf.php';

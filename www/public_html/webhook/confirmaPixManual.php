@@ -14,11 +14,11 @@ require_once "/www/includes/functions.php";
 $teste = '{
 		"http_status_code": 200,
 		"http_status_message": "OK",
-		"date": "2024-11-18 10:36:04",
+		"date": "2024-09-11 17:14:40",
 		"response": {
 			"message": {
 				"status": "TRANSACAO_RECEBIDA",
-				"id": "1020241108105539327"
+				"id": "2020240910180901840"
 			}
 		}
 	}';

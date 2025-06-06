@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../../../includes/constantes.php";
@@ -7,7 +8,7 @@ require_once  DIR_INCS . "configIP.php";
 require_once  DIR_INCS . "functions_captcha.php";
 
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 
 $con = ConnectionPDO::getConnection();

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 		<!-- fim :: conteudo principal //-->
 			
 	</div>
@@ -24,7 +25,7 @@
   		<table width="100%"  border="0" cellpadding="0" cellspacing="0" bgcolor="#F1F1F1">
   		<tr>
     		<td width="1%"><img src="/images/rodape_esq.gif" width="6" height="23"></td>
-    		<td width="98%" align="center" class="rodape">E-Prepag Copyright 2007. Todos os direitos reservados. <a href="http://www.e-prepag.com.br" class="rodape">Saiba mais sobre a E-Prepag</a></td>
+    		<td width="98%" align="center" class="rodape">E-Prepag Copyright 2007. Todos os direitos reservados. <a href="EPREPAG_URL_HTTP" class="rodape">Saiba mais sobre a E-Prepag</a></td>
     		<td width="1%" align="right"><img src="/images/rodape_dir.gif" width="6" height="23"></td>
   		</tr>
 		</table>

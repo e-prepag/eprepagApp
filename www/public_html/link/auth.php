@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
      	 
 	 //ini_set('display_errors', 1);
@@ -53,7 +54,7 @@
 					 <div class="alert alert-dark d-none" role="alert">
 						  Token Copiado.
 					 </div>
-				     <img title="E-Prepag" src="https://www.e-prepag.com.br/sys/imagens/epp_logo.png">
+				     <img title="E-Prepag" src="<?= EPREPAG_URL_HTTPS ?>/sys/imagens/epp_logo.png">
 				     <form class="pt-4" method="post" action="">
 					    <h3 class="mb-4">Criar Token de acesso</h3>
 						<?php if(isset($_SESSION['access_token'])){ ?>

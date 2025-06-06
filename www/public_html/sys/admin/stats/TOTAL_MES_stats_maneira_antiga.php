@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php  
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -24,7 +25,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 $time_start = getmicrotime();
 
-if ($_SERVER['HTTP_REFERER'] != "http://www.e-prepag.com.br/sys/admin/stats/TOTAL_MES_stats_maneira_antiga.php") {
+if ($_SERVER['HTTP_REFERER'] != "" . EPREPAG_URL_HTTP . "/sys/admin/stats/TOTAL_MES_stats_maneira_antiga.php") {
         $dd_exclui_epp_cash = 1;
 }
 

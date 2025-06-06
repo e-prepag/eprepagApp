@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
@@ -383,7 +384,7 @@ if(Util::isAjaxRequest()){
                         "order by vgm_opr_codigo, vgm_valor ";
         $rs_venda_modelos = SQLexecuteQuery($sql);
 
-        $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+        $parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
 
         /* ---Wagner - variavel $aux_lista */
         $aux_lista = "<table cellspacing='0' cellpadding='5' width='100%' style='font: normal 13px arial, sans-serif;'>

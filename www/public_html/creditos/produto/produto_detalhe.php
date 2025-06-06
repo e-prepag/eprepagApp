@@ -30,21 +30,6 @@ if($GLOBALS['_SESSION']["dist_usuarioGames_ser"]){
 
 $ogp_id = $_POST["prod"];
 
-if(in_array($controller->usuarios->getId(),$ARRAY_INIBI_VENDA_HARDCODE) && in_array($ogp_id,$ARRAY_INIBI_PRODUTOS_VENDA_TO_ID_HARDCODE)){ 
-        $msg = "O produto que você está tentando acessar está indisponível no momento.<br>Entre em contato com nosso suporte.<br>Obrigado.";
-?>
-       <form name="pagamento" id="pagamento" method="POST" action="/creditos/mensagem.php">
-           <input type='hidden' name='msg' id='msg' value='<?php echo $msg; ?>'>
-           <input type='hidden' name='titulo' id='titulo' value='Produto Indisponível no Momento'>
-           <input type='hidden' name='link' id='link' value='/creditos/'>
-       </form>
-       <script language='javascript'>
-           document.getElementById("pagamento").submit();
-       </script>       
-<?php    
-    die();
-}
-
 $sqlClickProduto = "insert into clicks (sistema, ug_id, ogp_id) values (:sistema, :ug_id, :ogp_id)";
 //Conectando com PDO para execução da QUERY
 $con = ConnectionPDO::getConnection();

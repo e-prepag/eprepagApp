@@ -7,6 +7,24 @@ function block_direct_calling() {
            die("Stop");
     }
 }
+$tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST['verificationCode'], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+
+$recaptcha = curl_init();
+curl_setopt_array($recaptcha, [
+    CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
+
+]);
+$retorno = json_decode(curl_exec($recaptcha), true);
+curl_close($recaptcha);
+
+// if($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))){
+     
+//       echo '<span class="col-md-offset-2 col-md-4 text-left txt-vermelho">Preencha o campo de verificação corretamente!!</span>';
+                 
+// }
 block_direct_calling();
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS."gamer/controller/HeaderController.class.php";
@@ -50,7 +68,7 @@ if(!isset($_POST['box']) || $_POST['box'] != true){
     <?php		
 		
         // Verifica se o codigo foi digitado ou se o codigo digitado é igual ao da imagem
-        if ((strtolower($_POST['verificationCode']) == strtolower($_SESSION['palavraCodigo'])) and ($_POST['verificationCode'] != "")){
+        if ( true ){
     ?>
             <div id="legendas"></div>
             <div id="map" style="height: 500px"></div>
@@ -408,10 +426,14 @@ if(!isset($_POST['box']) || $_POST['box'] != true){
         </script>
                             <?php 
                     }elseif($_POST['verificationCode'] == ""){
-                            echo utf8_encode ('<div class="col-md-12"><span class="col-md-offset-2 col-md-4 text-left txt-vermelho">Preencha o campo de verificação.</span></div>');
-                    }elseif(strtolower($_POST['verificationCode']) != strtolower($_SESSION['palavraCodigo'])){
-                            echo '<span class="col-md-offset-2 col-md-4 text-left txt-vermelho">Preencha o campo de verificação corretamente.</span>';
+                            echo utf8_encode ('<div class="col-md-12"><span class="col-md-offset-2 col-md-4 text-left txt-vermelho">Preencha o campo de verificação!</span></div>');
                     }
+                    elseif(strtolower($_POST['verificationCode'])){
+                       
+                    
+                        echo '<span class="col-md-offset-2 col-md-4 text-left txt-vermelho">Preencha o campo de verificação corretamente...</span>';
+                    }
+                    
                     ?>
                             </form>
                             <!-- fim :: conteudo principal //-->

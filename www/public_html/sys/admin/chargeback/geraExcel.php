@@ -1,7 +1,8 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php 
     session_start();
 	if(!isset($_SESSION["excelBack"]) && empty($_SESSION["excelBack"])){
-		header("location: https://www.e-prepag.com.br/sys/admin/");
+		header("location: " . EPREPAG_URL_HTTPS . "/sys/admin/");
 		exit;
 	}
 ?>

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 
@@ -398,7 +399,7 @@ if($pagtoInvalido){
         <div class="col-md-12 text-center">
             <p>Obrigado!</p>
             <p>Sua transação foi processada com sucesso.</p>
-			<a class="btn btn-success bottom10" href="https://www.e-prepag.com.br/game/conta/pedidos.php">Meus pedidos</a>
+			<a class="btn btn-success bottom10" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/pedidos.php">Meus pedidos</a>
         </div>
 <?php 
         if (($banco=="237") && ($assinatura)) { 
@@ -918,7 +919,7 @@ if($pagtoInvalido){
             <div class="col-md-11 text-center txt-verde bottom20 top50">
                 <p>Pagamento realizado com sucesso.</p>
                 <p>O crédito foi enviado para seu Email cadastrado.</p>
-				<a class="btn btn-success bottom10" href="https://www.e-prepag.com.br/game/conta/pedidos.php">Meus pedidos</a>
+				<a class="btn btn-success bottom10" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/pedidos.php">Meus pedidos</a>
             </div>
             <div class="col-md-1 bottom20 top-50">
                 <input type="button" name="btVoltar" value="Voltar" OnClick="window.location='/game/conta/pedidos.php';" class="btn btn-info">

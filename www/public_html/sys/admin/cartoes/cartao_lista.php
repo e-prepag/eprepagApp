@@ -100,8 +100,8 @@
 //echo "data_inicial_limite: $data_inicial_limite<br>";	
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":8080/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":8080/images/anterior.gif";
+	$img_proxima  = "https://".$server_url_complete."/images/proxima.gif";
+	$img_anterior = "https://".$server_url_complete."/images/anterior.gif";
 	$max          = 100; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 

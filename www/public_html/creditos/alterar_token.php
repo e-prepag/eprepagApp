@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 require_once "../../includes/constantes.php";
 require_once "../libs/PHPGangsta/GoogleAuthenticator.php";
@@ -6,7 +7,7 @@ require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php
 $controller = new OfflineController;
 
 $https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 $id_do_usuario = $_SESSION['id_do_usuario'] ? $_SESSION['id_do_usuario'] : 0;
 
@@ -24,9 +25,11 @@ if ($_SESSION['usuario_operador']) {
 
     if (empty($user)) {
         $msg = "Usuario inválido.\n";
+        $linha = "4[" . date('Y-m-d H:i:s') . "] [".$_SESSION['login_usuario']."] $msg" . PHP_EOL;
+        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
-            "/creditos/login_teste.php?msg=" .
+            "/creditos/login.php?msg=" .
             urlencode($msg) .
             "&login=" .
             urlencode($login);
@@ -46,9 +49,11 @@ if ($_SESSION['usuario_operador']) {
     if ($authData) {
         if (!empty($authData['ugo_chave_autenticador'])) {
             $msg = "Usuario inválido.\n";
+            $linha = "4[" . date('Y-m-d H:i:s') . "] [".$_SESSION['login_usuario']."] $msg" . PHP_EOL;
+            file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
             //$pag = $server_url . $pag;
             $strRedirect = $server_url .
-                "/creditos/login_teste.php?msg=" .
+                "/creditos/login.php?msg=" .
                 urlencode($msg) .
                 "&login=" .
                 urlencode($login);
@@ -72,7 +77,7 @@ if ($_SESSION['usuario_operador']) {
 
             // Verifica se alguma linha foi afetada
             if ($stmt->rowCount() > 0) {
-                header("Location: loginEf_teste.php?token=$token");
+                header("Location: loginEf2.php?token=$token");
                 exit;
             }
             $msg = "Erro ao salvar o token!";
@@ -107,9 +112,11 @@ if ($_SESSION['usuario_operador']) {
 
     if (empty($user)) {
         $msg = "Usuario inválido.\n";
+        $linha = "4[" . date('Y-m-d H:i:s') . "] [".$_SESSION['login_usuario']."] $msg" . PHP_EOL;
+        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
-            "/creditos/login_teste.php?msg=" .
+            "/creditos/login.php?msg=" .
             urlencode($msg) .
             "&login=" .
             urlencode($login);
@@ -129,9 +136,11 @@ if ($_SESSION['usuario_operador']) {
     if ($authData) {
         if (!empty($authData['ug_chave_autenticador'])) {
             $msg = "Usuario inválido.\n";
+            $linha = "4[" . date('Y-m-d H:i:s') . "] [".$_SESSION['login_usuario']."] $msg" . PHP_EOL;
+            file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
             //$pag = $server_url . $pag;
             $strRedirect = $server_url .
-                "/creditos/login_teste.php?msg=" .
+                "/creditos/login.php?msg=" .
                 urlencode($msg) .
                 "&login=" .
                 urlencode($login);
@@ -155,7 +164,7 @@ if ($_SESSION['usuario_operador']) {
 
             // Verifica se alguma linha foi afetada
             if ($stmt->rowCount() > 0) {
-                header("Location: loginEf_teste.php?token=$token");
+                header("Location: loginEf2.php?token=$token");
                 exit;
             }
             $msg = "Erro ao salvar o token!";

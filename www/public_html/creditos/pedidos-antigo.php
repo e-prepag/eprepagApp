@@ -1,7 +1,8 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
-header("location: https://www.e-prepag.com.br/creditos/pedidos.php");
+header("location: " . EPREPAG_URL_HTTPS . "/creditos/pedidos.php");
 exit;
 require_once "../../includes/constantes.php";
 

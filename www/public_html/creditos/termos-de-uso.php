@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 $pagina_titulo = "E-prepag - Créditos para Games";
 require_once "../../includes/constantes.php";
@@ -431,7 +432,7 @@ require_once "includes/header-offline.php";
             <div>
                             &nbsp;</div>
 			<div>
-			                13.5 Todas as informações referentes a coleta e tratamento de dados dos titulares encontram-se na Política de Privacidade, disponível em: <a href="https://www.e-prepag.com.br/game/politica-de-privacidade.php">https://www.e-prepag.com.br/game/politica-de-privacidade.php</a> 
+			                13.5 Todas as informações referentes a coleta e tratamento de dados dos titulares encontram-se na Política de Privacidade, disponível em: <a href="<?= EPREPAG_URL_HTTPS ?>/game/politica-de-privacidade.php"><?= EPREPAG_URL_HTTPS ?>/game/politica-de-privacidade.php</a> 
 			</div>
             <div>
                             &nbsp;</div>
@@ -445,7 +446,7 @@ require_once "includes/header-offline.php";
             <div>
                             &nbsp;</div>
 			<div>
-			                O presente Contrato está disponível para consulta no website da E-Prepag no endereço eletrônico &nbsp; <a href="https://www.e-prepag.com.br/creditos/termos-de-uso.php">https://www.e-prepag.com.br/creditos/termos-de-uso.php</a>, &nbsp; registrado bfce591a2995a7187eae023d707b8119c13efa712584222720b8e5829f0dacd6, &nbsp;&nbsp; e &nbsp;&nbsp; substitui integralmente o “Contrato de Adesão – Serviço de Disponibilização de Créditos Digitais e Cartões Pré-Pagos” datado de 1º de agosto de 2015.
+			                O presente Contrato está disponível para consulta no website da E-Prepag no endereço eletrônico &nbsp; <a href="<?= EPREPAG_URL_HTTPS ?>/creditos/termos-de-uso.php"><?= EPREPAG_URL_HTTPS ?>/creditos/termos-de-uso.php</a>, &nbsp; registrado bfce591a2995a7187eae023d707b8119c13efa712584222720b8e5829f0dacd6, &nbsp;&nbsp; e &nbsp;&nbsp; substitui integralmente o “Contrato de Adesão – Serviço de Disponibilização de Créditos Digitais e Cartões Pré-Pagos” datado de 1º de agosto de 2015.
 			</div>
             <div>
                             &nbsp;</div>

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -632,7 +633,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
 				if(!isset($GLOBALS['_SESSION']['usuarioGames_ser'])) {
 				?>
 					<div class="row espacamento text-center">
-						<a style="margin: 10px 0 0 0;" class="btn btn-success" href="https://www.e-prepag.com.br/game/conta/login.php">Para prosseguir faça login na sua conta E-prepag</a>
+						<a style="margin: 10px 0 0 0;" class="btn btn-success" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/login.php">Para prosseguir faça login na sua conta E-prepag</a>
 					</div>
 				<?php
 				}

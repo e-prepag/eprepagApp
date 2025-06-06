@@ -12,7 +12,14 @@ require_once "/www/includes/gamer/AES.class.php";
 require_once "/www/includes/gamer/inc_sanitize.php";
 require_once "/www/class/classGeraPin.php";
 
-$valor = $_POST["valor"];
+$valor = isset($_POST["valor"]) ? str_replace(",", ".", $_POST["valor"]) : null;
+
+if (is_numeric($valor)) {
+    // Aceita int ou float
+    $valor = $valor + 0; // força a conversão numérica mantendo int se possível, float se necessário
+} else {
+    $valor = null; // valor inválido
+}
 
 if(isset($_POST["atimo"])){
 	$operadora = 49;

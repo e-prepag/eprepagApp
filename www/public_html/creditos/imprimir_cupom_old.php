@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php 
 $_PaginaOperador1Permitido = 53; // o número magico
 $_PaginaOperador2Permitido = 54;
@@ -49,7 +50,7 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
     $lp_ids = $listaPINs;
 
     //capturando a variável server
-    $server_url = "www.e-prepag.com.br";
+    $server_url = "" . EPREPAG_URL . "";
     if(checkIP()) {
         $server_url = $_SERVER['SERVER_NAME'];
     }
@@ -254,7 +255,7 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
             $teste = new classPesquisaEY($pin_serial);
             if(count($teste->getErro()) == 0) { 
                 echo "      <tr>
-                                 <td colspan='2' height='10px'><strong><i>Ganhe ".(($teste->getPublisher() == 13)?"10.000 Cash Ongame":"1255 Riot Points")." respondendo uma pesquisa!<br>Saiba mais em www.e-prepag.com.br/pesquisa</i></strong></td>
+                                 <td colspan='2' height='10px'><strong><i>Ganhe ".(($teste->getPublisher() == 13)?"10.000 Cash Ongame":"1255 Riot Points")." respondendo uma pesquisa!<br>Saiba mais em EPREPAG_URL/pesquisa</i></strong></td>
                              </tr>
                              <tr>
                                  <td colspan='2' height='10px'></td>
@@ -374,7 +375,7 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
                                  <td>
                                  </td>
                                  <td class='label_pin_veja'>
-                                 Suporte: www.e-prepag.com.br
+                                 Suporte: " . EPREPAG_URL . "
                                  </td>
                               </tr>
                  </table>";

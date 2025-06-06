@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 /* Redirect browser */
 
@@ -275,7 +276,7 @@ addLoadEvent(carregaBanner);
                         ?> 
 
 				<table width="100%" border="0" cellspacing="0" cellpadding="0" height="55">
-				<form name="formLogin" action="https://www.e-prepag.com.br/prepag2/dist_commerce/loginEf.php" method="post">
+				<form name="formLogin" action="<?= EPREPAG_URL_HTTPS ?>/prepag2/dist_commerce/loginEf.php" method="post">
 				<input type="hidden" name="pag" value="<?php echo $pag?>">
 				<!--input type="hidden" name="pag" value="<?php echo $_SERVER['SCRIPT_NAME'] . "?" . $_SERVER['QUERY_STRING']?>"-->
 				  <tr>
@@ -320,7 +321,7 @@ addLoadEvent(carregaBanner);
 				if($_SERVER['SCRIPT_NAME']=="/prepag2/dist_commerce/conta/lista_extratos_rapido.php") {
 					//Mostra o icone de quadro de ajuda sobre o extrato.
 					if (isset($_SESSION['dist_usuarioGames_ser'])){
-						echo "<input type='image' id='bntAjudaExtrato' class='basic' style='width:25px; height:25px; cursor: hand' title='Ajuda sobre Informações de Extrato.' src='http://www.e-prepag.com.br/prepag2/dist_commerce/images/balanco_help.png'>";
+						echo "<input type='image' id='bntAjudaExtrato' class='basic' style='width:25px; height:25px; cursor: hand' title='Ajuda sobre Informações de Extrato.' src='" . EPREPAG_URL_HTTP . "/prepag2/dist_commerce/images/balanco_help.png'>";
 					}
 				}
 			}

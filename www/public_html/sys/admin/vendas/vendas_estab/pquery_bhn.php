@@ -322,7 +322,7 @@ $resprods = pg_exec($connid, $sql_produtos);
 <?php
                                         if(b_is_Financeiro()) {
 ?>
-                                            <td class="text-right"><a href="https://<?php echo $_SERVER["SERVER_NAME"] ?>:8080/pdv/vendas/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id']; ?></a></td>
+                                            <td class="text-right"><a href="https://<?php echo $server_url_complete ?>/pdv/vendas/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id']; ?></a></td>
 <?php 
                                         }
 

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 //ini_set('display_errors', 1);
@@ -41,7 +42,7 @@ if(isset($_POST) && !empty($_POST["code"])){
 	$receive = $_POST["code"];
 	
 	if ($receive === $_SESSION["SMS_CODE"]) {
-		$url = 'https://www.e-prepag.com.br/creditos/produto/produtos_selecionados.php?'. http_build_query($_SESSION['prodData']);
+		$url = '' . EPREPAG_URL_HTTPS . '/creditos/produto/produtos_selecionados.php?'. http_build_query($_SESSION['prodData']);
         unset($_SESSION['prodData']);
 		header('location: '. $url);
 		exit;

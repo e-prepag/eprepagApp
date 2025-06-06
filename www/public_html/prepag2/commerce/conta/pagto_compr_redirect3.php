@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 
 <?php 
 //session_start();
@@ -66,7 +67,7 @@ echo "e-prepag: ".$venda_status ;
         // $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";	
 
 // } elseif ($pagto_tipo == $PAGAMENTO_PIN_EPREPAG_NUMERIC){ // $FORMAS_PAGAMENTO['PAGAMENTO_PIN_EPREPAG']
-        // $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";		// https://www.e-prepag.com.br
+        // $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";		// EPREPAG_URL_HTTPS
 
 // } elseif ($pagto_tipo == $PAGAMENTO_HIPAY_ONLINE_NUMERIC){ 
         // $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";	

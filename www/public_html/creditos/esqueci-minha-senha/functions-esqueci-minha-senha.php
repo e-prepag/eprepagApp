@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 	function chaveEspecial() {
@@ -170,7 +171,7 @@
 		$cc = null;
 		$bcc = null;
 		$subject = 'Solicitação de Troca de Senha';
-		$body_html = "<html><head><title>Esqueci Minha Senha</title></head><body><h1>Olá, {$dadosUsuario['primeiroNomeUsuario']}</h1><p>Você poderá cadastrar uma nova senha clicando no link abaixo:</p><a target='_blank' href='https://www.e-prepag.com.br/creditos/esqueci-minha-senha/verifica-solicitacao.php?redirected=true&codigoValidacao={$codigoValidacao}&origemUsuario={$dadosUsuario['origemUsuario']}'>Mudar a Senha</a><p>Caso você não tenha feito essa solicitação, ignore o link acima e nos avise: <a href='https://www.e-prepag.com.br/game/suporte.php' target='_blank' title='Entre em contato conosco'>aqui</a>.</p></body></html>";
+		$body_html = "<html><head><title>Esqueci Minha Senha</title></head><body><h1>Olá, {$dadosUsuario['primeiroNomeUsuario']}</h1><p>Você poderá cadastrar uma nova senha clicando no link abaixo:</p><a target='_blank' href='" . EPREPAG_URL_HTTPS . "/creditos/esqueci-minha-senha/verifica-solicitacao.php?redirected=true&codigoValidacao={$codigoValidacao}&origemUsuario={$dadosUsuario['origemUsuario']}'>Mudar a Senha</a><p>Caso você não tenha feito essa solicitação, ignore o link acima e nos avise: <a href='" . EPREPAG_URL_HTTPS . "/game/suporte.php' target='_blank' title='Entre em contato conosco'>aqui</a>.</p></body></html>";
 		//$body_html = file_get_contents('/www/includes/templates/testeEmailMudaSenha.html');
 		$body_html = html_entity_decode($body_html, ENT_QUOTES, 'ISO8859-1');
 		$body_plain = '';

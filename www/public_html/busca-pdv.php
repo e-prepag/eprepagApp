@@ -1,8 +1,11 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
+// error_reporting(E_ALL); 
+// ini_set("display_errors", 1); 
 $request_uri = $_SERVER['REQUEST_URI'];
-// Obtém o script principal chamado
+// Obtï¿½m o script principal chamado
 $script_name = $_SERVER['SCRIPT_NAME'];
-// Se a URI acessada não for exatamente igual ao script chamado, bloqueia o acesso
+// Se a URI acessada nï¿½o for exatamente igual ao script chamado, bloqueia o acesso
 if ($request_uri !== $script_name) {
     http_response_code(403);
     die("Acesso negado.");
@@ -19,18 +22,52 @@ $controller->setHeader();
 
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 
 //Id do GoCASH
 $id_gocash = 1;
 
-//Conectando com PDO para execução da QUERY
+//Conectando com PDO para execuï¿½ï¿½o da QUERY
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
+$recaptcha = $_POST['g-recaptcha-response'];
+    
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //$recaptcha = $_POST['g-recaptcha-response'];
+    
+    if(!empty($_POST["g-recaptcha-response"])){
+			
+        $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+
+         $recaptcha = curl_init();
+         curl_setopt_array($recaptcha, [
+             CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+             CURLOPT_CUSTOMREQUEST => "POST",
+             CURLOPT_RETURNTRANSFER => true,
+             CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
+
+         ]);
+         $retorno = json_decode(curl_exec($recaptcha), true);
+         curl_close($recaptcha);
+
+         if($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))){
+               $erros[] = "<p>Processo invalidado por RECAPTCHA.</p>";
+         }
+        
+   }else{
+        $erros[] = "<p>Vocï¿½ deve realizar a verificaï¿½ï¿½o do RECAPTCHA para prosseguir.</p>";
+   }
+   if(!empty($erros)){
+    print "manipulaModal(1,\"".implode($erros)."\",'Atenï¿½ï¿½o');";
+}
+
+    // Prosseguir com o restante do formulï¿½rio...
+}
 
 // Deixa o drop down nos valores que estavam selecionados antes do reload.
-if ((isset($_POST['cidade'])) and ( isset($_POST['bairro']))) {
+if ((isset($_POST['cidade'])) and ( isset($_POST['bairro']) and !empty($recaptcha))) {
     
     $valorRequestCidade = isset($_POST['cidade']) ? filter_var(trim(str_replace("'", "",$_POST['cidade'])),FILTER_SANITIZE_STRING) : '';
     $_POST['bairro'] = filter_var($_POST['bairro'], FILTER_SANITIZE_STRING);
@@ -90,7 +127,7 @@ if ((isset($_POST['cidade'])) and ( isset($_POST['bairro']))) {
 }
 
 // Query que cria o drop drown das cidades
-if ((isset($_POST['estado'])) and ( isset($_POST['cidade']))) {
+if ((isset($_POST['estado'])) and ( isset($_POST['cidade']) and !empty($recaptcha))) {
     
     $_POST['estado'] = filter_var($_POST['estado'], FILTER_SANITIZE_STRING);
     
@@ -239,17 +276,19 @@ $Resultadoestado = $SIGLA_ESTADOS;
                     }
                     ?>
                 </span>
-                <span class="col-md-4 col-md-offset-3 top10" id="span_captcha">
+                <!-- <span class="col-md-4 col-md-offset-3 top10" id="span_captcha">
 <?php
-                    $randomcode = (isset($_POST['rc'])) ? $_POST['rc'] : generateRandomCode();
-                    $randomcode_translated = translateCode($randomcode);
+                    // $randomcode = (isset($_POST['rc'])) ? $_POST['rc'] : generateRandomCode();
+                    // $randomcode_translated = translateCode($randomcode);
 ?>
                     <img width="110px" height="60px" class="pull-right" src="includes/captcha/CaptchaImage.php?uid=<?php echo $randomcode_translated; ?>" title="Verify Code" vspace="2" />
-                </span>
-                <span class="col-md-5 top10">
-                    <input name="verificationCode" class="form-control input-sm" type="text" id="verificationCode" value="<?php if(isset($_POST['verificationCode'])) echo htmlspecialchars($_POST['verificationCode'], ENT_QUOTES, 'UTF-8'); ?>" size="5" /><br>
-                    <a class="estiloSpan font-10px" href="javascript:monta_captcha();">Gerar outro código</a>
-                </span>
+                </span> -->
+                <input readonly name="verificationCode" class="form-control input-sm" type="hidden"  id="verificationCode" value="<?php if(isset($_POST['g-recaptcha-response'])) echo htmlspecialchars($_POST['g-recaptcha-response'], ENT_QUOTES, 'UTF-8'); ?>" size="5" /><br>
+                <!-- <span class="col-md-5 top10">
+                    <a class="estiloSpan font-10px" href="javascript:monta_captcha();">Gerar outro cï¿½digo</a>
+                </span> -->
+                <div class="g-recaptcha col-md-4 col-md-offset-3 text-center" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T" data-callback="onReCaptchaSuccess"></div>
+					
                 <div class="clearfix"></div>
                 <span class="col-md-4 col-md-offset-3 text-center">
                     <a onClick="ValidaForm()" id="bt_procurar" href="#" class="btn top10 btn-success">Procurar</a>
@@ -273,7 +312,7 @@ $Resultadoestado = $SIGLA_ESTADOS;
                             </div>
                             <div class="modal-body">
                               <div class="alert alert-info" role="alert"> 
-                                  <h5><span id="msg-modal">Cards E-Prepag/Go Cash: Você encontra os gift cards em livrarias, lojas de departamento, lojas de games, supermercados, e outras redes de varejo.</span></h5>
+                                  <h5><span id="msg-modal">Cards E-Prepag/Go Cash: Vocï¿½ encontra os gift cards em livrarias, lojas de departamento, lojas de games, supermercados, e outras redes de varejo.</span></h5>
                               </div>
                             </div>
                             <div class="modal-footer">
@@ -292,7 +331,7 @@ $Resultadoestado = $SIGLA_ESTADOS;
                             </div>
                             <div class="modal-body">
                               <div class="alert alert-info" role="alert"> 
-                                  <h5><span id="msg-modal">PINs E-Prepag: São milhares de Lan Houses, lojas de games, de informáticas e vários outros tipos de comércio em todo o Brasil.</span></h5>
+                                  <h5><span id="msg-modal">PINs E-Prepag: Sï¿½o milhares de Lan Houses, lojas de games, de informï¿½ticas e vï¿½rios outros tipos de comï¿½rcio em todo o Brasil.</span></h5>
                               </div>
                             </div>
                             <div class="modal-footer">
@@ -311,7 +350,7 @@ $Resultadoestado = $SIGLA_ESTADOS;
                             </div>
                             <div class="modal-body">
                               <div class="alert alert-info" role="alert"> 
-                                  <h5><span id="msg-modal">Tótens com PINs E-Prepag: São centenas de tótens eletrônicos de auto-serviço, onde você pode comprar o E-Prepag Cash diretamente da máquina, e também alguns estabelecimentos comerciais da rede credenciada.</span></h5>
+                                  <h5><span id="msg-modal">Tï¿½tens com PINs E-Prepag: Sï¿½o centenas de tï¿½tens eletrï¿½nicos de auto-serviï¿½o, onde vocï¿½ pode comprar o E-Prepag Cash diretamente da mï¿½quina, e tambï¿½m alguns estabelecimentos comerciais da rede credenciada.</span></h5>
                               </div>
                             </div>
                             <div class="modal-footer">
@@ -331,6 +370,13 @@ $Resultadoestado = $SIGLA_ESTADOS;
 </div>
 <script type="text/javascript" src="js/scripts.js"></script>
 <script type="text/javascript" src="js/scripts_dropdown.js"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+  function onReCaptchaSuccess(token) {
+    // Preenche o input com o token para ser enviado no FormData
+    document.getElementById('verificationCode').value = token;
+  }
+</script>
 <script type="text/javascript" src="<?php echo $https; ?>://maps.google.com/maps/api/js?<?php echo $need_key_maps; ?>"></script>
 <script>
     $(document).ready(function(){
@@ -363,7 +409,7 @@ echo modal_includes();*/
     }
 </style>    
 <?php 
-if(isset($_POST['verificationCode']) && isset($_POST['cidade']) && isset($_POST['bairro'])){
+if(isset($_POST['g-recaptcha-response']) && isset($_POST['cidade']) && isset($_POST['bairro'])){
     echo "<script>ValidaForm();</script>";
 }
 

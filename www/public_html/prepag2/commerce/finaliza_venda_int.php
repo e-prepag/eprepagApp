@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
@@ -550,7 +551,7 @@ if (true) {	// Começa aqui o email antigo
                 "where vg.vg_id = " . $venda_id . " and vg.vg_ug_id=" . $usuarioGames->getId();
         $rs_venda_modelos = SQLexecuteQuery($sql);
 
-        $parametros['prepag_dominio'] = $https . "://www.e-prepag.com.br";
+        $parametros['prepag_dominio'] = $https . "://" . EPREPAG_URL . "";
 
         /* ---Wagner - variavel $aux_lista */
         $aux_lista = "<table cellspacing='0' cellpadding='5' width='100%' style='font: normal 13px arial, sans-serif;'>

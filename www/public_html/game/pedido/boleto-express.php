@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 die("Acesso negado!");
 //error_reporting(E_ALL); 
@@ -170,7 +171,7 @@ $controller->setHeader();
 <script type="text/javascript" src="/js/ajax.js"></script>
 <script>
 function envFacebook(prod) {
-    var link = "http://www.facebook.com/share.php?u=http://www.e-prepag.com.br/prepag2/commerce/modelos.php?prod="+prod+"&title=E-PREPAG&bodytext=&topic=";
+    var link = "http://www.facebook.com/share.php?u=<?= EPREPAG_URL_HTTP ?>/prepag2/commerce/modelos.php?prod="+prod+"&title=E-PREPAG&bodytext=&topic=";
     var prod = eval(prod);
     //alert(prod);
     //alert(link);
@@ -178,7 +179,7 @@ function envFacebook(prod) {
 }
 
 function envTwitter(prod) {
-    var link = "http://twitter.com/share?url=http://www.e-prepag.com.br/prepag2/commerce/modelos.php?prod="+prod+"&via=E-Prepag&text=E-PREPAG&";
+    var link = "http://twitter.com/share?url=<?= EPREPAG_URL_HTTP ?>/prepag2/commerce/modelos.php?prod="+prod+"&via=E-Prepag&text=E-PREPAG&";
     var prod = eval(prod);
     //alert(prod);
     //alert(link);

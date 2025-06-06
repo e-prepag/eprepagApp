@@ -1,7 +1,9 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 require_once "../../../includes/constantes.php";
 require_once "../../../includes/functions.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
+require_once "/www/includes/load_dotenv.php";
 
 $posicao = "Inferior Internas";
 $controller = new HeaderController;
@@ -32,7 +34,7 @@ if($msg == ""){
         //Tentando executar a Query de Insert
         $stmt = $pdo->prepare($sql);
 		
-		$key = getEnvVariable('ENCRYPT_KEY');
+		$key = getenv('ENCRYPT_KEY');
 		$plaintext = $venda_id;
 		$ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
 		$iv = openssl_random_pseudo_bytes($ivlen);
@@ -231,7 +233,15 @@ if($vg_ultimo_status == 1){
                     <p class="margin004 txt-azul-claro"><strong>Status: <span class="<?=$color?>"><?php echo $GLOBALS['STATUS_VENDA_DESCRICAO'][$vg_ultimo_status] ?></span></strong></p>
 					<?php
 					
-					     $sqlGarena = "select count(*) as tot from tb_venda_games_modelo where vgm_opr_codigo = 124 and vgm_vg_id =" . $venda_id;
+					     $sqlGarena = "select count(*) as tot,
+                            (
+                                SELECT vgm_ogp_id
+                                FROM tb_venda_games_modelo
+                                WHERE vgm_opr_codigo = 124 and vgm_vg_id = $venda_id
+                                GROUP BY vgm_ogp_id
+                                ORDER BY COUNT(*) DESC
+                                LIMIT 1
+                            ) AS vgm_ogp_id from tb_venda_games_modelo where vgm_opr_codigo = 124 and vgm_vg_id =" . $venda_id;
 						 $dadosGarena = $pdo->prepare($sqlGarena);
 						 $dadosGarena->execute();
 						 $totalGarena = $dadosGarena->fetch(PDO::FETCH_ASSOC);
@@ -239,7 +249,13 @@ if($vg_ultimo_status == 1){
 						 //$totalGarena = pg_fetch_array($dadosGarena); 
 						
 						 if($totalGarena["tot"] > 0){
-							 echo '<div style="margin-top:5px;"><a target="_blank" href="https://www.e-prepag.com.br/resgate/garena/creditos.php" style="display:block;width: 200px;" class="btn btn-success copiar">link para resgate Garena</a></div>';
+                            $mapaJogo = [
+                                433 => "free_fire",
+                                569 => "delta_force"
+                            ];
+                            
+                            $jogoGarena = $mapaJogo[$totalGarena["vgm_ogp_id"]] ? $mapaJogo[$totalGarena["vgm_ogp_id"]] : "";
+							 echo '<div style="margin-top:5px;"><a target="_blank" href="' . EPREPAG_URL_HTTPS . '/resgate/garena/creditos.php?game='.$jogoGarena.'" style="display:block;width: 200px;" class="btn btn-success copiar">link para resgate Garena</a></div>';
 						 }
 					 
 					?>
@@ -527,7 +543,7 @@ if($vg_ultimo_status == 1){
 				$("#msgUser").css({color:"#268fbd"});
 				$.ajax({
 
-					url: "https://www.e-prepag.com.br/ajax/garena/verificaProduto.php",
+					url: "<?= EPREPAG_URL_HTTPS ?>/ajax/garena/verificaProduto.php",
 					method: "POST",
                     data: { codigo: [c], garena: $("#UserGarena").val(), type: "usuario", valid: true, vde: vd},
 					beforeSend: function(){
@@ -572,7 +588,7 @@ if($vg_ultimo_status == 1){
 							  
 							  $.ajax({
 
-								url: "https://www.e-prepag.com.br/ajax/garena/verificaProduto.php",
+								url: "<?= EPREPAG_URL_HTTPS ?>/ajax/garena/verificaProduto.php",
 								method: "POST",
 								data: { codigo: [c], garena: $("#UserGarena").val(), type: "usuario", vde: vd},
 								beforeSend: function(){

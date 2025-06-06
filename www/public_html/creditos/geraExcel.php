@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,7 +30,7 @@
 <?php
 
    if(empty($_SESSION["pins"]) || !isset($_SESSION["pins"])){
-	   header("loction: https://www.e-prepag.com.br/creditos/pesquisa.php");
+	   header("loction: " . EPREPAG_URL_HTTPS . "/creditos/pesquisa.php");
 	   exit;
    }
    $arquivo = 'Pins-disponiveis.xls';

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 
 	header("Content-Type: text/html; charset=ISO-8859-1",true);
@@ -39,7 +40,7 @@
         <script type="text/javascript" src="/js/modalwaitingfor.js"></script>
         <script type="text/javascript" src="/js/valida.js"></script>
 		
-		<link rel="stylesheet" href="https://www.e-prepag.com.br/creditos/esqueci-minha-senha/style/style.css" />
+		<link rel="stylesheet" href="<?= EPREPAG_URL_HTTPS ?>/creditos/esqueci-minha-senha/style/style.css" />
 		
     </head>
     <body>

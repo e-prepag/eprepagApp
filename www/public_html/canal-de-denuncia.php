@@ -11,6 +11,7 @@ if ($request_uri !== $script_name) {
 require_once "../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once DIR_CLASS . "util/CanalDenuncia.php";
+require_once "/www/includes/load_dotenv.php";
 $controller = new HeaderController;
  
 $pagina_titulo = "E-prepag - Créditos para Games";
@@ -242,10 +243,10 @@ if(isset($GLOBALS['_POST']['enviado']) && $GLOBALS['_POST']['enviado']){
 		
 		 if(!empty($_POST["g-recaptcha-response"])){
 			
-		    $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+		    $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
 			$recaptcha = curl_init();
 			curl_setopt_array($recaptcha, [
-				CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+				CURLOPT_URL => getenv("RECAPTCHA_URL"),
 				CURLOPT_CUSTOMREQUEST => "POST",
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_POSTFIELDS => http_build_query($tokenInfo)

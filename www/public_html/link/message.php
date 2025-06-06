@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,11 +14,11 @@
         <div class="container-fluid vh-100">
 		     <div class="row h-100 bg-secondary-subtle justify-content-center align-items-center">
 				<div class="col-10 col-sm-8 col-md-7 col-lg-6 col-xl-4 bg-white rounded px-3 py-5 shadow text-center">
-				     <img title="E-Prepag" src="https://www.e-prepag.com.br/sys/imagens/epp_logo.png">
+				     <img title="E-Prepag" src="<?= EPREPAG_URL_HTTPS ?>/sys/imagens/epp_logo.png">
 				     <div class="alert alert-warning mt-4 border-top-0 border-end-0 border-bottom-0 border-warning-subtle border-5" role="alert">
 						<span class="fs-3">&#128680;</span> O tempo acabou, por favor gere outro link.
 					 </div>
-					 <a class="btn btn-primary" href="https://www.e-prepag.com.br/creditos/login.php">Voltar</a>
+					 <a class="btn btn-primary" href="<?= EPREPAG_URL_HTTPS ?>/creditos/login.php">Voltar</a>
 				</div>
 			 </div>
 		</div>

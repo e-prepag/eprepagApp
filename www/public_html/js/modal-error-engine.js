@@ -6,7 +6,7 @@ let link = document.createElement('link');
 link.id = cssId;
 link.rel = 'stylesheet';
 link.type = 'text/css';
-link.href = 'https://www.e-prepag.com.br/css/modal-error-style.css'; // Corrigido o domínio
+link.href = '/css/modal-error-style.css'; // Corrigido o domínio
 link.media = 'all';
 
 head.appendChild(link);

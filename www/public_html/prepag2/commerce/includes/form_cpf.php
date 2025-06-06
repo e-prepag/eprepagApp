@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -193,7 +194,7 @@ if (isset($_REQUEST['formsubmit'])) {
     // Atingiu o limite máximo de utilização do mesmo CPF
     else {
 
-        $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"https://www.e-prepag.com/support\");\' style=\'cursor:pointer; color:#2e5984;\'>https://www.e-prepag.com/support</span>.";
+        $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"" . EPREPAG_URL_HTTPS_COM . "/support\");\' style=\'cursor:pointer; color:#2e5984;\'>" . EPREPAG_URL_HTTPS_COM . "/support</span>.";
 
     }//end else do elseif ($testeCPF != 171)
 

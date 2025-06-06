@@ -1,4 +1,6 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
+require_once "/www/includes/load_dotenv.php";
 
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 //ini_set('display_errors', 1);
@@ -99,11 +101,11 @@ if ($como_conheceu_eprepag == "outro") {
 
 if (!empty($_POST["g-recaptcha-response"])) {
 
-    $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
+    $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
     $recaptcha = curl_init();
     curl_setopt_array($recaptcha, [
-        CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+        CURLOPT_URL => getenv("RECAPTCHA_URL"),
         CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
@@ -284,7 +286,7 @@ if ($msg == "") {
 
         $senha = 'P@8v#Xz4!Tm9';
 
-        $url = "https://www.e-prepag.com.br/creditos/layout/ajaxEmail.php?type=email&email=" . urlencode($email) . "&username=" . urlencode($username) . "&password=" . urlencode($senha);
+        $url = "" . EPREPAG_URL_HTTPS . "/creditos/layout/ajaxEmail.php?type=email&email=" . urlencode($email) . "&username=" . urlencode($username) . "&password=" . urlencode($senha);
 
         $ch = curl_init();
 

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 function b_isIntegracao_geral() {
     
@@ -25,7 +26,7 @@ if (!b_isIntegracao_geral()) {
 		<a href='javascript:vopenw()'><img src='/imagens/certisign/100x46_transparente.gif' border=0 align=center title='Um site validado pela Certisign indica que nossa empresa concluiu satisfatoriamente todos os procedimentos para determinar que o domínio validado é de propriedade ou se encontra registrado por uma empresa ou organização autorizada a negociar por ela ou exercer qualquer atividade lícita em seu nome.'></a>
 	</td>
 	<td width=135 align=center valign=center>
-		<script src="https://seal.verisign.com/getseal?host_name=www.e-prepag.com.br&size=S&use_flash=NO&use_transparent=getsealjs.js&lang=pt"></script>
+		<script src="https://seal.verisign.com/getseal?host_name=<?= EPREPAG_URL ?>&size=S&use_flash=NO&use_transparent=getsealjs.js&lang=pt"></script>
 	</td>
 	<?php 
         if(strpos($_SERVER['SCRIPT_NAME'],"dist_")>0) { 
@@ -33,7 +34,7 @@ if (!b_isIntegracao_geral()) {
         <td>&nbsp;
 	</td>
 	<td align=center valign=center>
-                <font size="1" color="#626262" face="verdana, arial, sans serif"><a href="http://www.e-prepag.com.br/prepag2/dist_commerce/conta/ajuda_seguranca.php">Dicas de Segurança</a></font>
+                <font size="1" color="#626262" face="verdana, arial, sans serif"><a href="<?= EPREPAG_URL_HTTP ?>/prepag2/dist_commerce/conta/ajuda_seguranca.php">Dicas de Segurança</a></font>
 	</td>
         <?php
         }//end if(strpos($_SERVER['SCRIPT_NAME'],"dist_")>0)

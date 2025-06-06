@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 header("Content-Type: text/html; charset=ISO-8859-1",true);
@@ -15,7 +16,7 @@ if(!empty($_SERVER['HTTP_REFERER'])){
 
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
-//$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+//$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'EPREPAG_URL');
 session_start();
 
 //error_reporting(E_ALL); 
@@ -465,7 +466,7 @@ $Resultadoestado = $SIGLA_ESTADOS;
             <?php if ($withLogo) { ?>
                 <div id="background_banner">
                     <a href="http://br.leagueoflegends.com/pt/pagamentos#map" target="__blank"><img src="/eprepag/moedavirtual/imgs/banner_lol_ekko.jpg" /></a>
-                    <a href="https://www.e-prepag.com/Cartao-Xbox-Live-Gold-na-Eprepag" target="__blank"><img src="/eprepag/moedavirtual/imgs/banner_xbox_card.jpg" /></a>
+                    <a href="<?= EPREPAG_URL_HTTPS_COM ?>/Cartao-Xbox-Live-Gold-na-Eprepag" target="__blank"><img src="/eprepag/moedavirtual/imgs/banner_xbox_card.jpg" /></a>
                     <a href="http://blog.e-prepag.com/seja-um-ponto-de-venda/" target="__blank"><img src="/eprepag/moedavirtual/imgs/banner_faca_parte.jpg" /></a>
                 </div>
 

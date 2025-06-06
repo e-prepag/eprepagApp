@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
@@ -9,7 +10,7 @@ require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
 require_once DIR_INCS . "funcoes_cpf.php";
-
+require_once "/www/includes/load_dotenv.php";
 
 checkingIsCompletedData('/creditos/carrinho/');///prepag2/dist_commerce/finaliza_venda_preview
 
@@ -60,11 +61,11 @@ fwrite($ff, "***************************************************\r\n");
 fclose($ff);
  if(!empty($_POST["g-recaptcha-response"])){
 		
-   $tokenInfo = ["secret" => "ES_c5e93fbd48b146578b65fc84f8717a95", "response" => $_POST["g-recaptcha-response"]];  //, "remoteip" => $_SERVER["REMOTE_ADDR"]
+   $tokenInfo = ["secret" => getenv("HCAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"]];  //, "remoteip" => $_SERVER["REMOTE_ADDR"]
 
 	$recaptcha = curl_init();
 	curl_setopt_array($recaptcha, [
-		CURLOPT_URL => 'https://api.hcaptcha.com/siteverify', // https://www.google.com/recaptcha/api/siteverify
+		CURLOPT_URL => getenv("HCAPTCHA_URL"), // https://www.google.com/recaptcha/api/siteverify
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
@@ -89,13 +90,13 @@ fclose($ff);
 	
 	if($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))){
 		$erro = true;
-		header("location: https://www.e-prepag.com.br/creditos/");
+		header("location: " . EPREPAG_URL_HTTPS . "/creditos/");
         exit;
 	}
    
 }
 else{
-  header("location: https://www.e-prepag.com.br/creditos/");
+  header("location: " . EPREPAG_URL_HTTPS . "/creditos/");
   exit;
 }
 

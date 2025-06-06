@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <link href="/includes/bootstrap/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />
 <link href="/css/creditos.css" rel="stylesheet" type="text/css" />
 
@@ -55,7 +56,7 @@ if($pagto_tipo == $FORMAS_PAGAMENTO['DEP_DOC_TRANSF']){
         $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";	
 
 } elseif ($pagto_tipo == $PAGAMENTO_PIN_EPREPAG_NUMERIC){ // $FORMAS_PAGAMENTO['PAGAMENTO_PIN_EPREPAG']
-        $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";		// https://www.e-prepag.com.br
+        $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";		// EPREPAG_URL_HTTPS
 
 } elseif ($pagto_tipo == $PAGAMENTO_HIPAY_ONLINE_NUMERIC){ 
         $strRedirect = "/prepag2/commerce/conta/pagto_compr_online.php";	

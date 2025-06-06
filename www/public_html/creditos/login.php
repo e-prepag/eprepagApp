@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 require_once "../../includes/constantes.php";
@@ -8,7 +9,7 @@ $controller = new OfflineController;
 require_once "includes/header-offline.php";
 
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 
 //Id do GoCASH
@@ -79,7 +80,7 @@ Function translateCode($scode) {
         <div class="alert alert-danger" role="alert">
             <span class="glyphicon glyphicon-exclamation-sign t0" aria-hidden="true"></span>
             <span class="sr-only">Erro:</span>
-            <?php echo $msg; ?>
+            <?php echo htmlspecialchars(utf8_decode($msg)); ?>
         </div>
     </div>
 <?php
@@ -92,7 +93,7 @@ Function translateCode($scode) {
 			<div class="alert-login">
 				O acesso para conta principal deverá ser feito somente com o login cadastrado.
 			</div>
-            <form action="loginEf.php" method="post">
+            <form action="login_auth.php" method="post">
                 <div class="form-group top20 col-md-8 col-md-offset-4 col-sm-12 col-xs-12">
                     <div class="col-md-3 col-md-offset-1">
                         <label for="login">Login:</label>
@@ -112,7 +113,7 @@ Function translateCode($scode) {
 						<div style="padding: 10px 0 15px 0;">
 							<div class="g-recaptcha" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T"></div>
 						</div>
-						<a class="decoration-none txt-cinza" href="https://www.e-prepag.com.br/creditos/esqueci-minha-senha/index.php?redirected=true&origemUsuario=pdv"><em>Esqueci minha senha</em></a>
+						<a class="decoration-none txt-cinza" href="<?= EPREPAG_URL_HTTPS ?>/creditos/esqueci-minha-senha/index.php?redirected=true&origemUsuario=pdv"><em>Esqueci minha senha</em></a>
                     </div>
                     <div class="col-md-8 col-md-offset-6 fontsize-p">
                         <a class="decoration-none txt-cinza" id="faca-cadastro" target="_blank" href="/cadastro-de-ponto-de-venda.php"><em>Faça aqui seu cadastro</em></a>

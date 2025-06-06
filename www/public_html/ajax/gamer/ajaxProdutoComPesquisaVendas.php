@@ -1,42 +1,58 @@
 <?php
 require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto."public_html/sys/includes/topo_sys_inc.php";
+require_once __DIR__ . "/../../../db/connect.php"; 
+require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 
-if ($_REQUEST['id'] > 0){
-    if(strpos($_SERVER['HTTP_REFERER'],'dist_commerce') > 0)
-        $tb = "tb_dist_operadora_games_produto";
-    else
-        $tb = "tb_operadora_games_produto";
-    
-	$sql = "SELECT ogp_id,ogp_nome FROM $tb WHERE ogp_opr_codigo = " . $_REQUEST['id'] . "";
-//echo $sql."<br>";
-	$rs_oprProdutos = SQLexecuteQuery($sql);
+$id = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
+
+if ($id > 0) {
+    // Determina a tabela com base no referer
+    $tb = (strpos($_SERVER['HTTP_REFERER'], 'dist_commerce') > 0)
+        ? "tb_dist_operadora_games_produto"
+        : "tb_operadora_games_produto";
+
+    // Valida se a tabela é permitida (evita SQL Injection via nome de tabela)
+    $tabelasPermitidas = ['tb_dist_operadora_games_produto', 'tb_operadora_games_produto'];
+    if (!in_array($tb, $tabelasPermitidas)) {
+        die("Tabela não permitida.");
+    }
+
+    // Conexão PDO
+    try {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Prepara e executa a consulta com placeholder
+        $sql = "SELECT ogp_id, ogp_nome FROM $tb WHERE ogp_opr_codigo = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rs_oprProdutos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (PDOException $e) {
+        die("Erro na conexão ou consulta: " . $e->getMessage());
+    }
 }
 
-$id = $_REQUEST['id'];
+// Exibe os checkboxes se houver produtos
+if (!empty($rs_oprProdutos)) {
+    foreach ($rs_oprProdutos as $row) {
+        $checked = '';
+        if (isset($tf_produto) && is_array($tf_produto) && in_array($row['ogp_nome'], $tf_produto)) {
+            $checked = ' checked';
+        } elseif (isset($tf_produto) && $row['ogp_nome'] == $tf_produto) {
+            $checked = ' checked';
+        }
 
-if(isset($rs_oprProdutos) && $rs_oprProdutos){
-
-	$v = 0;
-	while($rs_oprProdutos_row = pg_fetch_array($rs_oprProdutos)){ 
+        echo '<nobr><input type="checkbox" id="tf_produto" name="tf_produto[]" value="' . 
+             htmlspecialchars($row['ogp_nome']) . '"' . $checked . '>' . 
+             str_replace(" ", "&nbsp;", utf8_encode($row['ogp_nome'])) . "</nobr>\n";
+    }
+}
 ?>
-		<nobr><input type="checkbox" id="tf_produto" name="tf_produto[]" value="<?php echo $rs_oprProdutos_row['ogp_nome']; ?>"<?php
-		if (isset($tf_produto) && is_array($tf_produto)){
-			if (in_array($rs_oprProdutos_row['ogp_nome'], $tf_produto)){ 
-				echo " checked";
-			}else{
-				if ($rs_oprProdutos_row['ogp_nome'] == $tf_produto){
-					echo " checked";
-				}
-			}
-		}								
-		?>><?php 
-		echo str_replace(" ", "&nbsp;", utf8_encode($rs_oprProdutos_row['ogp_nome'])); 
-		?></nobr> 
-<?php 
-	}
-}	
-?><script>
+<script>
 		
 /*
 

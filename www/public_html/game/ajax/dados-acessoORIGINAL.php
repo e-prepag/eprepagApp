@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 session_start();
@@ -90,7 +91,7 @@ if(Util::isAjaxRequest()){
                 $strEncrypt = "email=".$_POST['email']."&id=".$usuario->getId();
                 $objEncryption = new Encryption();
                 $strEncrypt = urlencode($objEncryption->encrypt($strEncrypt));
-                $server_url = 'https://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+                $server_url = 'https://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
                 $strMail = "Para efetivar a alteração, por favor, faça o login de sua conta em nosso site e acesse este link a seguir: <a href='$server_url/game/conta/altera-email.php?c=".$strEncrypt."'>$server_url/game/conta/altera-email.php?c=".$strEncrypt."</a>";
 

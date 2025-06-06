@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 
 $msg = '';
@@ -377,7 +378,7 @@ src="https://www.facebook.com/tr?id=564270170805767&ev=PageView
                             Agora nossa equipe de negócios irá verificar seus dados.<br />
                             Este processo de análise leva até 3 dias úteis. Se for aprovado você receberá um e-mail com as instruções do serviço.<br />
                             <br />
-                            Caso tenha alguma dúvida por favor entre em contato com nosso <a href="<?php echo $https;?>://www.e-prepag.com/support" target="_blank">suporte</a>.
+                            Caso tenha alguma dúvida por favor entre em contato com nosso <a href="<?php echo $https;?>://<?= EPREPAG_URL_COM ?>/support" target="_blank">suporte</a>.
                         </span>
                     </div>
                 </div>

@@ -816,7 +816,7 @@ $(function(){
                                     { //
                                         $schanel = (($pgrow['vg_canal']=="L")?"pdv":"gamer");
 ?>
-                                        <td class="text-center"><a href="https://<?php echo $_SERVER["SERVER_NAME"] ?>:8080/<?php  echo $schanel; ?>/vendas/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo "".$pgrow['vg_id']; ?></a></td>
+                                        <td class="text-center"><a href="https://<?php echo $server_url_complete ?>/<?php  echo $schanel; ?>/vendas/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo "".$pgrow['vg_id']; ?></a></td>
                                         <td class="text-center"><?php  echo "".$pgrow['vg_canal']; ?></td>
 <?php
                                     }

@@ -55,7 +55,7 @@ body {
 
 .diamond,
 .conta {
-	color: #ffb900;
+	color: #d81a0d;
 	transition: color .5s ease-in;
 }
 
@@ -79,11 +79,11 @@ body {
 }
 
 .input-group:hover .diamond {
-	color: #A07900;
+	color: #ad150a;
 }
 
 .input-group:hover .conta {
-	color: #A07900;
+	color: #ad150a;
 }
 
 .text-inform {
@@ -104,7 +104,7 @@ body {
 #confirma {
 	font-weight: bold;
 	border-color: transparent;
-	background-color: #ffb900;
+	background-color: #d81a0d;
 	color: white;
 	box-shadow: 2px 2px 5px rgba(255, 185, 0, 0.4);
 }
@@ -113,12 +113,12 @@ body {
 	/* background-color: transparent; */
 	color: lightgray;
 	border-color: transparent;
-	background-color: #A07900;
+	background-color: #ad150a;
 }
 
 .logo-epp {
 	width: auto;
-	height: 28px;
+	height: 26px;
 	position: fixed;
 }
 
