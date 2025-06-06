@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 // include do arquivo contendo IPs DEV
 // include do arquivo contendo IPs DEV
@@ -9,7 +10,7 @@ if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
     }
 else {
-    $server_url = "www.e-prepag.com.br";
+    $server_url = "" . EPREPAG_URL . "";
 }
 ?>
 <title>E-Prepag - Créditos para games online</title>
@@ -19,7 +20,7 @@ else {
     <div class="faixa">
     </div>
     <div class="links">
-            <a href="https://www.e-prepag.com/" target="_blank" class="corlink">E-Prepag</a> | <a href="https://www.e-prepag.com/support" target="_blank" class="corlink">Suporte</a> | <a href="http://blog.e-prepag.com/seja-um-ponto-de-venda/" target="_blank" class="corlink">Seja um ponto autorizado</a>
+            <a href="<?= EPREPAG_URL_HTTPS_COM ?>/" target="_blank" class="corlink">E-Prepag</a> | <a href="<?= EPREPAG_URL_HTTPS_COM ?>/support" target="_blank" class="corlink">Suporte</a> | <a href="http://blog.e-prepag.com/seja-um-ponto-de-venda/" target="_blank" class="corlink">Seja um ponto autorizado</a>
     </div>
     <div class="dadosparceiro">
         <img src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://<?php echo $server_url; ?>/imagens/logo_ongame.jpg" class="goodgames" width="150"/>

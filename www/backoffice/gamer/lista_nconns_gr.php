@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php  
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -203,7 +204,7 @@ $dia_ingles = date("w", strtotime(substr($data_ini,0,10)));
 echo "$tf_v_data_inclusao_ini -> $dia_ingles<br>";
 echo "subtitle: ".$subtitle."<br>";
 */
-//echo "img_path+fname: http://www.e-prepag.com.br:8080".$datafull['img_path'].$datafull['fname']."<br>";
+//echo "img_path+fname: EPREPAG_URL_HTTP:8080".$datafull['img_path'].$datafull['fname']."<br>";
 
 $strenc = urlencode(serialize($datafull));
 //print $strenc . "<br>\n";

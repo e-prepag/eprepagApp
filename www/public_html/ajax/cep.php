@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 	// "1LG8j9ofhEp6DAedOzZ1V3WAbKeIGY1"
 	$chave = "1rWe5Px/mdDJ8okXCFBrTMEgyF3O1A0";
@@ -120,7 +121,7 @@ function getFileByCURL($url, $post_parameters) {
 
 	// Some sites may protect themselves from remote logins by checking which site you came from.
 	// http://php.net/manual/en/function.curl-setopt.php
-	$ref_url = "http://www.e-prepag.com.br";
+	$ref_url = "" . EPREPAG_URL_HTTP . "";
 	curl_setopt($curl_handle, CURLOPT_REFERER, $ref_url);
 	
 	// http://www.weberdev.com/get_example-4136.html

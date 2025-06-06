@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 // Functions processaExpressMoneyLH() e processaEmailExpressMoneyLH(), 
 //	similares àquelas em \bkov2_prepag\dist_commerce\includes\functions_vendaGames.php"
@@ -149,7 +150,7 @@ function processaEmailExpressMoneyLH_pag_online($venda_id, $parametros){
     //envia email
     if($msg == ""){
 
-            $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+            $parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
             $parametros['nome_fantasia'] = $ug_nome_fantasia;
             $parametros['tipo_cadastro'] = $ug_tipo_cadastro;
             $parametros['sexo'] = $ug_sexo;

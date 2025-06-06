@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php 
 
 header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'",true);
@@ -91,7 +92,7 @@ require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_verificacoes.php";
 				"where vg.vg_id = " . $venda_id . " and vg.vg_ug_id=" . $usuarioGames->getId();
 		$rs_venda_modelos = SQLexecuteQuery($sql);
 
-		$parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+		$parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
 
 		$msgEmail  = email_cabecalho($parametros);
 	    $msgEmail .= "	<br>

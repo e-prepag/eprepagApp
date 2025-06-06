@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //script equivalente a C:/Sites/E-Prepag/www/web/prepag2/dist_commerce/includes/incProcessado_dr.php
 
@@ -5,7 +6,7 @@
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "configIP.php";
 require_once DIR_INCS . "pdv/constantes.php";
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }
@@ -317,7 +318,7 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
        } //if($podeEnviarEmail)
 ?>      
             <button type="button" class="btn btn-success" id="imprimirPin" value="">Imprimir</button>
-			<a class="btn btn-success" href="https://www.e-prepag.com.br/creditos/pedidos.php">Meus pedidos</a>
+			<a class="btn btn-success" href="<?= EPREPAG_URL_HTTPS ?>/creditos/pedidos.php">Meus pedidos</a>
     </p>
 <?php 
 

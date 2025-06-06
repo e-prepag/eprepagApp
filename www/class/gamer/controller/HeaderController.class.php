@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 set_time_limit(180);
 ini_set('max_execution_time', 180); 
@@ -17,11 +18,11 @@ if($_SERVER['HTTPS']!="on") {
 
 if(!checkIP()){
     if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false){
-        header("Location: https://www.e-prepag.com.br" . $_SERVER['REQUEST_URI']);
+        header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
         die();
     }
     elseif(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), ".br") === false){
-        header("Location: https://www.e-prepag.com.br" . $_SERVER['REQUEST_URI']);
+        header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
         die();
     }
 } 

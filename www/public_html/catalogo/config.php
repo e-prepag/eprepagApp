@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 require_once "/www/db/connect.php";
@@ -25,10 +26,10 @@ if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
 			$resultado = $query->fetch(PDO::FETCH_ASSOC);
 			
 			if($resultado != false){
-				header("location: https://www.e-prepag.com.br/game/produto/detalhe.php?token={$resultado["token_produto"]}");
+				header("location: " . EPREPAG_URL_HTTPS . "/game/produto/detalhe.php?token={$resultado["token_produto"]}");
 				exit;
 			}else{
-				header("location: https://www.e-prepag.com.br/game/produto/detalhe.php");
+				header("location: " . EPREPAG_URL_HTTPS . "/game/produto/detalhe.php");
 				exit;
 			}
 		

@@ -1,10 +1,45 @@
-<?php 
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
+<?php
 
 $_PaginaOperador1Permitido = 53; // o número magico
 
 $_PaginaOperador2Permitido = 54;
 
+function getEstilosUsuarioPDO($userId, PDO $pdo)
+{
+    // Configurações recomendadas
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+    $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 
+    $sql = "SELECT ug_estilo, ug_logo FROM dist_usuarios_games WHERE ug_id = :userId";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($resultado && isset($resultado['ug_estilo'])) {
+        $dados = json_decode($resultado['ug_estilo'], true);
+
+        if (!empty($resultado['ug_logo'])) {
+            // Se for um stream, precisamos ler o conteúdo
+            $logoRaw = is_resource($resultado['ug_logo'])
+                ? stream_get_contents($resultado['ug_logo'])
+                : $resultado['ug_logo'];
+
+            // Detectar extensão do logo (opcional)
+            $ext = isset($dados['logo_extensao']) ? strtolower($dados['logo_extensao']) : 'png';
+            $mime = ($ext === 'jpg') ? 'jpeg' : $ext;
+
+            // Gerar base64 da imagem
+            $dados['logo_base64'] = 'data:image/' . $mime . ';base64,' . base64_encode($logoRaw);
+        }
+
+        return is_array($dados) ? $dados : array();
+    }
+
+    return array();
+}
 
 require_once "../../includes/constantes.php";
 
@@ -12,13 +47,13 @@ require_once DIR_INCS . "main.php";
 
 require_once DIR_INCS . "pdv/main.php";
 
-require_once DIR_CLASS."pdv/classOperadorGamesUsuario.php";
+require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
 
 
 
 // include do arquivo contendo IPs DEV
 
-require_once DIR_INCS. "configIP.php";
+require_once DIR_INCS . "configIP.php";
 
 
 
@@ -28,21 +63,30 @@ require_once DIR_CLASS . "pdv/classPesquisaEY.php";
 
 $_PaginaOperador1Permitido = 53; // o número magico
 
-$_PaginaOperador2Permitido = 54; 
+$_PaginaOperador2Permitido = 54;
 
-validaSessao(); 
+validaSessao();
 
-header("Content-Type: text/html; charset=ISO-8859-1",true);
+header("Content-Type: text/html; charset=ISO-8859-1", true);
 
 //Recupera usuario
 
-if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser'])){
+if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser'])) {
 
-	$usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
+    $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 
-	$usuarioId = $usuarioGames->getId();
+    $usuarioId = $usuarioGames->getId();
+    $nome_pdv = $usuarioGames->getNomeFantasia();
 
-
+    $con = ConnectionPDO::getConnection();
+    $pdo = $con->getLink();
+    $estilos = getEstilosUsuarioPDO($usuarioId, $pdo);
+    if (!filter_var($estilos['email_suporte'], FILTER_VALIDATE_EMAIL)){
+        $estilos['email_suporte'] = "";
+    }
+    if (!filter_var($estilos['link_canal'], FILTER_VALIDATE_URL)) {
+        $estilos['link_canal'] = "";
+    }
 
     //Variavel para mensagens
 
@@ -54,19 +98,18 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
 
     $listaPINs = "";
 
-    foreach($_POST as $key => $val) {
+    foreach ($_POST as $key => $val) {
 
-        if($key!=str_replace('emitir', '', $key)) { 
+        if ($key != str_replace('emitir', '', $key)) {
 
-            if(empty($listaPINs)) {
+            if (empty($listaPINs)) {
 
                 $listaPINs = $val;
 
             }//end if(empty($listaPINs))
-
             else {
 
-                $listaPINs .= ",".$val;
+                $listaPINs .= "," . $val;
 
             }//end else do if(empty($listaPINs))
 
@@ -84,7 +127,7 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
 
     //Testando se teve algum PIN selecionado
 
-    if(empty($listaPINs)) {
+    if (empty($listaPINs)) {
 
         die("<p class='text-red'>Nenhum PIN selecionado.</p>");
 
@@ -100,9 +143,9 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
 
     //capturando a variável server
 
-    $server_url = "www.e-prepag.com.br";
+    $server_url = "" . EPREPAG_URL . "";
 
-    if(checkIP()) {
+    if (checkIP()) {
 
         $server_url = $_SERVER['SERVER_NAME'];
 
@@ -110,9 +153,9 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
 
 
 
-    if($msg == ""){
+    if ($msg == "") {
 
-            $sql  = "select p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
+        $sql = "select p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
 
                                     vgm.vgm_nome_produto, vgm.vgm_nome_modelo, opr.opr_codigo, opr.opr_nome, opr.opr_ban_pos, ogp.ogp_nome_imagem, 
 
@@ -138,21 +181,21 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
 
                      where vg.vg_ug_id = $usuarioId 
 
-                           and vg.vg_id = ".$_POST['tf_v_codigo_detalhe']." 
+                           and vg.vg_id = " . $_POST['tf_v_codigo_detalhe'] . " 
 
                            and vgmp.vgmp_pin_codinterno in ($lp_ids)
 
                      order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde ";
 
-    //echo "$sql<br>";
+        //echo "$sql<br>";
 
-            $rs_modelos = SQLexecuteQuery($sql);
+        $rs_modelos = SQLexecuteQuery($sql);
 
-            if(!$rs_modelos || pg_num_rows($rs_modelos) == 0) $msg = "Nenhum cupom encontrado.\n";
+        if (!$rs_modelos || pg_num_rows($rs_modelos) == 0)
+            $msg = "Nenhum cupom encontrado.\n";
+        else {
 
-            else{
-
-                    $sql  = "update tb_dist_venda_games_modelo_pins set
+            $sql = "update tb_dist_venda_games_modelo_pins set
 
                                             vgmp_impressao_ult_data = CURRENT_TIMESTAMP,
 
@@ -160,373 +203,389 @@ if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuario
 
                                     where vgmp_pin_codinterno in ($lp_ids)";
 
-                    $ret = SQLexecuteQuery($sql);
+            $ret = SQLexecuteQuery($sql);
 
-                    if(!$ret) $msg = "Erro ao atualizar quantidade de impressões dos cupons.\n";
+            if (!$ret)
+                $msg = "Erro ao atualizar quantidade de impressões dos cupons.\n";
 
-            } //end else do if(!$rs_modelos || pg_num_rows($rs_modelos) == 0)
+        } //end else do if(!$rs_modelos || pg_num_rows($rs_modelos) == 0)
 
     } //end if($msg == "")
 
-?>
+    ?>
 
     <html>
 
     <head>
 
-            <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-            <title>Rede E-Prepag Meios de Pagamentos / Prepag Money</title>
+        <title>Rede E-Prepag Meios de Pagamentos / Prepag Money</title>
 
-            <link href="/incs/css.css" rel="stylesheet" type="text/css">
+        <link href="/incs/css.css" rel="stylesheet" type="text/css">
 
-            <style type="text/css">
-
+        <style type="text/css">
             <!--
+            @media print {
 
-                @media print {
-
-                  .noprint { display: none; }
-
+                .noprint {
+                    display: none;
                 }
 
-                .texto_vermelho {
+            }
 
-                        font-family: Arial, Helvetica, sans-serif;
+            .texto_vermelho {
 
-                        font-size: 11px;
+                font-family: Arial, Helvetica, sans-serif;
 
-                        color: #FF0000;
+                font-size: 11px;
 
-                }
+                color: #FF0000;
 
-                .label_pin {
+            }
 
-                        font-family: Arial, Helvetica, sans-serif;
+            .label_pin {
 
-                        font-size: 20px;
+                font-family: Arial, Helvetica, sans-serif;
 
-                        font-weight:bold;
+                font-size: 20px;
 
-                        color:#000000;
+                font-weight: bold;
 
-                }
+                color: #000000;
 
-                .novo_label {
+            }
 
-                        font-family: Arial, Helvetica, sans-serif;
+            .novo_label {
 
-                        font-size: 20px;
+                font-family: Arial, Helvetica, sans-serif;
 
-                        color:#000000;
+                font-size: 20px;
 
-                }
+                color: #000000;
 
-                .dados_pin_texto {
+            }
 
-                        font-family: Arial, Helvetica, sans-serif;
+            .dados_pin_texto {
 
-                        font-size: 15px;
+                font-family: Arial, Helvetica, sans-serif;
 
-                        vertical-align:middle;
+                font-size: 15px;
 
-                        color:#58585A;
+                vertical-align: middle;
 
-                }
+                color: #58585A;
 
-                .dados_pin_linha {
+            }
 
-                        background-color:#BCBDC1;
+            .dados_pin_linha {
 
-                }
+                background-color: #BCBDC1;
 
-                .label_pin_veja {
+            }
 
-                        font-family: Arial, Helvetica, sans-serif;
+            .label_pin_veja {
 
-                        font-size: 14px;
+                font-family: Arial, Helvetica, sans-serif;
 
-                        font-style:italic;
+                font-size: 14px;
 
-                        color:#58585A;
+                font-style: italic;
 
-                        text-decoration: none;
+                color: #58585A;
 
-                }
+                text-decoration: none;
 
-                .imagem_epp { float: right; display: block; overflow: hidden; position:relative;
+            }
 
-                }
+            .imagem_epp {
+                float: right;
+                display: block;
+                overflow: hidden;
+                position: relative;
 
-                -->
+            }
+            -->
 
-              </style>
+        </style>
 
-    <head>
+        <head>
 
-    <body marginleft="0" marginright="0" margintop="0" marginbottom="0" >
+        <body marginleft="0" marginright="0" margintop="0" marginbottom="0">
 
-<?php
+            <?php
 
-    if($_POST['imprimir_ou_csv'] == 'imprimir'){
+            if ($_POST['imprimir_ou_csv'] == 'imprimir') {
 
-?>        
+                ?>
 
-    
 
-    <table border="0" cellspacing="0" bgcolor="#F0F0F0" width="100%" class='noprint'>
 
-        <tr>
+                <table border="0" cellspacing="0" bgcolor="#F0F0F0" width="100%" class='noprint'>
 
-            <td colspan="2">&nbsp;</td>
+                    <tr>
 
-        </tr>
+                        <td colspan="2">&nbsp;</td>
 
-        <tr>
+                    </tr>
 
-            <td align="center" class="texto">
+                    <tr>
 
-                    <input type="button" name="btImprimir" value="Imprimir" OnClick="window.print();" class="botao_simples">
+                        <td align="center" class="texto">
 
-            </td>
+                            <input type="button" name="btImprimir" value="Imprimir" OnClick="window.print();"
+                                class="botao_simples">
 
-            <td align="center" class="texto">
+                        </td>
 
-                    <input type="button" name="btFechar" value="Fechar" OnClick="window.close();" class="botao_simples">
+                        <td align="center" class="texto">
 
-            </td>
+                            <input type="button" name="btFechar" value="Fechar" OnClick="window.close();" class="botao_simples">
 
-        </tr>
+                        </td>
 
-        <tr>
+                    </tr>
 
-            <td colspan="2">&nbsp;</td>
+                    <tr>
 
-        </tr>
+                        <td colspan="2">&nbsp;</td>
 
-    </table>
+                    </tr>
 
+                </table>
 
 
-<?php 
 
-    }//end if($_POST['imprimir_ou_csv'] == 'imprimir')
+            <?php
 
-    if($msg != "") {
+            }//end if($_POST['imprimir_ou_csv'] == 'imprimir')
+        
+            if ($msg != "") {
 
-?>
+                ?>
 
-    <table border="0" cellspacing="0" align="center" class='noprint'>
+                <table border="0" cellspacing="0" align="center" class='noprint'>
 
-    <tr><td>&nbsp;</td></tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
 
-    <tr valign="middle" bgcolor="#FFFFFF">
+                    <tr valign="middle" bgcolor="#FFFFFF">
 
-            <td align="left" class="texto_vermelho"><?php echo str_replace("\n", "<br>", $msg)?></td>
+                        <td align="left" class="texto_vermelho"><?php echo str_replace("\n", "<br>", $msg) ?></td>
 
-    </tr>
+                    </tr>
 
-    </table>
+                </table>
 
-<?php 	
+            <?php
 
-    }//end if($msg != "")
+            }//end if($msg != "")
+        
 
 
+            $cuponsPorLinha = 2;
 
-    $cuponsPorLinha = 2;
+            if ($_POST['imprimir_ou_csv'] == 'imprimir') {
 
-if($_POST['imprimir_ou_csv'] == 'imprimir'){
+                if ($rs_modelos) {
 
-    if($rs_modelos) {
+                    echo "<center><table cellspacing='0' width='960px'>";
 
-        echo "<center><table cellspacing='0' width='960px'>";
+                    $rs_modelos_row_total = pg_num_rows($rs_modelos);
 
-        $rs_modelos_row_total = pg_num_rows($rs_modelos);
+                    for ($i = 0; $i < $rs_modelos_row_total; $i++) {
 
-        for($i=0;$i<$rs_modelos_row_total;$i++) {
+                        $rs_modelos_row = pg_fetch_array($rs_modelos);
 
-            $rs_modelos_row = pg_fetch_array($rs_modelos);
+                        if ((($i) % $cuponsPorLinha) === 0) {
 
-            if((($i) % $cuponsPorLinha) === 0 ) {
-
-                 //echo "QUebra linha Inicio<br>";
-
-                 echo "<tr class='texto' valign='middle'>
+                            //echo "QUebra linha Inicio<br>";
+        
+                            echo "<tr class='texto' valign='middle'>
 
                                      <td width='480px' style='padding: 5px 5px;' align='center'>";
 
-            }
+                        } else {
 
-            else {
+                            echo "       <td width='480px' style='padding: 5px 5px;' align='center'>";
 
-                 echo "       <td width='480px' style='padding: 5px 5px;' align='center'>";
+                        }
 
-            }
-
-            echo "<table style='border: solid 1px; padding: 5px 15px;'> 
+                        echo "<table style='border: solid 1px; padding: 5px 15px;'> 
 
                   ";
 
-            if($rs_modelos_row['vgm_pin_request'] != 1) {
+                        if ($rs_modelos_row['vgm_pin_request'] != 1) {
 
-                echo " 
+                            echo " 
 
                              <tr style='height: 80px;'>
 
                                  <td colspan='2' align='left'>";
 
-                if($rs_modelos_row['ogp_nome_imagem'] && $rs_modelos_row['ogp_nome_imagem'] != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem'])) {
+                            if ($rs_modelos_row['ogp_nome_imagem'] && $rs_modelos_row['ogp_nome_imagem'] != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem'])) {
 
-                     echo "              <img src='".$GLOBALS['URL_DIR_IMAGES_PRODUTO'].$rs_modelos_row['ogp_nome_imagem']."' title='".$aux_matriz[$i]['descricao']."' alt='".$aux_matriz[$i]['descricao']."' style='max-width: 145px; max-height: 80px;' border='0'>
+                                echo "              <img src='" . $GLOBALS['URL_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem'] . "' title='" . $aux_matriz[$i]['descricao'] . "' alt='" . $aux_matriz[$i]['descricao'] . "' style='max-width: 145px; max-height: 80px;' border='0'>
 
                          ";
 
-                }//end if($rs_modelos_row['ogp_nome_imagem'] && $rs_modelos_row['ogp_nome_imagem'] != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem']))
+                            }//end if($rs_modelos_row['ogp_nome_imagem'] && $rs_modelos_row['ogp_nome_imagem'] != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem']))
+                            
+                            if($estilos['logo_base64']){
+                            echo "               
 
-                echo "               
+                                        <img src='" . $estilos['logo_base64'] . "' title='$nome_pdv' alt='$nome_pdv' border='0' class='imagem_epp' style='max-width: 130px; max-height: 24px;'>";
+                            }else{
+                                echo '<span class="imagem_epp" style="
+        		  font-size: 18px;
+        		  font-weight: bold;
+        		  color: #A7A7A7;
+        		  font-family: Arial, sans-serif;
+        		  letter-spacing: 1px;
+                  text-align: left;
+        		">
+        		  ' . $nome_pdv . '
+        		</span>';
+                            }
 
-                                        <img src='/imagens/pdv/logo_eprepag.gif' title='E-Prepag' alt='E-Prepag' border='0' class='imagem_epp'>";
-
-                echo "
+                            echo "
 
                                  </td>
 
                              </tr>";
 
-            } //end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                        } //end if($rs_modelos_row['vgm_pin_request'] != 1) 
+        
+                        $pin_serial = $rs_modelos_row['case_serial'];
 
-            $pin_serial = $rs_modelos_row['case_serial'];
+                        $case_serial = $rs_modelos_row['pin_serial'];
 
-            $case_serial = $rs_modelos_row['pin_serial'];
 
 
+                        $opr_codigo = $rs_modelos_row['opr_codigo'];
 
-            $opr_codigo     = $rs_modelos_row['opr_codigo'];
+                        $pin_codinterno = $rs_modelos_row['pin_codinterno'];
 
-            $pin_codinterno = $rs_modelos_row['pin_codinterno'];
 
 
+                        $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 
-            $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 
 
+                        //	opr_codigo = 44 -> 'Axeso5' , 28 -> 'PayByCash', 34 -> 'Webzen', 100 -> 'Facebook BHN'
+        
+                        if ($opr_codigo == 28 || $opr_codigo == 44 || $opr_codigo == 34 || $opr_codigo == 100 || $opr_codigo == 106) {
 
-            //	opr_codigo = 44 -> 'Axeso5' , 28 -> 'PayByCash', 34 -> 'Webzen', 100 -> 'Facebook BHN'
+                            // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
+        
+                            // o carregamento no estoque para Facebook BHN foi baseado no Axeso5 que está trocado -> então troca de novo aqui
+        
+                            $pin_serial = $rs_modelos_row['pin_serial'];
 
-            if($opr_codigo == 28 || $opr_codigo == 44 || $opr_codigo == 34 || $opr_codigo == 100 || $opr_codigo == 106) {
+                            $case_serial = $rs_modelos_row['case_serial'];
 
-                     // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
+                        }
 
-                     // o carregamento no estoque para Facebook BHN foi baseado no Axeso5 que está trocado -> então troca de novo aqui
+                        //	opr_codigo = 100 -> 'Facebook BHN' 
+        
+                        if ($opr_codigo == 100) {
 
-                     $pin_serial = $rs_modelos_row['pin_serial'];
+                            $conteudo_instrucoes = "<br><br>Para resgatar este cartão virtual:<br>1. Acesse www.facebook.com/giftcards/redeem.<br>2. Siga as instruções para resgate de cartões.<br>3. Quando solicitado, insira o código PIN.";
 
-                     $case_serial = $rs_modelos_row['case_serial'];
+                            $label_numero_serie = "Cartão";
 
-            }
+                        } else {
 
-            //	opr_codigo = 100 -> 'Facebook BHN' 
+                            $label_numero_serie = "Nº de série";
 
-            if($opr_codigo == 100) {
+                            $conteudo_instrucoes = "";
 
-                     $conteudo_instrucoes = "<br><br>Para resgatar este cartão virtual:<br>1. Acesse www.facebook.com/giftcards/redeem.<br>2. Siga as instruções para resgate de cartões.<br>3. Quando solicitado, insira o código PIN.";
+                        }
 
-                     $label_numero_serie =  "Cartão";
 
-            }
 
-            else {
+                        //If para capturar instruções enviadas pelo integração de requisição de PINs
+        
+                        if ($rs_modelos_row['vgm_pin_request']) {
 
-                $label_numero_serie = "Nº de série";
+                            $sql_instrucoes = "SELECT bhn_xml_retorno FROM pedidos_bhn WHERE bhn_pin = '" . $rs_modelos_row['pin_codigo'] . "';";
 
-                $conteudo_instrucoes = "";
+                            $rs_instrucoes = SQLexecuteQuery($sql_instrucoes);
 
-            }
+                            if ($rs_instrucoes) {
 
-            
+                                $rs_instrucoes_row = pg_fetch_array($rs_instrucoes);
 
-            //If para capturar instruções enviadas pelo integração de requisição de PINs
+                                $rs_instrucoes_row['bhn_xml_retorno'] = str_replace("\n", "", $rs_instrucoes_row['bhn_xml_retorno']);
 
-            if($rs_modelos_row['vgm_pin_request']) {
+                                $instrucoes = json_decode($rs_instrucoes_row['bhn_xml_retorno']);
 
-                $sql_instrucoes = "SELECT bhn_xml_retorno FROM pedidos_bhn WHERE bhn_pin = '".$rs_modelos_row['pin_codigo']."';";
+                                $total = count($instrucoes->transaction->receiptsFields->line);
 
-                $rs_instrucoes = SQLexecuteQuery($sql_instrucoes);
+                                $conteudo_instrucoes = "";
 
-                if($rs_instrucoes) {
+                                if ($total > 0) {
 
-                    $rs_instrucoes_row = pg_fetch_array($rs_instrucoes);
+                                    $conteudo_instrucoes = "<br><br>Instruções para resgatar:<br>";
 
-                    $rs_instrucoes_row['bhn_xml_retorno'] = str_replace("\n", "", $rs_instrucoes_row['bhn_xml_retorno']);
+                                    for ($contador = 0; $contador < $total; $contador++) {
 
-                    $instrucoes = json_decode($rs_instrucoes_row['bhn_xml_retorno']);
+                                        if (!is_object($instrucoes->transaction->receiptsFields->line[$contador])) {
 
-                    $total = count($instrucoes->transaction->receiptsFields->line);
+                                            if (!empty($instrucoes->transaction->receiptsFields->line[$contador]))
 
-                    $conteudo_instrucoes = "";
+                                                $conteudo_instrucoes .= $instrucoes->transaction->receiptsFields->line[$contador] . "<br>";
 
-                    if($total > 0) {
+                                        }//end if(!is_object($instrucoes->transaction->receiptsFields->line[$contador])) 
+        
+                                    }//end foreach
+        
+                                }//end if($total > 0)
+        
+                                if (isset($instrucoes->transaction->termsAndConditions)) {
 
-                        $conteudo_instrucoes = "<br><br>Instruções para resgatar:<br>";
+                                    $conteudo_instrucoes .= "<br>Termos de Serviço:<br>" . $instrucoes->transaction->termsAndConditions . "<br><br>";
 
-                        for($contador=0;$contador < $total; $contador++){
+                                }
 
-                            if(!is_object($instrucoes->transaction->receiptsFields->line[$contador])) {
+                                $label_numero_serie = "Numero de serie";
 
-                                if(!empty($instrucoes->transaction->receiptsFields->line[$contador]))
+                                $case_serial = $instrucoes->transaction->additionalTxnFields->activationAccountNumber;
 
-                                    $conteudo_instrucoes .= $instrucoes->transaction->receiptsFields->line[$contador]."<br>";
+                            }//end if($rs_instrucoes)
+        
+                        }//end if($rs_modelos_row['vgm_pin_request'])
+        
 
-                            }//end if(!is_object($instrucoes->transaction->receiptsFields->line[$contador])) 
 
-                        }//end foreach
+                        //Teste para impressão do link da pesquisa
+        
+                        /*Trecho de pesquisa da Ernst Young
 
-                    }//end if($total > 0)
+                        $teste = new classPesquisaEY($pin_serial);
 
-                    if(isset($instrucoes->transaction->termsAndConditions)) {
+                        if(count($teste->getErro()) == 0) { 
 
-                        $conteudo_instrucoes .= "<br>Termos de Serviço:<br>".$instrucoes->transaction->termsAndConditions."<br><br>"; 
+                            echo "      <tr>
 
-                    }
+                                             <td colspan='2' height='10px'><strong><i>Ganhe ".(($teste->getPublisher() == 13)?"10.000 Cash Ongame":"1255 Riot Points")." respondendo uma pesquisa!<br>Saiba mais em EPREPAG_URL/pesquisa</i></strong></td>
 
-                    $label_numero_serie = "Numero de serie";
+                                         </tr>
 
-                    $case_serial = $instrucoes->transaction->additionalTxnFields->activationAccountNumber;
+                                         <tr>
 
-                }//end if($rs_instrucoes)
+                                             <td colspan='2' height='10px'></td>
 
-            }//end if($rs_modelos_row['vgm_pin_request'])
+                                         </tr>";
 
-            
+                        }//end if(count($teste->getErro()) == 0)
 
-            //Teste para impressão do link da pesquisa
+                        */
 
-            /*Trecho de pesquisa da Ernst Young
+                        if ($rs_modelos_row['vgm_pin_request'] != 1) {
 
-            $teste = new classPesquisaEY($pin_serial);
-
-            if(count($teste->getErro()) == 0) { 
-
-                echo "      <tr>
-
-                                 <td colspan='2' height='10px'><strong><i>Ganhe ".(($teste->getPublisher() == 13)?"10.000 Cash Ongame":"1255 Riot Points")." respondendo uma pesquisa!<br>Saiba mais em www.e-prepag.com.br/pesquisa</i></strong></td>
-
-                             </tr>
-
-                             <tr>
-
-                                 <td colspan='2' height='10px'></td>
-
-                             </tr>";
-
-            }//end if(count($teste->getErro()) == 0)
-
-            */
-
-            if($rs_modelos_row['vgm_pin_request'] != 1) {
-
-                echo "<tr class='dados_pin_texto'>
+                            echo "<tr class='dados_pin_texto'>
 
                                  <td>
 
@@ -536,7 +595,7 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                  <td>
 
-                                     &nbsp;".$rs_modelos_row['opr_nome']."
+                                     &nbsp;" . $rs_modelos_row['opr_nome'] . "
 
                                  </td>
 
@@ -552,17 +611,16 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                  <td>
 
-                                     &nbsp;".$rs_modelos_row['vgm_nome_produto'].(($rs_modelos_row['vgm_nome_modelo']!="")?" - ".$rs_modelos_row['vgm_nome_modelo']:"")."
+                                     &nbsp;" . $rs_modelos_row['vgm_nome_produto'] . (($rs_modelos_row['vgm_nome_modelo'] != "") ? " - " . $rs_modelos_row['vgm_nome_modelo'] : "") . "
 
                                  </td>
 
                               </tr>";
 
-            }//end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                        }//end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                        else {
 
-            else {
-
-                echo " 
+                            echo " 
 
                              <tr class='dados_pin_texto'>
 
@@ -574,7 +632,7 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                  <td>
 
-                                     &nbsp;".$rs_modelos_row['vgm_nome_produto']."
+                                     &nbsp;" . $rs_modelos_row['vgm_nome_produto'] . "
 
                                  </td>
 
@@ -582,9 +640,9 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                     ";
 
-            }//end else
-
-            echo " 
+                        }//end else
+        
+                        echo " 
 
                              <tr class='dados_pin_texto'>
 
@@ -596,7 +654,7 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                  <td>
 
-                                     &nbsp;R$ ".number_format($rs_modelos_row['pin_valor'], 2, ',', '.')."
+                                     &nbsp;R$ " . number_format($rs_modelos_row['pin_valor'], 2, ',', '.') . "
 
                                  </td>
 
@@ -604,9 +662,9 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                              ";
 
-            if($rs_modelos_row['pin_vencimento']) {
+                        if ($rs_modelos_row['pin_vencimento']) {
 
-            echo "<tr class='dados_pin_texto'>
+                            echo "<tr class='dados_pin_texto'>
 
                                  <td>
 
@@ -616,7 +674,7 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                  <td>
 
-                                     &nbsp;".$rs_modelos_row['pin_vencimento']."&nbsp; Dias
+                                     &nbsp;" . $rs_modelos_row['pin_vencimento'] . "&nbsp; Dias
 
                                  </td>
 
@@ -624,9 +682,9 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                               ";
 
-            }
+                        }
 
-            echo "<tr>
+                        echo "<tr>
 
                                  <td colspan='2' height='1px' class='dados_pin_linha' width='450px'></td>
 
@@ -648,27 +706,27 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                  <td class='label_pin'>
 
-                                     &nbsp;".$pin_serial."
+                                     &nbsp;" . $pin_serial . "
 
                                  </td>
 
                              </tr>";
 
-            if(!$rs_modelos_row['vgm_pin_request']) {
+                        if (!$rs_modelos_row['vgm_pin_request']) {
 
-                echo " 
+                            echo " 
 
                              <tr>
 
                                  <td class='novo_label'>
 
-                                     ".$label_numero_serie."
+                                     " . $label_numero_serie . "
 
                                  </td>
 
                                  <td class='label_pin'>
 
-                                     &nbsp;".$case_serial."
+                                     &nbsp;" . $case_serial . "
 
                                  </td>
 
@@ -676,11 +734,11 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                  ";
 
-                
 
-                if(!empty($rs_modelos_row['ogp_comunicacao_cupom'])){
 
-                    echo "
+                            if (!empty($rs_modelos_row['ogp_comunicacao_cupom'])) {
+
+                                echo "
 
                                 <tr>
 
@@ -690,53 +748,25 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                     <td class='label_pin_veja' style='padding: 15px 0px 15px 0px;' height='35px'>
 
-                                        ".$rs_modelos_row['ogp_comunicacao_cupom']."
+                                        " . $rs_modelos_row['ogp_comunicacao_cupom'] . "
 
                                     </td>
 
                                 </tr>";
 
-                }
+                            }
 
-            }//end if(!$rs_modelos_row['vgm_pin_request']) 
-			$mensagem = "";
-			
-			if($opr_codigo == 113){
-			
-			 $mensagem = "Código distribuído através da plataforma E-Prepag.";
-			
-			}
+                        }//end if(!$rs_modelos_row['vgm_pin_request']) 
+                        $mensagem = "";
 
-            if($opr_codigo == 166){
-                echo " 
+                        if ($opr_codigo == 113) {
 
-                                 <tr>
+                            $mensagem = "Código distribuído através da plataforma E-Prepag.";
 
-                                     <td colspan='2' height='1px'></td>
+                        }
 
-                                 </tr>
-
-			    				 <tr>
-			    				     <td>
-
-                                     </td>
-			    				     <td class='label_pin_veja'>
-                                          $mensagem
-                                     </td>
-			    				 </tr>
-                                 <tr>
-                                      <td>
-
-                                      </td>
-                                     <td class='label_pin_veja'>
-
-                                     O código deve ser utilizado em até 60 dias.".$conteudo_instrucoes."
-
-                                     </td>
-
-                                  </tr>";
-            }else{
-                echo " 
+                        if ($opr_codigo == 166) {
+                            echo " 
 
                                  <tr>
 
@@ -758,22 +788,51 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
                                       </td>
                                      <td class='label_pin_veja'>
 
-                                     O código deve ser utilizado em até 6 meses.".$conteudo_instrucoes."
+                                     O código deve ser utilizado em até 60 dias." . $conteudo_instrucoes . "
 
                                      </td>
 
                                   </tr>";
-            }
+                        } else {
+                            echo " 
 
-            if($rs_modelos_row['vgm_pin_request'] && isset($instrucoes->transaction->additionalTxnFields->activationAccountNumber)) {
+                                 <tr>
 
-                echo " 
+                                     <td colspan='2' height='1px'></td>
+
+                                 </tr>
+
+			    				 <tr>
+			    				     <td>
+
+                                     </td>
+			    				     <td class='label_pin_veja'>
+                                          $mensagem
+                                     </td>
+			    				 </tr>
+                                 <tr>
+                                      
+                                     <td class='label_pin_veja' colspan='2'>
+
+                                     O código deve ser utilizado em até 6 meses." . $conteudo_instrucoes . "
+
+                                     </td>
+                                     <td>
+
+                                      </td>
+
+                                  </tr>";
+                        }
+
+                        if ($rs_modelos_row['vgm_pin_request'] && isset($instrucoes->transaction->additionalTxnFields->activationAccountNumber)) {
+
+                            echo " 
 
                              <tr>
 
                                  <td colspan='2' class='label_pin_veja'  height='35px'>
 
-                                     ".$label_numero_serie." : &nbsp;".$case_serial."
+                                     " . $label_numero_serie . " : &nbsp;" . $case_serial . "
 
                                  </td>
 
@@ -781,19 +840,32 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                  ";
 
-            }//end if($rs_modelos_row['vgm_pin_request'])
+                        }//end if($rs_modelos_row['vgm_pin_request'])
+        
+                        echo "
 
-            echo "
+                              <tr>
 
+                                 <td class='label_pin_veja' colspan='2'>
+
+                                 Suporte: " . ($estilos['link_canal'] ? $estilos['link_canal'] : "" . EPREPAG_URL_HTTPS . "/game/suporte.php") . "
+
+                                 </td>
+
+                                 <td>
+
+                                 </td>
+
+                              </tr>
                               <tr>
 
                                  <td>
 
                                  </td>
 
-                                 <td class='label_pin_veja'>
+                                 <td style='text-align: right; font-size: 10px; font-family: Arial, Helvetica, sans-serif; color: #58585A;'>
 
-                                 Suporte: www.e-prepag.com.br
+                                    Copyright E-prepag
 
                                  </td>
 
@@ -801,17 +873,17 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                  </table>";
 
-            if((($i+1) % $cuponsPorLinha) === 0 ) { //(($i+2) % $cuponsPorLinha) {
-
-                  //echo "QUEBRA linha FIM<br>";
-
-                  $retorno .= "       </td>
+                        if ((($i + 1) % $cuponsPorLinha) === 0) { //(($i+2) % $cuponsPorLinha) {
+        
+                            //echo "QUEBRA linha FIM<br>";
+        
+                            $retorno .= "       </td>
 
                                </tr>
 
                                <tr>
 
-                                  <td colspan='".$cuponsPorLinha."' height='5px'>
+                                  <td colspan='" . $cuponsPorLinha . "' height='5px'>
 
                                         &nbsp;
 
@@ -821,242 +893,239 @@ if($_POST['imprimir_ou_csv'] == 'imprimir'){
 
                                 ";
 
-            }
+                        } else {
 
-            else {
+                            $retorno .= "       </td>";
 
-                  $retorno .= "       </td>";
+                        }
 
-            }
-
-       } //end for($i=0;$i<$rs_modelos_row_total;$i++)
-
-       echo "</table>
+                    } //end for($i=0;$i<$rs_modelos_row_total;$i++)
+        
+                    echo "</table>
 
            </center>";
 
-    } //end if($rs_modelos)
-
-} 
-
-if($_POST['imprimir_ou_csv'] == 'csv'){
-
-    if($rs_modelos) {
-
-        $rs_modelos_row_total = pg_num_rows($rs_modelos);
-
-        for($i=0;$i<$rs_modelos_row_total;$i++) {
-
-            $rs_modelos_row = pg_fetch_array($rs_modelos);
-
-
-
-            $pin_serial = $rs_modelos_row['case_serial'];
-
-            $case_serial = $rs_modelos_row['pin_serial'];
-
-
-
-            $opr_codigo     = $rs_modelos_row['opr_codigo'];
-
-            $pin_codinterno = $rs_modelos_row['pin_codinterno'];
-
-
-
-            $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
-
-            //	opr_codigo = 44 -> 'Axeso5' , 28 -> 'PayByCash', 34 -> 'Webzen', 100 -> 'Facebook BHN', 100 -> 'IMVU BHN'
-
-            if($opr_codigo == 28 || $opr_codigo == 44 || $opr_codigo == 34 || $opr_codigo == 100 || $opr_codigo == 101 || $opr_codigo == 101 || $opr_codigo == 106) {
-
-                // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
-
-                // o carregamento no estoque para Facebook BHN foi baseado no Axeso5 que está trocado -> então troca de novo aqui
-
-                $pin_serial = $rs_modelos_row['pin_serial'];
-
-                $case_serial = $rs_modelos_row['case_serial'];
-
+                } //end if($rs_modelos)
+        
             }
 
+            if ($_POST['imprimir_ou_csv'] == 'csv') {
+
+                if ($rs_modelos) {
+
+                    $rs_modelos_row_total = pg_num_rows($rs_modelos);
+
+                    for ($i = 0; $i < $rs_modelos_row_total; $i++) {
+
+                        $rs_modelos_row = pg_fetch_array($rs_modelos);
 
 
-            $label_numero_serie = "Nº de série";
+
+                        $pin_serial = $rs_modelos_row['case_serial'];
+
+                        $case_serial = $rs_modelos_row['pin_serial'];
 
 
 
-            if($rs_modelos_row['vgm_pin_request'] != 1) {
+                        $opr_codigo = $rs_modelos_row['opr_codigo'];
 
-                if($i == 0){
+                        $pin_codinterno = $rs_modelos_row['pin_codinterno'];
 
-                    $mensagem .= "Publisher;";
 
-                    $mensagem .= "Produto;";
 
-                }
+                        $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 
-                $pub = $rs_modelos_row['opr_nome'] . ";";
+                        //	opr_codigo = 44 -> 'Axeso5' , 28 -> 'PayByCash', 34 -> 'Webzen', 100 -> 'Facebook BHN', 100 -> 'IMVU BHN'
+        
+                        if ($opr_codigo == 28 || $opr_codigo == 44 || $opr_codigo == 34 || $opr_codigo == 100 || $opr_codigo == 101 || $opr_codigo == 101 || $opr_codigo == 106) {
 
-                
+                            // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
+        
+                            // o carregamento no estoque para Facebook BHN foi baseado no Axeso5 que está trocado -> então troca de novo aqui
+        
+                            $pin_serial = $rs_modelos_row['pin_serial'];
 
-            }//end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                            $case_serial = $rs_modelos_row['case_serial'];
 
-            else {
+                        }
 
-                if($i == 0){
 
-                    $mensagem .= "Produto;";
 
-                }
+                        $label_numero_serie = "Nº de série";
 
-            }//end else
 
-            if($i == 0){
 
-                $mensagem .= "Valor;";
+                        if ($rs_modelos_row['vgm_pin_request'] != 1) {
 
-                $mensagem .= "PIN;";
+                            if ($i == 0) {
 
-            }
+                                $mensagem .= "Publisher;";
 
-                                 
+                                $mensagem .= "Produto;";
 
-            if(!$rs_modelos_row['vgm_pin_request']) {
+                            }
 
-                if($i == 0){
+                            $pub = $rs_modelos_row['opr_nome'] . ";";
 
-                    $mensagem .= $label_numero_serie.";";
 
-                }
 
-            }
+                        }//end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                        else {
 
-            $pin = ($pin_serial && $pin_serial != "") ? $pin_serial : "-";
+                            if ($i == 0) {
 
-            $c_serial = ($case_serial && $case_serial != "") ? $case_serial : "-";
+                                $mensagem .= "Produto;";
 
-            
+                            }
 
-            $mensagem .= "\n". $pub . $rs_modelos_row['vgm_nome_produto'].(($rs_modelos_row['vgm_nome_modelo']!="")?" - ".$rs_modelos_row['vgm_nome_modelo']:"").";" ."R$". number_format($rs_modelos_row['pin_valor'], 2, ',', '.').";". '="'.$pin. '"' .";" . '="'.$c_serial.'"' ;
+                        }//end else
+        
+                        if ($i == 0) {
 
+                            $mensagem .= "Valor;";
+
+                            $mensagem .= "PIN;";
+
+                        }
+
+
+
+                        if (!$rs_modelos_row['vgm_pin_request']) {
+
+                            if ($i == 0) {
+
+                                $mensagem .= $label_numero_serie . ";";
+
+                            }
+
+                        }
+
+                        $pin = ($pin_serial && $pin_serial != "") ? $pin_serial : "-";
+
+                        $c_serial = ($case_serial && $case_serial != "") ? $case_serial : "-";
+
+
+
+                        $mensagem .= "\n" . $pub . $rs_modelos_row['vgm_nome_produto'] . (($rs_modelos_row['vgm_nome_modelo'] != "") ? " - " . $rs_modelos_row['vgm_nome_modelo'] : "") . ";" . "R$" . number_format($rs_modelos_row['pin_valor'], 2, ',', '.') . ";" . '="' . $pin . '"' . ";" . '="' . $c_serial . '"';
+
+
+
+                    } //end for($i=0;$i<$rs_modelos_row_total;$i++)
         
 
-        } //end for($i=0;$i<$rs_modelos_row_total;$i++)
 
-
-
-    } //end if($rs_modelos)
-
-    $file_ret = grava_arquivo_pin($mensagem); 
-
- ?> 
-
-
-
-<script>
-
-    $( document ).ready(function() {
-
-        location.href= '/creditos/dld.php?f=<?php echo $file_ret; ?>&fc=<?php echo "eprepag_pin_".date("YmdHis").".csv"; ?>';
-
-    }); 
-
-</script>
-
+                } //end if($rs_modelos)
         
+                $file_ret = grava_arquivo_pin($mensagem);
 
-<?php
+                ?>
 
-}
+
+
+                <script>
+
+                    $(document).ready(function () {
+
+                        location.href = '/creditos/dld.php?f=<?php echo $file_ret; ?>&fc=<?php echo "eprepag_pin_" . date("YmdHis") . ".csv"; ?>';
+
+                    });
+
+                </script>
+
+
+
+                <?php
+
+            }
 
 
 
 } //end if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser']))
-
 else {
 
-?>
+    ?>
 
-    <p>Seu login expirou. Por favor, faça novamente o login para imprimir seu cupom.</p>
+            <p>Seu login expirou. Por favor, faça novamente o login para imprimir seu cupom.</p>
 
-<?php
+            <?php
 
 }//end else do if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser']))
 
 
 
-function grava_arquivo_pin($mensagem) {
+function grava_arquivo_pin($mensagem)
+{
 
 
 
-		$file_path = RAIZ_DO_PROJETO . 'public_html/tmp/txt/';
+    $file_path = RAIZ_DO_PROJETO . 'public_html/tmp/txt/';
 
-		$web_path = "temp/txt/";
+    $web_path = "temp/txt/";
 
-		$expiration = 20;
+    $expiration = 20;
 
-		// -----------------------------------
+    // -----------------------------------
 
-		// Remove old files	
+    // Remove old files	
 
-		// -----------------------------------
+    // -----------------------------------
 
-		list($usec, $sec) = explode(" ", microtime());
+    list($usec, $sec) = explode(" ", microtime());
 
-		$now = ((float)$usec + (float)$sec);
-
-				
-
-		$current_dir = @opendir($file_path);
-
-		
-
-		while($filename = @readdir($current_dir)) {
-
-			if ($filename != "." and $filename != ".." and $filename != "index.html") {
-
-				$name = str_replace(".csv", "", $filename);
-
-				if (($name + $expiration) < $now) {
-
-					@unlink($file_path.$filename);
-
-				}
-
-			}
-
-		}
-
-		@closedir($current_dir);
-
-           
-
-		//Arquivo
-
-		$file = $file_path.$now.".csv";
-
-            
-
-		//Grava mensagem no arquivo
-
-		if ($handle = fopen($file, 'a+')) {
-
-			fwrite($handle, $mensagem);
-
-			fclose($handle);
-
-		}
-
-		$file_return = $now.".csv";
+    $now = ((float) $usec + (float) $sec);
 
 
 
-		return $file_return;
+    $current_dir = @opendir($file_path);
+
+
+
+    while ($filename = @readdir($current_dir)) {
+
+        if ($filename != "." and $filename != ".." and $filename != "index.html") {
+
+            $name = str_replace(".csv", "", $filename);
+
+            if (($name + $expiration) < $now) {
+
+                @unlink($file_path . $filename);
+
+            }
+
+        }
+
+    }
+
+    @closedir($current_dir);
+
+
+
+    //Arquivo
+
+    $file = $file_path . $now . ".csv";
+
+
+
+    //Grava mensagem no arquivo
+
+    if ($handle = fopen($file, 'a+')) {
+
+        fwrite($handle, $mensagem);
+
+        fclose($handle);
+
+    }
+
+    $file_return = $now . ".csv";
+
+
+
+    return $file_return;
 
 }
 
 ?>
 
-</body>
+    </body>
 
 </html>

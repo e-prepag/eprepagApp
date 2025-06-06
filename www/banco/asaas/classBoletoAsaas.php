@@ -1,5 +1,5 @@
 <?php
-
+require_once "/www/includes/load_dotenv.php";
 class classBoleto
 {
 
@@ -8,23 +8,13 @@ class classBoleto
 
     public function __construct()
     {
-
-        if (!function_exists('getEnvVariable')) {
-            require_once "/www/includes/getEnvVar.php";
-        }
-
-        //$token = getEnvVariable('mp_access_token');
-
-        //$token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmM0MzYzOGZhLWE0ZTktNDQ1Yy04OGJlLTQyMmNjNjU3YzRmZjo6JGFhY2hfMDgxN2FjMWYtMjQ3OC00OTcyLTk5ZDYtZTJlYmQwNWUwZDdh'; //chave jose
-        //$token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjQzZTJmODZjLTE5ZTctNDFkNy1hYmJjLTk5N2ExYWJjZDRhMTo6JGFhY2hfNmJlNmNlYjMtYmIxYy00NzFjLThlNjgtNjE4MTAxNmY1ZWRl'; //chave sandbox glaucia
-        $token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjE4MzAxZjU3LWUyMTktNDBmYi1iY2YxLWNmY2QyOGEwN2E0ZTo6JGFhY2hfNWQ5YTU3Y2EtZjJhMC00ZjZhLTgyMDAtYTMzYTBhMjk1Yjc2';
+        $token = getenv('ASAAS_ACCESS_TOKEN');
 
         if ($token == "") {
             echo ("<br><br>ERRO ao obter acesso ao Banco! Asaas.<br>Obrigado.");
         } else {
             $this->setAccessToken($token);
-            //$this->url = "https://sandbox.asaas.com/api/v3/";
-            $this->url = "https://api.asaas.com/v3/";
+            $this->url = getenv('ASAAS_API_URL');
         }
 
     }//end function __construct()

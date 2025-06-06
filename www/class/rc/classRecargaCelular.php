@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -38,7 +39,7 @@ class RecargaCelular {
 /*	Antes de 2012/04/26
 			'identificador' => '54627',
 			'senha'	=> 'teste',
-			'url_pontocerto' => 'http://10.22.1.1:8081/jscom/', //'http://www.e-prepag.com.br/prepag2/rc/pc.php',
+			'url_pontocerto' => 'http://10.22.1.1:8081/jscom/', //'EPREPAG_URL_HTTP/prepag2/rc/pc.php',
 */
 /*
 			'identificador' => '58285',
@@ -826,7 +827,7 @@ gravaLog_RC_processing("SolicitacaoRecarga: \n".print_r(json_encode($aret), true
 
 		// Some sites may protect themselves from remote logins by checking which site you came from.
 		// http://php.net/manual/en/function.curl-setopt.php
-		$ref_url = "http://www.e-prepag.com.br";
+		$ref_url = "" . EPREPAG_URL_HTTP . "";
 		curl_setopt($curl_handle, CURLOPT_REFERER, $ref_url);
 		
 		// http://www.weberdev.com/get_example-4136.html

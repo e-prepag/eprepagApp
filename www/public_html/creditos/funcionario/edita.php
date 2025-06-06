@@ -14,9 +14,22 @@ if($_POST['sel_id'] && $_POST['sel_id'] > 0)
     if($_POST["btRemoveAuth"]){
         $conexao = ConnectionPDO::getConnection()->getLink();
 
-        $query = $conexao->prepare("UPDATE dist_usuarios_games_operador SET ugo_chave_autenticador = '' WHERE ugo_id = :ID;");
+        $query = $conexao->prepare("SELECT ugo_ativo from dist_usuarios_games_operador WHERE ugo_id = :ID;");
         $query->bindValue(":ID", $_POST['sel_id']);
         $query->execute();
+        $resultado = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($resultado) {
+
+            $query = $conexao->prepare("UPDATE dist_usuarios_games_operador SET ugo_chave_autenticador = '' WHERE ugo_id = :ID;");
+            $query->bindValue(":ID", $_POST['sel_id']);
+            $query->execute();
+
+            $query = $conexao->prepare("UPDATE dist_usuarios_games_operador SET ugo_ativo = :ATIVO WHERE ugo_id = :ID;");
+            $query->bindValue(":ID", $_POST['sel_id']);
+            $query->bindValue(":ATIVO", $resultado['ugo_ativo']);
+            $query->execute();
+        }
     }
 
     $funcionario = $controller->pega($_POST['sel_id']);

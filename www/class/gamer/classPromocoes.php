@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 require_once $raiz_do_projeto . "class/gamer/classToken.php";
 
@@ -60,7 +61,7 @@ class Promocoes {
     }
 
 	function __construct() {
-		$this->url = "www.e-prepag.com.br";
+		$this->url = "" . EPREPAG_URL . "";
 	}
 
 	function BuscarPromocao($email, $ug_id, $opr_codigo, $vg_id=null) {

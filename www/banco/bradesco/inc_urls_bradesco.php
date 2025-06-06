@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 //echo "\n<!-- carrinho: <pre>";
@@ -31,16 +32,16 @@ $Senha = "@DM_859674";	//	(antigo: 12345678)
 // $link_Financiamento = "http://". $nome_servidor . "/sepsFinanciamento/". $Merchantid . "/prepara_pagto.asp?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
 //$link_NE_SPSEmpresas = "http://". $nome_servidor . "/sepsSPSEmpresas/". $Merchantid . "/prepara_pagto.asp?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
 
-        $link_joker = "http://www.e-prepag.com.br/prepag2/pag/brd/joker.php?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
+        $link_joker = "" . EPREPAG_URL_HTTP . "/prepag2/pag/brd/joker.php?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
 
-        $link_error = "http://www.e-prepag.com.br/prepag2/pag/brd/joker.php?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
+        $link_error = "" . EPREPAG_URL_HTTP . "/prepag2/pag/brd/joker.php?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
 
         $link_debug = "https://mup.comercioeletronico.com.br/paymethods/boleto/model5dbg/prepara_pagto.asp?merchantid=". $Merchantid . "&orderid=". $OrderId."&";
 
-        $link_confirma = "http://www.e-prepag.com.br/prepag2/pag/brd/confirmaBradesco.php?numOrder=". $OrderId."&";
+        $link_confirma = "" . EPREPAG_URL_HTTP . "/prepag2/pag/brd/confirmaBradesco.php?numOrder=". $OrderId."&";
 //echo "<!-- link_Transferencia: ".$link_Transferencia." -->";
 
-//        $link_ajax_status = "http://www.e-prepag.com.br/prepag2/commerce/ajax_info_pagamento.php";
+//        $link_ajax_status = "EPREPAG_URL_HTTP/prepag2/commerce/ajax_info_pagamento.php";
 
 	// Links para arquivos de retorno Bradesco
 	$data_retorno = date('Y/m/d', strtotime("-5 days"));	

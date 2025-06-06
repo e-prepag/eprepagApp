@@ -283,7 +283,7 @@ if($b_lista) {
 <script language="javascript">
 
 function open_notify_window(ip_id, store_id, order_id) { 
-	window.open('https://' + '<?php echo $_SERVER["SERVER_NAME"] ?>' + ':8080/gamer/integracao/com_integracao_notificacao_manual.php?ip_id='+ip_id+'&store_id='+store_id+'&order_id='+order_id,'mywindow', 'width=1000,height=500');
+	window.open('https://' + '<?php echo $server_url_complete ?>' + '/gamer/integracao/com_integracao_notificacao_manual.php?ip_id='+ip_id+'&store_id='+store_id+'&order_id='+order_id,'mywindow', 'width=1000,height=500');
 }
 
 function GP_popupAlertMsg(msg) { //v1.0
@@ -586,7 +586,7 @@ $(function(){
 
                         <td class="texto" width="100" align="center"><font style='color:blue'><?php echo "R$".number_format(($rs_pedidos_row['ip_amount']/100), 2, ',', '.')?></font></td>
 
-                        <td class="texto" width="100" align="center"><?php echo (($rs_pedidos_row['ip_vg_id']>0)?"<!--a href='https://www.e-prepag.com.br:8080/bkov2_prepag/commerce/com_venda_detalhe.php?venda_id=" . $rs_pedidos_row['ip_vg_id'] . "&fila_ncamp=vg_data_inclusao&fila_ordem=1&BtnSearch=1&tf_v_codigo=" . $rs_pedidos_row['ip_vg_id'] . "' target='_blank'-->":"") . $rs_pedidos_row['ip_vg_id'] . (($rs_pedidos_row['ip_vg_id']>0)?"<!--/a-->":"") ?></td>
+                        <td class="texto" width="100" align="center"><?php echo $rs_pedidos_row['ip_vg_id'] ?></td>
                         <td class="texto" width="100" align="center"><?php echo $rs_pedidos_row['ip_order_id'] ?></td>
 
 						<?php

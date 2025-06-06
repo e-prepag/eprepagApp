@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 header("Content-Type: text/html; charset=ISO-8859-1",true);
@@ -9,7 +10,7 @@ require_once  DIR_INCS . "functions_captcha.php";
 
 
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 
 //error_reporting(E_ALL); 

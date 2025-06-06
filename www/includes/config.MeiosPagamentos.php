@@ -1,5 +1,5 @@
 <?php
-// 2025-03-31 10:32:40
+// 2025-05-03 10:35:17
 //Vetor que possui o status ativado e desativado
 $vetorHabilita = array(
                         "0" => "Desativado",
@@ -46,6 +46,6 @@ define("PAGAMENTO_PIX_PROVEDOR2", "mercadopago");
 
 define("PAGAMENTO_PIX_CHAVEAMENTO", "a");
 
-define("VALOR_TROCA", 2000);
+define("VALOR_TROCA", 200);
 
 ?>

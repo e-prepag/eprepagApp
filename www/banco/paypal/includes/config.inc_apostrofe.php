@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 /*
  * config.inc.php
@@ -21,7 +22,7 @@
 //die("Stop");
 
 $paypal['business']=$_GET['business'];
-$paypal['site_url']="http://www.e-prepag.com.br";
+$paypal['site_url']="" . EPREPAG_URL_HTTP . "";
 $paypal['image_url']="/eprepag/imgs/home/logo.gif";
 $paypal['success_url']="/prepag2/pag/pay/ipn/paypal_ipn.php";
 $paypal['cancel_url']="/prepag2/pag/pay/paypal_error.php";

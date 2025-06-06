@@ -680,7 +680,7 @@ $(document).ready(function () {
 if(b_is_Financeiro()) {
 				  $schanel = (($pgrow['vg_canal']=="L")?"dist_":"");
 				?>
-                <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><a href="http://www.e-prepag.com.br:8080/bkov2_prepag/<?php  echo $schanel; ?>commerce/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id'] ?></a></font></div></td>
+                <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><a href="http://<?= $server_url_complete ?>/bkov2_prepag/<?php  echo $schanel; ?>commerce/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id'] ?></a></font></div></td>
                 <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><?php  echo $pgrow['vg_source'] ?></font></div></td>
               <?php 
 }

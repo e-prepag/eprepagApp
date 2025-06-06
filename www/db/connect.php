@@ -1,24 +1,21 @@
 <?php
-//  Dados do Banco de Dados
+require_once "/www/includes/load_dotenv.php";
 
-define('DB_HOST', '10.204.134.61');
-//define('DB_HOST', '192.168.4.1');
-//define('DB_HOST', '11.0.0.1');
-//define('DB_HOST', '187.45.202.15');
-//define('DB_HOST', '186.202.139.58');
-define('DB_PORT', '5433');
+// Verifica se as variáveis de ambiente já estão definidas, caso contrário as carrega do .env
+$db_host = getenv('DB_HOST') ?: null;
+$db_port = getenv('DB_PORT') ?: null;
+$db_banco = getenv('DB_BANCO') ?: null;
+$db_user = getenv('DB_USER') ?: null;
+$db_pass = getenv('DB_PASS') ?: null;
 
-//Dados de Produção
-define('DB_BANCO', 'db_epp_prod');
-define('DB_USER', 'epp_prod');
-define('DB_PASS', 'db@eprepag2013');
+// Definir constantes
+define('DB_HOST', $db_host);
+define('DB_PORT', $db_port);
+define('DB_BANCO', $db_banco);
+define('DB_USER', $db_user);
+define('DB_PASS', $db_pass);
 
-//Dados de Homologação
-//define('DB_BANCO', 'epp_test');
-//define('DB_USER', 'epp_prod');
-//define('DB_PASS', 'db@eprepag2013');
-
-//Conectando ao Banco de dados
-$connid = pg_connect("host=".DB_HOST." port=".DB_PORT." dbname=".DB_BANCO." user=".DB_USER." password=".DB_PASS);
+// Conectando ao Banco de dados
+$connid = pg_connect("host=" . DB_HOST . " port=" . DB_PORT . " dbname=" . DB_BANCO . " user=" . DB_USER . " password=" . DB_PASS);
 
 ?>

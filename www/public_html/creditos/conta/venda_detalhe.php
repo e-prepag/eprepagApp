@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
@@ -442,7 +443,7 @@ ob_end_flush();
             <td>
 <?php
 /*
-				<a style="text-decoration:none" href="http://www.e-prepag.com.br/SICOB/BoletoWebCaixaDistCommerce.php?token=<_?)php echo $token_crypt?_>" target="_blank">Boleto</a>*
+				<a style="text-decoration:none" href="EPREPAG_URL_HTTP/SICOB/BoletoWebCaixaDistCommerce.php?token=<_?)php echo $token_crypt?_>" target="_blank">Boleto</a>*
 				&nbsp;&nbsp;&nbsp;*link válido por 5 min, após este período recarregar a página para pode acessá-lo.
 */
 ?>

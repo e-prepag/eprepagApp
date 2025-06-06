@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 ob_start();
 //error_reporting(E_ALL); 
@@ -348,7 +349,7 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
 					$("#alert-message").addClass("alert-success");
 					setTimeout(function(){
 						//$("#form1").submit();
-						window.location.href = "https://www.e-prepag.com.br/sys/admin/pins/situacao_pin.php?pin="+$("#fpin").val();
+						window.location.href = "<?= EPREPAG_URL_HTTPS ?>/sys/admin/pins/situacao_pin.php?pin="+$("#fpin").val();
 					}, 5000);
 				}
 					$("#alert-message").html(message.mensagem);

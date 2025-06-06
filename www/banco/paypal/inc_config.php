@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 die("Stop PP");
 	// Inicializa valores
@@ -15,8 +16,8 @@ die("Stop PP");
 	$amount = number_format($amount,2); // valor do pedido, que deve ter duas casas decimais no formato xx.xx.
 	$item_name = "Venda de Créditos E-Prepag"; // texto para definir o item vendido
 	$item_number = $venda_id; // Número da venda no site E-prepag
-	$retornosucesso = "http://www.e-prepag.com.br/prepag2/pag/pay/sucesso.php"; // Página para retorno quando sucesso da transação
-	$retornocancela = "http://www.e-prepag.com.br/prepag2/pag/pay/cancel.html"; // Página para retorno quando a transação for cancelada
+	$retornosucesso = "" . EPREPAG_URL_HTTP . "/prepag2/pag/pay/sucesso.php"; // Página para retorno quando sucesso da transação
+	$retornocancela = "" . EPREPAG_URL_HTTP . "/prepag2/pag/pay/cancel.html"; // Página para retorno quando a transação for cancelada
 	$botao_paypal = "https://www.sandbox.paypal.com/pt_BR/i/btn/btn_buynowCC_LG.gif"; // Botão para submit para PayPal
 
 /* 	echo "<hr>";

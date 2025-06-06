@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 
 // include do arquivo contendo IPs DEV
@@ -101,7 +102,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 	}
     	
 	function __construct($ug_id = null,$bds_tipo_usuario = null) {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -241,7 +242,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 	}//end function MontarBanner()
 
 	function MontarBannerBloqueio() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -282,7 +283,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 	}//end MontarBannerBloqueio()
 
 	function MontarBannerTodasVezes(){
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }

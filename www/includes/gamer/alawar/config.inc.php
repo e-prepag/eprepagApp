@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../constantes_url.php'; ?>
 <?php
 
 define("PATH_API_ALAWAR", $raiz_do_projeto . "includes/gamer/alawar/");
@@ -7,8 +8,8 @@ define("LOG_FILE_ALAWAR", $raiz_do_projeto . "log/logAlawarAPI.log");
 define("PATH_LOAD_REMOTE_GAMEID_LIST_ALAWAR", "C:\\Sites\\E-Prepag\\backoffice\\offweb\\tarefas\\");
 define("LOG_FILE_AUTOMATIC_TASKS_ALAWAR", "C:\\Sites\\E-Prepag\\backoffice\\offweb\\tarefas\\log\\logAlawar_LoadGameList.log");
 
-define("URL_LOJA", "http://www.e-prepag.com.br/prepag2/commerce/");
-define("URL_BASE_ALAWAR", "http://www.e-prepag.com.br/prepag2/commerce/jogos/");
+define("URL_LOJA", "" . EPREPAG_URL_HTTP . "/prepag2/commerce/");
+define("URL_BASE_ALAWAR", "" . EPREPAG_URL_HTTP . "/prepag2/commerce/jogos/");
 define("URL_SHOWCASE_ALAWAR", "http://vitr.alawar.com/vitr3.0/e-prepag.com.br/");
 define("URL_LOAD_GAME_LIST_ALAWAR", "http://eu.export.alawar.com/games_agsn_xml.php?pid=20403&locale=pt");
 

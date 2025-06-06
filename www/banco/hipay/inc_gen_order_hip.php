@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 	require_once( "C:/Sites/E-Prepag/www/web/incs/inc_register_globals.php");	
 
@@ -22,7 +23,7 @@ $retornosucesso = "";
 $retornocancela = "";
 
 // Botão para submit para Hipay
-$botao_hipay = "http://www.e-prepag.com.br/prepag2/commerce/images/botao_hipay.gif"; 
+$botao_hipay = "" . EPREPAG_URL_HTTP . "/prepag2/commerce/images/botao_hipay.gif"; 
 
 $iforma = ((isset($_SESSION['pagamento.pagto']))?$_SESSION['pagamento.pagto']:0);	
 $sbanco = (($iforma==$FORMAS_PAGAMENTO['PAGAMENTO_HIPAY_ONLINE']) ? 

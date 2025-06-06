@@ -4976,8 +4976,13 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                 $dataconfirma = date("Y-m-d H:i:s");
                                 unset($alinePIX);
 
-                                $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $rs_transacoes_row['numcompra'], $alinePIX);
-                                $s_sonda = (($b_sonda_PIX) ? "OK" : "none");
+                                if($webhook === true){
+                                        $b_sonda_PIX = null;
+                                        $s_sonda = "none";
+                                }else{
+                                        $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $rs_transacoes_row['numcompra'], $alinePIX);
+                                        $s_sonda = (($b_sonda_PIX) ? "OK" : "none");
+                                }
 
                                 if ($webhook === true) {
                                         $dataconfirma = "CURRENT_TIMESTAMP";
@@ -6239,8 +6244,14 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                 unset($alinePIX);
                                 $s_update_status_lr = "";
 
-                                $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $rs_transacoes_row['numcompra'], $alinePIX);
-                                $s_sonda = (($b_sonda_PIX) ? "OK" : "none");
+                                if($webhook == true){
+                                        $b_sonda_PIX = null;
+                                        $s_sonda = "none";
+                                }else{
+                                        $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $rs_transacoes_row['numcompra'], $alinePIX);
+                                        $s_sonda = (($b_sonda_PIX) ? "OK" : "none");
+                                }
+
                                 if ($b_sonda_PIX) {
                                         $sBanco = $GLOBALS['PAGAMENTO_PIX_NOME_BANCO'];
                                         //pegar a data do JSON

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 $withLogo = false;
 if(!empty($_SERVER['HTTP_REFERER'])){
@@ -14,7 +15,7 @@ require_once  DIR_INCS . "functions_captcha.php";
 
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 
 //Conectando com PDO para execução da QUERY
@@ -355,7 +356,7 @@ $Resultadoestado = $SIGLA_ESTADOS;
                     </tr>
                 </table>
                 <div id="inline1" style="width:432px;display: none; text-align: justify;font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: small;">
-                    <p>Tótens com PINs E-Prepag: São centenas de tótens eletrônicos de auto-serviço, onde você pode comprar o E-Prepag Cash diretamente da máquina, e também alguns estabelecimentos comerciais da rede credenciada. <a href='<?php echo $https; ?>://www.e-prepag.com/ativar' target='_blank'>Veja aqui como fazer a compra e ativar o PIN.</a></p>
+                    <p>Tótens com PINs E-Prepag: São centenas de tótens eletrônicos de auto-serviço, onde você pode comprar o E-Prepag Cash diretamente da máquina, e também alguns estabelecimentos comerciais da rede credenciada. <a href='<?php echo $https; ?>://<?= EPREPAG_URL_COM ?>/ativar' target='_blank'>Veja aqui como fazer a compra e ativar o PIN.</a></p>
                 </div>
             </div>
             <form name="form_lanHouses_filtros" id="form_lanHouses_filtros" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php  
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../../../includes/constantes.php";
@@ -41,8 +42,8 @@ $send_to_url = $INTEGRACAO_URL_EPP_GATEWAY;
 
 $partner_params = array(
 	"store_id" => $INTEGRACAO_STORE_ID,
-//	"return_url" => "http://www.e-prepag.com.br/prepag2/commerce/partner_return.php",
-//	"notify_url" => "https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php",
+//	"return_url" => "EPREPAG_URL_HTTP/prepag2/commerce/partner_return.php",
+//	"notify_url" => "EPREPAG_URL_HTTPS/prepag2/commerce/partner_notify.php",
 	"currency_code" => getPartner_param_By_ID('partner_currency_code', $INTEGRACAO_STORE_ID),
 	"order_id" => get_random_order_id(),
 //	"transaction_id" => get_random_order_id(),

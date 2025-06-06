@@ -1,15 +1,16 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 	session_start();
 
 //	$username = "Gestor";
 //	$password = "r_e_c_a_r_g_a!";
-//	if($_SERVER['SERVER_NAME'] == "200.196.233.24" || $_SERVER['SERVER_NAME'] == "www.e-prepag.com.br" || $_SERVER['SERVER_NAME'] == "bo.e-prepag.com.br")
+//	if($_SERVER['SERVER_NAME'] == "200.196.233.24" || $_SERVER['SERVER_NAME'] == "EPREPAG_URL" || $_SERVER['SERVER_NAME'] == "bo.e-prepag.com.br")
 //	{
 //		if ($PHP_AUTH_USER != $username || $PHP_AUTH_PW != $password)
 //		{ 
 //			header("WWW-Authenticate: basic realm=Backoffice");
 //			header("HTTP/1.0 401 Unauthorized");
-//			echo "<META HTTP-EQUIV='Refresh' Content=0;URL='http://www.e-prepag.com.br/prepag/mensagens/access_denied.php'>";
+//			echo "<META HTTP-EQUIV='Refresh' Content=0;URL='EPREPAG_URL_HTTP/prepag/mensagens/access_denied.php'>";
 //			exit;
 //		}
 //	}	

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -12,7 +13,7 @@ if(checkIP()) {
     }
 else {
     define("B2C_LIVE_ENVIRONMET",	1);
-    $server_url = "www.e-prepag.com.br";
+    $server_url = "" . EPREPAG_URL . "";
     }
 
 // Constante definindo o IP do cliente
@@ -281,7 +282,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
                                                                                                                 Você tem até 180 dias após a data da compra para ativar o seu produto.<br><br>
                                                                                                                 Suporte Kaspersky:<br>
                                                                                                                 <a href="http://www.kaspersky.com.br/suporte">www.kaspersky.com.br/suporte</a></div>',
-													'mais_info'	=> 'https://www.e-prepag.com/antivirus-kaspersky',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/antivirus-kaspersky',
                                                                                                         'tipo'          => 'servicos',
                                                                                                 ),
 						B2C_PRODUCT_SERVICE_INTERNETSECURITY=> array(	'name'		=> 'Kaspersky Internet Security 1 PC / 1 ANO',
@@ -297,7 +298,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
                                                                                                                 Você tem até 180 dias após a data da compra para ativar o seu produto.<br><br>
                                                                                                                 Suporte Kaspersky:<br>
                                                                                                                 <a href="http://www.kaspersky.com.br/suporte">www.kaspersky.com.br/suporte</a></div>',
-													'mais_info'	=> 'https://www.e-prepag.com/kaspersky-internet-security',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/kaspersky-internet-security',
                                                                                                         'tipo'          => 'servicos',
                                                                                                         ),
 						B2C_PRODUCT_SERVICE_SECURITY_PARA_ANDROID=> array(	'name'		=> 'Kaspersky Security para Android',
@@ -314,7 +315,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 																4. Você ainda receberá por e-mail os dados para a instalação do Kaspersky Anti-Virus;
 																Você tem até 180 (cento e oitenta) dias após a data da compra para ativar o seu produto. Após este período a ativação não poderá ser realizada.
 																</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/internet-security-para-android',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/internet-security-para-android',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_KARSPERSKY_ANTI_VIRUS_5P=> array(	'name'		=> 'Kaspersky Anti-Virus - 5 PCs',
@@ -331,7 +332,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 																4. Você ainda receberá por e-mail os dados para a instalação do Kaspersky Anti-Virus;
 																Você tem até 180 (cento e oitenta) dias após a data da compra para ativar o seu produto. Após este período a ativação não poderá ser realizada.
 																</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/antivirus-kaspersky',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/antivirus-kaspersky',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_KARSPERSKY_ANTI_VIRUS_10P=> array(	'name'		=> 'Kaspersky Anti-Virus - 10 PCs',
@@ -348,7 +349,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 																4. Você ainda receberá por e-mail os dados para a instalação do Kaspersky Anti-Virus;
 																Você tem até 180 (cento e oitenta) dias após a data da compra para ativar o seu produto. Após este período a ativação não poderá ser realizada.
 																</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/antivirus-kaspersky',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/antivirus-kaspersky',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_KARSPERSKY_INTERNET=> array(	'name'		=> 'Kaspersky Internet Security MD - 3 PCs',
@@ -365,7 +366,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 																4. Você ainda receberá por e-mail os dados para a instalação do Kaspersky Anti-Virus;
 																Você tem até 180 (cento e oitenta) dias após a data da compra para ativar o seu produto. Após este período a ativação não poderá ser realizada.
 																</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/kaspersky-internet-security',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/kaspersky-internet-security',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_KARSPERSKY_INTERNET_5P=> array(	'name'		=> 'Kaspersky Internet Security MD - 5 PCs',
@@ -382,7 +383,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 																4. Você ainda receberá por e-mail os dados para a instalação do Kaspersky Anti-Virus;
 																Você tem até 180 (cento e oitenta) dias após a data da compra para ativar o seu produto. Após este período a ativação não poderá ser realizada.
 																</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/kaspersky-internet-security',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/kaspersky-internet-security',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_KARSPERSKY_INTERNET_10P=> array(	'name'		=> 'Kaspersky Internet Security MD - 10 PCs',
@@ -399,7 +400,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 																4. Você ainda receberá por e-mail os dados para a instalação do Kaspersky Anti-Virus;
 																Você tem até 180 (cento e oitenta) dias após a data da compra para ativar o seu produto. Após este período a ativação não poderá ser realizada.
 																</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/kaspersky-internet-security',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/kaspersky-internet-security',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_KARSPERSKY_TOTAL_SECURUTY_3P=> array(	'name'		=> 'Kaspersky Total Security Multidispositivos - 3 PCs',
@@ -410,7 +411,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 													'comiss_lan'	=> '15', //EM PERCENTAGEM
 													'image'		=> DIR_WEB . 'imagens/pdv/Kaspersky_TotalSecurity2016.jpg',
 													'instrucoes'	=> '<div align="justify"></div>',
-													'mais_info'	=> 'https://www.e-prepag.com/kaspersky-total-security',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/kaspersky-total-security',
                                                                                                         'tipo'          => 'servicos',
 													),
                                                 B2C_PRODUCT_SERVICE_CPF_CONSULTA	=> array(	'name'		=> 'Acompanhe o seu CPF - Plano Mensal',
@@ -422,7 +423,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 													'image'		=> DIR_WEB . 'imagens/pdv/CPF_Mensal.jpg',
 													'instrucoes'	=> '<div align="justify">Acesse o site www.nuvemdeservicos.com.br/ativar e insira o seu código PIN. Siga as instruções para realizar o cadastramento de suas informações pessoais e utilizar o serviço. 
 																Você tem até 90 dias (noventa) a partir da data da compra para ativar o seu serviço.</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/acompanhe-seu-cpf',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/acompanhe-seu-cpf',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_CPF_CONSULTA_3M	=> array(	'name'		=> 'Acompanhe o seu CPF - Plano 3 meses',
@@ -434,7 +435,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 													'image'		=> DIR_WEB . 'imagens/pdv/CPF_3meses.jpg',
 													'instrucoes'	=> '<div align="justify">Acesse o site www.nuvemdeservicos.com.br/ativar e insira o seu código PIN. Siga as instruções para realizar o cadastramento de suas informações pessoais e utilizar o serviço. 
 																Você tem até 90 dias (noventa) a partir da data da compra para ativar o seu serviço.</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/acompanhe-seu-cpf',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/acompanhe-seu-cpf',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_CPF_CONSULTA_6M	=> array(	'name'		=> 'Acompanhe o seu CPF - Plano 6 meses',
@@ -446,7 +447,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 													'image'		=> DIR_WEB . 'imagens/pdv/CPF_6meses.jpg',
 													'instrucoes'	=> '<div align="justify">Acesse o site www.nuvemdeservicos.com.br/ativar e insira o seu código PIN. Siga as instruções para realizar o cadastramento de suas informações pessoais e utilizar o serviço.
 																Você tem até 90 dias (noventa) a partir da data da compra para ativar o seu serviço.</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/acompanhe-seu-cpf',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/acompanhe-seu-cpf',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_CPF_CONSULTA_12M	=> array(	'name'		=> 'Acompanhe o seu CPF - Plano 12 meses',
@@ -458,7 +459,7 @@ $B2C_PRODUCT = array(	B2C_PRODUCT_SERVICE_ANTIVIRUS		=> array(	'name'		=> 'Kaspe
 													'image'		=> DIR_WEB . 'imagens/pdv/CPF_Anual.jpg',
 													'instrucoes'	=> '<div align="justify">Acesse o site www.nuvemdeservicos.com.br/ativar e insira o seu código PIN. Siga as instruções para realizar o cadastramento de suas informações pessoais e utilizar o serviço.
 																Você tem até 90 dias (noventa) a partir da data da compra para ativar o seu serviço.</div>',
-													'mais_info'	=> 'https://www.e-prepag.com/acompanhe-seu-cpf',
+													'mais_info'	=> '' . EPREPAG_URL_HTTPS_COM . '/acompanhe-seu-cpf',
                                                                                                         'tipo'          => 'servicos',
 													),
 						B2C_PRODUCT_SERVICE_CURSOSONLINE	=> array(	'name'		=> 'Cursos online internet p/ capacitação profissional',

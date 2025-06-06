@@ -17,8 +17,8 @@
 	if($BtnSearch) $total_table = 0;
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":8080/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":8080/images/anterior.gif";
+	$img_proxima  = "https://".$server_url_complete."/images/proxima.gif";
+	$img_anterior = "https://".$server_url_complete."/images/anterior.gif";
 	$max          = 10; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -655,13 +655,13 @@ function ResetCheckedValue() {
                                 if($dd_pins_vendas)
                                 {
                                     if($pgrow['pin_status']=="3")  {
-                                            $url_com_venda_detalhe_prev = "<a href='https://" . $_SERVER["SERVER_NAME"] . ":8080/gamer/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id']."' target='_blank'>";
+                                            $url_com_venda_detalhe_prev = "<a href='https://".$server_url_complete."/gamer/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id']."' target='_blank'>";
                                             $url_com_venda_detalhe_pos = "</a>";
                                     } else if($pgrow['pin_status']=="6")  {
-                                            $url_com_venda_detalhe_prev = "<a href='https://" . $_SERVER["SERVER_NAME"] . ":8080/pdv/vendascom_venda_detalhe.php?venda_id=".$pgrow['vg_id']."' target='_blank'>";
+                                            $url_com_venda_detalhe_prev = "<a href='https://".$server_url_complete."/pdv/vendascom_venda_detalhe.php?venda_id=".$pgrow['vg_id']."' target='_blank'>";
                                             $url_com_venda_detalhe_pos = "</a>";
                                     } else {
-                                            $url_com_venda_detalhe_prev = "<a href='https://" . $_SERVER["SERVER_NAME"] . ":8080/pdv/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id']."' target='_blank'>";
+                                            $url_com_venda_detalhe_prev = "<a href='https://".$server_url_complete."/pdv/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id']."' target='_blank'>";
                                             $url_com_venda_detalhe_pos = "</a>";
                                     }
 ?>

@@ -4,6 +4,7 @@ set_time_limit(120);
 require_once RAIZ_DO_PROJETO . "consulta_cpf/config.inc.cpf.php";
 require_once DIR_WEB . "includes/functions.php";
 require_once "/www/consulta_cpf/trocaAutomatica.php";
+require_once "../../includes/constantes_url.php";
 
 $errors = array();
 
@@ -204,7 +205,7 @@ if( isset($_POST['formsubmit']) ){
         // Atingiu o limite máximo de utilização do mesmo CPF
         else {
 
-                $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"https://www.e-prepag.com/support\");\' style=\'cursor:pointer; color:#2e5984;\'>https://www.e-prepag.com/support</span>.";
+                $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"".EPREPAG_URL_HTTPS."/support\");\' style=\'cursor:pointer; color:#2e5984;\'>".EPREPAG_URL_HTTPS."/support</span>.";
 
         }//end else do elseif ($testeCPF != 171)
 

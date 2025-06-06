@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -8,7 +9,7 @@ require_once DIR_INCS . "gamer/inc_ajax.php";
 // include do arquivo contendo IPs DEV
 require_once DIR_INCS . "configIP.php";
 
-$server_url = 'www.e-prepag.com.br';
+$server_url = '' . EPREPAG_URL . '';
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
     }

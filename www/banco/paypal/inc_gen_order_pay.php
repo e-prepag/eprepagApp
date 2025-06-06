@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 	require_once( "C:/Sites/E-Prepag/www/web/incs/inc_register_globals.php");	
@@ -27,10 +28,10 @@ $item_name = "Venda de Creditos E-Prepag";
 $item_number = $orderId; 
 
 // Página para retorno quando sucesso da transação
-$retornosucesso = "http://www.e-prepag.com.br/prepag2/pag/pay/sucesso.php"; 
+$retornosucesso = "" . EPREPAG_URL_HTTP . "/prepag2/pag/pay/sucesso.php"; 
 
 // Página para retorno quando a transação for cancelada
-$retornocancela = "http://www.e-prepag.com.br/prepag2/pag/pay/cancel.html"; 
+$retornocancela = "" . EPREPAG_URL_HTTP . "/prepag2/pag/pay/cancel.html"; 
 
 // Botão para submit para PayPal
 $botao = "https://www.sandbox.paypal.com/pt_BR/i/btn/btn_buynowCC_LG.gif"; 

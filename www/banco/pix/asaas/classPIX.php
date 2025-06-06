@@ -1,5 +1,5 @@
 <?php
-
+require_once "/www/includes/load_dotenv.php";
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 //ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
 
@@ -12,29 +12,18 @@ class classPIX
 
     public function __construct()
     {
-
-        if (!function_exists('getEnvVariable')) {
-            require_once "/www/includes/getEnvVar.php";
-        }
-
-        //$token = getEnvVariable('mp_access_token');
-
-        //$token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmM0MzYzOGZhLWE0ZTktNDQ1Yy04OGJlLTQyMmNjNjU3YzRmZjo6JGFhY2hfMDgxN2FjMWYtMjQ3OC00OTcyLTk5ZDYtZTJlYmQwNWUwZDdh';
-        $token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjE4MzAxZjU3LWUyMTktNDBmYi1iY2YxLWNmY2QyOGEwN2E0ZTo6JGFhY2hfNWQ5YTU3Y2EtZjJhMC00ZjZhLTgyMDAtYTMzYTBhMjk1Yjc2';
-
-        //$this->chave_pix = "d91a07ca-3b55-4de7-9fd6-e210f366e831";
-        $this->chave_pix = "efb5b2e8-bc83-43ce-a7b4-3530d766bbd0";
+        $token = getenv('ASAAS_ACCESS_TOKEN');
+        $this->chave_pix = getenv('ASAAS_CHAVE_PIX');
 
         if ($token == "") {
             echo ("<br><br>ERRO ao obter acesso ao Banco!<br>Por favor, entre em
                  contado com o suporte da E-Prepag e informe o erro de código PIX790954 - Asaas.<br>Obrigado.");
         } else {
             $this->setAccessToken($token);
-            $this->url = "https://api.asaas.com/v3/";
-            //$this->url = "https://api-sandbox.asaas.com/v3/";
+            $this->url = getenv('ASAAS_API_URL');
         }
 
-    }//end function __construct()
+    }///end function __construct()
 
     private function setAccessToken($access_token)
     {

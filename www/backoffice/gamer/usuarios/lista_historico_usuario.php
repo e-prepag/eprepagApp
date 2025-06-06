@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -11,7 +12,7 @@ if (b_IsBKOUsuarioHistorico()) {
 require_once $raiz_do_projeto."class/classDescriptionReport.php";
 $descricao = new DescriptionReport('historico_usuario');
 $descricao = $descricao->MontaAreaDescricao();
-echo str_replace("<script language='JavaScript' src='http://www.e-prepag.com.br/prepag2/dist_commerce/includes/jquery.js'></script>","", $descricao);
+echo str_replace("<script language='JavaScript' src='" . EPREPAG_URL_HTTP . "/prepag2/dist_commerce/includes/jquery.js'></script>","", $descricao);
 
 ?>
 <script language="JavaScript">

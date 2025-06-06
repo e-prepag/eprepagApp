@@ -296,7 +296,7 @@ $ARRAY_CONCATENA_ID_VENDA = array
 $cotacao_dolar = null;
 
 //Declarando valor IOF 6.38 ou 0.38
-$iof = array(6.38,0.38);
+$iof = array(6.38,0.38, IOF);
 
 $time_start = getmicrotime();
 

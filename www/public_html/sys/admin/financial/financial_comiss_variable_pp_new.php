@@ -19,7 +19,7 @@ if($_SESSION['langNome'] == 'pt') {
 }
 
 //Alicota EPP Administradora
-$alicota_epp_adm = array(6.38,0.38);//6.38;
+$alicota_epp_adm = array(6.38,0.38, IOF);//6.38;
 
 // Publishers com Detalhamento (POS - LAN - SITE)
 /*
@@ -1368,7 +1368,7 @@ function validacaoPublisherEppPagamentosFacilitadora($opr_codigo) {
                 where 
                         opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS']." 
                         and opr_data_inicio_operacoes is not null
-                        and opr_internacional_alicota = 0.38
+                        and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
                         and opr_codigo = ".$opr_codigo."
                         and opr_status != '0'
                 ";

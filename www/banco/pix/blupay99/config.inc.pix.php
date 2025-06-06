@@ -4,6 +4,7 @@
 @header ('Content-type: text/html; charset=ISO-8859-1'); 
 //@header ('Content-type: text/html; charset=utf-8'); 
 require_once '../../../includes/functions.php';
+require_once "/www/includes/load_dotenv.php";
 
 //Dados bancários
 define("PIX_BANK","");
@@ -33,18 +34,18 @@ define("PIX_SONDA_PAGO_OK","CONCLUIDA");
 
 if(checkIP()) {
     // Ambiente DEV / HOMOLOGAÇÃO
-    define("CLIENT_ID", getEnvVariable('CLIENT_ID'));
-    define("CLIENT_SECRET", getEnvVariable('CLIENT_SECRET_HML'));
-    define("PIX_SERVICE_URL_AUTH", getEnvVariable('PIX_SERVICE_URL_AUTH_HML'));
-    define("PIX_SERVICE_URL_SERVICE", getEnvVariable('PIX_SERVICE_URL_SERVICE_HML'));
-    define("PIX_SERVICE_URL_SONDA", getEnvVariable('PIX_SERVICE_URL_SONDA_HML'));
+    define("CLIENT_ID", getenv('CLIENT_ID'));
+    define("CLIENT_SECRET", getenv('CLIENT_SECRET_HML'));
+    define("PIX_SERVICE_URL_AUTH", getenv('PIX_SERVICE_URL_AUTH_HML'));
+    define("PIX_SERVICE_URL_SERVICE", getenv('PIX_SERVICE_URL_SERVICE_HML'));
+    define("PIX_SERVICE_URL_SONDA", getenv('PIX_SERVICE_URL_SONDA_HML'));
 } else {
     // Ambiente PRODUÇÃO
-    define("CLIENT_ID", getEnvVariable('CLIENT_ID'));
-    define("CLIENT_SECRET", getEnvVariable('CLIENT_SECRET_PROD'));
-    define("PIX_SERVICE_URL_AUTH", getEnvVariable('PIX_SERVICE_URL_AUTH_PROD'));
-    define("PIX_SERVICE_URL_SERVICE", getEnvVariable('PIX_SERVICE_URL_SERVICE_PROD'));
-    define("PIX_SERVICE_URL_SONDA", getEnvVariable('PIX_SERVICE_URL_SONDA_PROD'));
+    define("CLIENT_ID", getenv('CLIENT_ID'));
+    define("CLIENT_SECRET", getenv('CLIENT_SECRET_PROD'));
+    define("PIX_SERVICE_URL_AUTH", getenv('PIX_SERVICE_URL_AUTH_PROD'));
+    define("PIX_SERVICE_URL_SERVICE", getenv('PIX_SERVICE_URL_SERVICE_PROD'));
+    define("PIX_SERVICE_URL_SONDA", getenv('PIX_SERVICE_URL_SONDA_PROD'));
 }
 
 //Timeout da requisição SOAP

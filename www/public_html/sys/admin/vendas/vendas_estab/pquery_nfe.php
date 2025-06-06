@@ -1,6 +1,6 @@
 <?php 
-//error_reporting(E_ALL); 
-//ini_set("display_errors", 1);
+error_reporting(E_ALL); 
+ini_set("display_errors", 1);
 session_start();
 if (isset($_POST['exportar_excel'])) {
     header('Content-Type: text/csv; charset=utf-8');
@@ -8,16 +8,20 @@ if (isset($_POST['exportar_excel'])) {
 
     $output = fopen('php://output', 'w');
 
-    fputcsv($output, [
-        'Data da OperaÃ§Ã£o',
-        'Nome do Consumidor',
-        'Canal UsuÃ¡rio - Nome do Comprador',
-        'Canal PDV - Nome do Comprador Informado pelo PDV',
-        'Valor de Venda ao Consumidor'
-    ]);
+   fputcsv($output, [
+    'Data da Operação',
+    'Nome do Consumidor',
+    'Canal Usuário - Nome do Comprador',
+    'Canal PDV - Nome do Comprador Informado pelo PDV',
+    'Valor de Venda ao Consumidor',
+    'Endereço',
+    'Bairro',
+    'Cidade',
+    'CEP'
+]);
 
     if (!isset($_SESSION['sqldata'])) {
-        die("Nenhuma consulta disponÃ­vel para exportaÃ§Ã£o.");
+        die("Nenhuma consulta disponível para exportação.");
     }
 
     $sqlExport = $_SESSION['sqldata'];
@@ -45,6 +49,7 @@ require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 
 set_time_limit ( 30000 ) ;
+$seg_auxilar = 0;
 $pos_pagina = $seg_auxilar;
 $qtde_reg_tela = 100;
 
@@ -176,7 +181,7 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
         $where_valor_3 = "";
         $where_opr_1 = "";
         $where_opr_2 = "";
-        $where_opr_3 = " and false ";	// Cartï¿½es - Sï¿½ funciona para Ongame
+        $where_opr_3 = " and false ";	// Cartões - Só funciona para Ongame
         $where_canal_lh = "";
         $where_canal_s = "";
         $where_canal_p = "";
@@ -191,7 +196,7 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
                 $where_opr_1 = " and (vgm.vgm_opr_codigo = ".$dd_operadora.") ";
                 if($dd_operadora_nome=='ONGAME') {
                         $where_opr_2 = " and (ve_jogo = 'OG') ";
-                        $where_opr_3 = " and true ";	// Cartï¿½es - Sï¿½ funciona para Ongame
+                        $where_opr_3 = " and true ";	// Cartões - Só funciona para Ongame
                 }
                 elseif  ($dd_operadora_nome=='MU ONLINE') 
                         $where_opr_2 = " and (ve_jogo = 'MU') ";
@@ -202,11 +207,11 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
         }
         if($dd_operadora=="") $dd_valor = "";
 
-        // Numeraï¿½ï¿½o de Nfe's comeï¿½a em 01/dez/09
+        // Numeração de Nfe's começa em 01/dez/09
         $data_inicio_numeracao_nfe = "2009-12-01 00:00:00";
-        if($dd_operadora==13)	// Ongame comeï¿½a em 01/fev/10
+        if($dd_operadora==13)	// Ongame começa em 01/fev/10
                 $data_inicio_numeracao_nfe = "2010-02-01 00:00:00";		
-        if($dd_operadora==31)	// GPotato comeï¿½a em 01/nov/10
+        if($dd_operadora==31)	// GPotato começa em 01/nov/10
                 $data_inicio_numeracao_nfe = "2010-11-01 00:00:00";		
 
         // para todos
@@ -218,12 +223,16 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
         $where_canal_c = " ";
 
         // SQL para preencher
-        $estat  = "select trn_code, trn_data, opr_nome, valor, qtde_itens, qtde_produtos, canal, trn_nome, trn_cpf, trn_cpf_indicador, trn_vgm_id, trn_vgm_nfe_rps_id
+        $estat  = "select 
+        trn_code, trn_data, opr_nome, valor, qtde_itens, qtde_produtos, canal, trn_nome, trn_cpf, trn_cpf_indicador, trn_vgm_id, trn_vgm_nfe_rps_id, 
+        endereco,
+    bairro, cidade, cep
                 from (
 
                         select '1' as trn_code, vg.vg_data_inclusao as trn_data, t2.opr_nome, 
                         sum(vgm.vgm_valor * vgm.vgm_qtde) as valor, sum(vgm.vgm_qtde) as qtde_itens, count(*) as qtde_produtos, 
                         'Site LH' as canal, vgm.vgm_nome_cpf AS trn_nome, vgm.vgm_cpf AS trn_cpf, '3' as trn_cpf_indicador, vgm_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id 
+                       ,  ug.ug_endereco as endereco, ug.ug_numero as numero, ug.ug_bairro as bairro, ug.ug_cidade as cidade, ug.ug_cep as CEP
                         from tb_dist_venda_games vg inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id inner join dist_usuarios_games ug on ug.ug_id = vg.vg_ug_id , operadoras t2 
                         where vgm.vgm_opr_codigo=t2.opr_codigo ".$where_opr_1." and vg.vg_data_inclusao>='".$data_inicio_numeracao_nfe."' and vg.vg_ultimo_status='5' ".$where_data_1a." ".$where_canal_lh." and vgm.vgm_nfe_rps_id<=0 
                         group by ug.ug_id, vgm.vgm_id, 
@@ -235,26 +244,19 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
                         select '2' as trn_code, $where_mode_data as trn_data, t2.opr_nome, 
                         sum(vgm.vgm_valor * vgm.vgm_qtde) as valor, sum(vgm.vgm_qtde) as qtde_itens, count(*) as qtde_produtos, 
                         'Site '||(case when (vg_ug_id=7909) then 'ExpressMoney' else 'Money' end) as canal,  ug.ug_nome AS trn_nome,
-    ug.ug_cpf AS trn_cpf, '3' as trn_cpf_indicador, vgm_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id 
-                        from tb_venda_games vg inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
+    ug.ug_cpf AS trn_cpf, '3' as trn_cpf_indicador, vgm_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id ,
+      ug.ug_endereco as endereco, ug.ug_numero as numero, ug.ug_bairro as bairro, ug.ug_cidade as cidade, ug.ug_cep as CEP                
+    from tb_venda_games vg inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
                          INNER JOIN usuarios_games ug ON ug.ug_id = vg.vg_ug_id , operadoras t2 
                         where vgm.vgm_opr_codigo=t2.opr_codigo ".$where_valor_1." ".$where_opr_1." and $where_mode_data>='".$data_inicio_numeracao_nfe."' and vg.vg_ultimo_status='5' ".$where_data_1b." ".$where_canal_s." and vgm.vgm_nfe_rps_id<=0 
                         group by vgm.vgm_id, vg.vg_data_concilia, vg.vg_pagto_tipo, vg.vg_ultimo_status, vg.vg_concilia, 
                                 t2.opr_nome, 
                                 vg.vg_ug_id, vgm_nfe_rps_id 
 
-                        union all
+                       
 
-                        select '3' as trn_code, ve_data_inclusao as trn_data, (select opr_nome from operadoras o where o.opr_codigo=ve.ve_opr_codigo) as opr_nome, ve_valor as valor, 1 as qtde_itens, 1 as qtde_produtos, 'POS' as canal, '' as trn_nome, '' as trn_cpf, '3' as trn_cpf_indicador, ve_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id 
-                        from dist_vendas_pos ve 
-                        where 1=1 ".$where_data_2." ".$where_valor_2." ".$where_opr_2." ".$where_canal_p." and ve_data_inclusao>='".$data_inicio_numeracao_nfe."' and ve.vgm_nfe_rps_id<=0 
-
-                        union all
-
-                        select '4' as trn_code, vc_data as trn_data, (select opr_nome from operadoras o where o.opr_codigo=13) as opr_nome, (vc_total_5k*13 + vc_total_10k*25 + vc_total_15k*37 + vc_total_20k*49) as valor, (vc_total_5k + vc_total_10k + vc_total_15k + vc_total_20k) as qtde_itens, 1 as qtde_produtos, 'Cartï¿½es' as canal, '' as trn_nome, '' as trn_cpf, '3' as trn_cpf_indicador, vc_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id 
-                        from dist_vendas_cartoes_tmp vc 
-                                inner join dist_usuarios_games ug on ug.ug_id = vc.vc_ug_id 
-                        where 1=1 and (vc_total_5k + vc_total_10k + vc_total_15k + vc_total_20k)>0 ".$where_data_3." ".$where_valor_3." ".$where_opr_3." ".$where_canal_c." and vc_data>='2010-01-01 00:00:00' and vc.vgm_nfe_rps_id<=0 
+                         
+                       
 
                 ) v ";
 
@@ -296,7 +298,7 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
                 $time_end = getmicrotime();
                 $time_each = $time_end - $time_start;
                 if($_SESSION["tipo_acesso_pub"]=='AT') {
-                        echo  " <font face='Arial, Helvetica, sans-serif' size='1' color='#FF6600'>Delay: ".number_format($time_each, 2, '.', '.')."s (total: ".number_format(($time_end - $time_start_0), 2, '.', '.')."s) (mï¿½dia de cada: ".number_format(($time_end - $time_start_0)/(($n_trans==0)?1:$n_trans), 2, '.', '.')."s)</font><br>";
+                        echo  " <font face='Arial, Helvetica, sans-serif' size='1' color='#FF6600'>Delay: ".number_format($time_each, 2, '.', '.')."s (total: ".number_format(($time_end - $time_start_0), 2, '.', '.')."s) (média de cada: ".number_format(($time_end - $time_start_0)/(($n_trans==0)?1:$n_trans), 2, '.', '.')."s)</font><br>";
                 }
         }
        
@@ -305,7 +307,7 @@ if($FrmPreencher && $_SESSION["tipo_acesso_pub"]=='AT') {
         
         if($_SESSION["tipo_acesso_pub"]=='AT') {
                 $time_end = getmicrotime();
-                echo "<br>&nbsp;<font face='Arial, Helvetica, sans-serif' size='1' color='#0000CC'>Tempo total: ".number_format(($time_end - $time_start_0), 2, '.', '.')."s (mï¿½dia de cada: ".number_format(($time_end - $time_start_0)/(($n_trans==0)?1:$n_trans), 2, '.', '.')."s)</font><br>&nbsp;";
+                echo "<br>&nbsp;<font face='Arial, Helvetica, sans-serif' size='1' color='#0000CC'>Tempo total: ".number_format(($time_end - $time_start_0), 2, '.', '.')."s (média de cada: ".number_format(($time_end - $time_start_0)/(($n_trans==0)?1:$n_trans), 2, '.', '.')."s)</font><br>&nbsp;";
         }
 }
 
@@ -405,7 +407,7 @@ if($FrmEnviar == 1) {
                                 $where_canal_c = " and false ";
 								$where_canal_a = " and false ";
                                 break;
-                        case "Cartï¿½es":
+                        case "Cartões":
                                 $where_canal_lh = " and false ";
                                 $where_canal_s = " and false ";
                                 $where_canal_p = " and false ";
@@ -433,16 +435,20 @@ if($FrmEnviar == 1) {
 
         // SQL para listar
         $estat  = "select trn_code, trn_data, opr_nome, trn_valor, qtde_itens, qtde_produtos, canal, trn_nome, trn_cpf, trn_cpf_indicador, trn_vgm_id, trn_vgm_nfe_rps_id, trn_comissao 
-                from (
+      ,endereco, bairro, cidade, cep 
+        from (
 
                         select '1' as trn_code, vg.vg_data_inclusao as trn_data, t2.opr_nome, 
                         sum(vgm.vgm_valor * vgm.vgm_qtde) as trn_valor, sum(vgm.vgm_qtde) as qtde_itens, count(*) as qtde_produtos, 
                         'Site LH' as canal, vgm.vgm_nome_cpf as trn_nome,  vgm.vgm_cpf  as trn_cpf, '3' as trn_cpf_indicador, vgm_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id, vgm_perc_desconto/100 as trn_comissao   
+                         ,  
+                         ug.ug_endereco as endereco, ug.ug_numero as numero, ug.ug_bairro as bairro, ug.ug_cidade as cidade, ug.ug_cep as CEP
                         from tb_dist_venda_games vg inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id inner join dist_usuarios_games ug on ug.ug_id = vg.vg_ug_id , operadoras t2 
                         where vgm.vgm_opr_codigo=t2.opr_codigo ".$where_valor_1." ".$where_opr_1." and vg.vg_data_inclusao>='2008-01-01 00:00:00' and vg.vg_ultimo_status='5' ".$where_data_1a." ".$where_canal_lh." 
                         group by ug.ug_id, vgm.vgm_nome_cpf, vgm.vgm_cpf, vgm.vgm_id, 
                                 vg.vg_data_inclusao, vg.vg_ultimo_status, vg.vg_concilia, 
-                                t2.opr_nome, vgm_nfe_rps_id, vgm.vgm_opr_codigo, vgm.vgm_perc_desconto 
+                                t2.opr_nome, vgm_nfe_rps_id, vgm.vgm_opr_codigo, vgm.vgm_perc_desconto ,
+  ug.ug_endereco, ug.ug_numero, ug.ug_bairro, ug.ug_cidade, ug.ug_cep
 
                         union all
 
@@ -455,24 +461,17 @@ if($FrmEnviar == 1) {
 					      $estat .= "(case when (vg_ug_id=7909) then 'Site ExpressMoney' else case when vg_ultimo_status_obs like '%AtimoPay%' then 'ATIMO' else 'Site Money' end end) as canal,";
 					   }
 					   $estat .= "ug.ug_nome as trn_nome,  ug.ug_cpf as trn_cpf, '3' as trn_cpf_indicador, vgm_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id, 0 as trn_comissao 
-                        from tb_venda_games vg inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id inner join usuarios_games ug on ug.ug_id = vg.vg_ug_id, operadoras t2 
+                        ,  ug.ug_endereco as endereco, ug.ug_numero as numero, ug.ug_bairro as bairro, ug.ug_cidade as cidade, ug.ug_cep as CEP 
+                       from tb_venda_games vg inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id inner join usuarios_games ug on ug.ug_id = vg.vg_ug_id, operadoras t2 
                         where vgm.vgm_opr_codigo=t2.opr_codigo ".$where_valor_1." ".$where_opr_1." and $where_mode_data>='2008-01-01 00:00:00' and vg.vg_ultimo_status='5' ".$where_data_1b." ".$where_canal_s." ".$where_canal_a."
-                        group by vgm.vgm_id, vg.vg_data_concilia,vg.vg_ultimo_status_obs, vg.vg_pagto_tipo, vg.vg_ultimo_status, vg.vg_concilia, 
+                        group by vgm.vgm_id, vg.vg_data_concilia,vg.vg_ultimo_status_obs, vg.vg_pagto_tipo, vg.vg_ultimo_status,
+                        vg.vg_concilia, 
                                 t2.opr_nome,  ug.ug_nome,   ug.ug_cpf, 
-                                vg.vg_ug_id, ug.ug_nome, vgm_nfe_rps_id, vgm.vgm_opr_codigo  
+                                vg.vg_ug_id, ug.ug_nome, vgm_nfe_rps_id, vgm.vgm_opr_codigo,ug.ug_endereco, ug.ug_numero, ug.ug_bairro, ug.ug_cidade, ug.ug_cep
 
-                        union all
+                       
 
-                        select '3' as trn_code, ve_data_inclusao as trn_data, (select opr_nome from operadoras o where o.opr_codigo=ve.ve_opr_codigo) as opr_nome, ve_valor as trn_valor, 1 as qtde_itens, 1 as qtde_produtos, 'POS' as canal, '' as trn_nome, '' as trn_cpf, '3' as trn_cpf_indicador, ve_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id, 0 as trn_comissao 
-                        from dist_vendas_pos ve 
-                        where 1=1 ".$where_data_2."".$where_valor_2." ".$where_opr_2." ".$where_canal_p."
-
-                        union all
-
-                        select '4' as trn_code, vc_data as trn_data, (select opr_nome from operadoras o where o.opr_codigo=13) as opr_nome, (vc_total_5k*13 + vc_total_10k*25 + vc_total_15k*37 + vc_total_20k*49) as trn_valor, (vc_total_5k + vc_total_10k + vc_total_15k + vc_total_20k) as qtde_itens, 1 as qtde_produtos, 'Cartï¿½es' as canal, '' as trn_nome, '' as trn_cpf, '3' as trn_cpf_indicador, vc_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id, 0 as trn_comissao    
-                        from dist_vendas_cartoes_tmp vc 
-                                inner join dist_usuarios_games ug on ug.ug_id = vc.vc_ug_id 
-                        where 1=1 and (vc_total_5k + vc_total_10k + vc_total_15k + vc_total_20k)>0 ".$where_data_3."".$where_valor_3." ".$where_opr_3." ".$where_canal_c." and vc_data>='2010-01-01 00:00:00'
+                      
 
                 ) v ";
 
@@ -485,8 +484,11 @@ if($FrmEnviar == 1) {
         }
 
         $res_count = pg_query($estat);
+        if (!$res_count) {
+            die("Erro ao executar query: " . pg_last_error());
+        }
         $total_table = pg_num_rows($res_count);
-
+       
 
         if($bDebug) {
             echo "<font color='#FF0000' size='1' face='Arial, Helvetica, sans-serif'>(tempo1aaa: ".number_format((getmicrotime() - $time_start), 2, '.', '.')."s)</font><br>"; 
@@ -497,7 +499,7 @@ if($FrmEnviar == 1) {
         $valor_geral = 0;
         $res_geral = SQLexecuteQuery($estat);
         while($pg_geral = pg_fetch_array($res_geral)) {
-                // Apenas para Ongame: desconta comissï¿½o das lans do valor da venda
+                // Apenas para Ongame: desconta comissão das lans do valor da venda
                 if($dd_operadora==13) {
                         $valor_geral += $pg_geral['trn_valor']*(1-$pg_geral['trn_comissao']);
                 } else {
@@ -564,7 +566,7 @@ if($FrmEnviar == 1) {
                         $varAliquotaRPS = "0290";//"0200";	// 2%
                         $varISSRetido = "2";
                         $varIndicadorCPF = "3"; //$pg_nfe['trn_cpf_indicador'];
-                        $varCPF = "";	//$pg_nfe['trn_cpf'];	// CPF vï¿½lido "27329574880"
+                        $varCPF = "";	//$pg_nfe['trn_cpf'];	// CPF válido "27329574880"
                         $varIM = str_pad("", 8, "0", STR_PAD_LEFT);
                         $varIE = str_pad("", 12, "0", STR_PAD_LEFT);
 
@@ -582,7 +584,7 @@ if($FrmEnviar == 1) {
 
                         $varEmail = str_pad("", 75, " ", STR_PAD_RIGHT);
 
-                        $varDiscriminacao = "Cessï¿½o de Direito de uso de Programas de Computaï¿½ï¿½o";
+                        $varDiscriminacao = "Cessão de Direito de uso de Programas de Computação";
 
                         if(true || $n_linhas==1) {
                                 // formatar_string_break(, 80)
@@ -598,7 +600,7 @@ if($FrmEnviar == 1) {
 
                         $handle = fopen($varArquivo, "w+");
                         if (fwrite($handle, $sNFe) === FALSE) {
-                                $msg = "Nï¿½o foi possï¿½vel gravar em '$varArquivo' (2).";
+                                $msg = "Não foi possível gravar em '$varArquivo' (2).";
                                 echo $msg;
                                 die("Stop");
                         } else {
@@ -747,7 +749,7 @@ function clearSelection (){
 	// Se tamanho do arquivo > 10Mb => avisa
 	if(strlen($sNFe)>10*1024*1024) {
 	?>
-	<p><font color="#FF0000">(Avido: O tamanho do arquivo gerado ï¿½ maior do que 10Mb, tente diminuir o intervalo das datas)</font></p>
+	<p><font color="#FF0000">(Avido: O tamanho do arquivo gerado é maior do que 10Mb, tente diminuir o intervalo das datas)</font></p>
 	<?php
 	}
 	?>
@@ -793,7 +795,7 @@ function clearSelection (){
                     <option value="SiteME" <?php  if("SiteME" == $dd_canal) echo "selected" ?>>Site (M+E)</option>
                     <option value="SiteMEL" <?php  if("SiteMEL" == $dd_canal) echo "selected" ?>>Site (M+E+L)</option>
                     <option value="POS" <?php  if("POS" == $dd_canal) echo "selected" ?>>POS</option>
-                    <option value="Cartï¿½es" <?php  if("Cartï¿½es" == $dd_canal) echo "selected" ?>>Cartï¿½es</option>
+                    <option value="Cartões" <?php  if("Cartões" == $dd_canal) echo "selected" ?>>Cartões</option>
                 </select>
             </div>
             <div class="col-md-2 text-right">
@@ -930,11 +932,16 @@ function clearSelection (){
                     <?php  if($ncamp == 'quantidade') echo "<img src=".$img_seta." width='10' height='7' align='absmiddle'>"; ?>
                     <strong><?php echo LANG_PINS_QUANTITY_1; ?></strong></div></td>
                 <td><div align="right"> 
-                    <?php  if($ncamp == 'trn_comissao') echo "<img src=".$img_seta." width='10' height='7' align='absmiddle'>"; ?>
-                    <strong><?php echo LANG_PINS_TOTAL_COMISSAO." (%)"; ?></strong></div></td>
-                <td><div align="right"> 
                     <?php  if($ncamp == 'trn_valor') echo "<img src=".$img_seta." width='10' height='7' align='absmiddle'>"; ?>
                     <strong><?php echo LANG_PINS_TOTAL_VALUE; ?></strong></div></td>
+                    <td><div align="right"> 
+                       <strong>Endereço</strong></div></td>
+                       <td><div align="right"> 
+                       <strong>Bairro</strong></div></td>
+                       <td><div align="right"> 
+                       <strong>Cidade</strong></div></td>
+                       <td><div align="right"> 
+                       <strong>CEP</strong></div></td>
               </tr>
               <?php 
 if($bDebug) {
@@ -970,9 +977,12 @@ echo "<font color='#FF0000' size='1' face='Arial, Helvetica, sans-serif'>(tempo4
                 <td bgcolor="<?php  echo $cor1 ?>"><div align="center"><?php  echo ($pgrow['trn_nome']); ?></div></td>
                 <td bgcolor="<?php  echo $cor1 ?>"><div align="center"><?php  echo ($pgrow['trn_cpf']); ?></div></td>
                 <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><?php  echo $pgrow['qtde_itens'] ?></div></td>
-                <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><?php  echo (($valor_comissao>0)?number_format(100*$valor_comissao, 2, ',', '.') :"-")?></div></td>
-                <td bgcolor="<?php  echo $cor1 ?>" title="<?php  echo (($valor_comissao>0)?number_format($pgrow['trn_valor'], 2, ',', '.'):"") ?>"><div align="right"><?php  echo number_format($valor_da_venda, 2, ',', '.') ?></div></td>
-              </tr>
+                <td bgcolor="<?php  echo $cor1 ?>" title="<?php  echo number_format($pgrow['trn_valor'], 2, ',', '.') ?>"><div align="right"><?php  echo number_format($valor_da_venda, 2, ',', '.') ?></div></td>
+                <td bgcolor="<?php  echo $cor1 ?>"><div align="center"><?php  echo $pgrow['endereco'] ?></div></td>
+                <td bgcolor="<?php  echo $cor1 ?>"><div align="center"><?php  echo $pgrow['bairro'] ?></div></td>
+                <td bgcolor="<?php  echo $cor1 ?>"><div align="center"><?php  echo $pgrow['cidade'] ?></div></td>
+                <td bgcolor="<?php  echo $cor1 ?>"><div align="center"><?php  echo $pgrow['CEP'] ?></div></td>
+                </tr>
               <?php 
 				 		if($cor1 == $cor2)
 							$cor1 = $cor3;
@@ -984,7 +994,7 @@ echo "<font color='#FF0000' size='1' face='Arial, Helvetica, sans-serif'>(tempo5
 }
 			 		if (!$valor) { ?>
               <tr bgcolor="#f5f5fb"> 
-                <td colspan="10" bgcolor="<?php  echo $cor1 ?>"><div align="center"><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>
+                <td colspan="14" bgcolor="<?php  echo $cor1 ?>"><div align="center"><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>
                     <?php echo LANG_NO_DATA; ?>.<br>
                     <br>
                     </strong></font></div></td>
@@ -1038,7 +1048,7 @@ function exportarTabelaParaExcel() {
 
     let csv = '';
 
-    // Cabeçalho incluindo CPF
+    // Cabeçalho
     csv += [
         "Data da Operação",
         "RPS_ID",
@@ -1047,8 +1057,11 @@ function exportarTabelaParaExcel() {
         "Usuário",
         "CPF",
         "Qtde",
-       
-        "Valor Total"
+        "Valor Total",
+        "Endereço",
+        "Bairro",
+        "Cidade",
+        "CEP"
     ].map(col => `"${col}"`).join(",") + '\n';
 
     const linhas = tabela.querySelectorAll('tr');
@@ -1056,7 +1069,7 @@ function exportarTabelaParaExcel() {
     linhas.forEach((row) => {
         const textoLinha = row.innerText?.trim() || row.textContent?.trim() || "";
 
-        // Ignorar linhas de subtotal, total, observações etc
+        // Ignorar linhas irrelevantes
         if (
             textoLinha.toLowerCase().includes("subtotal") ||
             textoLinha.toLowerCase().includes("total") ||
@@ -1071,15 +1084,22 @@ function exportarTabelaParaExcel() {
         const cols = row.querySelectorAll('td, th');
         let linhaCsv = [];
 
-        // Índices: 0 = Data, 2 = RPS_ID, 3 = Canal, 4 = Operadora, 5 = Usuário, 6 = CPF, 7 = Qtde, 8 = Comissão, 9 = Valor Total
-        const colunasDesejadas = [0, 2, 3, 4, 5, 6, 7,  9];
+        // Índices: 0 = Data, 1 = VG_ID (ignorar), 2 = RPS_ID, 3 = Canal, 4 = Operadora, 5 = Usuário,
+        // 6 = CPF, 7 = Qtde, 8 = Valor Total, 9 = Endereço, 10 = Bairro, 11 = Cidade, 12 = CEP
+        // Vamos montar na ordem desejada: 0,2,3,4,5,6,7,9,10,11,12,13
+        const mapaIndices = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-        cols.forEach((col, index) => {
-            if (colunasDesejadas.includes(index)) {
-                let valor = col.innerText || col.textContent;
-                valor = valor.replace(/"/g, '""'); // escapa aspas duplas
-                linhaCsv.push(`"${valor}"`);
+        mapaIndices.forEach((index) => {
+            let col = cols[index];
+            let valor = col ? (col.innerText || col.textContent || '').trim() : '';
+
+            // Substitui valores vazios por 'não informado' para campos finais
+            if ((index >= 9 && index <= 12) && (!valor || valor === '-' || valor === '""')) {
+                valor = 'não informado';
             }
+
+            valor = valor.replace(/"/g, '""'); // escapa aspas duplas
+            linhaCsv.push(`"${valor}"`);
         });
 
         if (linhaCsv.length > 0) {
@@ -1097,6 +1117,8 @@ function exportarTabelaParaExcel() {
     document.body.removeChild(link);
 }
 
+
+
 function exportarTabelaParaExcel2() {
     const tabela = document.getElementById("tableNfe");
     if (!tabela) {
@@ -1106,7 +1128,7 @@ function exportarTabelaParaExcel2() {
 
     let csv = '';
 
-    // CabeÃ§alho SEM a coluna VG_ID
+    // Cabeçalho SEM a coluna VG_ID
     csv += [
         "Data da Operação",
         "RPS_ID",

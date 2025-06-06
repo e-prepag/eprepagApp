@@ -13,7 +13,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 
 //Declarando valor IOF 6.38 ou 0.38
-$iof = array(6.38,0.38);
+$iof = array(6.38,0.38, IOF);
 
 $time_start = getmicrotime();
 

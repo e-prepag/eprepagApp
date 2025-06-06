@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 require_once '../../includes/constantes.php';
@@ -116,7 +117,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 <script type="text/javascript" src="/js/jquery.mask.min.js"></script>
 
-<script src="https://www.e-prepag.com.br/js/valida.js"></script>
+<script src="<?= EPREPAG_URL_HTTPS ?>/js/valida.js"></script>
 
 <link rel="stylesheet" type="text/css" href="/js/jqueryui/css/custom-theme/jquery-ui-1.9.2.custom.min.css" />
 
@@ -184,7 +185,7 @@ if(isset($BtnSearch) && $BtnSearch) {
 
                 <div class="alert alert-danger" id="tipo-modal" role="alert"> 
 
-                    <h5><span id="error-text"><div class="row"><div class="col-md-10"><b>Aguarde enquanto o sistema está processando as informações para a geração do arquivo.<br>Isto pode levar algum tempo.</b></div><div class="col-md-2"><center><img src="https://www.e-prepag.com.br/imagens/engrenagem.gif" height="50px" /><center></div></div></span></h5>
+                    <h5><span id="error-text"><div class="row"><div class="col-md-10"><b>Aguarde enquanto o sistema está processando as informações para a geração do arquivo.<br>Isto pode levar algum tempo.</b></div><div class="col-md-2"><center><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="50px" /><center></div></div></span></h5>
 
               </div>
 
@@ -3368,7 +3369,7 @@ if(isset($BtnSearch) && $BtnSearch) {
 
             else {
 
-                manipulaModal(1,'<div class="row"><div class="col-md-10"><b>Aguarde enquanto o sistema está processando as informações para a geração do arquivo.<br>Isto pode levar algum tempo.</b></div><div class="col-md-2"><center><img src="https://www.e-prepag.com.br/imagens/engrenagem.gif" height="50px" /><center></div></div>','<b>ATENÇÃO</b>');
+                manipulaModal(1,'<div class="row"><div class="col-md-10"><b>Aguarde enquanto o sistema está processando as informações para a geração do arquivo.<br>Isto pode levar algum tempo.</b></div><div class="col-md-2"><center><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="50px" /><center></div></div>','<b>ATENÇÃO</b>');
 
             }
 

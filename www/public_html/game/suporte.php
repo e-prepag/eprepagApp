@@ -83,7 +83,7 @@ if(!empty($_POST)){
 
 	 if(!empty($_POST["g-recaptcha-response"])){
 			
-		   $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+		   $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
 
 			$recaptcha = curl_init();
 			curl_setopt_array($recaptcha, [

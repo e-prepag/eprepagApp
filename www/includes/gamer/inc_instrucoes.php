@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 /**
  * Acrescentar a linha correspondente em gamers_instructions.php para manter a listagem funcionando, depois passar para banco de dados
@@ -162,7 +163,7 @@ function get_Instructions_for_Gamer_PIN($opr_codigo, $vgm_id, $vgm_nome) {
 							<b>3.</b> Após abrir o jogo, clique em 'Remover Limite de Tempo'<br>
 							<b>4.</b> Clique em “Digite a chave do seu jogo” e insira o código que recebeu acima.<br>
 							<br>
-							Qualquer dúvida, acesse <a href='http://www.e-prepag.com.br/prepag2/commerce/jogos/instrucoes_alawar.php' target='_blank'>http://www.e-prepag.com.br/prepag2/commerce/jogos/instrucoes_alawar.php</a><br>
+							Qualquer dúvida, acesse <a href='" . EPREPAG_URL_HTTP . "/prepag2/commerce/jogos/instrucoes_alawar.php' target='_blank'>" . EPREPAG_URL_HTTP . "/prepag2/commerce/jogos/instrucoes_alawar.php</a><br>
 						</td>
 					</tr>
 					</table>";
@@ -198,7 +199,7 @@ function get_Instructions_for_Gamer_PIN($opr_codigo, $vgm_id, $vgm_nome) {
 					<tr>
 						<td> 
                                                     <font face='arial' color='#515151' size='2'>
-							<b>1.</b> Acesse https://www.e-prepag.com.br/resgate/garena/creditos.php<br>
+							<b>1.</b> Acesse " . EPREPAG_URL_HTTPS . "/resgate/garena/creditos.php<br>
 							<b>2.</b> Digite ou cole o PIN<br>
 							<b>3.</b> Informe o ID da conta, localizado dentro do seu personagem do jogo.<br>
 							<b>4.</b> Clique em RESGATAR, confirme o Nickname da conta clicando em CONFIRMAR e prontinho!<br>

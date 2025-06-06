@@ -1,11 +1,12 @@
 <?php
+require_once __DIR__ . '/../includes/constantes_url.php';
 //Charset
 header("Content-type: text/html; charset=ISO-8859-1 ");
 
 //Ambiente
 $ambiente = 'producao';
 
-$server_url = 'www.e-prepag.com.br';
+$server_url = EPREPAG_URL;
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }

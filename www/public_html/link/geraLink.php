@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php 
 
 	//ini_set('display_errors', 1);
@@ -23,7 +24,7 @@
         <div class="container-fluid vh-100">
 		     <div class="row h-100 bg-secondary-subtle justify-content-center align-items-center">
 				<div class="col-10 col-sm-8 col-md-7 col-lg-6 col-xl-4 bg-white rounded px-3 py-5 shadow text-center">
-				     <img title="E-Prepag" src="https://www.e-prepag.com.br/sys/imagens/epp_logo.png">
+				     <img title="E-Prepag" src="<?= EPREPAG_URL_HTTPS ?>/sys/imagens/epp_logo.png">
 				     <div class="mt-2">
 					     <?php// echo $link; ?>
 					 </div>

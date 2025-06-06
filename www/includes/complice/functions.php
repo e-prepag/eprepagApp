@@ -934,7 +934,7 @@ function levantamentoPublisherEppPagamentosFacilitadora($ano,$mes, $variado = fa
                         opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS']." 
                         and opr_data_inicio_operacoes is not null
                         and opr_data_inicio_operacoes <= '".$ano."-".$mes."-".date("t",mktime(0, 0, 0, ($mes*1), 1, $ano))." 00:00:00'
-                        and opr_internacional_alicota = 0.38
+                        and (opr_internacional_alicota = 0.38 OR opr_internacional_alicota = ".IOF.")
                         and opr_status = '1'";
         if($variado) $sql .= " and opr_cotacao_dolar = 1 ";
         $sql .= "order by opr_nome";

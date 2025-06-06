@@ -1,5 +1,5 @@
 <?php
-
+require_once "/www/includes/load_dotenv.php";
 class ClassCaf
 {
 
@@ -9,8 +9,8 @@ class ClassCaf
 
     public function __construct()
     {
-        $this->url = "https://api.combateafraude.com/v1/services";
-        $this->token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsIm9yZyI6ImNhZiJ9.eyJpc3MiOiJja2lkX3dwNHNleHloNmRpeWQwM3BueTVvZTBpeiIsImlhdCI6MTc0MzQyNDc3MzIzNSwiYXVkIjoiNTViYzEzMzMtZmRjMy00NWQwLWIzODEtYjA3NjA0Njg2NjJkIn0.q0oDGO4w805JDrs_BFdJjbSeTzHwcDb5FaUb3bad4w4";
+        $this->url = getenv('CAF_URL_PROD') . "/services";
+        $this->token = getenv('CAF_TOKEN_PROD');
     }
 
     public function consultaCPF($cpf, $data_nascimento)
@@ -33,7 +33,7 @@ class ClassCaf
 
         $ch = curl_init();
         curl_setopt_array($ch, [
-            CURLOPT_URL => $this->url, //desenv
+            CURLOPT_URL => $this->url, 
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => false,
@@ -100,7 +100,7 @@ class ClassCaf
 
                     if ($abre_arquivo) {
                         fwrite($abre_arquivo, $error . "\n"); // Escreve a mensagem de erro
-                        fwrite($abre_arquivo, $response . "\n"); // Escreve a resposta da requisição, se houver
+                        fwrite($abre_arquivo, $response . "\n"); // Escreve a resposta da requisicao, se houver
                         fclose($abre_arquivo);
                     }
 
@@ -120,7 +120,7 @@ class ClassCaf
 
                 if ($abre_arquivo) {
                     fwrite($abre_arquivo, $error . "\n"); // Escreve a mensagem de erro
-                    fwrite($abre_arquivo, $response . "\n"); // Escreve a resposta da requisição, se houver
+                    fwrite($abre_arquivo, $response . "\n"); // Escreve a resposta da requisicao, se houver
                     fclose($abre_arquivo);
                 }
 

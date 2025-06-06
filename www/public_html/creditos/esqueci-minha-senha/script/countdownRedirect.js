@@ -11,7 +11,7 @@
 					
 		if (timeLeft == 0) {
 			clearInterval(interval);
-			window.location.href = 'https://www.e-prepag.com.br/creditos/login.php';
+			window.location.href = '/creditos/login.php';
 		}
 				
 	}, 1000);

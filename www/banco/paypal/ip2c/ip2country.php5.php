@@ -42,20 +42,31 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 *********************************************************/
+require_once "/www/includes/load_dotenv.php";
 
-class ip2country {
+class ip2country
+{
 
-	public $mysql_host='mysql01_3.renebmjr_1.pessoal._2ws';
-	public $db_name='renebmjr***';
-	public $db_user='renebmjr****';
-	public $db_pass='proero4012***';
-	public $table_name='ip2c';
+	public $mysql_host;
+	public $db_name;
+	public $db_user;
+	public $db_pass;
+	public $table_name;
 
-	private $ip_num=0;
-	private $ip='';
-	private $country_code='';
-	private $country_name='';
-	private $con=false;
+	private $ip_num = 0;
+	private $ip = '';
+	private $country_code = '';
+	private $country_name = '';
+	private $con = false;
+
+	public function __construct()
+	{
+		$this->mysql_host = getenv('MYSQL_HOST5');
+		$this->db_name = getenv('DB_NAME5');
+		$this->db_user = getenv('DB_USER5');
+		$this->db_pass = getenv('DB_PASS5');
+		$this->table_name = getenv('TABLE_NAME5');
+	}
 
 	function ip2country()
 	{
@@ -66,54 +77,53 @@ class ip2country {
 	{
 		return $this->ip_num;
 	}
-	public function set_ip($newip='')
+	public function set_ip($newip = '')
 	{
-		if($newip=='')
-		$newip=$this->get_client_ip();
+		if ($newip == '')
+			$newip = $this->get_client_ip();
 
-		$this->ip=$newip;
+		$this->ip = $newip;
 		$this->calculate_ip_num();
-		$this->country_code='';
-		$this->country_name='';
+		$this->country_code = '';
+		$this->country_name = '';
 	}
 	public function calculate_ip_num()
 	{
-		if($this->ip=='')
-		$this->ip=$this->get_client_ip();
+		if ($this->ip == '')
+			$this->ip = $this->get_client_ip();
 
-		$this->ip_num=sprintf("%u",ip2long($this->ip));
+		$this->ip_num = sprintf("%u", ip2long($this->ip));
 	}
-	public function get_country_code($ip_addr='')
+	public function get_country_code($ip_addr = '')
 	{
-		if($ip_addr!='' && $ip_addr!=$this->ip)
-		$this->set_ip($ip_addr);
+		if ($ip_addr != '' && $ip_addr != $this->ip)
+			$this->set_ip($ip_addr);
 
-		if($ip_addr=='')
-		{
-			if($this->ip!=$this->get_client_ip())
-			$this->set_ip();
+		if ($ip_addr == '') {
+			if ($this->ip != $this->get_client_ip())
+				$this->set_ip();
 		}
 
-		if($this->country_code!='')
-		return $this->country_code;
+		if ($this->country_code != '')
+			return $this->country_code;
 
-		if(!$this->con)
-		$this->mysql_con();
+		if (!$this->con)
+			$this->mysql_con();
 
-		$sq="SELECT country_code,country_name FROM ".$this->table_name. " WHERE ". $this->ip_num." BETWEEN begin_ip_num AND end_ip_num";
-		$r=@mysql_query($sq,$this->con);
+		$sq = "SELECT country_code,country_name FROM " . $this->table_name . " WHERE " . $this->ip_num . " BETWEEN begin_ip_num AND end_ip_num";
+		$r = @mysql_query($sq, $this->con);
 
-		if(!$r)
-		return '';
+		if (!$r)
+			return '';
 
-		$row=@mysql_fetch_assoc($r);
+		$row = @mysql_fetch_assoc($r);
 		$this->close();
-		$this->country_name=$row['country_name'];
-		$this->country_code=$row['country_code'];
+		$this->country_name = $row['country_name'];
+		$this->country_code = $row['country_code'];
 		return $row['country_code'];
 	}
 
-	public function get_country_name($ip_addr='')
+	public function get_country_name($ip_addr = '')
 	{
 		$this->get_country_code($ip_addr);
 		return $this->country_name;
@@ -121,22 +131,21 @@ class ip2country {
 
 	public function get_client_ip()
 	{
-		$v='';
-		$v= (!empty($_SERVER['REMOTE_ADDR']))?$_SERVER['REMOTE_ADDR'] :((!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR']: @getenv('REMOTE_ADDR'));
-		if(isset($_SERVER['HTTP_CLIENT_IP']))
-		$v=$_SERVER['HTTP_CLIENT_IP'];
-		return htmlspecialchars($v,ENT_QUOTES);
+		$v = '';
+		$v = (!empty($_SERVER['REMOTE_ADDR'])) ? $_SERVER['REMOTE_ADDR'] : ((!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : @getenv('REMOTE_ADDR'));
+		if (isset($_SERVER['HTTP_CLIENT_IP']))
+			$v = $_SERVER['HTTP_CLIENT_IP'];
+		return htmlspecialchars($v, ENT_QUOTES);
 	}
 
 	public function mysql_con()
 	{
-		$this->con=@mysql_connect($this->mysql_host,$this->db_user,$this->db_pass);
-		
-		if(!$this->con)
-		return false;
+		$this->con = @mysql_connect($this->mysql_host, $this->db_user, $this->db_pass);
 
-		if( !mysql_query('USE ' . $this->db_name))
-		{
+		if (!$this->con)
+			return false;
+
+		if (!mysql_query('USE ' . $this->db_name)) {
 			$this->close();
 			return false;
 		}
@@ -149,16 +158,16 @@ class ip2country {
 	}
 	public function create_mysql_table()
 	{
-		if(!$this->con)
-		return false;
-		mysql_query('DROP table ' . $this->table_name,$this->con);
-		return mysql_query("CREATE table " . $this->table_name ." (id int(10) unsigned auto_increment, begin_ip varchar(20),end_ip varchar(20),begin_ip_num int(11) unsigned,end_ip_num int(11) unsigned,country_code varchar(3),country_name varchar(150), PRIMARY KEY(id),INDEX(begin_ip_num,end_ip_num))ENGINE=MyISAM",$this->con);
+		if (!$this->con)
+			return false;
+		mysql_query('DROP table ' . $this->table_name, $this->con);
+		return mysql_query("CREATE table " . $this->table_name . " (id int(10) unsigned auto_increment, begin_ip varchar(20),end_ip varchar(20),begin_ip_num int(11) unsigned,end_ip_num int(11) unsigned,country_code varchar(3),country_name varchar(150), PRIMARY KEY(id),INDEX(begin_ip_num,end_ip_num))ENGINE=MyISAM", $this->con);
 	}
 
 	public function close()
 	{
 		@mysql_close($this->con);
-		$this->con=false;
+		$this->con = false;
 	}
 }
 ?>

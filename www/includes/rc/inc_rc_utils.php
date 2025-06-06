@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 function get_id_in_vector_form_codigoOperadora($id) {
 	$id_operadoras_current = -1;
@@ -19,7 +20,7 @@ function get_lista_logos_Operadoras() {
 	
 		$sret .= "<td align='center' valign='middle' onMouseOver=\"this.className='linkover'\" onMouseOut=\"this.className='linkout'\"><a href='#priceDiv' onclick=\"document.getElementById('provider').value = ".$val['codigoOperadora']."; carga_valor();\"><img width='50' src='".$val['urlLogo'];
 
-//		src='http://www.e-prepag.com.br/prepag2/rc/inc/imgs/
+//		src='EPREPAG_URL_HTTP/prepag2/rc/inc/imgs/
 //		$img_src = $val['urlLogo'];
 //		$file_name = basename(parse_url($img_src, PHP_URL_PATH)); 
 //		$auxOprNome3 = $file_name;

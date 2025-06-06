@@ -93,8 +93,8 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
         }
     }
     else {
-		require_once "../../includes/functions.php";
-        $bd = getEnvVariable('DB_BANCO');
+		require_once "/www/includes/load_dotenv.php";
+        $bd = getenv('DB_BANCO');
     }
     
 	// Calcula tamanho do BD no disco, da tabela e nrows

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 /* 
@@ -6,7 +7,7 @@
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS."inc_register_globals.php";
 
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 require_once "../../includes/constantes.php";
@@ -10,7 +11,7 @@ $controller = new OfflineController;
 require_once "includes/header-offline.php";
 
 $https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 $id_do_usuario = $_SESSION['id_do_usuario'];
 
@@ -28,12 +29,14 @@ if ($_SESSION['usuario_operador']) {
 
     if (empty($user)) {
         $msg = "Usuario inválido.\n";
+        $linha = "3[" . date('Y-m-d H:i:s') . "] [".$_SESSION['login_usuario']."] $msg" . PHP_EOL;
+        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
-            "/creditos/login_teste.php?msg=" .
+            "/creditos/login.php?msg=" .
             urlencode($msg) .
             "&login=" .
-            urlencode($login);
+            urlencode($_SESSION['login_usuario']);
 
         header("Location: $strRedirect");
         exit;
@@ -60,12 +63,14 @@ if ($_SESSION['usuario_operador']) {
 
     if (empty($user)) {
         $msg = "Usuario inválido.\n";
+        $linha = "3[" . date('Y-m-d H:i:s') . "] [".$_SESSION['login_usuario']."] $msg" . PHP_EOL;
+        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
-            "/creditos/login_teste.php?msg=" .
+            "/creditos/login.php?msg=" .
             urlencode($msg) .
             "&login=" .
-            urlencode($login);
+            urlencode($_SESSION['login_usuario']);
 
         header("Location: $strRedirect");
         exit;
@@ -124,7 +129,7 @@ if ($authData) {
             <div class="alert-login">
                 <?= $mensagemAuth ?>
             </div>
-            <form action="loginEf_teste.php" method="post">
+            <form action="loginEf2.php" method="post">
                 <div class="col-md-12 top10 form-group col-sm-12 col-xs-12"
                     style="display: flex; flex-direction: row; margin-top: 30px; margin-bottom: 40px;">
                     <div class="dislineblock" style="margin-right: 25px;">

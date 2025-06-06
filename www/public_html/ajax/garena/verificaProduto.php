@@ -1,7 +1,9 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //header("Access-Control-Allow-Origin: *");
 require_once "/www/class/classIntegracaoGarena.php";
 require_once "../../../includes/functions.php";
+require_once "/www/includes/load_dotenv.php";
 
 $ipsBloqueados = ["65.108.44.39", "201.46.218.115", "187.65.200.122"];
 if (in_array($_SERVER["REMOTE_ADDR"], $ipsBloqueados)) {
@@ -62,13 +64,13 @@ if (!isset($_POST["dist"])) {
 	# BLOQUEIO HTTPS DESATIVO
 	/*if($_SERVER["REQUEST_SCHEME"] == "https"){
 		if(strpos($_SERVER["HTTP_ORIGIN"], "http:") !== false){
-			header("Access-Control-Allow-Origin: http://www.e-prepag.com.br"); //https://www.e-prepag.com.br/
+			header("Access-Control-Allow-Origin: EPREPAG_URL_HTTP"); //EPREPAG_URL_HTTPS/
 		}else{
-			header("Access-Control-Allow-Origin: https://www.e-prepag.com.br"); //https://www.e-prepag.com.br/
+			header("Access-Control-Allow-Origin: EPREPAG_URL_HTTPS"); //EPREPAG_URL_HTTPS/
 		}
 		
 	}else{
-		header("Access-Control-Allow-Origin: http://www.e-prepag.com.br"); //https://www.e-prepag.com.br/
+		header("Access-Control-Allow-Origin: EPREPAG_URL_HTTP"); //EPREPAG_URL_HTTPS/
 	}*/
 
 	if (isset($_POST["verifica"])) {
@@ -133,7 +135,7 @@ if (!isset($_POST["dist"])) {
 
 	} else {
 		$pinCode = $_POST["codigo"];
-		$key = getEnvVariable('ENCRYPT_KEY');
+		$key = getenv('ENCRYPT_KEY');
 		$c = base64_decode($idVenda);
 		$ivlen = openssl_cipher_iv_length($cipher = "AES-128-CBC");
 		$iv = substr($c, 0, $ivlen);

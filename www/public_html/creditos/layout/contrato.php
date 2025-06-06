@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 CONTRATO DE ADESÃO
 
 SERVIÇO DE   DISPONIBILIZAÇÃO DE CRÉDITOS DIGITAIS E CARTÕES PRÉ-PAGOS
@@ -180,13 +181,13 @@ d. parceiros estratégicos para possibilitar a oferta de produtos e serviços.
 
 13.4 Caso o titular dos dados deseje revogar o consentimento para o tratamento de dados, deverá ser feito para o e-mail suporte@e-prepag.com.br e os acessos para utilização da plataforma E-Prepag serão interrompidos em até 15 dias, contados a partir do recebimento da solicitação.
 
-13.5 Todas as informações referentes a coleta e tratamento de dados dos titulares encontram-se na Política de Privacidade, disponível em: https://www.e-prepag.com.br/game/politica-de-privacidade.php 
+13.5 Todas as informações referentes a coleta e tratamento de dados dos titulares encontram-se na Política de Privacidade, disponível em: <?= EPREPAG_URL_HTTPS ?>/game/politica-de-privacidade.php 
 
 CLÁUSULA DÉCIMA QUARTA - DO FORO
 
 14.1. Fica eleito o Foro da Cidade de São Paulo, em detrimento de qualquer outro, por mais privilegiado que seja, para dirimir quaisquer divergências a respeito do presente Contrato. 
 
-O presente Contrato está disponível para consulta no website da E-Prepag no endereço eletrônico https://www.e-prepag.com.br/creditos/termos-de-uso.php, registrado bfce591a2995a7187eae023d707b8119c13efa712584222720b8e5829f0dacd6, e substitui integralmente o “Contrato de Adesão – Serviço de Disponibilização de Créditos Digitais e Cartões Pré-Pagos” datado de 1º de agosto de 2015.
+O presente Contrato está disponível para consulta no website da E-Prepag no endereço eletrônico <?= EPREPAG_URL_HTTPS ?>/creditos/termos-de-uso.php, registrado bfce591a2995a7187eae023d707b8119c13efa712584222720b8e5829f0dacd6, e substitui integralmente o “Contrato de Adesão – Serviço de Disponibilização de Créditos Digitais e Cartões Pré-Pagos” datado de 1º de agosto de 2015.
 
 São Paulo, 19 de novembro de 2021.
 

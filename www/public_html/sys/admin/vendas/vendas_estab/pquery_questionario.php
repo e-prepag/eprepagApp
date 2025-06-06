@@ -757,9 +757,9 @@ $sql_transform=$estat;
 						$qtde_total_tela += $pgrow['quantidade'];
 						$valor_total_tela += $pgrow['total_face'];
 						$slink = (
-								($pgrow['canal']=="Gamer") ? "https://" . $_SERVER['SERVER_NAME'] . ":8080/gamer/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id'] : 
+								($pgrow['canal']=="Gamer") ? "https://".$server_url_complete."/gamer/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id'] : 
 								(	
-									($pgrow['canal']=="LH") ? "https://" . $_SERVER['SERVER_NAME'] . ":8080/pdv/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id'] : 
+									($pgrow['canal']=="LH") ? "https://".$server_url_complete."/pdv/vendas/com_venda_detalhe.php?venda_id=".$pgrow['vg_id'] : 
 										(
 											($pgrow['canal']=="POS")?"" : ""
 										)

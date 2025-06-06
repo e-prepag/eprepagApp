@@ -74,7 +74,7 @@ if($rs) {
                 <tr class='trListagem'>
                     <td align='right'>".$rsRow['total_pins']."</td>
                     <td align='right'>".$rsRow['total_pedido']."</td>
-                    <td align='right'><a href='https://www.e-prepag.com.br:8080/pdv/vendas/com_venda_detalhe.php?venda_id=".$rsRow['vg_id']."'>".$rsRow['vg_id']."</a></td>
+                    <td align='right'><a href='https://".$server_url_complete."/pdv/vendas/com_venda_detalhe.php?venda_id=".$rsRow['vg_id']."'>".$rsRow['vg_id']."</a></td>
                     <td align='center'>".substr($rsRow['vg_data_inclusao'],0,19)."</td>
                 </tr>
              ";

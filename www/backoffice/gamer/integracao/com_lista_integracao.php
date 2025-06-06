@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -106,7 +107,7 @@ if($resopr && pg_num_rows($resopr) > 0) {
                                             echo "<td valign='top'>";
                                             echo "<table cellpadding='0' cellspacing='1' border='0' bordercolor='#cccccc' style='border-collapse:collapse;' width='100%'>\n";
                                             // partner_url
-                                            $style = (strpos(strtoupper($val['partner_url']), strtoupper("https://www.e-prepag.com.br/prepag2/commerce/"))!==false )?" style='color:grey'":" style='color:blue'";
+                                            $style = (strpos(strtoupper($val['partner_url']), strtoupper("" . EPREPAG_URL_HTTPS . "/prepag2/commerce/"))!==false )?" style='color:grey'":" style='color:blue'";
                                             echo "<tr class='texto' align='left'><td style='color:black'>partner_url</td><td>&nbsp;</td><td".$style." width='100%'><a href='".$val['partner_url']."' target='_blank'>".$val['partner_url']."</a></td></tr>\n";
                                            // partner IP
                                             $style = ((!(strpos(strtoupper($val['partner_ip']), strtoupper($s_local_ip_address))))?" style='color:grey'":" style='color:blue'");
@@ -127,10 +128,10 @@ if($resopr && pg_num_rows($resopr) > 0) {
                                             }
                                             echo "</td></tr>\n";
                                             // notify_url
-                                            $style = (strpos(strtoupper($val['notify_url']), strtoupper("https://www.e-prepag.com.br/prepag2/commerce/"))!==false )?" style='color:grey'":" style='color:blue'";
+                                            $style = (strpos(strtoupper($val['notify_url']), strtoupper("" . EPREPAG_URL_HTTPS . "/prepag2/commerce/"))!==false )?" style='color:grey'":" style='color:blue'";
                                             echo "<tr class='texto' align='left'><td style='color:black'>notify_url</td><td>&nbsp;</td><td".$style.">" . $val['notify_url'] . "</td></tr>\n";
                                             // return_url
-                                            $style = (strpos(strtoupper($val['return_url']), strtoupper("http://www.e-prepag.com.br/prepag2/commerce/"))!==false )?" style='color:grey'":" style='color:blue'";
+                                            $style = (strpos(strtoupper($val['return_url']), strtoupper("" . EPREPAG_URL_HTTP . "/prepag2/commerce/"))!==false )?" style='color:grey'":" style='color:blue'";
                                             echo "<tr class='texto' align='left'><td style='color:black'>return_url</td><td>&nbsp;</td><td".$style.">".$val['return_url']."</td></tr>\n";
                                             // sonda_url
                                             $style = ( strlen($val['sonda_url'])==0)?" style='color:grey'":" style='color:blue'";

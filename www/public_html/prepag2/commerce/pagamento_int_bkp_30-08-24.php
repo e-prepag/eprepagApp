@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 if(!strpos($_SERVER['HTTP_REFERER'],"prepag2/commerce/pagamento_int.php")) {
     @session_start();
@@ -1439,7 +1440,7 @@ if(!$msg) {
                         if(!$only_eppcash){
 ?>
                             <p class="txt-azul fontsize-pp bottom0">Não tem um PIN?</p>
-                            <p class="txt-azul fontsize-pp"><b><u><a href="https://www.e-prepag.com.br/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Compre aqui</a></u></b></p>
+                            <p class="txt-azul fontsize-pp"><b><u><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Compre aqui</a></u></b></p>
 <?php
                         }
 ?>
@@ -1515,9 +1516,9 @@ if(!$msg) {
 ?>       
             <div class="col-xs-12 col-md-7 mt-sm-15">
                 <span class="txt-cinza">
-                    Para finalizar esta compra, você precisa de um <b><a href="https://www.e-prepag.com.br/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Cartão E-Prepag Cash</a></b> ou <b><a href="https://www.e-prepag.com.br/game/conta/add-saldo.php">saldo</a></b> em sua Conta E-Prepag.<br>
+                    Para finalizar esta compra, você precisa de um <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Cartão E-Prepag Cash</a></b> ou <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/conta/add-saldo.php">saldo</a></b> em sua Conta E-Prepag.<br>
                     Caso já possua um <b>cartão</b> ou <b>saldo</b>, clique no botão <b>"E-PREPAG Cash"</b> e finalize a compra.<br><br>
-                    Caso queira adquirir um Cartão E-Prepag Cash, <b><a href="https://www.e-prepag.com.br/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">clique aqui</a></b><br>
+                    Caso queira adquirir um Cartão E-Prepag Cash, <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">clique aqui</a></b><br>
                     <i>(Você pode pagar por boleto bancário, transferência, débito em conta, depósito bancário, DOC ou TED)</i>
                 </span>
             </div>

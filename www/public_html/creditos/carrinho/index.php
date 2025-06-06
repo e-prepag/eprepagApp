@@ -159,7 +159,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
                                 opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS']." 
                                 and opr_data_inicio_operacoes is not null
                                 and opr_data_inicio_operacoes <= NOW()
-                                and opr_internacional_alicota = 0.38
+                                and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
                                 and opr_status != '0'
                                 and opr_codigo  = ".$modelo['modelo']->getCodOperador();
                         
@@ -251,7 +251,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
                                         opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS']." 
                                         and opr_data_inicio_operacoes is not null
                                         and opr_data_inicio_operacoes <= NOW()
-                                        and opr_internacional_alicota = 0.38
+                                        and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
                                         and opr_status != '0'
                                         and opr_codigo  = ".$prod["produto"]["ogp_opr_codigo"];
 
@@ -656,7 +656,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
 									opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS']." 
 									and opr_data_inicio_operacoes is not null
 									and opr_data_inicio_operacoes <= NOW()
-									and opr_internacional_alicota = 0.38
+									and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
 									and opr_status != '0'
 									and opr_codigo  = ".$modelo['modelo']->getCodOperador();
 							

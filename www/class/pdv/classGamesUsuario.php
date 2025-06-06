@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 class UsuarioGames {
 
@@ -1257,7 +1258,7 @@ class UsuarioGames {
 
                     //Envia email
                     //--------------------------------------------------------------------------------
-                    $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                    $parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
                     $parametros['nome_fantasia'] = $objGamesUsuario->getNomefantasia();
                     $parametros['tipo_cadastro'] = $objGamesUsuario->getTipoCadastro();
                     $parametros['nome'] = $objGamesUsuario->getNome();
@@ -1581,7 +1582,7 @@ class UsuarioGames {
                 //Envia email
                 //--------------------------------------------------------------------------------
                 /*
-                $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
                 $parametros['nome_fantasia'] = $objGamesUsuario->getNomefantasia();
                 $parametros['tipo_cadastro'] = $objGamesUsuario->getTipoCadastro();
                 $parametros['nome'] = $objGamesUsuario->getNome();
@@ -4081,7 +4082,7 @@ class UsuarioGames {
     }
 
     
-    function autenticarLogin($login, $senha) {
+    function autenticarLogin($login, $senha, $aut = false) {
         $senha0 = $senha;
 
         $ret = false;
@@ -4165,7 +4166,14 @@ class UsuarioGames {
             $stmt->execute();
 
             //Log na base
-            usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
+            $obs = "";
+            if($aut == true){
+                $obs = "Login com autenticador";
+            } else{
+                $obs = "Login sem autenticador";
+            }
+
+            usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null,$obs);
             
         }
 
@@ -4837,7 +4845,7 @@ class UsuarioGames {
                     //Envia email
                     //--------------------------------------------------------------------------------
                     $objGamesUsuario = unserialize($_SESSION['dist_usuarioGames_ser']);
-                    $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                    $parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
                     $parametros['nome_fantasia'] = $objGamesUsuario->getNomefantasia();
                     $parametros['tipo_cadastro'] = $objGamesUsuario->getTipoCadastro();
                     $parametros['nome'] = $objGamesUsuario->getNome();
@@ -5006,7 +5014,7 @@ class UsuarioGames {
 
         //Envia email
         //--------------------------------------------------------------------------------
-        $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+        $parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
         $parametros['nome_fantasia'] = $objGamesUsuario->getNomefantasia();
         $parametros['tipo_cadastro'] = $objGamesUsuario->getTipoCadastro();
         $parametros['nome'] = $objGamesUsuario->getNome();
@@ -5024,9 +5032,9 @@ class UsuarioGames {
                                 Acesse agora mesmo e já faça a sua primeira compra, é fácil e rápido!<br><br>
                                 <b>Login:</b> " . $objGamesUsuario->getLogin() . "<br>
                                 Assista os vídeos de instrução. Clique nos links abaixo:<br><br>
-                                <a href=\"http://www.e-prepag.com.br/prepag2/dist_commerce/conta/v/comocolocarcreditos.wmv\" target=\"_blank\" style=\"text-decoration:none;\"><u>Vídeo 1: Como colocar créditos. (duração: 1:44)</u></a><br>
-                                <a href=\"http://www.e-prepag.com.br/prepag2/dist_commerce/conta/v/comoganhocomissao.wmv\" target=\"_blank\" style=\"text-decoration:none;\"><u>Vídeo 2: Como ganho comissão. (duração: 1:14)</u></a><br>
-                                <a href=\"http://www.e-prepag.com.br/prepag2/dist_commerce/conta/v/comorealizarvendas.wmv\" target=\"_blank\" style=\"text-decoration:none;\"><u>Vídeo 2: Como realizar vendas. (duração: 3:13)</u></a><br>
+                                <a href=\"" . EPREPAG_URL_HTTP . "/prepag2/dist_commerce/conta/v/comocolocarcreditos.wmv\" target=\"_blank\" style=\"text-decoration:none;\"><u>Vídeo 1: Como colocar créditos. (duração: 1:44)</u></a><br>
+                                <a href=\"" . EPREPAG_URL_HTTP . "/prepag2/dist_commerce/conta/v/comoganhocomissao.wmv\" target=\"_blank\" style=\"text-decoration:none;\"><u>Vídeo 2: Como ganho comissão. (duração: 1:14)</u></a><br>
+                                <a href=\"" . EPREPAG_URL_HTTP . "/prepag2/dist_commerce/conta/v/comorealizarvendas.wmv\" target=\"_blank\" style=\"text-decoration:none;\"><u>Vídeo 2: Como realizar vendas. (duração: 3:13)</u></a><br>
                             </td>
                         </tr>
                         <tr><td>&nbsp;</td></tr>

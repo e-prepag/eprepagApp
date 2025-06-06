@@ -15,20 +15,38 @@ block_direct_calling();
 require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto."public_html/sys/includes/topo_sys_inc.php";
 require_once $raiz_do_projeto."class/classPinsStore.php";
+require_once __DIR__ . "/../../../db/connect.php"; 
+require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 
-if ($_REQUEST['id'] > 0){
-	$sql = "SELECT pin_valor FROM pins WHERE opr_codigo = " . intval($_REQUEST['id']) . " GROUP BY pin_valor ORDER BY pin_valor;";
-//echo "$sql<br>";
-	$rs_oprPins = SQLexecuteQuery($sql);
+$pdo = ConnectionPDO::getConnection()->getLink();
+
+$id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
+$valorSelecionado = isset($_REQUEST['valor']) ? intval($_REQUEST['valor']) : null;
+
+if ($id > 0) {
+    // Prepara SQL
+    $sql = "SELECT pin_valor FROM pins WHERE opr_codigo = :id GROUP BY pin_valor ORDER BY pin_valor;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        $rs_oprPins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $rs_oprPins = false;
+    }
 }
 
-if($rs_oprPins){
-	echo '<select name="pin_valor" id="pin_valor" class="combo_normal">\n';
-	echo '<option value="">Selecione o Valor</option>';
-	while($rs_oprPins_row = pg_fetch_array($rs_oprPins)){ 
-      echo '<option value="'.$rs_oprPins_row['pin_valor'].'"'.((intval($_REQUEST['valor'])==$rs_oprPins_row['pin_valor'])?" selected":"").'>'.$rs_oprPins_row['pin_valor'] . ',00</option>'; 
-	}
-	echo '</select>';
+if (!empty($rs_oprPins)) {
+    echo '<select name="pin_valor" id="pin_valor" class="combo_normal">' . "\n";
+    echo '<option value="">Selecione o Valor</option>' . "\n";
+
+    foreach ($rs_oprPins as $row) {
+        $pin_valor = (int)$row['pin_valor'];
+        $selected = ($valorSelecionado === $pin_valor) ? ' selected' : '';
+        echo '<option value="' . $pin_valor . '"' . $selected . '>' . $pin_valor . ',00</option>' . "\n";
+    }
+
+    echo '</select>' . "\n";
 }
 else {
 	echo '<select name="pin_valor" id="pin_valor" class="combo_normal">\n';

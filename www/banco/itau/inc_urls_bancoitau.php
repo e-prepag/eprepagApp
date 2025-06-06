@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 	require_once DIR_INCS . "inc_register_globals.php";
@@ -14,7 +15,7 @@
 	$cidadeSacado		= "Sao Paulo";
 	$estadoSacado		= "SP";
 	$dataVencimento		= getDataItau();					// 8 posições no formato "DDMMAAAA".
-	$urlRetorna			= "/pag/ita/ita_retorno.php";	// "https://" //Anterior =>  "www.e-prepag.com.br/prepag2/pag/ita/ita_retorno.php"
+	$urlRetorna			= "/pag/ita/ita_retorno.php";	// "https://" //Anterior =>  "EPREPAG_URL/prepag2/pag/ita/ita_retorno.php"
 	$ObsAdicional1		= "Pagamentos Online";
 	$ObsAdicional2		= "Banco Itau";
 	$ObsAdicional3		= "Empresa E-Prepag";

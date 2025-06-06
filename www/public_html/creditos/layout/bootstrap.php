@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 require_once DIR_INCS . "main.php";
@@ -8,7 +9,7 @@ $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 
 require_once DIR_INCS . "configIP.php";
 
-$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 
 define('SITE_URL', $server_url.'/');

@@ -1,19 +1,18 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-// Configurar tempo de execução infinito
 set_time_limit(0);
-
-// Configurar limite de memória para 1024M
 ini_set('memory_limit', '1024M');
+//error_reporting(E_ALL);
+//ini_set('error_log', 'erro.log');
+//ini_set('display_errors', 1);
 
-// Habilita o relatório de erros
-error_reporting(E_ALL);
+ignore_user_abort(true);
+ob_start();
 
-// Opcional: Mostrar erros na tela (apenas para desenvolvimento)
-ini_set('display_errors', 1); // Defina como 0 em produção
+$id_request = $_POST['requisicao_id'];
 
 if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
     list($mes, $ano) = explode("/", $_POST['data_inicial']);
-    //$nomeArquivo = $_POST['estado'] . '_TEF-DIMP_' . $mes . $ano . date('-YmdHis') . '.txt';
 
     $diretorio = "../dimp/" . date('Ymd');
     $nomeBase = $_POST['estado'] . '_TEF-DIMP_' . $mes . $ano;
@@ -42,18 +41,37 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
 
     if ($ultimoArquivo) {
         echo '<div class="row"><div class="col-md-12 text-center top50"><a href="/dimp/' . date('Ymd') . '/' . strtoupper($ultimoArquivo) . '" class="btn btn-info" download="' . strtoupper($ultimoArquivo) . '">Download Arquivo DIMP</a><div></div>';
+        
+        ob_end_flush();
+        flush();
         exit();
     }
 }
 
-if (isset($_POST["verificacao"])){
-    echo 'processando';
+if (isset($_POST['verificar']) && isset($_POST['requisicao_id'])) {
+    $arquivo = '/www/backoffice/dimp/' . date('Ymd') . '/result_' . $id_request . '.txt';
+
+    if (file_exists($arquivo)) {
+        $conteudo = file_get_contents($arquivo);
+        echo nl2br($conteudo);
+    } else {
+        echo 'aguardando';
+    }
+
+    ob_end_flush();
+    flush();
     exit();
 }
 
-header("Content-Type: text/html; charset=UTF-8");
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Connection: close");            // Fecha a conexão com o navegador
+header("Content-Encoding: none");       // Evita gzip atrasar o envio
+echo str_repeat(" ", 1024);             // Força o envio do buffer com algo preenchido
+ob_end_flush();                         // Envia e fecha o buffer
+flush();                                // Garante que foi enviado
 
+if (function_exists('fastcgi_finish_request')) {
+    fastcgi_finish_request();           // Libera o navegador e continua executando
+}
 
 require_once "../../class/util/classFilePipe.php";
 require_once '../../includes/constantes.php';
@@ -213,7 +231,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 <script type="text/javascript" src="/js/jquery.mask.min.js"></script>
 
-<script src="https://www.e-prepag.com.br/js/valida.js"></script>
+<script src="<?= EPREPAG_URL_HTTPS ?>/js/valida.js"></script>
 
 <link rel="stylesheet" type="text/css" href="/js/jqueryui/css/custom-theme/jquery-ui-1.9.2.custom.min.css" />
 
@@ -3153,5 +3171,9 @@ try {
 }
 
 echo $msg;
-ob_end_flush();
+
+$output = ob_get_clean();
+
+// Salva no arquivo de log
+file_put_contents("/www/backoffice/dimp/" . date('Ymd') . "/result_" . $id_request . ".txt", $output, FILE_APPEND);
 ?>

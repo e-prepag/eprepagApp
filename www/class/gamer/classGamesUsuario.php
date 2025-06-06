@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 class UsuarioGames {
 
@@ -598,7 +599,7 @@ class UsuarioGames {
                     //Envia email
                     //--------------------------------------------------------------------------------
                     /*
-                      $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                      $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
                       $parametros['nome'] = $objGamesUsuario->getNome();
                       $parametros['sexo'] = $objGamesUsuario->getSexo();
 
@@ -692,7 +693,7 @@ class UsuarioGames {
                     /* 					
                       //Envia email
                       //--------------------------------------------------------------------------------
-                      $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                      $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
                       $parametros['nome'] = "";
                       $parametros['sexo'] = "";
 
@@ -801,7 +802,7 @@ class UsuarioGames {
                     //Envia email
                     /*
                       //--------------------------------------------------------------------------------
-                      $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                      $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
                       $parametros['nome'] = $objGamesUsuario->getNome();
                       $parametros['sexo'] = $objGamesUsuario->getSexo();
                       $msgEmail  = email_cabecalho($parametros);
@@ -2048,7 +2049,7 @@ class UsuarioGames {
                 //--------------------------------------------------------------------------------
                 $usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
                 /*
-                  $parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+                  $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
                   $parametros['nome'] = $usuarioGames->getNome();
                   $parametros['sexo'] = $usuarioGames->getSexo();
 

@@ -1,5 +1,5 @@
 <?php
-
+require_once "/www/includes/load_dotenv.php";
 require_once "../../../includes/functions.php";
 /* Constantes com os IDs dos Canais de Ofertas */
 
@@ -30,17 +30,17 @@ define("PATH_INCLUDES", "C:\\Sites\\E-Prepag\\www\\web\\prepag2\\commerce\\inclu
 /** ==# Matomy - Configurações #== **/
 
 /* Secret Key da Aplicacao denominada 'E-Prepag Matomy Ads - 01' */
-define("MATOMY_APP_SECRET_KEY", getEnvVariable('MATOMY_APP_SECRET_KEY'));
+define("MATOMY_APP_SECRET_KEY", getenv('MATOMY_APP_SECRET_KEY'));
 
 /** ==# SponsorPay - Configurações #== **/
 
 /* Secret Key da Aplicação denominada 'E-Prepag Ads # 01' */
-define("SECURITY_TOKEN_SPONSORPAY", getEnvVariable('SECURITY_TOKEN_SPONSORPAY'));
+define("SECURITY_TOKEN_SPONSORPAY", getenv('SECURITY_TOKEN_SPONSORPAY'));
 
 /** ==# Super Rewards - Configurações #== **/
 
 /* Secret Key da Aplicacao denominada 'E-Prepag SRPOINTS Ads #1' */
-define("SUPER_REWARDS_APP_SECRET_KEY", getEnvVariable('SUPER_REWARDS_APP_SECRET_KEY'));
-define("SUPER_REWARDS_API_KEY", getEnvVariable('SUPER_REWARDS_API_KEY'));
+define("SUPER_REWARDS_APP_SECRET_KEY", getenv('SUPER_REWARDS_APP_SECRET_KEY'));
+define("SUPER_REWARDS_API_KEY", getenv('SUPER_REWARDS_API_KEY'));
 
 ?>

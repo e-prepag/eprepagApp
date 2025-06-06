@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
@@ -8,6 +9,7 @@ require_once DIR_CLASS . "pdv/controller/CarrinhoController.class.php";
 require_once DIR_INCS . "gamer/constantes.php";
 require_once "/www/class/pdv/classChaveMestra.php";
 require_once "/www/class/pdv/classProvedor.php";
+require_once "/www/includes/load_dotenv.php";
 
 //Recupera carrinho do session
 //$carrinho = $_SESSION['dist_carrinho'];
@@ -25,11 +27,11 @@ if(isset($_POST) && $_POST["passMestra"] != ""){
 	
 	if(!empty($_POST["g-recaptcha-response"])){
 				
-	   $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+	   $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
 
 		$recaptcha = curl_init();
 		curl_setopt_array($recaptcha, [
-			CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+			CURLOPT_URL => getenv("RECAPTCHA_URL"),
 			CURLOPT_CUSTOMREQUEST => "POST",
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
@@ -121,7 +123,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 	    <h1 class="titulo-verificacao">Verificação de identidade</h1>
 		<h2 class="subtitulo-verificacao">Digite sua Chave Mestra para confirmar sua identidade</h2>
 		<p style="text-align: center">A Chave Mestra foi enviada para seu e-mail de cadastro, não esqueça de verificar o spam e lixo eletrônico.</p>
-		<p style="text-align: center">Dúvidas? Fale com o <a style="text-decoration: none; color: #337ab7;" href="https://www.e-prepag.com.br/game/suporte.php" title="Clique para falar com o suporte">suporte</a>.<p>
+		<p style="text-align: center">Dúvidas? Fale com o <a style="text-decoration: none; color: #337ab7;" href="<?= EPREPAG_URL_HTTPS ?>/game/suporte.php" title="Clique para falar com o suporte">suporte</a>.<p>
 		<form method="POST" class="container-form-verificacao" onSubmit="return verificaRecaptcha()">
 		     <div class="container-input-verificacao">
 				 <input type="text" id="passMestra" value="<?php echo (isset($_POST["passMestra"]))? $_POST["passMestra"]: "";?>" name="passMestra" class="form-control">

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 $request_uri = $_SERVER['REQUEST_URI'];
 // Obtém o script principal chamado
@@ -24,9 +25,9 @@ if(isset($_POST['login']) && !empty($_POST['login'])){
 
     //if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
 
-	  if(!empty($_POST["g-recaptcha-response"])){
-			
-		   $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+    if (!empty($_POST["g-recaptcha-response"])) {
+
+        $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
 			$recaptcha = curl_init();
 			curl_setopt_array($recaptcha, [
@@ -117,7 +118,7 @@ if(isset($_POST['login']) && !empty($_POST['login'])){
 			$verificaParteVazia = (array_search("", $dataQuebrada) === false)? true: false;
 			if($verificaNumeroDePartes === true && $verificaParteVazia === true && strlen($dataNascimento) == 10){
 				
-                $url = "https://www.e-prepag.com.br/ajax/ajaxCpf.php";
+                $url = "" . EPREPAG_URL_HTTPS . "/ajax/ajaxCpf.php";
 
                 $postFields = [
                     'cpf' => $cpf,

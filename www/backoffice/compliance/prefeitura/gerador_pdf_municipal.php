@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 header ('Content-type: text/html; charset=iso-8859-1');
 
@@ -54,7 +55,7 @@ $pdf->Image($GLOBALS['raiz_do_projeto'] . "backoffice/images/background_anexo3.j
 
 //escreve no pdf largura,altura,conteudo,borda,quebra de linha,alinhamento
 $pdf->Cell(0,-7,$titulo,0,0,'L');
-$pdf->Cell(0,-7,'http://www.e-prepag.com.br',0,1,'R',false,'javascript:history.go(-1);');
+$pdf->Cell(0,-7,'' . EPREPAG_URL_HTTP . '',0,1,'R',false,'javascript:history.go(-1);');
 $pdf->Ln(12);
 
 //setando a cor de fundo

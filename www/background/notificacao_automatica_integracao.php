@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: text/html; charset=ISO-8859-1",true);
-// Notificação Automaticamente de Pedidos de Integração
+// Notificaï¿½ï¿½o Automaticamente de Pedidos de Integraï¿½ï¿½o
 // \backoffice\offweb\tarefas\notificacao_automatica_integracao.php 
 // 
 
@@ -23,15 +23,15 @@ if(!$arquivoLog->haveFile()) {
     $time_start_stats = getmicrotime();
 
     // Parametros
-    $qtde_minutos_considerados = 10; //já conciliado
-    $qtde_meses_considerados_apartirde = 2; //qtde de meses considerado na pesquisa
-    $subject = "Notificação Automaticamente de Pedidos de Integração";
+    $qtde_minutos_considerados = 30; //jï¿½ conciliado
+    $qtde_meses_considerados_apartirde = 1; //qtde de meses considerado na pesquisa
+    $subject = "NotificaÃ§Ã£o Automaticamente de Pedidos de IntegraÃ§Ã£o";
     $email = "suporte@e-prepag.com.br";
     $cc = "glaucia@e-prepag.com.br"; //"glaucia@e-prepag.com.br";
     $bcc = "wagner@e-prepag.com.br";
     $msg = "";
 
-    echo PHP_EOL.str_repeat("=", 80).PHP_EOL."Notificação Automaticamente de Pedidos de Integração com mais de ".$qtde_minutos_considerados." Minutos já conciliados (".date("Y-m-d H:i:s").")".PHP_EOL.str_repeat("=", 80).PHP_EOL;
+    //echo PHP_EOL.str_repeat("=", 80).PHP_EOL."NotificaÃ§Ã£o Automaticamente de Pedidos de IntegraÃ§Ã£o com mais de ".$qtde_minutos_considerados." Minutos jÃ¡ conciliados (".date("Y-m-d H:i:s").")".PHP_EOL.str_repeat("=", 80).PHP_EOL;
 
     $sql = "
     select  ip.* , 
@@ -57,17 +57,17 @@ if(!$arquivoLog->haveFile()) {
     order by ip_data_inclusao desc 
 
     ";
-    echo "SQL para levantamento de Pedidos a serem notificados automáticamente:".PHP_EOL.$sql.PHP_EOL;
+   // echo "SQL para levantamento de Pedidos a serem notificados automï¿½ticamente:".PHP_EOL.$sql.PHP_EOL;
     //die();
     $rs = SQLexecuteQuery($sql);
     $n_updates = pg_num_rows($rs);
-    echo "Encontrado".(($n_updates>1)?"s":"")." : ".$n_updates." Registro".(($n_updates>1)?"s":"")." para serem notificados manualmente".PHP_EOL;
+   // echo "Encontrado".(($n_updates>1)?"s":"")." : ".$n_updates." Registro".(($n_updates>1)?"s":"")." para serem notificados manualmente".PHP_EOL;
 
     if(!$rs || pg_num_rows($rs) == 0) {
-            echo  "Nenhum pedido selecionado".PHP_EOL;
+           // echo  "Nenhum pedido selecionado".PHP_EOL;
     } else {
-            echo "Pedidos que serão considerados nestas notificações:".PHP_EOL;
-            $msg .= "<html>Pedidos que serão considerados nestas notificações: Total [".$n_updates."]<br><br>";
+           // echo "Pedidos que serï¿½o considerados nestas notificaï¿½ï¿½es:".PHP_EOL;
+            $msg .= "<html>Pedidos que serï¿½o considerados nestas notificaï¿½ï¿½es: Total [".$n_updates."]<br><br>";
 
             while($rs_row = pg_fetch_array($rs)) {
 
@@ -87,15 +87,15 @@ if(!$arquivoLog->haveFile()) {
 
                     // Do notify
                     $notify_url = getPartner_notify_url_By_ID($rs_row["ip_store_id"]);
-                    echo "URL:".$notify_url.PHP_EOL;
-                    echo "Parameters: ".$post_parameters.PHP_EOL;
+                   // echo "URL:".$notify_url.PHP_EOL;
+                   // echo "Parameters: ".$post_parameters.PHP_EOL;
                     $sret = getIntegracaoCURL($notify_url, $post_parameters);
 
-                    echo " Pedido ".$rs_row['vg_id']."\t\t=> Conciliado em [".$rs_row['vg_data_concilia']."]\t\t=> Tipo de pagamento [".$rs_row['vg_pagto_tipo']."];".PHP_EOL;
+                  //  echo " Pedido ".$rs_row['vg_id']."\t\t=> Conciliado em [".$rs_row['vg_data_concilia']."]\t\t=> Tipo de pagamento [".$rs_row['vg_pagto_tipo']."];".PHP_EOL;
                     $msg .= " Pedido ".$rs_row['vg_id']." => Conciliado em [".$rs_row['vg_data_concilia']."] => Tipo de pagamento [".$rs_row['vg_pagto_tipo']."]; <br>".PHP_EOL;
-                    // => ".((strstr($sret[0], '200'))?"Notificado com Sucesso":"NÃO Notificado")." -- teste para verificar se existiu sucesso ba notificação
+                    // => ".((strstr($sret[0], '200'))?"Notificado com Sucesso":"Nï¿½O Notificado")." -- teste para verificar se existiu sucesso ba notificaï¿½ï¿½o
 
-                    echo  "sret: ".print_r($sret, true).PHP_EOL;
+                 //   echo  "sret: ".print_r($sret, true).PHP_EOL;
 
                     //Temporizador
                     //sleep(2);
@@ -106,15 +106,15 @@ if(!$arquivoLog->haveFile()) {
             if(!empty($msg)) {
                 $msg .= "<br><br></html>";
                 if(enviaEmail($email, $cc, $bcc, $subject, $msg)) {
-                    echo "Email enviado com sucesso".PHP_EOL;
+                 //  echo "Email enviado com sucesso".PHP_EOL;
                 }
                 else {
-                    echo "Problemas no envio do Email\n TO: ".$email.PHP_EOL." CC: ".$cc.PHP_EOL." BCC: ".$bcc.PHP_EOL." SUBJECT: ".$subject.PHP_EOL;
+                   // echo "Problemas no envio do Email\n TO: ".$email.PHP_EOL." CC: ".$cc.PHP_EOL." BCC: ".$bcc.PHP_EOL." SUBJECT: ".$subject.PHP_EOL;
                 }
             }//end if(!empty($msg))
 
     }//end else do if(!$rs || pg_num_rows($rs) == 0)
-    echo PHP_EOL.str_repeat("_", 80) .PHP_EOL."Elapsed time: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL.str_repeat("=", 80) .PHP_EOL;
+   // echo PHP_EOL.str_repeat("_", 80) .PHP_EOL."Elapsed time: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL.str_repeat("=", 80) .PHP_EOL;
 
     $arquivoLog->deleteLockedFile();
 }
@@ -122,7 +122,7 @@ else {
     $arquivoLog->showBusy();
 }
 
-//Fechando Conexão
+//Fechando Conexï¿½o
 pg_close($connid);
 
 ?>

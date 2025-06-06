@@ -10,10 +10,23 @@ require_once $raiz_do_projeto . "includes/main.php";
 require_once $raiz_do_projeto . "includes/pdv/main.php";
 require_once $raiz_do_projeto . "includes/pdv/corte_constantes.php";
 require_once $raiz_do_projeto . "class/util/Util.class.php";
+require_once __DIR__ . '../../../../public_html/creditos/includes/funcoes_login.php';
 //$varBlDebug = true;
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
+function corTextoContraste($hexCor)
+{
+	$hex = ltrim($hexCor, '#');
+
+	$r = hexdec(substr($hex, 0, 2));
+	$g = hexdec(substr($hex, 2, 2));
+	$b = hexdec(substr($hex, 4, 2));
+
+	$yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+
+	return ($yiq >= 128) ? '#000000' : '#FFFFFF';
+}
 
 //var_dump($_SESSION);
 $grupos = unserialize($_SESSION["arrIdGrupos"]);
@@ -322,7 +335,8 @@ ob_end_flush();
 					?></td>
 					<td width="140">Possui Restrição de Vendas de Produtos?</td>
 					<td width="307">
-						<?php echo (($objUsuarioGames->getPossuiRestricaoProdutos() == 1) ? "SIM" : "Não"); ?></td>
+						<?php echo (($objUsuarioGames->getPossuiRestricaoProdutos() == 1) ? "SIM" : "Não"); ?>
+					</td>
 				</tr>
 				<tr bgcolor="#FFFFFF" class="texto">
 					<td colspan="4" bgcolor="#ECE9D8">Dados Administrativos</font>
@@ -428,6 +442,24 @@ ob_end_flush();
 					<td><button type="button" class="btn btn-danger <?php echo $autenticador ? "" : "d-none" ?>"
 							id="btn-remove-auth">Remover autenticador
 							&#128274;</button></td>
+				</tr>
+				<tr bgcolor="#F5F5FB" class="texto">
+					<td><b>Usuário bloqueado por fraude</b></td>
+					<td id="txt-block"><?php
+					$usuario_bloqueio = obterUsuarioBloqueado(0+$objUsuarioGames->getId());
+					if ($usuario_bloqueio) {
+						echo "Sim. Motivo: " . utf8_decode($usuario_bloqueio['motivo']) . " - Data: " . $usuario_bloqueio['data_bloqueio'];
+					} else {
+						echo "Não possui bloqueio por fraude";
+					}
+					?></td>
+					<td></td>
+					<td><button type="button"
+							class="btn <?php echo $usuario_bloqueio ? "btn-success act-remove" : "btn-danger act-add" ?>"
+							style="font-weight: bold;" id="btn-bloqueio"><?php echo $usuario_bloqueio
+								? "Desbloquear usuário &#128275;"
+								: "Bloquear usuário &#9888;&#65039;" ?>
+						</button></td>
 				</tr>
 
 				<tr bgcolor="#FFFFFF" class="texto">
@@ -569,6 +601,129 @@ ob_end_flush();
 						<td><?php echo ($objUsuarioGames->getTipoVenda() == '1' ? 'On' : ($objUsuarioGames->getTipoVenda() == '3' ? 'Online e Off' : 'Off')); ?>line
 						</td>
 					</tr>
+
+					<tr bgcolor="#FFFFFF" class="texto">
+						<td colspan="4" bgcolor="#ECE9D8">
+							<table border="0" cellspacing="0" cellpadding="0" width="0">
+								<tr>
+									<td align="left" class="texto">Estilização</td>
+									<td width="100%">&nbsp;</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<?php
+					function getEstilosUsuarioPDO($userId, PDO $pdo)
+					{
+						// Configurações recomendadas
+						$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+						$pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+
+						$sql = "SELECT ug_estilo, ug_logo FROM dist_usuarios_games WHERE ug_id = :userId";
+						$stmt = $pdo->prepare($sql);
+						$stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+						$stmt->execute();
+
+						$resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+						if ($resultado && isset($resultado['ug_estilo'])) {
+							$dados = json_decode($resultado['ug_estilo'], true);
+
+							if (!empty($resultado['ug_logo'])) {
+								// Se for um stream, precisamos ler o conteúdo
+								$logoRaw = is_resource($resultado['ug_logo'])
+									? stream_get_contents($resultado['ug_logo'])
+									: $resultado['ug_logo'];
+
+								// Detectar extensão do logo (opcional)
+								$ext = isset($dados['logo_extensao']) ? strtolower($dados['logo_extensao']) : 'png';
+								$mime = ($ext === 'jpg') ? 'jpeg' : $ext;
+
+								// Gerar base64 da imagem
+								$dados['logo_base64'] = 'data:image/' . $mime . ';base64,' . base64_encode($logoRaw);
+							}
+
+							return is_array($dados) ? $dados : array();
+						}
+
+						return array();
+					}
+					$con = ConnectionPDO::getConnection();
+					$pdo = $con->getLink();
+					$estilos = getEstilosUsuarioPDO($objUsuarioGames->getId(), $pdo);
+					if (!filter_var($estilos['email_suporte'], FILTER_VALIDATE_EMAIL)) {
+						$estilos['email_suporte'] = "";
+					}
+					if (!filter_var($estilos['link_canal'], FILTER_VALIDATE_URL)) {
+						$estilos['link_canal'] = "";
+					}
+					?>
+
+					<tr bgcolor="#F5F5FB" class="texto">
+						<td><b>Cor primária</b></td>
+						<td>
+							<?php
+							echo '<div style="
+									width: 90px;
+									height: 30px;
+									border-radius: 10px;
+									background-color: ' . htmlspecialchars($estilos['cor_primaria']) . ';
+									color: ' . corTextoContraste(htmlspecialchars($estilos['cor_primaria'])) . ';
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									font-family: Arial, sans-serif;
+									font-weight: bold;
+									font-size: 14px;
+									box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.3);
+									">
+									' . htmlspecialchars($estilos['cor_primaria']) . '
+									</div>';
+							?>
+						</td>
+						<td><b>Cor secundária</b></td>
+						<td><?php
+						echo '<div style="
+									width: 90px;
+									height: 30px;
+									border-radius: 10px;
+									background-color: ' . htmlspecialchars($estilos['cor_secundaria']) . ';
+									color: ' . corTextoContraste(htmlspecialchars($estilos['cor_secundaria'])) . ';
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									font-family: Arial, sans-serif;
+									font-weight: bold;
+									font-size: 14px;
+									box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.3);
+									">
+									' . htmlspecialchars($estilos['cor_secundaria']) . '
+									</div>';
+						?></td>
+					</tr>
+					<tr bgcolor="#F5F5FB" class="texto">
+						<td><b>E-mail de suporte</b></td>
+						<td>
+							<?php
+							echo htmlspecialchars($estilos['email_suporte']);
+							?>
+						</td>
+						<td><b>Canal de atendimento</b></td>
+						<td><?php echo htmlspecialchars($estilos['link_canal']); ?></td>
+					</tr>
+					<tr bgcolor="#F5F5FB" class="texto">
+						<td><b>Mensagem</b></td>
+						<td>
+							<?php
+							echo htmlspecialchars($estilos['mensagem']);
+							?>
+						</td>
+						<td><b>Logo</b></td>
+						<td><?php echo "<img src='" . $estilos['logo_base64'] . "' title='logo' alt='Sem logo' border='0' class='imagem_epp' style='max-width: 100px; max-height: 25px;'>"; ?>
+						</td>
+					</tr>
+
 					<tr bgcolor="#FFFFFF" class="texto">
 						<td colspan="4" bgcolor="#ECE9D8">Representante Legal da Empresa</font>
 						</td>
@@ -1431,13 +1586,61 @@ ob_end_flush();
 								response.msg,
 								"success"
 							).then(() => {
-								$("#btn-remove-auth").hide(); 
+								$("#btn-remove-auth").hide();
 								$("#txt-auth").html("Não");
 							});
 						} else {
 							Swal.fire(
 								"Erro!",
 								response.msg,
+								"error"
+							);
+						}
+					}
+				});
+			}
+		});
+	});
+	$("#btn-bloqueio").click(function () {
+		let acao = $("#btn-bloqueio").hasClass("act-add") ? "add" : "rm";
+
+		let msg = acao == "add" ? "Esta ação bloqueará o usuário!" : "Esta ação desbloqueará o usuário!";
+		Swal.fire({
+			title: "Tem certeza?",
+			text: msg,
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Sim! Confirmar",
+			cancelButtonText: "Cancelar"
+		}).then((result) => {
+			if (result.isConfirmed) {
+				$.ajax({
+					url: "/pdv/usuarios/ajax_usuario_fraude.php",
+					method: "POST",
+					data: { ug_id: $("#codigo-pdv").html(), codigo: 'Gz8#kV2!mP$Xr9@tQw', acao: acao },
+					beforeSend: function () {
+						Swal.fire({
+							didOpen: () => {
+								Swal.showLoading()
+							}
+						});
+					},
+					complete: function (request, status) {
+						Swal.close();
+						let response = JSON.parse(request.responseText);
+
+						if (response.status == 'success') {
+							Swal.fire(
+								"Sucesso!",
+								response.message,
+								"success"
+							).then(() => {
+								window.location.reload();
+							});
+						} else {
+							Swal.fire(
+								"Erro!",
+								response.message,
 								"error"
 							);
 						}

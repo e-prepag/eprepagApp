@@ -12,7 +12,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.p
 set_time_limit (60000) ;
 
 //Declarando valor IOF 6.38 ou 0.38
-$iof = array(6.38,0.38);
+$iof = array(6.38,0.38, IOF);
 
 $time_start = getmicrotime();
 

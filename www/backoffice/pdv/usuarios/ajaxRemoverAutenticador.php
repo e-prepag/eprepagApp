@@ -23,15 +23,33 @@ if (empty($id)) {
 
 $conexao = ConnectionPDO::getConnection()->getLink();
 
-$query = $conexao->prepare("UPDATE dist_usuarios_games SET ug_chave_autenticador = '' WHERE ug_id = :ID;");
+$query = $conexao->prepare("SELECT ug_ativo from dist_usuarios_games WHERE ug_id = :ID;");
 $query->bindValue(":ID", $id);
 $query->execute();
+$resultado = $query->fetch(PDO::FETCH_ASSOC);
 
-if ($query->rowCount() > 0) {
+if ($resultado) {
+	$ativo = $resultado['ug_ativo'];
 
-	echo json_encode(["situacao" => "success", "msg" => "Autenticador removido com sucesso, usuário foi inativado."]);
-	http_response_code(200);
-	exit;
+	$query = $conexao->prepare("UPDATE dist_usuarios_games SET ug_chave_autenticador = '' WHERE ug_id = :ID;");
+	$query->bindValue(":ID", $id);
+	$query->execute();
+
+	if ($query->rowCount() > 0) {
+		$query = $conexao->prepare("UPDATE dist_usuarios_games SET ug_ativo = :ATIVO WHERE ug_id = :ID;");
+		$query->bindValue(":ID", $id);
+		$query->bindValue(":ATIVO", $ativo);
+		$query->execute();
+		if ($query->rowCount() > 0) {
+			echo json_encode(["situacao" => "success", "msg" => "Autenticador removido com sucesso."]);
+			http_response_code(200);
+			exit;
+		}
+
+		echo json_encode(["situacao" => "error", "msg" => "Autenticador removido com sucesso, usuário não foi reativado."]);
+		http_response_code(200);
+		exit;
+	}
 }
 
 http_response_code(400);

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 	require_once( "C:/Sites/E-Prepag/www/web/incs/inc_register_globals.php");	
 
@@ -21,7 +22,7 @@ $business_from_form = $_GET[business];
 if(strlen($business_from_form)==0) $business_from_form = $_POST[business];
 
 $paypal[business]=$business_from_form;		//$_GET[business];		//"reneb_1291838212_biz@gmail.com"
-$paypal[site_url]="http://www.e-prepag.com.br";
+$paypal[site_url]="" . EPREPAG_URL_HTTP . "";
 $paypal[image_url]="/eprepag/imgs/home/logo.gif";
 $paypal[success_url]="/prepag2/pag/pay/ipn/paypal_ipn.php";
 $paypal[cancel_url]="/prepag2/pag/pay/paypal_error.php";

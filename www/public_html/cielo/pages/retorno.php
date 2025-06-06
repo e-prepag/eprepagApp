@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 			
@@ -229,9 +230,9 @@ gravaLog_TMP("$sql\n");
 		<br>
 		<h4>Veja tamb&eacute;m a lista completa de cr&eacute;ditos para<br>games que a E-Prepag oferece:</h4>
         <div class="clear"></div>
-		<a href="http://www.e-prepag.com.br/eprepag/destaques.asp?id=16" target="_blank" border="0"><img id="VejaTodos" tabindex="10"  src="../imgs/vejatodos.gif" alt="Veja todos os jogos" title="Veja todos os jogos" style="border: none;"></a>
+		<a href="<?= EPREPAG_URL_HTTP ?>/eprepag/destaques.asp?id=16" target="_blank" border="0"><img id="VejaTodos" tabindex="10"  src="../imgs/vejatodos.gif" alt="Veja todos os jogos" title="Veja todos os jogos" style="border: none;"></a>
 <?php
-			<img id="VejaTodos" tabindex="10"  src="../imgs/vejatodos.gif" alt="Veja todos os jogos" title="Veja todos os jogos" style="cursor: pointer" onclick="javascript:window.location.href='http://www.e-prepag.com.br/eprepag/destaques.asp?id=16';">	
+			<img id="VejaTodos" tabindex="10"  src="../imgs/vejatodos.gif" alt="Veja todos os jogos" title="Veja todos os jogos" style="cursor: pointer" onclick="javascript:window.location.href='" . EPREPAG_URL_HTTP . "/eprepag/destaques.asp?id=16';">	
 */
 ?>
 </div>

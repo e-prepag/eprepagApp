@@ -10,19 +10,20 @@ require_once "/www/includes/gamer/constantes.php";
 require_once "/www/includes/main.php";
 require_once "/www/includes/inc_Pagamentos.php";
 require_once "/www/includes/functions.php";
+require_once "/www/includes/load_dotenv.php";
 
-define("ASAAS_SECRET_TOKEN", "yPuoo6j'V8#9]Fg+");
+define("ASAAS_SECRET_TOKEN", getenv('ASAAS_SECRET_TOKEN'));
 
 // Pegue o token enviado pelo Asaas no header
 
 $receivedToken = isset($_SERVER['HTTP_ASAAS_ACCESS_TOKEN']) ? $_SERVER['HTTP_ASAAS_ACCESS_TOKEN'] : "nao existe";
 
 if ($receivedToken !== ASAAS_SECRET_TOKEN) {
-    // Se o token estiver errado, rejeita a requisição
+    // Se o token estiver errado, rejeita a requisiï¿½ï¿½o
     
 	http_response_code(403);
 	
-    exit("Acesso negado. Token inválido: $receivedToken");
+    exit("Acesso negado. Token invï¿½lido: $receivedToken");
 }
 
 $webhook = file_get_contents('php://input');
@@ -177,10 +178,10 @@ class RecebePix {
 
         $curl = curl_init();
 
-		$token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjE4MzAxZjU3LWUyMTktNDBmYi1iY2YxLWNmY2QyOGEwN2E0ZTo6JGFhY2hfNWQ5YTU3Y2EtZjJhMC00ZjZhLTgyMDAtYTMzYTBhMjk1Yjc2';
+		$token = getenv('ASAAS_ACCESS_TOKEN');
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.asaas.com/v3/customers/$idUsuario",
+            CURLOPT_URL => getenv('ASAAS_API_URL') . "customers/$idUsuario",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

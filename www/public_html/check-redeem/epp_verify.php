@@ -138,7 +138,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										 * 147=> IGG Teste
 										 * 148=> IGG
 										 */
-										$ids_https = array(88, 90, 73, 13, 102, 124, 137, 142, 143, 147, 148, 166);
+										$ids_https = array(88, 90, 73, 13, 102, 124, 137, 142, 143, 147, 148, 166, 168);
 										if (in_array($id, $ids_https)) {
 											$url = "https://";
 										} else {

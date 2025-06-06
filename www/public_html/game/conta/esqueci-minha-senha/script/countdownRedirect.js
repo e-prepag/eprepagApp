@@ -11,7 +11,7 @@
 					
 		if (timeLeft == 0) {
 			clearInterval(interval);
-			window.location.href = 'https://www.e-prepag.com.br/game/conta/login.php';
+			window.location.href = '/game/conta/login.php';
 		}
 				
 	}, 1000);

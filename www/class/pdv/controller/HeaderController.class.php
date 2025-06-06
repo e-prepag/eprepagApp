@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 /**
  * Classe para as regras de negocio das vendas
@@ -80,7 +81,7 @@ try {
     file_put_contents($logFile, $logMessage, FILE_APPEND);
 }
 
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if (checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }

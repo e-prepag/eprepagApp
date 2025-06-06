@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 if(!function_exists('checkIP')) {
 	function checkIP() {
@@ -477,7 +478,7 @@ function usuarios_games_log($tipo, $usuario_games_id, $venda_id, $observacao = n
 
 }
 
-function usuarios_games_operador_log($tipo, $usuario_games_operador_id, $venda_id){
+function usuarios_games_operador_log($tipo, $usuario_games_operador_id, $venda_id, $observacao = null){
 
         if(!$usuario_games_operador_id){
                 $usuarioGamesOperador = unserialize($_SESSION['dist_usuarioGamesOperador_ser']);
@@ -486,13 +487,17 @@ function usuarios_games_operador_log($tipo, $usuario_games_operador_id, $venda_i
         if(!$usuario_games_operador_id) return;
 
         $sql = "insert into dist_usuarios_games_operador_log (" .
-                        "	ugol_data_inclusao, ugol_ip, ugol_uglt_id, ugol_ugo_id, ugol_vg_id" .
+                        "	ugol_data_inclusao, ugol_ip, ugol_uglt_id, ugol_ugo_id, ugol_vg_id" . ($observacao == null ? "" : ", ugol_obs") .
                         ") values (";
         $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
         $sql .= SQLaddFields($_SERVER['REMOTE_ADDR'], "s") . ",";
         $sql .= SQLaddFields($tipo, "") . ",";
         $sql .= SQLaddFields($usuario_games_operador_id, "") . ",";
-        $sql .= SQLaddFields($venda_id, "") . ")";
+        $sql .= SQLaddFields($venda_id, "");
+        if($observacao != null) {
+                $sql.= ", ". SQLaddFields($observacao, "s");
+        }
+        $sql .= ")";
 
         $ret = SQLexecuteQuery($sql);
 
@@ -541,7 +546,7 @@ function theRealStripTags2($string){
 }
 
 
-function enviaEmail($to, $cc, $bcc, $subject, $msgEmail) {
+function enviaEmail($to, $cc, $bcc, $subject, $msgEmail, $nome = '') {
         $body_plain = str_replace("\r\n", "", $msgEmail);
         $body_plain = str_replace("<br>", "\r\n", $msgEmail);
         $body_plain = str_replace("\t", "", theRealStripTags2($body_plain));
@@ -550,11 +555,11 @@ function enviaEmail($to, $cc, $bcc, $subject, $msgEmail) {
         $body_plain = str_replace("\r\n\r\n\r\n\r\n", "\r\n", $body_plain);
         $body_plain = str_replace(", \r\n", ", ", $body_plain);
 
-        return enviaEmail3($to, $cc, $bcc, $subject, $msgEmail, $body_plain);	
+        return enviaEmail3($to, $cc, $bcc, $subject, $msgEmail, $body_plain, $nome);	
 }
 
 	// Está usando esta enviaEmail3() no envio de emails de Lanhouses
-function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain) {
+function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = '') {
 
         $mail = new PHPMailer();
         //		$mail->Host     = "smtp.e-prepag.com.br";	//"localhost";
@@ -566,7 +571,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain) {
         $mail->SMTPAuth = true;     // turn on SMTP authentication
         $mail->Username = 'suporte@e-prepag.com.br';  // a valid email here
         $mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856';		//'850637'; 
-        $mail->FromName = "E-Prepag";	  // "(EPP LH)"
+        $mail->FromName = $nome != '' ? $nome : "E-Prepag";	  // "(EPP LH)"
 
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
@@ -868,7 +873,7 @@ function email_rodape($parametros){
                                                                                 Atenciosamente, <br><br>
                                                                                 E-Prepag<br>
                                                                                 * One Stop Total Billing Service!<br>
-                                                                                www.e-prepag.com.br<br>
+                                                                                " . EPREPAG_URL . "<br>
                                                                         </td>
                                                                 </tr>
                                                                 </table>

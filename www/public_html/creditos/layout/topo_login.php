@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 $msg = '';
 if ( array_key_exists('msg', $_GET) ) {
@@ -77,8 +78,8 @@ if ( array_key_exists('msg', $_GET) ) {
 <div class="topo">
     <div class="faixa">
         <div class="links">
-            <span><a href="https://www.e-prepag.com/" target="_blank" class="corlink">E-Prepag</a></span>
-            <span><a href="https://www.e-prepag.com/support" target="_blank" class="corlink">Suporte</a></span>
+            <span><a href="<?= EPREPAG_URL_HTTPS_COM ?>/" target="_blank" class="corlink">E-Prepag</a></span>
+            <span><a href="<?= EPREPAG_URL_HTTPS_COM ?>/support" target="_blank" class="corlink">Suporte</a></span>
             <span><a href="http://blog.e-prepag.com/seja-um-ponto-de-venda/" target="_blank" class="corlink">Seja um ponto autorizado</a></span>
         </div>
     </div>

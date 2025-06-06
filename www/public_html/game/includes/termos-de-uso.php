@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 $termosDeUso = "<div class=WordSection1>
 
@@ -45,7 +46,7 @@ seguinte forma:</p>
 
 <p class=MsoNormal>(a) A E-Prepag dispõe de uma plataforma tecnológica voltada
 para a gestão de Cartões pré-pagos usados como pagamento na aquisição de bens
-ou serviços, hospedada sob o domínio www.e-prepag.com (&quot;Site&quot;), sob
+ou serviços, hospedada sob o domínio " . EPREPAG_URL_COM . " (&quot;Site&quot;), sob
 os cuidados da E-PREPAG ADMINISTRADORA DE CARTÕES LTDA., sociedade empresária,
 inscrita no CNPJ/MF sob o n°. 19.037.276/0001-72, com sede na Rua Deputado
 Lacerda Franco, 300, cond. 26-A, CEP 05.418-000, São Paulo/SP, denominado

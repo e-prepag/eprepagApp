@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 
 // include do arquivo contendo IPs DEV
@@ -142,7 +143,7 @@ class AtivacaoPinTemplate {
 	 * @param String $urlParam
 	*/
 	public function generateUrl($urlParam) {
-		$server_url = "www.e-prepag.com.br";
+		$server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -174,7 +175,7 @@ class AtivacaoPinTemplate {
 	 * 
 	*/
 	public function boxAtivacaoPin() {
-                $server_url = "www.e-prepag.com.br";
+                $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -300,7 +301,7 @@ class AtivacaoPinTemplate {
 	 * Exibe o HTML que contém o box-sessao-usuario
 	*/
 	private function boxSessaoUsuario() {
-                $server_url = "www.e-prepag.com.br";
+                $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -397,7 +398,7 @@ class AtivacaoPinTemplate {
 	 * Exibe o Captcha no box-adicionar-pin-form-captcha
 	*/
 	private function boxCaptcha() {
-                $server_url = "www.e-prepag.com.br";
+                $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -418,7 +419,7 @@ class AtivacaoPinTemplate {
 	 * Exibe o Adicionar PIN no box-adicionar-pin
 	*/
 	private function boxAdicionaPIN() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -511,7 +512,7 @@ class AtivacaoPinTemplate {
 	 * Exibe o PIN no box-resumo-item-pin-label
 	*/
 	private function boxPIN_EPP() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -530,7 +531,7 @@ class AtivacaoPinTemplate {
 															";
 /************************ Incluir este trecho abaixo no codigo acima quando dispo nibilizar o bonus ************************************************************
 														<tr class='box-resumo-item-pin bg_color_odd'>
-															<td class='box-resumo-item-pin-bonus'>+ Bônus<img src='http<_?php echo (($_SERVER['HTTPS']=="on")?"s":"") ?_>://www.e-prepag.com.br/prepag2/commerce/ativacao_pin/images/ajuda_pin.gif' /></td>
+															<td class='box-resumo-item-pin-bonus'>+ Bônus<img src='http<_?php echo (($_SERVER['HTTPS']=="on")?"s":"") ?_>://EPREPAG_URL/prepag2/commerce/ativacao_pin/images/ajuda_pin.gif' /></td>
 															<td align='right'><span class='box-resumo-item-pin-bonus-valor'>".number_format(($values['BONUS']*100),0,',','.')."</span></td>
 															<td class='box-resumo-item-pin-excluir'></td>
 														</tr>						
@@ -544,7 +545,7 @@ class AtivacaoPinTemplate {
 	 * Exibe mensagem de confirmação do pagamento no box-resumo-pedido-msg-confirma-pagamento
 	*/
 	private function boxConfirmaPagamento() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -647,7 +648,7 @@ class AtivacaoPinTemplate {
 	 * Exibe o botão pagar no box-resumo-pedido-pagar
 	*/
 	private function boxBotaoPagar() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
@@ -716,7 +717,7 @@ class AtivacaoPinTemplate {
 	 * Monta javascript para execução
 	*/
 	private function MontaJavaScript() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }

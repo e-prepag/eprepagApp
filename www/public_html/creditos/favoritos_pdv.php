@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php	
 	header("Content-Type: text/html; charset=ISO-8859-1",true);
 	
@@ -91,8 +92,8 @@
 				}
 				if(!empty($lista_favoritos)) {
 					foreach ($lista_favoritos as $id => $nome):
-						$caminho_imagem_jpg = "https://www.e-prepag.com.br/imagens/pdv/produtos/p_".$id.".jpg";
-						$caminho_imagem_png = "https://www.e-prepag.com.br/imagens/pdv/produtos/p_".$id.".png";
+						$caminho_imagem_jpg = "" . EPREPAG_URL_HTTPS . "/imagens/pdv/produtos/p_".$id.".jpg";
+						$caminho_imagem_png = "" . EPREPAG_URL_HTTPS . "/imagens/pdv/produtos/p_".$id.".png";
 						
 						$headers_jpg = get_headers($caminho_imagem_jpg);
 						$headers_png = get_headers($caminho_imagem_png);

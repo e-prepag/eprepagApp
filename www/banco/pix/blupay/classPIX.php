@@ -1,5 +1,5 @@
 <?php
-
+require_once "/www/includes/load_dotenv.php";
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 ini_set('default_socket_timeout', ((PIX_TIMEOUT/1000)+5));
 
@@ -249,12 +249,8 @@ class classPIX {
 
         private function sendJSONAuthentication() {
 
-            if(!function_exists('getEnvVariable')){
-                require_once "/www/includes/getEnvVar.php";
-            }
-
-            $client_id = getEnvVariable("Client_id_Novo");
-            $client_secret = getEnvVariable("Secret");
+            $client_id = getenv("Client_id_Novo");
+            $client_secret = getenv("Secret");
 
 
             $resultado = NULL;

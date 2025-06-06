@@ -1,7 +1,8 @@
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php 
 
 # $Id: eprepag_lang_ko.inc.php 
-# Copyright (c) 2007-2008, Reinaldo Perez Sanchez www.e-prepag.com.br
+# Copyright (c) 2007-2008, Reinaldo Perez Sanchez EPREPAG_URL
 # All rights reserved.  
 
 @define('LANG_NOT', 'does not have');

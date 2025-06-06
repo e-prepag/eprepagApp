@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 // ini_set('display_errors', 1);
@@ -245,7 +246,7 @@ if ($msg == "") {
 //Envia email
 //--------------------------------------------------------------------------------
 if ($msg == "") {
-	$server_url = "www.e-prepag.com.br";
+	$server_url = "" . EPREPAG_URL . "";
 	if (checkIP()) {
 		$server_url = $_SERVER['SERVER_NAME'];
 	}

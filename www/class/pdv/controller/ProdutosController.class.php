@@ -184,7 +184,7 @@ class ProdutosController extends HeaderController{
                 throw new Exception("PRODUTO NÃO ENCONTRADO.");
             }
         } catch (Exception $ex) {
-                $msg = "O produto que você está tentando acessar está indisponível no momento.<br>Aguarde alguns instantes ou entre em contato com nosso suporte.<br>Obrigado.";
+                $msg = "O produto que você está tentando acessar está indisponível no momento.<br>Aguarde alguns instantes ou entre em contato com nosso suporte.<br>Obrigado.<br>" . $ex->getMessage();
 ?>
                 <form name="pagamento" id="pagamento" method="POST" action="/creditos/mensagem.php">
                    <input type='hidden' name='msg' id='msg' value='<?php echo $msg; ?>'>

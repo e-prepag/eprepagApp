@@ -21,18 +21,22 @@ require_once DIR_INCS . "pdv/main.php";
 echo date("H:i:s")."<br>";
 
 // recupera cesta
+$pdo = ConnectionPDO::getConnection()->getLink();
+
+// Sanitiza o número da compra, mantendo apenas dígitos
 $numcompra = preg_replace("/\D/", "", $numcompra);
-// Recupera da base de dados da loja os dados da compra
-$sql = "SELECT * FROM tb_pag_compras WHERE numcompra='".$numcompra."' ";
-//echo "sql: $sql<br>"; 
-//echo "<br>$numcompra<br>"; 
-//$rsCompra = $conn->Execute($sql) or die("Erro 21");
-$ret = SQLexecuteQuery($sql);
-if(!$ret) {
-	echo "Erro ao recuperar transação de pagamento (1a).<br>\nnumcompra: '$numcompra'<br>\n";
-	die("Stop");
+
+$sql = "SELECT * FROM tb_pag_compras WHERE numcompra = :numcompra";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':numcompra', $numcompra, PDO::PARAM_STR);
+
+if (!$stmt->execute()) {
+    echo "Erro ao recuperar transação de pagamento (1a).<br>\nnumcompra: '$numcompra'<br>\n";
+    die("Stop");
 }
-$ret_row = pg_fetch_array($ret);
+
+$ret_row = $stmt->fetch(PDO::FETCH_ASSOC);
+
 
 echo utf8_encode("".(($ret_row['status']==3)?(($ret_row['datacompra'])?date("Y-m-d H:i:s", strtotime($ret_row['datacompra'])):"-"):
             "<table>"

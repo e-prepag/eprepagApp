@@ -1,9 +1,10 @@
+<?php require_once __DIR__ . '/constantes_url.php'; ?>
 <?php
 
-$server_url = 'www.e-prepag.com.br';
-$server_url_ep = 'https://www.e-prepag.com.br';
-$server_url_bo = 'backoffice.e-prepag.com.br';
+$server_url = EPREPAG_URL;
+$server_url_ep = EPREPAG_URL_HTTPS;
+$server_url_bo = getenv("BACKOFFICE_URL");
 $server_port = '';
-$server_url_complete = 'backoffice.e-prepag.com.br';
+$server_url_complete = getenv("BACKOFFICE_URL");
 
 ?>

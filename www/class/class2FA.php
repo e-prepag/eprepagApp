@@ -8,6 +8,7 @@ require_once "/www/class/classEmailAutomatico.php";
 require_once "/www/class/phpmailer/class.phpmailer.php";
 require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
+require_once "/www/includes/load_dotenv.php";
 
 class TwoFactorAuthenticator {
 	
@@ -34,7 +35,7 @@ class TwoFactorAuthenticator {
 	public function generate_random_code(){
 		$code = mt_rand(100000,999999);
 		
-		$token = hash_hmac('sha256',$code, getEnvVariable('HMAC_SECRET'));
+		$token = hash_hmac('sha256',$code, getenv('HMAC_SECRET'));
 		
 		return $token;
 	}

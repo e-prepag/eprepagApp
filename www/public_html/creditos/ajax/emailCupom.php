@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 //script equivalente a "/www/web/prepag2/dist_commerce/conta/ajax_cupom_email_dr.php"
 //error_reporting(E_ALL); 
@@ -31,7 +32,7 @@ vgpe_email			=	'Campo contendo o email para qual o PIN foi enviado.';
 
 //validaSessao(); 
 
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }

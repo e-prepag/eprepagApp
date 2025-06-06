@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //script equivalente a: "/www/web/prepag2/dist_commerce/ajaxPedido.php"
 //error_reporting(E_ALL); 
@@ -25,7 +26,7 @@ $id = $GLOBALS['_SESSION']['venda'];
 // include do arquivo contendo IPs DEV
 
 
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }
