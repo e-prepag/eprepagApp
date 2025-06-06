@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/constantes_url.php'; ?>
 <?php
 //Mater esta variavel com este valor
 //Coloca-la com true nas paginas que for debugar apos a chamada deste include
@@ -179,7 +180,7 @@ function VerificaIncomm($post_parameters, $action) {
         $post_parameters['action'] = $action;
         
         $curl_handle = curl_init();
-        curl_setopt($curl_handle, CURLOPT_URL, "https://www.e-prepag.com.br/prepag2/commerce/epp_incomm.php");
+        curl_setopt($curl_handle, CURLOPT_URL, "" . EPREPAG_URL_HTTPS . "/prepag2/commerce/epp_incomm.php");
         // verify the digital certificate
         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
         //  verify digital certificate’s name

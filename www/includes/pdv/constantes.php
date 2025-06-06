@@ -1,8 +1,9 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 //Constantes
 //------------------------------------------------------------------------------------------------
 $BOLETO_TAXA_ADICIONAL = 2.00; //TAXA BOLETO COBRADO PDV
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }

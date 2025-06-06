@@ -147,84 +147,12 @@ function verificaEstoque($venda_id)
     return $msg;
 }
 
-function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
-{
-    $pin_ignorados = []; // Lista para armazenar PINs já processados
-
-    do {
-        // Monta a cláusula para ignorar os PINs já verificados
-        $ignorar_clausula = "";
-        if (!empty($pin_ignorados)) {
-            $ignorar_clausula = " AND pin_codigo NOT IN ('" . implode("','", $pin_ignorados) . "')";
-        }
-
-        // Consulta para buscar um PIN disponível
-        $sql = "SELECT * FROM pins
-            WHERE opr_codigo = '" . $vgm_opr_codigo . "'
-              AND pin_status = '1'
-              AND pin_canal = 's'
-              AND pin_valor = " . $vgm_pin_valor . $ignorar_clausula . "
-            LIMIT 1";
-
-        if ($bDebug) {
-            echo "SQL pin: " . $sql . PHP_EOL;
-        }
-
-        $rs_pins = SQLexecuteQuery($sql);
-
-        // Verifica se encontrou algum PIN
-        if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
-            return [
-                'success' => false,
-                'msg' => "Nenhum pin encontrado ou estoque insuficiente para atender este pedido." . PHP_EOL
-            ];
-        }
-
-        // Pega o PIN encontrado
-        $pgpins = pg_fetch_array($rs_pins);
-
-        if ($pgpins["pin_codigo"] != '0000000000000000' && $pgpins["pin_codigo"] != '1111111111111111' && $pgpins["pin_codigo"] != null && $pgpins["pin_codigo"] != "") {
-
-            // Verifica se o PIN já foi vendido
-            $sql = "SELECT * FROM tb_dist_venda_games_modelo_pins vp
-            JOIN pins p ON p.pin_codinterno = vp.vgmp_pin_codinterno
-            WHERE p.pin_codigo = '" . $pgpins["pin_codigo"] . "'";
-
-            $pin_test_duplic = SQLexecuteQuery($sql);
-
-            if ($pin_test_duplic && pg_num_rows($pin_test_duplic) > 0 && $vgm_opr_codigo != 16) {
-                if ($bDebug) {
-                    echo "PIN já vendido, procurando o próximo..." . PHP_EOL;
-                }
-
-                // Adiciona o PIN na lista de ignorados
-                $pin_ignorados[] = $pgpins["pin_codigo"];
-
-            } else {
-                // Retorna o PIN válido
-                return [
-                    'success' => true,
-                    'pin' => $pgpins
-                ];
-            }
-        } else {
-            // Retorna o PIN válido
-            return [
-                'success' => true,
-                'pin' => $pgpins
-            ];
-        }
-
-    } while (true);
-
-}
-
 function processaVendaGames($venda_id, $EstabCod, $parametros)
 {
     set_time_limit(0);
     global $raiz_do_projeto;
 
-    $bDebug = true;
+    $bDebug = false;
 
     if ($bDebug) {
         $time_start_stats = getmicrotime();
@@ -428,17 +356,17 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     PHP_EOL;
             }
 
-
+            
             $verificaExist = SQLexecuteQuery("SELECT COUNT(*) AS qtde FROM tb_dist_venda_games_modelo_pins WHERE vgmp_vgm_id = $vgm_id;");
 
             // Verifique se a consulta foi bem-sucedida e obtemos um recurso de resultado
             if ($verificaExist) {
-                // Extrai o valor da contagem usando pg_fetch_assoc
-                $row = pg_fetch_assoc($verificaExist);
-                $qtde = $row['qtde'];
-                if ($qtde >= $vgm_qtde) {
-                    continue;
-                }
+                    // Extrai o valor da contagem usando pg_fetch_assoc
+                    $row = pg_fetch_assoc($verificaExist);
+                    $qtde = $row['qtde'];
+                    if ($qtde >= $vgm_qtde) {
+                            continue;
+                    }
             }
 
             //Realiza n qtde de venda de pins
@@ -543,17 +471,30 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         fwrite($ff, "Entra aqui ??? " . $vgm_ogp_id);
                         fclose($ff);
                         // Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter
-                        $resultado = buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug);
-
-                        if (!$resultado['success']) {
-                            $msg = $resultado['msg'];
+                        $sql =
+                            "select * from pins
+                                                        where opr_codigo = '" .
+                            $vgm_opr_codigo .
+                            "'
+                                                                and pin_status = '1'
+                                                                and pin_canal = 's'
+                                                                and pin_valor = " .
+                            $vgm_pin_valor .
+                            "
+                                                        limit 1";
+                        if ($bDebug) {
+                            echo "SQL pin: " . $sql . PHP_EOL;
+                        }
+                        $rs_pins = SQLexecuteQuery($sql);
+                        if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
+                            $msg =
+                                "Nenhum pin encontrado ou estoque insuficiente para atender este pedido." .
+                                PHP_EOL;
                         } else {
-
-                            $pgpins = $resultado['pin'];
+                            $pgpins = pg_fetch_array($rs_pins);
                             $pin_codinterno = $pgpins["pin_codinterno"];
                             $pin_valor = $pgpins["pin_valor"];
                             $pin_serial = $pgpins["pin_serial"];
-
                         }
                     }
 
@@ -3440,8 +3381,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                     if (
                         $vg_pagto_banco == "237" ||
                         $vg_pagto_banco == "341" ||
-                        $vg_pagto_banco == "033" ||
-                        $vg_pagto_banco == "461"
+                        $vg_pagto_banco == "033"
                     ) {
                         if ($vg_pagto_banco == "341") {
                             $sql .=

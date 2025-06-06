@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/constantes_url.php'; ?>
 <?php
 $a_formas_pagamento = array(
 	'VISA' => 'Cartão de Crédito VISA', 
@@ -69,7 +70,7 @@ Cache-control: private
 
 	// Some sites may protect themselves from remote logins by checking which site you came from.
 	// http://php.net/manual/en/function.curl-setopt.php
-	$ref_url = "http://www.e-prepag.com.br";
+	$ref_url = "" . EPREPAG_URL_HTTP . "";
 	curl_setopt($curl_handle, CURLOPT_REFERER, $ref_url);
 
 	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);	// não verifica certificado

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 
 	require_once RAIZ_DO_PROJETO . "includes/inc_register_globals.php";	
@@ -39,7 +40,7 @@ if (!(isset($_SESSION['epp_origem'])) || ($_SESSION['epp_origem']=="") || ($_SES
 //		etc.
 
 //echo "_SERVER['SCRIPT_NAME']: ".$_SERVER['SCRIPT_NAME']."<br>";
-//if( (substr($_SERVER['HTTP_REFERER'],0,26)!="http://www.e-prepag.com.br") || (substr($_SERVER['HTTP_REFERER'],0,25)!="http://www.eprepag.com.br")) {
+//if( (substr($_SERVER['HTTP_REFERER'],0,26)!="EPREPAG_URL_HTTP") || (substr($_SERVER['HTTP_REFERER'],0,25)!="http://www.eprepag.com.br")) {
 
 	if(strpos($_SERVER['SCRIPT_NAME'],"eprepag/index.asp")>0) {	$LocalId = "Home"; } 
 	else if (strpos($_SERVER['SCRIPT_NAME'],"moedavirtual")>0) { $LocalId = "Gamers"; } 
@@ -62,7 +63,7 @@ if (!(isset($_SESSION['epp_origem'])) || ($_SESSION['epp_origem']=="") || ($_SES
 		else if (strpos(strtoupper($_SERVER['HTTP_REFERER']),"ONGAME.COM.BR")>0) { $OrigemId = "ONGAME"; } 
 		else if (strpos(strtoupper($_SERVER['HTTP_REFERER']),"VOSTU.COM")>0) { $OrigemId = "VOSTU"; } 
 		else if (strpos(strtoupper($_SERVER['HTTP_REFERER']),"WWW.VIRTUALKNOWLEDGE.COM.BR")>0) { $OrigemId = "TMP"; } 
-		else if (strpos(strtoupper($_SERVER['HTTP_REFERER']),"WWW.E-PREPAG.COM.BR")>0) { $OrigemId = "EPP"; } 
+		else if (strpos($_SERVER['HTTP_REFERER'],EPREPAG_URL)>0) { $OrigemId = "EPP"; } 
 		else if (strpos(strtoupper($_SERVER['HTTP_REFERER']),"SOFTNYX")>0) { $OrigemId = "SOFTNYX"; } 
 		else if (strpos(strtoupper($_SERVER['HTTP_REFERER']),"AXESO5.COM.BR")>0) { $OrigemId = "AXESO5"; } 
 		else if (strlen($_SERVER['HTTP_REFERER'])==0) { $OrigemId = "==EMPTY=="; } 
@@ -138,7 +139,7 @@ if (!(isset($_SESSION['epp_origem'])) || ($_SESSION['epp_origem']=="") || ($_SES
 	// Redireciona para landing page
 	if($OrigemId && $OrigemId == "AXESO5") {	
 		// Axeso5
-		$strRedirect = "http://www.e-prepag.com.br/prepag2/commerce/landing_page.php";
+		$strRedirect = "" . EPREPAG_URL_HTTP . "/prepag2/commerce/landing_page.php";
 		header("Location: " . $strRedirect);
 		die("Stop ABCGLanding");
 	} 
@@ -150,7 +151,7 @@ if (!(isset($_SESSION['epp_origem'])) || ($_SESSION['epp_origem']=="") || ($_SES
 /*
 // Redireciona por IP
 if($_SERVER['REMOTE_ADDR'] == "189.38.238.205") {	
-	$strRedirect = "https://www.e-prepag.com";
+	$strRedirect = "EPREPAG_URL_HTTPS_COM";
 	header("Location: " . $strRedirect);
 	die("Stop ABCG Redirecting");
 } 
@@ -159,7 +160,7 @@ if($_SERVER['REMOTE_ADDR'] == "189.38.238.205") {
 /*
 // Redireciona por Country
 if($country_array['country'] == "US") {	
-	$strRedirect = "https://www.e-prepag.com";
+	$strRedirect = "EPREPAG_URL_HTTPS_COM";
 	header("Location: " . $strRedirect);
 	die("Stop ABCG Redirecting");
 } 

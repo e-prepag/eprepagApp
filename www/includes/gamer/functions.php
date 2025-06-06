@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_pagto.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_economy.php";
@@ -1011,7 +1012,7 @@ function email_cabecalho($parametros){
         if(isset($parametros['logoepp']) && $parametros['logoepp']) { 
                         // width='226' height='54' 
                 $email_cab .= "		<td align='right' class='texto'>
-                                                                <a href='http://www.e-prepag.com.br/'><img src='http://www.e-prepag.com.br/eprepag/imgs/home/LogoEPP_novo.jpg' title='E-PREPAG(EPP)' width='110' height='28' border='0' /></a>
+                                                                <a href='" . EPREPAG_URL_HTTP . "/'><img src='" . EPREPAG_URL_HTTP . "/eprepag/imgs/home/LogoEPP_novo.jpg' title='E-PREPAG(EPP)' width='110' height='28' border='0' /></a>
                                                         </td>";
         }
 
@@ -1048,11 +1049,11 @@ function email_rodape($parametros){
                                                                         Atenciosamente<br>
                                                                         <br>";
         if(isset($parametros['logoepp']) && ($parametros['logoepp']==1)) { 
-                $email_rod .= "<a href='http://www.e-prepag.com.br/'><img src='http://www.e-prepag.com.br/eprepag/imgs/home/LogoEPP_novo.jpg' title='E-PREPAG(EPP)' width='110' height='28' border='0' /></a><br>\n";
+                $email_rod .= "<a href='" . EPREPAG_URL_HTTP . "/'><img src='" . EPREPAG_URL_HTTP . "/eprepag/imgs/home/LogoEPP_novo.jpg' title='E-PREPAG(EPP)' width='110' height='28' border='0' /></a><br>\n";
         }
 
         $email_rod  .= "				E-Prepag<br>
-                                                                        www.e-prepag.com.br<br>
+                                                                        " . EPREPAG_URL . "<br>
                                                         </td>
                                                 </tr>
                                                         </table>
@@ -1067,7 +1068,7 @@ function email_rodape($parametros){
                                                         <table width='100%'  border='0' cellpadding='0' cellspacing='0' bgcolor='#F1F1F1'>
                                                         <tr height='23'>
                                                         <td width='1%'></td>
-                                                        <td width='98%' align='center' class='rodape'>E-Prepag Copyright ".date('Y').". Todos os direitos reservados. <a href='http://www.e-prepag.com.br/eprepag/moedavirtual/ajuda_seguranca.asp' class='rodape'>Pol&iacute;tica de Privacidade e Seguran&ccedil;a</a></td>
+                                                        <td width='98%' align='center' class='rodape'>E-Prepag Copyright ".date('Y').". Todos os direitos reservados. <a href='" . EPREPAG_URL_HTTP . "/eprepag/moedavirtual/ajuda_seguranca.asp' class='rodape'>Pol&iacute;tica de Privacidade e Seguran&ccedil;a</a></td>
                                                         <td width='1%' align='right'></td>
                                                         </tr>
                                                         </table>
@@ -2051,15 +2052,15 @@ function get_msg_bloqueio($stipo) {
 	$smsg .= "<style>\n";
 	$smsg .= ".notice {font-family:arial, verdana, sans serif;color:#1F3682; font-size:12px}\n";
 	$smsg .= "</style>\n";
-	$smsg .= "<p class='notice'>O pagamento de produtos Ongame pelo site da E-Prepag � feito somente por <a href='http://www.e-prepag.com.br/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank' class='notice'>E-Prepag Cash</a></p>\n";
+	$smsg .= "<p class='notice'>O pagamento de produtos Ongame pelo site da E-Prepag � feito somente por <a href='" . EPREPAG_URL_HTTP . "/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank' class='notice'>E-Prepag Cash</a></p>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<p class='notice'><b>Voc� pode adquirir E-Prepag Cash da seguinte forma:</b></p>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<center>\n";
 	$smsg .= "<table border='0'><tr>\n";
-	$smsg .= "<td><a href='http://www.e-prepag.com.br/eprepag/moedavirtual/lan_houses_geral.php' target='_blank'><img src='images/botao_lans.gif' width='140' height='40' border='0' alt='E-Prepag Lan Houses' title='E-Prepag Lan Houses'></a></td>\n";
+	$smsg .= "<td><a href='" . EPREPAG_URL_HTTP . "/eprepag/moedavirtual/lan_houses_geral.php' target='_blank'><img src='images/botao_lans.gif' width='140' height='40' border='0' alt='E-Prepag Lan Houses' title='E-Prepag Lan Houses'></a></td>\n";
 	$smsg .= "<td>&nbsp;&nbsp;&nbsp;</td>";
-	$smsg .= "<td><a href='http://www.e-prepag.com.br/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank'><img src='images/ponto_certo.gif' width='136' height='36' border='0' alt='Rede Ponto Certo' title='Rede Ponto Certo'></a></td>\n";
+	$smsg .= "<td><a href='" . EPREPAG_URL_HTTP . "/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank'><img src='images/ponto_certo.gif' width='136' height='36' border='0' alt='Rede Ponto Certo' title='Rede Ponto Certo'></a></td>\n";
 	$smsg .= "</tr></table>";
 	$smsg .= "</center>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
@@ -2073,7 +2074,7 @@ function get_msg_bloqueio($stipo) {
 	}
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<p class='notice'><b>Saiba mais sobre o E-Prepag Cash</b></p>\n";
-	$smsg .= "<p class='notice'><a href='http://www.e-prepag.com.br/prepag2/newhome/eppcash.php?secao=o-que-e-eprepag-cash' target='_blank'><img src='images/epp_cash.gif' width='92' height='35' border='0' alt='E-Prepag' title='E-Prepag'></a></p>\n";
+	$smsg .= "<p class='notice'><a href='" . EPREPAG_URL_HTTP . "/prepag2/newhome/eppcash.php?secao=o-que-e-eprepag-cash' target='_blank'><img src='images/epp_cash.gif' width='92' height='35' border='0' alt='E-Prepag' title='E-Prepag'></a></p>\n";
 	return $smsg;
 }
 
@@ -2087,15 +2088,15 @@ function get_msg_bloqueio_elex() {
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<center>\n";
 	$smsg .= "<table border='0'><tr>\n";
-	$smsg .= "<td><a href='http://www.e-prepag.com.br/eprepag/moedavirtual/lan_houses_geral.php' target='_blank'><img src='images/botao_lans.gif' width='140' height='40' border='0' alt='E-Prepag Lan Houses' title='E-Prepag Lan Houses'></a></td>\n";
+	$smsg .= "<td><a href='" . EPREPAG_URL_HTTP . "/eprepag/moedavirtual/lan_houses_geral.php' target='_blank'><img src='images/botao_lans.gif' width='140' height='40' border='0' alt='E-Prepag Lan Houses' title='E-Prepag Lan Houses'></a></td>\n";
 	$smsg .= "<td>&nbsp;&nbsp;&nbsp;</td>";
-	$smsg .= "<td><a href='http://www.e-prepag.com.br/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank'><img src='images/ponto_certo.gif' width='136' height='36' border='0' alt='Rede Ponto Certo' title='Rede Ponto Certo'></a></td>\n";
+	$smsg .= "<td><a href='" . EPREPAG_URL_HTTP . "/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank'><img src='images/ponto_certo.gif' width='136' height='36' border='0' alt='Rede Ponto Certo' title='Rede Ponto Certo'></a></td>\n";
 	$smsg .= "</tr></table>";
 	$smsg .= "</center>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<p class='notice'><b>Saiba mais sobre o E-Prepag Cash</b></p>\n";
-	$smsg .= "<p class='notice'><a href='http://www.e-prepag.com.br/prepag2/newhome/eppcash.php?secao=o-que-e-eprepag-cash' target='_blank'><img src='images/epp_cash.gif' width='92' height='35' border='0' alt='E-Prepag' title='E-Prepag'></a></p>\n";
+	$smsg .= "<p class='notice'><a href='" . EPREPAG_URL_HTTP . "/prepag2/newhome/eppcash.php?secao=o-que-e-eprepag-cash' target='_blank'><img src='images/epp_cash.gif' width='92' height='35' border='0' alt='E-Prepag' title='E-Prepag'></a></p>\n";
 	return $smsg;
 }
 
@@ -2164,7 +2165,7 @@ function get_info_EPPCash($valor_eppcash,$id_DIV = false){
 		$sret .= "id='divTotalEPP' ";
 	$sret .= "style='color:darkgreen;font-weight:bold;font-size:12px'>".number_format($valor_eppcash, 0, ',', '.')."</div></td>\n";
 //	$sret .= "<td>&nbsp;</td>\n";
-	$sret .= "<td align='center' valign='middle'><img src='http://www.e-prepag.com.br/prepag2/commerce/images/EPPCash_logo.gif' width='38' height='17' border='0' alt='EPPCash' title='EPPCash'></td>\n";
+	$sret .= "<td align='center' valign='middle'><img src='" . EPREPAG_URL_HTTP . "/prepag2/commerce/images/EPPCash_logo.gif' width='38' height='17' border='0' alt='EPPCash' title='EPPCash'></td>\n";
 	$sret .= "</tr>\n";
 	$sret .= "</table>\n";
 	return $sret;

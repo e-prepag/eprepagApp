@@ -1,3 +1,4 @@
+    <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
     <div class="container-fluid bg-cinza">
             <div class="container espacamento top50">
                 <div class="row">
@@ -56,7 +57,7 @@
                         <!-- Begin DigiCert/ClickID site seal HTML and JavaScript -->
                             <div id="DigiCertClickID_l47UPnR6" data-language="en_US">
                                 <div id="DigiCertClickID_l47UPnR6Seal" class="div-divcert">
-                                    <img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,www.e-prepag.com" alt="DigiCert Seal" class="img-digicert">
+                                    <img src="//seal.digicert.com/seals/cascade/?s=l47UPnR6,13,s,<?= EPREPAG_URL ?>" alt="DigiCert Seal" class="img-digicert">
                                 </div>
                             </div>
                             <script type="text/javascript">

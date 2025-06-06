@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -947,7 +948,7 @@ function envia_email_recarga_redesim($params) {
 	11 4063-0656, 11 3030-9101, msn: atendimento1@e-prepag.com.br ou suporte@e-prepag.com.br"; 
 
 	$parametros = array();	
-	$parametros['prepag_dominio'] = "https://www.e-prepag.com.br";
+	$parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTPS . "";
 
 
 	$msg_data = str_replace("\r\n","\n",$stexto);

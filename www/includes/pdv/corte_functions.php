@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 function geraRemessaBradesco() {
 
@@ -558,7 +559,7 @@ function geraCorte($usuario_id, $periodo_ini = null, $periodo_fim = null, $force
                                 <tr>
                                         <td class='texto'>
                                                 <blockquote>
-                                                1. Acesse o E-Prepag LanHouse através do www.e-prepag.com.br<br>
+                                                1. Acesse o E-Prepag LanHouse através do " . EPREPAG_URL . "<br>
                                                 2. Clique em Revendedores e faça Login<br>
                                                 3. Na opção “Serviços” escolha 'BOLETOS'<br>
                                                 4. Identifique a semana correspondente e clique 'Emitir Boleto'<br>
@@ -1238,7 +1239,7 @@ function processaZeraLimiteBoletoVencido() {
 				<p>Prezado PDV,</p>
 				<p>Cumprindo nosso compromisso de estabelecer um relacionamento de parceria com  um revendedor importante como você, gostaríamos de comunicá-lo que, até o  momento do envio deste e-mail, não registramos o pagamento do boleto vencido  esta semana. Por este motivo seu limite de créditos em nosso sistema foi  bloqueado. </p>
 				<p>Para desbloquear seu crédito e continuar utilizando os benefícios de nossos  serviços, efetue o pagamento do boleto pendente. </p>
-				<p><a href='http://www.e-prepag.com.br/creditos/login.php'>Acesse já</a> sua conta, clique em \"BOLETO\" e depois em \"Emitir  boleto\". </p>
+				<p><a href='" . EPREPAG_URL_HTTP . "/creditos/login.php'>Acesse já</a> sua conta, clique em \"BOLETO\" e depois em \"Emitir  boleto\". </p>
 				<p>O pagamento do boleto pode ser feito em qualquer agência Bradesco, uma vez  que o título  já está vencido. Seu crédito será desbloqueado no dia útil seguinte ao pagamento.</p> 
 				<p>Atenciosamente,</p> 
 				<p>Equipe E-Prepag </p>";

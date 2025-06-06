@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 /*************************************************************
 ********** Variaveis necessarias ao módulo PIN EPP ***********
@@ -128,7 +129,7 @@ $DISTRIBUIDORAS = array(
 									'distributor_format'	=> '4',
 									'distributor_active'	=> '1',
 									'distributor_commiss'	=> '0',
-									'distributor_url'		=> 'http://www.e-prepag.com.br/',
+									'distributor_url'		=> '' . EPREPAG_URL_HTTP . '/',
 									'distributor_flag_email'=> 1,	
 									'distributor_email'		=> 'glaucia@e-prepag.com.br',
 									'distributor_valores'	=> array(
@@ -151,7 +152,7 @@ $DISTRIBUIDORAS = array(
 									'distributor_format'	=> '4',
 									'distributor_active'	=> '1',
 									'distributor_commiss'	=> '0',
-									'distributor_url'		=> 'http://www.e-prepag.com.br/',
+									'distributor_url'		=> '' . EPREPAG_URL_HTTP . '/',
 									'distributor_flag_email'=> 1,	
 									'distributor_email'		=> 'glaucia@e-prepag.com.br',
 									'distributor_valores'	=> array(
@@ -176,7 +177,7 @@ $DISTRIBUIDORAS = array(
 									'distributor_format'	=> '4',
 									'distributor_active'	=> '1',
 									'distributor_commiss'	=> '0',
-									'distributor_url'		=> 'http://www.e-prepag.com.br/',
+									'distributor_url'		=> '' . EPREPAG_URL_HTTP . '/',
 									'distributor_flag_email'=> 1,	
 									'distributor_email'		=> 'glaucia@e-prepag.com.br',
 									'distributor_valores'	=> array(

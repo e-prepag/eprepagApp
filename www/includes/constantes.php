@@ -52,6 +52,8 @@ define("DIR_G_IMG_PRODUTOS","/imagens/gamer/produtos/");
 
 define("DIR_EPREPAG","/");
 
+define('IOF', 3.5);
+
 (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on" ? define("PROTOCOL","HTTPS"):define("PROTOCOL","HTTP"));
 
 $origem = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? $_SERVER['HTTP_REFERER'] : $_SERVER['SCRIPT_NAME'];

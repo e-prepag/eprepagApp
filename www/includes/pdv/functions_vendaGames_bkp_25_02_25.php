@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 $bHTML = null;
 $cReturn = PHP_EOL;
@@ -1007,7 +1008,7 @@ function processaEmailVendaGames($venda_id, $parametros)
     //---------------------------------------------------------------------------------------------------
     //envia email
     if ($msg == "") {
-        $parametros["prepag_dominio"] = "http://www.e-prepag.com.br";
+        $parametros["prepag_dominio"] = "" . EPREPAG_URL_HTTP . "";
         $parametros["nome_fantasia"] = $ug_nome_fantasia;
         $parametros["tipo_cadastro"] = $ug_tipo_cadastro;
         $parametros["sexo"] = $ug_sexo;
@@ -3905,7 +3906,7 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
     //---------------------------------------------------------------------------------------------------
     //envia email
     if ($msg == "") {
-        $parametros["prepag_dominio"] = "http://www.e-prepag.com.br";
+        $parametros["prepag_dominio"] = "" . EPREPAG_URL_HTTP . "";
         $parametros["nome_fantasia"] = $ug_nome_fantasia;
         $parametros["tipo_cadastro"] = $ug_tipo_cadastro;
         $parametros["sexo"] = $ug_sexo;

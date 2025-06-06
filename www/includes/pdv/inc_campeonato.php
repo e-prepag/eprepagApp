@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 
 $DIAS_VALIDADE_TOKEN_AVISO_LH = 20;
@@ -24,7 +25,7 @@ echo "token: '$token'<br>";
 	//--------------------------------------------------------------------------------
 	if($msg == ""){
 	
-		$parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+		$parametros['prepag_dominio'] = "" . EPREPAG_URL_HTTP . "";
 		$msgEmail = email_cabecalho($parametros);
 	    $msgEmail .= "
 <html xmlns:v='urn:schemas-microsoft-com:vml' xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns:m='http://schemas.microsoft.com/office/2004/12/omml' xmlns='http://www.w3.org/TR/REC-html40'>
