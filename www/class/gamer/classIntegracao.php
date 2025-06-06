@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -14,7 +15,7 @@ $CPF_OPICIONAL = 2;
 ------------------------------------------------------------------------------------------------ */
 $NUM_DIAS_CONSIDERADO = "150";
 
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if (checkIP()) {
 	$server_url = $GLOBALS['_SERVER']['SERVER_NAME'];
 }
@@ -35,7 +36,7 @@ $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR = "$INTEGRACAO_STORE_TREINAMENTO_PR
 // Aerial Games Site
 //$INTEGRACAO_URL_PARCEIRO = "http://billing.aeriagames.com/index.asp";
 //$INTEGRACAO_IP_PARCEIRO = "72.55.177.115";
-//$INTEGRACAO_URL_PARCEIRO = "https://www.e-prepag.com.br/prepag2/commerce/aeria.php";
+//$INTEGRACAO_URL_PARCEIRO = "EPREPAG_URL_HTTPS/prepag2/commerce/aeria.php";
 //$INTEGRACAO_IP_PARCEIRO = "187.45.247.106";
 
 $epp_gateway = "https://" . $server_url . "/prepag2/commerce/epp_notify.php";
@@ -52,15 +53,15 @@ $partner_list = array(
 	 *  2 = CPF como opcional
 
 	Original URLs
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/aeria.php',
+		'return_url' => 'EPREPAG_URL_HTTP/prepag2/commerce/partner_return.php',
+		'notify_url' => 'EPREPAG_URL_HTTPS/prepag2/commerce/partner_notify.php',
+		'partner_url' => 'EPREPAG_URL_HTTPS/prepag2/commerce/aeria.php',
 		'partner_ip' => '187.45.247.106',
 
 
 	2010-12-22
 		'return_url' => 'http://billing.test.aeriagames.com/fillup/eprepag_return.asp',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
+		'notify_url' => 'EPREPAG_URL_HTTPS/prepag2/commerce/partner_notify.php',
 		'partner_url' => 'http://billing.test.aeriagames.com/fillup/eprepag_frm.asp',
 		'partner_ip' => '174.142.60.5',
 
@@ -99,7 +100,7 @@ $partner_list = array(
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Aeriagames_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Aeriagames_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -116,11 +117,11 @@ $partner_list = array(
 		'partner_opr_codigo' => '39',
 		'partner_active' => '0',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/aeria.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/aeria.php',
 		'partner_ip' => '187.45.247.106',	//'72.55.188.52',
 
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Aeria - 60, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -128,7 +129,7 @@ $partner_list = array(
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Aeriagames_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Aeriagames_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -156,7 +157,7 @@ $partner_list = array(
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Aeriagames_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Aeriagames_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -184,7 +185,7 @@ $partner_list = array(
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Aeriagames_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Aeriagames_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -274,7 +275,7 @@ $partner_list = array(
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_bigpoint_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_bigpoint_logo.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '1,2,5',
 
@@ -293,10 +294,10 @@ $partner_list = array(
 		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_kg.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_kg.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Koramgames - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -355,7 +356,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 0,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Bila_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Bila_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -402,7 +403,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Bila_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Bila_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -419,11 +420,11 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_rt.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_rt.php',
 		'partner_ip' => '187.45.247.106',
 		'partner_ip_defined_list' => '187.45.247.106,201.6.243.44',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => '79,80', 	// Rixty - 79,80, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -431,7 +432,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 0,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_rixty_logo.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_rixty_logo.jpg',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '5, 6, 9, A',
 		'partner_need_cpf' => 0,
@@ -449,10 +450,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_ol.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_ol.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Owlient - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -477,10 +478,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_og.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_og.php',
 		'partner_ip' => '68.71.247.22',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// OGPlanet - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -488,7 +489,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 0,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 0,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/ogplanet-logo_peq.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/ogplanet-logo_peq.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -526,7 +527,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Stardoll_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Stardoll_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -567,7 +568,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_pwall_menor.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_pwall_menor.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -584,7 +585,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '37',	//'78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_sn.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_sn.php',
 		'partner_ip' => '34.236.80.247',		//'183.110.159.85',		//'187.45.247.106',
 		//'partner_ip_defined_list' => '190.8.151.76,190.102.137.84,38.82.217.164,38.82.217.170,38.82.217.11,38.82.217.12',//'38.82.217.11,38.82.217.12',
 		//'partner_ip_defined_list' => '66.231.244.196,66.231.244.142,66.231.244.143,38.82.217.11,38.82.217.12',//'38.82.217.11,38.82.217.12',
@@ -597,7 +598,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 0,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_Softnyx_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_Softnyx_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -629,7 +630,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/habbo_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/habbo_logo.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -646,10 +647,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_sg.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_sg.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Snailgames - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -702,15 +703,15 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/elex_logo.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/elex_logo.jpg',
 		'partner_img_prods_logo' => array(
-			117 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_cesar_peq.jpg',
-			112 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_ddt_peq.jpg',
-			113 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_ik_peq.jpg',
-			119 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_namo_peq.jpg',
-			121 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_nindou_peq.jpg',
-			116 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_poker_peq.jpg',
-			142 => 'https://www.e-prepag.com.br/prepag2/commerce/images/337cash.png',
+			117 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_cesar_peq.jpg',
+			112 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_ddt_peq.jpg',
+			113 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_ik_peq.jpg',
+			119 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_namo_peq.jpg',
+			121 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_nindou_peq.jpg',
+			116 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_poker_peq.jpg',
+			142 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/337cash.png',
 		),
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '1, 2, 5, 6, 9, A',
@@ -739,15 +740,15 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/elex_logo.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/elex_logo.jpg',
 		'partner_img_prods_logo' => array(
-			117 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_cesar_peq.jpg',
-			112 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_ddt_peq.jpg',
-			113 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_ik_peq.jpg',
-			119 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_namo_peq.jpg',
-			121 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_nindou_peq.jpg',
-			116 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int_poker_peq.jpg',
-			142 => 'https://www.e-prepag.com.br/prepag2/commerce/images/337cash.png',
+			117 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_cesar_peq.jpg',
+			112 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_ddt_peq.jpg',
+			113 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_ik_peq.jpg',
+			119 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_namo_peq.jpg',
+			121 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_nindou_peq.jpg',
+			116 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/int_poker_peq.jpg',
+			142 => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/337cash.png',
 		),
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '1, 2, 5, 6, 9, A',
@@ -779,7 +780,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_ankama_peq.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_ankama_peq.jpg',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -809,9 +810,9 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/cyberstep_logo.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/cyberstep_logo.jpg',
 		'partner_img_prods_logo' => array(
-			132 => 'http://www.e-prepag.com.br/prepag2/commerce/images/produtos/p_132.jpg',
+			132 => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/images/produtos/p_132.jpg',
 		),
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
@@ -840,7 +841,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_ongame.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_ongame.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '5, 6, 9, A',
 
@@ -858,10 +859,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '0',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_gr.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_gr.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Cyberstep - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -909,7 +910,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/gamerage_menor.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/gamerage_menor.jpg',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -941,7 +942,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/z8_img.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/z8_img.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -973,7 +974,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/z8_img.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/z8_img.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -1003,9 +1004,9 @@ partner_do_notify COM NOTIFICAÇÃO
 						'partner_do_notify' => 1,
 						'partner_do_renotify_automatico' => 0,
 						'partner_bypass_ip_check' => 1,
-						'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/cyberstep_logo.jpg',
+						'partner_img_logo' => 'EPREPAG_URL_HTTPS/prepag2/commerce/images/cyberstep_logo.jpg',
 							'partner_img_prods_logo' => array(
-								147 => 'http://www.e-prepag.com.br/prepag2/commerce/images/produtos/p_147.jpg',
+								147 => 'EPREPAG_URL_HTTP/prepag2/commerce/images/produtos/p_147.jpg',
 							),
 						'amount_free' => 0,
 						'lista_formas_pagto_bloqueadas' => '',
@@ -1035,7 +1036,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_BP_160x31.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_BP_160x31.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -1074,7 +1075,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_Vibrant.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_Vibrant.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 
@@ -1132,7 +1133,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/xsolla-logo2.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/xsolla-logo2.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '1, 2, 5, 6, 7, 9, A, F, G, H, I, J, K, L, M',
 
@@ -1169,7 +1170,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/xsolla-logo2.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/xsolla-logo2.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '1, 2, 5, 6, 7, 9, A, F, G, H, I, J, K, L, M',
 
@@ -1198,7 +1199,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/NTTGameLogo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/NTTGameLogo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 		'auto_close' => 1,
@@ -1231,7 +1232,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
 		'partner_img_logo' => '',
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/gamengame_login_logo.gif',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/gamengame_login_logo.gif',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 		'partner_need_cpf' => 0,
@@ -1244,10 +1245,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_nt.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_nt.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Cyberstep - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 1,
@@ -1268,10 +1269,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '0',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_nt.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_nt.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	// Cyberstep - ??, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 1,
@@ -1328,7 +1329,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/skillab.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/skillab.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '1, 2, 5, 6, 7, 9, A, F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1344,10 +1345,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_opr_codigo' => '78',
 		'partner_active' => '0',
 		'partner_currency_code' => 'BRL',
-		'partner_url' => 'https://www.e-prepag.com.br/prepag2/commerce/integracao_na.php',
+		'partner_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/integracao_na.php',
 		'partner_ip' => '187.45.247.106',
-		'notify_url' => 'https://www.e-prepag.com.br/prepag2/commerce/partner_notify.php',
-		'return_url' => 'http://www.e-prepag.com.br/prepag2/commerce/partner_return.php',
+		'notify_url' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/partner_notify.php',
+		'return_url' => '' . EPREPAG_URL_HTTP . '/prepag2/commerce/partner_return.php',
 		'sonda_url' => '',
 		'partner_produto_id' => $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR,	//Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 1,
@@ -1382,7 +1383,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/Walgames_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/Walgames_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1409,13 +1410,13 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/Stark_Inter.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/Stark_Inter.png',
 		/*
 										   'partner_img_prods_logo' => array(
-							   212 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int.jpg',
-							   213 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int.jpg',
-							   215 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int.jpg',
-							   216 => 'https://www.e-prepag.com.br/prepag2/commerce/images/int.jpg',
+							   212 => 'EPREPAG_URL_HTTPS/prepag2/commerce/images/int.jpg',
+							   213 => 'EPREPAG_URL_HTTPS/prepag2/commerce/images/int.jpg',
+							   215 => 'EPREPAG_URL_HTTPS/prepag2/commerce/images/int.jpg',
+							   216 => 'EPREPAG_URL_HTTPS/prepag2/commerce/images/int.jpg',
 						   ),
 											*/
 		'amount_free' => 1,
@@ -1445,7 +1446,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/proficient_logo.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/proficient_logo.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1473,7 +1474,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/goodgames.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/goodgames.png',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1501,7 +1502,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/xcloudgame.gif',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/xcloudgame.gif',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1529,7 +1530,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/produtos/p_129.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/produtos/p_129.jpg',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1557,7 +1558,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/produtos/p_129.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/produtos/p_129.jpg',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1584,7 +1585,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/Stark_Inter.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/Stark_Inter.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1611,7 +1612,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/unicoin.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/unicoin.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '2, F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1639,7 +1640,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/unicoin.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/unicoin.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '2, F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1666,7 +1667,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/Epp_cash_loja.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/Epp_cash_loja.jpg',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '1, 5, 6, 7, 9, A, E, F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1700,7 +1701,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/Logo_lightgray.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/Logo_lightgray.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1734,7 +1735,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/Logo_lightgray.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/Logo_lightgray.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1789,7 +1790,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/new_with_text_final2_resize.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/new_with_text_final2_resize.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -1819,7 +1820,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/dragon_awaken.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/dragon_awaken.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1848,7 +1849,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/pagsmile.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/pagsmile.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1876,7 +1877,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/dragon_awaken.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/dragon_awaken.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1905,7 +1906,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/dragon_awaken.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/dragon_awaken.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1933,7 +1934,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/game_hollywood.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/game_hollywood.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1962,7 +1963,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/LogoGameHollywood.png',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/LogoGameHollywood.png',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => 'F, G, H, I, J, K, L, M',
 		'forma_pagto_direta' => '',
@@ -1991,7 +1992,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_eprepag.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_eprepag.jpg',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -2019,7 +2020,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_eprepag.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_eprepag.jpg',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -2047,7 +2048,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => 'https://www.e-prepag.com.br/prepag2/commerce/images/logo_eprepag.jpg',
+		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/logo_eprepag.jpg',
 		'amount_free' => 1,
 		'lista_formas_pagto_bloqueadas' => '',
 		'forma_pagto_direta' => '',
@@ -2114,7 +2115,7 @@ function is_Integracao()
 	$GLOBALS['_SERVER']['integration_debug_info'] = "";
 
 	// Permite acesso para páginas no nosso site
-	$epp_http_referer = "https://www.e-prepag.com.br/prepag2/commerce/";
+	$epp_http_referer = "" . EPREPAG_URL_HTTPS . "/prepag2/commerce/";
 	$epp_remote_addr = "187.45.247.106";	//"189.38.238.205";
 //	$epp_remote_addr_1 = "201.6.243.44";
 
@@ -3209,7 +3210,7 @@ function getIntegracaoCURL($url, $post_parameters)
 
 	// Some sites may protect themselves from remote logins by checking which site you came from.
 	// http://php.net/manual/en/function.curl-setopt.php
-	$ref_url = "http://www.e-prepag.com.br";
+	$ref_url = "" . EPREPAG_URL_HTTP . "";
 	curl_setopt($curl_handle, CURLOPT_REFERER, $ref_url);
 
 	// http://www.weberdev.com/get_example-4136.html
@@ -4218,7 +4219,7 @@ function SolicitaCPF($ug_id)
 {
 	global $CPF_OBRIGATORIO, $CPF_OPICIONAL;
 	$id_partner = get_Integracao_is_sessao_logged();
-	$server_url = "www.e-prepag.com.br";
+	$server_url = "" . EPREPAG_URL . "";
 	if (checkIP()) {
 		$server_url = $_SERVER['SERVER_NAME'];
 	}

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 if(!class_exists('Provedor')){
@@ -92,7 +93,7 @@ class LinkAcesso {
 	public static function geraLink(){
 		$link = new LinkAcesso(null);
 		$token = $link->serviceSMS->code();
-		$url = "https://www.e-prepag.com.br/link/auth.php?code=".$token;
+		$url = "" . EPREPAG_URL_HTTPS . "/link/auth.php?code=".$token;
 		$link->registraLink($url, $token);
 		return $url;
 	}

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 require_once $raiz_do_projeto . "consulta_cpf/config.inc.cpf.php";
 require_once $raiz_do_projeto . 'includes/main.php';
@@ -137,7 +138,7 @@ class CPF extends classCPF
         // Atingiu o limite máximo de utilização do mesmo CPF
         else {
 
-            $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag. https://www.e-prepag.com/support";
+            $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag. " . EPREPAG_URL_HTTPS_COM . "/support";
             //$errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.";
 
         }//end else do elseif ($testeCPF != 171)

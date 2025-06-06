@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 // include do arquivo contendo IPs DEV
 require_once DIR_INCS . 'configIP.php';
@@ -21,7 +22,7 @@ class Helper{
     }
     
     public static function get_cupom_small( $data ){
-        $server_url = "www.e-prepag.com.br";
+        $server_url = "" . EPREPAG_URL . "";
         if(checkIP()) {
             $server_url = $GLOBALS['_SERVER']['SERVER_NAME'];
         }

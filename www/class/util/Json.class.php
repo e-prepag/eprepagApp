@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 /* 
@@ -158,7 +159,7 @@ class Json{
                 
                 if(function_exists("enviaEmail4")){
                     
-                    $server_url = "www.e-prepag.com.br";
+                    $server_url = "" . EPREPAG_URL . "";
                     $to = "nathany.andrade@e-prepag.com.br, estagiario1@e-prepag.com, wagner@e-prepag.com.br";
 
                     if(checkIP()) {
@@ -194,7 +195,7 @@ class Json{
         global $url;
         
         if(!$url)
-            $url = "https://www.e-prepag.com.br";
+            $url = "" . EPREPAG_URL_HTTPS . "";
         
         if(file_exists($content))
             $json = Util::jsonVerify($content);

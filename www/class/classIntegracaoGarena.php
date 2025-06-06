@@ -5,6 +5,7 @@
 //error_reporting(E_ALL);
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
+require_once "/www/includes/load_dotenv.php";
 
 class Garena{
 
@@ -18,10 +19,12 @@ class Garena{
 	private $dataUtilizacao;
 	private $type;
 	public $error = [];
-	private $url = ["producao"=> [ "https://recargajogo.com.br/api/partner/get_role_list", "https://recargajogo.com.br/api/partner/eprepag_br/notify" ], "homologacao"=> [ "https://testpay.recargajogo.com.br/api/partner/get_role_list", "https://testpay.recargajogo.com.br/api/partner/eprepag_br/notify" ]];
+	private $url;
 	   
 	public function __construct($idPin, $conta, $type = "pdv", $idvenda = 0, $atimo = false, $produtoAtimo = false){
     
+		$this->url = ["producao"=> [ getenv("GARENA_URL_ROLES"), getenv("GARENA_URL_PARTNER") ], "homologacao"=> [ getenv("GARENA_URL_ROLES_HOMOLOG"), getenv("GARENA_URL_PARTNER_HOMOLOG") ]];
+
 	    if($atimo == false){
 			if($this->testeConexaoBanco()){
 				$this->setConta($conta);
@@ -170,21 +173,29 @@ class Garena{
 		
 		$con = $this->retornaConexao();
 		
-		if($type == "pdv"){
-			
+		if ($type == "pdv") {
+
 			$this->type = "pdv";
-			$sql = "select * from tb_dist_venda_games_modelo_pins inner join tb_dist_venda_games_modelo on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =". $this->idPin;
-			$comando = $con->prepare($sql);
-			$comando->execute();
-			
-		}else{
-			
+			$sql = "SELECT * 
+					FROM tb_dist_venda_games_modelo_pins 
+					INNER JOIN tb_dist_venda_games_modelo 
+					ON vgm_id = vgmp_vgm_id 
+					WHERE vgmp_pin_codinterno = :idPin";
+		
+		} else {
+		
 			$this->type = "usuario";
-			$sql = "select * from tb_venda_games_modelo_pins inner join tb_venda_games_modelo on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =". $this->idPin;
-			$comando = $con->prepare($sql);
-			$comando->execute();
-			
+			$sql = "SELECT * 
+					FROM tb_venda_games_modelo_pins 
+					INNER JOIN tb_venda_games_modelo 
+					ON vgm_id = vgmp_vgm_id 
+					WHERE vgmp_pin_codinterno = :idPin";
 		}
+		
+		// Preparar e executar com bind seguro
+		$comando = $con->prepare($sql);
+		$comando->bindParam(':idPin', $this->idPin, PDO::PARAM_INT);
+		$comando->execute();
 		
 		$resultado = $comando->fetch(PDO::FETCH_ASSOC); 
 		$produtoId = $resultado["vgm_ogp_id"];
@@ -231,9 +242,9 @@ class Garena{
 		}
 		
 		if($ambiente == "producao"){
-			$chave = getEnvVariable('GARENA_HASH');
+			$chave = getenv('GARENA_HASH');
 		}else{
-			$chave = getEnvVariable('GARENA_HASH_DEV');
+			$chave = getenv('GARENA_HASH_DEV');
 		}
 		
 		return bin2hex(hash_hmac("sha256", $informacao, $chave, true)); 
@@ -376,8 +387,6 @@ class Garena{
 			$guid = "TXN-".sprintf("%05X-%05X-%05X-%05X", mt_rand(10000, 90000), mt_rand(20000, 999999), mt_rand(50000, 999999), mt_rand(15000, 999999)); //
 			/// Ler os roles em loop : $this->rolesGarena
 			$hashSha256 = $this->geraHash([$this->codGarena, $this->conta, $this->rolesGarena[0]["code"], $guid, intval($this->valorResgate * 100), $currecy, $ip], $ambiente);
-			
-			
 			
 			curl_setopt_array($disparo, [
 				CURLOPT_RETURNTRANSFER => true,
@@ -904,10 +913,10 @@ class Garena{
 
 	public static function verificaTokenRe($token){
 	   
-	    $dados = ["secret" => "6Ldb9pMgAAAAAG_2sxY4KabzmvvA2Gr5hpbZ9XnE", "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
+	    $dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY2"), "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
 		$curlToken = curl_init();
 		curl_setopt_array($curlToken, [
-		  CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+		  CURLOPT_URL => getenv("RECAPTCHA_URL"),
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_POST => true,
 		  //CURLOPT_CUSTOMREQUEST => 'POST',

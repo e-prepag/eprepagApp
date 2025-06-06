@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 /**
  * Classe para as regras de negocio das vendas
@@ -22,7 +23,7 @@ require_once RAIZ_DO_PROJETO.'includes/constantes.php';
 require_once RAIZ_DO_PROJETO."class/util/Busca.class.php";
 
 
-$server_url = "www.e-prepag.com.br";
+$server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }

@@ -2,6 +2,7 @@
 
     require_once "/www/db/connect.php";
 	require_once "/www/db/ConnectionPDO.php";
+	require_once "/www/includes/load_dotenv.php";
 
 class  ClassCAF {
 	
@@ -12,8 +13,8 @@ class  ClassCAF {
 	
 	public function __construct() {
 		
-		$this->baseurl = ($this->environment == "homol")? "https://api.beta.combateafraude.com/v1": "https://api.combateafraude.com/v1";
-		$this->auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjllNTBlNDU0MTAzYzAwMDlkZDAwM2IiLCJpYXQiOjE2NTQ1NDI1NjR9.60x8lCHAajy-AlE45AOtR8WCuHehAk1sX2B-rywsxg0";
+		$this->baseurl = ($this->environment == "homol")? getenv('CAF_URL_HOMOLOG'): getenv('CAF_URL_PROD');
+		$this->auth_token = getenv('CAF_TOKEN_HOMOLOG');
 		$this->connect = ConnectionPDO::getConnection()->getLink();
 		
 	}
@@ -98,7 +99,7 @@ class  ClassCAF {
 	public function generateOnboarding($type, $email, $data){
 
 		$url = $this->baseurl . "/onboardings?origin=TRUST";
-		$templateID = ["PJ" => "6451848b7f4cb300084f5cb7", "PF" => "645184d97f4cb300084f5cba"];
+		$templateID = ["PJ" => getenv('CAF_PJ_TEMPLATE'), "PF" => getenv('CAF_PF_TEMPLATE')];
 		$keyData = ["PJ" => "cnpj", "PF" => "cpf"];
 		
 		$information = [

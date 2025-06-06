@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 require_once $raiz_do_projeto . "includes/constantesGerais.php";
 
@@ -5,8 +6,10 @@ class EnvioEmailAutomatico {
     private $ug_id;
     private $tipo_usuario;
     private $ug_nome;
+    private $ug_nome2;
     private $ug_login;
     private $ug_email;
+    private $ug_email_sup;
     private $ug_email_antigo;
     private $ug_email_novo;
     private $ug_login_antigo;
@@ -24,6 +27,9 @@ class EnvioEmailAutomatico {
     private $promocoes;
     private $ug_senha;
     private $product;
+    private $ug_atendimento;
+    private $ug_cor;
+    private $ug_logo;
     private $subject = null;
     private $bcc = "";
     private $partner_email;
@@ -96,10 +102,6 @@ class EnvioEmailAutomatico {
         "AdicaoSaldoLan" => "E-Prepag - Adição de Saldo",
         // Adicao de Saldo Gamer
         "AdicaoSaldoGamer" => "E-Prepag - Adição de Saldo",
-        // Envio de Email com a senha
-        "EsqueciSenhaGamer" => "E-Prepag - Esqueci Minha Senha",
-        // Envio de Email com a senha
-        "EsqueciSenhaLan" => "E-Prepag - Esqueci Minha Senha",
         // Pedido negado lan
         "PedidoNegadoLan" => "E-Prepag - Seu cadastro E-Prepag não foi aprovado",
         // Boleto para pagamento
@@ -249,9 +251,14 @@ class EnvioEmailAutomatico {
         // Envio de Email com PINs através da LAN House para seus usuários
         "CompraPontoVenda" => array(
             "<<<UG_NOME>>>" => "\$this->getUgNome()",
+            "<<<UG_NOME2>>>" => "\$this->getUgNome2()",
             "<<<LISTA_PRODUTO>>>" => "\$this->getListaProduto()",
             "<<<INSTRUCOES_USO>>>" => "\$this->getInstrucoesUso()",
             "<<<PROMOCOES>>>" => "\$this->getPromocoes()",
+            "<<<UG_EMAIL_SUPORTE>>>" => "\$this->getUgEmailSup()",
+            "<<<UG_ATENDIMENTO>>>" => "\$this->getUgAtendimento()",
+            "<<<UG_COR>>>" => "\$this->getUgCor()",
+            "<<<UG_LOGO>>>" => "\$this->getUgLogo()",
         ),
         // Envio de Email com Compra de Serviços B2C
         "CompraB2C" => array(
@@ -288,16 +295,6 @@ class EnvioEmailAutomatico {
             "<<<FORMA_PAGTO>>>" => '$this->getFormaPagamento()',
             "<<<UG_EMAIL>>>" => '$this->getUgEmail()',
             "<<<DADOS_BOLETO>>>" => '$this->getToken()',
-        ),
-        // Envio de Email com Senha do gamer
-        "EsqueciSenhaGamer" => array(
-            "<<<UG_NOME>>>" => '$this->getUgNome()',
-            "<<<UG_SENHA>>>" => '$this->getUgSenha()',
-        ),
-        // Envio de Email com Senha da lan
-        "EsqueciSenhaLan" => array(
-            "<<<UG_NOME>>>" => '$this->getUgNome()',
-            "<<<UG_SENHA>>>" => '$this->getUgSenha()',
         ),
         // Envio de Email com Senha da lan
         "PedidoNegadoLan" => array(
@@ -416,7 +413,7 @@ class EnvioEmailAutomatico {
         "SenhaExMoney" => "SenhaExMoney.html",
 
         // Envio de Email com PINs através da LAN House para seus usuários
-        "CompraPontoVenda" => "CompraPontoVenda.html",
+        "CompraPontoVenda" => "CompraPontoVenda_jose.html",
 
         // Envio de Email com Compra de Serviços B2C
         "CompraB2C" => "CompraB2C.html",
@@ -441,12 +438,6 @@ class EnvioEmailAutomatico {
         
         // Informação da adição de saldo da lan
         "AdicaoSaldoGamer" => "AdicaoSaldoGamer.html",
-        
-        // Esqueci minha senha gamer
-        "EsqueciSenhaGamer" => "EsqueciSenhaGamer.html",
-        
-        // Esqueci minha senha lan
-        "EsqueciSenhaLan" => "EsqueciSenhaLan.html",
         
         // Pedido negado lan
         "PedidoNegadoLan" => "PedidoNegadoLan.html",
@@ -520,11 +511,11 @@ class EnvioEmailAutomatico {
 		switch($type) {
 			
 			case "P":
-				$this->twofaUrl = "https://www.e-prepag.com.br/creditos/confirmacao.php";
+				$this->twofaUrl = "" . EPREPAG_URL_HTTPS . "/creditos/confirmacao.php";
 				break;
 				
 			case "U":
-				$this->twofaUrl = "https://www.e-prepag.com.br/game/conta/confirmacao.php";
+				$this->twofaUrl = "" . EPREPAG_URL_HTTPS . "/game/conta/confirmacao.php";
 				break;
 		}
 	}
@@ -561,6 +552,13 @@ class EnvioEmailAutomatico {
     }
     public function setUgNome($ug_nome) {
         $this->ug_nome = $ug_nome;
+    }
+
+    public function getUgNome2() {
+        return $this->ug_nome2;
+    }
+    public function setUgNome2($ug_nome2) {
+        $this->ug_nome2 = $ug_nome2;
     }
 
     public function getUgEmail() {
@@ -792,6 +790,38 @@ class EnvioEmailAutomatico {
 		$this->chaveMestra = $chave_mestra;
 	}
 
+    public function getUgAtendimento() {
+        return $this->ug_atendimento;
+    }
+
+    public function setUgAtendimento($ug_atendimento) {
+        $this->ug_atendimento = $ug_atendimento;
+    }
+
+    public function getUgCor() {
+        return $this->ug_cor;
+    }
+
+    public function setUgCor($ug_cor) {
+        $this->ug_cor = $ug_cor;
+    }
+
+    public function getUgLogo() {
+        return $this->ug_logo;
+    }
+
+    public function setUgLogo($ug_logo) {
+        $this->ug_logo = $ug_logo;
+    }
+
+    public function getUgEmailSup() {
+        return $this->ug_email_sup;
+    }
+
+    public function setUgEmailSup($ug_email_sup) {
+        $this->ug_email_sup = $ug_email_sup;
+    }
+
     public function getUserDados() {
         $sql = "select ";
         if ($this->getTipoUsuario() == 'G') {
@@ -920,7 +950,7 @@ class EnvioEmailAutomatico {
     }//end function MontaEmail
 
 
-    public function MontaEmailEspecifico($attachment = null, $stringAttach = false, $name = '', &$sendStatus = false) {
+    public function MontaEmailEspecifico($attachment = null, $stringAttach = false, $name = '', &$sendStatus = false, $nome = '') {
 	 
         $subjectEmail = $this->getSubjectEmail($this->getIdentificadorEmail());
 
@@ -948,7 +978,11 @@ class EnvioEmailAutomatico {
 
         //envio do email
         if (is_null($attachment)) {
-            enviaEmail($ug_email, null, $bcc, $subjectEmail, $msgEmail);
+            if($nome == ''){
+                enviaEmail($ug_email, null, $bcc, $subjectEmail, $msgEmail);
+            }else{
+                enviaEmail($ug_email, null, $bcc, $subjectEmail, $msgEmail, $nome);
+            }
             $sendStatus = true;
         }//end if(is_null($attachment))
         else {

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 class UsuarioGamesOperador {
     
@@ -133,7 +134,7 @@ class UsuarioGamesOperador {
     
     
     function inserir(&$objOperadorGamesUsuario){
-        $server_url = "www.e-prepag.com.br";
+        $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -267,7 +268,7 @@ class UsuarioGamesOperador {
 				if(is_object($objOperadorGamesUsuario))	{
 					//Envia email
 					//--------------------------------------------------------------------------------
-					$parametros['prepag_dominio'] = "http://www.e-prepag.com.br";
+					$parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
 					$parametros['nome_fantasia'] = $objOperadorGamesUsuario->getNomefantasia();
 					$parametros['tipo_cadastro'] = $objOperadorGamesUsuario->getTipoCadastro();
 					$parametros['nome'] = $objOperadorGamesUsuario->getNome();
@@ -479,7 +480,7 @@ class UsuarioGamesOperador {
 		return $ret;   	
     }
     
-    function autenticarLogin($login, $senha){
+    function autenticarLogin($login, $senha, $aut = false) { //Autentica usuario
 
 		$ret = false;
 //echo "ret0: ".(($ret)?"ret OK":"Not ret")."<br>";
@@ -561,7 +562,13 @@ class UsuarioGamesOperador {
 			if($ret){
 				UsuarioGamesOperador::atualiza_ultimo_acesso($login);
 				//Log na base
-				usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN_OPERADOR'], null, null);
+				$obs = "";
+            	if($aut == true){
+            	    $obs = "Login com autenticador";
+            	} else{
+            	    $obs = "Login sem autenticador";
+				usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN_OPERADOR'], null, null, $obs);
+				}
 				
 			}
 		} 
@@ -570,7 +577,7 @@ class UsuarioGamesOperador {
  		return $ret;   	
     }
     
-    function LoginAutomatico($ugo_id,$login){
+    function LoginAutomatico($ugo_id,$login, $aut = false) { //Autentica usuario
 
 		$ret = false;
 		//SQL
@@ -611,8 +618,13 @@ class UsuarioGamesOperador {
 			//------------------------------------------------------------------
 			if($ret){
 				UsuarioGamesOperador::atualiza_ultimo_acesso($login);
-				//Log na base
-				usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN_OPERADOR'], null, null);
+				$obs = "";
+            	if($aut == true){
+            	    $obs = "Login com autenticador";
+            	} else{
+            	    $obs = "Login sem autenticador";
+            	}
+				usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN_OPERADOR'], null, null, $obs);
 				
 			}
 		} 
@@ -732,7 +744,7 @@ class UsuarioGamesOperador {
     
     
     function alterarSenha($senha, $senhaAtual, $login){
-        $server_url = "www.e-prepag.com.br";
+        $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -803,7 +815,7 @@ class UsuarioGamesOperador {
     }
  
     function enviaEmailAtivacao($usuario_id){
-        $server_url = "www.e-prepag.com.br";
+        $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }

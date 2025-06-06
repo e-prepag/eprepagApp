@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 // include do arquivo contendo IPs DEV
 require_once DIR_INCS . 'configIP.php';
@@ -106,7 +107,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 		*/
 		$this	->	setUgId			($ug_id);
 		$this	->	setTipoUsuario	($ql_tipo_usuario);
-		$prefixo	=	"www.e-prepag.com.br";
+		$prefixo	=	"" . EPREPAG_URL . "";
                 if(checkIP()) {
                     $prefixo = $_SERVER['SERVER_NAME'];
                     }
@@ -250,7 +251,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 	}//end function MontarQuestionario()
 
 	function MontarQuestionarioBloqueio() {
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -338,7 +339,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 	}//end MontarQuestionarioBloqueio()
 
 	function MontarQuestionarioUmVezDia(){
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
@@ -426,7 +427,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 	}//end MontarQuestionarioUmVezDia()
 
 	function MontarQuestionarioTodasVezes(){
-            $server_url = "www.e-prepag.com.br";
+            $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
