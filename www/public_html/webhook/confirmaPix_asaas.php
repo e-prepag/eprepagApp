@@ -19,11 +19,11 @@ define("ASAAS_SECRET_TOKEN", getenv('ASAAS_SECRET_TOKEN'));
 $receivedToken = isset($_SERVER['HTTP_ASAAS_ACCESS_TOKEN']) ? $_SERVER['HTTP_ASAAS_ACCESS_TOKEN'] : "nao existe";
 
 if ($receivedToken !== ASAAS_SECRET_TOKEN) {
-    // Se o token estiver errado, rejeita a requisição
+    // Se o token estiver errado, rejeita a requisiï¿½ï¿½o
     
 	http_response_code(403);
 	
-    exit("Acesso negado. Token inválido: $receivedToken");
+    exit("Acesso negado. Token invï¿½lido: $receivedToken");
 }
 
 $webhook = file_get_contents('php://input');
@@ -178,7 +178,7 @@ class RecebePix {
 
         $curl = curl_init();
 
-		$token = '$aact_MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjE4MzAxZjU3LWUyMTktNDBmYi1iY2YxLWNmY2QyOGEwN2E0ZTo6JGFhY2hfNWQ5YTU3Y2EtZjJhMC00ZjZhLTgyMDAtYTMzYTBhMjk1Yjc2';
+		$token = getenv('ASAAS_ACCESS_TOKEN');
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => getenv('ASAAS_API_URL') . "customers/$idUsuario",
