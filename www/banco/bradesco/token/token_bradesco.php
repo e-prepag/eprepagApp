@@ -1,4 +1,5 @@
 <?php
 //22/10/2021 13:33:04
-$GLOBALS["token_brd"] = "96dd5602013c0b38b4d11ace5a40c0395ded7e52";
+require_once "/www/includes/load_dotenv.php";
+$GLOBALS["token_brd"] = getenv("BRADESCO_CLIENT_ID");
 ?>

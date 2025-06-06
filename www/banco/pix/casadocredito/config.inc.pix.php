@@ -3,16 +3,16 @@
 //ini_set("display_errors", 1); 
 @header ('Content-type: text/html; charset=ISO-8859-1'); 
 //@header ('Content-type: text/html; charset=utf-8'); 
-require_once "/www/includes/getEnvVar.php";
+require_once "/www/includes/load_dotenv.php";
 //Dados bancários
 define("PIX_BANK","159");
 define("PIX_AGENCIA",	"001"); 
-define("PIX_CONTA",getEnvVariable("Conta_gen"));
+define("PIX_CONTA",getenv("Conta_gen"));
 define("PIX_CHAVE","19037276000172"); 
 
 //Dados de Acesso
-define("CLIENT_ID",getEnvVariable("Client_id_gen"));
-define("CLIENT_SECRET",getEnvVariable("Secret_gen"));
+define("CLIENT_ID",getenv("Client_id_gen"));
+define("CLIENT_SECRET",getenv("Secret_gen"));
 define("GRANT_TYPE","client_credentials");
 define("SCOPE","geral");
 

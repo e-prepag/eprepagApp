@@ -2,7 +2,7 @@
 
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
-
+require_once "/www/includes/load_dotenv.php";
 class classPIX
 {
 
@@ -11,19 +11,14 @@ class classPIX
 
     public function __construct()
     {
-
-        if (!function_exists('getEnvVariable')) {
-            require_once "/www/includes/getEnvVar.php";
-        }
-
-        $token = getEnvVariable('mp_access_token');
+        $token = getenv('mp_access_token');
 
         if ($token == "") {
             echo ("<br><br>ERRO ao obter acesso ao Banco!<br>Por favor, entre em
                  contado com o suporte da E-Prepag e informe o erro de código PIX790954 - MercadoPago.<br>Obrigado.");
         } else {
             $this->setAccessToken($token);
-            $this->url = "https://api.mercadopago.com";
+            $this->url = getenv('mp_url_api');
         }
 
     }//end function __construct()
@@ -119,7 +114,7 @@ class classPIX
     public function callSonda($params, &$reposta_consulta)
     {
         // URL e token da API
-        $url = 'https://api.mercadopago.com/v1/payments/search?external_reference=' . $params['idpedido'];
+        $url = $this->url . '/v1/payments/search?external_reference=' . $params['idpedido'];
 
         $accessToken = $this->getAccessToken();
 

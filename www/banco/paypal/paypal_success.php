@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 
 	require_once( "C:/Sites/E-Prepag/www/web/incs/inc_register_globals.php");	
@@ -5,7 +6,7 @@
 /*
 <script>
 // aqui fazemos a atualizacao em nosso servidor pois esse arquivo esta fora de nossa rede
-window.open("http://www.e-prepag.com.br/prepag2/pag/pay/atualizavenda.php?item_number=<_?php echo $_POST[item_number];?_>&data_compra=<_?php echo $_POST[payment_date];?_>&tx_id=<_?php echo $_POST[txn_id];?_>", "_self", "");
+window.open("EPREPAG_URL_HTTP/prepag2/pag/pay/atualizavenda.php?item_number=<_?php echo $_POST[item_number];?_>&data_compra=<_?php echo $_POST[payment_date];?_>&tx_id=<_?php echo $_POST[txn_id];?_>", "_self", "");
 </script>
 */
 

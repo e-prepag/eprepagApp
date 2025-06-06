@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <body style="background-color: rgb(255, 255, 153);" onbeforeunload="">
 <?php
 	$numcompra = $_REQUEST['numcompra'];
@@ -48,20 +49,20 @@
 	// The I.D. assigned to this website is ‘9’ 
 	$params->setMerchantSiteId(1960);  
 	// If the payment is accepted, the user will be redirected to this page 
-	//$params->setURLOk('http://www.e-prepag.com.br/prepag2/pag/hpy/success.php'); 
-	$params->setURLOk('http://www.e-prepag.com.br/prepag2/pag/hpy/listen_hipay_notification.php'); 
+	//$params->setURLOk('EPREPAG_URL_HTTP/prepag2/pag/hpy/success.php'); 
+	$params->setURLOk('' . EPREPAG_URL_HTTP . '/prepag2/pag/hpy/listen_hipay_notification.php'); 
 	
 	// If the payment is refused, the user will be redirected to this page 
-	$params->setUrlNok('http://www.e-prepag.com.br/prepag2/pag/hpy/refused.html'); 
+	$params->setUrlNok('' . EPREPAG_URL_HTTP . '/prepag2/pag/hpy/refused.html'); 
 	// If the user cancels the payment, he will be redirected to this page  
-	$params->setUrlCancel('http://www.e-prepag.com.br/prepag2/pag/hpy/cancel.html'); 
+	$params->setUrlCancel('' . EPREPAG_URL_HTTP . '/prepag2/pag/hpy/cancel.html'); 
 	// The email address used to send the notifications, on top of the http notifications. 
 	// cf chap 19 : RECEIVING A RESULTS NOTIFICATION ABOUT A PAYMENT ACTION 
 	$params->setEmailAck('rene@e-prepag.com.br'); 
 	// The merchant’s site will be notified of the result of the payment by a call to the script 
 	// “listen_hipay_notification.php” 
 	// cf chap 19 : RECEIVING A RESULTS NOTIFICATION ABOUT A PAYMENT ACTION 
-	$params->setUrlAck('http://www.e-prepag.com.br/prepag2/pag/hpy/listen_hipay_notification.php'); 
+	$params->setUrlAck('' . EPREPAG_URL_HTTP . '/prepag2/pag/hpy/listen_hipay_notification.php'); 
 	 
 	// The background color of the interface will be #FFFFFF (default color recommended) 
 	$t=$params->setBackgroundColor('#FFFF99'); 

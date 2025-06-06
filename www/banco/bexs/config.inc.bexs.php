@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -14,7 +15,7 @@ require_once $raiz_do_projeto . 'includes/configIP.php';
 //   - SE ALTEROU, ENVIAR O NOVO IP PARA SER CADASTRADO NA WHITE LIST DO BEXS]               //
 //                                                                                           //
 //  URL NA QUAL O BEXS RETORNARÁ UMA RESPOSTA DO PROCESSAMENTO DO ARQUIVO DE OPERAÇÕES:      //
-//  www.e-prepag.com.br/bexs/notification_bexs/resposta_remessa_operacoes.php                //
+//  EPREPAG_URL/bexs/notification_bexs/resposta_remessa_operacoes.php                //
 //*******************************************************************************************//
 //*******************************************************************************************//
 if(checkIP()) {
@@ -32,7 +33,7 @@ if(checkIP()) {
     define("BEXS_SFTP_PASSWD_EPREPAG", "XAeEMvllncYo");
 }
 else {
-    $server_url = "www.e-prepag.com.br";
+    $server_url = "" . EPREPAG_URL . "";
     //WSDL e URL para ambiente PROD
     define("BEXS_SERVICE_URL_WSDL",	"http://remessas.bexs.com.br/servicos?wsdl");
     define("BEXS_SERVICE_URL",	"http://remessas.bexs.com.br/servicos");

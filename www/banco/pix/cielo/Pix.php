@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 if (!class_exists('ConnectionPDO')) {
@@ -259,7 +260,7 @@ class Pix {
 			
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-			  CURLOPT_URL => 'https://www.e-prepag.com.br/webhook/confirmaPix.php',
+			  CURLOPT_URL => '' . EPREPAG_URL_HTTPS . '/webhook/confirmaPix.php',
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => '',
 			  CURLOPT_MAXREDIRS => 10,
