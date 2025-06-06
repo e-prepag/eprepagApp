@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
@@ -307,7 +308,7 @@ if ($atualizar == "OK") {
                 url: "/ajax/ajaxAlterarComissoes.php",
                 data: showValuesAlterar(),
                 beforeSend: function () {
-                    //$('#box-comisao').html("<center><table><tr><td><img src='http://www.e-prepag.com.br/prepag2/dist_commerce/images/loading1.gif' border='0' title='Aguardando pagamento...'/></td></tr><tr><td><font size='1'><b>Aguarde... Verificando.</b></font></td></tr></table></center>");
+                    //$('#box-comisao').html("<center><table><tr><td><img src='<?= EPREPAG_URL_HTTP ?>/prepag2/dist_commerce/images/loading1.gif' border='0' title='Aguardando pagamento...'/></td></tr><tr><td><font size='1'><b>Aguarde... Verificando.</b></font></td></tr></table></center>");
                 },
                 success: function (html) {
                     //$('#box-comisao').html(html);

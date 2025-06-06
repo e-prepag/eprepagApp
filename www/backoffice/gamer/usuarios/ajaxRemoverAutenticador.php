@@ -23,7 +23,7 @@ if (empty($id)) {
 
 $conexao = ConnectionPDO::getConnection()->getLink();
 
-$query = $conexao->prepare("SELECT ug_ativo from dist_usuarios_games WHERE ug_id = :ID;");
+$query = $conexao->prepare("SELECT ug_ativo from usuarios_games WHERE ug_id = :ID;");
 $query->bindValue(":ID", $id);
 $query->execute();
 $resultado = $query->fetch(PDO::FETCH_ASSOC);
@@ -31,12 +31,12 @@ $resultado = $query->fetch(PDO::FETCH_ASSOC);
 if ($resultado) {
 	$ativo = $resultado['ug_ativo'];
 
-	$query = $conexao->prepare("UPDATE dist_usuarios_games SET ug_chave_autenticador = '' WHERE ug_id = :ID;");
+	$query = $conexao->prepare("UPDATE usuarios_games SET ug_chave_autenticador = '' WHERE ug_id = :ID;");
 	$query->bindValue(":ID", $id);
 	$query->execute();
 
 	if ($query->rowCount() > 0) {
-		$query = $conexao->prepare("UPDATE dist_usuarios_games SET ug_ativo = :ATIVO WHERE ug_id = :ID;");
+		$query = $conexao->prepare("UPDATE usuarios_games SET ug_ativo = :ATIVO WHERE ug_id = :ID;");
 		$query->bindValue(":ID", $id);
 		$query->bindValue(":ATIVO", $ativo);
 		$query->execute();

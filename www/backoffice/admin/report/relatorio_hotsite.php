@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -75,7 +76,7 @@ else $totalRegistros = 0;
     <div class="col-md-6">Total de registros: <?php echo $totalRegistros;?></div>
     <div class="col-md-6"><a href="#" class="btn downloadCsv btn-info ">Download CSV</a></div>
 </div>
-<script src="https://www.e-prepag.com.br/js/table2CSV.js"></script>
+<script src="<?= EPREPAG_URL_HTTPS ?>/js/table2CSV.js"></script>
 <script>
 $(function(){
     $('#table').table2CSV({header:['pin','email','ano_nascimento','comprou_internet','conta_banco','cartao_credito','smart_phone','ug_id_pdv','opr_codigo'],toStr:""});

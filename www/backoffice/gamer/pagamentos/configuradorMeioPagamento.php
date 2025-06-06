@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 	<?php
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -136,7 +137,7 @@ require_once "/www/includes/bourls.php";
 <div class="col-md-12">
     <form id="buscaBanner" name="buscaBanner" method="post">
         <div class="text-left left row">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_bradesco.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_bradesco.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_bradesco" id="conf_bradesco" class="form-control right">
                     <?php 
@@ -150,7 +151,7 @@ require_once "/www/includes/bourls.php";
             </span>
         </div>
         <div class="text-left left row top10">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_bancodobrasil.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_bancodobrasil.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_banco_brasil" id="conf_banco_brasil" class="form-control right">
                     <?php 
@@ -164,7 +165,7 @@ require_once "/www/includes/bourls.php";
             </span>
         </div>
         <div class="text-left left row top10">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_itau_shopline.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_itau_shopline.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_itau" id="conf_itau" class="form-control right">
                     <?php 
@@ -178,7 +179,7 @@ require_once "/www/includes/bourls.php";
             </span>
         </div>
         <div class="text-left left row top10">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_boleto.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_boleto.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_boleto" id="conf_boleto" class="form-control right">
                     <?php 
@@ -206,7 +207,7 @@ require_once "/www/includes/bourls.php";
             </span>
         </div>
         <div class="text-left left row top10">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_eprepag.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_eprepag.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_eprepag_cash" id="conf_eprepag_cash" class="form-control right">
                     <?php 
@@ -220,7 +221,7 @@ require_once "/www/includes/bourls.php";
             </span>
         </div>
         <div class="text-left left row top10">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_cielo.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_cielo.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_cielo" id="conf_cielo" class="form-control right">
                     <?php 
@@ -234,7 +235,7 @@ require_once "/www/includes/bourls.php";
             </span>
         </div>
         <div style="border: 1px solid #eee; padding: 10px;" class="text-left left row top10">
-            <span class="p5 left col-md-2"><img src="https://www.e-prepag.com.br/imagens/pag/pagto_forma_pix.gif" width="110" height="40" border="0"></span>
+            <span class="p5 left col-md-2"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/pag/pagto_forma_pix.gif" width="110" height="40" border="0"></span>
             <span class="p5 left col-md-3">
                     <select name="conf_pix" id="conf_pix" class="form-control right">
                     <?php 
@@ -255,7 +256,7 @@ require_once "/www/includes/bourls.php";
 							padding: 10px;
 							border-radius: 10px;
 							" 
-							src="https://www.e-prepag.com.br/css/images/icone-interrogacao.png" 
+							src="<?= EPREPAG_URL_HTTPS ?>/css/images/icone-interrogacao.png" 
 						/>
 						<div style="position: absolute;
 							width: 350px;

@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 //error_reporting(E_ALL); 
@@ -103,7 +104,7 @@ echo "<span style='font-size:10px; font-family: tahoma,arial,sans serif'>" . $da
 		$curl = curl_init();
 
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://www.e-prepag.com.br/webhook/confirmaPix.php',
+			CURLOPT_URL => '' . EPREPAG_URL_HTTPS . '/webhook/confirmaPix.php',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,

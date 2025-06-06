@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 
 //ini_set('display_errors', 1);
@@ -596,7 +597,7 @@ echo "***";
 ?>
 		<!--trecho necessário para o calendario com data hora-->
 		<link rel="stylesheet" type="text/css" href="/css/anytime512.css" />
-		<!--link rel="stylesheet" type="text/css" href="http://www.e-prepag.com.br/prepag2/js/jqueryui/css/eprepag/jquery-ui-1.8.16.custom.css" /-->
+		<!--link rel="stylesheet" type="text/css" href="<?= EPREPAG_URL_HTTP ?>/prepag2/js/jqueryui/css/eprepag/jquery-ui-1.8.16.custom.css" /-->
 		<script language="JavaScript" src="/js/anytime512.js"></script>
 		<script language="JavaScript" src="/js/anytimetz.js"></script>
 		<script language="JavaScript" src="/js/anytimeBR.js"></script>

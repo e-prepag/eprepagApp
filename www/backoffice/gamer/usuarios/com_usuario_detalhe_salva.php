@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -124,7 +125,7 @@ function pegaNomeRF(){
             data: { cpf : $("#cpf").val(), dataNascimento : $("#novo_ug_data_nascimento").val()},
             beforeSend: function(){
                 searching = true;
-                $(".loading").html("<img src='https://www.e-prepag.com.br/imagens/ajax-loader.gif' width='30' height='30' title='Consultando...'>");
+                $(".loading").html("<img src='<?= EPREPAG_URL_HTTPS ?>/imagens/ajax-loader.gif' width='30' height='30' title='Consultando...'>");
             },
             success: function(txt){
                 searching = false;

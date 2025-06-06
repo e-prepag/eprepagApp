@@ -1,8 +1,9 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 // require_once "/www/includes/bourls.php";
-// https://www.e-prepag.com.br:$server_port/admin/pins_store/pins_store_lista.php
+// EPREPAG_URL_HTTPS:$server_port/admin/pins_store/pins_store_lista.php
 
-// https://www.e-prepag.com.br:$server_port/admin/pins_store/pins_store_lista_pin.php
+// EPREPAG_URL_HTTPS:$server_port/admin/pins_store/pins_store_lista_pin.php
 
 require_once $raiz_do_projeto . "includes/main.php";
 

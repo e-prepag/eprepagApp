@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
@@ -133,7 +134,7 @@ function load_dados(dados) {
 	//varre o array só pra mostrar que tá tudo ok
 	for (i in array_produtos)
 		html = html + array_produtos[i] + '<BR>';
-	html += '<br><center><img src="http://www.e-prepag.com.br/prepag2/commerce/images/voltar.gif" width="88" height="31" border="0" alt="Voltar" OnClick="fecha();" style="cursor:pointer;cursor:hand;"/></center>';
+	html += '<br><center><img src="<?= EPREPAG_URL_HTTP ?>/prepag2/commerce/images/voltar.gif" width="88" height="31" border="0" alt="Voltar" OnClick="fecha();" style="cursor:pointer;cursor:hand;"/></center>';
 	$('#boxPopUpDadosRecebidos').html(html); 
 	$('#boxPopUpDadosRecebidos').show();
 }

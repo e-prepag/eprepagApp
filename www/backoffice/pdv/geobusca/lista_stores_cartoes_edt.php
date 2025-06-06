@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -51,7 +52,7 @@ $us_id = $_POST['us_id'];
 			<br>
 		<center>
 			<input type='hidden' name='Submit' id='Submit' value='RESPONDER'>
-			<input type='submit' name='resp' id='resp' value='' style="background:url('http://www.e-prepag.com.br/prepag2/images/alterar.gif');background-repeat:no-repeat;width:79px;height:24px;" />
+			<input type='submit' name='resp' id='resp' value='' style="background:url('<?= EPREPAG_URL_HTTP ?>/prepag2/images/alterar.gif');background-repeat:no-repeat;width:79px;height:24px;" />
 		</center>
 </div>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

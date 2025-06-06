@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php 
 ob_start();
 require_once '../../includes/constantes.php';
@@ -1335,7 +1336,7 @@ if ($total_table > 0) {
 			$total_comissao += $comissao; */
 		?>
 			<!--	 <tr <?php //echo $bgcolor?> >
-				   <td class="texto" align="center" width="4%"><img src='https://www.e-prepag.com.br/prepag2/b2c/imgs/b2c_icon.png' title="B2C (<?php //echo $i_row ?>)"/></td>
+				   <td class="texto" align="center" width="4%"><img src='<?= EPREPAG_URL_HTTPS ?>/prepag2/b2c/imgs/b2c_icon.png' title="B2C (<?php //echo $i_row ?>)"/></td>
 				   <td class="texto" align="center" width="11%">
 					 <?php //echo $id_venda?>
 					</td>

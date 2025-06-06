@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 if(!isset($Empty)) $Empty = "";
 if(!isset($Invalido)) $Invalido = "";
@@ -15,8 +16,8 @@ require_once "/www/includes/bourls.php";
 <title>E-Prepag - BackOffice</title>
 <link rel="stylesheet" href="/css/css_frame.css" type="text/css">
 <link href="/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />
-<link rel="icon" href="https://www.e-prepag.com.br/favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="https://www.e-prepag.com.br/favicon.ico" type="image/x-icon">
+<link rel="icon" href="<?= EPREPAG_URL_HTTPS ?>/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="<?= EPREPAG_URL_HTTPS ?>/favicon.ico" type="image/x-icon">
 <link href="https://<?php echo $server_url; ?>/css/creditos.css" rel="stylesheet" type="text/css" />
 </head>
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="document.formLog.user.focus()">

@@ -569,6 +569,7 @@ $(function(){
                             <option value='6.38' <?php echo ((isset($opr_internacional_alicota) && $opr_internacional_alicota=="6.38")?" selected":"") ?>>Internacional com Alíquota de 6,38%</option>
                             <option value='10' <?php echo ((isset($opr_internacional_alicota) && $opr_internacional_alicota=="10")?" selected":"") ?>>Internacional com Alíquota de 10%</option>
                             <option value='15' <?php echo ((isset($opr_internacional_alicota) && $opr_internacional_alicota=="15")?" selected":"") ?>>Internacional com Alíquota de 15%</option>
+                            <option value='<?= IOF ?>' <?php echo ((isset($opr_internacional_alicota) && $opr_internacional_alicota==IOF)?" selected":"") ?>>Internacional com Alíquota de <?= IOF ?>%</option>
                         </select>
                     </td>
                     <td>&nbsp;</td>
