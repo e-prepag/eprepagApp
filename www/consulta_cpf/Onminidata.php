@@ -2,7 +2,7 @@
 
   //require "/www/db/connect.php";
   //require "/www/db/ConnectionPDO.php";
-
+  require_once "/www/includes/load_dotenv.php";
 class Onminidata {
 	
 	/* configuração dodos cliente */
@@ -15,23 +15,25 @@ class Onminidata {
 	private $query;
 	private $token;
 	private $id_search;
-	private $key = "19037276000172";
-	private $password = "BHcpQN8MP4PatFg";
+	private $key;
+	private $password;
 	
 	public function __construct(){
 		$this->query = ConnectionPDO::getConnection()->getLink();
+		$key = getenv("OMNIDATA_USERNAME");
+		$password = getenv("OMNIDATA_PASSWORD");
 	}
 	
 	private function token(){
 	     $data = [
 		      "AuthFlow" => "USER_PASSWORD_AUTH",
-			  "ClientId" => "v3dmm8ddo8130chj0ofa3cdif",
-			  "AuthParameters" => [ "USERNAME" => "19037276000172", "PASSWORD" => "BHcpQN8MP4PatFg" ]
+			  "ClientId" => getenv("OMNIDATA_CLIENT_ID"),
+			  "AuthParameters" => [ "USERNAME" => getenv("OMNIDATA_USERNAME"), "PASSWORD" => getenv("OMNIDATA_PASSWORD") ]
 		 ];
 	      
          $requestToken = curl_init();
 		 curl_setopt_array($requestToken, [
-			  CURLOPT_URL => 'https://cognito-idp.us-east-1.amazonaws.com/',
+			  CURLOPT_URL => getenv("OMNIDATA_URL_COGNITO"),
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_TIMEOUT => 0,
 			  CURLOPT_FOLLOWLOCATION => true,
@@ -40,10 +42,10 @@ class Onminidata {
 			  CURLOPT_HTTPHEADER => [
 			     'Content-Type: application/x-amz-json-1.1',
 				 'Accept-Language: pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
-				 'Referer: https://de-cargo.omninetworking.com.br/login',
+				 'Referer: '.getenv('OMNIDATA_URL_CARGO').'/login',
 				 'X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth',
 				 'X-Amz-User-Agent: aws-amplify/0.1.x js',
-				 'Origin: https://de-cargo.omninetworking.com.br' ,
+				 'Origin: '.getenv('OMNIDATA_URL_CARGO'),
 				 'Connection: keep-alive' ,
 				 'TE: Trailers'
 			  ],
@@ -71,7 +73,7 @@ class Onminidata {
 		
 		 $requestToken = curl_init();
 		 curl_setopt_array($requestToken, [
-			  CURLOPT_URL => 'https://doce.api.omnidata.com.br/v1/informations/asynchronous', //desenv
+			  CURLOPT_URL => getenv('OMNIDATA_URL'), //desenv
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_TIMEOUT => 0,
 			  CURLOPT_FOLLOWLOCATION => true,
@@ -102,7 +104,7 @@ class Onminidata {
 	
 	  public function result_status_search($id)
 	  {
-			$url = "https://doce.api.omnidata.com.br/v1/informations/asynchronous?ids=". $id; //desenv
+			$url = getenv('OMNIDATA_URL')."?ids=". $id; //desenv
 
 			$ch = curl_init($url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

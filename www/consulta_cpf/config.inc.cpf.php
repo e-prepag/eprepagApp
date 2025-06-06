@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -6,7 +7,7 @@ if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }
 else {
-    $server_url = "www.e-prepag.com.br";
+    $server_url = "" . EPREPAG_URL . "";
 }
 
 // Constante a quantidade limite para aceitação do mesmo CPF
