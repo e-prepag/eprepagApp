@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 
 class LoggingPDOStatement extends PDOStatement
@@ -17,7 +18,7 @@ class LoggingPDOStatement extends PDOStatement
         $callerDir = dirname($callerFile);   // Obtém o diretório do arquivo que chamou
 
         if (strpos($callerDir, 'public_html') === false 
-            && strpos($_SERVER['HTTP_HOST'], 'www.e-prepag.com.br') == false 
+            && strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false 
             && stripos($this->queryString, "usuarios") == false) {
             // Se não está na pasta public_html, não faz log
             return parent::execute($bound_input_params);
