@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Vulnerabilidades Críticas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #d32f2f;
+            border-bottom: 2px solid #d32f2f;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #c62828;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #b71c1c;
+        }
+        .vulnerability-count {
+            font-size: 24px;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .file-path {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .priority-high {
+            color: #d32f2f;
+        }
+        .priority-medium {
+            color: #f57c00;
+        }
+        .priority-low {
+            color: #388e3c;
+        }
+        .recommendations {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .category {
+            background-color: #fafafa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Vulnerabilidades Críticas E-prepag</h1>
+    <p>Data: 30 de Maio de 2025</p>
+	<p>Pontos identificados até o momemto em Webhooks, Sistema Administrativo e Integrações</p>
+    <div class="category">
+        <h2>Sumário Executivo</h2>
+        <p>Total de vulnerabilidades críticas identificadas: <span class="vulnerability-count">142</span></p>
+        
+        <h3>Distribuição por Tipo</h3>
+        <table>
+            <tr>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Severidade</th>
+            </tr>
+            <tr>
+                <td>SQL Injection</td>
+                <td>87</td>
+                <td class="priority-high">CRÍTICA</td>
+            </tr>
+            <tr>
+                <td>Cross-Site Scripting (XSS)</td>
+                <td>94</td>
+                <td class="priority-high">CRÍTICA</td>
+            </tr>
+            <tr>
+                <td>Pontos de Fraude</td>
+                <td>35</td>
+                <td class="priority-high">CRÍTICA</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="category">
+        <h2>SQL Injection (87 pontos críticos)</h2>
+        
+        <h3>Webhooks e Integrações (23 pontos)</h3>
+        <ul>
+            <li><span class="file-path">/webhook/confirmaPix_asaas_teste.php</span> - 9 vulnerabilidades</li>
+            <li><span class="file-path">/webhook/confirmaPix.php</span> - 7 vulnerabilidades</li>
+            <li><span class="file-path">/webhook/confirmaBoleto_asaas.php</span> - 1 vulnerabilidade</li>
+            <li><span class="file-path">/webhook/confirmaPixManual.php</span> - 6 vulnerabilidades</li>
+        </ul>
+
+        <h3>Sistema Administrativo (42 pontos)</h3>
+        <ul>
+            <li><span class="file-path">/sys/admin/vendas/vendas_estab/pquery_nfe.php</span> - 9 vulnerabilidades</li>
+            <li><span class="file-path">/sys/admin/vendas/vendas_estab/pquery_nfe_BKP.php</span> - 9 vulnerabilidades</li>
+            <li><span class="file-path">/sys/admin/stats/Cartoes_stats_abas.php</span> - 26 vulnerabilidades</li>
+            <li><span class="file-path">/sys/admin/pins/lote_carga/pendentes.php</span> - 7 vulnerabilidades</li>
+        </ul>
+    </div>
+
+    <div class="category">
+        <h2>Cross-Site Scripting (94 pontos críticos)</h2>
+        
+        <h3>Área Administrativa (45 pontos)</h3>
+        <ul>
+            <li><span class="file-path">/sys/admin/stats/POS_stats_abas.php</span> - 6 vulnerabilidades</li>
+            <li><span class="file-path">/sys/admin/vendas/vendas_estab/pquery.php</span> - 8 vulnerabilidades</li>
+            <li><span class="file-path">/sys/admin/financial/financial_nfse_build.php</span> - 4 vulnerabilidades</li>
+        </ul>
+
+        <h3>Área de Pagamentos (32 pontos)</h3>
+        <ul>
+            <li><span class="file-path">/prepag2/commerce/pagamento_int.php</span> - 5 vulnerabilidades</li>
+            <li><span class="file-path">/prepag2/commerce/includes/form_cpf.php</span> - 4 vulnerabilidades</li>
+            <li><span class="file-path">/game/pedido/boleto-express.php</span> - 2 vulnerabilidades</li>
+        </ul>
+    </div>
+
+    <div class="recommendations">
+        <h2>Recomendações Imediatas</h2>
+        
+        <h3>Correção Imediata</h3>
+        <ol>
+            <li>Webhooks de pagamento</li>
+            <li>Sistema de autenticação</li>
+            <li>Processamento de pagamentos</li>
+        </ol>
+
+        <h3>Correção Prioritária</h3>
+        <ol>
+            <li>Módulos administrativos</li>
+            <li>Interfaces de usuário</li>
+            <li>Módulos de estatísticas</li>
+        </ol>
+    </div>
+
+    <div class="category">
+        <h2>Conclusão</h2>
+        <p>O sistema apresenta vulnerabilidades críticas que requerem atenção imediata, especialmente nas áreas de processamento de pagamentos e administração. Recomenda-se iniciar as correções pelos pontos que envolvem transações financeiras e dados sensíveis de usuários.</p>
+    </div>
+
+    <div class="category">
+        <h2>Exemplos Práticos de Correção - SQL Injection</h2>
+        
+        <h3>Exemplo 1: Webhook de Pagamento</h3>
+        <div style="background-color: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <p><strong>Código Vulnerável:</strong></p>
+            <pre style="background-color: #fff; padding: 10px; border-radius: 3px;">
+$idVenda = $_POST['id_venda'];
+$sql = "SELECT * FROM vendas WHERE vg_id = " . $idVenda;
+$informacaoVenda = SQLexecuteQuery($sql);
+            </pre>
+            <p><strong>Código Corrigido:</strong></p>
+            <pre style="background-color: #e8f5e9; padding: 10px; border-radius: 3px;">
+$stmt = $pdo->prepare("SELECT * FROM vendas WHERE vg_id = ?");
+$stmt->execute([$_POST['id_venda']]);
+$informacaoVenda = $stmt->fetch();
+            </pre>
+        </div>
+
+        <h3>Exemplo 2: Sistema Administrativo</h3>
+        <div style="background-color: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <p><strong>Código Vulnerável:</strong></p>
+            <pre style="background-color: #fff; padding: 10px; border-radius: 3px;">
+$operadora = $_GET['operadora'];
+$sql = "select opr_nome, opr_codigo from operadoras 
+        where opr_status = '" . $operadora_ativada . "' 
+        and opr_codigo <> " . $opr_teste;
+$resopr = SQLexecuteQuery($sql);
+            </pre>
+            <p><strong>Código Corrigido:</strong></p>
+            <pre style="background-color: #e8f5e9; padding: 10px; border-radius: 3px;">
+$stmt = $pdo->prepare("SELECT opr_nome, opr_codigo 
+                       FROM operadoras 
+                       WHERE opr_status = ? 
+                       AND opr_codigo <> ?");
+$stmt->execute([$operadora_ativada, $opr_teste]);
+$resopr = $stmt->fetchAll();
+            </pre>
+        </div>
+
+        <h3>Exemplo 3: Módulo de Estatísticas</h3>
+        <div style="background-color: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <p><strong>Código Vulnerável:</strong></p>
+            <pre style="background-color: #fff; padding: 10px; border-radius: 3px;">
+$data_inicio = $_POST['data_inicio'];
+$data_fim = $_POST['data_fim'];
+$sql = "SELECT * FROM vendas_estado 
+        WHERE data_venda BETWEEN '$data_inicio' AND '$data_fim'
+        AND estado = '" . $_POST['estado'] . "'";
+$vendas_estado = SQLexecuteQuery($sql);
+            </pre>
+            <p><strong>Código Corrigido:</strong></p>
+            <pre style="background-color: #e8f5e9; padding: 10px; border-radius: 3px;">
+$stmt = $pdo->prepare("SELECT * FROM vendas_estado 
+                       WHERE data_venda BETWEEN ? AND ?
+                       AND estado = ?");
+$stmt->execute([
+    $data_inicio,
+    $data_fim,
+    $_POST['estado']
+]);
+$vendas_estado = $stmt->fetchAll();
+            </pre>
+        </div>
+
+        <h3>Recomendações Gerais para Prevenção de SQL Injection</h3>
+        <ul>
+            <li>Sempre use prepared statements com parâmetros vinculados</li>
+            <li>Nunca concatene variáveis diretamente em strings SQL</li>
+            <li>Valide e sanitize todas as entradas de usuário</li>
+            <li>Use tipos de dados apropriados para os parâmetros</li>
+            <li>Implemente um sistema de logs para queries SQL</li>
+            <li>Use um ORM (Object-Relational Mapping) quando possível</li>
+        </ul>
+
+        <h3>Implementação Segura da Função SQLexecuteQuery</h3>
+        <div style="background-color: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px;">
+            <p><strong>Nova Versão Segura:</strong></p>
+            <pre style="background-color: #fff; padding: 10px; border-radius: 3px;">
+class Database {
+    private $pdo;
+
+    public function __construct() {
+        $this->pdo = new PDO(
+            "mysql:host=localhost;dbname=seu_banco",
+            "usuario",
+            "senha",
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+    }
+
+    public function executeQuery($sql, $params = []) {
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->logError($e);
+            throw new Exception("Erro na execução da query");
+        }
+    }
+
+    // Exemplo de uso:
+    // $db = new Database();
+    // $result = $db->executeQuery(
+    //     "SELECT * FROM vendas WHERE id = ?", 
+    //     [$id]
+    // );
+}
+            </pre>
+        </div>
+    </div>
+</body>
+</html> 
