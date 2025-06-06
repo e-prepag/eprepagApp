@@ -1,0 +1,1 @@
+cd /www/background/; php -q "remove_logs_antigos.php"

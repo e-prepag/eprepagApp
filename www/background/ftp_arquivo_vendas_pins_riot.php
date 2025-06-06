@@ -1,6 +1,7 @@
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
+require_once "/www/includes/load_dotenv.php";
 
 set_time_limit(6000);
 ini_set('max_execution_time', 6000); 
@@ -20,7 +21,7 @@ if(!$arquivoLog->haveFile()) {
     echo PHP_EOL.str_repeat("=",80).PHP_EOL."Data execução : ".date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
 
     //Declarando valor IOF 6.38 ou 0.38
-    $iof = array(6.38,0.38);
+    $iof = array(6.38,0.38, IOF);
 
     $time_start = getmicrotime();
 
@@ -43,10 +44,10 @@ if(!$arquivoLog->haveFile()) {
     $nome_do_arquivo = $raiz_do_projeto."arquivos_gerados/riot/".$arq_csv;
     
     //Dados de conexão SFTP na RIOT
-    $host = '35.167.183.103';
-    $port = 22;
-    $username = 'eprepag';
-    $password = 'htLGUcYI4mwCVsRjeti1';
+    $host = getenv('SFTP_HOST'); 
+    $port = getenv('SFTP_PORT'); 
+    $username = getenv('CLIENT_ID');
+    $password = getenv('SFTP_PASSWORD');
     $remoteDir = '/filesDir/';
     $localDir = '/data/';
 

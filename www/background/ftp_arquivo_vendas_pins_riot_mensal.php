@@ -1,6 +1,7 @@
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
+require_once "/www/includes/load_dotenv.php";
 
 session_start();
 echo PHP_EOL.str_repeat("=",80).PHP_EOL."Data execução : ".date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
@@ -12,7 +13,7 @@ require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 
 //Declarando valor IOF 6.38 ou 0.38
-$iof = array(6.38,0.38);
+$iof = array(6.38,0.38, IOF);
 
 $time_start = getmicrotime();
 
@@ -31,10 +32,10 @@ $arq_csv = "E_Prepag_".date('Y_m_01', strtotime('-1 month'.$date))."_".date('Y_m
 $nome_do_arquivo = $raiz_do_projeto."arquivos_gerados/riot/".$arq_csv;
 
 //Dados de conexão SFTP na RIOT
-$host = '35.167.183.103'; //54.68.20.193
-$port = 22; // 9287
-$username = 'eprepag';
-$password = 'htLGUcYI4mwCVsRjeti1';
+$host = getenv('SFTP_HOST'); 
+$port = getenv('SFTP_PORT'); 
+$username = getenv('CLIENT_ID');
+$password = getenv('SFTP_PASSWORD');
 $remoteDir = '/filesDir/';
 $localDir = '/data/monthly/';
 
