@@ -279,7 +279,7 @@ if(is_array($productResult) && !empty($productResult)){
         </div>
     </div>
     <div class="row" title="Saiba mais sobre E-prepag Cash">
-        <a href="https://blog.e-prepag.com/e-prepag-cash-carteira-virtual/"target="_blank">
+        <a href=https://solucoes.e-prepag.com/cartao-e-prepag-2/"target="_blank">
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 top20">
                 <img class="width100" src="imagens/cartao-eprep.jpg" />
             </div>
