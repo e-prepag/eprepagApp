@@ -192,6 +192,8 @@ class classPIX
         // Executa a requisição
         $response = curl_exec($ch);
 
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
         // Verifica se ocorreu algum erro
         if (curl_errno($ch)) {
             echo 'Erro no cURL: ' . curl_error($ch);
@@ -200,6 +202,24 @@ class classPIX
 
         // Fecha a conexão cURL
         curl_close($ch);
+
+        $headers = [
+            'accept: application/json',
+            'content-type: application/json',
+            'access_token: ',
+            "User-Agent: Eprepag/1.0"
+        ];
+
+        $jsonPostData = json_encode($postData);
+
+        $logEntry = "[" . date('Y-m-d H:i:s') . "]\n";
+        $logEntry .= "URL: $url\n";
+        $logEntry .= "Headers Enviados:\n" . implode("\n", $headers) . "\n";
+        $logEntry .= "POST Data: $jsonPostData\n";
+        $logEntry .= "Response:\n$response\n";
+        $logEntry .= "HTTP Status Code: $httpCode\n";
+
+        file_put_contents("/www/log/Asaas_PIX.txt", $logEntry, FILE_APPEND);
 
         // Converte a resposta JSON para um array associativo
         $data = json_decode($response, true);
