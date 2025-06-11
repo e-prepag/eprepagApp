@@ -32,7 +32,7 @@ try {
     $stmt = $pdo->query($sql);
     $vg_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    if(count($vg_ids) == 0) {
+    if (count($vg_ids) == 0) {
         echo "Nenhum registro encontrado.\n";
         exit;
     }
@@ -102,15 +102,16 @@ try {
                     $stmt3 = $pdo->prepare($query3);
                     $stmt3->execute([$vgm_id, $pin_codinterno]);
 
-                    // Passo 4: Inserir na tabela pins_dist
+                    // Passo 4: Atualizar o status do PIN para 6
+                    $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+                    $query5 = "UPDATE pins SET pin_status = 6, pin_validade = CURRENT_DATE + $validade_interval WHERE pin_codinterno = ?";
+                    $stmt5 = $pdo->prepare($query5);
+                    $stmt5->execute([$pin_codinterno]);
+
+                    // Passo 5: Inserir na tabela pins_dist
                     $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
                     $stmt4 = $pdo->prepare($query4);
                     $stmt4->execute([$pin_codinterno]);
-
-                    // Passo 5: Atualizar o status do PIN para 6
-                    $query5 = "UPDATE pins SET pin_status = 6 WHERE pin_codinterno = ?";
-                    $stmt5 = $pdo->prepare($query5);
-                    $stmt5->execute([$pin_codinterno]);
 
                     // Commit da transaction
                     $pdo->commit();

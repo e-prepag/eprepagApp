@@ -494,7 +494,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                 "Erro ao associar pin no modelo vendido." . PHP_EOL;
                         }
 
-                        $sql = "update pins set pin_status = '6' where pin_codinterno = " . $pin_codinterno;
+                        $sql = "UPDATE pins 
+                                SET 
+                                    pin_status = '6', 
+                                    pin_validade = CURRENT_DATE + INTERVAL '6 months' 
+                                WHERE pin_codinterno = " . $pin_codinterno;
                         $ret = SQLexecuteQuery($sql);
 
                         if (!$ret)
@@ -575,33 +579,22 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $vg_somente_debito == 0 &&
                         $vgm_pin_request == 0
                     ) {
-                        $sql =
-                            "update pins set 
-                                                                pin_status = '6', 
-                                                                pin_celular = '" .
-                            str_replace("-", "", $ug_cel) .
-                            "',
-                                                                pin_ddd = " .
-                            SQLaddFields($ug_cel_ddd, "") .
-                            ",
-                                                                pin_datavenda = '" .
-                            $data_corrente .
-                            "', 
-                                                                pin_datapedido = '" .
-                            $data_corrente .
-                            "', 
-                                                                pin_horavenda = '" .
-                            $hora_corrente .
-                            "',
-                                                                pin_horapedido = '" .
-                            $hora_corrente .
-                            "', 
-                                                                pin_est_codigo = '" .
-                            $EstabCod .
-                            "'
-                                                        where pin_codinterno = '" .
-                            $pin_codinterno .
-                            "' and pin_status = '1'";
+                        $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+
+                        $sql = "
+                            UPDATE pins SET
+                                pin_status     = '6',
+                                pin_celular    = '" . str_replace("-", "", $ug_cel) . "',
+                                pin_ddd        = " . SQLaddFields($ug_cel_ddd, "") . ",
+                                pin_datavenda  = '" . $data_corrente . "',
+                                pin_datapedido = '" . $data_corrente . "',
+                                pin_horavenda  = '" . $hora_corrente . "',
+                                pin_horapedido = '" . $hora_corrente . "',
+                                pin_est_codigo = '" . $EstabCod . "',
+                                pin_validade   = CURRENT_DATE + $validade_interval
+                            WHERE pin_codinterno = '" . $pin_codinterno . "'
+                              AND pin_status = '1';
+                        ";
                         $ret = SQLexecuteQuery($sql);
                         if (!$ret) {
                             $msg =
@@ -1014,7 +1007,7 @@ function processaEmailVendaGames($venda_id, $parametros)
     //---------------------------------------------------------------------------------------------------
     //envia email
     if ($msg == "") {
-        $parametros["prepag_dominio"] = "" . EPREPAG_URL_HTTP . "";
+        $parametros["prepag_dominio"] = EPREPAG_URL_HTTP;
         $parametros["nome_fantasia"] = $ug_nome_fantasia;
         $parametros["tipo_cadastro"] = $ug_tipo_cadastro;
         $parametros["sexo"] = $ug_sexo;
@@ -3913,7 +3906,7 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
     //---------------------------------------------------------------------------------------------------
     //envia email
     if ($msg == "") {
-        $parametros["prepag_dominio"] = "" . EPREPAG_URL_HTTP . "";
+        $parametros["prepag_dominio"] = EPREPAG_URL_HTTP;
         $parametros["nome_fantasia"] = $ug_nome_fantasia;
         $parametros["tipo_cadastro"] = $ug_tipo_cadastro;
         $parametros["sexo"] = $ug_sexo;

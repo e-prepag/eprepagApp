@@ -221,29 +221,31 @@ if ($msg == "") {
               $stmt3 = $pdo->prepare($query3);
               $stmt3->execute([$vgm_id, $pin_codinterno]);
 
-              // Passo 4: Inserir na tabela pins_dist
+              // Passo 4: Atualizar o status do PIN para 6
+              $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+              $query5 = "UPDATE pins SET pin_status = 6, pin_validade = CURRENT_DATE + $validade_interval WHERE pin_codinterno = ?";
+              $stmt5 = $pdo->prepare($query5);
+              $stmt5->execute([$pin_codinterno]);
+
+              // Passo 5: Inserir na tabela pins_dist
               $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
               $stmt4 = $pdo->prepare($query4);
               $stmt4->execute([$pin_codinterno]);
-
-              // Passo 5: Atualizar o status do PIN para 6
-              $query5 = "UPDATE pins SET pin_status = 6 WHERE pin_codinterno = ?";
-              $stmt5 = $pdo->prepare($query5);
-              $stmt5->execute([$pin_codinterno]);
 
               // Commit da transaction
               $pdo->commit();
 
             } catch (Exception $e) {
               $pdo->rollBack();
+              echo "Erro ao gerar pins novamente.\n";
             }
           } else {
-            echo "Nenhum PIN dispon?vel para vg_id: {$venda['vgm_vg_id']}.\n";
+            echo "Nenhum PIN disponivel para vg_id: {$venda['vgm_vg_id']}.\n";
           }
         }
       }
     } catch (PDOException $e) {
-      echo "Erro de conex?o: " . $e->getMessage();
+      echo "Erro de conexao: " . $e->getMessage();
     }
   }
 
@@ -619,7 +621,7 @@ ob_end_flush();
           echo $vgm_pin_codinterno_tmp . " (";
 
           if ($sem_pins) {
-            echo '<font color="#FF0000">ATENÇÃO: Essa venda teve erro ao gerar PINs, <form name="formPins" id="formPins" method="post" action=""><input type="submit" name="BtnReprocessaPins" value="clique aqui para continuar." onclick="return GP_popupConfirmMsg("Os PINs serão reprocessados. Deseja continuar?");"></form></font>';
+            echo '<font color="#FF0000">ATENÇÃO: Essa venda teve erro ao gerar PINs, <form name="formPins" id="formPins" method="post" action=""><input type="submit" name="BtnReprocessaPins" value="Gerar PINs novamente." onclick="return GP_popupConfirmMsg("Os PINs serão reprocessados. Deseja continuar?");"></form></font>';
           } else if (trim($vgm_pin_codinterno_tmp) == "") {
             echo "<font color='#0000FF'>Sem PINs vendidos</font>";
           } else {

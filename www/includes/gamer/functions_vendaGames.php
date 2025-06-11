@@ -116,10 +116,8 @@ function conciliaVendaGames_deposito($venda_id, $dep_id, $EstabCod, $parametros)
 
                                         $s_msg = "AFTER Partner Notify - Conciliacao Manual de Depósito (Novo esquema) (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                         grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (1): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-
                                 }
                         }
-
                 }
         }
 
@@ -157,6 +155,7 @@ function conciliaVendaGames_deposito($venda_id, $dep_id, $EstabCod, $parametros)
 
         //Concilia na venda_games e atualiza status (deposito)
         if ($msg == "") {
+                $iduser_bko = null;
                 $sql = "update tb_venda_games set 
                                         vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
                                         vg_dep_codigo = " . SQLaddFields($dep_id, "") . ", 
@@ -255,6 +254,7 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
                 } elseif ($isVendaDeposito == 1) {
                         echo "Depósito em saldo (2132)";
 
+                        $concilia_cod_sel = null;
                         if (!$concilia_cod_sel)
                                 $concilia_cod_sel = $GLOBALS['_REQUEST']['concilia_cod_sel'];
                         $sql = "select * 
@@ -305,13 +305,13 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
                                                         if (($bol_valor + $GLOBALS['BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_2']) == ($bbg_valor_sem_taxa + $GLOBALS['BOLETO_MONEY_ITAU_TAXA_ADICIONAL'])) {
                                                                 if ($bDebug)
                                                                         echo "Vai conciliar Boleto (bol: $bol_codigo, vg: $venda_id, ug: $usuario_id)" . PHP_EOL;
-                                                                $parametros['valor'] = $bbg_valor_sem_taxa; {	/////////	==================   BLOCKED
+                                                                $parametros['valor'] = $bbg_valor_sem_taxa; {        /////////	==================   BLOCKED
                                                                         $ret = conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, $parametros);
                                                                         if ($ret != "")
                                                                                 echo $ret;
                                                                         else
                                                                                 echo "Depósito por boleto conciliado com sucesso e saldo depositado" . PHP_EOL;
-                                                                }	/////////	==================   BLOCKED
+                                                                }        /////////	==================   BLOCKED
                                                         } else {
                                                                 if ($bDebug)
                                                                         echo "NÃO concilia Boleto ($boleto_id, $venda_id, $usuario_id)" . PHP_EOL;
@@ -320,8 +320,6 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
                                                         if ($bDebug)
                                                                 echo "Nenhum Boleto encontrado ($venda_id, $usuario_id)" . PHP_EOL;
                                                 }
-
-
                                         }
                                 }
                         }
@@ -465,6 +463,8 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         // Levanta venda de Campeonato
         $b_isVendaCampeonato = isVendaCampeonato($venda_id);
 
+        $vgm_qtde = null;
+        $vgm_pin_codinterno = null;
         // Levanta pins vendidos
         $npins = get_qtde_pins($venda_id, $vgm_qtde, $vgm_pin_codinterno);
         gravaLog_TMP("Testing Conciliacao nPINs - em conciliacao() - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  venda_id: " . $venda_id . ", vgm_qtde: " . $vgm_qtde . ", vgm_pin_codinterno: '" . $vgm_pin_codinterno . "'" . PHP_EOL);
@@ -518,7 +518,6 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
                                 if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] && $webhook == false)
                                         $msg = "Dados do Pagamento ainda não recebidos(A3) (vg_ultimo_status: '$vg_ultimo_status', debia ser " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . ")." . PHP_EOL;
                         }
-
                 }
         }
 
@@ -554,7 +553,6 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
                         $pag_documento = $prefix . $rs_pagamento_row['iforma'] . "_" . $rs_pagamento_row['numcompra'];
                         echo "  - Valor total do pagamento (venda_id: $venda_id, '$pagamento_id') " . $pag_valor . PHP_EOL;
-
                 }
         }
 
@@ -926,8 +924,7 @@ function verificaEstoque($venda_id)
                                                         $msg .= "Não há suficientes pins de " . number_format($vgm_pin_valor, 2, ',', '.') . " da operadora " . $opr_nome . " em estoque (B)." . PHP_EOL;
                                         }
                                 }
-
-                        }//end if($vgm_pin_request == 0) {
+                        } //end if($vgm_pin_request == 0) {
                 }
         }
 
@@ -1012,7 +1009,6 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
                                 $valor_pago = $rs_deposito_row['dep_valor'];
                                 $datainicio = $rs_deposito_row['dep_aprovado_data'];
-
                         }
 
                         //Boleto
@@ -1032,7 +1028,6 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
                                 $valor_pago = $rs_boleto_row['bol_valor'];
                                 $datainicio = $rs_boleto_row['bol_aprovado_data'];
-
                         }
                         // Pagamentos Online Bradesco: Débito/Transferência - Banco do Brasil
                 } elseif (
@@ -1153,7 +1148,6 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                                 if (!$ret)
                                         $msg = "Erro ao conciliar boleto." . PHP_EOL;
                         }
-
                 } elseif (
                         b_IsPagtoOnline($vg_pagto_tipo)
                         /*	
@@ -1504,7 +1498,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                 // Extrai o valor da contagem usando pg_fetch_assoc
                                                 $row = pg_fetch_assoc($verificaExist);
                                                 $qtde = $row['qtde'];
-                                                if ($qtde >= $vgm_qtde)  {
+                                                if ($qtde >= $vgm_qtde) {
                                                         continue;
                                                 }
                                         }
@@ -1524,8 +1518,8 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         $pin_gerado = $geraPinEpp->gerar();
 
                                                         $sql = "update tb_venda_games_modelo set 
-																			vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_gerado . ",' 
-																	where vgm_id = '" . $vgm_id . "'";
+							vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_gerado . ",' 
+								where vgm_id = '" . $vgm_id . "'";
                                                         $ret = SQLexecuteQuery($sql);
                                                         if (!$ret)
                                                                 $msg = "Erro ao atualizar pin no modelo vendido." . PHP_EOL;
@@ -1549,20 +1543,20 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 // Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter	
                                                                 if ($temEstoque) {
                                                                         $sql = "select * from pins
-																where opr_codigo = " . $vgm_opr_codigo . "
-																		and pin_status = '1'
-																		and pin_canal = 's'
-																		and pin_valor = " . $vgm_pin_valor . "
-																order by pin_codinterno asc, pin_serial asc
-																limit 1 offset 10";
+									        where opr_codigo = " . $vgm_opr_codigo . "
+									        and pin_status = '1'
+									        and pin_canal = 's'
+									        and pin_valor = " . $vgm_pin_valor . "
+									        order by pin_codinterno asc, pin_serial asc
+									        limit 1 offset 10";
                                                                 } else {
                                                                         $sql = "select * from pins
-																where opr_codigo = " . $vgm_opr_codigo . "
-																		and pin_status = '1'
-																		and pin_canal = 's'
-																		and pin_valor = " . $vgm_pin_valor . "
-																order by pin_codinterno asc, pin_serial asc
-																limit 1;";
+									        where opr_codigo = " . $vgm_opr_codigo . "
+										and pin_status = '1' 
+                                                                                and pin_canal = 's'
+										and pin_valor = " . $vgm_pin_valor . "
+										order by pin_codinterno asc, pin_serial asc
+										limit 1;";
                                                                 }
 
                                                                 $rs_pins = SQLexecuteQuery($sql);
@@ -1575,7 +1569,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                         $pin_serial = $pgpins['pin_serial'];
                                                                         $pin_codigo = $pgpins['pin_codigo'];
                                                                 }
-                                                        }//end if($msg == "")
+                                                        } //end if($msg == "")
 
                                                         fwrite($fileLog, "PIN GERADO: " . $pin_codigo . " / " . $venda_id . " \n");
 
@@ -1583,16 +1577,21 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         // Atualiza a tabela de pins		
                                                         if ($msg == "") {
                                                                 $ug_cel_ddd = (trim($ug_cel_ddd) == "") ? 0 : trim($ug_cel_ddd);
-                                                                $sql = "update pins set 
-																					pin_status = '3', 
-																					pin_celular = '" . str_replace("-", "", $ug_cel) . "',
-																					pin_ddd = " . $ug_cel_ddd . ",
-																					pin_datavenda = '" . $data_corrente . "', 
-																					pin_datapedido = '" . $data_corrente . "', 
-																					pin_horavenda = '" . $hora_corrente . "',
-																					pin_horapedido = '" . $hora_corrente . "', 
-																					pin_est_codigo = '" . $EstabCod . "'
-																			where pin_codinterno = '" . $pin_codinterno . "'";
+                                                                $periodoValidade = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+
+                                                                $sql = "
+                                                                    UPDATE pins SET
+                                                                        pin_status      = '3',
+                                                                        pin_celular     = '" . str_replace('-', '', $ug_cel) . "',
+                                                                        pin_ddd         = $ug_cel_ddd,
+                                                                        pin_datavenda   = '$data_corrente',
+                                                                        pin_datapedido  = '$data_corrente',
+                                                                        pin_horavenda   = '$hora_corrente',
+                                                                        pin_horapedido  = '$hora_corrente',
+                                                                        pin_est_codigo  = '$EstabCod',
+                                                                        pin_validade    = CURRENT_DATE + $periodoValidade
+                                                                    WHERE pin_codinterno = '$pin_codinterno'
+                                                                ";
                                                                 $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao atualizar tabela de pins (3212)." . PHP_EOL;
@@ -1601,8 +1600,8 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         // Atualiza o serial do pin no modelo vendido
                                                         if ($msg == "") {
                                                                 $sql = "update tb_venda_games_modelo set 
-																				vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_codinterno . ",' 
-																		where vgm_id = '" . $vgm_id . "'";
+									vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_codinterno . ",' 
+									where vgm_id = '" . $vgm_id . "'";
                                                                 $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao atualizar pin no modelo vendido." . PHP_EOL;
@@ -1614,7 +1613,6 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 if (!$ret)
                                                                         $msg = "Erro ao associar pin no modelo vendido." . PHP_EOL;
                                                         }
-
                                                 }
 
                                                 // Alawar
@@ -1623,9 +1621,9 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         if ($vgm_opr_codigo == $GLOBALS['opr_codigo_Alawar']) {
                                                                 gravaLog_Debug("IS ALAWAR - pin_codigo: '$pin_codigo'" . PHP_EOL);
 
-                                                                $certificateID = $pin_codigo;	//'1919823594123';
-                                                                $email = $ug_email;	//'fabioss@e-prepag.com.br';
-                                                                $gameID = $vgm_game_id_alawar;	//'3876'; // Farm Frenzy: Ancient Rome 
+                                                                $certificateID = $pin_codigo;        //'1919823594123';
+                                                                $email = $ug_email;        //'fabioss@e-prepag.com.br';
+                                                                $gameID = $vgm_game_id_alawar;        //'3876'; // Farm Frenzy: Ancient Rome 
                                                                 $activationKeyAlawar = '';
                                                                 $errorsAlawar = '';
 
@@ -1637,7 +1635,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                         $msg = $errorsAlawarMsg;
                                                                 } else {
                                                                         $activationKeyAlawar = $objalawar->getGameActivationKey();
-                                                                        $errorsAlawarMsg = $ERRORS_ALAWAR_ID["NO_ERROR"];
+                                                                        if (isset($ERRORS_ALAWAR_ID["NO_ERROR"])) {
+                                                                                $errorsAlawarMsg = $ERRORS_ALAWAR_ID["NO_ERROR"];
+                                                                        } else {
+                                                                                $errorsAlawarMsg = "";
+                                                                        }
                                                                 }
 
                                                                 gravaLog_Debug("activationKeyAlawar: '$activationKeyAlawar', errorsAlawarMsg: '$errorsAlawarMsg'" . PHP_EOL . PHP_EOL);
@@ -1646,8 +1648,8 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 }
                                                         }
                                                 }
-                                        }//end for
-                                }//end if($vgm_pin_request == 0)
+                                        } //end for
+                                } //end if($vgm_pin_request == 0)
                         }
                 }
         }
@@ -1697,7 +1699,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         }
 
         return $msg;
-}//end function processaVendaGames
+} //end function processaVendaGames
 
 function processaEmailVendaGames($venda_id, $parametros)
 {
@@ -1738,6 +1740,8 @@ function processaEmailVendaGames($venda_id, $parametros)
 
                         // Não envia emails para vendas de integração
                         if (strlen($vg_integracao_parceiro_origem_id) > 0) {
+                                if (!isset($vg_id))
+                                        $vg_id = "";
                                 $msg = "Não enviar emails para vendas de Integração (vg_id: $vg_id, store_id: '$vg_integracao_parceiro_origem_id')." . PHP_EOL;
                         }
                 }
@@ -1800,8 +1804,6 @@ function processaEmailVendaGames($venda_id, $parametros)
                 $vgm_opr_codigo = $rs_venda_modelos_campeonato_row['vgm_opr_codigo'];
                 $vgm_nome_produto = $rs_venda_modelos_campeonato_row['vgm_nome_produto'];
                 $vgm_valor = $rs_venda_modelos_campeonato_row['vgm_valor'];
-
-
         } else {
 
                 if ($msg == "") {
@@ -1900,16 +1902,15 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                                         );
                                                                         $rs_api = new classGenerateeGift($parametrosRequest);
                                                                         $rs_api->registroPedido($dadosPedido);
-                                                                }//end for
+                                                                } //end for
                                                                 continue;
-                                                        }//end if(registroBHN::verificaExisteRegistro($dadosPedido))
+                                                        } //end if(registroBHN::verificaExisteRegistro($dadosPedido))
 
                                                 }
-
-                                        }//end if($vgm_pin_request == 1)
+                                        } //end if($vgm_pin_request == 1)
                                         //FIM Para produtos BHN
 
-                                }//end if($vgm_pin_request > 0)
+                                } //end if($vgm_pin_request > 0)
 
                                 //verifica se o(s) pin(s) foram associados ao modelo
                                 if ($vgm_pin_codinterno == "") {
@@ -1959,14 +1960,14 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                         $opr_codigo = $pgpin['opr_codigo'];
                                                         $s_opr_codigo .= (($s_opr_codigo) ? "," : "") . $opr_codigo;
 
-                                                        if ($opr_codigo == 44) {	//	opr_codigo = 44 -> 'Axeso5'
+                                                        if ($opr_codigo == 44) {        //	opr_codigo = 44 -> 'Axeso5'
                                                                 // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
                                                                 $pin_serial = $pgpin['pin_serial'];
                                                                 $case_serial = $pgpin['case_serial'];
                                                         }
 
                                                         // Alawar - obtem o activation key ou indica o erro com o certificado
-                                                        if ($vgm_opr_codigo == $GLOBALS['opr_codigo_Alawar']) {	// 55  
+                                                        if ($vgm_opr_codigo == $GLOBALS['opr_codigo_Alawar']) {        // 55  
 
                                                                 $sql_alawar = "select pa_activation_key from pins_alawar where pa_certificate_id = '$case_serial'";
 
@@ -1986,40 +1987,40 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                         // Formatação de título de senha
                                                         $labSenha = "PIN";
                                                         if ($opr_codigo == 16)
-                                                                $labSenha = "Habbo Crédito";	// Habbo
+                                                                $labSenha = "Habbo Crédito";        // Habbo
                                                         if ($opr_codigo == 38)
-                                                                $labSenha = "Senha (Código de Presente)";	// Stardoll
+                                                                $labSenha = "Senha (Código de Presente)";        // Stardoll
                                                         if ($opr_codigo == 37)
-                                                                $labSenha = "Cód de segurança";	// Softnyx
+                                                                $labSenha = "Cód de segurança";        // Softnyx
                                                         if ($opr_codigo == 31)
-                                                                $labSenha = "";	// GPotato
+                                                                $labSenha = "";        // GPotato
                                                         if ($opr_codigo == 31)
-                                                                $labSenhaExtra = " (Nro Série + Senha)";	// GPotato
+                                                                $labSenhaExtra = " (Nro Série + Senha)";        // GPotato
                                                         if ($opr_codigo == 33)
-                                                                $labSenha = "PIN Password";	// NDoors
+                                                                $labSenha = "PIN Password";        // NDoors
                                                         if ($opr_codigo == 44)
-                                                                $labSenha = "Serial";	// Axeso5
+                                                                $labSenha = "Serial";        // Axeso5
 
                                                         // Formatação de título do No de Serie
                                                         $labSerie = "No Série";
                                                         if ($opr_codigo == 37)
-                                                                $labSerie = "No do cartão";	// Softnyx
+                                                                $labSerie = "No do cartão";        // Softnyx
                                                         if ($opr_codigo == 44)
-                                                                $labSerie = "Pin";	// Axeso5
+                                                                $labSerie = "Pin";        // Axeso5
                                                         if ($opr_codigo == 34)
-                                                                $labSerie = "Código";	// Webzen
+                                                                $labSerie = "Código";        // Webzen
                                                         if ($opr_codigo == 74 || $opr_codigo == 75 || $opr_codigo == 76 || $opr_codigo == 77)
                                                                 $labSerie = "Código"; //Eletronic Arts
 
                                                         // Formatação do Serial
                                                         if ($opr_codigo == 13)
-                                                                $case_serial = wordwrap($case_serial, 4, " ", true);	// Ongame
+                                                                $case_serial = wordwrap($case_serial, 4, " ", true);        // Ongame
                                                         if ($opr_codigo == 31)
-                                                                $labSerie = "Pin Eletrônico";	// GPotato
+                                                                $labSerie = "Pin Eletrônico";        // GPotato
                                                         if ($opr_codigo == 33)
-                                                                $labSerie = "PIN Code";	// NDoors
+                                                                $labSerie = "PIN Code";        // NDoors
                                                         if ($opr_codigo == 125)
-                                                                $labSenha = "Habbo Crédito";	// Habbo 2
+                                                                $labSenha = "Habbo Crédito";        // Habbo 2
                                                 }
                                         }
 
@@ -2035,7 +2036,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                                                             <td width='15'><font face='arial' color='#304D77'>:</font></td>
                                                                                             <td><font face='arial' color='#304D77'>" . number_format($vgm_valor, 2, ',', '.') . "<font></td>
                                                                                     </tr>";
-                                                if ($opr_codigo == 31) {	// GPotato
+                                                if ($opr_codigo == 31) {        // GPotato
                                                         $aux_lista_prods .= "<tr>
                                                                                             <td><font face='arial' color='#304D77' size='4'><b>" . $labSerie . "</b></font></td>
                                                                                             <td width='15'><font face='arial' color='#304D77'>:</font></td>
@@ -2108,7 +2109,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                                 $vg_ug_id = $rs_venda_modelos_row['vg_ug_id'];
                                 $vgm_opr_codigo_list .= ((strlen($vgm_opr_codigo_list) > 0) ? "," : "") . $rs_venda_modelos_row['vgm_opr_codigo'];
                                 if ($rs_venda_modelos_row['vgm_opr_codigo'] == "49")
-                                        $opr_codigo_contains_EPP_Cash = true;	// marca a venda como contendo EPP Cash
+                                        $opr_codigo_contains_EPP_Cash = true;        // marca a venda como contendo EPP Cash
                                 $vgm_nome_produto = $rs_venda_modelos_row['vgm_nome_produto'];
                                 $vgm_ogp_id = $rs_venda_modelos_row['vgm_ogp_id'];
                                 $blEmailHabbo = (($rs_venda_modelos_row['vgm_opr_codigo'] == 16) ? true : false);
@@ -2142,8 +2143,8 @@ function processaEmailVendaGames($venda_id, $parametros)
                                         //Para produtos BHN
                                         if ($vgm_pin_request == 1) {
                                                 $vetorIDsProdsRequest[$vgm_ogp_id] = 1;
-                                        }//end if($vgm_pin_request == 1)
-                                }//end if($vgm_pin_request > 0) 
+                                        } //end if($vgm_pin_request == 1)
+                                } //end if($vgm_pin_request > 0) 
 
 
                         }
@@ -2157,8 +2158,8 @@ function processaEmailVendaGames($venda_id, $parametros)
                         if (count($vetorIDsProdsRequest) > 0) {
                                 foreach ($vetorIDsProdsRequest as $key => $value) {
                                         $aux_lista_prods .= getInstrucoesPinRequest($key);
-                                }//end foreach
-                        }//end if(count($vetorIDsProdsRequest) > 0) 
+                                } //end foreach
+                        } //end if(count($vetorIDsProdsRequest) > 0) 
 
                         // Obtem Promoções	==============================================
                         $prom_email = $ug_email;
@@ -2201,7 +2202,6 @@ function processaEmailVendaGames($venda_id, $parametros)
                 }
 
                 echo $objEnvioEmailAutomatico->MontaEmailEspecifico();
-
         }
 
         //VENDA GAMES
@@ -2236,7 +2236,7 @@ function processaEmailVendaGames($venda_id, $parametros)
         fclose($fileLog);
 
         return $msg;
-}//end function processaEmailVendaGames
+} //end function processaEmailVendaGames
 
 function enviaEmailFormatadoComProdutos($venda_id, $parametros, $cc, $bcc, $subjectEmail, $mensagem)
 {
@@ -2294,7 +2294,6 @@ function cancelaVendaGames($venda_id, $parametros)
                         $ret = SQLexecuteQuery($sql);
                         if (!$ret)
                                 $msg = "Erro ao cancelar pagamentos de venda (venda foi cancelada)." . PHP_EOL;
-
                 }
         }
 
@@ -2444,28 +2443,28 @@ function cancelaVendasEmPedidoEfetuado()
                         $vg_pagto_tipo = $rs_venda_venc_row['vg_pagto_tipo'];
 
                         switch ($vg_pagto_tipo) {
-                                case $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']:	//   5
+                                case $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']:        //   5
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']:	//   6
+                                case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']:        //   6
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']:	//   9
+                                case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']:        //   9
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']:	//   10
+                                case $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']:        //   10
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']:	//   13
+                                case $GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']:        //   13
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC']:	//   11
+                                case $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC']:        //   11
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC']:	//   12
+                                case $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC']:        //   12
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
-                                case $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']:	//   999
+                                case $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']:        //   999
                                         $parametros['usuario_obs'] = "Seu pagamento não foi realizado dentro do prazo indicado (" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos)." . PHP_EOL;
                                         break;
 
@@ -2541,7 +2540,7 @@ function cancelaVendasEmPedidoEfetuado()
                                 (
                                 " . getSQLWhereParaVendaPagtoOnline(true) . "
                                 ) ";
-        echo "CANCELA vendas com pagamentos CIELO onde o pagamento está com status -1" . PHP_EOL;	//"$sql".PHP_EOL;
+        echo "CANCELA vendas com pagamentos CIELO onde o pagamento está com status -1" . PHP_EOL;        //"$sql".PHP_EOL;
         $ret_cielo = SQLexecuteQuery($sql);
         if (!$ret_cielo || pg_num_rows($ret_cielo) == 0) {
                 $msg .= "Nenhuma venda encontrada com pagamento CIELO cancelado " . PHP_EOL;
@@ -2566,7 +2565,7 @@ function conciliacaoAutomaticaBoleto()
 {
         global $cReturn, $cSpaces, $sFontRedOpen, $sFontRedClose;
 
-        $bDebug = false;	// true;
+        $bDebug = false;        // true;
 
         if ($bDebug || true) {
                 $time_start_stats = getmicrotime();
@@ -2589,10 +2588,10 @@ function conciliacaoAutomaticaBoleto()
         $today_minus_5_days = date("Y-m-d H:i:s", mktime(0, 0, 0, $m, $d - 5, $y));
 
         //Procura boletos em aberto nos últimos 5 dias
-        $sql = "select b.* ";	// "--, vg.*  "
+        $sql = "select b.* ";        // "--, vg.*  "
         $sql .= "from bancos_financeiros bf, boletos_pendentes b ";
         $sql .= "where (bol_banco = bco_codigo) and (bco_rpp = 1) and bol_aprovado = 0 ";
-        $sql .= " and bol_data>='" . $today_minus_5_days . "' ";		// ".date("Y-m-d")."
+        $sql .= " and bol_data>='" . $today_minus_5_days . "' ";                // ".date("Y-m-d")."
         $sql .= " and (substr(bol_documento,1,1)='2' or substr(bol_documento,1,1)='3') ";
         $sql .= " order by bol_codigo desc ";
 
@@ -2603,7 +2602,7 @@ function conciliacaoAutomaticaBoleto()
         if ($bDebug)
                 echo $sql . $cReturn;
         if ($bDebug)
-                echo "Elapsed time (Procura boleto " . $n_boletos . "): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
+                echo "Elapsed time (Procura boleto " . (isset($n_boletos) ? $n_boletos : "") . "): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
 
         $rs_bol = SQLexecuteQuery($sql);
         if ($bDebug)
@@ -2667,7 +2666,6 @@ function conciliacaoAutomaticaBoleto()
                                 } else {
                                         $msg = "Nenhuma venda encontrada." . $cReturn;
                                 }
-
                         }
                         if ($bDebug)
                                 echo "  >> pg_num_rows(rs_venda): " . pg_num_rows($rs_venda) . $cReturn . PHP_EOL;
@@ -2756,7 +2754,6 @@ function conciliacaoAutomaticaBoleto()
                                                 default:
                                                         $msg .= "Erro#: código de boleto inválido (Bradesco): '" . substr($vg_pagto_num_docto, 0, 1) . "' (vg_pagto_num_docto: " . $vg_pagto_num_docto . ") " . $cReturn;
                                                         break;
-
                                         }
                                 } elseif ($vg_pagto_banco == $GLOBALS['BOLETO_MONEY_ITAU_COD_BANCO']) {
 
@@ -2770,7 +2767,7 @@ function conciliacaoAutomaticaBoleto()
                                         else {
                                                 $valor_pago_no_boleto = ($bol_valor - $GLOBALS['BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_2']);
                                                 // Excluir após testes => $taxas = 0;
-                                        }//end else do if($total_geral  < $GLOBALS['RISCO_GAMERS_VALOR_MIN_PARA_TAXA'])
+                                        } //end else do if($total_geral  < $GLOBALS['RISCO_GAMERS_VALOR_MIN_PARA_TAXA'])
 
                                         switch (substr($vg_pagto_num_docto, 0, 1)) {
                                                 case '2':
@@ -2783,7 +2780,6 @@ function conciliacaoAutomaticaBoleto()
                                                         if (abs($valor_pago_no_boleto - $valor_venda) < 0.000001) {
                                                                 // OK
                                                                 echo "    Valor CORRETO Boleto 2 - OK1 >> vg_id: $vg_id, bol_valor+custo_itau: " . ($bol_valor + $valor_pago_no_boleto) . " (" . $bol_valor . ", " . $valor_pago_no_boleto . "), total+taxas: " . ($total_geral + $taxas) . " (" . $total_geral . ", " . $taxas . ")" . $cReturn;
-
                                                         } else {
                                                                 $msg .= "Erro_2: valor do boleto inválido Money (Itaú)(vg_id: $vg_id): bol_valor+custo_itau: " . ($bol_valor + $valor_pago_no_boleto) . " (" . $bol_valor . ", " . $valor_pago_no_boleto . "), total+taxas: " . ($total_geral + $taxas) . " (" . $total_geral . ", " . $taxas . ")" . $cReturn;
                                                                 $msg .= "  [Total boleto: " . $bol_valor . "]" . $cReturn;
@@ -2809,9 +2805,7 @@ function conciliacaoAutomaticaBoleto()
                                                 default:
                                                         $msg .= "Erro#: código de boleto inválido (Itaú)(vg_id: $vg_id): '" . substr($vg_pagto_num_docto, 0, 1) . "' (vg_pagto_num_docto: " . $vg_pagto_num_docto . ") " . $cReturn;
                                                         break;
-
                                         }
-
                                 } elseif ($vg_pagto_banco == $GLOBALS['BOLETO_MONEY_BANCO_BANESPA_COD_BANCO']) {
 
                                         if ($bDebug)
@@ -2838,8 +2832,7 @@ function conciliacaoAutomaticaBoleto()
                                                 default:
                                                         $msg .= "Erro#: código de boleto inválido (Santander): '" . substr($vg_pagto_num_docto, 0, 1) . "' (vg_pagto_num_docto: " . $vg_pagto_num_docto . ") " . $cReturn;
                                                         break;
-
-                                        }//end switch
+                                        } //end switch
 
                                 } else {
                                         $msg .= "Erro?: Banco não suportado: " . $vg_pagto_banco . $cReturn;
@@ -2868,9 +2861,11 @@ function conciliacaoAutomaticaBoleto()
                                         if ($msgConcilia == "") {
                                                 // Teste de valores passou -> venda está paga aqui, 
                                                 //		na conciliação de integração faz a notificação e a venda já precisa estar completa para responder corretamente
+                                                $parametrosUltimoStatus = isset($parametros['ultimo_status_obs']) ? $parametros['ultimo_status_obs'] : "";
+
                                                 $sql = "update tb_venda_games set 
                                                         vg_bol_codigo = " . SQLaddFields($bol_codigo, "") . ",
-                                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                                        vg_ultimo_status_obs = " . SQLaddFields($parametrosUltimoStatus, "s") . ",
                                                         vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
                                                         where vg_id = " . $vg_id;
                                                 echo " DUMMY INT 1 $sql" . PHP_EOL . " ";
@@ -2878,7 +2873,6 @@ function conciliacaoAutomaticaBoleto()
                                                 if (!$ret)
                                                         $msg = "Erro ao atualizar venda." . PHP_EOL;
                                                 grava_log_integracao_tmp("Integração Debug Cont 1 (ip_id: $ip_id): " . date("Y-m-d H:i:s") . PHP_EOL . "$sql" . PHP_EOL . " (msg: '$msg')" . PHP_EOL);
-
                                         } else {
                                                 echo "ERRO Concilia (A2): $msgConcilia" . $cReturn;
                                         }
@@ -2969,7 +2963,6 @@ function conciliacaoAutomaticaBoleto()
                                                                 $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Boleto (Novo esquema) (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                                                 grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (1): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
                                                                 echo "  ==  $s_msg" . $cReturn . print_r($post_parameters, true) . $cReturn;
-
                                                         }
                                                 }
                                         } else {
@@ -3043,7 +3036,6 @@ function conciliacaoAutomaticaBoleto()
                                                         $msg .= "Envio de email: " . $msgConcilia;
                                                 }
                                         }
-
                                 } else {
                                         // Processamento para integração
                                         // Posteriormente -> envia email para usuário
@@ -3064,11 +3056,11 @@ function conciliacaoAutomaticaBoleto()
                         }
 
                         echo "  +++ Termina boleto " . $bol_documento . " " . str_repeat("+", 50) . PHP_EOL . PHP_EOL;
-                }	// Para cada boleto
+                }        // Para cada boleto
 
         } else {
                 if ($bDebug)
-                        echo "Sem boletos " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . " (boleto " . $n_boletos . ")" . $cReturn . "===============================" . $cReturn;
+                        echo "Sem boletos " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . " (boleto " . (isset($n_boletos) ? $n_boletos : "") . ")" . $cReturn . "===============================" . $cReturn;
         }
 
 
@@ -3079,7 +3071,6 @@ function conciliacaoAutomaticaBoleto()
         $msg1 = $header . $msg1 . "------------------------------------------------------------------------" . $cReturn;
 
         return $msg1;
-
 }
 
 // Não usa mais
@@ -3088,7 +3079,6 @@ function conciliacaoAutomaticaBoleto_antiga()
 {
 
         return "conciliacaoAutomaticaBoleto_antiga() - desabilitada " . date('Y-m-d H:i:s') . "";
-
 }
 
 
@@ -3110,7 +3100,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                 echo "Elapsed time : " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
-        $nminutes = 1440;	// Por agora 1 dia, depois apenas 90 min
+        $nminutes = 1440;        // Por agora 1 dia, depois apenas 90 min
         echo PHP_EOL . "========================================================================" . PHP_EOL;
         echo "Prepara conciliação de pagamentos online (registros com idvenda>0 e não processados nos últimos " . $nminutes . " minutos, desde " . date('Y-m-d H:i:s', strtotime("-" . $nminutes . " minutes")) . ")" . PHP_EOL;
         // Prepara conciliação de pagamentos online
@@ -3125,15 +3115,15 @@ function conciliacaoAutomaticaPagamentoOnline()
 
         // status=1 and 
         // Apenas para vendas que não são integração
-//		$sql .= "and vg_integracao_parceiro_origem_id is null ";
+        //		$sql .= "and vg_integracao_parceiro_origem_id is null ";
 
         // Opção 1 - não precissa limitar por data - apenas os pagtos com status_processed=0 serão retornados, após 90mins eles são cancelados.
         //	se houver um descancelamento de venda o pagto correspondente vai aparecer aqui
 
         // Opção 1 - Para processar normalmente
-//		$sql .= " and (pgt.datainicio between '".$date_ini."' and '".$date_end."') ";	
+        //		$sql .= " and (pgt.datainicio between '".$date_ini."' and '".$date_end."') ";	
         // Opção 2 - Para incluir algum pagamento antigo descancelado
-//		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
+        //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
 
         $rs_total = SQLexecuteQuery($sql);
         if ($bDebug) {
@@ -3153,7 +3143,7 @@ function conciliacaoAutomaticaPagamentoOnline()
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
-        echo $cReturn . $cReturn . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . $cReturn;	//."$sql".$cReturn;
+        echo $cReturn . $cReturn . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . $cReturn;        //."$sql".$cReturn;
 
         if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
                 $msg = "Nenhuma transação encontrada." . $cReturn;
@@ -3227,7 +3217,7 @@ function conciliacaoAutomaticaPagamentoOnline()
 
                                                 // começa aqui nova função getSondaBanco()
 
-                                                $dataconfirma = date("Y-m-d H:i:s");		// "CURRENT_TIMESTAMP";	// 
+                                                $dataconfirma = date("Y-m-d H:i:s");                // "CURRENT_TIMESTAMP";	// 
                                                 $s_sonda = "????";
                                                 //$valtotal = 0;
                                                 unset($aline5);
@@ -3294,13 +3284,12 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                                 echo " =====> Trecho 2 " . $aline9['dataPagamento'] . PHP_EOL;
                                                                 if (strpos($aline9['dataPagamento'], date('Y')) == 4) {
                                                                         $dataconfirma = "'" . substr($aline9['dataPagamento'], 4, 4) . "-" . substr($aline9['dataPagamento'], 2, 2) . "-" . substr($aline9['dataPagamento'], 0, 2) . "'";
-                                                                }//end if(strpos($aline9['dataPagamento'], date('Y')) == 4) 
+                                                                } //end if(strpos($aline9['dataPagamento'], date('Y')) == 4) 
                                                                 else {
                                                                         $dataconfirma = "'" . substr($aline9['dataPagamento'], 0, 4) . "-" . substr($aline9['dataPagamento'], 4, 2) . "-" . substr($aline9['dataPagamento'], 6, 2) . "'";
                                                                 }
                                                                 echo " =====> DEPOIS Trecho 2 " . $dataconfirma . PHP_EOL;
                                                         }
-
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
                                                         $pedido = str_pad($rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
 
@@ -3315,7 +3304,6 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                                 //     [dtPag] => 16092009
                                                                 $dataconfirma = "'" . substr($dtPag, 4, 4) . "-" . substr($dtPag, 2, 2) . "-" . substr($dtPag, 0, 2) . "'";
                                                         }
-
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']) {
 
                                                         $pag_status = getSondaPINsEPP($rs_transacoes_row['numcompra'], $dtPag);
@@ -3328,7 +3316,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_HIPAY_ONLINE']) {
 
-                                                        $pag_status = "";	//getSondaHipay($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                        $pag_status = "";        //getSondaHipay($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_B = ($rs_transacoes_row['status'] == 3) ? true : false;
 
 
@@ -3339,7 +3327,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PAYPAL_ONLINE']) {
 
-                                                        $pag_status = "";	//getSondaPayPal($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                        $pag_status = "";        //getSondaPayPal($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_P = ($rs_transacoes_row['status'] == 3) ? true : false;
 
 
@@ -3350,7 +3338,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']) {
 
-                                                        $pag_status = "";	//getSondaItau($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                        $pag_status = "";        //getSondaItau($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_Z = ($rs_transacoes_row['status'] == 3) ? true : false;
 
 
@@ -3399,27 +3387,27 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
                                                         $s_sync = (($b_sonda_A) ? "NO SYNC" : "");
                                                         // No Itau ajusta 'A' -> 10 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'];
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'];
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']) {
                                                         $s_sync = (($b_sonda_E) ? "NO SYNC" : "");
                                                         // No Banco E-Prepag ajusta 'E' -> 998 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']) {
                                                         $s_sync = (($b_sonda_Z) ? "NO SYNC" : "");
                                                         // No Banco E-Prepag ajusta 'Z' -> 999 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC']) {
                                                         $s_sync = (($b_sonda_B) ? "NO SYNC" : "");
                                                         // No Banco HiPay ajusta 'B' -> 11 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC']) {
                                                         $s_sync = (($b_sonda_P) ? "NO SYNC" : "");
                                                         // No Banco Paypal ajusta 'P' -> 12 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if (b_IsPagtoCielo($rs_transacoes_row['iforma'])) {
                                                         $s_sync = (($b_sonda_C) ? "NO SYNC" : "");
@@ -3431,7 +3419,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                 // até aqui nova função getSondaBanco()
 
                                                 // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
-                                                if ($s_sync == "NO SYNC") {			/////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                                if ($s_sync == "NO SYNC") {                        /////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                                                         if ($bDebug) {
                                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 5a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -3441,7 +3429,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         if ($msg == "") {
                                                                 $sql = "BEGIN TRANSACTION ";
                                                                 $ret = SQLexecuteQuery($sql);
-                                                                $ret = true;												/////////////////////
+                                                                $ret = true;                                                                                                /////////////////////
                                                                 if (!$ret)
                                                                         $msg = "Erro ao iniciar transação." . PHP_EOL;
                                                         }
@@ -3488,7 +3476,6 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                                         $msg = "Erro ao comitar transação." . PHP_EOL;
 
                                                                 $msg_sonda = "PROCESSADO POR SONDA";
-
                                                         } else {
                                                                 $sql = "ROLLBACK TRANSACTION ";
                                                                 $ret = SQLexecuteQuery($sql);
@@ -3503,14 +3490,12 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         if ($bDebug) {
                                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 5b): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                                         }
-
                                                 } else {
                                                         $total_pagto = $rs_transacoes_row['total'] / 100 - $rs_transacoes_row['taxas'];
                                                         $total_pagtos_pendente += $total_pagto;
                                                         $leading_zeros = (($total_pagto < 1000) ? (($total_pagto < 100) ? "00" : "0") : "");
                                                         echo "Não Processado por sonda: forma:" . $rs_transacoes_row['iforma'] . ", numcompra: " . $rs_transacoes_row['numcompra'] . " - IDVenda: " . str_pad($rs_transacoes_row['idvenda'], 8, '0', STR_PAD_LEFT) . " - " . $rs_transacoes_row['datainicio'] . " - R\$" . $leading_zeros . number_format(($total_pagto), 2, '.', '.') . " (NO SYNC) [" . number_format(getmicrotime() - $time_start_stats0_in, 2, '.', '.') . " s] [" . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . " s]" . $cReturn;
                                                 }
-
                                         }  // bloqueio para evitar consulta ao MUP
 
                                 } else {
@@ -3520,7 +3505,6 @@ function conciliacaoAutomaticaPagamentoOnline()
                         else {
                                 echo "Não processado: idvenda=0." . $cReturn . "numcompra: " . $rs_transacoes_row['numcompra'] . "- " . $rs_transacoes_row['datainicio'] . $cReturn;
                         }
-
                 } // End while loop 
 
                 if (isset($bank_sonda)) {
@@ -3581,8 +3565,6 @@ function conciliacaoAutomaticaPagamentoOnline()
                         // Save bank block configuration
                         $bank_sonda->save_banks_sonda_array();
                 }
-
-
         } // End if(rs)
         echo "Tempo médio de processamento: " . number_format((getmicrotime() - $time_start_stats0) / (($irows > 0) ? $irows : 1), 2, '.', '.') . " s/processamento (WSA)" . $cReturn;
         echo "Total pagamentos pendentes: R\$" . number_format($total_pagtos_pendente, 2, '.', '.') . " em $npags pagamentos (WSATP)" . $cReturn;
@@ -3680,7 +3662,6 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                 $vgm_ogp_id = $rs_venda_modelos_row['vgm_ogp_id'];
                                                 echo "  TESTA PRODUTO EM INTEGRAÇÃO PAG >> ['" . $rs_venda_modelos_row['vg_integracao_parceiro_origem_id'] . "'] ->  [vg_id: '" . $rs_venda_modelos_row['vg_id'] . "'; vgm_ogp_id: '$vgm_ogp_id']- qtde: '$qtde', valor: '$valor' " . $cReturn;
                                         }
-
                                 }
                         }
                         if ($bDebug) {
@@ -3848,7 +3829,6 @@ function conciliacaoAutomaticaPagamentoOnline()
 
                                                                 $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento Online (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                                                 grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-
                                                         }
                                                 }
                                         }
@@ -3863,7 +3843,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                 if ($bDebug) {
                                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (D): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                 }
-                        }	// Obtem vg_pagto_num_docto
+                        }        // Obtem vg_pagto_num_docto
                 } // Para cada venda
         }
 
@@ -3891,7 +3871,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                         $pag_status = $rs_venda_pendentes_row['status'];
                         $vg_ultimo_status = $rs_venda_pendentes_row['vg_ultimo_status'];
 
-                        if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {	// 3 and "not vgm_pin_codinterno=''"	(from query) 
+                        if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {        // 3 and "not vgm_pin_codinterno=''"	(from query) 
                                 $sql = "update tb_venda_games
                                                 set vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " 
                                                 where vg_id = " . $vg_id_pendente;
@@ -3917,7 +3897,6 @@ function conciliacaoAutomaticaPagamentoOnline()
         gravaLog_MonitorGamer($smonitor);
 
         return $msg;
-
 }
 
 
@@ -3939,7 +3918,6 @@ function gravaLog_MonitorPedidosDuplicados($mensagem)
         } catch (Exception $e) {
                 echo "Error(I6) writing monitor file [" . date("Y-m-d H:i:s") . "]: " . $e->getMessage() . PHP_EOL;
         }
-
 }
 
 function gravaLog_TMP_conciliacao($mensagem)
@@ -3956,7 +3934,6 @@ function gravaLog_TMP_conciliacao($mensagem)
                 fwrite($handle, $mensagem);
                 fclose($handle);
         }
-
 }
 
 function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
@@ -3977,7 +3954,6 @@ function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
         } catch (Exception $e) {
                 echo "Error(6) writing monitor file [" . date("Y-m-d H:i:s") . "]: " . $e->getMessage() . PHP_EOL;
         }
-
 }
 
 
@@ -4051,7 +4027,7 @@ function getInstrucoesPinRequest($ogp_id)
                 <div style='font: normal 10px arial, sans-serif;text-align: justify;font-weight: bold;top: 10px;'>Detalhes do Resgate</div><div style='font: normal 10px arial, sans-serif;text-align: justify;'>" . $rs_produto_row['ogp_detalhes_utilizacao'] . "</div>
                 <div style='font: normal 10px arial, sans-serif;text-align: justify;font-weight: bold;top: 10px;'>Termos e Condições</div><div style='font: normal 10px arial, sans-serif;text-align: justify;'>" . $rs_produto_row['ogp_termos_condicoes'] . "</div>";
         return $msg;
-}//end function getInstrucoesPinRequest($ogp_id)
+} //end function getInstrucoesPinRequest($ogp_id)
 
 function isVendaIntegracao($venda_id, &$vg_integracao_parceiro_origem_id)
 {
@@ -4121,7 +4097,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                 echo "Elapsed time : " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
-        $nminutes = 1440;	// Por agora 1 dia, depois apenas 90 min
+        $nminutes = 1440;        // Por agora 1 dia, depois apenas 90 min
         echo PHP_EOL . "========================================================================" . PHP_EOL;
         echo "Prepara conciliação de pagamentos online (registros com idvenda>0 e não processados nos últimos " . $nminutes . " minutos, desde " . date('Y-m-d H:i:s', strtotime("-" . $nminutes . " minutes")) . ")" . PHP_EOL;
         // Prepara conciliação de pagamentos online
@@ -4163,7 +4139,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
-        echo $cReturn . $cReturn . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . $cReturn;	//."$sql".$cReturn;
+        echo $cReturn . $cReturn . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . $cReturn;        //."$sql".$cReturn;
 
         if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
                 $msg = "Nenhuma transação encontrada." . $cReturn;
@@ -4236,7 +4212,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                                                 // começa aqui nova função getSondaBanco()
 
-                                                $dataconfirma = date("Y-m-d H:i:s");		// "CURRENT_TIMESTAMP";	// 
+                                                $dataconfirma = date("Y-m-d H:i:s");                // "CURRENT_TIMESTAMP";	// 
                                                 $s_sonda = "????";
                                                 //$valtotal = 0;
                                                 unset($aline5);
@@ -4299,7 +4275,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                 }
                                                                 echo "=========> DEPOIS Trecho 1 " . $dataconfirma . PHP_EOL;
                                                         }
-
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
                                                         $pedido = str_pad($rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
 
@@ -4312,7 +4287,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                 //     [dtPag] => 16092009
                                                                 $dataconfirma = "'" . substr($dtPag, 4, 4) . "-" . substr($dtPag, 2, 2) . "-" . substr($dtPag, 0, 2) . "'";
                                                         }
-
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']) {
                                                         $pag_status = getSondaPINsEPP($rs_transacoes_row['numcompra'], $dtPag);
                                                         $b_sonda_E = ($pag_status == 3) ? true : false;
@@ -4322,7 +4296,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                 $dataconfirma = "'" . date("Y-m-d") . "'";
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_HIPAY_ONLINE']) {
-                                                        $pag_status = "";	//getSondaHipay($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                        $pag_status = "";        //getSondaHipay($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_B = ($rs_transacoes_row['status'] == 3) ? true : false;
                                                         if ($b_sonda_B) {
                                                                 $s_sonda = (($b_sonda_B) ? "OK" : "none");
@@ -4330,7 +4304,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                 $dataconfirma = "'" . date("Y-m-d") . "'";
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PAYPAL_ONLINE']) {
-                                                        $pag_status = "";	//getSondaPayPal($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                        $pag_status = "";        //getSondaPayPal($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_P = ($rs_transacoes_row['status'] == 3) ? true : false;
                                                         if ($b_sonda_P) {
                                                                 $s_sonda = (($b_sonda_P) ? "OK" : "none");
@@ -4338,7 +4312,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                 $dataconfirma = "'" . date("Y-m-d") . "'";
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']) {
-                                                        $pag_status = "";	//getSondaItau($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                        $pag_status = "";        //getSondaItau($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_Z = ($rs_transacoes_row['status'] == 3) ? true : false;
                                                         if ($b_sonda_Z) {
                                                                 $s_sonda = (($b_sonda_Z) ? "OK" : "none");
@@ -4384,27 +4358,27 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
                                                         $s_sync = (($b_sonda_A) ? "NO SYNC" : "");
                                                         // No Itau ajusta 'A' -> 10 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'];
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'];
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']) {
                                                         $s_sync = (($b_sonda_E) ? "NO SYNC" : "");
                                                         // No Banco E-Prepag ajusta 'E' -> 998 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']) {
                                                         $s_sync = (($b_sonda_Z) ? "NO SYNC" : "");
                                                         // No Banco E-Prepag ajusta 'Z' -> 999 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC']) {
                                                         $s_sync = (($b_sonda_B) ? "NO SYNC" : "");
                                                         // No Banco HiPay ajusta 'B' -> 11 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC']) {
                                                         $s_sync = (($b_sonda_P) ? "NO SYNC" : "");
                                                         // No Banco Paypal ajusta 'P' -> 12 (usa numerico em tb_venda_games)
-//							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];	 
+                                                        //							$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];	 
                                                         $vg_pagto_tipo = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
                                                 } else if (b_IsPagtoCielo($rs_transacoes_row['iforma'])) {
                                                         $s_sync = (($b_sonda_C) ? "NO SYNC" : "");
@@ -4416,7 +4390,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                 // até aqui nova função getSondaBanco()
 
                                                 // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
-                                                if ($s_sync == "NO SYNC") {			/////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                                if ($s_sync == "NO SYNC") {                        /////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                                                         if ($bDebug) {
                                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 5a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -4426,7 +4400,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         if ($msg == "") {
                                                                 $sql = "BEGIN TRANSACTION ";
                                                                 $ret = SQLexecuteQuery($sql);
-                                                                $ret = true;												/////////////////////
+                                                                $ret = true;                                                                                                /////////////////////
                                                                 if (!$ret)
                                                                         $msg = "Erro ao iniciar transação." . PHP_EOL;
                                                         }
@@ -4471,7 +4445,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                         $msg = "Erro ao comitar transação." . PHP_EOL;
 
                                                                 $msg_sonda = "PROCESSADO POR SONDA";
-
                                                         } else {
                                                                 $sql = "ROLLBACK TRANSACTION ";
                                                                 $ret = SQLexecuteQuery($sql);
@@ -4486,14 +4459,12 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         if ($bDebug) {
                                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 5b): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                                         }
-
                                                 } else {
                                                         $total_pagto = $rs_transacoes_row['total'] / 100 - $rs_transacoes_row['taxas'];
                                                         $total_pagtos_pendente += $total_pagto;
                                                         $leading_zeros = (($total_pagto < 1000) ? (($total_pagto < 100) ? "00" : "0") : "");
                                                         echo "Não Processado por sonda: forma:" . $rs_transacoes_row['iforma'] . ", numcompra: " . $rs_transacoes_row['numcompra'] . " - IDVenda: " . str_pad($rs_transacoes_row['idvenda'], 8, '0', STR_PAD_LEFT) . " - " . $rs_transacoes_row['datainicio'] . " - R\$" . $leading_zeros . number_format(($total_pagto), 2, '.', '.') . " (NO SYNC) [" . number_format(getmicrotime() - $time_start_stats0_in, 2, '.', '.') . " s] [" . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . " s]" . $cReturn;
                                                 }
-
                                         }  // bloqueio para evitar consulta ao MUP
 
                                 } else {
@@ -4503,7 +4474,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                         else {
                                 echo "Não processado: idvenda=0." . $cReturn . "numcompra: " . $rs_transacoes_row['numcompra'] . "- " . $rs_transacoes_row['datainicio'] . $cReturn;
                         }
-
                 } // End while loop 
 
                 if (isset($bank_sonda)) {
@@ -4512,7 +4482,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                         if (count($aret) > 0) {
                                 //					echo "Bancos bloqueados: ".print_r($aret, true).PHP_EOL;
-//					echo "function_exists('getValueSingle'): ".((function_exists('getValueSingle'))?"YES":"Nope").PHP_EOL;
+                                //					echo "function_exists('getValueSingle'): ".((function_exists('getValueSingle'))?"YES":"Nope").PHP_EOL;
                                 $b_unblock_banks = true;
                                 // Do an extra Sonda to monitor if Bank is online again
                                 foreach ($aret as $key => $val) {
@@ -4566,8 +4536,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                         // Save bank block configuration
                         //$bank_sonda->save_banks_sonda_array();
                 }
-
-
         } // End if(rs)
         echo "Tempo médio de processamento: " . number_format((getmicrotime() - $time_start_stats0) / (($irows > 0) ? $irows : 1), 2, '.', '.') . " s/processamento (WSA)" . $cReturn;
         echo "Total pagamentos pendentes: R\$" . number_format($total_pagtos_pendente, 2, '.', '.') . " em $npags pagamentos (WSATP)" . $cReturn;
@@ -4659,7 +4627,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                 $vgm_ogp_id = $rs_venda_modelos_row['vgm_ogp_id'];
                                                 echo "  TESTA PRODUTO EM INTEGRAÇÃO PAG >> ['" . $rs_venda_modelos_row['vg_integracao_parceiro_origem_id'] . "'] ->  [vg_id: '" . $rs_venda_modelos_row['vg_id'] . "'; vgm_ogp_id: '$vgm_ogp_id']- qtde: '$qtde', valor: '$valor' " . $cReturn;
                                         }
-
                                 }
                         }
                         if ($bDebug) {
@@ -4827,7 +4794,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                                                                 $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento Online (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                                                 grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-
                                                         }
                                                 }
                                         }
@@ -4841,7 +4807,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                 if ($bDebug) {
                                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (D): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                 }
-                        }	// Obtem vg_pagto_num_docto
+                        }        // Obtem vg_pagto_num_docto
                 } // Para cada venda
         }
 
@@ -4869,7 +4835,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                         $pag_status = $rs_venda_pendentes_row['status'];
                         $vg_ultimo_status = $rs_venda_pendentes_row['vg_ultimo_status'];
 
-                        if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {	// 3 and "not vgm_pin_codinterno=''"	(from query) 
+                        if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {        // 3 and "not vgm_pin_codinterno=''"	(from query) 
                                 $sql = "update tb_venda_games
                                                 set vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " 
                                                 where vg_id = " . $vg_id_pendente;
@@ -4895,7 +4861,6 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
         gravaLog_MonitorGamer($smonitor, $codigoNumerico);
 
         return $msg;
-
 } //end function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico
 
 
@@ -4922,11 +4887,9 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
         if ($webhook === true) {
                 $sql = "select * from tb_pag_compras pgt where idvenda>0 and status_processed=0 and tipo_cliente='M' and idvenda = " . $venda . " and tipo_deposito = 0 and (pgt.datainicio > (now() -'" . $minutes . " minutes'::interval)) AND status = 1 AND iforma='" . $FORMAS_PAGAMENTO['PAGAMENTO_PIX'] . "' ";
                 $sql .= " order by pgt.datainicio desc ";
-
         } else {
                 $sql = "select * from tb_pag_compras pgt where idvenda>0 and status_processed=0 and tipo_cliente='M' and tipo_deposito = 0 and (pgt.datainicio > (now() -'" . $minutes . " minutes'::interval)) AND status = 1 AND iforma='" . $FORMAS_PAGAMENTO['PAGAMENTO_PIX'] . "' ";
                 $sql .= " order by pgt.datainicio desc ";
-
         }
 
 
@@ -4976,10 +4939,10 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                 $dataconfirma = date("Y-m-d H:i:s");
                                 unset($alinePIX);
 
-                                if($webhook === true){
+                                if ($webhook === true) {
                                         $b_sonda_PIX = null;
                                         $s_sonda = "none";
-                                }else{
+                                } else {
                                         $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $rs_transacoes_row['numcompra'], $alinePIX);
                                         $s_sonda = (($b_sonda_PIX) ? "OK" : "none");
                                 }
@@ -5022,7 +4985,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         if ($msg == "") {
                                                 $sql = "BEGIN TRANSACTION ";
                                                 $ret = SQLexecuteQuery($sql);
-                                                $ret = true;												/////////////////////
+                                                $ret = true;                                                                                                /////////////////////
                                                 if (!$ret)
                                                         $msg = "Erro ao iniciar transação." . PHP_EOL;
                                         }
@@ -5068,7 +5031,6 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                                         $msg = "Erro ao comitar transação." . PHP_EOL;
 
                                                 $msg_sonda = "PROCESSADO POR SONDA";
-
                                         } else {
                                                 $sql = "ROLLBACK TRANSACTION ";
                                                 $ret = SQLexecuteQuery($sql);
@@ -5083,19 +5045,16 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 5b): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                         }
-
                                 } else {
                                         $total_pagto = $rs_transacoes_row['total'] / 100 - $rs_transacoes_row['taxas'];
                                         $total_pagtos_pendente += $total_pagto;
                                         $leading_zeros = (($total_pagto < 1000) ? (($total_pagto < 100) ? "00" : "0") : "");
                                         echo "Não Processado por sonda: forma:" . $rs_transacoes_row['iforma'] . ", numcompra: " . $rs_transacoes_row['numcompra'] . " - IDVenda: " . str_pad($rs_transacoes_row['idvenda'], 8, '0', STR_PAD_LEFT) . " - " . $rs_transacoes_row['datainicio'] . " - R\$" . $leading_zeros . number_format(($total_pagto), 2, '.', '.') . " (NO SYNC) [" . number_format(getmicrotime() - $time_start_stats0_in, 2, '.', '.') . " s] [" . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . " s]" . $cReturn;
                                 }
-
                         } // 
                         else {
                                 echo "Não processado: idvenda=0." . $cReturn . "numcompra: " . $rs_transacoes_row['numcompra'] . "- " . $rs_transacoes_row['datainicio'] . $cReturn;
                         }
-
                 } // End while loop 
 
         } // End if(rs)
@@ -5188,7 +5147,6 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                                 $vgm_ogp_id = $rs_venda_modelos_row['vgm_ogp_id'];
                                                 echo "  TESTA PRODUTO EM INTEGRAÇÃO PAG >> ['" . $rs_venda_modelos_row['vg_integracao_parceiro_origem_id'] . "'] ->  [vg_id: '" . $rs_venda_modelos_row['vg_id'] . "'; vgm_ogp_id: '$vgm_ogp_id']- qtde: '$qtde', valor: '$valor' " . $cReturn;
                                         }
-
                                 }
                         }
                         if ($bDebug) {
@@ -5358,7 +5316,6 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
 
                                                                 $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento PIX (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                                                 grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-
                                                         }
                                                 }
                                         }
@@ -5369,7 +5326,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                 if ($bDebug) {
                                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (D): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                 }
-                        }	// Obtem vg_pagto_num_docto
+                        }        // Obtem vg_pagto_num_docto
                 } // Para cada venda
         }
 
@@ -5397,7 +5354,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                         $pag_status = $rs_venda_pendentes_row['status'];
                         $vg_ultimo_status = $rs_venda_pendentes_row['vg_ultimo_status'];
 
-                        if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {	// 3 and "not vgm_pin_codinterno=''"	(from query) 
+                        if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {        // 3 and "not vgm_pin_codinterno=''"	(from query) 
                                 $sql = "update tb_venda_games
                                                 set vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " 
                                                 where vg_id = " . $vg_id_pendente;
@@ -5420,10 +5377,12 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME TOTAL: " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
+        if (!isset($codigoNumerico))
+                $codigoNumerico = null;
+
         gravaLog_MonitorGamer($smonitor, $codigoNumerico);
 
         return $msg;
-
 } //end function conciliacaoAutomaticaPagtoPIXemGAMER
 
 
@@ -5480,7 +5439,7 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
                         $rs_saldo_row = pg_fetch_array($rs_saldo);
                         $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
                         if ($bDebug)
-                                echo " ++++B [" . date("Y-m-d H:i:s") . "] para ug_id:$ug_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
+                                echo " ++++B [" . date("Y-m-d H:i:s") . "] para ug_id:$usuario_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
                 }
         }
 
@@ -5557,7 +5516,7 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
                         $rs_saldo_row = pg_fetch_array($rs_saldo);
                         $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
                         if ($bDebug)
-                                echo " ++++B2 [" . date("Y-m-d H:i:s") . "] para ug_id:$ug_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
+                                echo " ++++B2 [" . date("Y-m-d H:i:s") . "] para ug_id:$usuario_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
                 }
         }
 
@@ -5578,34 +5537,34 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                 $bank_sonda->load_banks_sonda_array();
         }
 
-        $nminutes = 1440;	// Por agora 1 dia, depois apenas 90 min
+        $nminutes = 1440;        // Por agora 1 dia, depois apenas 90 min
         echo PHP_EOL . "========================================================================" . PHP_EOL;
         echo "Prepara conciliação de pagamentos online para depósito em Saldo (registros com idvenda>0 e não processados nos últimos " . $nminutes . " minutos, desde " . date('Y-m-d H:i:s', strtotime("-" . $nminutes . " minutes")) . ")" . PHP_EOL;
         // Prepara conciliação de pagamentos online
-//		$date_ini = date('Y-m-d', strtotime("-5 days"));	//"2009-01-01"; //date("Y-m-d");
+        //		$date_ini = date('Y-m-d', strtotime("-5 days"));	//"2009-01-01"; //date("Y-m-d");
         // echo "-90 minutes: ".date('Y-m-d H:i:s', strtotime("-90 minutes"))."<br>";
         $date_ini = date('Y-m-d H:i:s', strtotime("-" . $nminutes . " minutes"));
         $date_end = date("Y-m-d H:i:s");
 
         // Quando o pagamento retorna por sonda (e não diretamente do banco) o status_processed=0 mas ainda vg.vg_ultimo_status=3
         // Os dois casos devem ser conciliados
-//		$sql = "select * from tb_pag_compras pgt inner join tb_venda_games vg on vg.vg_id = pgt.idvenda ";
-//		$sql .= "where idvenda>0 and (status_processed=0 or vg.vg_ultimo_status=3) and tipo_cliente='M' ";
+        //		$sql = "select * from tb_pag_compras pgt inner join tb_venda_games vg on vg.vg_id = pgt.idvenda ";
+        //		$sql .= "where idvenda>0 and (status_processed=0 or vg.vg_ultimo_status=3) and tipo_cliente='M' ";
 
         // O anterior está demorando muito e não é necessário consultar tb_venda_games, apenas tb_pag_compras
         $sql = "select * from tb_pag_compras pgt where idvenda>0 and status_processed=0 and tipo_cliente='M' and tipo_deposito = 2 and datainicio > (now() -'2 months'::interval) and iforma!='6' and iforma!='" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX'] . "' ";
 
         // status=1 and 
         // Apenas para vendas que não são integração
-//		$sql .= "and vg_integracao_parceiro_origem_id is null ";
+        //		$sql .= "and vg_integracao_parceiro_origem_id is null ";
 
         // Opção 1 - não precissa limitar por data - apenas os pagtos com status_processed=0 serão retornados, após 90mins eles são cancelados.
         //	se houver um descancelamento de venda o pagto correspondente vai aparecer aqui
 
         // Opção 1 - Para processar normalmente
-//		$sql .= " and (pgt.datainicio between '".$date_ini."' and '".$date_end."') ";	
+        //		$sql .= " and (pgt.datainicio between '".$date_ini."' and '".$date_end."') ";	
         // Opção 2 - Para incluir algum pagamento antigo descancelado
-//		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
+        //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
 
         $rs_total = SQLexecuteQuery($sql);
         if ($bDebug) {
@@ -5625,7 +5584,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
         if ($bDebug) {
                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
         }
-        echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . "" . $cReturn;	//."$sql".$cReturn;
+        echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . "" . $cReturn;        //."$sql".$cReturn;
 
         if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
                 $msg = "Nenhuma transação encontrada." . $cReturn;
@@ -5696,7 +5655,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
 
                                         // começa aqui nova função getSondaBanco()
 
-                                        $dataconfirma = date("Y-m-d H:i:s");		// "CURRENT_TIMESTAMP";	// 
+                                        $dataconfirma = date("Y-m-d H:i:s");                // "CURRENT_TIMESTAMP";	// 
                                         $s_sonda = "????";
                                         //$valtotal = 0;
                                         unset($aline5);
@@ -5724,7 +5683,6 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         $dataconfirma = "'" . date('Y-m-d H:i:s') . "'";
                                                 }
                                                 echo ("Em conciliação TPDeposito - Sonda de Pagto BRD5 (" . $rs_transacoes_row['numcompra'] . ")." . PHP_EOL . print_r($aline5, true) . PHP_EOL);
-
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']) {
 
                                                 // obtem status, OK se status='003'
@@ -5753,7 +5711,6 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         //     [dataPagamento] => 16092009
                                                         $dataconfirma = "'" . substr($aline9['dataPagamento'], 4, 4) . "-" . substr($aline9['dataPagamento'], 2, 2) . "-" . substr($aline9['dataPagamento'], 0, 2) . "'";
                                                 }
-
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
                                                 $pedido = str_pad($rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
 
@@ -5768,7 +5725,6 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         //     [dtPag] => 16092009
                                                         $dataconfirma = "'" . substr($dtPag, 4, 4) . "-" . substr($dtPag, 2, 2) . "-" . substr($dtPag, 0, 2) . "'";
                                                 }
-
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']) {
                                                 $pag_status = getSondaPINsEPP($rs_transacoes_row['numcompra'], $dtPag);
                                                 $b_sonda_E = ($pag_status == 3) ? true : false;
@@ -5779,7 +5735,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         $dataconfirma = "'" . date("Y-m-d") . "'";
                                                 }
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_HIPAY_ONLINE']) {
-                                                $pag_status = "";	//getSondaHipay($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                $pag_status = "";        //getSondaHipay($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                 $b_sonda_B = ($rs_transacoes_row['status'] == 3) ? true : false;
 
 
@@ -5789,7 +5745,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         $dataconfirma = "'" . date("Y-m-d") . "'";
                                                 }
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_PAYPAL_ONLINE']) {
-                                                $pag_status = "";	//getSondaPayPal($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                $pag_status = "";        //getSondaPayPal($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                 $b_sonda_P = ($rs_transacoes_row['status'] == 3) ? true : false;
 
 
@@ -5799,7 +5755,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         $dataconfirma = "'" . date("Y-m-d") . "'";
                                                 }
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']) {
-                                                $pag_status = "";	//getSondaItau($pedido, &$a_retorno_itau, $sitPag, $dtPag);
+                                                $pag_status = "";        //getSondaItau($pedido, &$a_retorno_itau, $sitPag, $dtPag);
                                                 $b_sonda_Z = ($rs_transacoes_row['status'] == 3) ? true : false;
 
 
@@ -5875,7 +5831,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                         // até aqui nova função getSondaBanco()
 
                                         // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
-                                        if ($s_sync == "NO SYNC") {			/////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                        if ($s_sync == "NO SYNC") {                        /////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                                                 if ($bDebug) {
                                                         echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 5a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
@@ -5885,7 +5841,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 if ($msg == "") {
                                                         $sql = "BEGIN TRANSACTION ";
                                                         $ret = SQLexecuteQuery($sql);
-                                                        $ret = true;												/////////////////////
+                                                        $ret = true;                                                                                                /////////////////////
                                                         if (!$ret)
                                                                 $msg = "Erro ao iniciar transação." . PHP_EOL;
                                                 }
@@ -5933,7 +5889,6 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                                 $msg = "Erro ao comitar transação." . PHP_EOL;
 
                                                         $msg_sonda = "PROCESSADO POR SONDA";
-
                                                 } else {
                                                         $sql = "ROLLBACK TRANSACTION ";
                                                         $ret = SQLexecuteQuery($sql);
@@ -5948,15 +5903,12 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 if ($bDebug) {
                                                         echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 5b): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
                                                 }
-
                                         } else {
                                                 $total_pagto = $rs_transacoes_row['total'] / 100 - $rs_transacoes_row['taxas'];
                                                 $total_pagtos_pendente += $total_pagto;
                                                 $leading_zeros = (($total_pagto < 1000) ? (($total_pagto < 100) ? "00" : "0") : "");
                                                 echo "Não Processado por sonda: forma:" . $rs_transacoes_row['iforma'] . ", numcompra: " . $rs_transacoes_row['numcompra'] . " - IDVenda: " . str_pad($rs_transacoes_row['idvenda'], 8, '0', STR_PAD_LEFT) . " - " . $rs_transacoes_row['datainicio'] . " - R\$" . $leading_zeros . number_format(($total_pagto), 2, '.', '.') . " (NO SYNC) [" . number_format(getmicrotime() - $time_start_stats0_in, 2, '.', '.') . " s] [" . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . " s]" . $cReturn;
                                         }
-
-
                                 } else {
                                         echo "Não processado: status!=3 e Sonda=false." . $cReturn . "numcompra: " . $rs_transacoes_row['numcompra'] . " - IDVenda: " . $rs_transacoes_row['idvenda'] . "- " . $rs_transacoes_row['datainicio'] . "" . $cReturn;
                                 }
@@ -5964,7 +5916,6 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                         else {
                                 echo "Não processado: idvenda=0." . $cReturn . "numcompra: " . $rs_transacoes_row['numcompra'] . "- " . $rs_transacoes_row['datainicio'] . "" . $cReturn;
                         }
-
                 } // End while loop 
 
                 if (isset($bank_sonda)) {
@@ -6019,9 +5970,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                         } else {
                                 echo "  ==  Sem chamada a Sonda - não tem Bancos bloqueados1" . PHP_EOL;
                         }
-
                 }
-
         } // End if(rs)
         echo "Tempo médio de processamentoq: " . number_format((getmicrotime() - $time_start_stats0) / (($irows > 0) ? $irows : 1), 2, '.', '.') . " s/processamento (WSAa)" . $cReturn;
         echo "Total pagamentos pendentes: R\$" . number_format($total_pagtos_pendente, 2, '.', '.') . " em $npags pagamentos (WSATPa)" . $cReturn;
@@ -6210,7 +6159,7 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
         if ($bDebug) {
                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
         }
-        echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . "" . $cReturn;	//."$sql".$cReturn;
+        echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . "" . $cReturn;        //."$sql".$cReturn;
 
         if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
                 $msg = "Nenhuma transacao encontrada." . $cReturn;
@@ -6244,10 +6193,10 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                 unset($alinePIX);
                                 $s_update_status_lr = "";
 
-                                if($webhook == true){
+                                if ($webhook == true) {
                                         $b_sonda_PIX = null;
                                         $s_sonda = "none";
-                                }else{
+                                } else {
                                         $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $rs_transacoes_row['numcompra'], $alinePIX);
                                         $s_sonda = (($b_sonda_PIX) ? "OK" : "none");
                                 }
@@ -6278,7 +6227,7 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                 }
 
                                 // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
-                                if ($s_sync == "NO SYNC" || $webhook == true) {			/////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                if ($s_sync == "NO SYNC" || $webhook == true) {                        /////   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                                         if ($bDebug) {
                                                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 5a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
@@ -6288,7 +6237,7 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                         if ($msg == "") {
                                                 $sql = "BEGIN TRANSACTION ";
                                                 $ret = SQLexecuteQuery($sql);
-                                                $ret = true;												/////////////////////
+                                                $ret = true;                                                                                                /////////////////////
                                                 if (!$ret)
                                                         $msg = "Erro ao iniciar transacao." . PHP_EOL;
                                         }
@@ -6336,7 +6285,6 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                                         $msg = "Erro ao comitar transacao." . PHP_EOL;
 
                                                 $msg_sonda = "PROCESSADO POR SONDA";
-
                                         } else {
                                                 $sql = "ROLLBACK TRANSACTION ";
                                                 $ret = SQLexecuteQuery($sql);
@@ -6351,19 +6299,16 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                         if ($bDebug) {
                                                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 5b): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
                                         }
-
                                 } else {
                                         $total_pagto = $rs_transacoes_row['total'] / 100 - $rs_transacoes_row['taxas'];
                                         $total_pagtos_pendente += $total_pagto;
                                         $leading_zeros = (($total_pagto < 1000) ? (($total_pagto < 100) ? "00" : "0") : "");
                                         echo "Nao Processado por sonda: forma:" . $rs_transacoes_row['iforma'] . ", numcompra: " . $rs_transacoes_row['numcompra'] . " - IDVenda: " . str_pad($rs_transacoes_row['idvenda'], 8, '0', STR_PAD_LEFT) . " - " . $rs_transacoes_row['datainicio'] . " - R\$" . $leading_zeros . number_format(($total_pagto), 2, '.', '.') . " (NO SYNC) [" . number_format(getmicrotime() - $time_start_stats0_in, 2, '.', '.') . " s] [" . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . " s]" . $cReturn;
                                 }
-
                         } // 
                         else {
                                 echo "Nao processado: idvenda=0." . $cReturn . "numcompra: " . $rs_transacoes_row['numcompra'] . "- " . $rs_transacoes_row['datainicio'] . "" . $cReturn;
                         }
-
                 } // End while loop 
 
         } // End if(rs)
@@ -6488,7 +6433,7 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
                         $pag_valor = $rs_pagto_row['total'] / 100;
                         $pag_banco = $rs_pagto_row['banco'];
                         $pag_iforma = $rs_pagto_row['iforma'];
-                        echo "pag_data: '$pag_data', pag_valor: $pag_valor, pag_banco: $pag_banco, pag_iforma: '$pag_iforma'" . PHP_EOL;	//	"pag_documento: '$pag_documento', "
+                        echo "pag_data: '$pag_data', pag_valor: $pag_valor, pag_banco: $pag_banco, pag_iforma: '$pag_iforma'" . PHP_EOL;        //	"pag_documento: '$pag_documento', "
                 }
         }
 
@@ -6598,4 +6543,3 @@ function concilia_eppVariavel($vg_id, $ug_id)
                 processaEmailVendaGames($vg_id, $parametros);
         }
 }
-?>

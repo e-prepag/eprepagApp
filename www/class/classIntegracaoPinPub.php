@@ -82,50 +82,24 @@ function retorna_pin_valor($pin,$id) {
 }
 
 function verifica_validade($pin, $id) {
-    // Consulta para buscar os dados da venda
-    $sql = "SELECT pin_datavenda, pin_horavenda, pin_validade 
-            FROM pins 
-            WHERE pin_codigo = '" . addslashes($pin) . "' 
-              AND opr_codigo = " . addslashes($id);
+    $pin = addslashes($pin);
+    $id = (int)$id;
+    $periodo = $id == 166 ? 60 : 180;
 
-    $rs_log = SQLexecuteQuery($sql);
+    $sql = "
+        SELECT 1
+        FROM pins
+        WHERE pin_codigo = '$pin'
+          AND opr_codigo = $id
+          AND (
+              (pin_validade >= CURRENT_DATE and opr_codigo <> 166)
+              OR
+              ((CURRENT_DATE - INTERVAL '$periodo day') <= pin_datavenda)
+          )
+        LIMIT 1;
+    ";
 
-    if ($rs_log) {
-        $rs_log_row = pg_fetch_array($rs_log);
-
-        if ($rs_log_row['pin_datavenda'] != '' && $rs_log_row['pin_horavenda'] != '') {
-            // Combinar a data e a hora da venda em um único objeto DateTime
-            $data_venda = DateTime::createFromFormat(
-                'Y-m-d H:i:s', 
-                $rs_log_row['pin_datavenda'] . ' ' . $rs_log_row['pin_horavenda']
-            );
-
-            if ($data_venda) {
-                // Define o limite de dias baseado no ID
-                $dias_limite = ($id == 166) ? 60 : 180;
-
-                // Adicionar os dias limite à data da venda
-                $data_limite = clone $data_venda;
-                $data_limite->add(new DateInterval("P" . $dias_limite . "D"));
-
-                // Verificar se a data atual é menor ou igual ao limite
-                return new DateTime() <= $data_limite;
-            }
-        } else if ($rs_log_row['pin_validade'] != '') {
-            // Transformar pin_validade em um objeto DateTime
-            $data_validade = DateTime::createFromFormat('Y-m-d', $rs_log_row['pin_validade']);
-
-            if ($data_validade) {
-                // Verificar se a validade ainda não expirou
-                return $data_validade >= new DateTime();
-            }
-        }
-    }
-
-    // Retorna false se nenhuma condição for atendida
-    return $sql;
+    $rs = SQLexecuteQuery($sql);
+    return $rs && pg_fetch_row($rs) !== false;
 }
-
-
-
 ?>
