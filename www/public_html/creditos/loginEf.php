@@ -10,6 +10,7 @@
 	
 	require_once "/www/db/connect.php";
     require_once "/www/db/ConnectionPDO.php";
+    require_once "../../includes/load_dotenv.php";
 	
 	$connection = ConnectionPDO::getConnection()->getLink();
 	
@@ -168,7 +169,7 @@
     if ($_REQUEST["g-recaptcha-response"] != "") {
         
 		$tokenInfo = [
-            "secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ",
+            "secret" => getenv("RECAPTCHA_SECRET_KEY"),
             "response" => $_REQUEST["g-recaptcha-response"],
             "remoteip" => $_SERVER["REMOTE_ADDR"],
         ];

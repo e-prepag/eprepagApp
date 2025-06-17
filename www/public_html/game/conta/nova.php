@@ -1,5 +1,5 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
+require_once __DIR__ . '/../../../includes/constantes_url.php';
 $request_uri = $_SERVER['REQUEST_URI'];
 // Obtém o script principal chamado
 $script_name = $_SERVER['SCRIPT_NAME'];
@@ -25,8 +25,8 @@ if(isset($_POST['login']) && !empty($_POST['login'])){
 
     //if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
 
-    if (!empty($_POST["g-recaptcha-response"])) {
-
+	  if(!empty($_POST["g-recaptcha-response"])){
+			
         $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
 			$recaptcha = curl_init();
@@ -187,10 +187,20 @@ if(isset($_POST['login']) && !empty($_POST['login'])){
 					
 					}
 				}else{
-                    if(isset($retorno["erros"]) && !empty($retorno["erros"])){
+                    $cpfFinal = substr($cpf, 0, 3) . "." . substr($cpf, 3, 3) . "." . substr($cpf, 6, 3) . "-" . substr($cpf, 9, 2);
+                    $sql = "select * from usuarios_games where ug_cpf like '%" . $cpfFinal . "%' and ug_ativo = 1;";
+                    $buscaUsuario = SQLexecuteQuery($sql);
+
+                    $linhas = pg_num_rows($buscaUsuario);
+
+                    if ($linhas <= 2) {
+                        $erros[] = "<p>Detectamos que você possui mais de uma conta na E-Prepag. Se você já realizou alguma compra diretamente de um game, é possível que já tenha uma conta ativa conosco. Verifique o endereço de e-mail utilizado.</p>
+                        <p>Em caso de dúvidas, <a href=\'".EPREPAG_URL_HTTPS_COM."/support\'>clique aqui para entrar em contato com o suporte da E-Prepag</a>.</p>";
+                    
+                    } else if (isset($retorno["erros"]) && !empty($retorno["erros"])) {
                         $erros[] = "<p>" . $retorno["erros"] . "</p>";
-                    }else{
-					    $erros[] = "<p>O cpf não foi validado na receita federal.</p>";
+                    } else {
+                        $erros[] = "<p>Erro desconhecido ao verificar o CPF, se o problema persistir, por favor <a href=\'".EPREPAG_URL_HTTPS_COM."/support\'>clique aqui para entrar em contato com o suporte da E-Prepag</a>.</p>";
                     }
 				}
 				
@@ -224,7 +234,7 @@ $termosDeUso = strip_tags($termosDeUso);
 <script>
 <?php
     if(!empty($erros)){
-        print "manipulaModal(1,\"".implode($erros)."\",'Atenção');";
+        print "manipulaModal(1,`".implode($erros)."`,'Atenção');";
     }
 ?>
 $(function(){

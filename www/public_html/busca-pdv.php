@@ -16,6 +16,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../includes/constantes.php";
 require_once DIR_CLASS."gamer/controller/HeaderController.class.php";
 require_once DIR_INCS."functions_captcha.php";
+require_once "../includes/load_dotenv.php";
 
 $controller = new HeaderController;
 $controller->setHeader();
@@ -39,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if(!empty($_POST["g-recaptcha-response"])){
 			
-        $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+        $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
 
          $recaptcha = curl_init();
          curl_setopt_array($recaptcha, [

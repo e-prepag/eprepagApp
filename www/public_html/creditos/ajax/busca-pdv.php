@@ -1,4 +1,5 @@
 <?php
+require_once "../../../includes/load_dotenv.php";
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 function isAjax() {return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));}
 function block_direct_calling() {
@@ -7,7 +8,7 @@ function block_direct_calling() {
            die("Stop");
     }
 }
-$tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST['verificationCode'], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+$tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST['verificationCode'], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
 
 $recaptcha = curl_init();
 curl_setopt_array($recaptcha, [
