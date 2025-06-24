@@ -26,6 +26,16 @@ if(!checkIP()){
         die();
     }
 } 
+#if(!checkIP()){
+#    if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false){
+#        header("Location: https://www.e-prepag.com.br" . $_SERVER['REQUEST_URI']);
+#        die();
+#    }
+#    elseif(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), ".br") === false){
+#        header("Location: https://www.e-prepag.com.br" . $_SERVER['REQUEST_URI']);
+#        die();
+#    }
+#} 
 header('Content-Type: text/html; charset=ISO-8859-1');
 require_once RAIZ_DO_PROJETO."class/util/Busca.class.php";
 require_once RAIZ_DO_PROJETO."class/business/BannerBO.class.php";
