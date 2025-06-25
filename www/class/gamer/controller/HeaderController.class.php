@@ -6,26 +6,26 @@ session_start();
 
 require_once RAIZ_DO_PROJETO.'includes/configIP.php';
 
-$server_url = $GLOBALS['_SERVER']['SERVER_NAME'];
-if(checkIP()) {
-    $server_url = $_SERVER['SERVER_NAME'];
-}
+// $server_url = $GLOBALS['_SERVER']['SERVER_NAME'];
+// if(checkIP()) {
+//     $server_url = $_SERVER['SERVER_NAME'];
+// }
 
-if($_SERVER['HTTPS']!="on") {
-    Header("Location: https://".$server_url.$_SERVER['REQUEST_URI']);
-    die();
-} //end if($_SERVER['HTTPS']!="on") 
+// if($_SERVER['HTTPS']!="on") {
+//     Header("Location: https://".$server_url.$_SERVER['REQUEST_URI']);
+//     die();
+// } //end if($_SERVER['HTTPS']!="on") 
 
-if(!checkIP()){
-    if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false){
-        header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
-        die();
-    }
-    elseif(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), ".br") === false){
-        header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
-        die();
-    }
-} 
+// if(!checkIP()){
+//     if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false){
+//         header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
+//         die();
+//     }
+//     elseif(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), ".br") === false){
+//         header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
+//         die();
+//     }
+// } 
 #if(!checkIP()){
 #    if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false){
 #        header("Location: https://www.e-prepag.com.br" . $_SERVER['REQUEST_URI']);
