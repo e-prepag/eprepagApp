@@ -3,7 +3,7 @@ services:
   app:
     build: .
     extra_hosts:
-      - "hml.eprepag.com.br:127.0.0.1"
+      - "hml.e-prepag.com.br:127.0.0.1"
     ports:
       - 80:80
       - 443:443
