@@ -2,12 +2,12 @@
 // Constantes para URLs usadas no sistema
 require_once "/www/includes/load_dotenv.php";
 
-define('EPREPAG_URL_HTTPS', getenv("EPREPAG_URL_HTTPS"));
-define('EPREPAG_URL_HTTP', getenv("EPREPAG_URL_HTTP"));
+define('EPREPAG_URL_HTTPS', getenv("EPREPAG_URL"));
+define('EPREPAG_URL_HTTP', getenv("EPREPAG_URL"));
 define('EPREPAG_URL', getenv("EPREPAG_URL"));
 
-define('EPREPAG_URL_HTTPS_COM', getenv("EPREPAG_URL_HTTPS_COM"));
-define('EPREPAG_URL_HTTP_COM', getenv("EPREPAG_URL_HTTP_COM"));
-define('EPREPAG_URL_COM', getenv("EPREPAG_URL_COM"));
+define('EPREPAG_URL_HTTPS_COM', getenv("EPREPAG_URL"));
+define('EPREPAG_URL_HTTP_COM', getenv("EPREPAG_URL"));
+define('EPREPAG_URL_COM', getenv("EPREPAG_URL"));
 
 ?>
