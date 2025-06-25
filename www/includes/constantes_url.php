@@ -1,5 +1,5 @@
 <?php
-// Constantes para URLs usadas no sistema
+// Constantes para URLs usadas no sistema bdfklsdiofhsiodfhoisadhiop
 require_once "/www/includes/load_dotenv.php";
 
 define('EPREPAG_URL_HTTPS', getenv("EPREPAG_URL"));
