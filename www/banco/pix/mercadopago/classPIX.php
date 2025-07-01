@@ -2,7 +2,7 @@
 
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
-require_once "/www/includes/load_dotenv.php";
+
 class classPIX
 {
 
@@ -11,14 +11,19 @@ class classPIX
 
     public function __construct()
     {
-        $token = getenv('mp_access_token');
+
+        if (!function_exists('getEnvVariable')) {
+            require_once "/www/includes/getEnvVar.php";
+        }
+
+        $token = getEnvVariable('mp_access_token');
 
         if ($token == "") {
             echo ("<br><br>ERRO ao obter acesso ao Banco!<br>Por favor, entre em
                  contado com o suporte da E-Prepag e informe o erro de código PIX790954 - MercadoPago.<br>Obrigado.");
         } else {
             $this->setAccessToken($token);
-            $this->url = getenv('mp_url_api');
+            $this->url = "https://api.mercadopago.com";
         }
 
     }//end function __construct()
@@ -50,8 +55,9 @@ class classPIX
         $valor = floatval($params['valor']);
         $email = $params['email'];
         $id_pedido = $params['idpedido'];
+        $itens = $params['itens'];
 
-        $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
+        $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email, $itens);
 
         $logFilePath = "/www/log/mercadopago_PIX.txt";
         $ff = fopen($logFilePath, "a+");
@@ -114,7 +120,7 @@ class classPIX
     public function callSonda($params, &$reposta_consulta)
     {
         // URL e token da API
-        $url = $this->url . '/v1/payments/search?external_reference=' . $params['idpedido'];
+        $url = 'https://api.mercadopago.com/v1/payments/search?external_reference=' . $params['idpedido'];
 
         $accessToken = $this->getAccessToken();
 
@@ -240,7 +246,45 @@ class classPIX
         }
     }
 
-    private function sendJSON($nome, $cpf, $valor, $vendaId, $email = "")
+    private function separarNomeSobrenome($nomeCompleto)
+    {
+        $nomeCompleto = trim($nomeCompleto);
+        $nomeCompleto = preg_replace('/\s+/', ' ', $nomeCompleto); // Normaliza espaços múltiplos
+        $partes = explode(' ', $nomeCompleto);
+
+        if (count($partes) === 0 || $nomeCompleto === '') {
+            return ['nome' => '', 'sobrenome' => ''];
+        }
+
+        if (count($partes) === 1) {
+            return ['nome' => $partes[0], 'sobrenome' => ''];
+        }
+
+        $nome = array_shift($partes);
+        $sobrenome = implode(' ', $partes);
+
+        return ['nome' => $nome, 'sobrenome' => $sobrenome];
+    }
+
+    private function utf8ize($data) {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->utf8ize($value);
+            }
+        } elseif (is_object($data)) {
+            foreach ($data as $key => $value) {
+                $data->$key = $this->utf8ize($value);
+            }
+        } elseif (is_string($data)) {
+            // Converte apenas se não for UTF-8
+            if (!mb_check_encoding($data, 'UTF-8')) {
+                return mb_convert_encoding($data, 'UTF-8', 'ISO-8859-1');
+            }
+        }
+        return $data;
+    }
+
+    private function sendJSON($nome, $cpf, $valor, $vendaId, $email = "", $itens = [])
     {
 
         $type = $this->identifyDocumentType($cpf);
@@ -253,15 +297,19 @@ class classPIX
             $email = "teste@email.com";
         }
 
+        $nomeSeparado = $this->separarNomeSobrenome($nome);
+
         // Verifica se o cliente existe
         $url = $this->url . "/v1/payments";
-        $data = [
+
+        $post_data = [
             "transaction_amount" => $valor,
             "date_of_expiration" => $dateOfExpiration,
             "payment_method_id" => "pix",
             "external_reference" => $vendaId,
-            //"notification_url" => $notificationUrl, // Adicione aqui se necessário
+            "notification_url" => "https://www.e-prepag.com.br/webhook/mercadoPago.php",
             "description" => "PIX pagto id: $vendaId",
+
             "payer" => [
                 "first_name" => $nome,
                 //"last_name" => $payerLastName,
@@ -270,8 +318,18 @@ class classPIX
                     "type" => $type,
                     "number" => $cpf
                 ]
+            ],
+
+            "additional_info" => [
+                "items" => $itens,
+                "payer" => [
+                    "first_name" => $nomeSeparado['nome'],
+                    "last_name" => $nomeSeparado['sobrenome'],
+                ]
             ]
         ];
+
+        $post_utf8 = $this->utf8ize($post_data);
 
         $idempotencyKey = $this->generateRandomString();
 
@@ -287,7 +345,7 @@ class classPIX
             "Content-Type: application/json",
             "X-Idempotency-Key: $idempotencyKey"
         ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_utf8));
 
         // Executa o cURL
         $response = curl_exec($ch);

@@ -20,7 +20,7 @@ $filtro['b2c'] = false;
 $filtro['id_user'] = $controller->usuarios->getId();
 
 
-$findOperadoras = "select opr_nome,opr_codigo from operadoras where opr_codigo in(124, 13, 53) order by opr_nome;";
+$findOperadoras = "select opr_nome,opr_codigo from operadoras where opr_status = '1' and opr_campo_1 = 'codigo' and opr_use_check = 1 or opr_codigo = 53 order by opr_nome;";
 $resultadoOperadoras = SQLexecuteQuery($findOperadoras);
 $operadoras = pg_fetch_all($resultadoOperadoras);
 

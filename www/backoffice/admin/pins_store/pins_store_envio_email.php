@@ -1,9 +1,8 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 // require_once "/www/includes/bourls.php";
-// EPREPAG_URL_HTTPS:$server_port/admin/pins_store/pins_store_lista.php
+// https://www.e-prepag.com.br:$server_port/admin/pins_store/pins_store_lista.php
 
-// EPREPAG_URL_HTTPS:$server_port/admin/pins_store/pins_store_lista_pin.php
+// https://www.e-prepag.com.br:$server_port/admin/pins_store/pins_store_lista_pin.php
 
 require_once $raiz_do_projeto . "includes/main.php";
 
@@ -294,19 +293,19 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 
 				//$email->Host     = "smtp.e-prepag.com.br";	//"localhost";
 				//-----Alteração exigida pela BaseNet(11/2017)-------------//
-				$email->Host = "smtp.basenet.com.br";
+				$email->Host = "email-smtp.sa-east-1.amazonaws.com";
 				//---------------------------------------------------------//
 				$email->Mailer = "smtp";
 				$email->From = "suporte@e-prepag.com.br";
 				$email->SMTPAuth = true;     // turn on SMTP authentication
-				$email->Username = 'suporte@e-prepag.com.br';  // a valid email here
-				$email->Password = '@AnQ1V7hP#E7pQ31'; //'985856';	//'850637'; 
+				$email->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
+				$email->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';	//'850637'; 
 				$email->FromName = "E-Prepag";	// " (EPP)"
 
 				//-----Alteração exigida pela BaseNet(11/2017)-------------//
 				$email->IsSMTP();
-				$email->SMTPSecure = "ssl";
-				$email->Port = 465;
+				//$email->SMTPSecure = "ssl";
+				$email->Port = 587;
 				//---------------------------------------------------------//
 				/*	
 									  // Overwrite smt details for dev version cause e-prepag.com.br server reject it
