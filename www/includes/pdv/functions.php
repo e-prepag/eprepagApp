@@ -562,36 +562,20 @@ function enviaEmail($to, $cc, $bcc, $subject, $msgEmail, $nome = '') {
 function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = '') {
 
         $mail = new PHPMailer();
-        //		$mail->Host     = "smtp.e-prepag.com.br";	//"localhost";
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = "smtp.basenet.com.br";
+        $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
         $mail->From     = "suporte@e-prepag.com.br";
         $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Username = 'suporte@e-prepag.com.br';  // a valid email here
-        $mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856';		//'850637'; 
+        $mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
+        $mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';		//'850637'; 
         $mail->FromName = $nome != '' ? $nome : "E-Prepag";	  // "(EPP LH)"
 
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
-        $mail->SMTPSecure = "ssl";
-        $mail->Port     = 465;
-        //---------------------------------------------------------//
-
-        // Overwrite smt details for dev version cause e-prepag.com.br server reject it
-        // You can just add your IP or use elseif with your details
-        //Comentar aki quando problema no envio de email
-        if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
-        //                    $mail->SMTPDebug  = 2; //descomentar para debugar 
-            $mail->IsSMTP();
-            $mail->SMTPSecure = "ssl";
-            $mail->Host     = "email-ssl.com.br";
-            $mail->Port     = 465;
-            $mail->From     = "send@e-prepag.com";
-            $mail->Username = 'send@e-prepag.com';
-            $mail->Password = 'sendeprepag2013';
-        }
+        //$mail->SMTPSecure = "ssl";
+        $mail->Port     = 587;
 
         // Reply-to
         $mail->AddReplyTo('suporte@e-prepag.com.br');
@@ -630,36 +614,20 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
 function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $nome = '') {
 
     $mail = new PHPMailer();
-//                $mail->Host     = "smtp.e-prepag.com.br";	//"localhost";
     //-----Alteração exigida pela BaseNet(11/2017)-------------//
-    $mail->Host     = "smtp.basenet.com.br";
+    $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
     //---------------------------------------------------------//
     $mail->Mailer   = "smtp";
     $mail->From     = "suporte@e-prepag.com.br";
     $mail->SMTPAuth = true;     // turn on SMTP authentication
-    $mail->Username = 'suporte@e-prepag.com.br';  // a valid email here
-    $mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856';		//'850637'; 
+    $mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
+    $mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';		//'850637'; 
     $mail->FromName = "E-Prepag";	// " (EPP)"
     $mail->isHTML(true);
     //-----Alteração exigida pela BaseNet(11/2017)-------------//
     $mail->IsSMTP();
-    $mail->SMTPSecure = "ssl";
-    $mail->Port     = 465;
-    //---------------------------------------------------------//  
-
-    // Overwrite smt details for dev version cause e-prepag.com.br server reject it
-    // When run bat files there is not ip address so we need use COMPUTERNAME to check
-    //Comentar aki quando problema no envio de email
-    if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
-    //                    $mail->SMTPDebug  = 2; //descomentar para debugar 
-        $mail->IsSMTP();
-        $mail->SMTPSecure = "ssl";
-        $mail->Host     = "email-ssl.com.br";
-        $mail->Port     = 465;
-        $mail->From     = "send@e-prepag.com";
-        $mail->Username = 'send@e-prepag.com';
-        $mail->Password = 'sendeprepag2013';
-    }
+    //$mail->SMTPSecure = "ssl";
+    $mail->Port     = 587;
 
     // Reply-to
     $mail->AddReplyTo('suporte@e-prepag.com.br');
