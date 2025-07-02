@@ -5,6 +5,7 @@
 // https://www.e-prepag.com.br:$server_port/admin/pins_store/pins_store_lista_pin.php
 
 require_once $raiz_do_projeto . "includes/main.php";
+require_once "../../../includes/load_dotenv.php";
 
 set_time_limit(6000);
 
@@ -293,19 +294,19 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 
 				//$email->Host     = "smtp.e-prepag.com.br";	//"localhost";
 				//-----Alteração exigida pela BaseNet(11/2017)-------------//
-				$email->Host = "email-smtp.sa-east-1.amazonaws.com";
+				$email->Host = getenv("smtp_host");
 				//---------------------------------------------------------//
 				$email->Mailer = "smtp";
 				$email->From = "suporte@e-prepag.com.br";
 				$email->SMTPAuth = true;     // turn on SMTP authentication
-				$email->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
-				$email->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';	//'850637'; 
+				$email->Username = getenv("smtp_username");  // a valid email here
+				$email->Password = getenv("smtp_password"); //'985856';	//'850637'; 
 				$email->FromName = "E-Prepag";	// " (EPP)"
 
 				//-----Alteração exigida pela BaseNet(11/2017)-------------//
 				$email->IsSMTP();
 				//$email->SMTPSecure = "ssl";
-				$email->Port = 587;
+				$email->Port = getenv("smtp_port");
 				//---------------------------------------------------------//
 				/*	
 									  // Overwrite smt details for dev version cause e-prepag.com.br server reject it

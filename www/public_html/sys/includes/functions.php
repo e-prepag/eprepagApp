@@ -4,6 +4,7 @@ require_once $raiz_do_projeto.'includes/configIP.php';
 
 // include do classe de controle de servidor de envio de email
 require_once $raiz_do_projeto.'class/util/EmailEnvironment.class.php';
+require_once $raiz_do_projeto . "includes/load_dotenv.php";
 
 	function is_moeda($val){
 
@@ -2049,20 +2050,20 @@ function eprepag_detectLang($use_include = false) {
 
 		$mail = new PHPMailer();
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
+        $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
 		$mail->Mailer   = "smtp";
 		$mail->From     = "suporte@e-prepag.com.br";
 		$mail->SMTPAuth = true;     // turn on SMTP authentication
-		$mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
-		$mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856'; //'8s}:#t)YTa~5ks))';'850637'; 
+		$mail->Username = getenv("smtp_username");  // a valid email here
+		$mail->Password = getenv("smtp_password"); //'985856'; //'8s}:#t)YTa~5ks))';'850637'; 
 		$mail->FromName = "E-Prepag";
 		$mail->isHTML(true);
         
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
         //$mail->SMTPSecure = "ssl";
-        $mail->Port     = 587;
+        $mail->Port     = getenv("smtp_port");
         //---------------------------------------------------------//
                 
 
@@ -2108,20 +2109,20 @@ function eprepag_detectLang($use_include = false) {
 
 		$mail = new PHPMailer();
                 //-----Alteração exigida pela BaseNet(11/2017)-------------//
-                $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
+                $mail->Host     = getenv("smtp_host");
                 //---------------------------------------------------------//
 		$mail->Mailer   = "smtp";
 		$mail->From     = "financeiro@e-prepag.com.br";
 		$mail->SMTPAuth = true;     // turn on SMTP authentication
-		$mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
-		$mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; 
+		$mail->Username = getenv("smtp_username");  // a valid email here
+		$mail->Password = getenv("smtp_password"); 
 		$mail->FromName = "E-Prepag";
 		$mail->isHTML(true);
 
                 //-----Alteração exigida pela BaseNet(11/2017)-------------//
                 $mail->IsSMTP();
                 //$mail->SMTPSecure = "ssl";
-                $mail->Port     = 587;
+                $mail->Port     = getenv("smtp_port");
                 //---------------------------------------------------------//   
                
 

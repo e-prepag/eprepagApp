@@ -2,17 +2,18 @@
 	
 	require_once "/www/class/phpmailer/class.phpmailer.php";
 	require_once "/www/class/phpmailer/class.smtp.php";
+        require_once "/www/class/includes/load_dotenv.php";
 	
 	function disparaEmail($to, $cc, $bcc, $subject, $body_html, $body_plain, $codigoValidacao) {
                 $mail = new PHPMailer();
                 $mail->IsSMTP();
-                $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
+                $mail->Host     = getenv("smtp_host");
                 $mail->SMTPAuth = true;
                 $mail->Mailer   = "smtp";
-                $mail->Username = 'AKIAUYOIQI7LSCTC6LUP';
-                $mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';
+                $mail->Username = getenv("smtp_username");
+                $mail->Password = getenv("smtp_password"); //'985856';
                 //$mail->SMTPSecure = "ssl";
-                $mail->Port     = 587; //587;
+                $mail->Port     = getenv("smtp_port"); //587;
                 
                 $mail->From     = "suporte@e-prepag.com.br";
                 $mail->FromName = "E-Prepag";

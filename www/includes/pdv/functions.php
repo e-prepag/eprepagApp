@@ -1,5 +1,6 @@
 <?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
+require_once "../load_dotenv.php";
 if(!function_exists('checkIP')) {
 	function checkIP() {
 
@@ -563,19 +564,19 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
 
         $mail = new PHPMailer();
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
+        $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
         $mail->From     = "suporte@e-prepag.com.br";
         $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
-        $mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';		//'850637'; 
+        $mail->Username = getenv("smtp_username");  // a valid email here
+        $mail->Password = getenv("smtp_password"); //'985856';		//'850637'; 
         $mail->FromName = $nome != '' ? $nome : "E-Prepag";	  // "(EPP LH)"
 
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
         //$mail->SMTPSecure = "ssl";
-        $mail->Port     = 587;
+        $mail->Port     = getenv("smtp_port");
 
         // Reply-to
         $mail->AddReplyTo('suporte@e-prepag.com.br');
@@ -615,19 +616,19 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
 
     $mail = new PHPMailer();
     //-----Alteração exigida pela BaseNet(11/2017)-------------//
-    $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
+    $mail->Host     = getenv("smtp_host");
     //---------------------------------------------------------//
     $mail->Mailer   = "smtp";
     $mail->From     = "suporte@e-prepag.com.br";
     $mail->SMTPAuth = true;     // turn on SMTP authentication
-    $mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
-    $mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';		//'850637'; 
+    $mail->Username = getenv("smtp_username");  // a valid email here
+    $mail->Password = getenv("smtp_password"); //'985856';		//'850637'; 
     $mail->FromName = "E-Prepag";	// " (EPP)"
     $mail->isHTML(true);
     //-----Alteração exigida pela BaseNet(11/2017)-------------//
     $mail->IsSMTP();
     //$mail->SMTPSecure = "ssl";
-    $mail->Port     = 587;
+    $mail->Port     = getenv("smtp_port");
 
     // Reply-to
     $mail->AddReplyTo('suporte@e-prepag.com.br');
