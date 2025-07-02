@@ -2,6 +2,7 @@
 <?php
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_pagto.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_economy.php";
+require_once RAIZ_DO_PROJETO . "includes/load_dotenv.php";
 
 if (!function_exists('checkIP')) {
 
@@ -46,36 +47,22 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
 
         $mail = new PHPMailer();
 	
-        //-----Altera��o exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = "smtp.basenet.com.br";
+        //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
+        $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
         $mail->From     = "suporte@e-prepag.com.br";
         $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Username = 'suporte@e-prepag.com.br';  // a valid email here
-        $mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856';		//'850637';  985856
+        $mail->Username = getenv("smtp_username");  // a valid email here
+        $mail->Password = getenv("smtp_password"); //'985856';		//'850637';  985856
         $mail->FromName = "E-Prepag";	// " (EPP)"
         $mail->isHTML(true);
 
-        //-----Altera��o exigida pela BaseNet(11/2017)-------------//
+        //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
-        $mail->SMTPSecure = "ssl";
-        $mail->Port     = 465;
+        //$mail->SMTPSecure = "ssl";
+        $mail->Port     = getenv("smtp_port");
         //---------------------------------------------------------//  
-
-        // Overwrite smt details for dev version cause e-prepag.com.br server reject it
-        // When run bat files there is not ip address so we need use COMPUTERNAME to check
-        //Comentar aki quando problema no envio de email
-        if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
-            //  $mail->SMTPDebug  = 1; descomentar para debugar 
-            $mail->IsSMTP();
-            $mail->SMTPSecure = "ssl";
-            $mail->Host     = "email-ssl.com.br";
-            $mail->Port     = 465;
-            $mail->From     = "send@e-prepag.com";
-            $mail->Username = 'send@e-prepag.com';
-            $mail->Password = 'sendeprepag2013';
-        }
 
         // Reply-to
         $mail->AddReplyTo('suporte@e-prepag.com.br');
@@ -574,19 +561,19 @@ function redirect_dr($strRedirect, $post_ser_encrypted_encoded){
 }
 
 function Dia_Semana($posicao){
-        //'posicao = n�mero relacionado a string de dados
-        $dias = array("Domingo", "Segunda", "Ter�a", "Quarta", "Quinta", "Sexta", "S�bado");
+        //'posicao = nï¿½mero relacionado a string de dados
+        $dias = array("Domingo", "Segunda", "Terï¿½a", "Quarta", "Quinta", "Sexta", "Sï¿½bado");
         return $dias[$posicao];
 }
 
 function Mes_Do_Ano($posicao){
-        //'posicao = n�mero relacionado a string de dados
-        $meses = array("", "Janeiro", "Fevereiro", "Mar�o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro");
+        //'posicao = nï¿½mero relacionado a string de dados
+        $meses = array("", "Janeiro", "Fevereiro", "Marï¿½o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro");
         return $meses[$posicao];
 }
 
 function Mes_Do_Ano_Short($posicao){
-        //'posicao = n�mero relacionado a string de dados
+        //'posicao = nï¿½mero relacionado a string de dados
         $meses = array("", "Jan", "Fev", "Mar", "Abr", "Ma", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez");
         return $meses[$posicao];
 }
@@ -816,38 +803,24 @@ function enviaEmailRelatorio($to, $cc, $bcc, $subject, $msgEmail) {
         return enviaEmail3($to, $cc, $bcc, $subject, $msgEmail, $body_plain);	
 }
 
-// Est� usando esta enviaEmail3() em bko\commerce\ -> processaEmailVendaGames()
+// Estï¿½ usando esta enviaEmail3() em bko\commerce\ -> processaEmailVendaGames()
 function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain) {
 
         $mail = new PHPMailer();
-        //-----Altera��o exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = "smtp.basenet.com.br";
+        //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
+        $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
         $mail->From     = "suporte@e-prepag.com.br";
         $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Username = 'suporte@e-prepag.com.br';  // a valid email here
-        $mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856';		//'850637'; 
+        $mail->Username = getenv("smtp_username");  // a valid email here
+        $mail->Password = getenv("smtp_password"); //'985856';		//'850637'; 
         $mail->FromName = "E-Prepag";	// " (EPP)"
 
-        //-----Altera��o exigida pela BaseNet(11/2017)-------------//
+        //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
-        $mail->SMTPSecure = "ssl";
-        $mail->Port     = 465;
-        //---------------------------------------------------------//        
-        // Overwrite smt details for dev version cause e-prepag.com.br server reject it
-        // When run bat files there is not ip address so we need use COMPUTERNAME to check
-        //Comentar aki quando problema no email
-        if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
-            //  $mail->SMTPDebug  = 1; descomentar para debugar 
-            $mail->IsSMTP();
-            $mail->SMTPSecure = "ssl";
-            $mail->Host     = "email-ssl.com.br";
-            $mail->Port     = 465;
-            $mail->From     = "send@e-prepag.com";
-            $mail->Username = 'send@e-prepag.com';
-            $mail->Password = 'sendeprepag2013';
-            }
+        ////$mail->SMTPSecure = "ssl";
+        $mail->Port     = getenv("smtp_port");
 
         // Reply-to
         $mail->AddReplyTo('suporte@e-prepag.com.br');
@@ -935,7 +908,7 @@ function email_cabecalho($parametros){
 
                 //Nome
                 if($parametros['nome']) $nome = $parametros['nome'];
-                else $nome = " Usu�rio(a) E-Prepag";
+                else $nome = " Usuï¿½rio(a) E-Prepag";
 
         }
 
@@ -1042,9 +1015,9 @@ function email_rodape($parametros){
                                                 <tr valign='middle' bgcolor='#FFFFFF'>
                                                         <td align='left' class='texto'>
                                                                 <br><br>
-                                                                        Para resolver qualquer d�vida entre em contato conosco no email <a href='mailto:suporte@e-prepag.com.br'>suporte@e-prepag.com.br</a>.<br>
+                                                                        Para resolver qualquer dï¿½vida entre em contato conosco no email <a href='mailto:suporte@e-prepag.com.br'>suporte@e-prepag.com.br</a>.<br>
                                                                         <br>
-                                                                        Agradecemos sua prefer�ncia por nossos produtos e servi�os.<br>
+                                                                        Agradecemos sua preferï¿½ncia por nossos produtos e serviï¿½os.<br>
                                                                          <br>
                                                                         Atenciosamente<br>
                                                                         <br>";
@@ -1312,7 +1285,7 @@ function mostraCarrinho_pag($bprint, $iativo, &$libera_pagamento = array()){
         $total_geral = 0;
         $GLOBALS['_SESSION']['carrinho_total_geral_treinamento'] = 0;
         $iativo = ($iativo)?1:0;
-        // recupera dados integra��o
+        // recupera dados integraï¿½ï¿½o
         $b_amount_free = "0";
         $carrinho_val = "";
         if(isset($GLOBALS['_SESSION']['integracao_origem_id'])) {
@@ -1320,7 +1293,7 @@ function mostraCarrinho_pag($bprint, $iativo, &$libera_pagamento = array()){
                         $b_amount_free = getPartner_amount_free_By_ID($GLOBALS['_SESSION']['integracao_origem_id']);
                         if(isset($GLOBALS['_SESSION']['carrinho_val'])) {
                                 $carrinho_val = $GLOBALS['_SESSION']['carrinho_val'];
-                                $iativo = 0;	// Como o product_id vem do parceiro, n�o importa se o produto � ativo ou n�o 
+                                $iativo = 0;	// Como o product_id vem do parceiro, nï¿½o importa se o produto ï¿½ ativo ou nï¿½o 
                         }
                 }
         }
@@ -1329,7 +1302,7 @@ function mostraCarrinho_pag($bprint, $iativo, &$libera_pagamento = array()){
 ?>			
                 <table border="0" cellspacing="0" width="90%" height="200">
     <tr align="center" bgcolor="#FFFFFF">
-      <td align="center" class="texto">Carrinho v�zio no momento (1)</td>
+      <td align="center" class="texto">Carrinho vï¿½zio no momento (1)</td>
     </tr>
                 </table>
 <?php
@@ -1340,10 +1313,10 @@ function mostraCarrinho_pag($bprint, $iativo, &$libera_pagamento = array()){
                 ?>
                 <table border="0" cellspacing="0" width="95%" align="center">
         <tr bgcolor="F0F0F0">
-          <td class="texto" align="center" height="25"><b>Descri��o</b>&nbsp;</td>
+          <td class="texto" align="center" height="25"><b>Descriï¿½ï¿½o</b>&nbsp;</td>
           <td class="texto" align="center" colspan="1"><b>Quantidade</b>&nbsp;</td>
           <td class="texto" align="center">&nbsp;</td>
-          <td class="texto" align="center"><b>Unit�rio</b>&nbsp;</td>
+          <td class="texto" align="center"><b>Unitï¿½rio</b>&nbsp;</td>
           <td class="texto" align="center"><b>Total</b>&nbsp;</td>
           <td class="texto" align="center">&nbsp;</td>
         </tr>
@@ -1379,8 +1352,8 @@ function mostraCarrinho_pag($bprint, $iativo, &$libera_pagamento = array()){
 
                 // Debug reinaldops
                 // Para PINs de Treinamento 
-                //		-> salva tamb�m o valor nominal para usar nos testes de Pagamento online (envia para o banco um valor !=0 mas a venda � =0)
-                //	Tem que modificar a concilia��o para aceitar o pagamento !=0 numa venda =0
+                //		-> salva tambï¿½m o valor nominal para usar nos testes de Pagamento online (envia para o banco um valor !=0 mas a venda ï¿½ =0)
+                //	Tem que modificar a conciliaï¿½ï¿½o para aceitar o pagamento !=0 numa venda =0
                 if($rs_row['ogpm_ogp_id']==63 && 
                         ($rs_row['ogpm_id']==282 || $rs_row['ogpm_id']==283 || $rs_row['ogpm_id']==284 || $rs_row['ogpm_id']==285 || $rs_row['ogpm_id']==286)) {
                         $GLOBALS['_SESSION']['carrinho_total_geral_treinamento'] += $ogpm_pin_valor * $qtde;
@@ -1416,7 +1389,7 @@ function mostraCarrinho_pag($bprint, $iativo, &$libera_pagamento = array()){
                             $filtro['ogp_mostra_integracao_com_loja'] = '1';
                             $filtro['opr'] = 1;
                             $ret = (new Produto)->obtermelhorado($filtro, null, $rs);
-                            if(!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto dispon�vel no momento.";
+                            if(!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponï¿½vel no momento.";
                             else $rs_row = pg_fetch_array($rs);
 
                             //inicio bloco que libera pagamento para os publisher
@@ -1498,14 +1471,14 @@ function bCarrinho_ApenasProdutosOK($iativo){
 
 function montaCesta_pag(){
         if($_SESSION['drupal_deposit']=="1") {
-/* seguir este padr�o para funcionar com pagamentos Bradesco (dadosComopraBradesco.php)
+/* seguir este padrï¿½o para funcionar com pagamentos Bradesco (dadosComopraBradesco.php)
 "item:Habbo Hotel - Pacote de 30 HABBO MOEDAS
 1
 pin
 1000
 "
 */
-                $sout = "item:Dep�sito DRUPAL: \n";
+                $sout = "item:Depï¿½sito DRUPAL: \n";
                 $sout .= "1\n";
                 $sout .= "deposit\n";
                 $sout .= "".(($_SESSION['drupal_deposit_amount']>0)?$_SESSION['drupal_deposit_amount']:"0")."\n";
@@ -1521,7 +1494,7 @@ pin
                         $b_amount_free = getPartner_amount_free_By_ID($GLOBALS['_SESSION']['integracao_origem_id']);
                         if(isset($GLOBALS['_SESSION']['carrinho_val'])) {
                                 $carrinho_val = $GLOBALS['_SESSION']['carrinho_val'];
-                                $iativo = 0;	// Como o product_id vem do parceiro, n�o importa se o produto � ativo ou n�o 
+                                $iativo = 0;	// Como o product_id vem do parceiro, nï¿½o importa se o produto ï¿½ ativo ou nï¿½o 
                                 if($b_amount_free=="1") {
                                 }
                         }
@@ -1587,7 +1560,7 @@ pin
                                     $filtro['ogp_mostra_integracao_com_loja'] = '1';
                                     $filtro['opr'] = 1;
                                     $ret = (new Produto)->obtermelhorado($filtro, null, $rs);
-                                    if(!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto dispon�vel no momento.";
+                                    if(!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponï¿½vel no momento.";
                                     else $rs_row = pg_fetch_array($rs);
 
                                     $ogpm_valor = $valor; 
@@ -1679,7 +1652,7 @@ function get_time_difference_formatted( $start, $end ) {
 	return $s;
 }
 
-// -- 'M' - Money, 'E' - Money Express, 'LR' - Lanhouse Pr�, 'LO' - Lanhouse P�s
+// -- 'M' - Money, 'E' - Money Express, 'LR' - Lanhouse Prï¿½, 'LO' - Lanhouse Pï¿½s
 function get_tipo_cliente_descricao($stipo) {
         switch ($stipo) {
                 case "M":
@@ -1689,10 +1662,10 @@ function get_tipo_cliente_descricao($stipo) {
                         $sout = "Money_Express";
                         break;
                 case "LR":
-                        $sout = "LH_Pré";
+                        $sout = "LH_PrÃ©";
                         break;
                 case "LO":
-                        $sout = "LH_Pós";
+                        $sout = "LH_PÃ³s";
                         break;
                 default:
                         $sout = "???";
@@ -1758,7 +1731,7 @@ function getNVendasMoney($idusuario){
 
 function getVendasMoneyTotalDiarioOnline($idusuario){
         $total = 0;
-        // novo - lista vendas n�o canceladas (completas + em aberto) nas �ltimas 24h
+        // novo - lista vendas nï¿½o canceladas (completas + em aberto) nas ï¿½ltimas 24h
         $sql = "select sum(vgm_valor*vgm_qtde) as total from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id";
         $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
         $sql .= " and vg_data_inclusao>='".date('Y-m-d H:i:s', strtotime("-1 days"))."' ";	
@@ -1793,7 +1766,7 @@ function get_newOrderID() {
 		$sql = "SELECT count(*) as n from tb_pag_compras where numcompra='".$orderId."'";
 		$ret = SQLexecuteQuery($sql);
 		if(!$ret) {
-			echo "Erro ao recuperar transa��o de pagamento.\n";
+			echo "Erro ao recuperar transaï¿½ï¿½o de pagamento.\n";
 			die("Stop");
 		} else {
 			$pgresult = pg_fetch_array($ret);
@@ -1820,7 +1793,7 @@ function print_r2($val){
 }
 
 function b_isIntegracao() {
-	// Algumas p�ginas n�o trabalham em integra��o, para evitar que ProdutoModelo:obter() retorne modelos inativos
+	// Algumas pï¿½ginas nï¿½o trabalham em integraï¿½ï¿½o, para evitar que ProdutoModelo:obter() retorne modelos inativos
 	if(strpos(strtolower($GLOBALS['_SERVER']['SCRIPT_NAME']), "/prepag2/commerce/modelosEx.php")===false) {
 		if($GLOBALS['_SESSION']['integracao_is_parceiro']=="OK" && isset($GLOBALS['_SESSION']['integracao_origem_id']) && isset($GLOBALS['_SESSION']['integracao_order_id'])) {
 			return true;
@@ -1829,23 +1802,23 @@ function b_isIntegracao() {
 	return false;
 }
 
-// Algumas operadoras permitem que o usu�rio troque de email antes de enviar o pedido de integra��o -> n�o permite ver o Saldo ou pagar com Saldo
+// Algumas operadoras permitem que o usuï¿½rio troque de email antes de enviar o pedido de integraï¿½ï¿½o -> nï¿½o permite ver o Saldo ou pagar com Saldo
 function b_isIntegracao_with_nonvalidated_email() {
 		return true;
 }
 
-// Retorna true para as p�ginas da loja que podem ser utilizadas no login por integra��o, todas as outras ser�o recusadas por validaSessao()
+// Retorna true para as pï¿½ginas da loja que podem ser utilizadas no login por integraï¿½ï¿½o, todas as outras serï¿½o recusadas por validaSessao()
 function b_isIntegracao_allowed_url() {
 	$a_urls_allowed_in_integracao = array(
 		"/prepag2/commerce/pagamento_int.php", 
-//		"/prepag2/commerce/pagamento_int_cielo.php",				// temporario, para testes de pagto Cielo para integra��o
+//		"/prepag2/commerce/pagamento_int_cielo.php",				// temporario, para testes de pagto Cielo para integraï¿½ï¿½o
 		"/prepag2/commerce/finaliza_venda_int.php", 
-		"/prepag2/commerce/finaliza_venda_int_cielo.php",			// temporario, para testes de pagto Cielo para integra��o
+		"/prepag2/commerce/finaliza_venda_int_cielo.php",			// temporario, para testes de pagto Cielo para integraï¿½ï¿½o
 		"/prepag2/commerce/conta/pagto_compr_redirect.php", 
 		"/prepag2/commerce/conta/pagto_compr_online.php",
-//			"/prepag2/commerce/conta/pagto_compr_online_new.php",	// tempor�rio, apenas para os testes desta p�gina
-//			"/prepag2/commerce/ajax_pin_pagamento_new.php",			// tempor�rio, apenas para os testes desta p�gina
-//			"/prepag2/commerce/ajax_pin_pagamento_data_test.php",	// tempor�rio, apenas para os testes desta p�gina 
+//			"/prepag2/commerce/conta/pagto_compr_online_new.php",	// temporï¿½rio, apenas para os testes desta pï¿½gina
+//			"/prepag2/commerce/ajax_pin_pagamento_new.php",			// temporï¿½rio, apenas para os testes desta pï¿½gina
+//			"/prepag2/commerce/ajax_pin_pagamento_data_test.php",	// temporï¿½rio, apenas para os testes desta pï¿½gina 
 		"/prepag2/commerce/conta/pagto_compr_online_comp.php",
 		"/prepag2/commerce/conta/pagto_compr_boleto.php",
 		"/prepag2/commerce/conta/pagto_compr_dep_doc_transf.php",
@@ -1855,10 +1828,10 @@ function b_isIntegracao_allowed_url() {
 		"/ajax/gamer/ajax_login_integracao.php", 
 		"/cielo/pages/novoPedidoAguarde.php", 
 		"/cielo/pages/retorno.php", 
-                "/prepag2/commerce/conta/pagto_informa_dep_doc_transf.php",     // informa  dados do dep�sito off line
-                "/prepag2/commerce/conta/pagto_informa_dep_doc_transfConf.php", // confirma os dados do dep�sito off line
-                "/prepag2/commerce/conta/pagto_informa_dep_doc_transfEf.php",   // salva os dados informados dep�sito off line
-                "/prepag2/commerce/conta/lista_vendas.php",                     // lista pedido dep�sito off line
+                "/prepag2/commerce/conta/pagto_informa_dep_doc_transf.php",     // informa  dados do depï¿½sito off line
+                "/prepag2/commerce/conta/pagto_informa_dep_doc_transfConf.php", // confirma os dados do depï¿½sito off line
+                "/prepag2/commerce/conta/pagto_informa_dep_doc_transfEf.php",   // salva os dados informados depï¿½sito off line
+                "/prepag2/commerce/conta/lista_vendas.php",                     // lista pedido depï¿½sito off line
 		);
 	$b_script_allowed = in_array($GLOBALS['_SERVER']['SCRIPT_NAME'], $a_urls_allowed_in_integracao);
 
@@ -1869,7 +1842,7 @@ function b_isIntegracao_allowed_url() {
 	}
 }
 
-// Retorna true quando o login extra por ajax na p�gina de pagamentio com Saldo foi feito com sucesso
+// Retorna true quando o login extra por ajax na pï¿½gina de pagamentio com Saldo foi feito com sucesso
 function b_isIntegracao_logged_in() {
 	if(isset($GLOBALS['_SESSION']['integracao_autenticado']) && $GLOBALS['_SESSION']['integracao_autenticado']==1) {
 		return true;
@@ -1888,7 +1861,7 @@ function b_isIntegracao_logged_in() {
 // 4	+2		+2		+2		+2
 // 5	+2		+2		+2		+4
 // 6	+1		+1		+1		+4
-// Est� montado para "5 dias"
+// Estï¿½ montado para "5 dias"
 function get_dias_uteis_para_vencimento_boleto($cod_banco, $data1) {
 	$dow = date("N", $data1);
 	// Usa  5 dias para todos os bancos
@@ -1904,7 +1877,7 @@ function get_dias_uteis_para_vencimento_boleto($cod_banco, $data1) {
 	return $dias;
 }
 
-	// Retorna o n�mero de pins solicitados na venda (para todos os modelos)
+	// Retorna o nï¿½mero de pins solicitados na venda (para todos os modelos)
 	function get_qtde_pins($venda_id, &$vgm_qtde, &$vgm_pin_codinterno) {
 
 		$msg = "";
@@ -1992,7 +1965,7 @@ function gravaLog_DRUPAL_TMP($mensagem){
 	} 
 }
 
-//fun��o que retrono o IP de acesso
+//funï¿½ï¿½o que retrono o IP de acesso
 function retorna_ip_acesso_new() {
 	if (isset($GLOBALS['_SERVER'])) {
 		if (isset($GLOBALS['_SERVER']['REMOTE_ADDR'])) {
@@ -2038,7 +2011,7 @@ if(!function_exists("convert_secs_to_string_global")) {
 	}
 }
 /*
-//Fun��o que retorna a quantidade m�xima de PINs permitidos nos pagamentos
+//Funï¿½ï¿½o que retorna a quantidade mï¿½xima de PINs permitidos nos pagamentos
 function PagamentoNumeroMaximoPIN() {
 	return 5;
 }
@@ -2054,7 +2027,7 @@ function get_msg_bloqueio($stipo) {
 	$smsg .= "</style>\n";
 	$smsg .= "<p class='notice'>O pagamento de produtos Ongame pelo site da E-Prepag � feito somente por <a href='" . EPREPAG_URL_HTTP . "/prepag2/newhome/eppcash.php?secao=onde-comprar-eprepag-cash' target='_blank' class='notice'>E-Prepag Cash</a></p>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
-	$smsg .= "<p class='notice'><b>Voc� pode adquirir E-Prepag Cash da seguinte forma:</b></p>\n";
+	$smsg .= "<p class='notice'><b>Vocï¿½ pode adquirir E-Prepag Cash da seguinte forma:</b></p>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<center>\n";
 	$smsg .= "<table border='0'><tr>\n";
@@ -2065,10 +2038,10 @@ function get_msg_bloqueio($stipo) {
 	$smsg .= "</center>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	if($stipo == "boleto") {
-		$smsg .= "<p class='notice'><b>Se voc� j� tem um PIN E-Prepag Cash:</b></p>\n";
+		$smsg .= "<p class='notice'><b>Se vocï¿½ jï¿½ tem um PIN E-Prepag Cash:</b></p>\n";
 		$smsg .= "<ol>\n";
 		$smsg .= "<li class='notice'>Escolha o valor desejado</li>\n";
-		$smsg .= "<li class='notice'>Fa�a seu login ou cadastro na E-Prepag</li>\n";
+		$smsg .= "<li class='notice'>Faï¿½a seu login ou cadastro na E-Prepag</li>\n";
 		$smsg .= "<li class='notice'>Conclua a compra escolhendo o E-Prepag Cash para pagar</li>\n";
 		$smsg .= "</ol>\n";
 	}
@@ -2084,7 +2057,7 @@ function get_msg_bloqueio_elex() {
 	$smsg .= ".notice {font-family:arial, verdana, sans serif;color:#7e7e7e; font-size:12px}\n";
 	$smsg .= "</style>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
-	$smsg .= "<p class='notice'><b>Adquira EPP Cash em um Ponto de Venda abaixo ou, caso j� possua o PIN, clique no bot�o E-Prepag Cash ao lado:</b></p>\n";
+	$smsg .= "<p class='notice'><b>Adquira EPP Cash em um Ponto de Venda abaixo ou, caso jï¿½ possua o PIN, clique no botï¿½o E-Prepag Cash ao lado:</b></p>\n";
 	$smsg .= "<p class='notice'>&nbsp;</p>\n";
 	$smsg .= "<center>\n";
 	$smsg .= "<table border='0'><tr>\n";
@@ -2191,7 +2164,7 @@ function getSingleValue($sql) {
 	return $ret;   	
 }
 
-//Fun��o de Convers�o da data
+//Funï¿½ï¿½o de Conversï¿½o da data
 function converteData($data_nasc) {
 	if (strstr($data_nasc, "/")) {
 		  $data_array = explode ("/", $data_nasc);
@@ -2201,7 +2174,7 @@ function converteData($data_nasc) {
 	}
 }//end function converteData
 
-//Fun��o que verifica se o publisher exige CPF do Gamer
+//Funï¿½ï¿½o que verifica se o publisher exige CPF do Gamer
 function checkingNeedCPFGamer($opr_codigo) {
     $sql_function ="SELECT opr_need_cpf_lh from operadoras where opr_codigo=".intval($opr_codigo).";";
     $rs_function = SQLexecuteQuery($sql_function);

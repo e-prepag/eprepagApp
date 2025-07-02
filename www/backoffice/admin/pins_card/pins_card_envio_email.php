@@ -1,5 +1,6 @@
 <?php
 require_once $raiz_do_projeto . "includes/main.php";
+require_once "../../../includes/load_dotenv.php";
 
 set_time_limit(6000);
 
@@ -193,19 +194,19 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
 
 //			$email->Host     = "smtp.e-prepag.com.br";	//"localhost";
             //-----Alteração exigida pela BaseNet(11/2017)-------------//
-            $email->Host     = "smtp.basenet.com.br";
+            $email->Host     = getenv("smtp_host");
             //---------------------------------------------------------//
 			$email->Mailer   = "smtp";
 			$email->From     = "suporte@e-prepag.com.br";
 			$email->SMTPAuth = true;     // turn on SMTP authentication
-			$email->Username = 'suporte@e-prepag.com.br';  // a valid email here
-			$email->Password = '@AnQ1V7hP#E7pQ31'; //'985856';	//'850637'; 
+			$email->Username = getenv("smtp_username");  // a valid email here
+			$email->Password = getenv("smtp_password"); //'985856';	//'850637'; 
 			$email->FromName = "E-Prepag";	// " (EPP)"
             
             //-----Alteração exigida pela BaseNet(11/2017)-------------//
             $email->IsSMTP();
-            $email->SMTPSecure = "ssl";
-            $email->Port     = 465;
+            //$email->SMTPSecure = "ssl";
+            $email->Port     = getenv("smtp_port");
             //---------------------------------------------------------//
                         
                         // Overwrite smt details for dev version cause e-prepag.com.br server reject it
@@ -214,7 +215,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
  
                         if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
                             //  $email->SMTPDebug  = 1; descomentar para debugar 
-                            $email->Port     = 587;
+                            $email->Port     = getenv("smtp_port");
                             $email->Host     = "e-prepag.com";
                             $email->Username = 'send@e-prepag.com';
                             $email->Password = 'sendeprepag2013';

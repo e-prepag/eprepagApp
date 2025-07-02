@@ -1,7 +1,4 @@
 <?php
-
-
-
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "configIP.php";
 require_once DIR_INCS . "main.php";
@@ -200,7 +197,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                     <td align="center" class="texto">&nbsp;</td>
                 </tr>
             </table>
-        <?php
+            <?php
         } else if ($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']) {
             ?>
                 <table border="0" cellspacing="0" bgcolor="#FFFFFF" width="100%">
@@ -212,9 +209,9 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                         </td>
                     </tr>
                 </table>
-            <?php
-            if (($banco == "237") && ($assinatura)) {
-                ?>
+                <?php
+                if (($banco == "237") && ($assinatura)) {
+                    ?>
                     <center>
                         <table border="0" cellspacing="0" align="center">
                             <tr bgcolor="F0F0F0">
@@ -226,8 +223,8 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                         </table>
                     </center>
 
-            <?php
-            }
+                <?php
+                }
         } else if ($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_CANCELADA']) {
             ?>
                     <table border="0" cellspacing="0" bgcolor="#FFFFFF" width="100%">
@@ -239,7 +236,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                             </td>
                         </tr>
                     </table>
-        <?php
+            <?php
         } else { //	apenas $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'] ?>
                     <center>
                         <table cellspacing="0" cellpadding="0" width="90%">
@@ -299,7 +296,6 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                 if (!defined("PAGAMENTO_PIX_CHAVEAMENTO")) {
                                                                     include "/www/includes/config.MeiosPagamentos.php";
                                                                 }
-
                                                                 if (PAGAMENTO_PIX_CHAVEAMENTO == "a") {
                                                                     if (number_format(($total_carrinho + $taxas), 2, '.', '') > VALOR_TROCA) {
                                                                         $ativoNome["nome"] = PAGAMENTO_PIX_PROVEDOR2;
@@ -323,6 +319,16 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                         echo $pix->callService($params);
                                                                     } else if ($ativoNome["nome"] == "mercadopago") {
                                                                         $pix = new classPIX();
+                                                                        $item = [
+                                                                            [
+                                                                                "title" => "Compra de Crédito",
+                                                                                "description" => "Compra de crédito no valor de " . number_format(($total_carrinho + $taxas), 2, '.', ''),
+                                                                                "category_id" => "creditos",
+                                                                                "unit_price" => number_format(($total_carrinho + $taxas), 2, '.', ''),
+                                                                                "quantity" => 1,
+                                                                            ],
+                                                                        ];
+
                                                                         $params = array(
                                                                             'metodo' => PIX_REGISTER,
                                                                             'cpf_cnpj' => str_replace('-', '', str_replace('.', '', $usuarioGames->ug_sCNPJ)),
@@ -331,7 +337,8 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                             'descricao' => "E-PREPAG",
                                                                             'idpedido' => $ARRAY_CONCATENA_ID_VENDA['pdv'] . $_SESSION['pagamento.numorder'],
                                                                             'venda_id' => $venda_id,
-                                                                            'email' => $usuarioGames->ug_sEmail
+                                                                            'email' => $usuarioGames->ug_sEmail,
+                                                                            'itens' => $item
                                                                         );
                                                                         echo $pix->callService($params);
                                                                     } else {
@@ -355,6 +362,16 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                         echo $pix->callService($params);
                                                                     } else if ($ativoNome["nome"] == "mercadopago") {
                                                                         $pix = new classPIX();
+                                                                        $item = [
+                                                                            [
+                                                                                "title" => "Compra de Crédito",
+                                                                                "description" => "Compra de crédito no valor de " . number_format(($total_carrinho + $taxas), 2, '.', ''),
+                                                                                "category_id" => "creditos",
+                                                                                "unit_price" => number_format(($total_carrinho + $taxas), 2, '.', ''),
+                                                                                "quantity" => 1,
+                                                                            ],
+                                                                        ];
+
                                                                         $params = array(
                                                                             'metodo' => PIX_REGISTER,
                                                                             'cpf_cnpj' => str_replace('-', '', str_replace('.', '', $usuarioGames->ug_sCNPJ)),
@@ -363,7 +380,8 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                             'descricao' => "E-PREPAG",
                                                                             'idpedido' => $ARRAY_CONCATENA_ID_VENDA['pdv'] . $_SESSION['pagamento.numorder'],
                                                                             'venda_id' => $venda_id,
-                                                                            'email' => $usuarioGames->ug_sEmail
+                                                                            'email' => $usuarioGames->ug_sEmail,
+                                                                            'itens' => $item
                                                                         );
                                                                         echo $pix->callService($params);
                                                                     } else {
@@ -379,14 +397,15 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                                                     fwrite($ff, RAZAO_EMPRESA."\r\n");
                                                                                                     fwrite($ff, $ARRAY_CONCATENA_ID_VENDA['pdv'].'0000000'.$_SESSION['pagamento.numorder']."\r\n");
                                                                                                     fwrite($ff, "***************************************************\r\n");
-                                                                                                    
+
                                                                                                     fclose($ff);*/
                                                                 //var_dump($params); die();
                                                                 ?>
                                                                     <script language='javascript'>
                                                                         $("#info_pagamento").hide();
+                                                                        console.log("<?= $ativoNome["nome"] ?>");
                                                                     </script>
-                                                        <?php
+                                                            <?php
                                                             } //end else if($pagto_tipo == $PAGAMENTO_PIX_NUMERIC)
                                                         
 
@@ -403,51 +422,51 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                 <table border="0" cellspacing="0" width="90%">
                                                     <tr>
                                                         <td colspan="3" align="center" width="33%">
-                                                    <?php
-                                                    if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) || ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']) || ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_CREDITO'])) {
-                                                        $cesta = $rs_pagto_row['cesta'];
-                                                        $numcompra = $rs_pagto_row['numcompra'];
+                                                        <?php
+                                                        if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) || ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']) || ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_CREDITO'])) {
+                                                            $cesta = $rs_pagto_row['cesta'];
+                                                            $numcompra = $rs_pagto_row['numcompra'];
 
-                                                        if (strpos($cesta, "\n")) {
-                                                            $cesta_desc = explode("\n", $cesta);
+                                                            if (strpos($cesta, "\n")) {
+                                                                $cesta_desc = explode("\n", $cesta);
 
-                                                            $cesta_descricao = "";
-                                                            $pattern = "/item:/";
-                                                            foreach ($cesta_desc as $i => $prod) {
-                                                                if (preg_match($pattern, $prod)) {
-                                                                    $cesta_descricao .= $prod;
+                                                                $cesta_descricao = "";
+                                                                $pattern = "/item:/";
+                                                                foreach ($cesta_desc as $i => $prod) {
+                                                                    if (preg_match($pattern, $prod)) {
+                                                                        $cesta_descricao .= $prod;
+                                                                    }
                                                                 }
-                                                            }
-                                                        } else {
-                                                            $cesta_descricao = $cesta;
-                                                        }
-
-                                                        $obj_pagamento = new classBradescoTransferencia();
-
-                                                        $array_infos_ws = $obj_pagamento->montaVetorInformacoes($dist_usuarioGames, $total_carrinho, $numcompra, trim($cesta_descricao), TRUE);
-
-                                                        if (is_null($array_infos_ws)) {
-                                                            $titulo = "Sessão expirada";
-                                                            $msg_problem = "Sua sessão expirou!";
-                                                        } else {
-                                                            $comunica = $obj_pagamento->Req_EfetuaConsultaURL($array_infos_ws, $lista_resposta);
-
-                                                            if (is_null($comunica)) {
-                                                                $titulo = "ERRO - Problema na validação de seus dados";
-                                                                $msg_problem = "Problema ao validar seus dados cadastrados! Por favor, relate o problema ao Suporte";
                                                             } else {
-                                                                if (is_array($comunica)) {
-                                                                    $titulo = "ERRO - Problema de comunicação com o Bradesco";
-                                                                    $msg_problem = "Houve um problema de comunicação com o Bradesco! Tente novamente mais tarde. Obrigado!";
+                                                                $cesta_descricao = $cesta;
+                                                            }
+
+                                                            $obj_pagamento = new classBradescoTransferencia();
+
+                                                            $array_infos_ws = $obj_pagamento->montaVetorInformacoes($dist_usuarioGames, $total_carrinho, $numcompra, trim($cesta_descricao), TRUE);
+
+                                                            if (is_null($array_infos_ws)) {
+                                                                $titulo = "Sessão expirada";
+                                                                $msg_problem = "Sua sessão expirou!";
+                                                            } else {
+                                                                $comunica = $obj_pagamento->Req_EfetuaConsultaURL($array_infos_ws, $lista_resposta);
+
+                                                                if (is_null($comunica)) {
+                                                                    $titulo = "ERRO - Problema na validação de seus dados";
+                                                                    $msg_problem = "Problema ao validar seus dados cadastrados! Por favor, relate o problema ao Suporte";
                                                                 } else {
-                                                                    $location = $comunica;
+                                                                    if (is_array($comunica)) {
+                                                                        $titulo = "ERRO - Problema de comunicação com o Bradesco";
+                                                                        $msg_problem = "Houve um problema de comunicação com o Bradesco! Tente novamente mais tarde. Obrigado!";
+                                                                    } else {
+                                                                        $location = $comunica;
+                                                                    }
                                                                 }
                                                             }
-                                                        }
 
-                                                        if (isset($msg_problem)) {
+                                                            if (isset($msg_problem)) {
 
-                                                            ?>
+                                                                ?>
                                                                     <div class="col-md-12 top10 col-sm-12 col-xs-12">
                                                                         <p class="txt-vermelho"><?php echo $msg_problem; ?></p>
                                                                     </div>
@@ -467,7 +486,8 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                             <div class="modal-content">
                                                                                 <div class="modal-header">
                                                                                     <h4 class="modal-title txt-vermelho">
-                                                                                <?php echo $titulo; ?></h4>
+                                                                                <?php echo $titulo; ?>
+                                                                                    </h4>
                                                                                 </div>
                                                                                 <div class="modal-body alert alert-danger">
                                                                                     <div class="form-group top10">
@@ -485,10 +505,10 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                         $("#info_pagamento").hide();
                                                                         $("#modal-problema-comunicacao").modal();
                                                                     </script>
-                                                            <?php
-                                                            die();
-                                                        } else {
-                                                            ?>
+                                                                <?php
+                                                                die();
+                                                            } else {
+                                                                ?>
                                                                     <form action="" method="post" target="_blank">
                                                                         <input class="btn btn-success top50" type="button"
                                                                             name="btnIrAoBanco" value="Clique aqui para pagar"
@@ -496,9 +516,9 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                             class="int-btn1 grad1 int-pagamento-compr-online-btn1">
                                                                     </form>
                                                             <?php
-                                                        }
-                                                    } else if ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
-                                                        ?>
+                                                            }
+                                                        } else if ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
+                                                            ?>
                                                                     <form action="<?php echo $location; // "../debug.php" ?>" method="post"
                                                                         target="_blank">
                                                                         <input type="submit" name="btnIrAoBanco"
@@ -507,8 +527,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                             value="<?php echo $bbr_idConv; ?>">
                                                                         <input type="hidden" name="refTran"
                                                                             value="<?php echo $bbr_refTran; ?>">
-                                                                        <input type="hidden" name="valor"
-                                                                            value="<?php echo $bbr_valor; ?>">
+                                                                        <input type="hidden" name="valor" value="<?php echo $bbr_valor; ?>">
                                                                         <input type="hidden" name="qtdPontos"
                                                                             value="<?php echo $bbr_qtdPontos; ?>">
                                                                         <input type="hidden" name="dtVenc"
@@ -529,26 +548,26 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                         <input type="hidden" name="msgLoja"
                                                                             value="<?php echo $bbr_msgLoja; ?>">
                                                                     </form>
-                                                    <?php
-                                                    } else if ($pagto_tipo == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC) { // $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'] 
-                                                        $cripto = new Itaucripto();
+                                                        <?php
+                                                        } else if ($pagto_tipo == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC) { // $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'] 
+                                                            $cripto = new Itaucripto();
 
-                                                        $dados_cripto = $cripto->geraDados($codEmp, $pedido, $valorAux, $observacao, $chave, $nomeSacado, $codigoInscricao, $numeroInscricao, $enderecoSacado, $bairroSacado, $cepSacado, $cidadeSacado, $estadoSacado, $dataVencimento, $urlRetorna, $ObsAdicional1, $ObsAdicional2, $ObsAdicional3);
-                                                        //-----------------------------------------------------------------------------------------------------------------------------------------------------
+                                                            $dados_cripto = $cripto->geraDados($codEmp, $pedido, $valorAux, $observacao, $chave, $nomeSacado, $codigoInscricao, $numeroInscricao, $enderecoSacado, $bairroSacado, $cepSacado, $cidadeSacado, $estadoSacado, $dataVencimento, $urlRetorna, $ObsAdicional1, $ObsAdicional2, $ObsAdicional3);
+                                                            //-----------------------------------------------------------------------------------------------------------------------------------------------------
 //MODO UTILIZANDO ASP - DESCOMENTAR CASO UTILIZAR ASP                                        
 //                                            $dados = getItauCrypto($form_fields, "pagto");
 //                                            $aretorno = explode("\n", $dados);
 //                                            $dados_cripto = $aretorno[9];
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
-                                                        ?>
+                                                            ?>
                                                                         <form action="<?php echo $location; ?>" method="post" target="_blank">
                                                                             <input type="hidden" name="DC" value="<?php echo $dados_cripto ?>">
                                                                             <input type="submit" name="btnIrAoBanco"
                                                                                 value="Clique aqui para pagar" class="btn btn-success">
                                                                         </form>
-                                                    <?php
-                                                    }
-                                                    ?>
+                                                        <?php
+                                                        }
+                                                        ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -592,14 +611,14 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                     </center>
                 </div>
                 <script language="JavaScript" type="text/JavaScript">
-                $("#pagamento_ok").hide();
-                $("#pagamento_cancela").hide();
+                            $("#pagamento_ok").hide();
+                            $("#pagamento_cancela").hide();
     
-                $(".col-pix").removeClass("col-md-7");
-                $(".col-pix").addClass("col-md-12");
-                $("#img-pix").css("float","none");
+                            $(".col-pix").removeClass("col-md-7");
+                            $(".col-pix").addClass("col-md-12");
+                            $("#img-pix").css("float","none");
     
-                </script>
+                            </script>
     <?php } ?>
     <br>
     <br>

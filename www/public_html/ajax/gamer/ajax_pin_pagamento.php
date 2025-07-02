@@ -134,9 +134,13 @@ if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodig
 					//Confirmando existencia e valor do PIN EPP CASH
 					$aux_valida_pin = valida_pin($numpin);
 					if ($aux_valida_pin >= 0 || ($numpin == "")) {
-						session_start();
-						addContadorVezCarrinho($numpin);
-						$_SESSION['PINEPP'][$numpin]=$aux_valida_pin;
+						if(valida_vencimento_pin($numpin)){
+							session_start();
+							addContadorVezCarrinho($numpin);
+							$_SESSION['PINEPP'][$numpin]=$aux_valida_pin;
+						}else{
+							$msg_ajax .= "Este PIN est&aacute; fora da validade (Erro: 4).<br>Por favor, verifique se a validade n&atilde;o passou de 6 meses ou entre em contato com o <a href=\'mailto:suporte@e-prepag.com.br\'>suporte@e-prepag.com.br</a>";
+						}
 					}
 					else $msg_ajax .= "Este PIN n&atilde;o foi identificado (Erro: 1).<br>Por favor, verifique se o c&oacute;digo digitado est&aacute; correto ou entre em contato com o <a href=\'mailto:suporte@e-prepag.com.br\'>suporte@e-prepag.com.br</a>";
 				}//end if(RetonaTamanhoPINEPPCASH)
