@@ -2048,37 +2048,23 @@ function eprepag_detectLang($use_include = false) {
 		}		
 
 		$mail = new PHPMailer();
-//		$mail->Host     = "smtp.e-prepag.com.br";	//"localhost";
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = "smtp.basenet.com.br";
+        $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
         //---------------------------------------------------------//
 		$mail->Mailer   = "smtp";
 		$mail->From     = "suporte@e-prepag.com.br";
 		$mail->SMTPAuth = true;     // turn on SMTP authentication
-		$mail->Username = 'suporte@e-prepag.com.br';  // a valid email here
-		$mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856'; //'8s}:#t)YTa~5ks))';'850637'; 
+		$mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
+		$mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856'; //'8s}:#t)YTa~5ks))';'850637'; 
 		$mail->FromName = "E-Prepag";
 		$mail->isHTML(true);
         
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
         $mail->IsSMTP();
-        $mail->SMTPSecure = "ssl";
-        $mail->Port     = 465;
+        //$mail->SMTPSecure = "ssl";
+        $mail->Port     = 587;
         //---------------------------------------------------------//
                 
-                // Overwrite smt details for dev version cause e-prepag.com.br server reject it
-                // You can just add your IP or use elseif with your details
-                // When run bat files there is not ip address so we need use COMPUTERNAME to check
-                if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
-                    //  $mail->SMTPDebug  = 1; descomentar para debugar 
-                    $mail->IsSMTP();
-                    $mail->SMTPSecure = "ssl";
-                    $mail->Host     = "email-ssl.com.br";
-                    $mail->Port     = 465;
-                    $mail->From     = "send@e-prepag.com";
-                    $mail->Username = 'send@e-prepag.com';
-                    $mail->Password = 'sendeprepag2013';
-                    }
 
 		// Reply-to
 		$mail->AddReplyTo('suporte@e-prepag.com.br');
@@ -2122,35 +2108,22 @@ function eprepag_detectLang($use_include = false) {
 
 		$mail = new PHPMailer();
                 //-----Alteração exigida pela BaseNet(11/2017)-------------//
-                $mail->Host     = "smtp.basenet.com.br";
+                $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
                 //---------------------------------------------------------//
 		$mail->Mailer   = "smtp";
 		$mail->From     = "financeiro@e-prepag.com.br";
 		$mail->SMTPAuth = true;     // turn on SMTP authentication
-		$mail->Username = 'financeiro@e-prepag.com.br';  // a valid email here
-		$mail->Password = '8s}:#t)YTa~5ks))'; 
+		$mail->Username = 'AKIAUYOIQI7LSCTC6LUP';  // a valid email here
+		$mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; 
 		$mail->FromName = "E-Prepag";
 		$mail->isHTML(true);
 
                 //-----Alteração exigida pela BaseNet(11/2017)-------------//
                 $mail->IsSMTP();
-                $mail->SMTPSecure = "ssl";
-                $mail->Port     = 465;
+                //$mail->SMTPSecure = "ssl";
+                $mail->Port     = 587;
                 //---------------------------------------------------------//   
                
-                // Overwrite smt details for dev version cause e-prepag.com.br server reject it
-                // When run bat files there is not ip address so we need use COMPUTERNAME to check
-//Comentar aki quando problema no email
-                if(checkIP() || (class_exists('EmailEnvironment')  && EmailEnvironment::serverId() == 1)) {
-                    //  $mail->SMTPDebug  = 1; descomentar para debugar 
-                    $mail->IsSMTP();
-                    $mail->SMTPSecure = "ssl";
-                    $mail->Host     = "email-ssl.com.br";
-                    $mail->Port     = 465;
-                    $mail->From     = "send@e-prepag.com";
-                    $mail->Username = 'send@e-prepag.com';
-                    $mail->Password = 'sendeprepag2013';
-                }
 
 		// Reply-to
 		$mail->AddReplyTo('financeiro@e-prepag.com.br');

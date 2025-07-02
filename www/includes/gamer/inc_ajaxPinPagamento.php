@@ -476,6 +476,57 @@ function valida_pin($cod_pin, $geralog = null) {
 	else return -1;
 }
 
+function valida_vencimento_pin($cod_pin, $geralog = null) {
+	global $PINS_STORE_STATUS_VALUES,$PINS_STORE_MSG_LOG_STATUS; 
+	sleep(1);
+	if (!empty($cod_pin)) {
+
+		$pdo = ConnectionPDO::getConnection()->getLink();
+
+		$sql = "SELECT 1 
+				FROM pins 
+				WHERE pin_codigo = :PIN 
+				  AND pin_validade >= CURRENT_DATE;";
+
+		$stmt = $pdo->prepare($sql);
+		$stmt->bindValue(':PIN', trim($cod_pin), PDO::PARAM_STR);
+		$stmt->execute();
+		if (!($stmt->fetchColumn())) {
+
+			//instanciando a classe de cryptografia
+			$chave256bits = new Chave();
+			$aes = new AES($chave256bits->retornaChave());
+			$sql = "SELECT pin_codigo, pin_valor 
+        				from pins_store 
+        				where pin_codigo = '" . base64_encode($aes->encrypt(addslashes($cod_pin))) . "' 
+        				  and pin_dataentrada >= CURRENT_DATE - INTERVAL '6 months'";
+
+			
+			$ff = fopen("/www/log/erroFile.txt","a+");
+			fwrite($ff, $sql.date('Y-m-d H:i:s')."\r");
+			fclose($ff);
+			
+			$rs_oper = SQLexecuteQuery($sql);
+			if(!$rs_oper || pg_num_rows($rs_oper) == 0) {
+				if (is_null($geralog))
+					log_pin($PINS_STORE_MSG_LOG_STATUS['ERRO_VALIDACAO'],$sql,$cod_pin);
+				return false;
+			} else {
+				$rs_oper_row = pg_fetch_array($rs_oper);
+				if (is_null($geralog))
+					log_pin($PINS_STORE_MSG_LOG_STATUS['SUCESSO_VALIDACAO'],$sql,$cod_pin);
+				return true;
+			}
+		}else{
+			if (is_null($geralog))
+				log_pin($PINS_STORE_MSG_LOG_STATUS['SUCESSO_VALIDACAO'],$sql,$cod_pin);
+			return true;
+		}
+
+	}
+	else return false;
+}
+
 function limpa_session_pin($pagto) {
 //$usuarioGames1 = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 //if($usuarioGames1->getId()==53916) { 	echo "[$pagto]<br>"; }
@@ -691,7 +742,7 @@ function insereSaldoComposicaoFifo($valor_composicao,$canal,$comissao,$novo_vend
 	gravaLog_EPPCASH("SQL que insere registro na tabela saldo_composicao_fifo EPP:\n$sql_composicao_saldo");
 	$ret_composicao_saldo = SQLexecuteQuery($sql_composicao_saldo);
 	if(!$ret_composicao_saldo) {
-		$msg .= "Erro ao inserir a composição do saldo. Por favor, tente novamente atualizando a página. Obrigado 215.\n";
+		$msg = "Erro ao inserir a composição do saldo. Por favor, tente novamente atualizando a página. Obrigado 215.\n";
 		return false;
 	}
 	else {
@@ -757,6 +808,12 @@ function RedeemPIN_EPP_CASH($key,$value,&$msg,&$aux_valor_PINs_EPP,&$aux_valor_P
 	$chave256bits = new Chave();
 	$aes = new AES($chave256bits->retornaChave());
 	if(valida_pin($key,1) > 0){
+
+		if(valida_vencimento_pin($key,1) == false) {
+			$msg .= "<font color='#FF0000'><b>Erro ao validar a validade do PIN EPP CASH (".$key.").\n</b></font><br>";
+			return;
+		}
+
 		$sql = "UPDATE pins_store SET pin_status='".intval($GLOBALS['PINS_STORE_STATUS_VALUES']['U'])."' WHERE pin_codigo='".base64_encode($aes->encrypt(addslashes($key)))."' and pin_status='".intval($GLOBALS['PINS_STORE_STATUS_VALUES']['A'])."' and pin_valor = ".intval($value);
 		gravaLog_EPPCASH("Atualizando cada PIN CASH como utilizado. \n $sql");
 //echo "<br>SQL: ".$sql."<br>";
@@ -1354,6 +1411,9 @@ function utilizar_pin() {
 																		}
 																		if(!insereSaldoComposicaoFifo($valor_composicao,$canal,$comissao,$novo_venda_id)) {
 																			$msg .= "Erro ao inserir a composição do saldo. Por favor, tente novamente atualizando a página. Obrigado 215 EPP CASH.\n";
+																			log_pin($GLOBALS['PINS_STORE_MSG_LOG_STATUS']['ERRO_STRANSACAO'],"Sem sql",$key);
+																		}else{
+																			log_pin($GLOBALS['PINS_STORE_MSG_LOG_STATUS']['SUCESSO_CTRANSACAO'],"Sem sql",$key);
 																		}
 																	} //end if(($valor_parcial - $valor)>0)
 															}//end else if(!$rs_rastreab)
@@ -1551,7 +1611,7 @@ function utilizar_pin_carga() {
 			if($msg == ""){
 				$usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
 				$saldoDB = getSaldoUsuarioFunc();
-				if($sDebug) gravaLog_EPPCASH("Antes do if (saldo <> saldoDB)\n Saldo antes do transaction: saldo [$saldo]\n Saldo retornado pelo SQL: rs_user_saldo_row['ug_perfil_saldo']: [".$rs_user_saldo_row['ug_perfil_saldo']."]");
+				if($sDebug) gravaLog_EPPCASH("Antes do if (saldo <> saldoDB)\n Saldo antes do transaction: saldo [$saldo]\n Saldo retornado pelo SQL: rs_user_saldo_row['ug_perfil_saldo']: [".$saldoDB."]");
 				//variavel utilizada para rollback da SESSION
 				$valor_saldo_rollback = $saldoDB;
 				if ($saldo <> $saldoDB) {
@@ -1654,6 +1714,9 @@ function utilizar_pin_carga() {
 												else {
 														if(!insereSaldoComposicaoFifo($value,$canal,$comissao,$novo_venda_id)) {
 															$msg .= "Erro ao inserir a composição do saldo. Por favor, tente novamente atualizando a página. Obrigado 215 EPP CASH.\n";
+															log_pin($GLOBALS['PINS_STORE_MSG_LOG_STATUS']['ERRO_STRANSACAO'],"Sem sql",$key);
+														}else{
+															log_pin($GLOBALS['PINS_STORE_MSG_LOG_STATUS']['SUCESSO_CTRANSACAO'],"Sem sql",$key);
 														}
 												}//end else if(!$rs_rastreab)
 											}//end if(!empty($canal))

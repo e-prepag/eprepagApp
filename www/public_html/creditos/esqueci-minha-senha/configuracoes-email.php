@@ -6,13 +6,13 @@
 	function disparaEmail($to, $cc, $bcc, $subject, $body_html, $body_plain, $codigoValidacao) {
                 $mail = new PHPMailer();
                 $mail->IsSMTP();
-                $mail->Host     = "smtp.basenet.com.br";
+                $mail->Host     = "email-smtp.sa-east-1.amazonaws.com";
                 $mail->SMTPAuth = true;
                 $mail->Mailer   = "smtp";
-                $mail->Username = 'suporte@e-prepag.com.br';
-                $mail->Password = '@AnQ1V7hP#E7pQ31'; //'985856';
-                $mail->SMTPSecure = "ssl";
-                $mail->Port     = 465; //587;
+                $mail->Username = 'AKIAUYOIQI7LSCTC6LUP';
+                $mail->Password = 'BIFYsYF5+PhgFer64wPmfalJyRQXhukM3HVDoNO17giB'; //'985856';
+                //$mail->SMTPSecure = "ssl";
+                $mail->Port     = 587; //587;
                 
                 $mail->From     = "suporte@e-prepag.com.br";
                 $mail->FromName = "E-Prepag";
