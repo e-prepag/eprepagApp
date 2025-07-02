@@ -659,6 +659,8 @@ class PHPMailer
         if ($exceptions !== null) {
             $this->exceptions = (boolean)$exceptions;
         }
+        $this->CharSet  = 'ISO-8859-1';
+        $this->Encoding = 'quoted-printable';
     }
 
     /**

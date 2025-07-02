@@ -84,9 +84,13 @@ if (strtolower($op) != 'uti') {
 				$aux_valida_pin = valida_pin($numpin);
 				if ($aux_valida_pin >= 0 || ($numpin == "")) {
 					if (($numpin != "")&&(count($_SESSION['PINEPP']) < $PAGTO_RESTR_NUM_MAX_PINS_DEFAULT_DEP)) {
-						session_start();
-						addContadorVezCarrinho($numpin);
-						$_SESSION['PINEPP'][$numpin]=$aux_valida_pin;
+						if(valida_vencimento_pin($numpin)){
+							session_start();
+							addContadorVezCarrinho($numpin);
+							$_SESSION['PINEPP'][$numpin]=$aux_valida_pin;
+						}else{
+							$msg_ajax .= "Este PIN est&aacute; fora da validade (Erro: 4).<br>Por favor, verifique se a validade n&atilde;o passou de 6 meses ou entre em contato com o <a href=\'mailto:suporte@e-prepag.com.br\'>suporte@e-prepag.com.br</a>";
+						}
 					}
 					elseif ($numpin != "") {
 						$msg_ajax .=  "Quantidade m&aacute;xima de PINs a ser utilizados s&atilde;o ".$PAGTO_RESTR_NUM_MAX_PINS_DEFAULT_DEP.".<br>";
