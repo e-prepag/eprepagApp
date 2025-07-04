@@ -86,12 +86,9 @@ if ($_SESSION['usuario_operador']) {
             // Token is invalid
             $msg = "Token inválido!";
             $cor = "text-danger";
-
-            $secret = $ga->createSecret();
-            $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
-            $_SESSION['secret'] = $secret;
         }
-    } else {
+    } 
+    if(!$secret) {
         $ga = new PHPGangsta_GoogleAuthenticator();
 
         $secret = $ga->createSecret();
@@ -173,12 +170,9 @@ if ($_SESSION['usuario_operador']) {
             // Token is invalid
             $msg = "Token inválido!";
             $cor = "text-danger";
-
-            $secret = $ga->createSecret();
-            $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
-            $_SESSION['secret'] = $secret;
         }
-    } else {
+    } 
+    if(!$secret) {
         $ga = new PHPGangsta_GoogleAuthenticator();
 
         $secret = $ga->createSecret();

@@ -37,7 +37,7 @@ if (empty($user)) {
     file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
     //$pag = $server_url . $pag;
     $strRedirect = $server_url .
-        "/game/conta/login_teste.php?msg=" .
+        "/game/conta/login.php?msg=" .
         urlencode($msg) .
         "&login=" .
         urlencode($login);
@@ -61,7 +61,7 @@ if ($authData) {
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
-            "/game/conta/login_teste.php?msg=" .
+            "/game/conta/login.php?msg=" .
             urlencode($msg) .
             "&login=" .
             urlencode($login);
@@ -85,7 +85,7 @@ if ($token && $secret) {
 
         // Verifica se alguma linha foi afetada
         if ($stmt->rowCount() > 0) {
-            header("Location: $server_url/game/conta/login_teste.php");
+            header("Location: $server_url/game/conta/login.php?msg=" . urlencode("Realize o login com o novo autenticador!"));
             exit;
         }
         $msg = "Erro ao salvar o token!";
@@ -94,12 +94,10 @@ if ($token && $secret) {
         // Token is invalid
         $msg = "Token inválido!";
         $cor = "text-danger";
-
-        $secret = $ga->createSecret();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag Gamer', $secret);
-        $_SESSION['secret'] = $secret;
     }
-} else {
+} 
+
+if(!$secret){
     $ga = new PHPGangsta_GoogleAuthenticator();
 
     $secret = $ga->createSecret();
