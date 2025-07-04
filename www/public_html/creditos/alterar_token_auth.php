@@ -44,11 +44,13 @@ if ($token && $secret) {
     }
 }
 
-$ga = new PHPGangsta_GoogleAuthenticator();
+if (!$secret) {
+    $ga = new PHPGangsta_GoogleAuthenticator();
 
-$secret = $ga->createSecret();
-$qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
-$_SESSION['secret'] = $secret;
+    $secret = $ga->createSecret();
+    $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+    $_SESSION['secret'] = $secret;
+}
 
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 ?>
