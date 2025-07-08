@@ -150,8 +150,20 @@ $instProdMod = new ProdutoModelo();
 	if($msg == ""){
 		if($ogp_opr_codigo && is_numeric($ogp_opr_codigo)) {
                     
-			$sql  = "select opr_valor1, opr_valor2, opr_valor3, opr_valor4, opr_valor5, opr_valor6, opr_valor7, opr_valor8, opr_valor9, opr_valor10, opr_valor11, opr_valor12, opr_valor13, opr_valor14, opr_valor15, opr_valor16, opr_valor17, opr_valor18, opr_valor19, opr_valor20, opr_valor21, opr_markup from operadoras where opr_codigo = " . $ogp_opr_codigo . "";
-			$rs_pins_opr = SQLexecuteQuery($sql);
+			// Consulta os valores válidos (>0)
+      $sql_valores = "SELECT valor 
+                      FROM operadoras_valores 
+                      WHERE opr_codigo = $ogp_opr_codigo 
+                      AND valor > 0 
+                      ORDER BY valor";
+
+      // Consulta o markup (permanece igual)
+      $sql_markup = "SELECT opr_markup 
+                     FROM operadoras 
+                     WHERE opr_codigo = $ogp_opr_codigo";
+
+      $rs_pins_opr = SQLexecuteQuery($sql_valores);
+      $rs_markup = SQLexecuteQuery($sql_markup);
 
 		}
 	}
@@ -273,19 +285,24 @@ function abreUpload(modelo_id){
 				<select name="ogpm_pin_valor" class="form2">
 					<option value="">Selecione</option>
 					<?php 
-						if($rs_pins_opr) {
-							$rs_pins_opr_row = pg_fetch_array($rs_pins_opr); 
-							for($i=1;$i<=21;$i++) {
-								if($rs_pins_opr_row["opr_valor$i"]>0) {
-					?>
-									<option value="<?php echo $rs_pins_opr_row["opr_valor$i"]; ?>" <?php if ($ogpm_pin_valor == $rs_pins_opr_row["opr_valor$i"]) echo "selected";?>><?php echo $rs_pins_opr_row["opr_valor$i"]; ?></option>
-					<?php 
-								}
-								if($i>21) break;
-							}
-                                                        $opr_markup = $rs_pins_opr_row["opr_markup"];
-						} 
-					?>
+            if ($rs_pins_opr) {
+                $num_rows = pg_num_rows($rs_pins_opr);
+                for ($i = 0; $i < $num_rows; $i++) {
+                    $rs_pins_opr_row = pg_fetch_array($rs_pins_opr, $i);
+            ?>
+                    <option value="<?php echo $rs_pins_opr_row["valor"]; ?>" <?php if ($ogpm_pin_valor == $rs_pins_opr_row["valor"]) echo "selected"; ?>>
+                        <?php echo $rs_pins_opr_row["valor"]; ?>
+                    </option>
+            <?php
+                }
+            }
+
+            // Pega o markup
+            if ($rs_markup) {
+                $rs_markup_row = pg_fetch_array($rs_markup);
+                $opr_markup = $rs_markup_row["opr_markup"];
+            }
+          ?>
 
 				</select> (aqueles que aparecem no cadastro da operadora)
 			</td>

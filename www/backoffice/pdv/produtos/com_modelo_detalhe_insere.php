@@ -121,16 +121,12 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 	//Recupera o pins
 	if($msg == ""){
 		if($ogp_opr_codigo && is_numeric($ogp_opr_codigo)) {
-			$sql = "SELECT pin_valor FROM ( \n";
-			$sql .= "select opr_valor1 as pin_valor from operadoras where opr_codigo = $ogp_opr_codigo and (opr_valor1>0 or (opr_valor1=0 and opr_codigo=78)) \n";
-			$sql .= "union all \n";
-			for($i=2;$i<=15;$i++) {
-				$sql .= "select opr_valor".$i." as pin_valor from operadoras where opr_codigo = ".$ogp_opr_codigo." and opr_valor".$i.">0 \n";
-				if($i<15) {
-					$sql .= "union all \n";
-				}
-			}
-			$sql .= ") v order by pin_valor ";
+			$sql = "SELECT valor AS pin_valor
+        FROM operadoras_valores
+        WHERE opr_codigo = $ogp_opr_codigo
+        AND (valor > 0 OR (valor = 0 AND opr_codigo = 78))
+        ORDER BY valor";
+
 			$rs_pins = SQLexecuteQuery($sql);
                         
                         $sql = "SELECT opr_markup FROM operadoras WHERE opr_codigo = $ogp_opr_codigo;";

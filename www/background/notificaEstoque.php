@@ -22,70 +22,65 @@ require_once $raiz_do_projeto . "includes/gamer/main.php";
     $quantidade_total = 0;
     
     //Busca Operadoras exceto Brasil Telecom
-	$sql = "select t1.opr_nome, t0.pin_valor, count(t0.pin_valor) as quantidade, (CASE WHEN t0.opr_codigo <> 78 THEN sum(t0.pin_valor) ELSE 0 END) as total_face, t0.opr_codigo, t0.pin_status, t1.opr_pedido_estoque_prazo as prazo_pedido ";
-	$sql .= "from pins t0, operadoras t1 ";
-	$sql .= "where t0.opr_codigo <> 32 and t1.opr_codigo <> 32 and t1.opr_pin_online = 0 ";
-	$sql .= "and pin_status='1' ";
-	$sql .= "and (t0.pin_canal='".$fcanal."') ";
-	$sql .= "and (t0.opr_codigo=t1.opr_codigo) ";
-    $sql .= "and (t1.opr_valor1 = t0.pin_valor
-                  OR t1.opr_valor2 = t0.pin_valor
-                  OR t1.opr_valor3 = t0.pin_valor
-                  OR t1.opr_valor4 = t0.pin_valor
-                  OR t1.opr_valor5 = t0.pin_valor
-                  OR t1.opr_valor6 = t0.pin_valor
-                  OR t1.opr_valor7 = t0.pin_valor
-                  OR t1.opr_valor8 = t0.pin_valor
-                  OR t1.opr_valor9 = t0.pin_valor
-                  OR t1.opr_valor10 = t0.pin_valor
-                  OR t1.opr_valor11 = t0.pin_valor
-                  OR t1.opr_valor12 = t0.pin_valor
-                  OR t1.opr_valor13 = t0.pin_valor
-                  OR t1.opr_valor14 = t0.pin_valor
-                  OR t1.opr_valor15 = t0.pin_valor
-                  OR t1.opr_valor16 = t0.pin_valor
-                  OR t1.opr_valor17 = t0.pin_valor
-                  OR t1.opr_valor18 = t0.pin_valor
-                  OR t1.opr_valor19 = t0.pin_valor
-                  OR t1.opr_valor20 = t0.pin_valor
-                  OR t1.opr_valor21 = t0.pin_valor) ";
-	$sql .= "group by t1.opr_faturamento_ordem, t1.opr_nome, t0.pin_valor, t0.opr_codigo, t0.pin_status, t1.opr_pedido_estoque_prazo ";
-	$sql .= "order by opr_nome, ".$ncamp.", pin_valor, pin_status"; 
+	$sql = "SELECT 
+                t1.opr_nome, 
+                t0.pin_valor, 
+                COUNT(t0.pin_valor) AS quantidade, 
+                CASE 
+                    WHEN t0.opr_codigo <> 78 THEN SUM(t0.pin_valor) 
+                    ELSE 0 
+                END AS total_face, 
+                t0.opr_codigo, 
+                t0.pin_status, 
+                t1.opr_pedido_estoque_prazo AS prazo_pedido
+            FROM 
+                pins t0
+            JOIN 
+                operadoras t1 ON t0.opr_codigo = t1.opr_codigo
+            JOIN 
+                operadoras_valores v ON v.opr_codigo = t1.opr_codigo AND v.valor = t0.pin_valor
+            WHERE 
+                t0.opr_codigo <> 32
+                AND t1.opr_codigo <> 32
+                AND t1.opr_pin_online = 0
+                AND t0.pin_status = '1'
+                AND t0.pin_canal = '$fcanal'
+            GROUP BY 
+                t1.opr_faturamento_ordem, t1.opr_nome, t0.pin_valor, t0.opr_codigo, t0.pin_status, t1.opr_pedido_estoque_prazo
+            ORDER BY 
+                opr_nome, $ncamp, pin_valor, pin_status
+        "; 
     
 	$resestat = pg_exec($connid, $sql);
     
-    $sqlMedia = "select t1.opr_nome, t0.pin_valor, count(t0.pin_valor) as quantidade, (CASE WHEN t0.opr_codigo <> 78 THEN sum(t0.pin_valor) ELSE 0 END) as total_face, t0.opr_codigo, t1.opr_pedido_estoque_prazo as prazo_pedido ";
-    $sqlMedia .= "from pins t0, operadoras t1 ";
-    $sqlMedia .= "where t0.opr_codigo <> 32 and t1.opr_codigo <> 32 and t1.opr_pin_online = 0 ";
-    // Se procurar por pins de POS apresenta apenas o status 7 - 'Vendido - POS', caso contrario apresenta apenas 3 - 'Vendido' e 6 - 'Vendido – Lan House'
-    $sqlMedia .= " and (pin_status='3' or pin_status='6' or pin_status='8')";
-    $sqlMedia .= " and (pin_datavenda >='" . date("Y-m-d",strtotime("now -6 days")) . "' and pin_datavenda <='".date("Y-m-d",strtotime("now"))."') ";	
-    //if($fcanal=='s' || $fcanal=='p' || $fcanal=='r'){
-    $sqlMedia .= "and (t0.pin_canal='".$fcanal."') "; 
-    $sqlMedia .= "and (t1.opr_valor1 = t0.pin_valor
-                  OR t1.opr_valor2 = t0.pin_valor
-                  OR t1.opr_valor3 = t0.pin_valor
-                  OR t1.opr_valor4 = t0.pin_valor
-                  OR t1.opr_valor5 = t0.pin_valor
-                  OR t1.opr_valor6 = t0.pin_valor
-                  OR t1.opr_valor7 = t0.pin_valor
-                  OR t1.opr_valor8 = t0.pin_valor
-                  OR t1.opr_valor9 = t0.pin_valor
-                  OR t1.opr_valor10 = t0.pin_valor
-                  OR t1.opr_valor11 = t0.pin_valor
-                  OR t1.opr_valor12 = t0.pin_valor
-                  OR t1.opr_valor13 = t0.pin_valor
-                  OR t1.opr_valor14 = t0.pin_valor
-                  OR t1.opr_valor15 = t0.pin_valor
-                  OR t1.opr_valor16 = t0.pin_valor
-                  OR t1.opr_valor17 = t0.pin_valor
-                  OR t1.opr_valor18 = t0.pin_valor
-                  OR t1.opr_valor19 = t0.pin_valor
-                  OR t1.opr_valor20 = t0.pin_valor
-                  OR t1.opr_valor21 = t0.pin_valor) ";
-    $sqlMedia .= " and (t0.opr_codigo=t1.opr_codigo) ";
-    $sqlMedia .= "group by t1.opr_nome, t0.pin_valor, t0.opr_codigo, t1.opr_pedido_estoque_prazo ";
-    $sqlMedia .= "order by ".$ncamp.", pin_valor"; 
+    $sqlMedia = "SELECT 
+                    t1.opr_nome, 
+                    t0.pin_valor, 
+                    COUNT(t0.pin_valor) AS quantidade, 
+                    CASE 
+                        WHEN t0.opr_codigo <> 78 THEN SUM(t0.pin_valor) 
+                        ELSE 0 
+                    END AS total_face, 
+                    t0.opr_codigo, 
+                    t1.opr_pedido_estoque_prazo AS prazo_pedido
+                FROM 
+                    pins t0
+                JOIN 
+                    operadoras t1 ON t0.opr_codigo = t1.opr_codigo
+                JOIN 
+                    operadoras_valores v ON v.opr_codigo = t1.opr_codigo AND v.valor = t0.pin_valor
+                WHERE 
+                    t0.opr_codigo <> 32
+                    AND t1.opr_codigo <> 32
+                    AND t1.opr_pin_online = 0
+                    AND (t0.pin_status IN ('3', '6', '8'))
+                    AND t0.pin_datavenda BETWEEN '" . date("Y-m-d",strtotime("now -6 days")) . "' AND '" . date("Y-m-d",strtotime("now")) . "'
+                    AND t0.pin_canal = '$fcanal'
+                GROUP BY 
+                    t1.opr_nome, t0.pin_valor, t0.opr_codigo, t1.opr_pedido_estoque_prazo
+                ORDER BY 
+                    $ncamp, pin_valor
+                "; 
     
     $rs_Media = pg_exec($connid, $sqlMedia);
     

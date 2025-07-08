@@ -120,21 +120,13 @@ $instProdMod = new ProdutoModelo();
 	//Recupera o pins
 	if($msg == ""){
 		if($ogp_opr_codigo && is_numeric($ogp_opr_codigo)) {
-//			$sql  = "select distinct pin_valor from pins where opr_codigo = " . $ogp_opr_codigo . " and pin_canal='s' order by pin_valor";
 
-			$sql = "SELECT pin_valor FROM ( \n";
-			$sql .= "select opr_valor1 as pin_valor from operadoras where opr_codigo = $ogp_opr_codigo and (opr_valor1>0 or (opr_valor1=0 and opr_codigo=78)) \n";
-			$sql .= "union all \n";
-			for($i=2;$i<=15;$i++) {
-				$sql .= "select opr_valor".$i." as pin_valor from operadoras where opr_codigo = ".$ogp_opr_codigo." and opr_valor".$i.">0 \n";
-				if($i<15) {
-					$sql .= "union all \n";
-				}
-			}
-			$sql .= ") v order by pin_valor ";
-//echo str_replace("\n", "<br>\n", $sql)."<br>";
+			$sql = "SELECT valor AS pin_valor
+        FROM operadoras_valores
+        WHERE opr_codigo = $ogp_opr_codigo
+        AND (valor > 0 OR (valor = 0 AND opr_codigo = 78))
+        ORDER BY valor";
 
-//echo "sql: $sql<br>";
 			$rs_pins = SQLexecuteQuery($sql);
                         
                         $sql = "SELECT opr_markup FROM operadoras WHERE opr_codigo = $ogp_opr_codigo;";

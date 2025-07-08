@@ -1619,33 +1619,6 @@ function monta_valor_pgto($valor)
 	return $s;
 }
 
-function retorna_valores_pin($connid,$oprcodigo,$opr_tipo_online) 
-{
-if(!$connid) return "DIED!";
-if($opr_tipo_online) 
-{
-$sql = "select valor_fixo from pin_valor_fixo t0, pin_valor_lista t1 where t1.valor_lista_cod=t0.valor_lista_cod and opr_codigo = $oprcodigo group by valor_fixo,opr_codigo order by opr_codigo";
-$resx=pg_exec($connid,$sql);
-$srang="";
-while($pgresx=pg_fetch_array($resx)) 
-	$srang.=sprintf("%d,",$pgresx['valor_fixo']);
-}
-else 
-{
-$sql = "select opr_valor1,opr_valor2,opr_valor3,opr_valor4,opr_valor5,opr_valor6,opr_valor7,opr_valor8,opr_valor9,opr_valor10,opr_valor11min,opr_valor11max from operadoras where opr_codigo=$oprcodigo";
-$resx=pg_exec($connid,$sql);
-$resid=pg_fetch_array($resx);
-$srang="";
-for($a=0;$a<13;$a++) {
-	if($resid[$a]) 
-		$srang.=sprintf("%d,",$resid[$a]);
-	}
-}
-$srang[strlen($srang)-1]="";
-return $srang;
-}
-
-
 //#####################################################################################
 //###################            EstabelecimentoMovimentacao
 //#####################################################################################

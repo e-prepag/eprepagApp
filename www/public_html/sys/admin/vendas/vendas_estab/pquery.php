@@ -4,6 +4,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 require_once $raiz_do_projeto . "class/gamer/classIntegracao.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
+require_once "/www/includes/bourls.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
@@ -72,7 +73,7 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 		$dd_operadora_nome = $pg_opr_info['opr_nome'];
 	
 		if($pg_opr_info['opr_pin_online'] == 0) {
-			$sql_valor  = "select opr_valor1, opr_valor2, opr_valor3, opr_valor4, opr_valor5, opr_valor6, opr_valor7, opr_valor8, opr_valor9, opr_valor10, opr_valor11, opr_valor12, opr_valor13, opr_valor14, opr_valor15 from operadoras where opr_codigo = " . $dd_operadora . "";
+			$sql_valor  = "select valor from operadoras_valores where opr_codigo = " . $dd_operadora . " ORDER BY valor";
 
 			$resval = pg_exec($connid, $sql_valor);
 		} else {
@@ -628,16 +629,18 @@ $(function(){
                                 <option value=""><?php echo LANG_PINS_ALL_VALUES; ?></option>
 <?php 
                         if($resval) {
-                            $resval_row = pg_fetch_array($resval); 
-                            for($i=1;$i<=15;$i++) {
-                                if($resval_row["opr_valor$i"]>0) {
+						    $num_rows = pg_num_rows($resval);
+						    for($i = 0; $i < $num_rows; $i++) {
+						        $resval_row = pg_fetch_array($resval, $i);
+						        if($resval_row["valor"] > 0) {
 ?>
-                                <option value="<?php echo $resval_row["opr_valor$i"]; ?>" <?php if ($dd_valor == $resval_row["opr_valor$i"]) echo "selected";?>><?php echo $resval_row["opr_valor$i"]; ?></option>
-<?php 
-                                }
-                                if($i>15) break;
-                            }
-                        } 
+						            <option value="<?php echo $resval_row["valor"]; ?>" <?php if ($dd_valor == $resval_row["valor"]) echo "selected"; ?>>
+						                <?php echo $resval_row["valor"]; ?>
+						            </option>
+<?php
+						        }
+						    }
+						} 
 ?>
                           </select>
                         </div>
@@ -751,7 +754,7 @@ $(function(){
                                 if(b_is_Financeiro()) {
                                     $schanel = (($pgrow['vg_canal']=="L")?"pdv":"gamer");
 ?>
-                                    <td class="text-right"><a href="https://<?php echo $server_url_complete ?>/<?php  echo $schanel; ?>/vendas/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id'] ?></a></td>
+                                    <td class="text-right"><a href="https://<?php echo $_SERVER['SERVER_NAME'] ?>:<?php echo $server_port ;?>/<?php  echo $schanel; ?>/vendas/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id'] ?></a></td>
                                     <td class="text-right"><?php echo $pgrow['vg_source']; ?></td>
 <?php 
                                 }
@@ -816,6 +819,34 @@ $(function(){
                             <input type="button" value="GERAR ARQUIVO" id="btn-download" />
                             <div id="download-relatorio" style="display: none">
                                 <a href="#">Clique aqui para fazer o download do relatório.</a>
+                            </div>
+                        </center>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
+<script src="/js/facebook.js"></script>
+<script src="/js/jquery-ui-1.9.2.custom.min.js"></script>
+<script type="text/javascript" src="/js/table2CSV.js"></script>
+<script src="/js/global.js"></script>
+<script>
+$(function(){
+    $('#table').table2CSV({header:[<?php echo $cabecalho; ?>],toStr:""});
+    
+    var optDate = new Object();
+        optDate.interval = 1;
+
+    setDateInterval('tf_data_inicial','tf_data_final',optDate);
+});
+</script>
+
+<!-- FIM CODIGO NOVO -->
+<?php  
+require_once $raiz_do_projeto . "public_html/sys/includes/rodape_sys.php";
+?>load do relatório.</a>
                             </div>
                         </center>-->
                     </div>
