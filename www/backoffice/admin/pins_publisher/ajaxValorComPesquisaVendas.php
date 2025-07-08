@@ -13,22 +13,31 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/constantesPinEpp.php";
 
-if ($_REQUEST['id'] > 0){
-	$sql = "SELECT opr_valor1,opr_valor2,opr_valor3,opr_valor4,opr_valor5,opr_valor6,opr_valor7,opr_valor8,opr_valor9,opr_valor10,opr_valor11,opr_valor12,opr_valor13,opr_valor14,opr_valor15,opr_valor16,opr_valor17,opr_valor18, opr_valor19,opr_valor20, opr_valor21 FROM operadoras WHERE opr_codigo = " . intval($_REQUEST['id']) . ";";
-//echo "$sql<br>";
-	$rs_oprPins = SQLexecuteQuery($sql);
+if (isset($_REQUEST['id']) && intval($_REQUEST['id']) > 0) {
+    $opr_codigo = intval($_REQUEST['id']);
+
+    $sql = "SELECT valor FROM operadoras_valores 
+            WHERE opr_codigo = $opr_codigo 
+            ORDER BY valor";
+    $rs_oprPins = SQLexecuteQuery($sql);
 }
 
-if($rs_oprPins){
-	echo '<select name="pin_valor" id="pin_valor" class="combo_normal">'.PHP_EOL;
-	echo '<option value="">Selecione o Valor</option>';
-	if($rs_oprPins_row = pg_fetch_array($rs_oprPins)){ 
-		for ($i = 1; $i <= 21; $i++) {
-			//echo $i." : ".$rs_oprPins_row['opr_valor'.$i]."<br>";
-			if (!empty($rs_oprPins_row['opr_valor'.$i])&&$rs_oprPins_row['opr_valor'.$i]!="0.00")
-				echo '<option value="'.number_format($rs_oprPins_row['opr_valor'.$i], 2, ',', '.').'"'.((intval($_REQUEST['valor'])==number_format($rs_oprPins_row['opr_valor'.$i], 0, ',', '.'))?" selected":"").'>'.number_format($rs_oprPins_row['opr_valor'.$i], 2, ',', '.') . '</option>'; 
-		}
-	}
-	echo '</select>';
+if ($rs_oprPins) {
+    echo '<select name="pin_valor" id="pin_valor" class="combo_normal">'.PHP_EOL;
+    echo '<option value="">Selecione o Valor</option>';
+
+    $num_rows = pg_num_rows($rs_oprPins);
+    for ($i = 0; $i < $num_rows; $i++) {
+        $row = pg_fetch_array($rs_oprPins, $i);
+        $valor = $row['valor'];
+
+        if (!empty($valor) && $valor != "0.00") {
+            $valorFormatado = number_format($valor, 2, ',', '.');
+            $selected = (isset($_REQUEST['valor']) && floatval(str_replace(',', '.', $_REQUEST['valor'])) == floatval($valor)) ? ' selected' : '';
+            echo '<option value="'.$valorFormatado.'"'.$selected.'>'.$valorFormatado.'</option>'.PHP_EOL;
+        }
+    }
+
+    echo '</select>';
 }
 ?>

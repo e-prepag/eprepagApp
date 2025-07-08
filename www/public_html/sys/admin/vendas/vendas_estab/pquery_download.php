@@ -5,6 +5,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 require_once $raiz_do_projeto . "class/gamer/classIntegracao.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
+require_once "/www/includes/bourls.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
@@ -73,7 +74,7 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 		$dd_operadora_nome = $pg_opr_info['opr_nome'];
 	
 		if($pg_opr_info['opr_pin_online'] == 0) {
-			$sql_valor  = "select opr_valor1, opr_valor2, opr_valor3, opr_valor4, opr_valor5, opr_valor6, opr_valor7, opr_valor8, opr_valor9, opr_valor10, opr_valor11, opr_valor12, opr_valor13, opr_valor14, opr_valor15 from operadoras where opr_codigo = " . $dd_operadora . "";
+			$sql_valor  = "select valor from operadoras_valores where opr_codigo = " . $dd_operadora . " ORDER BY valor";
 
 			$resval = pg_exec($connid, $sql_valor);
 		} else {
@@ -523,16 +524,18 @@ $(document).ready(function () {
                       <option value=""><?php echo LANG_PINS_ALL_VALUES; ?></option>
 					<?php 
 						if($resval) {
-							$resval_row = pg_fetch_array($resval); 
-							for($i=1;$i<=15;$i++) {
-								if($resval_row["opr_valor$i"]>0) {
-					?>
-									<option value="<?php echo $resval_row["opr_valor$i"]; ?>" <?php if ($dd_valor == $resval_row["opr_valor$i"]) echo "selected";?>><?php echo $resval_row["opr_valor$i"]; ?></option>
-					<?php 
-								}
-								if($i>15) break;
-							}
-						} 
+						    $num_rows = pg_num_rows($resval);
+						    for($i = 0; $i < $num_rows; $i++) {
+						        $resval_row = pg_fetch_array($resval, $i);
+						        if($resval_row["valor"] > 0) {
+?>
+						            <option value="<?php echo $resval_row["valor"]; ?>" <?php if ($dd_valor == $resval_row["valor"]) echo "selected"; ?>>
+						                <?php echo $resval_row["valor"]; ?>
+						            </option>
+<?php
+						        }
+						    }
+						}  
 					?>
                     </select>
                     </font></td>
@@ -680,7 +683,7 @@ $(document).ready(function () {
 if(b_is_Financeiro()) {
 				  $schanel = (($pgrow['vg_canal']=="L")?"dist_":"");
 				?>
-                <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><a href="http://<?= $server_url_complete ?>/bkov2_prepag/<?php  echo $schanel; ?>commerce/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id'] ?></a></font></div></td>
+                <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><a href="http://<?php echo $server_url_complete ;?>/bkov2_prepag/<?php  echo $schanel; ?>commerce/com_venda_detalhe.php?venda_id=<?php  echo "".$pgrow['vg_id']; ?>" target="_blank"><?php  echo $pgrow['vg_id'] ?></a></font></div></td>
                 <td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><?php  echo $pgrow['vg_source'] ?></font></div></td>
               <?php 
 }
