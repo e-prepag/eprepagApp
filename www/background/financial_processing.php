@@ -48,7 +48,16 @@ $msg = "";
 
 echo PHP_EOL.str_repeat("=", 80).PHP_EOL."Pré-Processamento para fechamento financeiro (".date("Y-m-d H:i:s").")".PHP_EOL.PHP_EOL;
 
-$sql = "select 
+$sql = "WITH data_periodo AS (
+        SELECT GREATEST(
+            MIN(fp_date),
+            NOW() - INTERVAL '3 months'
+        ) AS inicio
+        FROM financial_processing
+        INNER JOIN operadoras ON opr_codigo = fp_publisher
+        WHERE fp_freeze = 0 AND opr_status = '1'
+    )";
+$sql .= "select 
 	canal, 
 	dia,
 	publisher,
@@ -64,7 +73,7 @@ from (
                 count(distinct('".$ARRAY_CONCATENA_ID_VENDA['pdv']."'  || to_char(ve_data_inclusao,'YYMMDD') || lpad(ve_id::text , 8, '0'))) as total_order,
 		sum(ve_valor) as total 
 	from dist_vendas_pos 
-	where ve_data_inclusao >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+	where ve_data_inclusao >= (SELECT inicio FROM data_periodo)
 	group by dia,
 		publisher) 
 union all 
@@ -78,10 +87,16 @@ union all
 	from tb_venda_games vg 
 		inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
 		inner join tb_venda_games_pinepp_origem tvgpo on tvgpo.vg_id = vg.vg_id 
+        left join tb_integracao_pedido ip on ip.ip_vg_id = vg.vg_id 
 	where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
-		and vg.vg_data_concilia >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_concilia >= (SELECT inicio FROM data_periodo)
 		and SUBSTR(tvgpo.tvgpo_canal, 1, 1) ='P' 
 		and vg.vg_pagto_tipo = ".$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']." 
+        and (
+                		(ip.ip_vg_id is not null and vg.vg_integracao_parceiro_origem_id is not null)
+                		or
+                		(ip.ip_vg_id is null and vg.vg_integracao_parceiro_origem_id is null)
+                	) 
 	group by dia,
 		publisher) 
 union all
@@ -94,7 +109,7 @@ union all
 		sum(valor) as total 
         from pos_transacoes_ponto_certo 
         where opr_codigo is not NULL 
-		and data_transacao >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and data_transacao >= (SELECT inicio FROM data_periodo)
 	group by dia,
 		publisher) 
 union all 
@@ -107,10 +122,16 @@ union all
 		sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
 		from tb_venda_games vg 
 		inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+        left join tb_integracao_pedido ip on ip.ip_vg_id = vg.vg_id 
 		where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."'
-		and vg.vg_data_concilia >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_concilia >= (SELECT inicio FROM data_periodo)
 		and vg.vg_ultimo_status_obs like '%Pagamento via AtimoPay%'
 		and vg.vg_pagto_tipo = ".$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']."
+        and (
+                		(ip.ip_vg_id is not null and vg.vg_integracao_parceiro_origem_id is not null)
+                		or
+                		(ip.ip_vg_id is null and vg.vg_integracao_parceiro_origem_id is null)
+                	) 
 		group by dia,canal,publisher)
 union all 
 	(select 
@@ -122,9 +143,15 @@ union all
 		sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
 	from tb_venda_games vg 
 		inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+        left join tb_integracao_pedido ip on ip.ip_vg_id = vg.vg_id 
 	where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
-		and vg.vg_data_concilia >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_concilia >= (SELECT inicio FROM data_periodo)
 		and vg.vg_pagto_tipo != ".$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']." 
+        and (
+                		(ip.ip_vg_id is not null and vg.vg_integracao_parceiro_origem_id is not null)
+                		or
+                		(ip.ip_vg_id is null and vg.vg_integracao_parceiro_origem_id is null)
+                	) 
 	group by dia, 
 		canal,
 		publisher) 
@@ -139,10 +166,16 @@ union all
 	from tb_venda_games vg 
 		inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
 		inner join tb_venda_games_pinepp_origem tvgpo on tvgpo.vg_id = vg.vg_id 
+        left join tb_integracao_pedido ip on ip.ip_vg_id = vg.vg_id 
 	where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
-		and vg.vg_data_concilia >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_concilia >= (SELECT inicio FROM data_periodo)
 		and tvgpo.tvgpo_canal='G' 
 		and vg.vg_pagto_tipo = ".$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']." 
+        and (
+                		(ip.ip_vg_id is not null and vg.vg_integracao_parceiro_origem_id is not null)
+                		or
+                		(ip.ip_vg_id is null and vg.vg_integracao_parceiro_origem_id is null)
+                	) 
 	group by dia, 
 		canal,
 		publisher) 
@@ -157,7 +190,7 @@ union all
 	from tb_dist_venda_games vg 
 		inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
 	where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' ".$where_opr_venda_lan."
-		and vg.vg_data_inclusao >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_inclusao >= (SELECT inicio FROM data_periodo)
 	group by dia,
 		publisher) ";
 //Contabilizando vendas por utilização de PINs Publisher
@@ -182,7 +215,7 @@ union all
              and pin_status = '8'
              and pih_codretepp='2'
              ".$where_opr_venda_lan_negativa."
-             and pih_data >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+             and pih_data >= (SELECT inicio FROM data_periodo)
              ".$where_opr_utilizacao_lan."
         group by dia,
                 publisher) 
@@ -201,10 +234,16 @@ union all
 	from tb_venda_games vg 
 		inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
 		inner join tb_venda_games_pinepp_origem tvgpo on tvgpo.vg_id = vg.vg_id 
+        left join tb_integracao_pedido ip on ip.ip_vg_id = vg.vg_id 
 	where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
-		and vg.vg_data_concilia >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_concilia >= (SELECT inicio FROM data_periodo)
 		and tvgpo.tvgpo_canal='L' 
 		and vg.vg_pagto_tipo = ".$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']." 
+        and (
+                		(ip.ip_vg_id is not null and vg.vg_integracao_parceiro_origem_id is not null)
+                		or
+                		(ip.ip_vg_id is null and vg.vg_integracao_parceiro_origem_id is null)
+                	) 
 	group by dia,
 		publisher) 
 -- naun vai calcular os cartoes fisicos da webzen e ongame por conta da incoerencia de informações
@@ -219,11 +258,17 @@ union all
 		sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
 	from tb_venda_games vg 
 		inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+        left join tb_integracao_pedido ip on ip.ip_vg_id = vg.vg_id 
 		inner join tb_venda_games_pinepp_origem tvgpo on tvgpo.vg_id = vg.vg_id 
 	where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
-		and vg.vg_data_concilia >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and vg.vg_data_concilia >= (SELECT inicio FROM data_periodo)
 		and tvgpo.tvgpo_canal='C' 
 		and vg.vg_pagto_tipo = ".$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']." 
+        and (
+                		(ip.ip_vg_id is not null and vg.vg_integracao_parceiro_origem_id is not null)
+                		or
+                		(ip.ip_vg_id is null and vg.vg_integracao_parceiro_origem_id is null)
+                	) 
 	group by dia,
 		publisher) 
 -- Contabilizando PINs GiftCards utilizados por Integração                
@@ -238,7 +283,7 @@ union all
 	from pins_integracao_card_historico
 	where pin_status = '".intval($PINS_STORE_STATUS_VALUES['U'])."' 
 		and pih_codretepp = '2'
-		and pih_data >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		and pih_data >= (SELECT inicio FROM data_periodo)
 	group by dia,
 		publisher)
 -- Contabilizando PINs GoCASH utilizado por Integração de Utilização                
@@ -254,7 +299,7 @@ union all
                      ELSE sum (pgc_face_amount) END as total 
 	from pins_gocash
 	where pgc_opr_codigo != 0 
-		 and pgc_pin_response_date >= (select min(fp_date) from financial_processing inner join operadoras on opr_codigo=fp_publisher where fp_freeze=0 and opr_status='1')
+		 and pgc_pin_response_date >= (SELECT inicio FROM data_periodo)
 	group by dia,
 		publisher) 
 ) t 
