@@ -7,7 +7,7 @@
 
     if(isset($_GET["acao"]) && $_GET["acao"] == "listar"){
 		$data = ["data" => []];
-		$sql = "select codigo,login,ip,TO_CHAR(data_requisicao, 'DD-MM-YYYY HH24:MI:SS') as data_requisicao,qtde from bloqueia_login_usuario where visualizacao = 'S' order by data_requisicao desc;";
+		$sql = "select codigo,login,ip,TO_CHAR(data_requisicao, 'DD-MM-YYYY HH24:MI:SS') as data_requisicao,qtde, expiracao from bloqueia_login_usuario where visualizacao = 'S' order by data_requisicao desc;";
 		$selectRows = $conexao->prepare($sql);
 		$selectRows->execute();
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
@@ -15,7 +15,8 @@
 		if(count($resultRows) > 0){
 			foreach($resultRows as $key => $value){
 				 $dataKeys = array_keys($value);
-				 $acao = ($value["qtde"] >= 5)? '<button class="btn btn-success btn-liberar" data-codigo="'.$value["codigo"].'">Liberar</button>': '<span>Usuário livre</span>'; 
+				 $agora = time();
+				 $acao = strtotime($value['expiracao']) > $agora ? '<button class="btn btn-success btn-liberar" data-codigo="'.$value["codigo"].'">Liberar</button>': '<span>Usuário livre</span>'; 
 				 $dataLine = [
 					  $dataKeys[0] => $value["codigo"],
 					  $dataKeys[1] => $value["login"],
@@ -30,7 +31,7 @@
 		}
 	    echo json_encode($data);
 	}else if(isset($_GET["acao"]) && $_GET["acao"] == "apagar"){
-		$sql = "update bloqueia_login_usuario set qtde = 0 where codigo = :CODIGO;";
+		$sql = "update bloqueia_login_usuario set qtde = 0, expiracao = null where codigo = :CODIGO;";
 		$deleteRow = $conexao->prepare($sql);
 		$deleteRow->bindValue(":CODIGO", $_POST["codigo"]);
 		$deleteRow->execute();
