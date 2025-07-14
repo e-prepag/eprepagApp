@@ -1,4 +1,3 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
 session_start();
@@ -24,29 +23,8 @@ if (Util::isAjaxRequest()) {
     require_once DIR_CLASS . "util/Log.class.php";
     require_once DIR_INCS . "main.php";
     require_once DIR_INCS . "gamer/main.php";
+    require_once "funcoes_login.php";
     $validate = new Validate;
-
-    //if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
-
-    function bloquearAcesso()
-    {
-        echo RETURN_MAX_COUNT;
-        exit();
-    }
-
-    function retornaQtde()
-    {
-
-        $conexao = ConnectionPDO::getConnection()->getLink();
-        $sql = "select * from bloqueia_login_usuario where ip = :IP;";
-        $query = $conexao->prepare($sql);
-        $query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-        $query->execute();
-        $resultRow = $query->fetch(PDO::FETCH_ASSOC);
-
-        return (isset($resultRow["qtde"])) ? $resultRow["qtde"] : 0;
-
-    }
 
     function checkDevice($userId, $pdo)
     {
@@ -65,41 +43,9 @@ if (Util::isAjaxRequest()) {
         }
     }
 
-    function verificarTentativasLogin($login_verificacao, $senha_verificacao)
-    {
-
-        $conexao = ConnectionPDO::getConnection()->getLink();
-        $sql = "select * from bloqueia_login_usuario where ip = :IP;";
-        $query = $conexao->prepare($sql);
-        $query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-        $query->execute();
-        $resultRow = $query->fetch(PDO::FETCH_ASSOC);
-
-        if ($resultRow == false) {
-            $insertRow = "insert into bloqueia_login_usuario(ip,data_requisicao,qtde,login,senha,visualizacao)values(:IP, CURRENT_TIMESTAMP, :QTDE, :LOGIN, :SENHA, 'S');";
-            $insert = $conexao->prepare($insertRow);
-            $insert->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-            $insert->bindValue(":QTDE", 1);
-            $insert->bindValue(":LOGIN", strip_tags(htmlentities($login_verificacao))); //addcslashes
-            $insert->bindValue(":SENHA", ""); //strip_tags(htmlentities($senha_verificacao))
-            $insert->execute();
-        } else {
-            if ($resultRow["qtde"] >= 5) {
-                bloquearAcesso();
-            } else {
-                $updateRow = "update bloqueia_login_usuario set qtde = qtde + 1 where ip = :IP;";
-                $update = $conexao->prepare($updateRow);
-                $update->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-                $update->execute();
-            }
-        }
-    }
-
-
-
     if (!empty($_POST["g-recaptcha-response"])) {
 
-        $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
+        $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
         $recaptcha = curl_init();
         curl_setopt_array($recaptcha, [
@@ -114,16 +60,22 @@ if (Util::isAjaxRequest()) {
 
         if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
             $erro = true;
-            verificarTentativasLogin($_POST['login'], $_POST['senha']);
+            registrarTentativaFalha($_POST['login']);
             echo RETURN_CAPTCHA;
             exit;
         }
 
     } else {
-        verificarTentativasLogin($_POST['login'], $_POST['senha']);
+        registrarTentativaFalha($_POST['login']);
         $erro = true;
         echo RETURN_CAPTCHA;
         exit;
+    }
+
+    $tempoBloqueio = verificarBloqueio();
+    if ($tempoBloqueio) {
+        session_destroy();
+        bloquearAcesso($tempoBloqueio);
     }
 
     if (isset($_POST['login']) && !empty($_POST['login']) && isset($_POST['senha']) && !empty($_POST['senha'])) {
@@ -202,20 +154,14 @@ if (Util::isAjaxRequest()) {
                 if (!$ret) {
                     $erro = true;
                     $geraLog = new Log("log_login", array("Login ou senha inválidos gamer: '" . $_POST['login'] . "', '" . $_POST['senha']));
-                    verificarTentativasLogin($_POST['login'], $_POST['senha']);
+                    registrarTentativaFalha($_POST['login']);
                 }
             }
 
             if ($erro) {
                 echo RETURN_WRONG;
             } else {
-
-                if (retornaQtde() >= 5) {
-                    session_destroy();
-                    echo RETURN_MAX_COUNT;
-                } else {
-                    modal_token();
-                }
+                modal_token();
             }
 
         } else if ($validate->qtdCaracteres($_POST['login'], 2, 255) == 0) {
@@ -259,19 +205,13 @@ if (Util::isAjaxRequest()) {
             if (!$ret) {
                 $erro = true;
                 $geraLog = new Log("log_login", array("Login ou senha inválidos gamer: '" . $_POST['login'] . "', '" . $_POST['senha'] . "'"));
-                verificarTentativasLogin($_POST['login'], $_POST['senha']);
-
+                registrarTentativaFalha($_POST['login']);
             }
 
             if ($erro) {
                 echo RETURN_WRONG;
             } else {
-                if (retornaQtde() >= 5) {
-                    session_destroy();
-                    echo RETURN_MAX_COUNT;
-                } else {
-                    modal_token();
-                }
+                modal_token();
             }
         } else {
             echo RETURN_WRONG;
@@ -420,7 +360,7 @@ function modal_token()
 function modal_criar_token($dia_faltam)
 {
     $https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
-    $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
+    $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
 
     $dataUltimoAcesso = new DateTime($dia_faltam);
     $dataHoje = new DateTime();
@@ -533,6 +473,9 @@ function modal_criar_token($dia_faltam)
                                 else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
                                     grecaptcha.reset();
                                     $('#myModal2FA').modal('show');
+                                } else if (ret.startsWith('<')) {
+                                    $("#modal-autenticador").html(ret);
+                                    $("#modal-token").modal('show');
                                 } else {
                                     erro = true;
                                     $("#msg-modal").text(ret);
