@@ -51,9 +51,82 @@ if (!$secret) {
     $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
     $_SESSION['secret'] = $secret;
 }
+if (!isset($qrCodeUrl)) {
+    $ga = new PHPGangsta_GoogleAuthenticator();
+    $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+}
 
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 ?>
+<style>
+    .form-token {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+    }
+
+    .instrucoes {
+        font-family: system-ui, sans-serif;
+        color: #333;
+    }
+
+    ol.lista-instrucoes li {
+        line-height: 1.7;
+        margin-bottom: 3px;
+    }
+
+    .div-principal {
+        display: flex;
+        flex-direction: row;
+        justify-content: stretch;
+    }
+
+    .botao-expandir {
+        background: none;
+        border: none;
+        color: #555;
+        font-size: 16px;
+        font-family: system-ui, sans-serif;
+        cursor: pointer;
+        padding: 8px 0;
+        margin-bottom: 10px;
+    }
+
+    .botao-expandir:hover {
+        color: #333;
+    }
+
+
+    @media (min-width: 769px) {
+        .botao-expandir {
+            display: none;
+        }
+
+        .instrucoes {
+            display: block !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .div-principal {
+            flex-direction: column;
+            /* empilha os itens */
+        }
+
+        .instrucoes {
+            display: none;
+        }
+
+        .instrucoes.expandida {
+            display: block;
+        }
+
+        .botao-expandir {
+            display: block;
+            margin-top: 15px;
+        }
+    }
+</style>
 <div class="container bg-branco">
     <div class="row">
         <div class="col-md-10 txt-preto" style="margin: 25px; padding: 15px;">
@@ -71,8 +144,8 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                 </div>
             <?php } ?>
 
-            <div class="row">
-                <div class="col-md-6">
+            <div class="div-principal">
+                <div class="form-token">
                     <form name="form1" action="" method="post">
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
@@ -119,13 +192,34 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                     </form>
                 </div>
 
-                <div class="col-md-4 d-md-block">
-                    <div class="mt-3 text-danger" style="text-align:justify;">
-                        <ol>
-                            <li>Escaneie o QR code ou cole a chave no seu aplicativo autenticador.</li>
-                            <li>Copie o Token gerado.</li>
-                            <li>Cole no campo abaixo e confirme.</li>
-                        </ol>
+                <button class="botao-expandir btn"
+                    onclick="document.querySelector('.instrucoes').classList.toggle('expandida')">
+                    Como configurar o autenticador? &#11206;
+                </button>
+                <div class="col-md-8 form-group col-sm-12 col-xs-12 col-md-offset-4 instrucoes">
+
+                    <h3>Instruções:</h3>
+                    <ol class="lista-instrucoes">
+                        <li>Abra o aplicativo autenticador instalado no seu celular. Caso não tenha um autenticador,
+                            você deve instalar um. O Microsoft Authenticator e o Google Authenticator são os mais
+                            populares.</li>
+
+                        <li>Com o aplicativo aberto, leia o QR code gerado pelo nosso site.
+                            Se estiver usando celular, copie a chave de segurança gerada e cole no
+                            aplicativo autenticador.</li>
+
+                        <li>Aparecerá um código de 6 dígitos no seu aplicativo.</li>
+
+                        <li>Digite esse código no site da E-prepag para confirmar e pronto! O autenticador está
+                            associado a sua conta.</li>
+
+                    </ol>
+                    <div style="width: 100%; display: flex; justify-content: center;">
+                        <iframe width="300" height="170px" src="https://www.youtube.com/embed/H_19Cv6jSDU"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
                     </div>
                 </div>
             </div>
