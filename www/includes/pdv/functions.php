@@ -1,6 +1,6 @@
 <?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
-require_once "../load_dotenv.php";
+require_once  __DIR__ . "/../load_dotenv.php";
 if(!function_exists('checkIP')) {
 	function checkIP() {
 

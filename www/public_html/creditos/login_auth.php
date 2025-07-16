@@ -47,64 +47,64 @@ $login = $_REQUEST["login"];
 $senha = $_REQUEST["senha"];
 $recaptcha = $_REQUEST["g-recaptcha-response"];
 
-if ($recaptcha != "") {
+// if ($recaptcha != "") {
 
-    $tokenInfo = [
-        "secret" => getenv("RECAPTCHA_SECRET_KEY"),
-        "response" => $recaptcha,
-        "remoteip" => $_SERVER["REMOTE_ADDR"],
-    ];
+//     $tokenInfo = [
+//         "secret" => getenv("RECAPTCHA_SECRET_KEY"),
+//         "response" => $recaptcha,
+//         "remoteip" => $_SERVER["REMOTE_ADDR"],
+//     ];
 
-    $recaptcha_curl = curl_init();
+//     $recaptcha_curl = curl_init();
 
-    curl_setopt_array($recaptcha_curl, [
-        CURLOPT_URL => getenv("RECAPTCHA_URL"),
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POSTFIELDS => http_build_query($tokenInfo),
-    ]);
+//     curl_setopt_array($recaptcha_curl, [
+//         CURLOPT_URL => getenv("RECAPTCHA_URL"),
+//         CURLOPT_CUSTOMREQUEST => "POST",
+//         CURLOPT_RETURNTRANSFER => true,
+//         CURLOPT_POSTFIELDS => http_build_query($tokenInfo),
+//     ]);
 
-    $dadosT = curl_exec($recaptcha_curl);
+//     $dadosT = curl_exec($recaptcha_curl);
 
-    $inforCurl = curl_getinfo($recaptcha_curl);
-
-
-
-    $retorno = json_decode($dadosT, true);
+//     $inforCurl = curl_getinfo($recaptcha_curl);
 
 
-    curl_close($recaptcha_curl);
 
-    if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
-        $msg = "Captcha inválido.\n";
+//     $retorno = json_decode($dadosT, true);
 
-        $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-        $strRedirect = $server_url .
-            "/creditos/login.php?msg=" .
-            urlencode($msg) .
-            "&login=" .
-            urlencode($login);
+//     curl_close($recaptcha_curl);
 
-        header("Location: $strRedirect");
-        exit;
-    }
-} else {
-    $msg = "Captcha inválido.\n";
+//     if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
+//         $msg = "Captcha inválido.\n";
 
-    $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
-    //$pag = $server_url . $pag;
-    $strRedirect = $server_url .
-        "/creditos/login.php?msg=" .
-        urlencode($msg) .
-        "&login=" .
-        urlencode($login);
+//         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
+//         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-    header("Location: $strRedirect");
-    exit;
-}
+//         $strRedirect = $server_url .
+//             "/creditos/login.php?msg=" .
+//             urlencode($msg) .
+//             "&login=" .
+//             urlencode($login);
+
+//         header("Location: $strRedirect");
+//         exit;
+//     }
+// } else {
+//     $msg = "Captcha inválido.\n";
+
+//     $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
+//     file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+//     //$pag = $server_url . $pag;
+//     $strRedirect = $server_url .
+//         "/creditos/login.php?msg=" .
+//         urlencode($msg) .
+//         "&login=" .
+//         urlencode($login);
+
+//     header("Location: $strRedirect");
+//     exit;
+// }
 
 $objEncryption = new Encryption();
 $original = trim($senha);
@@ -182,7 +182,7 @@ if ($usuario_operador) {
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if (temLogInconsistente($user['pdv_id'], $pdo)) {
@@ -195,7 +195,7 @@ if ($usuario_operador) {
 
         $users = lerUsuariosBloqueados();
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if(buscarUsuariosSemLog($pdo, $user['pdv_id'])) {
@@ -206,7 +206,7 @@ if ($usuario_operador) {
         adicionarUsuarioBloqueado($user['pdv_id'], $msg);
         enviaEmailReport($msg, $user);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     $_SESSION['id_do_usuario'] = $user['ugo_id'];
@@ -223,13 +223,13 @@ if ($usuario_operador) {
     $auth = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (empty($auth['ugo_chave_autenticador'])) {
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/adicionar-autenticacao.php");
+        header("Location: /creditos/adicionar-autenticacao.php");
         exit;
     }
     $msg = "";
     if (checkDevice($user['ugo_id'], $pdo, true)) {
         //$msg = "Dispositivo já autenticado.";
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/loginEf2.php");
+        header("Location: /creditos/loginEf2.php");
         exit;
     }
 
@@ -240,7 +240,7 @@ if ($usuario_operador) {
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if (temLogInconsistente($user['ug_id'], $pdo)) {
@@ -253,7 +253,7 @@ if ($usuario_operador) {
 
         $users = lerUsuariosBloqueados();
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if(buscarUsuariosSemLog($pdo, $user['ug_id'])) {
@@ -264,7 +264,7 @@ if ($usuario_operador) {
         adicionarUsuarioBloqueado($user['ug_id'], $msg);
         enviaEmailReport($msg, $user);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     $_SESSION['login_usuario'] = $login;
@@ -281,13 +281,13 @@ if ($usuario_operador) {
     $auth = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (empty($auth['ug_chave_autenticador'])) {
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/adicionar-autenticacao.php");
+        header("Location: /creditos/adicionar-autenticacao.php");
         exit;
     }
     $msg = "";
     if (checkDevice($user['ug_id'], $pdo, false)) {
         //$msg = "Dispositivo já autenticado.";
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/loginEf2.php");
+        header("Location: /creditos/loginEf2.php");
         exit;
     }
 }

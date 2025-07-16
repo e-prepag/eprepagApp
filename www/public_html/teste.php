@@ -1,69 +1,31 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 
-function temLogInconsistente($ug_id, $pdo) {
-    // 1. Pega todos os logs de alteração de e-mail na última semana
-    $stmt = $pdo->prepare("
-        SELECT ug_id, data_log
-        FROM log_alteracao_email
-        WHERE data_log >= NOW() - INTERVAL '7 days'
-          AND ug_id = :ug_id
-    ");
-    $stmt->execute([':ug_id' => $ug_id]);
-    $logsEmail = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($logsEmail as $log) {
-        $dataLog = $log['data_log'];
-
-        // 2. Verifica se existe um log do tipo 3 no intervalo de 5 segundos
-        $stmtCheck = $pdo->prepare("
-            SELECT 1
-            FROM dist_usuarios_games_log
-            WHERE ugl_ug_id = :ug_id
-              AND ugl_uglt_id = 3
-              AND ABS(EXTRACT(EPOCH FROM (ugl_data_inclusao - :data_log))) <= 5
-            LIMIT 1
-        ");
-        $stmtCheck->execute([
-            ':ug_id' => $ug_id,
-            ':data_log' => $dataLog,
-        ]);
-
-        if (!$stmtCheck->fetch()) {
-            // Log de e-mail sem log correspondente dentro de 5s
-            return true;
-        }
-    }
-
-    // Todos os logs têm correspondência válida
-    return false;
-}
-
 $pdo = ConnectionPDO::getConnection()->getLink();
+try {
+    $sql = "
+        ALTER TABLE dist_usuarios_games
+        ADD COLUMN ug_chave_autenticador TEXT NULL,
+        ADD COLUMN ug_acesso_sem_aut DATE NULL DEFAULT CURRENT_DATE;
 
-// Pega os últimos 100 usuários com data de acesso não nula
-$stmt = $pdo->query("
-    SELECT ug_id
-    FROM dist_usuarios_games
-    WHERE ug_data_ultimo_acesso IS NOT NULL
-    ORDER BY ug_data_ultimo_acesso DESC
-    LIMIT 100
-");
+        CREATE TABLE public.dist_usuarios_games_dispositivos (
+            id serial4 NOT NULL,
+            user_id int4 NOT NULL,
+            device_token text NOT NULL,
+            expires_at timestamp DEFAULT (now() + '30 days'::interval) NULL,
+            created_at timestamp DEFAULT now() NULL,
+            CONSTRAINT dist_usuarios_games_dispositivos_pkey PRIMARY KEY (id)
+        );
+    ";
 
-$usuarios = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-$resultados = [];
-
-foreach ($usuarios as $ug_id) {
-    if (temLogInconsistente($ug_id, $pdo)) {
-        $resultados[] = $ug_id;
-    }
+    $pdo->exec($sql);
+    echo "Altera��es aplicadas com sucesso.";
+} catch (PDOException $e) {
+    echo "Erro: " . $e->getMessage();
 }
 
-if (count($resultados) > 0) {
-    echo "⚠️ Inconsistências detectadas nos usuários: " . implode(", ", $resultados);
-} else {
-    echo "✅ Todos os últimos 100 usuários estão consistentes.";
-}
 ?>
