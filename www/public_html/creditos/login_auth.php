@@ -1,8 +1,8 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);  // Exibe todos os tipos de erros
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
 require '../libs/PHPGangsta/GoogleAuthenticator.php';
@@ -46,65 +46,67 @@ $pag = $_REQUEST["pag"];
 $login = $_REQUEST["login"];
 $senha = $_REQUEST["senha"];
 $recaptcha = $_REQUEST["g-recaptcha-response"];
+if(getenv("AMBIENTE") == "HOMOLOGACAO") {
+    // Passou
 
-// if ($recaptcha != "") {
+} else if ($recaptcha != "") {
 
-//     $tokenInfo = [
-//         "secret" => getenv("RECAPTCHA_SECRET_KEY"),
-//         "response" => $recaptcha,
-//         "remoteip" => $_SERVER["REMOTE_ADDR"],
-//     ];
+    $tokenInfo = [
+        "secret" => getenv("RECAPTCHA_SECRET_KEY"),
+        "response" => $recaptcha,
+        "remoteip" => $_SERVER["REMOTE_ADDR"],
+    ];
 
-//     $recaptcha_curl = curl_init();
+    $recaptcha_curl = curl_init();
 
-//     curl_setopt_array($recaptcha_curl, [
-//         CURLOPT_URL => getenv("RECAPTCHA_URL"),
-//         CURLOPT_CUSTOMREQUEST => "POST",
-//         CURLOPT_RETURNTRANSFER => true,
-//         CURLOPT_POSTFIELDS => http_build_query($tokenInfo),
-//     ]);
+    curl_setopt_array($recaptcha_curl, [
+        CURLOPT_URL => getenv("RECAPTCHA_URL"),
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS => http_build_query($tokenInfo),
+    ]);
 
-//     $dadosT = curl_exec($recaptcha_curl);
+    $dadosT = curl_exec($recaptcha_curl);
 
-//     $inforCurl = curl_getinfo($recaptcha_curl);
-
-
-
-//     $retorno = json_decode($dadosT, true);
+    $inforCurl = curl_getinfo($recaptcha_curl);
 
 
-//     curl_close($recaptcha_curl);
 
-//     if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
-//         $msg = "Captcha inválido.\n";
+    $retorno = json_decode($dadosT, true);
 
-//         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-//         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-//         $strRedirect = $server_url .
-//             "/creditos/login.php?msg=" .
-//             urlencode($msg) .
-//             "&login=" .
-//             urlencode($login);
+    curl_close($recaptcha_curl);
 
-//         header("Location: $strRedirect");
-//         exit;
-//     }
-// } else {
-//     $msg = "Captcha inválido.\n";
+    if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
+        $msg = "Captcha inválido.\n";
 
-//     $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-//     file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
-//     //$pag = $server_url . $pag;
-//     $strRedirect = $server_url .
-//         "/creditos/login.php?msg=" .
-//         urlencode($msg) .
-//         "&login=" .
-//         urlencode($login);
+        $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
+        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-//     header("Location: $strRedirect");
-//     exit;
-// }
+        $strRedirect = $server_url .
+            "/creditos/login.php?msg=" .
+            urlencode($msg) .
+            "&login=" .
+            urlencode($login);
+
+        header("Location: $strRedirect");
+        exit;
+    }
+} else {
+    $msg = "Captcha inválido.\n";
+
+    $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
+    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+    //$pag = $server_url . $pag;
+    $strRedirect = $server_url .
+        "/creditos/login.php?msg=" .
+        urlencode($msg) .
+        "&login=" .
+        urlencode($login);
+
+    header("Location: $strRedirect");
+    exit;
+}
 
 $objEncryption = new Encryption();
 $original = trim($senha);

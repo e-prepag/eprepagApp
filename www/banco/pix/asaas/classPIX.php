@@ -13,6 +13,7 @@ class classPIX
     public function __construct()
     {
         $token = getenv('ASAAS_ACCESS_TOKEN');
+        $url = getenv('ASAAS_API_URL');
         $this->chave_pix = getenv('ASAAS_CHAVE_PIX');
 
         if ($token == "") {
@@ -20,7 +21,12 @@ class classPIX
                  contado com o suporte da E-Prepag e informe o erro de código PIX790954 - Asaas.<br>Obrigado.");
         } else {
             $this->setAccessToken($token);
-            $this->url = getenv('ASAAS_API_URL');
+        }
+        if($url == "") {
+            echo ("<br><br>ERRO ao obter endereço do banco!<br>Por favor, entre em
+                 contado com o suporte da E-Prepag e informe o erro de código PIX790955 - Asaas.<br>Obrigado.");
+        } else{
+            $this->url = $url;
         }
 
     }///end function __construct()
@@ -196,8 +202,7 @@ class classPIX
 
         // Verifica se ocorreu algum erro
         if (curl_errno($ch)) {
-            echo 'Erro no cURL: ' . curl_error($ch);
-            exit;
+            return false;
         }
 
         // Fecha a conexão cURL
@@ -227,6 +232,7 @@ class classPIX
         // Verifica se a resposta contém os dados esperados
         if (!isset($data['id'])) {
             // Extrai os dados de interesse
+            echo json_encode($data);
             return false;
         }
 

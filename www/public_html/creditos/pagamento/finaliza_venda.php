@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+//error_reporting(E_ALL);
+//ini_set("display_errors", 1);
 
 @session_start();
 require_once "../../../includes/constantes.php";
@@ -33,7 +33,7 @@ $log_filepath = $log_directory . $log_filename;
 
 if (!is_dir($log_directory)) {
     if (!mkdir($log_directory, 0777, true)) {
-        die('Erro ao criar o diretório de log: ' . $log_directory);
+        //die('Erro ao criar o diretório de log: ' . $log_directory);
     }
 }
 // $ff = fopen("/www/log/finaliza_venda.txt", "a+");
