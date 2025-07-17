@@ -297,7 +297,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				$email->Host = getenv("smtp_host");
 				//---------------------------------------------------------//
 				$email->Mailer = "smtp";
-				$email->From = "suporte@e-prepag.com.br";
+				$email->From = getenv("email_suporte");
 				$email->SMTPAuth = true;     // turn on SMTP authentication
 				$email->Username = getenv("smtp_username");  // a valid email here
 				$email->Password = getenv("smtp_password"); //'985856';	//'850637'; 
@@ -322,7 +322,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 										  }
 								  */
 				// Reply-to
-				$email->AddReplyTo('suporte@e-prepag.com.br');
+				$email->AddReplyTo(getenv("email_suporte"));
 
 				$msg_temp = [];
 				if ($sEmailTo && trim($sEmailTo) != "") {

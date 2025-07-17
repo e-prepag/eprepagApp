@@ -1976,7 +1976,7 @@ function eprepag_detectLang($use_include = false) {
 		$mailVars['to'] = $to;
 		if($cc)$mailVars['cc'] = $cc;
 		if($bcc)$mailVars['bcc'] = $bcc;
-		$mailVars['from'] = 'suporte@e-prepag.com.br';
+		$mailVars['from'] = getenv("email_suporte");
 		$mailVars['fromname'] = 'E-Prepag';
 		$mailVars['subject'] = $subject;
 		$mailVars['html'] = $msgEmail;
@@ -2026,7 +2026,7 @@ function eprepag_detectLang($use_include = false) {
         $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
 		$mail->Mailer   = "smtp";
-		$mail->From     = "suporte@e-prepag.com.br";
+		$mail->From     = getenv("email_suporte");
 		$mail->SMTPAuth = true;     // turn on SMTP authentication
 		$mail->Username = getenv("smtp_username");  // a valid email here
 		$mail->Password = getenv("smtp_password"); //'985856'; //'8s}:#t)YTa~5ks))';'850637'; 
@@ -2041,7 +2041,7 @@ function eprepag_detectLang($use_include = false) {
                 
 
 		// Reply-to
-		$mail->AddReplyTo('suporte@e-prepag.com.br');
+		$mail->AddReplyTo(getenv("email_suporte"));
 		
 		//To
 		if($to && trim($to) != ""){
@@ -2085,7 +2085,7 @@ function eprepag_detectLang($use_include = false) {
                 $mail->Host     = getenv("smtp_host");
                 //---------------------------------------------------------//
 		$mail->Mailer   = "smtp";
-		$mail->From     = "financeiro@e-prepag.com.br";
+		$mail->From     = getenv('email_financeiro');
 		$mail->SMTPAuth = true;     // turn on SMTP authentication
 		$mail->Username = getenv("smtp_username");  // a valid email here
 		$mail->Password = getenv("smtp_password"); 
@@ -2100,7 +2100,7 @@ function eprepag_detectLang($use_include = false) {
                
 
 		// Reply-to
-		$mail->AddReplyTo('financeiro@e-prepag.com.br');
+		$mail->AddReplyTo(getenv('email_financeiro'));
 		
 		//To
 		if($to && trim($to) != ""){

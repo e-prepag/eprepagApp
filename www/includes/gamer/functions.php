@@ -51,7 +51,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
-        $mail->From     = "suporte@e-prepag.com.br";
+        $mail->From     = getenv("email_suporte");
         $mail->SMTPAuth = true;     // turn on SMTP authentication
         $mail->Username = getenv("smtp_username");  // a valid email here
         $mail->Password = getenv("smtp_password"); //'985856';		//'850637';  985856
@@ -65,7 +65,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         //---------------------------------------------------------//  
 
         // Reply-to
-        $mail->AddReplyTo('suporte@e-prepag.com.br');
+        $mail->AddReplyTo(getenv("email_suporte"));
 
         //To
         if($to && trim($to) != ""){
@@ -811,7 +811,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain) {
         $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
-        $mail->From     = "suporte@e-prepag.com.br";
+        $mail->From     = getenv("email_suporte");
         $mail->SMTPAuth = true;     // turn on SMTP authentication
         $mail->Username = getenv("smtp_username");  // a valid email here
         $mail->Password = getenv("smtp_password"); //'985856';		//'850637'; 
@@ -823,7 +823,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain) {
         $mail->Port     = getenv("smtp_port");
 
         // Reply-to
-        $mail->AddReplyTo('suporte@e-prepag.com.br');
+        $mail->AddReplyTo(getenv("email_suporte"));
 
         //To
         if($to && trim($to) != ""){

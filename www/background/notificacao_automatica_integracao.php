@@ -26,7 +26,7 @@ if(!$arquivoLog->haveFile()) {
     $qtde_minutos_considerados = 30; //j� conciliado
     $qtde_meses_considerados_apartirde = 1; //qtde de meses considerado na pesquisa
     $subject = "Notificação Automaticamente de Pedidos de Integração";
-    $email = "suporte@e-prepag.com.br";
+    $email = getenv("email_suporte");
     $cc = "glaucia@e-prepag.com.br"; //"glaucia@e-prepag.com.br";
     $bcc = "wagner@e-prepag.com.br";
     $msg = "";

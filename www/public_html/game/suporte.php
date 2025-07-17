@@ -114,7 +114,7 @@ if(!empty($_POST)){
 			require_once DIR_INCS."gamer/functions.php";
 			// Dados do Email
 	//        $email  = "diegogandradex@gmail.com";
-			$cc     = "suporte@e-prepag.com.br";
+			$cc     = getenv("email_suporte");
 			$subject= "Contato - Suporte";
 			$corpoMsg = "<html><head></head><body>
 						Olá<br>

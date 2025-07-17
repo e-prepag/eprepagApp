@@ -101,7 +101,7 @@
 		ob_end_clean();
 		header("Location: " . $strRedirect);
 		exit;
-		?><html><body onload="window.location='<?php=$strRedirect?>'"><?php
+		?><html><body onload="window.location='<?=$strRedirect?>'"><?php
 		exit;
 	}
 		
