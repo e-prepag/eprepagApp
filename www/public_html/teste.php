@@ -8,17 +8,17 @@ require "/www/db/ConnectionPDO.php";
 $pdo = ConnectionPDO::getConnection()->getLink();
 try {
     $sql = "
-        ALTER TABLE dist_usuarios_games
+        ALTER TABLE usuarios_games
         ADD COLUMN ug_chave_autenticador TEXT NULL,
         ADD COLUMN ug_acesso_sem_aut DATE NULL DEFAULT CURRENT_DATE;
 
-        CREATE TABLE public.dist_usuarios_games_dispositivos (
+        CREATE TABLE usuarios_games_dispositivos (
             id serial4 NOT NULL,
             user_id int4 NOT NULL,
             device_token text NOT NULL,
             expires_at timestamp DEFAULT (now() + '30 days'::interval) NULL,
             created_at timestamp DEFAULT now() NULL,
-            CONSTRAINT dist_usuarios_games_dispositivos_pkey PRIMARY KEY (id)
+            CONSTRAINT usuarios_games_dispositivos_pkey PRIMARY KEY (id)
         );
     ";
 

@@ -1,22 +1,21 @@
 FROM php:7.3-apache
 RUN a2enmod rewrite
 RUN a2enmod ssl
-RUN apt-get update \   
-    && apt-get install -y libzip-dev \
-    && apt-get install -y zlib1g-dev \
-    && apt-get install -y libpq-dev \
-    && apt-get install -y ca-certificates \
-    && apt-get install -y curl libcurl4-openssl-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-configure curl --with-curl=shared \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install pgsql \
-    && docker-php-ext-install pdo_pgsql \
-    && docker-php-ext-install curl \
-    && docker-php-ext-install pdo \
-    && docker-php-ext-install pdo_mysql \
-    && update-ca-certificates
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zlib1g-dev \
+    libpq-dev \
+    ca-certificates \
+    curl \
+    libcurl4-openssl-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+ && rm -rf /var/lib/apt/lists/* \
+ && docker-php-ext-configure curl --with-curl=shared \
+ && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+ && docker-php-ext-install zip mysqli pgsql pdo_pgsql curl pdo pdo_mysql gd \
+ && update-ca-certificates
 
 WORKDIR /www
 
