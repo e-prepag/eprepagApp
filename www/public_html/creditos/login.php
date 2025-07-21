@@ -1,5 +1,8 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);  // Exibe todos os tipos de erros
 
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";

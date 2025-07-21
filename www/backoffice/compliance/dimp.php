@@ -2,28 +2,11 @@
 <?php
 header("Content-Type: text/html; charset=UTF-8");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-set_time_limit(0);
-// Define o caminho do arquivo de log personalizado
-ini_set('log_errors', 1);
-ini_set('error_log', 'erro_log.log');
-
-// Habilita o relatório de erros
-error_reporting(E_ALL);
-
-// Opcional: Mostrar erros na tela (apenas para desenvolvimento)
-ini_set('display_errors', 1); // Defina como 0 em produção
-
 
 require_once "../../class/util/classFilePipe.php";
 require_once '../../includes/constantes.php';
-
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
-
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
-
-
-
-set_time_limit(7200);
 
 function removerAcentos($string)
 {
@@ -104,7 +87,7 @@ $nomeRespEPP = 'Daniela Oliveira';                      // Nome do responsável d
 
 $foneEPP = '01130309106';                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
-$emailEPP = 'financeiro@e-prepag.com.br';               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
+$emailEPP = getenv('email_financeiro');               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
 
 

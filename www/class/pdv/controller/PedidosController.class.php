@@ -344,7 +344,7 @@ class PedidosController extends HeaderController
                                 $cor_prim = $cor_prim_teste && $cor_prim_teste != "#000000" ? $cor_prim_teste : '#1b6d93';
 
                                 $emailsup_teste = $estilos['email_suporte'];
-                                $emailsup = $emailsup_teste ? $emailsup_teste : "suporte@e-prepag.com.br";
+                                $emailsup = $emailsup_teste ? $emailsup_teste : getenv("email_suporte");
 
                                 $nome2 = $this->usuarios->getNomeFantasia();
                                 if (($emailsup_teste == "" && $atendimento_teste == "") || ($emailsup_teste == null && $atendimento_teste == null)) {

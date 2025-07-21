@@ -15,10 +15,10 @@
                 //$mail->SMTPSecure = "ssl";
                 $mail->Port     = getenv("smtp_port"); //587;
                 
-                $mail->From     = "suporte@e-prepag.com.br";
+                $mail->From     = getenv("email_suporte");
                 $mail->FromName = "E-Prepag";
                 // Reply-to
-                $mail->AddReplyTo('suporte@e-prepag.com.br');
+                $mail->AddReplyTo(getenv("email_suporte"));
                 // To
                 if ($to && trim($to) != "") {
                         $toAr = explode(",", $to);

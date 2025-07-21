@@ -19,7 +19,7 @@ if(!$arquivoLog->haveFile()) {
     ob_start('callbackLog');
 
     // Dados do Email
-    $email  = "suporte@e-prepag.com.br";
+    $email  = getenv("email_suporte");
     $cc     = "wagner@e-prepag.com.br,glaucia@e-prepag.com.br";
     $bcc    = "";
     $subject= "Desbloqueio Automático de Gamers e PINs EPP CASH";

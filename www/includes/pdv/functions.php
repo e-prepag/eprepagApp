@@ -1,6 +1,6 @@
 <?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
-require_once "../load_dotenv.php";
+require_once  __DIR__ . "/../load_dotenv.php";
 if(!function_exists('checkIP')) {
 	function checkIP() {
 
@@ -567,7 +567,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
         $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
-        $mail->From     = "suporte@e-prepag.com.br";
+        $mail->From     = getenv("email_suporte");
         $mail->SMTPAuth = true;     // turn on SMTP authentication
         $mail->Username = getenv("smtp_username");  // a valid email here
         $mail->Password = getenv("smtp_password"); //'985856';		//'850637'; 
@@ -579,7 +579,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
         $mail->Port     = getenv("smtp_port");
 
         // Reply-to
-        $mail->AddReplyTo('suporte@e-prepag.com.br');
+        $mail->AddReplyTo(getenv("email_suporte"));
 
         //To
         if($to && trim($to) != ""){
@@ -619,7 +619,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
     $mail->Host     = getenv("smtp_host");
     //---------------------------------------------------------//
     $mail->Mailer   = "smtp";
-    $mail->From     = "suporte@e-prepag.com.br";
+    $mail->From     = getenv("email_suporte");
     $mail->SMTPAuth = true;     // turn on SMTP authentication
     $mail->Username = getenv("smtp_username");  // a valid email here
     $mail->Password = getenv("smtp_password"); //'985856';		//'850637'; 
@@ -631,7 +631,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
     $mail->Port     = getenv("smtp_port");
 
     // Reply-to
-    $mail->AddReplyTo('suporte@e-prepag.com.br');
+    $mail->AddReplyTo(getenv("email_suporte"));
 
     //To
     if ($to && trim($to) != "") {

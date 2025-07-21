@@ -16,7 +16,7 @@ $dataClickIni = date('Y-m-d',$data_inicio);
 $dataClickFim = date('Y-m-d',$data_fim);
 
 // Dados do Email
-$email  = "suporte@e-prepag.com.br";
+$email  = getenv("email_suporte");
 $cc     = "glaucia@e-prepag.com.br";
 $bcc    = "wagner@e-prepag.com.br";
 $subject= "Pedidos PDVs com Diferenças de PINs";

@@ -2,11 +2,11 @@
 require_once "/www/includes/load_dotenv.php";
 
 // Verifica se as variáveis de ambiente já estão definidas, caso contrário as carrega do .env
-$db_host = getenv('DB_HOST') ?: null;
-$db_port = getenv('DB_PORT') ?: null;
-$db_banco = getenv('DB_BANCO') ?: null;
-$db_user = getenv('DB_USER') ?: null;
-$db_pass = getenv('DB_PASS') ?: null;
+$db_host = getenv('DB_HOST_EPREPAG') ?: "null";
+$db_port = getenv('DB_PORT_EPREPAG') ?: "null";
+$db_banco = getenv('DB_BANCO_EPREPAG') ?: "null";
+$db_user = getenv('DB_USER_EPREPAG') ?: "null";
+$db_pass = getenv('DB_PASS_EPREPAG') ?: "null";
 
 // Definir constantes
 define('DB_HOST', $db_host);

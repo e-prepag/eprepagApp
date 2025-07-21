@@ -204,7 +204,8 @@ $msg = htmlentities($msg, ENT_QUOTES,'ISO-8859-1');
         $("#prosseguir").click(function () {
 
             var erro = false;
-            if (grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) {
+            
+            if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                 $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                 erro = true;
             }

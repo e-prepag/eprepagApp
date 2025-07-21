@@ -149,7 +149,7 @@ $nomeRespEPP = 'Daniela Oliveira';                      // Nome do responsável d
 
 $foneEPP = '01130309106';                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
-$emailEPP = 'financeiro@e-prepag.com.br';               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
+$emailEPP = getenv('email_financeiro');               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
 
 

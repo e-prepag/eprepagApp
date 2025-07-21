@@ -16,7 +16,7 @@ session_start();
 
 if(isset($_POST["email"]) && $_POST["email"] != ""){
 
-    $to = "suporte@e-prepag.com.br";
+    $to = getenv("email_suporte");
     $subject = "PDV Não Encontrado no Mapa";
     $body_html = "<b>Data</b>: ".date("d/m/Y H:i:s").". <br> ";
     foreach($_POST as $ind => $val){

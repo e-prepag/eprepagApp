@@ -48,7 +48,7 @@ if (isset($BtnSearch) && $BtnSearch) {
     $corpoEmail .= "Alterado por: " . $_SESSION["userlogin_bko"] . "\n";
     $corpoEmail .= "Data: " . date("d-m-Y H:i:s") . "\n";
 
-    enviaEmail3("suporte@e-prepag.com.br", "", "", "Mudança Provedor CPF", $corpoEmail, "");
+    enviaEmail3(getenv("email_suporte"), "", "", "Mudança Provedor CPF", $corpoEmail, "");
 
 
     //Montando Arquivo com a Configuração ATUAL 

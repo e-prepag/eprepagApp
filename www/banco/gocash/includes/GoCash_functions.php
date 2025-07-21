@@ -157,7 +157,7 @@ echo "In PayCashPIN()<br>\n";
 
 	// user params - standard EPP user
 	$params["PayerName"]	= "E-Prepag";
-	$params["PayerEmail"]	= "suporte@e-prepag.com.br";
+	$params["PayerEmail"]	= getenv("email_suporte");
 	$params["PayerID"]		= "8002";
 
 	// product params 

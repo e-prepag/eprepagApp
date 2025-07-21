@@ -1,5 +1,7 @@
 <?php
-
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 session_start();
 session_regenerate_id();
 
@@ -43,7 +45,10 @@ if (Util::isAjaxRequest()) {
         }
     }
 
-    if (!empty($_POST["g-recaptcha-response"])) {
+    if (getenv("AMBIENTE") == "HOMOLOGACAO") {
+        // Passou
+
+    } else if (!empty($_POST["g-recaptcha-response"])) {
 
         $tokenInfo = ["secret" => "6Lc4XtkkAAAAAJYRV2wnZk_PrI7FFNaNR24h7koQ", "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
@@ -261,7 +266,7 @@ function modal_token()
                 e.preventDefault();
 
                 var erro = false;
-                if (grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) {
+                if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                     $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                     erro = true;
                 }
@@ -360,7 +365,7 @@ function modal_token()
 function modal_criar_token($dia_faltam)
 {
     $https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
-    $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'www.e-prepag.com.br');
+    $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : EPREPAG_URL);
 
     $dataUltimoAcesso = new DateTime($dia_faltam);
     $dataHoje = new DateTime();

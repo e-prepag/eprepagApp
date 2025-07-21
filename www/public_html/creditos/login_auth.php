@@ -1,8 +1,8 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);  // Exibe todos os tipos de erros
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
 require '../libs/PHPGangsta/GoogleAuthenticator.php';
@@ -46,8 +46,10 @@ $pag = $_REQUEST["pag"];
 $login = $_REQUEST["login"];
 $senha = $_REQUEST["senha"];
 $recaptcha = $_REQUEST["g-recaptcha-response"];
+if(getenv("AMBIENTE") == "HOMOLOGACAO") {
+    // Passou
 
-if ($recaptcha != "") {
+} else if ($recaptcha != "") {
 
     $tokenInfo = [
         "secret" => getenv("RECAPTCHA_SECRET_KEY"),
@@ -182,7 +184,7 @@ if ($usuario_operador) {
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if (temLogInconsistente($user['pdv_id'], $pdo)) {
@@ -195,7 +197,7 @@ if ($usuario_operador) {
 
         $users = lerUsuariosBloqueados();
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if(buscarUsuariosSemLog($pdo, $user['pdv_id'])) {
@@ -206,7 +208,7 @@ if ($usuario_operador) {
         adicionarUsuarioBloqueado($user['pdv_id'], $msg);
         enviaEmailReport($msg, $user);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     $_SESSION['id_do_usuario'] = $user['ugo_id'];
@@ -223,13 +225,13 @@ if ($usuario_operador) {
     $auth = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (empty($auth['ugo_chave_autenticador'])) {
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/adicionar-autenticacao.php");
+        header("Location: /creditos/adicionar-autenticacao.php");
         exit;
     }
     $msg = "";
     if (checkDevice($user['ugo_id'], $pdo, true)) {
         //$msg = "Dispositivo já autenticado.";
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/loginEf2.php");
+        header("Location: /creditos/loginEf2.php");
         exit;
     }
 
@@ -240,7 +242,7 @@ if ($usuario_operador) {
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if (temLogInconsistente($user['ug_id'], $pdo)) {
@@ -253,7 +255,7 @@ if ($usuario_operador) {
 
         $users = lerUsuariosBloqueados();
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     if(buscarUsuariosSemLog($pdo, $user['ug_id'])) {
@@ -264,7 +266,7 @@ if ($usuario_operador) {
         adicionarUsuarioBloqueado($user['ug_id'], $msg);
         enviaEmailReport($msg, $user);
 
-        header("Location: ".EPREPAG_URL_HTTPS."/creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
+        header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
     $_SESSION['login_usuario'] = $login;
@@ -281,13 +283,13 @@ if ($usuario_operador) {
     $auth = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (empty($auth['ug_chave_autenticador'])) {
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/adicionar-autenticacao.php");
+        header("Location: /creditos/adicionar-autenticacao.php");
         exit;
     }
     $msg = "";
     if (checkDevice($user['ug_id'], $pdo, false)) {
         //$msg = "Dispositivo já autenticado.";
-        header("Location: " . EPREPAG_URL_HTTPS . "/creditos/loginEf2.php");
+        header("Location: /creditos/loginEf2.php");
         exit;
     }
 }
