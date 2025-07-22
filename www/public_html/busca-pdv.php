@@ -35,6 +35,7 @@ $pdo = $con->getLink();
 $recaptcha = $_POST['g-recaptcha-response'];
 
 $msg_modal = false;
+$nao_carregar = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //$recaptcha = $_POST['g-recaptcha-response'];
 
@@ -56,9 +57,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
             $erros[] = "<p>Processo invalidado por RECAPTCHA.</p>";
+        }else{
+            $_SESSION["recaptcha_valido"] = true;
         }
     } else {
-        $erros[] = "<p>Você deve realizar a verificação do RECAPTCHA para prosseguir.</p>";
+        $nao_carregar = true;
+        $recaptcha = "existe";
     }
     if (!empty($erros)) {
         $msg_modal = true;
@@ -287,10 +291,10 @@ $site_key = getenv("AMBIENTE") == "HOMOLOGACAO" ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEG
                 <input readonly name="verificationCode" class="form-control input-sm" type="hidden"
                     id="verificationCode" value="<?php if (isset($_POST['g-recaptcha-response']))
                         echo htmlspecialchars($_POST['g-recaptcha-response'], ENT_QUOTES, 'UTF-8'); ?>" size="5" /><br>
-                <!-- <span class="col-md-5 top10">
-                    <a class="estiloSpan font-10px" href="javascript:monta_captcha();">Gerar outro código</a>
-                </span> -->
-                <div class="g-recaptcha col-md-4 col-md-offset-3 text-center" data-sitekey="<?= $site_key ?>"
+                <span class="col-md-3 top10">
+                    Preencha o captcha:
+                </span>
+                <div class="g-recaptcha col-md-9 top10" data-sitekey="<?= $site_key ?>"
                     data-callback="onReCaptchaSuccess"></div>
 
                 <div class="clearfix"></div>
@@ -449,7 +453,7 @@ echo modal_includes();*/
 
 </script>
 <?php
-if (isset($_POST['g-recaptcha-response']) && isset($_POST['cidade']) && isset($_POST['bairro'])) {
+if ($nao_carregar == false && isset($_POST['cidade']) && isset($_POST['bairro'])) {
     echo "<script>ValidaForm();</script>";
 }
 

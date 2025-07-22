@@ -20,60 +20,6 @@ $id_gocash = 1;
 
 // Vetor que cria o drop drown dos estados
 $Resultadoestado = $SIGLA_ESTADOS;
-
-function generateRandomCode() {
-    $numbersAllowedInCode = false; //	Set to FALSE for a 'Letters Only' Code
-    $numberOfLetters = 4;   //	Allow Minimum 20 Pixels Per Letter - See codeBoxWidth Property Above)
-
-//echo "numbersAllowedInCode: '".($numbersAllowedInCode?"YES":"Nope")."', numberOfLetters: '".$numberOfLetters."'<br>";
-
-    $GLOBALS['_SESSION']['verificationCode'] = "";
-    $ret = "";
-    for ($placebo = 1; $placebo <= $numberOfLetters; $placebo++) {
-        if ((rand() > 0.49) || ($numbersAllowedInCode == false)) {
-            $number = 97 + rand(0, 25); //rand(97,122);
-            $char = chr($number);
-            $ret .= $char;
-//	        $ret .= chr(rand(97,122));
-        } else {
-            $number = 48 + rand(0, 10); //rand(48, 57);
-            $char = chr($number);
-            $ret .= $char;
-//			$ret .= chr(rand(48, 57));
-        }
-//echo "<nobr>char: '$char', number: '$number', ret: '".$ret."'</nobr><br>";
-    }
-    $GLOBALS['_SESSION']['verificationCode'] = $ret;
-    $GLOBALS['_SESSION']['palavraCodigo'] = $ret;
-//echo "verificationCode: '".$GLOBALS['_SESSION']['verificationCode']."'<br>";
-//die("Stop");
-    return $ret;
-}
-
-// echo "<hr>translateCode(generateRandomCode()) :" . translateCode(generateRandomCode()) . "<hr>";
-
-Function translateCode($scode) {
-    $numbersAllowedInCode = false; //	Set to FALSE for a 'Letters Only' Code
-    $numberOfLetters = 4;   //	Allow Minimum 20 Pixels Per Letter - See codeBoxWidth Property Above)
-
-//echo "<nobr>scode: '".$scode."'</nobr><br>";
-    $stmp = "";
-
-    for ($placebo = 0; $placebo < $numberOfLetters; $placebo++) {
-        /*
-          $schar = ord(substr($scode, $placebo, 1))+$placebo;
-          if(strlen($schar)==0) $schar = "000";
-          if(strlen($schar)==1) $schar = "00".$schar;
-          if(strlen($schar)==2) $schar = "0".$schar;
-          $stmp .= $schar;
-         */
-        $schar = ord(substr($scode, $placebo, 1)) + $placebo;
-        $stmp.= str_pad($schar, 3, '0', STR_PAD_LEFT);
-
-//echo "<nobr>$placebo: '".$schar."' ('".ord(substr($scode, $placebo, 1))."') -> '".$stmp ."'</nobr><br>";
-    }
-    return $stmp;
-}
 ?>
 <div class="container txt-cinza bg-branco  p-bottom40">
 <?php
@@ -177,18 +123,11 @@ Function translateCode($scode) {
                 </div>
                 <div class="form-group col-md-12 col-sm-12 col-xs-12">
                     <div class="col-md-5  col-sm-6 col-xs-6">
-    <?php
-                        $randomcode = (isset($_POST['rc'])) ? $_POST['rc'] : generateRandomCode();
-                        $randomcode_translated = translateCode($randomcode);
-    ?>
-                        <img width="110px" height="35px" class="pull-right" src="/includes/captcha/CaptchaImage.php?uid=<?php echo $randomcode_translated; ?>" title="Verify Code" vspace="2" />
-                        <input type="hidden" name="rc" value="<?php echo $randomcode;?>">
                     </div>
                     <div class="col-md-5  col-sm-4 col-xs-4">
-                        <input name="verificationCode" class="form-control input-sm" type="text" id="verificationCode"  size="5" />
                     </div>
                     <div class="col-md-2  col-sm-2 col-xs-2">
-                        <a onClick="procuraLan()" href="#" class=" btn btn-sm pull-right btn-success">Ok</a>
+                        <a onClick="procuraLan()" href="#" class=" btn btn-sm pull-right btn-success">Continuar</a>
                     </div>
                 </div>
                 <div class="clearfix"></div>

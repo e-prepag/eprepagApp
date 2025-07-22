@@ -29,26 +29,30 @@ $pdo = $con->getLink();
 
 if (!isset($_POST['box']) || $_POST['box'] != true) {
 
-        $captcha_secret = getenv("AMBIENTE") == "HOMOLOGACAO" ? "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe" : getenv("RECAPTCHA_SECRET_KEY");
+        if (!isset($_SESSION['recaptcha_valido']) || $_SESSION['recaptcha_valido'] != true) {
+                $captcha_secret = getenv("AMBIENTE") == "HOMOLOGACAO" ? "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe" : getenv("RECAPTCHA_SECRET_KEY");
 
-        $tokenInfo = ["secret" => $captcha_secret, "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
+                $tokenInfo = ["secret" => $captcha_secret, "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
-        $recaptcha = curl_init();
-        curl_setopt_array($recaptcha, [
-                CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
+                $recaptcha = curl_init();
+                curl_setopt_array($recaptcha, [
+                        CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+                        CURLOPT_CUSTOMREQUEST => "POST",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
 
-        ]);
-        $retorno = json_decode(curl_exec($recaptcha), true);
-        if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
-                die("<script type='text/javascript'>
+                ]);
+                $retorno = json_decode(curl_exec($recaptcha), true);
+                if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
+                        die("<script type='text/javascript'>
                                 document.getElementById('error-text').innerHTML = '<p>Processo invalidado por RECAPTCHA.</p>';
                                 $('#modal-load').modal();
                         </script>");
+                }
+                curl_close($recaptcha);
+        }else{
+                $_SESSION['recaptcha_valido'] = false;
         }
-        curl_close($recaptcha);
 
         function grava_log_mapa_lhs($mensagem)
         {
@@ -673,12 +677,12 @@ if (!isset($_POST['box']) || $_POST['box'] != true) {
                 </a>
         </div>
         <?php
-                $site_key = getenv("AMBIENTE") == "HOMOLOGACAO" ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" : getenv("RECAPTCHA_SITE_KEY_V3");
+        $site_key = getenv("AMBIENTE") == "HOMOLOGACAO" ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" : getenv("RECAPTCHA_SITE_KEY_V3");
         ?>
         <script>
                 function loadRecaptcha() {
                         const script = document.createElement('script');
-                        const site_key = "<?=$site_key?>";
+                        const site_key = "<?= $site_key ?>";
                         script.src = 'https://www.google.com/recaptcha/api.js?render=' + site_key;
                         script.onload = () => {
                                 grecaptcha.ready(function () {
