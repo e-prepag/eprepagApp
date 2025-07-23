@@ -216,7 +216,7 @@ if($vg_ultimo_status == 1){
     <div class="row top20">
             <div class="col-md-3 txt-azul-claro">
                 <div class="row">
-                    <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left"><h4 class="top20">Minha Conta</h4></strong>
+                    <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left"><h4 class="top20">MEU CARTÃO</h4></strong>
                 </div>
                 <div class="row">
                    <?php require_once RAIZ_DO_PROJETO . "public_html/game/includes/menu-carteira.php"?>

@@ -328,7 +328,7 @@ if(is_array($productResult) && !empty($productResult)){
         </div>
         <div class="row align-left">
             <div class="col-md-12">
-                <a href="http://e-prepagpdv.com.br/blog/" target="_blank"> <img id="image_bug_fixed" src="/imagens/imghomesiteparablogpdv.png" /> </a>
+                <a href="<?=NOVIDADES_URL?>" target="_blank"> <img id="image_bug_fixed" src="/imagens/imghomesiteparablogpdv.png" /> </a>
             </div>
 <?php
 //    if(is_array($feeds))

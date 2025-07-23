@@ -104,9 +104,9 @@ header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'un
                     <div class="col-md-5 col-md-offset-4 text-right">
                         <div class="col-md-12 fontsize-p">
                             <span class="txt-cinza">
-                                <a href="#" link="solucoes.e-prepag.com" class="decoration-none redirecionamento txt-cinza">Business Page</a> | 
-                                <a href="<?php echo PROTOCOL;?>://e-prepagpdv.com.br/" class="decoration-none redirecionamento txt-cinza">Seja um Parceiro</a> | 
-                                <a href="https://www.blog.e-prepag.com" target="_blank" class="decoration-none nowrap txt-cinza">Sobre a E-prepag</a></span>
+                                <a href="<?=SOLUCOES_URL?>" target="_blank" class="decoration-none txt-cinza">Business Page</a> | 
+                                <a href="https://e-prepagpdv.com.br/" target="_blank" class="decoration-none txt-cinza">Seja um Parceiro</a> | 
+                                <a href="<?=SOBRE_URL?>" target="_blank" class="decoration-none nowrap txt-cinza">Sobre a E-prepag</a></span>
                         </div>
                         <div class="col-md-12">
                             <span class="txt-azul-claro"><?=$this->usuario->getNome();?> <span id="sair" class="c-pointer">(sair)</span></span>
@@ -137,11 +137,11 @@ header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'un
                         <ul class="nav navbar-nav">
                             <li <?php echo ($_SERVER['SCRIPT_NAME'] == "/game/index.php") ? 'class="active decoration-none"><a href="#"' : '"><a href="/game/" class="decoration-none"';?>><strong>JOGOS</strong></a></li>
                             <li <?php echo (in_array($_SERVER['SCRIPT_NAME'],$arrCarteira)) ? 'class="active decoration-none"><a href="#"' : '><a href="/game/conta/extrato.php" class="decoration-none"';?>><strong>CARTÃO E-PREPAG</strong></a></li>
-                            <li><a class="decoration-none" href="https://www.blog.e-prepag.com" target="_blank"><strong>NOVIDADES</strong></a></li>
+                            <li><a class="decoration-none" href="<?=NOVIDADES_URL?>" target="_blank"><strong>NOVIDADES</strong></a></li>
                             <li>
                                 <ul class="hidden-xs hidden-sm nav navbar-nav" style="margin:0;">
                                     <li class="dropdown">
-                                        <a href="<?php echo (in_array($_SERVER['SCRIPT_NAME'],$arrMinhaConta)) ? "#\" class=\"bg-branco txt-azul decoration-none\"" : "/game/conta/pedidos.php\" class=\"decoration-none"; ?>"><strong>MINHA CONTA</strong></a>
+                                        <a href="<?php echo (in_array($_SERVER['SCRIPT_NAME'],$arrMinhaConta)) ? "#\" class=\"bg-branco txt-azul decoration-none\"" : "/game/conta/pedidos.php\" class=\"decoration-none"; ?>"><strong>MEU CARTÃO</strong></a>
                                         <div class="dropdown-content dropdown-menu-left text-left" style="z-index: 999;">
                                             <a href="/game/conta/pedidos.php" class="nowrap">Meus pedidos</a>
                                             <a href="/game/conta/extrato.php" class="nowrap">Cartão E-Prepag</a>
@@ -153,7 +153,7 @@ header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'un
 
                                     </li>
                                 </ul>
-                                <a href="<?php echo (in_array($_SERVER['SCRIPT_NAME'],$arrMinhaConta)) ? "#" : "/game/conta/pedidos.php"; ?>" class="hidden-md hidden-lg decoration-none  <?php if(in_array($_SERVER['SCRIPT_NAME'],$arrMinhaConta)) echo 'bg-branco txt-azul';?>"><strong>MINHA CONTA</strong></a>
+                                <a href="<?php echo (in_array($_SERVER['SCRIPT_NAME'],$arrMinhaConta)) ? "#" : "/game/conta/pedidos.php"; ?>" class="hidden-md hidden-lg decoration-none  <?php if(in_array($_SERVER['SCRIPT_NAME'],$arrMinhaConta)) echo 'bg-branco txt-azul';?>"><strong>MEU CARTÃO</strong></a>
                             </li>
                             <li <?php echo ($_SERVER['SCRIPT_NAME'] == "/game/suporte.php") ? 'class="active decoration-none"><a href="#"' : '><a href="/game/suporte.php" class="decoration-none"';?>><strong>SUPORTE</strong></a></li>
                         </ul>

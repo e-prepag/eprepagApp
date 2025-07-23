@@ -260,7 +260,7 @@ if (isset($_POST['envio']) && $_POST['envio'] == 1) {
         <div class="col-md-3 txt-azul-claro">
             <div class="row">
                 <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left">
-                    <h4 class="top20">Minha Conta</h4>
+                    <h4 class="top20">MEU CARTÃO</h4>
                 </strong>
             </div>
             <div class="row">

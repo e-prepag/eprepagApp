@@ -108,9 +108,9 @@ header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'un
                     </div>
                     <div class="col-md-5 col-md-offset-4 text-right">
                         <span class="txt-cinza fontsize-p">
-                            <a href="#" class="decoration-none txt-cinza redirecionamento" link="solucoes.e-prepag.com">Business Page</a> | 
-                            <a href="https://e-prepagpdv.com.br/" class="decoration-none txt-cinza">Seja um Parceiro</a> | 
-                            <a href="https://www.blog.e-prepag.com" target="_blank" class="decoration-none nowrap txt-cinza">Sobre a E-prepag</a></span>
+                            <a href="<?=SOLUCOES_URL?>" class="decoration-none txt-cinza" target="_blank">Business Page</a> | 
+                            <a href="https://e-prepagpdv.com.br/" target="_blank" class="decoration-none txt-cinza">Seja um Parceiro</a> | 
+                            <a href="<?=SOBRE_URL?>" target="_blank" class="decoration-none nowrap txt-cinza">Sobre a E-prepag</a></span>
                     </div>
                 </div> 
                 <div class="row">
@@ -140,8 +140,8 @@ header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'un
                         <ul class="nav navbar-nav">
                             <li <?php echo ($_SERVER['SCRIPT_NAME'] == "/game/index.php") ? 'class="active"><a href="#"' : '"><a href="/game/"';?>"><strong>JOGOS</strong></a></li>
                             <li><a href="/game/conta/extrato.php"><strong>CARTÃO E-PREPAG</strong></a></li>
-                            <li><a href="https://www.blog.e-prepag.com" target="_blank"><strong>NOVIDADES</strong></a></li><!-- href="#" link="blog.e-prepag.com" class="redirecionamento" -->
-                            <li><a href="/game/conta/pedidos.php"><strong>MINHA CONTA</strong></a></li>
+                            <li><a href="<?=NOVIDADES_URL?>" target="_blank"><strong>NOVIDADES</strong></a></li><!-- href="#" link="blog.e-prepag.com" class="redirecionamento" -->
+                            <li><a href="/game/conta/pedidos.php"><strong>MEU CARTÃO</strong></a></li>
                             <li <?php echo ($_SERVER['SCRIPT_NAME'] == "/game/suporte.php") ? 'class="active"><a href="#"' : '"><a href="/game/suporte.php"';?>><strong>SUPORTE</strong></a></li>
                         </ul>
                         <?php if(isset($_SESSION["carrinho"]) && count($_SESSION["carrinho"])) {?>
