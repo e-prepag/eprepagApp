@@ -80,7 +80,7 @@ if (is_array($carrinho) && count($carrinho) > 0) {
         <div class="col-md-12 txt-verde top10">
             <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong
                 class="pull-left">
-                <h4 class="top20">acesse sua conta</h4>
+                <h4 class="top20">Acesse seu cartão</h4>
             </strong>
         </div>
         <div class="clearfix"></div>

@@ -175,7 +175,7 @@ function get_Instructions_for_Gamer_PIN($opr_codigo, $vgm_id, $vgm_nome) {
 					<table border='0' cellspacing='0' width='90%'>
 					<tr>
 						<td class='texto'> 
-							<b>1.</b> Acesse sua conta no site da E-Prepag<br>
+							<b>1.</b> Acesse seu cartão no site da E-Prepag<br>
 							<b>2.</b> Escolha o produto que deseja comprar<br>
 							<b>3.</b> Selecione a forma de pagamento<br>
 							<b>4.</b> Adicione o PIN adquirido e clique e em pagar. (Se houver diferença entre o valor do PIN e o valor do pedido, você ficará com um saldo em conta para outras compras)<br>

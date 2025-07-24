@@ -1,13 +1,4 @@
 <?php
-// Obtém a URL acessada sem o domínio
-$request_uri = $_SERVER['REQUEST_URI'];
-// Obtém o script principal chamado
-$script_name = $_SERVER['SCRIPT_NAME'];
-// Se a URI acessada não for exatamente igual ao script chamado, bloqueia o acesso
-if ($request_uri !== $script_name) {
-    http_response_code(403);
-    die("Acesso negado.");
-}
 require_once "../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once DIR_CLASS . "util/CanalDenuncia.php";

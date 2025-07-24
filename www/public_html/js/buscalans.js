@@ -1,59 +1,64 @@
-function procuraLan(){
-    if(validaBuscaCidade()){
-        $("#bairro").closest("form").submit();   
+function procuraLan() {
+    if (validaBuscaCidade()) {
+        $("#bairro").closest("form").submit();
     }
 }
 
-function validaBuscaCidade(){
+function validaBuscaCidade() {
     var erro = false;
-    $("#error-text").text("");
+    var errorText = "";
 
-    if($("#estado").val() == ""){
-       $("#error-text").append("<p>Estado deve ser selecionada.</p>");
-       erro = true;
+    if ($("#estado").val() == "") {
+        errorText = "<p>Estado deve ser selecionada.</p>";
+        erro = true;
     }
 
-    if($("#cidade").val() == ""){
-       $("#error-text").append("<p>Cidade deve ser selecionada.</p>");
-       erro = true;
+    if ($("#cidade").val() == "") {
+        errorText = "<p>Cidade deve ser selecionada.</p>";
+        erro = true;
     }
 
-    if($("#bairro").val() == ""){
-       $("#error-text").append("<p>Bairro deve ser selecionado.</p>"); 
-       erro = true;
+    if ($("#bairro").val() == "") {
+        errorText = "<p>Bairro deve ser selecionado.</p>";
+        erro = true;
     }
 
-    if($("#verificationCode").val() == ""){
-       $("#error-text").append("<p>Captcha deve ser preenchido.</p>");
-       erro = true;
+    if ($("#verificationCode").val() == "") {
+        errorText = "<p>Captcha deve ser preenchido.</p>";
+        erro = true;
     }
 
-    if(erro === false){
+    if (erro === false) {
         return true;
-    }else{
+    } else {
         waitingDialog.hide();
+        $("#error-text").html(errorText);
         $("#modal-load").modal();
         return false;
     }
 }
 
-function resizeIframe(obj){
+function resizeIframe(obj) {
     obj.style.height = 0;
     obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
 }
 
 function ValidaForm() {
-    waitingDialog.show('Por favor, aguarde...',{dialogSize: 'sm'});
-    setTimeout(function(){ 
-        if(validaBuscaCidade()){
+    waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+    setTimeout(function () {
+        if (validaBuscaCidade()) {
             MostraLANs();
         }
     }, 500);
+    if (typeof grecaptcha !== 'undefined') {
+        grecaptcha.reset();
+    }
 }
 
 function MostraCidade() {
-    waitingDialog.show('Buscando cidades...',{dialogSize: 'sm'});
-    setTimeout(function(){ 
+    waitingDialog.show('Buscando cidades...', { dialogSize: 'sm' });
+    console.log("MostraCidade");
+    setTimeout(function () {
         if (document.form_lanHouses_filtros.estado.value != "") {
             estado = document.form_lanHouses_filtros.estado.value;
             $.ajax({
@@ -69,16 +74,19 @@ function MostraCidade() {
                 },
                 error: function () {
                     waitingDialog.hide();
-                    $("#SelCidade").html("ERRO");
+                    $("#error-text").html("Erro ao buscar cidades.");
+                    $("#modal-load").modal();
                 }
             });
         }
+        waitingDialog.hide();
     }, 500);
 }
 
 function MostraBairro() {
-    waitingDialog.show('Buscando bairros...',{dialogSize: 'sm'});
-    setTimeout(function(){
+    waitingDialog.show('Buscando bairros...', { dialogSize: 'sm' });
+    console.log("MostraBairro");
+    setTimeout(function () {
         if (document.form_lanHouses_filtros.cidade.value != "") {
             estado = document.form_lanHouses_filtros.estado.value;
             cidade = document.form_lanHouses_filtros.cidade.value;
@@ -95,24 +103,27 @@ function MostraBairro() {
                 },
                 error: function () {
                     waitingDialog.hide();
-                    $("#SelBairro").html("ERRO");
+                    $("#error-text").html("Erro ao buscar bairros.");
+                    $("#modal-load").modal();
                 }
             });
         }
+        waitingDialog.hide();
     }, 500);
 }
 
-function monta_captcha(){
+function monta_captcha() {
     document.form_lanHouses_filtros.verificationCode.value = "";
 
     $.ajax({
         type: "POST",
         url: "/creditos/ajax/ajax_captcha.php",
-        success: function(html){
+        success: function (html) {
             $("#span_captcha").html(html);
         },
-        error: function(){
-        $("#span_captcha").html("ERRO");
+        error: function () {
+            $("#error-text").html("Erro ao carregar o captcha.");
+            $("#modal-load").modal();
         }
     });
 }
@@ -128,7 +139,7 @@ function MostraLANs() {
             url: "/creditos/ajax/busca-pdv.php",
             data: "cidade=" + cidade + "&bairro=" + bairro + "&estado=" + estado + "&verificationCode=" + verificationCode,
             beforeSend: function () {
-                $("#resultado").html("&nbsp;&nbsp;&nbsp;Fazendo a consulta!");
+                waitingDialog.show('Buscando pontos de venda...', { dialogSize: 'sm' });
             },
             success: function (txt) {
                 waitingDialog.hide();
@@ -137,10 +148,12 @@ function MostraLANs() {
             },
             error: function () {
                 waitingDialog.hide();
-                $("#resultado").html("ERRO");
+                $("#error-text").html("Erro ao buscar pontos de venda.");
+                $("#modal-load").modal();
             }
         });
     }
+    waitingDialog.hide();
 }
 
 function Reload() {
@@ -149,14 +162,13 @@ function Reload() {
     document.form_lanHouses_filtros.submit();
     return false;
 }
-
-function montaBoxPdv(){
+function montaBoxPdv() {
     var box = true;
 
     $.ajax({
         type: "POST",
         url: "/creditos/ajax/busca-pdv.php",
-        data: { box: "true", estado: $("#estado").val(), cidade: $("#cidade").val(), bairro: $("#bairro").val()},
+        data: { box: "true", estado: $("#estado").val(), cidade: $("#cidade").val(), bairro: $("#bairro").val() },
         success: function (html) {
             $("#box-busca-pdv").html(html);
         }

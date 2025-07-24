@@ -968,7 +968,7 @@ class Garena
 	public static function verificaTokenRe($token)
 	{
 
-	    $dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY2"), "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
+	    $dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY_V3"), "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
 		$curlToken = curl_init();
 		curl_setopt_array($curlToken, [
 		  CURLOPT_URL => getenv("RECAPTCHA_URL"),

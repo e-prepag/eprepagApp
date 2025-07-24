@@ -22,9 +22,9 @@ if(($GLOBALS['_SERVER']['HTTPS']=="on") && ($GLOBALS['_SERVER']['SERVER_PORT']==
 	<div id="menu" <?php echo $styleMenu; ?>><nobr><table cellpadding='0' cellspacing='1' border='0' bordercolor='#cccccc' style='border-collapse:collapse;'><tr>
 		<td><a href='<?= EPREPAG_URL_HTTPS_COM ?>' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">PORTAL E-PREPAG</a></td>
 		<td><img src='/imagens/menu_div.gif' width='7' height='18' border='0'/></td>
-		<td><a href='/games-list-coins' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">COMPRE AQUI</a></td>
+		<td><a href='/' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">COMPRE AQUI</a></td>
 		<td><img src='/imagens/menu_div.gif' width='7' height='18' border='0'/></td>
-		<td><a href='/e-prepag' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">QUEM SOMOS</a></td>
+		<td><a href='<?=QUEMSOMOS_URL?>' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">QUEM SOMOS</a></td>
 		<td><img src='/imagens/menu_div.gif' width='7' height='18' border='0'/></td>
 		<td><a href='/eprepag/revendedores/index.asp' class='tit_menu_arial_bold' onMouseover="this.style.color='#FF0000'" onMouseout="this.style.color='#24297F'" border="0">REVENDEDORES</a></td>
 		<td><img src='/imagens/menu_div.gif' width='7' height='18' border='0'/></td>

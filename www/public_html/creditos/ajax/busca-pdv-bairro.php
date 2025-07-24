@@ -1,4 +1,7 @@
 <?php
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 function isAjax() {return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));}
 function block_direct_calling() {
@@ -28,7 +31,7 @@ $SQLBairro = "SELECT
 
 					(SELECT ug_bairro
 					FROM dist_usuarios_games
-					WHERE trim(both ' ' from replace(ug_cidade, '\'', '')) = :ug_cidade
+					WHERE trim(both ' ' from replace(ug_cidade, '''', '')) = :ug_cidade
 						AND trim(both ' ' from ug_estado) = :ug_estado
 						AND ug_ativo = 1
 						AND ug_status = 1
@@ -39,7 +42,7 @@ $SQLBairro = "SELECT
 					(SELECT us_bairro AS ug_bairro
 					FROM dist_usuarios_stores_cartoes
 					WHERE 
-                        trim(both ' ' from replace(us_cidade, '\'', '')) = :us_cidade
+                        trim(both ' ' from replace(us_cidade, '''', '')) = :us_cidade
 						AND trim(both ' ' from us_estado) = :us_estado 
 						AND us_coord_lat != 0
 						AND us_coord_lng != 0
@@ -53,7 +56,7 @@ $SQLBairro = "SELECT
                 UNION ALL
 					(SELECT trim(both ' ' from us_bairro) AS ug_bairro
 					FROM dist_usuarios_stores_qiwi
-					WHERE trim(both ' ' from replace(us_cidade, '\'', '')) = :us_cidade2
+					WHERE trim(both ' ' from replace(us_cidade, '''', '')) = :us_cidade2
 						AND trim(both ' ' from us_estado) = :us_estado2
 						AND us_coord_lat != 0
 						AND us_coord_lng != 0

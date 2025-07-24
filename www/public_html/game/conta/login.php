@@ -38,7 +38,7 @@ $msg = htmlentities($msg, ENT_QUOTES,'ISO-8859-1');
     <div class="row top40">
         <div class="col-md-12">
             <span class="glyphicon glyphicon-triangle-right graphycon-big color-green pull-left"></span>
-            <strong class="pull-left top15 color-green font20">Acesse sua conta</strong>
+            <strong class="pull-left top15 color-green font20">Acesse seu cartão</strong>
         </div>
     </div>
     <div class="row">

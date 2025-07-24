@@ -4,6 +4,7 @@
 // ini_set('log_errors', 1); // Habilita o registro de erros no log do PHP
 
 require_once "../includes/constantes.php";
+require_once "../includes/constantes_url.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;
 
@@ -279,7 +280,7 @@ if(is_array($productResult) && !empty($productResult)){
         </div>
     </div>
     <div class="row" title="Saiba mais sobre E-prepag Cash">
-        <a href=https://solucoes.e-prepag.com/cartao-e-prepag-2/"target="_blank">
+        <a href=<?=CARTAO_URL?>"target="_blank">
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 top20">
                 <img class="width100" src="imagens/cartao-eprep.jpg" />
             </div>
@@ -373,7 +374,7 @@ if(is_array($productResult) && !empty($productResult)){
     <div class="clearfix"></div>
 	
 	<div class="col-sm-12 col-xs-12 col-md-6 align-center top20">
-		<a href="https://blog.e-prepag.com/" target="_blank"> <img src="/imagens/imghomesiteparablog.png" id="image_bug_fixed" /> </a>
+		<a href="<?php echo NOVIDADES_URL; ?>" target="_blank"> <img src="/imagens/imghomesiteparablog.png" id="image_bug_fixed" /> </a>
 	</div>
 	
     <div class="row">

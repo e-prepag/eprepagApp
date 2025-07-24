@@ -2,7 +2,7 @@
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
-require_once "../../../includes/constantes_url.php"
+require_once "../../../includes/constantes_url.php";
 
 $posicao = "Inferior Internas";
 $controller = new HeaderController;
@@ -205,7 +205,7 @@ $_SESSION['secret'] = $secret;
             <div class="row">
                 <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left"
                     aria-hidden="true"></span><strong class="pull-left">
-                    <h4 class="top20">Minha Conta</h4>
+                    <h4 class="top20">MEU CARTÃO</h4>
                 </strong>
             </div>
             <div class="row">
