@@ -76,7 +76,7 @@ function get_Instructions_for_Gamer_PIN($opr_codigo, $vgm_id, $vgm_nome) {
 								<td class='texto'> 
 									Para inserir seu código no jogo siga os passos abaixo:<br>
 									<br>
-									<b>1</b>) Acesse seu cartão no jogo e clique em 'Mercado'. <br>
+									<b>1</b>) Acesse sua conta no jogo e clique em 'Mercado'. <br>
 									<b>2</b>) No canto inferior esquerdo da tela selecione 'Compre com E-Prepag' e clique em 'Inserir código'. <br>
 									<b>3</b>) Selecione a quantidade desejada e digite a senha (enviada para seu e-mail com o título \"Compra Processada\") no campo em branco.<br>
 									<b>4</b>) Após digitar sua senha aparecerá uma janela confirmando sua compra e você deverá clicar em 'Comprar'.<br>
@@ -89,7 +89,7 @@ function get_Instructions_for_Gamer_PIN($opr_codigo, $vgm_id, $vgm_nome) {
 							<tr>
 								<td class='texto'> 
 									Para inserir seu código no jogo siga os passos abaixo:<br>
-									<b>1</b>) Acesse seu cartão no jogo e clique em 'PINS'. <br>
+									<b>1</b>) Acesse sua conta no jogo e clique em 'PINS'. <br>
 									<b>2</b>) Selecione Grana ou Ouro e digite a senha no campo em branco.<br>
 									<b>3</b>) Após digitar sua senha aparecerá uma janela confirmando sua compra e você deverá clicar em 'Comprar'.<br>
 								</td>

@@ -3,7 +3,7 @@
     .galeria {
         display: flex;
         flex-wrap: wrap;
-        gap: 0;
+        gap: 1px;
         /* sem espaço entre imagens */
         align-items: stretch;
     }
@@ -83,8 +83,8 @@
                 <p><a href="<?= FORMASPAG_URL ?>" class="txt-cinza-claro2 decoration-none" target="_blank">Veja aqui
                         prazos e condições</a></p>
                 <div class="galeria">
-                    <img src="/imagens/gamer/p_boleto.gif" alt="">
                     <img src="/imagens/pag/iconePIX.png" alt="">
+                    <img src="/imagens/icones_boleto_cinza.jpg" alt="">
                     <img src="/imagens/logo_epp_cash.png" alt="">
                 </div>
             </div>
