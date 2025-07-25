@@ -415,7 +415,7 @@ function modal_criar_token($dia_faltam)
                 $("#logar_sem_token").click(function (e) {
 
                     var erro = false;
-                    if (grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) {
+                    if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                         $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                         erro = true;
                     }
@@ -518,7 +518,7 @@ function logar_direto()
     <script>
         $(function () {
             var erro = false;
-            if (grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) {
+            if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                 $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                 erro = true;
             }
