@@ -715,7 +715,7 @@ class Garena
 		$sql = "SELECT 1 
 				FROM pins 
 				WHERE pin_codinterno = :PIN 
-				  AND pin_validade >= CURRENT_DATE;";
+				  AND (pin_validade >= CURRENT_DATE OR pin_datavenda > (CURRENT_DATE - INTERVAL '180 day'));";
 
 		$comando = $con->prepare($sql);
 		$comando->bindValue(":PIN", $this->idPin);

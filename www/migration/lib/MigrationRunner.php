@@ -1,6 +1,7 @@
 <?php
 
-class MigrationRunner {
+class MigrationRunner
+{
     private $pdo;
 
     /**
@@ -8,13 +9,24 @@ class MigrationRunner {
      * @param PDO $pdo Instância de conexão com o banco de dados
      * Inicializa a tabela migrations_db se não existir
      */
-    public function __construct(PDO $pdo) {
+    public function __construct(PDO $pdo)
+    {
         $this->pdo = $pdo;
 
-        $this->pdo->exec("CREATE TABLE IF NOT EXISTS migrations_db (
-            nome TEXT PRIMARY KEY,
-            executado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )");
+        $stmt = $pdo->prepare("SELECT 1
+                                FROM pg_tables
+                                WHERE schemaname = 'public' AND tablename = 'migrations_db'");
+                                
+        $stmt->execute();
+        $existe = $stmt->fetchColumn();
+
+        if (!$existe) {
+            $pdo->exec("CREATE TABLE migrations_db (
+                            nome TEXT PRIMARY KEY,
+                            executado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )");
+        }
+
     }
 
     /**
@@ -23,7 +35,8 @@ class MigrationRunner {
      * @return void
      * Percorre todos os arquivos PHP no diretório e executa as migrations
      */
-    public function run($dir) {
+    public function run($dir)
+    {
         $executadas = $this->getExecutadas();
 
         foreach (glob("$dir/*.php") as $arquivo) {
@@ -43,23 +56,25 @@ class MigrationRunner {
     }
 
     /**
-        * Summary of getExecutadas
-        * @return array
-        * Retorna uma lista de migrations já executadas
-        * Não alterar a tabela migrations_db diretamente, pode causar inconsistências
+     * Summary of getExecutadas
+     * @return array
+     * Retorna uma lista de migrations já executadas
+     * Não alterar a tabela migrations_db diretamente, pode causar inconsistências
      */
-    private function getExecutadas() {
+    private function getExecutadas()
+    {
         $res = $this->pdo->query("SELECT nome FROM migrations_db");
         return $res ? $res->fetchAll(PDO::FETCH_COLUMN) : [];
     }
 
     /**
-        * Registra uma migration como executada
-        * @param string $nome Nome da migration
-        * @return void
-        * Registra a migration no banco de dados para evitar execução duplicada
-        */
-    private function registrar($nome) {
+     * Registra uma migration como executada
+     * @param string $nome Nome da migration
+     * @return void
+     * Registra a migration no banco de dados para evitar execução duplicada
+     */
+    private function registrar($nome)
+    {
         $stmt = $this->pdo->prepare("INSERT INTO migrations_db (nome) VALUES (?)");
         $stmt->execute([$nome]);
     }

@@ -26,6 +26,8 @@ class AES {
         // The number of rounds in this AES cipher.
         private $Nr;
 
+        private $chave;
+
         // The S-Box substitution table.
         private static $sBox = array(
                 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
@@ -181,6 +183,7 @@ class AES {
         /** constructs an AES cipher using a specific key.
         */
         public function __construct($z) {
+                $this->chave = $z;
                $this->Nk = strlen($z)/4;
                $this->Nr = $this->Nk + self::$Nb + 2;
 
@@ -202,6 +205,12 @@ class AES {
         *   to encrypt is linear to the size of the ciphertext.
         **/
         public function encrypt($x) {
+                $blockSize = 16;
+                $plaintext = $x;
+                $plaintext = str_pad($plaintext, $blockSize * ceil(strlen($plaintext) / $blockSize), chr(0));
+                $cipher = 'aes-256-ecb';
+                $encrypted = openssl_encrypt($plaintext, $cipher, $this->chave, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, "");
+                return $encrypted;
                 $t = ""; // 16-byte block
                 $y = ""; // returned cipher text;
 
@@ -229,6 +238,9 @@ class AES {
         *   to decrypt is linear to the size of the ciphertext.
         **/
         public function decrypt($y) {
+                $cipher = 'aes-256-ecb';
+                $encrypted = openssl_decrypt($y, $cipher, $this->chave, OPENSSL_RAW_DATA);
+                return $encrypted;
                 $t = ""; // 16-byte block
                 $x = ""; // returned plain text;
 

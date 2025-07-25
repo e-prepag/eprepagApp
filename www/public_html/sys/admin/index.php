@@ -19,13 +19,14 @@ if (!($_SERVER['SERVER_NAME'] == "192.168.200.91" || $_SERVER['SERVER_NAME'] == 
 }
 
 require_once $raiz_do_projeto . "public_html/sys/includes/functions.php";
+if(getenv("AMBIENTE") == "HOMOLOGACAO"){
 
-if($_SERVER['HTTPS']!="on" && !checkIP()) {
+}
+else if($_SERVER['HTTPS']!="on" && !checkIP()) {
     Header("Location: " . EPREPAG_URL_HTTPS . "".$_SERVER['REQUEST_URI']);
     die();
 } //end if($_SERVER['HTTPS']!="on") 
-
-if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false && !checkIP()){
+else if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false && !checkIP()){
     header("Location: " . EPREPAG_URL_HTTPS . "".$_SERVER['REQUEST_URI']);
     die();
 }
