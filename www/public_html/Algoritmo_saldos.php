@@ -7,7 +7,7 @@ require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 
 $pdo = ConnectionPDO::getConnection()->getLink();
-$sql = "SELECT distinct dugsl_ug_id from dist_usuarios_games_saldo_log where dugsl_data_inclusao >= CURRENT_DATE - INTERVAL '30 day'";
+$sql = "SELECT distinct dugsl_ug_id from dist_usuarios_games_saldo_log where dugsl_data_inclusao >= CURRENT_DATE - INTERVAL '3 day'";
 $stmt = $pdo->query($sql);
 $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -15,48 +15,54 @@ $saldos_org = [];
 
 foreach ($usuarios as $usuario) {
     $j = 0;
-    $sql = "SELECT dugsl_data_inclusao, dugsl_ug_perfil_saldo, dugsl_ug_perfil_saldo_antes 
-                FROM dist_usuarios_games_saldo_log 
-                WHERE dugsl_data_inclusao >= CURRENT_DATE - INTERVAL '30 day' AND dugsl_ug_id = {$usuario['dugsl_ug_id']} 
-                ORDER BY dugsl_data_inclusao DESC";
+    $sql = "WITH logs_filtrados AS (
+        SELECT 
+            dugsl_ug_id,
+            dugsl_data_inclusao::date AS dia,
+            dugsl_data_inclusao,
+            dugsl_ug_perfil_saldo,
+            dugsl_ug_perfil_saldo_antes
+        FROM dist_usuarios_games_saldo_log
+        WHERE dugsl_data_inclusao >= CURRENT_DATE - INTERVAL '3 day'
+          AND dugsl_ug_id = {$usuario['dugsl_ug_id']}
+    ),
+    ordenados AS (
+        SELECT *,
+               ROW_NUMBER() OVER (PARTITION BY dia ORDER BY dugsl_data_inclusao ASC) AS rn_asc,
+               ROW_NUMBER() OVER (PARTITION BY dia ORDER BY dugsl_data_inclusao DESC) AS rn_desc
+        FROM logs_filtrados
+    )
+    SELECT 
+        dia,
+        MAX(CASE WHEN rn_desc = 1 THEN dugsl_ug_perfil_saldo END) AS saldo_final,
+        MAX(CASE WHEN rn_asc = 1 THEN dugsl_ug_perfil_saldo_antes END) AS saldo_inicial,
+        SUM(CASE WHEN dugsl_ug_perfil_saldo > dugsl_ug_perfil_saldo_antes 
+                 THEN dugsl_ug_perfil_saldo - dugsl_ug_perfil_saldo_antes ELSE 0 END) AS entradas,
+        SUM(CASE WHEN dugsl_ug_perfil_saldo < dugsl_ug_perfil_saldo_antes 
+                 THEN dugsl_ug_perfil_saldo_antes - dugsl_ug_perfil_saldo ELSE 0 END) AS saidas
+    FROM ordenados
+    GROUP BY dia
+    ORDER BY dia desc;";
     $stmt = $pdo->query($sql);
     $saldos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    //print_r($saldos);
-    for ($i = 0; $i < 30; $i++) {
-        $primeiro = false;
-        $dias_atras = $i;
-        $data = (new DateTime())->modify("-$dias_atras days")->format('Y-m-d');
 
-        $saldo_final = 0;
-        $saldo_inicial = 0;
-        $entradas = 0;
-        $saidas = 0;
+    foreach ($saldos as $linha) {
+        $data = $linha['dia'];
 
-        while ($j < count($saldos) && substr($saldos[$j]['dugsl_data_inclusao'], 0, 10) == $data) {
-            echo "Usuario: {$usuario['dugsl_ug_id']} - Data: $data - Saldo: {$saldos[$j]['dugsl_ug_perfil_saldo']} - Saldo antes: {$saldos[$j]['dugsl_ug_perfil_saldo_antes']}\n";
-            if($primeiro == false){
-                $saldo_final = $saldos[$j]['dugsl_ug_perfil_saldo'];
-            }
-            if($saldos[$j]['dugsl_ug_perfil_saldo'] > $saldos[$j]['dugsl_ug_perfil_saldo_antes']) {
-                $entradas += $saldos[$j]['dugsl_ug_perfil_saldo'] - $saldos[$j]['dugsl_ug_perfil_saldo_antes'];
-            } else {
-                $saidas += $saldos[$j]['dugsl_ug_perfil_saldo_antes'] - $saldos[$j]['dugsl_ug_perfil_saldo'];
-            }
-            $j++;
-            $primeiro = true;
+        if (!$saldos_org[$data]) {
+            $saldos_org[$data] = [
+                'saldo_inicial' => $linha['saldo_inicial'],
+                'saldo_final' => $linha['saldo_final'],
+                'entradas' => $linha['entradas'],
+                'saidas' => $linha['saidas']
+            ];
+        }else {
+            $saldos_org[$data]['saldo_inicial'] += $linha['saldo_inicial'];
+            $saldos_org[$data]['saldo_final'] += $linha['saldo_final'];
+            $saldos_org[$data]['entradas'] += $linha['entradas'];
+            $saldos_org[$data]['saidas'] += $linha['saidas'];
         }
-        if($primeiro){
-            $saldo_inicial = $saldos[$j-1]['dugsl_ug_perfil_saldo_antes'];
-        }
-        
-        $saldos_org[$usuario['dugsl_ug_id']][$data] = [
-            'saldo_final' => $saldo_final,
-            'saldo_inicial' => $saldo_inicial,
-            'entradas' => $entradas,
-            'saidas' => $saidas
-        ];
     }
 }
-echo "\nsaldos:\n";
 
 echo json_encode($saldos_org);

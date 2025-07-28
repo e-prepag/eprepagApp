@@ -1,0 +1,138 @@
+<?php
+
+require_once "/www/includes/constantes.php";
+require_once "/www/includes/gamer/functions.php";
+require_once "/www/db/connect.php";
+require_once "/www/db/ConnectionPDO.php";
+
+function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
+{
+	$pdo = ConnectionPDO::getConnection()->getLink();
+	$sql = "WITH logs_filtrados AS (
+			    SELECT 
+			        dugsl_ug_id,
+			        dugsl_data_inclusao::date AS dia,
+			        dugsl_data_inclusao,
+			        dugsl_ug_perfil_saldo,
+			        dugsl_ug_perfil_saldo_antes
+			    FROM dist_usuarios_games_saldo_log
+			    WHERE dugsl_data_inclusao >= :data_inicial
+			      AND dugsl_data_inclusao <= :data_final
+			),
+			ordenados AS (
+			    SELECT *,
+			           ROW_NUMBER() OVER (PARTITION BY dugsl_ug_id, dia ORDER BY dugsl_data_inclusao ASC) AS rn_asc,
+			           ROW_NUMBER() OVER (PARTITION BY dugsl_ug_id, dia ORDER BY dugsl_data_inclusao DESC) AS rn_desc
+			    FROM logs_filtrados
+			),
+			por_usuario_dia AS (
+			    SELECT 
+			        dugsl_ug_id,
+			        dia,
+			        MAX(CASE WHEN rn_desc = 1 THEN dugsl_ug_perfil_saldo END) AS saldo_final,
+			        MAX(CASE WHEN rn_asc = 1 THEN dugsl_ug_perfil_saldo_antes END) AS saldo_inicial,
+			        SUM(CASE WHEN dugsl_ug_perfil_saldo > dugsl_ug_perfil_saldo_antes 
+			                 THEN dugsl_ug_perfil_saldo - dugsl_ug_perfil_saldo_antes ELSE 0 END) AS entradas,
+			        SUM(CASE WHEN dugsl_ug_perfil_saldo < dugsl_ug_perfil_saldo_antes 
+			                 THEN dugsl_ug_perfil_saldo_antes - dugsl_ug_perfil_saldo ELSE 0 END) AS saidas
+			    FROM ordenados
+			    GROUP BY dugsl_ug_id, dia
+			)
+			SELECT 
+			    dia,
+			    SUM(saldo_inicial) AS saldo_inicial,
+			    SUM(saldo_final) AS saldo_final,
+			    SUM(entradas) AS entradas,
+			    SUM(saidas) AS saidas
+			FROM por_usuario_dia
+			GROUP BY dia
+			ORDER BY dia DESC;
+			";
+
+	$stmt = $pdo->prepare($sql);
+	$stmt->bindParam(':data_inicial', $data_inicial);
+	$stmt->bindParam(':data_final', $data_final);
+	//$stmt->bindParam(':tipo_cliente', $tipo_cliente);
+	$stmt->execute();
+	$saldos_agrupados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	$saldos_org = [];
+	foreach ($saldos_agrupados as $linha) {
+		$saldos_org[] = [
+			'saldo_inicial' => $linha['saldo_inicial'],
+			'saldo_final' => $linha['saldo_final'],
+			'entradas' => $linha['entradas'],
+			'saidas' => $linha['saidas'],
+			'data' => $linha['dia'],
+		];
+	}
+
+	return $saldos_org;
+}
+
+function gerarTabelaClientes(array $dados)
+{
+	$html = '
+    <table class="tabela-clientes">
+        <thead>
+            <tr>
+				<th>Data</th>
+                <th>Tipo Cliente</th>
+                <th>Saldo Inicial</th>
+                <th>Entradas</th>
+                <th>Saídas</th>
+                <th>Saldo Final</th>
+            </tr>
+        </thead>
+        <tbody>
+    ';
+
+	$total_inicial = 0;
+	$total_entradas = 0;
+	$total_saidas = 0;
+	$total_final = 0;
+
+	foreach ($dados as $linha) {
+		$saldo_inicial = (float) $linha['saldo_inicial'];
+		$entradas = (float) $linha['entradas'];
+		$saidas = (float) $linha['saidas'];
+		$saldo_final = (float) $linha['saldo_final'];
+
+		$total_inicial += $saldo_inicial;
+		$total_entradas += $entradas;
+		$total_saidas += $saidas;
+		$total_final += $saldo_final;
+
+		$html .= '
+            <tr>
+				<td>' . $linha['data'] . '</td>
+                <td>PDV</td>
+                <td>' . formatarReais($saldo_inicial) . '</td>
+                <td>' . formatarReais($entradas) . '</td>
+                <td>' . formatarReais($saidas) . '</td>
+                <td>' . formatarReais($saldo_final) . '</td>
+            </tr>
+        ';
+	}
+
+	$html .= '
+        <tr class="total">
+            <td>Total</td>
+			 <td></td>
+            <td>' . formatarReais($total_inicial) . '</td>
+            <td>' . formatarReais($total_entradas) . '</td>
+            <td>' . formatarReais($total_saidas) . '</td>
+            <td>' . formatarReais($total_final) . '</td>
+        </tr>
+    ';
+
+	$html .= '</tbody></table>';
+
+	return $html;
+}
+
+function formatarReais($valor)
+{
+	return 'R$ ' . number_format($valor, 2, ',', '.');
+}
+
