@@ -21,13 +21,46 @@ class Garena
 	public $error = [];
 	private $url;
 
+	private $produtos = [
+		"freefire" => 100067,
+		"desativado" => 100080,
+		"blackClover" => 100130,
+		"DeltaForce" => 100151,
+		"haikyu" => 100153
+	];
+	private $mapaProdutos;
+
+	private $limites;
+
 	public function __construct($idPin, $conta, $type = "pdv", $idvenda = 0, $atimo = false, $produtoAtimo = false)
 	{
+		$this->mapaProdutos = [
+			433 => $this->produtos["freefire"],
+			355 => $this->produtos["freefire"],
 
-		$this->url = ["producao"=> [ getenv("GARENA_URL_ROLES"), getenv("GARENA_URL_PARTNER") ], "homologacao"=> [ getenv("GARENA_URL_ROLES_HOMOLOG"), getenv("GARENA_URL_PARTNER_HOMOLOG") ]];
+			454 => $this->produtos["desativado"],
+			374 => $this->produtos["desativado"],
 
-	    if($atimo == false){
-			if($this->testeConexaoBanco()){
+			493 => $this->produtos["blackClover"],
+
+			569 => $this->produtos["DeltaForce"],
+			498 => $this->produtos["DeltaForce"],
+
+			499 => $this->produtos["haikyu"],
+			570 => $this->produtos["haikyu"],
+		];
+
+		$this->limites  = [
+			$this->produtos["freefire"] => [8, 20],
+			$this->produtos["blackClover"] => [8, 20],
+			$this->produtos["DeltaForce"] => [8, 22],
+			$this->produtos["haikyu"] => [4, 20],
+		];
+
+		$this->url = ["producao" => [getenv("GARENA_URL_ROLES"), getenv("GARENA_URL_PARTNER")], "homologacao" => [getenv("GARENA_URL_ROLES_HOMOLOG"), getenv("GARENA_URL_PARTNER_HOMOLOG")]];
+
+		if ($atimo == false) {
+			if ($this->testeConexaoBanco()) {
 				$this->setConta($conta);
 				$this->setCodigo($idPin[0]);
 				if (empty($this->error)) {
@@ -50,15 +83,10 @@ class Garena
 			}
 		} else {
 
-			if ($produtoAtimo == 433 || $produtoAtimo == 355) {
-				$this->codGarena = 100067;
-			} else if ($produtoAtimo == 454 || $produtoAtimo == 374) {
-				$this->codGarena = 100080;
-			} else if ($produtoAtimo == 493) {
-				$this->codGarena = 100130;
-			} else if ($produtoAtimo == 569 || $produtoAtimo == 498) {
-				$this->codGarena = 100151;
+			if (isset($this->mapaProdutos[$produtoAtimo])) {
+				$this->codGarena = $this->mapaProdutos[$produtoAtimo];
 			}
+
 			$this->setConta($conta);
 		}
 	}
@@ -66,32 +94,15 @@ class Garena
 	private function verificaContaPorJogo()
 	{
 
-		if ($this->codGarena == 100067) {
+		
 
-			$count = strlen($this->conta);
-			if ($count < 8 || $count > 20) {
-				array_push($this->error, ["Erro" => "Formato da conta garena digitada está invalido (EPP0002)."]);
-			}
+		list($min, $max) = isset($this->limites[$this->codGarena]) ? $this->limites[$this->codGarena] : [8, 20];
 
-		} else if ($this->codGarena == 100130) {
-			$count = strlen($this->conta);
-			if ($count < 8 || $count > 20) {
-				array_push($this->error, ["Erro" => "Formato da conta garena digitada está invalido (EPP0002)."]);
-			}
-		} else if ($this->codGarena == 100151) {
-			$count = strlen($this->conta);
-			if ($count < 8 || $count > 22) {
-				array_push($this->error, ["Erro" => "Formato da conta garena digitada está invalido (EPP0002)."]);
-			}
-		} else {
+		$count = strlen($this->conta);
 
-			$count = strlen($this->conta);
-			if ($count < 8 || $count > 20) {
-				array_push($this->error, ["Erro" => "Formato da conta garena digitada está invalido (EPP0002)."]);
-			}
-
+		if ($count < $min || $count > $max) {
+			$this->error[] = ["Erro" => "Formato da conta garena digitada está invalido (EPP0002)."];
 		}
-
 	}
 
 	private function setConta($conta)
@@ -217,26 +228,7 @@ class Garena
 
 		$this->valorResgate = $resultado["vgm_pin_valor"];
 
-		switch ($produtoId) {
-			case 355:
-			case 433:
-				$this->codGarena = 100067;
-				break;
-			case 374:
-			case 454:
-				$this->codGarena = 100080;
-				break;
-			case 498:
-			case 569:
-				$this->codGarena = 100151;
-				break;
-			case 493:
-				$this->codGarena = 100130;
-				break;
-			default:
-				$this->codGarena = "ERRO";
-				break;
-		}
+		$this->codGarena = isset($this->mapaProdutos[$produtoId]) ? $this->mapaProdutos[$produtoId] : 'ERRO';
 
 		return true;
 
@@ -250,9 +242,9 @@ class Garena
 			$informacao .= $conteudo[$linha];
 		}
 
-		if($ambiente == "producao"){
+		if ($ambiente == "producao") {
 			$chave = getenv('GARENA_HASH');
-		}else{
+		} else {
 			$chave = getenv('GARENA_HASH_DEV');
 		}
 
@@ -277,7 +269,7 @@ class Garena
 			return json_encode(["Erro" => "Esse pin já foi utilizado (EPP0007)."]);
 		}
 
-		if($this->verificaValidade() == false){
+		if ($this->verificaValidade() == false) {
 			return json_encode(["Erro" => "Esse pin não está mais válido, nossos pins possuem 6 meses de validade (EPP0031)."]);
 		}
 
@@ -968,10 +960,10 @@ class Garena
 	public static function verificaTokenRe($token)
 	{
 
-	    $dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY_V3"), "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
+		$dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY_V3"), "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
 		$curlToken = curl_init();
 		curl_setopt_array($curlToken, [
-		  CURLOPT_URL => getenv("RECAPTCHA_URL"),
+			CURLOPT_URL => getenv("RECAPTCHA_URL"),
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
 			//CURLOPT_CUSTOMREQUEST => 'POST',
