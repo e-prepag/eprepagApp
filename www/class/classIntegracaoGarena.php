@@ -5,6 +5,7 @@
 //error_reporting(E_ALL);
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
+require_once __DIR__ . "/../includes/load_dotenv.php";
 
 class Garena
 {

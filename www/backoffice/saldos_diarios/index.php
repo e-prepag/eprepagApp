@@ -1,16 +1,17 @@
 <?php
 require_once '/www/includes/constantes.php';
-require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
+require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL); 
 
-$data_atual = date("Y-m-d");
-$data_1mes = date("Y-m-d", strtotime("-1 month"));
-
 $data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : date('Y-m-d', strtotime('-30 days'));
 $data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] . " 23:59:59" : date('Y-m-d') . " 23:59:59";
+$data_final_sem_hora = isset($_GET['dt_final']) ? $_GET['dt_final'] : date('Y-m-d');
 $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
+$data_atual = date('Y-m-d');
+
+$tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs' : ($tipo_cliente == 2 ? 'Gamers' : 'Desconhecido'));
 ?>
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -111,11 +112,11 @@ $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
 <div>
 	<div class="col-md-12">
 		<ol class="breadcrumb top10">
-			<li><a href="#" class="muda-aba" ordem="<?php //echo $currentAba->getOrdem(); ?>">BackOffice -
-					<?php //echo $currentAba->getDescricao(); ?></a></li>
-			<li class="active"><?php //echo $sistema->menu[0]->getDescricao(); ?></li>
+			<li><a href="#" class="muda-aba" ordem="<?php echo $currentAba->getOrdem(); ?>">BackOffice -
+					<?php echo $currentAba->getDescricao(); ?></a></li>
+			<li class="active"><?php echo $sistema->menu[0]->getDescricao(); ?></li>
 			<li class="active"><a
-					href="<?php //echo $sistema->item->getLink(); ?>"><?php //echo $sistema->item->getDescricao(); ?></a>
+					href="<?php echo $sistema->item->getLink(); ?>"><?php echo $sistema->item->getDescricao(); ?></a>
 			</li>
 		</ol>
 	</div>
@@ -126,23 +127,22 @@ $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
 			<div class="col-cancel-pins">
 				<label for="tipo_cliente">Usuários</label>
 				<select id="tipo_cliente" name="tipo_cliente" class="form-control">
-					<option value="4" selected>Todos</option>
-					<option value="3">PDVs</option>
-					<option value="2">Gamers</option>
-					<option value="1">Atimo Pay</option>
+					<option <?php if($tipo_cliente == 4) echo "selected"; ?> value="4" selected>Todos</option>
+					<option <?php if($tipo_cliente == 3) echo "selected"; ?> value="3">PDVs</option>
+					<option <?php if($tipo_cliente == 2) echo "selected"; ?> value="2">Gamers</option>
 				</select>
 			</div>
 
 			<div class="col-cancel-pins">
 				<label for="dt_inicial">Início período
 				</label>
-				<input id="dt_inicial" name="dt_inicial" max="<?php echo $data_atual; ?>" value="<?php echo $data_1mes; ?>" class="form-control"
+				<input id="dt_inicial" name="dt_inicial" max="<?php echo $data_atual; ?>" value="<?php echo $data_inicial; ?>" class="form-control"
 					type="date">
 			</div>
 			<div class="col-cancel-pins">
 				<label for="dt_final">Final período
 				</label>
-				<input id="dt_final" name="dt_final" max="<?php echo $data_atual; ?>" value="<?php echo $data_atual; ?>" class="form-control"
+				<input id="dt_final" name="dt_final" max="<?php echo $data_atual; ?>" value="<?php echo $data_final_sem_hora; ?>" class="form-control"
 					type="date">
 			</div>
 		</div>
@@ -150,7 +150,7 @@ $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
 			<a class="btn btn-success btn-info" 
 			href="gerar_csv.php?
 			data_inicial=<?= urlencode($data_inicial) ?>
-			&data_final=<?= urlencode($data_final) ?>
+			&data_final=<?= urlencode($data_final_sem_hora) ?>
 			&tipo_cliente=<?= urlencode($tipo_cliente) ?>" 
 			target="_blank">Download</a>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
@@ -161,13 +161,13 @@ $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
 <div style="overflow-x: auto;">
 	<div class="relatorio-info">
 		<div><strong>Data:</strong> <?php echo date('d/m/Y H:m:i'); ?></div>
-		<div><strong>Tipo de Cliente:</strong> Todos</div>
+		<div><strong>Tipo de Cliente:</strong><?php echo $tipo_cliente_texto ?></div>
 	</div>
 
 	<?php
 	require_once __DIR__ . "/functions_saldos.php";
 	$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente);
-	echo gerarTabelaClientes($dados);
+	echo gerarTabelaClientes($dados, $tipo_cliente);
 	//echo json_encode($dados);
 	?>
 </div>
