@@ -2,13 +2,13 @@
 <?php
 header('Content-Type: application/json');
 
-$referer = $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : '';
-$host_permitido = '' . EPREPAG_URL_HTTPS . '';
-
-if (stripos($referer, $host_permitido) !== 0) {
-    http_response_code(403);
-    exit;
-}
+//$referer = $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : '';
+//$host_permitido = '' . EPREPAG_URL_HTTPS . '';
+//
+//if (stripos($referer, $host_permitido) !== 0) {
+//    http_response_code(403);
+//    exit;
+//}
 
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";

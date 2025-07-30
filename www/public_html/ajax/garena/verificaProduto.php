@@ -84,6 +84,11 @@ if (!isset($_POST["dist"])) {
 
 		$respostaToken = Garena::verificaTokenRe($_POST["token"]);
 
+		if(getenv("AMBIENTE") == "HOMOLOGACAO") {
+			$respostaToken["retorno"] = true;
+			$respostaToken["code"] = 1;
+		}
+
 		//if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
 		//$respostaToken = ["retorno" => true, "code" => 0];
 		//}

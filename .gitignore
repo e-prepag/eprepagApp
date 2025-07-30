@@ -1,4 +1,5 @@
-.env
+.env**
+!.env_example
 **/backoffice_old 
 **/log
 **/cache
