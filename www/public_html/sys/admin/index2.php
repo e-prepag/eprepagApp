@@ -159,7 +159,7 @@ if($Enviar) {
                      }
         } else { 
                 gravaLog_LoginSys("Login Error (2 Invalido): $login_var", true);
-                header("Location: index.php?Invalido=$passw");
+                header("Location: index.php?Invalido=1");
                 exit;
         }
         pg_close($connid); 
