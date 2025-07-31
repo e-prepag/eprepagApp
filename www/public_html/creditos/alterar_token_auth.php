@@ -211,7 +211,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                         <li>Aparecerá um código de 6 dígitos no seu aplicativo.</li>
 
                         <li>Digite esse código no site da E-prepag para confirmar e pronto! O autenticador está
-                            associado a sua conta.</li>
+                            associado a seu PDV.</li>
 
                     </ol>
                     <div style="width: 100%; display: flex; justify-content: center;">

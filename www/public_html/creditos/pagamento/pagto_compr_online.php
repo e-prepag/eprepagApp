@@ -205,7 +205,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                         <td class="texto" align="center" height="25">
                             <br>
                             Sua transação de depósito foi concluída com sucesso.<br><br>
-                            Seu saldo em conta será atualizado automaticamente.
+                            Seu saldo do PDV será atualizado automaticamente.
                         </td>
                     </tr>
                 </table>
@@ -590,7 +590,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                     <div id="pagamento_ok" class="col-md-12 h-footer"> <?php // bloco pagamento efetuado inicio ?>
                                         <center>
                                             Sua transação de depósito foi concluída com sucesso.<br>
-                                            Seu saldo em conta será atualizado automaticamente.<br>
+                                            Seu saldo do PDV será atualizado automaticamente.<br>
                                             <br>
                                             <!--//voltar-->
                                         </center>

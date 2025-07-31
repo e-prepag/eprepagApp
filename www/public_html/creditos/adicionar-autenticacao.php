@@ -100,7 +100,7 @@ if ($authData) {
               Você tem <strong>{$diasRestantes} dias</strong> para ativá-la antes que se torne obrigatória.";
     } else {
         $mensagemAuth = "O prazo para ativar a autenticação de dois fatores expirou. 
-              Para continuar acessando sua conta, é necessário configurá-la agora.";
+              Para continuar acessando seu PDV, é necessário configurá-la agora.";
     }
 }
 
@@ -237,7 +237,7 @@ if ($authData) {
                         <li>Aparecerá um código de 6 dígitos no seu aplicativo.</li>
 
                         <li>Digite esse código no site da E-prepag para confirmar e pronto! O autenticador está
-                            associado a sua conta.</li>
+                            associado a seu PDV.</li>
 
                     </ol>
                     <div style="width: 100%; display: flex; justify-content: center;">

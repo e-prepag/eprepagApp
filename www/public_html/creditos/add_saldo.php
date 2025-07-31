@@ -54,7 +54,7 @@ $valor_maximo_0 = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS
                         <p class="txt-cinza">Mínimo de R$ <?php echo number_format($valor_minimo_0, 2, ',', '.');?> - <a data-toggle="modal" data-target="#modal-veja-mais" href="#" class="veja-mais">Veja mais</a></p>
                         <p><input type="button" id="btnPagamento" class="btn btn-success" value="Escolha a forma de pagamento"></p>
                         <p class="txt-cinza bottom0">Após confirmação de pagamento o saldo será</p>
-                        <p class="txt-cinza">creditado diretamente em sua conta</p>
+                        <p class="txt-cinza">creditado diretamente em seu PDV</p>
                     </div>
                 </form>
             </div>
