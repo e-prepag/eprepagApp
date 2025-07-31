@@ -188,7 +188,7 @@ if ($usuario_operador) {
         exit;
     }
     if (temLogInconsistente($user['pdv_id'], $pdo)) {
-        $msg = "(BLQ101) Os dados da sua conta estão inconsistentes.";
+        $msg = "(BLQ101) Os dados do seu PDV estão inconsistentes.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 
@@ -246,7 +246,7 @@ if ($usuario_operador) {
         exit;
     }
     if (temLogInconsistente($user['ug_id'], $pdo)) {
-        $msg = "(BLQ101) Os dados da sua conta estão inconsistentes.";
+        $msg = "(BLQ101) Os dados do seu PDV estão inconsistentes.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
 

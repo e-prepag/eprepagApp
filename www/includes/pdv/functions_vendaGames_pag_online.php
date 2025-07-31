@@ -179,7 +179,7 @@ function processaEmailExpressMoneyLH_pag_online($venda_id, $parametros){
                                             <tr>
                                                     <td class='texto'> 
                                                             Seu pagamento de créditos de número <b>" . formata_codigo_venda($venda_id) . "</b> foi processado com sucesso!<br>
-                                                            Na sua conta com a E-Prepag foi creditado o valor de <b>R$".number_format($parametros['valor'],2,',','.')."</b> que já pode ser usado para comprar os produtos disponíveis. 
+                                                            No seu PDV com a E-Prepag foi creditado o valor de <b>R$".number_format($parametros['valor'],2,',','.')."</b> que já pode ser usado para comprar os produtos disponíveis. 
                                                     </td>
                                             </tr>
                                             </table>";

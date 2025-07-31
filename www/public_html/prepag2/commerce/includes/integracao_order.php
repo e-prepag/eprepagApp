@@ -76,7 +76,7 @@
                 <?php if(isset($data['venda_id']) && $data['venda_id']){ ?><p><strong>Pedido <?php echo $data['venda_id']; ?></strong></p><?php } ?>
                 <p></p><strong>User:</strong> <?php echo $data['email']; ?> <span class="glyphicon glyphicon-info-sign txt-vermelho c-pointer t0"  data-toggle="modal" data-target="#modal-info"></span>
 				<?php if($_SESSION['integracao_origem_id'] == "10427"){ ?>
-				      <p style="font-size: 12px; margin-top: 8px; margin-bottom: 4px; color: green;">Para realizar o resgate, é necessário que o e-mail associado à sua conta E-prepag seja o mesmo utilizado em sua conta do jogo. Caso o e-mail da conta E-prepag seja diferente, entre em contato com nosso suporte.</p>
+				      <p style="font-size: 12px; margin-top: 8px; margin-bottom: 4px; color: green;">Para realizar o resgate, é necessário que o e-mail associado ao seu cartão E-prepag seja o mesmo utilizado em sua conta do jogo. Caso o e-mail do seu cartão E-prepag seja diferente, entre em contato com nosso suporte.</p>
 				<?php } ?>
                 <p class="top10"><a href="https://<?php echo $_SERVER["SERVER_NAME"] ?>/game/suporte.php" target="_blank"><span class="glyphicon glyphicon-question-sign t0"></span> suporte</a></p>
             </div>

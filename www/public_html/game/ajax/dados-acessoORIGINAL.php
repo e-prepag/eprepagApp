@@ -93,7 +93,7 @@ if(Util::isAjaxRequest()){
                 $strEncrypt = urlencode($objEncryption->encrypt($strEncrypt));
                 $server_url = 'https://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
-                $strMail = "Para efetivar a alteração, por favor, faça o login de sua conta em nosso site e acesse este link a seguir: <a href='$server_url/game/conta/altera-email.php?c=".$strEncrypt."'>$server_url/game/conta/altera-email.php?c=".$strEncrypt."</a>";
+                $strMail = "Para efetivar a alteração, por favor, faça o login do seu cartão em nosso site e acesse este link a seguir: <a href='$server_url/game/conta/altera-email.php?c=".$strEncrypt."'>$server_url/game/conta/altera-email.php?c=".$strEncrypt."</a>";
 
                 //enviar str por e-mail
                 $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoEmail');
