@@ -3958,7 +3958,7 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
                                                                 Seu pagamento de boleto Express Money PDV número <b>" .
             formata_codigo_venda($venda_id) .
             "</b> foi processado com sucesso!<br>
-                                                                Na sua conta com a E-Prepag foi creditado o valor de <b>R$" .
+                                                                No seu PDV com a E-Prepag foi creditado o valor de <b>R$" .
             number_format($parametros["valor"], 2, ",", ".") .
             "</b> que já pode ser usado para comprar os produtos disponíveis. 
                                                         </td>

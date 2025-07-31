@@ -32,7 +32,7 @@ fbq('track', 'PageView');
 			<a href="https://cadastro.io/87ff8e5d6cee8e712af17a7dbea63058" title="Completar Cadastro" style="background: #62bd6e; color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 16px; text-transform: uppercase; font-weight: bold; transition: background-color 0.3s ease-in-out;" onmouseover="this.style.backgroundColor='#268fbd'" onmouseout="this.style.backgroundColor='#62bd6e';">Completar cadastro</a>
 		</div>
 		<div class="txt-cinza">
-			<p>Esse processo é essencial para garantir a segurança da sua conta e a conformidade regulatória.</p>
+			<p>Esse processo é essencial para garantir a segurança do seu ponto de venda, e a conformidade regulatória.</p>
 			<p>Se tiver alguma dúvida, entre em contato com o nosso suporte, pelo e-mail <a href="mailto:suporte@eprepag.com.br">suporte@eprepag.com.br</a> ou pelo chat disponível em nosso site que responderemos em até um dia útil.
 </p>
 			<p>Equipe E-prepag</p>

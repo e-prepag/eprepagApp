@@ -559,8 +559,8 @@ if ($msg == "") {
             isset($infoRow["ug_substatus"]) &&
             $infoRow["ug_substatus"] == "12"
         ) {
-            $msg = "Para sua segurança, sua conta está inativa. Para reativá-la, entre em contato com o suporte E-Prepag.\n";
-            gravaLog_Login("Para sua segurança, sua conta está inativa. Para reativá-la, entre em contato com o suporte E-Prepag: '$login_usuario', '$senha'.\n");
+            $msg = "Para sua segurança, seu PDV está inativo. Para reativá-lo, entre em contato com o suporte E-Prepag.\n";
+            gravaLog_Login("Para sua segurança, seu PDV está inativo. Para reativá-lo, entre em contato com o suporte E-Prepag: '$login_usuario', '$senha'.\n");
         } else {
             $msg = "Login ou senha inválidos.\n";
             gravaLog_Login("Login ou senha inválidos: '$login_usuario', '$senha'.\n");

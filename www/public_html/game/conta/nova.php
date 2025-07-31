@@ -194,7 +194,7 @@ if(isset($_POST['login']) && !empty($_POST['login'])){
                     $linhas = pg_num_rows($buscaUsuario);
 
                     if ($linhas <= 2) {
-                        $erros[] = "<p>Detectamos que você possui mais de uma conta na E-Prepag. Se você já realizou alguma compra diretamente de um game, é possível que já tenha uma conta ativa conosco. Verifique o endereço de e-mail utilizado.</p>
+                        $erros[] = "<p>Detectamos que você possui mais de um cadastro na E-Prepag. Se você já realizou alguma compra diretamente de um game, é possível que já tenha um cadastro ativa conosco. Verifique o endereço de e-mail utilizado.</p>
                         <p>Em caso de dúvidas, <a href=\'".EPREPAG_URL_HTTPS_COM."/support\'>clique aqui para entrar em contato com o suporte da E-Prepag</a>.</p>";
                     
                     } else if (isset($retorno["erros"]) && !empty($retorno["erros"])) {
@@ -386,7 +386,7 @@ $(function(){
                     </div>-->
                     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-left">
                         <ul>
-                            <li>Esta conta deve ser utilizada para compras de créditos para uso pessoal.</li>
+                            <li>Este cadastro deve ser utilizado para compras de créditos para uso pessoal.</li>
                             <li>Limite de compras diário de R$<?php echo number_format($GLOBALS['RISCO_GAMERS_TOTAL_DIARIO'], 2) ?>, condicionado ao máximo de <?php echo CPF_QUANTIDADE_LIMITE ?> compras em 30 dias.</li>
                             <li>Não é permitida a comercialização dos créditos adquiridos. Quer ser um ponto de venda? Acesse: <a href="https://e-prepagpdv.com.br/" target="_blank">https://e-prepagpdv.com.br/</a></li>
                         </ul>

@@ -1565,7 +1565,7 @@ Comentado por nao usar
 ?>
                 <div class="col-xs-12 col-md-6 mt-sm-20">
                     <span class="txt-cinza">
-                        Para finalizar esta compra, você precisa de um <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Cartão E-Prepag Cash</a></b> ou <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/conta/add-saldo.php">saldo</a></b> em sua Conta E-Prepag.<br>
+                        Para finalizar esta compra, você precisa de um <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Cartão E-Prepag Cash</a></b> ou <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/conta/add-saldo.php">saldo</a></b> em seu cartão E-Prepag.<br>
                         Caso já possua um <b>cartão</b> ou <b>saldo</b>, clique no botão <b>"E-PREPAG Cash"</b> e finalize a compra.<br><br>
                         Caso queira adquirir um Cartão E-Prepag Cash, <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">clique aqui</a></b><br>
                         <i>(Você pode pagar por boleto bancário, transferência, débito em conta, depósito bancário, DOC ou TED)</i>

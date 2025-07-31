@@ -1185,7 +1185,7 @@ function utilizar_pin() {
 
 	$usuarioGames1 = unserialize($_SESSION['usuarioGames_ser']);
 	if(flag_user_test($usuarioGames1->getId()) ) {
-		$msg = "<font color='red'>Conta com saldo em uso, faça login novamente, por favor.</font><br>";
+		$msg = "<font color='red'>Saldo em uso, faça login novamente, por favor.</font><br>";
 		if($sDebug) gravaLog_EPPCASH("FLAG Usa - Blocked - go away (ug_id: ".$usuarioGames1->getId().")");
 	} else {
 
@@ -1580,7 +1580,7 @@ function utilizar_pin_carga() {
 
 	$usuarioGames1 = unserialize($_SESSION['usuarioGames_ser']);
 	if(flag_user_test($usuarioGames1->getId()) ) {
-		$msg .= "<font color='red'>Conta com saldo em uso, faça login novamente, por favor.</font><br>";
+		$msg .= "<font color='red'>Saldo em uso, faça login novamente, por favor.</font><br>";
 		if($sDebug) gravaLog_EPPCASH("FLAG carga - Blocked - go away");
 	} else {
 

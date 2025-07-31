@@ -40,7 +40,7 @@ $Resultadoestado = $SIGLA_ESTADOS;
             <span class="glyphicon txt-azul-claro glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span>
             <strong class="pull-left"><h4 class="top20 txt-azul-claro">acesso para pontos de venda</h4></strong>
 			<div class="alert-login">
-				O acesso para conta principal deverá ser feito somente com o login cadastrado.
+				O administrador do PDV deve acessar utilizando o login principal cadastrado.
 			</div>
             <form action="login_auth.php" method="post">
                 <div class="form-group top20 col-md-8 col-md-offset-4 col-sm-12 col-xs-12">
