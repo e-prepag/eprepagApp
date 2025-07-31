@@ -108,7 +108,7 @@ if ($_GET["game"] == "free_fire") {
 		</div>
 	</div>
 	<div class="d-none" id="img-padrao"><?= $logo ?></div>
-	<script src="./js/processo.js"></script>
+	<script src="./js/processo.js?v=3"></script>
 	<script src="./js/verifica.js"></script>
 </body>
 

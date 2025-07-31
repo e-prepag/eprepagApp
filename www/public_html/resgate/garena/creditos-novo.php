@@ -128,7 +128,7 @@ $logo = (isset($style["LOGO"]) && $style["LOGO"] != "") ? $logo : $logo_game;
 		</div>
 
 	</div>
-	<script src="./js/processo.js"></script>
+	<script src="./js/processo.js?v=3"></script>
 	<script src="./js/verifica.js"></script>
 </body>
 

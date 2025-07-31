@@ -40,7 +40,7 @@ $("#confirma").on("click", function(){
 			
 			getToken(); 
 			$.ajax({
-				url: "/ajax/garena/verificaProduto.php",
+				url: "https://www.e-prepag.com.br/ajax/garena/verificaProduto.php",
 				method: "POST",
 				data: {vde: 111111111, codigo: pin.val(), garena: conta.val(), valid: true, type: "pdv", verifica: true, token: localStorage.getItem('token')},
 				beforeSend: function(){
@@ -63,7 +63,7 @@ $("#confirma").on("click", function(){
 				}else{
 					Swal.fire({
 					  title: 'Confirmação de resgate',
-					  html: 'Você deseja adicionar <b>'+dados.modelo+'</b> na conta <b>'+dados.usuario.nome+'</b> ?',
+					  html: 'Você deseja adicionar <b>'+dados.modelo+'</b> na conta <b>'+(dados.usuario?.nome ?? "usuario")+'</b> ?',
 					  icon: 'question',
 					  showDenyButton: true,
 					  allowOutsideClick: false,
@@ -79,7 +79,7 @@ $("#confirma").on("click", function(){
 					
 						   $.ajax({
 
-								url: "/ajax/garena/verificaProduto.php",
+								url: "https://www.e-prepag.com.br/ajax/garena/verificaProduto.php",
 								method: "POST",
 								data: { codigo: pin.val(), garena: conta.val(), type: "pdv", vde: 111111111, verifica: true, token: localStorage.getItem('token') },
 								beforeSend: function(){
@@ -118,9 +118,9 @@ $("#confirma").on("click", function(){
 									localStorage.setItem('info', dadosJson);
 									
 									//if($("#part").length && $("#part").html() != '0'){
-										//window.location.href = "/resgate/garena/comprovante.php?partner="+ $("#part").html();
+										//window.location.href = "https://www.e-prepag.com.br/resgate/garena/comprovante.php?partner="+ $("#part").html();
 									//}else{
-										window.location.href = "/resgate/garena/comprovante.php";
+										window.location.href = "https://www.e-prepag.com.br/resgate/garena/comprovante.php";
 									//}
 					
 								}

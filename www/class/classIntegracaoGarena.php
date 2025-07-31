@@ -862,7 +862,7 @@ class Garena
 	{
 
 		$conexao = ConnectionPDO::getConnection();
-		$limite_pin = 6;
+		$limite_pin = 10;
 
 		// verifica se o pin j� foi utilizado mais de tres vezes
 		$sql = "select pin, qtde from trava_qtde_pin where ip = :IP and pin = :PIN and date(data_inclusao) = :DT;";
@@ -900,7 +900,7 @@ class Garena
 			} else {
 
 				//update
-				$sqlUpdate = "update trava_qtde_pin set qtde = qtde + 1 where pin = :PIN and qtde <= 6;";
+				$sqlUpdate = "update trava_qtde_pin set qtde = qtde + 1 where pin = :PIN and qtde <= 10;";
 				$update = $conexao->getLink()->prepare($sqlUpdate);
 				$update->bindValue(":PIN", $pin);
 				$update->execute();
@@ -922,10 +922,10 @@ class Garena
 	{
 
 		$conexao = ConnectionPDO::getConnection();
-		$limite_pin = 2;
+		$limite_pin = 10;
 
 		// verifica se tem mais de um pin bloqueado para o IP
-		$sql = "select count(*) as total from trava_qtde_pin where date(data_inclusao) = :DT and ip = :IP and qtde >= 6 group by ip, date(data_inclusao);";
+		$sql = "select count(*) as total from trava_qtde_pin where date(data_inclusao) = :DT and ip = :IP and qtde >= 10 group by ip, date(data_inclusao);";
 		$query = $conexao->getLink()->prepare($sql);
 		$query->bindValue(":IP", $ip);
 		$query->bindValue(":DT", $data);
