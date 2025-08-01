@@ -51,7 +51,7 @@ class Garena
 			570 => $this->produtos["haikyu"],
 		];
 
-		$this->limites  = [
+		$this->limites = [
 			$this->produtos["freefire"] => [8, 20],
 			$this->produtos["blackClover"] => [8, 20],
 			$this->produtos["DeltaForce"] => [8, 22],
@@ -95,7 +95,7 @@ class Garena
 	private function verificaContaPorJogo()
 	{
 
-		
+
 
 		list($min, $max) = isset($this->limites[$this->codGarena]) ? $this->limites[$this->codGarena] : [8, 20];
 
@@ -390,16 +390,17 @@ class Garena
 			}
 			//echo intval($this->valorResgate * 100);
 
+			$valor_resgate_arredondado = intval(round($this->valorResgate * 100));
 			/// guardar guid
 			$guid = "TXN-" . sprintf("%05X-%05X-%05X-%05X", mt_rand(10000, 90000), mt_rand(20000, 999999), mt_rand(50000, 999999), mt_rand(15000, 999999)); //
 			/// Ler os roles em loop : $this->rolesGarena
-			$hashSha256 = $this->geraHash([$this->codGarena, $this->conta, $this->rolesGarena[0]["code"], $guid, intval($this->valorResgate * 100), $currecy, $ip], $ambiente);
+			$hashSha256 = $this->geraHash([$this->codGarena, $this->conta, $this->rolesGarena[0]["code"], $guid, $valor_resgate_arredondado, $currecy, $ip], $ambiente);
 
 			curl_setopt_array($disparo, [
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_POST => true,
 				CURLOPT_TIMEOUT => 150,
-				CURLOPT_POSTFIELDS => json_encode(["test_mode" => $test, "app_id" => $this->codGarena, "player_id" => $this->conta, "packed_role_id" => $this->rolesGarena[0]["code"], "txn_id" => $guid, "amount" => intval($this->valorResgate * 100), "currency_code" => $currecy, "ip_address" => $ip]),
+				CURLOPT_POSTFIELDS => json_encode(["test_mode" => $test, "app_id" => $this->codGarena, "player_id" => $this->conta, "packed_role_id" => $this->rolesGarena[0]["code"], "txn_id" => $guid, "amount" => $valor_resgate_arredondado, "currency_code" => $currecy, "ip_address" => $ip]),
 				CURLOPT_HTTPHEADER => [
 					"Authorization: Signature " . $hashSha256
 				],

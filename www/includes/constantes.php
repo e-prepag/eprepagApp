@@ -52,7 +52,7 @@ define("DIR_G_IMG_PRODUTOS","/imagens/gamer/produtos/");
 
 define("DIR_EPREPAG","/");
 
-define('IOF', 0.38);
+define('IOF', 3.5);
 
 (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on" ? define("PROTOCOL","HTTPS"):define("PROTOCOL","HTTP"));
 
