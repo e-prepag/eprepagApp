@@ -12,6 +12,9 @@ require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 
+if(!isset($_POST['termos']) || empty($_POST['termos'])) {
+    die("Erro: Você deve aceitar os termos de uso para prosseguir.");
+}
 // Step 1
 $username = getInputRequest('username');
 if (preg_match('/[\[\]{}*;()"\']/', $username) || $username == "") {
@@ -98,8 +101,9 @@ $como_conheceu_eprepag = sanitizeInput(getInputRequest('como_conheceu_eprepag'))
 if ($como_conheceu_eprepag == "outro") {
     $como_conheceu_eprepag = "OUTRO: " . sanitizeInput(getInputRequest('campo_outro_input'));
 }
-
-if (!empty($_POST["g-recaptcha-response"])) {
+if(getenv('AMBIENTE') == "HOMOLOGACAO") {
+    
+} else if (!empty($_POST["g-recaptcha-response"])) {
 
     $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
@@ -121,6 +125,22 @@ if (!empty($_POST["g-recaptcha-response"])) {
 
 } else {
     echo "Você deve realizar a verificação do RECAPTCHA para prosseguir.<br>";
+    exit;
+}
+
+if (isset($_POST["location"]) && !empty($_POST["location"])) {
+
+    preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $_POST['location'], $matches);
+
+    $lat = floatval($matches[1]);
+    $lon = floatval($matches[3]);
+
+    if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+        echo "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.";
+        exit;
+    }
+} else {
+    echo "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.";
     exit;
 }
 
