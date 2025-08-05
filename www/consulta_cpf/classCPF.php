@@ -36,42 +36,46 @@ class classCPF
                 $this->set_service_status(false);
                 $this->set_quantidade_limite(CPF_QUANTIDADE_LIMITE);
                 $this->set_quantidade_contas(CPF_QUANTIDADE_CONTAS);
-                try {
-                        //Para Consulta CACHE
-                        if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE || CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB || CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CAF) {
-                                $this->set_service_status(true);
-                        } //end if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
-
-                        //Para Consulta através de Parceiros
-                        else {
-                                if ($testaConexao) {
-                                        $this->arraySoapClient = array(
-                                                'location' => CPF_SERVICE_URL,
-                                                'uri' => CPF_SERVICE_URL,
-                                                'cache_wsdl' => WSDL_CACHE_NONE,
-                                                'soap_version' => SOAP_1_1,//SOAP_1_2,
-                                                //'encoding'	=> 'UTF-8',
-                                                'encoding' => 'ISO-8859-1',
-                                                'trace' => 1,
-                                                'exceptions' => 1,
-                                        );
-                                        if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
-                                                $this->arraySoapClient['login'] = CPF_CLIENT_ID;
-                                                $this->arraySoapClient['password'] = CPF_CLIENT_PASSWORD;
-                                                $this->arraySoapClient['connection_timeout'] = (CPF_TIMEOUT / 1000);
-                                        }
-
-                                        $soapClient = @new SoapClient(CPF_WSDL_URL, $this->arraySoapClient);
-
+                if (class_exists('SoapClient')) {
+                        try {
+                                //Para Consulta CACHE
+                                if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE || CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB || CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CAF) {
                                         $this->set_service_status(true);
+                                } //end if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
 
-                                        $this->logEvents("Service enable!\n", CPF_MSG_ERROR_LOG);
-                                }//end if($testaConexao)
-                        }//end else do if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
+                                //Para Consulta através de Parceiros
+                                else {
+                                        if ($testaConexao) {
+                                                $this->arraySoapClient = array(
+                                                        'location' => CPF_SERVICE_URL,
+                                                        'uri' => CPF_SERVICE_URL,
+                                                        'cache_wsdl' => WSDL_CACHE_NONE,
+                                                        'soap_version' => SOAP_1_1,//SOAP_1_2,
+                                                        //'encoding'	=> 'UTF-8',
+                                                        'encoding' => 'ISO-8859-1',
+                                                        'trace' => 1,
+                                                        'exceptions' => 1,
+                                                );
+                                                if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
+                                                        $this->arraySoapClient['login'] = CPF_CLIENT_ID;
+                                                        $this->arraySoapClient['password'] = CPF_CLIENT_PASSWORD;
+                                                        $this->arraySoapClient['connection_timeout'] = (CPF_TIMEOUT / 1000);
+                                                }
 
-                } catch (SoapFault $e) {
-                        $this->logEvents("Caught exception 1 (" . $e->faultcode . "): " . $e->getMessage() . PHP_EOL, CPF_MSG_ERROR_LOG);
-                        $this->set_error_system($e->getMessage());
+                                                $soapClient = @new SoapClient(CPF_WSDL_URL, $this->arraySoapClient);
+
+                                                $this->set_service_status(true);
+
+                                                $this->logEvents("Service enable!\n", CPF_MSG_ERROR_LOG);
+                                        }//end if($testaConexao)
+                                }//end else do if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
+
+                        } catch (SoapFault $e) {
+                                $this->logEvents("Caught exception 1 (" . $e->faultcode . "): " . $e->getMessage() . PHP_EOL, CPF_MSG_ERROR_LOG);
+                                $this->set_error_system($e->getMessage());
+                        }
+                }else{
+                        $this->set_service_status(true);
                 }
         }//end function __construct()
 
@@ -122,7 +126,11 @@ class classCPF
                 $cpfRequestRecord = $this->getRequestObject($typeOfService, $requestParams);
 
                 try {
-                        $this->soapClient = @new SoapClient(CPF_WSDL_URL, $this->arraySoapClient);
+                        if (class_exists('SoapClient')) {
+                                $this->soapClient = @new SoapClient(CPF_WSDL_URL, $this->arraySoapClient);
+                        } else {
+                                $this->soapClient = null;
+                        }
 
                 } catch (SoapFault $e) {
                         $this->logEvents("Caught exception 2A (" . utf8_decode($e->faultcode) . "): " . utf8_decode($e->getMessage()) . PHP_EOL, CPF_MSG_ERROR_LOG, 0);
@@ -354,8 +362,10 @@ class classCPF
                                                                         return 2;
                                                                 }
                                                         } else {
-                                                                if(isset($lista_resposta["msg"]) && 
-                                                                ($lista_resposta["msg"] == "Erro ao analisar a resposta JSON." || strpos($lista_resposta["msg"], "Erro ao fazer a") !== false)){
+                                                                if (
+                                                                        isset($lista_resposta["msg"]) &&
+                                                                        ($lista_resposta["msg"] == "Erro ao analisar a resposta JSON." || strpos($lista_resposta["msg"], "Erro ao fazer a") !== false)
+                                                                ) {
                                                                         return 1;
                                                                 }
                                                                 return 2;
