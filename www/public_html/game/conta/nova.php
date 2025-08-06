@@ -280,6 +280,15 @@ $termosDeUso = strip_tags($termosDeUso);
     }
     ?>
     $(function () {
+
+        // Tenta obter localização (se o usuário permitir)
+        new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+        ).catch((error) => {
+            manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+            return null;
+        });
+
         $("#cadastro").submit(async function (e) {
 
             e.preventDefault();
@@ -311,7 +320,10 @@ $termosDeUso = strip_tags($termosDeUso);
             // Tenta obter localização (se o usuário permitir)
             const pos = await new Promise((resolve, reject) =>
                 navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
-            );
+            ).catch((error) => {
+                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                return null;
+            });
 
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
                 manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');

@@ -2775,7 +2775,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                     if ($getid->execute()) {
                         $res = $getid->fetch(PDO::FETCH_ASSOC);
 
-                        $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id']);
+                        $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id'], $erro);
                         //Log na base
                         usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CRIACAO_DO_CADASTRO'], $res['ug_id'], null);
                         $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER,'CadastroGamer');
@@ -2805,7 +2805,32 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return $erro;
     }
 
-    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
+    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id, &$erro){
+        try {
+            //Inicializando conexao PDO
+            $con = ConnectionPDO::getConnection();
+            $pdo = $con->getLink();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "INSERT INTO usuarios_aceito_termos (ug_id, versao_termo, aceitou, data_aceite, ip, dispositivo, localizacao) VALUES 
+            (:ug_id, :versao_termo, :aceitou, NOW(), :ip, :dispositivo, :localizacao)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':ug_id', $ug_id, PDO::PARAM_INT);
+            $stmt->bindValue(':localizacao', $location, PDO::PARAM_STR);
+            $stmt->bindValue(':dispositivo', $device, PDO::PARAM_STR);
+            $stmt->bindValue(':versao_termo', $version, PDO::PARAM_STR);
+            $stmt->bindValue(':ip', $ipAdress, PDO::PARAM_STR);
+            $stmt->bindValue(':aceitou', true, PDO::PARAM_BOOL);
+            $stmt->execute();
+
+        } catch (PDOException $e) {
+            UsuarioGames::logEvents($e->getMessage());
+            $erro[] = $e->getMessage();
+        }
+
+    }
+
+    public function salvaAceiteTermosGamer($location, $device, $version, $ipAdress, $ug_id) {
         try {
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -2827,7 +2852,6 @@ function b_IsLogin_pagamento_pin_Personalizado() {
             UsuarioGames::logEvents($e->getMessage());
             return false;
         }
-
     }
     
     function logEvents($msg) {

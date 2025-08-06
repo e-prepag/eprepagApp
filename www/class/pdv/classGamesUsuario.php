@@ -1601,7 +1601,7 @@ class UsuarioGames {
     } //end function inserirPDO
 
 
-    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
+    public function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
         try {
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();

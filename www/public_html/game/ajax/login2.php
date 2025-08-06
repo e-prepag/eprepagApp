@@ -20,22 +20,22 @@ require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
  */
 session_start();
 
-if ($_SESSION['captcha_passed'] == 1) {
-
-} else {
-	session_destroy();
-	echo "Você deve fazer a verificação do RECAPTCHA para fazer o login.";
-	registrarTentativaFalha($_POST['login']);
-	exit;
-}
-
 if (Util::isAjaxRequest()) {
 	// Exibe todos os dados enviados via POST
-
 	require_once DIR_CLASS . "util/Log.class.php";
 	require_once DIR_INCS . "main.php";
 	require_once DIR_INCS . "gamer/main.php";
 	require_once "funcoes_login.php";
+
+	if ($_SESSION['captcha_passed'] == 1) {
+
+	} else {
+		session_destroy();
+		echo "Você deve fazer a verificação do RECAPTCHA para fazer o login.";
+		registrarTentativaFalha($_POST['login']);
+		exit;
+	}
+
 	$validate = new Validate;
 
 	if (isset($_POST['login']) && !empty($_POST['login']) && isset($_POST['senha']) && !empty($_POST['senha'])) {
