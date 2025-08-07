@@ -69,6 +69,16 @@ try {
         $pdo = $con->getLink();
 
         if (isset($_SESSION['usuarioGames_ser'])) {
+
+            //Linha de código para verificar se o usuário gamer aceitou os termos de uso, caso não tenha aceitado, redireciona para a página de aceite de termos
+            //Caso não aceite, ele não poderá acessar o sistema logado
+            if(isset($_SESSION['acessou_pag_termos']) && $_SESSION['acessou_pag_termos'] === true && $_SERVER['PHP_SELF'] !== '/game/aceite_termos.php') {
+                $_SESSION['usuarioGames_ser'] = null;
+                $_SESSION['acessou_pag_termos'] = null;
+                header("Refresh:0");
+                exit;
+            }
+
             $usuarioGamesSession = unserialize($_SESSION['usuarioGames_ser']);
             $id_usuario_gamer = $usuarioGamesSession->getId();
 

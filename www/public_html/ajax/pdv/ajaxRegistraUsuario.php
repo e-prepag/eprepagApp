@@ -128,6 +128,8 @@ if(getenv('AMBIENTE') == "HOMOLOGACAO") {
     exit;
 }
 
+$msgErroLocation = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
 if (isset($_POST["location"]) && !empty($_POST["location"])) {
 
     preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $_POST['location'], $matches);
@@ -136,11 +138,11 @@ if (isset($_POST["location"]) && !empty($_POST["location"])) {
     $lon = floatval($matches[3]);
 
     if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-        echo "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.";
+        echo $msgErroLocation;
         exit;
     }
 } else {
-    echo "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.";
+    echo $msgErroLocation;
     exit;
 }
 

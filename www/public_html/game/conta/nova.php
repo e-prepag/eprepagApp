@@ -236,7 +236,7 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
             $lon = floatval($matches[3]);
 
             if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-                $erros[] = "<p>Não foi possível obter a sua localização. Por favor, permita o acesso a localização.</p>";
+                $erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
             } else {
 
                 $location = $_POST["location"];
@@ -259,7 +259,7 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                 }
             }
         } else {
-            $erros[] = "<p>Não foi possível obter a sua localização. Por favor, permita o acesso a localização.</p>";
+            $erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
         }
 
     }
@@ -274,6 +274,9 @@ $termosDeUso = strip_tags($termosDeUso);
 <script src="/js/valida.js"></script>
 <script src="/js/validaSenha.js"></script>
 <script>
+
+    const msgLocationError = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
     <?php
     if (!empty($erros)) {
         print "manipulaModal(1,`" . implode($erros) . "`,'Atenção');";
@@ -285,7 +288,7 @@ $termosDeUso = strip_tags($termosDeUso);
         new Promise((resolve, reject) =>
             navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
         ).catch((error) => {
-            manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+            manipulaModal(1, msgLocationError, 'Erro');
             return null;
         });
 
@@ -321,12 +324,12 @@ $termosDeUso = strip_tags($termosDeUso);
             const pos = await new Promise((resolve, reject) =>
                 navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
             ).catch((error) => {
-                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                manipulaModal(1, msgLocationError, 'Erro');
                 return null;
             });
 
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                manipulaModal(1, msgLocationError, 'Erro');
                 return false;
             }
 
@@ -487,6 +490,7 @@ $termosDeUso = strip_tags($termosDeUso);
                             <li>Limite de compras diário de
                                 R$<?php echo number_format($GLOBALS['RISCO_GAMERS_TOTAL_DIARIO'], 2) ?>, condicionado ao
                                 máximo de <?php echo CPF_QUANTIDADE_LIMITE ?> compras em 30 dias.</li>
+                            <li>Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</li>
                             <li>Não é permitida a comercialização dos créditos adquiridos. Quer ser um ponto de venda?
                                 Acesse: <a href="https://e-prepagpdv.com.br/"
                                     target="_blank">https://e-prepagpdv.com.br/</a></li>

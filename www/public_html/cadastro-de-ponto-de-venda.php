@@ -581,6 +581,12 @@ if (!empty($msg)) { ?>
                 (link da loja online, foto da fachada, print do google maps ou print das redes sociais), tais
                 informações são importantes para garantirmos sua segurança.</li>
         </ul>
+        <p class="txt-azul-claro top10"><strong>Localização</strong></p>
+        <ul class="top10" style="list-style-type: disc;padding-left: 20px;">
+            <li>Precisamos da sua autorização para acessar sua localização, essa informação nos ajuda a garantir mais
+                segurança no processo.</li>
+            <li>Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de
+                Dados (LGPD).</li>
     </div>
 </div>
 <style>
@@ -607,7 +613,16 @@ if (!empty($msg)) { ?>
 </div>
 <script>
 
+    const msgLocationError = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
     $(document).ready(function () {
+
+        new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+        ).catch((error) => {
+            manipulaModal(1, msgLocationError, 'Erro');
+            return null;
+        });
 
         function adjustIframeHeight() {
             var $body = $('body'),
@@ -742,10 +757,13 @@ if (!empty($msg)) { ?>
                     // Tenta obter localização (se o usuário permitir)
                     const pos = await new Promise((resolve, reject) =>
                         navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
-                    );
+                    ).catch((error) => {
+                        manipulaModal(1, msgLocationError, 'Erro');
+                        return null;
+                    });
 
                     if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                        manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                        manipulaModal(1, msgLocationError, 'Erro');
                         return false;
                     }
 

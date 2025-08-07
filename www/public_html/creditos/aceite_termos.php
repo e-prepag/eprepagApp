@@ -14,7 +14,6 @@ $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREP
 
 $id_do_usuario = $_SESSION['id_do_usuario'];
 
-
 $sql = "select * from dist_usuarios_games where ug_id = ? and ug_ativo = 1";
 
 $con = ConnectionPDO::getConnection();
@@ -31,6 +30,19 @@ if (empty($user)) {
     $linha = "3[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
     file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
     //$pag = $server_url . $pag;
+    $strRedirect = $server_url .
+        "/creditos/login.php?msg=" .
+        urlencode($msg) .
+        "&login=" .
+        urlencode($_SESSION['login_usuario']);
+
+    header("Location: $strRedirect");
+    exit;
+}
+if(!$_SESSION['precisa_termos']) {
+    $msg = "Você já aceitou os termos de uso.";
+    $linha = "3[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
+    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
     $strRedirect = $server_url .
         "/creditos/login.php?msg=" .
         urlencode($msg) .
@@ -68,12 +80,15 @@ if (empty($user)) {
     }
 </style>
 <script type="text/javascript">
+
+    const msgLocationError = "Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
     $(document).ready(function () {
 
         new Promise((resolve, reject) =>
             navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
         ).catch((error) => {
-            manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+            manipulaModal(1, msgLocationError, 'Erro');
             return null;
         });
         // Verifica se o checkbox está marcado
@@ -104,12 +119,12 @@ if (empty($user)) {
             const pos = await new Promise((resolve, reject) =>
                 navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
             ).catch((error) => {
-                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                manipulaModal(1, msgLocationError, 'Erro');
                 return null;
             });
 
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                manipulaModal(1, msgLocationError, 'Erro');
                 return false;
             }
 
@@ -156,6 +171,7 @@ if (empty($user)) {
                         </div>
                     </div>
                     <div class="col-md-12 fontsize-p" style="text-align: start;">
+                        <p class="decoration-none txt-preto" style="text-align: justify;" >Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>
                         <p class="decoration-none txt-cinza"><em>Algum problema?</em></p>
                         <a id="faca-cadastro" target="_blank" href="/game/suporte.php"><em>Entre em
                                 contato com o suporte.</em></a>

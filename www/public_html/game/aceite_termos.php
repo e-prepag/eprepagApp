@@ -22,6 +22,8 @@ $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : EPREPAG_UR
 
 session_start();
 
+$_SESSION['acessou_pag_termos'] = true;
+
 $id_do_usuario = $_SESSION['id_do_usuario'] ? $_SESSION['id_do_usuario'] : 0;
 
 $sql = "select * from usuarios_games where ug_id = ? and ug_ativo = 1";
@@ -64,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lon = floatval($matches[3]);
 
         if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-            $erros[] = "<p>Não foi possível obter a sua localização. Por favor, permita o acesso a localização.</p>";
+            $erros[] = "<p>Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
         } else {
 
             $location = $_POST["location"];
@@ -75,13 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $usuarios_func = new UsuarioGames();
             $salvou = $usuarios_func->salvaAceiteTermosGamer($location, $device, $version, $ipAdress, $id_do_usuario);
             if ($salvou) {
+                $_SESSION['acessou_pag_termos'] = false;
                 Util::redirect("/game/");
             } else {
                 $erros[] = "<p>Ocorreu um erro ao salvar os termos. Tente novamente novamente, se o erro persistir, entre em contato com o suporte.</p>";
             }
         }
     } else {
-        $erros[] = "<p>Não foi possível obter a sua localização. Por favor, permita o acesso a localização.</p>";
+        $erros[] = "<p>Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
     }
 }
 
@@ -119,6 +122,16 @@ $termosDeUso = strip_tags($termosDeUso);
         justify-content: stretch;
     }
 
+    .container-custom{
+        width: 1150px;
+    }
+
+    @media (max-width: 1200px) {
+        .container-custom{
+            width: 100%;
+        }
+    }
+
     @media (max-width: 768px) {
         .div-principal {
             flex-direction: column;
@@ -127,12 +140,15 @@ $termosDeUso = strip_tags($termosDeUso);
     }
 </style>
 <script type="text/javascript">
+
+    const msgLocationError = "Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
     $(document).ready(function () {
 
         new Promise((resolve, reject) =>
             navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
         ).catch((error) => {
-            manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+            manipulaModal(1, msgLocationError, 'Erro');
             return null;
         });
         // Verifica se o checkbox está marcado
@@ -176,12 +192,12 @@ $termosDeUso = strip_tags($termosDeUso);
             const pos = await new Promise((resolve, reject) =>
                 navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
             ).catch((error) => {
-                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                manipulaModal(1, msgLocationError, 'Erro');
                 return null;
             });
 
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, "Não foi possível obter a sua localização. Por favor, permita o acesso a localização.", 'Erro');
+                manipulaModal(1, msgLocationError, 'Erro');
                 return false;
             }
 
@@ -199,7 +215,7 @@ $termosDeUso = strip_tags($termosDeUso);
         });
     });
 </script>
-<div class="container txt-cinza bg-branco  p-bottom40">
+<div class="container txt-cinza bg-branco container-custom p-bottom40">
     <div class="row top10">
         <div class="top10 col-sm-12 col-xs-12">
             <span class="glyphicon txt-azul-claro glyphicon-triangle-right graphycon-big pull-left"
@@ -233,6 +249,7 @@ $termosDeUso = strip_tags($termosDeUso);
                         </div>
                     </div>
                     <div class="col-md-12 fontsize-p" style="text-align: start;">
+                        <p class="decoration-none txt-preto" style="text-align: justify;" >Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>
                         <p class="decoration-none txt-cinza"><em>Algum problema?</em></p>
                         <a id="faca-cadastro" target="_blank" href="/game/suporte.php"><em>Entre em
                                 contato com o suporte.</em></a>
