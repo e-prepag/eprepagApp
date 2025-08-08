@@ -121,7 +121,7 @@ while($rs_dados_taxa_row = pg_fetch_array($rs_dados_taxa)) {
                                 break;
                         }
                 }//end while
-                $sql_update_perfil_saldo = "UPDATE usuarios_games SET ug_perfil_saldo = ug_perfil_saldo-".$rs_dados_taxa_row['total']." WHERE ug_id = ".$rs_dados_taxa_row['ug_id'].";";
+                $sql_update_perfil_saldo = "UPDATE usuarios_games SET ug_perfil_saldo = GREATEST(ug_perfil_saldo-".$rs_dados_taxa_row['total'].", 0) WHERE ug_id = ".$rs_dados_taxa_row['ug_id'].";";
                 echo "SQL que Atualiza o Saldo do Usuário Gamer: ".PHP_EOL.$sql_update_perfil_saldo.PHP_EOL;
                 $rs_update_perfil_saldo = SQLexecuteQuery($sql_update_perfil_saldo);
                 if(!$rs_update_perfil_saldo) {

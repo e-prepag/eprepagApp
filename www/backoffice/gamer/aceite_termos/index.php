@@ -281,7 +281,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 				},
 				columns: [
 					{ data: 'ug_id' },
-					{ data: 'ug_nome_fantasia' },
+					{ data: 'ug_nome_cpf' },
 					{ data: 'aceitou' },
 					{ data: 'versao_termo' },
 					{ data: 'data_aceite' },
