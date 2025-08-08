@@ -15,11 +15,11 @@ class ClassCaf
 
     public function consultaCPF($cpf, $data_nascimento)
     {
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $data_nascimento)) {
-            // Converte para YYYY-MM-DD
-            $partes = explode('/', $data_nascimento);
-            $data_nascimento = $partes[2] . '-' . $partes[1] . '-' . $partes[0];
-        }        
+        // if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $data_nascimento)) {
+        //     // Converte para YYYY-MM-DD
+        //     $partes = explode('/', $data_nascimento);
+        //     $data_nascimento = $partes[2] . '-' . $partes[1] . '-' . $partes[0];
+        // }        
 
         $data = [
             "service" => "pf_basic_data",
@@ -29,7 +29,8 @@ class ClassCaf
             ]
         ];
 
-        $data_post = json_encode($data, JSON_PRETTY_PRINT); // Converte para JSON formatado        
+        $data_post = json_encode($data, JSON_PRETTY_PRINT); // Converte para JSON formatado  
+        //echo $data_post;      
 
         $ch = curl_init();
         curl_setopt_array($ch, [
@@ -55,6 +56,7 @@ class ClassCaf
             curl_close($ch);
             return $resultado;
         } else {
+            //echo $response; // Debug: Exibe a resposta da requisição
             $data = json_decode($response, true);
 
             if ($data !== null) {

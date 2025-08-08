@@ -486,7 +486,7 @@ function valida_vencimento_pin($cod_pin, $geralog = null) {
 		$sql = "SELECT 1 
 				FROM pins 
 				WHERE pin_codigo = :PIN 
-				  AND pin_validade >= CURRENT_DATE;";
+				  AND (pin_validade >= CURRENT_DATE OR pin_datavenda >= CURRENT_DATE - INTERVAL '6 months');";
 
 		$stmt = $pdo->prepare($sql);
 		$stmt->bindValue(':PIN', trim($cod_pin), PDO::PARAM_STR);

@@ -1322,7 +1322,7 @@ class UsuarioGames {
 		return $string;
 	}
 
-    function inserirPDO(&$objGamesUsuario, $dados = "") {
+    function inserirPDO(&$objGamesUsuario, $dados = []) {
         $objGamesUsuario->setPerfilSenhaReimpressao("E!!!Prepag");
         $objGamesUsuario->setPerfilLimite("0,00");
 
@@ -1578,33 +1578,12 @@ class UsuarioGames {
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CADASTRO_LANHOUSE_VIA_NEXCAFE'], $objGamesUsuario->getId(), null);
                 }
 
+                $location = $dados['location'] ? $dados['location'] : 'Desconhecido';
+                $device = $dados["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
+                $version = 'v1 termos de uso PDV';
+                $ipAdress = $_SERVER['REMOTE_ADDR'] ? $_SERVER['REMOTE_ADDR'] : 'Desconhecido';
 
-                //Envia email
-                //--------------------------------------------------------------------------------
-                /*
-                $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
-                $parametros['nome_fantasia'] = $objGamesUsuario->getNomefantasia();
-                $parametros['tipo_cadastro'] = $objGamesUsuario->getTipoCadastro();
-                $parametros['nome'] = $objGamesUsuario->getNome();
-                $parametros['sexo'] = $objGamesUsuario->getSexo();
-
-                $msgEmail = email_cabecalho($parametros);
-                $msgEmail .= "  <br><br>
-                                <table border='0' cellspacing='0'>
-                                <tr><td>&nbsp;</td></tr>
-                                <tr valign='middle' bgcolor='#FFFFFF'>
-                                    <td align='left' class='texto'>
-                                        Confirmamos a recepção do seu pedido de cadastro junto ao E-Prepag LanHouses. 
-                                        O seu pedido será submetido a análise e você será informado por e-mail quanto ao aceite, ou não, do seu pedido.<br>
-                                    </td>
-                                </tr>
-                                <tr><td>&nbsp;</td></tr>
-                                </table>
-                            ";
-                $msgEmail .= email_rodape($parametros);
-                enviaEmail($objGamesUsuario->getEmail(), null, null, "E-Prepag - Pedido de Cadastro", $msgEmail);
-                UsuarioGames::logEvents("Teste deu tudo Certo!!!".PHP_EOL);
-                */
+                $this->salvaAceiteTermos($location, $device, $version, $ipAdress, $objGamesUsuario->getId());
                 
                 $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_LAN,'CadastroLAN');
                 $envioEmail->setUgID($objGamesUsuario->getId());
@@ -1620,6 +1599,32 @@ class UsuarioGames {
 
         return $ret;
     } //end function inserirPDO
+
+
+    public function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
+        try {
+            //Inicializando conexao PDO
+            $con = ConnectionPDO::getConnection();
+            $pdo = $con->getLink();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "INSERT INTO dist_usuarios_aceito_termos (ug_id, versao_termo, aceitou, data_aceite, ip, dispositivo, localizacao) VALUES 
+            (:ug_id, :versao_termo, :aceitou, NOW(), :ip, :dispositivo, :localizacao)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':ug_id', $ug_id, PDO::PARAM_INT);
+            $stmt->bindValue(':localizacao', $location, PDO::PARAM_STR);
+            $stmt->bindValue(':dispositivo', $device, PDO::PARAM_STR);
+            $stmt->bindValue(':versao_termo', $version, PDO::PARAM_STR);
+            $stmt->bindValue(':ip', $ipAdress, PDO::PARAM_STR);
+            $stmt->bindValue(':aceitou', true, PDO::PARAM_BOOL);
+            return $stmt->execute();
+
+        } catch (PDOException $e) {
+            UsuarioGames::logEvents($e->getMessage());
+            return false;
+        }
+
+    }
 
     
     function logEvents($msg) {

@@ -12,6 +12,9 @@ require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 
+if(!isset($_POST['termos']) || empty($_POST['termos'])) {
+    die("Erro: Você deve aceitar os termos de uso para prosseguir.");
+}
 // Step 1
 $username = getInputRequest('username');
 if (preg_match('/[\[\]{}*;()"\']/', $username) || $username == "") {
@@ -98,8 +101,9 @@ $como_conheceu_eprepag = sanitizeInput(getInputRequest('como_conheceu_eprepag'))
 if ($como_conheceu_eprepag == "outro") {
     $como_conheceu_eprepag = "OUTRO: " . sanitizeInput(getInputRequest('campo_outro_input'));
 }
-
-if (!empty($_POST["g-recaptcha-response"])) {
+if(getenv('AMBIENTE') == "HOMOLOGACAO") {
+    
+} else if (!empty($_POST["g-recaptcha-response"])) {
 
     $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
@@ -121,6 +125,24 @@ if (!empty($_POST["g-recaptcha-response"])) {
 
 } else {
     echo "Você deve realizar a verificação do RECAPTCHA para prosseguir.<br>";
+    exit;
+}
+
+$msgErroLocation = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
+if (isset($_POST["location"]) && !empty($_POST["location"])) {
+
+    preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $_POST['location'], $matches);
+
+    $lat = floatval($matches[1]);
+    $lon = floatval($matches[3]);
+
+    if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+        echo $msgErroLocation;
+        exit;
+    }
+} else {
+    echo $msgErroLocation;
     exit;
 }
 

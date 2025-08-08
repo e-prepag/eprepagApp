@@ -324,10 +324,16 @@ if(!empty($menus)){
 <?php
     }
 ?>
-<div class="col-md-12" id="divvincula"></div>
+<div class="col-md-12" id="divvincula" style="color: black;"></div>
 <link href="<?php echo $server_url_ep; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
 <script src="<?php echo $server_url_ep; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+		const modal = document.getElementById("divvincula");
+		if (modal && modal.parentNode !== document.body) {
+			document.body.appendChild(modal);
+		}
+	});
     $("#callModalUsuarioGrupo").click(function(){
         $.ajax({
             type: "POST",

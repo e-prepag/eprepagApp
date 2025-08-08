@@ -196,9 +196,8 @@ $msg = htmlentities($msg, ENT_QUOTES,'ISO-8859-1');
     $(function () {
         <?php
         if (isset($msg) && $msg != "") {
-            echo "manipulaModal(1,'$msg','Erro');";
+            echo 'manipulaModal(1,`'.$msg.'`,"Erro");';
         }
-
 
         ?>
         $("#prosseguir").click(function () {

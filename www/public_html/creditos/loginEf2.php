@@ -37,11 +37,10 @@ if (!$login_id || !is_numeric($login_id)) {
     $login_id = 0;
 }
 $login_autenticado = true;
-if($_SESSION['pode_logar'] == 1){
+if ($_SESSION['pode_logar'] == 1) {
     $login_autenticado = false;
-}
-elseif ($_SESSION['usuario_operador']) {
-    
+} elseif ($_SESSION['usuario_operador']) {
+
     $sql = "SELECT ugo_acesso_sem_aut, ugo_chave_autenticador FROM dist_usuarios_games_operador WHERE ugo_id = ?";
 
     $stmt = $connection->prepare($sql);
@@ -73,7 +72,7 @@ elseif ($_SESSION['usuario_operador']) {
         $diasRestantes = $prazoMaximo - $diasPassados;
 
         if ($_REQUEST['tem_auth'] == "false") {
-            if ($diasRestantes <= 0 ) {
+            if ($diasRestantes <= 0) {
                 $msgAuth = "Você precisa adicionar um autenticador para poder realizar seu login.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
@@ -88,7 +87,7 @@ elseif ($_SESSION['usuario_operador']) {
                 exit;
             }
             $login_autenticado = false;
-        }else{
+        } else {
             header("Location: alterar_token.php");
             exit;
         }
@@ -117,6 +116,7 @@ elseif ($_SESSION['usuario_operador']) {
     }
     unset($_SESSION['usuario_operador']);
 } else {
+
     $sql = "SELECT ug_acesso_sem_aut, ug_chave_autenticador FROM dist_usuarios_games WHERE ug_id = ?";
 
     $stmt = $connection->prepare($sql);
@@ -148,7 +148,7 @@ elseif ($_SESSION['usuario_operador']) {
         $diasRestantes = $prazoMaximo - $diasPassados;
 
         if ($_REQUEST['tem_auth'] == "false") {
-            if ($diasRestantes <= 0 ) {
+            if ($diasRestantes <= 0) {
                 $msgAuth = "Você precisa adicionar um autenticador para poder realizar seu login.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
@@ -163,13 +163,39 @@ elseif ($_SESSION['usuario_operador']) {
                 exit;
             }
             $login_autenticado = false;
-        }else{
+        } else {
             header("Location: alterar_token.php");
             exit;
         }
     } else {
+        $passou_termos = false;
 
-        if (!checkDevice($login_id, $connection, false)) {
+        $sql = "SELECT 1 FROM dist_usuarios_aceito_termos WHERE ug_id = ?";
+        $stmt = $connection->prepare($sql);
+        $stmt->execute([$login_id]);
+        $termos = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($_POST["termos"] && $_SESSION['precisa_termos']) {
+            if (verifica_location($_POST['location']) === false) {
+                $msgAuth = "Não foi possível obter a localização.\n";
+
+                $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
+                file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+
+                header("Location: aceite_termos.php");
+                exit;
+            }
+            $location = $_POST['location'] ? $_POST['location'] : 'Desconhecido';
+            $device = $_POST["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
+            $version = 'v1 termos de uso PDV';
+            $ipAdress = $_SERVER['REMOTE_ADDR'] ? $_SERVER['REMOTE_ADDR'] : 'Desconhecido';
+
+            $classUsuario = new UsuarioGames();
+            $termos = $classUsuario->salvaAceiteTermos($location, $device, $version, $ipAdress, $login_id);
+            $passou_termos = true;
+            $_SESSION['precisa_termos'] = false;
+        }
+
+        if (!checkDevice($login_id, $connection, false) && !$passou_termos) {
             $ga = new PHPGangsta_GoogleAuthenticator();
             if (!$ga->verifyCode($auth['ug_chave_autenticador'], $_REQUEST['token'], 2)) {
                 $msgAuth = "Token inválido.\n";
@@ -189,6 +215,16 @@ elseif ($_SESSION['usuario_operador']) {
                 $salva_dispositivo = true;
             }
         }
+        if (!$termos) {
+            $msgAuth = "precisa aceitar os termos de uso para continuar.\n";
+
+            $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
+            file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+
+            $_SESSION['precisa_termos'] = true;
+            header("Location: aceite_termos.php");
+            exit;
+        }
     }
 }
 
@@ -198,10 +234,10 @@ $g_recaptcha_response = $_SESSION['g-recaptcha-response'];
 
 /*
        NOTA:::
-       
+
        Se o usuário está na tabela de bloqueio e atingiu o limite de tentativas, ele será direcionado à pagina_bloquieio.php e não conseguirá logar.
        Se não, a sessão seguirá com o restante do fluxo.
-       
+
    */
 
 if (checkIP()) {
@@ -217,9 +253,9 @@ session_destroy();
 
 /*
        NOTA:::
-       
+
        Esse session_destroy() está comentado porque limpa os dados da sessão.
-       
+
        É bom descomentar e executá-lo para limpar os dados de testes.
    */
 
@@ -246,7 +282,7 @@ if (!isset($_SESSION["tentativas_login"])) {
 }
 /*
        NOTA:::
-       
+
        Se "tentativas_login" estiver definido e não for nulo, adiciona o valor 1.
        Caso a quatidade de tentativas for igual ou maior que 5, chama a função bloquearAcesso() .
        Se não, incrementa "tentativas_login" .
@@ -277,11 +313,11 @@ if (isset($_SESSION["bloqueado"]) && $_SESSION["bloqueado"] == true) {
 }
 /*
        NOTA:::
-       
+
        O código acima verifica se a sessão foi bloqueada e se o IP estão no banco de dados.
-   
+
        Caso esteja bloqueado e no banco de dados, envia para pagina_bloqueio.php .
-       
+
        Se não, limpa a condição "bloqueado" da sessão e adiciona "tentativas_login" igual a 1.
    */
 function generateDeviceId()
@@ -383,9 +419,9 @@ if ($g_recaptcha_response != "valido") {
 
 /*
        NOTA:::
-       
+
        Verifica se a resposta do recaptcha está OK.
-       
+
        Se não estiver OK ou se estiver vazia, adiciona a mensagem de erro na variável $msg .
    */
 
@@ -396,7 +432,7 @@ if (substr($pag, 0, 23) == "/creditos/") {
 
 /*
        NOTA:::
-       
+
        Parece que o código acima é uma failsafe que corrige a URL.
    */
 
@@ -404,9 +440,9 @@ if (substr($pag, 0, 23) == "/creditos/") {
 /*
        $msg = "Usuario bloqueado. Por favor, tente novamente em %s.";
        $msg = "Usuario bloqueado. Para desbloquear seu acesso, entre em contato <a href='EPREPAG_URL_HTTPS/game/suporte.php' title='Desbloquear Acesso'>aqui<a>.";
-       
+
        NOTA:::
-       
+
        Inicialmente, a delacaração de $msg acima estava ativa, porém, aparentemente, estava interferindo na contagem de tentativas.
    */
 
@@ -429,9 +465,9 @@ $clsLogin->autentica();
 
 /*
        NOTA:::
-       
+
        Faz a instância para validar os dados, usando como referência os limites de tentativas + tempo de bloqueio.
-   
+
    */
 
 
@@ -651,7 +687,7 @@ if ($msg == "") {
 
 /*
        NOTA:::
-       
+
        Esse bloco dentro do if($msg == ""){} parece ser uma maneira de validar e evitar vazamentos de dados caso ocorra um acesso de forma
        não convecional.
    */
@@ -662,4 +698,22 @@ pg_close($connid);
 
 //Redirect
 redirect($strRedirect);
+
+function verifica_location($location)
+{
+    if (isset($location) && !empty($location)) {
+
+        preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $location, $matches);
+
+        $lat = floatval($matches[1]);
+        $lon = floatval($matches[3]);
+
+        if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
 ?>

@@ -96,7 +96,7 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 
 	if ($_POST["tipo"] == "gamer") {
 		$queryRow = "UPDATE pins p
-			SET pin_validade = :validade, pin_vencimento = 'Alterada', pin_datavenda = NOW()
+			SET pin_validade = :validade, pin_vencimento = 'Alterada'
 			WHERE p.pin_codinterno IN (SELECT vp.vgmp_pin_codinterno FROM tb_venda_games_modelo_pins vp
 				JOIN tb_venda_games_modelo vm ON vm.vgm_id = vp.vgmp_vgm_id
 				WHERE vm.vgm_vg_id = :VG_ID);";
@@ -112,7 +112,7 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 		}
 	} else if ($_POST["tipo"] == "pdv") {
 		$queryRow = "UPDATE pins p
-			SET pin_validade = :validade, pin_vencimento = 'Alterada', pin_datavenda = NOW()
+			SET pin_validade = :validade, pin_vencimento = 'Alterada'
 			WHERE p.pin_codinterno IN (SELECT vp.vgmp_pin_codinterno FROM tb_dist_venda_games_modelo_pins vp
 				JOIN tb_dist_venda_games_modelo vm ON vm.vgm_id = vp.vgmp_vgm_id
 				WHERE vm.vgm_vg_id = :VG_ID);";
@@ -143,7 +143,7 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 	$conexao->beginTransaction();
 
 	$queryRow = "UPDATE pins p
-					SET pin_validade = :validade, pin_vencimento = 'Alterada', pin_datavenda = NOW()
+					SET pin_validade = :validade, pin_vencimento = 'Alterada'
 					WHERE pin_codinterno = :CODIGO;";
 	$selectRow = $conexao->prepare($queryRow);
 	$selectRow->bindValue(":CODIGO", $_POST["pin"]);

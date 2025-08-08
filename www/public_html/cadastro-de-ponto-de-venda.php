@@ -76,7 +76,7 @@ if (isset($_css_add)) {
     !function (f, b, e, v, n, t, s) {
         if (f.fbq) return; n = f.fbq = function () {
             n.callMethod ?
-            n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
         };
         if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
         n.queue = []; t = b.createElement(e); t.async = !0;
@@ -330,6 +330,8 @@ if (!empty($msg)) { ?>
             <li>Comissão de até 10%</li>
         </ul>
         <form id="profileForm" method="post" class="form-horizontal top20">
+            <input type="hidden" name="device" id="device" value="" />
+            <input type="hidden" name="location" id="location" value="" />
             <h2 class="hidden-xs hidden-sm">Cadastro</h2>
             <section data-step="0" style="padding: 15px 15px !important;">
 
@@ -492,7 +494,9 @@ if (!empty($msg)) { ?>
                         </div>
                     </div> -->
                 <div style="display: block; padding: 15px 15px; margin-top: 10px">
-                    <?php echo "<textarea class='contrato' rows='12' readonly style='width: 100%; font-size: 13px'>" . file_get_contents(DIR_WEB . "creditos/layout/contrato.php") . "</textarea>"; ?>
+                    <?php echo "<textarea class='contrato' rows='12' readonly style='width: 100%; font-size: 13px'>";
+                    require_once __DIR__ . "/creditos/layout/contrato.php";
+                    echo "</textarea>"; ?>
                     <div class="titulo_cinza form-group" style="font-size: 17px">
                         <label class="control-label" style="margin-left: 15px;">Termos de Uso <span
                                 class="required txt-vermelho">*</span></label>
@@ -535,7 +539,8 @@ if (!empty($msg)) { ?>
                         Este processo de análise leva até 3 dias úteis. Se for aprovado você receberá um e-mail com as
                         instruções do serviço.<br />
                         <br />
-                            Caso tenha alguma dúvida por favor entre em contato com nosso <a href="<?php echo $https;?>://<?= EPREPAG_URL_COM ?>/support" target="_blank">suporte</a>.
+                        Caso tenha alguma dúvida por favor entre em contato com nosso <a
+                            href="<?php echo $https; ?>://<?= EPREPAG_URL_COM ?>/support" target="_blank">suporte</a>.
                     </span>
                 </div>
             </div>
@@ -576,6 +581,12 @@ if (!empty($msg)) { ?>
                 (link da loja online, foto da fachada, print do google maps ou print das redes sociais), tais
                 informações são importantes para garantirmos sua segurança.</li>
         </ul>
+        <p class="txt-azul-claro top10"><strong>Localização</strong></p>
+        <ul class="top10" style="list-style-type: disc;padding-left: 20px;">
+            <li>Precisamos da sua autorização para acessar sua localização, essa informação nos ajuda a garantir mais
+                segurança no processo.</li>
+            <li>Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de
+                Dados (LGPD).</li>
     </div>
 </div>
 <style>
@@ -602,7 +613,16 @@ if (!empty($msg)) { ?>
 </div>
 <script>
 
+    const msgLocationError = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+
     $(document).ready(function () {
+
+        new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+        ).catch((error) => {
+            manipulaModal(1, msgLocationError, 'Erro');
+            return null;
+        });
 
         function adjustIframeHeight() {
             var $body = $('body'),
@@ -708,9 +728,11 @@ if (!empty($msg)) { ?>
                     return true;
                 },
                 // Triggered when clicking the Finish button
-                onFinishing: function (e, currentIndex) {
+                onFinishing: async function (e, currentIndex) {
 
-                    if (grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) {
+                    e.preventDefault();
+
+                    if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv('AMBIENTE') == "HOMOLOGACAO" ? "false" : "true"; ?>) {
                         manipulaModal(1, "Você deve fazer a verificação do RECAPTCHA para finalizar seu cadastro.", 'Erro');
                         return false;
                     }
@@ -727,6 +749,32 @@ if (!empty($msg)) { ?>
                         // Do not jump to the next step
                         return false;
                     }
+
+                    const dispositivo = navigator.userAgent;
+                    const linguagem = navigator.language;
+                    const plataforma = navigator.platform;
+
+                    // Tenta obter localização (se o usuário permitir)
+                    const pos = await new Promise((resolve, reject) =>
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+                    ).catch((error) => {
+                        manipulaModal(1, msgLocationError, 'Erro');
+                        return null;
+                    });
+
+                    if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
+                        manipulaModal(1, msgLocationError, 'Erro');
+                        return false;
+                    }
+
+                    const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
+
+                    if (localizacao === "") {
+                        console.log("Localização não obtida.");
+                        return false;
+                    }
+                    $("#location").val(localizacao);
+                    $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);
 
                     $.ajax({
                         type: "POST",
