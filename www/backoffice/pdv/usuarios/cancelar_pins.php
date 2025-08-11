@@ -70,7 +70,8 @@ $nome_operador = $_SESSION["userlogin_bko"];
 </style>
 
 <div class="bottom10">
-	<h1 class="titulo-solicitacoes">Cancelar pins</h1>
+	<h1 class="titulo-solicitacoes" style='font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: bold; color: #004E84;'>CANCELAR PINS</h1>
+	<p class="txt-cinza"><em>Por razões de segurança, Pins gerados pelas publishers, como Webzen e Habbo, não podem ser cancelados pois não conseguimos verificar a utilização.</em></p>
 	<form id="form1" class="form-solicitacoes">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
@@ -87,7 +88,7 @@ $nome_operador = $_SESSION["userlogin_bko"];
 			</div>
 			<div class="col-cancel-pins data-input">
 				<label for="tp_solicitacao">Data inicial</label>
-				<input value="<?php echo date('Y-m-d', strtotime('-1 day')) . 'T00:00'; ?>" id="dt_inicial"
+				<input value="<?php echo date('Y-m-d', strtotime('-1 month')) . 'T00:00'; ?>" id="dt_inicial"
 					name="dt_inicial" max="<?php echo date("Y-m-d"); ?>" class="form-control" type="datetime-local">
 			</div>
 			<div class="col-cancel-pins data-input">
@@ -157,6 +158,18 @@ $nome_operador = $_SESSION["userlogin_bko"];
 				if (dt_final.val() == "") {
 					msgError += "Você deve escolher uma data final<br>";
 				}
+			}
+
+			if( msgError != "") {
+				Swal.fire({
+					position: 'center',
+					icon: 'error',
+					title: "Erros encotrados",
+					html: msgError,
+					showConfirmButton: false,
+					timer: 3500
+				});
+				return;
 			}
 
 			const table = $('#table').DataTable({
@@ -304,7 +317,7 @@ $nome_operador = $_SESSION["userlogin_bko"];
 				cancelButtonText: 'Cancelar'
 			}).then((result) => {
 				if (result.isConfirmed) {
-					let formulario = $("#form");
+					let formulario = $("#form1");
 					let idPDV = formulario.find("#id_pdv");
 					let dt_inicial = formulario.find("#dt_inicial");
 					let dt_final = formulario.find("#dt_final");

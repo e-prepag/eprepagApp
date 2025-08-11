@@ -1,5 +1,7 @@
 <?php
-
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 require_once "/www/class/phpmailer/class.phpmailer.php";
 require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
@@ -15,7 +17,7 @@ $conexao = ConnectionPDO::getConnection()->getLink();
 if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	$data = ["data" => []];
-	$sql = "SELECT p.pin_codinterno, p.pin_valor, p.pin_codigo, o.opr_nome, vg.vg_data_inclusao, ps.stat_descricao, ug.ug_login, p.pin_status, o.opr_pin_epp_formato, ug.ug_id ";
+	$sql = "SELECT p.pin_codinterno, p.pin_valor, p.pin_codigo, o.opr_nome, vg.vg_data_inclusao, ps.stat_descricao, ug.ug_login, p.pin_status, o.opr_pin_epp_formato, ug.ug_id, o.opr_codigo ";
 
 	if (isset($_POST["id_pedido"]) && $_POST["id_pedido"] != "") {
 
@@ -123,11 +125,15 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 				FROM tb_dist_venda_games_modelo_pins vp
 				JOIN tb_dist_venda_games_modelo vm ON vp.vgmp_vgm_id = vm.vgm_id
 				JOIN tb_dist_venda_games vg ON vm.vgm_vg_id = vg.vg_id
+				JOIN operadoras o ON o.opr_codigo = vm.vgm_opr_codigo
 				WHERE p.pin_codinterno = vp.vgmp_pin_codinterno
+				  AND p.opr_codigo = o.opr_codigo
 				  AND p.pin_status <> '8'
 				  AND vg.vg_ug_id = :UG_ID
 				  AND vg.vg_data_inclusao > :DT_INICIAL
 				  AND vg.vg_data_inclusao < :DT_FINAL
+				  AND (o.opr_pin_epp_formato IS NOT NULL OR o.opr_codigo IN (49, 53))
+				  AND p.pin_status <> '9'
 				  RETURNING pin_codinterno;";
 	$selectRow = $conexao->prepare($queryRow);
 	$selectRow->bindValue(":DT_INICIAL", $_POST["dt_inicial"]);
@@ -183,19 +189,14 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 		$tipoAcao = "Cancelar todos os pins do pdv";
 
-		$queryRow = "select ug_login from dist_usuarios_games where ug_id = :UG_ID;";
-		$selectRow = $conexao->prepare($queryRow);
-		$selectRow->bindValue(":UG_ID", $_POST["id_pdv"]);
-		$selectRow->execute();
-
 		if(!is_numeric($_POST["id_pdv"]) || $_POST["id_pdv"] <= 0) {
 			$_POST["id_pdv"] = 0;
 		}
 
-		$queryRow = "update dist_usuarios_games set ug_ativo = 0 where ug_id = :UG_ID;";
-		$selectRow2 = $conexao->prepare($queryRow);
-		$selectRow2->bindValue(":UG_ID", $_POST["id_pdv"], PDO::PARAM_INT);
-		$selectRow2->execute();
+		$queryRow = "select ug_login from dist_usuarios_games where ug_id = :UG_ID;";
+		$selectRow = $conexao->prepare($queryRow);
+		$selectRow->bindValue(":UG_ID", $_POST["id_pdv"]);
+		$selectRow->execute();
 
 		$data = $selectRow->fetch(PDO::FETCH_ASSOC);
 		if (!$resultRow["shn_mail"]) {
@@ -267,6 +268,10 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		$resultRow = $selectRow->fetch(PDO::FETCH_ASSOC);
 
 		$tipoAcao = "Cancelar pin id: " . $_POST["pin"];
+
+		if(!is_numeric($_POST["id_pdv"]) || $_POST["id_pdv"] <= 0) {
+			$_POST["id_pdv"] = 0;
+		}
 
 		$queryRow = "select ug_login from dist_usuarios_games where ug_id = :UG_ID;";
 		$selectRow2 = $conexao->prepare($queryRow);
