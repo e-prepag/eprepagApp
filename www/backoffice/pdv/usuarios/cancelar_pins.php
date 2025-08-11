@@ -70,37 +70,38 @@ $nome_operador = $_SESSION["userlogin_bko"];
 </style>
 
 <div class="bottom10">
-	<h1 class="titulo-solicitacoes">Cancelar pins</h1>
-	<div id="form" class="form-solicitacoes">
+	<h1 class="titulo-solicitacoes" style='font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: bold; color: #004E84;'>CANCELAR PINS</h1>
+	<p class="txt-cinza"><em>Por razões de segurança, Pins gerados pelas publishers, como Webzen e Habbo, não podem ser cancelados pois não conseguimos verificar a utilização.</em></p>
+	<form id="form1" class="form-solicitacoes">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
 				<label for="pin_cod">Cód. pin</label>
-				<input type="number" id="pin_cod" class="form-control" />
+				<input type="number" id="pin_cod" name="pin_cod" class="form-control" />
 			</div>
 			<div class="col-cancel-pins">
 				<label for="id_pedido">Num. Pedido</label>
-				<input type="number" id="id_pedido" class="form-control" />
+				<input type="number" id="id_pedido" name="id_pedido" class="form-control" />
 			</div>
 			<div class="col-cancel-pins">
 				<label for="id_pdv">ID do PDV</label>
-				<input type="number" id="id_pdv" class="form-control" />
+				<input type="number" id="id_pdv" name="id_pdv" class="form-control" />
 			</div>
 			<div class="col-cancel-pins data-input">
 				<label for="tp_solicitacao">Data inicial</label>
-				<input value="<?php echo date('Y-m-d', strtotime('-1 day')) . 'T00:00'; ?>" id="dt_inicial"
-					max="<?php echo date("Y-m-d"); ?>" class="form-control" type="datetime-local">
+				<input value="<?php echo date('Y-m-d', strtotime('-1 month')) . 'T00:00'; ?>" id="dt_inicial"
+					name="dt_inicial" max="<?php echo date("Y-m-d"); ?>" class="form-control" type="datetime-local">
 			</div>
 			<div class="col-cancel-pins data-input">
 				<label for="tp_solicitacao">Data final</label>
-				<input value="<?php echo date('Y-m-d') . 'T23:59'; ?>" id="dt_final" max="<?php echo date("Y-m-d"); ?>"
-					class="form-control" type="datetime-local">
+				<input value="<?php echo date('Y-m-d') . 'T23:59'; ?>" id="dt_final" name="dt_final"
+					max="<?php echo date("Y-m-d"); ?>" class="form-control" type="datetime-local">
 			</div>
 		</div>
 		<div class="d-flex top10 custom-justify">
-			<button type="button" class="btn btn-success btn-busca">Buscar</button>
+			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 			<button type="button" class="btn btn-danger btn-todos align-right d-none">Cancelar Todos Pins</button>
 		</div>
-	</div>
+	</form>
 
 </div>
 <div style="overflow-x: auto;">
@@ -124,11 +125,13 @@ $nome_operador = $_SESSION["userlogin_bko"];
 <script>
 	$(document).ready(function () {
 
+		$("#form1").on("submit", function (e) {
+			e.preventDefault();
+			const formulario = $("#form1");
 
-		$(".btn-busca").on("click", function () {
-
-			let formulario = $("#form");
+			// Mostra a tabela e inicializa DataTable
 			$("#table").css("visibility", "visible");
+
 			let idPDV = formulario.find("#id_pdv");
 			let dt_inicial = formulario.find("#dt_inicial");
 			let dt_final = formulario.find("#dt_final");
@@ -144,8 +147,7 @@ $nome_operador = $_SESSION["userlogin_bko"];
 				msgError += "Você deve escolher um PDV, número do pedido ou código do pin<br>";
 
 			}
-			else if(id_pedido.val() && pin_cod.val())
-			{
+			else if (id_pedido.val() && pin_cod.val()) {
 				msgError += "Você só pode escolher número do pedido ou código do pin<br>";
 			}
 			else {
@@ -158,58 +160,97 @@ $nome_operador = $_SESSION["userlogin_bko"];
 				}
 			}
 
-			if (msgError != "") {
+			if( msgError != "") {
 				Swal.fire({
 					position: 'center',
 					icon: 'error',
-					title: "Erros encontrados",
+					title: "Erros encotrados",
 					html: msgError,
 					showConfirmButton: false,
 					timer: 3500
 				});
-			} else {
-
-				let table = $('#table').DataTable({
-					ajax: './ajax_cancela_pins.php?acao=listar&dt_inicial=' + dt_inicial.val() + '&pin_cod=' + pin_cod.val() + '&dt_final=' + dt_final.val() + '&id_pdv=' + idPDV.val() + '&id_pedido=' + id_pedido.val() + '&reload=' + new Date().getTime(),
-					cache: false,
-					dataSrc: '',
-					columns: [
-						{ data: 'acoes' },
-						{ data: 'pin_codinterno' },
-						{ data: 'pin_valor' },
-						{ data: 'pin_codigo' },
-						{ data: 'opr_nome' },
-						{ data: 'vg_data_inclusao' },
-						{ data: 'stat_descricao' },
-						{ data: 'ug_login' }
-					],
-					destroy: true,
-					language: {
-						"zeroRecords": "Não foram encontrados registros",
-						"lengthMenu": "Mostrar _MENU_ linhas",
-						"info": "Mostrando a página _PAGE_ de _PAGES_",
-						"infoEmpty": "Dados inexistentes",
-						"infoFiltered": "(filtro aplicado em _MAX_ registros)",
-						"sSearch": "Pesquisar",
-						"paginate": {
-							"previous": "Anterior",
-							"next": "Próximo"
-						}
-					}
-				});
-
-				table.on('xhr', function () {
-					let data = table.ajax.json().data; // Acessa os dados retornados
-					if (data && data.length > 0) {
-						$('.btn-todos').removeClass("d-none"); // Mostra o botão se houver registros
-					} else {
-						$('.btn-todos').addClass("d-none"); // Esconde o botão se não houver registros
-					}
-				});
-
+				return;
 			}
 
+			const table = $('#table').DataTable({
+				//order: [[4, 'asc']],
+				ajax: {
+					url: './ajax_cancela_pins.php',
+					type: 'POST',
+					data: function (d) {
+						// Convertemos os campos do form para objeto
+						const formData = $("#form1").serializeArray();
+						console.log(formData);
+						formData.forEach(item => {
+							d[item.name] = item.value;
+						});
+
+						// Adiciona manualmente a ação
+						d.acao = 'listar';
+						return d;
+					},
+					dataSrc: function (json) {
+						if (json.erro) {
+							Swal.fire({
+								icon: 'error',
+								title: 'Erro ao carregar',
+								text: json.erro
+							});
+							return []; // não popula a tabela
+						}
+						return json.data || [];
+					},
+					error: function (xhr) {
+						let msg = "Erro inesperado.";
+						try {
+							const response = JSON.parse(xhr.responseText);
+							msg = response.erro || msg;
+						} catch (e) {
+							msg = xhr.responseText;
+						}
+						Swal.fire({
+							icon: 'error',
+							title: 'Erro ao carregar os dados',
+							text: msg
+						});
+					},
+					cache: false
+				},
+				columns: [
+					{ data: 'acoes' },
+					{ data: 'pin_codinterno' },
+					{ data: 'pin_valor' },
+					{ data: 'pin_codigo' },
+					{ data: 'opr_nome' },
+					{ data: 'vg_data_inclusao' },
+					{ data: 'stat_descricao' },
+					{ data: 'ug_login' }
+				],
+				destroy: true,
+				searching: false,
+				language: {
+					"zeroRecords": "Não foram encontrados registros",
+					"lengthMenu": "Mostrar _MENU_ linhas",
+					"info": "Mostrando a página _PAGE_ de _PAGES_",
+					"infoEmpty": "Dados inexistentes",
+					"infoFiltered": "(filtro aplicado em _MAX_ registros)",
+					"paginate": {
+						"previous": "Anterior",
+						"next": "Próximo"
+					}
+				}
+			});
+
+			table.on('xhr', function () {
+				let data = table.ajax.json().data; // Acessa os dados retornados
+				if (data && data.length > 0) {
+					$('.btn-todos').removeClass("d-none"); // Mostra o botão se houver registros
+				} else {
+					$('.btn-todos').addClass("d-none"); // Esconde o botão se não houver registros
+				}
+			});
 		});
+
 
 		$(document).on("click", ".btn-negar", function (e) {
 
@@ -244,17 +285,30 @@ $nome_operador = $_SESSION["userlogin_bko"];
 						showConfirmButton: false,
 						timer: 3000
 					});
-
+					$('#table').DataTable().ajax.reload();
+				},
+				error: function (xhr) {
+					let msg = "Erro inesperado.";
+					try {
+						const response = JSON.parse(xhr.responseText);
+						msg = response.erro || msg;
+					} catch (e) {
+						msg = xhr.responseText;
+					}
+					Swal.fire({
+						icon: 'error',
+						title: 'Erro ao carregar os dados',
+						text: msg
+					});
 				}
 			});
 
-			$('#table').DataTable().ajax.reload();
 		});
 
 		$(document).on("click", ".btn-todos", function (e) {
 			Swal.fire({
 				title: 'Tem certeza?',
-				text: "Essa ação não poderá ser desfeita!",
+				text: "O cancelamento não pode ser desfeito!",
 				icon: 'warning',
 				showCancelButton: true,
 				confirmButtonColor: '#3085d6',
@@ -263,7 +317,7 @@ $nome_operador = $_SESSION["userlogin_bko"];
 				cancelButtonText: 'Cancelar'
 			}).then((result) => {
 				if (result.isConfirmed) {
-					let formulario = $("#form");
+					let formulario = $("#form1");
 					let idPDV = formulario.find("#id_pdv");
 					let dt_inicial = formulario.find("#dt_inicial");
 					let dt_final = formulario.find("#dt_final");
@@ -322,11 +376,23 @@ $nome_operador = $_SESSION["userlogin_bko"];
 									showConfirmButton: false,
 									timer: 3000
 								});
-
+								$('#table').DataTable().ajax.reload();
+							},
+							error: function (xhr) {
+								let msg = "Erro inesperado.";
+								try {
+									const response = JSON.parse(xhr.responseText);
+									msg = response.erro || msg;
+								} catch (e) {
+									msg = xhr.responseText;
+								}
+								Swal.fire({
+									icon: 'error',
+									title: 'Erro ao carregar os dados',
+									text: msg
+								});
 							}
 						});
-
-						$('#table').DataTable().ajax.reload();
 					}
 				}
 			});
