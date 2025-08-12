@@ -694,6 +694,9 @@ if($BtnSearch) {
                 ";
         //echo "<pre>".$sql."</pre>";
         //die();
+    if($_SERVER["REMOTE_ADDR"] == "187.18.252.183"){
+        echo $sql;
+    }
 	$resid = pg_exec($connid, $sql);
 	$total_table = pg_num_rows($resid);
 
@@ -1000,19 +1003,23 @@ if("TELE" == $dd_tipo) {
                             $valor = 1;
 							
 							// temporario \/
-							if($dd_opr_codigo == 124 && $countE == 0){
-								$pgrow['valor_total'] += 48.96;
-								$countE++;
-							}
+							$hoje = new DateTime();
+                            $inicio = new DateTime('2025-08-10');
+                            $fim = new DateTime('2025-08-15');
+
+                            $extra = 0;
+                            if ($dd_opr_codigo == 90 && $hoje >= $inicio && $hoje <= $fim) {
+                                $extra = 1;
+                            }
 
                             $valor_geral += $pgrow['valor_total'];
                             
                             //Calculando a Comissão
                             $valor_iof = $pgrow['valor_total']/100*$vetorPublishersAux[$dd_opr_codigo]['IOF'];
-                            $valor_sem_iof = $pgrow['valor_total'] - $valor_iof;
+                            $valor_sem_iof = $pgrow['valor_total'];
                             $alicota = recupera_comissao($dd_opr_codigo,substr($pgrow['data'],0,10),$pgrow['vg_canal']);
                             $valor_comissao = $pgrow['valor_total']/100*$alicota;
-                            $valor_sem_iof_sem_comissao = $pgrow['valor_total'] - $valor_iof - $valor_comissao;
+                            $valor_sem_iof_sem_comissao = $pgrow['valor_total'] - $valor_iof - $valor_comissao + $extra;
 							
 						
                             //var_dump($valor_iof,$valor_sem_iof,$valor_comissao, $valor_sem_iof_sem_comissao);
@@ -1139,7 +1146,7 @@ if("SIMBO" == $dd_tipo ) {
                             
                             //Calculando a Comissão
                             $valor_iof = $pgrow['valor_total']/100*$vetorPublishersAux[$dd_opr_codigo]['IOF'];
-                            $valor_sem_iof = $pgrow['valor_total'] - $valor_iof;
+                            $valor_sem_iof = $pgrow['valor_total'];
                             $alicota = recupera_comissao($dd_opr_codigo,substr($pgrow['data'],0,10),$pgrow['vg_canal']);
                             $valor_comissao = $pgrow['valor_total']/100*$alicota;
                             $valor_sem_iof_sem_comissao = $pgrow['valor_total'] - $valor_iof - $valor_comissao;
