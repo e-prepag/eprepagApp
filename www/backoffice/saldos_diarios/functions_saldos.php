@@ -5,9 +5,26 @@ require_once "/www/includes/gamer/functions.php";
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 
-function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
+function ajustarParaSTR($data_inicial, $data_final)
+{
+	$data_inicial = date('Y-m-d', strtotime($data_inicial));
+	$data_final = date('Y-m-d', strtotime($data_final));
+
+	$data_inicial_str = date('Y-m-d H:i:s', strtotime($data_inicial . ' -1 day 18:30:00'));
+	$data_final_str = date('Y-m-d', strtotime($data_final)) . " 18:29:59";
+	return [$data_inicial_str, $data_final_str];
+}
+
+function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario_str)
 {
 	$pdo = ConnectionPDO::getConnection()->getLink();
+
+	$fechamento_dia = $horario_str == 1 ? "(dugsl_data_inclusao - INTERVAL '18 hours 30 minutes')::date + INTERVAL '1 day'" : "dugsl_data_inclusao::date";
+	$fechamento_dia_gamer = $horario_str == 1 ? "(ugsl_data_inclusao - INTERVAL '18 hours 30 minutes')::date + INTERVAL '1 day'" : "ugsl_data_inclusao::date";
+
+	if ($horario_str) {
+		list($data_inicial, $data_final) = ajustarParaSTR($data_inicial, $data_final);
+	}
 
 	$sql = "";
 	if ($tipo_cliente == 4) {
@@ -23,7 +40,7 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 		$sql .= "(WITH logs_filtrados AS (
 				    SELECT 
 				        dugsl_ug_id,
-				        dugsl_data_inclusao::date AS dia,
+				        $fechamento_dia AS dia,
 				        dugsl_data_inclusao,
 				        dugsl_ug_perfil_saldo,
 				        dugsl_ug_perfil_saldo_antes
@@ -51,7 +68,7 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 				    GROUP BY dugsl_ug_id, dia
 				)
 				SELECT 
-				    dia AS data,
+				    dia::date AS data,
 				    SUM(saldo_inicial) AS saldo_inicial,
 				    SUM(saldo_final) AS saldo_final,
 				    SUM(entradas) AS entradas,
@@ -70,7 +87,7 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 		$sql .= "(WITH logs_filtrados AS (
 				    SELECT 
 				        ugsl_ug_id,
-				        ugsl_data_inclusao::date AS dia,
+				        $fechamento_dia_gamer AS dia,
 				        ugsl_data_inclusao,
 				        ugsl_ug_perfil_saldo,
 				        ugsl_ug_perfil_saldo_antes
@@ -98,7 +115,7 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 				    GROUP BY ugsl_ug_id, dia
 				)
 				SELECT 
-				    dia AS data,
+				    dia::date AS data,
 				    SUM(saldo_inicial) AS saldo_inicial,
 				    SUM(saldo_final) AS saldo_final,
 				    SUM(entradas) AS entradas,
@@ -131,7 +148,7 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 	}
 }
 
-function gerarTabelaClientes(array $dados, $tipo_cliente)
+function gerarTabelaClientes(array $dados, $tipo_cliente, $horario_str)
 {
 	$html = '
     <table class="tabela-clientes">
@@ -168,7 +185,7 @@ function gerarTabelaClientes(array $dados, $tipo_cliente)
 
 		$html .= '
             <tr>
-				<td>' . $linha['data'] . '</td>
+				<td>' . $linha['data'] . ($horario_str == 1 ? " (STR)" : "") . '</td>
                 <td>' . $tipo_cliente_texto . '</td>
                 <td>' . formatarReais($saldo_inicial) . '</td>
                 <td>' . formatarReais($entradas) . '</td>

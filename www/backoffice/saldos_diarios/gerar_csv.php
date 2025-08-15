@@ -14,8 +14,9 @@ $output = fopen('php://output', 'w');
 $data_inicial = isset($_GET['data_inicial']) ? urldecode($_GET['data_inicial']) : date('Y-m-d', strtotime('-30 days'));
 $data_final = isset($_GET['data_final']) ? urldecode($_GET['data_final']) . " 23:59:59" : date('Y-m-d') . " 23:59:59";
 $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
+$horario_str = $_GET['horario_str'] ? $_GET['horario_str'] : 1;
 
-$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente);
+$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario_str);
 
 // Escreve BOM para que Excel reconheça UTF-8 (evita problemas com acentos)
 echo "\xEF\xBB\xBF";
