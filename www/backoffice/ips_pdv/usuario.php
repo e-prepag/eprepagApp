@@ -1,9 +1,9 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 require_once '/www/includes/constantes.php';
-require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
+require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
 $conexao = ConnectionPDO::getConnection()->getLink();
 
@@ -42,10 +42,8 @@ if (!$Ip) {
 }
 
 ?>
-<link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
-
+<script src="/js/jquery.mask.min.js"></script>
 <style>
 	.titulo-vencimento {
 		font-weight: bold;
@@ -239,7 +237,6 @@ if (!$Ip) {
 
 	function clearMessages() {
 		document.getElementById('ipError').textContent = '';
-		document.getElementById('ipSuccess').textContent = '';
 	}
 
 	function selectIpType(type) {
@@ -319,7 +316,10 @@ if (!$Ip) {
 				$.ajax({
 					url: "ajax_ip_pdv.php",
 					method: "POST",
-					data: { acao: "remover", id: id },
+					data: {
+						acao: "remover",
+						id: id
+					},
 					success: function(data) {
 						let resposta;
 						try {
@@ -362,6 +362,11 @@ if (!$Ip) {
 	});
 
 	$(document).ready(function() {
+
+		$('#singleIp').mask('099.099.099.099');
+		$('#startIp').mask('099.099.099.099');
+		$('#endIp').mask('099.099.099.099');
+
 		$('#formNovo').on('submit', function(e) {
 			e.preventDefault();
 
@@ -409,7 +414,6 @@ if (!$Ip) {
 						// Atualiza os campos de risco e data
 						document.getElementById('startIp').value = '';
 						document.getElementById('endIp').value = '';
-						document.getElementById('ipSuccess').textContent = 'IP' + resposta.msg + 'adicionado!';
 						// Limpa o formulário
 						//$("#modal-novo").modal('hide');
 					} else {
@@ -459,7 +463,7 @@ if (!$Ip) {
 		<!-- Modal content-->
 		<div class="modal-content" style="z-index: 1001;">
 			<div class="card">
-				<h2 class="modal-title-alt">Cadastrar Usuário e IPs</h2>
+				<h2 class="modal-title-alt">Cadastrar endereços IPs</h2>
 				<form id="formNovo">
 					<div class="form-group">
 						<label>Tipo de IP</label>
@@ -486,11 +490,10 @@ if (!$Ip) {
 							</div>
 						</div>
 						<div id="ipError" class="error"></div>
-						<div id="ipSuccess" class="success"></div>
 					</div>
 
 					<div class="form-group btn-modal-group">
-						<button class="button-modal btn-modal-submit" type="submit">Salvar Usuário</button>
+						<button class="button-modal btn-modal-submit" type="submit">Salvar IP</button>
 						<button class="button-modal btn-modal-close" type="button" data-dismiss="modal">Fechar</button>
 					</div>
 				</form>
@@ -500,15 +503,15 @@ if (!$Ip) {
 </div>
 <div class="col-md-12">
 	<ol class="breadcrumb top10">
-		<li><a href="#" class="muda-aba" ordem="<?php //echo $currentAba->getOrdem(); 
+		<li><a href="#" class="muda-aba" ordem="<?php echo $currentAba->getOrdem();
 												?>">BackOffice -
-				<?php //echo $currentAba->getDescricao(); 
+				<?php echo $currentAba->getDescricao();
 				?></a></li>
-		<li class="active"><?php //echo $sistema->menu[0]->getDescricao(); 
+		<li class="active"><?php echo $sistema->menu[0]->getDescricao();
 							?></li>
 		<li class="active"><a
-				href="<?php //echo $sistema->item->getLink(); 
-						?>"><?php //echo $sistema->item->getDescricao(); 
+				href="<?php echo $sistema->item->getLink();
+						?>"><?php echo $sistema->item->getDescricao();
 							?> -
 				<?= utf8_decode(htmlspecialchars(utf8_encode($usuario['ug_id']))) ?></a>
 		</li>
@@ -518,7 +521,7 @@ if (!$Ip) {
 	<div>
 		<fieldset>
 			<h4 class="titulo-vencimento">PDV</h4>
-			<table class="table txt-preto fontsize-pp">
+			<table class="table txt-preto">
 				<tr>
 					<td>Id:</td>
 					<td id="ug_id">
@@ -562,10 +565,10 @@ if (!$Ip) {
 												$range = $row['ip_range'] == false;
 
 												if ($range) {
-													$msgRange = "Range";
+													$msgRange = "Único";
 													$ipAdress = $row['ip_address'];
 												} else {
-													$msgRange = "Único";
+													$msgRange = "Range";
 													$ipAdress = "{$row['ip_range_ini']} - {$row['ip_range_end']}";
 												}
 
@@ -573,7 +576,7 @@ if (!$Ip) {
               									  		<td style="font-size: 16px;font-weight: bold;color: #444;">' . $msgRange . '</td>
               									  		<td style="font-size: 16px;font-weight: bold;color: #444;">' . $ipAdress . '</td>
               											<td>
-															<button id="remover'.$row['id'].'" type="button" class="btn btn-danger" style="font-weight: bold;" title="Remover">Remover</button>
+															<button id="remover' . $row['id'] . '" type="button" class="btn btn-danger" style="font-weight: bold;" title="Remover">Remover</button>
 														</td>
               										</tr>';
 											}

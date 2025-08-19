@@ -94,24 +94,25 @@ if($BtnSearch) {
                         t0.pin_datavenda,
                         t0.pin_horavenda,
                         case 
-                            when pin_status = '3' then 'G'
-                            when pin_status = '6' then 'L'
+                            when t0.pin_status = '3' then 'G'
+                            when t0.pin_status = '6' then 'L'
                             -- TODO => Alterar a linha abaixo para verificar se a venda foi para gamer ou LAN
-                            when pin_status = '8' then 'L'
+                            when t0.pin_status = '8' then 'L'
                         end as vg_canal
-                    from pins t0, operadoras t1, pins_status t3 
-                    where 
-                        (t0.opr_codigo=t1.opr_codigo) 
-                        and (t0.pin_status=t3.stat_codigo)  ".PHP_EOL;
+                    from pins t0
+                    JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
+					JOIN pins_status t3 ON t0.pin_status = t3.stat_codigo
+					JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno
+                    where 1=1".PHP_EOL;
             if($tf_data_inicial && $tf_data_final) {
                         $data_inic = formata_data(trim($tf_data_inicial), 1);
                         $data_fim = formata_data(trim($tf_data_final), 1); 
                         $sql .= " 
-                        and (pin_datavenda between '".trim($data_inic)." 00:00:00' and  '".trim($data_fim)." 23:59:59')  ".PHP_EOL; 
+                        and (pih_data between '".trim($data_inic)." 00:00:00' and  '".trim($data_fim)." 23:59:59')  ".PHP_EOL; 
             }
             if($dd_opr_codigo) {
                 $sql .= " 
-                        and (t0.opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
+                        and (t0.opr_codigo=".$dd_opr_codigo.") and pih_codretepp='2' ".PHP_EOL;
             }
             $sql .= " 
                      ) ".PHP_EOL;
@@ -167,6 +168,9 @@ if($BtnSearch) {
                 ) as selection
                 order by pin_datavenda desc, pin_horavenda desc";
         //echo $sql;
+        if($_SERVER["REMOTE_ADDR"] == "187.18.252.183"){
+            echo $sql;
+        }
 	$resid = pg_exec($connid, $sql);
 	$total_table = pg_num_rows($resid);
 

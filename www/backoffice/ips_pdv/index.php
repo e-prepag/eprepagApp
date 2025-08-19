@@ -1,6 +1,6 @@
 <?php
 require_once '/www/includes/constantes.php';
-require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
+require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
 ?>
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
@@ -134,11 +134,11 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 <div>
 	<div class="col-md-12">
 		<ol class="breadcrumb top10">
-			<li><a href="#" class="muda-aba" ordem="<?php //echo $currentAba->getOrdem(); ?>">BackOffice -
-					<?php //echo $currentAba->getDescricao(); ?></a></li>
-			<li class="active"><?php //echo $sistema->menu[0]->getDescricao(); ?></li>
+			<li><a href="#" class="muda-aba" ordem="<?php echo $currentAba->getOrdem(); ?>">BackOffice -
+					<?php echo $currentAba->getDescricao(); ?></a></li>
+			<li class="active"><?php echo $sistema->menu[0]->getDescricao(); ?></li>
 			<li class="active"><a
-					href="<?php //echo $sistema->item->getLink(); ?>"><?php //echo $sistema->item->getDescricao(); ?></a>
+					href="<?php echo $sistema->item->getLink(); ?>"><?php echo $sistema->item->getDescricao(); ?></a>
 			</li>
 		</ol>
 	</div>
