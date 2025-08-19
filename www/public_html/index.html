@@ -1,1 +1,661 @@
-<h1>TESTE</h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cadastro de IPs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .ip-type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-group:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .radio-group.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .ip-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .ip-input-group input {
+            flex: 1;
+        }
+
+        .range-inputs {
+            display: none;
+            gap: 10px;
+        }
+
+        .range-inputs.active {
+            display: flex;
+        }
+
+        .range-separator {
+            padding: 12px 0;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            min-width: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .users-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .user-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ip-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .ip-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ip-tag.range {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .remove-ip {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+            min-width: unset;
+        }
+
+        .remove-ip:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        .stats {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            color: #555;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .ip-type-selector {
+                flex-direction: column;
+            }
+            
+            .range-inputs {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Formulário de Cadastro -->
+        <div class="card">
+            <h2>?? Cadastrar Usuário e IPs</h2>
+            
+            <div class="stats">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="userCount">0</div>
+                        <div>Usuários</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="ipCount">0</div>
+                        <div>IPs Totais</div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="userName">Nome do Usuário</label>
+                    <input type="text" id="userName" placeholder="Digite o nome do usuário" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="userSelect">Ou selecione um usuário existente</label>
+                    <select id="userSelect">
+                        <option value="">Selecione um usuário</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de IP</label>
+                    <div class="ip-type-selector">
+                        <div class="radio-group active" onclick="selectIpType('single')">
+                            <input type="radio" name="ipType" value="single" checked>
+                            <span>IP Individual</span>
+                        </div>
+                        <div class="radio-group" onclick="selectIpType('range')">
+                            <input type="radio" name="ipType" value="range">
+                            <span>Range de IPs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label id="ipLabel">Endereço IP</label>
+                    <div class="ip-input-group">
+                        <input type="text" id="singleIp" placeholder="ex: 192.168.1.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+                        <div class="range-inputs" id="rangeInputs">
+                            <input type="text" id="startIp" placeholder="IP inicial" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+                            <div class="range-separator">até</div>
+                            <input type="text" id="endIp" placeholder="IP final" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+                        </div>
+                        <button type="button" onclick="addIp()">Adicionar IP</button>
+                    </div>
+                    <div id="ipError" class="error"></div>
+                    <div id="ipSuccess" class="success"></div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit">?? Salvar Usuário</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm()">?? Limpar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Usuários -->
+        <div class="card">
+            <h2>?? Usuários Cadastrados</h2>
+            <div id="usersList" class="users-list">
+                <div class="empty-state">
+                    Nenhum usuário cadastrado ainda.<br>
+                    Use o formulário ao lado para adicionar o primeiro usuário!
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="btn-danger" onclick="clearAllUsers()">??? Limpar Todos</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = {};
+        let currentUser = null;
+        let tempIps = [];
+
+        function selectIpType(type) {
+            const radioGroups = document.querySelectorAll('.radio-group');
+            const rangeInputs = document.getElementById('rangeInputs');
+            const singleIp = document.getElementById('singleIp');
+            const ipLabel = document.getElementById('ipLabel');
+
+            radioGroups.forEach(group => group.classList.remove('active'));
+            
+            if (type === 'single') {
+                radioGroups[0].classList.add('active');
+                rangeInputs.classList.remove('active');
+                singleIp.style.display = 'block';
+                ipLabel.textContent = 'Endereço IP';
+                document.querySelector('input[name="ipType"][value="single"]').checked = true;
+            } else {
+                radioGroups[1].classList.add('active');
+                rangeInputs.classList.add('active');
+                singleIp.style.display = 'none';
+                ipLabel.textContent = 'Range de IPs';
+                document.querySelector('input[name="ipType"][value="range"]').checked = true;
+            }
+            clearMessages();
+        }
+
+        function validateIP(ip) {
+            const regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            return regex.test(ip);
+        }
+
+        function clearMessages() {
+            document.getElementById('ipError').textContent = '';
+            document.getElementById('ipSuccess').textContent = '';
+        }
+
+        function addIp() {
+            clearMessages();
+            const ipType = document.querySelector('input[name="ipType"]:checked').value;
+            
+            if (ipType === 'single') {
+                const ip = document.getElementById('singleIp').value.trim();
+                if (!ip) {
+                    document.getElementById('ipError').textContent = 'Digite um endereço IP válido.';
+                    return;
+                }
+                if (!validateIP(ip)) {
+                    document.getElementById('ipError').textContent = 'Formato de IP inválido.';
+                    return;
+                }
+                if (tempIps.some(item => item.type === 'single' && item.ip === ip)) {
+                    document.getElementById('ipError').textContent = 'Este IP já foi adicionado.';
+                    return;
+                }
+                
+                tempIps.push({ type: 'single', ip: ip });
+                document.getElementById('singleIp').value = '';
+                document.getElementById('ipSuccess').textContent = `IP ${ip} adicionado!`;
+                
+            } else {
+                const startIp = document.getElementById('startIp').value.trim();
+                const endIp = document.getElementById('endIp').value.trim();
+                
+                if (!startIp || !endIp) {
+                    document.getElementById('ipError').textContent = 'Digite ambos os IPs do range.';
+                    return;
+                }
+                if (!validateIP(startIp) || !validateIP(endIp)) {
+                    document.getElementById('ipError').textContent = 'Formato de IP inválido.';
+                    return;
+                }
+                
+                const range = `${startIp} - ${endIp}`;
+                if (tempIps.some(item => item.type === 'range' && item.range === range)) {
+                    document.getElementById('ipError').textContent = 'Este range já foi adicionado.';
+                    return;
+                }
+                
+                tempIps.push({ type: 'range', range: range, startIp: startIp, endIp: endIp });
+                document.getElementById('startIp').value = '';
+                document.getElementById('endIp').value = '';
+                document.getElementById('ipSuccess').textContent = `Range ${range} adicionado!`;
+            }
+            
+            updateTempIpCount();
+        }
+
+        function updateTempIpCount() {
+            const count = tempIps.length;
+            if (count > 0) {
+                document.getElementById('ipSuccess').textContent += ` (${count} IP${count > 1 ? 's' : ''} na lista)`;
+            }
+        }
+
+        function updateUserSelect() {
+            const select = document.getElementById('userSelect');
+            select.innerHTML = '<option value="">Selecione um usuário</option>';
+            
+            Object.keys(users).forEach(userName => {
+                const option = document.createElement('option');
+                option.value = userName;
+                option.textContent = userName;
+                select.appendChild(option);
+            });
+        }
+
+        function updateStats() {
+            const userCount = Object.keys(users).length;
+            let totalIps = 0;
+            
+            Object.values(users).forEach(user => {
+                totalIps += user.length;
+            });
+            
+            document.getElementById('userCount').textContent = userCount;
+            document.getElementById('ipCount').textContent = totalIps;
+        }
+
+        function renderUsers() {
+            const usersList = document.getElementById('usersList');
+            
+            if (Object.keys(users).length === 0) {
+                usersList.innerHTML = `
+                    <div class="empty-state">
+                        Nenhum usuário cadastrado ainda.<br>
+                        Use o formulário ao lado para adicionar o primeiro usuário!
+                    </div>
+                `;
+                return;
+            }
+            
+            usersList.innerHTML = '';
+            
+            Object.entries(users).forEach(([userName, ips]) => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                
+                const ipTags = ips.map((ipItem, index) => {
+                    if (ipItem.type === 'single') {
+                        return `
+                            <div class="ip-tag">
+                                ${ipItem.ip}
+                                <button class="remove-ip" onclick="removeIp('${userName}', ${index})">×</button>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="ip-tag range">
+                                ?? ${ipItem.range}
+                                <button class="remove-ip" onclick="removeIp('${userName}', ${index})">×</button>
+                            </div>
+                        `;
+                    }
+                }).join('');
+                
+                userCard.innerHTML = `
+                    <div class="user-header">
+                        <div class="user-name">?? ${userName}</div>
+                        <div class="user-actions">
+                            <button class="btn-secondary" onclick="selectUser('${userName}')">Editar</button>
+                            <button class="btn-danger" onclick="removeUser('${userName}')">Remover</button>
+                        </div>
+                    </div>
+                    <div class="ip-list">
+                        ${ipTags}
+                    </div>
+                `;
+                
+                usersList.appendChild(userCard);
+            });
+        }
+
+        function selectUser(userName) {
+            currentUser = userName;
+            document.getElementById('userName').value = userName;
+            document.getElementById('userSelect').value = userName;
+            tempIps = [...users[userName]];
+            updateTempIpCount();
+        }
+
+        function removeUser(userName) {
+            if (confirm(`Tem certeza que deseja remover o usuário "${userName}" e todos os seus IPs?`)) {
+                delete users[userName];
+                if (currentUser === userName) {
+                    clearForm();
+                }
+                updateUserSelect();
+                renderUsers();
+                updateStats();
+            }
+        }
+
+        function removeIp(userName, ipIndex) {
+            users[userName].splice(ipIndex, 1);
+            if (users[userName].length === 0) {
+                delete users[userName];
+                if (currentUser === userName) {
+                    clearForm();
+                }
+                updateUserSelect();
+            }
+            renderUsers();
+            updateStats();
+        }
+
+        function clearForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userName').value = '';
+            document.getElementById('userSelect').value = '';
+            currentUser = null;
+            tempIps = [];
+            selectIpType('single');
+            clearMessages();
+        }
+
+        function clearAllUsers() {
+            if (Object.keys(users).length === 0) return;
+            
+            if (confirm('Tem certeza que deseja remover todos os usuários?')) {
+                users = {};
+                clearForm();
+                updateUserSelect();
+                renderUsers();
+                updateStats();
+            }
+        }
+
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearMessages();
+            
+            const userName = document.getElementById('userName').value.trim() || 
+                           document.getElementById('userSelect').value;
+            
+            if (!userName) {
+                document.getElementById('ipError').textContent = 'Digite ou selecione um nome de usuário.';
+                return;
+            }
+            
+            if (tempIps.length === 0) {
+                document.getElementById('ipError').textContent = 'Adicione pelo menos um IP antes de salvar.';
+                return;
+            }
+            
+            users[userName] = tempIps;
+            
+            document.getElementById('ipSuccess').textContent = `Usuário "${userName}" salvo com ${tempIps.length} IP${tempIps.length > 1 ? 's' : ''}!`;
+            
+            tempIps = [];
+            currentUser = userName;
+            updateUserSelect();
+            renderUsers();
+            updateStats();
+        });
+
+        document.getElementById('userSelect').addEventListener('change', function() {
+            if (this.value) {
+                selectUser(this.value);
+                document.getElementById('userName').value = this.value;
+            }
+        });
+
+        // Inicialização
+        updateStats();
+        renderUsers();
+    </script>
+</body>
+</html>

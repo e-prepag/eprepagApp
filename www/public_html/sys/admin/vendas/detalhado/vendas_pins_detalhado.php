@@ -306,7 +306,11 @@ if($BtnSearch) {
 		//echo "<pre>".print_r($sql,true)."</pre>";
 		
 	//echo $sql;
-		
+	
+    if($_SERVER["REMOTE_ADDR"] == "187.18.252.183"){
+        echo $sql;
+    }
+
 	$resid = pg_exec($connid, $sql);
 	$total_table = pg_num_rows($resid);
 
