@@ -1,0 +1,22 @@
+name: EprepagApp
+services:
+  app:
+    build: .
+    extra_hosts:
+      - "hml.eprepag.com.br:127.0.0.1"
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - default
+    volumes:
+      - ./www/:/www/
+      - ./docker-config/certs:/etc/apache2/certs/
+    environment:
+      TZ: 'America/Sao_Paulo'
+      env_file: ./www/.env
+
+
+networks:
+  default:
+    driver: bridge
