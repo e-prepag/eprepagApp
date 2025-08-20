@@ -80,31 +80,32 @@ if ($usuarioGames && isset($usuarioGames->ug_blAtivo)) {
                     <a href="/creditos/index.php" class="">
                         <img src="/sys/imagens/epp_logo.png" alt="Painel de Administração da E-Prepag" title="Painel de Administração da E-Prepag" name="LogoRPP" border="0" id="LogoRPP">
                     </a>
-                    <a class="hidden-sm hidden-xs p-left8 pull-right decoration-none fontsize-p txt-branco" href="/game/suporte.php" alt="Veja como funciona" title="Suporte" target="_blank"><strong>SUPORTE</strong></a>
-                    <span class="hidden-sm hidden-xs p-left8 pull-right decoration-none fontsize-p txt-branco"> | </span>
-                    <a class="hidden-sm hidden-xs pull-right decoration-none fontsize-p txt-branco" href="http://blog.e-prepag.com/como-funciona-o-sistema-de-vendas/" alt="Veja como funciona" title="Veja como funciona" target="_blank"><strong>VEJA COMO FUNCIONA</strong></a>
+                    <a class=" hidden-xs p-left8 pull-right decoration-none fontsize-p txt-branco" href="/game/suporte.php" alt="Veja como funciona" title="Suporte" target="_blank"><strong>SUPORTE</strong></a>
+                    <span class=" hidden-xs p-left8 pull-right decoration-none fontsize-p txt-branco"> | </span>
+                    <a class=" hidden-xs pull-right decoration-none fontsize-p txt-branco" href="http://blog.e-prepag.com/como-funciona-o-sistema-de-vendas/" alt="Veja como funciona" title="Veja como funciona" target="_blank"><strong>VEJA COMO FUNCIONA</strong></a>
                 </div>
-                <div class="col-md-3 col-sm-12 col-xs-12 col-lg-3">
+                <div class="col-md-3 col-sm-3 col-lg-3">
                     <span class=" p-left8"><strong>Créditos para games</strong></span>
                 </div>
-                <div class="col-md-3 col-lg-3 hidden-sm hidden-xs">
+                <div class="col-md-3 col-lg-3 col-sm-3 hidden-xs">
                     <strong class=" texto-topo div-texto-topo nowrap">Olá <?= $strNome; ?></strong>
                 </div>
-                <div class="col-md-3 col-lg-3 text-right  hidden-sm hidden-xs">
+                <div class="col-md-3 col-lg-3 text-right col-sm-2 hidden-xs">
 <?php 
                 if(($controller->lanHouse && $controller->usuarios->getRiscoClassif()==2) || ($controller->usuarios->getRiscoClassif()==2 && $controller->operadorTipo == $GLOBALS['USUARIO_GAMES_OPERADOR_TIPOS'][FUNCIONARIO_1]))
                 { 
 ?>
-                    <a href="/creditos/add_saldo.php" alt="Adicionar saldo" title="Adicionar saldo" class="link_azul hidden-sm hidden-xs">
-                    <span class="texto-topo"><strong>ADICIONAR SALDO</strong></span>
+                    <a href="/creditos/add_saldo.php" alt="Adicionar saldo" title="Adicionar saldo" class="link_azul nowrap hidden-xs">
+                    <span class="texto-topo hidden-sm"><strong>ADICIONAR SALDO</strong></span>
+                    <span class="texto-topo hidden-lg hidden-md"><strong>ADD SALDO</strong></span>
                     <img src="/imagens/t_icons2.png" alt="Painel de Administração da E-Prepag" name="" border="0" id="">
                     </a>
 <?php 
                 } 
 ?>
                 </div>
-                <div class="col-md-3 col-lg-3 text-right hidden-sm hidden-xs">
-                    <span class="text-success text22"> 
+                <div class="col-sm-4 col-md-3 col-lg-3 text-right hidden-xs nowrap">
+                    <p class="text-success text22"> 
 <?php 
                 if($controller->operadorTipo !== $GLOBALS['USUARIO_GAMES_OPERADOR_TIPOS'][FUNCIONARIO_2]){ 
                     echo ($controller->usuarios->getRiscoClassif()==1) ? "Limite" : "Saldo";
@@ -113,7 +114,7 @@ if ($usuarioGames && isset($usuarioGames->ug_blAtivo)) {
 <?php 
                 }
 ?>
-                    </span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -129,7 +130,7 @@ if ($usuarioGames && isset($usuarioGames->ug_blAtivo)) {
                 </button>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-left hidden-lg hidden-md">
+                <ul class="nav navbar-nav navbar-left hidden-lg hidden-md hidden-sm">
                     <li class="p-left8">Olá <?= $strNome; ?>.</li>
 <?php 
                 if($controller->operadorTipo !== $GLOBALS['USUARIO_GAMES_OPERADOR_TIPOS'][FUNCIONARIO_2]){ 
@@ -146,7 +147,7 @@ if ($usuarioGames && isset($usuarioGames->ug_blAtivo)) {
                 <ul class="nav navbar-nav navbar-left bg-verde-claro">
                   <li class=""><a href="/creditos/produtos.php" alt="Clique para Comprar Games" title="Clique para Comprar Games" class="p-top10 bg-verde-claro hover-verde"><strong>GAMES</strong></a></li>
                 </ul>
-                <div class="hidden-sm hidden-xs w35 pull-left right10">&nbsp</div>
+                <div class=" hidden-xs w35 pull-left right10">&nbsp</div>
 <?php
             }
             
@@ -166,7 +167,7 @@ if ($usuarioGames && isset($usuarioGames->ug_blAtivo)) {
 <?php
             }
 ?>
-                <ul class="nav navbar-nav navbar-right hidden-md hidden-lg">
+                <ul class="nav navbar-nav navbar-right hidden-md hidden-sm hidden-lg">
 <?php
                     if(($controller->usuarios->getRiscoClassif()==1 && $controller->operadorTipo !== $GLOBALS['USUARIO_GAMES_OPERADOR_TIPOS'][FUNCIONARIO_2]) && checaBoletoEmAberto() != 0)
                     { 
@@ -220,7 +221,8 @@ if ($usuarioGames && isset($usuarioGames->ug_blAtivo)) {
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/creditos/logout.php" alt="Sair" title="Sair" class="decoration-none texto-topo">(sair)</a></li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right hidden-xs hidden-sm">
+                <ul class="nav navbar-nav navbar-right hidden-xs">
+                    <li class=""><a style="padding-top: 15px; height:50px;" href="/creditos/produto/produtos_selecionados.php" alt="Meu Carrinho" title="Meu Carrinho"><span class="glyphicon glyphicon-shopping-cart txt-branco font20" style="top: 0px !important;"></span></a></li>
                     <li class=""><a href="/creditos/pedidos.php" alt="Meus Pedidos" title="Meus Pedidos"><strong>PEDIDOS</strong></a></li>
                     <li class=""><a href="/creditos/pedidos.php?nao_emitidos=1" alt="Pins Não Emitidos" title="Pins Não Emitidos"><strong>PINS NÃO EMITIDOS</strong></a></li>
                     <li class="active"><a href="/creditos/index.php" class="" alt="Minha Loja" title="Minha Loja"><strong>MINHA LOJA</strong></a></li>

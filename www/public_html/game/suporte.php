@@ -1,132 +1,168 @@
 <?php
 require_once "../../includes/constantes.php";
-require_once DIR_CLASS."gamer/controller/HeaderController.class.php";
-require_once DIR_CLASS."util/Validate.class.php";
+require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
+require_once DIR_CLASS . "util/Validate.class.php";
 
 $controller = new HeaderController;
 $controller->setHeader();
 
-if(!empty($_POST)){
-    
-    foreach($_POST as $ind => $val){
+if (!empty($_POST)) {
+
+    foreach ($_POST as $ind => $val) {
         $_POST[$ind] = stripslashes(strip_tags($val));
     }
-    
+
     $valida = new Validate;
-    
-    if($valida->email($_POST['email'])){
+
+    if ($valida->email($_POST['email'])) {
         $erro[] = "Email inválido.";
     }
-    
-    if(!empty($_FILES['anexo']["tmp_name"])){
-        if($retImg = $valida->imagem($_FILES['anexo'])){
+
+    if (!empty($_FILES['anexo']["tmp_name"])) {
+        if ($retImg = $valida->imagem($_FILES['anexo'])) {
             $erro = $retImg; //retorna array
-        }else{
+        } else {
             $attach = "";
             $file = $_FILES['anexo'];
-            if(!move_uploaded_file(basename($file["tmp_name"]),DIR_CACHE . basename($file["name"])))
+            if (!move_uploaded_file(basename($file["tmp_name"]), DIR_CACHE . basename($file["name"])))
                 $erro[] = "Erro ao gravar imngem";
             else
-                $attach = DIR_CACHE.$file["name"];
-        
+                $attach = DIR_CACHE . $file["name"];
         }
     }
-    
-    if($valida->letras($_POST['nome'])){
+
+    if ($valida->letras($_POST['nome'])) {
         $erro[] = "Nome inválido.";
     }
-        
-    if($valida->qtdCaracteres($_POST['tel'],14,15)){
-        $erro[] = "Telefone inválido.";
+
+    // Validação de CPF ou CNPJ
+    function validaCpfCnpj($value) {
+        $value = preg_replace('/\D/', '', $value);
+
+        if (strlen($value) == 11) {
+            // Validação de CPF
+            if (preg_match('/(\d)\1{10}/', $value)) return false;
+            for ($t = 9; $t < 11; $t++) {
+                for ($d = 0, $c = 0; $c < $t; $c++) {
+                    $d += $value[$c] * (($t + 1) - $c);
+                }
+                $d = ((10 * $d) % 11) % 10;
+                if ($value[$c] != $d) return false;
+            }
+            return true;
+        } elseif (strlen($value) == 14) {
+            // Validação de CNPJ
+            if (preg_match('/(\d)\1{13}/', $value)) return false;
+            $t = [5,4,3,2,9,8,7,6,5,4,3,2];
+            for ($i = 0, $s = 0; $i < 12; $i++) $s += $value[$i] * $t[$i];
+            $r = $s % 11;
+            if ($value[12] != ($r < 2 ? 0 : 11 - $r)) return false;
+            $t = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+            for ($i = 0, $s = 0; $i < 13; $i++) $s += $value[$i] * $t[$i];
+            $r = $s % 11;
+            if ($value[13] != ($r < 2 ? 0 : 11 - $r)) return false;
+            return true;
+        }
+        return false;
     }
-    
-    if(empty($_POST['msg'])){
+
+    if (!validaCpfCnpj($_POST['cpfcnpj'])) {
+        $erro[] = "CPF ou CNPJ inválido.";
+    }
+
+    if (empty($_POST['msg'])) {
         $erro[] = "Mensagem precisa ser preenchida.";
     }
-	
-    function verificaPOST($referer,$POST){
-            
-		//if (strpos($referer,"bronzato.com.br")===false && strpos($referer,"contause.digital")===false){return false;}
-		$flag=true;
-		foreach($_POST as $xa=>$xb){
-			$xb = serialize($xb);
-			if (strpos($xb,"dbms_pipe.receive_message")!==false || strpos($xb,"DBMS_PIPE.RECEIVE_MESSAGE")!==false || strpos($xb,"delete")!==false || strpos($xb,"delete")!==false || strpos($xb,"update")!==false || strpos($xb,"select")!==false ){
-					return false;
-			}
-			
-			if (strpos($xb,"dbms_pipe.receive_message")!==false || strpos($xb,"DBMS_PIPE.RECEIVE_MESSAGE")!==false ||strpos(hexToStr($xb),"delete")!==false || strpos(hexToStr($xb),"update")!==false || strpos(hexToStr($xb),"select")!==false ){
-					return false;
-			}
-		}
-		
-		if ($flag){return true;}else{return false;}
-	}
-	
-	function strToHex($string){
-		$hex = '';
-		for ($i=0; $i<strlen($string); $i++){
-			$ord = ord($string[$i]);
-			$hexCode = dechex($ord);
-			$hex .= substr('0'.$hexCode, -2);
-		}
-		return strToUpper($hex);
-	}
-	
-	function hexToStr($hex){
-		$string='';
-		for ($i=0; $i < strlen($hex)-1; $i+=2){
-			$string .= chr(hexdec($hex[$i].$hex[$i+1]));
-		}
-		return $string;
-	}
+
+    function verificaPOST($referer, $POST)
+    {
+
+        //if (strpos($referer,"bronzato.com.br")===false && strpos($referer,"contause.digital")===false){return false;}
+        $flag = true;
+        foreach ($_POST as $xa => $xb) {
+            $xb = serialize($xb);
+            if (strpos($xb, "dbms_pipe.receive_message") !== false || strpos($xb, "DBMS_PIPE.RECEIVE_MESSAGE") !== false || strpos($xb, "delete") !== false || strpos($xb, "delete") !== false || strpos($xb, "update") !== false || strpos($xb, "select") !== false) {
+                return false;
+            }
+
+            if (strpos($xb, "dbms_pipe.receive_message") !== false || strpos($xb, "DBMS_PIPE.RECEIVE_MESSAGE") !== false || strpos(hexToStr($xb), "delete") !== false || strpos(hexToStr($xb), "update") !== false || strpos(hexToStr($xb), "select") !== false) {
+                return false;
+            }
+        }
+
+        if ($flag) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function strToHex($string)
+    {
+        $hex = '';
+        for ($i = 0; $i < strlen($string); $i++) {
+            $ord = ord($string[$i]);
+            $hexCode = dechex($ord);
+            $hex .= substr('0' . $hexCode, -2);
+        }
+        return strToUpper($hex);
+    }
+
+    function hexToStr($hex)
+    {
+        $string = '';
+        for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
+            $string .= chr(hexdec($hex[$i] . $hex[$i + 1]));
+        }
+        return $string;
+    }
 
 
-	 if(!empty($_POST["g-recaptcha-response"])){
-			
-		   $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];             
+    if (!empty($_POST["g-recaptcha-response"])) {
 
-			$recaptcha = curl_init();
-			curl_setopt_array($recaptcha, [
-				CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
-				CURLOPT_CUSTOMREQUEST => "POST",
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
+        $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
-			]);
-			$retorno = json_decode(curl_exec($recaptcha), true);
-			curl_close($recaptcha);
+        $recaptcha = curl_init();
+        curl_setopt_array($recaptcha, [
+            CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS => http_build_query($tokenInfo)
 
-			if($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))){
-				  $erro[] = "<p>Processo invalidado por RECAPTCHA.</p>";
-			}
-		   
-	  }else{
-		   $erro[] = "<p>Você deve realizar a verificação do RECAPTCHA para prosseguir.</p>";
-	  }
-    
-	if(!verificaPOST("", $_POST)){
-	    $titulo = "Ops...";
-	    $modalMsg = "Problemas no envio do Email.";
-		$modalTipo = 1;
-	}else{
-		if(empty($erro)){
-	//        require_once DIR_CLASS."util/Email.class.php";
-			require_once DIR_INCS."gamer/functions.php";
-			// Dados do Email
-	//        $email  = "diegogandradex@gmail.com";
-			$cc     = getenv("email_suporte");
-			$subject= "Contato - Suporte";
-			$corpoMsg = "<html><head></head><body>
+        ]);
+        $retorno = json_decode(curl_exec($recaptcha), true);
+        curl_close($recaptcha);
+
+        if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
+            $erro[] = "<p>Processo invalidado por RECAPTCHA.</p>";
+        }
+    } else {
+        $erro[] = "<p>Você deve realizar a verificação do RECAPTCHA para prosseguir.</p>";
+    }
+
+    if (!verificaPOST("", $_POST)) {
+        $titulo = "Ops...";
+        $modalMsg = "Problemas no envio do Email.";
+        $modalTipo = 1;
+    } else {
+        if (empty($erro)) {
+            //        require_once DIR_CLASS."util/Email.class.php";
+            require_once DIR_INCS . "gamer/functions.php";
+            // Dados do Email
+            //        $email  = "diegogandradex@gmail.com";
+            $to     = getenv("email_suporte");
+            $subject = "Contato - Suporte";
+            $corpoMsg = "<html><head></head><body>
 						Olá<br>
 						<br>
 						O seu formulário de contato com a E-Prepag foi enviado.<br>
 						<br>
-						Data de envio: ".date("d-m-Y H:i:s").".<br>
+						Data de envio: " . date("d-m-Y H:i:s") . ".<br>
 						<br>
-						Nome: ".$_POST['nome']."<br>
-						Email: ".$_POST['email']."<br>
-						Telefone: ".$_POST['tel']."<br>
-						Dúvida, mensagem ou problema apresentado: ".$_POST['msg']."<br>
+						Nome: " . $_POST['nome'] . "<br>
+						Email: " . $_POST['email'] . "<br>
+						CPF/CNPJ: " . $_POST['cpfcnpj'] . "<br>
+						Dúvida, mensagem ou problema apresentado: " . $_POST['msg'] . "<br>
 						<br>
 						<br>
 						Fique tranquilo, enviaremos uma resposta em até 1 dia útil!
@@ -134,49 +170,48 @@ if(!empty($_POST)){
 						Atenciosamente,
 						<br><br>
 						Equipe E-Prepag</body></html>";
-			
-			if (enviaEmail4($_POST['email'], $cc, $bcc, $subject, $corpoMsg, null, $attach)) {
-				if($attach != "")
-					unlink($attach);
-				
-				$titulo = "E-Prepag - Créditos";
-				$modalMsg = "Email enviado com sucesso.";
-				$modalTipo = 2;
-			}
-			else {
-				$titulo = "Ops...";
-				$modalMsg = "Problemas no envio do Email.";
-				$modalTipo = 1;
-			}
 
-		}else{
-			$titulo = "Ops...";
-			
-			if(is_array($erro))
-				$modalMsg = implode("<br>",$erro);
-			else
-				$modalMsg = "Erro desconhecido";
-			
-			$modalTipo = 1;
-		}
-	
-	}
+            if (enviaEmail4($to, $_POST['email'], $bcc, $subject, $corpoMsg, null, $attach, false, '', $_POST['email'])) {
+                if ($attach != "")
+                    unlink($attach);
+
+                $titulo = "E-Prepag - Créditos";
+                $modalMsg = "Email enviado com sucesso.";
+                $modalTipo = 2;
+            } else {
+                $titulo = "Ops...";
+                $modalMsg = "Problemas no envio do Email.";
+                $modalTipo = 1;
+            }
+        } else {
+            $titulo = "Ops...";
+
+            if (is_array($erro))
+                $modalMsg = implode("<br>", $erro);
+            else
+                $modalMsg = "Erro desconhecido";
+
+            $modalTipo = 1;
+        }
+    }
 }
 
 ?>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script src="/js/valida.js"></script>
 <div class="container txt-azul-claro bg-branco p-bottom40">
-<?php
-    if(isset($modalTipo) && isset($modalMsg) && isset($titulo)){
+    <?php
+    if (isset($modalTipo) && isset($modalMsg) && isset($titulo)) {
         print "<script>manipulaModal($modalTipo,'$modalMsg','$titulo');</script>";
     }
-?>
+    ?>
     <div class="col-md-12 txt-azul-claro top10">
-        <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left"><h4 class="top20">Suporte</h4></strong>
+        <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left">
+            <h4 class="top20">Suporte</h4>
+        </strong>
     </div>
     <div class="clearfix"></div>
-    <div class="col-md-4 txt-cinza text-center">
+    <!-- <div class="col-md-4 txt-cinza text-center">
         <p><img src="/imagens/icone_chat.gif"></p>
         <p class="text18 txt-azul-claro">Chat</p>
         <p class="leftright15">Segunda a sexta das 09:00 as 13:00 e das 14:00 as 17:00h.</p>
@@ -191,9 +226,9 @@ if(!empty($_POST)){
         <p>Segunda a sexta das 08h às 17h</p>
     </div>
     <div class="col-md-12 espacamento hidden-md hidden-lg borda-top-azul top10">
-    </div>
+    </div> -->
     <div class="col-md-4 txt-cinza text-center">
-        <a href="<?php echo PROTOCOL;?>://e-prepag.zendesk.com/hc/pt-br" class="txt-cinza" target="_blank">
+        <a href="<?php echo PROTOCOL; ?>://e-prepag.zendesk.com/hc/pt-br" class="txt-cinza" target="_blank">
             <p><img src="/imagens/duvidas_frequentes.gif"></p>
             <p class="text18 txt-azul-claro">Dúvidas frequentes</p>
             <p class="leftright15">Encontre rapidamente as</p>
@@ -211,13 +246,13 @@ if(!empty($_POST)){
         <form id="formContato" enctype="multipart/form-data" name="form" method="post">
             <div class="col-md-6 top20">
                 <div class="col-md-12 top5">
-                    <input type="text" placeholder="Nome *" id="nome" name="nome" class="form-control" char="2">
+                    <input type="text" placeholder="Nome *" id="nome" name="nome" class="form-control" required>
                 </div>
                 <div class="col-md-12 top5">
-                    <input type="text" placeholder="E-mail *" id="email" name="email" class="form-control">
+                    <input type="text" placeholder="E-mail *" id="email" name="email" class="form-control" required>
                 </div>
                 <div class="col-md-12 top5">
-                    <input type="text" placeholder="Telefone *" id="tel" name="tel" class="form-control" char="14" maxlength="15">
+                    <input type="text" placeholder="CPF/CNPJ *" id="cpfcnpj" name="cpfcnpj" class="form-control" maxlength="18" required>
                 </div>
                 <div class="col-md-12 top5">
                     <label for="anexo" class="text-left fontsize-p">Anexar
@@ -234,8 +269,8 @@ if(!empty($_POST)){
                     <textarea class="form-control" char="5" rows="5" name="msg" id="msg"></textarea>
                 </div>
                 <div style="padding: 0 0 15px 0;">
-					<div class="g-recaptcha" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T"></div>
-			    </div>
+                    <div class="g-recaptcha" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T"></div>
+                </div>
                 <div class="row text-right">
                     <button type="submit" class="btn btn-success">Enviar</button>
                 </div>
@@ -246,23 +281,31 @@ if(!empty($_POST)){
 </div>
 <script type="text/javascript" src="/js/jquery.mask.min.js"></script>
 <script>
-$(function(){
-    $("#tel").mask('(00) 90000-0000');
-    
-    $("#formContato").submit(function(){
-        if(grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0){
-            manipulaModal(1,"Você deve fazer a verificação do RECAPTCHA para finalizar seu cadastro.",'Erro');
-            return false;
-        }
+    $(function() {
+        // Máscara para CPF ou CNPJ
+        $('#cpfcnpj').on('input', function() {
+            var valor = $(this).val().replace(/\D/g, '');
+            if (valor.length <= 11) {
+                $(this).mask('000.000.000-00');
+            } else {
+                $(this).mask('00.000.000/0000-00');
+            }
+        });
 
-        if(!valida())
-            return false;
+        $("#formContato").submit(function() {
+            if (grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) {
+                manipulaModal(1, "Você deve fazer a verificação do RECAPTCHA para finalizar seu cadastro.", 'Erro');
+                return false;
+            }
+
+            if (!valida())
+                return false;
+        });
+
+        $("#btnanexo").click(function() {
+            $("#anexo").trigger("click");
+        });
     });
-       
-   $("#btnanexo").click(function(){
-      $("#anexo").trigger("click"); 
-   });
-});
 </script>
 <?php
 require_once RAIZ_DO_PROJETO . "public_html/game/includes/footer.php";
