@@ -158,7 +158,7 @@ if (isset($_SESSION['dist_carrinho']) && is_array($_SESSION['dist_carrinho'])) {
     <nav class="navbar navbar-default bottom0 bg-info">
         <div class="container">
             <div class="navbar-header" style="display: flex; justify-content: end; align-items: center; gap: 20px;">
-                <a class="hidden-sm hidden-md hidden-lg" style="padding-top: 15px; height:50px;  position: relative; <?= ($quantidadeCarrinho > 0 ? "" : "display: none !important;") ?>" href="/creditos/produto/produtos_selecionados.php" alt="Meu Carrinho" title="Meu Carrinho">
+                <a class="hidden-sm hidden-md hidden-lg display-carrinho" style="padding-top: 15px; height:50px;  position: relative; <?= ($quantidadeCarrinho > 0 ? "" : "display: none !important;") ?>" href="/creditos/produto/produtos_selecionados.php" alt="Meu Carrinho" title="Meu Carrinho">
                     <span class="glyphicon glyphicon-shopping-cart txt-branco" style="top: -5px !important; font-size: 28px;"></span>
                     <span class="carrinho-compras" style="
                                             position: absolute;
@@ -265,7 +265,7 @@ if (isset($_SESSION['dist_carrinho']) && is_array($_SESSION['dist_carrinho'])) {
                     <li><a href="/creditos/logout.php" alt="Sair" title="Sair" class="decoration-none texto-topo">(sair)</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right hidden-xs">
-                    <li style="position: relative; <?= ($quantidadeCarrinho > 0 ? "" : "display: none !important;") ?>">
+                    <li class="display-carrinho" style="position: relative; <?= ($quantidadeCarrinho > 0 ? "" : "display: none !important;") ?>">
                         <a style="padding-top: 15px; height:50px; position: relative;" href="/creditos/produto/produtos_selecionados.php" alt="Meu Carrinho" title="Meu Carrinho">
                             <span class="glyphicon glyphicon-shopping-cart txt-branco" style="top: -5px !important; font-size: 28px;"></span>
                             <span class="carrinho-compras" style="

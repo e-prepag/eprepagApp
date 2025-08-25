@@ -46,379 +46,13 @@ $modelos = $produto->getModelo();
 ///prepag2/dist_commerce/images/produtos/
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 ?>
-<style>
-    .produto-selecionado {
-        border: 1px solid rgb(100, 100, 100, 0.5) !important;
-        position: relative;
-        transition: border 0.2s, box-shadow 0.2s;
-    }
-
-    .triangulo-produto-selecionado {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        z-index: 10;
-        border-left: 11px solid transparent;
-        border-top: 11px solid transparent;
-        border-bottom: 11px solid green;
-        border-right: 11px solid green;
-    }
-
-    .icone-produto-selecionado {
-        position: absolute;
-        bottom: 3px;
-        right: 3px;
-        top: auto !important;
-        font-size: 9px;
-        color: #F0F0F0;
-        z-index: 10;
-    }
-
-    .bg-comprar:hover .txt-azul-claro2,
-    .bg-comprar:hover .txt-verde {
-        color: #fff;
-    }
-
-    .bg-comprar .txt-azul-claro2 {
-        color: #478ee6;
-        transition: color 0.1s ease;
-    }
-
-    .bg-comprar .txt-verde {
-        color: #009b4a;
-        transition: color 0.1s ease;
-    }
-
-    #btn-adicionar-carrinho {
-        gap: 6px;
-        display: flex;
-        align-items: center;
-        background-color: #5cb85c10;
-        color: #4E9C4E;
-        border-color: #4cae4c;
-    }
-
-    #btn-adicionar-carrinho:hover {
-        color: #408040 !important;
-        background-color: #4E9C4E15;
-    }
-
-    #seleciona {
-        margin-top: 15px;
-        margin-right: -15px;
-        display: flex;
-        justify-content: end;
-        gap: 20px;
-    }
-
-    .btn-custom {
-        display: inline-block;
-        margin-bottom: 0;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-        border-radius: 0;
-        font-style: normal;
-        padding: 10px 20px;
-        font-size: 15px;
-        box-shadow: 3px 3px 5px rgb(0, 0, 0, 0.2);
-        margin-top: 10px;
-    }
-
-    .btn-custom.disabled,
-    .btn-custom[disabled],
-    fieldset[disabled] .btn-custom {
-        pointer-events: none;
-        cursor: not-allowed;
-        filter: alpha(opacity=65);
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        opacity: .65
-    }
-
-
-    #confirmModal .modal-content {
-        border-radius: 18px;
-        overflow: hidden;
-
-    }
-
-    #confirmModal .modal-footer {
-        border: 0;
-        display: flex;
-        align-items: center;
-        justify-content: end;
-        flex-wrap: wrap;
-        row-gap: 10px;
-    }
-
-    #confirmModal .modal-header {
-        /* border: 0; */
-        background: linear-gradient(rgb(28, 95, 124) 0%, rgb(47, 121, 153) 100%);
-    }
-
-    .product-info {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-        background: #f8fafc;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .product-details h3 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1a202c;
-        margin: 0 0 5px;
-    }
-
-    .product-details p {
-        color: #64748b;
-        margin: 0 0 8px;
-        font-size: 14px;
-    }
-
-    .product-price {
-        font-size: 20px;
-        font-weight: 700;
-        color: #478ee6;
-        margin: 0;
-    }
-
-    .success-icon {
-        width: 60px;
-        height: 60px;
-        background: #4cae4c;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 15px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .checkmark {
-        width: 24px;
-        height: 24px;
-        stroke: white;
-        stroke-width: 3;
-        fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        animation: checkmark 0.6s ease-in-out 0.3s both;
-    }
-
-    @keyframes checkmark {
-        0% {
-            stroke-dasharray: 0 50;
-            stroke-dashoffset: 0;
-        }
-
-        100% {
-            stroke-dasharray: 50 0;
-            stroke-dashoffset: 0;
-        }
-    }
-
-    #confirmModal .modal-title {
-        color: white;
-        font-size: 24px;
-        font-weight: 700;
-        margin: 0;
-        position: relative;
-        z-index: 1;
-    }
-
-    #confirmModal .modal-subtitle {
-        color: white;
-        font-size: 14px;
-        opacity: 0.9;
-        margin: 5px 0 0;
-        font-weight: 400;
-        position: relative;
-        z-index: 1;
-    }
-
-    #confirmModal .btn {
-        height: 55px;
-        flex: 0 0 auto;
-        min-width: 232px;
-        padding: 15px 20px;
-        border: none;
-        border-radius: 0;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    #confirmModal .btn-primary {
-        background: #009b4a;
-        color: white;
-        box-shadow: 0 4px 15px rgba(0, 155, 74, 0.4);
-    }
-
-    #confirmModal .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 155, 74, 0.6);
-    }
-
-    #confirmModal .btn-secondary {
-        background: white;
-        color: #64748b;
-        border: 2px solid #e2e8f0;
-    }
-
-    #confirmModal .btn-secondary:hover {
-        background: #f8fafc;
-        border-color: #cbd5e0;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(100, 116, 139, 0.2);
-    }
-
-    .quantity-selector {
-        display: inline-flex;
-        align-items: center;
-        background: #f8fafc;
-        border: 2px solid #e2e8f0;
-        border-radius: 0;
-        padding: 4px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .quantity-selector:hover {
-        border-color: rgb(190, 196, 202);
-        box-shadow: 0 0 0 4px rgba(190, 196, 202, 0.1);
-    }
-
-    .quantity-selector:focus-within {
-        border-color: rgb(190, 196, 202);
-        box-shadow: 0 0 0 4px rgba(190, 196, 202, 0.15);
-    }
-
-    .quantity-btn {
-        width: 44px;
-        height: 44px;
-        border: none;
-        background: white;
-        border-radius: 0;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        position: relative;
-        overflow: hidden;
-        color: #64748b;
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    .quantity-btn:hover {
-        background: #e2e8f0;
-        /* color: white; */
-        transform: scale(1.05);
-    }
-
-    .quantity-btn:active {
-        transform: scale(0.95);
-    }
-
-    .quantity-btn:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .quantity-btn:disabled:hover {
-        background: white;
-        color: #64748b;
-    }
-
-    .quantity-input {
-        border-top-width: 0;
-        border-right-width: 1px;
-        border-bottom-width: 0;
-        border-left-width: 1px;
-        border-style: solid;
-        border-color: #e2e8f0e0;
-        background: transparent;
-        width: 60px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: 600;
-        color: #478ee6;
-        padding: 12px 8px;
-        outline: none;
-        -moz-appearance: textfield;
-    }
-
-    .quantity-input::-webkit-outer-spin-button,
-    .quantity-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    .quantity-selector.compact {
-        border-radius: 0;
-        padding: 1px;
-    }
-
-    .quantity-selector.compact .quantity-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 0;
-        font-size: 14px;
-        margin: 1px;
-    }
-
-    .quantity-selector.compact .quantity-input {
-        width: 36px;
-        font-size: 14px;
-        padding: 4px 2px;
-    }
-
-    @keyframes pulse {
-        0% {
-            transform: scale(1);
-        }
-
-        50% {
-            transform: scale(1.1);
-        }
-
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    .pulse-animation {
-        animation: pulse 0.3s ease;
-    }
-</style>
+<link rel="stylesheet" href="/css/produtos.css" type="text/css">
 <div class="container txt-azul-claro bg-branco">
     <div class="row">
         <div class="col-md-10">
             <div class="row">
                 <div class="col-md-12 espacamento">
-                    <strong>Selecione o valor. carrinho: <?php print_r($_SESSION['dist_carrinho']) ?></strong>
+                    <strong>Selecione o valor.</strong>
                 </div>
             </div>
             <div class="row txt-cinza espacamento right10 borda-fina">
@@ -483,9 +117,6 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 
                             <?php
                             }
-
-
-                            //$urlTest = ($_SERVER["REMOTE_ADDR"] == "201.93.162.169")? "sms.php":"produtos_selecionados.php";
                             $urlTest = "produtos_selecionados.php";
 
                             ?>
@@ -532,7 +163,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                                     <div class="form-group align-center">
                                         <div class="input-group align-center">
                                             <div class="input-group-addon">R$</div>
-                                            <input type="number" class="form-control align-right" id="valor" min="<?php echo $produto->getValorMinimo(); ?>" max="<?php echo $produto->getValorMaximo(); ?>" value="<?php echo number_format($produto->getValorMinimo(), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
+                                            <input type="number" class="form-control align-right" id="valor" step="1" min="<?php echo $produto->getValorMinimo(); ?>" max="<?php echo $produto->getValorMaximo(); ?>" value="<?php echo number_format($produto->getValorMinimo(), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
                                             <div class="input-group-addon">.00</div>
                                         </div>
 
@@ -558,26 +189,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                             </div>
                         </div>
                         <?php
-                        //$urlTest = ($_SERVER["REMOTE_ADDR"] == "201.93.162.169")? "sms.php":"produtos_selecionados.php";
                         $urlTest = "produtos_selecionados.php";
-
-                        /* $se_for_get = "<form id='seleciona' method='get' action='". $urlTest . "'>
-                    <input type='hidden' name='acao' id='acao' value='a'>
-                    <input type='hidden' name='mod' id='mod' value=''>
-                    <input type='hidden' name='valor' id='valor_hidden' value=''>
-                    <input type='hidden' name='codeProd' id='codeProd' value='" . $produto->getId() . "'>
-                </form>";
-					$se_for_post = "<form id='seleciona' method='post' action='". $urlTest . "'>
-                    <input type='hidden' name='acao' id='acao' value='a'>
-                    <input type='hidden' name='mod' id='mod' value=''>
-                    <input type='hidden' name='valor' id='valor_hidden' value=''>
-                    <input type='hidden' name='codeProd' id='codeProd' value='" . $produto->getId() . "'>
-                </form>";
-				if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
-					echo $se_for_get;
-				} else {
-					echo $se_for_post;
-				}*/
                         ?>
                         <form id='seleciona' method='post' action='<?php echo $urlTest; ?>' style="display: flex; align-items:end; flex-wrap: wrap;">
                             <input type='hidden' name='acao' id='acao' value='u'>
@@ -644,62 +256,15 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
     </div>
 </div>
 <script src="/js/jquery.mask.min.js"></script>
+<script src="/js/quantitySelector.js"></script>
 <script>
-    function validateQuantity(input) {
-        const selector = input.closest('.quantity-selector');
-        const min = parseInt(selector.dataset.min) || 0;
-        const max = parseInt(selector.dataset.max) || Infinity;
-        let value = parseInt(input.value);
-
-        if (isNaN(value) || value < min) {
-            value = min;
-        } else if (value > max) {
-            value = max;
-        }
-
-        input.value = value;
-        updateButtonStates(selector);
-    }
-
-    function changeQuantity(button, change) {
-        const selector = button.closest('.quantity-selector');
-        const input = selector.querySelector('.quantity-input');
-        const minusBtn = selector.querySelector('.quantity-btn:first-child');
-        const plusBtn = selector.querySelector('.quantity-btn:last-child');
-
-        const min = parseInt(selector.dataset.min) || 0;
-        const max = parseInt(selector.dataset.max) || Infinity;
-        const currentValue = parseInt(input.value) || min;
-        const newValue = Math.max(min, Math.min(max, currentValue + change));
-
-        if (newValue !== currentValue) {
-            input.value = newValue;
-
-            // Animação de pulso
-            selector.classList.add('pulse-animation');
-            setTimeout(() => selector.classList.remove('pulse-animation'), 300);
-
-            // Atualizar estado dos botões
-            updateButtonStates(selector);
-        }
-    }
-
-    function updateButtonStates(selector) {
-        const input = selector.querySelector('.quantity-input');
-        const minusBtn = selector.querySelector('.quantity-btn:first-child');
-        const plusBtn = selector.querySelector('.quantity-btn:last-child');
-
-        const min = parseInt(selector.dataset.min) || 0;
-        const max = parseInt(selector.dataset.max) || Infinity;
-        const value = parseInt(input.value);
-
-        minusBtn.disabled = value <= min;
-        plusBtn.disabled = value >= max;
-    }
-
     $(function() {
 
         $('#qtde').mask('000', {
+            reverse: true
+        });
+
+        $('#valor').mask('0000', {
             reverse: true
         });
 
@@ -719,7 +284,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
             }
 
             // Pega o produto selecionado
-            var produtoSelecionado = $(this).find("span").attr("id");
+            let produtoSelecionado = $(this).find("span").attr("id");
 
             // Atualiza o campo hidden do form, mas NÃO faz submit ainda
             $("#mod").val(produtoSelecionado);
@@ -732,7 +297,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 
         $("#btn-adicionar-carrinho").click(function() {
             // Envia os dados do formulário via AJAX para adiciona-carrinho.php
-            var data = {
+            let data = {
                 acao: "u",
                 mod: $("#mod").val(),
                 valor: $("#valor_hidden").val(),
@@ -747,14 +312,14 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                 success: function(response) {
                     if (response.trim() === "sucesso") {
                         // Exibe modal de sucesso com nome do produto, modelo e valor
-                        var nomeProduto = "<?php echo addslashes($produto->getNome()); ?>";
-                        var nomeModelo = "";
-                        var valorModelo = "";
-                        var qtdProdutos = ($("#qtde").length ? $("#qtde").val() : 1);
+                        let nomeProduto = "<?php echo addslashes($produto->getNome()); ?>";
+                        let nomeModelo = "";
+                        let valorModelo = "";
+                        let qtdProdutos = ($("#qtde").length ? $("#qtde").val() : 1);
 
                         // Tenta obter o nome e valor do modelo selecionado
-                        var modeloId = $("#mod").val();
-                        var spanSelecionado = $("span#" + modeloId);
+                        let modeloId = $("#mod").val();
+                        let spanSelecionado = $("span#" + modeloId);
                         if (spanSelecionado.length > 0) {
                             nomeModelo = spanSelecionado.closest(".row").find("strong").first().text().trim();
                             valorModelo = spanSelecionado.find(".pull-left strong").text().trim();
@@ -769,9 +334,14 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                         $("#productPrice").html(valorModelo);
                         $("#productQtd").html(qtdProdutos);
                         $(".carrinho-compras").each(function() {
-                            var atual = parseInt($(this).text()) || 0;
-                            var novoTotal = atual + parseInt(qtdProdutos);
+                            let atual = parseInt($(this).text()) || 0;
+                            let novoTotal = atual + parseInt(qtdProdutos);
                             $(this).text(novoTotal);
+                            if (atual == 0) {
+                                $(".display-carrinho").each(function() {
+                                    this.style.removeProperty("display");
+                                });
+                            }
                         });
 
                         $("#confirmModal").modal("show");
@@ -794,48 +364,29 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                 $(this).children(".txt-azul-claro2").css("color", "#478ee6");
                 $(this).children(".txt-verde").css("color", "##009b4a");
             }
-        ) // ).click(function() {
-
-        //     if ($(this).attr("estoque") == "1") {
-        //         console.log("redir");
-        //         $("#mod").val($(this).attr("id"));
-        //         if ($("#valor").length && $("#valor").val() === "") {
-        //             var html = "<p class='txt-vermelho'>Por favor, informe um valor no campo!</p>";
-        //             $(".error-list").html(html);
-        //             return;
-        //         }
-        //         $('#valor_hidden').val($("#valor").val());
-        //         $("#seleciona").submit();
-        //     }
-        // });
-
-        // $(".prod").click(function() {
-        //     var id = $(this).attr("id");
-        //     $("#prod").val(id);
-        //     $("#detalhe").submit();
-        // });
+        )
 
         $("#valor").change(function() {
-            var min = parseInt($("#valor").attr("min"));
-            var max = parseInt($("#valor").attr("max"));
-            var valor = parseInt($("#valor").val());
+            let min = parseInt($("#valor").attr("min"));
+            let max = parseInt($("#valor").attr("max"));
+            let valor = parseInt($("#valor").val());
             if (valor < min) {
 
-                var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
+                let html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                 $("#valor").val(min);
                 $(".error-list").html(html);
             } else if (valor > max) {
-                var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
+                let html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                 console.log(valor);
                 $("#valor").val(max);
                 $(".error-list").html(html);
             } else {
-                var html = "R$" + valor + ",00";
+                let html = "R$" + valor + ",00";
                 $.post("/game/ajax/epp_info.php", {
                         valor: valor,
                     },
                     function(data) {
-                        var html = data;
+                        let html = data;
                         $(".span-valor").html(html);
                     });
                 $(".error-list").html("");
