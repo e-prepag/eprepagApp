@@ -43,7 +43,7 @@ if (!function_exists('checkIP')) {
     }//end function checkIP()
 
 }
-function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $name = '') {
+function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $name = '', $replyTo = '') {
 
         $mail = new PHPMailer();
 	
@@ -51,7 +51,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         $mail->Host     = getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
-        $mail->From     = getenv("email_suporte");
+        $mail->From     = ( $replyTo != '' ? "site@e-prepag.com.br" : getenv("email_suporte"));
         $mail->SMTPAuth = true;     // turn on SMTP authentication
         $mail->Username = getenv("smtp_username");  // a valid email here
         $mail->Password = getenv("smtp_password"); //'985856';		//'850637';  985856
@@ -65,7 +65,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         //---------------------------------------------------------//  
 
         // Reply-to
-        $mail->AddReplyTo(getenv("email_suporte"));
+        $mail->AddReplyTo(( $replyTo != '' ? $replyTo : getenv("email_suporte")));
 
         //To
         if($to && trim($to) != ""){

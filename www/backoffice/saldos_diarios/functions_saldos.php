@@ -19,12 +19,15 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario
 {
 	$pdo = ConnectionPDO::getConnection()->getLink();
 
-	$fechamento_dia = $horario_str == 1 ? "(dugsl_data_inclusao - INTERVAL '18 hours 30 minutes')::date + INTERVAL '1 day'" : "dugsl_data_inclusao::date";
-	$fechamento_dia_gamer = $horario_str == 1 ? "(ugsl_data_inclusao - INTERVAL '18 hours 30 minutes')::date + INTERVAL '1 day'" : "ugsl_data_inclusao::date";
+	// $fechamento_dia = $horario_str == 1 ? "(dugsl_data_inclusao - INTERVAL '18 hours 30 minutes')::date + INTERVAL '1 day'" : "dugsl_data_inclusao::date";
+	// $fechamento_dia_gamer = $horario_str == 1 ? "(ugsl_data_inclusao - INTERVAL '18 hours 30 minutes')::date + INTERVAL '1 day'" : "ugsl_data_inclusao::date";
 
-	if ($horario_str) {
-		list($data_inicial, $data_final) = ajustarParaSTR($data_inicial, $data_final);
-	}
+	$fechamento_dia = $horario_str == 1 ? "AND dugsl_data_inclusao::time <= '18:30:00'" : "";
+	$fechamento_dia_gamer = $horario_str == 1 ? "AND ugsl_data_inclusao::time <= '18:30:00'" : "";
+
+	// if ($horario_str) {
+	// 	list($data_inicial, $data_final) = ajustarParaSTR($data_inicial, $data_final);
+	// }
 
 	$sql = "";
 	if ($tipo_cliente == 4) {
@@ -40,13 +43,14 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario
 		$sql .= "(WITH logs_filtrados AS (
 				    SELECT 
 				        dugsl_ug_id,
-				        $fechamento_dia AS dia,
+				        dugsl_data_inclusao::date AS dia,
 				        dugsl_data_inclusao,
 				        dugsl_ug_perfil_saldo,
 				        dugsl_ug_perfil_saldo_antes
 				    FROM dist_usuarios_games_saldo_log
 				    WHERE dugsl_data_inclusao >= :data_inicial
 				      AND dugsl_data_inclusao <= :data_final
+					  $fechamento_dia
 				),
 				ordenados AS (
 				    SELECT *,
@@ -87,13 +91,14 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario
 		$sql .= "(WITH logs_filtrados AS (
 				    SELECT 
 				        ugsl_ug_id,
-				        $fechamento_dia_gamer AS dia,
+				        ugsl_data_inclusao::date AS dia,
 				        ugsl_data_inclusao,
 				        ugsl_ug_perfil_saldo,
 				        ugsl_ug_perfil_saldo_antes
 				    FROM usuarios_games_saldo_log
 				    WHERE ugsl_data_inclusao >= :data_inicial
 				      AND ugsl_data_inclusao <= :data_final
+					  $fechamento_dia_gamer
 				),
 				ordenados AS (
 				    SELECT *,

@@ -25,10 +25,10 @@ if(!$arquivoLog->haveFile()) {
     // Parametros
     $qtde_minutos_considerados = 30; //jï¿½ conciliado
     $qtde_meses_considerados_apartirde = 1; //qtde de meses considerado na pesquisa
-    $subject = "NotificaÃ§Ã£o Automaticamente de Pedidos de IntegraÃ§Ã£o";
+    $subject = "Notificação Automatica de Pedidos de Integração";
     $email = getenv("email_suporte");
     $cc = "glaucia@e-prepag.com.br"; //"glaucia@e-prepag.com.br";
-    $bcc = "wagner@e-prepag.com.br";
+    $bcc = "";
     $msg = "";
 
     //echo PHP_EOL.str_repeat("=", 80).PHP_EOL."NotificaÃ§Ã£o Automaticamente de Pedidos de IntegraÃ§Ã£o com mais de ".$qtde_minutos_considerados." Minutos jÃ¡ conciliados (".date("Y-m-d H:i:s").")".PHP_EOL.str_repeat("=", 80).PHP_EOL;
@@ -67,7 +67,7 @@ if(!$arquivoLog->haveFile()) {
            // echo  "Nenhum pedido selecionado".PHP_EOL;
     } else {
            // echo "Pedidos que serï¿½o considerados nestas notificaï¿½ï¿½es:".PHP_EOL;
-            $msg .= "<html>Pedidos que serï¿½o considerados nestas notificaï¿½ï¿½es: Total [".$n_updates."]<br><br>";
+            $msg .= "<html>Pedidos que serão considerados nestas notificações: Total [".$n_updates."]<br><br>";
 
             while($rs_row = pg_fetch_array($rs)) {
 
@@ -105,11 +105,11 @@ if(!$arquivoLog->haveFile()) {
             //Enviando email
             if(!empty($msg)) {
                 $msg .= "<br><br></html>";
-                if(enviaEmail($email, $cc, $bcc, $subject, $msg)) {
+                if(enviaEmail4($email, $cc, $bcc, $subject, $msg, $msg, null, false, '', $cc)) {
                  //  echo "Email enviado com sucesso".PHP_EOL;
                 }
                 else {
-                   // echo "Problemas no envio do Email\n TO: ".$email.PHP_EOL." CC: ".$cc.PHP_EOL." BCC: ".$bcc.PHP_EOL." SUBJECT: ".$subject.PHP_EOL;
+                   echo "Problemas no envio do Email\n TO: ".$email.PHP_EOL." CC: ".$cc.PHP_EOL." BCC: ".$bcc.PHP_EOL." SUBJECT: ".$subject.PHP_EOL;
                 }
             }//end if(!empty($msg))
 
