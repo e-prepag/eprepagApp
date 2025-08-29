@@ -118,7 +118,7 @@ function actions($get)
 				//verifica se o modelo esta no carrinho
 				if ($carrinho[$mod][$codeProd][$valor]) {
 					//atualiza modelo no carrinho
-					$carrinho[$mod][$codeProd][$valor] = +$qtde;
+					$carrinho[$mod][$codeProd][$valor] += $qtde;
 				} else {
 					//Se o modelo nao esta no carrinho, adiciona
 					if (getProduto($codeProd)) {

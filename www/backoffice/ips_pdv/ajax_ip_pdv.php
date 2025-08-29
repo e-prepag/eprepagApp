@@ -22,11 +22,15 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 				    COALESCE(ip.ip_range, false)      AS ip_range,
 				    ip.ip_range_ini,
 				    ip.ip_range_end,
+					ip.created_date,
+					ip.active,
 				    ug.ug_nome_fantasia,
-				    ug.ug_id
+				    ug.ug_id,
+					COALESCE(u.shn_nome, 'Desconhecido') as shn_nome
 				FROM dist_usuarios_games ug
 				LEFT JOIN pdv_api_ip ip 
 				       ON ug.ug_id = ip.ug_id
+				LEFT JOIN usuarios u ON u.id = ip.bko_user
 				WHERE ug.ug_ativo = 1
 		";
 
@@ -41,11 +45,27 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	}
 
 	if (filter_var($ip_pdv, FILTER_VALIDATE_IP) !== false) {
-		$sql .= " 	AND (ip.ip_range IS TRUE AND inet(ip.ip_address) = inet(:ip_pdv))
-        					OR
-        				(ip.ip_range IS FALSE AND inet(ip.ip_range_ini) <= inet(:ip_pdv) AND inet(ip.ip_range_end) >= inet(:ip_pdv))
-      				);
-			";
+		$sql .= " AND (ip.ip_range IS FALSE AND ip_address = :ip_pdv)
+						OR
+						(ip.ip_range IS TRUE AND ip_range_ini <= :ip_pdv AND ip_range_end >= :ip_pdv)";
+	}
+
+	// Adiciona filtro para "Somente com IP"
+	$ip_only = isset($_POST['ip_only']) ? $_POST['ip_only'] : null;
+	if ($ip_only !== null && $ip_only !== "") {
+		if ($ip_only == "1") {
+			$sql .= " AND ip.ip_address IS NOT NULL ";
+		}
+	}
+
+	// Adiciona filtro para ativos/inativos
+	$ativos = isset($_POST['ativos']) ? $_POST['ativos'] : "";
+	if ($ativos !== "") {
+		if ($ativos == "1") {
+			$sql .= " AND ip.active = true ";
+		} else if ($ativos == "0") {
+			$sql .= " AND (ip.active = false) ";
+		}
 	}
 
 	$sql .= "ORDER BY ip.id NULLS LAST LIMIT 100;";
@@ -55,8 +75,8 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	if ($usuario_id != null && !empty($usuario_id)) {
 		$stmt->bindParam(':usuario_id', $usuario_id);
 	}
-	if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
-		$stmt->bindParam(':ip_pdv', $ip_pdv);
+	if (isset($ip_pdv) && filter_var($ip_pdv, FILTER_VALIDATE_IP) !== false) {
+		$stmt->bindParam(':ip_pdv', $ip_pdv, PDO::PARAM_STR);
 	}
 	$stmt->execute();
 	$resultRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -85,18 +105,15 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 				"ug_id" => $value["ug_id"],
 				"ug_nome" => (isset($value["ug_nome_fantasia"]) ? utf8_encode($value["ug_nome_fantasia"]) : "Não encontrado"),
 				"ip_pdv" => $str_ip,
+				"shn_nome" => utf8_encode($value["shn_nome"]),
+				"criado_em" => isset($value["created_date"]) ? $value["created_date"] : "",
+				"ativo" => isset($value["active"]) ? ($value["active"] ? "Sim" : "Não") : "",
 				"acao" => $acao
 			];
 			array_push($data["data"], $dataLine);
 		}
 	}
-	// $dataLine = [
-	// 	"ug_id" => "",
-	// 	"ug_nome" => "",
-	// 	"ip_pdv" => "",
-	// 	"acao" => $sql
-	// ];
-	//array_push($data["data"], $dataLine);
+
 	echo json_encode($data);
 	die;
 } else if (isset($_POST["acao"]) && $_POST["acao"] == "novo") {
@@ -123,13 +140,14 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	}
 
 	// 2) Insere a nova observação
-	$sql = "INSERT INTO pdv_api_ip (ug_id, ip_address, ip_range_ini, ip_range_end, ip_range) VALUES (:ug_id, :ip_address, :ip_range_ini, :ip_range_end, :ip_range) RETURNING id";
+	$sql = "INSERT INTO pdv_api_ip (ug_id, ip_address, ip_range_ini, ip_range_end, ip_range, bko_user) VALUES (:ug_id, :ip_address, :ip_range_ini, :ip_range_end, :ip_range, :bko_user) RETURNING id";
 	$stmt = $conexao->prepare($sql);
 	$stmt->bindParam(':ug_id', $ug_id);
 	$stmt->bindParam(':ip_address', $ip_address, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range_ini', $ip_range_ini, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range_end', $ip_range_end, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range', $ip_range, PDO::PARAM_BOOL);
+	$stmt->bindParam(':bko_user', $_POST['bko_user'], PDO::PARAM_STR);
 
 	if ($stmt->execute()) {
 		$id = $stmt->fetchColumn();
@@ -157,6 +175,28 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		echo json_encode(["status" => "error", "msg" => "Erro ao remover o endereço IP."]);
 	}
 	die;
+
+} else if(isset($_POST["acao"]) && $_POST["acao"] == "alterar") {
+
+	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+
+	$ativo = $_POST["ativo"] == 1;
+
+	if ($id <= 0) {
+		echo json_encode(["status" => "error", "msg" => "ID do IP inválido."]);
+		die;
+	}
+
+	$sql = "UPDATE pdv_api_ip SET active = :ativo WHERE id = :id";
+	$stmt = $conexao->prepare($sql);
+	$stmt->bindParam(':id', $id, PDO::PARAM_INT);
+	$stmt->bindParam(':ativo', $ativo, PDO::PARAM_BOOL);
+
+	if ($stmt->execute()) {
+		echo json_encode(["status" => "success", "msg" => "Endereço IP alterado com sucesso."]);
+	} else {
+		echo json_encode(["status" => "error", "msg" => "Erro ao alterar o endereço IP."]);
+	}
 
 } else {
 	echo json_encode(["status" => "error", "msg" => "Não foi possivel efetuar sua escolha."]);

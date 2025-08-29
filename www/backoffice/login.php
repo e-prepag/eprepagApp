@@ -1,9 +1,9 @@
 <?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
-if(!isset($Empty)) $Empty = "";
-if(!isset($Invalido)) $Invalido = "";
-if(!isset($UserBlocked)) $UserBlocked = "";
-if(!isset($SessionExpires)) $SessionExpires = "";
+$Empty = isset($_GET['Empty']) ? $_GET['Empty'] : "";
+$Invalido = isset($_GET['Invalido']) ? $_GET['Invalido'] : "";
+$UserBlocked = isset($_GET['UserBlocked']) ? $_GET['UserBlocked'] : "";
+$SessionExpires = isset($_GET['SessionExpires']) ? $_GET['SessionExpires'] : "";
 
 require_once '../includes/constantes.php';
 require_once $raiz_do_projeto.'includes/configIP.php';
@@ -21,6 +21,9 @@ require_once "/www/includes/bourls.php";
 <link href="https://<?php echo $server_url; ?>/css/creditos.css" rel="stylesheet" type="text/css" />
 </head>
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="document.formLog.user.focus()">
+<div id="recebe-modal">
+
+</div>
 <table width="779" border="0" cellspacing="0" cellpadding="0" height="100%" align="center">
   <tr> 
       <td height="69" colspan="2" align="center" valign="middle"><img src="/images/backoffice.png" width="777" height="72" class="top74"><br> 
@@ -32,7 +35,7 @@ require_once "/www/includes/bourls.php";
         <tr> 
           <td height="156"> <div align="center"> 
               <form action="https://<?php echo $server_url_bo; ?>:<?php echo $server_port; ?>/index2.php" method="post" name="formLog" id="formLog">
-                <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag. <?php echo $server_url_bo; ?>:<?php echo $server_port; ?></div>
+                <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag.</div>
                 <table width="40%" border="0" style="margin-top:120px">
                   <tr> 
                     <td width="29%" class="text-right text-info">Usu&aacute;rio:</td>

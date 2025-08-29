@@ -5,11 +5,11 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL); 
 
-$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : date('Y-m-d', strtotime('-30 days'));
-$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] . " 23:59:59" : date('Y-m-d') . " 23:59:59";
-$data_final_sem_hora = isset($_GET['dt_final']) ? $_GET['dt_final'] : date('Y-m-d');
+$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : date('Y-m-d', strtotime('-1 Month'));
+$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] . " 23:59:59" : date('Y-m-d', strtotime('-1 Day')) . " 23:59:59";
+$data_final_sem_hora = isset($_GET['dt_final']) ? $_GET['dt_final'] : date('Y-m-d', strtotime('-1 Day'));
 $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
-$data_atual = date('Y-m-d');
+$data_atual = date('Y-m-d', strtotime('-1 Day'));
 $horario_str = isset($_GET['horario_str']) ? $_GET['horario_str'] : 1;
 
 $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs' : ($tipo_cliente == 2 ? 'Gamers' : 'Desconhecido'));
@@ -62,6 +62,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 		flex-wrap: wrap;
 		gap: 15px;
 	}
+
 	.container-cancel-pins {
 		display: flex;
 		justify-content: space-between;
@@ -128,18 +129,20 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 			<div class="col-cancel-pins">
 				<label for="tipo_cliente">Usuários</label>
 				<select id="tipo_cliente" name="tipo_cliente" class="form-control">
-					<option <?php if($tipo_cliente == 4) echo "selected"; ?> value="4">Todos</option>
-					<option <?php if($tipo_cliente == 3) echo "selected"; ?> value="3">PDVs</option>
-					<option <?php if($tipo_cliente == 2) echo "selected"; ?> value="2">Gamers</option>
+					<option <?php if ($tipo_cliente == 4) echo "selected"; ?> value="4">Todos</option>
+					<option <?php if ($tipo_cliente == 3) echo "selected"; ?> value="3">PDVs</option>
+					<option <?php if ($tipo_cliente == 2) echo "selected"; ?> value="2">Gamers</option>
 				</select>
 			</div>
-			<div class="col-cancel-pins">
+			<!-- <div class="col-cancel-pins">
 				<label for="horario_str">Horário STR</label>
 				<select id="horario_str" name="horario_str" class="form-control">
-					<option <?php if($horario_str == 1) echo "selected"; ?> value="1">Sim</option>
-					<option <?php if($horario_str == 0) echo "selected"; ?> value="0">Não</option>
+					<option <?php //if($horario_str == 1) echo "selected"; 
+							?> value="1">Sim</option>
+					<option <?php //if($horario_str == 0) echo "selected";&horario_str=<?= urlencode($horario_str) 
+							?>" ?> value="0">Não</option>
 				</select>
-			</div>
+			</div> -->
 			<div class="col-cancel-pins">
 				<label for="dt_inicial">Início período
 				</label>
@@ -154,12 +157,11 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 			</div>
 		</div>
 		<div class="d-flex top10 custom-justify">
-			<a class="btn btn-success btn-info" 
-			href="gerar_csv.php?
+			<a class="btn btn-success btn-info"
+				href="gerar_csv.php?
 			data_inicial=<?= urlencode($data_inicial) ?>
 			&data_final=<?= urlencode($data_final_sem_hora) ?>
-			&tipo_cliente=<?= urlencode($tipo_cliente) ?>
-			&horario_str=<?= urlencode($horario_str) ?>"
+			&tipo_cliente=<?= urlencode($tipo_cliente) ?>"
 			target="_blank">Download</a>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>
@@ -174,11 +176,22 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 
 	<?php
 	require_once __DIR__ . "/functions_saldos.php";
-	$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario_str);
-	echo gerarTabelaClientes($dados, $tipo_cliente, $horario_str);
+	$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente);
+	echo gerarTabelaClientes($dados, $tipo_cliente);
 	//echo json_encode($dados);
 	?>
 </div>
+<script>
+	$(document).ready(function() {
+		$('.container').removeClass('container');
+		$('#tabela-clientes').DataTable({
+			"ordering": true,
+			"paging": false,
+        	"searching": false,
+			"info": false
+		});
+	});
+</script>
 <?php
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
 ?>

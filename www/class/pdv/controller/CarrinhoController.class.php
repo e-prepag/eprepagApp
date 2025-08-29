@@ -93,7 +93,7 @@ class CarrinhoController extends ProdutosController
                     if ($carrinho[$mod]) {
 
                         //atualiza modelo no carrinho
-                        $carrinho[$mod] += $qtde;
+                        $carrinho[$mod] = $qtde;
 
                         //Se o modelo nao esta no carrinho, adiciona
                     } else {
