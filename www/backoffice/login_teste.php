@@ -26,6 +26,7 @@ require_once "/www/includes/bourls.php";
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onload="document.formLog.user.focus()">
+  <div id="recebe-modal"></div>
   <table width="779" border="0" cellspacing="0" cellpadding="0" height="100%" align="center">
     <tr>
       <td height="69" colspan="2" align="center" valign="middle"><img src="/images/backoffice.png" width="777" height="72" class="top74"><br>
@@ -37,7 +38,7 @@ require_once "/www/includes/bourls.php";
           <tr>
             <td height="156">
               <div align="center">
-                <form action="https://<?php echo $server_url_bo; ?>:<?php echo $server_port; ?>/index2.php" method="post" name="formLog" id="formLog">
+                <form name="formLog" id="formLog">
                   <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag.</div>
                   <table width="40%" border="0" style="margin-top:120px">
                     <tr>
@@ -134,7 +135,7 @@ require_once "/www/includes/bourls.php";
           type: 'POST',
           data: $("#formLog").serialize(),
           success: function(response) {
-            $("body").append(response);
+            $("#recebe-modal").html(response);
             // Supondo que o modal tenha id #modalLoginResult
             if ($("#modal-token").length) {
               $("#modal-token").modal('show');

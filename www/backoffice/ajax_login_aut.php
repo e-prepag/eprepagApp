@@ -33,7 +33,6 @@ try {
         if ($stmt->rowCount() > 0) {
             $ret = true;
             if (empty($fetch['chave_autenticador'])) {
-                //$_SESSION['id_do_usuario'] = $fetch['ug_id'];
 
                 modal_criar_token($fetch);
                 exit;
@@ -64,6 +63,7 @@ function modal_criar_token($fetch)
     $btn_recusar = true;
     if ($diasRestantes > 0) {
         $mensagemAuth = "Ative a autenticação de dois fatores, você tem <strong>{$diasRestantes} dias</strong> antes que se torne obrigatória.";
+        $_SESSION['logar'] = true;
     } else {
         $mensagemAuth = "O prazo para ativar a autenticação de dois fatores expirou, é necessário configurá-la.";
         $btn_recusar = false;
@@ -80,13 +80,13 @@ function modal_criar_token($fetch)
                 </div>
                 <div class="modal-body espacamento">
                     <div class="dislineblock" style="margin-right: 25px;">
-                        <a style="font-weight: bold; font-style: italic;" class="pull-right btn btn-success"
-                            href="/criar-autenticador.php' ?>"><?php echo $btn_recusar ? "Sim" : "Configurar"; ?></a>
+                        <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-success"
+                            onclick="criar_autenticador()"><?php echo $btn_recusar ? "Sim" : "Configurar"; ?></button>
                     </div>
                     <?php if ($btn_recusar) { ?>
                         <div class="dislineblock">
-                            <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info"
-                                id="logar_sem_token">Não</button>
+                            <a style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info"
+                                href="/index3.php">Não</a>
                         </div>
                     <?php } ?>
                 </div>
@@ -98,6 +98,28 @@ function modal_criar_token($fetch)
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        function criar_autenticador() {
+            $("#modal-token").modal('hide');
+            setTimeout(function() {
+                $.ajax({
+                    url: 'ajax_cria_aut.php',
+                    type: 'POST',
+                    data: $("#formLog").serialize(),
+                    success: function(response) {
+                        $("#recebe-modal").html(response);
+                        // Supondo que o modal tenha id #modalLoginResult
+                        if ($("#modal-autenticador").length) {
+                            $("#modal-autenticador").modal('show');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Ocorreu um erro ao processar o login. Tente novamente.');
+                    }
+                });
+            }, 300);
+        }
+    </script>
 <?php
 }
 
@@ -141,7 +163,7 @@ function modal_token()
 function logar_direto()
 {
 ?>
-    <form id="redir" method="POST" action="/index2.php">
+    <form id="redir" method="POST" action="/index3.php">
         <input type="hidden" name="user" value="<?= $_POST['user'] ?>">
         <input type="hidden" name="passw" value="<?= $_POST['passw'] ?>">
     </form>
@@ -153,19 +175,19 @@ function logar_direto()
 }
 
 function checkDevice($userId, $pdo)
-    {
-        if (!isset($_COOKIE['device_token_bo'])) {
-            return false; // Sem cookie, exige login
+{
+        if (!isset($_COOKIE['device_token_bko'])) {
+                return false; // Sem cookie, exige login
         }
 
-        $deviceId = $_COOKIE['device_token_bo'];
-        $stmt = $pdo->prepare("SELECT * FROM usuarios_games_dispositivos WHERE user_id = ? AND device_token = ? AND expires_at > NOW()");
+        $deviceId = $_COOKIE['device_token_bko'];
+        $stmt = $pdo->prepare("SELECT * FROM usuarios_bo_dispositivos WHERE user_id = ? AND device_token = ? AND expires_at > NOW()");
         $stmt->execute([$userId, $deviceId]);
 
         if ($stmt->fetch()) {
-            return true; // Dispositivo válido
+                return true; // Dispositivo válido
         } else {
-            return false; // Dispositivo inválido ou expirado
+                return false; // Dispositivo inválido ou expirado
         }
-    }
+}
 ?>
