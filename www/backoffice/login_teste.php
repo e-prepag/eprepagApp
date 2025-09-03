@@ -1,4 +1,9 @@
-<?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
+<?php 
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 $Empty = isset($_GET['Empty']) ? $_GET['Empty'] : "";
 $Invalido = isset($_GET['Invalido']) ? $_GET['Invalido'] : "";
@@ -9,7 +14,6 @@ require_once '../includes/constantes.php';
 require_once $raiz_do_projeto . 'includes/configIP.php';
 require_once $raiz_do_projeto . 'includes/configuracaoBO.php';
 require_once "/www/includes/bourls.php";
-
 ?>
 <html>
 
@@ -39,7 +43,7 @@ require_once "/www/includes/bourls.php";
             <td height="156">
               <div align="center">
                 <form name="formLog" id="formLog">
-                  <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag.</div>
+                  <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag. teste</div>
                   <table width="40%" border="0" style="margin-top:120px">
                     <tr>
                       <td width="29%" class="text-right text-info">Usu&aacute;rio:</td>
@@ -101,6 +105,32 @@ require_once "/www/includes/bourls.php";
                       <td align="center">
                         <font size="2" face="Arial, Helvetica, sans-serif" color="#FF0000">
                           <b>Preencha os campos</b>
+                        </font>
+                      </td>
+                    </tr>
+                  </table>
+                <?php  } ?>
+                <?php if ($_GET['erro']) { ?>
+                  <table width="78%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td align="center">
+                        <font size="2" face="Arial, Helvetica, sans-serif" color="#FF0000">
+                          <?php
+                          switch ($_GET['erro']) {
+                            case 1:
+                              echo "<b>Cadastro de autenticador necessário</b>";
+                              break;
+                            case 2:
+                              echo "<b>Usuário inválido</b>";
+                              break;
+                            case 3:
+                              echo "<b>Impossível</b>";
+                              break;
+                            case 4:
+                              echo "<b>Token inválido</b>";
+                              break;
+                          }
+                          ?>
                         </font>
                       </td>
                     </tr>

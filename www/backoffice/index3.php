@@ -9,13 +9,14 @@ $user = strtoupper(filter_input(INPUT_POST, 'user'));
 $passw = filter_input(INPUT_POST, 'passw');
 
 if (empty($user) || empty($passw)) {
-        header("Location: login.php?Empty=1");
+        header("Location: login_teste.php?Empty=1");
         exit;
 }
 
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
+require_once __DIR__ . "/../libs/PHPGangsta/GoogleAuthenticator.php";
 
 //Instanciando Objetos para Descriptografia
 $chave256bits = new Chave();
@@ -23,6 +24,7 @@ $aes = new AES($chave256bits->retornaChavePub());
 $passw = base64_encode($aes->encrypt(addslashes($passw)));
 
 gravaLog_LoginBKO("Login BKO: '" . $user . "', '" . $passw . "'");
+$Enviar = true;
 if ($Enviar) {
         require_once $raiz_do_projeto . 'db/connect.php';
         require_once $raiz_do_projeto . "db/ConnectionPDO.php";
@@ -63,23 +65,36 @@ if ($Enviar) {
                         gravaLog_LoginBKO("Login BKO - dados usuário: " . print_r($pgrow, true) . "");
                         if (!empty($iduser_var)) {
 
-                                if (isset($_SESSION['iduser_bko_pub']) && $_SESSION['iduser_bko_pub'] != $iduser_var) {
+                                $dataUltimoAcesso = new DateTime($pgrow['sem_aut_data']);
+                                $dataHoje = new DateTime();
+                                $diasRestantes = 28 - $dataUltimoAcesso->diff($dataHoje)->days;
 
-                                        if (!$_SESSION['logar'] && !empty($pgrow['chave_autenticador'])) {
-                                                if (!checkDevice($iduser_var, $pdo) || verifyCode($_POST['token'], $pgrow['chave_autenticador'])) {
-                                                        header("Location: login.php?erro=2");
-                                                        exit;
-                                                }
-                                                if ($_POST['salvarDispositivo'] == "sim") {
-                                                        $deviceId = generateDeviceId();
-                                                        saveDevice($iduser_var, $deviceId, $pdo);
-                                                        setDeviceCookie($deviceId);
-                                                }
-                                        }else{
-                                                header("Location: login.php?erro=2");
-                                                exit; 
+                                if ($diasRestantes <= 0 || !empty($pgrow['chave_autenticador'])) {
+
+                                        if (empty($pgrow['chave_autenticador'])) {
+                                                header("Location: login_teste.php?erro=1");
+                                                exit;
                                         }
 
+                                        $ga = new PHPGangsta_GoogleAuthenticator();
+                                        $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token'], 2);
+                                        $deviceValido = checkDevice($iduser_var, $pdo);
+
+                                        if (!$tokenValido && !$deviceValido) {
+                                                header("Location: login_teste.php?erro=4");
+                                                exit;
+                                        }
+
+                                        // Salva dispositivo se selecionado
+                                        if (!empty($_POST['salvarDispositivo']) && $_POST['salvarDispositivo'] === "sim") {
+                                                $deviceId = generateDeviceId();
+                                                saveDevice($iduser_var, $deviceId, $pdo);
+                                                setDeviceCookie($deviceId);
+                                        }
+                                }
+
+
+                                if (isset($_SESSION['iduser_bko_pub']) && $_SESSION['iduser_bko_pub'] != $iduser_var) {
                                         $_SESSION = array();
                                         session_destroy();
                                         session_start();
@@ -93,7 +108,7 @@ if ($Enviar) {
                                 $_SESSION['tipo_acesso'] = $tipo_acesso;
                                 $_SESSION['visualiza_dados'] = $visualiza_dados;
                         } else {
-                                header("Location: login.php?erro=2");
+                                header("Location: login_teste.php?erro=2");
                                 exit;
                         }
 
@@ -131,16 +146,16 @@ if ($Enviar) {
                         header("Location: /");
                         exit;
                 } else {
-                        header("Location: login.php?UserBlocked=1");
+                        header("Location: login_teste.php?UserBlocked=1");
                         exit;
                 }
         } else {
-                header("Location: login.php?Invalido=1");
+                header("Location: login_teste.php?Invalido=1");
                 exit;
         }
 } //end if($Enviar)
 else {
-        header("Location: login.php?erro=3");
+        header("Location: login_teste.php?erro=3");
         exit;
 }
 
@@ -225,10 +240,4 @@ function checkDevice($userId, $pdo)
         } else {
                 return false; // Dispositivo inválido ou expirado
         }
-}
-
-function verifyCode($code, $secret)
-{
-        $ga = new PHPGangsta_GoogleAuthenticator();
-        return $ga->verifyCode($secret, $code, 2);
 }

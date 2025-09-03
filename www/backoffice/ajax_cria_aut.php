@@ -52,11 +52,11 @@ try {
                             // Verifica se alguma linha foi afetada
                             if ($stmt->rowCount() > 0) {
                                 $_SESSION['secret'] = "";
-                                $_SESSION['logar'] = true;
 ?>
                                 <form id="redir" method="POST" action="/index3.php">
-                                    <input type="hidden" name="user" value="<?= $_POST['user'] ?>">
-                                    <input type="hidden" name="passw" value="<?= $_POST['passw'] ?>">
+                                    <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="token" value="<?= htmlspecialchars($_POST['token'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                                 </form>
 
                                 <script>
@@ -270,6 +270,7 @@ try {
                             console.error("Erro ao copiar:", err);
                         });
                     }
+                    
                 </script>
 <?php
                 exit;

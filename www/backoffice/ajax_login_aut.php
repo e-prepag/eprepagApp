@@ -38,7 +38,7 @@ try {
                 exit;
             }
 
-            if (checkDevice($fetch['ug_id'], $pdo)) {
+            if (checkDevice($fetch['id'], $pdo)) {
                 logar_direto();
                 exit;
             }
@@ -63,7 +63,6 @@ function modal_criar_token($fetch)
     $btn_recusar = true;
     if ($diasRestantes > 0) {
         $mensagemAuth = "Ative a autenticação de dois fatores, você tem <strong>{$diasRestantes} dias</strong> antes que se torne obrigatória.";
-        $_SESSION['logar'] = true;
     } else {
         $mensagemAuth = "O prazo para ativar a autenticação de dois fatores expirou, é necessário configurá-la.";
         $btn_recusar = false;
@@ -85,8 +84,11 @@ function modal_criar_token($fetch)
                     </div>
                     <?php if ($btn_recusar) { ?>
                         <div class="dislineblock">
-                            <a style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info"
-                                href="/index3.php">Não</a>
+                        <form id="redir" method="POST" action="/index3.php">
+                                    <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info" type="submit">Não</button>
+                                </form>
                         </div>
                     <?php } ?>
                 </div>
@@ -126,7 +128,7 @@ function modal_criar_token($fetch)
 function modal_token()
 {
 ?>
-    <div id="modal-token" class="modal fade" role="dialog">
+    <div id="modal-token" class="modal fade txt-preto" role="dialog">
         <div class="modal-dialog modal-sm">
             <!-- Modal content-->
             <div class="modal-content">
@@ -135,9 +137,11 @@ function modal_token()
                     <h4 class="modal-title text-left">Digite o token disponível no seu app de autenticação</h4>
                 </div>
                 <div class="modal-body espacamento">
-                    <form role="form" id="formLogar" name="formLogar" method="POST">
+                    <form action="/index3.php" method="POST">
                         <div class="form-group text-left">
                             <label for="token">Token:</label>
+                            <input type="hidden" name="user" value="<?=  htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                            <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                             <input type="text" class="form-control" id="token" name="token" placeholder="Token">
                             <div style="margin: 7px 0px; display: flex; align-items: center; gap: 3px;">
                                 <label for="salvarDispositivo" style="margin: 0; font-weight: normal;">Lembrar desse
@@ -146,7 +150,7 @@ function modal_token()
                                     value="sim">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-block" id="logarToken">Logar</button>
+                        <button type="submit" class="btn btn-success btn-block" id="logarToken">Login</button>
                     </form>
                 </div>
                 <div class="modal-footer">
