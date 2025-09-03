@@ -19,6 +19,58 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
 
 <style>
+	.help-icon {
+		position: relative;
+		margin-left: 5px;
+		cursor: pointer;
+		background: #007BFF;
+		color: white;
+		border-radius: 50%;
+		width: 18px;
+		height: 18px;
+		text-align: center;
+		line-height: 18px;
+		font-size: 12px;
+		user-select: none;
+		display: inline-block;
+	}
+
+	.help-icon .tooltiptext {
+		visibility: hidden;
+		width: 120px;
+		bottom: 100%;
+		left: 50%;
+		margin-left: -60px;
+		background-color: rgba(0, 0, 0, 0.9);
+		color: #fff;
+		text-align: center;
+		border-radius: 6px;
+		padding: 5px;
+		font-weight: bold;
+
+		/* Position the tooltip */
+		position: absolute;
+		z-index: 1;
+	}
+
+	.help-icon .tooltiptext::after {
+		content: " ";
+		position: absolute;
+		top: 100%;
+		/* At the bottom of the tooltip */
+		left: 50%;
+		margin-left: -5px;
+		border-width: 5px;
+		border-style: solid;
+		border-color: black transparent transparent transparent;
+	}
+
+	.help-icon:hover .tooltiptext,
+	.tooltiptext.show {
+		visibility: visible;
+		pointer-events: auto;
+	}
+
 	.relatorio-info {
 		display: flex;
 		justify-content: space-between;
@@ -134,15 +186,6 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 					<option <?php if ($tipo_cliente == 2) echo "selected"; ?> value="2">Gamers</option>
 				</select>
 			</div>
-			<!-- <div class="col-cancel-pins">
-				<label for="horario_str">Horário STR</label>
-				<select id="horario_str" name="horario_str" class="form-control">
-					<option <?php //if($horario_str == 1) echo "selected"; 
-							?> value="1">Sim</option>
-					<option <?php //if($horario_str == 0) echo "selected";&horario_str=<?= urlencode($horario_str) 
-							?>" ?> value="0">Não</option>
-				</select>
-			</div> -->
 			<div class="col-cancel-pins">
 				<label for="dt_inicial">Início período
 				</label>
@@ -162,7 +205,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 			data_inicial=<?= urlencode($data_inicial) ?>
 			&data_final=<?= urlencode($data_final_sem_hora) ?>
 			&tipo_cliente=<?= urlencode($tipo_cliente) ?>"
-			target="_blank">Download</a>
+				target="_blank">Download</a>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>
 	</form>
@@ -183,11 +226,28 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 </div>
 <script>
 	$(document).ready(function() {
+		document.querySelectorAll('.help-icon').forEach(icon => {
+			icon.addEventListener('click', () => {
+				const tooltip = icon.querySelector('.tooltiptext');
+
+				// Remove outros tooltips visíveis
+				document.querySelectorAll('.tooltiptext.show').forEach(other => {
+					if (other !== tooltip) other.classList.remove('show');
+				});
+
+				tooltip.classList.add('show');
+
+				// Remove após 3 segundos
+				setTimeout(() => {
+					tooltip.classList.remove('show');
+				}, 3000);
+			});
+		});
 		$('.container').removeClass('container');
 		$('#tabela-clientes').DataTable({
 			"ordering": true,
 			"paging": false,
-        	"searching": false,
+			"searching": false,
 			"info": false
 		});
 	});

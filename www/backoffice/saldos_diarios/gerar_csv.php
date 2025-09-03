@@ -26,12 +26,12 @@ fputcsv($output, [
     'Data',
     'Tipo Cliente',
     'Saldo Inicial',
-    'Entradas STR',
-    'Saídas STR',
+    'Entr. STR (18:30)',
+    'Saídas STR (18:30)',
     'Saldo Final STR',
-    'Entradas Dia',
-    'Saídas Dia',
-    'Saldo Final'
+    'Entradas (23:59)',
+    'Saídas (23:59)',
+    'Saldo Final (23:59)'
 ], ';');
 
 // Linhas dos dados

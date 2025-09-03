@@ -33,12 +33,21 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 					
 				-- 1. Último saldo de cada usuário antes do período
 				ultimo_saldo_anterior AS (
-				    SELECT DISTINCT ON (sl.dugsl_ug_id)
-				        sl.dugsl_ug_id,
-				        sl.dugsl_ug_perfil_saldo AS saldo
-				    FROM dist_usuarios_games_saldo_log sl
-				    WHERE sl.dugsl_data_inclusao < (SELECT data_inicio FROM parametros)
-				    ORDER BY sl.dugsl_ug_id, sl.dugsl_data_inclusao DESC
+				    SELECT 
+					    dugsl_ug_id,
+					    dugsl_ug_perfil_saldo AS saldo
+					FROM (
+					    SELECT 
+					        dugsl_ug_id,
+					        dugsl_ug_perfil_saldo,
+					        ROW_NUMBER() OVER (
+					            PARTITION BY dugsl_ug_id 
+					            ORDER BY dugsl_data_inclusao DESC
+					        ) as rn
+					    FROM dist_usuarios_games_saldo_log
+					    WHERE dugsl_data_inclusao < (SELECT data_inicio FROM parametros)
+					) ranked
+					WHERE rn = 1
 				),
 					
 				-- 2. Saldo inicial total (apenas soma dos anteriores)
@@ -240,12 +249,21 @@ function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 					
 				-- 1. Último saldo de cada usuário antes do período
 				ultimo_saldo_anterior AS (
-				    SELECT DISTINCT ON (sl.ugsl_ug_id)
-				        sl.ugsl_ug_id,
-				        sl.ugsl_ug_perfil_saldo AS saldo
-				    FROM usuarios_games_saldo_log sl
-				    WHERE sl.ugsl_data_inclusao < (SELECT data_inicio FROM parametros)
-				    ORDER BY sl.ugsl_ug_id, sl.ugsl_data_inclusao DESC
+				    SELECT 
+					    ugsl_ug_id,
+					    ugsl_ug_perfil_saldo AS saldo
+					FROM (
+					    SELECT 
+					        ugsl_ug_id,
+					        ugsl_ug_perfil_saldo,
+					        ROW_NUMBER() OVER (
+					            PARTITION BY ugsl_ug_id 
+					            ORDER BY ugsl_data_inclusao DESC
+					        ) as rn
+					    FROM usuarios_games_saldo_log
+					    WHERE ugsl_data_inclusao < (SELECT data_inicio FROM parametros)
+					) ranked
+					WHERE rn = 1
 				),
 					
 				-- 2. Saldo inicial total (apenas soma dos anteriores)
@@ -464,12 +482,28 @@ function gerarTabelaClientes(array $dados, $tipo_cliente)
 				<th>Data</th>
                 <th>Tipo Cliente</th>
                 <th>Saldo Inicial</th>
-                <th>Entradas STR</th>
-                <th>Saídas STR</th>
-                <th>Saldo Final STR</th>
+                <th>Entradas STR <span class="help-icon">?
+						<span class="tooltiptext">
+							Entradas acumuladas até 18:30.
+						</span>
+					</span></th>
+                <th>Saídas STR <span class="help-icon">?
+						<span class="tooltiptext">
+							Saídas acumuladas até 18:30.
+						</span>
+					</span></th>
+                <th>Saldo Final STR <span class="help-icon">?
+						<span class="tooltiptext">
+							Saldo de entrada + entradas - saídas até 18:30
+						</span>
+					</span></th>
 				<th>Entradas Dia</th>
                 <th>Saídas Dia</th>
-                <th>Saldo Final</th>
+                <th>Saldo Final <span class="help-icon">?
+						<span class="tooltiptext">
+							Saldo de entrada + entradas - saídas até o fim do dia
+						</span>
+					</span></th>
             </tr>
         </thead>
         <tbody>
@@ -536,13 +570,13 @@ function gerarTabelaClientes(array $dados, $tipo_cliente)
         	<tr class="total">
         	    <td>Média</td>
 				<td>' . $tipo_cliente_texto . '</td>
-        	    <td>' . formatarReais($soma_saldo_inicial/count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_entradas_str/count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_saidas_str/count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_saldo_final_str/count($dados)) . '</td>
-				<td>' . formatarReais($soma_entradas_dia/count($dados)) . '</td>
-				<td>' . formatarReais($soma_saidas_dia/count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_saldo_final/count($dados)) . '</td>
+        	    <td>' . formatarReais($soma_saldo_inicial / count($dados)) . '</td>
+        	    <td>' . formatarReais($soma_entradas_str / count($dados)) . '</td>
+        	    <td>' . formatarReais($soma_saidas_str / count($dados)) . '</td>
+        	    <td>' . formatarReais($soma_saldo_final_str / count($dados)) . '</td>
+				<td>' . formatarReais($soma_entradas_dia / count($dados)) . '</td>
+				<td>' . formatarReais($soma_saidas_dia / count($dados)) . '</td>
+        	    <td>' . formatarReais($soma_saldo_final / count($dados)) . '</td>
         	</tr>
 		</tfoot>
     ';
