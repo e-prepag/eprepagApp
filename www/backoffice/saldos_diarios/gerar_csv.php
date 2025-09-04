@@ -23,9 +23,9 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 // Cabeçalhos da tabela
 // Cabeçalhos ajustados conforme os campos retornados pela função buscarSaldosDiarios
 fputcsv($output, [
-    'Data',
+    'Data do Saldo',
     'Tipo Cliente',
-    'Saldo Inicial',
+    'Saldo Inicial (00:00)',
     'Entr. STR (18:30)',
     'Saídas STR (18:30)',
     'Saldo Final STR',

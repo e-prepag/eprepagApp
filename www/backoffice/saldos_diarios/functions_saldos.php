@@ -5,8 +5,29 @@ require_once "/www/includes/gamer/functions.php";
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 
+function compararDatas($data_inicial, $data_final) {
+	if ($data_inicial == "" || $data_final == "") {
+		return 0;
+	}
+    try {
+        $d1 = new DateTime($data_inicial);
+        $d2 = new DateTime($data_final);
+
+        if ($d1 < $d2) {
+            return 1;   // data inicial menor (normal)
+        } else {
+            return -1;  // data inicial maior ou igual
+        }
+    } catch (Exception $e) {
+        return 0; // erro na data
+    }
+}
 function buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente)
 {
+	if(compararDatas($data_inicial, $data_final) < 1){
+		return [];
+	}
+
 	$pdo = ConnectionPDO::getConnection()->getLink();
 
 	$sql = "";
@@ -479,29 +500,45 @@ function gerarTabelaClientes(array $dados, $tipo_cliente)
     <table id="tabela-clientes" class="table table-striped">
         <thead>
             <tr>
-				<th>Data</th>
-                <th>Tipo Cliente</th>
-                <th>Saldo Inicial</th>
+				<th>Data <span class="help-icon">?<span id="data-help-icon" class="tooltiptext">
+							Data onde ocorreu o relatório de saldo
+						</span>
+					</span></th>
+                <th>Tipo Cliente <span class="help-icon">?<span class="tooltiptext">
+							Tipo de cliente que contabilizou no relatório
+						</span>
+					</span></th>
+                <th>Saldo Inicial <span class="help-icon">?
+						<span class="tooltiptext">
+							Saldo inicial somado de todos os usuários às 00:00
+						</span>
+					</span></th>
                 <th>Entradas STR <span class="help-icon">?
 						<span class="tooltiptext">
-							Entradas acumuladas até 18:30.
+							Entradas acumuladas até 18:30
 						</span>
 					</span></th>
                 <th>Saídas STR <span class="help-icon">?
 						<span class="tooltiptext">
-							Saídas acumuladas até 18:30.
+							Saídas acumuladas até 18:30
 						</span>
 					</span></th>
                 <th>Saldo Final STR <span class="help-icon">?
 						<span class="tooltiptext">
-							Saldo de entrada + entradas - saídas até 18:30
+							Saldo de final até 18:30 (inicial + entradas - saídas)
 						</span>
 					</span></th>
-				<th>Entradas Dia</th>
-                <th>Saídas Dia</th>
+				<th>Entradas Dia <span class="help-icon">?
+						<span class="tooltiptext">
+							Entradas até o fim do dia (23:59)
+						</span></th>
+                <th>Saídas Dia <span class="help-icon">?
+						<span class="tooltiptext">
+							Saídas até o fim do dia (23:59)
+						</span></th>
                 <th>Saldo Final <span class="help-icon">?
 						<span class="tooltiptext">
-							Saldo de entrada + entradas - saídas até o fim do dia
+							Saldo de final do dia (inicial + entradas - saídas) 23:59
 						</span>
 					</span></th>
             </tr>

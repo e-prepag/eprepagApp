@@ -5,9 +5,9 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL); 
 
-$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : date('Y-m-d', strtotime('-1 Month'));
-$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] . " 23:59:59" : date('Y-m-d', strtotime('-1 Day')) . " 23:59:59";
-$data_final_sem_hora = isset($_GET['dt_final']) ? $_GET['dt_final'] : date('Y-m-d', strtotime('-1 Day'));
+$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
+$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] . " 23:59:59" : "";
+$data_final_sem_hora = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
 $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
 $data_atual = date('Y-m-d', strtotime('-1 Day'));
 $horario_str = isset($_GET['horario_str']) ? $_GET['horario_str'] : 1;
@@ -19,12 +19,20 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
 
 <style>
+	#data-help-icon {
+		left: 50px;
+
+	}
+	#data-help-icon::after {
+		left: 20px;
+	}
+
 	.help-icon {
 		position: relative;
 		margin-left: 5px;
 		cursor: pointer;
-		background: #007BFF;
-		color: white;
+		background: rgb(0, 0, 0, 0.1);
+		color: #606060;
 		border-radius: 50%;
 		width: 18px;
 		height: 18px;
@@ -37,7 +45,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 
 	.help-icon .tooltiptext {
 		visibility: hidden;
-		width: 120px;
+		width: 135px;
 		bottom: 100%;
 		left: 50%;
 		margin-left: -60px;
@@ -47,6 +55,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 		border-radius: 6px;
 		padding: 5px;
 		font-weight: bold;
+		font-size: 11px;
 
 		/* Position the tooltip */
 		position: absolute;
@@ -117,7 +126,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 
 	.container-cancel-pins {
 		display: flex;
-		justify-content: space-between;
+		justify-content: left;
 		flex-wrap: wrap;
 		gap: 20px;
 		/* Adiciona uma margem entre as colunas */
@@ -128,6 +137,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 		flex: 1;
 		min-width: 100px;
 		margin: 0;
+		max-width: 180px;
 		/* Remove margens laterais desnecessárias */
 	}
 
@@ -199,19 +209,23 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 					type="date">
 			</div>
 		</div>
+
 		<div class="d-flex top10 custom-justify">
-			<a class="btn btn-success btn-info"
-				href="gerar_csv.php?
-			data_inicial=<?= urlencode($data_inicial) ?>
-			&data_final=<?= urlencode($data_final_sem_hora) ?>
-			&tipo_cliente=<?= urlencode($tipo_cliente) ?>"
-				target="_blank">Download</a>
+			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
+				<a class="btn btn-success btn-info"
+					href="gerar_csv.php?
+					data_inicial=<?= urlencode($data_inicial) ?>
+					&data_final=<?= urlencode($data_final_sem_hora) ?>
+					&tipo_cliente=<?= urlencode($tipo_cliente) ?>"
+					target="_blank">Download</a>
+			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>
+
 	</form>
 
 </div>
-<div style="overflow-x: auto;">
+<div style="overflow-x: auto; padding-top: 20px;">
 	<div class="relatorio-info">
 		<div><strong>Data:</strong> <?php echo date('d/m/Y H:m:i'); ?></div>
 		<div><strong>Tipo de Cliente:</strong><?php echo $tipo_cliente_texto ?></div>
