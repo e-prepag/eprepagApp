@@ -38,7 +38,7 @@ class CarrinhoController extends ProdutosController
         //Modelo
         $mod = $get['mod'];
         //Valor para p´rodutos de valor variável
-        $valor = $get['valor'];
+        $valor = $get['valor'] > 0 ? $get['valor'] : 0;
         //Idjogo
         $codeProd = $get['codeProd'];
         //Adiciona modelo no carrinho
