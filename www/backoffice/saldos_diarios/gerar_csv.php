@@ -11,28 +11,41 @@ require __DIR__ .'/functions_saldos.php';
 
 $output = fopen('php://output', 'w');
 
-$data_inicial = isset($_GET['data_inicial']) ? urldecode($_GET['data_inicial']) : date('Y-m-d', strtotime('-30 days'));
-$data_final = isset($_GET['data_final']) ? urldecode($_GET['data_final']) . " 23:59:59" : date('Y-m-d') . " 23:59:59";
+$data_inicial = isset($_GET['data_inicial']) ? urldecode($_GET['data_inicial']) : date('Y-m-d', strtotime('-1 Month'));
+$data_final = isset($_GET['data_final']) ? urldecode($_GET['data_final']) . " 23:59:59" : date('Y-m-d', strtotime('-1 Day')) . " 23:59:59";
 $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
-$horario_str = $_GET['horario_str'] ? $_GET['horario_str'] : 1;
 
-$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente, $horario_str);
+$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente);
 
 // Escreve BOM para que Excel reconheça UTF-8 (evita problemas com acentos)
 echo "\xEF\xBB\xBF";
 $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs' : ($tipo_cliente == 2 ? 'Gamers' : 'Desconhecido'));
 // Cabeçalhos da tabela
-fputcsv($output, ['Data', 'Tipo Cliente', 'Saldo Inicial', 'Entradas', 'Saídas', 'Saldo Final'], ';');
+// Cabeçalhos ajustados conforme os campos retornados pela função buscarSaldosDiarios
+fputcsv($output, [
+    'Data do Saldo',
+    'Tipo Cliente',
+    'Saldo Inicial (00:00)',
+    'Entr. STR (18:30)',
+    'Saídas STR (18:30)',
+    'Saldo Final STR',
+    'Entradas (23:59)',
+    'Saídas (23:59)',
+    'Saldo Final (23:59)'
+], ';');
 
 // Linhas dos dados
 foreach ($dados as $linha) {
     fputcsv($output, [
-        $linha['data'],
+        isset($linha['data']) ? $linha['data'] : '',
         $tipo_cliente_texto,
-        number_format($linha['saldo_inicial'], 2, ',', '.'),
-        number_format($linha['entradas'], 2, ',', '.'),
-        number_format($linha['saidas'], 2, ',', '.'),
-        number_format($linha['saldo_final'], 2, ',', '.')
+        number_format(isset($linha['saldo_inicial']) ? $linha['saldo_inicial'] : 0, 2, ',', '.'),
+        number_format(isset($linha['entradas_ate_corte']) ? $linha['entradas_ate_corte'] : 0, 2, ',', '.'),
+        number_format(isset($linha['saidas_ate_corte']) ? $linha['saidas_ate_corte'] : 0, 2, ',', '.'),
+        number_format(isset($linha['saldo_corte']) ? $linha['saldo_corte'] : 0, 2, ',', '.'),
+        number_format(isset($linha['entradas_completas']) ? $linha['entradas_completas'] : 0, 2, ',', '.'),
+        number_format(isset($linha['saidas_completas']) ? $linha['saidas_completas'] : 0, 2, ',', '.'),
+        number_format(isset($linha['saldo_final']) ? $linha['saldo_final'] : 0, 2, ',', '.')
     ], ';');
 }
 

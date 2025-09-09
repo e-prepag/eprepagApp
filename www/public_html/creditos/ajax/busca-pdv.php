@@ -32,7 +32,7 @@ if (!isset($_POST['box']) || $_POST['box'] != true) {
         if (!isset($_SESSION['recaptcha_valido']) || $_SESSION['recaptcha_valido'] != true) {
                 $captcha_secret = getenv("AMBIENTE") == "HOMOLOGACAO" ? "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe" : getenv("RECAPTCHA_SECRET_KEY");
 
-                $tokenInfo = ["secret" => $captcha_secret, "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
+                $tokenInfo = ["secret" => $captcha_secret, "response" => $_POST["verificationCode"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
 
                 $recaptcha = curl_init();
                 curl_setopt_array($recaptcha, [

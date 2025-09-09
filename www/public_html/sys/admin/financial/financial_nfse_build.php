@@ -7,14 +7,6 @@ if ($_SESSION["tipo_acesso_pub"] == 'PU') {
 	ob_end_clean();
 	header("Location: " . $strRedirect);
 	exit;
-	?>
-	<html>
-
-	<body onLoad="window.location='<?php echo $strRedirect ?>'">
-		<?php
-		exit;
-
-		ob_end_flush();
 }
 $time_start = getmicrotime();
 
@@ -72,12 +64,14 @@ function gerarArquivo(varArquivo) {
 			$sNFe .= gera_cabecalho('EPP', $data, $data);
 			$total_geral = 0;
 			$cont_nota = 0;
+			$proc_novamente = "";
 
 			//RPS EPP ADM
 			$sNFeADM = "";
 			$sNFeADM .= gera_cabecalho_administradora($data);
 			$total_geral_adm = 0;
 			$cont_nota_adm = 0;
+			$proc_novamente_adm = "";
 
 			foreach ($valorNota as $line => $valor) {
 				$valorAux = $valor * 1;
@@ -106,7 +100,8 @@ function gerarArquivo(varArquivo) {
 						$rs_periodo = SQLexecuteQuery($sql);
 						if (pg_num_rows($rs_periodo) > 0) {
 							echo "<tr><td><font color='#000000' class='texto' align='center'>Per&iacute;odo j&aacute; processado para o Publisher ($line)</font></td></tr>";
-						} else {
+							$proc_novamente = "_segunda_via";
+						}
 							//$varTipoRPS = "02";
 							$varTipoRPS = "RPS";
 							$varSerieRPS = "EPP";
@@ -204,7 +199,6 @@ function gerarArquivo(varArquivo) {
 							}
 							$total_geral += $valor;
 							$cont_nota++;
-						}//end não encontrou registro do publisher para este periodo
 					}//end if(empty($vinculoEmpresa[$line]))
 			
 					// Para EPP ADMINISTRADORA
@@ -214,7 +208,8 @@ function gerarArquivo(varArquivo) {
 						$rs_periodo = SQLexecuteQuery($sql);
 						if (pg_num_rows($rs_periodo) > 0) {
 							echo "<tr><td><font color='#000000' class='texto' align='center'>Per&iacute;odo j&aacute; processado para o Publisher ($line)</font></td></tr>";
-						} else {
+							$proc_novamente_adm = "_segunda_via";
+						}
 							$varTipoRPS = "RPS";
 							$varSerieRPS = "EPP";
 
@@ -319,44 +314,57 @@ function gerarArquivo(varArquivo) {
 							}
 							$total_geral_adm += $valor;
 							$cont_nota_adm++;
-						}//end não encontrou registro do publisher para este periodo
+						
 					}//end else do if(empty($vinculoEmpresa[$line]))            
 				}//end se o valor apurado é diferente de ZERO
 			}//end foreach
 			$sNFe .= gera_rodape($cont_nota, ($total_geral / 100));
 			$sNFeADM .= gera_rodape($cont_nota_adm, ($total_geral_adm / 100));
 
-			$varArquivo = "lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAux, 4, "0", STR_PAD_LEFT) . ".txt";
-			$handle = fopen($varArquivo, "w+");
-			if (fwrite($handle, $sNFe) === FALSE) {
-				$msg = "Não foi possível gravar em '$varArquivo' (2).";
-				echo "<tr><td><font color='#000000' class='texto' align='center'>" . $msg . "</font></td></tr>";
-				//die("Stop");
-			} else {
-				echo "<tr><td bgcolor='#CCCCCC' id='area' class='texto' align='center'><div id='download' onClick='gerarArquivo(\"" . $varArquivo . "\");' onMouseOver='this.style.backgroundColor=\"#CCFF99\"' onMouseOut='this.style.backgroundColor=\"#CCCCCC\"'><strong>EPP - Pagamentos => Arquivo de lote Nº " . str_pad($varLoteAux, 4, "0", STR_PAD_LEFT) . " gravado com sucesso.</strong></td></tr>";
-			}
-			fclose($handle);
 			if ($cont_nota > 0) {
-				// pass
+				$varArquivo = "lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAux, 4, "0", STR_PAD_LEFT) . $proc_novamente . ".txt";
+				$handle = fopen($varArquivo, "w+");
+				if ($handle === false) {
+					$msg = "Não foi possível abrir o arquivo '$varArquivo' para escrita.";
+					echo "<tr><td><font color='#000000' class='texto' align='center'>" . $msg . "</font></td></tr>";
+				} else {
+					if (fwrite($handle, $sNFe) === FALSE) {
+						$msg = "Não foi possível gravar em '$varArquivo' (2).";
+						echo "<tr><td><font color='#000000' class='texto' align='center'>" . $msg . "</font></td></tr>";
+					} else {
+						echo "<tr><td bgcolor='#CCCCCC' id='area' class='texto' align='center'><div style='cursor: pointer;' id='download' onClick='gerarArquivo(\"" . $varArquivo . "\");' onMouseOver='this.style.backgroundColor=\"#CCFF99\"' onMouseOut='this.style.backgroundColor=\"#CCCCCC\"'><strong>EPP - Pagamentos => Arquivo de lote Nº " . str_pad($varLoteAux, 4, "0", STR_PAD_LEFT) . " gravado com sucesso.</strong></td></tr>";
+					}
+					fclose($handle);
+				}
+				if (!empty($proc_novamente)) {
+					echo "<tr><td><font color='#000000' class='texto' align='center'>ATENÇÃO: EPP - Pagamentos => ESSE ARQUIVO FOI GERADO NOVAMENTE, VERIFIQUE SE A NOTA JÁ FOI ENVIADA. </font></td></tr>";
+				}
 			} else {
-				echo "<tr><td><font color='#000000' class='texto' align='center'>ATENÇÃO: EPP - Pagamentos => ESSE ARQUIVO FOI GERADO NOVAMENTE, VERIFIQUE SE A NOTA JÁ FOI ENVIADA. </font></td></tr>";
+				echo "<tr><td bgcolor='#CCCCCC' id='area' class='texto' align='center'><div onMouseOver='this.style.backgroundColor=\"#CCFF99\"' onMouseOut='this.style.backgroundColor=\"#CCCCCC\"'><strong>EPP - Pagamentos => Arquivo não gerado.</strong></td></tr>";
 			}
+			
 			echo "<tr><td>&nbsp;</td></tr>";
 
-			$varArquivo = "lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAuxADM, 4, "0", STR_PAD_LEFT) . "_ADMINISTRADORA.txt";
-			$handle = fopen($varArquivo, "w+");
-			if (fwrite($handle, $sNFeADM) === FALSE) {
-				$msg = "Não foi possível gravar em '$varArquivo' (2).";
-				echo "<tr><td><font color='#000000' class='texto' align='center'>" . $msg . "</font></td></tr>";
-				//die("Stop");
-			} else {
-				echo "<tr><td bgcolor='#CCCCCC' id='area' class='texto' align='center'><div id='download' onClick='gerarArquivo(\"" . $varArquivo . "\");' onMouseOver='this.style.backgroundColor=\"#CCFF99\"' onMouseOut='this.style.backgroundColor=\"#CCCCCC\"'><strong>EPP - Administradora => Arquivo de lote Nº " . str_pad($varLoteAuxADM, 4, "0", STR_PAD_LEFT) . " gravado com sucesso.</strong></td></tr>";
-			}
-			fclose($handle);
 			if ($cont_nota_adm > 0) {
-				// pass
+				$varArquivo = "lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAuxADM, 4, "0", STR_PAD_LEFT) . $proc_novamente_adm . "_ADMINISTRADORA.txt";
+				$handle = fopen($varArquivo, "w+");
+				if ($handle === false) {
+					$msg = "Não foi possível abrir o arquivo '$varArquivo' para escrita.";
+					echo "<tr><td><font color='#000000' class='texto' align='center'>" . $msg . "</font></td></tr>";
+				} else {
+					if (fwrite($handle, $sNFeADM) === FALSE) {
+						$msg = "Não foi possível gravar em '$varArquivo' (2).";
+						echo "<tr><td><font color='#000000' class='texto' align='center'>" . $msg . "</font></td></tr>";
+					} else {
+						echo "<tr><td bgcolor='#CCCCCC' id='area' class='texto' align='center'><div style='cursor: pointer;' id='download' onClick='gerarArquivo(\"" . $varArquivo . "\");' onMouseOver='this.style.backgroundColor=\"#CCFF99\"' onMouseOut='this.style.backgroundColor=\"#CCCCCC\"'><strong>EPP - Administradora => Arquivo de lote Nº " . str_pad($varLoteAuxADM, 4, "0", STR_PAD_LEFT) . " gravado com sucesso.</strong></td></tr>";
+					}
+					fclose($handle);
+				}
+				if (!empty($proc_novamente_adm)) {
+					echo "<tr><td><font color='#000000' class='texto' align='center'>ATENÇÃO: EPP - Administradora => ESSE ARQUIVO FOI GERADO NOVAMENTE, VERIFIQUE SE A NOTA JÁ FOI ENVIADA. </font></td></tr>";
+				}
 			} else {
-				echo "<tr><td><font color='#000000' class='texto' align='center'>ATENÇÃO: EPP - Administradora => ESSE ARQUIVO FOI GERADO NOVAMENTE, VERIFIQUE SE A NOTA JÁ FOI ENVIADA. </font></td></tr>";
+				echo "<tr><td bgcolor='#CCCCCC' id='area' class='texto' align='center'><div onMouseOver='this.style.backgroundColor=\"#CCFF99\"' onMouseOut='this.style.backgroundColor=\"#CCCCCC\"'><strong>EPP - Administradora => Arquivo não gerado.</strong></td></tr>";
 			}
 			?>
 			<tr>

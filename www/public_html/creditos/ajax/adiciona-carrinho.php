@@ -63,7 +63,7 @@ function actions($get)
 	//Modelo
 	$mod = $get['mod'];
 	//Valor para p´rodutos de valor variável
-	$valor = $get['valor'];
+	$valor = $get['valor'] > 0 ? $get['valor'] : 0;
 	//Idjogo
 	$codeProd = $get['codeProd'];
 	//Adiciona modelo no carrinho
@@ -118,7 +118,7 @@ function actions($get)
 				//verifica se o modelo esta no carrinho
 				if ($carrinho[$mod][$codeProd][$valor]) {
 					//atualiza modelo no carrinho
-					$carrinho[$mod][$codeProd][$valor] = +$qtde;
+					$carrinho[$mod][$codeProd][$valor] += $qtde;
 				} else {
 					//Se o modelo nao esta no carrinho, adiciona
 					if (getProduto($codeProd)) {

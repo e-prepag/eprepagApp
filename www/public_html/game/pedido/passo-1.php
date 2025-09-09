@@ -24,7 +24,7 @@ if(!$mod) $mod = $_POST['mod'];
 if(!$codeProd) $codeProd = $_POST['codeProd'];
 
 //Valor para p´rodutos de valor variável
-if(!$valor) $valor = $_POST['valor'];
+$valor = $_POST['valor'] > 0 ? $_POST['valor'] : 0;
 
 /*    Teste de quantidade de itens   */
 //Captura da quantidade para teste 

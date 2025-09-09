@@ -142,7 +142,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 			</li>
 		</ol>
 	</div>
-	<h2 class="titulo-vencimento">Risco Merchants - Lista</h2>
+	<h2 class="titulo-vencimento">IPs PDV API - Lista</h2>
 	<form id="form1" class="form-solicitacoes">
 		<div class="container-cancel-pins">
 
@@ -158,17 +158,29 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 			<div class="col-cancel-pins">
 				<label for="ip_pdv">IP do PDV<span class="help-icon">?
 						<span class="tooltiptext">
-							Só buscam PDVs que possuam IP. Caso o PDV possua um range de IPs, qualquer IP inserido, se tiver no range, será encontrado.
+							Caso o PDV possua um range de IPs, qualquer IP inserido, se tiver no range, será encontrado.
 						</span>
 					</span></label>
 				<input type="text" id="ip_pdv" name="ip_pdv" class="form-control" />
 			</div>
+			<div class="col-cancel-pins">
+				<label for="ip_only">Somente com IP</label>
+				<select id="ip_only" name="ip_only" class="form-control">
+					<option value="1">Sim</option>
+					<option selected value="0">Não</option>
+				</select>
+			</div>
+			<div class="col-cancel-pins">
+				<label for="ativos">Ativos</label>
+				<select id="ativos" name="ativos" class="form-control">
+					<option selected value="">Todos</option>
+					<option value="1">Sim</option>
+					<option value="0">Não</option>
+				</select>
+			</div>
 		</div>
 		<div class="d-flex top10 custom-justify">
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
-		</div>
-		<div class="d-flex top10 custom-justify">
-			<a class="btn btn-success btn-busca">Novo</a>
 		</div>
 	</form>
 
@@ -181,6 +193,9 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 				<th>Id PDV</th>
 				<th>Nome</th>
 				<th>Endereço IP</th>
+				<th>Responsável</th>
+				<th>Criado em</th>
+				<th>Ativo</th>
 				<th>Ação</th>
 			</tr>
 		</thead>
@@ -265,6 +280,9 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 					{ data: 'ug_id' },
 					{ data: 'ug_nome' },
 					{ data: 'ip_pdv' },
+					{ data: 'shn_nome', title: 'Usuário' },
+					{ data: 'criado_em', title: 'Criado em' },
+					{ data: 'ativo', title: 'Ativo' },
 					{ data: 'acao' },
 				],
 				destroy: true,

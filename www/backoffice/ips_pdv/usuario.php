@@ -27,12 +27,16 @@ if (!$usuario) {
 	die("Usuário não encontrado.");
 }
 
-$sqlIp = "SELECT id, ip_address,
-				    ip_range,
-				    ip_range_ini,
-				    ip_range_end
-					FROM pdv_api_ip
-					WHERE ug_id = :user_id";
+$sqlIp = "SELECT ip.id, ip.ip_address,
+				    ip.ip_range,
+				    ip.ip_range_ini,
+				    ip.ip_range_end,
+					ip.created_date,
+					ip.active,
+					COALESCE(u.shn_nome, 'Desconhecido') as shn_nome
+					FROM pdv_api_ip ip
+					LEFT JOIN usuarios u ON u.id = ip.bko_user
+					WHERE ip.ug_id = :user_id";
 $stmtIp = $conexao->prepare($sqlIp);
 $stmtIp->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmtIp->execute();
@@ -40,6 +44,16 @@ $Ip = $stmtIp->fetchAll(PDO::FETCH_ASSOC);
 if (!$Ip) {
 	$Ip = [];
 }
+
+$sqlUser = "SELECT shn_nome
+					FROM usuarios
+					WHERE id = :user_id";
+$stmtUser = $conexao->prepare($sqlUser);
+$stmtUser->bindParam(':user_id', $_SESSION["iduser_bko"], PDO::PARAM_STR);
+$stmtUser->execute();
+$usuarioNome = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+$usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -355,6 +369,79 @@ if (!$Ip) {
 		});
 	}
 
+	function alterarIp(botao, id) {
+		let ativo;
+		if (botao instanceof HTMLButtonElement) {
+			ativo = botao.classList[1] == "btn-info" ? 0 : 1;
+		} else {
+			return;
+		}
+
+		Swal.fire({
+			title: 'Tem certeza?',
+			text: "Deseja realmente alterar este endereço IP?",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#d33',
+			cancelButtonColor: '#3085d6',
+			confirmButtonText: 'Sim, alterar',
+			cancelButtonText: 'Cancelar'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				Swal.fire({
+					title: 'Alterando...',
+					html: 'Aguarde enquanto alteramos o IP.',
+					allowOutsideClick: false,
+					didOpen: () => {
+						Swal.showLoading();
+					}
+				});
+				$.ajax({
+					url: "ajax_ip_pdv.php",
+					method: "POST",
+					data: {
+						acao: "alterar",
+						ativo: ativo,
+						id: id,
+
+					},
+					success: function(data) {
+						let resposta;
+						try {
+							resposta = typeof data === "string" ? JSON.parse(data) : data;
+						} catch (e) {
+							resposta = {};
+						}
+						if (resposta.status === "success") {
+							Swal.fire({
+								icon: "success",
+								title: "Alterado!",
+								text: resposta.msg
+							});
+							// Remove a linha da tabela
+							botao.classList.remove(ativo == 1 ? "btn-danger" : "btn-info");
+							botao.classList.add(ativo == 0 ? "btn-danger" : "btn-info");
+							botao.innerText = ativo == 0 ? "Inativo" : "Ativo";
+						} else {
+							Swal.fire({
+								icon: "error",
+								title: "Erro",
+								text: resposta.msg || "Erro ao alterar o endereço IP."
+							});
+						}
+					},
+					error: function() {
+						Swal.fire({
+							icon: "error",
+							title: "Erro",
+							text: "Erro ao alterar o endereço IP."
+						});
+					}
+				});
+			}
+		});
+	}
+
 	// Delegação de evento para os botões de remover (caso sejam adicionados dinamicamente)
 	$(document).on('click', 'button[id^="remover"]', function() {
 		const id = $(this).attr('id').replace('remover', '');
@@ -379,7 +466,7 @@ if (!$Ip) {
 			$.ajax({
 				url: "ajax_ip_pdv.php",
 				method: "POST",
-				data: $("#formNovo").serialize() + "&acao=novo&ug_id=<?= $user_id ?>",
+				data: $("#formNovo").serialize() + "&acao=novo&ug_id=<?= $user_id ?>&bko_user=<?= $_SESSION["iduser_bko"] ?>",
 				beforeSend: function() {
 					Swal.fire({
 						title: 'Aguarde!',
@@ -402,12 +489,14 @@ if (!$Ip) {
 					}
 					if (resposta.status === "success") {
 						icone = "success";
-						//msg = "Endereço IP cadastrado com sucesso!";
-
 						// Atualiza a tabela de histórico
-						const newRow = `<tr>
+						const newRow = `
+						<tr>
 							<td style="font-size: 16px;font-weight: bold;color: #444;">${(ipType == 'single' ? 'Único' : 'Range')}</td>
 							<td style="font-size: 16px;font-weight: bold;color: #444;">${resposta.msg}</td>
+							<td style="font-size: 16px;font-weight: bold;color: #444;"><?= $usuarioNome ?></td>
+							<td style="font-size: 16px;font-weight: bold;color: #444;">${(new Date().toISOString().slice(0, 10))}</td>
+							<td style="font-size: 16px;font-weight: bold;color: #444;"><button onclick="alterarIp(this, ${resposta.id})" type="button" class="btn btn-info" style="font-weight: bold;" title="Desativar">Ativo</button></td>
 							<td><button type="button" class="btn btn-danger" id="remover${resposta.id}" style="font-weight: bold;" title="Remover">Remover</button></td>
 						</tr>`;
 						$("#col-Ip").prepend(newRow);
@@ -552,6 +641,9 @@ if (!$Ip) {
 											<tr>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Tipo</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Endereço IP</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">User Criação</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">Dt Inclusão</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">Ativo</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Ação</th>
 											</tr>
 										</thead>
@@ -571,10 +663,18 @@ if (!$Ip) {
 													$msgRange = "Range";
 													$ipAdress = "{$row['ip_range_ini']} - {$row['ip_range_end']}";
 												}
+												if ($row['active']) {
+													$btn_ativo = '<button onclick="alterarIp(this, ' . $row['id'] . ')" type="button" class="btn btn-info" style="font-weight: bold;" title="Desativar">Ativo</button>';
+												} else {
+													$btn_ativo = '<button onclick="alterarIp(this, ' . $row['id'] . ')" type="button" class="btn btn-danger" style="font-weight: bold;" title="Ativar">Inativo</button>';
+												}
 
 												echo '<tr>
               									  		<td style="font-size: 16px;font-weight: bold;color: #444;">' . $msgRange . '</td>
               									  		<td style="font-size: 16px;font-weight: bold;color: #444;">' . $ipAdress . '</td>
+														<td style="font-size: 16px;font-weight: bold;color: #444;">' . $row['shn_nome'] . '</td>
+														<td style="font-size: 16px;font-weight: bold;color: #444;">' . $row['created_date'] . '</td>
+														<td style="font-size: 16px;font-weight: bold;color: #444;">' . $btn_ativo . '</td>
               											<td>
 															<button id="remover' . $row['id'] . '" type="button" class="btn btn-danger" style="font-weight: bold;" title="Remover">Remover</button>
 														</td>

@@ -112,22 +112,6 @@ function MostraBairro() {
     }, 500);
 }
 
-function monta_captcha() {
-    document.form_lanHouses_filtros.verificationCode.value = "";
-
-    $.ajax({
-        type: "POST",
-        url: "/creditos/ajax/ajax_captcha.php",
-        success: function (html) {
-            $("#span_captcha").html(html);
-        },
-        error: function () {
-            $("#error-text").html("Erro ao carregar o captcha.");
-            $("#modal-load").modal();
-        }
-    });
-}
-
 function MostraLANs() {
     if (document.form_lanHouses_filtros.cidade.value != "") {
         estado = document.form_lanHouses_filtros.estado.value;
@@ -144,7 +128,6 @@ function MostraLANs() {
             success: function (txt) {
                 waitingDialog.hide();
                 $("#resultado").html(txt);
-                monta_captcha();
             },
             error: function () {
                 waitingDialog.hide();
