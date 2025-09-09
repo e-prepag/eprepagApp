@@ -17,7 +17,7 @@ $valor_maximo_0 = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS
 
 
 	if($controller->usuarios->b_IsLogin_pagamento_platinum()) {
-		$valor_maximo_0 = 120000;
+		$valor_maximo_0 = 150000;
 	}
 
 ?>

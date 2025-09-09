@@ -54,7 +54,7 @@ $valor_minimo = (($controller->usuarios->b_IsLogin_pagamento_minimo_1_real()) ? 
 $valor_maximo = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_VALOR_MAX'] : $GLOBALS['RISCO_LANS_PRE_VALOR_MAX']))));
 
 if ($controller->usuarios->b_IsLogin_pagamento_platinum()) {
-    $valor_maximo = 120000;
+    $valor_maximo = 150000;
 }
 
 if ($GLOBALS['TIPO_LIMITE'] == 0) {

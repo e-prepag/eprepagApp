@@ -7,13 +7,20 @@ $posicao = "Inferior Internas";
 $controller = new HeaderController;
 $banners = $controller->getBanner($posicao);
 
+session_start();
+
 if (!$controller || !$controller->usuario) {
     header("Location: /game/conta/login.php");
 }
 
 $controller->setHeader();
+if(!isset($_SESSION["token_csrf"])) {
 
-if (isset($_POST['envio']) && $_POST['envio'] == 1) {
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
+}else if (isset($_POST['envio']) && $_POST['envio'] == 1) {
+    $token_csrf = $_SESSION["token_csrf"];
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
     $arrCel = explode(" ", $_POST['cel']);
     $celDDD = str_replace(array("(", ")"), "", $arrCel[0]);
     $cel = str_replace("-", "", $arrCel[1]);
@@ -21,6 +28,9 @@ if (isset($_POST['envio']) && $_POST['envio'] == 1) {
     // Define a lista de caracteres permitidos como expressão regular
     $pattern = "/^[a-zA-Z0-9\s\(\)\-\.\/,]+$/";
 
+    if($token_csrf != $_POST["token"]){
+        $msgErrors .= "Requisição inválida.<br>";
+    }
     if (trim($_POST['nome']) == "") {
         $msgErrors .= "Problema com o campo Nome.<br>";
     } elseif (!preg_match($pattern, $_POST['nome'])) {
@@ -94,6 +104,8 @@ if (isset($_POST['envio']) && $_POST['envio'] == 1) {
     }
 
     unset($_POST);
+}else{
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 }
 
 //$readonly_cidade = (trim($controller->usuario->getCidade()) == "")?"":"readonly='readonly'";
@@ -274,6 +286,7 @@ if (isset($_POST['envio']) && $_POST['envio'] == 1) {
             <form method="post" id="edita-cadastro" class="text-right-lg text-right-md text-left-sm text-left-xs top20">
                 <input type="hidden" name="nome_cpf" id="nome_cpf">
                 <input type="hidden" name="envio" id="envio" value="1">
+                <input type="hidden" name="token" value="<?= $_SESSION["token_csrf"] ?>">
                 <?php
                 $login = $controller->usuario->getLogin();
 
