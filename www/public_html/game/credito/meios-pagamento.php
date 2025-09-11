@@ -13,6 +13,12 @@ require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "gamer/functions_endereco.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
+    header("location: /index.php");
+}
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 //Definindo valor Default no caso do include estar conrrompido
 if(!defined('PAGAMENTO_BRADESCO')) {
     //Definindo como ativado

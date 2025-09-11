@@ -8,7 +8,7 @@ $controller = new MeuCadastroController;
 
 $banner = $controller->getBanner();
 
-if($_POST['cad_senha']){
+if($_POST['cad_senha'] && $_SESSION["token_csrf"] == $_POST["token_csrf"]){
     
     require DIR_CLASS."util/Login.class.php";
     
@@ -59,6 +59,8 @@ if($_POST['cad_senha']){
     }
 }
 
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 if($controller->usuarios->getDataExpiraSenha() != "" && $controller->validaSenhaExpirada() && $msg == ""){
     $cor = "txt-vermelho";
     $msg = "Sua senha expirou. Para sua segurança é necessário que você cadastre uma nova senha antes de acessar o sistema. <br>Siga as instruções abaixo ou qualquer dúvida entre em contato com o suporte.";
@@ -90,6 +92,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
             <div class="row top5">
                 <div class="col-md-6">
                     <form name="form1" action="" method="post">
+                            <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                             <span class="col-md-offset-2 col-md-4 col-xs-12 col-sm-12"><label class="<?php if(isset($txtVermelho)) echo $txtVermelho;?>" for="cad_senhaAtual">Senha atual: </label></span>
                             <span class="col-md-6 col-xs-12 col-sm-12"><input type="password" label="Senha atual " name="cad_senhaAtual" id="cad_senhaAtual" class="form-control"></span>
                             <span class="col-md-offset-2 col-md-4 col-xs-12 top5  col-sm-12"><label for="cad_senha">Nova senha: </label></span>

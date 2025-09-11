@@ -6,12 +6,12 @@ $controller = new FuncionarioController;
 
 if($_POST['sel_id'] && $_POST['sel_id'] > 0)
 {    
-    if($_POST["btSubmit"])
+    if($_POST["btSubmit"] && $_SESSION["token_csrf"] == $_POST["token_csrf"])
     {
         $controller->edita($_POST['sel_id']);
     }
     
-    if($_POST["btRemoveAuth"]){
+    if($_POST["btRemoveAuth"] && $_SESSION["token_csrf"] == $_POST["token_csrf"]){
         $conexao = ConnectionPDO::getConnection()->getLink();
 
         $query = $conexao->prepare("SELECT ugo_ativo from dist_usuarios_games_operador WHERE ugo_id = :ID;");
@@ -33,6 +33,7 @@ if($_POST['sel_id'] && $_POST['sel_id'] > 0)
     }
 
     $funcionario = $controller->pega($_POST['sel_id']);
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 }
 else
 {
@@ -70,6 +71,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                 </div>
                 <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12 top20">
                     <form method="post" id="edita">
+                        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                         <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
                             <span class="pull-right">Nome:</span>
                         </div>
@@ -124,6 +126,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                     ?>
                     <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8 top10">
                         <form id="removeAuth" method="post">
+                                <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                                 <input type="hidden" name="sel_id" id="sel_id" class="btn btn-info" value='<?php echo $_POST['sel_id']; ?>'>
                                 <input type="submit" name="btRemoveAuth" id="btRemoveAuth" class="btn btn-danger" value='Remover autenticador'>
                         </form>

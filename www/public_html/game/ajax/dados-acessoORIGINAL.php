@@ -28,6 +28,8 @@ if(Util::isAjaxRequest()){
         print json_encode($retorno);
         die;
     }
+
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
     
     if(isset($_POST['type']) && isset($_POST['senha'])){
         

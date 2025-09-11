@@ -1,11 +1,10 @@
 <?php
-//error_reporting(E_ALL);
-//ini_set("display_errors", 1);
+// error_reporting(E_ALL);
+// ini_set("display_errors", 1);
 require_once "../../includes/constantes.php";
 require_once DIR_CLASS . "pdv/controller/MeuCadastroController.class.php";
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 $controller = new MeuCadastroController;
-
 function salva_estilos($idUsuario, $pdo)
 {
     $maxFileSize = 200 * 1024;
@@ -134,7 +133,7 @@ function getEstilosUsuarioPDO($userId, PDO $pdo)
     return array();
 }
 
-if (isset($_POST['telefone_contato'])) {
+if (isset($_POST['telefone_contato']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
     $retorno = array();
 
     $con = ConnectionPDO::getConnection();
@@ -157,7 +156,7 @@ if (isset($_POST['telefone_contato'])) {
         }
     }
 }
-
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 //Conectando com PDO para execução da QUERY
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
@@ -214,6 +213,7 @@ require_once "includes/header.php";
     <div class="row">
         <div class="col-md-10 txt-preto">
             <form method="post" id="formCad" name="formCad" enctype="multipart/form-data">
+            <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                 <div class="row">
                     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 espacamento txt-azul-claro">
                         <strong>Meu Cadastro</strong>

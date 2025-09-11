@@ -14,11 +14,7 @@ if (!$controller || !$controller->usuario) {
 }
 
 $controller->setHeader();
-if(!isset($_SESSION["token_csrf"])) {
-
-    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
-
-}else if (isset($_POST['envio']) && $_POST['envio'] == 1) {
+if (isset($_POST['envio']) && $_POST['envio'] == 1) {
     $token_csrf = $_SESSION["token_csrf"];
     $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
     $arrCel = explode(" ", $_POST['cel']);

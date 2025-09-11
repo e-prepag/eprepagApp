@@ -12,6 +12,12 @@ require_once "includes/header.php";
 
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
+    header("location: /creditos/index.php");
+}
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 //Definindo valor Default no caso do include estar conrrompido
 if (!defined('PAGAMENTO_BRADESCO')) {
     //Definindo como ativado

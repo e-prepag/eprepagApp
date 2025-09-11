@@ -39,7 +39,7 @@ $usuarioId = $controller->usuario->getId();
 // Para fins de teste, algumas lans com minimo de R$1,00
 $valor_minimo = (($controller->usuario->b_IsLogin_pagamento_minimo_1_real())?1:$GLOBALS['RISCO_GAMERS_VALOR_MIN']);
 $valor_indicado = (($controller->usuario->b_IsLogin_pagamento_minimo_1_real())?1:$GLOBALS['RISCO_GAMERS_VALOR_MIN']);
-
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 ?>
 <script src="/js/valida.js"></script>
 <script type="text/javascript" src="/js/jquery.mask.min.js"></script>
@@ -109,6 +109,7 @@ function fcnPagamento(){
         if($controller->usuario->b_IsLogin_pagamento()) {
 ?>
             <form id="deposito" classe="form-horizontal" name="deposito" action="/game/credito/meios-pagamento.php" method="post">
+                <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                 <input type="hidden" name="email" id="email" value="<?php echo $controller->usuario->getEmail()?>">
                 <input type="hidden" name="produtos" id="produtos" value="">
                 <div class="col-md-12 col-sm-12 h310 top20">

@@ -10,6 +10,8 @@ $banner = $controller->getBanner();
 
 require_once "includes/header.php";
 
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 // Para fins de teste, algumas lans com minimo de R$1,00
 $valor_minimo_0 = (($controller->usuarios->b_IsLogin_pagamento_minimo_1_real())?1:$GLOBALS['RISCO_LANS_PRE_VALOR_MIN']);
 if($controller->usuarios->getId() == 17371) $valor_minimo_0 = 1;
@@ -48,6 +50,7 @@ $valor_maximo_0 = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS
             </div>
             <div class="row espacamento borda-fina">
                 <form action="/creditos/formas_pagamento.php" id="form1" method="post">
+                    <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                     <div class="col-md-12">
                         <p class="txt-cinza"><strong>Selecione o valor que deseja adicionar</strong></p>
                         <p><strong>R$ <input class="widthInputMoeda" id="produtos_valor" value="<?php echo $valor_minimo_0; ?>" name="produtos_valor">,00</strong></p>

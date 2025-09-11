@@ -12,7 +12,7 @@ $banner = $controller->getBanner();
 $token = $_POST['token'];
 $secret = $_SESSION['secret'];
 
-if ($token && $secret) {
+if ($token && $secret && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
 
     @$cad_id = $controller->usuarios->getId();
 
@@ -55,7 +55,7 @@ if (!isset($qrCodeUrl)) {
     $ga = new PHPGangsta_GoogleAuthenticator();
     $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
 }
-
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 ?>
 <style>
@@ -147,6 +147,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
             <div class="div-principal">
                 <div class="form-token">
                     <form name="form1" action="" method="post">
+                        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
                                 echo $txtVermelho; ?>">

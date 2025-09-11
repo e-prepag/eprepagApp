@@ -30,6 +30,8 @@ if (Util::isAjaxRequest()) {
         die;
     }
 
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
     if (isset($_POST['cad_senhaAtual'])) {
 
         require_once DIR_CLASS . "util/Login.class.php";

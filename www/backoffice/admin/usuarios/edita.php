@@ -42,7 +42,7 @@ if (isset($fetch[0]['id']) && isset($fetch[0]['shn_login'])) {
     $chave_autenticador = $fetch[0]['chave_autenticador'];
 }
 
-if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id'])) {
+if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
 
     $validate = new Validate();
 
@@ -128,7 +128,7 @@ if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id'])) {
         $color = "txt-vermelho";
     }
 }
-if ($_POST["remove_chave"]) {
+if ($_POST["remove_chave"] && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
     $update = "UPDATE usuarios set chave_autenticador = '' where id = ?";
     $params = array(
         $_POST['id']
@@ -153,6 +153,7 @@ $sql = "SELECT grupos_descricao, g.grupos_id from grupos_usuarios g inner join g
 $stmt = $pdo->prepare($sql);
 $stmt->execute(array($id));
 $fetchGrupos = $stmt->fetchAll(PDO::FETCH_OBJ);
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">
@@ -176,6 +177,7 @@ if (!empty($msg)) {
 if (isset($login)) {
     ?>
     <form method="POST" id="form">
+        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
         <div class="col-md-7 top20 txt-preto">
             <div class="form-group col-md-12 has-feedback">
                 <label class="control-label col-md-6 text-right" for="usuarios">
@@ -280,7 +282,11 @@ if (isset($login)) {
                 ?>
                     <div class="panel-body">
                         <p>Usuário possui autenticador</p>
-                        <form method="POST" id="form2"><input type="hidden" name="id" value="<?php echo $id; ?>"><button class="btn btn-danger" name="remove_chave" value="1">Clique aqui para remover</button></form>
+                        <form method="POST" id="form2">
+                            <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
+                            <input type="hidden" name="id" value="<?php echo $id; ?>">
+                            <button class="btn btn-danger" name="remove_chave" value="1">Clique aqui para remover</button>
+                        </form>
                     </div>
                 <?php
                 } else {
