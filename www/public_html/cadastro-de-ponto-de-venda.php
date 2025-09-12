@@ -409,7 +409,7 @@ if (!empty($msg)) { ?>
                     </div>
                     <div
                         class="col-lg-5 col-md-5 col-sm-12 col-xs-12 col-md-offset-4 col-lg-offset-4 text-danger font-p">
-                        *Sua senha deve ter: de 6 a 12 caracteres, letras, números, caracteres especiais (|,!,?,*,$,%,
+                        *Sua senha deve ter: de 10 a 35 caracteres, letras (maiúsculas e minúsculas), números, caracteres especiais (|,!,?,*,$,%,
                         etc)
                     </div>
                 </div>

@@ -63,7 +63,7 @@ class Login {
     public function getMaxTentativas(){
         return $this->_maxTentativas;
     }
-        
+
     public function valida(){
         
         $erros = 0;
@@ -73,6 +73,7 @@ class Login {
         $erros += $validate->caracteresEspeciais($this->_senha);
         $erros += $validate->letras($this->_senha);
         $erros += $validate->numeros($this->_senha);
+        $erros += !$validate->validaLetras($this->_senha);
 
         return $erros;
             

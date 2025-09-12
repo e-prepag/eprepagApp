@@ -29,7 +29,7 @@ $(function(){
 function validaFormSenha(){
     var erro = [];
     if($(".progress-bar-success").hasClass("hidden")){
-        erro.push("Senha ainda é insegura. Sua senha deve ter: de 6 a 12 caracteres, letras, números, caracteres especiais (|,!,?,*,$,%, etc).");
+        erro.push("Senha ainda é insegura. Sua senha deve ter: de 10 a 35 caracteres, letras (maiúsculas e minúsculas), números, caracteres especiais (|,!,?,*,$,%, etc).");
     }
 
     if($(":input").hasClass("senhaAtual") && $(".senhaAtual").val().length < 6){

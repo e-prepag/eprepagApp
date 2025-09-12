@@ -26,6 +26,9 @@ class Validate {
         $filter= "/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i";
         return preg_match($filter,$str) ? 0 : 1;
     }
+    public function validaLetras($str) {
+        return preg_match('/[A-Z]/', $str) && preg_match('/[a-z]/', $str);
+    }
     
     public function imagem($file){
         $erros = array();
