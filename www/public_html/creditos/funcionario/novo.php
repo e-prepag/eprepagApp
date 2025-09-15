@@ -49,7 +49,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                     <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12 top10 text-right-lg">E-mail:</div>
                     <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10"><input class="input-sm form-control input-medium" <?php if(isset($_POST['cad_email'])) echo "value='".$_POST['cad_email']."'";?> type="text" name="cad_email" id="cad_email"></div>
                     <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12 top10 text-right-lg">Senha:</div>
-                    <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10"><input class="input-sm novaSenha form-control input-medium" maxlength="12" autocomplete="off" <?php if(isset($_POST['cad_senha'])) echo "value='".$_POST['cad_senha']."'";?> type="password" name="cad_senha" id="cad_senha"></div>
+                    <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10"><input class="input-sm novaSenha form-control input-medium" maxlength="35" autocomplete="off" <?php if(isset($_POST['cad_senha'])) echo "value='".$_POST['cad_senha']."'";?> type="password" name="cad_senha" id="cad_senha"></div>
                     <div class="col-md-offset-2 col-md-10">
                         <div class="progress input-medium">
                             <div class="progress-bar hidden progress-bar-danger" style="width: 33.33%">
@@ -64,10 +64,10 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                         </div>
                     </div>
                     <div class="col-md-offset-2 col-md-10 txt-vermelho fontsize-p">
-                        *Sua senha deve ter: de 6 a 12 caracteres, letras, números, caracteres especiais (|,!,?,*,$,%, etc)
+                        *Sua senha deve ter: de 10 a 35 caracteres, letras maiúsculas e minúsculas, números, caracteres especiais (|,!,?,*,$,%, etc)
                     </div>
                     <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12 top10 text-right-lg">Confirmar senha:</div>
-                    <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10"><input class="input-sm form-control confirmacaoSenha input-medium" maxlength="12" <?php if(isset($_POST['cad_senhaConf'])) echo "value='".$_POST['cad_senhaConf']."'";?> type="password" name="cad_senhaConf" id="cad_senhaConf"></div>
+                    <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10"><input class="input-sm form-control confirmacaoSenha input-medium" maxlength="35" <?php if(isset($_POST['cad_senhaConf'])) echo "value='".$_POST['cad_senhaConf']."'";?> type="password" name="cad_senhaConf" id="cad_senhaConf"></div>
                     <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12 top10 text-right-lg">Acesso:</div>
                     <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10">
                         <select name="cad_tipo" id="cad_tipo" class="form-control w-auto">
