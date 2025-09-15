@@ -370,7 +370,7 @@
 	function validarSenha($confirmacaoNovaSenha) {
 		
 		// Verificar comprimento mínimo da senha e presença de caracteres obrigatórios
-		return strlen($confirmacaoNovaSenha) >= 12
+		return strlen($confirmacaoNovaSenha) >= 10
 			&& preg_match('/[A-Z]/', $confirmacaoNovaSenha)   // Pelo menos uma letra maiúscula
 			&& preg_match('/[0-9]/', $confirmacaoNovaSenha)   // Pelo menos um número
 			&& preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $confirmacaoNovaSenha);  // Pelo menos um caractere especial

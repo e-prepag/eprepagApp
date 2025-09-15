@@ -19,7 +19,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="campo-form">
-									<input type="password" minlength="12" maxlength="12" autocomplete="off" name="novaSenha" id="novaSenha" placeholder="************" class="form-control input-sm campo-senha" required>
+									<input type="password" minlength="10" maxlength="35" autocomplete="off" name="novaSenha" id="novaSenha" placeholder="************" class="form-control input-sm campo-senha" required>
 									<i class="bi bi-eye-fill btn-exibicao"></i>
 								</div>
 							</div>
@@ -32,7 +32,7 @@
 							<label for="confirmacaoNovaSenha">Confirme Sua Nova Senha</label>
 						</div>
 						<div class="col-md-4">
-							<input type="password" minlength="12" maxlength="12" autocomplete="off" name="confirmacaoNovaSenha" id="confirmacaoNovaSenha" autocomplete="off" onpaste="return false" placeholder="************" class="form-control input-sm campo-senha" required>
+							<input type="password" minlength="10" maxlength="35" autocomplete="off" name="confirmacaoNovaSenha" id="confirmacaoNovaSenha" autocomplete="off" onpaste="return false" placeholder="************" class="form-control input-sm campo-senha" required>
 						</div>
 						<div class="col-md-3"></div>
 					</div>
@@ -41,7 +41,7 @@
 						<div class="col-md-2"></div>
 						<div class="col-md-10">
 						
-							<p>*Sua senha deve ter 12 caracteres, incluindo letras, números e caracteres especiais, ex: |, !, ?, *, $ e % </p>
+							<p>*Sua senha deve ter 10 a 35 caracteres, incluindo letras maiúsculas ou minúsculas, números e caracteres especiais, ex: |, !, ?, *, $ e % </p>
 					
 							<input type='hidden' name='checked' id='checked' value='true'>
 							<input type='hidden' name='codigoValidacao' id='codigoValidacao' value='<?php echo htmlspecialchars($codigoValidacao); ?>'>
