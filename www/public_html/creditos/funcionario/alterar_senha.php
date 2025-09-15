@@ -8,12 +8,13 @@ $banner = $controller->getBanner();
 
 if($_POST['sel_id'] && $_POST['sel_id'] > 0)
 {    
-    if($_POST["btSubmit"])
+    if($_POST["btSubmit"] && $_SESSION["token_csrf"] == $_POST["token_csrf"])
     {
         $controller->alteraSenha($_POST['sel_id']);
     }
     
     $funcionario = $controller->pega($_POST['sel_id']);
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 }
 else
 {
@@ -51,6 +52,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
             <div class="row top5">
                 <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
                     <form name="form1" action="" method="post">
+                        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                         <div class="row">
                             <span class="col-md-6 col-lg-6 col-sm-4 col-xs-4 text-right">Nome: </span>
                             <span class="col-md-6 text-left col-lg-6 col-sm-8 col-xs-8">

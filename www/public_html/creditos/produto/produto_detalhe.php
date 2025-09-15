@@ -1,39 +1,29 @@
 <?php
-session_start();
-require_once __DIR__ . "/../../../class/pdv/classGamesUsuario.php";
-$pdvInfo_testes = unserialize($_SESSION["dist_usuarioGames_ser"]);
-$usuario_teste = $pdvInfo_testes->ug_id;
-
-if(in_array($usuario_teste, [19465, 18980, 18894, 17371])){
-    require __DIR__ . "/produto_detalhe_teste.php";
-    exit;
-}
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 require_once "../../../includes/constantes.php";
-require_once DIR_CLASS."pdv/controller/ProdutosController.class.php";
-require_once DIR_CLASS."gamer/classConversionPINsEPP.php";
-header("Content-Type: text/html; charset=ISO-8859-1",true);
+require_once DIR_CLASS . "pdv/controller/ProdutosController.class.php";
+require_once DIR_CLASS . "gamer/classConversionPINsEPP.php";
+header("Content-Type: text/html; charset=ISO-8859-1", true);
 
 $qtdFeedsIndex = 5;
 $controller = new ProdutosController;
 
-if(isset($_GET['token'])){
-    
+if (isset($_GET['token'])) {
+
     $objEncryption = new Encryption();
     $token = unserialize($objEncryption->decrypt($_GET['token']));
     $_POST["prod"] = $token['produto'];
-    
 }
 
-if(!isset($_POST["prod"]) || $_POST["prod"] == "")
+if (!isset($_POST["prod"]) || $_POST["prod"] == "")
     $controller->accessDenied();
 
-if($GLOBALS['_SESSION']["dist_usuarioGames_ser"]){
+if ($GLOBALS['_SESSION']["dist_usuarioGames_ser"]) {
     $sistema = "pdv";
     $ug_id = $controller->usuarios->getId();
-}else{
-    $sistema = "gamer";    
+} else {
+    $sistema = "gamer";
     $ug_id = ($controller->usuario) ? $controller->usuario->getId() : "7909";
 }
 
@@ -56,213 +46,167 @@ $modelos = $produto->getModelo();
 ///prepag2/dist_commerce/images/produtos/
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 ?>
+<link rel="stylesheet" href="/css/produtos.css" type="text/css">
 <div class="container txt-azul-claro bg-branco">
     <div class="row">
         <div class="col-md-10">
             <div class="row">
                 <div class="col-md-12 espacamento">
-                    <strong>Selecione o valor</strong>
+                    <strong>Selecione o valor.</strong>
                 </div>
             </div>
             <div class="row txt-cinza espacamento right10 borda-fina">
                 <div class="col-md-3">
-                    
-<?php 
-                if($produto->getNomeImagem() && $produto->getNomeImagem() != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $produto->getNomeImagem()))
-                { 
-?>
-                    <p class="bottom0"><img border="0" style="max-width: 100%;" src="<?php echo $GLOBALS['URL_DIR_IMAGES_PRODUTO'] . $produto->getNomeImagem()?>"></p>
-<?php 
-                } 
-?>
-                    <p class="txt-azul-claro bottom0 top20"><strong><?php  echo $produto->getNome(); ?> </strong></p>
-                    <p class="txt-azul-claro bottom0 p-top10">Publisher: <span class="txt-cinza"><?php  echo $produto->getNomeOperadora(); ?></span></p>  
-                    
-<?php 
-                if(!$produto->getMostraIntegracao())
-                {
-?>               
-                    <p class="p-top10"><?php  echo $produto->getDescricao(); ?></p>
-<?php
-                }
-?>
+
+                    <?php
+                    if ($produto->getNomeImagem() && $produto->getNomeImagem() != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $produto->getNomeImagem())) {
+                    ?>
+                        <p class="bottom0"><img border="0" style="max-width: 100%;" src="<?php echo $GLOBALS['URL_DIR_IMAGES_PRODUTO'] . $produto->getNomeImagem() ?>"></p>
+                    <?php
+                    }
+                    ?>
+                    <p class="txt-azul-claro bottom0 top20"><strong><?php echo $produto->getNome(); ?> </strong></p>
+                    <p class="txt-azul-claro bottom0 p-top10">Publisher: <span class="txt-cinza"><?php echo $produto->getNomeOperadora(); ?></span></p>
+
+                    <?php
+                    if (!$produto->getMostraIntegracao()) {
+                    ?>
+                        <p class="p-top10"><?php echo $produto->getDescricao(); ?></p>
+                    <?php
+                    }
+                    ?>
                 </div>
                 <div class="col-md-9">
-<?php
-            if(is_null($produto->getValorMinimo()) && is_null($produto->getValorMaximo())) {
-                if(is_array($modelos))
-                {
-                    foreach($modelos as $modelo){
-						if($_SERVER["REMOTE_ADDR"] == "187.18.199.172" && $modelo->getId() == 1424){
-?>
-                        <div class="row top10">
-                            <div class="col-md-5">
-                                <p class="txt-cinza p-top10"><strong><?php echo $modelo->getNome(); ?></strong></p>
-                            </div>
-                            <div class="col-md-7 bg-comprar p-top10 nome-produto">
-<?php
-                            if($modelo->contar($produto->getOprCodigo(),$modelo->getPinValor())>0 || $produto->getPinRequest() > 0) 
-                            {
-?>
-                                <span class="c-pointer" id="<?php echo $modelo->getId();?>">
-                                    <div class="col-md-6 txt-azul-claro2"><p class="pull-left "><strong>R$ <?php echo number_format($modelo->getValor(), 2, ',', '.')?></strong></p></div>
-                                    <div class="col-md-6 txt-verde">
-                                        <p class="pull-right">
-                                            <strong><em>Comprar</em></strong>
-                                        </p>
+                    <?php
+                    if (is_null($produto->getValorMinimo()) && is_null($produto->getValorMaximo())) {
+                        if (is_array($modelos)) {
+                            foreach ($modelos as $modelo) {
+                    ?>
+                                <div class="row top10">
+                                    <div class="col-md-5">
+                                        <p class="txt-cinza p-top10"><strong><?php echo $modelo->getNome(); ?></strong></p>
                                     </div>
-                                </span>
-<?php
-                            } 
-                            else 
-                            {
-?>
-                                <p class="pull-right txt-vermelho"><strong><em>Fora de Estoque</em></strong></p>
-<?php
-                            }
-?>
-                            </div>
-                        </div>
-<?php 
-                        }else if($modelo->getId() != 1424){
-?>
 
-                        <div class="row top10">
-                            <div class="col-md-5">
-                                <p class="txt-cinza p-top10"><strong><?php echo $modelo->getNome(); ?></strong></p>
-                            </div>
-                            <div class="col-md-7 bg-comprar p-top10 nome-produto">
-<?php
-                            if($modelo->contar($produto->getOprCodigo(),$modelo->getPinValor())>0 || $produto->getPinRequest() > 0) 
-                            {
-?>
-                                <span class="c-pointer" id="<?php echo $modelo->getId();?>">
-                                    <div class="col-md-6 txt-azul-claro2"><p class="pull-left "><strong>R$ <?php echo number_format($modelo->getValor(), 2, ',', '.')?></strong></p></div>
-                                    <div class="col-md-6 txt-verde">
-                                        <p class="pull-right">
-                                            <strong><em>Comprar</em></strong>
-                                        </p>
-                                    </div>
-                                </span>
-<?php
-                            } 
-                            else 
-                            {
-?>
-                                <p class="pull-right txt-vermelho"><strong><em>Fora de Estoque</em></strong></p>
-<?php
-                            }
-?>
-                            </div>
-                        </div>
+                                    <?php
+                                    if ($modelo->contar($produto->getOprCodigo(), $modelo->getPinValor()) > 0 || $produto->getPinRequest() > 0) {
+                                    ?>
+                                        <div class="col-md-7 bg-comprar c-pointer p-top10 nome-produto">
+                                            <span id="<?php echo $modelo->getId(); ?>">
+                                                <div class="col-md-6 txt-azul-claro2">
+                                                    <p class="pull-left "><strong>R$ <?php echo number_format($modelo->getValor(), 2, ',', '.') ?></strong></p>
+                                                </div>
+                                                <div class="col-md-6 txt-verde">
+                                                    <p class="pull-right">
+                                                        <strong><em>Selecionar</em></strong>
+                                                    </p>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    <?php
+                                    } else {
+                                    ?>
+                                        <div class="col-md-7 bg-comprar p-top10 nome-produto">
+                                            <p class="pull-right txt-vermelho"><strong><em>Fora de Estoque</em></strong></p>
+                                        </div>
+                                    <?php
+                                    }
+                                    ?>
 
-
-<?php						
-						}
-                    }
-					
-					
-					//$urlTest = ($_SERVER["REMOTE_ADDR"] == "201.93.162.169")? "sms.php":"produtos_selecionados.php";
-					$urlTest = "produtos_selecionados.php";
-					
-?>
-                    <form id="seleciona" method="post" action="<?php echo $urlTest;?>">
-                        <input type="hidden" name="acao" id="acao" value="a">
-                        <input type="hidden" name="mod" id="mod" value="">
-                        <input type="hidden" name="valor" id="valor_hidden" value="">
-                        <input type="hidden" name="codeProd" id="codeProd" value="<?php echo $produto->getId()  ?>">
-                    </form>
-<?php
-                }elseif($produto->getMostraIntegracao() == 1)
-                {
-?>
-                    <div class="row top10">
-                        <?php  echo $produto->getDescricao(); ?>
-                    </div>
-<?php
-                }
-                else
-                {    
-?>
-                    <div class="row top10">
-                        <p class="pull-right txt-vermelho"><strong><em>Não existem modelos cadastrados para este produto.</em></strong></p>
-                    </div>
-<?php
-                }
-            }else{
-                
-?>
-                    
-                <div class="row top10 align-center">
-                    <p class=""><strong>Informe o valor desejado de acordo com os valores máximo e mínimo informados</strong></p>
-                    <div class="error-list">
-
-                    </div>
-                </div>
-                <div class="row top10">
-                    <div class="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 align-center">
-                        <div class="col-sm-12 col-md-6 col-lg-6 top10" id="input-valor">
-                            <div class="form-group align-center">
-                                <div class="input-group align-center">
-                                    <div class="input-group-addon">R$</div>
-                                    <input type="number" class="form-control align-right" id="valor" name="valor" min="<?php echo $produto->getValorMinimo(); ?>" max="<?php echo $produto->getValorMaximo(); ?>" value="<?php echo number_format($produto->getValorMinimo(), 0); ?>" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
-                                    <div class="input-group-addon">.00</div>
                                 </div>
 
-                            </div>  
+
+                            <?php
+                            }
+                            $urlTest = "produtos_selecionados.php";
+
+                            ?>
+                            <form id="seleciona" method="post" action="<?php echo $urlTest; ?>" style="display: flex; align-items:end; flex-wrap: wrap;">
+                                <input type="hidden" name="acao" id="acao" value="u">
+                                <input type="hidden" name="mod" id="mod" value="">
+                                <input type="hidden" name="valor" id="valor_hidden" value="">
+                                <input type="hidden" name="codeProd" id="codeProd" value="<?php echo $produto->getId()  ?>">
+                                <div class="quantity-selector compact" data-min="1" data-max="999">
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
+                                    <input type="text" name='qtde' id='qtde' class="quantity-input" onchange="validateQuantity(this)" value='1'>
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
+                                </div>
+                                <button type='button' id='btn-adicionar-carrinho' class='btn-custom' disabled><i style="font-size: 17px; position: inherit;" class="glyphicon glyphicon-shopping-cart"></i> Adicionar ao carrinho</button>
+                                <button type='submit' id='btn-finalizar-selecao' class='btn-custom btn-success' disabled>Comprar agora</button>
+                            </form>
+                        <?php
+                        } elseif ($produto->getMostraIntegracao() == 1) {
+                        ?>
+                            <div class="row top10">
+                                <?php echo $produto->getDescricao(); ?>
+                            </div>
+                        <?php
+                        } else {
+                        ?>
+                            <div class="row top10">
+                                <p class="pull-right txt-vermelho"><strong><em>Não existem modelos cadastrados para este produto.</em></strong></p>
+                            </div>
+                        <?php
+                        }
+                    } else {
+
+                        ?>
+
+                        <div class="row top10 align-center">
+                            <p class=""><strong>Informe o valor desejado de acordo com os valores máximo e mínimo informados</strong></p>
+                            <div class="error-list">
+
+                            </div>
                         </div>
-                        <form class="form-inline c-pointer modelo-produto" estoque="1" id="<?php echo $NO_HAVE; ?>">
-                            
-                            <div class="row p-left10 p-right10 bg-comprar">
-                                <div>
-                                    <div class="col-sm-12 col-md-3 col-lg-3 top15 align-center">
+                        <div class="row top10">
+                            <div class="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 align-center">
+                                <div class="col-sm-12 col-md-6 col-lg-6 top10" id="input-valor">
+                                    <div class="form-group align-center">
+                                        <div class="input-group align-center">
+                                            <div class="input-group-addon">R$</div>
+                                            <input type="number" class="form-control align-right" id="valor" step="1" min="<?php echo $produto->getValorMinimo(); ?>" max="<?php echo $produto->getValorMaximo(); ?>" value="<?php echo number_format($produto->getValorMinimo(), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
+                                            <div class="input-group-addon">.00</div>
+                                        </div>
+
                                     </div>
-                                    <div class="col-sm-12 col-md-3 col-lg-3 mt-md-15 pb-sm-15">
-                                        <div class="" estoque="1" id="<?php echo $NO_HAVE ?>">
-                                            <strong class="txt-verde-escuro"><em>Comprar</em></strong>
+                                </div>
+                                <div class="form-inline modelo-produto" estoque="1" id="<?php echo $NO_HAVE; ?>">
+
+                                    <div class="row p-left10 p-right10 bg-comprar">
+                                        <div>
+                                            <div class="col-sm-12 col-md-6 col-lg-6 mt-md-15 pb-sm-15">
+                                                <div style="margin-top: 3px;" estoque="1" id="<?php echo $NO_HAVE ?>">
+                                                    <strong class="txt-verde-escuro"><em>Digite o valor</em></strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row top10">
+                                        <div class="col-lg-12 align-center">
+                                            <span>Valor mínimo: <?php echo $produto->getValorMinimo(); ?> | Valor máximo: <?php echo $produto->getValorMaximo(); ?></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row top10">
-                                <div class="col-lg-12 align-center">
-                                    <span>Valor mínimo: <?php echo $produto->getValorMinimo(); ?> | Valor máximo: <?php echo $produto->getValorMaximo(); ?></span>
-                                </div>
+                        </div>
+                        <?php
+                        $urlTest = "produtos_selecionados.php";
+                        ?>
+                        <form id='seleciona' method='post' action='<?php echo $urlTest; ?>' style="display: flex; align-items:end; flex-wrap: wrap;">
+                            <input type='hidden' name='acao' id='acao' value='u'>
+                            <input type='hidden' name='mod' id='mod' value='NO HAVE'>
+                            <input type='hidden' name='valor' id='valor_hidden' value='1'>
+                            <input type='hidden' name='codeProd' id='codeProd' value='<?php echo $produto->getId(); ?>'>
+                            <div class="quantity-selector compact" data-min="1" data-max="999">
+                                <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
+                                <input type="text" name='qtde' id='qtde' class="quantity-input" onchange="validateQuantity(this)" value='1'>
+                                <button type="button" class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
                             </div>
+                            <button type='button' id='btn-adicionar-carrinho' class='btn-custom'><i style="font-size: 17px; position: inherit;" class="glyphicon glyphicon-shopping-cart"></i> Adicionar ao carrinho</button>
+                            <button type='submit' id='btn-finalizar-selecao' class='btn-custom btn-success'>Comprar agora</button>
                         </form>
-                    </div>
-                </div>
-				<?php
-					//$urlTest = ($_SERVER["REMOTE_ADDR"] == "201.93.162.169")? "sms.php":"produtos_selecionados.php";
-					$urlTest = "produtos_selecionados.php";
-					
-					/* $se_for_get = "<form id='seleciona' method='get' action='". $urlTest . "'>
-                    <input type='hidden' name='acao' id='acao' value='a'>
-                    <input type='hidden' name='mod' id='mod' value=''>
-                    <input type='hidden' name='valor' id='valor_hidden' value=''>
-                    <input type='hidden' name='codeProd' id='codeProd' value='" . $produto->getId() . "'>
-                </form>";
-					$se_for_post = "<form id='seleciona' method='post' action='". $urlTest . "'>
-                    <input type='hidden' name='acao' id='acao' value='a'>
-                    <input type='hidden' name='mod' id='mod' value=''>
-                    <input type='hidden' name='valor' id='valor_hidden' value=''>
-                    <input type='hidden' name='codeProd' id='codeProd' value='" . $produto->getId() . "'>
-                </form>";
-				if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
-					echo $se_for_get;
-				} else {
-					echo $se_for_post;
-				}*/
-				?>
-				<form id='seleciona' method='post' action='<?php echo $urlTest; ?>'>
-                    <input type='hidden' name='acao' id='acao' value='a'>
-                    <input type='hidden' name='mod' id='mod' value=''>
-                    <input type='hidden' name='valor' id='valor_hidden' value=''>
-                    <input type='hidden' name='codeProd' id='codeProd' value='<?php echo $produto->getId(); ?>'>
-                </form>
-<?php
-            }
-?>
+                    <?php
+                    }
+                    ?>
                 </div>
             </div>
         </div>
@@ -274,74 +218,177 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+                <div class="success-icon">
+                    <svg class="checkmark" viewBox="0 0 24 24">
+                        <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                </div>
+                <h2 class="modal-title">Produto Adicionado!</h2>
+                <p class="modal-subtitle">Item adicionado com sucesso ao seu carrinho</p>
+            </div>
+
+            <div class="modal-body">
+                <div class="product-info">
+                    <div class="product-details">
+                        <h3 id="productName"></h3>
+                        <p id="productDesc"></p>
+                        <p>Quantidade: <span id="productQtd"></span></p>
+                        <div class="product-price"><span id="productPrice"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Comprar mais deste</button>
+                <a href="/creditos/produtos.php" class="btn btn-primary">Explorar catálogo</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="/js/jquery.mask.min.js"></script>
+<script src="/js/quantitySelector.js"></script>
 <script>
-    $(function(){
-        $(".bg-comprar > span").hover(
-         function() {
-           $(this).children(".txt-azul-claro2").css("color","#fff");
-           $(this).children(".txt-verde").css("color","#fff");
-         }, function() {
-           $(this).children(".txt-azul-claro2").css("color","#478ee6");
-           $(this).children(".txt-verde").css("color","##009b4a");
-         }
-       ).click(function(){
-             $("#mod").val($(this).attr("id"));
-             $("#seleciona").submit();
-       });
-       
-          $(".modelo-produto").hover(
-            function() {
-              $(this).children(".txt-azul-claro2").css("color","#fff");
-              $(this).children(".txt-verde").css("color","#fff");
-            }, function() {
-              $(this).children(".txt-azul-claro2").css("color","#478ee6");
-              $(this).children(".txt-verde").css("color","##009b4a");
-            }
-          ).click(function(){
+    $(function() {
 
-                if($(this).attr("estoque") == "1"){
-                    console.log("redir");
-                    $("#mod").val($(this).attr("id"));
-                    if($("#valor").length && $("#valor").val() === ""){
-                        var html = "<p class='txt-vermelho'>Por favor, informe um valor no campo!</p>";
-                        $(".error-list").html(html);
-                        return;
-                    }
-                    $('#valor_hidden').val($("#valor").val());
-                    $("#seleciona").submit();
-                }
-          });
-      
-        $(".prod").click(function(){
-            var id = $(this).attr("id");
-            $("#prod").val(id);
-            $("#detalhe").submit();
+        $('#qtde').mask('000', {
+            reverse: true
         });
-        
-        $("#valor").change(function(){
-            var min = parseInt($("#valor").attr("min"));
-            var max = parseInt($("#valor").attr("max"));
-            var valor = parseInt($("#valor").val());
-            if(valor < min){
 
-                var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
+        $('#valor').mask('0000', {
+            reverse: true
+        });
+
+        $(".bg-comprar").click(function() {
+            // Remove a borda de seleção e ícone de todos os produtos
+            if (!$(this).hasClass("c-pointer")) return;
+            $(".bg-comprar").removeClass("produto-selecionado");
+            $(".bg-comprar .icone-produto-selecionado").remove();
+            $(".bg-comprar .triangulo-produto-selecionado").remove();
+
+            // Adiciona a borda de seleção ao produto clicado
+            $(this).addClass("produto-selecionado");
+
+            // Adiciona um ícone visual de seleção (check)
+            if ($(this).find(".icone-produto-selecionado").length === 0) {
+                $(this).append('<div class="triangulo-produto-selecionado"></div><i class="icone-produto-selecionado glyphicon glyphicon-ok"></i>');
+            }
+
+            // Pega o produto selecionado
+            let produtoSelecionado = $(this).find("span").attr("id");
+
+            // Atualiza o campo hidden do form, mas NÃO faz submit ainda
+            $("#mod").val(produtoSelecionado);
+
+            //Mostrar o botão "Comprar"
+            $("#btn-finalizar-selecao").prop("disabled", false);
+            // Ao selecionar um produto, habilita o botão "Adicionar ao carrinho"
+            $("#btn-adicionar-carrinho").prop("disabled", false);
+        });
+
+        $("#btn-adicionar-carrinho").click(function() {
+            // Envia os dados do formulário via AJAX para adiciona-carrinho.php
+            let data = {
+                acao: "u",
+                mod: $("#mod").val(),
+                valor: $("#valor_hidden").val(),
+                codeProd: $("#codeProd").val(),
+                qtde: ($("#qtde").length ? $("#qtde").val() : 1)
+            };
+
+            $.ajax({
+                url: "/creditos/ajax/adiciona-carrinho.php",
+                type: "POST",
+                data: data,
+                success: function(response) {
+                    if (response.trim() === "sucesso") {
+                        // Exibe modal de sucesso com nome do produto, modelo e valor
+                        let nomeProduto = "<?php echo addslashes($produto->getNome()); ?>";
+                        let nomeModelo = "";
+                        let valorModelo = "";
+                        let qtdProdutos = ($("#qtde").length ? $("#qtde").val() : 1);
+
+                        // Tenta obter o nome e valor do modelo selecionado
+                        let modeloId = $("#mod").val();
+                        let spanSelecionado = $("span#" + modeloId);
+                        if (spanSelecionado.length > 0) {
+                            nomeModelo = spanSelecionado.closest(".row").find("strong").first().text().trim();
+                            valorModelo = spanSelecionado.find(".pull-left strong").text().trim();
+                        } else {
+                            // fallback para valor digitado manualmente
+                            nomeModelo = "Personalizado";
+                            valorModelo = "R$ " + ($("#valor").val() ? $("#valor").val() : "");
+                        }
+
+                        $("#productName").html(nomeProduto);
+                        $("#productDesc").html(nomeModelo);
+                        $("#productPrice").html(valorModelo);
+                        $("#productQtd").html(qtdProdutos);
+                        $(".carrinho-compras").each(function() {
+                            let atual = parseInt($(this).text()) || 0;
+                            let novoTotal = atual + parseInt(qtdProdutos);
+                            $(this).text(novoTotal);
+                            if (atual == 0) {
+                                $(".display-carrinho").each(function() {
+                                    this.style.removeProperty("display");
+                                });
+                            }
+                        });
+
+                        $("#confirmModal").modal("show");
+                    } else {
+                        alert("Falha ao adicionar produto ao carrinho. Tente novamente.");
+                    }
+                },
+                error: function() {
+                    alert("Erro ao processar a requisição. Por favor, tente novamente.");
+                }
+            });
+        });
+
+        $(".modelo-produto").hover(
+            function() {
+                $(this).children(".txt-azul-claro2").css("color", "#fff");
+                $(this).children(".txt-verde").css("color", "#fff");
+            },
+            function() {
+                $(this).children(".txt-azul-claro2").css("color", "#478ee6");
+                $(this).children(".txt-verde").css("color", "##009b4a");
+            }
+        )
+
+        $("#valor").change(function() {
+            let min = parseInt($("#valor").attr("min"));
+            let max = parseInt($("#valor").attr("max"));
+            let valor = parseInt($("#valor").val());
+            if (valor < min) {
+
+                let html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                 $("#valor").val(min);
                 $(".error-list").html(html);
-            }else if(valor > max){
-                var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
+            } else if (valor > max) {
+                let html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                 console.log(valor);
                 $("#valor").val(max);
                 $(".error-list").html(html);
-            }else{
-                var html = "R$" + valor + ",00";
-                $.post("/game/ajax/epp_info.php",
-                {
-                  valor: valor,
-                },
-                function(data){
-                  var html = data;
-                  $(".span-valor").html(html);
-                });
+            } else {
+                let html = "R$" + valor + ",00";
+                $.post("/game/ajax/epp_info.php", {
+                        valor: valor,
+                    },
+                    function(data) {
+                        let html = data;
+                        $(".span-valor").html(html);
+                    });
                 $(".error-list").html("");
             }
         });

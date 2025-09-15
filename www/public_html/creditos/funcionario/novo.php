@@ -2,12 +2,14 @@
 
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS ."pdv/controller/FuncionarioController.class.php";
-
+session_start();
 $controller = new FuncionarioController;
 
-if($_POST['btSubmit']){
+if($_POST['btSubmit'] && $_SESSION["token_csrf"] == $_POST["token_csrf"]){
     $controller->salva();
 }
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 
 $banner = $controller->getBanner();
 
@@ -39,6 +41,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                     <strong>Novo Funcionário</strong>
                 </div>
                 <form method="post">
+                    <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                     <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12 top10 text-right-lg">Nome:</div>
                     <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12 top10"><input class="input-sm form-control input-medium" <?php if(isset($_POST['cad_nome'])) echo "value='".$_POST['cad_nome']."'";?> type="text" name="cad_nome" id="cad_nome"></div>
                     <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12 top10 text-right-lg">Login:</div>

@@ -17,6 +17,12 @@ checkingIsCompletedData('/creditos/carrinho/');///prepag2/dist_commerce/finaliza
 $_PaginaOperador2Permitido = 54; 
 validaSessao(); 
 
+if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
+    header("location: /creditos/index.php");
+}
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 //Recupera o usuario do session
 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 

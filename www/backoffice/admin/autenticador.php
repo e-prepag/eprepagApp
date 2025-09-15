@@ -26,7 +26,7 @@ if (!$_SESSION['secret']) {
     $_SESSION['secret'] = $secret;
 } else {
     $secret = $_SESSION['secret'];
-    if (isset($_POST['cad_senhaAtual'])) {
+    if (isset($_POST['cad_senhaAtual']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
         $erros = 0;
         $msg = "";
 
@@ -75,6 +75,7 @@ if (!$_SESSION['secret']) {
         $color = "txt-vermelho";
     }
 }
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag bko', $secret);
 ?>
 <div class="col-md-12">
@@ -109,6 +110,7 @@ if (isset($msg) && $color == "txt-verde") {
 ?>
     <div class="col-md-7 espacamento txt-preto">
         <form name="form1" action="" method="post">
+            <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
             <div class="mb-3">
                 <label style="margin-top: 15px;" for="token_old">
                     Insira o Token atual (somente se tiver):

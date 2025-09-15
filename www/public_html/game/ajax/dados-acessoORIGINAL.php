@@ -22,6 +22,14 @@ if(Util::isAjaxRequest()){
     $retorno = new stdClass();
     $retorno->erro = '';
     $retorno->sucesso = false;
+
+    if($_POST["token_csrf"] != $_SESSION["token_csrf"]){
+        $retorno->erro = utf8_encode("Requisição inválida");
+        print json_encode($retorno);
+        die;
+    }
+
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
     
     if(isset($_POST['type']) && isset($_POST['senha'])){
         

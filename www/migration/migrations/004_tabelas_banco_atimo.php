@@ -122,7 +122,7 @@ return function (PDO $pdo) {
                     scope VARCHAR(4000)                    -- Space-delimited list of scopes
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS user (
+    $pdo->exec("CREATE TABLE IF NOT EXISTS \"user\" (
                     id_new BIGSERIAL PRIMARY KEY,
                     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -18,6 +18,7 @@ $controller->setHeader();
 
 $ga = new PHPGangsta_GoogleAuthenticator();
 
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 $secret = $ga->createSecret();
 $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag Gamer', $secret);
 $_SESSION['secret'] = $secret;
@@ -41,7 +42,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "pass", novaSenha: $("#novaSenha").val(), confirmaSenha: $("#confirmaSenha").val(), senha: $("#senha").val() },
+                data: { type: "pass", novaSenha: $("#novaSenha").val(), confirmaSenha: $("#confirmaSenha").val(), senha: $("#senha").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -86,7 +87,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "novoLogin", login: $("#novoLogin").val(), confirmaLogin: $("#confirmaLogin").val(), senha: $("#l-senha").val() },
+                data: { type: "novoLogin", login: $("#novoLogin").val(), confirmaLogin: $("#confirmaLogin").val(), senha: $("#l-senha").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -130,7 +131,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "solicitaNovoEmail", email: $("#novoEmail").val(), confirmaEmail: $("#confirmaEmail").val(), senha: true },
+                data: { type: "solicitaNovoEmail", email: $("#novoEmail").val(), confirmaEmail: $("#confirmaEmail").val(), senha: true, token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -173,7 +174,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/alterar_autenticador.php",
-                data: { token: $("#token").val(), cad_senhaAtual: $("#cad_senhaAtual").val(), token_old: $("#token_old").val() },
+                data: { token: $("#token").val(), cad_senhaAtual: $("#cad_senhaAtual").val(), token_old: $("#token_old").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();

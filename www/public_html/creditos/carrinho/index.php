@@ -88,6 +88,7 @@ require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php"; 
 $connection = ConnectionPDO::getConnection()->getLink();	
 
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 ?>
 <!-- script src="https://www.google.com/recaptcha/api.js" async="" defer=""></script> -->
 <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
@@ -576,6 +577,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
             require_once DIR_INCS . "pdv/form_cpf.php";?>
     </div>
 		<form action="/creditos/pagamento/finaliza_venda.php" id="step" method="POST">
+            <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
 			<div style="padding: 0 0 15px 10px; display: flex; justify-content: end;">
 			    <!-- <div class="g-recaptcha" data-sitekey="6LcajMgoAAAAADfMoqDlJVP90GcztNfrQIjDIwk8"></div> -->
 				<div class="h-captcha" data-sitekey="cf431eba-155c-4d7f-a313-bf9d69cdf7e2"></div>
