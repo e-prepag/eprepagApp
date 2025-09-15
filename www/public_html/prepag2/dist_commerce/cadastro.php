@@ -703,14 +703,14 @@ require_once dirname(__FILE__) . '/layout/topo_login.php';
                         },
                         password: {
                             validators: {
-                                stringLength: {min:6, max:15, message: 'A senha deve ter entre 6 e 15 caracteres'},
+                                stringLength: {min:10, max:35, message: 'A senha deve ter entre 10 e 35 caracteres'},
                                 notEmpty: {message: 'Campo senha não pode ficar em branco'},
                                 different: {field: 'username',message: 'A senha não pode ser igual ao nome de usuário'}
                             }
                         },
                         password_confirmacao: {
                             validators: {
-                                stringLength: {min:6, max:15, message: 'A senha deve ter entre 6 e 15 caracteres'},
+                                stringLength: {min:10, max:35, message: 'A senha deve ter entre 10 e 35 caracteres'},
                                 notEmpty: {message: 'Campo confirmação de senha não pode ficar em branco'},
                                 identical: {
                                     field: 'password',

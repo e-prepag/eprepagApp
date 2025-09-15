@@ -73,14 +73,21 @@ if (isset($_css_add)) {
 ?>
 <!-- Facebook Pixel Code -->
 <script>
-    !function (f, b, e, v, n, t, s) {
-        if (f.fbq) return; n = f.fbq = function () {
+    ! function(f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function() {
             n.callMethod ?
                 n.callMethod.apply(n, arguments) : n.queue.push(arguments)
         };
-        if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-        n.queue = []; t = b.createElement(e); t.async = !0;
-        t.src = v; s = b.getElementsByTagName(e)[0];
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s)
     }(window, document, 'script',
         'https://connect.facebook.net/en_US/fbevents.js');
@@ -109,7 +116,7 @@ if (isset($_js_add)) {
 }
 if (!empty($msg)) { ?>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('.msgbox').fancybox().trigger('click');
         });
     </script>
@@ -391,7 +398,7 @@ if (!empty($msg)) { ?>
                             class="required txt-vermelho">*</span></label>
 
                     <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-                        <input type="password" class="form-control novaSenha" minlength="6" maxlength="15"
+                        <input type="password" class="form-control novaSenha" minlength="10" maxlength="35"
                             autocomplete="off" name="password" id="password" />
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 col-md-offset-4 col-lg-offset-4 ">
@@ -420,7 +427,7 @@ if (!empty($msg)) { ?>
                             class="required txt-vermelho">*</span></label>
 
                     <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-                        <input type="password" class="form-control confirmacaoSenha" name="password_confirmacao"
+                        <input type="password" class="form-control confirmacaoSenha" name="password_confirmacao" minlength="10" maxlength="35"
                             id="password_confirmacao" autocomplete="off" onpaste="return false" />
                     </div>
                 </div>
@@ -457,7 +464,7 @@ if (!empty($msg)) { ?>
                     </div>
                 </div>
                 <script>
-                    $('#como_conheceu_eprepag').on('change', function () {
+                    $('#como_conheceu_eprepag').on('change', function() {
                         if ($(this).val() === 'outro') {
 
                             // Exibe o campo adicional caso a opção "outro" seja selecionada
@@ -612,13 +619,14 @@ if (!empty($msg)) { ?>
     <ul class="list-errors-socios"></ul>
 </div>
 <script>
-
     const msgLocationError = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
 
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         new Promise((resolve, reject) =>
-            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000
+            })
         ).catch((error) => {
             manipulaModal(1, msgLocationError, 'Erro');
             return null;
@@ -633,7 +641,7 @@ if (!empty($msg)) { ?>
             }
         }
 
-        $(window).keydown(function (event) {
+        $(window).keydown(function(event) {
             if (event.keyCode == 13 || event.keywich == 13) {
                 event.preventDefault();
                 return false;
@@ -663,18 +671,24 @@ if (!empty($msg)) { ?>
                     previous: "Anterior",
                     loading: "Carregando ..."
                 },
-                onInit: function (event, currentIndex) {
-                    $('.cnpj').mask('99.999.999/9999-99', { placeholder: '__.___.___/____-__' });
-                    $('.cpf').mask('999.999.999-99', { placeholder: '___.___.___-__' });
+                onInit: function(event, currentIndex) {
+                    $('.cnpj').mask('99.999.999/9999-99', {
+                        placeholder: '__.___.___/____-__'
+                    });
+                    $('.cpf').mask('999.999.999-99', {
+                        placeholder: '___.___.___-__'
+                    });
                     //$('.rg').mask('##.###.###-?');
-                    $('.cep').mask('99999-999', { placeholder: '_____-___' });
+                    $('.cep').mask('99999-999', {
+                        placeholder: '_____-___'
+                    });
 
 
-                    var SPMaskBehavior = function (val) {
-                        return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
-                    },
+                    var SPMaskBehavior = function(val) {
+                            return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+                        },
                         spOptions = {
-                            onKeyPress: function (val, e, field, options) {
+                            onKeyPress: function(val, e, field, options) {
                                 field.mask(SPMaskBehavior.apply({}, arguments), options);
                             }
                         };
@@ -684,11 +698,11 @@ if (!empty($msg)) { ?>
                     //$('.celular').mask('(00) 90000-0000');
                     $(".data").mask("99/99/9999");
                 },
-                onStepChanged: function (e, currentIndex, priorIndex) {
+                onStepChanged: function(e, currentIndex, priorIndex) {
                     //adjustIframeHeight();
                 },
                 // Triggered when clicking the Previous/Next buttons
-                onStepChanging: function (e, currentIndex, newIndex) {
+                onStepChanging: function(e, currentIndex, newIndex) {
 
                     var fv = $('#profileForm').data('formValidation'),
                         $container = $('#profileForm').find('section[data-step="' + currentIndex + '"]');
@@ -714,7 +728,10 @@ if (!empty($msg)) { ?>
                         return false;
                     }
                     if (currentIndex === 0) {
-                        $.post('/creditos/layout/pdv_pendente.php', { email: $('#email').val(), username: $("#username").val() }, function (data) { });
+                        $.post('/creditos/layout/pdv_pendente.php', {
+                            email: $('#email').val(),
+                            username: $("#username").val()
+                        }, function(data) {});
                     }
 
                     if (newIndex > 0) {
@@ -728,7 +745,7 @@ if (!empty($msg)) { ?>
                     return true;
                 },
                 // Triggered when clicking the Finish button
-                onFinishing: async function (e, currentIndex) {
+                onFinishing: async function(e, currentIndex) {
 
                     e.preventDefault();
 
@@ -756,7 +773,9 @@ if (!empty($msg)) { ?>
 
                     // Tenta obter localização (se o usuário permitir)
                     const pos = await new Promise((resolve, reject) =>
-                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            timeout: 10000
+                        })
                     ).catch((error) => {
                         manipulaModal(1, msgLocationError, 'Erro');
                         return null;
@@ -780,7 +799,7 @@ if (!empty($msg)) { ?>
                         type: "POST",
                         url: "/ajax/pdv/ajaxRegistraUsuario.php",
                         data: $("#profileForm").serialize(),
-                        beforeSend: function () {
+                        beforeSend: function() {
                             $("#profileForm-t-0").addClass("hidden");
                             $("#profileForm-t-1").addClass("hidden");
                             $("#profileForm-t-2").addClass("hidden");
@@ -790,7 +809,7 @@ if (!empty($msg)) { ?>
                             //$('#profileForm').find('section[data-step="4"]').addClass("hidden");
                             $(".ajax-load").removeClass("hidden");
                         },
-                        success: function (txt) {
+                        success: function(txt) {
 
                             txt = txt.trim();
                             if (txt == "") { //!txt 
@@ -814,8 +833,7 @@ if (!empty($msg)) { ?>
                                     $("#email").val("");
                                     $("#email_confirmacao").val("");
                                     $("#profileForm-t-0").trigger("click");
-                                }
-                                else if (txt.indexOf("Login") !== -1) {
+                                } else if (txt.indexOf("Login") !== -1) {
                                     if (txt.indexOf("cadastrado") !== -1) {
                                         txt = '<ul class="list-errors"><li data-field="username"><span class="error-msg-info">Login já cadastrado. Escolha outro.</span></li></ul>';
                                     } else if (txt.indexOf("preenchido")) {
@@ -868,7 +886,11 @@ if (!empty($msg)) { ?>
                     // Conta
                     name: {
                         validators: {
-                            stringLength: { min: 5, max: 100, message: 'Nome deve ter o mínimo de 5 caracteres' },
+                            stringLength: {
+                                min: 5,
+                                max: 100,
+                                message: 'Nome deve ter o mínimo de 5 caracteres'
+                            },
                             notEmpty: {
                                 message: 'Campo "Nome" não pode ficar em branco'
                             }
@@ -878,14 +900,22 @@ if (!empty($msg)) { ?>
                         threshold: 6,
                         trigger: 'blur',
                         validators: {
-                            stringLength: { min: 6, max: 100, message: 'O nome de usuário deve ter mais que 6 e menos que 100 caracteres de tamanho' },
+                            stringLength: {
+                                min: 6,
+                                max: 100,
+                                message: 'O nome de usuário deve ter mais que 6 e menos que 100 caracteres de tamanho'
+                            },
                             remote: {
                                 message: 'Nome de usuário indisponível. Escolha outro.',
                                 url: '/creditos/layout/ajaxCadastro.php',
                                 type: 'POST',
-                                data: { field: 'username' }
+                                data: {
+                                    field: 'username'
+                                }
                             },
-                            notEmpty: { message: 'Nome de usuário não pode ficar em branco.' },
+                            notEmpty: {
+                                message: 'Nome de usuário não pode ficar em branco.'
+                            },
                             regexp: {
                                 regexp: /^[a-zA-Z0-9_\.]+$/,
                                 message: 'O nome de usuário deve ser somente alfanumérico, pontos "." e underline "_"'
@@ -897,26 +927,34 @@ if (!empty($msg)) { ?>
                         threshold: 6,
                         trigger: 'blur',
                         validators: {
-                            stringLength: { min: 5, max: 100, message: 'O e-mail deve ter o mínimo de 5 caracteres' },
+                            stringLength: {
+                                min: 5,
+                                max: 100,
+                                message: 'O e-mail deve ter o mínimo de 5 caracteres'
+                            },
                             remote: {
                                 message: 'E-mail já cadastrado. Escolha outro.',
                                 url: '/creditos/layout/ajaxVerificaEmail.php',
                                 type: 'POST',
-                                data: { field: 'email' },
+                                data: {
+                                    field: 'email'
+                                },
                                 delay: 1000, // opcional: adiciona um atraso antes de enviar a requisição
                                 // Função chamada após a requisição AJAX
-                                callback: function (value, validator, $field) {
+                                callback: function(value, validator, $field) {
                                     // Aqui você pode realizar uma ação caso a requisição falhe
                                     return true; // Retorna true se a requisição foi bem-sucedida
                                 },
                                 // Função chamada em caso de erro na requisição
-                                error: function () {
+                                error: function() {
                                     // Aqui você pode exibir uma mensagem de erro personalizada
                                     alert("Erro ao verificar o e-mail. Tente novamente.");
                                     return false; // Retorna false para que a validação falhe
                                 }
                             },
-                            notEmpty: { message: 'E-mail não pode ficar em branco' },
+                            notEmpty: {
+                                message: 'E-mail não pode ficar em branco'
+                            },
                             //emailAddress: {message: 'O e-mail digitado não é válido'},
                             regexp: {
                                 regexp: '^[^@\\s]+@([^@\\s]+\\.)+[^@\\s]+$',
@@ -926,44 +964,54 @@ if (!empty($msg)) { ?>
                     },
                     email_confirmacao: {
                         validators: {
-                            stringLength: { min: 5, message: 'O e-mail deve ter o mínimo de 5 caracteres' },
-                            notEmpty: { message: "E-mail de confirmação não pode ficar em branco" },
-                            identical: { field: 'email', message: 'O e-mail de confirmação é diferente do e-mail original' }
+                            stringLength: {
+                                min: 5,
+                                message: 'O e-mail deve ter o mínimo de 5 caracteres'
+                            },
+                            notEmpty: {
+                                message: "E-mail de confirmação não pode ficar em branco"
+                            },
+                            identical: {
+                                field: 'email',
+                                message: 'O e-mail de confirmação é diferente do e-mail original'
+                            }
                         }
                     },
                     password: {
                         validators: {
-                            stringLength: { min: 6, max: 15, message: 'A senha deve ter entre 6 e 12 caracteres' },
-                            notEmpty: { message: 'Campo senha não pode ficar em branco' },
-                            different: { field: 'username', message: 'A senha não pode ser igual ao nome de usuário' }
+                            stringLength: {
+                                min: 10,
+                                max: 35,
+                                message: 'A senha deve ter entre 10 e 35 caracteres'
+                            },
+                            notEmpty: {
+                                message: 'Campo senha não pode ficar em branco'
+                            },
+                            different: {
+                                field: 'username',
+                                message: 'A senha não pode ser igual ao nome de usuário'
+                            },
+                            regexp: {
+                                regexp: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\'\/~`!@#\$%\^&\*\(\)_\-\+=\{\}\[\]\|;:"<>,\.\?\\]).{10,35}$/,
+                                message: 'A senha deve conter ao menos uma letra minúscula, uma maiúscula, um número e um caractere especial'
+                            }
                         }
                     },
                     password_confirmacao: {
                         validators: {
-                            stringLength: { min: 6, max: 15, message: 'A senha de confirmação deve ter entre 6 e 12 caracteres' },
-                            notEmpty: { message: 'Campo confirmação de senha não pode ficar em branco' },
-                            callback: {
-                                message: 'Senha inválida',
-                                callback: function (value, validator, $field) {
-                                    var erro = validaFormSenha(); //funcao esta em /js/validaSenha.js
-                                    if (erro.length > 0) {
-                                        return {
-                                            valid: false,
-                                            message: erro.join("\n")
-                                        };
-                                    } else {
-                                        return true;
-
-                                    }
-                                }
-                            }
+                            identical: {
+                                field: 'password',
+                                message: 'A senha de confirmação deve ser igual a senha'
+                            },
                         }
                     },
                     // Fim Conta
                     // Contato
                     telefone_contato: {
                         validators: {
-                            notEmpty: { message: 'Campo telefone não pode ficar em branco' },
+                            notEmpty: {
+                                message: 'Campo telefone não pode ficar em branco'
+                            },
                             regexp: {
                                 regexp: /\(\d{2}\)\s\d{4,5}-\d{4}$/,
                                 'message': 'Número de telefone inválido'
@@ -985,13 +1033,18 @@ if (!empty($msg)) { ?>
                                 message: 'CNPJ já cadastrado.',
                                 url: '/creditos/layout/ajaxCadastro.php',
                                 type: 'POST',
-                                data: { field: 'cnpj_empresa' }
+                                data: {
+                                    field: 'cnpj_empresa'
+                                }
                             },
                             remote: {
                                 message: 'CNPJ invalido na receita federal.',
                                 url: '/creditos/layout/ajaxCadastro.php',
                                 type: 'POST',
-                                data: { field: 'cnpj_empresa', rf: true }
+                                data: {
+                                    field: 'cnpj_empresa',
+                                    rf: true
+                                }
                             }
                         }
                     },
@@ -1037,7 +1090,7 @@ if (!empty($msg)) { ?>
                     }
                     // Fim Confirmação
                 }
-            }).on('err.field.fv', function (e, data) {
+            }).on('err.field.fv', function(e, data) {
                 var id = $('li.current').children('a').attr('id');
                 //var step = id.replace(/[^\d]/g, '');
                 var messages = data.fv.getMessages(data.element);
@@ -1051,14 +1104,14 @@ if (!empty($msg)) { ?>
                         .attr('data-field', data.field)
                         .wrapInner(
                             $('<span/>')
-                                .addClass('error-msg-info')
-                                .html(messages[i])
-                                .on('click', function (e) {
-                                    // Focus on the invalid field
-                                    //data.element.focus();
-                                    parent.$.fancybox.close();
-                                    $.fancybox.close();
-                                })
+                            .addClass('error-msg-info')
+                            .html(messages[i])
+                            .on('click', function(e) {
+                                // Focus on the invalid field
+                                //data.element.focus();
+                                parent.$.fancybox.close();
+                                $.fancybox.close();
+                            })
                         ).appendTo('.list-errors');
                 }
                 data.element
@@ -1066,7 +1119,7 @@ if (!empty($msg)) { ?>
                     .find('.help-block[data-fv-for="' + data.field + '"]')
                     .hide();
             })
-            .on('success.field.fv', function (e, data) {
+            .on('success.field.fv', function(e, data) {
                 var id = $('li.current').children('a').attr('id');
                 var step = id.replace(/[^\d]/g, '');
                 $('#ourError').find('li[data-field="' + data.field + '"]').remove();
@@ -1083,16 +1136,16 @@ if (!empty($msg)) { ?>
              }
          }); */
 
-        $("#password_confirmacao").blur(function () {
+        $("#password_confirmacao").blur(function() {
             $('#profileForm').formValidation('revalidateField', 'password_confirmacao');
         });
 
-        $("#password").blur(function () {
+        $("#password").blur(function() {
             $('#profileForm').formValidation('revalidateField', 'password_confirmacao');
         });
 
         //Função para buscar o endereço.
-        $("#cep").blur(function () {
+        $("#cep").blur(function() {
             setCep($(this).val());
         });
 
@@ -1112,16 +1165,20 @@ if (!empty($msg)) { ?>
         //            pegaNomeRF();
         //        });
 
-        $("#enviaNewsletter").click(function () {
+        $("#enviaNewsletter").click(function() {
             $.ajax({
                 url: '/ajax/newsletter.php',
                 type: "POST",
-                data: { email: $("#newsletter").val() },
-                dataType: "JSON",
-                beforeSend: function () {
-                    waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+                data: {
+                    email: $("#newsletter").val()
                 },
-                success: function (ret) {
+                dataType: "JSON",
+                beforeSend: function() {
+                    waitingDialog.show('Por favor, aguarde...', {
+                        dialogSize: 'sm'
+                    });
+                },
+                success: function(ret) {
                     waitingDialog.hide();
 
                     if (ret) {
@@ -1134,7 +1191,7 @@ if (!empty($msg)) { ?>
                     }
 
                 },
-                error: function (x, y) {
+                error: function(x, y) {
                     waitingDialog.hide();
                     return false;
                 }
@@ -1143,11 +1200,11 @@ if (!empty($msg)) { ?>
 
         $("input[name='porcentagem_socios[0]']").val('100,00%');
 
-        $(".validar_campos_cpf , .validar_campos_data").on('click keyup keydown', function () {
+        $(".validar_campos_cpf , .validar_campos_data").on('click keyup keydown', function() {
 
             if ($(this).closest('.form-group').hasClass('has-success') === true || $(this).closest('.form-group').hasClass('has-error') === true) {
                 ($(this).closest('.form-group').hasClass('has-success') === true) ?
-                    $(this).closest('.form-group').removeClass('has-feedback has-success') : $(this).closest('.form-group').removeClass('has-feedback has-error');
+                $(this).closest('.form-group').removeClass('has-feedback has-success'): $(this).closest('.form-group').removeClass('has-feedback has-error');
 
                 $(this).next('.form-control-feedback').remove();
             }
@@ -1155,7 +1212,7 @@ if (!empty($msg)) { ?>
 
         var indice_socios = 0;
 
-        $(document).on('click', '.remDiv, .addDiv', function (e) {
+        $(document).on('click', '.remDiv, .addDiv', function(e) {
 
             thisClass = e.target.className;
             var get_action = thisClass.split(" ");
@@ -1180,7 +1237,7 @@ if (!empty($msg)) { ?>
                 indice_socios--;
 
             } else {
-                (indice_socios === 0 && $("input[name='porcentagem_socios[0]']").val() === '100,00%') ? $("input[name='porcentagem_socios[0]']").val("") : '0';
+                (indice_socios === 0 && $("input[name='porcentagem_socios[0]']").val() === '100,00%') ? $("input[name='porcentagem_socios[0]']").val(""): '0';
 
                 indice_socios++;
 
@@ -1240,7 +1297,7 @@ if (!empty($msg)) { ?>
     function formata_porcentagem(ind) {
         var aux_val = $("input[name='porcentagem_socios[" + ind + "]']").val();
         if (aux_val.length <= 3 && aux_val.trim() !== "" && $.isNumeric(aux_val.replace(',', '.'))) {
-            (aux_val.indexOf(',') === -1 && aux_val.indexOf('.') === -1) ? $("input[name='porcentagem_socios[" + ind + "]']").val(aux_val + ',00%') : ((aux_val.length === (aux_val.indexOf(',') + 1)) || (aux_val.length === (aux_val.indexOf('.') + 1))) ? $("input[name='porcentagem_socios[" + ind + "]']").val(aux_val + '00%') : 0;
+            (aux_val.indexOf(',') === -1 && aux_val.indexOf('.') === -1) ? $("input[name='porcentagem_socios[" + ind + "]']").val(aux_val + ',00%'): ((aux_val.length === (aux_val.indexOf(',') + 1)) || (aux_val.length === (aux_val.indexOf('.') + 1))) ? $("input[name='porcentagem_socios[" + ind + "]']").val(aux_val + '00%') : 0;
         } else {
             if ((aux_val.length === 5 && (aux_val.indexOf(',') === 2 || aux_val.indexOf('.') === 2)) || (aux_val.length === 6 && (aux_val.indexOf(',') === 3 || aux_val.indexOf('.') === 3))) {
                 $("input[name='porcentagem_socios[" + ind + "]']").val(aux_val + '%');
@@ -1255,12 +1312,18 @@ if (!empty($msg)) { ?>
                 type: "POST",
                 url: "/ajax/ajaxCpf.php",
                 dataType: "json",
-                data: { cpf: $("input[name='cpf_socios[" + index + "]']").val(), dataNascimento: $("input[name='data_nascimento_socios[" + index + "]']").val() },
-                beforeSend: function () {
+                data: {
+                    cpf: $("input[name='cpf_socios[" + index + "]']").val(),
+                    dataNascimento: $("input[name='data_nascimento_socios[" + index + "]']").val()
+                },
+                beforeSend: function() {
                     searching = true;
                     $(".actions").addClass("hidden");
-                    waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
-                }, success: function (txt) {
+                    waitingDialog.show('Por favor, aguarde...', {
+                        dialogSize: 'sm'
+                    });
+                },
+                success: function(txt) {
                     searching = false;
                     $(".actions").removeClass("hidden");
                     waitingDialog.hide();
@@ -1295,8 +1358,7 @@ if (!empty($msg)) { ?>
                         $("input[name='nome_socios[" + index + "]']").val("");
 
                         alert(txt.erros);
-                    }
-                    else {
+                    } else {
                         $("input[name='nome_socios[" + index + "]']").val(txt.nome.substr(0, 480));
 
                         if ($("input[name='cpf_socios[" + index + "]']").closest('.form-group').hasClass('has-error') === true) {
@@ -1328,7 +1390,7 @@ if (!empty($msg)) { ?>
                         }
                     }
                 },
-                error: function (x, y) {
+                error: function(x, y) {
                     waitingDialog.hide();
                     return false;
                 }
@@ -1339,7 +1401,9 @@ if (!empty($msg)) { ?>
     function validaPorcentagemSocios() {
         var total = 0;
         var coeficiente = 0.1;
-        var values = $('input[name^="porcentagem_socios"]').map(function () { return $(this).val(); }).get();
+        var values = $('input[name^="porcentagem_socios"]').map(function() {
+            return $(this).val();
+        }).get();
 
         var vetor_valores = Object.values(values);
 
@@ -1349,12 +1413,16 @@ if (!empty($msg)) { ?>
 
         var diferenca = Math.abs(100 - total);
 
-        if (diferenca >= coeficiente) { return false; }
+        if (diferenca >= coeficiente) {
+            return false;
+        }
         return true;
     }
 
     function temSocioDuplicado() {
-        var values = $('input[name^="cpf_socios"]').map(function () { return $(this).val(); }).get();
+        var values = $('input[name^="cpf_socios"]').map(function() {
+            return $(this).val();
+        }).get();
         var vetor_valores = Object.values(values);
         return (new Set(vetor_valores)).size !== vetor_valores.length;
 
@@ -1368,7 +1436,7 @@ if (!empty($msg)) { ?>
         var marcador = true;
         var mensagem_soma_porcentagens = false;
 
-        $('.validar_campos_cpf').each(function () {
+        $('.validar_campos_cpf').each(function() {
 
             if ($(this).val().trim().length != 14) {
 
@@ -1420,7 +1488,7 @@ if (!empty($msg)) { ?>
 
         ind = 0;
 
-        $('.validar_campos_data').each(function () {
+        $('.validar_campos_data').each(function() {
 
             if ($(this).val().trim().length != 10) {
 
@@ -1473,7 +1541,7 @@ if (!empty($msg)) { ?>
         var valida_porc = validaPorcentagemSocios();
         ind = 0;
 
-        $('.validar_campos_porcentagem').each(function () {
+        $('.validar_campos_porcentagem').each(function() {
 
             if ($(this).val().trim() === "") {
 
@@ -1561,12 +1629,12 @@ if (!empty($msg)) { ?>
                     .attr('data-field', 'socios_errors')
                     .wrapInner(
                         $('<span/>')
-                            .addClass('error-msg-info')
-                            .html(mensagens[i])
-                            .on('click', function (e) {
-                                parent.$.fancybox.close();
-                                $.fancybox.close();
-                            })
+                        .addClass('error-msg-info')
+                        .html(mensagens[i])
+                        .on('click', function(e) {
+                            parent.$.fancybox.close();
+                            $.fancybox.close();
+                        })
                     ).appendTo('.list-errors-socios');
             }
             //removendo o último da lista (vazio)
@@ -1585,11 +1653,13 @@ if (!empty($msg)) { ?>
                 type: "POST",
                 url: "/ajax/cep.php",
                 data: "cep=" + cep,
-                beforeSend: function () {
+                beforeSend: function() {
                     searching = true;
-                    waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+                    waitingDialog.show('Por favor, aguarde...', {
+                        dialogSize: 'sm'
+                    });
                 },
-                success: function (txt) {
+                success: function(txt) {
                     var fv = $('#profileForm').data('formValidation');
                     searching = false;
                     waitingDialog.hide();
@@ -1620,8 +1690,7 @@ if (!empty($msg)) { ?>
                                 $("#endereco").removeAttr("readonly");
                                 document.getElementById("bairro").focus();
                             }
-                        }
-                        else {
+                        } else {
                             document.getElementById("tipo_endereco").value = "";
                             document.getElementById("endereco").value = "";
                             document.getElementById("bairro").value = "";
@@ -1635,8 +1704,7 @@ if (!empty($msg)) { ?>
                         fv.enableFieldValidators('cidade_empresa', true).revalidateField('cidade_empresa');
                         fv.enableFieldValidators('estado_empresa', true).revalidateField('estado_empresa');
                         fv.enableFieldValidators('numero_empresa', true).revalidateField('numero_empresa');
-                    }
-                    else {
+                    } else {
                         document.getElementById("endereco").value = "";
                         document.getElementById("bairro").value = "";
                         document.getElementById("cidade").value = "";
@@ -1645,7 +1713,7 @@ if (!empty($msg)) { ?>
                     }
 
                 },
-                error: function (jqXHR, textStatus) {
+                error: function(jqXHR, textStatus) {
                     searching = false;
                     $("#info_cep").html("");
                     document.getElementById("tipo_endereco").value = "";
@@ -1678,7 +1746,7 @@ if (!empty($msg)) { ?>
 <script src="/js/validaSenha.js"></script>
 <script src="http<?php echo (($_SERVER['HTTPS'] == "on") ? "s" : ""); ?>://www.google-analytics.com/urchin.js"
     type="text/javascript">
-    </script>
+</script>
 <script type="text/javascript">
     _uacct = "UA-1903237-3";
     urchinTracker();

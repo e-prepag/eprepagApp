@@ -12,7 +12,7 @@ require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 
-if(!isset($_POST['termos']) || empty($_POST['termos'])) {
+if (!isset($_POST['termos']) || empty($_POST['termos'])) {
     die("Erro: Você deve aceitar os termos de uso para prosseguir.");
 }
 // Step 1
@@ -31,6 +31,21 @@ if (!isValidEmail($email_confirmacao)) {
 }
 $password = getInputRequest('password');
 $password_confirmacao = getInputRequest('password_confirmacao');
+
+if ($password !== $password_confirmacao) {
+    die("Erro: A senha e a confirmação de senha são diferentes.");
+}
+
+require_once DIR_CLASS . "util/Validate.class.php";
+require_once DIR_CLASS . "util/Login.class.php";
+
+$erros = array();
+$validate = new Validate;
+$clsLogin = new Login($password);
+
+if ($clsLogin->valida() > 0) {
+    $erros[] = "<p>Senha não atinge os níveis de segurança desejados.</p>";
+}
 
 // Step 2
 $telefone_contato = getInputRequest('telefone_contato');
@@ -101,8 +116,7 @@ $como_conheceu_eprepag = sanitizeInput(getInputRequest('como_conheceu_eprepag'))
 if ($como_conheceu_eprepag == "outro") {
     $como_conheceu_eprepag = "OUTRO: " . sanitizeInput(getInputRequest('campo_outro_input'));
 }
-if(getenv('AMBIENTE') == "HOMOLOGACAO") {
-    
+if (getenv('AMBIENTE') == "HOMOLOGACAO") {
 } else if (!empty($_POST["g-recaptcha-response"])) {
 
     $tokenInfo = ["secret" => getenv("RECAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]];
@@ -122,7 +136,6 @@ if(getenv('AMBIENTE') == "HOMOLOGACAO") {
         echo "Processo invalidado por RECAPTCHA.<br>";
         exit;
     }
-
 } else {
     echo "Você deve realizar a verificação do RECAPTCHA para prosseguir.<br>";
     exit;
@@ -276,7 +289,7 @@ if ($cad_usuarioGames->getTipoEstabelecimento() == "Outros") {
     if ($rs_select_tipo_estabelecimento_row = pg_fetch_array($rs_select_tipo_estabelecimento)) {
         //echo  "rs_select_tipo_estabelecimento_row [te_id]: ".$rs_select_tipo_estabelecimento_row['te_id']."<br>";
         $cad_usuarioGames->setTipoEstabelecimento($rs_select_tipo_estabelecimento_row['te_id']);
-    }//end if ($rs_select_tipo_estabelecimento_row = pg_fetch_array($rs_select_tipo_estabelecimento))
+    } //end if ($rs_select_tipo_estabelecimento_row = pg_fetch_array($rs_select_tipo_estabelecimento))
     else {
         $outro_estabelecimento = utf8_encode(str_replace("'", '"', $outro_estabelecimento));
         $sql = "INSERT INTO tb_tipo_estabelecimento (te_ativo,te_descricao) VALUES (0,'" . $outro_estabelecimento . "');"; //".utf8_decode($resposta)."

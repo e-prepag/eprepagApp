@@ -309,7 +309,7 @@ class UsuarioGamesOperador {
 		
 		//Senha
 		if(is_null($senha) || $senha == "") 				$ret .= "A Senha deve ser preenchida.\n";
-		elseif(strlen($senha) < 6 || strlen($senha) > 15) 	$ret .= "A Senha deve ter entre 6 e 15 caracteres.\n";
+		elseif(strlen($senha) < 10 || strlen($senha) > 35) 	$ret .= "A Senha deve ter entre 10 e 35 caracteres.\n";
  		
 		//SenhaConf 		
 		if($senha != $senhaConf) 							$ret .= "A confirmação da senha deve ser igual a senha.";
