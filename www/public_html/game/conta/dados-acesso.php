@@ -238,7 +238,7 @@ $_SESSION['secret'] = $secret;
                                 <div class="form-group">
                                     <label for="novaSenha">Nova senha:</label>
                                     <input type="password" class="form-control novaSenha" onpaste="return false;"
-                                        autocomplete="new-password" maxlength="12" char="6" id="novaSenha"
+                                        autocomplete="new-password" maxlength="35" char="6" id="novaSenha"
                                         name="novaSenha" placeholder="Nova senha">
                                 </div>
                             </div>
@@ -246,7 +246,7 @@ $_SESSION['secret'] = $secret;
                                 <div class="form-group">
                                     <label for="confirmaSenha">Confirme a nova senha:</label>
                                     <input type="password" class="form-control confirmacaoSenha" onpaste="return false;"
-                                        autocomplete="new-password" maxlength="12" id="confirmaSenha" char="6"
+                                        autocomplete="new-password" maxlength="35" id="confirmaSenha" char="6"
                                         name="confirmaSenha" placeholder="Confirme sua nova senha">
                                     <div class="progress w-auto top10">
                                         <div class="progress-bar hidden progress-bar-danger" style="width: 33.33%">
@@ -260,7 +260,7 @@ $_SESSION['secret'] = $secret;
                                         </div>
                                     </div>
                                     <div class="col-md-12 txt-vermelho fontsize-pp">
-                                        *Sua senha deve ter: de 6 a 12 caracteres, letras, números, caracteres especiais
+                                        *Sua senha deve ter: de 10 a 35 caracteres, letras maiúsculas e minúsculas, números, caracteres especiais
                                         (|,!,?,*,$,%, etc)
                                     </div>
                                 </div>
