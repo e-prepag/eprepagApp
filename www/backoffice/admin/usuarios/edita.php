@@ -23,8 +23,8 @@ if (!$con->isConnected()) {
 $grupos_id = unserialize($_SESSION["arrIdGrupos"]);
 
 $msg = array();
-$minCaracPass = 6;
-$maxCaracPass = 12;
+$minCaracPass = 10;
+$maxCaracPass = 35;
 
 $pdo = $con->getLink();
 $sql = "SELECT id,shn_login,shn_nome,shn_mail, visualiza_dados, chave_autenticador FROM usuarios where id = ?";
@@ -225,7 +225,7 @@ if (isset($login)) {
                     </div>
                 </div>
                 <div class="col-md-offset-6 col-md-6 txt-vermelho fontsize-p">
-                    <span class="text-right"><?php echo vsprintf('*Sua senha deve ter: de %s a %s caracteres, letras, números, caracteres especiais (|,!,?,*,$, etc)', array($minCaracPass, $maxCaracPass)); ?></span>
+                    <span class="text-right"><?php echo vsprintf('*Sua senha deve ter: de %s a %s caracteres, letras maiúsculas e minúsculas, números, caracteres especiais (|,!,?,*,$, etc)', array($minCaracPass, $maxCaracPass)); ?></span>
                 </div>
             </div>
             <div class="form-group col-md-12 has-feedback">

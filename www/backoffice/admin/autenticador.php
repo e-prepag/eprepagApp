@@ -12,8 +12,6 @@ require_once __DIR__ . "/../../libs/PHPGangsta/GoogleAuthenticator.php";
 //Instanciando Objetos para Descriptografia
 $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
-$minCaracPass = 6;
-$maxCaracPass = 12;
 
 $con = ConnectionPDO::getConnection();
 if (!$con->isConnected()) {

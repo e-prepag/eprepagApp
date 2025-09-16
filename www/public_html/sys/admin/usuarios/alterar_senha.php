@@ -12,8 +12,8 @@ require_once $raiz_do_projeto . "class/util/Login.class.php";
 $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
 
-$minCaracPass = 6;
-$maxCaracPass = 12;
+$minCaracPass = 10;
+$maxCaracPass = 35;
 
 $con = ConnectionPDO::getConnection();
 if ( !$con->isConnected() ) {

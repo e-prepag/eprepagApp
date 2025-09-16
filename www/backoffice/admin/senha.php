@@ -9,8 +9,8 @@ require_once $raiz_do_projeto."class/util/Login.class.php";
 //Instanciando Objetos para Descriptografia
 $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
-$minCaracPass = 6;
-$maxCaracPass = 12;
+$minCaracPass = 10;
+$maxCaracPass = 35;
 
 $con = ConnectionPDO::getConnection();
 if ( !$con->isConnected() ) {
@@ -140,7 +140,7 @@ else {
                 </div>
             </div>
             <div class="col-md-offset-7 col-md-5 txt-vermelho fontsize-p">
-                <span class="text-right"><?php echo vsprintf('*Sua senha deve ter: de %s a %s caracteres, letras, números, caracteres especiais (|,!,?,*,$, etc)',array($minCaracPass,$maxCaracPass));?></span>
+                <span class="text-right"><?php echo vsprintf('*Sua senha deve ter: de %s a %s caracteres maiúsculas e minúsculas, letras, números, caracteres especiais (|,!,?,*,$, etc)',array($minCaracPass,$maxCaracPass));?></span>
             </div>
         </div>
         <div class="form-group col-md-12 has-feedback">
