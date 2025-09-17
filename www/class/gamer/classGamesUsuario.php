@@ -2775,7 +2775,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                     if ($getid->execute()) {
                         $res = $getid->fetch(PDO::FETCH_ASSOC);
 
-                        $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id'], $erro);
+                        $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id']);
                         //Log na base
                         usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CRIACAO_DO_CADASTRO'], $res['ug_id'], null);
                         $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER,'CadastroGamer');
@@ -2805,7 +2805,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return $erro;
     }
 
-    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id, &$erro){
+    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
         try {
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -2825,7 +2825,6 @@ function b_IsLogin_pagamento_pin_Personalizado() {
 
         } catch (PDOException $e) {
             UsuarioGames::logEvents($e->getMessage());
-            $erro[] = $e->getMessage();
         }
 
     }

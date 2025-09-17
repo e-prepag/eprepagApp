@@ -3,6 +3,23 @@ $raiz_do_projeto = "/www/";
 require_once "/www/includes/bourls.php";
 define("RAIZ_DO_PROJETO",$raiz_do_projeto);
 
+if (!function_exists('random_bytes')) {
+    function random_bytes($length) {
+
+        // Se tiver OpenSSL, usa bytes seguros
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            return openssl_random_pseudo_bytes($length);
+        }
+        // Fallback manual (não criptograficamente seguro)
+        $bytes = '';
+        for ($i = 0; $i < $length; $i++) {
+            // chr(rand(0, 255)) gera um byte ?aleatório?
+            $bytes .= chr(mt_rand(0, 255));
+        }
+        return $bytes;
+    }
+}
+
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
 
 // Nome do host

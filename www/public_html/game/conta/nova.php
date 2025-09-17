@@ -229,11 +229,11 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
             $lat = floatval($matches[1]);
             $lon = floatval($matches[3]);
 
-            if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-                $erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
-            } else {
+            //if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+                //$erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
+            //} else {
 
-                $location = $_POST["location"];
+                $location = $_POST["location"] ?: "Desconhecido";
                 $device = $_POST["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
                 $version = "v1 Termos Uso | v1 Termo Respons. ou pais";
                 $ipAdress = $_SERVER["REMOTE_ADDR"] ? $_SERVER["REMOTE_ADDR"] : "Desconhecido";
@@ -251,9 +251,10 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                 } else {
                     Util::redirect("/game/");
                 }
-            }
+            //}
         } else {
-            $erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
+            //$erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
+            $erros[] = "<p>Erro ao validar seus dados, tente novamente.</p>";
         }
     }
 }
@@ -282,8 +283,8 @@ $termosDeUso = strip_tags($termosDeUso);
                 timeout: 10000
             })
         ).catch((error) => {
-            manipulaModal(1, msgLocationError, 'Erro');
-            return null;
+            //manipulaModal(1, msgLocationError, 'Erro');
+            //return null;
         });
 
         $("#cadastro").submit(async function(e) {
@@ -320,20 +321,20 @@ $termosDeUso = strip_tags($termosDeUso);
                     timeout: 10000
                 })
             ).catch((error) => {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return null;
+                //manipulaModal(1, msgLocationError, 'Erro');
+                //return null;
             });
 
+            var localizacao;
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return false;
+                localizacao = 'Desconhecido';
+            }else{
+                localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
             }
 
-            const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-
             if (localizacao === "") {
-                console.log("Localização não obtida.");
-                return false;
+                //console.log("Localização não obtida.");
+                //return false;
             }
             $("#location").val(localizacao);
             $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);

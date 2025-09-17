@@ -414,6 +414,7 @@ if ($b_nova_forma_pagamento) {
     </script>
 
     <form id="form1" name="form1" method="POST">
+        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
         <input type="hidden" name="iforma" value="0">
         <input type="hidden" name="idu" value="0">
         <input type="hidden" name="sno" value="0">

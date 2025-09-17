@@ -151,12 +151,12 @@ if (isset($_POST["location"]) && !empty($_POST["location"])) {
     $lon = floatval($matches[3]);
 
     if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-        echo $msgErroLocation;
-        exit;
+        //echo $msgErroLocation;
+        //exit;
     }
 } else {
-    echo $msgErroLocation;
-    exit;
+    //echo $msgErroLocation;
+    //exit;
 }
 
 $cad_usuarioGames = new UsuarioGames(

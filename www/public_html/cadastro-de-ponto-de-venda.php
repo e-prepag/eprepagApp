@@ -628,8 +628,8 @@ if (!empty($msg)) { ?>
                 timeout: 10000
             })
         ).catch((error) => {
-            manipulaModal(1, msgLocationError, 'Erro');
-            return null;
+            //manipulaModal(1, msgLocationError, 'Erro');
+            //return null;
         });
 
         function adjustIframeHeight() {
@@ -777,21 +777,17 @@ if (!empty($msg)) { ?>
                             timeout: 10000
                         })
                     ).catch((error) => {
-                        manipulaModal(1, msgLocationError, 'Erro');
-                        return null;
+                        //manipulaModal(1, msgLocationError, 'Erro');
+                        //return null;
                     });
 
+                    var localizacao;
                     if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                        manipulaModal(1, msgLocationError, 'Erro');
-                        return false;
+                        localizacao = 'Desconhecido';
+                    } else {
+                        localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
                     }
 
-                    const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-
-                    if (localizacao === "") {
-                        console.log("Localização não obtida.");
-                        return false;
-                    }
                     $("#location").val(localizacao);
                     $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);
 

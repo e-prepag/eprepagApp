@@ -257,8 +257,9 @@ if($controller->usuario->b_IsLogin_pagamento()) {
                 </div>
             </div>
             <form id="form1" name="form1" method="post">
+                <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                 <input type="hidden" name="produtos_valor" id="produtos_valor" value="<?php echo $produtos_valor; ?>" />
-		<input type="hidden" name="pagto" id="pagto" value="<?php echo $pagto ?>" />
+		        <input type="hidden" name="pagto" id="pagto" value="<?php echo $pagto ?>" />
                 <input type="hidden" name="iforma" id="iforma" value="0">
                 <input type="hidden" name="idu" id="idu" value="0">
                 <input type="hidden" name="sno" id="sno" value="0">
