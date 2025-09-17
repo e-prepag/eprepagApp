@@ -8,12 +8,13 @@ $banner = $controller->getBanner();
 
 if($_POST['sel_id'] && $_POST['sel_id'] > 0)
 {    
-    if($_POST["btSubmit"])
+    if($_POST["btSubmit"] && $_SESSION["token_csrf"] == $_POST["token_csrf"])
     {
         $controller->alteraSenha($_POST['sel_id']);
     }
     
     $funcionario = $controller->pega($_POST['sel_id']);
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 }
 else
 {
@@ -51,6 +52,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
             <div class="row top5">
                 <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
                     <form name="form1" action="" method="post">
+                        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                         <div class="row">
                             <span class="col-md-6 col-lg-6 col-sm-4 col-xs-4 text-right">Nome: </span>
                             <span class="col-md-6 text-left col-lg-6 col-sm-8 col-xs-8">
@@ -66,12 +68,12 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                         <div class="row top5">
                             <span class="col-md-6 col-lg-6 col-sm-4 col-xs-4 text-right"><label for="cad_senha">Nova senha: </label></span>
                             <span class="col-md-6 col-lg-6 col-sm-8 col-xs-8">
-                                <input type="password" maxlength="12" char="6"  label="Nova senha " id="novaSenha" name="novaSenha" class="form-control novaSenha">
+                                <input type="password" maxlength="35" char="6"  label="Nova senha " id="novaSenha" name="novaSenha" class="form-control novaSenha">
                             <div class="hidden-md hidden-lg">
                                 <div class=" top10 txt-vermelho">
                                     *Sua senha deve ter<br>
-                                    - de 6 a 12 caracteres<br>
-                                    - letras<br>
+                                    - de 10 a 35 caracteres<br>
+                                    - letras maiúsculas e minúsculas<br>
                                     - números<br>
                                     - caracteres especiais (|,!,?,*,$,%, etc)"
                                 </div>
@@ -98,7 +100,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                                 <label for="cad_senhaConf">Confirmar senha: </label>
                             </span>
                             <span class="col-md-6 col-lg-6 col-sm-8 col-xs-8">
-                                <input type="password" name="novaSenhaConf" label="Confirmação de senha " id="novaSenhaConf" char="6" maxlength="12" class="form-control confirmacaoSenha">
+                                <input type="password" name="novaSenhaConf" label="Confirmação de senha " id="novaSenhaConf" char="6" maxlength="35" class="form-control confirmacaoSenha">
                             </span>
                         </div>
                         <div class="row top10 bottom10">
@@ -112,8 +114,8 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                 <div class="col-md-4 hidden-xs hidden-sm">
                     <div class="row top10 txt-vermelho">
                         *Sua senha deve ter<br>
-- de 6 a 12 caracteres<br>
-- letras<br>
+- de 10 a 35 caracteres<br>
+- letras maiúsculas e minúsculas<br>
 - números<br>
 - caracteres especiais (|,!,?,*,$,%, etc)"
                     </div>

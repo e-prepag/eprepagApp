@@ -17,3 +17,5 @@
 *.zip
 /.vscode
 test.php
+/docker-config/certs_local/*
+!/docker-config/certs_local/.gitkeep

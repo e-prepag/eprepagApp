@@ -502,7 +502,7 @@ class UsuarioGames {
 
         if ($ret == "") {
             if (UsuarioGames::existeEmail($objGamesUsuario->getEmail(), null)) {
-                $ret = "Email j√° cadastrado.";
+                $ret = "Email j· cadastrado.";
             }
         }
 
@@ -515,7 +515,7 @@ class UsuarioGames {
 
         if ($ret == "") {
             if (UsuarioGames::existeRG($objGamesUsuario->getRG(), null)) {
-                $ret = "RG j√° cadastrado.";
+                $ret = "RG j· cadastrado.";
             }
         }
 
@@ -585,7 +585,7 @@ class UsuarioGames {
             $sql .= ")";
 
             $ret = SQLexecuteQuery($sql);
-            if (!$ret) $ret = "Erro ao inserir usu√°rio.\n";
+            if (!$ret) $ret = "Erro ao inserir usu·rio.\n";
             else {
                 $ret = "";
                 $rs_id = SQLexecuteQuery("select currval('usuarios_games_id_seq') as last_id");
@@ -637,7 +637,7 @@ class UsuarioGames {
         $id_novo = 0;
         if ($ret == "") {
             if (UsuarioGames::existeEmail($email_novo, null)) {
-                $ret = "Email j√° cadastrado.";
+                $ret = "Email j· cadastrado.";
             }
         }
 
@@ -679,7 +679,7 @@ class UsuarioGames {
 //echo "$sql<br>";
 //grava_log_integracao("IntegraÔøΩÔøΩo Debug 4: ".date("Y-m-d H:i:s")."\n  $sql \n");
             $ret = SQLexecuteQuery($sql);
-            if (!$ret) $ret = "Erro ao inserir usu√°rio.\n";
+            if (!$ret) $ret = "Erro ao inserir usu·rio.\n";
             else { 
                 $ret = "";
                 $rs_id = SQLexecuteQuery("select currval('usuarios_games_id_seq') as last_id");
@@ -727,7 +727,7 @@ class UsuarioGames {
 
         if ($ret == "") {
             if ($this->existeEmail($objGamesUsuario->getEmail(), $objGamesUsuario->getId())) {
-                $ret = "Email j√° cadastrado.";
+                $ret = "Email j· cadastrado.";
             }
         }
 
@@ -740,7 +740,7 @@ class UsuarioGames {
 
         if ($ret == "") {
             if ($this->existeRG($objGamesUsuario->getRG(), $objGamesUsuario->getId())) {
-                $ret = "RG j√° cadastrado.";
+                $ret = "RG j· cadastrado.";
             }
         }
 
@@ -790,7 +790,7 @@ class UsuarioGames {
             $sql .= " where ug_id = " . SQLaddFields($objGamesUsuario->getId(), "");
 
             $ret = SQLexecuteQuery($sql);
-			if(!$ret) $ret = "Erro ao atualizar usu√°rio.\n";
+			if(!$ret) $ret = "Erro ao atualizar usu·rio.\n";
             else {
                 $ret = "";
 
@@ -905,7 +905,7 @@ class UsuarioGames {
                             }
                         }
                         else{
-                            $erro[] = "ERRO 2155357. Houve algum erro no momento de informar os dados. Por favor, tente a opera√ß√£o novamente. Obrigado!";
+                            $erro[] = "ERRO 2155357. Houve algum erro no momento de informar os dados. Por favor, tente a operaÁ„o novamente. Obrigado!";
                         }
  
                     
@@ -920,7 +920,7 @@ class UsuarioGames {
         } //end if(is_numeric($objGamesUsuario->getId()))
         else{
             $erro[] = "Sua sess√£o expirou. Volte no jogo e tente novamente. Obrigado!";
-            UsuarioGames::logEvents("ERRO - Sem sucesso ao capturar o ID do usu√°rio (objGamesUsuario->getId())");
+            UsuarioGames::logEvents("ERRO - Sem sucesso ao capturar o ID do usu·rio (objGamesUsuario->getId())");
             return false;
         }
     }//end atualizar_dados_endereco()
@@ -935,7 +935,7 @@ class UsuarioGames {
 
         //Senha
 		if(is_null($senha) || $senha == "") 				$ret .= "A Senha deve ser preenchida.\n";
-		elseif(strlen($senha) < 6 || strlen($senha) > 15) 	$ret .= "A Senha deve ter entre 6 e 15 caracteres.\n";
+		elseif(strlen($senha) < 10 || strlen($senha) > 35) 	$ret .= "A Senha deve ter entre 10 e 35 caracteres.\n";
 
         //SenhaConf 		
         if ($senha != $senhaConf) {
@@ -963,8 +963,8 @@ class UsuarioGames {
         if (!is_null($email) || $blCompleto) {
             $email = trim($objGamesUsuario->getEmail());
 	 		if(is_null($email) || $email == "") $ret .= "O Email deve ser preenchido.\n";
-			elseif(strlen($email) > 100) 		$ret .= "O Email deve ter at√© 100 caracteres.\n";
-			elseif(!verifica_email($email)) 	$ret .= "O Email √© inv√°lido.\n";
+			elseif(strlen($email) > 100) 		$ret .= "O Email deve ter atÈ 100 caracteres.\n";
+			elseif(!verifica_email($email)) 	$ret .= "O Email È inv·lido.\n";
         }
 
         //Nome
@@ -972,7 +972,7 @@ class UsuarioGames {
         if (!is_null($nome) || $blCompleto) {
             $nome = trim($objGamesUsuario->getNome());
  			if(is_null($nome) || $nome == "") 	$ret .= "O Nome deve ser preenchido.\n";
- 			elseif(strlen($nome) > 100) 		$ret .= "O Nome deve ter at√© 100 caracteres.\n";
+ 			elseif(strlen($nome) > 100) 		$ret .= "O Nome deve ter atÈ 100 caracteres.\n";
         }
 
         //CPF
@@ -1012,7 +1012,7 @@ class UsuarioGames {
         if (!is_null($dataNascimento) || $blCompleto) {
             $dataNascimento = trim($objGamesUsuario->getDataNascimento());
  			if(is_null($dataNascimento) || $dataNascimento == "") 	$ret .= "A Data de Nascimento deve ser preenchida.\n";
- 			elseif(verifica_data($dataNascimento) == 0)				$ret .= "A Data de Nascimento √© invÔøΩlida.\n";
+ 			elseif(verifica_data($dataNascimento) == 0)				$ret .= "A Data de Nascimento È invÔøΩlida.\n";
         }
 
         //Sexo
@@ -1020,7 +1020,7 @@ class UsuarioGames {
         if (!is_null($sexo) || $blCompleto) {
             $sexo = trim($objGamesUsuario->getSexo());
  			if(is_null($sexo) || $sexo == "") 							$ret .= "O Sexo deve ser preenchida.\n";
- 			elseif(strtoupper($sexo) != "M" && strtoupper($sexo) != "F")$ret .= "O Sexo √© inv√°lido.\n";
+ 			elseif(strtoupper($sexo) != "M" && strtoupper($sexo) != "F")$ret .= "O Sexo È inv·lido.\n";
         }
 
         /*
@@ -1066,7 +1066,7 @@ class UsuarioGames {
         if (!is_null($cidade) || $blCompleto) {
             $cidade = trim($objGamesUsuario->getCidade());
  			if(is_null($cidade) || $cidade == "") 	$ret .= "O Cidade deve ser preenchido.\n";
- 			elseif(strlen($cidade) > 100) 			$ret .= "O Cidade deve ter at√© 100 caracteres.\n";
+ 			elseif(strlen($cidade) > 100) 			$ret .= "O Cidade deve ter atÈ 100 caracteres.\n";
         }
 
         //Estado
@@ -1083,7 +1083,7 @@ class UsuarioGames {
             $CEP = trim($objGamesUsuario->getCEP());
 	 		if(is_null($CEP) || $CEP == "")	$ret .= "O CEP deve ser preenchido.\n";
  			elseif(strlen($CEP) <> 8) 		$ret .= "O CEP deve ser no formato 00000000.\n";
- 			elseif(!verifica_cepEx($CEP, false)) 		$ret .= "O CEP √© inv√°lido. Utilize o formato 00000000.\n";
+ 			elseif(!verifica_cepEx($CEP, false)) 		$ret .= "O CEP È inv·lido. Utilize o formato 00000000.\n";
         }
 
         //Tel DDI
@@ -1103,7 +1103,7 @@ class UsuarioGames {
  			if(is_null($TelDDD) || $TelDDD == "")	$ret .= "O DDD do Telefone deve ser preenchido.\n";
  			elseif(strlen($TelDDD) <> 2) 			$ret .= "O DDD do Telefone deve ter 2 d√≠gitos.\n";
  			elseif(!is_numeric($TelDDD)) 			$ret .= "O DDD do Telefone deve ser n√∫merico.\n";
- 			elseif($TelDDD <= 10 || ($TelDDD % 10 == 0)) $ret .= "O DDD do Telefone √© inv√°lido.\n";
+ 			elseif($TelDDD <= 10 || ($TelDDD % 10 == 0)) $ret .= "O DDD do Telefone È inv·lido.\n";
         }
 
         //Tel 
@@ -1113,7 +1113,7 @@ class UsuarioGames {
             $Tel = trim($objGamesUsuario->getTel());
  			if(is_null($Tel) || $Tel == "")	$ret .= "O Telefone deve ser preenchido.\n";
             //			elseif(verifica_tel($Tel) == 0)		$ret .= "O Telefone ÔøΩ invÔøΩlido.\n";
- 			elseif(!is_numeric($Tel) || (strlen($Tel)!=8))		$ret .= "O Telefone √© inv√°lido.\n";
+ 			elseif(!is_numeric($Tel) || (strlen($Tel)!=8))		$ret .= "O Telefone È inv·lido.\n";
         }
 
         //Cel DDI
@@ -1132,7 +1132,7 @@ class UsuarioGames {
  			if(is_null($CelDDD) || $CelDDD == "")	$ret .= "O DDD do Celular deve ser preenchido.\n";
  			elseif(strlen($CelDDD) <> 2) 			$ret .= "O DDD do Celular deve ter 2 d√≠gitos.\n";
  			elseif(!is_numeric($CelDDD)) 			$ret .= "O DDD do Celular deve ser n√∫merico.\n";
- 			elseif($CelDDD <= 10 || ($CelDDD % 10 == 0)) $ret .= "O DDD do Celular √© inv√°lido.\n";
+ 			elseif($CelDDD <= 10 || ($CelDDD % 10 == 0)) $ret .= "O DDD do Celular È inv·lido.\n";
         }
 
         //Cel 
@@ -1141,14 +1141,14 @@ class UsuarioGames {
             $Cel = trim($objGamesUsuario->getCel());
 	 		if(is_null($Cel) || $Cel == "")	$ret .= "O Celular deve ser preenchido.\n";
 // 			elseif(verifica_tel($Cel) == 0)		$ret .= "O Celular ÔøΩ invÔøΩlido.\n";
- 			elseif(!is_numeric($Cel) || ((strlen($Cel)!=8) && (strlen($Cel)!=9)))		$ret .= "O Celular √© inv√°lido.\n";
+ 			elseif(!is_numeric($Cel) || ((strlen($Cel)!=8) && (strlen($Cel)!=9)))		$ret .= "O Celular È inv·lido.\n";
         }
 
         //Habbo Id
         $habboId = $objGamesUsuario->getHabboId();
         if (!is_null($habboId) || $blCompleto) {
             $habboId = trim($objGamesUsuario->getHabboId());
- 			if(strlen($habboId) > 50) 				$ret .= "O Nome Habbo deve ter at√© 50 caracteres.\n";
+ 			if(strlen($habboId) > 50) 				$ret .= "O Nome Habbo deve ter atÈ 50 caracteres.\n";
         }
 
         return $ret;
@@ -1312,7 +1312,7 @@ class UsuarioGames {
 //gravaLog_DebugTMP("Cria usuÔøΩrio : \n  $sql \n");
 
         $rs = SQLexecuteQuery($sql);
-		if(!$rs) $ret = "Erro ao obter usu√°rio(s).\n";
+		if(!$rs) $ret = "Erro ao obter usu·rio(s).\n";
 
         return $ret;
 
@@ -1855,7 +1855,7 @@ class UsuarioGames {
             $ug_obs = NULL;
             if(pg_num_rows($rs_usuario_obs) > 0) { 
                     while($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
-                        $ug_obs .= "Em ".$rs_usuario_obs_row['data'].PHP_EOL."Autor: ".$rs_usuario_obs_row['ugo_user_insert'].PHP_EOL."Observa√ß√£o:".PHP_EOL.$rs_usuario_obs_row['ug_obs'].PHP_EOL.str_repeat("-",40).PHP_EOL;
+                        $ug_obs .= "Em ".$rs_usuario_obs_row['data'].PHP_EOL."Autor: ".$rs_usuario_obs_row['ugo_user_insert'].PHP_EOL."ObservaÁ„o:".PHP_EOL.$rs_usuario_obs_row['ug_obs'].PHP_EOL.str_repeat("-",40).PHP_EOL;
                     }//end while
             } //end if(pg_num_rows($rs_usuario) > 0)
             $usuarioGames->setOBS($ug_obs);
@@ -2593,7 +2593,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         if ($ret == "") {
 			if($acessa){
 			    if (UsuarioGames::existeEmail($objGamesUsuario->getEmail(), $objGamesUsuario->getId())) {
-					$ret = "Email j√° cadastrado.";
+					$ret = "Email j· cadastrado.";
 				}	
 			}
 
@@ -2601,7 +2601,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         
         if ($ret == "" && $editaSemLogin === false) {
             if (UsuarioGames::existeLogin($objGamesUsuario->getLogin(), $objGamesUsuario->getId())) {
-                $ret = "Login j√° cadastrado.";
+                $ret = "Login j· cadastrado.";
             }
         }
 
@@ -2665,7 +2665,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                                 $sql_insert_obs = "INSERT INTO usuarios_games_obs VALUES (".$objGamesUsuario->getId().",". SQLaddFields(trim($objGamesUsuario->getOBS()), "s") . ",'".$GLOBALS['_SESSION']['userlogin_bko']."');";
                                 //echo $sql_insert_obs;
                                 $ret_insert_obs = SQLexecuteQuery($sql_insert_obs);
-                                if(!$ret_insert_obs) echo "Erro ao atualizar Observa√ß√£o do Usu√°rio.".PHP_EOL;
+                                if(!$ret_insert_obs) echo "Erro ao atualizar ObservaÁ„o do Usu·rio.".PHP_EOL;
                             }//end if(trim($objGamesUsuario->getOBS()) != "")
                         } //end if(!is_null($objGamesUsuario->getOBS())) 
                         
@@ -2673,7 +2673,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
 			if(substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
             $sql .= " where ug_id = " . SQLaddFields($objGamesUsuario->getId(), "");
             $ret = SQLexecuteQuery($sql);
-			if(!$ret) $ret = "Erro ao atualizar usu√°rio.\n";
+			if(!$ret) $ret = "Erro ao atualizar usu·rio.\n";
             else {
                 $ret = "";
             }
@@ -2687,11 +2687,11 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         $erro = array();
 
         if (UsuarioGames::existeEmail($this->getEmail(), null)) {
-            $erro[] = "<p>E-mail '".$this->getEmail(). "' j√° cadastrado.</p>";
+            $erro[] = "<p>E-mail '".$this->getEmail(). "' j· cadastrado.</p>";
         }
 
         if (UsuarioGames::existeLogin($this->getLogin())){
-            $erro[] = "<p>Login '".$this->getLogin()."' j√° cadastrado.</p>";
+            $erro[] = "<p>Login '".$this->getLogin()."' j· cadastrado.</p>";
         }
 		
         $msgCpf = UsuarioGames::existeCPFCadastro($this->getCPF());
@@ -2775,7 +2775,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                     if ($getid->execute()) {
                         $res = $getid->fetch(PDO::FETCH_ASSOC);
 
-                        $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id'], $erro);
+                        $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id']);
                         //Log na base
                         usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CRIACAO_DO_CADASTRO'], $res['ug_id'], null);
                         $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER,'CadastroGamer');
@@ -2805,7 +2805,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return $erro;
     }
 
-    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id, &$erro){
+    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
         try {
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -2825,7 +2825,6 @@ function b_IsLogin_pagamento_pin_Personalizado() {
 
         } catch (PDOException $e) {
             UsuarioGames::logEvents($e->getMessage());
-            $erro[] = $e->getMessage();
         }
 
     }
@@ -2875,13 +2874,13 @@ function b_IsLogin_pagamento_pin_Personalizado() {
 
         if ($ret == "") {
             if (UsuarioGames::existeEmail($this->getEmail(), $this->getId())) {
-                $ret = "E-mail j√° cadastrado.";
+                $ret = "E-mail j· cadastrado.";
             }
         }
         
         if ($ret == "" && $editaSemLogin === false) {
             if (UsuarioGames::existeLogin($this->getLogin(), $this->getId())) {
-                $ret = "Login j√° cadastrado.";
+                $ret = "Login j· cadastrado.";
             }
         }
         
@@ -2990,7 +2989,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                         throw new PDOException("ERRO 215535. Tivemos um problema, favor entrar em contato com nosso suporte.");
                     }
                 }else{
-                    $erro[] = "N√£o h√° campos a serem atualizados.";
+                    $erro[] = "N√£o h· campos a serem atualizados.";
                 }
 
             } catch(PDOException $e) {
@@ -3032,12 +3031,12 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         if($campo == "ug_email"){
             $valor = strtoupper($valor);
             if($this->existeEmail($valor, $this->getId())){
-                $ret = utf8_encode("E-mail j√° cadastrado em nossa base de dados.");
+                $ret = utf8_encode("E-mail j· cadastrado em nossa base de dados.");
             }
         }else if($campo == "ug_login"){
             $valor = strtoupper($valor);
             if($this->existeLogin($valor, $this->getId())){
-                $ret = utf8_encode("Login j√° cadastrado em nossa base de dados. Insira um novo Login.");
+                $ret = utf8_encode("Login j· cadastrado em nossa base de dados. Insira um novo Login.");
             }
         }else if($campo == "ug_senha"){
             //SQL
@@ -3054,7 +3053,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
             if($rs->execute()){
 
                 if($rs->fetchColumn() > 0) {
-                    $ret =utf8_encode( "A nova senha √© identica a senha atual.");
+                    $ret =utf8_encode( "A nova senha È identica a senha atual.");
                 }
             }
         }
@@ -3128,7 +3127,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                         }
 
                     }else{
-                        $ret = utf8_encode("A senha atual est√° incorreta.");
+                        $ret = utf8_encode("A senha atual est· incorreta.");
                     }
                 }
             } catch(PDOException $e) {

@@ -18,6 +18,7 @@ $controller->setHeader();
 
 $ga = new PHPGangsta_GoogleAuthenticator();
 
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 $secret = $ga->createSecret();
 $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag Gamer', $secret);
 $_SESSION['secret'] = $secret;
@@ -41,7 +42,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "pass", novaSenha: $("#novaSenha").val(), confirmaSenha: $("#confirmaSenha").val(), senha: $("#senha").val() },
+                data: { type: "pass", novaSenha: $("#novaSenha").val(), confirmaSenha: $("#confirmaSenha").val(), senha: $("#senha").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -86,7 +87,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "novoLogin", login: $("#novoLogin").val(), confirmaLogin: $("#confirmaLogin").val(), senha: $("#l-senha").val() },
+                data: { type: "novoLogin", login: $("#novoLogin").val(), confirmaLogin: $("#confirmaLogin").val(), senha: $("#l-senha").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -130,7 +131,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "solicitaNovoEmail", email: $("#novoEmail").val(), confirmaEmail: $("#confirmaEmail").val(), senha: true },
+                data: { type: "solicitaNovoEmail", email: $("#novoEmail").val(), confirmaEmail: $("#confirmaEmail").val(), senha: true, token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -173,7 +174,7 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/alterar_autenticador.php",
-                data: { token: $("#token").val(), cad_senhaAtual: $("#cad_senhaAtual").val(), token_old: $("#token_old").val() },
+                data: { token: $("#token").val(), cad_senhaAtual: $("#cad_senhaAtual").val(), token_old: $("#token_old").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
                 success: function (obj) {
 
                     waitingDialog.hide();
@@ -237,7 +238,7 @@ $_SESSION['secret'] = $secret;
                                 <div class="form-group">
                                     <label for="novaSenha">Nova senha:</label>
                                     <input type="password" class="form-control novaSenha" onpaste="return false;"
-                                        autocomplete="new-password" maxlength="12" char="6" id="novaSenha"
+                                        autocomplete="new-password" maxlength="35" char="6" id="novaSenha"
                                         name="novaSenha" placeholder="Nova senha">
                                 </div>
                             </div>
@@ -245,7 +246,7 @@ $_SESSION['secret'] = $secret;
                                 <div class="form-group">
                                     <label for="confirmaSenha">Confirme a nova senha:</label>
                                     <input type="password" class="form-control confirmacaoSenha" onpaste="return false;"
-                                        autocomplete="new-password" maxlength="12" id="confirmaSenha" char="6"
+                                        autocomplete="new-password" maxlength="35" id="confirmaSenha" char="6"
                                         name="confirmaSenha" placeholder="Confirme sua nova senha">
                                     <div class="progress w-auto top10">
                                         <div class="progress-bar hidden progress-bar-danger" style="width: 33.33%">
@@ -259,7 +260,7 @@ $_SESSION['secret'] = $secret;
                                         </div>
                                     </div>
                                     <div class="col-md-12 txt-vermelho fontsize-pp">
-                                        *Sua senha deve ter: de 6 a 12 caracteres, letras, números, caracteres especiais
+                                        *Sua senha deve ter: de 10 a 35 caracteres, letras maiúsculas e minúsculas, números, caracteres especiais
                                         (|,!,?,*,$,%, etc)
                                     </div>
                                 </div>

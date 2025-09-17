@@ -9,8 +9,8 @@ require_once $raiz_do_projeto."class/util/Login.class.php";
 //Instanciando Objetos para Descriptografia
 $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
-$minCaracPass = 6;
-$maxCaracPass = 12;
+$minCaracPass = 10;
+$maxCaracPass = 35;
 
 $con = ConnectionPDO::getConnection();
 if ( !$con->isConnected() ) {
@@ -18,7 +18,7 @@ if ( !$con->isConnected() ) {
     die('Erro#2');
 }
 
-if(isset($_POST['pass_old'])) {
+if(isset($_POST['pass_old']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
     $erros = 0;
     $msg = "";
     
@@ -76,6 +76,8 @@ if(isset($_POST['pass_old'])) {
     }
     
 }
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">
@@ -107,6 +109,7 @@ if(isset($msg) && $color == "txt-verde") {
 else {
 ?>
 <form method="POST" id="form">
+    <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
     <div class="col-md-7 espacamento txt-preto">
         <div class="form-group col-md-12 has-feedback">
             <label class="control-label col-md-7 text-right" for="pass_old">
@@ -137,7 +140,7 @@ else {
                 </div>
             </div>
             <div class="col-md-offset-7 col-md-5 txt-vermelho fontsize-p">
-                <span class="text-right"><?php echo vsprintf('*Sua senha deve ter: de %s a %s caracteres, letras, números, caracteres especiais (|,!,?,*,$, etc)',array($minCaracPass,$maxCaracPass));?></span>
+                <span class="text-right"><?php echo vsprintf('*Sua senha deve ter: de %s a %s caracteres maiúsculas e minúsculas, letras, números, caracteres especiais (|,!,?,*,$, etc)',array($minCaracPass,$maxCaracPass));?></span>
             </div>
         </div>
         <div class="form-group col-md-12 has-feedback">

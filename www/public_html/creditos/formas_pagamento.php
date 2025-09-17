@@ -12,6 +12,12 @@ require_once "includes/header.php";
 
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
+    header("location: /creditos/index.php");
+}
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 //Definindo valor Default no caso do include estar conrrompido
 if (!defined('PAGAMENTO_BRADESCO')) {
     //Definindo como ativado
@@ -54,7 +60,7 @@ $valor_minimo = (($controller->usuarios->b_IsLogin_pagamento_minimo_1_real()) ? 
 $valor_maximo = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_VALOR_MAX'] : $GLOBALS['RISCO_LANS_PRE_VALOR_MAX']))));
 
 if ($controller->usuarios->b_IsLogin_pagamento_platinum()) {
-    $valor_maximo = 120000;
+    $valor_maximo = 150000;
 }
 
 if ($GLOBALS['TIPO_LIMITE'] == 0) {
@@ -408,6 +414,7 @@ if ($b_nova_forma_pagamento) {
     </script>
 
     <form id="form1" name="form1" method="POST">
+        <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
         <input type="hidden" name="iforma" value="0">
         <input type="hidden" name="idu" value="0">
         <input type="hidden" name="sno" value="0">

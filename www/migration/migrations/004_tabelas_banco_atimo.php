@@ -1,7 +1,7 @@
 <?php
 
 return function (PDO $pdo) {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS AT_ApisUsoCpf (
+    $pdo->exec("CREATE TABLE AT_ApisUsoCpf (
                     id SERIAL PRIMARY KEY,
                     retorno TEXT NOT NULL,
                     chamada TEXT NOT NULL,
@@ -9,7 +9,7 @@ return function (PDO $pdo) {
                 );
                     ");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS AT_ApisUso (
+    $pdo->exec("CREATE TABLE AT_ApisUso (
                     id BIGSERIAL PRIMARY KEY,
                     token VARCHAR(100) NOT NULL,
                     datahora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -21,7 +21,7 @@ return function (PDO $pdo) {
                 );
                     ");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_access_tokens (
+    $pdo->exec("CREATE TABLE oauth_access_tokens (
                     access_token VARCHAR(40) PRIMARY KEY,  -- System generated access token. Use appropriate collation for case-sensitive tokens.
                     client_id VARCHAR(80),                 -- OAUTH_CLIENTS.CLIENT_ID
                     user_id VARCHAR(80),                   -- OAUTH_USERS.USER_ID
@@ -41,10 +41,10 @@ return function (PDO $pdo) {
     $pdo->exec("CREATE TRIGGER trigger_update_expires
                 BEFORE UPDATE ON oauth_access_tokens
                 FOR EACH ROW
-                EXECUTE FUNCTION update_expires_column();
+                EXECUTE PROCEDURE update_expires_column();
                 ");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_authorization_codes (
+    $pdo->exec("CREATE TABLE oauth_authorization_codes (
                     authorization_code VARCHAR(40) PRIMARY KEY,  -- System generated authorization code
                     client_id VARCHAR(80),                        -- OAUTH_CLIENTS.CLIENT_ID
                     user_id VARCHAR(80),                          -- OAUTH_USERS.USER_ID
@@ -57,9 +57,9 @@ return function (PDO $pdo) {
     $pdo->exec("CREATE TRIGGER trigger_update_expires
                 BEFORE UPDATE ON oauth_authorization_codes
                 FOR EACH ROW
-                EXECUTE FUNCTION update_expires_column();");
+                EXECUTE PROCEDURE update_expires_column();");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_clients (
+    $pdo->exec("CREATE TABLE oauth_clients (
                     client_id VARCHAR(80) PRIMARY KEY,      -- A unique client identifier
                     client_secret VARCHAR(80),              -- Used to secure Client Credentials Grant
                     redirect_uri VARCHAR(2000),             -- Redirect URI used for Authorization Grant
@@ -68,7 +68,7 @@ return function (PDO $pdo) {
                     user_id VARCHAR(80)                     -- OAUTH_USERS.USER_ID
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_jti (
+    $pdo->exec("CREATE TABLE oauth_jti (
                     jti VARCHAR(2000) PRIMARY KEY,          -- JSON Token Identifier
                     subject VARCHAR(80),                    -- Related user/client
                     issuer VARCHAR(80),                     -- JWT issuer
@@ -79,22 +79,22 @@ return function (PDO $pdo) {
     $pdo->exec("CREATE TRIGGER trigger_update_expires
                 BEFORE UPDATE ON oauth_jti
                 FOR EACH ROW
-                EXECUTE FUNCTION update_expires_column();");
+                EXECUTE PROCEDURE update_expires_column();");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_jwt (
+    $pdo->exec("CREATE TABLE oauth_jwt (
                     client_id VARCHAR(80) PRIMARY KEY,     -- OAUTH_CLIENTS.CLIENT_ID
                     subject VARCHAR(80),                    -- Related user/client
                     public_key TEXT                         -- PEM encoded public key
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_public_keys (
+    $pdo->exec("CREATE TABLE oauth_public_keys (
                     client_id VARCHAR(80) PRIMARY KEY,     -- OAUTH_CLIENTS.CLIENT_ID
                     public_key TEXT,                        -- PEM encoded public key
                     private_key TEXT,                       -- PEM encoded private key
                     encryption_algorithm VARCHAR(100) DEFAULT 'RS256'        -- Algorithm used for signing/encryption
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_refresh_tokens (
+    $pdo->exec("CREATE TABLE oauth_refresh_tokens (
                     refresh_token VARCHAR(40) PRIMARY KEY,  -- System generated refresh token
                     client_id VARCHAR(80),                   -- OAUTH_CLIENTS.CLIENT_ID
                     user_id VARCHAR(80),                     -- OAUTH_USERS.USER_ID
@@ -105,14 +105,14 @@ return function (PDO $pdo) {
     $pdo->exec("CREATE TRIGGER trigger_update_expires
                 BEFORE UPDATE ON oauth_refresh_tokens
                 FOR EACH ROW
-                EXECUTE FUNCTION update_expires_column();");
+                EXECUTE PROCEDURE update_expires_column();");
                 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_scopes (
+    $pdo->exec("CREATE TABLE oauth_scopes (
                     scope VARCHAR(80) PRIMARY KEY,          -- Name of the scope
                     is_default BOOLEAN                      -- If this scope is granted by default
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_users (
+    $pdo->exec("CREATE TABLE oauth_users (
                     username VARCHAR(80) PRIMARY KEY,      -- Username / user ID
                     password VARCHAR(255),                 -- Hashed password
                     first_name VARCHAR(80),
@@ -122,7 +122,7 @@ return function (PDO $pdo) {
                     scope VARCHAR(4000)                    -- Space-delimited list of scopes
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS user (
+    $pdo->exec("CREATE TABLE \"user\" (
                     id_new BIGSERIAL PRIMARY KEY,
                     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -139,7 +139,7 @@ return function (PDO $pdo) {
                     auto_saldo smallint DEFAULT 0
                 );");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS situacao_chave_api (
+    $pdo->exec("CREATE TABLE situacao_chave_api (
                     id_situacao SERIAL PRIMARY KEY,
                     cod_situacao INTEGER NOT NULL, -- 1 = ativo; 2 = inativo
                     cod_usuario INTEGER NOT NULL,

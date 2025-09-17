@@ -13,6 +13,12 @@ require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "gamer/functions_endereco.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
+    header("location: /index.php");
+}
+
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
+
 //Definindo valor Default no caso do include estar conrrompido
 if(!defined('PAGAMENTO_BRADESCO')) {
     //Definindo como ativado
@@ -251,8 +257,9 @@ if($controller->usuario->b_IsLogin_pagamento()) {
                 </div>
             </div>
             <form id="form1" name="form1" method="post">
+                <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                 <input type="hidden" name="produtos_valor" id="produtos_valor" value="<?php echo $produtos_valor; ?>" />
-		<input type="hidden" name="pagto" id="pagto" value="<?php echo $pagto ?>" />
+		        <input type="hidden" name="pagto" id="pagto" value="<?php echo $pagto ?>" />
                 <input type="hidden" name="iforma" id="iforma" value="0">
                 <input type="hidden" name="idu" id="idu" value="0">
                 <input type="hidden" name="sno" id="sno" value="0">

@@ -11,7 +11,7 @@ else {
 }
 
 // Constante a quantidade limite para aceitação do mesmo CPF
-define("CPF_QUANTIDADE_LIMITE",	50);
+define("CPF_QUANTIDADE_LIMITE",	100);
     
 // Constante a quantidade limite para numero de contas com o mesmo CPF
 define("CPF_QUANTIDADE_CONTAS",	1); // 2

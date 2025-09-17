@@ -12,8 +12,8 @@ require_once $raiz_do_projeto . "class/util/Login.class.php";
 $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
 
-$minCaracPass = 6;
-$maxCaracPass = 12;
+$minCaracPass = 10;
+$maxCaracPass = 35;
 
 $con = ConnectionPDO::getConnection();
 if ( !$con->isConnected() ) {
@@ -21,7 +21,7 @@ if ( !$con->isConnected() ) {
     die('Erro#2');
 }
 
-if(isset($_POST['pass_old']) && $_POST['pass_old'] != "")
+if(isset($_POST['pass_old']) && $_POST['pass_old'] != "" && $_SESSION["token_csrf"] == $_POST["token_csrf"])
 {
     $erros = 0;
     
@@ -81,6 +81,7 @@ if(isset($_POST['pass_old']) && $_POST['pass_old'] != "")
     }
     
 }
+$_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 
 ?>
 <link href="/includes/bootstrap/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />
@@ -106,6 +107,7 @@ td {
        
     <div class="row" style="margin-top:20px; margin: 0 auto; width: 891px;">
         <form method="post" name="alterar_senha" id="alterar_senha">
+            <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
             <div class="col-md-12 top20">
 <?php                
                 if(isset($msg) && $color != "txt-verde")

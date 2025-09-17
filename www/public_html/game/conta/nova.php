@@ -44,7 +44,6 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
         if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
             $erros[] = "<p>Processo invalidado por RECAPTCHA.</p>";
         }
-
     } else {
         $erros[] = "<p>Você deve realizar a verificação do RECAPTCHA para prosseguir.</p>";
     }
@@ -193,11 +192,9 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                             $usuarios->setDataNascimento(addslashes($_POST['dtNasc']));
                             $usuarios->setEmail(addslashes($_POST['email']));
                             $usuarios->setSenha($_POST['senha']);
-
                         } else {
                             $erros[] = "<p>A idade mínima para o cadastro é de 18 anos.</p>";
                         }
-
                     }
                 } else {
                     $cpfFinal = substr($cpf, 0, 3) . "." . substr($cpf, 3, 3) . "." . substr($cpf, 6, 3) . "-" . substr($cpf, 9, 2);
@@ -209,21 +206,18 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                     if ($linhas <= 2) {
                         $erros[] = "<p>Detectamos que você possui mais de um cadastro na E-Prepag. Se você já realizou alguma compra diretamente de um game, é possível que já tenha um cadastro ativa conosco. Verifique o endereço de e-mail utilizado.</p>
                         <p>Em caso de dúvidas, <a href=\'" . EPREPAG_URL_HTTPS_COM . "/support\'>clique aqui para entrar em contato com o suporte da E-Prepag</a>.</p>";
-
                     } else if (isset($retorno["erros"]) && !empty($retorno["erros"])) {
                         $erros[] = "<p>" . $retorno["erros"] . "</p>";
                     } else {
                         $erros[] = "<p>Erro desconhecido ao verificar o CPF, se o problema persistir, por favor <a href=\'" . EPREPAG_URL_HTTPS_COM . "/support\'>clique aqui para entrar em contato com o suporte da E-Prepag</a>.</p>";
                     }
                 }
-
             } else {
                 $erros[] = "<p>A data de nascimento digitada está invalida</p>";
             }
         } else {
             $erros[] = "<p>A data de nascimento digitada está invalida</p>";
         }
-
     }
 
     if (empty($erros)) {
@@ -235,11 +229,11 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
             $lat = floatval($matches[1]);
             $lon = floatval($matches[3]);
 
-            if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-                $erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
-            } else {
+            //if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+                //$erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
+            //} else {
 
-                $location = $_POST["location"];
+                $location = $_POST["location"] ?: "Desconhecido";
                 $device = $_POST["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
                 $version = "v1 Termos Uso | v1 Termo Respons. ou pais";
                 $ipAdress = $_SERVER["REMOTE_ADDR"] ? $_SERVER["REMOTE_ADDR"] : "Desconhecido";
@@ -257,11 +251,11 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                 } else {
                     Util::redirect("/game/");
                 }
-            }
+            //}
         } else {
-            $erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
+            //$erros[] = "<p>Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
+            $erros[] = "<p>Erro ao validar seus dados, tente novamente.</p>";
         }
-
     }
 }
 
@@ -274,7 +268,6 @@ $termosDeUso = strip_tags($termosDeUso);
 <script src="/js/valida.js"></script>
 <script src="/js/validaSenha.js"></script>
 <script>
-
     const msgLocationError = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
 
     <?php
@@ -282,17 +275,19 @@ $termosDeUso = strip_tags($termosDeUso);
         print "manipulaModal(1,`" . implode($erros) . "`,'Atenção');";
     }
     ?>
-    $(function () {
+    $(function() {
 
         // Tenta obter localização (se o usuário permitir)
         new Promise((resolve, reject) =>
-            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000
+            })
         ).catch((error) => {
-            manipulaModal(1, msgLocationError, 'Erro');
-            return null;
+            //manipulaModal(1, msgLocationError, 'Erro');
+            //return null;
         });
 
-        $("#cadastro").submit(async function (e) {
+        $("#cadastro").submit(async function(e) {
 
             e.preventDefault();
 
@@ -322,22 +317,24 @@ $termosDeUso = strip_tags($termosDeUso);
 
             // Tenta obter localização (se o usuário permitir)
             const pos = await new Promise((resolve, reject) =>
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    timeout: 10000
+                })
             ).catch((error) => {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return null;
+                //manipulaModal(1, msgLocationError, 'Erro');
+                //return null;
             });
 
+            var localizacao;
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return false;
+                localizacao = 'Desconhecido';
+            }else{
+                localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
             }
 
-            const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-
             if (localizacao === "") {
-                console.log("Localização não obtida.");
-                return false;
+                //console.log("Localização não obtida.");
+                //return false;
             }
             $("#location").val(localizacao);
             $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);
@@ -377,7 +374,7 @@ $termosDeUso = strip_tags($termosDeUso);
                     </div>
                     <div class="col-md-6">
                         <input class="form-control" id="login" char="5" name="login" type="text" value="<?php if (isset($_POST['login']))
-                            echo htmlspecialchars($_POST['login'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                                                                            echo htmlspecialchars($_POST['login'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </div>
                 <div class="row top20">
@@ -386,7 +383,7 @@ $termosDeUso = strip_tags($termosDeUso);
                     </div>
                     <div class="col-md-6">
                         <input class="form-control" id="email" char="5" maxlength="100" name="email" type="text" value="<?php if (isset($_POST['email']))
-                            echo htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                                                                                            echo htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </div>
                 <div class="row top10">
@@ -396,7 +393,7 @@ $termosDeUso = strip_tags($termosDeUso);
                     <div class="col-md-6">
                         <input class="form-control" id="conf_mail" char="5" maxlength="100" name="conf_mail" type="text"
                             value="<?php if (isset($_POST['conf_mail']))
-                                echo htmlspecialchars($_POST['conf_mail'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        echo htmlspecialchars($_POST['conf_mail'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </div>
 
@@ -406,7 +403,7 @@ $termosDeUso = strip_tags($termosDeUso);
                     </div>
                     <div class="col-md-6">
                         <input class="form-control" id="cpf" char="14" maxlength="14" name="cpf" type="text" value="<?php if (isset($_POST['cpf']))
-                            echo htmlspecialchars($_POST['cpf'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                                                                                        echo htmlspecialchars($_POST['cpf'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </div>
                 <div class="row top10">
@@ -416,7 +413,7 @@ $termosDeUso = strip_tags($termosDeUso);
                     <div class="col-md-6">
                         <input class="form-control" id="dtNasc" char="10" maxlength="10" name="dtNasc" type="text"
                             value="<?php if (isset($_POST['dtNasc']))
-                                echo htmlspecialchars($_POST['dtNasc'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        echo htmlspecialchars($_POST['dtNasc'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </div>
 
@@ -425,7 +422,7 @@ $termosDeUso = strip_tags($termosDeUso);
                         <label for="senha">Senha:</label>
                     </div>
                     <div class="col-md-6">
-                        <input class="form-control novaSenha" maxlength="12" autocomplete="new-password" char="6"
+                        <input class="form-control novaSenha" maxlength="35" autocomplete="new-password" char="6"
                             id="senha" name="senha" char="3" type="password" value="">
                     </div>
                 </div>
@@ -434,15 +431,15 @@ $termosDeUso = strip_tags($termosDeUso);
                         <label for="conf_senha">Confirmação de senha:</label>
                     </div>
                     <div class="col-md-6">
-                        <input class="form-control confirmacaoSenha" maxlength="12" autocomplete="new-password" char="6"
+                        <input class="form-control confirmacaoSenha" maxlength="35" autocomplete="new-password" char="6"
                             id="conf_senha" char="3" name="conf_senha" type="password" value="">
                     </div>
 
                     <div class="col-md-6 col-md-offset-6 col-sm-12 col-xs-12 txt-preto text-left">
                         <span>Sua senha deve ter:</span>
                         <ul>
-                            <li>De 6 a 12 caracteres</li>
-                            <li>Letras</li>
+                            <li>De 10 a 35 caracteres</li>
+                            <li>Letras maiúsculas e minúsculas</li>
                             <li>Números</li>
                             <li>Caracteres especiais (!,?,*,$,%)</li>
                         </ul>
@@ -464,21 +461,16 @@ $termosDeUso = strip_tags($termosDeUso);
                         </div>
                     </div>
                 </div>
-                <div class="row top10">
-                    <div class="col-md-6">
+                <div class="row top10" style="display: flex;
+                        flex-direction: column;
+                        align-items: stretch;
+                        margin: 0px 10px;">
+                    <div style="text-align: start;">
                         <label for="comment">Termos de uso:</label>
                     </div>
-                    <div class="col-md-6">
-                        <textarea class="form-control" rows="5"
+                    <div>
+                        <textarea class="form-control" rows="7" style="border-radius: 4px;"
                             readonly="readonly"><?php echo $termosDeUso; ?></textarea>
-                    </div>
-                </div>
-                <div class="row top10 ">
-                    <div class="col-md-6 col-lg-6 col-sm-10 col-xs-10">
-                        <label for="termos_uso">Li e aceito os termos de uso:</label>
-                    </div>
-                    <div class="col-md-6 col-lg-6 col-sm-2 col-xs-2 text-left">
-                        <input id="termos_uso" type="checkbox" char="1" class="" name="termos_uso" value="">
                     </div>
                 </div>
                 <div class="row top10 ">
@@ -514,11 +506,17 @@ $termosDeUso = strip_tags($termosDeUso);
                         </ul>
                     </div>
                 </div>
-
+                <div class="row top10 ">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-left"
+                        style="display: inline-flex;justify-content: flex-start; margin-left: 20px;">
+                        <input id="termos_uso" type="checkbox" char="1"
+                            name="termos_uso" value=""><span style="margin-top: 4px; margin-left: 4px;">Li e aceito os termos de uso.</span>
+                    </div>
+                </div>
                 <div class="row top10">
                     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-left"
-                        style="display: inline-flex;justify-content: flex-end">
-                        <input id="termos_responsaveis_uso" type="checkbox" char="1" class=""
+                        style="display: inline-flex;justify-content: flex-start; margin-left: 20px;">
+                        <input id="termos_responsaveis_uso" type="checkbox" char="1"
                             name="termos_responsaveis_uso" value=""><span style="margin-top: 4px; margin-left: 4px;">Li
                             e aceito os termos de responsabilidade para os pais e responsáveis.</span>
                     </div>
@@ -591,8 +589,12 @@ $termosDeUso = strip_tags($termosDeUso);
     integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    $('#cpf').mask('000.000.000-00', { reverse: true });
-    $('#dtNasc').mask('00/00/0000', { placeholder: "__/__/____" });
+    $('#cpf').mask('000.000.000-00', {
+        reverse: true
+    });
+    $('#dtNasc').mask('00/00/0000', {
+        placeholder: "__/__/____"
+    });
 </script>
 <?php
 require_once RAIZ_DO_PROJETO . "public_html/game/includes/footer.php";

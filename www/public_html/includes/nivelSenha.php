@@ -8,8 +8,8 @@ require_once $raiz_do_projeto."class/util/Login.class.php";
 if(Util::isAjaxRequest())
 {
     if($_POST['str'] != ""){
-        $minCarac = 6;
-        $maxCarac = 12;
+        $minCarac = 10;
+        $maxCarac = 35;
         $login = new Login($_POST['str']);
         $login->setLimiteCaracteres($minCarac, $maxCarac);
 

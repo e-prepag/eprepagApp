@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-error_reporting(E_ALL); 
-ini_set("display_errors", 1); 
+//error_reporting(E_ALL); 
+//ini_set("display_errors", 1); 
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
@@ -23,6 +23,14 @@ if (Util::isAjaxRequest()) {
     $retorno = new stdClass();
     $retorno->erro = '';
     $retorno->sucesso = false;
+
+    if($_POST["token_csrf"] != $_SESSION["token_csrf"]){
+        $retorno->erro = "Requisição inválida";
+        print json_encode($retorno);
+        die;
+    }
+
+    $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 
     if (isset($_POST['cad_senhaAtual'])) {
 
@@ -89,7 +97,7 @@ if (Util::isAjaxRequest()) {
                 }
             } else {
                 // Token is invalid
-                $retorno->erro = "Token novo inválido! Verifique se o Token foi inserido corretamente." . $secret;
+                $retorno->erro = "Token novo inválido! Verifique se o Token foi inserido corretamente.";
             }
         }
 
