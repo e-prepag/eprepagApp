@@ -53,7 +53,7 @@ try {
                             if ($stmt->rowCount() > 0) {
                                 $_SESSION['secret'] = "";
 ?>
-                                <form id="redir" method="POST" action="/index3.php">
+                                <form id="redir" method="POST" action="/index2.php">
                                     <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                                     <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                                     <input type="hidden" name="token" value="<?= htmlspecialchars($_POST['token'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
