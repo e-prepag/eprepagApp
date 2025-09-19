@@ -205,7 +205,7 @@ class RecebePix {
 				Status final venda: '.$novoRetorno["vg_ultimo_status"].'<br>
 				Ambiente Venda: '.$this->ambiente.'<br>
 				ID de venda E-Prepag: '.$venda["idvenda"]);
-				$retornoEmail = enviaEmail("monitoramento@e-prepag.com.br,felipe.farias@easygroupit.com", "", "", "WEB HOOK(".$venda["idvenda"].")", $mensagem);
+				$retornoEmail = enviaEmail("monitoramento@e-prepag.com.br,wesley.pereira@easygroupit.com", "", "", "WEB HOOK(".$venda["idvenda"].")", $mensagem);
 			if($retornoEmail){ //
 			
 			    $status = ($retornoEmail == true)? "OK":"NOK";

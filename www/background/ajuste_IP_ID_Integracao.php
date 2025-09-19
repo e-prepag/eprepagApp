@@ -18,7 +18,7 @@ if(!$arquivoLog->haveFile()) {
     ob_start('callbackLog');
     
     // Dados do Email
-    $email  = "felipe.farias@easygroupit.com";
+    $email  = "wesley.pereira@easygroupit.com";
     $cc     = "glaucia@e-prepag.com.br";
     $bcc    = "";
     $subject= "Ajuste de IP_ID referente a Integração";

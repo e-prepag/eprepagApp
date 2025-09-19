@@ -28,7 +28,7 @@ try {
 
     if ($alteracoes) {
         // Configurações do e-mail
-        $to = 'felipe.farias@easygroupit.com, jose.carlos@easygroupit.com, rc@e-prepag.com.br, glaucia@e-prepag.com.br';
+        $to = 'wesley.pereira@easygroupit.com, jose.carlos@easygroupit.com, rc@e-prepag.com.br, glaucia@e-prepag.com.br';
         $cc     = "";
         $subject = 'Notificação de Alteração de E-mail no PDV';
         $bcc = "";
@@ -75,7 +75,7 @@ try {
 
     if ($suspeitos) {
         // Configurações do e-mail
-        $to = 'felipe.farias@easygroupit.com, jose.carlos@easygroupit.com, rc@e-prepag.com.br, glaucia@e-prepag.com.br';
+        $to = 'wesley.pereira@easygroupit.com, jose.carlos@easygroupit.com, rc@e-prepag.com.br, glaucia@e-prepag.com.br';
         $subject = 'Notificação de Bloqueio por Saldo Suspeito';
         $message = "<h1>Notificação de Bloqueio por Saldo Suspeito</h1>";
         $message .= "<p>Os seguintes usuários foram bloqueados por saldo suspeito:</p>";
