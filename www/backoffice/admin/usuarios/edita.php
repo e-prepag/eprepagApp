@@ -1,4 +1,8 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
+// ini_set("error_log", "/erros.log");
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "class/util/Validate.class.php";
@@ -19,6 +23,18 @@ if (!$con->isConnected()) {
     die('Erro#2');
 }
 
+$publishers = [];
+
+try {
+    $pdo = ConnectionPDO::getConnection()->getLink();
+
+    $sql = "select opr_codigo, opr_nome from operadoras order by opr_nome asc;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $publishers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro no banco de dados";
+}
 
 $grupos_id = unserialize($_SESSION["arrIdGrupos"]);
 
@@ -27,7 +43,7 @@ $minCaracPass = 10;
 $maxCaracPass = 35;
 
 $pdo = $con->getLink();
-$sql = "SELECT id,shn_login,shn_nome,shn_mail, visualiza_dados, chave_autenticador FROM usuarios where id = ?";
+$sql = "SELECT id,shn_login,shn_nome,shn_mail, visualiza_dados, chave_autenticador, tipo_acesso, opr_codigo FROM usuarios where id = ?";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute(array($_POST['id']));
@@ -40,6 +56,8 @@ if (isset($fetch[0]['id']) && isset($fetch[0]['shn_login'])) {
     $email = $fetch[0]['shn_mail'];
     $visualiza_dados = $fetch[0]['visualiza_dados'];
     $chave_autenticador = $fetch[0]['chave_autenticador'];
+    $tipo_acesso_var = $fetch[0]['tipo_acesso'];
+    $publisher_var = $fetch[0]['opr_codigo'];
 }
 
 if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
@@ -88,21 +106,36 @@ if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($fetch) == 1) {
+
+            if($_POST["tipo_acesso"] == "PU"){
+                $opr_codigo = $_POST["publisher"];
+            }else{
+                $opr_codigo = 0;
+            }
+
+            if(empty($_POST["tipo_acesso"])){
+                $_POST["tipo_acesso"] = "AT";
+            }
+
             if (isset($passw)) {
-                $update = "UPDATE usuarios set shn_password = ?, shn_nome = ?, shn_mail = ?, visualiza_dados = ? where id = ?";
+                $update = "UPDATE usuarios set shn_password = ?, shn_nome = ?, shn_mail = ?, visualiza_dados = ?, tipo_acesso = ?, opr_codigo = ? where id = ?";
                 $params = array(
                     $passw,
                     $_POST['nome'],
                     $_POST['email'],
                     $visualiza_dados,
+                    $_POST["tipo_acesso"],
+                    $opr_codigo,
                     $_POST['id']
                 );
             } else {
-                $update = "UPDATE usuarios set shn_nome = ?, shn_mail = ?, visualiza_dados = ? where id = ?";
+                $update = "UPDATE usuarios set shn_nome = ?, shn_mail = ?, visualiza_dados = ?, tipo_acesso = ?, opr_codigo = ? where id = ?";
                 $params = array(
                     $_POST['nome'],
                     $_POST['email'],
                     $visualiza_dados,
+                    $_POST["tipo_acesso"],
+                    $opr_codigo,
                     $_POST['id']
                 );
             }
@@ -237,6 +270,32 @@ if (isset($login)) {
                 </div>
             </div>
             <div class="form-group col-md-12 has-feedback">
+                <label class="control-label  text-right col-md-6" for="tipo_acesso">
+                    Tipo de acesso
+                </label>
+                <div class="col-md-6">
+                    <select class="form-control input" name="tipo_acesso" id="tipo_acesso">
+                        <option <?php echo (isset($tipo_acesso_var)) ? "" : "selected"; ?> value="">Selecione um tipo</option>
+                        <option <?php echo $tipo_acesso_var == "AT" ? "selected" : ""; ?> value="AT">Atendente</option>
+                        <option <?php echo $tipo_acesso_var == "PU" ? "selected" : ""; ?> value="PU">Publisher</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-md-12 has-feedback <?= $publisher_var > 0 ? "" : "d-none" ?>" id="divPublisher">
+                <label class="control-label  text-right col-md-6" for="publisher">
+                    Publisher
+                </label>
+                <div class="col-md-6">
+                    <select class="form-control input" name="publisher" id="publisher">
+                        <option <?php echo $publisher_var == "0" ? "selected" : ""; ?> value="0">Selecione uma publisher</option>
+                        <?php foreach ($publishers as $publisher) {
+                            $selected_publisher = $publisher_var == $publisher["opr_codigo"] ? "selected" : "";
+                            echo "<option $selected_publisher value='{$publisher["opr_codigo"]}'>{$publisher["opr_codigo"]} - {$publisher["opr_nome"]}</option>";
+                        } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-md-12 has-feedback">
                 <label class="control-label  text-right col-md-6" for="visualiza_dados">
                     Visualiza informações <br>(Login, id, e-mail) <br> na listagem
                 </label>
@@ -302,6 +361,13 @@ if (isset($login)) {
     </div>
     <script>
         $(function() {
+            $("#tipo_acesso").change((e) => {
+                if (e.target.value == "PU") {
+                    $("#divPublisher").removeClass("d-none");
+                } else {
+                    $("#divPublisher").addClass("d-none");
+                }
+            })
             $(".botao-salvar").click(function() {
                 let senha = $("#nova_senha").val();
 

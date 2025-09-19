@@ -22,14 +22,14 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
     // Abre o diretório e lista os arquivos
     if (is_dir($diretorio)) {
         $arquivos = scandir($diretorio); // Lista os arquivos e diretórios
-    
+
         foreach ($arquivos as $arquivo) {
             $caminhoCompleto = $diretorio . DIRECTORY_SEPARATOR . $arquivo;
-    
+
             // Verifica se o nome contém "imagem" e se é um arquivo
             if (is_file($caminhoCompleto) && strpos($arquivo, $nomeBase) !== false) {
                 $modificacao = filemtime($caminhoCompleto); // Obtém a última modificação
-                
+
                 // Atualiza o arquivo mais recente
                 if ($modificacao > $ultimaModificacao) {
                     $ultimaModificacao = $modificacao;
@@ -41,7 +41,7 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
 
     if ($ultimoArquivo) {
         echo '<div class="row"><div class="col-md-12 text-center top50"><a href="/dimp/' . date('Ymd') . '/' . strtoupper($ultimoArquivo) . '" class="btn btn-info" download="' . strtoupper($ultimoArquivo) . '">Download Arquivo DIMP</a><div></div>';
-        
+
         ob_end_flush();
         flush();
         exit();
@@ -49,6 +49,12 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
 }
 
 if (isset($_POST['verificar']) && isset($_POST['requisicao_id'])) {
+    $dir = "/www/backoffice/dimp/" . date('Ymd') . "/";
+
+    // cria a pasta se não existir
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
     $arquivo = '/www/backoffice/dimp/' . date('Ymd') . '/result_' . $id_request . '.txt';
 
     if (file_exists($arquivo)) {
@@ -199,9 +205,7 @@ $NAT_OPER = "2";                                             // Informar a natur
 
 //Esse ID é concatenado no inicio de cada id da operação('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
 
-$ARRAY_CONCATENA_ID_VENDA = array
-
-(
+$ARRAY_CONCATENA_ID_VENDA = array(
 
     'gamer' => '10',
 
@@ -402,15 +406,13 @@ try {
                              </div>";
 
                     $lastPublisher = $freeze_detail_row['fp_publisher'];
+                } //end while
 
-                }//end while
-
-            }//end if ($freeze_detail)
+            } //end if ($freeze_detail)
             else {
 
                 $msg = "<strong><br>ERRO 0003</strong>: Erro ao executar o select dos DETALHES dos periodos não congelados<br><br>";
-
-            }//end else do if ($freeze_detail)
+            } //end else do if ($freeze_detail)
 
         } //end if($freeze_total_row['total'] > 0)
         else {
@@ -452,7 +454,7 @@ try {
                 ),
 
                 1 => array(
-                    'name' => '09',//'07', '03'
+                    'name' => '09', //'07', '03'
 
                     'size' => 2
 
@@ -688,24 +690,21 @@ try {
                     if (!empty($publishers_epp_pagto)) {
 
                         $publishers_epp_pagto .= ", " . $response_epp_pagto_row['opr_codigo'];
-
-                    }//edn if(!empty($publishers_epp_pagto))
+                    } //edn if(!empty($publishers_epp_pagto))
                     else {
 
                         $publishers_epp_pagto = $response_epp_pagto_row['opr_codigo'];
+                    } //end else do if(!empty($publishers_epp_pagto))
 
-                    }//end else do if(!empty($publishers_epp_pagto))
+                } //end while
 
-                }//end while
-
-            }//end if ($response_epp_pagto) 
+            } //end if ($response_epp_pagto) 
             else {
 
                 $msg .= "<strong><br>ERRO 0004</strong>: Erro ao executar o select dos Publishes vinculados à E-Prepag Pagamentos<br><br>";
 
                 $class = "alert-danger txt-vermelho";
-
-            }//end esle do if ($response_epp_pagto) 
+            } //end esle do if ($response_epp_pagto) 
 
 
 
@@ -823,8 +822,7 @@ try {
                 $countBlocoZero++;
 
                 $REG_BLC['0100']++;
-
-            }//end if(!empty($publishers_epp_pagto))
+            } //end if(!empty($publishers_epp_pagto))
 
             //echo "<div> EPP PAGTO : [".$publishers_epp_pagto."]</div>";
 
@@ -1016,17 +1014,15 @@ try {
                     $countBlocoZero++;
 
                     $REG_BLC['0100']++;
+                } //end while
 
-                }//end while
-
-            }//end if ($response_epp_adm) 
+            } //end if ($response_epp_adm) 
             else {
 
                 $msg .= "<strong><br>ERRO 0005</strong>: Erro ao executar o select dos Publishes vinculados à E-Prepag Administradora<br><br>";
 
                 $class = "alert-danger txt-vermelho";
-
-            }//end esle do if ($response_epp_adm) 
+            } //end esle do if ($response_epp_adm) 
 
             //=========================================================================================================================
 
@@ -1465,15 +1461,13 @@ try {
                                         $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
 
                                         $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-
-                                    }//end foreach
+                                    } //end foreach
 
                                     $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
 
                                     $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
 
                                     $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
-
                                 } //end if(count($vetorPublisherPorUtilizacao)>0)
                                 else {
 
@@ -1482,8 +1476,7 @@ try {
                                     $where_opr_venda_lan_negativa = "";
 
                                     $where_opr_utilizacao_lan = "";
-
-                                }//end else do if(count($vetorPublisherPorUtilizacao)>0)          
+                                } //end else do if(count($vetorPublisherPorUtilizacao)>0)          
 
 
 
@@ -1753,8 +1746,7 @@ try {
                                                 publisher) 
 
                                             ";
-
-                                }//end if(count($vetorPublisherPorUtilizacao)>0)
+                                } //end if(count($vetorPublisherPorUtilizacao)>0)
 
                                 $sql .= " 
 
@@ -2017,17 +2009,15 @@ try {
                                         $countBlocoUm++;
 
                                         $REG_BLC['1115']++;
+                                    } //endwhile
 
-                                    }//endwhile
-
-                                }//end if ($transacoes)
+                                } //end if ($transacoes)
                                 else {
 
                                     $msg .= "<strong><br>ERRO 0010</strong>: Erro ao executar a Query das Transações dos Publishes vinculados à E-Prepag Pagamentos<br><br>";
 
                                     $class = "alert-danger txt-vermelho";
-
-                                }//end else do if ($transacoes)
+                                } //end else do if ($transacoes)
 
                                 //=========================================================================================================================
 
@@ -2039,16 +2029,15 @@ try {
 
 
 
-                            }//endwhile
+                            } //endwhile
 
-                        }//end iif ($total_operacoes_diarias)
+                        } //end iif ($total_operacoes_diarias)
                         else {
 
                             $msg .= "<strong><br>ERRO 0009</strong>: Erro ao executar o select dos Totais de Operações Diárias<br><br>";
 
                             $class = "alert-danger txt-vermelho";
-
-                        }//end esle do if ($total_operacoes_diarias)
+                        } //end esle do if ($total_operacoes_diarias)
 
 
 
@@ -2060,25 +2049,23 @@ try {
 
 
 
-                    }//end if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
+                    } //end if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
                     else {
 
                         $msg .= "<strong><br>ERRO 0007</strong>: Erro ao executar o fectch_array dos Totais dos Publishes vinculados à E-Prepag Pagamentos<br><br>";
 
                         $class = "alert-danger txt-vermelho";
+                    } //end else do if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
 
-                    }//end else do if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
-
-                }//end if ($total_epp_pagto) 
+                } //end if ($total_epp_pagto) 
                 else {
 
                     $msg .= "<strong><br>ERRO 0006</strong>: Erro ao executar o select dos Totais dos Publishes vinculados à E-Prepag Pagamentos<br><br>";
 
                     $class = "alert-danger txt-vermelho";
+                } //end esle do if ($total_epp_pagto) 
 
-                }//end esle do if ($total_epp_pagto) 
-
-            }//end if(!empty($publishers_epp_pagto))
+            } //end if(!empty($publishers_epp_pagto))
 
             //Levantando totais por Publishers vinculados a EPP ADM
 
@@ -2318,15 +2305,13 @@ try {
                                     $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
 
                                     $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-
-                                }//end foreach
+                                } //end foreach
 
                                 $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
 
                                 $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
 
                                 $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
-
                             } //end if(count($vetorPublisherPorUtilizacao)>0)
                             else {
 
@@ -2335,8 +2320,7 @@ try {
                                 $where_opr_venda_lan_negativa = "";
 
                                 $where_opr_utilizacao_lan = "";
-
-                            }//end else do if(count($vetorPublisherPorUtilizacao)>0)          
+                            } //end else do if(count($vetorPublisherPorUtilizacao)>0)          
 
 
 
@@ -2495,8 +2479,7 @@ try {
                                             publisher) 
 
                                         ";
-
-                            }//end if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
+                            } //end if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
                             else {
 
                                 $sql .= " 
@@ -2534,10 +2517,7 @@ try {
                                             dia,
 
                                             publisher) ";
-
-
-
-                            }//end else do if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
+                            } //end else do if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
 
                             $sql .= " 
 
@@ -2720,17 +2700,15 @@ try {
                                     $countBlocoUm++;
 
                                     $REG_BLC['1115']++;
+                                } //endwhile
 
-                                }//endwhile
-
-                            }//end if ($transacoes)
+                            } //end if ($transacoes)
                             else {
 
                                 $msg .= "<strong><br>ERRO 0011</strong>: Erro ao executar a Query das Transações dos Publishes vinculados à E-Prepag Administradora<br><br>";
 
                                 $class = "alert-danger txt-vermelho";
-
-                            }//end else do if ($transacoes)
+                            } //end else do if ($transacoes)
 
 
 
@@ -2744,16 +2722,15 @@ try {
 
 
 
-                        }//endwhile
+                        } //endwhile
 
-                    }//end if ($total_operacoes_diarias) 
+                    } //end if ($total_operacoes_diarias) 
                     else {
 
                         $msg .= "<strong><br>ERRO 0009</strong>: Erro ao executar o select dos Totais de Operações Diárias<br><br>";
 
                         $class = "alert-danger txt-vermelho";
-
-                    }//end esle do if ($total_operacoes_diarias) 
+                    } //end esle do if ($total_operacoes_diarias) 
 
 
 
@@ -2767,16 +2744,15 @@ try {
 
 
 
-                }//endwhile
+                } //endwhile
 
-            }//end if ($total_epp_adm) 
+            } //end if ($total_epp_adm) 
             else {
 
                 $msg .= "<strong><br>ERRO 0008</strong>: Erro ao executar o select dos Totais dos Publishes vinculados à E-Prepag Administradora<br><br>";
 
                 $class = "alert-danger txt-vermelho";
-
-            }//end esle do if ($total_epp_adm) 
+            } //end esle do if ($total_epp_adm) 
 
             //=========================================================================================================================
 
@@ -2948,7 +2924,6 @@ try {
                 $file->setVetorLines($vetorLines);
 
                 $countBlocoNove++;
-
             } //end foreach
 
             $vetorLines = array(
@@ -3147,14 +3122,13 @@ try {
         $msg = "<strong><br>ERRO 0001</strong>: Erro ao executar o select dos periodos não congelados.<br><br>";
 
         $class = "alert-danger txt-vermelho";
-
     }
 
 
 
     if (!empty($msg)) {
 
-        ?>
+?>
 
         <div class="container espacamento">
 
@@ -3162,9 +3136,9 @@ try {
 
         </div>
 
-        <?php
+<?php
 
-    }//end if(!empty($msg))
+    } //end if(!empty($msg))
 
 } catch (\Throwable $e) {
     echo $e->getMessage();
@@ -3174,6 +3148,12 @@ echo $msg;
 
 $output = ob_get_clean();
 
+$dir = "/www/backoffice/dimp/" . date('Ymd') . "/";
+
+// cria a pasta se não existir
+if (!is_dir($dir)) {
+    mkdir($dir, 0777, true);
+}
 // Salva no arquivo de log
 file_put_contents("/www/backoffice/dimp/" . date('Ymd') . "/result_" . $id_request . ".txt", $output, FILE_APPEND);
 ?>

@@ -16,6 +16,11 @@ if(!isset($_POST["check"])){
 }else{
 	$visualiza = 'S';
 }
+if($_POST["tipo"] == "PU"){
+	$opr_codigo = $_POST["publisher"];
+}else{
+	$opr_codigo = 0;
+}
 	
 $query = $conexao->prepare("select count(*) from usuarios where shn_mail = :EMAIL;");
 $query->bindValue(":EMAIL", $_POST["email"]);	
@@ -36,7 +41,7 @@ $aes = new AES($chave256bits->retornaChavePub());
 $passw = base64_encode($aes->encrypt(addslashes($_POST["passw"])));
 $bko_local = ($_POST["tipo"] == 'AT')? '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111': '110000000000';
 
-$insertQuery = $conexao->prepare("insert into usuarios(shn_login,shn_password,id,shn_mail,shn_codigovinculo,bko_autoriza,tipo_acesso,visualiza_dados,bko_local_acesso)values(:LOGIN,:PASS,:ID,:EMAIL,:COD,:AUTO,:TIPO,:VISU,:BKO);");
+$insertQuery = $conexao->prepare("insert into usuarios(shn_login,shn_password,id,shn_mail,shn_codigovinculo,bko_autoriza,tipo_acesso,visualiza_dados,bko_local_acesso,opr_codigo)values(:LOGIN,:PASS,:ID,:EMAIL,:COD,:AUTO,:TIPO,:VISU,:BKO,:OPR_CODIGO);");
 $insertQuery->bindValue(":LOGIN", strtoupper($_POST["login"]));
 $insertQuery->bindValue(":PASS", $passw);
 $insertQuery->bindValue(":ID", $id);
@@ -46,6 +51,7 @@ $insertQuery->bindValue(":AUTO", "S");
 $insertQuery->bindValue(":TIPO", $_POST["tipo"]);
 $insertQuery->bindValue(":VISU", $visualiza);
 $insertQuery->bindValue(":BKO", $bko_local);
+$insertQuery->bindValue(":OPR_CODIGO", $opr_codigo);
 $insertQuery->execute();
 
 if($insertQuery->rowCount() > 0){
