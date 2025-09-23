@@ -46,7 +46,7 @@ try {
             modal_token();
             exit;
         } else {
-            $ret = false;
+            echo "<script>alert('Usuário ou senha inválidos');</script>";
         }
     }
 } catch (PDOException $e) {
