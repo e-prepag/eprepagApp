@@ -7,6 +7,14 @@ require_once DIR_INCS ."gamer/constantes.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 require_once DIR_INCS . 'gamer/functions.php';
 $controller = new HeaderController;
+
+$ug_id = ($controller->usuario) ? $controller->usuario->getId() : 0;
+
+if(in_array($ug_id, [1354068, 8972, 1368770, 1368828])) {
+    require_once "./passo-1_teste.php";
+    exit;
+}
+
 $controller->setHeader();
 /*
  * Início controller
@@ -115,56 +123,6 @@ if($mod && $mod != "" && is_numeric($mod)){
                 //verifica se o modelo esta no carrinho
                 if($carrinho[$mod]){
                     //atualiza modelo no carrinho
-                    $carrinho[$mod] += $qtde;
-                    //Se o modelo nao esta no carrinho, adiciona
-                } else {
-                    //verifica se o modelo existe e esta ativo	
-                    $rs = null;
-                    $filtro['ogpm_ativo'] = 1;
-                    $filtro['ogpm_id'] = $mod;
-                    $filtro['com_produto'] = true;	// **
-
-                    // Debug reinaldops
-                    if(isset($GLOBALS['_SESSION']['usuarioGames_ser'])) {
-                            $controller->usuarios = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-                            if($controller->usuario->b_IsLogin_pagamento_usa_produto_treinamento()) {
-                                    $filtro['show_treinamento'] = 1;
-                            }
-                    }
-
-                    if(isset($controller->usuarios)) {
-                            if($controller->usuario->b_IsLogin_pagamento_pin_eprepag()) {
-//							$filtro['ogpm_ativo'] = 0;
-                            }
-                    }
-
-                    $ret = (new ProdutoModelo)->obter($filtro, null, $rs);
-
-                    //Adiciona modelo no carrinho
-                    if($rs && pg_num_rows($rs) == 1){
-                            $carrinho[$mod] = $qtde;
-                    }
-                }
-            }
-        }//end if(verificaQtdeCarrinho($qtde_nova, $mod))
-        else $msg = "Número máximo de produtos no carrinho é de ".$QTDE_MAX_ITENS." unidades.";
-
-        header("Refresh:0"); 
-    }
-    
-    if($acao == "p"){
-
-        if(verificaQtdeCarrinho($qtde_nova, $mod, $pularTesteInicial, ($codeProd?$codeProd:0), ($valor?$valor:0))  ) {
-
-            //Qtde
-            if(!$qtde) $qtde = $_POST['qtde'];
-
-            //Atualiza se for qtde valida
-            if($qtde && is_numeric($qtde) && $qtde > 0 ){
-
-                //verifica se o modelo esta no carrinho
-                if($carrinho[$mod]){
-                    //atualiza modelo no carrinho
                     $carrinho[$mod] = $qtde;
                     //Se o modelo nao esta no carrinho, adiciona
                 } else {
@@ -199,7 +157,7 @@ if($mod && $mod != "" && is_numeric($mod)){
         }//end if(verificaQtdeCarrinho($qtde_nova, $mod))
         else $msg = "Número máximo de produtos no carrinho é de ".$QTDE_MAX_ITENS." unidades.";
     }
-
+    
     //diminiu qtde modelo no carrinho
     //---------------------------------------------------------------
     if($acao == "m"){
@@ -290,32 +248,6 @@ elseif($mod == $NO_HAVE) {
                 //verifica se o modelo esta no carrinho
                 if($carrinho[$mod][$codeProd][$valor]){
                     //atualiza modelo no carrinho
-                    $carrinho[$mod][$codeProd][$valor] += $qtde;
-                    
-                } else {
-                    //Se o modelo nao esta no carrinho, adiciona
-                    $carrinho[$mod][$codeProd][$valor] = $qtde;
-                }
-            }
-        }//end if(verificaQtdeCarrinho($qtde_nova, $mod))
-        else $msg = "Número máximo de produtos no carrinho é de ".$QTDE_MAX_ITENS." unidades.";
-
-        header("Refresh:0"); 
-    }
-        
-    if($acao == "p"){
-
-        if(verificaQtdeCarrinho($qtde_nova, $mod, $pularTesteInicial, ($codeProd?$codeProd:0), ($valor?$valor:0))) {
-
-            //Qtde
-            if(!$qtde) $qtde = $_POST['qtde'];
-
-            //Atualiza se for qtde valida
-            if($qtde && is_numeric($qtde) && $qtde > 0 ){
-
-                //verifica se o modelo esta no carrinho
-                if($carrinho[$mod][$codeProd][$valor]){
-                    //atualiza modelo no carrinho
                     $carrinho[$mod][$codeProd][$valor] = $qtde;
                 } else {
                     //Se o modelo nao esta no carrinho, adiciona
@@ -325,6 +257,7 @@ elseif($mod == $NO_HAVE) {
         }//end if(verificaQtdeCarrinho($qtde_nova, $mod))
         else $msg = "Número máximo de produtos no carrinho é de ".$QTDE_MAX_ITENS." unidades.";
     }
+        
 
     //diminiu qtde modelo no carrinho
     //---------------------------------------------------------------
@@ -748,7 +681,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
         $(".glyphicon-plus").click(function(){
             var qtd = parseInt($(this).attr("qtde").trim())+1;
             $("#qtde").val(qtd);
-            $("#acao").val("p");
+            $("#acao").val("u");
             $("#mod").val($(this).attr("mod"));
             $("#codeProd").val($(this).attr("codeProd"));
             $("#valor").val($(this).attr("valor"));
