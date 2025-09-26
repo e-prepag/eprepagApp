@@ -1581,6 +1581,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                                                                 $sql = "
                                                                     UPDATE pins SET
+                                                                        pin_desc       = 'Gamer, produto: $produto_operadora',
                                                                         pin_status      = '3',
                                                                         pin_celular     = '" . str_replace('-', '', $ug_cel) . "',
                                                                         pin_ddd         = $ug_cel_ddd,

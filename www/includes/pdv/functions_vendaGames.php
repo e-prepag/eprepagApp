@@ -497,7 +497,8 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $sql = "UPDATE pins 
                                 SET 
                                     pin_status = '6', 
-                                    pin_validade = CURRENT_DATE + INTERVAL '6 months' 
+                                    pin_validade = CURRENT_DATE + INTERVAL '6 months',
+                                    pin_desc = 'Pin Eprepag cash PDV variavel'
                                 WHERE pin_codinterno = " . $pin_codinterno;
                         $ret = SQLexecuteQuery($sql);
 
@@ -584,6 +585,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $sql = "
                             UPDATE pins SET
                                 pin_status     = '6',
+                                pin_desc       = '$vgm_nome_produto',
                                 pin_celular    = '" . str_replace("-", "", $ug_cel) . "',
                                 pin_ddd        = " . SQLaddFields($ug_cel_ddd, "") . ",
                                 pin_datavenda  = '" . $data_corrente . "',
