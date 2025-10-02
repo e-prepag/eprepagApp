@@ -324,13 +324,6 @@ class Garena
 					$this->destravaProcesso();
 					if ($resultado["error"] == 98 || $resultado["error"] == 99) {
 
-						/*$fileName = "/www/public_html/ajax/garena/erroServidor.txt";
-						$file = fopen($fileName, "a+");
-						fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\r");
-						fwrite($file, "Foi encontrado erro de servidor na conexão com a garena\r");
-						fwrite($file, json_encode($resultado)."\r");
-						fwrite($file, str_repeat("*", 50)."\r");
-						fclose($file);*/
 						array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0009)."]);
 
 					} else {
@@ -684,21 +677,9 @@ class Garena
 		$comando->execute();
 		$retorno = $comando->fetch(PDO::FETCH_ASSOC);
 
-		//$parametros = fopen('/www/log/ggg_GARENA.txt', 'a+');
 		if ($retorno == false || $retorno == "") {
-			/*fwrite($parametros, "DATA: ".date("d-m-Y H:i:s")."\r");
-			fwrite($parametros, "sucesso\r");
-			fwrite($parametros, json_encode($retorno)."\r");
-			fwrite($parametros, "pin: ".$this->idPin."\r");
-			fwrite($parametros, str_repeat("*", 50)."\r");
-			fclose($parametros);*/
 			return false;
 		}
-		/*
-		fwrite($parametros, "DATA: ".date("d-m-Y H:i:s")."\r");
-		fwrite($parametros, "erro log\r");
-		fwrite($parametros, str_repeat("*", 50)."\r");
-		fclose($parametros);*/
 		return true;
 	}
 
@@ -776,31 +757,6 @@ class Garena
 			98 => "Não foi possivel realizar o resgate, por favor tente novamente mais tarde (EPP0013).", //Servidor temporariamente não disponível
 			99 => "Não foi possivel realizar o resgate, por favor tente novamente mais tarde (EPP0013)." //Erro do servidor			
 		];
-
-		//$this->salvaLog($ERROS[$codigo], "ERRO", $this->conta);
-
-		// pega os erros que o usuario pode receber na tela 
-		/*switch($codigo){
-
-			case 9:
-				 $retorno = (isset($ERROS[$codigo]))?$ERROS[$codigo]:"Não foi possivel realizar seu resgate, teste novamente mais tarde";
-			break;
-			case 10:
-				 $retorno = (isset($ERROS[$codigo]))?$ERROS[$codigo]:"Não foi possivel realizar seu resgate, teste novamente mais tarde";
-			break;
-			case 98:
-				 $retorno = (isset($ERROS[$codigo]))?$ERROS[$codigo]:"Não foi possivel realizar seu resgate, teste novamente mais tarde";
-			break;
-			case 12:
-				 $retorno = (isset($ERROS[$codigo]))?$ERROS[$codigo]:"Não foi possivel realizar seu resgate, teste novamente mais tarde";
-			break;
-			case 24:
-				 $retorno = (isset($ERROS[$codigo]))?$ERROS[$codigo]:"Não foi possivel realizar seu resgate, teste novamente mais tarde";
-			break;
-			default:
-				 $retorno = "Não foi possivel realizar seu resgate, teste novamente mais tarde";
-			break;			
-		}*/
 
 		$retorno = (isset($ERROS[$codigo])) ? $ERROS[$codigo] : "Não foi possivel realizar seu resgate, teste novamente mais tarde (EPP0042).";
 		return $retorno;

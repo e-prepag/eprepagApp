@@ -1,11 +1,52 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);  // Exibe todos os tipos de erros
 @session_start();
 date_default_timezone_set('America/Fortaleza');
 require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto . "includes/inc_register_globals.php";	
 require_once $raiz_do_projeto . "public_html/sys/includes/functions.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
+require_once "../../../includes/load_dotenv.php";
 
+$recaptcha = $_REQUEST["g-recaptcha-response"];
+if ($recaptcha != "") {
+
+  $tokenInfo = [
+      "secret" => getenv("RECAPTCHA_SECRET_KEY"),
+      "response" => $recaptcha,
+      "remoteip" => $_SERVER["REMOTE_ADDR"],
+  ];
+
+  $recaptcha_curl = curl_init();
+
+  curl_setopt_array($recaptcha_curl, [
+      CURLOPT_URL => getenv("RECAPTCHA_URL"),
+      CURLOPT_CUSTOMREQUEST => "POST",
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_POSTFIELDS => http_build_query($tokenInfo),
+  ]);
+
+  $dadosT = curl_exec($recaptcha_curl);
+
+  $inforCurl = curl_getinfo($recaptcha_curl);
+
+
+
+  $retorno = json_decode($dadosT, true);
+
+
+  curl_close($recaptcha_curl);
+
+  if ($retorno["success"] != true || (isset($retorno["error-codes"]) && !empty($retorno["error-codes"]))) {
+      header("Location: index.php?Invalido=1");
+      exit;
+  }
+} else {
+  header("Location: index.php?Invalido=1");
+  exit;
+}
 
 $varBlDebug = true;
 
