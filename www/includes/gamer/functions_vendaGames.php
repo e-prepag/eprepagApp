@@ -1517,6 +1517,24 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         );
                                                         $pin_gerado = $geraPinEpp->gerar();
 
+                                                        $sql = "
+                                                                    UPDATE pins SET
+                                                                        pin_desc       = 'Gamer, produto: $produto_operadora',
+                                                                        pin_status      = '3',
+                                                                        pin_celular     = '" . str_replace('-', '', $ug_cel) . "',
+                                                                        pin_ddd         = $ug_cel_ddd,
+                                                                        pin_datavenda   = '$data_corrente',
+                                                                        pin_datapedido  = '$data_corrente',
+                                                                        pin_horavenda   = '$hora_corrente',
+                                                                        pin_horapedido  = '$hora_corrente',
+                                                                        pin_est_codigo  = '$EstabCod',
+                                                                        pin_validade    = CURRENT_DATE + INTERVAL '6 months'
+                                                                    WHERE pin_codinterno = $pin_gerado
+                                                                ";
+                                                        $ret = SQLexecuteQuery($sql);
+                                                        if (!$ret)
+                                                                $msg = "Erro ao atualizar tabela de pins (3212)." . PHP_EOL;
+
                                                         $sql = "update tb_venda_games_modelo set 
 							vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_gerado . ",' 
 								where vgm_id = '" . $vgm_id . "'";
