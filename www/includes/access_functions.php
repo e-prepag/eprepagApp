@@ -18,7 +18,7 @@ function getUsuarioTipoNome($st) {
 }
 
 function b_IsBKOUsuarioPagamento(){
-    $usuarios_BKO_Pagamentos = array('GLAUCIA', 'ODECIO', 'TAMY', 'WAGNER', 'JOAO', 'EVERTON');
+    $usuarios_BKO_Pagamentos = array('GLAUCIA_G', 'ODECIO', 'TAMY', 'WAGNER', 'JOAO', 'EVERTON');
     $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
     if(in_array(strtoupper($stmp), $usuarios_BKO_Pagamentos)) {
             return true;
@@ -60,7 +60,7 @@ function b_IsUsuarioTamy(){
 }
 
 function b_IsBKOUsuarioSondaIntegracao(){
-        $usuarios_BKO_Admin = array('GLAUCIA','ODECIO', 'FABIO', 'TAMY', 'WAGNER');
+        $usuarios_BKO_Admin = array('GLAUCIA_G','ODECIO', 'FABIO', 'TAMY', 'WAGNER');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Admin)) {
                 return true;
@@ -69,7 +69,7 @@ function b_IsBKOUsuarioSondaIntegracao(){
 }
 
 function b_IsBKOUsuarioAdminBKO(){
-        $usuarios_BKO_Admin = array('GLAUCIA', 'ODECIO', 'GOKEI', 'ANDRE', 'VICTOR', 'FABIO', 'WAGNER','DESENVOLVIMENTO', 'JOSEC.EASYGROUP', 'FELIPE.EASYGROUP');
+        $usuarios_BKO_Admin = array('GLAUCIA_G', 'ODECIO', 'GOKEI', 'ANDRE', 'VICTOR', 'FABIO', 'WAGNER','DESENVOLVIMENTO', 'JOSE_CARLOS_EG', 'FELIPE.EASYGROUP');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Admin)) {
                 return true;
@@ -85,7 +85,7 @@ function b_Is_PIN_Vendido($pin_status){
 }
 
 function b_IsBKOUsuarioGestaoDeRsico(){
-        $usuarios_BKO_Pagamentos = array('GLAUCIA', 'TAMY', 'WAGNER');
+        $usuarios_BKO_Pagamentos = array('GLAUCIA_G', 'TAMY', 'WAGNER');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Pagamentos)) {
                 return true;
@@ -95,7 +95,7 @@ function b_IsBKOUsuarioGestaoDeRsico(){
 
 //	===================== PINs-EPP - Inicio
 function b_IsBKOUsuarioAdminPINs(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'DANIELA', 'TAMY', 'WAGNER');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'DANIELA_FINANCEIRO', 'TAMY', 'WAGNER');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -113,7 +113,7 @@ function b_IsBKOUsuarioAdminPINsFinanceiro(){
 }
 
 function b_IsBKOUsuarioAdminPINsArquivos(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER', 'TAMY');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER', 'TAMY');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -123,7 +123,7 @@ function b_IsBKOUsuarioAdminPINsArquivos(){
 //	===================== PINs-EPP - Fim
 
 function b_IsBKOUsuarioAdminComplice(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -132,7 +132,7 @@ function b_IsBKOUsuarioAdminComplice(){
 }
 
 function b_IsBKOUsuarioAdminCompliceCotacao(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER','TAMY');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER','TAMY');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -141,7 +141,7 @@ function b_IsBKOUsuarioAdminCompliceCotacao(){
 }
 
 function b_IsBKOUsuarioAdminPontoCerto(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -150,7 +150,7 @@ function b_IsBKOUsuarioAdminPontoCerto(){
 }
 
 function b_IsBKOUsuarioAdminCompliceMunicipal(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER', 'EVERTON');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER', 'EVERTON');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -159,7 +159,7 @@ function b_IsBKOUsuarioAdminCompliceMunicipal(){
 }
 
 function b_IsBKOUsuarioAdminTaxaAnual(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER', 'EVERTON');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER', 'EVERTON');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -168,7 +168,7 @@ function b_IsBKOUsuarioAdminTaxaAnual(){
 }
 
 function b_IsBKOUsuarioRelatorioPorEmpresa(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER', 'EVERTON','TAMY');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER', 'EVERTON','TAMY');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -177,7 +177,7 @@ function b_IsBKOUsuarioRelatorioPorEmpresa(){
 }
 
 function b_IsBKOUsuarioAdminConsultaCPF(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'WAGNER', 'TAMY');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'WAGNER', 'TAMY');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -186,7 +186,7 @@ function b_IsBKOUsuarioAdminConsultaCPF(){
 }
 
 function b_IsBKOUsuarioAdminMeiosPagamentos(){
-        $usuarios_BKO_AdminPINsArquivos = array('ANDRE', 'VICTOR', 'GLAUCIA','DANIELA', 'NATHANY', 'SUPORTEEPP', 'WAGNER', 'TAMY', 'JOSEC.EASYGROUP');
+        $usuarios_BKO_AdminPINsArquivos = array('ANDRE', 'VICTOR', 'GLAUCIA_G','DANIELA_FINANCEIRO', 'NATHANY', 'SUPORTEEPP', 'WAGNER', 'TAMY', 'JOSE_CARLOS_EG');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -195,7 +195,7 @@ function b_IsBKOUsuarioAdminMeiosPagamentos(){
 }
 
 function b_IsBKOUsuarioAdminServidorEmails(){
-        $usuarios_BKO_AdminServidorEmails = array('GLAUCIA', 'WAGNER', 'TAMY');
+        $usuarios_BKO_AdminServidorEmails = array('GLAUCIA_G', 'WAGNER', 'TAMY');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminServidorEmails)) {
                 return true;
@@ -204,7 +204,7 @@ function b_IsBKOUsuarioAdminServidorEmails(){
 }
 
 function b_IsBKOUsuarioAdminPINsPUB(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'ODECIO', 'TAMY', 'WAGNER');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'ODECIO', 'TAMY', 'WAGNER');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -214,7 +214,7 @@ function b_IsBKOUsuarioAdminPINsPUB(){
 
 // Libera usu�rios que podem administrar promo��es
 function b_IsBKOUsuarioAdminPromocao(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'CAROLINA', 'JEAN');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'CAROLINA', 'JEAN');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -234,7 +234,7 @@ function b_IsBKOUsuarioAdminJogosAlawar(){
 
 // Libera usu�rios que podem corrigir Bairros e Cidades
 function b_IsBKOUsuarioCidadesBairros(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'ODECIO', 'TAMY',  'WAGNER');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'ODECIO', 'TAMY',  'WAGNER');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -244,7 +244,7 @@ function b_IsBKOUsuarioCidadesBairros(){
 
 // Libera usu�rios que podem visualizar a listagem de cadastro da newsletter
 function b_IsBKOUsuarioNewletter(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'CAROLINA', 'JEAN');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'CAROLINA', 'JEAN');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -254,7 +254,7 @@ function b_IsBKOUsuarioNewletter(){
 
 // Libera usu�rios que podem visualizar o cadastro de question�rios
 function b_IsBKOUsuarioQuestionario(){
-        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'CAROLINA');
+        $usuarios_BKO_AdminPINsArquivos = array('GLAUCIA_G', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'CAROLINA');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -264,7 +264,7 @@ function b_IsBKOUsuarioQuestionario(){
 
 // Libera usu�rios que podem controlar a Gest�o de Riscos
 function b_IsBKOUsuarioAdminGestaodeRisco(){
-        $usuarios_BKO_AdminPINsArquivos = array('WAGNER', 'GLAUCIA', 'TAMY', 'JOAO','KATIA', 'NATHANY', 'KELI', 'FLAVIO');
+        $usuarios_BKO_AdminPINsArquivos = array('WAGNER', 'GLAUCIA_G', 'TAMY', 'JOAO','KATIA', 'NATHANY', 'KELI', 'FLAVIO');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
@@ -283,7 +283,7 @@ function b_IsBKOUsuarioAdminRecargaCelular(){
 }
 
 function b_IsBKOUsuarioEstornos(){
-        $usuarios_BKO_Estornos = array('TAMY',  'WAGNER','GLAUCIA');
+        $usuarios_BKO_Estornos = array('TAMY',  'WAGNER','GLAUCIA_G');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Estornos)) {
                 return true;
@@ -292,7 +292,7 @@ function b_IsBKOUsuarioEstornos(){
 }
 
 function b_IsBKOUsuarioComposicaoFifo(){
-        $usuarios_BKO_Composicao_Fifo = array('TAMY',  'WAGNER','GLAUCIA', 'JOAO', 'EVERTON');
+        $usuarios_BKO_Composicao_Fifo = array('TAMY',  'WAGNER','GLAUCIA_G', 'JOAO', 'EVERTON');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Composicao_Fifo)) {
                 return true;
@@ -301,7 +301,7 @@ function b_IsBKOUsuarioComposicaoFifo(){
 }
 
 function b_IsBKOUsuarioHistorico(){
-        $usuarios_BKO_Historico = array('TAMY',  'WAGNER','GLAUCIA', 'JOAO');
+        $usuarios_BKO_Historico = array('TAMY',  'WAGNER','GLAUCIA_G', 'JOAO');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Historico)) {
                 return true;
@@ -310,7 +310,7 @@ function b_IsBKOUsuarioHistorico(){
 }
 
 function b_IsBKOUsuarioRankingLAN(){
-        $usuarios_BKO_Historico = array( 'WAGNER','GLAUCIA', 'JOAO', 'TAMY');
+        $usuarios_BKO_Historico = array( 'WAGNER','GLAUCIA_G', 'JOAO', 'TAMY');
         $stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($stmp), $usuarios_BKO_Historico)) {
                 return true;
@@ -320,7 +320,7 @@ function b_IsBKOUsuarioRankingLAN(){
 
 // Libera usu�rios que podem visualizar a listagem de cadastro da banner drop shadow
 function b_IsBKOUsuarioBanner(){
-        $usuarios_BKO_AdminBanner = array('GLAUCIA', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'JEAN');
+        $usuarios_BKO_AdminBanner = array('GLAUCIA_G', 'ODECIO', 'TAMY',  'WAGNER', 'JOAO', 'JEAN');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminBanner)) {
                 return true;
@@ -329,7 +329,7 @@ function b_IsBKOUsuarioBanner(){
 }
 
 function b_IsBKOUsuarioBannerAdm(){
-        $usuarios_BKO_BannerAdm = array('GLAUCIA',  'WAGNER', 'JOAO');
+        $usuarios_BKO_BannerAdm = array('GLAUCIA_G',  'WAGNER', 'JOAO');
         $aux_stmp = $GLOBALS['_SESSION']['userlogin_bko'];
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_BannerAdm)) {
                 return true;
