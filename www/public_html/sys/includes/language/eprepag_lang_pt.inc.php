@@ -31,7 +31,7 @@
 
 @define('LANG_HOME_SECTION_PRODUCTS_PINS', 'Produtos Pins');
 @define('LANG_HOME_SECTION_REPORTS_PINS', 'Relatórios');
-@define('LANG_CHARGEBACK', 'Relatório de chargeback'); 
+@define('LANG_CHARGEBACK', 'Relatório de chargeback');
 @define('LANG_HOME_ITEM_SUPPLY_PINS', 'Estoque');
 @define('LANG_HOME_ITEM_REPORT_PINS', 'Relatório de Vendas');
 @define('LANG_HOME_ITEM_REPORT_PINS_BHN', 'Relatório de Vendas BHN');
@@ -81,7 +81,7 @@
 @define('LANG_HOME_ITEM_SALES_STATS_BCG_INCOME', 'Matriz BCG Receita');
 @define('LANG_HOME_ITEM_SALES_TOTAL_BY_GAME', 'TOTAIS Por JOGOS');
 
-@define('LANG_SITE_COPYRIGHT', 'E-Prepag Copyright '.date('Y').'. Todos os direitos reservados.');
+@define('LANG_SITE_COPYRIGHT', 'E-Prepag Copyright ' . date('Y') . '. Todos os direitos reservados.');
 
 @define('LANG_SITE_DAY_OF_WEEK_MONDAY', '2aF');
 @define('LANG_SITE_DAY_OF_WEEK_TUESDAY', '3aF');
@@ -90,7 +90,7 @@
 @define('LANG_SITE_DAY_OF_WEEK_FRIDAY', '6aF');
 @define('LANG_SITE_DAY_OF_WEEK_SATURDAY', 'Sab');
 @define('LANG_SITE_DAY_OF_WEEK_SUNDAY', 'Dom');
- 
+
 @define('LANG_SITE_SEARCH_MSG_1', 'Pesquisa gerada em');
 @define('LANG_SITE_SEARCH_MSG_2', ' segundos.');
 
@@ -374,8 +374,8 @@
 @define('LANG_STATISTICS_FOR_ESTABLISHMENT', 'Estabelecimento');
 @define('LANG_STATISTICS_FOR_LAST_MONTH', 'Ultimo-Mes');
 @define('LANG_STATISTICS_FOR_LAST_WEEK', 'Ultima-Semana');
-@define('LANG_TOTAL_ESTABLISHMENT','Total-Estabelecimento');
-@define('LANG_TOTAL_ESTABLISHMENT_MONTH','Total-Estabelecimento-Mês');
+@define('LANG_TOTAL_ESTABLISHMENT', 'Total-Estabelecimento');
+@define('LANG_TOTAL_ESTABLISHMENT_MONTH', 'Total-Estabelecimento-Mês');
 @define('LANG_STATISTICS_FOR_ESTABLISHMENT_TYPE', 'por Tipo de Estabelecimento');
 @define('LANG_STATISTICS_FOR_PUBLISHER_THIS_MONTH', 'por Publisher neste mês');
 @define('LANG_STATISTICS_FOR_USER', 'Usuário');
@@ -516,7 +516,7 @@
 
 //Constantes para Integracao
 @define('LANG_INTEGRATION_TITLE_PAGE', 'Pesquisa de Pedidos de Integra&ccedil;&atilde;o de Parceiros');
-@define('LANG_INTEGRATION_REQUESTS', 'Detalhe de vendas por integra&ccedil;&atilde;o'); 
+@define('LANG_INTEGRATION_REQUESTS', 'Detalhe de vendas por integra&ccedil;&atilde;o');
 @define('LANG_INTEGRATION_SEARCH', 'Buscar');
 @define('LANG_INTEGRATION_DATE_INCLUDE', 'Data de Inclus&atilde;o');
 @define('LANG_INTEGRATION_DATE_CONFIRM', 'Data de Confirma&ccedil;&atilde;o');
@@ -545,13 +545,13 @@
 
 //COMMONS
 //DAYS
-@define('LANG_MONDAY','Segunda-feira');
-@define('LANG_TUESDAY','Terã-feira');
-@define('LANG_WEDNESDAY','Quarta-feira');
-@define('LANG_THURSDAY','Quinta-feira');
-@define('LANG_FRIDAY','Sexta-feira');
-@define('LANG_SATURDAY','Sábado');
-@define('LANG_SUNDAY','Domingo');
+@define('LANG_MONDAY', 'Segunda-feira');
+@define('LANG_TUESDAY', 'Terã-feira');
+@define('LANG_WEDNESDAY', 'Quarta-feira');
+@define('LANG_THURSDAY', 'Quinta-feira');
+@define('LANG_FRIDAY', 'Sexta-feira');
+@define('LANG_SATURDAY', 'Sábado');
+@define('LANG_SUNDAY', 'Domingo');
 
 //MONTHS
 @define('LANG_JANUARY', 'Janeiro');
@@ -599,27 +599,27 @@
 @define('LANG_SELECT', 'Selecionar');
 
 //COLUNAS RELATORIOS
-@define('LANG_CITY','Cidade');
-@define('LANG_STATE','Estado&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_NUMBER_SALES','N. de Vendas&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_VALUE_SALES','Valor das Vendas em (R$)&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_VALUE','% em valor&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_DAY','Dia');
-@define('LANG_WEEK','Dia da Semana');
-@define('LANG_ESTABLISHMENT','Estabelecimento');
-@define('LANG_TYPE','Tipo');
-@define('LANG_FIRST_LAST','1a-Ultima Venda');
-@define('LANG_UF','UF&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_GAME','Jogo');
-@define('LANG_ITEM','Item');
-@define('LANG_MONTH','Mes&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_TYPE','Tipo');
+@define('LANG_CITY', 'Cidade');
+@define('LANG_STATE', 'Estado&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_NUMBER_SALES', 'N. de Vendas&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_VALUE_SALES', 'Valor das Vendas em (R$)&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_VALUE', '% em valor&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_DAY', 'Dia');
+@define('LANG_WEEK', 'Dia da Semana');
+@define('LANG_ESTABLISHMENT', 'Estabelecimento');
+@define('LANG_TYPE', 'Tipo');
+@define('LANG_FIRST_LAST', '1a-Ultima Venda');
+@define('LANG_UF', 'UF&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_GAME', 'Jogo');
+@define('LANG_ITEM', 'Item');
+@define('LANG_MONTH', 'Mes&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_TYPE', 'Tipo');
 @define('LANG_ESTABLISHMENT_TYPE', 'Tipo de Estabelecimento&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_USER','Usuario');
-@define('LANG_ABANDON','Abandonou&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_START_DATE','Data Inicio&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_LAST_DATE','Ultima Data&nbsp;&nbsp;&nbsp;&nbsp;');
-@define('LANG_INTEGRATION','Integração');
+@define('LANG_USER', 'Usuario');
+@define('LANG_ABANDON', 'Abandonou&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_START_DATE', 'Data Inicio&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_LAST_DATE', 'Ultima Data&nbsp;&nbsp;&nbsp;&nbsp;');
+@define('LANG_INTEGRATION', 'Integração');
 
 //ADMINISTRAÇÃ DE USUÁRIOS
 @define('LANG_USER_ADMIN_MODULE', 'Administração de usuários');
@@ -636,30 +636,30 @@
 @define('LANG_CONFIRM_NEW_PASS', 'Confirme a nova senha');
 @define('LANG_ACCES_DENIED', 'Acesso negado');
 @define('LANG_WRONG_CONFIRM_PASS', 'Confirmação de senha está diferente');
-@define('LANG_MIN_MAX_PASS','*Sua senha deve ter: de %s a %s caracteres, letras, números, caracteres especiais (|,!,?,*,$, etc)');
-@define('LANG_PASSW_NOT_SECURITY','Senha não atinge os níveis de segurança desejados.');
+@define('LANG_MIN_MAX_PASS', '*Sua senha deve ter: de %s a %s caracteres, letras, números, caracteres especiais (|,!,?,*,$, etc)');
+@define('LANG_PASSW_NOT_SECURITY', 'Senha não atinge os níveis de segurança desejados.');
 
 //página de login
-@define('LANG_PASSW',"Senha");
-@define('LANG_SEND',"Entrar");
-@define('LANG_ACCESS_RESTRICT','Acesso permitido somente para usuários expressamente autorizados pela E-Prepag');
-@define('LANG_DOUBTS_CONTACT','Em caso de dúvidas<br>entre em contato aqui');
-@define('LANG_VERSION','Versão');
-@define('LANG_EPP_REPORT','Relatórios Publishers');
+@define('LANG_PASSW', "Senha");
+@define('LANG_SEND', "Entrar");
+@define('LANG_ACCESS_RESTRICT', 'Acesso permitido somente para usuários expressamente autorizados pela E-Prepag');
+@define('LANG_DOUBTS_CONTACT', 'Em caso de dúvidas<br>entre em contato aqui');
+@define('LANG_VERSION', 'Versão');
+@define('LANG_EPP_REPORT', 'Relatórios Publishers');
 
-@define('LANG_USER_PASS_INVALID','Usuário ou Senha Inválidos');
-@define('LANG_ACCESS_DENIED_BACKOFFICE','Usuário não tem autorização para acessar o Backoffice');
-@define('LANG_SESSION_EXPIRED','A sessão expirou');
-@define('LANG_WRITE_FIELDS','Preencha os campos');
-@define('LANG_PASSWORD_MUST_HAVE','Campo senha precisa ter %s caracteres ou mais');
-@define('LANG_SEND_RPS_TO_PUBLISHER','Envio de RPS para o Publisher');
-@define('LANG_MAP_PDV','Mapa PDV');
-@define('LANG_MAP_PDV_TITLE','Mapa PDVs');
+@define('LANG_USER_PASS_INVALID', 'Usuário ou Senha Inválidos');
+@define('LANG_ACCESS_DENIED_BACKOFFICE', 'Usuário não tem autorização para acessar o Backoffice');
+@define('LANG_SESSION_EXPIRED', 'A sessão expirou');
+@define('LANG_WRITE_FIELDS', 'Preencha os campos');
+@define('LANG_PASSWORD_MUST_HAVE', 'Campo senha precisa ter %s caracteres ou mais');
+@define('LANG_SEND_RPS_TO_PUBLISHER', 'Envio de RPS para o Publisher');
+@define('LANG_MAP_PDV', 'Mapa PDV');
+@define('LANG_MAP_PDV_TITLE', 'Mapa PDVs');
 @define('LANG_MAP_PDV_SEARCH_1', 'Pesquisa');
 @define('LANG_MAP_PDV_SEARCH_2', 'Buscar');
 
-@define('LANG_PUBLISHER_CPF_REPORT','Relatório de CPF por Publisher (Bom Sucesso)');
-@define('LANG_PUBLISHER_BACEN_REPORT','Relatório BACEN por Publisher (ACAM220)');
+@define('LANG_PUBLISHER_CPF_REPORT', 'Relatório de CPF por Publisher (Bom Sucesso)');
+@define('LANG_PUBLISHER_BACEN_REPORT', 'Relatório BACEN por Publisher (ACAM220)');
 
 @define('LANG_PINS_SOLD_USED', 'Vendido ou Utilizado - TODOS');
 
@@ -673,20 +673,81 @@
 
 @define('LANG_PINS_TRANSACTION_TYPE', 'Tipo de Transação');
 
-$finantial_report = array (
+@define('LANG_AUTHENTICATOR_REGISTER_NOT_REQUIRED_YET', "Ative a autenticação de dois fatores, você tem <strong>%s dias</strong> antes que se torne obrigatória.");
+
+@define('LANG_AUTHENTICATOR_REGISTER_EXPIRED', "O prazo para ativar a autenticação de dois fatores expirou, é necessário configurá-la.");
+
+@define('LANG_NO', 'NÃO');
+
+@define('LANG_CONFIGURE', 'Configurar');
+
+@define('LANG_PROBLEMS_WITH_AUTHENTICATOR', 'Problemas com a autenticação?');
+
+@define('LANG_ERROR_PROCESSING_LOGIN', 'Ocorreu um erro ao processar o login. Tente novamente.');
+
+@define('LANG_ENTER_AUT_TOKEN', 'Digite o token disponível no seu app de autenticação');
+
+@define('LANG_REMEMBER_DEVICE', 'Lembrar desse dispositivo');
+
+@define('LANG_ERROR_SAVE_AUT', 'Erro ao salvar o autenticador');
+
+@define('LANG_FILL_TOKEN_FIELD', 'Preencha o campo com um token!');
+
+@define('LANG_INVALID_TOKEN', 'Token inválido!');
+
+@define('LANG_TWO_FA_REGISTER', 'Cadastro de autenticador');
+
+@define('LANG_TWO_FA_KEY', 'Chave de segurança:');
+
+@define('LANG_CLICK_TO_COPY', 'Clique para copiar');
+
+@define('LANG_COPIED', 'Copiado!');
+
+@define('LANG_ENTER_TOKEN', 'Insira o Token gerado:');
+
+@define('LANG_SAVE', 'Salvar');
+
+@define('LANG_HOW_TO_AUT', 'Como configurar o autenticador?');
+
+@define('LANG_CLOSE_BTN', 'Fechar');
+
+@define('LANG_LOGIN_PROBLEM', 'Problemas ao tentar logar?');
+
+@define('LANG_BLOCKED', 'Você está bloqueado!');
+
+@define('LANG_FORGOT_PASSWORD', 'Caso tenha esquecido a senha, clique em recuperar senha.');
+
+@define('LANG_PLEASE_WAIT', 'Por favor, aguarde');
+
+@define('LANG_TRY_AGAIN', 'e tente novamente.');
+
+$LANG_INSTRUCOES_CONFIG_AUTENTICADOR = '<h3>Instruções:</h3>
+                                    <ol class="lista-instrucoes">
+                                        <li>Abra o aplicativo autenticador instalado no seu celular. Caso não tenha um autenticador,
+                                            você deve instalar um. O Microsoft Authenticator e o Google Authenticator são os mais
+                                            populares.</li>
+                                        <li>Com o aplicativo aberto, leia o QR code gerado pelo nosso site.
+                                            Se estiver usando celular, copie a chave de segurança gerada e cole no
+                                            aplicativo autenticador.</li>
+                                        <li>Aparecerá um código de 6 dígitos no seu aplicativo.</li>
+                                        <li>Digite esse código no site da E-prepag para confirmar e pronto! O autenticador está
+                                            associado a sua conta.</li>
+                                    </ol>';
+
+$finantial_report = array(
     'DIRECT' => 'Direta',
-    'INDIRECT'=>'Indireta',
-    'SALES'=>'Vendas',
-    'CARDS'=>'CARTÕES',
-    'SITE'=>'LOJA',
-    'PDV'=>'PDV',
-    'POS'=>'POS',
-    'aNVendasAux'=>'Qtde Transações',
-    'aVendasAux'=>'Valor Transações',
-    'aNVendasEComisAux'=>'Qtde Comissionada',
-    'aVendasEComisAux'=>'Valor Comissão',
-    'IOF'=>'IOF',
-    'IRRF'=>'IRRF',
-    'Repasse'=>'Repasse',
-    'GRAND_TOTAL'=>'TOTAL GERAL'
-    );
+    'INDIRECT' => 'Indireta',
+    'SALES' => 'Vendas',
+    'CARDS' => 'CARTÕES',
+    'SITE' => 'LOJA',
+    'PDV' => 'PDV',
+    'POS' => 'POS',
+    'aNVendasAux' => 'Qtde Transações',
+    'aVendasAux' => 'Valor Transações',
+    'aNVendasEComisAux' => 'Qtde Comissionada',
+    'aVendasEComisAux' => 'Valor Comissão',
+    'IOF' => 'IOF',
+    'IRRF' => 'IRRF',
+    'Repasse' => 'Repasse',
+    'GRAND_TOTAL' => 'TOTAL GERAL'
+);

@@ -678,6 +678,67 @@
 
 @define('LANG_PINS_TRANSACTION_TYPE', 'Transaction Type');
 
+@define('LANG_AUTHENTICATOR_REGISTER_NOT_REQUIRED_YET', "Enable two-factor authentication. You still have <strong>%s days</strong> before it becomes mandatory.");
+
+@define('LANG_AUTHENTICATOR_REGISTER_EXPIRED', "The deadline to enable two-factor authentication has passed. You must set it up now.");
+
+@define('LANG_NO', 'NO');
+
+@define('LANG_CONFIGURE', 'Set up');
+
+@define('LANG_PROBLEMS_WITH_AUTHENTICATOR', 'Having issues with the authenticator?');
+
+@define('LANG_ERROR_PROCESSING_LOGIN', 'An error occurred while processing your login. Please try again.');
+
+@define('LANG_ENTER_AUT_TOKEN', 'Enter the token from your authenticator app');
+
+@define('LANG_REMEMBER_DEVICE', 'Remember this device');
+
+@define('LANG_ERROR_SAVE_AUT', 'Error while saving the authenticator');
+
+@define('LANG_FILL_TOKEN_FIELD', 'Please enter a token!');
+
+@define('LANG_INVALID_TOKEN', 'Invalid token!');
+
+@define('LANG_TWO_FA_REGISTER', 'Authenticator setup');
+
+@define('LANG_TWO_FA_KEY', 'Security key:');
+
+@define('LANG_CLICK_TO_COPY', 'Click to copy');
+
+@define('LANG_COPIED', 'Copied!');
+
+@define('LANG_ENTER_TOKEN', 'Enter the generated token:');
+
+@define('LANG_SAVE', 'Save');
+
+@define('LANG_HOW_TO_AUT', 'How to set up the authenticator?');
+
+@define('LANG_CLOSE_BTN', 'Close');
+
+@define('LANG_LOGIN_PROBLEM', 'Having trouble logging in?');
+
+@define('LANG_BLOCKED', 'You are blocked!');
+
+@define('LANG_FORGOT_PASSWORD', 'If you forgot your password, click on ?Recover Password.?');
+
+@define('LANG_PLEASE_WAIT', 'Please wait');
+
+@define('LANG_TRY_AGAIN', 'and try again.');
+
+
+$LANG_INSTRUCOES_CONFIG_AUTENTICADOR = '<h3>Setup instructions:</h3>
+                                    <ol class="lista-instrucoes">
+                                        <li>Open the authenticator app installed on your phone. If you don?t have one,
+                                            install an authenticator app such as Microsoft Authenticator or Google Authenticator.</li>
+                                        <li>With the app open, scan the QR code shown on our site.
+                                            If you are on a mobile device, copy the security key provided and paste it into the
+                                            authenticator app.</li>
+                                        <li>The app will generate a 6-digit code.</li>
+                                        <li>Enter this code on the E-prepag site to confirm. Done! Your authenticator is now
+                                            linked to your account.</li>
+                                    </ol>';
+
 $finantial_report = array (
     'DIRECT' => 'Direct',
     'INDIRECT'=>'Indirect',

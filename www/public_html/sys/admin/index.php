@@ -83,6 +83,7 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
 </script>
 
 <body onload="document.formLog.user.focus()">
+    <div id="recebe-modal"></div>
     <div class="container pt-30 pb-30 borda-container">
         <div class="row">
             <div class="col-md-8 text-center pt-10 pb-10">
@@ -117,7 +118,7 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
                         <div class="form-group">
                             <label for="inputPassword3" class="col-sm-2 col-md-offset-1 text-primary control-label"><?php echo LANG_PASSW; ?></label>
                             <div class="col-sm-7">
-                                <input type="password" name="passw" id="passw" class="form-control" size="10" maxlength="15" placeholder="<?php echo LANG_PASSW; ?>">
+                                <input type="password" name="passw" id="passw" class="form-control" size="10" maxlength="35" placeholder="<?php echo LANG_PASSW; ?>">
                             </div>
                         </div>
                         <div class="form-group">
@@ -172,6 +173,31 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+    $(function() {
+      $("#formLog").submit((e) => {
+        e.preventDefault();
+
+        // Envia os dados do formulário via AJAX para ajax_login_aut.php, exibe o resultado no body e chama o modal
+        $.ajax({
+          url: 'ajax_login_aut.php',
+          type: 'POST',
+          data: $("#formLog").serialize(),
+          success: function(response) {
+            $("#recebe-modal").html(response);
+            // Supondo que o modal tenha id #modalLoginResult
+            if ($("#modal-token").length) {
+              $("#modal-token").modal('show');
+            }
+            grecaptcha.reset();
+          },
+          error: function(xhr, status, error) {
+            alert('<?=LANG_ERROR_PROCESSING_LOGIN?>');
+          }
+        });
+      })
+    });
+  </script>
 </body>
 
 </html>
