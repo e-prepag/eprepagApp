@@ -1,5 +1,10 @@
 <?php
-
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+{
+    echo "Chamada não permitida!<br>";
+    die("Stop");
+}
 function isAjax() {
     return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));
 }

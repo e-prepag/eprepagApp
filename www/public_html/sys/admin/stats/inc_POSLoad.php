@@ -1,5 +1,11 @@
 
 <?php
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+    {
+            echo '<script>alert("Faça login novamente");</script>';
+            exit;
+    }
         require_once "../../../../includes/constantes.php";
 	// Configura dirs
 //	$sDirPOS = "C:/Sites/E-Prepag/www/web/POS/";	//	"../../../POS/";

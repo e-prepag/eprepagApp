@@ -3,7 +3,12 @@
 	//ini_set("display_errors", 1); 
 //die("ABANOME=".$_GET['abanome']);
 	
-	session_start();
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
 
 	//desenvolvimento	
         require_once "../../../../includes/constantes.php";

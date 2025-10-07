@@ -2,7 +2,11 @@
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 0); 
 session_start();
-
+if(empty($_SESSION["iduser_bko_pub"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
 $file = fopen("/www/public_html/sys/admin/pins/dadosRecebidos.txt", "a+");
 fwrite($file, "Data ".date("d-m-Y H:i:s")."\n");
 fwrite($file, json_encode($_POST)."\n");
