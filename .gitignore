@@ -19,3 +19,6 @@
 test.php
 /docker-config/certs_local/*
 !/docker-config/certs_local/.gitkeep
+/www/ssl/private.pem
+/www/ssl/public.pem
+!/www/ssl/.gitkeep

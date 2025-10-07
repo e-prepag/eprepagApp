@@ -1,0 +1,265 @@
+<?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);  // Exibe todos os tipos de erros
+
+require "/www/db/connect.php";
+require "/www/db/ConnectionPDO.php";
+require_once  '/www/includes/gamer/chave.php';
+require_once  '/www/includes/gamer/AES.class.php';
+
+class PinGenerator {
+    public $banks = [
+        '0' => ['23456789', 8, 4],
+        '1' => ['23456789abcdefghjkmnpqrstvwxyz', 16, 4],
+        '2' => ['23456789ABCDEFGHIJKLMNPQRSTUVWXYZ', 16, 4],
+        '3' => ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789', 16, 4],
+        '4' => ['0123456789', 16, 4],
+        '5' => ['0123456789', 14, 4],
+        '6' => ['0123456789', 20, 4],
+    ];
+
+    public $sformato = '1';
+    public $bank = '';
+    public $nchars = 16;
+    public $separador = 4;
+    public $serial_length = 12;
+
+    public function set_config($sformato) {
+        $this->sformato = (string)$sformato;
+        if (!isset($this->banks[$this->sformato])) {
+            $this->sformato = '1';
+        }
+        $this->bank       = $this->banks[$this->sformato][0];
+        $this->nchars     = (int)$this->banks[$this->sformato][1];
+        $this->separador  = (int)$this->banks[$this->sformato][2];
+    }
+
+    public function gera_pin($sformato, $pin_valor) {
+        $this->set_config($sformato);
+        $return = "";
+        $i = 0;
+        while ($i < $this->nchars) {
+            $char = substr($this->bank, mt_rand(0, strlen($this->bank) - 1), 1);
+            if (!strstr($return, $char) || strlen($this->bank) < $this->nchars) {
+                if (($i % $this->separador == 0) && ($i > 0)) {
+                    $return .= "-";
+                }
+                $return .= $char;
+                $i++;
+            }
+        }
+        return $return;
+    }
+}
+
+/*
+ * Funções auxiliares
+ */
+function printFeedback($orig_pin, $spin_codigo, $vgm_id, $opr_nome, $ug_nome, $pin_valor, $spin_serial, $status, $msg) {
+    echo "---------------------------------------------\n";
+    echo "PIN Antigo      : $orig_pin\n";
+    echo "PIN Novo        : $spin_codigo\n";
+    echo "Pedido (vgm_id) : $vgm_id\n";
+    echo "Operadora       : $opr_nome\n";
+    echo "Vendedor        : $ug_nome\n";
+    echo "Valor do PIN    : $pin_valor\n";
+    echo "Número de Série : $spin_serial\n";
+    echo "Status          : $status\n";
+    if ($msg) {
+        echo "Mensagem        : $msg\n";
+    }
+    echo "---------------------------------------------\n\n";
+}
+function getFormato(PDO $pdo, $opr_codigo) {
+    $sql = "SELECT opr_pin_epp_formato FROM operadoras WHERE opr_codigo = :opr";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':opr' => $opr_codigo]);
+    $row = $stmt->fetch();
+    return $row ? $row['opr_pin_epp_formato'] : null;
+}
+
+function getNextLote(PDO $pdo, $opr_codigo) {
+    $sql = "SELECT max(pin_lote_codigo) AS max_pin_lote_codigo FROM pins WHERE opr_codigo = :opr";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':opr' => $opr_codigo]);
+    $row = $stmt->fetch();
+    return (!$row || $row['max_pin_lote_codigo'] === null) ? 1 : intval($row['max_pin_lote_codigo']) + 1;
+}
+
+function getNextSerial(PDO $pdo, $opr_codigo) {
+    $sql = "SELECT CAST(pin_serial AS BIGINT) AS max_serial
+            FROM pins
+            WHERE opr_codigo = :opr
+            ORDER BY CAST(pin_serial AS BIGINT) DESC
+            LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':opr' => $opr_codigo]);
+    $row = $stmt->fetch();
+    return ($row && $row['max_serial'] !== null) ? intval($row['max_serial']) : 1;
+}
+
+function existsPin(PDO $pdo, $spin_codigo, $opr_codigo) {
+    $sql = "SELECT 1 FROM pins WHERE pin_codigo = :pin AND opr_codigo = :opr LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':pin' => $spin_codigo, ':opr' => $opr_codigo]);
+    return (bool)$stmt->fetch();
+}
+
+$chave256bits = new Chave();
+$aes = new AES($chave256bits->retornaChave());
+try {
+    $pdo = ConnectionPDO::getConnection()->getLink();
+} catch (PDOException $e) {
+    die("Erro na conexão: " . $e->getMessage());
+}
+
+// Lista de PINs recebida externamente
+$inputPins = [];
+
+$placeholders = implode(',', array_fill(0, count($inputPins), '?'));
+
+$sql = "
+    SELECT 
+        p.pin_codigo,
+        p.pin_valor,
+        p.opr_codigo,
+        vm.vgm_id,
+        vg.vg_id,
+        o.opr_nome,
+        ug.ug_nome_fantasia
+    FROM pins p
+    JOIN tb_dist_venda_games_modelo_pins vp 
+        ON vp.vgmp_pin_codinterno = p.pin_codinterno
+    JOIN tb_dist_venda_games_modelo vm 
+        ON vm.vgm_id = vp.vgmp_vgm_id
+    JOIN tb_dist_venda_games vg 
+        ON vg.vg_id = vm.vgm_vg_id 
+    JOIN dist_usuarios_games ug 
+        ON ug.ug_id = vg.vg_ug_id
+    JOIN operadoras o 
+        ON o.opr_codigo = p.opr_codigo
+    WHERE p.pin_codigo IN ($placeholders)
+      AND p.pin_status = '8'
+";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($inputPins);
+$pinsEncontrados = $stmt->fetchAll();
+
+// CSV amigável
+$csvFile =  '/www/log/novos_pins_gerados.csv';
+$fp = fopen($csvFile, 'w');
+fputcsv($fp, [
+    'PIN Antigo',
+    'PIN Novo',
+    'Número Pedido',
+    'Publisher',
+    'PDV',
+    'Valor do PIN',
+    'Número de Série',
+    'Status',
+    'Mensagem'
+]);
+
+$generator = new PinGenerator();
+$operadorasCache = [];
+
+foreach ($pinsEncontrados as $row) {
+    $orig_pin   = $row['pin_codigo'];
+    $pin_valor  = $row['pin_valor'];
+    $opr_codigo = $row['opr_codigo'];
+    $vgm_id     = $row['vgm_id'];
+    $vg_id     = $row['vg_id'];
+    $opr_nome   = $row['opr_nome'];
+    $ug_nome    = $row['ug_nome_fantasia'];
+
+    // Se ainda não tem cache da operadora, inicializa
+    if (!isset($operadorasCache[$opr_codigo])) {
+        $sformato   = getFormato($pdo, $opr_codigo);
+        $ilote      = getNextLote($pdo, $opr_codigo);
+        $pin_serial = getNextSerial($pdo, $opr_codigo);
+
+        $operadorasCache[$opr_codigo] = [
+            'sformato' => $sformato,
+            'lote'     => $ilote,
+            'serial'   => $pin_serial
+        ];
+    }
+
+    // usa o cache
+    $sformato   = $operadorasCache[$opr_codigo]['sformato'];
+    $ilote      = $operadorasCache[$opr_codigo]['lote'];
+    $pin_serial = ++$operadorasCache[$opr_codigo]['serial']; // incrementa serial
+
+    $spin_serial = str_pad($pin_serial, $generator->serial_length, "0", STR_PAD_LEFT);
+    $spin_codigo = str_replace('-', '', $generator->gera_pin($sformato, $pin_valor));
+
+    if (existsPin($pdo, $spin_codigo, $opr_codigo)) {
+        fputcsv($fp, [$orig_pin, '', $vgm_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', 'PIN já existe']);
+        printFeedback($orig_pin, '', $vgm_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', 'PIN já existe');
+
+        continue;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // Inserção no pins com pin_desc = pin antigo
+        $sqlPins = "
+            INSERT INTO pins (
+                pin_serial, pin_codigo, opr_codigo, pin_valor, pin_lote_codigo,
+                pin_dataentrada, pin_canal, pin_horaentrada, pin_status,
+                pin_validade, pin_est_codigo, pin_datavenda, pin_horavenda,
+                pin_datapedido, pin_horapedido, pin_desc
+            ) VALUES (
+                :serial, :codigo, :opr, :valor, :lote,
+                CURRENT_TIMESTAMP, 's', NOW(), '6',
+                (NOW() + interval '6 month'), 1, CURRENT_DATE, '14:30:00',
+                CURRENT_DATE, '14:30:00', :desc
+            )
+            RETURNING pin_codinterno
+        ";
+        $stmtPins = $pdo->prepare($sqlPins);
+        $stmtPins->execute([
+            ':serial' => $spin_serial,
+            ':codigo' => $spin_codigo,
+            ':opr'    => $opr_codigo,
+            ':valor'  => $pin_valor,
+            ':lote'   => $ilote,
+            ':desc'   => $orig_pin,
+        ]);
+        $novoPinRow = $stmtPins->fetch();
+        $pin_codinterno = $novoPinRow['pin_codinterno'];
+
+        // associa ao vgm_id
+        $query3 = "INSERT INTO tb_dist_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) VALUES (?, ?)";
+        $pdo->prepare($query3)->execute([$vgm_id, $pin_codinterno]);
+
+        // copia para pins_dist
+        $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
+        $pdo->prepare($query4)->execute([$pin_codinterno]);
+
+        // atualiza quantidade
+        $query5 = "UPDATE tb_dist_venda_games_modelo SET vgm_qtde = vgm_qtde + 1 WHERE vgm_id = ?";
+        $pdo->prepare($query5)->execute([$vgm_id]);
+
+        // atualiza pin antigo
+        $query6 = "UPDATE pins SET pin_status = '9' WHERE pin_codigo = ?";
+        $pdo->prepare($query6)->execute([$orig_pin]);
+
+        $pdo->commit();
+
+        printFeedback($orig_pin, $spin_codigo, $vg_id, $opr_nome, $ug_nome, $pin_valor, $spin_serial, 'ok', '');
+        fputcsv($fp, [$orig_pin, $spin_codigo, $vg_id, $opr_nome, $ug_nome, $pin_valor, $spin_serial, 'ok', '']);
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        fputcsv($fp, [$orig_pin, '', $vg_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', $e->getMessage()]);
+        printFeedback($orig_pin, '', $vg_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', $e->getMessage());
+
+    }
+}
+
+fclose($fp);
+echo "CSV gerado em $csvFile\n";

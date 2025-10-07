@@ -5,13 +5,15 @@ error_reporting(E_ALL);  // Exibe todos os tipos de erros
 @session_start();
 date_default_timezone_set('America/Fortaleza');
 require_once "../../../includes/constantes.php";
+require_once "../../../class/pdv/classGamesUsuario.php";
 require_once $raiz_do_projeto . "includes/inc_register_globals.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/functions.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
 require_once "../../../includes/load_dotenv.php";
 require_once __DIR__ . "/../../../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once "../includes/funcoes_login.php";
 
-if($_SESSION['RECAPTCHA_TRUE'] != true){
+if ($_SESSION['RECAPTCHA_TRUE'] != true) {
     header("Location: index.php?Invalido=1");
     exit;
 }
@@ -20,17 +22,25 @@ $_SESSION['RECAPTCHA_TRUE'] = null;
 
 $varBlDebug = true;
 
-$user = strtoupper(filter_input(INPUT_POST, 'user'));
-$passw = filter_input(INPUT_POST, 'passw');
-
-if (!$user || !$passw) header("Location: index.php?Empty=1");
+if (!$_POST['passw'] || !$_POST['user']) header("Location: index.php?Empty=1");
 
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 //Instanciando Objetos para Descriptografia
+
+$senha_decript = null;
+$user_decript = null;
+
+$okDecript = descript_login($_POST['user'], $_POST['passw'], $senha_decript, $user_decript);
+if ($okDecript != 1) {
+    header("Location: index.php?Erro=13");
+    exit;
+}
+
 $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
-$passw = base64_encode($aes->encrypt(addslashes($passw)));
+$passw = base64_encode($aes->encrypt($senha_decript));
+$user = strtoupper($user_decript);
 
 $Enviar = true;
 
@@ -277,4 +287,3 @@ function checkDevice($userId, $pdo)
         return false; // Dispositivo inválido ou expirado
     }
 }
-?>

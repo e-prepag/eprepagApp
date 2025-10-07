@@ -12,10 +12,11 @@ require_once RAIZ_DO_PROJETO . "includes/gamer/AES.class.php";
 require_once __DIR__ . "/../../../libs/PHPGangsta/GoogleAuthenticator.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/configuracao.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/languages.php";
+require_once "../includes/funcoes_login.php";
 
 session_start();
 
-if($_SESSION['RECAPTCHA_TRUE'] != true){
+if ($_SESSION['RECAPTCHA_TRUE'] != true) {
     echo '<script>window.location.href = "index.php?Invalido=1";</script>';
     exit;
 }
@@ -29,10 +30,19 @@ try {
 
     if (Util::isAjaxRequest()) {
 
+        $senha_decript = null;
+        $user_decript = null;
+
+        $okDecript = descript_login($_POST['user'], $_POST['passw'], $senha_decript, $user_decript);
+        if ($okDecript != 1) {
+            echo "<script>alert('Error');</script>";
+            exit;
+        }
+
         $chave256bits = new Chave();
         $aes = new AES($chave256bits->retornaChavePub());
-        $senha = base64_encode($aes->encrypt(addslashes($_POST['passw'])));
-        $login = strtoupper(trim($_POST['user']));
+        $senha = base64_encode($aes->encrypt($senha_decript));
+        $login = strtoupper(trim($user_decript));
 
         $sql = "SELECT id, chave_autenticador FROM usuarios WHERE shn_login = ? AND shn_password = ? 
         AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='PU') OR (tipo_acesso='US'))";
@@ -46,6 +56,14 @@ try {
 
         if ($stmt->rowCount() > 0) {
             if (empty($fetch['chave_autenticador'])) {
+
+                $senha_base64 = null;
+                $user_base64 = null;
+                cript_login($user_decript, $senha_decript, $user_base64, $senha_base64);
+
+                $user_html = htmlspecialchars($user_base64, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
+                $senha_html = htmlspecialchars($senha_base64, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
+
                 $_SESSION['RECAPTCHA_TRUE'] = true;
                 if (!$_SESSION['secret']) {
                     $secret = $ga->createSecret();
@@ -64,8 +82,8 @@ try {
                                 $_SESSION['secret'] = "";
 ?>
                                 <form id="redir" method="POST" action="index2.php">
-                                    <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                    <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="user" value="<?= $user_html ?>">
+                                    <input type="hidden" name="passw" value="<?= $senha_html ?>">
                                     <input type="hidden" name="token" value="<?= htmlspecialchars($_POST['token'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                                 </form>
 
@@ -171,7 +189,7 @@ try {
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title"><?=LANG_TWO_FA_REGISTER?></h4>
+                                <h4 class="modal-title"><?= LANG_TWO_FA_REGISTER ?></h4>
                             </div>
                             <div class="modal-body espacamento div-principal">
                                 <form id="formAutenticador" action="" method="post">
@@ -183,32 +201,32 @@ try {
                                     </div>
 
                                     <div class="text-left" style="margin: 15px;">
-                                        <label class=""><?=LANG_TWO_FA_KEY?></label>
+                                        <label class=""><?= LANG_TWO_FA_KEY ?></label>
                                         <div id="div-copiar" onclick="copyAuthCode()" style="cursor: pointer;">
                                             <p id="authCode" style="font-size: 15px; letter-spacing: 0.5px; margin-bottom: 0px;">
                                                 <?= $secret ?>
                                             </p>
-                                            <small style="color: #333;" id="copyMessage"><?=LANG_CLICK_TO_COPY?></small>
+                                            <small style="color: #333;" id="copyMessage"><?= LANG_CLICK_TO_COPY ?></small>
                                         </div>
                                     </div>
 
                                     <div>
                                         <label style="margin-top: 15px;" for="token">
-                                            <?=LANG_ENTER_TOKEN?>
+                                            <?= LANG_ENTER_TOKEN ?>
                                         </label>
                                         <input type="text" name="token" id="token" class="form-control" style="max-width: 180px;">
                                     </div>
 
                                     <div style="margin-top: 15px; max-width: 180px;">
-                                        <button type="submit" class="btn btn-success btn-block" id="alteraToken"><?=LANG_SAVE?></button>
+                                        <button type="submit" class="btn btn-success btn-block" id="alteraToken"><?= LANG_SAVE ?></button>
                                     </div>
                                 </form>
                                 <button class="botao-expandir btn"
                                     onclick="document.querySelector('.instrucoes').classList.toggle('expandida')">
-                                    <?=LANG_HOW_TO_AUT?> &#11206;
+                                    <?= LANG_HOW_TO_AUT ?> &#11206;
                                 </button>
                                 <div class="instrucoes">
-                                    <?=$LANG_INSTRUCOES_CONFIG_AUTENTICADOR?>
+                                    <?= $LANG_INSTRUCOES_CONFIG_AUTENTICADOR ?>
                                     <div style="width: 100%; display: flex; justify-content: center;">
                                         <iframe width="300" height="170px" src="https://www.youtube.com/embed/H_19Cv6jSDU"
                                             frameborder="0"
@@ -224,7 +242,7 @@ try {
                                     echo "<p class='msg-error'>$msg</p>";
                                 }
                                 ?>
-                                <button type="button" class="btn btn-default" data-dismiss="modal"><?=LANG_CLOSE_BTN?></button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal"><?= LANG_CLOSE_BTN ?></button>
                             </div>
                         </div>
                     </div>
@@ -237,7 +255,11 @@ try {
                             $.ajax({
                                 url: 'ajax_cria_aut.php',
                                 type: 'POST',
-                                data: $("#formLog").serialize() + "&token=" + $("#token").val(),
+                                data: {
+                                    user: '<?= $user_base64 ?>',
+                                    passw: '<?= $senha_base64 ?>',
+                                    token: $("#token").val()
+                                },
                                 success: function(response) {
                                     $("#recebe-modal").html(response);
                                     // Supondo que o modal tenha id #modalLoginResult
@@ -246,7 +268,7 @@ try {
                                     }
                                 },
                                 error: function(xhr, status, error) {
-                                    alert('<?=LANG_ERROR_PROCESSING_LOGIN?>');
+                                    alert('<?= LANG_ERROR_PROCESSING_LOGIN ?>');
                                 }
                             });
                         }, 300);
@@ -256,15 +278,14 @@ try {
                         const authCode = document.getElementById("authCode").innerText;
                         navigator.clipboard.writeText(authCode).then(() => {
                             const message = document.getElementById("copyMessage");
-                            message.innerText = "<?=LANG_COPIED?>";
+                            message.innerText = "<?= LANG_COPIED ?>";
                             setTimeout(() => {
-                                message.innerText = "<?=LANG_CLICK_TO_COPY?>";
+                                message.innerText = "<?= LANG_CLICK_TO_COPY ?>";
                             }, 2000);
                         }).catch(err => {
                             console.error("Error to copy:", err);
                         });
                     }
-                    
                 </script>
 <?php
                 exit;
