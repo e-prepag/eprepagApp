@@ -124,7 +124,7 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
                         <div class="form-group">
                             <label for="inputPassword3" class="col-sm-2 col-md-offset-1 text-primary control-label">Captcha</label>
                             <div class="col-sm-7">
-                                <div class="g-recaptcha" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T"></div>
+                                <div class="g-recaptcha" data-sitekey="6Lc4XtkkAAAAAJrfsAKc99enqDlxXz4uq86FI9_T" data-callback="captchaResolvido"></div>
                             </div>
                         </div>
                         <div class="form-group top30">
@@ -173,31 +173,47 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
             </div>
         </div>
     </div>
+    <script src="/js/encryptPayload.js"></script>
     <script type="text/javascript">
-    $(function() {
-      $("#formLog").submit((e) => {
-        e.preventDefault();
+        let tokenRecaptcha = '';
 
-        // Envia os dados do formulário via AJAX para ajax_login_aut.php, exibe o resultado no body e chama o modal
-        $.ajax({
-          url: 'ajax_login_aut.php',
-          type: 'POST',
-          data: $("#formLog").serialize(),
-          success: function(response) {
-            $("#recebe-modal").html(response);
-            // Supondo que o modal tenha id #modalLoginResult
-            if ($("#modal-token").length) {
-              $("#modal-token").modal('show');
-            }
-            grecaptcha.reset();
-          },
-          error: function(xhr, status, error) {
-            alert('<?=LANG_ERROR_PROCESSING_LOGIN?>');
-          }
+        function captchaResolvido(token) {
+            tokenRecaptcha = token; // salva o token para usar depois
+        }
+        $(function() {
+            $("#formLog").submit(async (e) => {
+                e.preventDefault();
+
+                const res = await fetch('/public-key'); // deve ser HTTPS
+                if (!res.ok) alert('<?= LANG_ERROR_PROCESSING_LOGIN ?>');
+                const publicPem = await res.text();
+
+                var formData = $("#formLog").serializeArray();
+                var data = {};
+
+                data.user = await encryptPasswordWithPublicKey(publicPem, $('#user').val());
+                data.passw = await encryptPasswordWithPublicKey(publicPem, $('#passw').val());
+                data['g-recaptcha-response'] = tokenRecaptcha;
+                // Envia os dados do formulário via AJAX para ajax_login_aut.php, exibe o resultado no body e chama o modal
+                $.ajax({
+                    url: 'ajax_login_aut.php',
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        $("#recebe-modal").html(response);
+                        // Supondo que o modal tenha id #modalLoginResult
+                        if ($("#modal-token").length) {
+                            $("#modal-token").modal('show');
+                        }
+                        grecaptcha.reset();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('<?= LANG_ERROR_PROCESSING_LOGIN ?>');
+                    }
+                });
+            })
         });
-      })
-    });
-  </script>
+    </script>
 </body>
 
 </html>

@@ -65,10 +65,27 @@ try {
 
         $_SESSION['RECAPTCHA_TRUE'] = true;
 
+        $privateKeyPem = file_get_contents('/www/ssl/private.pem');
+
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+
+        if (!$privateKey) {
+            echo "<script>alert('Error');</script>";
+            exit;
+        }
+
+        $senha_decript = null;
+        $user_decript = null;
+        $okDecript = descript_login($_POST['user'], $_POST['passw'], $senha_decript, $user_decript);
+        if ($okDecript != 1) {
+            echo "<script>alert('Error');</script>";
+            exit;
+        }
+
         $chave256bits = new Chave();
         $aes = new AES($chave256bits->retornaChavePub());
-        $senha = base64_encode($aes->encrypt(addslashes($_POST['passw'])));
-        $login = strtoupper(trim($_POST['user']));
+        $senha = base64_encode($aes->encrypt($senha_decript));
+        $login = strtoupper(trim($user_decript));
 
         $sql = "SELECT id, chave_autenticador, sem_aut_data FROM usuarios WHERE shn_login = ? AND shn_password = ? 
         AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='PU') OR (tipo_acesso='US'))";
@@ -81,22 +98,27 @@ try {
         $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($stmt->rowCount() > 0) {
+
+            $senha_base64 = null;
+            $user_base64 = null;
+            cript_login($user_decript, $senha_decript, $user_base64, $senha_base64);
+
             $ret = true;
             if (empty($fetch['chave_autenticador'])) {
 
-                modal_criar_token($fetch);
+                modal_criar_token($fetch, $senha_base64, $user_base64);
                 exit;
             }
 
             if (checkDevice($fetch['id'], $pdo)) {
-                logar_direto();
+                logar_direto($senha_base64, $user_base64);
                 exit;
             }
 
-            modal_token();
+            modal_token($senha_base64, $user_base64);
             exit;
         } else {
-            registrarTentativaFalha($_POST['user']);
+            registrarTentativaFalha($login);
             echo "<script>alert('" . LANG_USER_PASS_INVALID . "');</script>";
         }
     }
@@ -104,7 +126,7 @@ try {
     echo "Connection error";
 }
 
-function modal_criar_token($fetch)
+function modal_criar_token($fetch, $senha, $login)
 {
     $dataUltimoAcesso = new DateTime($fetch['sem_aut_data']);
     $dataHoje = new DateTime();
@@ -118,6 +140,9 @@ function modal_criar_token($fetch)
         $mensagemAuth = LANG_AUTHENTICATOR_REGISTER_EXPIRED;
         $btn_recusar = false;
     }
+
+    $user_html = htmlspecialchars($login, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
+    $senha_html = htmlspecialchars($senha, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1');
 
 ?>
     <div id="modal-token" class="modal fade txt-preto" role="dialog">
@@ -136,8 +161,8 @@ function modal_criar_token($fetch)
                     <?php if ($btn_recusar) { ?>
                         <div class="dislineblock">
                             <form id="redir" method="POST" action="index2.php">
-                                <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                <input type="hidden" name="user" value="<?= $user_html ?>">
+                                <input type="hidden" name="passw" value="<?= $senha_html ?>">
                                 <button style="font-weight: bold; font-style: italic; width: 55px;" class="pull-right btn btn-info" type="submit"><?= LANG_NO ?></button>
                             </form>
                         </div>
@@ -157,7 +182,10 @@ function modal_criar_token($fetch)
                 $.ajax({
                     url: 'ajax_cria_aut.php',
                     type: 'POST',
-                    data: $("#formLog").serialize(),
+                    data: {
+                        user: '<?= $login ?>',
+                        passw: '<?= $senha ?>'
+                    },
                     success: function(response) {
                         $("#recebe-modal").html(response);
                         // Supondo que o modal tenha id #modalLoginResult
@@ -175,7 +203,7 @@ function modal_criar_token($fetch)
 <?php
 }
 
-function modal_token()
+function modal_token($senha, $login)
 {
 ?>
     <div id="modal-token" class="modal fade txt-preto" role="dialog">
@@ -190,8 +218,8 @@ function modal_token()
                     <form action="index2.php" method="POST">
                         <div class="form-group text-left">
                             <label for="token">Token:</label>
-                            <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                            <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                            <input type="hidden" name="user" value="<?= htmlspecialchars($login, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                            <input type="hidden" name="passw" value="<?= htmlspecialchars($senha, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                             <input type="text" class="form-control" id="token" name="token" placeholder="Token">
                             <div style="margin: 7px 0px; display: flex; align-items: center; gap: 3px;">
                                 <label for="salvarDispositivo" style="margin: 0; font-weight: normal;"><?= LANG_REMEMBER_DEVICE ?>:</label>
@@ -212,12 +240,12 @@ function modal_token()
 <?php
 }
 
-function logar_direto()
+function logar_direto($senha, $login)
 {
 ?>
     <form id="redir" method="POST" action="index2.php">
-        <input type="hidden" name="user" value="<?= $_POST['user'] ?>">
-        <input type="hidden" name="passw" value="<?= $_POST['passw'] ?>">
+        <input type="hidden" name="user" value="<?= htmlspecialchars($login, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+        <input type="hidden" name="passw" value="<?= htmlspecialchars($senha, ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
     </form>
 
     <script>

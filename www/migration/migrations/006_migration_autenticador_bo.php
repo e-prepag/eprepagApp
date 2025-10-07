@@ -6,7 +6,7 @@ return function (PDO $pdo) {
                     ADD COLUMN sem_aut_data DATE NOT NULL DEFAULT CURRENT_DATE;");
                     
     $pdo->exec("CREATE TABLE usuarios_bo_dispositivos (
-                	id serial4 NOT NULL,
+                	id varchar(20) NOT NULL,
                 	user_id int4 NOT NULL,
                 	device_token varchar(100) NOT NULL,
                 	expires_at timestamp DEFAULT (now() + '30 days'::interval) NULL,

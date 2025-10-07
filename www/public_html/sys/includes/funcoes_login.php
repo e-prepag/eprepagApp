@@ -152,3 +152,45 @@ function registrarTentativaFalha($login_verificacao)
         $stmt->execute();
     }
 }
+
+function descript_login($login_cript, $senha_cript, &$senha, &$login)
+{
+    $privateKeyPem = file_get_contents('/www/ssl/private.pem');
+
+    $privateKey = openssl_pkey_get_private($privateKeyPem);
+
+    if (!$privateKey) {
+        return 0;
+    }
+
+    $okSenha = openssl_private_decrypt(base64_decode($senha_cript), $senha, $privateKey, OPENSSL_PKCS1_OAEP_PADDING);
+    $okUsuario = openssl_private_decrypt(base64_decode($login_cript), $login, $privateKey, OPENSSL_PKCS1_OAEP_PADDING);
+    if (!$okSenha || !$okUsuario) {
+        return -1;
+    }
+    return 1;
+}
+
+function cript_login($login, $senha, &$login_cript, &$senha_cript)
+{
+    $publicKey = file_get_contents("/www/ssl/public.pem");
+
+    $senhaCriptografada = null;
+    openssl_public_encrypt(
+        $senha,
+        $senhaCriptografada,
+        $publicKey,
+        OPENSSL_PKCS1_OAEP_PADDING
+    );
+
+    $userCriptografado = null;
+    openssl_public_encrypt(
+        $login,
+        $userCriptografado,
+        $publicKey,
+        OPENSSL_PKCS1_OAEP_PADDING
+    );
+
+    $senha_cript = base64_encode($senhaCriptografada);
+    $login_cript = base64_encode($userCriptografado);
+}
