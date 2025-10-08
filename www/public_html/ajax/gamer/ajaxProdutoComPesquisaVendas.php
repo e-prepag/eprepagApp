@@ -4,7 +4,7 @@ require_once $raiz_do_projeto."public_html/sys/includes/topo_sys_inc.php";
 require_once __DIR__ . "/../../../db/connect.php"; 
 require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 session_start();
-if(empty($_SESSION["iduser_bko_pub"]))
+if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
 {
         echo '<script>alert("Faça login novamente");</script>';
         exit;

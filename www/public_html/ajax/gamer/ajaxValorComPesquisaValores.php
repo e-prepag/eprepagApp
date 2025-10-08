@@ -2,7 +2,12 @@
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
 function isAjax() {return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));}
 function block_direct_calling() {
     if(!isAjax()) {

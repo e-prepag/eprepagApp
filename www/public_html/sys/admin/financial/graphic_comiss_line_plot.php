@@ -1,5 +1,10 @@
 <?php
 session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+    {
+            echo '<script>alert("Faça login novamente");</script>';
+            exit;
+    }
 $imagem			= isset($_POST['imagem'])		? utf8_decode($_POST['imagem'])	: null;
 $labeloperadora	= isset($_POST['labeloperadora'])? $_POST['labeloperadora']		: null;
 $language		= isset($_POST['language'])		? $_POST['language']			: null;
