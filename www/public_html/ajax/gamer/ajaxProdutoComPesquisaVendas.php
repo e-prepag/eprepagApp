@@ -3,7 +3,12 @@ require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto."public_html/sys/includes/topo_sys_inc.php";
 require_once __DIR__ . "/../../../db/connect.php"; 
 require_once __DIR__ . "/../../../db/ConnectionPDO.php";
-
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
 $id = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 
 if ($id > 0) {
@@ -52,58 +57,3 @@ if (!empty($rs_oprProdutos)) {
     }
 }
 ?>
-<script>
-		
-/*
-
-
-		function reload_precos() {
-		
-		'NOOOOOO';
-
-		var selectedItems = new Array();
-	
-		$("input[@name='tf_produto[]']:checked").each( function () { 
-		selectedItems.push($(this).val());
-		
-
-		$.ajax({
-				
-			type: "POST",
-			url: "../commerce/includes/ajaxTipoComPesquisaVendas.php",
-		    data: 
-				
-				{id:<?=$id?>}
-			,
-beforeSend: function(){
-					$('#mostraValores2').html("Aguarde...");
-				},
-				success: function(html){
-					
-					$('#mostraValores2').html(html);
-				},
-				error: function(){
-					alert('erro ao carregar valores');
-				}
-
-				}); //fim ajax
-
-					
-		});
-
-	
-		}// fim function reload precos
-
-		
-		$("input[@name='tf_produto[]']:unchecked").change(function () { 
-			
-		reload_precos();
-
-	//	alert('eittaa');
-		
-		}); 
-		//	"input[@name='chkBox']"
-		
-		//alert(this.value);
-		
-		*/</script>

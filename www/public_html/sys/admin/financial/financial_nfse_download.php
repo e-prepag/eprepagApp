@@ -1,4 +1,10 @@
 <?php 
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+    {
+            echo '<script>alert("Faça login novamente");</script>';
+            exit;
+    }
 if($_SESSION["tipo_acesso_pub"]=='PU') {
 	//redireciona
 	$strRedirect = "/sys/admin/commerce/index.php";

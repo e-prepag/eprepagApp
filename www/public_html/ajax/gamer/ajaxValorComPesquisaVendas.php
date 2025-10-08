@@ -3,7 +3,12 @@ require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys_inc.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
-
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
 $pdo = ConnectionPDO::getConnection()->getLink();
 
 $tf_pins = isset($tf_pins) ? $tf_pins : null;

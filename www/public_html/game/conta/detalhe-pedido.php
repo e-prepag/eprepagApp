@@ -29,7 +29,7 @@ if($msg == ""){
     $pdo = $con->getLink();
     
         $sql  = "select * from tb_venda_games vg " .
-                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id where vg.vg_id = " . $venda_id . " and vg_ug_id = ".$controller->usuario->getId();
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id where vg.vg_id = ? and vg_ug_id = ?";
      
         //Tentando executar a Query de Insert
         $stmt = $pdo->prepare($sql);
@@ -46,7 +46,7 @@ if($msg == ""){
 				
 		//$idVendCalc = (($venda_id * 5)/3)-90;
 
-        if($stmt->execute()){
+        if($stmt->execute([$venda_id, $controller->usuario->getId()])){
             $num_rows = $stmt->rowCount();
             
             if($num_rows > 0){
@@ -84,11 +84,11 @@ if($msg == ""){
 
         if($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO']){
                 $sql  = "select * from boleto_bancario_games bbg " .
-                                "where bbg.bbg_vg_id = " . $venda_id;
+                                "where bbg.bbg_vg_id = ?";
                 
                 $stmt = $pdo->prepare($sql);
 
-                if($stmt->execute()){
+                if($stmt->execute([$venda_id])){
                     if($stmt->rowCount() > 0){
                         $rs_boleto_row = $stmt->fetch(PDO::FETCH_ASSOC);
                         $bbg_boleto_codigo = $rs_boleto_row['bbg_boleto_codigo'];
@@ -108,11 +108,11 @@ if($msg == ""){
                 }
         } elseif($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['REDECARD_MASTERCARD'] || $vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['REDECARD_DINERS']){
                 $sql  = "select * from tb_venda_games_redecard vgrc " .
-                                "where vgrc.vgrc_vg_id = " . $venda_id;
+                                "where vgrc.vgrc_vg_id = ?";
                 
                 $stmt = $pdo->prepare($sql);
 
-                if($stmt->execute()){
+                if($stmt->execute([$venda_id])){
                     if($stmt->rowCount() > 0){
                         $rs_redecard_row = $stmt->fetch(PDO::FETCH_ASSOC);
                         $vgrc_id = $rs_redecard_row['vgrc_id'];
@@ -164,12 +164,12 @@ if($msg == ""){
                         $shn_nome = "Anonymous";
                 } else {
                         $sql  = "select * from usuarios urpp " .
-                                        "where urpp.id = '" . $vg_user_id_concilia . "'";
+                                        "where urpp.id = ?";
                         
                         
                         $stmt = $pdo->prepare($sql);
 
-                        if($stmt->execute()){
+                        if($stmt->execute([$vg_user_id_concilia])){
                             if($stmt->rowCount() > 0){
                                 
                                 $rs_urpp_row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -237,13 +237,13 @@ if($vg_ultimo_status == 1){
                             (
                                 SELECT vgm_ogp_id
                                 FROM tb_venda_games_modelo
-                                WHERE vgm_opr_codigo = 124 and vgm_vg_id = $venda_id
+                                WHERE vgm_opr_codigo = 124 and vgm_vg_id = ?
                                 GROUP BY vgm_ogp_id
                                 ORDER BY COUNT(*) DESC
                                 LIMIT 1
-                            ) AS vgm_ogp_id from tb_venda_games_modelo where vgm_opr_codigo = 124 and vgm_vg_id =" . $venda_id;
+                            ) AS vgm_ogp_id from tb_venda_games_modelo where vgm_opr_codigo = 124 and vgm_vg_id = ?";
 						 $dadosGarena = $pdo->prepare($sqlGarena);
-						 $dadosGarena->execute();
+						 $dadosGarena->execute([$venda_id, $venda_id]);
 						 $totalGarena = $dadosGarena->fetch(PDO::FETCH_ASSOC);
 						 //$dadosGarena = SQLexecuteQuery($sqlGarena);
 						 //$totalGarena = pg_fetch_array($dadosGarena); 

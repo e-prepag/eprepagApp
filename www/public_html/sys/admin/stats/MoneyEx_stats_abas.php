@@ -3,6 +3,11 @@
 //ini_set("display_errors", 1); 
 set_time_limit(3000);	
 @session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+    {
+            echo '<script>alert("Faça login novamente");</script>';
+            exit;
+    }
 require_once "../../../../includes/constantes.php";
 $_SERVER['DOCUMENT_ROOT'] = $raiz_do_projeto . "public_html/sys";
 require_once ($_SERVER['DOCUMENT_ROOT']."/includes/language/eprepag_lang_".$_SESSION['langNome'].".inc.php");

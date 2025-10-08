@@ -1,5 +1,11 @@
 <?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
+@session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+    {
+            echo '<script>alert("Faça login novamente");</script>';
+            exit;
+    }
 //Alicota EPP Administradora
 $alicota_epp_adm = array(6.38);//6.38;
 

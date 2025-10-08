@@ -1,7 +1,9 @@
 .env**
 !.env_example
 **/backoffice_old 
-**/log
+**/log/*
+**/log/*/
+!**/log/.gitkeep
 **/cache
 *.csv
 *.CSV

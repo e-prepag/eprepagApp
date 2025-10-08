@@ -1,5 +1,10 @@
 <?php 
-
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 require_once "../../../includes/constantes.php";

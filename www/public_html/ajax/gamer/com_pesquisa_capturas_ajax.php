@@ -1,6 +1,13 @@
 <?php header("Content-Type: text/html; charset=ISO-8859-1",true) ?>
 <?php 
 
+session_start();
+if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
+{
+        echo '<script>alert("Faça login novamente");</script>';
+        exit;
+}
+
 require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto."public_html/sys/includes/topo_sys_inc.php";
 
