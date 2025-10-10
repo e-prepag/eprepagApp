@@ -720,8 +720,8 @@ function clearSelection (){
 
 
 	// Arquivo
-	$path = $raiz_do_projeto . "public_html";
-	$url = "/sys/admin/vendas/vendas_estab/lotes/";
+	$path = $raiz_do_projeto . "/www/arquivos_gerados";
+	$url = "/vendas_estab/";
 	$file = date("YmdHis").str_pad(rand(0,999), 3, "0", STR_PAD_LEFT).".txt";
 
 	//Grava mensagem no arquivo
