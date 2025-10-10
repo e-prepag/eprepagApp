@@ -38,10 +38,10 @@ if (isset($controller->logado) && $controller->logado) {
                 $b_LimiteDiarioOK = ((($total_carrinho + $total_diario) <= $RISCO_GAMERS_SALDO_TOTAL_DIARIO) && ($qtde_last_dayOK <= $RISCO_GAMERS_SALDO_PAGAMENTOS_DIARIO));
 
                 // Libera pagamento Online Banco do Brasil
-                $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK;// && $controller->usuario->b_IsLogin_pagamento_bancodobrasil();
+                $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK; // && $controller->usuario->b_IsLogin_pagamento_bancodobrasil();
 
                 // Libera Bradesco apenas se limite diario não ultrapassado e tem até 10 compras nas últimas 24 horas	//produtos (Habbo e GPotato) 
-                $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK;	//$b_IsProdutoOK && 
+                $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK;        //$b_IsProdutoOK && 
 
                 // Libera pagamento pix
                 $b_libera_Pix = $b_LimiteDiarioOK && $b_TentativasDiariasOK;
@@ -107,10 +107,27 @@ if (isset($controller->logado) && $controller->logado) {
                 // ver montaCesta_pag() para cesta Money
                 $cesta_boleto_pagto_online = "item:Boleto Online Gamers (Saldo)\n1\ncrédito\n" . (100 * $total_carrinho) . "\n";
 
-                // tipo_deposito = 2 -> 'Depósito direto no Saldo'
-                $sql = "UPDATE tb_pag_compras SET cliente_nome='" . str_replace("'", "''", $snome) . "', idcliente=" . $controller->usuario->getId() . ", status=1, cesta='" . $cesta_boleto_pagto_online . "', total=" . (100 * ($total_carrinho + $taxas)) . ", tipo_deposito = 2 WHERE numcompra='" . $numOrder . "'";		// "pagto='".$_SESSION['pagamento.pagto']."', "
+                $sql = "
+                    UPDATE tb_pag_compras
+                    SET
+                        cliente_nome = $1,
+                        idcliente = $2,
+                        status = 1,
+                        cesta = $3,
+                        total = $4,
+                        tipo_deposito = 2
+                    WHERE numcompra = $5
+                ";
 
-                $ret = SQLexecuteQuery($sql);
+                $params = array(
+                        $snome, // $1
+                        $controller->usuario->getId(), // $2
+                        $cesta_boleto_pagto_online, // $3
+                        100 * ($total_carrinho + $taxas), // $4
+                        $numOrder // $5
+                );
+
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret) {
                         echo "Erro ao atualizar transação de pagamento (2).\n";
                         die("Stop");
@@ -174,41 +191,77 @@ if (isset($controller->logado) && $controller->logado) {
                         $_SESSION['pagamento.numorder'] = $orderId;
                         $pagto_venda = getCodigoNumericoParaPagto($pagto);
 
-                        // Salva registro de vendas
-                        $sql = "insert into tb_venda_games (" .
-                                "vg_id, vg_ug_id, vg_data_inclusao,vg_pagto_data_inclusao, vg_pagto_tipo, " .
-                                "vg_ultimo_status, vg_ultimo_status_obs, vg_http_referer_origem, vg_http_referer, vg_http_referer_ip, vg_deposito_em_saldo_valor, vg_valor_eppcash, vg_deposito_em_saldo) values (";
-                        $sql .= SQLaddFields($venda_id, "") . ",";
-                        $sql .= SQLaddFields($usuarioId, "") . ",";
-                        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                        $sql .= SQLaddFields($pagto_venda, "") . ",";
-                        $sql .= SQLaddFields($GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'], "") . ",";
-                        $sql .= SQLaddFields("", "s") . ", ";
-                        $sql .= SQLaddFields($_SESSION['epp_origem'], "s") . ", ";
-                        $sql .= SQLaddFields($_SESSION['epp_origem_referer'], "s") . ", ";
-                        $sql .= SQLaddFields($_SESSION['epp_remote_addr'], "s") . ", ";
-                        $sql .= SQLaddFields(number_format($total_carrinho, 2, '.', '.'), "") . ", ";
-                        $sql .= SQLaddFields($total_carrinho_eppcash, "") . ", ";
-                        $sql .= SQLaddFields("1", "") . ")";
-                        //gravaLog_DebugTMP(" TESTE 433443 a: (total_carrinho: '$total_carrinho') ".$sql."\n");
-                        $ret = SQLexecuteQuery($sql);
+                        // preparar valores com fallback (evita notices se índice de sessão não existir)
+                        $param_vg_id   = $venda_id;
+                        $param_vg_ug_id = $usuarioId;
+                        $param_vg_pagto_tipo = $pagto_venda;
+                        $param_vg_ultimo_status = $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'];
+                        $param_vg_ultimo_status_obs = ''; // era SQLaddFields("", "s")
+                        $param_vg_http_referer_origem = isset($_SESSION['epp_origem']) ? $_SESSION['epp_origem'] : null;
+                        $param_vg_http_referer = isset($_SESSION['epp_origem_referer']) ? $_SESSION['epp_origem_referer'] : null;
+                        $param_vg_http_referer_ip = isset($_SESSION['epp_remote_addr']) ? $_SESSION['epp_remote_addr'] : null;
+
+                        // valores numéricos: normalizar para string com ponto decimal (PostgreSQL aceita)
+                        $param_vg_deposito_em_saldo_valor = number_format((float)$total_carrinho, 2, '.', '');
+                        $param_vg_valor_eppcash = number_format((float)$total_carrinho_eppcash, 2, '.', '');
+                        $param_vg_deposito_em_saldo = 1;
+
+                        // montar SQL com CURRENT_TIMESTAMP inlined (não como parâmetro)
+                        $sql = "
+                                    INSERT INTO tb_venda_games (
+                                        vg_id,
+                                        vg_ug_id,
+                                        vg_data_inclusao,
+                                        vg_pagto_data_inclusao,
+                                        vg_pagto_tipo,
+                                        vg_ultimo_status,
+                                        vg_ultimo_status_obs,
+                                        vg_http_referer_origem,
+                                        vg_http_referer,
+                                        vg_http_referer_ip,
+                                        vg_deposito_em_saldo_valor,
+                                        vg_valor_eppcash,
+                                        vg_deposito_em_saldo
+                                    )
+                                    VALUES (
+                                        $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $3, $4, $5, $6, $7, $8, $9, $10, $11
+                                    )
+                                ";
+                        // executar de forma segura
+                        $ret = SQLexecuteQueryParams($sql, array(
+                                $param_vg_id,                       // $1
+                                $param_vg_ug_id,                    // $2
+                                $param_vg_pagto_tipo,               // $3
+                                $param_vg_ultimo_status,            // $4
+                                $param_vg_ultimo_status_obs,        // $5
+                                $param_vg_http_referer_origem,      // $6
+                                $param_vg_http_referer,             // $7
+                                $param_vg_http_referer_ip,          // $8
+                                $param_vg_deposito_em_saldo_valor,  // $9
+                                $param_vg_valor_eppcash,            // $10
+                                $param_vg_deposito_em_saldo         // $11
+                        ));
+
                         if (!$ret) {
                                 $msg = "Erro ao inserir venda. Por favor, tente novamente atualizando a página. Obrigado *.\n";
                                 gravaLog_BoletoExpressMoney($msg . "\n" . $sql);
                         }
-                }//end if(!$msg)
+                } //end if(!$msg)
 
                 if (!$msg) {
                         // Salva venda_id em tb_pag_compras
-                        $sql = "UPDATE tb_pag_compras SET idvenda=" . $venda_id . " WHERE numcompra='" . $numOrder . "'";
-                        $ret = SQLexecuteQuery($sql);
+                        $sql = "UPDATE tb_pag_compras SET idvenda = $1 WHERE numcompra = $2";
+
+                        $ret = SQLexecuteQueryParams($sql, array(
+                                $param_venda_id,   // $1
+                                $param_numOrder    // $2
+                        ));
                         if (!$ret) {
                                 $msg = "Erro ao atualizar transação de pagamento (2a, id_venda=$id_venda, numcompra='" . $numOrder . "').\n";
                                 gravaLog_BoletoExpressMoney($msg . "\n" . $sql);
                         }
-                }//end if(!$msg)
-        }//end if($msg == "")
+                } //end if(!$msg)
+        } //end if($msg == "")
 
         if ($msg == "") {
                 //Log na base
@@ -262,8 +315,7 @@ if (isset($controller->logado) && $controller->logado) {
                 $objEnvioEmailAutomatico->setFormaPagamento($formaPagamento);
                 $objEnvioEmailAutomatico->setPedido(formata_codigo_venda($venda_id));
                 $objEnvioEmailAutomatico->MontaEmailEspecifico();
-
-        }//end if($msg == "")
+        } //end if($msg == "")
 
         //Retorno
         if ($msg != "") {
@@ -286,8 +338,8 @@ if (isset($controller->logado) && $controller->logado) {
                 } else {
                         echo "ERRO 64532.";
                 }
-        }//end else do if($msg != "")
-}//end if(isset($controller->logado) && $controller->logado) 
+        } //end else do if($msg != "")
+} //end if(isset($controller->logado) && $controller->logado) 
 
 function depositoBoleto($total_geral, $usuarioId)
 {
@@ -312,27 +364,41 @@ function depositoBoleto($total_geral, $usuarioId)
                 $instConversionPINsEPP = new ConversionPINsEPP;
                 $total_geral_epp = $instConversionPINsEPP->get_ValorEPPCash('E', $total_geral);
 
-                $sql = "insert into tb_venda_games (" .
-                        "vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, " .
-                        "vg_ultimo_status, vg_ultimo_status_obs, vg_http_referer_origem, vg_http_referer, vg_deposito_em_saldo_valor, vg_valor_eppcash, vg_deposito_em_saldo) values (";
-                $sql .= SQLaddFields($venda_id, "") . ",";
-                $sql .= SQLaddFields($usuarioId, "") . ",";
-                $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                $sql .= SQLaddFields($GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'], "") . ",";
-                $sql .= SQLaddFields($GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'], "") . ",";
-                $sql .= SQLaddFields("", "s") . ", ";
-                $sql .= SQLaddFields($GLOBALS['_SESSION']['epp_origem'], "s") . ",";
-                $sql .= SQLaddFields($GLOBALS['_SESSION']['epp_origem_referer'], "s") . ", ";
-                $sql .= SQLaddFields(number_format($total_geral, 2, '.', '.'), "") . ", ";
-                $sql .= SQLaddFields($total_geral_epp, "") . ", ";
-                $sql .= SQLaddFields("1", "") . ")";
-                //gravaLog_DebugTMP(" TESTE 433443 b (total_geral: '$total_geral') : ".$sql."\n");
-                $ret = SQLexecuteQuery($sql);
+                $sql = "
+                            INSERT INTO tb_venda_games (
+                                vg_id,
+                                vg_ug_id,
+                                vg_data_inclusao,
+                                vg_pagto_tipo,
+                                vg_ultimo_status,
+                                vg_ultimo_status_obs,
+                                vg_http_referer_origem,
+                                vg_http_referer,
+                                vg_deposito_em_saldo_valor,
+                                vg_valor_eppcash,
+                                vg_deposito_em_saldo
+                            ) VALUES (
+                                $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, $7, $8, $9, $10
+                            )
+                        ";
+
+                $ret = SQLexecuteQueryParams($sql, array(
+                        $venda_id,                              // $1
+                        $usuarioId,                             // $2
+                        $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'], // $3
+                        $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'],     // $4
+                        '',                                     // $5 (obs)
+                        $GLOBALS['_SESSION']['epp_origem'],     // $6
+                        $GLOBALS['_SESSION']['epp_origem_referer'], // $7
+                        number_format($total_geral, 2, '.', ''), // $8
+                        $total_geral_epp,                       // $9
+                        1                                       // $10
+                ));
                 if (!$ret) {
                         $msg = "Erro ao inserir venda. Por favor, tente novamente atualizando a página. Obrigado.\n";
                         gravaLog_BoletoExpressLH($msg . "\n" . $sql);
                 }
-        }//end if($msg == "")
+        } //end if($msg == "")
 
         //Log na base
         if ($msg == "") {
@@ -382,7 +448,7 @@ function depositoBoleto($total_geral, $usuarioId)
                                 $qtde_dias_venc = $GLOBALS['BOLETO_MONEY_BRADESCO_QTDE_DIAS_VENCIMENTO'];
                                 $bco_codigo = $GLOBALS['BOLETO_MONEY_BRADESCO_COD_BANCO'];
                                 $num_doc = "6" . "00" . str_pad($venda_id, 8, "0", STR_PAD_LEFT);
-                        }//end if($controller->usuario->b_Is_Boleto_Bradesco())
+                        } //end if($controller->usuario->b_Is_Boleto_Bradesco())
                         elseif ($controller->usuario->b_Is_Boleto_Banespa()) {
                                 $qtde_dias_venc = $GLOBALS['BOLETO_MONEY_BANESPA_QTDE_DIAS_VENCIMENTO'];
                                 $bco_codigo = $GLOBALS['BOLETO_MONEY_BANCO_BANESPA_COD_BANCO'];
@@ -403,34 +469,53 @@ function depositoBoleto($total_geral, $usuarioId)
 
                 //Insere boleto na base
                 //----------------------------------------------------
-                $sql = "insert into boleto_bancario_games (" .
-                        "bbg_ug_id, bbg_vg_id, bbg_data_inclusao, bbg_valor, bbg_valor_taxa, " .
-                        "bbg_bco_codigo, bbg_documento, bbg_data_venc" .
-                        ") values (";
-                $sql .= SQLaddFields($usuarioId, "") . ",";
-                $sql .= SQLaddFields($venda_id, "") . ",";
-                $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                $sql .= SQLaddFields($total_geral + $taxa_adicional, "") . ",";
-                $sql .= SQLaddFields($taxa_adicional, "") . ",";
-                $sql .= SQLaddFields($bco_codigo, "") . ",";
-                $sql .= SQLaddFields($num_doc, "s") . ","; //documento
-                $sql .= SQLaddFields("CURRENT_DATE + interval '$qtde_dias_venc day'", "") . ")"; //vencimento
-                $ret = SQLexecuteQuery($sql);
+                $sql = "
+                            INSERT INTO boleto_bancario_games (
+                                bbg_ug_id,
+                                bbg_vg_id,
+                                bbg_data_inclusao,
+                                bbg_valor,
+                                bbg_valor_taxa,
+                                bbg_bco_codigo,
+                                bbg_documento,
+                                bbg_data_venc
+                            ) VALUES (
+                                $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + interval '$7 day'
+                            )
+                        ";
+
+                $ret = SQLexecuteQueryParams($sql, array(
+                        $usuarioId,                              // $1 bbg_ug_id
+                        $venda_id,                               // $2 bbg_vg_id
+                        $total_geral + $taxa_adicional,          // $3 bbg_valor
+                        $taxa_adicional,                         // $4 bbg_valor_taxa
+                        $bco_codigo,                             // $5 bbg_bco_codigo
+                        $num_doc,                                // $6 bbg_documento
+                        $qtde_dias_venc                          // $7 intervalo para vencimento
+                ));
 
                 //atualiza dados do pagamento e status da venda
                 if ($ret) {
-                        $sql = "update tb_venda_games set 
-                                            vg_pagto_data_inclusao = " . SQLaddFields("CURRENT_TIMESTAMP", "") . ",
-                                            vg_pagto_banco = '" . $bco_codigo . "',
-                                            vg_pagto_num_docto = '" . $num_doc . "',
-                                            vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'], "") . "
-                                    where vg_id = " . $venda_id;
-                        // Marca esta venda como deposito.em.saldo, para uso em venda_e_modelos_logica.php
+                        $sql = "
+                                    UPDATE tb_venda_games SET
+                                        vg_pagto_data_inclusao = CURRENT_TIMESTAMP,
+                                        vg_pagto_banco = $1,
+                                        vg_pagto_num_docto = $2,
+                                        vg_ultimo_status = $3
+                                    WHERE vg_id = $4
+                                ";
+
+                        // executar de forma segura
+                        $ret = SQLexecuteQueryParams($sql, array(
+                                $bco_codigo,                                      // $1 vg_pagto_banco
+                                $num_doc,                                         // $2 vg_pagto_num_docto
+                                $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'],      // $3 vg_ultimo_status
+                                $venda_id                                         // $4 vg_id
+                        ));
+
                         $pagto = $_SESSION['pagamento.pagto'];
                         $_SESSION['pagamento.pagto.deposito.em.saldo'] = $pagto;
                         $_SESSION['pagamento.pagto.deposito.em.saldo.num.docto'] = $num_doc;
-
-                        $ret = SQLexecuteQuery($sql);
                         if (!$ret)
                                 $msg = "Erro ao atualizar status da venda (3223).\n";
                 }
@@ -462,6 +547,4 @@ function depositoBoleto($total_geral, $usuarioId)
                 echo $msg;
                 exit;
         }
-
-}//end function depositoBoleto 
-?>
+} //end function depositoBoleto 

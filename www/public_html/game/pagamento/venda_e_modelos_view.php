@@ -253,12 +253,13 @@ if(isset($pagto_tipo)) {
     }//end if($total_geral  < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA) 
     else $taxa = 0;
 }//end if(isset($pagto_tipo))
-$sql_total = "select total,taxas from tb_pag_compras where tipo_cliente = 'M' and idvenda = ".$GLOBALS['_SESSION']['venda'].";";
-$rs_total = SQLexecuteQuery($sql_total);
+$sql_total = "select total,taxas from tb_pag_compras where tipo_cliente = 'M' and idvenda = $1;";
+$rs_total = SQLexecuteQueryParams($sql_total, [$GLOBALS['_SESSION']['venda']]);
 $rs_total_row = pg_fetch_array($rs_total);
 if($rs_total_row['total'] == 0) {
-        $sql_update_total = "update tb_pag_compras set total = ".(($total_geral+$rs_total_row['taxas'])*100)." where tipo_cliente = 'M' and idvenda = ".$GLOBALS['_SESSION']['venda'];
-        $rs_update_total = SQLexecuteQuery($sql_update_total);
+        $sql_update_total = "update tb_pag_compras set total = $1 where tipo_cliente = 'M' and idvenda = $2";
+        $total_mais_taxas = ($total_geral+$rs_total_row['taxas'])*100;
+        $rs_update_total = SQLexecuteQueryParams($sql_update_total, [$total_mais_taxas, $GLOBALS['_SESSION']['venda']]);
 }
 //fim do trecho que atualiza o total no registro de pagamento
 }//end if(isset($controller->logado) && $controller->logado) {

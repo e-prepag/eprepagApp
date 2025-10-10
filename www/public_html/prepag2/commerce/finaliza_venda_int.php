@@ -67,11 +67,11 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
                         )
                 );
                 $_SESSION['pagamento.taxa'] = getTaxaPagtoOnline($iforma, $total_carrinho);
-        }//end if ($total_carrinho > $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
+        } //end if ($total_carrinho > $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
         else {
                 $taxas = 0;
                 $_SESSION['pagamento.taxa'] = 0;
-        }//end else do if ($total_carrinho > $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
+        } //end else do if ($total_carrinho > $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
 
         $_SESSION['pagamento.pagto'] = $pagto;
         $_SESSION['pagamento.total'] = $total_carrinho;
@@ -104,10 +104,10 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
         $b_LimiteDiarioOK = (($total_carrinho + $total_diario) <= $total_diario_const);
 
         // Libera pagamento Online Banco do Brasil
-        $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK;// && $usuarioGames->b_IsLogin_pagamento_bancodobrasil();
+        $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK; // && $usuarioGames->b_IsLogin_pagamento_bancodobrasil();
 
         // Libera Bradesco apenas se limite diario não ultrapassado e tem até 10 compras nas últimas 24 horas	//produtos (Habbo e GPotato) 
-        $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK;	//$b_IsProdutoOK && 
+        $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK;        //$b_IsProdutoOK && 
 
         // Libera pagamento Online Banco Itaú
         $b_libera_BancoItau = $b_LimiteDiarioOK && $b_TentativasDiariasOK && $usuarioGames->b_IsLogin_pagamento_bancoitau();
@@ -145,23 +145,20 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 
                 $numOrder = $OrderId;
                 $cesta_descricao = montaCesta_pag();
-
         } elseif ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
                 // gera nova ordem em tb_pag_compras
                 include RAIZ_DO_PROJETO . "banco/bancodobrasil/inc_gen_order_bbr.php"; // 
                 $numOrder = $orderId;
                 $cesta_descricao = montaCesta_pag();
-
         } elseif ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']) {
 
                 // gera nova ordem em tb_pag_compras
                 require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
                 require_once RAIZ_DO_PROJETO . "banco/itau/inc_gen_order_bit.php"; // 
                 $numOrder = $orderId;
-                $pagto_venda = $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC;	// convert to numeric value to allow storing in tb_dist_venda_games
+                $pagto_venda = $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC;        // convert to numeric value to allow storing in tb_dist_venda_games
 
                 $cesta_descricao = montaCesta_pag();
-
         } elseif ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_PIN_EPREPAG']) {
                 // gera nova ordem em tb_pag_compras
                 include RAIZ_DO_PROJETO . "banco/epp/inc_config.php";
@@ -169,17 +166,15 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
                 $pagto_venda = $PAGAMENTO_PIN_EPREPAG_NUMERIC;
 
                 $cesta_descricao = montaCesta_pag();
-
         } elseif ($pagto == $PAGAMENTO_BANCO_EPP_ONLINE) {
 
                 // gera nova ordem em tb_pag_compras
                 include "../pag/bep/inc_config.php";
                 include "../pag/bep/inc_gen_order_bep.php"; // 
                 $numOrder = $orderId;
-                $pagto_venda = $PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC;	// convert to numeric value to allow storing in tb_dist_venda_games
+                $pagto_venda = $PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC;        // convert to numeric value to allow storing in tb_dist_venda_games
 
                 $cesta_descricao = montaCesta_pag_bep();
-
         } elseif (b_IsPagtoCieloAlpha($pagto)) {
 
                 $cesta_descricao = montaCesta_pag();
@@ -196,7 +191,6 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
                         // gera nova ordem em tb_pag_compras
                         include RAIZ_DO_PROJETO . "banco/cielo/inc_config.php";
                         $numOrder = $orderId;
-
                 } else {
                         $b_libera_Cielo = false;
                         gravaLog_BloqueioPagtoOnline("Pagamento Cielo Bloqueado\n    pagto: $pagto, usuarioGames->getId(): " . $usuarioGames->getId() . ", total_carrinho: $total_carrinho, qtde_last_dayOK: " . $qtde_last_dayOK . ", total_diario: " . $total_diario . "\n    " . $mensagem);
@@ -216,25 +210,37 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
         }
 
         // Pagamento existe?
-        $sql = "SELECT * FROM tb_pag_compras WHERE numCompra='" . $numOrder . "'";
-        $ret = SQLexecuteQuery($sql);
+        $sql = "SELECT * FROM tb_pag_compras WHERE numCompra = $1";
+        $params = array($numOrder);
+        $ret = SQLexecuteQueryParams($sql, $params);
+
         if (!$ret) {
                 echo "Erro ao recuperar transação de pagamento (1).\n";
                 die("Stop");
         }
 
-        $sql = "UPDATE tb_pag_compras SET cliente_nome='" . $usuarioGames->getNome() . "', idcliente=" . $usuarioGames->getId() . ", status=1, ";
-        if ($cesta_descricao) {
-                $sql .= "cesta='" . $cesta_descricao . "', ";
-        }
-        $sql .= "total=" . (100 * ($total_carrinho + $taxas)) . " WHERE numcompra='" . $numOrder . "'";		// "iforma='".$_SESSION['pagamento.pagto']."', "
+        $sql = "UPDATE tb_pag_compras SET 
+            cliente_nome = $1, 
+            idcliente = $2, 
+            status = 1, 
+            cesta = $3, 
+            total = $4 
+        WHERE numcompra = $5";
 
-        $ret = SQLexecuteQuery($sql);
+        $params = array(
+                $usuarioGames->getNome(),             // $1
+                $usuarioGames->getId(),               // $2
+                $cesta_descricao ?: '',             // $3
+                100 * ($total_carrinho + $taxas),     // $4
+                $numOrder                             // $5
+        );
+
+        $ret = SQLexecuteQueryParams($sql, $params);
+
         if (!$ret) {
                 echo "Erro ao atualizar transação de pagamento (2).\n";
                 die("Stop");
         }
-
 }
 
 //Junta objetos de uma venda
@@ -264,7 +270,6 @@ if ($strRedirect == "") {
                 //if($qtde <= 0) $carrinho[$modeloId] = null;
                 if ($qtde <= 0)
                         unset($carrinho[$modeloId]);
-
         }
 
         //Se nao restou produto, retorna para o carrinho
@@ -331,7 +336,7 @@ if ($strRedirect == "") {
 }
 
 if (!$b_libera_Bradesco && (($pagto == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) || ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']))) {
-        ?>
+?>
         <script language="Javascript">
                 alert("Erro: <?php echo $msg_bloqueia_Bradesco; ?>");
         </script>
@@ -340,38 +345,38 @@ if (!$b_libera_Bradesco && (($pagto == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CO
         $strRedirect = "/prepag2/commerce/carrinho.php";
 } else if (!$b_libera_BancodoBrasil && ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA'])) {
         if ($usuarioGames->b_IsLogin_pagamento_bancodobrasil()) {
-                ?>
-                        <script language="Javascript">
-                                alert("Erro: <?php echo $msg_bloqueia_BancodoBrasil; ?>");
-                        </script>
-                        <?php
-                        $strRedirect = "/prepag2/commerce/carrinho.php";
+        ?>
+                <script language="Javascript">
+                        alert("Erro: <?php echo $msg_bloqueia_BancodoBrasil; ?>");
+                </script>
+        <?php
+                $strRedirect = "/prepag2/commerce/carrinho.php";
         }
 } else if (!$b_libera_BancoItau && ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'])) {
         if ($usuarioGames->b_IsLogin_pagamento_bancoitau()) {
-                ?>
-                                <script language="Javascript">
-                                        alert("Erro: <?php echo $msg_bloqueia_BancoItau; ?>");
-                                </script>
-                        <?php
-                        $strRedirect = "/prepag2/commerce/carrinho.php";
+        ?>
+                <script language="Javascript">
+                        alert("Erro: <?php echo $msg_bloqueia_BancoItau; ?>");
+                </script>
+        <?php
+                $strRedirect = "/prepag2/commerce/carrinho.php";
         }
 } else if (!$b_libera_BancoEPP && ($pagto == $PAGAMENTO_BANCO_EPP_ONLINE)) {
         if ($usuarioGames->b_IsLogin_pagamento_bancoepp()) {
-                ?>
-                                        <script language="Javascript">
-                                                alert("Erro: <?php echo $msg_bloqueia_BancoEPrepag; ?>");
-                                        </script>
-                        <?php
-                        $strRedirect = "/prepag2/commerce/carrinho.php";
+        ?>
+                <script language="Javascript">
+                        alert("Erro: <?php echo $msg_bloqueia_BancoEPrepag; ?>");
+                </script>
+        <?php
+                $strRedirect = "/prepag2/commerce/carrinho.php";
         }
 } else if (!$b_libera_Pix && ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_PIX'])) {
         ?>
-                                        <script language="Javascript">
-                                                alert("Erro: <?php echo $msg_bloqueia_Pix; ?>");
-                                        </script>
-                <?php
-                $strRedirect = "/prepag2/commerce/carrinho.php";
+        <script language="Javascript">
+                alert("Erro: <?php echo $msg_bloqueia_Pix; ?>");
+        </script>
+<?php
+        $strRedirect = "/prepag2/commerce/carrinho.php";
 }
 
 
@@ -395,27 +400,32 @@ if ($ret == "") {
         $venda_id = obterIdVendaValido();
         $_SESSION['integracao_transaction_id'] = $venda_id;
 
-        $sql = "insert into tb_venda_games (" .
-                "vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, " .
-                "vg_ultimo_status, vg_ultimo_status_obs, vg_integracao_parceiro_origem_id, vg_http_referer_origem, vg_http_referer) values (";
-        $sql .= SQLaddFields($venda_id, "") . ",";
-        $sql .= SQLaddFields($usuarioGames->getId(), "") . ",";
-        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-        $sql .= SQLaddFields($pagto_venda, "") . ",";
-        $sql .= SQLaddFields($STATUS_VENDA['PEDIDO_EFETUADO'], "") . ",";
-        $sql .= SQLaddFields("", "s") . ", ";
-        // Integração Start
-        // Se esta venda vem de algum parceiro de integração então deve ter os seguintes parâmetros:
-        //			$_SESSION['integracao_is_parceiro'] = "OK";
-        //			$_SESSION['integracao_origem_id'] = $origem_id;
-        $sql .= SQLaddFields(($_SESSION['integracao_origem_id'] . ""), "s") . ",";
-        // Integração End
-        $sql .= SQLaddFields($_SESSION['epp_origem'], "s") . ",";
-        $sql .= SQLaddFields($_SESSION['epp_origem_referer'], "s") . ")";
+        $sql = "INSERT INTO tb_venda_games (
+            vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo,
+            vg_ultimo_status, vg_ultimo_status_obs, vg_integracao_parceiro_origem_id,
+            vg_http_referer_origem, vg_http_referer
+        ) VALUES (
+            $1, $2, CURRENT_TIMESTAMP, $3,
+            $4, $5, $6,
+            $7, $8
+        )";
 
-        grava_log_integracao("Venda Integração - Cadastra venda " . date("Y-m-d H:i:s") . "\nvg_id: '$venda_id' - integracao_origem_id: '" . $_SESSION['integracao_origem_id'] . "' - integracao_order_id: '" . $_SESSION['integracao_order_id'] . "'\n" . $sql . "\n");	//"s_session :'".$s_session."'\n"
+        $params = array(
+                $venda_id,                                    // $1
+                $usuarioGames->getId(),                        // $2
+                $pagto_venda,                                  // $3
+                $STATUS_VENDA['PEDIDO_EFETUADO'],             // $4
+                "",                                            // $5, vg_ultimo_status_obs
+                $_SESSION['integracao_origem_id'] ?: '',    // $6
+                $_SESSION['epp_origem'] ?: '',             // $7
+                $_SESSION['epp_origem_referer'] ?: ''      // $8
+        );
 
-        $ret = SQLexecuteQuery($sql);
+        // Grava log antes de executar
+        grava_log_integracao("Venda Integração - Cadastra venda " . date("Y-m-d H:i:s") . "\nvg_id: '$venda_id' - integracao_origem_id: '" . $_SESSION['integracao_origem_id'] . "' - integracao_order_id: '" . $_SESSION['integracao_order_id'] . "'\n" . $sql . "\n");        //"s_session :'".$s_session."'\n"
+
+        $ret = SQLexecuteQueryParams($sql, $params);
+
         if (!$ret)
                 $ret = "Erro ao inserir venda.\n";
         else {
@@ -428,8 +438,17 @@ if ($ret == "") {
 
         if ($usuarioGames->b_IsLogin_pagamento()) {
                 // atualiza $venda_id
-                $sql = "UPDATE tb_pag_compras SET idvenda=" . $venda_id . " WHERE numcompra='" . $numOrder . "'";
-                $ret1 = SQLexecuteQuery($sql);
+                $sql = "UPDATE tb_pag_compras 
+                                SET idvenda = $1 
+                                WHERE numcompra = $2";
+
+                $params = array(
+                        $venda_id,  // $1
+                        $numOrder   // $2
+                );
+
+                $ret1 = SQLexecuteQueryParams($sql, $params);
+
                 if (!$ret1) {
                         echo "Erro ao atualizar transação de pagamento (3).\n";
                         gravaLog_TMP("Erro ao atualizar transação de pagamento (3).\n" . $sql . "\n");
@@ -437,12 +456,33 @@ if ($ret == "") {
                 if (b_IsPagtoCielo($pagto_venda)) {
                         //Inicio do novo trecho para cadastramento do token no BD
                         $softDescriptor = $GLOBALS['_SESSION']['pagamento.token'];
-                        $sql = "insert into codigo_confirmacao (cc_tipo_usuario,cc_ug_id,cc_vg_id,cc_tipo_pagamento, cc_data_inclusao, cc_codigo, cc_status) values ('M'," . intval($usuarioGames->getId()) . "," . intval($venda_id) . ",'" . getCodigoCaracterParaPagto($pagto_venda) . "',NOW(),'" . $softDescriptor . "','0');";
-                        $rs_token = SQLexecuteQuery($sql);
+                        $sql = "INSERT INTO codigo_confirmacao (
+                                    cc_tipo_usuario,
+                                    cc_ug_id,
+                                    cc_vg_id,
+                                    cc_tipo_pagamento,
+                                    cc_data_inclusao,
+                                    cc_codigo,
+                                    cc_status
+                                ) VALUES (
+                                    $1, $2, $3, $4, NOW(), $5, $6
+                                )";
+
+                        $params = array(
+                                'M',                                         // $1 cc_tipo_usuario
+                                $usuarioGames->getId(),                      // $2 cc_ug_id
+                                $venda_id,                                   // $3 cc_vg_id
+                                getCodigoCaracterParaPagto($pagto_venda),   // $4 cc_tipo_pagamento
+                                $softDescriptor,                             // $5 cc_codigo
+                                '0'                                          // $6 cc_status
+                        );
+
+                        $rs_token = SQLexecuteQueryParams($sql, $params);
+
                         if (!$rs_token) {
                                 die("Problema ao salvar o registro do Token.");
                         }
-                }//end if(b_IsPagtoCielo($pagto_tipo))
+                } //end if(b_IsPagtoCielo($pagto_tipo))
         }
 
         if (get_Integracao_is_sessao_logged()) {
@@ -451,9 +491,24 @@ if ($ret == "") {
 
                 if ($ip_order_id != "") {
                         // atualiza $venda_id
-                        $sql = "UPDATE tb_integracao_pedido SET ip_vg_id = " . $venda_id . ", ip_transaction_id = '" . $venda_id . "' WHERE ip_order_id='" . $ip_order_id . "' AND ip_store_id = '" . $_SESSION['integracao_origem_id'] . "' AND ip_amount = '" . ($total_carrinho * 100) . "';";
-                        grava_log_integracao("Venda - Integração: " . $sql . "\n");
-                        $ret1 = SQLexecuteQuery($sql);
+                        $sql = "UPDATE tb_integracao_pedido 
+                                SET ip_vg_id = $1, ip_transaction_id = $2
+                                WHERE ip_order_id = $3
+                                  AND ip_store_id = $4
+                                  AND ip_amount = $5";
+
+                        $params = array(
+                                $venda_id,                          // $1 ip_vg_id
+                                $venda_id,                          // $2 ip_transaction_id
+                                $ip_order_id,                        // $3 ip_order_id
+                                $_SESSION['integracao_origem_id'],   // $4 ip_store_id
+                                $total_carrinho * 100                // $5 ip_amount
+                        );
+
+                        grava_log_integracao("Venda - Integração: UPDATE tb_integracao_pedido SET ip_vg_id=$venda_id, ip_transaction_id=$venda_id WHERE ip_order_id=$ip_order_id AND ip_store_id=" . $_SESSION['integracao_origem_id'] . " AND ip_amount=" . ($total_carrinho * 100) . "\n");
+
+                        $ret1 = SQLexecuteQueryParams($sql, $params);
+
                         if (!$ret1) {
                                 echo "Erro ao atualizar transação de integração (3).\n";
                                 gravaLog_TMP("Erro ao atualizar transação de integração (3).\n" . $sql . "\n");
@@ -485,32 +540,52 @@ if ($ret == "") {
                         $svalorEPPCASH = $carrinho_val[$modeloId];
                 }
 
-                $sql = "insert into tb_venda_games_modelo( ";
-                $sql .= "		vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo, ";
-                $sql .= "		vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor, ";
-                $sql .= " 		vgm_game_id, vgm_valor_eppcash) ";
-                $sql .= "select " . $venda_id . ", ogp.ogp_id, ogp.ogp_nome, ogpm.ogpm_id, ogpm.ogpm_nome, ";
-                $sql .= "		" . $svalor . ", " . $qtde . ", ogp.ogp_opr_codigo, ogpm.ogpm_pin_valor, ";
-                $sql .= "		case ogp.ogp_id ";
-                $sql .= "			when 5 then " . SQLaddFields($usuarioGames->getHabboId(), "s");
-                $sql .= "			else NULL ";
-                $sql .= "		end, " . $svalorEPPCASH . " ";
-                $sql .= "from tb_operadora_games_produto_modelo ogpm ";
-                $sql .= "	inner join tb_operadora_games_produto ogp on ogp.ogp_id = ogpm.ogpm_ogp_id ";
-                $sql .= "where ogpm.ogpm_id = " . $modeloId;
+                $sql = "
+                            INSERT INTO tb_venda_games_modelo (
+                                vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo,
+                                vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor,
+                                vgm_game_id, vgm_valor_eppcash
+                            )
+                            SELECT $1, ogp.ogp_id, ogp.ogp_nome, ogpm.ogpm_id, ogpm.ogpm_nome,
+                                   $2, $3, ogp.ogp_opr_codigo, ogpm.ogpm_pin_valor,
+                                   CASE ogp.ogp_id
+                                       WHEN 5 THEN $4
+                                       ELSE NULL
+                                   END,
+                                   $5
+                            FROM tb_operadora_games_produto_modelo ogpm
+                            INNER JOIN tb_operadora_games_produto ogp ON ogp.ogp_id = ogpm.ogpm_ogp_id
+                            WHERE ogpm.ogpm_id = $6
+                        ";
 
-                $ret = SQLexecuteQuery($sql);
+                $params = [
+                        $venda_id,                  // $1 vgm_vg_id
+                        $svalor,                     // $2 vgm_valor
+                        $qtde,                       // $3 vgm_qtde
+                        $usuarioGames->getHabboId(), // $4 vgm_game_id quando ogp_id = 5
+                        $svalorEPPCASH,              // $5 vgm_valor_eppcash
+                        $modeloId                    // $6 filtro ogpm_id
+                ];
+
+                $ret = SQLexecuteQueryParams($sql, $params);
+
                 if ($ret)
                         $ret = ""; //limpa resourceId
                 else {
 
                         //Se deu erro ao inserir um modelo, deleta toda a venda
-                        $sql = "delete from tb_venda_games_modelo where vgm_vg_id=" . $venda_id;
-                        SQLexecuteQuery($sql);
-                        $sql = "delete from tb_venda_games where vg_id=" . $venda_id;
-                        SQLexecuteQuery($sql);
-                        $sql = "delete from tb_venda_games_historico where vgh_vg_id=" . $venda_id;
-                        SQLexecuteQuery($sql);
+                        // Deleta modelos da venda
+                        $sql = "DELETE FROM tb_venda_games_modelo WHERE vgm_vg_id = $1";
+                        SQLexecuteQueryParams($sql, [$venda_id]);
+
+                        // Deleta a venda
+                        $sql = "DELETE FROM tb_venda_games WHERE vg_id = $1";
+                        SQLexecuteQueryParams($sql, [$venda_id]);
+
+                        // Deleta histórico da venda
+                        $sql = "DELETE FROM tb_venda_games_historico WHERE vgh_vg_id = $1";
+                        SQLexecuteQueryParams($sql, [$venda_id]);
+
 
                         $ret = "Erro ao inserir modelo(s) na venda.\n";
                         break;
@@ -543,13 +618,16 @@ unset($_SESSION['pagamento.parcelas.REDECARD_DINERS']);
 usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['VENDA'], null, $venda_id);
 
 
-if (true) {	// Começa aqui o email antigo 
+if (true) {        // Começa aqui o email antigo 
         //Envia email
         //--------------------------------------------------------------------------------
-        $sql = "select * from tb_venda_games vg " .
-                "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
-                "where vg.vg_id = " . $venda_id . " and vg.vg_ug_id=" . $usuarioGames->getId();
-        $rs_venda_modelos = SQLexecuteQuery($sql);
+        $sql = "SELECT * 
+                    FROM tb_venda_games vg
+                    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+                    WHERE vg.vg_id = $1 AND vg.vg_ug_id = $2
+                ";
+        $rs_venda_modelos = SQLexecuteQueryParams($sql, [$venda_id, $usuarioGames->getId()]);
+
 
         $parametros['prepag_dominio'] = $https . "://" . EPREPAG_URL . "";
 
@@ -589,7 +667,6 @@ if (true) {	// Começa aqui o email antigo
                                 <td width='5'>&nbsp;</td>
                         </tr>";
                 /* ---Fim Wagner - variavel $aux_lista */
-
         }
         /* ---Wagner - variavel $aux_lista */
         $aux_lista .= "<tr  bgcolor='#CCCCCC'>
@@ -600,7 +677,6 @@ if (true) {	// Começa aqui o email antigo
                 </tr>
                 </table>";
         /* ---Fim Wagner - variavel $aux_lista */
-
 } // Até aqui o email antigo 
 
 
@@ -613,8 +689,8 @@ if (is_object($usuarioGames)) {
                 $stipoEmail = 'PedidoRegistradoInt';
                 $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, $stipoEmail);
 
-                $ug_id = $usuarioGames->getId();	// 9093;	//
-                $ug_email = $usuarioGames->getEmail();	// "reynaldo@e-prepag.com.br";// 
+                $ug_id = $usuarioGames->getId();        // 9093;	//
+                $ug_email = $usuarioGames->getEmail();        // "reynaldo@e-prepag.com.br";// 
                 $objEnvioEmailAutomatico->setPedido($venda_id);
                 $objEnvioEmailAutomatico->setListaCreditoOferta($aux_lista);
                 $objEnvioEmailAutomatico->setUgID($ug_id);
@@ -632,10 +708,16 @@ if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) {
 
         //obtem o valor total da venda
         //----------------------------------------------------
-        $sql = "select * from tb_venda_games vg " .
-                "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
-                "where vg.vg_id = " . $venda_id . " and vg.vg_ug_id=" . $usuarioGames->getId();
-        $rs_venda_modelos = SQLexecuteQuery($sql);
+        $sql = "
+                    SELECT *
+                    FROM tb_venda_games vg
+                    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+                    WHERE vg.vg_id = $1
+                      AND vg.vg_ug_id = $2
+                ";
+
+        $rs_venda_modelos = SQLexecuteQueryParams($sql, [$venda_id, $usuarioGames->getId()]);
+
         if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
                 $total_geral = 0;
                 while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
@@ -653,14 +735,14 @@ if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) {
         else
                 $taxa_adicional = 0;
 
-        if ( BANCO_BOLETO == "asaas") {
+        if (BANCO_BOLETO == "asaas") {
                 $bco_codigo = $GLOBALS['BOLETO_MONEY_ASAAS_COD_BANCO'];
         } elseif (BANCO_BOLETO == "bradesco") {
                 $bco_codigo = $GLOBALS['BOLETO_MONEY_BRADESCO_COD_BANCO'];
         }
         // Usa Boleto Itau para alguns usuários
         if ($usuarioGames) {
-                if ( BANCO_BOLETO == "asaas") {
+                if (BANCO_BOLETO == "asaas") {
                         if ($total_carrinho < $GLOBALS['RISCO_GAMERS_VALOR_MIN_PARA_TAXA'])
                                 $taxa_adicional = $GLOBALS['BOLETO_MONEY_BRADESCO_TAXA_ADICIONAL'];
                         else
@@ -676,7 +758,7 @@ if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) {
                         $qtde_dias_venc = $GLOBALS['BOLETO_MONEY_BRADESCO_QTDE_DIAS_VENCIMENTO'];
                         $bco_codigo = $GLOBALS['BOLETO_MONEY_BRADESCO_COD_BANCO'];
                         $num_doc = "2" . "00" . str_pad($venda_id, 8, "0", STR_PAD_LEFT);
-                }//end if($usuarioGames->b_Is_Boleto_Bradesco())
+                } //end if($usuarioGames->b_Is_Boleto_Bradesco())
                 elseif ($usuarioGames->b_Is_Boleto_Banespa()) {
                         $qtde_dias_venc = $GLOBALS['BOLETO_MONEY_BANESPA_QTDE_DIAS_VENCIMENTO'];
                         $bco_codigo = $GLOBALS['BOLETO_MONEY_BANCO_BANESPA_COD_BANCO'];
@@ -697,68 +779,91 @@ if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) {
 
         //Insere boleto na base
         //----------------------------------------------------
-        $sql = "insert into boleto_bancario_games (" .
-                "bbg_ug_id, bbg_vg_id, bbg_data_inclusao, bbg_valor, bbg_valor_taxa, " .
-                "bbg_bco_codigo, bbg_documento, bbg_data_venc" .
-                ") values (";
-        $sql .= SQLaddFields($usuarioGames->getId(), "") . ",";
-        $sql .= SQLaddFields($venda_id, "") . ",";
-        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-        $sql .= SQLaddFields($total_geral + $taxa_adicional, "") . ",";
-        $sql .= SQLaddFields($taxa_adicional, "") . ",";
-        $sql .= "$bco_codigo,";
-        $sql .= SQLaddFields($num_doc, "s") . ","; //documento
-        $sql .= SQLaddFields("CURRENT_DATE + interval '$qtde_dias_venc day'", "") . ")"; //vencimento
-        $ret = SQLexecuteQuery($sql);
+        $sql = "
+                    INSERT INTO boleto_bancario_games (
+                        bbg_ug_id, 
+                        bbg_vg_id, 
+                        bbg_data_inclusao, 
+                        bbg_valor, 
+                        bbg_valor_taxa, 
+                        bbg_bco_codigo, 
+                        bbg_documento, 
+                        bbg_data_venc
+                    ) VALUES (
+                        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + interval '$7 day'
+                    )
+                ";
+
+        $params = [
+                $usuarioGames->getId(),       // $1
+                $venda_id,                    // $2
+                $total_geral + $taxa_adicional, // $3
+                $taxa_adicional,              // $4
+                $bco_codigo,                  // $5
+                $num_doc,                     // $6
+                $qtde_dias_venc               // $7
+        ];
+
+        $ret = SQLexecuteQueryParams($sql, $params);
+
 
         //atualiza dados do pagamento e status da venda
         if ($ret) {
-                $sql = "update tb_venda_games set 
-                                        vg_pagto_data_inclusao = " . SQLaddFields("CURRENT_TIMESTAMP", "") . ",
-                                        vg_pagto_banco = '" . $bco_codigo . "',
-                                        vg_pagto_num_docto = '" . $num_doc . "',
-                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], "") . "
-                                where vg_id = " . $venda_id;
-                $ret = SQLexecuteQuery($sql);
+                $sql = "
+                            UPDATE tb_venda_games SET 
+                                vg_pagto_data_inclusao = CURRENT_TIMESTAMP,
+                                vg_pagto_banco = $1,
+                                vg_pagto_num_docto = $2,
+                                vg_ultimo_status = $3
+                            WHERE vg_id = $4
+                        ";
+
+                $params = [
+                        $bco_codigo,                                    // $1
+                        $num_doc,                                       // $2
+                        $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $3
+                        $venda_id                                       // $4
+                ];
+
+                $ret = SQLexecuteQueryParams($sql, $params);
+
                 if (!$ret)
                         $ret = "Erro ao atualizar status da venda.\n";
                 else
                         $ret = ""; //limpa resourceId
         }
-
 }
 
 //Redecard
 //Se forma de pagamento foi cartoes Redecard, cria o item Redecard
 //----------------------------------------------------------------------------------------------------------------------------
-if ($pagto == $FORMAS_PAGAMENTO['REDECARD_MASTERCARD']) {
+if ($pagto === $FORMAS_PAGAMENTO['REDECARD_MASTERCARD'] || $pagto === $FORMAS_PAGAMENTO['REDECARD_DINERS']) {
 
-        //Insere mastercard
-        //----------------------------------------------------
-        $sql = "insert into tb_venda_games_redecard (" .
-                "vgrc_ug_id, vgrc_vg_id, vgrc_data_inclusao, vgrc_parcelas" .
-                ") values (";
-        $sql .= SQLaddFields($usuarioGames->getId(), "") . ",";
-        $sql .= SQLaddFields($venda_id, "") . ",";
-        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-        $sql .= SQLaddFields($parcelas_REDECARD_MASTERCARD, "") . ")";
-        $ret = SQLexecuteQuery($sql);
+        // Define o número de parcelas conforme o tipo de pagamento
+        $param_parcelas = ($pagto === $FORMAS_PAGAMENTO['REDECARD_MASTERCARD'])
+                ? $parcelas_REDECARD_MASTERCARD
+                : $parcelas_REDECARD_DINERS;
 
+        $sql = "
+                    INSERT INTO tb_venda_games_redecard (
+                        vgrc_ug_id,
+                        vgrc_vg_id,
+                        vgrc_data_inclusao,
+                        vgrc_parcelas
+                    ) VALUES (
+                        $1, $2, CURRENT_TIMESTAMP, $3
+                    )
+                ";
 
-} elseif ($pagto == $FORMAS_PAGAMENTO['REDECARD_DINERS']) {
+        $params = [
+                $usuarioGames->getId(), // $1
+                $venda_id,              // $2
+                $param_parcelas         // $3
+        ];
 
-        //Insere diners
-        //----------------------------------------------------
-        $sql = "insert into tb_venda_games_redecard (" .
-                "vgrc_ug_id, vgrc_vg_id, vgrc_data_inclusao, vgrc_parcelas" .
-                ") values (";
-        $sql .= SQLaddFields($usuarioGames->getId(), "") . ",";
-        $sql .= SQLaddFields($venda_id, "") . ",";
-        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-        $sql .= SQLaddFields($parcelas_REDECARD_DINERS, "") . ")";
-        $ret = SQLexecuteQuery($sql);
-
+        $ret = SQLexecuteQueryParams($sql, $params);
 }
+
 
 
 

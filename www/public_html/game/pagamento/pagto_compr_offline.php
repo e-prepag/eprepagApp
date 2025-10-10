@@ -48,16 +48,30 @@ if($msg != ""){
 }
 
 //Atualiza dados do pagamento
-$sql  = "update tb_venda_games set 
-        	vg_ultimo_status = " . 		SQLaddFields($STATUS_VENDA['DADOS_PAGTO_RECEBIDO'], "") . ",
-        	vg_pagto_data_inclusao = ".	SQLaddFields("CURRENT_TIMESTAMP", "") . ",
-        	vg_pagto_banco = " . 		SQLaddFields($pagto_banco, "s") . ",
-        	vg_pagto_local = " . 		SQLaddFields($pagto_local, "s") . ",
-        	vg_pagto_num_docto = " . 	SQLaddFields(implode("|", $pagto_num_docto), "s") . ",
-        	vg_pagto_valor_pago = " . 	SQLaddFields(moeda2numeric($pagto_valor_pago), "") . ",
-        	vg_pagto_data = " . 		SQLaddFields(monta_data_gravacao($pagto_data_data)." ".$pagto_data_horas.":".$pagto_data_minutos, "s") . " 
-        where vg_id = " . $venda_id.";";
-$ret = SQLexecuteQuery($sql);
+$sql = "
+    UPDATE tb_venda_games
+    SET 
+        vg_ultimo_status     = $1,
+        vg_pagto_data_inclusao = CURRENT_TIMESTAMP,
+        vg_pagto_banco       = $2,
+        vg_pagto_local       = $3,
+        vg_pagto_num_docto   = $4,
+        vg_pagto_valor_pago  = $5,
+        vg_pagto_data        = $6
+    WHERE vg_id = $7
+";
+
+$params = array(
+    $STATUS_VENDA['DADOS_PAGTO_RECEBIDO'],                       // $1 vg_ultimo_status
+    $pagto_banco,                                                 // $2 vg_pagto_banco
+    $pagto_local,                                                 // $3 vg_pagto_local
+    implode("|", $pagto_num_docto),                               // $4 vg_pagto_num_docto
+    moeda2numeric($pagto_valor_pago),                             // $5 vg_pagto_valor_pago
+    monta_data_gravacao($pagto_data_data)." ".$pagto_data_horas.":".$pagto_data_minutos, // $6 vg_pagto_data
+    $venda_id                                                     // $7 vg_id
+);
+
+$ret = SQLexecuteQueryParams($sql, $params);
 if(!$ret){
         $msg = "Erro ao atualizar venda.\n";
         //redireciona
