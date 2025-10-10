@@ -402,14 +402,14 @@ if($vg_ultimo_status == 1){
 										$pin_status_g = $pgpin['pin_status'];
 										$guidEPP = $pgpin['pin_guid_epp'];
 
-                                        $sqlDataUtiliza = "select pih_data from pins_integracao_historico where pih_pin_id = $pin_codinterno";
-										$resData = SQLexecuteQuery($sqlDataUtiliza);
+                                        $sqlDataUtiliza = "select pih_data from pins_integracao_historico where pih_pin_id = $1";
+										$resData = SQLexecuteQueryParams($sqlDataUtiliza, [$pin_codinterno]);
 										$dataUtil = pg_fetch_array($resData);
 									
                                         if($opr_codigo==$GLOBALS['opr_codigo_Alawar']) {
                                             //	select pa_data_transacao, pa_activation_key, pa_pag_id, * from pins_alawar where pa_certificate_id = '1256704180550'
-                                            $sql2 = "select * from pins_alawar where pa_certificate_id = '$case_serial';";
-                                            $rs_pin_alawar = SQLexecuteQuery($sql2);
+                                            $sql2 = "select * from pins_alawar where pa_certificate_id = $1;";
+                                            $rs_pin_alawar = SQLexecuteQueryParams($sql2, [$case_serial]);
                                             if(!$rs_pin_alawar || pg_num_rows($rs_pin_alawar) == 0) $msg = "Activation key Alawar não encontrado.\n";
                                             else {
                                                 $pgpin_alawar = pg_fetch_array($rs_pin_alawar);

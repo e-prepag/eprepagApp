@@ -65,13 +65,13 @@ SELECT total,
         idvenda_origem
 FROM tb_pag_compras 
 WHERE tipo_cliente = 'M' AND 
-	idvenda=".$venda_id.";";
+	idvenda= ?;";
 
 //Conectando com PDO para execução da QUERY
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
 $stmt = $pdo->prepare($sql);
-$stmt->execute();
+$stmt->execute([$venda_id]);
 $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if(count($fetch) > 0 && $fetch[0]['idvenda_origem'] > 0) {

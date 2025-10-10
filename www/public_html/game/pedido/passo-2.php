@@ -2062,8 +2062,10 @@ Comentado por nao usar
 	*/
 
 if(isset($cpf)) {
-	$sql_djx = "SELECT * FROM pep WHERE cpf = $cpf and enviado_email = 0;";
-	$rs_djx = SQLexecuteQuery($sql_djx);
+	$sql_djx = "SELECT * FROM pep WHERE cpf = $1 AND enviado_email = 0;";
+    $params = array($cpf);
+    $rs_djx = SQLexecuteQueryParams($sql_djx, $params);
+
 	$dadosTotais_djx = pg_fetch_all($rs_djx);
 	$count_registers = pg_num_rows($rs_djx);
 	

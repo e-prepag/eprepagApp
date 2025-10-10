@@ -14,7 +14,7 @@ require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
 require_once DIR_INCS . "inc_register_globals.php";
 $_PaginaOperador1Permitido = 53;
 require_once DIR_INCS . "pdv/corte_constantes.php";
-require_once DIR_INCS . "config.MeiosPagamentos.php";	
+require_once DIR_INCS . "config.MeiosPagamentos.php";
 //validacao
 $msg = "";
 
@@ -81,20 +81,31 @@ if ($msg == "") {
 
 	//echo "venda_id: $venda_id<br>";
 
-	$sql = "insert into tb_dist_venda_games (" .
-		"vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, " .
-		"vg_ultimo_status, vg_ultimo_status_obs, vg_deposito_em_saldo) values (";
-	$sql .= SQLaddFields($venda_id, "") . ",";
-	$sql .= SQLaddFields($usuarioId, "") . ",";
-	$sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-	$sql .= SQLaddFields($GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'], "") . ",";
-	$sql .= SQLaddFields($GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'], "") . ",";
-	$sql .= SQLaddFields("", "s") . ", ";
-	$sql .= SQLaddFields("1", "") . ")";
-	//		$sql .= SQLaddFields($email, "s") . ")";
-//echo "sql: $sql<br>";
+	$sql = "
+		    INSERT INTO tb_dist_venda_games (
+		        vg_id, 
+		        vg_ug_id, 
+		        vg_data_inclusao, 
+		        vg_pagto_tipo, 
+		        vg_ultimo_status, 
+		        vg_ultimo_status_obs, 
+		        vg_deposito_em_saldo
+		    ) VALUES (
+		        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6
+		    )
+		";
 
-	$ret = SQLexecuteQuery($sql);
+	$params = array(
+		$venda_id,                                // $1
+		$usuarioId,                               // $2
+		$GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'], // $3
+		$GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'],     // $4
+		"",                                       // $5 (vg_ultimo_status_obs)
+		"1"                                       // $6 (vg_deposito_em_saldo)
+	);
+
+	$ret = SQLexecuteQueryParams($sql, $params);
+
 	if (!$ret) {
 		$msg = "Erro ao inserir venda. Por favor, tente novamente atualizando a página. Obrigado.\n";
 		gravaLog_BoletoExpressLH($msg . "\n" . $sql);
@@ -123,7 +134,7 @@ if ($msg == "") {
 	//4 – identifica MONEY EXPRESS LH
 	//CCCCC – código do cliente MONEY (composto com zeros a esquerda)
 	//VVVVV – codigo da venda (composto com zeros a esquerda)
-//		$num_doc = "4" . substr("00000" . $usuarioId, -5) . substr("00000" . $venda_id, -5);
+	//		$num_doc = "4" . substr("00000" . $usuarioId, -5) . substr("00000" . $venda_id, -5);
 	$num_doc = "4" . "00" . str_pad($venda_id, 8, "0", STR_PAD_LEFT);
 
 	if ($usuarioGames->b_Is_Boleto_Itau()) {
@@ -145,8 +156,7 @@ if ($msg == "") {
 		else
 			$taxa_adicional = $GLOBALS['BOLETO_BANESPA_TAXA_ADICIONAL'];
 		$num_doc = "4" . "000" . str_pad($venda_id, 8, "0", STR_PAD_LEFT);
-	}
-	elseif(BANCO_BOLETO == "asaas" || $usuarioGames->getId() == 17371) {
+	} elseif (BANCO_BOLETO == "asaas" || $usuarioGames->getId() == 17371) {
 		// INICIO BLOCO BRADESCO
 		if ($total_geral >= $BOLETO_LIMITE_PARA_TAXA_ADICIONAL_BRADESCO)
 			$taxa_adicional = 0;
@@ -156,8 +166,7 @@ if ($msg == "") {
 		$qtde_dias_venc = $GLOBALS['BOLETO_MONEY_BRADESCO_QTDE_DIAS_VENCIMENTO'];
 		$bco_codigo = $GLOBALS['BOLETO_MONEY_ASAAS_COD_BANCO'];
 		// FIM BLOCO BRADESCO
-	}
-	 elseif(BANCO_BOLETO == "bradesco") {
+	} elseif (BANCO_BOLETO == "bradesco") {
 		// INICIO BLOCO BRADESCO
 		if ($total_geral >= $BOLETO_LIMITE_PARA_TAXA_ADICIONAL_BRADESCO)
 			$taxa_adicional = 0;
@@ -170,33 +179,56 @@ if ($msg == "") {
 	}
 	//Insere boleto na base
 	//----------------------------------------------------
-	$sql = "insert into dist_boleto_bancario_games (" .
-		"bbg_ug_id, bbg_vg_id, bbg_data_inclusao, bbg_valor, bbg_valor_taxa, " .
-		"bbg_bco_codigo, bbg_documento, bbg_data_venc" .
-		") values (";
-	$sql .= SQLaddFields($usuarioId, "") . ",";
-	$sql .= SQLaddFields($venda_id, "") . ",";
-	$sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-	$sql .= SQLaddFields($total_geral + $taxa_adicional, "") . ",";
-	$sql .= SQLaddFields($taxa_adicional, "") . ",";
-	$sql .= SQLaddFields($bco_codigo, "s") . ",";
-	$sql .= SQLaddFields($num_doc, "s") . ","; //documento
-	$sql .= SQLaddFields("CURRENT_DATE + interval '$qtde_dias_venc day'", "") . ")"; //vencimento
-	$ret = SQLexecuteQuery($sql);
+	$sql = "
+			    INSERT INTO dist_boleto_bancario_games (
+			        bbg_ug_id,
+			        bbg_vg_id,
+			        bbg_data_inclusao,
+			        bbg_valor,
+			        bbg_valor_taxa,
+			        bbg_bco_codigo,
+			        bbg_documento,
+			        bbg_data_venc
+			    ) VALUES (
+			        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + INTERVAL '$7 day'
+			    )
+			";
+
+	$params = array(
+		$usuarioId,             // $1
+		$venda_id,              // $2
+		$total_geral + $taxa_adicional, // $3
+		$taxa_adicional,        // $4
+		$bco_codigo,            // $5
+		$num_doc,               // $6
+		$qtde_dias_venc         // $7
+	);
+
+	$ret = SQLexecuteQueryParams($sql, $params);
+
 
 	//echo "sql: $sql<br>";
 	//atualiza dados do pagamento e status da venda
 	if ($ret) {
-		$sql = "update tb_dist_venda_games set 
-						vg_cor_codigo = 0,  
-						vg_pagto_data_inclusao = " . SQLaddFields("CURRENT_TIMESTAMP", "") . ",
-						vg_pagto_banco = '" . $bco_codigo . "',
-						vg_pagto_num_docto = '" . $num_doc . "',
-						vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['AGUARDANDO_PROCESSAMENTO'], "") . "
-					where vg_id = " . $venda_id;
-		//echo "sql: $sql<br>";
+		$sql = "
+			    UPDATE tb_dist_venda_games SET
+			        vg_cor_codigo = 0,
+			        vg_pagto_data_inclusao = CURRENT_TIMESTAMP,
+			        vg_pagto_banco = $1,
+			        vg_pagto_num_docto = $2,
+			        vg_ultimo_status = $3
+			    WHERE vg_id = $4
+			";
 
-		$ret = SQLexecuteQuery($sql);
+		$params = array(
+			$bco_codigo,                                   // $1
+			$num_doc,                                      // $2
+			$GLOBALS['STATUS_VENDA']['AGUARDANDO_PROCESSAMENTO'], // $3
+			$venda_id                                      // $4
+		);
+
+		$ret = SQLexecuteQueryParams($sql, $params);
+
 		if (!$ret)
 			$msg = "Erro ao atualizar status da venda.\n";
 	} else {
@@ -220,21 +252,21 @@ if ($msg == "") {
 
 //token
 if ($msg == "") {
-	if(BANCO_BOLETO == "asaas" || $usuarioGames->getId() == 17371){
+	if (BANCO_BOLETO == "asaas" || $usuarioGames->getId() == 17371) {
 		require_once "../../../banco/asaas/classBoletoAsaas.php";
 		$classBoleto = new classBoleto();
-		$params = array (
+		$params = array(
 			'cpf_cnpj'  => str_replace('-', '', str_replace('.', '', $usuarioGames->ug_sCNPJ)),
 			'nome'      => $usuarioGames->ug_sRazaoSocial,
-			'valor'     => number_format(($total_geral+$taxa_adicional),2,'.',''),
+			'valor'     => number_format(($total_geral + $taxa_adicional), 2, '.', ''),
 			'idpedido'  => "PD" . $venda_id,
 			'email'    => $usuarioGames->ug_sEmail
-		); 
+		);
 		$token = $classBoleto->callService($params);
-		if(!$token) {
+		if (!$token) {
 			$msg = "Erro ao gerar boleto.";
 		}
-	}elseif(BANCO_BOLETO == "bradesco"){
+	} elseif (BANCO_BOLETO == "bradesco") {
 		//$token = date('YmdHis') . "," . $venda_id . "," . $usuarioId;
 		$token = date('YmdHis', strtotime("+20 day")) . "," . $venda_id . "," . $usuarioId;
 		$objEncryption = new Encryption();
@@ -251,8 +283,7 @@ if ($msg == "") {
 		$server_url = $_SERVER['SERVER_NAME'];
 	}
 	// Envio de boleto
-	$GLOBALS['_SESSION']['saldoAdicionado'] = number_format($total_geral, 2, ',', '.');
-	;
+	$GLOBALS['_SESSION']['saldoAdicionado'] = number_format($total_geral, 2, ',', '.');;
 	$GLOBALS['_SESSION']['boleto_imagem'] = 'AdicaoSaldoLan';
 }
 

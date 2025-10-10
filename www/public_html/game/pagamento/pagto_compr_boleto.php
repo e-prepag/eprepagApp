@@ -94,9 +94,9 @@ $pagina_titulo = "Comprovante";
                 require_once "../../../banco/asaas/classBoletoAsaas.php";
                 $classBoleto = new classBoleto();
 
-                $buscarBoleto = "SELECT bbg_valor FROM boleto_bancario_games WHERE bbg_vg_id = " . addslashes($venda_id) . ";";
+                $buscarBoleto = "SELECT bbg_valor FROM boleto_bancario_games WHERE bbg_vg_id = $1;";
 
-                $boletoEncontrado = pg_fetch_array(SQLexecuteQuery($buscarBoleto));
+                $boletoEncontrado = pg_fetch_array(SQLexecuteQueryParams($buscarBoleto, [$venda_id]));
                 $boleto_valor = $boletoEncontrado["bbg_valor"];
 
                 $params = array (

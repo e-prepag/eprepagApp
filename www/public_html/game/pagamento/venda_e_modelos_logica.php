@@ -31,9 +31,9 @@ if(isset($controller->logado) && $controller->logado) {
                     select * 
                     from tb_venda_games vg
                     where 
-                        vg.vg_id = " . $venda_id . " 
-                        and vg.vg_ug_id=" . $usuarioId."; ";
-            $rs_venda = SQLexecuteQuery($sql);
+                        vg.vg_id = $1 
+                        and vg.vg_ug_id = $2; ";
+            $rs_venda = SQLexecuteQueryParams($sql, [$venda_id, $usuarioId]);
             if(!$rs_venda || pg_num_rows($rs_venda) == 0) $msg = "Nenhuma venda encontrada.";
     }
 
@@ -52,8 +52,8 @@ if(isset($controller->logado) && $controller->logado) {
                                     from tb_venda_games vg
                                     inner join boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id 
                                     where 
-                                        vg.vg_id = " . $venda_id . " 
-                                        and vg.vg_ug_id=" . $usuarioId.";";
+                                        vg.vg_id = $1
+                                        and vg.vg_ug_id= $2;";
                     } 
                     else {
                             $sql  = " 
@@ -65,10 +65,10 @@ if(isset($controller->logado) && $controller->logado) {
                                         '' as vgm_nome_modelo 
                                     from tb_venda_games vg 
                                         inner join tb_pag_compras pg on pg.idvenda = vg.vg_id 
-                                    where vg.vg_id = " . $venda_id . " 
-                                          and vg.vg_ug_id=" . $usuarioId.";";
+                                    where vg.vg_id = $1
+                                          and vg.vg_ug_id= $2;";
                     }
-                    $rs_venda_modelos = SQLexecuteQuery($sql);
+                    $rs_venda_modelos = SQLexecuteQueryParams($sql, [$venda_id , $usuarioId]);
                     if(!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
                             $msg = "Nenhum produto encontrado. (4335A)";
                             gravaLog_DRUPAL_TMP("Em venda_e_modelos_logica.php: {venda_id = '$venda_id', $msg} \n\t$sql\n");
@@ -89,9 +89,9 @@ if(isset($controller->logado) && $controller->logado) {
                     $sql  = "select * 
                              from tb_venda_games vg 
                                 inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                             where vg.vg_id = " . $venda_id . " 
-                                 and vg.vg_ug_id=" . $usuarioId.";";
-                    $rs_venda_modelos = SQLexecuteQuery($sql);
+                             where vg.vg_id = $1
+                                 and vg.vg_ug_id=  $2;";
+                    $rs_venda_modelos = SQLexecuteQueryParams($sql, [$venda_id , $usuarioId]);
                     if(!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado (1rew).";
             }
     }//end else do if(((strlen($GLOBALS['_SESSION']['pagamento.pagto.deposito.em.saldo'])>0) && (strlen($GLOBALS['_SESSION']['pagamento.pagto.deposito.em.saldo.num.docto'])>0)))

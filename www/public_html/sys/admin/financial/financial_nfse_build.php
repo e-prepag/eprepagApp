@@ -322,7 +322,7 @@ function gerarArquivo(varArquivo) {
 			$sNFeADM .= gera_rodape($cont_nota_adm, ($total_geral_adm / 100));
 
 			if ($cont_nota > 0) {
-				$varArquivo = "lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAux, 4, "0", STR_PAD_LEFT) . $proc_novamente . ".txt";
+				$varArquivo = "/www/arquivos_gerados/lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAux, 4, "0", STR_PAD_LEFT) . $proc_novamente . ".txt";
 				$handle = fopen($varArquivo, "w+");
 				if ($handle === false) {
 					$msg = "Não foi possível abrir o arquivo '$varArquivo' para escrita.";
@@ -346,7 +346,7 @@ function gerarArquivo(varArquivo) {
 			echo "<tr><td>&nbsp;</td></tr>";
 
 			if ($cont_nota_adm > 0) {
-				$varArquivo = "lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAuxADM, 4, "0", STR_PAD_LEFT) . $proc_novamente_adm . "_ADMINISTRADORA.txt";
+				$varArquivo = "/www/arquivos_gerados/lotes/" . "nfse_lote_" . date("Ymd") . "_" . str_pad($varLoteAuxADM, 4, "0", STR_PAD_LEFT) . $proc_novamente_adm . "_ADMINISTRADORA.txt";
 				$handle = fopen($varArquivo, "w+");
 				if ($handle === false) {
 					$msg = "Não foi possível abrir o arquivo '$varArquivo' para escrita.";

@@ -60,12 +60,20 @@ $GLOBALS["jquery"] = true;
 
             if ($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']) {
                 $sql = "
-                select * 
-                from tb_pag_compras 
-                where 
-                    idvenda = " . $venda_id . " 
-                    and idcliente=" . $usuarioId . ";";
-                $rs_pagto = SQLexecuteQuery($sql);
+                        SELECT * 
+                        FROM tb_pag_compras
+                        WHERE 
+                            idvenda = $1
+                            AND idcliente = $2
+                    ";
+
+                $params = array(
+                    $venda_id,  // $1
+                    $usuarioId  // $2
+                );
+
+                $rs_pagto = SQLexecuteQueryParams($sql, $params);
+
                 if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
                     $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
                 } else {
@@ -76,15 +84,24 @@ $GLOBALS["jquery"] = true;
                         $total_carrinho = $rs_pagto_row['total'] / 100;
                     }
                 }
-            }//end if($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'])
-            
+            } //end if($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'])
+
             if ($total_carrinho == 0) {
-                $sql = " 
-                select * from tb_pag_compras 
-                where 
-                    idvenda = " . $venda_id . " 
-                    and idcliente=" . $usuarioId . "; ";
-                $rs_pagto = SQLexecuteQuery($sql);
+                $sql = "
+                        SELECT * 
+                        FROM tb_pag_compras
+                        WHERE 
+                            idvenda = $1
+                            AND idcliente = $2
+                    ";
+
+                $params = array(
+                    $venda_id,   // $1
+                    $usuarioId   // $2
+                );
+
+                $rs_pagto = SQLexecuteQueryParams($sql, $params);
+
                 if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
                     $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
                 } else {
@@ -94,7 +111,7 @@ $GLOBALS["jquery"] = true;
                     }
                 }
             } //end if($total_carrinho == 0) 
-            
+
             if (!(b_IsPagtoBoletoDeposito($pagto_tipo) || b_IsPagtoOnline($pagto_tipo))) {
                 $strRedirect = "/game/conta/pedidos.php";
                 //Fechando Conexão
@@ -159,7 +176,6 @@ $GLOBALS["jquery"] = true;
                 include RAIZ_DO_PROJETO . "banco/bradesco/inc_functions.php";
                 include RAIZ_DO_PROJETO . "banco/bradesco/inc_urls_bradesco.php";
                 include RAIZ_DO_PROJETO . "banco/bradesco/config.inc.bradesco_transf.php";
-
             } else if ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
 
                 foreach ($arrPagtosBloqueados as $ind => $val) {
@@ -171,7 +187,6 @@ $GLOBALS["jquery"] = true;
 
                 include DIR_INCS . "gamer/venda_e_modelos_calculate.php";
                 include RAIZ_DO_PROJETO . "banco/bancodobrasil/inc_urls_bancodobrasil.php";
-
             } else if ($pagto_tipo == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC) {
 
                 foreach ($arrPagtosBloqueados as $ind => $val) {
@@ -182,8 +197,20 @@ $GLOBALS["jquery"] = true;
                 }
 
                 // Recupera Itau ID
-                $sql = "select * from tb_pag_compras where idvenda = " . $venda_id . " and idcliente=" . $usuarioId;
-                $rs_pagto_id = SQLexecuteQuery($sql);
+                $sql = "
+                            SELECT *
+                            FROM tb_pag_compras
+                            WHERE idvenda = $1
+                              AND idcliente = $2
+                        ";
+
+                $params = array(
+                    $venda_id,   // $1
+                    $usuarioId   // $2
+                );
+
+                $rs_pagto_id = SQLexecuteQueryParams($sql, $params);
+
                 if (!$rs_pagto_id || pg_num_rows($rs_pagto_id) == 0) {
                     $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
                 } else {
@@ -193,7 +220,6 @@ $GLOBALS["jquery"] = true;
                 include DIR_INCS . "gamer/venda_e_modelos_calculate.php";
                 require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
                 require_once RAIZ_DO_PROJETO . "banco/itau/inc_urls_bancoitau.php";
-
             } else if ($pagto_tipo == $PAGAMENTO_HIPAY_ONLINE_NUMERIC) {
 
                 foreach ($arrPagtosBloqueados as $ind => $val) {
@@ -205,7 +231,7 @@ $GLOBALS["jquery"] = true;
 
                 include DIR_INCS . "gamer/venda_e_modelos_calculate.php";
                 //		include DIR_WEB."prepag2/pag/bep/inc_urls_bancoeprepag.php";
-            
+
             } else if ($pagto_tipo == $PAGAMENTO_PAYPAL_ONLINE_NUMERIC) {
 
                 foreach ($arrPagtosBloqueados as $ind => $val) {
@@ -240,7 +266,6 @@ $GLOBALS["jquery"] = true;
                 }
 
                 $taxa = $PAGAMENTO_PIN_EPP_TAXA;
-
             } else if ($pagto_tipo == $PAGAMENTO_PIX_NUMERIC) {
 
 
@@ -252,7 +277,6 @@ $GLOBALS["jquery"] = true;
                 }
 
                 $taxa = $PAGAMENTO_PIX_TAXA;
-
             }
 
             $numOrder = $OrderId;
@@ -261,7 +285,6 @@ $GLOBALS["jquery"] = true;
             if ($iforma == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
                 $img_bank_logo = "bradesco_logo_dr.gif";
                 $simg_bank = "<img src='/imagens/pag/$img_bank_logo' border='0' title='Bradesco'>";
-
             } else if ($iforma == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']) {
                 $location = $link_PagtoFacil;
                 $img_bank_logo = "bradesco_logo_dr.gif";
@@ -292,7 +315,7 @@ $GLOBALS["jquery"] = true;
             }
 
             if ($pagtoInvalido) {
-                ?>
+            ?>
                 <div class="col-md-12">
                     <div class="alert alert-danger" id="erro" role="alert">
                         <span class="glyphicon t0 glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -304,10 +327,10 @@ $GLOBALS["jquery"] = true;
             } else {
 
                 if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
-                    ?>
+                ?>
 
                     <script language="JavaScript" type="text/JavaScript">
-                <!--
+                        <!--
 
                     function abrePaginaBanco() {
                         $("#vaipagamento").click();
@@ -327,7 +350,7 @@ $GLOBALS["jquery"] = true;
                     refresh_snipet = 1;
                     <?php
                     if ($pagto_tipo != $PAGAMENTO_PIN_EPREPAG_NUMERIC) {
-                        ?>
+                    ?>
 
                         // Mostra status da compra
                         function refresh_status(){
@@ -366,88 +389,87 @@ $GLOBALS["jquery"] = true;
 
                         <?php
                     } //end if($pagto_tipo != $PAGAMENTO_PIN_EPREPAG_NUMERIC)
-                    ?>
+                        ?>
 
                 //-->
-                </script>
+                    </script>
 
-                    <?php
+                <?php
                 } //end if($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'])
-            
+
                 include DIR_INCS . "gamer/venda_e_modelos_view.php";
 
                 //Testando a necessidade de solicitação de CPF para Gamer
                 if ($test_opr_need_cpf || $iforma == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
                     cpf_page_gamer();
-                }//end if($test_opr_need_cpf)
-            
+                } //end if($test_opr_need_cpf)
+
                 include DIR_INCS . "gamer/pagto_compr_usuario_dados.php";
 
                 if (($ultimo_status == $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO']) || ($ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) || ($ultimo_status == $GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'])) {
-                    ?>
+                ?>
                     <div class="col-md-12 text-center">
                         <p>Obrigado!</p>
                         <p>Em poucos instantes a transação será concluida. Em caso de dúvida, favor entrar em contato com o
                             suporte.</p>
                     </div>
                 <?php
-                }//end if(($ultimo_status == $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO']) || ($ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) || ($ultimo_status == $GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO']))
+                } //end if(($ultimo_status == $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO']) || ($ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) || ($ultimo_status == $GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO']))
                 else if ($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']) {
-                    ?>
-                        <div class="col-md-12 text-center">
-                            <p>Obrigado!</p>
-                            <p>Sua transação foi processada com sucesso.</p>
-			<a class="btn btn-success bottom10" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/pedidos.php">Meus pedidos</a>
-                        </div>
+                ?>
+                    <div class="col-md-12 text-center">
+                        <p>Obrigado!</p>
+                        <p>Sua transação foi processada com sucesso.</p>
+                        <a class="btn btn-success bottom10" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/pedidos.php">Meus pedidos</a>
+                    </div>
                     <?php
                     if (($banco == "237") && ($assinatura)) {
-                        ?>
-                            <div class="col-md-12 text-center txt-cinza-claro">
-                                <p><strong>Autenticação</strong></p>
-                                <p><?php formataAssinatura($assinatura) ?></p>
-                            </div>
+                    ?>
+                        <div class="col-md-12 text-center txt-cinza-claro">
+                            <p><strong>Autenticação</strong></p>
+                            <p><?php formataAssinatura($assinatura) ?></p>
+                        </div>
                     <?php
                     }
-
                 } else if ($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_CANCELADA']) {
                     ?>
-                            <div class="col-md-12 txt-vermelho espacamento text-center bottom20">
-                                Sua compra foi cancelada pelo sistema. Tente novamente.
-                            </div>
-                <?php
+                    <div class="col-md-12 txt-vermelho espacamento text-center bottom20">
+                        Sua compra foi cancelada pelo sistema. Tente novamente.
+                    </div>
+                    <?php
                 } else {
 
                     if (!empty($simg_bank)) {
-                        ?>
-                                <div class="clearfix top20"></div>
-                                <div
-                                    class="int-pagamento-compr-online-logo col-md-5 text-right-lg text-right-md text-center-sm text-center-xs col-lg-5 col-sm-12 col-xs-12 hide-pix-success">
+                    ?>
+                        <div class="clearfix top20"></div>
+                        <div
+                            class="int-pagamento-compr-online-logo col-md-5 text-right-lg text-right-md text-center-sm text-center-xs col-lg-5 col-sm-12 col-xs-12 hide-pix-success">
                             <?php echo $simg_bank; ?>
-                                </div>
-                        <?php
+                        </div>
+                    <?php
                     }
 
                     if ($pagto_tipo != $PAGAMENTO_PIN_EPREPAG_NUMERIC && $pagto_tipo != $PAGAMENTO_PIX_NUMERIC) {
-                        ?>
-                                <div id="info_pagamento" class="col-md-7">
-                                    <div
-                                        class="col-md-1 col-lg-1 col-sm-12 col-xs-12 text-right-lg text-right-md text-center-sm text-center-xs top10">
-                                        <img src='/imagens/loading1.gif' width='42' height='42' border='0' title='Aguardando pagamento...'
-                                            class="int-pagamento-compr-online-loading">
-                                    </div>
-                                    <div class="col-md-11 col-lg-11 col-sm-12 col-xs-12 text-left top10">
-                                        <span class="int-pagamento-compr-online-message1 text-left fontsize-pp txt-verde">Aguardando
-                                            pagamento.<br>Clique abaixo para efetuar a transação.</span>
-                                    </div>
-                                </div>
-                        <?php
-                    }//end if($pagto_tipo != $PAGAMENTO_PIN_EPREPAG_NUMERIC) 
-            
-                    if ($pagto_tipo == $PAGAMENTO_PIX_NUMERIC) {
-                        ?>
-                                <div id="info_pagamento" pix="1" style="display: none;" class="col-md-12">
+                    ?>
+                        <div id="info_pagamento" class="col-md-7">
+                            <div
+                                class="col-md-1 col-lg-1 col-sm-12 col-xs-12 text-right-lg text-right-md text-center-sm text-center-xs top10">
+                                <img src='/imagens/loading1.gif' width='42' height='42' border='0' title='Aguardando pagamento...'
+                                    class="int-pagamento-compr-online-loading">
+                            </div>
+                            <div class="col-md-11 col-lg-11 col-sm-12 col-xs-12 text-left top10">
+                                <span class="int-pagamento-compr-online-message1 text-left fontsize-pp txt-verde">Aguardando
+                                    pagamento.<br>Clique abaixo para efetuar a transação.</span>
+                            </div>
+                        </div>
+                    <?php
+                    } //end if($pagto_tipo != $PAGAMENTO_PIN_EPREPAG_NUMERIC) 
 
-                                </div>
+                    if ($pagto_tipo == $PAGAMENTO_PIX_NUMERIC) {
+                    ?>
+                        <div id="info_pagamento" pix="1" style="display: none;" class="col-md-12">
+
+                        </div>
                         <?php
                     }
 
@@ -492,17 +514,15 @@ $GLOBALS["jquery"] = true;
 
                             $ativacaoPinTemplate2 = new AtivacaoPinTemplate($paramList);
                             echo $ativacaoPinTemplate2->boxAtivacaoPin();
-
-                        }//end if(($total_geral_epp_cash/100+$taxa) > 0)
+                        } //end if(($total_geral_epp_cash/100+$taxa) > 0)
                         else {
                             echo "Dados da compra recebido sem valores.";
                         }
 
                         echo "</div>";
-
-                    }//end if($pagto_tipo == $PAGAMENTO_PIN_EPREPAG_NUMERIC)  
+                    } //end if($pagto_tipo == $PAGAMENTO_PIN_EPREPAG_NUMERIC)  
                     //fim do bloco de pagamento com PINS EPREPAG
-            
+
                     //inicio do bloco de pagamentos CIELO
                     if (b_IsPagtoCielo($pagto_tipo)) {
 
@@ -530,7 +550,7 @@ $GLOBALS["jquery"] = true;
                                 <input type='submit' name='btnToken' id='btnToken' value='Enviar'>
                         </form>
                 </div>"; //$cielo_pan contem o hash do cartão
-                        }//end if($limite->getPrimeiraVendaGamers())
+                        } //end if($limite->getPrimeiraVendaGamers())
                         else {
 
                             // controle primeiro pedido
@@ -580,44 +600,55 @@ $GLOBALS["jquery"] = true;
                                     $indicadorAutorizacao = "3";
                                     break;
                             }
-                            ?>
-                                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-center">
-                                        <form action="/cielo/pages/novoPedidoAguarde.php" method="POST" target="_blank">
-                                            <input type="hidden" name="produto" id="produto" value="<?php echo ($total_geral + $taxa) * 100; ?>" />
-                                            <input type="hidden" name="codigoBandeira" id="codigoBandeira"
-                                                value="<?php echo $codigoBandeira; ?>" />
-                                            <input type="hidden" name="formaPagamento" id="formaPagamento"
-                                                value="<?php echo $formaPagamento; ?>" />
-                                            <input type="hidden" name="capturarAutomaticamente" id="capturarAutomaticamente" value="true" />
-                                            <input type="hidden" name="indicadorAutorizacao" id="indicadorAutorizacao"
-                                                value="<?php echo $indicadorAutorizacao; ?>" />
-                                            <input type="hidden" name="dadosPedidoDescricao" id="dadosPedidoDescricao"
-                                                value="<?php echo $dadosPedidoDescricao; ?>" />
-                                            <input type="hidden" name="softDescriptor" id="softDescriptor"
-                                                value="<?php echo $softDescriptor; ?>" />
-                                            <input type="hidden" name="campolivre" id="campolivre"
-                                                value="<?php echo md5(uniqid(rand(), true)); ?>" />
-                                        <?php
-                                        $sql = "select * from tb_pag_compras " .
-                                            "where idvenda = " . $venda_id . " and idcliente=" . $usuarioId;
-                                        $rs_pagto = SQLexecuteQuery($sql);
-                                        if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
-                                            $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
-                                        } else {
-                                            $rs_pagto_row = pg_fetch_array($rs_pagto);
-                                            $numcompra = $rs_pagto_row['numcompra'];
-                                            ?>
-                                                <input type="hidden" name="numcompra" id="numcompra" value="<?php echo $numcompra; ?>" />
-                                                <input class="btn btn-success top50" type="submit" name="btnIrCielo" value="Clique aqui para pagar">
-                                        <?php
-                                        }
-                                        ?>
-                                        </form>
-                                    </div>
-                            <?php
-                        }//end else do if($limite->getPrimeiraVendaGamers())
-                    }//fim do bloco de pagamentos CIELO
-            
+                        ?>
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-center">
+                                <form action="/cielo/pages/novoPedidoAguarde.php" method="POST" target="_blank">
+                                    <input type="hidden" name="produto" id="produto" value="<?php echo ($total_geral + $taxa) * 100; ?>" />
+                                    <input type="hidden" name="codigoBandeira" id="codigoBandeira"
+                                        value="<?php echo $codigoBandeira; ?>" />
+                                    <input type="hidden" name="formaPagamento" id="formaPagamento"
+                                        value="<?php echo $formaPagamento; ?>" />
+                                    <input type="hidden" name="capturarAutomaticamente" id="capturarAutomaticamente" value="true" />
+                                    <input type="hidden" name="indicadorAutorizacao" id="indicadorAutorizacao"
+                                        value="<?php echo $indicadorAutorizacao; ?>" />
+                                    <input type="hidden" name="dadosPedidoDescricao" id="dadosPedidoDescricao"
+                                        value="<?php echo $dadosPedidoDescricao; ?>" />
+                                    <input type="hidden" name="softDescriptor" id="softDescriptor"
+                                        value="<?php echo $softDescriptor; ?>" />
+                                    <input type="hidden" name="campolivre" id="campolivre"
+                                        value="<?php echo md5(uniqid(rand(), true)); ?>" />
+                                    <?php
+                                    $sql = "
+                                                SELECT *
+                                                FROM tb_pag_compras
+                                                WHERE idvenda = $1
+                                                  AND idcliente = $2
+                                            ";
+
+                                    $params = array(
+                                        $venda_id,   // $1
+                                        $usuarioId   // $2
+                                    );
+
+                                    $rs_pagto = SQLexecuteQueryParams($sql, $params);
+
+                                    if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
+                                        $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
+                                    } else {
+                                        $rs_pagto_row = pg_fetch_array($rs_pagto);
+                                        $numcompra = $rs_pagto_row['numcompra'];
+                                    ?>
+                                        <input type="hidden" name="numcompra" id="numcompra" value="<?php echo $numcompra; ?>" />
+                                        <input class="btn btn-success top50" type="submit" name="btnIrCielo" value="Clique aqui para pagar">
+                                    <?php
+                                    }
+                                    ?>
+                                </form>
+                            </div>
+                        <?php
+                        } //end else do if($limite->getPrimeiraVendaGamers())
+                    } //fim do bloco de pagamentos CIELO
+
                     if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) || ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']) || ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_CREDITO'])) {
 
                         $cesta = $rs_pagto_row['cesta'];
@@ -664,78 +695,78 @@ $GLOBALS["jquery"] = true;
                         }
 
                         if (isset($msg_problem)) {
-                            ?>
-                                    <form name="pagamento" id="pagamento" method="POST" action="/game/mensagem.php">
-                                        <input type='hidden' name='msg' id='msg' value='<?php echo $msg_problem; ?>'>
-                                        <input type='hidden' name='titulo' id='titulo' value='<?php echo $titulo; ?>'>
-                                        <input type='hidden' name='link' id='link' value='<?php echo $redireciona; ?>'>
-                                    </form>
-                                    <script language='javascript'>
-                                        $("#info_pagamento").hide();
-                                        document.getElementById("pagamento").submit();
-                                    </script>
-                            <?php
+                        ?>
+                            <form name="pagamento" id="pagamento" method="POST" action="/game/mensagem.php">
+                                <input type='hidden' name='msg' id='msg' value='<?php echo $msg_problem; ?>'>
+                                <input type='hidden' name='titulo' id='titulo' value='<?php echo $titulo; ?>'>
+                                <input type='hidden' name='link' id='link' value='<?php echo $redireciona; ?>'>
+                            </form>
+                            <script language='javascript'>
+                                $("#info_pagamento").hide();
+                                document.getElementById("pagamento").submit();
+                            </script>
+                        <?php
                             die();
                         } else {
-                            ?>
-                                    <form action="" method="post" target="_blank">
-                                        <input class="btn btn-success top50" type="button" name="btnIrAoBanco" value="Clique aqui para pagar"
-                                            onclick="window.open('<?php echo $location; ?>')"
-                                            class="int-btn1 grad1 int-pagamento-compr-online-btn1">
-                                    </form>
-                            <?php
+                        ?>
+                            <form action="" method="post" target="_blank">
+                                <input class="btn btn-success top50" type="button" name="btnIrAoBanco" value="Clique aqui para pagar"
+                                    onclick="window.open('<?php echo $location; ?>')"
+                                    class="int-btn1 grad1 int-pagamento-compr-online-btn1">
+                            </form>
+                        <?php
                         }
                     } else if ($pagto_tipo == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
                         ?>
-                                    <form action="<?php echo $location; ?>" method="post" target="_blank">
-                                        <input class="btn btn-success top50" type="submit" name="btnIrAoBanco" value="Clique aqui para pagar"
-                                            class="int-btn1 grad1 int-pagamento-compr-online-btn1">
-                                        <input type="hidden" name="idConv" value="<?php echo $bbr_idConv; ?>">
-                                        <input type="hidden" name="refTran" value="<?php echo $bbr_refTran; ?>">
-                                        <input type="hidden" name="valor" value="<?php echo $bbr_valor; ?>">
-                                        <input type="hidden" name="qtdPontos" value="<?php echo $bbr_qtdPontos; ?>">
-                                        <input type="hidden" name="dtVenc" value="<?php echo $bbr_dtVenc; ?>">
-                                        <input type="hidden" name="tpPagamento" value="<?php echo $bbr_tpPagamento; ?>">
-                                        <input type="hidden" name="urlRetorno" value="<?php echo $bbr_urlRetorno; ?>">
-                                        <input type="hidden" name="urlInforma" value="<?php echo $bbr_urlInforma; ?>">
-                                        <input type="hidden" name="nome" value="<?php echo $bbr_nome; ?>">
-                                        <input type="hidden" name="endereco" value="<?php echo $bbr_endereco; ?>">
-                                        <input type="hidden" name="cidade" value="<?php echo $bbr_cidade; ?>">
-                                        <input type="hidden" name="uf" value="<?php echo $bbr_uf; ?>">
-                                        <input type="hidden" name="cep" value="<?php echo $bbr_cep; ?>">
-                                        <input type="hidden" name="msgLoja" value="<?php echo $bbr_msgLoja; ?>">
-                                    </form>
-                        <?php
+                        <form action="<?php echo $location; ?>" method="post" target="_blank">
+                            <input class="btn btn-success top50" type="submit" name="btnIrAoBanco" value="Clique aqui para pagar"
+                                class="int-btn1 grad1 int-pagamento-compr-online-btn1">
+                            <input type="hidden" name="idConv" value="<?php echo $bbr_idConv; ?>">
+                            <input type="hidden" name="refTran" value="<?php echo $bbr_refTran; ?>">
+                            <input type="hidden" name="valor" value="<?php echo $bbr_valor; ?>">
+                            <input type="hidden" name="qtdPontos" value="<?php echo $bbr_qtdPontos; ?>">
+                            <input type="hidden" name="dtVenc" value="<?php echo $bbr_dtVenc; ?>">
+                            <input type="hidden" name="tpPagamento" value="<?php echo $bbr_tpPagamento; ?>">
+                            <input type="hidden" name="urlRetorno" value="<?php echo $bbr_urlRetorno; ?>">
+                            <input type="hidden" name="urlInforma" value="<?php echo $bbr_urlInforma; ?>">
+                            <input type="hidden" name="nome" value="<?php echo $bbr_nome; ?>">
+                            <input type="hidden" name="endereco" value="<?php echo $bbr_endereco; ?>">
+                            <input type="hidden" name="cidade" value="<?php echo $bbr_cidade; ?>">
+                            <input type="hidden" name="uf" value="<?php echo $bbr_uf; ?>">
+                            <input type="hidden" name="cep" value="<?php echo $bbr_cep; ?>">
+                            <input type="hidden" name="msgLoja" value="<?php echo $bbr_msgLoja; ?>">
+                        </form>
+                    <?php
                     } else if ($pagto_tipo == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC) {
 
                         $cripto = new Itaucripto();
 
                         $dados_cripto = $cripto->geraDados($codEmp, $pedido, $valorAux, $observacao, $chave, $nomeSacado, $codigoInscricao, $numeroInscricao, $enderecoSacado, $bairroSacado, $cepSacado, $cidadeSacado, $estadoSacado, $dataVencimento, $urlRetorna, $ObsAdicional1, $ObsAdicional2, $ObsAdicional3);
                         //-----------------------------------------------------------------------------------------------------------------------------------------------------
-//MODO UTILIZANDO ASP - DESCOMENTAR CASO UTILIZAR ASP            
+                        //MODO UTILIZANDO ASP - DESCOMENTAR CASO UTILIZAR ASP            
                         //$dados = getItauCrypto($form_fields, "pagto");
-            
+
                         //            $aretorno = explode("\n", $dados);
-            
+
                         //            $auxCripto = trim($aretorno[9]);
-//            $dados_cripto = (empty($auxCripto)?$aretorno[10]:$aretorno[9]);
-//-----------------------------------------------------------------------------------------------------------------------------------------------------            
-                        ?>
-                                        <form action="<?php echo $location; ?>" method="post" target="_blank">
-                                            <input type="hidden" name="DC" value="<?php echo $dados_cripto ?>">
-                                            <input type="submit" name="btnIrAoBanco" value="Clique aqui para pagar" class="btn btn-success top50">
-                                        </form>
-                        <?php
+                        //            $dados_cripto = (empty($auxCripto)?$aretorno[10]:$aretorno[9]);
+                        //-----------------------------------------------------------------------------------------------------------------------------------------------------            
+                    ?>
+                        <form action="<?php echo $location; ?>" method="post" target="_blank">
+                            <input type="hidden" name="DC" value="<?php echo $dados_cripto ?>">
+                            <input type="submit" name="btnIrAoBanco" value="Clique aqui para pagar" class="btn btn-success top50">
+                        </form>
+                    <?php
                     } else if ($pagto_tipo == $PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC) {
 
                         $_SESSION['Banco_EPP_usuarioId'] = $usuarioId;
                         $_SESSION['Banco_EPP_venda_id'] = $venda_id;
-                        ?>
-                                            <form action="" method="post" target="_blank" name="formEPP">
-                                                <input type="button" name="btnIrAoBanco" value="Clique aqui para pagar"
-                                                    onclick="window.open('<?php echo $location; ?>')">
-                                            </form>
-                        <?php
+                    ?>
+                        <form action="" method="post" target="_blank" name="formEPP">
+                            <input type="button" name="btnIrAoBanco" value="Clique aqui para pagar"
+                                onclick="window.open('<?php echo $location; ?>')">
+                        </form>
+                    <?php
                     } elseif ($pagto_tipo == $PAGAMENTO_PAYPAL_ONLINE_NUMERIC) {
 
                         // aqui exibimos o botao paypal que e gerado no inc_gen_order_pay.php
@@ -744,49 +775,49 @@ $GLOBALS["jquery"] = true;
                         $total_carrinho_nominal = $GLOBALS['_SESSION']['carrinho_total_geral_treinamento'];
                         $amount = $total_carrinho_nominal;
                         $item_number = $OrderId;
-                        $item_name = montaCesta_pag_paypal($_SESSION['venda']);	//"Pagamento Online EPP";
-                        ?>
-                                            <form action="/prepag2/pag/pay/paypal_process.php" target="_blank">
-                                                <input type="hidden" name="cmd" value="_xclick">
-                                                <input type="hidden" name="business" value="<?php echo $business ?>">
-                                                <input type="hidden" name="item_name" value="<?php echo $item_name ?>">
-                                                <input type="hidden" name="item_number" value="<?php echo $item_number ?>">
-                                                <input type="hidden" name="INVNUM" value="<?php echo $item_number ?>">
-                                                <input type="hidden" name="invoice" value="<?php echo $item_number ?>">
-                                                <input type="hidden" name="amount" value="<?php echo number_format($amount, 2) ?>">
-                                                <input type="hidden" name="mc_gross" value="<?php echo number_format($amount, 2) ?>">
-                                                <input type="hidden" name="tax" value="<?php echo $taxa ?>">
-                                                <input type="hidden" name="quantity" value="1">
-                                                <input type="hidden" name="currency_code" value="<?php echo $currencyValue ?>">
-                                                <input type="hidden" name="button_subtype" value="services">
-                                                <input type="hidden" name="no_note" value="1">
-                                                <input type="hidden" name="no_shipping" value="1">
-                                                <input type="hidden" name="rm" value="1">
-                                                <input type="hidden" name="return" value="<?php echo $retornosucesso ?>">
-                                                <input type="hidden" name="cancel_return" value="<?php echo $retornocancela ?>">
-                                                <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHostedGuest">
-                                                <input type="hidden" name="cbt" value="Continue">
-                                                <input type="image" src="<?php echo $https; ?>://www.sandbox.paypal.com/pt_BR/i/btn/btn_buynowCC_LG.gif"
-                                                    border="0" name="submit" title="Pague com PayPal!">
-                                                <img alt="" border="0" src="<?php echo $https; ?>://www.sandbox.paypal.com/en_US/i/scr/pixel.gif"
-                                                    width="1" height="1">
-                                            </form>
+                        $item_name = montaCesta_pag_paypal($_SESSION['venda']);    //"Pagamento Online EPP";
+                    ?>
+                        <form action="/prepag2/pag/pay/paypal_process.php" target="_blank">
+                            <input type="hidden" name="cmd" value="_xclick">
+                            <input type="hidden" name="business" value="<?php echo $business ?>">
+                            <input type="hidden" name="item_name" value="<?php echo $item_name ?>">
+                            <input type="hidden" name="item_number" value="<?php echo $item_number ?>">
+                            <input type="hidden" name="INVNUM" value="<?php echo $item_number ?>">
+                            <input type="hidden" name="invoice" value="<?php echo $item_number ?>">
+                            <input type="hidden" name="amount" value="<?php echo number_format($amount, 2) ?>">
+                            <input type="hidden" name="mc_gross" value="<?php echo number_format($amount, 2) ?>">
+                            <input type="hidden" name="tax" value="<?php echo $taxa ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="currency_code" value="<?php echo $currencyValue ?>">
+                            <input type="hidden" name="button_subtype" value="services">
+                            <input type="hidden" name="no_note" value="1">
+                            <input type="hidden" name="no_shipping" value="1">
+                            <input type="hidden" name="rm" value="1">
+                            <input type="hidden" name="return" value="<?php echo $retornosucesso ?>">
+                            <input type="hidden" name="cancel_return" value="<?php echo $retornocancela ?>">
+                            <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHostedGuest">
+                            <input type="hidden" name="cbt" value="Continue">
+                            <input type="image" src="<?php echo $https; ?>://www.sandbox.paypal.com/pt_BR/i/btn/btn_buynowCC_LG.gif"
+                                border="0" name="submit" title="Pague com PayPal!">
+                            <img alt="" border="0" src="<?php echo $https; ?>://www.sandbox.paypal.com/en_US/i/scr/pixel.gif"
+                                width="1" height="1">
+                        </form>
 
-                        <?php
+                    <?php
                     } elseif ($pagto_tipo == $PAGAMENTO_HIPAY_ONLINE_NUMERIC) {
 
                         // Para uso em testes PayPal/Hipay
                         $total_carrinho_nominal = $GLOBALS['_SESSION']['carrinho_total_geral_treinamento'];
                         $amount = $total_carrinho_nominal;
-                        ?>
-                                            <form action="/prepag2/pag/hpy/hipay_single_payment.php" target="_blank">
-                                                <input type="hidden" name="numcompra" id="numcompra"
-                                                    value="<?php echo $_SESSION['pagamento.numorder'] ?>">
-                                                <input type="hidden" name="amount" id="amount" value="<?php echo number_format($amount, 2) ?>">
-                                                <input type="image" src="/prepag2/commerce/images/botao_hipay.gif" border="0" name="submit"
-                                                    title="Hipay">
-                                            </form>
-                        <?php
+                    ?>
+                        <form action="/prepag2/pag/hpy/hipay_single_payment.php" target="_blank">
+                            <input type="hidden" name="numcompra" id="numcompra"
+                                value="<?php echo $_SESSION['pagamento.numorder'] ?>">
+                            <input type="hidden" name="amount" id="amount" value="<?php echo number_format($amount, 2) ?>">
+                            <input type="image" src="/prepag2/commerce/images/botao_hipay.gif" border="0" name="submit"
+                                title="Hipay">
+                        </form>
+                    <?php
                     } else if ($pagto_tipo == $PAGAMENTO_PIX_NUMERIC) {
                         $sql = "select nome from provedor_pix where ativo = 'A';";
                         $ativo = SQLexecuteQuery($sql);
@@ -929,79 +960,77 @@ $GLOBALS["jquery"] = true;
                         }
 
                         //var_dump($params); die();
-            
+
                     } //end else if($pagto_tipo == $PAGAMENTO_PIX_NUMERIC)
-            
+
                     //inicio do bloco de pagamento com PINS EPREPAG
                     if ($pagto_tipo != $PAGAMENTO_PIN_EPREPAG_NUMERIC && $pagto_tipo != $PAGAMENTO_PIX_NUMERIC) {
-                        ?>
-                                <div class="col-md-12 text-center espacamento">
-                                    Seus dados bancários ficarão restritos à interface do banco.
-                                </div>
-                        <?php
+                    ?>
+                        <div class="col-md-12 text-center espacamento">
+                            Seus dados bancários ficarão restritos à interface do banco.
+                        </div>
+                    <?php
                     } elseif ($pagto_tipo == $PAGAMENTO_PIX_NUMERIC) {
-                        ?>
-                                <div class="col-md-12 text-center espacamento">
-                                    <b>ATENÇÃO: Não efetue o Pix fora do nosso site. Para cada pagamento será necessário gerar um novo
-                                        pedido.</b>
-                                </div>
-                        <?php
+                    ?>
+                        <div class="col-md-12 text-center espacamento">
+                            <b>ATENÇÃO: Não efetue o Pix fora do nosso site. Para cada pagamento será necessário gerar um novo
+                                pedido.</b>
+                        </div>
+                    <?php
 
                     }
                     ?>
-                        </div>
-                <?php
-                // bloco pagamento fim  
-                ?>
-                        <div id="pagamento_ok">
-                    <?php
+        </div>
+        <?php
+                    // bloco pagamento fim  
+        ?>
+        <div id="pagamento_ok">
+            <?php
                     // bloco pagamento efetuado inicio 
-                    ?>
-                            <script language="JavaScript" type="text/javascript">
-
-                                function send_to_trans() {
-                                    document.forms['last_trans'].submit();
-                                }
-
-                            </script>
-                            <div class="col-md-11 text-center txt-verde bottom20 top50">
-                                <p>Pagamento realizado com sucesso.</p>
-                                <p>O crédito foi enviado para seu Email cadastrado.</p>
-				<a class="btn btn-success bottom10" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/pedidos.php">Meus pedidos</a>
-                            </div>
-                            <div class="col-md-1 bottom20 top-50">
-                                <input type="button" name="btVoltar" value="Voltar" OnClick="window.location='/game/conta/pedidos.php';"
-                                    class="btn btn-info">
-                            </div>
-                        </div>
-                <?php
-                // bloco pagamento efetuado fim  
-                ?>
-                        <div id="pagamento_cancela">
-                    <?php
+            ?>
+            <script language="JavaScript" type="text/javascript">
+                function send_to_trans() {
+                    document.forms['last_trans'].submit();
+                }
+            </script>
+            <div class="col-md-11 text-center txt-verde bottom20 top50">
+                <p>Pagamento realizado com sucesso.</p>
+                <p>O crédito foi enviado para seu Email cadastrado.</p>
+                <a class="btn btn-success bottom10" href="<?= EPREPAG_URL_HTTPS ?>/game/conta/pedidos.php">Meus pedidos</a>
+            </div>
+            <div class="col-md-1 bottom20 top-50">
+                <input type="button" name="btVoltar" value="Voltar" OnClick="window.location='/game/conta/pedidos.php';"
+                    class="btn btn-info">
+            </div>
+        </div>
+        <?php
+                    // bloco pagamento efetuado fim  
+        ?>
+        <div id="pagamento_cancela">
+            <?php
                     // bloco pagamento cancelado inicio 
-                    ?>
-                            <div class="col-md-11 text-center bottom20">
-                                <p>Compra <span class="txt-vermelho">cancelada</span> por falta de pagamento.<br>
-                                    Se ainda quiser realizar a compra, tente novamente e complete o pagamento sem demorar muito.<br>
-                                    Obrigado.</p>
-                            </div>
-                            <div class="col-md-1 bottom20">
-                                <input type="button" name="btVoltar" value="Voltar" OnClick="window.location='/game/';"
-                                    class="btn btn-info">
-                            </div>
-                        </div>
-                <?php
-                // bloco pagamento cancelado fim  
-                ?>
-                        <script language="JavaScript" type="text/JavaScript">
-                    $("#pagamento_ok").hide();
+            ?>
+            <div class="col-md-11 text-center bottom20">
+                <p>Compra <span class="txt-vermelho">cancelada</span> por falta de pagamento.<br>
+                    Se ainda quiser realizar a compra, tente novamente e complete o pagamento sem demorar muito.<br>
+                    Obrigado.</p>
+            </div>
+            <div class="col-md-1 bottom20">
+                <input type="button" name="btVoltar" value="Voltar" OnClick="window.location='/game/';"
+                    class="btn btn-info">
+            </div>
+        </div>
+        <?php
+                    // bloco pagamento cancelado fim  
+        ?>
+        <script language="JavaScript" type="text/JavaScript">
+            $("#pagamento_ok").hide();
                     $("#pagamento_cancela").hide();
                 </script>
-                <?php
+<?php
                 } //end do else do else if($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'])
             }
-            ?>
+?>
     </div>
 </div>
 </div>
