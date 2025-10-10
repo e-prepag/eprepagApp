@@ -18,7 +18,7 @@
 				
 				$resposta = 'Acesso negado! O código não foi informado';
 				
-				$arquivoLog = 'logEsqueciMinhaSenha.log';
+				$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log';
 		
 				$mensagemLog = $resposta;
 
@@ -36,7 +36,7 @@
 				
 				$dataHoraAtual = capturaDataHoraAtual();
 				
-				$arquivoLog = 'logEsqueciMinhaSenha.log';
+				$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log';
 				
 				$mensagemLog = "O usuário acessou a página de atualização de senha\nDATA / HORA: $dataHoraAtual\nID: {$resposta[0]['ug_id']}\nNOME: {$resposta[0]['ug_nome_completo']}\nCÓDIGO: {$codigoValidacao}";
 		
@@ -50,7 +50,7 @@
 				
 				$resposta = "Acesso negado! O código informado não existe no banco: {$codigoValidacao}";
 				
-				$arquivoLog = 'logEsqueciMinhaSenha.log';
+				$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log';
 		
 				$mensagemLog = $resposta;
 
@@ -64,7 +64,7 @@
 			
 			$resposta = "Acesso negado! Código fora do padrão: {$codigoValidacao}";
 			
-			$arquivoLog = 'logEsqueciMinhaSenha.log';
+			$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log';
 		
 			$mensagemLog = $resposta;
 

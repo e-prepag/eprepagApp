@@ -33,7 +33,7 @@
 	
 				atualizaHistoricoCliente($idUsuario, $idIp, $idDataTrocaSenha);
 				
-				$arquivoLog = 'logEsqueciMinhaSenha.log';
+				$arquivoLog = '/www/log/logEsqueciMinhaSenha.log';
 				
 				$mensagemLog = "CÓDIGO: {$codigoValidacao} -- A senha foi atualizada";
 				
@@ -47,7 +47,7 @@
 				
 				defineStatusErro($codigoValidacao);
 				
-				$arquivoLog = 'logEsqueciMinhaSenha.log'; 
+				$arquivoLog = '/www/log/logEsqueciMinhaSenha.log'; 
 				
 				$mensagemLog = 'Forçou entrada de uma senha fora do padrão';
 				
@@ -60,7 +60,7 @@
 			
 			defineStatusErro($codigoValidacao);
 			
-			$arquivoLog = 'logEsqueciMinhaSenha.log'; 
+			$arquivoLog = '/www/log/logEsqueciMinhaSenha.log'; 
 			
 			$mensagemLog = 'Forçou a entrada de duas senhas que não coincidem';
 				

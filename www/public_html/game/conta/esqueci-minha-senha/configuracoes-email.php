@@ -59,7 +59,7 @@
         //Mensagem
 		//$mensagemLog = "E-mail encaminhado para: {$to} C�DIGO: {$codigoValidacao}";
 		
-		$arquivoLog = 'envioEmailEsqueciMinhaSenha.log';
+		$arquivoLog = '/www/log/envioEmailEsqueciMinhaSenha.log';
 		
 		geraLogEnvioEmail($arquivoLog, $mensagemLog);
 		
