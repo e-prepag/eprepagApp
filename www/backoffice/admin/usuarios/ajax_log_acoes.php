@@ -92,7 +92,8 @@ try {
 					$dataKeys[2] => $tipo_usuario_descricao,
 					$dataKeys[3] => $value["data_hora_registro"],
 					$dataKeys[4] => $value["ip_usuario"],
-					$dataKeys[5] => $value["caminho_arquivo"]
+					$dataKeys[5] => $value["caminho_arquivo"],
+					$dataKeys[6] => $value["dados_request"]
 				];
 				array_push($data["data"], $dataLine);
 			}

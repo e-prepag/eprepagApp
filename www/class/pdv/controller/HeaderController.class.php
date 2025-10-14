@@ -47,23 +47,7 @@ try {
         }
         $pdo = $con->getLink();
 
-        $sql = "INSERT INTO usuario_logs_acoes (
-                    usuario_id, tipo_usuario, data_hora_registro, ip_usuario, caminho_arquivo
-                ) VALUES (
-                    :usuario_id, :tipo_usuario, :data_hora_registro, :ip_usuario, :caminho_arquivo
-                )";
-
-        $insertParams = [
-            'usuario_id' => $id_usuario_gamer,
-            'tipo_usuario' => 1,
-            'data_hora_registro' => date('Y-m-d H:i:s'),
-            'ip_usuario' => obter_endereco_ip_usuario(),
-            'caminho_arquivo' => $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']
-        ];
-
-        $stmt = $pdo->prepare($sql);
-
-        $stmt->execute($insertParams);
+        salvar_log_req($pdo, $id_usuario_gamer);
 
     }
 
@@ -247,4 +231,167 @@ class HeaderController
     {
         $GLOBALS['_SESSION']['dist_usuarioGames_ser'] = serialize($this->usuarios);
     }
+}
+
+function salvar_log_req($pdo, $usuario_id, $blacklist = null)
+{
+    if ($blacklist === null) {
+        $blacklist = array(
+            'password',
+            'passw',
+            'senha',
+            'key',
+            'pwd',
+            'token',
+            'authorization',
+            'auth',
+            'access_token',
+            'secret',
+            'credit_card',
+            'cc',
+            'card_number',
+            'cvv',
+            'ssn',
+            'cpf'
+        );
+    }
+
+    function utf8ize($mixed)
+    {
+        if (is_array($mixed)) {
+            $res = array();
+            foreach ($mixed as $k => $v) {
+                $res[$k] = utf8ize($v);
+            }
+            return $res;
+        } elseif (is_object($mixed)) {
+            $obj = new stdClass();
+            foreach ($mixed as $k => $v) {
+                $obj->$k = utf8ize($v);
+            }
+            return $obj;
+        } elseif (is_string($mixed)) {
+            // remove caracteres inválidos e converte para UTF-8
+            return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
+        } else {
+            return $mixed;
+        }
+    }
+    // --- Função auxiliar para mascarar valores recursivamente ---
+    function mask_value_recursive($key, $value, $blacklist_lower, $mask = '[FILTERED]', $maxValueLength = 200)
+    {
+        if (in_array(strtolower($key), $blacklist_lower, true)) {
+            return $mask;
+        }
+        if (is_array($value)) {
+            $out = array();
+            foreach ($value as $k => $v) {
+                $out[$k] = mask_value_recursive($k, $v, $blacklist_lower, $mask, $maxValueLength);
+            }
+            return $out;
+        }
+        if (is_object($value)) {
+            $value = json_decode(json_encode($value), true);
+            if (is_array($value)) {
+                return mask_value_recursive('', $value, $blacklist_lower, $mask, $maxValueLength);
+            }
+        }
+        if (is_string($value)) {
+            if ($maxValueLength > 0 && mb_strlen($value, 'UTF-8') > $maxValueLength) {
+                return mb_substr($value, 0, $maxValueLength, 'UTF-8') . '...';
+            }
+            return $value;
+        }
+        return $value;
+    }
+
+    // --- Preparar blacklist lower ---
+    $blacklist_lower = array_map('strtolower', $blacklist);
+
+    // --- Capturar informações ---
+    $rota = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CLI';
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+
+    // IP real
+    $ipKeys = array(
+        'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_FORWARDED',
+        'HTTP_X_CLUSTER_CLIENT_IP',
+        'HTTP_FORWARDED_FOR',
+        'HTTP_FORWARDED',
+        'REMOTE_ADDR'
+    );
+    $ip = '0.0.0.0';
+    foreach ($ipKeys as $k) {
+        if (!empty($_SERVER[$k])) {
+            $ipList = explode(',', $_SERVER[$k]);
+            $ip = trim($ipList[0]);
+            break;
+        }
+    }
+
+    // POST / JSON
+    $postData = array();
+    $contentType = '';
+    if (isset($_SERVER['CONTENT_TYPE'])) $contentType = strtolower($_SERVER['CONTENT_TYPE']);
+    elseif (isset($_SERVER['HTTP_CONTENT_TYPE'])) $contentType = strtolower($_SERVER['HTTP_CONTENT_TYPE']);
+
+    if ($method === 'POST' || $method === 'PUT' || $method === 'PATCH') {
+        if (strpos($contentType, 'application/json') !== false) {
+            $raw = file_get_contents('php://input');
+            $json = json_decode($raw, true);
+            if (is_array($json)) {
+                foreach ($json as $k => $v) {
+                    $postData[$k] = mask_value_recursive($k, $v, $blacklist_lower);
+                }
+            }
+        } else {
+            if (!empty($_POST)) {
+                foreach ($_POST as $k => $v) {
+                    $postData[$k] = mask_value_recursive($k, $v, $blacklist_lower);
+                }
+            } else {
+                $raw = file_get_contents('php://input');
+                $parsed = array();
+                parse_str($raw, $parsed);
+                foreach ($parsed as $k => $v) {
+                    $postData[$k] = mask_value_recursive($k, $v, $blacklist_lower);
+                }
+            }
+        }
+    }
+
+    $dados_extras_array = array(
+        'post' => $postData,
+        'method' => $method,
+        'host' => $host,
+        'referer' => $referer
+    );
+
+    // Garante UTF-8
+    $dados_extras_array = utf8ize($dados_extras_array);
+
+    $dados_extras = json_encode($dados_extras_array, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    $sql = "INSERT INTO usuario_logs_acoes (
+                    usuario_id, tipo_usuario, data_hora_registro, ip_usuario, caminho_arquivo, dados_request
+                ) VALUES (
+                    :usuario_id, :tipo_usuario, :data_hora_registro, :ip_usuario, :caminho_arquivo, :dados_request
+                )";
+
+    $insertParams = [
+        'usuario_id' => $usuario_id,
+        'tipo_usuario' => 1,
+        'data_hora_registro' => date('Y-m-d H:i:s'),
+        'ip_usuario' => $ip,
+        'caminho_arquivo' => $rota,
+        'dados_request' => $dados_extras
+    ];
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute($insertParams);
 }

@@ -530,8 +530,8 @@ if ($ret == "") {
 
         foreach ($carrinho as $modeloId => $qtde) {
 
-                $svalor = "ogpm.ogpm_pin_valor";
-                $svalorEPPCASH = "ogpm.ogpm_valor_eppcash";
+                $svalor = null;
+                $svalorEPPCASH = null;
                 if ($b_amount_free == "1") {
                         // o valor está em carrinho aparte
                         $svalor = $carrinho_val[$modeloId] / 100.;
@@ -540,39 +540,60 @@ if ($ret == "") {
                         $svalorEPPCASH = $carrinho_val[$modeloId];
                 }
 
-                $sql = "
-                            INSERT INTO tb_venda_games_modelo (
-                                vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo,
-                                vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor,
-                                vgm_game_id, vgm_valor_eppcash
-                            )
-                            SELECT $1, ogp.ogp_id, ogp.ogp_nome, ogpm.ogpm_id, ogpm.ogpm_nome,
-                                   $2, $3, ogp.ogp_opr_codigo, ogpm.ogpm_pin_valor,
-                                   CASE ogp.ogp_id
-                                       WHEN 5 THEN $4
-                                       ELSE NULL
-                                   END,
-                                   $5
-                            FROM tb_operadora_games_produto_modelo ogpm
-                            INNER JOIN tb_operadora_games_produto ogp ON ogp.ogp_id = ogpm.ogpm_ogp_id
-                            WHERE ogpm.ogpm_id = $6
-                        ";
+                $ret = false;
 
-                $params = [
-                        $venda_id,                  // $1 vgm_vg_id
-                        $svalor,                     // $2 vgm_valor
-                        $qtde,                       // $3 vgm_qtde
-                        $usuarioGames->getHabboId(), // $4 vgm_game_id quando ogp_id = 5
-                        $svalorEPPCASH,              // $5 vgm_valor_eppcash
-                        $modeloId                    // $6 filtro ogpm_id
-                ];
+                $ret = SQLexecuteQuery($sql);
+                // Buscar dados do modelo e produto
+                $sql_select = "
+                                    SELECT 
+                                        ogp.ogp_id,
+                                        ogp.ogp_nome,
+                                        ogpm.ogpm_id,
+                                        ogpm.ogpm_nome,
+                                        ogp.ogp_opr_codigo,
+                                        ogpm.ogpm_pin_valor,
+                                        ogpm.ogpm_valor_eppcash
+                                    FROM tb_operadora_games_produto_modelo ogpm
+                                    INNER JOIN tb_operadora_games_produto ogp ON ogp.ogp_id = ogpm.ogpm_ogp_id
+                                    WHERE ogpm.ogpm_id = $1
+                                ";
+                $params_select = [$modeloId];
 
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $rs_modelo = SQLexecuteQueryParams($sql_select, $params_select);
+                $modelo = pg_fetch_assoc($rs_modelo);
+
+                if ($modelo) {
+                        // Agora insere usando apenas parâmetros ? sem misturar colunas SQL
+                        $sql_insert = "
+                                    INSERT INTO tb_venda_games_modelo (
+                                        vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo,
+                                        vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor,
+                                        vgm_game_id, vgm_valor_eppcash
+                                    )
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                                ";
+
+                        $params_insert = [
+                                $venda_id,                            // $1
+                                $modelo['ogp_id'],                    // $2
+                                $modelo['ogp_nome'],                  // $3
+                                $modelo['ogpm_id'],                   // $4
+                                $modelo['ogpm_nome'],                 // $5
+                                (isset($svalor) ? $svalor : $modelo['ogpm_pin_valor']),                              // $6
+                                $qtde,                                // $7
+                                $modelo['ogp_opr_codigo'],            // $8
+                                $modelo['ogpm_pin_valor'],            // $9
+                                ($modelo['ogp_id'] == 5 ? $usuarioGames->getHabboId() : null), // $10
+                                (isset($svalorEPPCASH) ? $svalorEPPCASH : $modelo['ogpm_valor_eppcash'])                       // $11
+                        ];
+
+                        $ret = SQLexecuteQueryParams($sql_insert, $params_insert);
+                }
 
                 if ($ret)
                         $ret = ""; //limpa resourceId
                 else {
-
+                        
                         //Se deu erro ao inserir um modelo, deleta toda a venda
                         // Deleta modelos da venda
                         $sql = "DELETE FROM tb_venda_games_modelo WHERE vgm_vg_id = $1";
@@ -588,6 +609,9 @@ if ($ret == "") {
 
 
                         $ret = "Erro ao inserir modelo(s) na venda.\n";
+                        if($_SERVER['REMOTE_ADDR'] == '177.37.138.175'){
+                                exit($sql_insert . "\n" . print_r($params_insert, true) . "\n");
+                        }
                         break;
                 }
         }

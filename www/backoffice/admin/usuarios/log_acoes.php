@@ -118,6 +118,7 @@ $nome_operador = $_SESSION["userlogin_bko"];
 				<th>Data Registro</th>
 				<th>IP usuário</th>
 				<th>URL página</th>
+				<th>Dados Requisição</th>
 			</tr>
 		</thead>
 	</table>
@@ -190,6 +191,7 @@ $nome_operador = $_SESSION["userlogin_bko"];
 						{ data: 'data_hora_registro' },
 						{ data: 'ip_usuario' },
 						{ data: 'caminho_arquivo' },
+						{ data: 'dados_request' }
 					],
 					destroy: true,
 					language: {

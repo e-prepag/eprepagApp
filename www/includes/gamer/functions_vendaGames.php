@@ -3715,8 +3715,10 @@ function conciliacaoAutomaticaPagamentoOnline()
 
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
-                                        if (trim($vg_ultimo_status_obs) != "")
-                                                $parametros['ultimo_status_obs'] = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                        if (trim($vg_ultimo_status_obs) != ""){
+                                                $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                                $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
+                                        }
                                         $parametros['PROCESS_AUTOM'] = '1';
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (A): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -3764,8 +3766,10 @@ function conciliacaoAutomaticaPagamentoOnline()
 
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
-                                        if (trim($vg_ultimo_status_obs) != "")
-                                                $parametros['ultimo_status_obs'] = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                        if (trim($vg_ultimo_status_obs) != ""){
+                                                $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                                $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
+                                        }
                                         $parametros['PROCESS_AUTOM'] = '1';
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (A): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -4679,8 +4683,10 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
-                                        if (trim($vg_ultimo_status_obs) != "")
-                                                $parametros['ultimo_status_obs'] = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                        if (trim($vg_ultimo_status_obs) != ""){
+                                                $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                                $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
+                                        }
                                         $parametros['PROCESS_AUTOM'] = '1';
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (A): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -4728,8 +4734,10 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
-                                        if (trim($vg_ultimo_status_obs) != "")
-                                                $parametros['ultimo_status_obs'] = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                        if (trim($vg_ultimo_status_obs) != ""){
+                                                $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                                $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
+                                        }
                                         $parametros['PROCESS_AUTOM'] = '1';
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (A): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -5195,8 +5203,10 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                 if (trim($vg_integracao_parceiro_origem_id) == '') {
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
-                                        if (trim($vg_ultimo_status_obs) != "")
-                                                $parametros['ultimo_status_obs'] = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                        if (trim($vg_ultimo_status_obs) != ""){
+                                                $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                                $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
+                                        }
                                         $parametros['PROCESS_AUTOM'] = '1';
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (A): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
@@ -5250,8 +5260,10 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
 
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
-                                        if (trim($vg_ultimo_status_obs) != "")
-                                                $parametros['ultimo_status_obs'] = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                        if (trim($vg_ultimo_status_obs) != ""){
+                                                $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
+                                                $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
+                                        }
                                         $parametros['PROCESS_AUTOM'] = '1';
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (A): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
