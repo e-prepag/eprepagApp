@@ -165,8 +165,8 @@ if ($BtnSearch) {
     if ($dd_opr_codigo) $sql_wheres .= "and (t0.opr_codigo=" . $dd_opr_codigo . ")  \n";
 
     if ($dd_pin_status) {
-        if (($dd_pin_status == "stVendido - TODOS") || ($dd_pin_status == "stVendido-TODOS")) {                         //Tratativa para pins roubados da riot
-            $sql_wheres .= " and (t0.pin_status='3' or t0.pin_status='6' or t0.pin_status='7' or t0.pin_status='8' " . (date('m-Y') == '10-2025' ? "or t0.pin_status='9'" : "") . ")  \n";
+        if (($dd_pin_status == "stVendido - TODOS") || ($dd_pin_status == "stVendido-TODOS")) {
+            $sql_wheres .= " and (t0.pin_status='3' or t0.pin_status='6' or t0.pin_status='7' or t0.pin_status='8')  \n";
         } else {
             $sql_wheres .= " and (t0.pin_status='" . substr($dd_pin_status, 2, 1) . "')  \n";
         }

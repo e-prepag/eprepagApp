@@ -1522,7 +1522,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                         pin_desc       = 'Gamer, produto: $produto_operadora',
                                                                         pin_status      = '3',
                                                                         pin_celular     = '" . str_replace('-', '', $ug_cel) . "',
-                                                                        pin_ddd         = $ug_cel_ddd,
+                                                                        pin_ddd         = ".($ug_cel_ddd?:0).",
                                                                         pin_datavenda   = '$data_corrente',
                                                                         pin_datapedido  = '$data_corrente',
                                                                         pin_horavenda   = '$hora_corrente',
@@ -3716,6 +3716,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
                                         if (trim($vg_ultimo_status_obs) != ""){
+                                                $vg_ultimo_status_obs = substr($vg_ultimo_status_obs, -1023);
                                                 $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
                                                 $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
                                         }
@@ -3767,6 +3768,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
                                         if (trim($vg_ultimo_status_obs) != ""){
+                                                $vg_ultimo_status_obs = substr($vg_ultimo_status_obs, -1023);
                                                 $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
                                                 $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
                                         }
@@ -4684,6 +4686,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
                                         if (trim($vg_ultimo_status_obs) != ""){
+                                                $vg_ultimo_status_obs = substr($vg_ultimo_status_obs, -1023);
                                                 $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
                                                 $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
                                         }
@@ -4735,6 +4738,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
                                         if (trim($vg_ultimo_status_obs) != ""){
+                                                $vg_ultimo_status_obs = substr($vg_ultimo_status_obs, -1023);
                                                 $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
                                                 $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
                                         }
@@ -5204,6 +5208,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
                                         if (trim($vg_ultimo_status_obs) != ""){
+                                                $vg_ultimo_status_obs = substr($vg_ultimo_status_obs, -1023);
                                                 $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
                                                 $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
                                         }
@@ -5261,6 +5266,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         // Prepara conciliação
                                         $parametros['ultimo_status_obs'] = "Conciliação automática pagamento online em " . date('d/m/Y - H:i:s') . PHP_EOL;
                                         if (trim($vg_ultimo_status_obs) != ""){
+                                                $vg_ultimo_status_obs = substr($vg_ultimo_status_obs, -1023);
                                                 $ultimo_status_obs_sem_trim = $vg_ultimo_status_obs . PHP_EOL . $parametros['ultimo_status_obs'];
                                                 $parametros['ultimo_status_obs'] = substr($ultimo_status_obs_sem_trim, -1023);
                                         }

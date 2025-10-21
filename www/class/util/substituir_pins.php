@@ -57,13 +57,12 @@ class PinGenerator {
 /*
  * Funções auxiliares
  */
-function printFeedback($orig_pin, $spin_codigo, $vgm_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, $spin_serial, $status, $msg) {
+function printFeedback($orig_pin, $spin_codigo, $vgm_id, $opr_nome, $ug_nome, $pin_valor, $spin_serial, $status, $msg) {
     echo "---------------------------------------------\n";
     echo "PIN Antigo      : $orig_pin\n";
     echo "PIN Novo        : $spin_codigo\n";
     echo "Pedido (vgm_id) : $vgm_id\n";
     echo "Operadora       : $opr_nome\n";
-    echo "Game       : $nome_produto\n";
     echo "Vendedor        : $ug_nome\n";
     echo "Valor do PIN    : $pin_valor\n";
     echo "Número de Série : $spin_serial\n";
@@ -117,31 +116,19 @@ try {
 }
 
 // Lista de PINs recebida externamente
-$inputPins = [
-];
+$inputPins = [];
 
 $placeholders = implode(',', array_fill(0, count($inputPins), '?'));
 
 $sql = "
     SELECT 
-        p.pin_codinterno,
         p.pin_codigo,
         p.pin_valor,
         p.opr_codigo,
-        p.pin_status,
         vm.vgm_id,
         vg.vg_id,
         o.opr_nome,
-        ug.ug_nome_fantasia,
-        vm.vgm_nome_produto,
-        vm.vgm_nome_modelo,
-        ug.ug_id,
-        vm.vgm_nome_cpf,
-        vm.vgm_cpf,
-        vm.vgm_cpf_data_nascimento,
-        vm.vgm_ogp_id,
-        vm.vgm_ogpm_id,
-        vm.vgm_perc_desconto
+        ug.ug_nome_fantasia
     FROM pins p
     JOIN tb_dist_venda_games_modelo_pins vp 
         ON vp.vgmp_pin_codinterno = p.pin_codinterno
@@ -154,7 +141,7 @@ $sql = "
     JOIN operadoras o 
         ON o.opr_codigo = p.opr_codigo
     WHERE p.pin_codigo IN ($placeholders)
-    and p.pin_status = '6'
+      AND p.pin_status = '8'
 ";
 
 $stmt = $pdo->prepare($sql);
@@ -169,7 +156,6 @@ fputcsv($fp, [
     'PIN Novo',
     'Número Pedido',
     'Publisher',
-    'Game',
     'PDV',
     'Valor do PIN',
     'Número de Série',
@@ -188,17 +174,6 @@ foreach ($pinsEncontrados as $row) {
     $vg_id     = $row['vg_id'];
     $opr_nome   = $row['opr_nome'];
     $ug_nome    = $row['ug_nome_fantasia'];
-    $nome_produto = $row['vgm_nome_produto'];
-    $ug_id      = $row['ug_id'];
-    $vgm_ogp_id = $row['vgm_ogp_id'];
-    $vgm_ogpm_id = $row['vgm_ogpm_id'];
-    $vgm_nome_cpf = $row['vgm_nome_cpf'];
-    $vgm_cpf = $row['vgm_cpf'];
-    $vgm_cpf_data_nascimento = $row['vgm_cpf_data_nascimento'];
-    $vgm_nome_modelo = $row['vgm_nome_modelo'];
-    $vgm_perc_desconto = $row['vgm_perc_desconto'];
-    $pin_status = $row['pin_status'];
-    $pin_codinterno_old = $row['pin_codinterno'];
 
     // Se ainda não tem cache da operadora, inicializa
     if (!isset($operadorasCache[$opr_codigo])) {
@@ -222,13 +197,10 @@ foreach ($pinsEncontrados as $row) {
     $spin_codigo = str_replace('-', '', $generator->gera_pin($sformato, $pin_valor));
 
     if (existsPin($pdo, $spin_codigo, $opr_codigo)) {
-        //Tenta gerar novamente
-        $spin_codigo = str_replace('-', '', $generator->gera_pin($sformato, $pin_valor));
-        if (existsPin($pdo, $spin_codigo, $opr_codigo)) {
-            fputcsv($fp, [$orig_pin, '', $vgm_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, '', 'erro', 'PIN já existe']);
-            printFeedback($orig_pin, '', $vgm_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, '', 'erro', 'PIN já existe');
-            continue;
-        }
+        fputcsv($fp, [$orig_pin, '', $vgm_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', 'PIN já existe']);
+        printFeedback($orig_pin, '', $vgm_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', 'PIN já existe');
+
+        continue;
     }
 
     try {
@@ -261,61 +233,30 @@ foreach ($pinsEncontrados as $row) {
         $novoPinRow = $stmtPins->fetch();
         $pin_codinterno = $novoPinRow['pin_codinterno'];
 
-        // venda
-        $query1 = "INSERT INTO tb_dist_venda_games (vg_ug_id, vg_data_inclusao, vg_pagto_tipo, vg_ultimo_status, vg_id) VALUES (?, CURRENT_TIMESTAMP, 2, 5, (select (max(vg_id) + 1) from tb_dist_venda_games)) RETURNING vg_id";
-        $stmtVenda = $pdo->prepare($query1);
-        $stmtVenda->execute([$ug_id]);
-        $novaVendaRow = $stmtVenda->fetch();
-        $vg_id_novo = $novaVendaRow['vg_id'];
-
-        // venda modelo
-        $query2 = "INSERT INTO tb_dist_venda_games_modelo (vgm_vg_id, vgm_nome_produto, vgm_nome_modelo, vgm_valor, vgm_qtde, vgm_ogp_id, vgm_ogpm_id, vgm_opr_codigo, vgm_pin_valor, vgm_perc_desconto, vgm_cpf, vgm_cpf_data_nascimento, vgm_nome_cpf) VALUES 
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING vgm_id";
-        $stmtVendaModelo = $pdo->prepare($query2);
-        $stmtVendaModelo->execute([$vg_id_novo, $nome_produto, $vgm_nome_modelo, $pin_valor, 1, $vgm_ogp_id, $vgm_ogpm_id, $opr_codigo, $pin_valor, $vgm_perc_desconto, $vgm_cpf, $vgm_cpf_data_nascimento, $vgm_nome_cpf]);
-        $novaVendaModeloRow = $stmtVendaModelo->fetch();
-        $vgm_id_novo = $novaVendaModeloRow['vgm_id'];
-
         // associa ao vgm_id
         $query3 = "INSERT INTO tb_dist_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) VALUES (?, ?)";
-        $pdo->prepare($query3)->execute([$vgm_id_novo, $pin_codinterno]);
+        $pdo->prepare($query3)->execute([$vgm_id, $pin_codinterno]);
 
         // copia para pins_dist
         $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
         $pdo->prepare($query4)->execute([$pin_codinterno]);
 
-        $status = 'ok';
+        // atualiza quantidade
+        $query5 = "UPDATE tb_dist_venda_games_modelo SET vgm_qtde = vgm_qtde + 1 WHERE vgm_id = ?";
+        $pdo->prepare($query5)->execute([$vgm_id]);
 
-        if($pin_status == '6'){
-            $query6 = "UPDATE pins SET pin_desc = 'Substituido', pin_status = '9' WHERE pin_codigo = ?";
-            $pdo->prepare($query6)->execute([$orig_pin]);
-
-            $query7 = "UPDATE tb_dist_venda_games_modelo SET vgm_qtde = vgm_qtde -1 WHERE vgm_id = ?";
-            $pdo->prepare($query7)->execute([$vgm_id]);
-
-            $query8 = "DELETE FROM tb_dist_venda_games_modelo_pins WHERE vgmp_vgm_id = ? AND vgmp_pin_codinterno = ?";
-            $pdo->prepare($query8)->execute([$vgm_id, $pin_codinterno_old]);
-
-            $query9 = "DELETE FROM pins_dist WHERE pin_codigo = ?";
-            $pdo->prepare($query9)->execute([$orig_pin]);
-
-            $status = 'ok (PIN antigo cancelado)';
-        }else{
-            // atualiza pin antigo
-            $query6 = "UPDATE pins SET pin_desc = 'Substituido' WHERE pin_codigo = ?";
-            $pdo->prepare($query6)->execute([$orig_pin]);
-
-            $status = 'ok (PIN antigo marcado como substituído)';
-        }
+        // atualiza pin antigo
+        $query6 = "UPDATE pins SET pin_status = '9' WHERE pin_codigo = ?";
+        $pdo->prepare($query6)->execute([$orig_pin]);
 
         $pdo->commit();
 
-        printFeedback($orig_pin, $spin_codigo, $vg_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, $spin_serial, $status, '');
-        fputcsv($fp, [$orig_pin, $spin_codigo, $vg_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, $spin_serial, $status, '']);
+        printFeedback($orig_pin, $spin_codigo, $vg_id, $opr_nome, $ug_nome, $pin_valor, $spin_serial, 'ok', '');
+        fputcsv($fp, [$orig_pin, $spin_codigo, $vg_id, $opr_nome, $ug_nome, $pin_valor, $spin_serial, 'ok', '']);
     } catch (Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
-        fputcsv($fp, [$orig_pin, '', $vg_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, '', 'erro', $e->getMessage()]);
-        printFeedback($orig_pin, '', $vg_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, '', 'erro', $e->getMessage());
+        fputcsv($fp, [$orig_pin, '', $vg_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', $e->getMessage()]);
+        printFeedback($orig_pin, '', $vg_id, $opr_nome, $ug_nome, $pin_valor, '', 'erro', $e->getMessage());
 
     }
 }
