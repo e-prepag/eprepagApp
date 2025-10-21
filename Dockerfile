@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libpng-dev \
     libfreetype6-dev \
+    libxml2-dev \ 
  && rm -rf /var/lib/apt/lists/* \
  && docker-php-ext-configure curl --with-curl=shared \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \

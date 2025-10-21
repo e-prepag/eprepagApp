@@ -9,10 +9,17 @@
 
     session_start();
 
+<<<<<<< HEAD
     if ($_SERVER['HTTPS'] != "on") {
         Header("Location: https://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);
         die();
     } //end if($_SERVER['HTTPS']!="on") 
+=======
+if($_SERVER['HTTPS']!="on") {
+//    Header("Location: https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+//    die();
+} //end if($_SERVER['HTTPS']!="on") 
+>>>>>>> eb7c1fb (add docker and fix sys)
 
     require_once $raiz_do_projeto . "includes/inc_register_globals.php";
 
