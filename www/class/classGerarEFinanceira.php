@@ -5,7 +5,28 @@ require_once '/www/db/ConnectionPDO.php';
 class GerarEFinanceira
 {
 
-    public function __construct() {}
+    private $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $razaoEPP;  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $enderecoEPP;    // Endereço da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $cepEPP;                                   // CEP da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $ufEPP;                                          // UF da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $nomeRespEPP;                      // Nome do responsável da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $foneEPP;                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
+    private $emailEPP;               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
+    private $municipioEPP;
+
+    public function __construct()
+    {
+        $this->cnpjEPP = '19037276000172';
+        $this->razaoEPP = 'E-prepag Administradora de Cartoes Ltda';
+        $this->enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';
+        $this->cepEPP = '05418000';
+        $this->ufEPP = 'SP';
+        $this->nomeRespEPP = 'Daniela Oliveira';
+        $this->foneEPP = '01130309106';
+        $this->emailEPP = getenv('email_financeiro');
+        $this->municipioEPP = 'SAO PAULO';
+    }
 
     private function obterDadosMovFin()
     {
@@ -201,7 +222,7 @@ class GerarEFinanceira
         $ideDeclarante = $dom->createElement('ideDeclarante');
         $evtMovOpFin->appendChild($ideDeclarante);
 
-        $cnpjDeclarante = $dom->createElement('CNPJ', '12345678000190');
+        $cnpjDeclarante = $dom->createElement('CNPJ', $this->cnpjEPP);
         $ideDeclarante->appendChild($cnpjDeclarante);
 
         // ideDeclarado -  grupo
@@ -221,11 +242,7 @@ class GerarEFinanceira
         $NomeDeclarado = $dom->createElement('NomeDeclarado', substr($nomeDeclarado, 0, 100));
         $ideDeclarado->appendChild($NomeDeclarado);
 
-        //tpNomeDeclarado
-        $tpNomeDeclarado = $dom->createElement('tpNomeDeclarado', 'OECD207');
-        $ideDeclarado->appendChild($tpNomeDeclarado);
-
-        if($tipoNI == 1){
+        if ($tipoNI == 1) {
             // DataNasc
             $DataNasc = $dom->createElement('DataNasc', $dataNascimento);
             $ideDeclarado->appendChild($DataNasc);
@@ -238,14 +255,6 @@ class GerarEFinanceira
         //PaisEndereco - grupo
         $PaisEndereco = $dom->createElement('PaisEndereco');
         $ideDeclarado->appendChild($PaisEndereco);
-
-        //tpEndereco
-        if($tipoNI == 1){
-            $tpEndereco = $dom->createElement('tpEndereco', 'OECD302');
-        } else {
-            $tpEndereco = $dom->createElement('tpEndereco', 'OECD303');
-        }
-        $ideDeclarado->appendChild($tpEndereco);
 
         //Pais
         $Pais = $dom->createElement('Pais', 'BR');
@@ -292,7 +301,7 @@ class GerarEFinanceira
         $infoConta->appendChild($tpNumConta);
 
         //numConta
-        $numConta = $dom->createElement('numConta', '$ug_id');
+        $numConta = $dom->createElement('numConta', $ug_id);
         $infoConta->appendChild($numConta);
 
         //tpRelacaoDeclarado
@@ -349,7 +358,192 @@ class GerarEFinanceira
         $PgtosAcum->appendChild($totPgtosAcum);
 
         // Gerar XML final
-        $xmlString = $dom->saveXML();
-        echo $xmlString;
+        return $dom;
+    }
+
+    public function gerarCadastroDeclarante()
+    {
+        // Cria o objeto DOM
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true; // deixa o XML identado
+
+        // Cria o elemento raiz com namespace
+        $eFinanceira = $dom->createElementNS(
+            'http://www.eFinanceira.gov.br/schemas/evtCadDeclarante/v1_2_0',
+            'eFinanceira'
+        );
+        $dom->appendChild($eFinanceira);
+
+        // Cria o nó evtCadDeclarante
+        $idNovo = $this->obterUltimoIdEnvio() + 1;
+
+        $id_formatado = $this->gerarIdFormatado($idNovo);
+
+        $evtCadDeclarante = $dom->createElement('evtCadDeclarante');
+        $evtCadDeclarante->setAttribute('id', $id_formatado);
+        $eFinanceira->appendChild($evtCadDeclarante);
+
+        // ideEvento
+        $ideEvento = $dom->createElement('ideEvento');
+        $ideEvento->appendChild($dom->createElement('indRetificacao', '1'));
+        $ideEvento->appendChild($dom->createElement('tpAmb', '1'));
+        $ideEvento->appendChild($dom->createElement('aplicEmi', '2'));
+        $ideEvento->appendChild($dom->createElement('verAplic', '00000000000000000001'));
+        $evtCadDeclarante->appendChild($ideEvento);
+
+        // ideDeclarante
+        $ideDeclarante = $dom->createElement('ideDeclarante');
+        $ideDeclarante->appendChild($dom->createElement('cnpjDeclarante', $this->cnpjEPP));
+        $evtCadDeclarante->appendChild($ideDeclarante);
+
+        // infoCadastro
+        $infoCadastro = $dom->createElement('infoCadastro');
+        $infoCadastro->appendChild($dom->createElement('nome', $this->razaoEPP));
+        $infoCadastro->appendChild($dom->createElement('enderecoLivre', $this->enderecoEPP));
+        $infoCadastro->appendChild($dom->createElement('municipio', $this->municipioEPP));
+        $infoCadastro->appendChild($dom->createElement('UF', $this->ufEPP));
+        $infoCadastro->appendChild($dom->createElement('CEP', $this->cepEPP));
+        $infoCadastro->appendChild($dom->createElement('Pais', 'BR'));
+
+        // Subnó paisResid
+        $paisResid = $dom->createElement('paisResid');
+        $paisResid->appendChild($dom->createElement('Pais', 'BR'));
+        $infoCadastro->appendChild($paisResid);
+
+        $evtCadDeclarante->appendChild($infoCadastro);
+
+        return $dom;
+    }
+
+    public function gerarAbertura()
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+
+        // <eFinanceira>
+        $eFinanceira = $dom->createElementNS('http://www.eFinanceira.gov.br/schemas/evtAberturaeFinanceira/v1_2_1', 'eFinanceira');
+        $dom->appendChild($eFinanceira);
+
+        // <evtAberturaeFinanceira id="...">
+        $evt = $dom->createElement('evtAberturaeFinanceira');
+        $evt->setAttribute('id', 'ID0000000000001'); // Identificador único do evento
+        $eFinanceira->appendChild($evt);
+
+        // <ideEvento>
+        $ideEvento = $dom->createElement('ideEvento');
+        // Indicativo de Retificação: 1 - Original, 2 - Retificador, 3 - Retificador a Pedido
+        $indRetificacao = $dom->createElement('indRetificacao', '1');
+        $ideEvento->appendChild($indRetificacao);
+        // Identificação do ambiente: 1 - Produção, 2 - Homologação
+        $tpAmb = $dom->createElement('tpAmb', '1');
+        $ideEvento->appendChild($tpAmb);
+        // Processo de emissão do evento: 1 - Emissão com aplicativo da empresa
+        $aplicEmi = $dom->createElement('aplicEmi', '1');
+        $ideEvento->appendChild($aplicEmi);
+        // Versão do aplicativo de emissão do evento
+        $verAplic = $dom->createElement('verAplic', '0000000000000001');
+        $ideEvento->appendChild($verAplic);
+
+        $evt->appendChild($ideEvento);
+
+        // <ideDeclarante>
+        $ideDeclarante = $dom->createElement('ideDeclarante');
+        // CNPJ da Entidade Declarante
+        $cnpjDeclarante = $dom->createElement('cnpjDeclarante', '11111111111111');
+        $ideDeclarante->appendChild($cnpjDeclarante);
+
+        $evt->appendChild($ideDeclarante);
+
+        // <infoAbertura>
+        $infoAbertura = $dom->createElement('infoAbertura');
+        // Data Inicial
+        $dtInicio = $dom->createElement('dtInicio', '2025-01-01');
+        $infoAbertura->appendChild($dtInicio);
+        // Data Final
+        $dtFim = $dom->createElement('dtFim', '2025-12-31');
+        $infoAbertura->appendChild($dtFim);
+
+        $evt->appendChild($infoAbertura);
+
+        // <AberturaMovOpFin> informações obrigatórias
+        $aberturaMov = $dom->createElement('AberturaMovOpFin');
+
+        // <ResponsavelRMF>
+        $responsavel = $dom->createElement('ResponsavelRMF');
+        // CNPJ da entidade responsável pela RMF
+        $cnpj = $dom->createElement('CNPJ', '11111111111111');
+        $responsavel->appendChild($cnpj);
+        // CPF
+        $cpf = $dom->createElement('CPF', '12345678901');
+        $responsavel->appendChild($cpf);
+        // Nome
+        $nome = $dom->createElement('Nome', 'João da Silva');
+        $responsavel->appendChild($nome);
+        // Setor
+        $setor = $dom->createElement('Setor', 'Financeiro');
+        $responsavel->appendChild($setor);
+
+        // Telefone
+        $telefone = $dom->createElement('Telefone');
+        // DDD
+        $ddd = $dom->createElement('DDD', '21');
+        $telefone->appendChild($ddd);
+        // Número
+        $numero = $dom->createElement('Numero', '999999999');
+        $telefone->appendChild($numero);
+        $responsavel->appendChild($telefone);
+
+        // Endereço
+        $endereco = $dom->createElement('Endereco');
+        // Logradouro
+        $logradouro = $dom->createElement('Logradouro', 'Rua Exemplo');
+        $endereco->appendChild($logradouro);
+        // Número
+        $num = $dom->createElement('Numero', '123');
+        $endereco->appendChild($num);
+        // Bairro
+        $bairro = $dom->createElement('Bairro', 'Centro');
+        $endereco->appendChild($bairro);
+        // CEP
+        $cep = $dom->createElement('CEP', '12345678');
+        $endereco->appendChild($cep);
+        // Município
+        $municipio = $dom->createElement('Municipio', '3304557');
+        $endereco->appendChild($municipio);
+        // UF
+        $uf = $dom->createElement('UF', 'RJ');
+        $endereco->appendChild($uf);
+
+        $responsavel->appendChild($endereco);
+
+        $aberturaMov->appendChild($responsavel);
+
+        // <RespeFin> responsável pela e-Financeira
+        $respeFin = $dom->createElement('RespeFin');
+        // CPF
+        $cpfRF = $dom->createElement('CPF', '98765432100');
+        $respeFin->appendChild($cpfRF);
+        // Nome
+        $nomeRF = $dom->createElement('Nome', 'Maria Oliveira');
+        $respeFin->appendChild($nomeRF);
+        // Setor
+        $setorRF = $dom->createElement('Setor', 'TI');
+        $respeFin->appendChild($setorRF);
+        // Telefone
+        $telRF = $dom->createElement('Telefone');
+        // DDD
+        $dddRF = $dom->createElement('DDD', '21');
+        $telRF->appendChild($dddRF);
+        // Número
+        $numRF = $dom->createElement('Numero', '988888888');
+        $telRF->appendChild($numRF);
+        $respeFin->appendChild($telRF);
+
+        $aberturaMov->appendChild($respeFin);
+
+        $evt->appendChild($aberturaMov);
+
+        // Gerar XML
+        echo $dom->saveXML();
     }
 }
