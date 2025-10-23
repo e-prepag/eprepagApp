@@ -6,26 +6,71 @@ class GerarEFinanceira
 {
 
     private $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
-    private $razaoEPP;  // Raz„o Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
-    private $enderecoEPP;    // EndereÁo da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $razaoEPP;  // Raz√£o Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $enderecoEPP;    // Endere√ßo da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    private $bairroEPP;
+    private $numeroEPP;
+    private $complementoEPP;
     private $cepEPP;                                   // CEP da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $ufEPP;                                          // UF da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
-    private $nomeRespEPP;                      // Nome do respons·vel da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
-    private $foneEPP;                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
-    private $emailEPP;               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
     private $municipioEPP;
+    private $nomeRespRMF;                  // Nome do respons√°vel pela RMF
+    private $cpfRespRMF;                    // CPF do respons√°vel pela RMF
+    private $foneRespRMF;                  // Telefone do respons√°vel pela RMF
+    private $dddRespRMF;                  // DDD do respons√°vel pela RMF
+    private $emailRespeFIN;                // Email do respons√°vel pela e-financeira
+    private $cpfRespeFIN;                // CPF do respons√°vel pela e-financeira
+    private $nomeRespeFIN;                // Nome do respons√°vel pela e-financeira
+    private $foneRespeFIN;                // Telefone do respons√°vel pela e-financeira
+    private $dddRespeFIN;                // DDD do respons√°vel pela e-financeira
+    private $setorRespeFIN;                // Setor do respons√°vel pela e-financeira
+    private $enderecoRespeFIN;                // Endere√ßo do respons√°vel pela e-financeira
+    private $municipioRespeFIN;                // Munic√≠pio do respons√°vel pela e-financeira
+    private $ufRespeFIN;                // UF do respons√°vel pela e-financeira
+    private $cepRespeFIN;                // CEP do respons√°vel pela e-financeira
+    private $bairroRespeFIN;                // Bairro do respons√°vel pela e-financeira
+    private $complementoRespeFIN;                // Complemento do respons√°vel pela e-financeira
+    private $numeroRespeFIN;                // N√∫mero do respons√°vel pela e-financeira
+    private $setorReprLegal;
+    private $telefoneReprLegal;
+    private $dddTelefoneReprLegal;
+    private $cpfReprLegal;
+    private $codMunicipioEPP;
+
 
     public function __construct()
     {
         $this->cnpjEPP = '19037276000172';
         $this->razaoEPP = 'E-prepag Administradora de Cartoes Ltda';
-        $this->enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';
+        $this->enderecoEPP = 'R. Dep. Lacerda Franco';
+        $this->bairroEPP = 'Pinheiros';
+        $this->numeroEPP = '300';
+        $this->complementoEPP = 'conjuntos 26-A';
         $this->cepEPP = '05418000';
         $this->ufEPP = 'SP';
-        $this->nomeRespEPP = 'Daniela Oliveira';
-        $this->foneEPP = '01130309106';
-        $this->emailEPP = getenv('email_financeiro');
+        $this->nomeRespRMF = 'Glaucia da Costa Gregio';
+        $this->cpfRespRMF = '16806289843';
+        $this->foneRespRMF = '51783224';
+        $this->dddRespRMF = '11';
+        $this->emailRespeFIN = 'rc@e-prepag.com.br';
         $this->municipioEPP = 'SAO PAULO';
+        $this->enderecoRespeFIN = 'R. Dep. Lacerda Franco';
+        $this->municipioRespeFIN = 'SAO PAULO';
+        $this->ufRespeFIN = 'SP';
+        $this->cepRespeFIN = '05418000';
+        $this->bairroRespeFIN = 'Pinheiros';
+        $this->complementoRespeFIN = 'conjuntos 26-A';
+        $this->numeroRespeFIN = '300';
+        $this->cpfRespeFIN = '38574409880';
+        $this->nomeRespeFIN = 'THANIA LOPES FERREIRA';
+        $this->dddRespeFIN = '11';
+        $this->foneRespeFIN = '51783224';
+        $this->setorRespeFIN = 'Risco e Compliance';
+        $this->setorReprLegal = 'Diretoria';
+        $this->telefoneReprLegal = '975687428';
+        $this->dddTelefoneReprLegal = '11';
+        $this->cpfReprLegal = '16806289843';
+        $this->codMunicipioEPP = '350010';
     }
 
     private function obterDadosMovFin()
@@ -33,7 +78,7 @@ class GerarEFinanceira
         $sql = "SELECT DISTINCT ON (ug.ug_id) 
                 ug.ug_id,
                 ug.*,
-                sl.* -- Pega todas as colunas do log da transaÁ„o
+                sl.* -- Pega todas as colunas do log da transa√ß√£o
             FROM 
                 dist_usuarios_games ug
             JOIN 
@@ -45,7 +90,7 @@ class GerarEFinanceira
                 ug.ug_id,                -- 1. Tem que bater com o DISTINCT ON
                 sl.dugsl_data_inclusao DESC; -- 2. Define qual linha pegar (a mais recente)
                 
-            -- CTE (tabela tempor·ria) que calcula a movimentaÁ„o de TODOS os usu·rios
+            -- CTE (tabela tempor√°ria) que calcula a movimenta√ß√£o de TODOS os usu√°rios
             WITH MovimentacaoMensal AS (
                 SELECT 
                     ug.ug_id,
@@ -56,7 +101,7 @@ class GerarEFinanceira
                     ELSE 0 
                 END) AS entradas,
                 
-                -- Soma a diferenÁa APENAS SE for negativa (menor que 0)
+                -- Soma a diferen√ßa APENAS SE for negativa (menor que 0)
                 -- e usa ABS() para tornar o resultado positivo
                 ABS(SUM(CASE 
                     WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
@@ -158,21 +203,21 @@ class GerarEFinanceira
         // Define o prefixo
         $prefixo = 'ID';
 
-        // Define o comprimento total da parte numÈrica
+        // Define o comprimento total da parte num√©rica
         $comprimentoNumerico = 18;
 
-        // Usa str_pad para preencher o n˙mero com '0' ‡ esquerda (STR_PAD_LEFT)
-        // atÈ que ele atinja o comprimento de 18 caracteres.
+        // Usa str_pad para preencher o n√∫mero com '0' √† esquerda (STR_PAD_LEFT)
+        // at√© que ele atinja o comprimento de 18 caracteres.
         $parteNumerica = str_pad($numero, $comprimentoNumerico, '0', STR_PAD_LEFT);
 
-        // Concatena o prefixo com a parte numÈrica
+        // Concatena o prefixo com a parte num√©rica
         return $prefixo . $parteNumerica;
     }
 
     private function apenasNumeros($documento)
     {
-        // A express„o regular /\D/ significa "qualquer caractere que N√O seja um dÌgito".
-        // A funÁ„o preg_replace substitui todos eles por uma string vazia ('').
+        // A express√£o regular /\D/ significa "qualquer caractere que N√ÉO seja um d√≠gito".
+        // A fun√ß√£o preg_replace substitui todos eles por uma string vazia ('').
         return preg_replace('/\D/', '', $documento);
     }
 
@@ -180,11 +225,12 @@ class GerarEFinanceira
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true; // Deixa o XML formatado (quebras de linha e identaÁ„o)
+        $dom->formatOutput = true; // Deixa o XML formatado (quebras de linha e identa√ß√£o)
 
+        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtMovOpFin/v1_2_1';
         // Criar o elemento raiz com namespace
         $eFinanceira = $dom->createElementNS(
-            'http://www.eFinanceira.gov.br/schemas/evtMovOpFin/v1_2_0', // namespace
+            $namespace, // namespace
             'eFinanceira' // nome do elemento
         );
         $dom->appendChild($eFinanceira);
@@ -194,126 +240,126 @@ class GerarEFinanceira
 
         $id_formatado = $this->gerarIdFormatado($idNovo);
 
-        $evtMovOpFin = $dom->createElement('evtMovOpFin');
+        $evtMovOpFin = $dom->createElementNS($namespace, 'evtMovOpFin');
         $evtMovOpFin->setAttribute('id', $id_formatado);
         $eFinanceira->appendChild($evtMovOpFin);
 
         // ideEvento - grupo
-        $ideEvento = $dom->createElement('ideEvento');
+        $ideEvento = $dom->createElementNS($namespace, 'ideEvento');
         $evtMovOpFin->appendChild($ideEvento);
 
-        // indRetificacao - 1 para original 2 para retificaÁ„o 3 para retificaÁ„o a pedido
-        $indRetificacao = $dom->createElement('indRetificacao', '1');
+        // indRetificacao - 1 para original 2 para retifica√ß√£o 3 para retifica√ß√£o a pedido
+        $indRetificacao = $dom->createElementNS($namespace, 'indRetificacao', '1');
         $ideEvento->appendChild($indRetificacao);
 
         // tpAmb
-        $tpAmb = $dom->createElement('tpAmb', '1');
+        $tpAmb = $dom->createElementNS($namespace, 'tpAmb', '1');
         $ideEvento->appendChild($tpAmb);
 
         // aplicEmi
-        $aplicEmi = $dom->createElement('aplicEmi', '1');
+        $aplicEmi = $dom->createElementNS($namespace, 'aplicEmi', '1');
         $ideEvento->appendChild($aplicEmi);
 
         // verAplic
-        $verAplic = $dom->createElement('verAplic', '00000000000000000001');
+        $verAplic = $dom->createElementNS($namespace, 'verAplic', '00000000000000000001');
         $ideEvento->appendChild($verAplic);
 
         // ideDeclarante - grupo
-        $ideDeclarante = $dom->createElement('ideDeclarante');
+        $ideDeclarante = $dom->createElementNS($namespace, 'ideDeclarante');
         $evtMovOpFin->appendChild($ideDeclarante);
 
-        $cnpjDeclarante = $dom->createElement('CNPJ', $this->cnpjEPP);
+        $cnpjDeclarante = $dom->createElementNS($namespace, 'cnpjDeclarante', $this->cnpjEPP);
         $ideDeclarante->appendChild($cnpjDeclarante);
 
         // ideDeclarado -  grupo
-        $ideDeclarado = $dom->createElement('ideDeclarado');
+        $ideDeclarado = $dom->createElementNS($namespace, 'ideDeclarado');
         $evtMovOpFin->appendChild($ideDeclarado);
 
         // tipo NI 1-cpf 2-cnpj
-        $tpNI = $dom->createElement('tpNI', $tipoNI);
+        $tpNI = $dom->createElementNS($namespace, 'tpNI', $tipoNI);
         $ideDeclarado->appendChild($tpNI);
 
         // NIDeclarado cpf ou cnpj
         $cpfCnpjNum = $this->apenasNumeros($cpfCnpj);
-        $NIDeclarado = $dom->createElement('NIDeclarado', $cpfCnpjNum);
+        $NIDeclarado = $dom->createElementNS($namespace, 'NIDeclarado', $cpfCnpjNum);
         $ideDeclarado->appendChild($NIDeclarado);
 
         // NomeDeclarado
-        $NomeDeclarado = $dom->createElement('NomeDeclarado', substr($nomeDeclarado, 0, 100));
+        $NomeDeclarado = $dom->createElementNS($namespace, 'NomeDeclarado', substr($nomeDeclarado, 0, 100));
         $ideDeclarado->appendChild($NomeDeclarado);
 
         if ($tipoNI == 1) {
             // DataNasc
-            $DataNasc = $dom->createElement('DataNasc', $dataNascimento);
+            $DataNasc = $dom->createElementNS($namespace, 'DataNasc', $dataNascimento);
             $ideDeclarado->appendChild($DataNasc);
         }
 
         // EnderecoLivre
-        $EnderecoLivre = $dom->createElement('EnderecoLivre', substr($enderecoCliente, 0, 200));
+        $EnderecoLivre = $dom->createElementNS($namespace, 'EnderecoLivre', substr($enderecoCliente, 0, 200));
         $ideDeclarado->appendChild($EnderecoLivre);
 
         //PaisEndereco - grupo
-        $PaisEndereco = $dom->createElement('PaisEndereco');
+        $PaisEndereco = $dom->createElementNS($namespace, 'PaisEndereco');
         $ideDeclarado->appendChild($PaisEndereco);
 
         //Pais
-        $Pais = $dom->createElement('Pais', 'BR');
+        $Pais = $dom->createElementNS($namespace, 'Pais', 'BR');
         $PaisEndereco->appendChild($Pais);
 
         //mesCaixa - grupo
-        $mesCaixa = $dom->createElement('mesCaixa');
+        $mesCaixa = $dom->createElementNS($namespace, 'mesCaixa');
         $evtMovOpFin->appendChild($mesCaixa);
 
         //anoMesCaixa
-        $anoMesCaixa = $dom->createElement('anoMesCaixa', "{$ano}{$mes}");
+        $anoMesCaixa = $dom->createElementNS($namespace, 'anoMesCaixa', "{$ano}{$mes}");
         $mesCaixa->appendChild($anoMesCaixa);
 
         //movOpFin - grupo
-        $movOpFin = $dom->createElement('movOpFin');
+        $movOpFin = $dom->createElementNS($namespace, 'movOpFin');
         $mesCaixa->appendChild($movOpFin);
 
         //Conta - grupo
-        $Conta = $dom->createElement('Conta');
+        $Conta = $dom->createElementNS($namespace, 'Conta');
         $movOpFin->appendChild($Conta);
 
         //infoConta - grupo
-        $infoConta = $dom->createElement('infoConta');
+        $infoConta = $dom->createElementNS($namespace, 'infoConta');
         $Conta->appendChild($infoConta);
 
         //Reportavel - grupo
-        $Reportavel = $dom->createElement('Reportavel');
+        $Reportavel = $dom->createElementNS($namespace, 'Reportavel');
         $infoConta->appendChild($Reportavel);
 
         //Pais
-        $PaisReportavel = $dom->createElement('Pais', 'BR');
+        $PaisReportavel = $dom->createElementNS($namespace, 'Pais', 'BR');
         $Reportavel->appendChild($PaisReportavel);
 
         //tpConta 1 deposito
-        $tpConta = $dom->createElement('tpConta', '1');
+        $tpConta = $dom->createElementNS($namespace, 'tpConta', '1');
         $infoConta->appendChild($tpConta);
 
-        //subTpConta 105 conta prÈ paga 
-        $subTpConta = $dom->createElement('subTpConta', '105');
+        //subTpConta 105 conta pr√© paga 
+        $subTpConta = $dom->createElementNS($namespace, 'subTpConta', '105');
         $infoConta->appendChild($subTpConta);
 
         //tpNumConta
-        $tpNumConta = $dom->createElement('tpNumConta', 'OECD602');
+        $tpNumConta = $dom->createElementNS($namespace, 'tpNumConta', 'OECD602');
         $infoConta->appendChild($tpNumConta);
 
         //numConta
-        $numConta = $dom->createElement('numConta', $ug_id);
+        $numConta = $dom->createElementNS($namespace, 'numConta', $ug_id);
         $infoConta->appendChild($numConta);
 
         //tpRelacaoDeclarado
-        $tpRelacaoDeclarado = $dom->createElement('tpRelacaoDeclarado', '1');
+        $tpRelacaoDeclarado = $dom->createElementNS($namespace, 'tpRelacaoDeclarado', '1');
         $infoConta->appendChild($tpRelacaoDeclarado);
 
         //BRL moeda
-        $moeda = $dom->createElement('moeda', 'BRL');
+        $moeda = $dom->createElementNS($namespace, 'moeda', 'BRL');
         $infoConta->appendChild($moeda);
 
         //NoTitulares
-        $NoTitulares = $dom->createElement('NoTitulares', '1');
+        $NoTitulares = $dom->createElementNS($namespace, 'NoTitulares', '1');
         $infoConta->appendChild($NoTitulares);
 
         //dtEncerramentoConta RESOLVER DEPOIS
@@ -321,40 +367,40 @@ class GerarEFinanceira
         //IndInatividade RESOLVER DEPOIS 6 ANOS INATIV
 
         //BalancoConta grupo
-        $BalancoConta = $dom->createElement('BalancoConta');
+        $BalancoConta = $dom->createElementNS($namespace, 'BalancoConta');
         $infoConta->appendChild($BalancoConta);
 
         //totCreditos
 
         $entradas_formatadas = number_format($entradas, 2, ',', '');
-        $totCreditos = $dom->createElement('totCreditos', $entradas_formatadas);
+        $totCreditos = $dom->createElementNS($namespace, 'totCreditos', $entradas_formatadas);
         $BalancoConta->appendChild($totCreditos);
 
         //totDebitos
         $saidas_formatadas = number_format($saidas, 2, ',', '');
-        $totDebitos = $dom->createElement('totDebitos', $saidas_formatadas);
+        $totDebitos = $dom->createElementNS($namespace, 'totDebitos', $saidas_formatadas);
         $BalancoConta->appendChild($totDebitos);
 
         //totCreditosMesmaTitularidade
-        $totCreditosMesmaTitularidade = $dom->createElement('totCreditosMesmaTitularidade', '0,00');
+        $totCreditosMesmaTitularidade = $dom->createElementNS($namespace, 'totCreditosMesmaTitularidade', '0,00');
         $BalancoConta->appendChild($totCreditosMesmaTitularidade);
 
         //totDebitosMesmaTitularidade
-        $totDebitosMesmaTitularidade = $dom->createElement('totDebitosMesmaTitularidade', '0,00');
+        $totDebitosMesmaTitularidade = $dom->createElementNS($namespace, 'totDebitosMesmaTitularidade', '0,00');
         $BalancoConta->appendChild($totDebitosMesmaTitularidade);
 
         //vlrUltDia RESOLVER DEPOIS SO MES DEZEMBRO
 
         //PgtosAcum - grupo
-        $PgtosAcum = $dom->createElement('PgtosAcum');
+        $PgtosAcum = $dom->createElementNS($namespace, 'PgtosAcum');
         $infoConta->appendChild($PgtosAcum);
 
         //tpPgto
-        $tpPgto = $dom->createElement('tpPgto', '999');
+        $tpPgto = $dom->createElementNS($namespace, 'tpPgto', '999');
         $PgtosAcum->appendChild($tpPgto);
 
         //totPgtosAcum
-        $totPgtosAcum = $dom->createElement('totPgtosAcum', '0,00');
+        $totPgtosAcum = $dom->createElementNS($namespace, 'totPgtosAcum', '0,00');
         $PgtosAcum->appendChild($totPgtosAcum);
 
         // Gerar XML final
@@ -367,47 +413,49 @@ class GerarEFinanceira
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true; // deixa o XML identado
 
+        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtCadDeclarante/v1_2_0';
+
         // Cria o elemento raiz com namespace
         $eFinanceira = $dom->createElementNS(
-            'http://www.eFinanceira.gov.br/schemas/evtCadDeclarante/v1_2_0',
+            $namespace,
             'eFinanceira'
         );
         $dom->appendChild($eFinanceira);
 
-        // Cria o nÛ evtCadDeclarante
+        // Cria o n√≥ evtCadDeclarante
         $idNovo = $this->obterUltimoIdEnvio() + 1;
 
         $id_formatado = $this->gerarIdFormatado($idNovo);
 
-        $evtCadDeclarante = $dom->createElement('evtCadDeclarante');
+        $evtCadDeclarante = $dom->createElementNS($namespace, 'evtCadDeclarante');
         $evtCadDeclarante->setAttribute('id', $id_formatado);
         $eFinanceira->appendChild($evtCadDeclarante);
 
         // ideEvento
-        $ideEvento = $dom->createElement('ideEvento');
-        $ideEvento->appendChild($dom->createElement('indRetificacao', '1'));
-        $ideEvento->appendChild($dom->createElement('tpAmb', '1'));
-        $ideEvento->appendChild($dom->createElement('aplicEmi', '2'));
-        $ideEvento->appendChild($dom->createElement('verAplic', '00000000000000000001'));
+        $ideEvento = $dom->createElementNS($namespace, 'ideEvento');
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'indRetificacao', '1'));
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'tpAmb', '1'));
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'aplicEmi', '1'));
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'verAplic', '00000000000000000001'));
         $evtCadDeclarante->appendChild($ideEvento);
 
         // ideDeclarante
-        $ideDeclarante = $dom->createElement('ideDeclarante');
-        $ideDeclarante->appendChild($dom->createElement('cnpjDeclarante', $this->cnpjEPP));
+        $ideDeclarante = $dom->createElementNS($namespace, 'ideDeclarante');
+        $ideDeclarante->appendChild($dom->createElementNS($namespace, 'cnpjDeclarante', $this->cnpjEPP));
         $evtCadDeclarante->appendChild($ideDeclarante);
 
         // infoCadastro
-        $infoCadastro = $dom->createElement('infoCadastro');
-        $infoCadastro->appendChild($dom->createElement('nome', $this->razaoEPP));
-        $infoCadastro->appendChild($dom->createElement('enderecoLivre', $this->enderecoEPP));
-        $infoCadastro->appendChild($dom->createElement('municipio', $this->municipioEPP));
-        $infoCadastro->appendChild($dom->createElement('UF', $this->ufEPP));
-        $infoCadastro->appendChild($dom->createElement('CEP', $this->cepEPP));
-        $infoCadastro->appendChild($dom->createElement('Pais', 'BR'));
+        $infoCadastro = $dom->createElementNS($namespace, 'infoCadastro');
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'nome', $this->razaoEPP));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'enderecoLivre', $this->enderecoEPP));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'municipio', $this->codMunicipioEPP));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'UF', $this->ufEPP));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'CEP', $this->cepEPP));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'Pais', 'BR'));
 
-        // SubnÛ paisResid
-        $paisResid = $dom->createElement('paisResid');
-        $paisResid->appendChild($dom->createElement('Pais', 'BR'));
+        // Subn√≥ paisResid
+        $paisResid = $dom->createElementNS($namespace, 'paisResid');
+        $paisResid->appendChild($dom->createElementNS($namespace, 'Pais', 'BR'));
         $infoCadastro->appendChild($paisResid);
 
         $evtCadDeclarante->appendChild($infoCadastro);
@@ -415,135 +463,281 @@ class GerarEFinanceira
         return $dom;
     }
 
-    public function gerarAbertura()
+    public function gerarAbertura($data_inicio, $data_fim)
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
 
+        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtAberturaeFinanceira/v1_2_1';
+
         // <eFinanceira>
-        $eFinanceira = $dom->createElementNS('http://www.eFinanceira.gov.br/schemas/evtAberturaeFinanceira/v1_2_1', 'eFinanceira');
+        $eFinanceira = $dom->createElementNS($namespace, 'eFinanceira');
         $dom->appendChild($eFinanceira);
 
         // <evtAberturaeFinanceira id="...">
-        $evt = $dom->createElement('evtAberturaeFinanceira');
-        $evt->setAttribute('id', 'ID0000000000001'); // Identificador ˙nico do evento
+        $idNovo = $this->obterUltimoIdEnvio() + 1;
+
+        $id_formatado = $this->gerarIdFormatado($idNovo);
+        $evt = $dom->createElementNS($namespace, 'evtAberturaeFinanceira');
+        $evt->setAttribute('id', $id_formatado); // Identificador √∫nico do evento
         $eFinanceira->appendChild($evt);
 
         // <ideEvento>
-        $ideEvento = $dom->createElement('ideEvento');
-        // Indicativo de RetificaÁ„o: 1 - Original, 2 - Retificador, 3 - Retificador a Pedido
-        $indRetificacao = $dom->createElement('indRetificacao', '1');
+        $ideEvento = $dom->createElementNS($namespace, 'ideEvento');
+        // Indicativo de Retifica√ß√£o: 1 - Original, 2 - Retificador, 3 - Retificador a Pedido
+        $indRetificacao = $dom->createElementNS($namespace, 'indRetificacao', '1');
         $ideEvento->appendChild($indRetificacao);
-        // IdentificaÁ„o do ambiente: 1 - ProduÁ„o, 2 - HomologaÁ„o
-        $tpAmb = $dom->createElement('tpAmb', '1');
+        // Identifica√ß√£o do ambiente: 1 - Produ√ß√£o, 2 - Homologa√ß√£o
+        $tpAmb = $dom->createElementNS($namespace, 'tpAmb', '1');
         $ideEvento->appendChild($tpAmb);
-        // Processo de emiss„o do evento: 1 - Emiss„o com aplicativo da empresa
-        $aplicEmi = $dom->createElement('aplicEmi', '1');
+        // Processo de emiss√£o do evento: 1 - Emiss√£o com aplicativo da empresa
+        $aplicEmi = $dom->createElementNS($namespace, 'aplicEmi', '1');
         $ideEvento->appendChild($aplicEmi);
-        // Vers„o do aplicativo de emiss„o do evento
-        $verAplic = $dom->createElement('verAplic', '0000000000000001');
+        // Vers√£o do aplicativo de emiss√£o do evento
+        $verAplic = $dom->createElementNS($namespace, 'verAplic', '0000000000000001');
         $ideEvento->appendChild($verAplic);
 
         $evt->appendChild($ideEvento);
 
         // <ideDeclarante>
-        $ideDeclarante = $dom->createElement('ideDeclarante');
+        $ideDeclarante = $dom->createElementNS($namespace, 'ideDeclarante');
         // CNPJ da Entidade Declarante
-        $cnpjDeclarante = $dom->createElement('cnpjDeclarante', '11111111111111');
+        $cnpjDeclarante = $dom->createElementNS($namespace, 'cnpjDeclarante', $this->cnpjEPP);
         $ideDeclarante->appendChild($cnpjDeclarante);
 
         $evt->appendChild($ideDeclarante);
 
         // <infoAbertura>
-        $infoAbertura = $dom->createElement('infoAbertura');
+        $infoAbertura = $dom->createElementNS($namespace, 'infoAbertura');
         // Data Inicial
-        $dtInicio = $dom->createElement('dtInicio', '2025-01-01');
+        $dtInicio = $dom->createElementNS($namespace, 'dtInicio', $data_inicio);
         $infoAbertura->appendChild($dtInicio);
         // Data Final
-        $dtFim = $dom->createElement('dtFim', '2025-12-31');
+        $dtFim = $dom->createElementNS($namespace, 'dtFim', $data_fim);
         $infoAbertura->appendChild($dtFim);
 
         $evt->appendChild($infoAbertura);
 
-        // <AberturaMovOpFin> informaÁıes obrigatÛrias
-        $aberturaMov = $dom->createElement('AberturaMovOpFin');
+        // <AberturaMovOpFin> informa√ß√µes obrigat√≥rias
+        $aberturaMov = $dom->createElementNS($namespace, 'AberturaMovOpFin');
 
         // <ResponsavelRMF>
-        $responsavel = $dom->createElement('ResponsavelRMF');
-        // CNPJ da entidade respons·vel pela RMF
-        $cnpj = $dom->createElement('CNPJ', '11111111111111');
+        $responsavel = $dom->createElementNS($namespace, 'ResponsavelRMF');
+        // CNPJ da entidade respons√°vel pela RMF
+        $cnpj = $dom->createElementNS($namespace, 'CNPJ', $this->cnpjEPP);
         $responsavel->appendChild($cnpj);
         // CPF
-        $cpf = $dom->createElement('CPF', '12345678901');
+        $cpf = $dom->createElementNS($namespace, 'CPF', $this->cpfRespRMF);
         $responsavel->appendChild($cpf);
         // Nome
-        $nome = $dom->createElement('Nome', 'Jo„o da Silva');
+        $nome = $dom->createElementNS($namespace, 'Nome', $this->nomeRespRMF);
         $responsavel->appendChild($nome);
         // Setor
-        $setor = $dom->createElement('Setor', 'Financeiro');
+        $setor = $dom->createElementNS($namespace, 'Setor', 'Financeiro');
         $responsavel->appendChild($setor);
 
         // Telefone
-        $telefone = $dom->createElement('Telefone');
+        $telefone = $dom->createElementNS($namespace, 'Telefone');
         // DDD
-        $ddd = $dom->createElement('DDD', '21');
+        $ddd = $dom->createElementNS($namespace, 'DDD', $this->dddRespRMF);
         $telefone->appendChild($ddd);
-        // N˙mero
-        $numero = $dom->createElement('Numero', '999999999');
+        // N√∫mero
+        $numero = $dom->createElementNS($namespace, 'Numero', $this->foneRespRMF);
         $telefone->appendChild($numero);
         $responsavel->appendChild($telefone);
 
-        // EndereÁo
-        $endereco = $dom->createElement('Endereco');
+        // Endere√ßo
+        $endereco = $dom->createElementNS($namespace, 'Endereco');
         // Logradouro
-        $logradouro = $dom->createElement('Logradouro', 'Rua Exemplo');
+        $logradouro = $dom->createElementNS($namespace, 'Logradouro', $this->enderecoEPP);
         $endereco->appendChild($logradouro);
-        // N˙mero
-        $num = $dom->createElement('Numero', '123');
+        // N√∫mero
+        $num = $dom->createElementNS($namespace, 'Numero', $this->numeroEPP);
         $endereco->appendChild($num);
+        //Complemento
+        $complemento = $dom->createElementNS($namespace, 'Complemento', $this->complementoEPP);
+        $endereco->appendChild($complemento);
         // Bairro
-        $bairro = $dom->createElement('Bairro', 'Centro');
+        $bairro = $dom->createElementNS($namespace, 'Bairro', $this->bairroEPP);
         $endereco->appendChild($bairro);
         // CEP
-        $cep = $dom->createElement('CEP', '12345678');
+        $cep = $dom->createElementNS($namespace, 'CEP', $this->cepEPP);
         $endereco->appendChild($cep);
-        // MunicÌpio
-        $municipio = $dom->createElement('Municipio', '3304557');
+        // Munic√≠pio
+        $municipio = $dom->createElementNS($namespace, 'Municipio', $this->municipioEPP);
         $endereco->appendChild($municipio);
         // UF
-        $uf = $dom->createElement('UF', 'RJ');
+        $uf = $dom->createElementNS($namespace, 'UF', $this->ufEPP);
         $endereco->appendChild($uf);
 
         $responsavel->appendChild($endereco);
 
         $aberturaMov->appendChild($responsavel);
 
-        // <RespeFin> respons·vel pela e-Financeira
-        $respeFin = $dom->createElement('RespeFin');
+        // <RespeFin> respons√°vel pela e-Financeira
+        $respeFin = $dom->createElementNS($namespace, 'RespeFin');
         // CPF
-        $cpfRF = $dom->createElement('CPF', '98765432100');
+        $cpfRF = $dom->createElementNS($namespace, 'CPF', $this->cpfRespeFIN);
         $respeFin->appendChild($cpfRF);
         // Nome
-        $nomeRF = $dom->createElement('Nome', 'Maria Oliveira');
+        $nomeRF = $dom->createElementNS($namespace, 'Nome', $this->nomeRespeFIN);
         $respeFin->appendChild($nomeRF);
         // Setor
-        $setorRF = $dom->createElement('Setor', 'TI');
+        $setorRF = $dom->createElementNS($namespace, 'Setor', $this->setorRespeFIN);
         $respeFin->appendChild($setorRF);
         // Telefone
-        $telRF = $dom->createElement('Telefone');
+        $telRF = $dom->createElementNS($namespace, 'Telefone');
         // DDD
-        $dddRF = $dom->createElement('DDD', '21');
+        $dddRF = $dom->createElementNS($namespace, 'DDD', $this->dddRespeFIN);
         $telRF->appendChild($dddRF);
-        // N˙mero
-        $numRF = $dom->createElement('Numero', '988888888');
+        // N√∫mero
+        $numRF = $dom->createElementNS($namespace, 'Numero', $this->foneRespeFIN);
         $telRF->appendChild($numRF);
         $respeFin->appendChild($telRF);
 
+        // Cria o n√≥ <Endereco>
+        $enderecoRespEfin = $dom->createElementNS($namespace, 'Endereco');
+
+        // Adiciona os filhos de <Endereco>
+        $logradouroEfin = $dom->createElementNS($namespace, 'Logradouro', $this->enderecoRespeFIN);
+        $numeroEfin = $dom->createElementNS($namespace, 'Numero', $this->numeroRespeFIN);
+        $bairroEfin = $dom->createElementNS($namespace, 'Bairro', $this->bairroRespeFIN);
+        $cepEfin = $dom->createElementNS($namespace, 'CEP', $this->cepRespeFIN);
+        $municipioEfin = $dom->createElementNS($namespace, 'Municipio', $this->municipioRespeFIN);
+        $ufEfin = $dom->createElementNS($namespace, 'UF', $this->ufRespeFIN);
+        $ComplementoEfin = $dom->createElementNS($namespace, 'Complemento', $this->complementoRespeFIN);
+
+        // Monta o elemento <Endereco>
+        $enderecoRespEfin->appendChild($logradouroEfin);
+        $enderecoRespEfin->appendChild($numeroEfin);
+        $enderecoRespEfin->appendChild($ComplementoEfin);
+        $enderecoRespEfin->appendChild($bairroEfin);
+        $enderecoRespEfin->appendChild($cepEfin);
+        $enderecoRespEfin->appendChild($municipioEfin);
+        $enderecoRespEfin->appendChild($ufEfin);
+
+        // Cria o elemento <Email>
+        $emaiRespEfin = $dom->createElementNS($namespace, 'Email', $this->emailRespeFIN);
+
+        // Adiciona <Endereco> e <Email> dentro de <RespeFin>
+        $respeFin->appendChild($enderecoRespEfin);
+        $respeFin->appendChild($emaiRespEfin);
+
         $aberturaMov->appendChild($respeFin);
+
+        //RepresLegal
+        $represLegal = $dom->createElementNS($namespace, 'RepresLegal');
+
+        // CPF
+        $cpfRL = $dom->createElementNS($namespace, 'CPF', $this->cpfReprLegal);
+        $represLegal->appendChild($cpfRL);
+        // Setor
+        $setorRL = $dom->createElementNS($namespace, 'Setor', $this->setorReprLegal);
+        $represLegal->appendChild($setorRL);
+        // Telefone
+        $telRL = $dom->createElementNS($namespace, 'Telefone');
+        // DDD
+        $dddRL = $dom->createElementNS($namespace, 'DDD', $this->dddTelefoneReprLegal);
+        $telRL->appendChild($dddRL);
+        // N√∫mero
+        $numRL = $dom->createElementNS($namespace, 'Numero', $this->telefoneReprLegal);
+        $telRL->appendChild($numRL);
+        $represLegal->appendChild($telRL);
+
+        $aberturaMov->appendChild($represLegal);
 
         $evt->appendChild($aberturaMov);
 
         // Gerar XML
-        echo $dom->saveXML();
+        return $dom;
+    }
+
+    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre)
+    {
+
+        // 1. Defini√ß√£o dos Namespaces
+        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_2_2';
+        $nsDS = 'http://www.w3.org/2000/09/xmldsig#';
+
+        // 2. Dados de Exemplo para o fechamento (1¬∫ Semestre de 2025)
+        $idNovo = $this->obterUltimoIdEnvio() + 1;
+        $id_formatado = $this->gerarIdFormatado($idNovo);
+        $versaoApp = '1.0.0';
+        $ambiente = '2'; // 1 = Produ√ß√£o, 2 = Homologa√ß√£o
+
+        // Exemplo de quantos arquivos evtMovOpFin voc√™ enviou por m√™s
+        $arquivosPorMes = [
+            '202501' => '1500',
+            '202502' => '1450',
+            '202503' => '1600',
+            '202504' => '1520',
+            '202505' => '1580',
+            '202506' => '1700'
+        ];
+
+        // 3. Cria√ß√£o do Documento DOM
+        $doc = new DOMDocument('1.0', 'UTF-8');
+        $doc->formatOutput = true;
+        $doc->preserveWhiteSpace = false;
+
+        // 4. Elemento Raiz (eFinanceira)
+        $eFinanceira = $doc->createElementNS($ns, 'eFinanceira');
+        $doc->appendChild($eFinanceira);
+
+        // 5. Elemento do Evento (evtFechamentoeFinanceira)
+        $evtFechamento = $doc->createElementNS($ns, 'evtFechamentoeFinanceira');
+        $evtFechamento->setAttribute('id', $id_formatado);
+        $eFinanceira->appendChild($evtFechamento);
+
+        // 6. Grupo: ideEvento (Obrigat√≥rio)
+        $ideEvento = $doc->createElementNS($ns, 'ideEvento');
+        $evtFechamento->appendChild($ideEvento);
+
+        $ideEvento->appendChild($doc->createElementNS($ns, 'indRetificacao', '1')); // 1 = Original
+        $ideEvento->appendChild($doc->createElementNS($ns, 'tpAmb', $ambiente));
+        $ideEvento->appendChild($doc->createElementNS($ns, 'aplicEmi', '1')); // 1 = Aplicativo da empresa
+        $ideEvento->appendChild($doc->createElementNS($ns, 'verAplic', $versaoApp));
+
+        // 7. Grupo: ideDeclarante (Obrigat√≥rio)
+        $ideDeclarante = $doc->createElementNS($ns, 'ideDeclarante');
+        $evtFechamento->appendChild($ideDeclarante);
+
+        $ideDeclarante->appendChild($doc->createElementNS($ns, 'cnpjDeclarante', $this->cnpjEPP));
+
+        // 8. Grupo: infoFechamento (Obrigat√≥rio)
+        $infoFechamento = $doc->createElementNS($ns, 'infoFechamento');
+        $evtFechamento->appendChild($infoFechamento);
+
+        $infoFechamento->appendChild($doc->createElementNS($ns, 'dtInicio', $dataInicioSemestre));
+        $infoFechamento->appendChild($doc->createElementNS($ns, 'dtFim', $dataFimSemestre));
+        $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0')); // 0 = N√£o se aplica
+
+        // 9. Grupo: FechamentoMovOpFin (Funcionalmente Obrigat√≥rio para voc√™)
+        // Este grupo √© minOccurs="0" no XSD, mas obrigat√≥rio pela regra de neg√≥cio do seu m√≥dulo.
+        $fechamentoMovOpFin = $doc->createElementNS($ns, 'FechamentoMovOpFin');
+        $evtFechamento->appendChild($fechamentoMovOpFin);
+
+        // Voc√™ DEVE adicionar um 'FechamentoMes' para cada m√™s do semestre.
+        foreach ($arquivosPorMes as $anoMes => $quantidade) {
+            // Grupo: FechamentoMes (Obrigat√≥rio dentro de FechamentoMovOpFin)
+            $fechamentoMes = $doc->createElementNS($ns, 'FechamentoMes');
+            $fechamentoMovOpFin->appendChild($fechamentoMes);
+
+            // anoMesCaixa (Obrigat√≥rio)
+            $fechamentoMes->appendChild($doc->createElementNS($ns, 'anoMesCaixa', $anoMes));
+            // quantArqTrans (Obrigat√≥rio)
+            $fechamentoMes->appendChild($doc->createElementNS($ns, 'quantArqTrans', $quantidade));
+        }
+
+        // 10. Grupo: ds:Signature (Obrigat√≥rio)
+        // Este √© o placeholder para a Assinatura Digital XMLDSig.
+        // A assinatura deve ser gerada por uma biblioteca espec√≠fica (ex: xmlseclibs)
+        // e inserida aqui.
+        $signature = $doc->createElementNS($nsDS, 'ds:Signature');
+        $eFinanceira->appendChild($signature);
+        $signature->appendChild($doc->createComment(' Bloco obrigat√≥rio para assinatura digital (XMLDSig) '));
+
+        // 11. Exibir o XML
+        return $doc;
     }
 }

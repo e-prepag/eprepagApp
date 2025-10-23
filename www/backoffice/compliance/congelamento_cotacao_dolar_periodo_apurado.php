@@ -110,7 +110,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                     $sql = "SELECT cd_cotacao FROM cotacao_dolar WHERE opr_codigo = ".$cod_opr." AND cd_data = '".date('Y-m-d',strtotime($data_fim . " +1 day")) . "'";
                     $rs_verifica_proximo_dia = SQLexecuteQuery($sql);
                     $rs_row = pg_fetch_array($rs_verifica_proximo_dia);
-                    if($cotacao == $rs_row["cd_cotacao"]){
+                    if($cotacao == $rs_row["cd_cotacao"] && $primeiroDia != $data_inicio){
                         $msg .= "O período selecionado não engloba todo o fragmento de cotação presente no cadastro.<br> Consulte o cadastro no seguinte link: <a href='/compliance/cadastro_cotacao_dolar.php' target='_blank' > https://" . $_SERVER['SERVER_NAME'] . "/compliance/cadastro_cotacao_dolar.php </a>";
                     }
                 }
@@ -119,7 +119,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                     $sql = "SELECT cd_cotacao FROM cotacao_dolar WHERE opr_codigo = ".$cod_opr." AND cd_data = '".date('Y-m-d',strtotime($data_inicio . " -1 day")) . "'";
                     $rs_verifica_dia_anterior = SQLexecuteQuery($sql);
                     $rs_row = pg_fetch_array($rs_verifica_dia_anterior);
-                    if($cotacao == $rs_row["cd_cotacao"]){
+                    if($cotacao == $rs_row["cd_cotacao"] && $ultimoDia != $data_fim){
                         $msg .= "O período selecionado não engloba todo o fragmento de cotação presente no cadastro.<br> Consulte o cadastro no seguinte link: <a href='/compliance/cadastro_cotacao_dolar.php' target='_blank' > https://" . $_SERVER['SERVER_NAME'] . "/compliance/cadastro_cotacao_dolar.php </a>";
                     }
                 }
