@@ -261,6 +261,7 @@ class RecebeBoleto
 	}
 }
 
+
 # 20000000020221109121112256 | 10000000020221109120309450
 $Boleto = new RecebeBoleto($tipoUsuario);
 $Boleto->conciliaBoleto($paymentReference, $paymentStatus);
