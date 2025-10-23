@@ -141,7 +141,7 @@ class RecebeBoleto
 	private function gravaLog($idVenda, $novoStatus, $antigoStatus, $statusFinalVenda)
 	{
 
-		$confirmaConciliacao = ($novoStatus != $antigoStatus) ? "CONCILIADO COM SUCESSO" : "PEDIDO JÝ CONCILIADO";
+		$confirmaConciliacao = ($novoStatus != $antigoStatus) ? "CONCILIADO COM SUCESSO" : "PEDIDO JA CONCILIADO";
 		$file = fopen("/www/log/log_webhook.txt", "a+");
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
@@ -150,7 +150,7 @@ class RecebeBoleto
 		fwrite($file, "ANTIGO STATUS PAGAMENTO: " . $antigoStatus . "\n");
 		fwrite($file, "CODIGO PEDIDO RECEBIDO CDC: " . $this->idVendaConcilia . "\n");
 		fwrite($file, "STATUS RECEBIDO CDC: " . $this->status . "\n");
-		fwrite($file, "SITUAÇÃO DA CONCILIAÇÃO: " . $confirmaConciliacao . "\n");
+		fwrite($file, "SITUACAO DA CONCILIACAO: " . $confirmaConciliacao . "\n");
 		fwrite($file, "STATUS FINAL VENDA: " . $statusFinalVenda . "\n");
 		fwrite($file, "AMBIENTE VENDA: " . $this->ambiente . "\n");
 		fwrite($file, str_repeat("*", 50) . "\n");
@@ -227,7 +227,7 @@ class RecebeBoleto
 
 		if ($conciliado) {
 			$mensagem = utf8_decode('<b>O pagamento foi conciliado com sucesso!</b><br> 
-			    Data da conciliação: ' . date("d-m-Y H:i:s") . '<br>
+			    Data da conciliacao: ' . date("d-m-Y H:i:s") . '<br>
 				ID pagamento E-Prepag: ' . $this->idVendaConcilia . '<br>
 				Status final venda: ' . $novoRetorno["vg_ultimo_status"] . '<br>
 				Ambiente Venda: ' . $this->ambiente . '<br>
@@ -256,7 +256,7 @@ class RecebeBoleto
 				echo "erro e-mail";
 			}
 		} else {
-			echo "Pagamento já conciliado";
+			echo "Pagamento ja� conciliado";
 		}
 	}
 }
