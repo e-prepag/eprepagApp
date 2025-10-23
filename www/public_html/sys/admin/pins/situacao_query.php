@@ -41,13 +41,48 @@ $img_anterior = "/sys/imagens/anterior.gif";
 $max          = 500; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
 
+
 if (!$fpin) $fpin = '';
 if (!$fserial) $fserial = '';
 if (!$dd_opr_codigo) $dd_opr_codigo = '';
 if (!$tf_data_final)    $tf_data_final   = date('d/m/Y');
 if (!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
 
-//if(!$fcanal) $fcanal = 's';
+
+if ($dd_opr_codigo && !filter_var($dd_opr_codigo, FILTER_VALIDATE_INT)) {
+    $dd_opr_codigo = '';
+}
+
+
+if ($fcanal && !in_array($fcanal, ['s', 'p', 'r', 'todos'])) {
+    $fcanal = '';
+}
+
+
+if ($festab && !filter_var($festab, FILTER_VALIDATE_INT)) {
+    $festab = '';
+}
+
+
+if ($fpin) {
+    $fpin = preg_replace('/[^a-zA-Z0-9]/', '', $fpin);
+}
+if ($fserial) {
+    $fserial = preg_replace('/[^a-zA-Z0-9]/', '', $fserial);
+}
+if ($fcodinterno) {
+    $fcodinterno = preg_replace('/[^0-9,]/', '', $fcodinterno);
+}
+
+
+if ($tf_data_inicial) {
+    $tf_data_inicial = preg_replace('/[^0-9\/]/', '', $tf_data_inicial);
+}
+if ($tf_data_final) {
+    $tf_data_final = preg_replace('/[^0-9\/]/', '', $tf_data_final);
+}
+
+
 
 if (b_is_Publisher()) {
     $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
@@ -91,13 +126,19 @@ while ($pgstatus = pg_fetch_array($resstatus)) {
 }
 ksort($a_status);
 
-// Levanta lista de valores
 $sql = "select pin_valor, count(*) as n from pins where 1=1 ";
+$sql_params = array();
+$param_count = 0;
+
 if ($dd_opr_codigo) {
-    $sql .= " and opr_codigo=" . $dd_opr_codigo . " ";
+    $param_count++;
+    $sql .= " and opr_codigo=$" . $param_count . " ";
+    $sql_params[] = $dd_opr_codigo;
 }
 if ($fcanal) {
-    $sql .= " and pin_canal='" . $fcanal . "' ";
+    $param_count++;
+    $sql .= " and pin_canal=$" . $param_count . " ";
+    $sql_params[] = $fcanal;
 }
 $sql .= " group by pin_valor ";
 $sql .= " order by pin_valor;";
@@ -105,7 +146,12 @@ if ($debug) {
     echo "Elapsed time A1: " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "<br>";
 }
 //echo "felipe " . $sql;
-$resvalue = pg_exec($connid, $sql);
+
+if (!empty($sql_params)) {
+    $resvalue = SQLexecuteQueryParams($connid, $sql, $sql_params);
+} else {
+    $resvalue = SQLexecuteQuery($connid, $sql);
+}
 $a_valores = array();
 while ($pgvalue = pg_fetch_array($resvalue)) {
     $a_valores[$pgvalue['pin_valor']] = $pgvalue['n'];
@@ -155,27 +201,58 @@ if ($BtnSearch) {
     //if(!trim($fpin) && !trim($fserial) && !($festab)) $sql.= "and (t0.pin_codigo='') and (t0.pin_serial='')  \n"; 
     //else{
     $sql_wheres = "";
-    if ($fcodinterno)    $sql_wheres .= " and (t0.pin_codinterno in (" . trim($fcodinterno) . "))  \n";
-    if ($fserial) $sql_wheres .= " and (t0.pin_serial like '%" . trim($fserial) . "%')  \n";
-    if ($fpin)    $sql_wheres .= " and (t0.pin_codigo like '%" . trim($fpin) . "%')  \n";
-    if ($festab)    $sql_wheres .= " and (t0.pin_est_codigo = " . $festab . ")  \n";
-    if ($fcanal) $sql_wheres .= " and (t0.pin_canal='" . $fcanal . "') \n";
+    $sql_params_main = array();
+    $param_count_main = 0;
+    
+    if ($fcodinterno) {
+        $param_count_main++;
+        $sql_wheres .= " and (t0.pin_codinterno in ($" . $param_count_main . "))  \n";
+        $sql_params_main[] = $fcodinterno;
+    }
+    if ($fserial) {
+        $param_count_main++;
+        $sql_wheres .= " and (t0.pin_serial like $" . $param_count_main . ")  \n";
+        $sql_params_main[] = '%' . $fserial . '%';
+    }
+    if ($fpin) {
+        $param_count_main++;
+        $sql_wheres .= " and (t0.pin_codigo like $" . $param_count_main . ")  \n";
+        $sql_params_main[] = '%' . $fpin . '%';
+    }
+    if ($festab) {
+        $param_count_main++;
+        $sql_wheres .= " and (t0.pin_est_codigo = $" . $param_count_main . ")  \n";
+        $sql_params_main[] = $festab;
+    }
+    if ($fcanal) {
+        $param_count_main++;
+        $sql_wheres .= " and (t0.pin_canal=$" . $param_count_main . ") \n";
+        $sql_params_main[] = $fcanal;
+    }
     //}
 
-    if ($dd_opr_codigo) $sql_wheres .= "and (t0.opr_codigo=" . $dd_opr_codigo . ")  \n";
+    if ($dd_opr_codigo) {
+        $param_count_main++;
+        $sql_wheres .= "and (t0.opr_codigo=$" . $param_count_main . ")  \n";
+        $sql_params_main[] = $dd_opr_codigo;
+    }
 
     if ($dd_pin_status) {
         if (($dd_pin_status == "stVendido - TODOS") || ($dd_pin_status == "stVendido-TODOS")) {                         //Tratativa para pins roubados da riot
             $sql_wheres .= " and (t0.pin_status='3' or t0.pin_status='6' or t0.pin_status='7' or t0.pin_status='8' " . (date('m-Y') == '10-2025' ? "or t0.pin_status='9'" : "") . ")  \n";
         } else {
-            $sql_wheres .= " and (t0.pin_status='" . substr($dd_pin_status, 2, 1) . "')  \n";
+            $param_count_main++;
+            $sql_wheres .= " and (t0.pin_status=$" . $param_count_main . ")  \n";
+            $sql_params_main[] = substr($dd_pin_status, 2, 1);
         }
     }
 
     if ($tf_pins) {
         $sql_wheres .= " and (";
         for ($i = 0; $i < count($tf_pins); $i++) {
-            $sql_wheres .= " (t0.pin_valor = " . $tf_pins[$i] . ")  ";
+            $param_count_main++;
+            $sql_wheres .= " (t0.pin_valor = $" . $param_count_main . ")  ";
+            $sql_params_main[] = $tf_pins[$i];
             if ($i < count($tf_pins) - 1) {
                 $sql_wheres .= " or  ";
             }
@@ -285,7 +362,12 @@ if ($BtnSearch) {
                   )
                 order by pin_datavenda desc, pin_horavenda desc;";
     //echo "felipe: " . $sql;
-    $resid_count = pg_exec($connid, $sql);
+    
+    if (!empty($sql_params_main)) {
+        $resid_count = SQLexecuteQueryParams($connid, $sql, $sql_params_main);
+    } else {
+        $resid_count = SQLexecuteQuery($connid, $sql);
+    }
     $total_table = pg_num_rows($resid_count);
 
     $qtde_geral = 0;
@@ -421,7 +503,12 @@ if ($BtnSearch) {
         $sql = preg_replace('/offset [0-9]*/s', '', $sql);
     }
     //echo "felipe2: " . $sql;
-    $resid = pg_exec($connid, $sql);
+    
+    if (!empty($sql_params_main)) {
+        $resid = SQLexecuteQueryParams($connid, $sql, $sql_params_main);
+    } else {
+        $resid = SQLexecuteQuery($connid, $sql);
+    }
 
     if ($max + $inicial > $total_table) $reg_ate = $total_table;
     else $reg_ate = $max + $inicial;

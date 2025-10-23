@@ -19,9 +19,34 @@ $time_start = getmicrotime();
 
 $b_debug = false;
 
+// Validação e sanitização de entrada
 if(!$dd_opr_codigo) $dd_opr_codigo = '';
 if(!$tf_data_final)    $tf_data_final   = date('d/m/Y');
 if(!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
+
+// Validação de $dd_opr_codigo
+if($dd_opr_codigo) {
+    $dd_opr_codigo = filter_var($dd_opr_codigo, FILTER_VALIDATE_INT);
+    if($dd_opr_codigo === false) {
+        $dd_opr_codigo = '';
+    }
+}
+
+// Validação de datas
+if($tf_data_inicial && !verifica_data($tf_data_inicial)) {
+    $tf_data_inicial = date('d/m/Y');
+}
+if($tf_data_final && !verifica_data($tf_data_final)) {
+    $tf_data_final = date('d/m/Y');
+}
+
+// Sanitização adicional de datas
+if($tf_data_inicial) {
+    $tf_data_inicial = preg_replace('/[^0-9\/]/', '', $tf_data_inicial);
+}
+if($tf_data_final) {
+    $tf_data_final = preg_replace('/[^0-9\/]/', '', $tf_data_final);
+}
 
 if(b_is_Publisher()) {
         $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
@@ -39,17 +64,24 @@ if($BtnSearch) {
                 from operadoras o 
                     left outer join tb_comissoes c on o.opr_codigo=c.co_opr_codigo 
                 where to_char(co_data_inclusao,'YYYYDDMMHH24MISS') = (select to_char(max(co_data_inclusao),'YYYYDDMMHH24MISS') from tb_comissoes where co_opr_codigo=opr_codigo) ";
+        
+        $sql_params = array();
         if($dd_opr_codigo) {
-            $sql .= "
-                and opr_codigo = ".$dd_opr_codigo."
-                     ";
+            $sql .= " and opr_codigo = $1 ";
+            $sql_params[] = $dd_opr_codigo;
         }
+        
         $sql .= " 
                 group by co_opr_codigo, co_canal, co_data_inclusao, co_volume_tipo, co_volume_min, co_comissao, opr_internacional_alicota 
                 order by co_opr_codigo, co_canal, co_data_inclusao desc, co_volume_tipo, co_volume_min  
                ";
 			   
-        $rescommiss = pg_exec($connid,$sql);
+        // Execução segura da query
+        if(!empty($sql_params)) {
+            $rescommiss = SQLexecuteQueryParams($sql, $sql_params);
+        } else {
+            $rescommiss = SQLexecuteQuery($sql);
+        }
         $vetorComissao = "";
         $vetorComissaoIOF = "";
         $vetorAlicotaIOF = "";
@@ -115,15 +147,22 @@ if($BtnSearch) {
                         LEFT OUTER JOIN pins_riot_id t4 ON (t0.pin_codinterno=t4.pin_codinterno)
                     where 
                         (t4.pin_channel='L' OR t4.pin_channel IS NULL) ";
+            
+            $sql_params_pins = array();
+            $param_count = 1;
+            
             if($tf_data_inicial && $tf_data_final) {
-                        $data_inic = formata_data(trim($tf_data_inicial), 1);
-                        $data_fim = formata_data(trim($tf_data_final), 1); 
-                        $sql .= " 
-                        and pin_datavenda >= '".trim($data_inic)." 00:00:00' and  pin_datavenda <= '".trim($data_fim)." 23:59:59'  "; 
+                $data_inic = formata_data(trim($tf_data_inicial), 1);
+                $data_fim = formata_data(trim($tf_data_final), 1); 
+                $sql .= " and pin_datavenda >= $".$param_count." and pin_datavenda <= $".($param_count+1)." ";
+                $sql_params_pins[] = trim($data_inic)." 00:00:00";
+                $sql_params_pins[] = trim($data_fim)." 23:59:59";
+                $param_count += 2;
             }
             if($dd_opr_codigo) {
-                $sql .= " 
-                        and (t0.opr_codigo=".$dd_opr_codigo.")  ";
+                $sql .= " and (t0.opr_codigo=$".$param_count.") ";
+                $sql_params_pins[] = $dd_opr_codigo;
+                $param_count++;
             }
             $sql .= " 
                      ) ".PHP_EOL;
@@ -163,15 +202,20 @@ if($BtnSearch) {
                         and pin_lote_codigo > 6 -- Codigo de lotes menor e igual a 6 foram utilizados para testes 
                         and (r.pin_channel='C' OR r.pin_channel IS NULL)
                         "; 
+            
+            // Continuando a numeração dos parâmetros da query anterior
             if($dd_opr_codigo) {
-                    $sql .= " 
-                        and pih_id = ".$dd_opr_codigo;
+                $sql .= " and pih_id = $".$param_count." ";
+                $sql_params_pins[] = $dd_opr_codigo;
+                $param_count++;
             } //end if($dd_opr_codigo) 
             if($tf_data_inicial && $tf_data_final) {
-                        $data_inic = formata_data(trim($tf_data_inicial), 1);
-                        $data_fim = formata_data(trim($tf_data_final), 1); 
-                        $sql .= " 
-                        and pih_data >= '".trim($data_inic)." 00:00:00' and  pih_data <= '".trim($data_fim)." 23:59:59'  "; 
+                $data_inic = formata_data(trim($tf_data_inicial), 1);
+                $data_fim = formata_data(trim($tf_data_final), 1); 
+                $sql .= " and pih_data >= $".$param_count." and pih_data <= $".($param_count+1)." ";
+                $sql_params_pins[] = trim($data_inic)." 00:00:00";
+                $sql_params_pins[] = trim($data_fim)." 23:59:59";
+                $param_count += 2;
             }
             $sql .= " 
                     )
@@ -184,7 +228,13 @@ if($BtnSearch) {
         if(!b_is_Publisher()) {
            // echo "<pre>".print_r($sql,true)."</pre>";
         }
-	$resid = pg_exec($connid, $sql);
+        
+        // Execução segura da query principal
+        if(!empty($sql_params_pins)) {
+            $resid = SQLexecuteQueryParams($sql, $sql_params_pins);
+        } else {
+            $resid = SQLexecuteQuery($sql);
+        }
 	$total_table = pg_num_rows($resid);
 
 } //end if($BtnSearch)
