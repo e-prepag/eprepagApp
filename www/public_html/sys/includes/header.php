@@ -27,8 +27,8 @@
 
 	//$connid = pg_connect("host=$host port=$port dbname=$banco user=$usuario password=$senha");
 	
-	$sql = "select bko_autoriza, bko_local_acesso from usuarios where id='".$_SESSION['iduser_bko_pub']."'";
-	$result = pg_exec($connid, $sql);   
+	$sql = "select bko_autoriza, bko_local_acesso from usuarios where id=$1";
+	$result = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko_pub']));   
 	$pgrow = pg_fetch_array($result);  
 
 	/*if($pgrow['bko_autoriza'] != 'S')

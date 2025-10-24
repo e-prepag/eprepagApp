@@ -73,7 +73,7 @@ if($_SERVER['HTTPS']!="on") {
 
     header('Content-Type: text/html; charset=' . LANG_CHARSET);
 
-    $resusr = pg_exec($connid, "select shn_nome, tipo_acesso, bko_datalogin, bko_horalogin from usuarios where id='" . $_SESSION["iduser_bko_pub"] . "'");
+    $resusr = SQLexecuteQueryParams("select shn_nome, tipo_acesso, bko_datalogin, bko_horalogin from usuarios where id=$1", array($_SESSION["iduser_bko_pub"]));
     $pgusr = pg_fetch_array($resusr);
 
     $pdo = ConnectionPDO::getConnection()->getLink();

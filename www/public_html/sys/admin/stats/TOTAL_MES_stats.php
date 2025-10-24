@@ -91,7 +91,7 @@ if(!$dd_year)   $dd_year      = date('Y');
 $dd_operadora_nome = "";
 $possui_totalizacao_utilizacao = false;
 if($dd_operadora) {
-        $resopr_nome = SQLexecuteQuery("select opr_nome, opr_contabiliza_utilizacao, opr_data_inicio_contabilizacao_utilizacao from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome");
+        $resopr_nome = SQLexecuteQueryParams("select opr_nome, opr_contabiliza_utilizacao, opr_data_inicio_contabilizacao_utilizacao from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome", array($dd_operadora));
         if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
                 $dd_operadora_nome = $pgopr_nome['opr_nome'];
                 $possui_totalizacao_utilizacao = $pgopr_nome['opr_contabiliza_utilizacao'];

@@ -119,7 +119,7 @@ _SESSION[\"horalog_bko\"]: ".$_SESSION["horalog_bko"]."<br>";
 	$dd_operadora_nome = "";
 	if($dd_operadora) {
 //		$resopr_nome = pg_exec($connid, "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
-		$resopr_nome = SQLexecuteQuery("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
+		$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array($dd_operadora));
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome = $pgopr_nome['opr_nome'];
 		} 
