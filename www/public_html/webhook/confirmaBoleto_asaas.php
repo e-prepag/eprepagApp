@@ -4,19 +4,19 @@ $originalValue = $webhookData['payment']['originalValue'] ? $webhookData['paymen
 $value = $webhookData['payment']['value'] ? $webhookData['payment']['value'] : null;
 $interestValue = $webhookData['payment']['interestValue'] ? $webhookData['payment']['interestValue'] : 0;
 
-// Se originalValue n�o for nulo, faz a verifica��o
+// Se originalValue nao for nulo, faz a verificacao
 if (!is_null($originalValue)) {
-	// Soma interestValue ao originalValue caso interestValue n�o seja nulo
+	// Soma interestValue ao originalValue caso interestValue nao seja nulo
 	$calculatedValue = $originalValue + $interestValue;
 
-	// Compara��o
+	// Comparacao
 	if (bccomp($calculatedValue, $value, 2) !== 0) {
-		echo "Valores n�o batem";
+		echo "Valores não batem";
 		exit;
 	}
 }
 if (!$value) {
-	echo "N�o foi possivel obter o valor do boleto";
+	echo "Não foi possivel obter o valor do boleto";
 	exit;
 }
 
@@ -256,7 +256,7 @@ class RecebeBoleto
 				echo "erro e-mail";
 			}
 		} else {
-			echo "Pagamento ja� conciliado";
+			echo "Pagamento já conciliado";
 		}
 	}
 }

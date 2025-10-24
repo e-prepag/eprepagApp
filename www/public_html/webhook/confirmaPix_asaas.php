@@ -19,11 +19,11 @@ define("ASAAS_SECRET_TOKEN", getenv('ASAAS_SECRET_TOKEN'));
 $receivedToken = isset($_SERVER['HTTP_ASAAS_ACCESS_TOKEN']) ? $_SERVER['HTTP_ASAAS_ACCESS_TOKEN'] : "nao existe";
 
 if ($receivedToken !== ASAAS_SECRET_TOKEN) {
-	// Se o token estiver errado, rejeita a requisi��o
+	// Se o token estiver errado, rejeita a requisicao
 
 	http_response_code(403);
 
-	exit("Acesso negado. Token inv�lido: $receivedToken");
+	exit("Acesso negado. Token inválido: $receivedToken");
 }
 
 $webhook = file_get_contents('php://input');
@@ -179,7 +179,7 @@ class RecebePix
 			$tableName = ($this->ambiente == "PDV") ? "tb_dist_venda_games" : "tb_venda_games";
 			$tableNameJoin = ($this->ambiente == "PDV") ? "tb_dist_venda_games_modelo" : "tb_venda_games_modelo";
 
-			// Sele��o da venda
+			// Selecao da venda
 			$sqlSelect = "SELECT * 
                       FROM {$tableName} 
                       INNER JOIN tb_pag_compras ON idvenda = vg_id 
@@ -195,7 +195,7 @@ class RecebePix
 				$data_venda = date('Y-m-d H:i:s') . '.' . sprintf('%05d', round(microtime(true) * 1000) % 1000);
 				$valor = substr($venda["total"], 0, -2) . "." . substr($venda["total"], -2);
 
-				// Atualiza��o da venda
+				// Atualizacao da venda
 				$sqlAtualiza = "UPDATE {$tableName} 
                             SET vg_ultimo_status_obs = '',
                                 vg_usuario_obs = :usuario_obs,
@@ -218,7 +218,7 @@ class RecebePix
 				$stmtAtualiza->execute();
 
 				if ($stmtAtualiza->rowCount() > 0 && $this->ambiente === "PDV") {
-					// Atualiza saldo do usu�rio
+					// Atualiza saldo do usuario
 					$sqlSaldo = "UPDATE dist_usuarios_games 
                              SET ug_perfil_saldo = ug_perfil_saldo + :valor 
                              WHERE ug_id = :ugId";
