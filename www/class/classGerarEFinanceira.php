@@ -2,6 +2,12 @@
 require_once '/www/db/connect.php';
 require_once '/www/db/ConnectionPDO.php';
 require_once '../libs/xmlseclibs.php';
+require_once '/www/includes/load_dotenv.php';
+require_once '../libs/xmlseclibs.php';
+
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+
 
 class GerarEFinanceira
 {
@@ -39,6 +45,7 @@ class GerarEFinanceira
     private $codMunicipioEPP;
     private $certificado;
     private $senhaCertificado;
+    private $caminhoCertificadoPublico;
 
     public function __construct()
     {
@@ -73,6 +80,9 @@ class GerarEFinanceira
         $this->dddTelefoneReprLegal = '11';
         $this->cpfReprLegal = '16806289843';
         $this->codMunicipioEPP = '350010';
+        $this->certificado = '../ssl/cert-eprepag.pfx';
+        $this->senhaCertificado = getenv('senha_certificado_digital');
+        $this->caminhoCertificadoPublico = '../ssl/pre-efinanceira-receita-fazenda-gov-br-2025.cer';
     }
 
     private function obterDadosMovFin()
@@ -406,7 +416,7 @@ class GerarEFinanceira
         $PgtosAcum->appendChild($totPgtosAcum);
 
         // Gerar XML final
-        return $dom;
+        return ['xml' => $dom, 'id' => $id_formatado];
     }
 
     public function gerarCadastroDeclarante()
@@ -462,7 +472,7 @@ class GerarEFinanceira
 
         $evtCadDeclarante->appendChild($infoCadastro);
 
-        return $dom;
+        return ['xml' => $dom, 'id' => $id_formatado];
     }
 
     public function gerarAbertura($data_inicio, $data_fim)
@@ -651,7 +661,7 @@ class GerarEFinanceira
         $evt->appendChild($aberturaMov);
 
         // Gerar XML
-        return $dom;
+        return ['xml' => $dom, 'id' => $id_formatado];
     }
 
     public function gerarFechamento($dataInicioSemestre, $dataFimSemestre)
@@ -740,62 +750,196 @@ class GerarEFinanceira
         $signature->appendChild($doc->createComment(' Bloco obrigatório para assinatura digital (XMLDSig) '));
 
         // 11. Exibir o XML
-        return $doc;
+        return ['xml' => $doc, 'id' => $id_formatado];
+    }
+
+    function gerarLoteAssincrono(array $eventos)
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+
+        $ns = 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0';
+
+        // Elemento raiz <eFinanceira>
+        $eFinanceira = $dom->createElementNS($ns, 'eFinanceira');
+        $dom->appendChild($eFinanceira);
+
+        // <loteEventosAssincrono>
+        $lote = $dom->createElement('loteEventosAssincrono');
+        $eFinanceira->appendChild($lote);
+
+        // <cnpjDeclarante>
+        $cnpjElem = $dom->createElement('cnpjDeclarante', $this->cnpjEPP);
+        $lote->appendChild($cnpjElem);
+
+        // <eventos>
+        $eventosElem = $dom->createElement('eventos');
+        $lote->appendChild($eventosElem);
+
+        foreach ($eventos as $ev) {
+            if (!isset($ev['id'], $ev['xml'])) {
+                continue; // pula itens inválidos
+            }
+
+            $eventoElem = $dom->createElement('evento');
+            $eventoElem->setAttribute('id', $ev['id']);
+
+            // Importa o XML do evento para dentro de <evento>
+            if ($ev['xml'] instanceof DOMDocument) {
+                $imported = $dom->importNode($ev['xml']->documentElement, true);
+                $eventoElem->appendChild($imported);
+            } elseif ($ev['xml'] instanceof DOMElement) {
+                $imported = $dom->importNode($ev['xml'], true);
+                $eventoElem->appendChild($imported);
+            } else {
+                throw new Exception('O evento deve ser DOMDocument ou DOMElement');
+            }
+
+            $eventosElem->appendChild($eventoElem);
+        }
+
+        return $dom;
     }
 
     public function assinarXML(DOMDocument $dom)
     {
-        // procura o nó com atributo Id ou id (onde será feita a assinatura)
+        // Busca qualquer elemento que tenha atributo 'id'
         $xpath = new DOMXPath($dom);
-        $elementoId = null;
-        foreach ($xpath->query('//*[@Id] | //*[@id]') as $el) {
-            $elementoId = $el;
-            break;
+        $elementoEvento = $xpath->query('//*[@id]')->item(0);
+
+        if (!$elementoEvento) {
+            throw new Exception('Elemento com atributo "id" não encontrado no XML.');
         }
 
-        if (!$elementoId) {
-            throw new Exception('Não foi encontrado nenhum elemento com atributo Id ou id no XML.');
+        // Obtém o valor do id
+        $idEvento = $elementoEvento->getAttribute('id');
+
+        if (empty($idEvento)) {
+            throw new Exception('Atributo "id" está vazio.');
         }
 
-        // Lê o certificado .pfx do caminho configurado
+        // Remove assinatura existente se houver
+        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+        $assinaturaExistente = $xpath->query('.//ds:Signature', $elementoEvento);
+        if ($assinaturaExistente instanceof DOMNodeList && $assinaturaExistente->length > 0) {
+            $elementoEvento->removeChild($assinaturaExistente->item(0));
+        }
+
+        // Lê certificado .pfx
         if (!file_exists($this->certificado)) {
-            throw new Exception('Certificado PFX não encontrado em: ' . $this->certificado);
+            throw new Exception('Certificado PFX não encontrado: ' . $this->certificado);
         }
 
         $pfxContent = file_get_contents($this->certificado);
-
-        // Extrai chave privada e certificado público
         if (!openssl_pkcs12_read($pfxContent, $certs, $this->senhaCertificado)) {
-            throw new Exception('Erro ao abrir o certificado PFX. Caminho ou senha inválidos.');
+            throw new Exception('Erro ao abrir o certificado PFX. Verifique caminho e senha.');
         }
 
-        // cria assinatura XML
+        // Cria objeto de assinatura
         $objDSig = new XMLSecurityDSig();
         $objDSig->setCanonicalMethod(XMLSecurityDSig::C14N);
 
-        // referencia a tag com ID (para assinatura enveloped)
+        // Adiciona referência SEM gerar Id automático
+        // Passa o id_name vazio para evitar geração de Id aleatório
         $objDSig->addReference(
-            $elementoId,
+            $elementoEvento,
             XMLSecurityDSig::SHA256,
-            [
+            array(
                 'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
                 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'
-            ],
-            ['uri' => '#' . $elementoId->getAttribute('Id')]
+            ),
+            array('overwrite' => false)
         );
 
-        // cria chave privada e assina
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
-        $objKey->loadKey($privateKey, false);
+        // Carrega chave privada
+        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, array('type' => 'private'));
+        $objKey->loadKey($certs['pkey'], false);
+
+        // Assina o documento
         $objDSig->sign($objKey);
 
-        // adiciona certificado público (sem cadeia completa)
-        $objDSig->add509Cert($publicCert, true, false, ['subjectName' => false]);
+        // Adiciona certificado X509
+        $objDSig->add509Cert($certs['cert'], true, false);
 
-        // anexa assinatura no final do XML
-        $objDSig->appendSignature($dom->documentElement);
+        // Anexa assinatura no elemento
+        $signatureNode = $objDSig->appendSignature($elementoEvento);
 
-        // retorna XML assinado
-        return $dom->saveXML();
+        // Após assinar, ajusta o atributo URI manualmente no XML gerado
+        if ($signatureNode) {
+            $xpathSig = new DOMXPath($dom);
+            $xpathSig->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+            $referenceNode = $xpathSig->query('.//ds:Reference', $signatureNode)->item(0);
+
+            if ($referenceNode) {
+                // Define o URI com o id original
+                $referenceNode->setAttribute('URI', '#' . $idEvento);
+            }
+        }
+
+        // Remove o atributo Id (maiúsculo) gerado automaticamente pela biblioteca
+        // Mantém apenas o id (minúsculo) original
+        if ($elementoEvento->hasAttribute('Id')) {
+            $idMaiusculo = $elementoEvento->getAttribute('Id');
+            // Remove apenas se for diferente do id original (é o gerado automaticamente)
+            if ($idMaiusculo !== $idEvento) {
+                $elementoEvento->removeAttribute('Id');
+            }
+        }
+
+        return $dom;
+    }
+
+
+    public function criptografarLoteEF($xmlConteudo)
+    {
+        // 1. Gerar chave AES-128 e IV (vetor inicialização)
+        $chaveAES = openssl_random_pseudo_bytes(16); // 128 bits
+        $iv = openssl_random_pseudo_bytes(16);       // CBC precisa de IV 16 bytes
+
+        // 2. Encriptar XML com AES-128-CBC
+        $xmlCriptografado = openssl_encrypt(
+            $xmlConteudo,
+            'AES-128-CBC',
+            $chaveAES,
+            OPENSSL_RAW_DATA,
+            $iv
+        );
+
+        // 3. Ler certificado público e encriptar chave AES + IV com RSA 2048
+        $certPubContent = file_get_contents($this->caminhoCertificadoPublico);
+        $certPub = openssl_pkey_get_public($certPubContent);
+        if (!$certPub) {
+            throw new Exception("Não foi possível carregar o certificado público.");
+        }
+
+        // Concatenar IV + chave AES
+        $chaveConcatenada = $iv . $chaveAES;
+        // Encriptar com RSA (PKCS#1 v1.5)
+        $chaveCriptografada = '';
+        if (!openssl_public_encrypt($chaveConcatenada, $chaveCriptografada, $certPub, OPENSSL_PKCS1_PADDING)) {
+            throw new Exception("Erro ao criptografar chave AES com RSA.");
+        }
+
+        // 4. Converter tudo para Base64
+        $xmlCriptografadoBase64 = base64_encode($xmlCriptografado);
+        $chaveCriptografadaBase64 = base64_encode($chaveCriptografada);
+
+        // 5. Montar XML final
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+
+        $ns = 'http://www.eFinanceira.gov.br/schemas/envioLoteCriptografado/v1_2_0';
+        $eFinanceira = $dom->createElementNS($ns, 'eFinanceira');
+        $dom->appendChild($eFinanceira);
+
+        $loteElem = $dom->createElement('loteCriptografado');
+        $eFinanceira->appendChild($loteElem);
+
+        $loteElem->appendChild($dom->createElement('id', $idLote));
+        $loteElem->appendChild($dom->createElement('idCertificado', $idCertificado));
+        $loteElem->appendChild($dom->createElement('chave', $chaveCriptografadaBase64));
+        $loteElem->appendChild($dom->createElement('lote', $xmlCriptografadoBase64));
+
+        return $dom;
     }
 }
