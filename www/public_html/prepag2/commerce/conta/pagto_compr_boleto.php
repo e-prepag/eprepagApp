@@ -68,10 +68,16 @@ if ($completar_endereco) {
                 require_once "../../../../banco/asaas/classBoletoAsaas.php";
                 $classBoleto = new classBoleto();
 
-                $buscarBoleto = "SELECT bbg_valor FROM boleto_bancario_games WHERE bbg_vg_id = " . addslashes($venda_id) . ";";
+                $pdo = ConnectionPDO::getConnection()->getLink();
 
-                $boletoEncontrado = pg_fetch_array(SQLexecuteQuery($buscarBoleto));
-                $boleto_valor = $boletoEncontrado["bbg_valor"];
+                $sql = "SELECT bbg_valor FROM boleto_bancario_games WHERE bbg_vg_id = :venda_id;";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindValue(':venda_id', (int)$venda_id, PDO::PARAM_INT);
+                $stmt->execute();
+
+                $boletoEncontrado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $boleto_valor = $boletoEncontrado ? $boletoEncontrado["bbg_valor"] : null;
 
                 $params = array(
                     'cpf_cnpj' => str_replace('-', '', str_replace('.', '', $usuarioGames->ug_sCPF)),
@@ -83,24 +89,24 @@ if ($completar_endereco) {
                 );
                 $link = $classBoleto->callService($params);
                 if ($link) {
-                    ?>
+        ?>
                     window.open('<?php echo $link ?>', 'boleto', '');
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     alert('Erro ao gerar boleto <?= $boleto_valor ?>.');
                     console.log('<?= ($buscarBoleto . "\n" . $boletoEncontrado) ?>');
-                    <?php
+                <?php
                 }
             } elseif ($usuarioGames->b_Is_Boleto_Bradesco()) {
                 ?>
                 window.open('/boletos/gamer/boleto_bradesco.php?venda=<?php echo $venda_id ?>', 'boleto', '');
-                <?php
+            <?php
             } else {
                 die("Caixa");
-                ?>
+            ?>
                 window.open('/SICOB/BoletoWebCaixaCommerce.php?venda=<?php echo $venda_id ?>', 'boleto', '');
-                <?php
+        <?php
             }
         }
         ?>
@@ -144,13 +150,13 @@ if ($completar_endereco) {
                     <?php if (b_isIntegracao()) { ?>
                         Após o pagamento aguarde até 2 dias úteis para confirmação bancária. Seu crédito ocorrerá diretamente em
                         sua conta no jogo.
-                        <?php
+                    <?php
                     } else { ?>
                         Obrigado por comprar conosco!<br><br>
                         Após o pagamento aguarde até dois dias úteis<br />
                         para o processamento do boleto pelo banco, quando a <br />
                         senha será automaticamente enviada para o seu email.<br>
-                        <?php
+                    <?php
                     } //end else do if(b_isIntegracao())
                     ?>
                 </td>
@@ -195,10 +201,21 @@ if ($completar_endereco) {
 </script>
 <!-- Facebook Pixel Code -->
 <script>
-    !function (f, b, e, v, n, t, s) {
-        if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) }; if (!f._fbq) f._fbq = n;
-        n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0;
-        t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
+    ! function(f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function() {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s)
     }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '228069144336893'); // Insert your pixel ID here.
     fbq('track', 'PageView');
@@ -226,5 +243,5 @@ if (getPartner_Integracao_Transparente_By_ID($GLOBALS['_SESSION']['integracao_or
             redirect('/SICOB/BoletoWebCaixaCommerce.php?venda=' . $venda_id);
         }
     }
-}//end if(getPartner_Integracao_Transparente_By_ID)
+} //end if(getPartner_Integracao_Transparente_By_ID)
 ?>
