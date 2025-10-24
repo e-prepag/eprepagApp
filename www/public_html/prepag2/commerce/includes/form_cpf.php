@@ -53,7 +53,7 @@ if (isset($_REQUEST['formsubmit'])) {
     if ($_REQUEST['consulta_automatica'] == '1') {
         $rs_api->set_quantidade_contas($rs_api->consultaQuantidadeContas($parametros) + 1);
         $rs_api->set_quantidade_limite($rs_api->consultaQuantidadeUtilizada($parametros) + 1);
-    }//end if($_REQUEST['consulta_automatica'] == '1')
+    } //end if($_REQUEST['consulta_automatica'] == '1')
 
     $testeCPF = $rs_api->Req_EfetuaConsulta($parametros, $resposta);
 
@@ -108,7 +108,6 @@ if (isset($_REQUEST['formsubmit'])) {
                 $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
                 qtdeTrocaAutomatica();
             }
-
         } // end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
         elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB) {
 
@@ -129,14 +128,11 @@ if (isset($_REQUEST['formsubmit'])) {
                 $retorno["data_nascimento"] = $resposta['result']['data_nascimento'];
                 $name = $retorno["nome"];
                 $data_nascimento = $retorno["data_nascimento"];
-
             } else {
                 $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
                 qtdeTrocaAutomatica();
             }
-
-        } 
-        elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) {
+        } elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) {
 
             if ($testeCPF == 2) {
                 $errors[] = "Estamos momentaneamente com falha na comunição para verificação do CPF informado. Por favor, aguarde alguns minutos e tente novamente.";
@@ -146,9 +142,7 @@ if (isset($_REQUEST['formsubmit'])) {
             } else {
                 $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0485). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
             }
-
-        }
-        else {
+        } else {
             $file = fopen("/www/log/retorno_cpf_OMNIDATA.txt", "a+");
             fwrite($file, "logs para teste \n");
             fwrite($file, "resultado code: " . $testeCPF . "\n");
@@ -188,15 +182,13 @@ if (isset($_REQUEST['formsubmit'])) {
                 qtdeTrocaAutomatica();
             }
         }
-
-    }//end elseif ($testeCPF != 171)
+    } //end elseif ($testeCPF != 171)
 
     // Atingiu o limite máximo de utilização do mesmo CPF
     else {
 
         $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"" . EPREPAG_URL_HTTPS_COM . "/support\");\' style=\'cursor:pointer; color:#2e5984;\'>" . EPREPAG_URL_HTTPS_COM . "/support</span>.";
-
-    }//end else do elseif ($testeCPF != 171)
+    } //end else do elseif ($testeCPF != 171)
 
     if (count($errors) == 0 && !empty($usuarioId)) {
 
@@ -206,8 +198,34 @@ if (isset($_REQUEST['formsubmit'])) {
 
         $cpf = implode('', $matches[0]);
 
-        $sql = "UPDATE usuarios_games SET ug_cpf='" . mask($cpf, '###.###.###-##') . "', ug_nome='" . fix_name($name) . "', ug_nome_cpf='" . fix_name($name) . "', ug_data_cpf_informado=NOW(), ug_data_nascimento = to_date('" . $data_nascimento . "','DD/MM/YYYY')  WHERE ug_id=" . $usuarioId . ";";
-        $res = SQLexecuteQuery($sql);
+        // formata valores em PHP (antes do bind)
+        $cpfMasked  = mask($cpf, '###.###.###-##');
+        $nomeFixed  = fix_name($name);
+        $dataNasc   = $data_nascimento;
+
+        $usuarioIdInt = (int) $usuarioId;
+
+        $sql = "
+            UPDATE usuarios_games
+            SET
+                ug_cpf = $1,
+                ug_nome = $2,
+                ug_nome_cpf = $3,
+                ug_data_cpf_informado = NOW(),
+                ug_data_nascimento = to_date($4, 'DD/MM/YYYY')
+            WHERE ug_id = $5
+        ";
+
+        $params = [
+            $cpfMasked,     // $1
+            $nomeFixed,     // $2
+            $nomeFixed,     // $3
+            $dataNasc,      // $4
+            $usuarioIdInt   // $5
+        ];
+
+        $res = SQLexecuteQueryParams($sql, $params);
+
         if ($res) {
             (new UsuarioGames)->adicionarLoginSession_ByID($usuarioId);
         } else {
@@ -227,23 +245,8 @@ if (isset($_REQUEST['formsubmit'])) {
         $msg .= "Problemas encontrados:<br>";
         foreach ($errors as $error) {
             $msg .= $error . "<br>";
-        }/*
-             $sql = "UPDATE usuarios_games SET ug_data_cpf_informado=NOW() WHERE ug_id=".$usuarioId.";";
-             //echo $sql;
-             $res = SQLexecuteQuery($sql);
-             if($testeCPF != 171) {
-                 $msg = "Não houve sucesso na atualização do CPF do usuário de ID[".$usuarioId."]<br>Porém foi permitido efetuar a compra e foi atualizado a data de consulta do seu CPF para ter sucesso.<br>Dados:<br>CPF: ".$_REQUEST['cpf']."<br>Data de Nascimento: ".$_REQUEST['data_nascimento']."<br>";
-                 foreach($errors as $key => $error){ 
-                     $msg .= str_replace("\n","<br>",  $error); 
-                 }
-                 enviaEmail("rc@e-prepag.com.br", "tamy@e-prepag.com.br", "wagner@e-prepag.com.br", "Erro na atualização de CPF já informado", $msg);
-             } //end if($testeCPF != 171)
-             UsuarioGames::adicionarLoginSession_ByID($usuarioId);
-             header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);      
-             die();
-             */
-
-    }//end if(count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1')
+        }
+    } //end if(count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1')
 }
 
 $form_name = isset($_REQUEST['name']) ? $_REQUEST['name'] : $usuarioGames->ug_sNome;
@@ -360,7 +363,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
     <?php
     $url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
     //echo '<link href="'.$url.'/prepag2/js/jqueryui/css/custom-theme/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">';
-//echo '<script src="'.$url.'/prepag2/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>';
+    //echo '<script src="'.$url.'/prepag2/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>';
     echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
     ?>
 
@@ -375,7 +378,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
         if (count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1') {
             echo "<script>$(function(){ showMessage('" . $msg . "'); });</script>";
             die();
-        }//end if(count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1')
+        } //end if(count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1')
         ?>
         <div class="wrapper txt-preto int-box">
             <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
@@ -417,7 +420,11 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                     </form>
 
                     <?php foreach ($errors as $key => $error) { ?>
-                        <script>$(function () { showMessage('<?php echo str_replace("\n", " ", $error); ?>'); });</script>
+                        <script>
+                            $(function() {
+                                showMessage('<?php echo str_replace("\n", " ", $error); ?>');
+                            });
+                        </script>
                         <?php break; ?>
                     <?php } ?>
                 </div>
@@ -427,13 +434,13 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
         <script>
             $('div#captcha_img, div#captcha_img + a').wrapAll('<div id="captcha-wrapper">');
 
-            $(document).ready(function () {
+            $(document).ready(function() {
 
                 var currentDate = new Date();
                 $("#data_nascimento").datepicker();
                 $("#data_nascimento").mask("99/99/9999");
                 $("#cpf").mask("999.999.999-99");
-                $("#data_nascimento").blur(function () {
+                $("#data_nascimento").blur(function() {
                     if ($(this).val().length == "10") {
                         var dt_nasc = $(this).val().split("/");
                         var objDtNasc = new Date(parseInt(dt_nasc[2]), parseInt(dt_nasc[1]) - 1, parseInt(dt_nasc[0]));
@@ -444,7 +451,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                     }
                 });
 
-                $("#data_nascimento").change(function () {
+                $("#data_nascimento").change(function() {
                     if ($(this).val().length == "10") {
                         var dt_nasc = $(this).val().split("/");
                         var objDtNasc = new Date(parseInt(dt_nasc[2]), parseInt(dt_nasc[1]) - 1, parseInt(dt_nasc[0]));
@@ -459,7 +466,6 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                 //        maxDate: currentDate
                 //    });
             });
-
         </script>
 
     </body>
