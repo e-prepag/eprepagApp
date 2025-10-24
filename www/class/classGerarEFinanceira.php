@@ -1,6 +1,7 @@
 <?php
 require_once '/www/db/connect.php';
 require_once '/www/db/ConnectionPDO.php';
+require_once '../libs/xmlseclibs.php';
 
 class GerarEFinanceira
 {
@@ -36,7 +37,8 @@ class GerarEFinanceira
     private $dddTelefoneReprLegal;
     private $cpfReprLegal;
     private $codMunicipioEPP;
-
+    private $certificado;
+    private $senhaCertificado;
 
     public function __construct()
     {
@@ -739,5 +741,61 @@ class GerarEFinanceira
 
         // 11. Exibir o XML
         return $doc;
+    }
+
+    public function assinarXML(DOMDocument $dom)
+    {
+        // procura o nó com atributo Id ou id (onde será feita a assinatura)
+        $xpath = new DOMXPath($dom);
+        $elementoId = null;
+        foreach ($xpath->query('//*[@Id] | //*[@id]') as $el) {
+            $elementoId = $el;
+            break;
+        }
+
+        if (!$elementoId) {
+            throw new Exception('Não foi encontrado nenhum elemento com atributo Id ou id no XML.');
+        }
+
+        // Lê o certificado .pfx do caminho configurado
+        if (!file_exists($this->certificado)) {
+            throw new Exception('Certificado PFX não encontrado em: ' . $this->certificado);
+        }
+
+        $pfxContent = file_get_contents($this->certificado);
+
+        // Extrai chave privada e certificado público
+        if (!openssl_pkcs12_read($pfxContent, $certs, $this->senhaCertificado)) {
+            throw new Exception('Erro ao abrir o certificado PFX. Caminho ou senha inválidos.');
+        }
+
+        // cria assinatura XML
+        $objDSig = new XMLSecurityDSig();
+        $objDSig->setCanonicalMethod(XMLSecurityDSig::C14N);
+
+        // referencia a tag com ID (para assinatura enveloped)
+        $objDSig->addReference(
+            $elementoId,
+            XMLSecurityDSig::SHA256,
+            [
+                'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
+                'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'
+            ],
+            ['uri' => '#' . $elementoId->getAttribute('Id')]
+        );
+
+        // cria chave privada e assina
+        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
+        $objKey->loadKey($privateKey, false);
+        $objDSig->sign($objKey);
+
+        // adiciona certificado público (sem cadeia completa)
+        $objDSig->add509Cert($publicCert, true, false, ['subjectName' => false]);
+
+        // anexa assinatura no final do XML
+        $objDSig->appendSignature($dom->documentElement);
+
+        // retorna XML assinado
+        return $dom->saveXML();
     }
 }
