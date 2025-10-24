@@ -6,22 +6,46 @@ require_once "/www/db/ConnectionPDO.php";
 if (isset($_GET["partner"])) {
 
 	/*
+                         $decode = base64_decode($_GET["partner"]);
+                         $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
+                         $iv = substr($decode, 0, $ivlen);
+                         $hmac = substr($decode, $ivlen, $sha2len=32);
+                         $ciphertext_raw = substr($decode, $ivlen+$sha2len);
+                         $id = openssl_decrypt($ciphertext_raw, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
+    */
 
-						 $decode = base64_decode($_GET["partner"]);
-						 $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
-						 $iv = substr($decode, 0, $ivlen);
-						 $hmac = substr($decode, $ivlen, $sha2len=32);
-						 $ciphertext_raw = substr($decode, $ivlen+$sha2len);
-						 $id = openssl_decrypt($ciphertext_raw, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
-						 */
+	// decodifica em modo estrito
+	$decoded = base64_decode(urldecode($_GET["partner"]), true);
 
-	// numero maximo para conversão são 19 caracteres
-	$id = base_convert(base_convert(base64_decode(urldecode($_GET["partner"])), 16, 8), 8, 10);
+	$id = null;
+	if ($decoded !== false) {
+		$step1 = @base_convert($decoded, 16, 8);
+		$step2 = ($step1 !== false) ? @base_convert($step1, 8, 10) : false;
+
+		if ($step2 !== false && $step2 !== null) {
+			if (ctype_digit((string)$step2)) {
+				$id = (int)$step2;
+			}
+		}
+	}
+
+	if ($id === null) {
+		$id = 0;
+	}
+
 	$con = ConnectionPDO::getConnection();
-	$sql = "select ug_repr_legal_msn from dist_usuarios_games where ug_id = " . $id . ";";
-	$find = $con->getLink()->prepare($sql);
-	$find->execute();
-	$result = $find->fetch(PDO::FETCH_ASSOC);
+
+	try {
+		$sql = "SELECT ug_repr_legal_msn FROM dist_usuarios_games WHERE ug_id = :id;";
+		$find = $con->getLink()->prepare($sql);
+		$find->bindValue(':id', $id, PDO::PARAM_INT);
+		$find->execute();
+		$result = $find->fetch(PDO::FETCH_ASSOC);
+	} catch (PDOException $e) {
+		// error_log($e->getMessage());
+		$result = false;
+	}
+
 	if ($result["ug_repr_legal_msn"] != false && $result["ug_repr_legal_msn"] != "") {
 		$style = json_decode($result["ug_repr_legal_msn"], true);
 		$corCaixa = "background-color:" . $style["CAIXA"] . ";";
@@ -33,6 +57,7 @@ if (isset($_GET["partner"])) {
 } else {
 	$_GET["partner"] = 0;
 }
+
 
 if ($_GET["game"] == "free_fire") {
 	$logo_game = "" . EPREPAG_URL_HTTPS . "/sys/imagens/Free_Fire.png";
