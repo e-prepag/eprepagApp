@@ -46,6 +46,8 @@ class GerarEFinanceira
     private $certificado;
     private $senhaCertificado;
     private $caminhoCertificadoPublico;
+    private $certificado_privado_epp;
+    private $chave_privada_epp;
 
     public function __construct()
     {
@@ -82,7 +84,9 @@ class GerarEFinanceira
         $this->codMunicipioEPP = '350010';
         $this->certificado = '../ssl/cert-eprepag.pfx';
         $this->senhaCertificado = getenv('senha_certificado_digital');
-        $this->caminhoCertificadoPublico = '../ssl/pre-efinanceira-receita-fazenda-gov-br-2025.cer';
+        $this->caminhoCertificadoPublico = '/www/ssl/pre-efinanceira-receita-fazenda-gov-br-2025.cer';
+        $this->certificado_privado_epp = '/www/ssl/private-epp-cert.pem';
+        $this->chave_privada_epp = '/www/ssl/key-epp-cert.pem';
     }
 
     private function obterDadosMovFin()
@@ -207,7 +211,7 @@ class GerarEFinanceira
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result['ultimo_id'] ?: 0;
+        return $result['ultimo_id'] ?: 9;
     }
 
     private function gerarIdFormatado($numero)
@@ -237,7 +241,8 @@ class GerarEFinanceira
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true; // Deixa o XML formatado (quebras de linha e identação)
+        $dom->formatOutput = false; // Deixa o XML formatado (quebras de linha e identação)
+        $dom->preserveWhiteSpace = true;
 
         $namespace = 'http://www.eFinanceira.gov.br/schemas/evtMovOpFin/v1_2_1';
         // Criar o elemento raiz com namespace
@@ -421,24 +426,21 @@ class GerarEFinanceira
 
     public function gerarCadastroDeclarante()
     {
-        // Cria o objeto DOM
-        $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true; // deixa o XML identado
-
         $namespace = 'http://www.eFinanceira.gov.br/schemas/evtCadDeclarante/v1_2_0';
 
-        // Cria o elemento raiz com namespace
-        $eFinanceira = $dom->createElementNS(
-            $namespace,
-            'eFinanceira'
-        );
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = false;
+        $dom->preserveWhiteSpace = true;
+
+        // Elemento raiz <eFinanceira> com namespace correto
+        $eFinanceira = $dom->createElementNS($namespace, 'eFinanceira');
         $dom->appendChild($eFinanceira);
 
-        // Cria o nó evtCadDeclarante
+        // Gera ID único do evento
         $idNovo = $this->obterUltimoIdEnvio() + 1;
-
         $id_formatado = $this->gerarIdFormatado($idNovo);
 
+        // Cria <evtCadDeclarante> dentro do <eFinanceira>
         $evtCadDeclarante = $dom->createElementNS($namespace, 'evtCadDeclarante');
         $evtCadDeclarante->setAttribute('id', $id_formatado);
         $eFinanceira->appendChild($evtCadDeclarante);
@@ -465,7 +467,6 @@ class GerarEFinanceira
         $infoCadastro->appendChild($dom->createElementNS($namespace, 'CEP', $this->cepEPP));
         $infoCadastro->appendChild($dom->createElementNS($namespace, 'Pais', 'BR'));
 
-        // Subnó paisResid
         $paisResid = $dom->createElementNS($namespace, 'paisResid');
         $paisResid->appendChild($dom->createElementNS($namespace, 'Pais', 'BR'));
         $infoCadastro->appendChild($paisResid);
@@ -475,10 +476,12 @@ class GerarEFinanceira
         return ['xml' => $dom, 'id' => $id_formatado];
     }
 
+
     public function gerarAbertura($data_inicio, $data_fim)
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
+        $dom->formatOutput = false;
+        $dom->preserveWhiteSpace = true;
 
         $namespace = 'http://www.eFinanceira.gov.br/schemas/evtAberturaeFinanceira/v1_2_1';
 
@@ -689,8 +692,8 @@ class GerarEFinanceira
 
         // 3. Criação do Documento DOM
         $doc = new DOMDocument('1.0', 'UTF-8');
-        $doc->formatOutput = true;
-        $doc->preserveWhiteSpace = false;
+        $doc->formatOutput = false;
+        $doc->preserveWhiteSpace = true;
 
         // 4. Elemento Raiz (eFinanceira)
         $eFinanceira = $doc->createElementNS($ns, 'eFinanceira');
@@ -753,79 +756,149 @@ class GerarEFinanceira
         return ['xml' => $doc, 'id' => $id_formatado];
     }
 
-    function gerarLoteAssincrono(array $eventos)
+    /**
+     * Gera o XML do lote de eventos como uma STRING.
+     * Espera que os eventos já sejam strings XML assinadas.
+     *
+     * @param array $eventos Array de eventos, ex: [['id' => 'ID0', 'xml' => '<eFinanceira...']]
+     * @return string O XML completo do lote (sem criptografia).
+     * @throws Exception
+     */
+    public function gerarLoteAssincrono(array $eventos)
     {
-        $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
+        $nsLote = 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0';
 
-        $ns = 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0';
+        // 1. Inicia a string do XML com a estrutura do lote (como no exemplo)
+        // Adiciona os atributos xsi e xsd que faltavam
+        $xmlString = '<?xml version="1.0" encoding="utf-8"?>' .
+            '<eFinanceira xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="' . $nsLote . '">' .
+            '<loteEventosAssincrono>' .
+            '<cnpjDeclarante>' . $this->cnpjEPP . '</cnpjDeclarante>' .
+            '<eventos>';
 
-        // Elemento raiz <eFinanceira>
-        $eFinanceira = $dom->createElementNS($ns, 'eFinanceira');
-        $dom->appendChild($eFinanceira);
-
-        // <loteEventosAssincrono>
-        $lote = $dom->createElement('loteEventosAssincrono');
-        $eFinanceira->appendChild($lote);
-
-        // <cnpjDeclarante>
-        $cnpjElem = $dom->createElement('cnpjDeclarante', $this->cnpjEPP);
-        $lote->appendChild($cnpjElem);
-
-        // <eventos>
-        $eventosElem = $dom->createElement('eventos');
-        $lote->appendChild($eventosElem);
-
+        // 2. Loop para injetar as strings dos eventos
         foreach ($eventos as $ev) {
-            if (!isset($ev['id'], $ev['xml'])) {
-                continue; // pula itens inválidos
+            if (!isset($ev['id'], $ev['xml']) || !is_string($ev['xml'])) {
+                throw new Exception('O evento ' . ($ev['id'] ?? '') . ' não foi passado como uma string XML.');
             }
 
-            $eventoElem = $dom->createElement('evento');
-            $eventoElem->setAttribute('id', $ev['id']);
-
-            // Importa o XML do evento para dentro de <evento>
-            if ($ev['xml'] instanceof DOMDocument) {
-                $imported = $dom->importNode($ev['xml']->documentElement, true);
-                $eventoElem->appendChild($imported);
-            } elseif ($ev['xml'] instanceof DOMElement) {
-                $imported = $dom->importNode($ev['xml'], true);
-                $eventoElem->appendChild($imported);
-            } else {
-                throw new Exception('O evento deve ser DOMDocument ou DOMElement');
-            }
-
-            $eventosElem->appendChild($eventoElem);
+            // 3. Anexa o evento
+            // Isso injeta a string <eFinanceira... do evento dentro da tag <evento>
+            $xmlString .= '<evento id="' . $ev['id'] . '">';
+            $xmlString .= $ev['xml']; // Injeta a string do evento assinado aqui
+            $xmlString .= '</evento>';
         }
 
-        return $dom;
+        // 4. Fecha as tags do lote
+        $xmlString .= '</eventos>' .
+            '</loteEventosAssincrono>' .
+            '</eFinanceira>';
+
+        // 5. Retorna a string XML completa
+        return $xmlString;
     }
 
-    public function assinarXML(DOMDocument $dom)
+
+
+    private function obterTagEventoAssinar(DOMElement $eventoElement)
     {
-        // Busca qualquer elemento que tenha atributo 'id'
+        // Lista de tags de eventos da e-Financeira
+        $tiposEventos = [
+            'evtCadDeclarante',
+            'evtAberturaeFinanceira',
+            'evtCadIntermediario',
+            'evtCadPatrocinado',
+            'evtExclusaoeFinanceira',
+            'evtExclusao',
+            'evtFechamentoeFinanceira',
+            'evtMovOpFin',
+            'evtMovPP'
+        ];
+
+        $xml = $eventoElement->ownerDocument->saveXML($eventoElement);
+
+        foreach ($tiposEventos as $tipo) {
+            if (strpos($xml, $tipo) !== false) {
+                return $tipo;
+            }
+        }
+
+        return null;
+    }
+
+
+    private function buscarElementoEventoPorTag(DOMElement $eventoElement, $tagEvento)
+    {
+        // Busca o elemento por nome local (ignora namespace)
+        $xpath = new DOMXPath($eventoElement->ownerDocument);
+
+        // Procura em qualquer namespace: //*[local-name()='evtCadDeclarante' and @id]
+        $query = sprintf(".//*[local-name()='%s' and @id]", $tagEvento);
+        $resultado = $xpath->query($query, $eventoElement);
+
+        if ($resultado->length > 0) {
+            return $resultado->item(0);
+        }
+
+        return null;
+    }
+
+
+    private function buscarElementoEFinanceira(DOMElement $eventoElement)
+    {
+        // Busca o elemento <eFinanceira> dentro do <evento>
+        // Pode ter qualquer namespace ou nenhum
+        $xpath = new DOMXPath($eventoElement->ownerDocument);
+        $query = ".//*[local-name()='eFinanceira']";
+        $resultado = $xpath->query($query, $eventoElement);
+
+        if ($resultado->length > 0) {
+            return $resultado->item(0);
+        }
+
+        return null;
+    }
+
+
+    public function assinarLoteEventos($xml)
+    {
+        // --- 1. Carregar XML de forma flexível ---
+        if ($xml instanceof DOMDocument) {
+            $dom = $xml;
+        } elseif (is_string($xml)) {
+            $dom = new DOMDocument('1.0', 'UTF-8');
+            $dom->preserveWhiteSpace = true;
+            $dom->formatOutput = false;
+
+            // Se for caminho de arquivo
+            if (file_exists($xml)) {
+                $xmlContent = file_get_contents($xml);
+            } else {
+                // Se for conteúdo XML
+                $xmlContent = $xml;
+            }
+
+            if (!$dom->loadXML($xmlContent, LIBXML_NOBLANKS | LIBXML_NOERROR)) {
+                throw new Exception('Não foi possível carregar o XML informado.');
+            }
+        } else {
+            throw new Exception('O parâmetro deve ser um DOMDocument, caminho de arquivo XML, ou string XML.');
+        }
+
+        // CRÍTICO: Garantir que não há formatação
+        $dom->preserveWhiteSpace = true;
+        $dom->formatOutput = false;
+
+        // --- 2. Inicia o XPath e configura o namespace ---
         $xpath = new DOMXPath($dom);
-        $elementoEvento = $xpath->query('//*[@id]')->item(0);
+        $xpath->registerNamespace('ef', 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0');
 
-        if (!$elementoEvento) {
-            throw new Exception('Elemento com atributo "id" não encontrado no XML.');
+        $eventos = $xpath->query('//ef:evento[@id]');
+        if ($eventos->length === 0) {
+            throw new Exception('Nenhum evento com atributo "id" encontrado no lote.');
         }
 
-        // Obtém o valor do id
-        $idEvento = $elementoEvento->getAttribute('id');
-
-        if (empty($idEvento)) {
-            throw new Exception('Atributo "id" está vazio.');
-        }
-
-        // Remove assinatura existente se houver
-        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
-        $assinaturaExistente = $xpath->query('.//ds:Signature', $elementoEvento);
-        if ($assinaturaExistente instanceof DOMNodeList && $assinaturaExistente->length > 0) {
-            $elementoEvento->removeChild($assinaturaExistente->item(0));
-        }
-
-        // Lê certificado .pfx
+        // --- 3. Lê certificado uma única vez ---
         if (!file_exists($this->certificado)) {
             throw new Exception('Certificado PFX não encontrado: ' . $this->certificado);
         }
@@ -835,111 +908,415 @@ class GerarEFinanceira
             throw new Exception('Erro ao abrir o certificado PFX. Verifique caminho e senha.');
         }
 
-        // Cria objeto de assinatura
-        $objDSig = new XMLSecurityDSig();
-        $objDSig->setCanonicalMethod(XMLSecurityDSig::C14N);
-
-        // Adiciona referência SEM gerar Id automático
-        // Passa o id_name vazio para evitar geração de Id aleatório
-        $objDSig->addReference(
-            $elementoEvento,
-            XMLSecurityDSig::SHA256,
-            array(
-                'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
-                'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'
-            ),
-            array('overwrite' => false)
-        );
-
-        // Carrega chave privada
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, array('type' => 'private'));
-        $objKey->loadKey($certs['pkey'], false);
-
-        // Assina o documento
-        $objDSig->sign($objKey);
-
-        // Adiciona certificado X509
-        $objDSig->add509Cert($certs['cert'], true, false);
-
-        // Anexa assinatura no elemento
-        $signatureNode = $objDSig->appendSignature($elementoEvento);
-
-        // Após assinar, ajusta o atributo URI manualmente no XML gerado
-        if ($signatureNode) {
-            $xpathSig = new DOMXPath($dom);
-            $xpathSig->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
-            $referenceNode = $xpathSig->query('.//ds:Reference', $signatureNode)->item(0);
-
-            if ($referenceNode) {
-                // Define o URI com o id original
-                $referenceNode->setAttribute('URI', '#' . $idEvento);
+        // --- 4. Assina cada evento ---
+        foreach ($eventos as $eventoElement) {
+            $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+            $assinaturasExistentes = $xpath->query('.//ds:Signature', $eventoElement);
+            foreach ($assinaturasExistentes as $sig) {
+                $sig->parentNode->removeChild($sig);
             }
-        }
 
-        // Remove o atributo Id (maiúsculo) gerado automaticamente pela biblioteca
-        // Mantém apenas o id (minúsculo) original
-        if ($elementoEvento->hasAttribute('Id')) {
-            $idMaiusculo = $elementoEvento->getAttribute('Id');
-            // Remove apenas se for diferente do id original (é o gerado automaticamente)
-            if ($idMaiusculo !== $idEvento) {
-                $elementoEvento->removeAttribute('Id');
+            $tagEvento = $this->obterTagEventoAssinar($eventoElement);
+            if (!$tagEvento) {
+                throw new Exception('Tipo de evento não identificado.');
             }
+
+            $elementoEvento = $this->buscarElementoEventoPorTag($eventoElement, $tagEvento);
+            if (!$elementoEvento) {
+                throw new Exception("Elemento '$tagEvento' com atributo 'id' não encontrado.");
+            }
+
+            $elementoEFinanceira = $this->buscarElementoEFinanceira($eventoElement);
+            if (!$elementoEFinanceira) {
+                throw new Exception("Elemento 'eFinanceira' não encontrado dentro do evento.");
+            }
+
+            // --- Cria objeto de assinatura ---
+            $objDSig = new XMLSecurityDSig('');
+            $objDSig->setCanonicalMethod(XMLSecurityDSig::C14N);
+
+            $options = [
+                'id_name' => 'id',
+                'overwrite' => false
+            ];
+
+            $objDSig->addReference(
+                $elementoEvento,
+                XMLSecurityDSig::SHA256,
+                [
+                    'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
+                    'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'
+                ],
+                $options
+            );
+
+            // --- Assina ---
+            $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
+            $objKey->loadKey($certs['pkey'], false);
+            $objDSig->sign($objKey);
+            $objDSig->add509Cert($certs['cert'], true, false);
+            $objDSig->appendSignature($elementoEFinanceira);
         }
 
         return $dom;
     }
 
-
-    public function criptografarLoteEF($xmlConteudo)
+    public function criptografarLoteEF($xmlConteudo, $idLote)
     {
+        // CORREÇÃO CRÍTICA: Converter para string SEM modificações
+        if ($xmlConteudo instanceof DOMDocument) {
+            // Garantir configurações antes de salvar
+            $xmlConteudo->preserveWhiteSpace = true;
+            $xmlConteudo->formatOutput = false;
+
+            // Usar saveXML() sem parâmetros para pegar o documento inteiro
+            // EXATAMENTE como foi assinado
+            $xmlString = $xmlConteudo->saveXML();
+
+            // ALTERNATIVA MAIS SEGURA: usar C14N (mesmo método da assinatura)
+            // $xmlString = $xmlConteudo->C14N(false, false);
+        } else {
+            $xmlString = $xmlConteudo;
+        }
+
         // 1. Gerar chave AES-128 e IV (vetor inicialização)
-        $chaveAES = openssl_random_pseudo_bytes(16); // 128 bits
-        $iv = openssl_random_pseudo_bytes(16);       // CBC precisa de IV 16 bytes
+        $chaveAES = random_bytes(16); // 128 bits
+        $iv = random_bytes(16);       // CBC precisa de IV 16 bytes
 
         // 2. Encriptar XML com AES-128-CBC
         $xmlCriptografado = openssl_encrypt(
-            $xmlConteudo,
+            $xmlString,
             'AES-128-CBC',
             $chaveAES,
             OPENSSL_RAW_DATA,
             $iv
         );
 
-        // 3. Ler certificado público e encriptar chave AES + IV com RSA 2048
-        $certPubContent = file_get_contents($this->caminhoCertificadoPublico);
-        $certPub = openssl_pkey_get_public($certPubContent);
-        if (!$certPub) {
-            throw new Exception("Não foi possível carregar o certificado público.");
+        if ($xmlCriptografado === false) {
+            throw new Exception("Erro ao criptografar XML com AES-128-CBC.");
         }
 
-        // Concatenar IV + chave AES
-        $chaveConcatenada = $iv . $chaveAES;
-        // Encriptar com RSA (PKCS#1 v1.5)
+        // 3. Ler certificado público
+        if (!file_exists($this->caminhoCertificadoPublico)) {
+            throw new Exception("Arquivo de certificado não encontrado: " . $this->caminhoCertificadoPublico);
+        }
+
+        $certPubContent = file_get_contents($this->caminhoCertificadoPublico);
+        if (!$certPubContent) {
+            throw new Exception("Não foi possível ler o certificado público.");
+        }
+
+        // Verificar se não é HTML
+        if (strpos($certPubContent, '<html') !== false) {
+            throw new Exception("O arquivo contém HTML. Baixe novamente o certificado.");
+        }
+
+        // Thumbprint SHA1 do certificado (idCertificado)
+        $idCertificado = strtoupper(hash('sha1', $certPubContent));
+
+        // Converter DER para PEM
+        $certPEM = "-----BEGIN CERTIFICATE-----\n";
+        $certPEM .= chunk_split(base64_encode($certPubContent), 64, "\n");
+        $certPEM .= "-----END CERTIFICATE-----\n";
+
+        // Carregar certificado
+        $certX509 = openssl_x509_read($certPEM);
+        if (!$certX509) {
+            throw new Exception("Não foi possível ler o certificado X.509.");
+        }
+
+        // Extrair chave pública
+        $certPub = openssl_pkey_get_public($certX509);
+        if (!$certPub) {
+            throw new Exception("Não foi possível extrair a chave pública.");
+        }
+
+        // 4. Concatenar CHAVE + VETOR
+        $chaveConcatenada = $chaveAES . $iv; // 16 + 16 = 32 bytes
+
+        // 5. Encriptar com RSA (PKCS#1 v1.5)
         $chaveCriptografada = '';
         if (!openssl_public_encrypt($chaveConcatenada, $chaveCriptografada, $certPub, OPENSSL_PKCS1_PADDING)) {
-            throw new Exception("Erro ao criptografar chave AES com RSA.");
+            throw new Exception("Erro ao criptografar chave com RSA.");
         }
 
-        // 4. Converter tudo para Base64
+        // 6. Converter para Base64
         $xmlCriptografadoBase64 = base64_encode($xmlCriptografado);
         $chaveCriptografadaBase64 = base64_encode($chaveCriptografada);
 
-        // 5. Montar XML final
+        // 7. Montar XML final (ESTE pode ser formatado, não tem assinatura)
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
+        $dom->formatOutput = false;
+        $dom->preserveWhiteSpace = true;
 
         $ns = 'http://www.eFinanceira.gov.br/schemas/envioLoteCriptografado/v1_2_0';
         $eFinanceira = $dom->createElementNS($ns, 'eFinanceira');
+        $eFinanceira->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:xsi',
+            'http://www.w3.org/2001/XMLSchema-instance'
+        );
         $dom->appendChild($eFinanceira);
 
         $loteElem = $dom->createElement('loteCriptografado');
         $eFinanceira->appendChild($loteElem);
 
-        $loteElem->appendChild($dom->createElement('id', $idLote));
-        $loteElem->appendChild($dom->createElement('idCertificado', $idCertificado));
-        $loteElem->appendChild($dom->createElement('chave', $chaveCriptografadaBase64));
-        $loteElem->appendChild($dom->createElement('lote', $xmlCriptografadoBase64));
+        $loteElem->appendChild($dom->createElementNS($ns, 'id', $idLote));
+        $loteElem->appendChild($dom->createElementNS($ns, 'idCertificado', $idCertificado));
+        $loteElem->appendChild($dom->createElementNS($ns, 'chave', $chaveCriptografadaBase64));
+        $loteElem->appendChild($dom->createElementNS($ns, 'lote', $xmlCriptografadoBase64));
 
         return $dom;
+    }
+
+    public function enviarLoteEFinanceira($xmlLoteCriptografado, $usarGzip = false, $producao = false)
+    {
+        // Definir endpoint
+        if ($producao) {
+            $urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
+        } else {
+            $urlBase = 'https://pre-efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
+        }
+
+        $endpoint = $urlBase . ($usarGzip ? 'criptoGzip' : 'cripto');
+
+        // CORREÇÃO: Obter XML como string SEM modificações
+        if ($xmlLoteCriptografado instanceof DOMDocument) {
+            $xmlLoteCriptografado->preserveWhiteSpace = true;
+            $xmlLoteCriptografado->formatOutput = false;
+            $xmlString = $xmlLoteCriptografado->saveXML();
+        } else {
+            $xmlString = $xmlLoteCriptografado;
+        }
+
+        // Configurar cURL com autenticação mútua TLS
+        $ch = curl_init($endpoint);
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $xmlString,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/xml',
+                'Content-Length: ' . strlen($xmlString)
+            ],
+
+            // Autenticação mútua TLS
+            CURLOPT_SSLCERT => $this->certificado_privado_epp,
+            CURLOPT_SSLKEY => $this->chave_privada_epp,
+            CURLOPT_SSLCERTPASSWD => $this->senhaCertificado,
+
+            // Segurança TLS
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeout
+            CURLOPT_TIMEOUT => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+
+            // Debug (remova em produção)
+            CURLOPT_VERBOSE => true
+        ]);
+
+        // Executar requisição
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+
+        curl_close($ch);
+
+        // Verificar erros de conexão
+        if ($response === false) {
+            throw new Exception("Erro na conexão com e-Financeira: " . $curlError);
+        }
+
+        // Processar resposta
+        return $response;
+    }
+
+    public function consultarLoteEFinanceira($numeroLote, $producao = false)
+    {
+        // Limpar o número (apenas dígitos)
+
+        if (empty($numeroLote)) {
+            throw new Exception("Número de protocolo inválido: vazio");
+        }
+
+        //echo "Consultando protocolo de lote: $numeroLote\n";
+
+        // Definir endpoint CORRETO
+        if ($producao) {
+            $endpoint = "https://efinanceira.receita.fazenda.gov.br/consulta/lotes/{$numeroLote}";
+        } else {
+            $endpoint = "https://pre-efinanceira.receita.fazenda.gov.br/consulta/lotes/{$numeroLote}";
+        }
+
+        //echo "Endpoint: $endpoint\n";
+
+        // IMPORTANTE: Aguardar pelo menos 30 segundos após envio
+        // conforme recomendação da documentação
+
+        // Verificar certificado
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($endpoint);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPGET => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/xml',
+            ],
+
+            // Autenticação mútua TLS
+            CURLOPT_SSLCERT => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE => 'PEM',
+
+            // Segurança TLS
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeout
+            CURLOPT_TIMEOUT => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão: " . $curlError);
+        }
+
+        //return $this->processarRespostaConsulta($response, $httpCode);
+        return $response;
+    }
+    /**
+     * Valida TODAS as assinaturas dentro de um XML de lote assinado.
+     * Isso verifica se a assinatura é válida do ponto de vista do PHP (xmlseclibs).
+     *
+     * @param DOMDocument|string $xmlAssinado O DOM ou string XML do lote JÁ ASSINADO.
+     * @return array Um array com os resultados da validação de cada evento.
+     * @throws Exception
+     */
+    public function validarLoteAssinado($xmlAssinado)
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = true;
+        $dom->formatOutput = false;
+
+        if ($xmlAssinado instanceof DOMDocument) {
+            // Se já é DOM, apenas usamos
+            $dom = $xmlAssinado;
+        } elseif (is_string($xmlAssinado)) {
+            // Se for string, carregamos
+            if (file_exists($xmlAssinado)) {
+                $xmlAssinado = file_get_contents($xmlAssinado);
+            }
+            if (!$dom->loadXML($xmlAssinado)) {
+                throw new Exception("Falha ao carregar XML para validação.");
+            }
+        } else {
+            throw new Exception("Entrada inválida. Esperado DOMDocument ou string XML.");
+        }
+
+        $xpath = new DOMXPath($dom);
+        // Namespace do Lote
+        $xpath->registerNamespace('efLote', 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0');
+        // Namespace da Assinatura (que agora não tem prefixo, mas o XPath precisa)
+        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+
+        // Encontra todos os eventos
+        $eventos = $xpath->query('//efLote:evento');
+
+        if ($eventos->length === 0) {
+            return ["status" => "erro", "mensagem" => "Nenhum evento <evento> encontrado no lote."];
+        }
+
+        $resultados = [];
+        foreach ($eventos as $eventoNode) {
+            $idEvento = $eventoNode->getAttribute('id');
+
+            // Encontra a assinatura DENTRO deste evento
+            $assinaturaNode = $xpath->query('.//ds:Signature', $eventoNode)->item(0);
+
+            if (!$assinaturaNode) {
+                $resultados[$idEvento] = "FALHA: Evento não contém nó <Signature>.";
+            } else {
+                // Chama o helper de validação
+                $resultados[$idEvento] = $this->validarAssinaturaNode($assinaturaNode);
+            }
+        }
+
+        return ["status" => "concluido", "resultados" => $resultados];
+    }
+
+
+    /**
+     * Helper que valida um único nó <Signature> usando xmlseclibs.
+     *
+     * @param DOMElement $signatureNode O nó <Signature> a ser validado.
+     * @return string "VÁLIDA" ou uma mensagem de erro.
+     */
+    private function validarAssinaturaNode(DOMElement $signatureNode)
+    {
+        try {
+            // 1. Cria o objeto de segurança e localiza a assinatura
+            $objXMLSecDSig = new XMLSecurityDSig('');
+            $objDSig = $objXMLSecDSig->locateSignature($signatureNode);
+
+            if (!$objDSig) {
+                return "FALHA: Nó <Signature> não pôde ser processado por xmlseclibs.";
+            }
+
+            // 2. Validar o Hash (DigestValue) - a causa do MS0017
+            // Isso recalcula o hash do evento e compara com o DigestValue
+            $objXMLSecDSig->canonicalizeSignedInfo();
+            if (!$objXMLSecDSig->validateReference()) {
+                return "FALHA: Referência (DigestValue) inválida! O hash C14N não bate.";
+            }
+
+            // 3. Localizar a Chave (Certificado)
+            $objKey = $objXMLSecDSig->locateKey();
+            if (!$objKey) {
+                return "FALHA: Chave X509Certificate não encontrada na assinatura.";
+            }
+
+            // 4. Carregar a Chave Pública do Certificado
+            $x509Cert = $objXMLSecDSig->keyInfo[XMLSecurityKey::X509_CERTIFICATE_NODE]->textContent;
+            $objKey->loadKey($x509Cert, false, true); // (content, isFile=false, isCert=true)
+
+            // 5. Verificar a Assinatura (SignatureValue)
+            // Isso usa a chave pública para descriptografar a assinatura
+            if ($objXMLSecDSig->verify($objKey) !== 1) {
+                return "FALHA: Verificação da assinatura (SignatureValue) falhou.";
+            }
+
+            // Se chegou aqui, está válida
+            return "VÁLIDA";
+        } catch (Exception $e) {
+            return "EXCEÇÃO: " . $e->getMessage();
+        }
     }
 }
