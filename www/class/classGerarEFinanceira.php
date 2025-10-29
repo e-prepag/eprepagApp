@@ -862,103 +862,23 @@ class GerarEFinanceira
 
     public function assinarLoteEventos($xml)
     {
-        // --- 1. Carregar XML de forma flexível ---
-        if ($xml instanceof DOMDocument) {
-            $dom = $xml;
-        } elseif (is_string($xml)) {
-            $dom = new DOMDocument('1.0', 'UTF-8');
-            $dom->preserveWhiteSpace = true;
-            $dom->formatOutput = false;
+        $senha = $this->senhaCertificado;
 
-            // Se for caminho de arquivo
-            if (file_exists($xml)) {
-                $xmlContent = file_get_contents($xml);
-            } else {
-                // Se for conteúdo XML
-                $xmlContent = $xml;
-            }
+        $ch = curl_init('http://assinador:5000/assinar');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            'xml'  => $xml,
+            'senha' => $senha
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $resposta = curl_exec($ch);
+        curl_close($ch);
 
-            if (!$dom->loadXML($xmlContent, LIBXML_NOBLANKS | LIBXML_NOERROR)) {
-                throw new Exception('Não foi possível carregar o XML informado.');
-            }
-        } else {
-            throw new Exception('O parâmetro deve ser um DOMDocument, caminho de arquivo XML, ou string XML.');
+        if ($resposta === false) {
+            throw new Exception("Falha ao chamar serviço de assinatura");
         }
 
-        // CRÍTICO: Garantir que não há formatação
-        $dom->preserveWhiteSpace = true;
-        $dom->formatOutput = false;
-
-        // --- 2. Inicia o XPath e configura o namespace ---
-        $xpath = new DOMXPath($dom);
-        $xpath->registerNamespace('ef', 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0');
-
-        $eventos = $xpath->query('//ef:evento[@id]');
-        if ($eventos->length === 0) {
-            throw new Exception('Nenhum evento com atributo "id" encontrado no lote.');
-        }
-
-        // --- 3. Lê certificado uma única vez ---
-        if (!file_exists($this->certificado)) {
-            throw new Exception('Certificado PFX não encontrado: ' . $this->certificado);
-        }
-
-        $pfxContent = file_get_contents($this->certificado);
-        if (!openssl_pkcs12_read($pfxContent, $certs, $this->senhaCertificado)) {
-            throw new Exception('Erro ao abrir o certificado PFX. Verifique caminho e senha.');
-        }
-
-        // --- 4. Assina cada evento ---
-        foreach ($eventos as $eventoElement) {
-            $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
-            $assinaturasExistentes = $xpath->query('.//ds:Signature', $eventoElement);
-            foreach ($assinaturasExistentes as $sig) {
-                $sig->parentNode->removeChild($sig);
-            }
-
-            $tagEvento = $this->obterTagEventoAssinar($eventoElement);
-            if (!$tagEvento) {
-                throw new Exception('Tipo de evento não identificado.');
-            }
-
-            $elementoEvento = $this->buscarElementoEventoPorTag($eventoElement, $tagEvento);
-            if (!$elementoEvento) {
-                throw new Exception("Elemento '$tagEvento' com atributo 'id' não encontrado.");
-            }
-
-            $elementoEFinanceira = $this->buscarElementoEFinanceira($eventoElement);
-            if (!$elementoEFinanceira) {
-                throw new Exception("Elemento 'eFinanceira' não encontrado dentro do evento.");
-            }
-
-            // --- Cria objeto de assinatura ---
-            $objDSig = new XMLSecurityDSig('');
-            $objDSig->setCanonicalMethod(XMLSecurityDSig::C14N);
-
-            $options = [
-                'id_name' => 'id',
-                'overwrite' => false
-            ];
-
-            $objDSig->addReference(
-                $elementoEvento,
-                XMLSecurityDSig::SHA256,
-                [
-                    'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
-                    'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'
-                ],
-                $options
-            );
-
-            // --- Assina ---
-            $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
-            $objKey->loadKey($certs['pkey'], false);
-            $objDSig->sign($objKey);
-            $objDSig->add509Cert($certs['cert'], true, false);
-            $objDSig->appendSignature($elementoEFinanceira);
-        }
-
-        return $dom;
+        return $resposta;
     }
 
     public function criptografarLoteEF($xmlConteudo, $idLote)

@@ -62,7 +62,7 @@ function SQLexecuteQuery($sql)
 		return $ret;
 	}
 	// Verifica se a consulta é do tipo INSERT ou UPDATE
-	if (preg_match('/^\s*(INSERT|UPDATE|DELETE)/i', $sql)) {
+	if (preg_match('/^\s*(INSERT|UPDATE|DELETE|USUARIOS)/i', $sql)) {
 		// Log da consulta SQL e parâmetros
 		$log = date('Y-m-d H:i:s') . " | Query: " . $sql . PHP_EOL;
 

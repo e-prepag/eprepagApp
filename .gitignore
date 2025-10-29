@@ -24,3 +24,4 @@ test.php
 /www/ssl/private.pem
 /www/ssl/public.pem
 !/www/ssl/.gitkeep
+assinador/__pycache__

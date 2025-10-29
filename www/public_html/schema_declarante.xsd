@@ -470,7 +470,7 @@
             </xs:attribute>
           </xs:complexType>
         </xs:element>
-        <!-- <xs:element ref="ds:Signature"/> -->
+        <xs:element ref="ds:Signature"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
