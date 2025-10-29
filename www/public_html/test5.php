@@ -5,9 +5,11 @@ require_once '../class/classGerarEFinanceira.php';
 
 $gerador = new GerarEFinanceira();
 
-$protocolo = '2.202510.81187';
+$_POST = json_decode(file_get_contents('php://input'), true);
 
-sleep(30);
+$protocolo = "{$_POST['protocolo']}";
+
+sleep($_POST['tempo_espera']);
 
 try {
     header('Content-Type: application/xml; charset=utf-8');

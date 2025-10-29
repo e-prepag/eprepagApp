@@ -16,14 +16,16 @@ $xmlLote = $efinanceira->gerarLoteAssincrono([
 
 $xmlLoteAssinado = $efinanceira->assinarLoteEventos($xmlLote);
 
-$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado->saveXML(), 'LOTE_20251028_012');
+//$xmlLoteAssinado = file_get_contents('/www/arquivos_gerados/xml_lote_efinanceira-ASSINADO2025-10-29_04_35.xml');
+
+$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado, 'LOTE_20251028_52');
 
 try {
     header('Content-Type: application/xml; charset=utf-8');
     $resultado = $efinanceira->enviarLoteEFinanceira(
         $xmlCriptgrafado,
-        $usarGzip = false,
-        $producao = false // true para produção
+        false,
+        false // true para produção
     );
     
     echo $resultado;

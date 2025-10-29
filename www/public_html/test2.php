@@ -38,6 +38,8 @@ $efinanceira = new GerarEFinanceira();
 //$xmlMov = $efinanceira->gerarMovimentacaoFinanceira(1, '12345678901', 'Joao Mota', '2000-02-10', 'Rua teste da silve', '2025', '09', 1111, 999.99, 200.11);
 $xmlCad = $efinanceira->gerarCadastroDeclarante();
 
+$xmlCad['xml'] = $xmlCad['xml']->saveXML($xmlCad['xml']->documentElement);
+
 //$xmlAberturaCert = $efinanceira->assinarXML($xmlAbertura['xml']);
 //$xmlFechamentoCert = $efinanceira->assinarXML($xmlFechamento['xml']);
 //$xmlMovCert = $efinanceira->assinarXML($xmlMov['xml']);
@@ -47,7 +49,7 @@ $xmlLote = $efinanceira->gerarLoteAssincrono([
     //['xml' => $xmlAberturaCert, 'id' => $xmlAbertura['id']],
     //['xml' => $xmlFechamentoCert, 'id' => $xmlFechamento['id']],
     //['xml' => $xmlMovCert, 'id' => $xmlMov['id']],
-    ['xml' => $xmlCad['xml']->saveXML($xmlCad['xml']->documentElement), 'id' => $xmlCad['id']]
+    $xmlCad
 ]);
 
 //$arquivo = '/www/arquivos_gerados/xml_lote_efinanceira.xml';
@@ -55,10 +57,14 @@ $xmlLote = $efinanceira->gerarLoteAssincrono([
 
 $xmlLoteAssinado = $efinanceira->assinarLoteEventos($xmlLote);
 
-//$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado, 'LOTE_20251027_001');
+//file_put_contents('/www/arquivos_gerados/xml_lote_efinanceira-ASSINADO'.date('Y-m-d_h_i').'.xml', $xmlLoteAssinado);
+
+$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado, 'LOTE_20251027_001');
 
 // if(eUmaStringXmlValida($xmlLote)) {
-     header('Content-Type: application/xml; charset=utf-8');
+     //header('Content-Type: application/xml; charset=utf-8');
 // }
-//echo $xmlLoteAssinado;
-echo ($xmlLote);
+//echo $efinanceira->validarLoteAssinado($xmlLoteAssinado);
+//echo $xmlLote;
+echo ($xmlLoteAssinado);
+echo $xmlCriptgrafado;
