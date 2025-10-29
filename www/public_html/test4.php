@@ -1,35 +1,10 @@
 <?php
-//libxml_use_internal_errors(true);
+libxml_use_internal_errors(true);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);  // Exibe todos os tipos de erros
 
 require "../class/classGerarEFinanceira.php";
-require '../class/classMostraXML.php';
-
-function eUmaStringXmlValida($stringConteudo) {
-    // Se a string estiver vazia, não é um XML válido.
-    if (trim($stringConteudo) == '') {
-        return false;
-    }
-
-    // Ponto-chave: Suprime os warnings e erros do PHP.
-    // Sem isso, o loadXML() vai "poluir" seu log.
-    libxml_use_internal_errors(true);
-
-    $dom = new DOMDocument('1.0', 'UTF-8');
-    
-    // Tenta carregar a string
-    $sucesso = $dom->loadXML($stringConteudo);
-
-    // Opcional: Limpa os erros da memória do libxml
-    libxml_clear_errors();
-
-    // Restaura o comportamento padrão de erros (importante)
-    libxml_use_internal_errors(false);
-
-    return $sucesso;
-}
 
 $efinanceira = new GerarEFinanceira();
 //exit();
@@ -55,10 +30,4 @@ $xmlLote = $efinanceira->gerarLoteAssincrono([
 
 $xmlLoteAssinado = $efinanceira->assinarLoteEventos($xmlLote);
 
-//$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado, 'LOTE_20251027_001');
-
-// if(eUmaStringXmlValida($xmlLote)) {
-     header('Content-Type: application/xml; charset=utf-8');
-// }
-//echo $xmlLoteAssinado;
-echo ($xmlLote);
+echo print_r($efinanceira->validarLoteAssinado($xmlLoteAssinado));
