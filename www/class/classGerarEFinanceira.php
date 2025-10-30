@@ -89,118 +89,526 @@ class GerarEFinanceira
         $this->chave_privada_epp = '/www/ssl/key-epp-cert.pem';
     }
 
-    private function obterDadosMovFin()
+    private function obterDadosMovFinPJ($inicio, $fim)
     {
-        $sql = "SELECT DISTINCT ON (ug.ug_id) 
-                ug.ug_id,
-                ug.*,
-                sl.* -- Pega todas as colunas do log da transação
-            FROM 
-                dist_usuarios_games ug
-            JOIN 
-                dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
-            WHERE 
-                ug.ug_status = 1 
-                AND sl.dugsl_data_inclusao::date <= '2025-09-30'
-            ORDER BY 
-                ug.ug_id,                -- 1. Tem que bater com o DISTINCT ON
-                sl.dugsl_data_inclusao DESC; -- 2. Define qual linha pegar (a mais recente)
-                
-            -- CTE (tabela temporária) que calcula a movimentação de TODOS os usuários
-            WITH MovimentacaoMensal AS (
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $sql = "WITH 
+                    MovimentacaoMensal AS (
+                        SELECT 
+                            ug.ug_id,
+                            TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa,
+                            
+                            SUM(CASE 
+                                WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 
+                                THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
+                                ELSE 0 
+                            END) AS entradas,
+                            
+                            ABS(SUM(CASE 
+                                WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
+                                THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
+                                ELSE 0 
+                            END)) AS saidas,
+                            
+                            (
+                                SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END) +
+                                ABS(SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END))
+                            ) AS total_movimentado_mes
+                            
+                        FROM 
+                            dist_usuarios_games ug
+                        JOIN 
+                            dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
+                        WHERE 
+                            ug.ug_ativo = 1 
+                            AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                        GROUP BY 
+                            ug.ug_id,
+                            TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
+                    ),
+                    Whitelist AS (
+                        SELECT unnest(ARRAY[]::int[]) AS ug_id -- << COLOQUE OS IDs DA WHITELIST AQUI
+                    ),
+                    MesAtivacaoRegra AS (
+                        SELECT 
+                            ug_id, 
+                            MIN(ano_mes_caixa) AS mes_ativacao
+                        FROM MovimentacaoMensal
+                        WHERE total_movimentado_mes > 6000
+                        GROUP BY ug_id
+                    ),
+                    RegrasReporte AS (
+                        SELECT 
+                            ug_id,
+                            MIN(mes_inicio) AS mes_inicio_reporte
+                        FROM (
+                            SELECT ug_id, mes_ativacao AS mes_inicio FROM MesAtivacaoRegra
+                            UNION ALL
+                            SELECT ug_id, TO_CHAR(:data_inicio::date, 'YYYYMM') AS mes_inicio FROM Whitelist
+                        ) AS RegrasCombinadas
+                        GROUP BY ug_id
+                    ),
+                    DadosUsuario AS (
+                        SELECT DISTINCT ON (ug.ug_id) 
+                            ug.ug_id,
+                            ug.ug_nome_fantasia,
+                            ug.ug_razao_social,
+                            ug.ug_cnpj,
+                            ug.ug_endereco,
+                            ug.ug_numero,
+                            ug.ug_complemento,
+                            ug.ug_bairro,
+                            ug.ug_cidade,
+                            ug.ug_estado,
+                            ug.ug_cep,
+                            ug.ug_perfil_saldo -- Adicionando o saldo atual
+                        FROM 
+                            dist_usuarios_games ug
+                        WHERE 
+                            ug.ug_id IN (SELECT r.ug_id FROM RegrasReporte r)
+                    ),
+                    Calendario AS (
+                        SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
+                        FROM generate_series(
+                            :data_inicio::date, 
+                            :data_fim::date, 
+                            '1 month'::interval
+                        ) d
+                    )
                 SELECT 
-                    ug.ug_id,
-                    
-                    SUM(CASE 
-                    WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 
-                    THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
-                    ELSE 0 
-                END) AS entradas,
-                
-                -- Soma a diferença APENAS SE for negativa (menor que 0)
-                -- e usa ABS() para tornar o resultado positivo
-                ABS(SUM(CASE 
-                    WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
-                    THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
-                    ELSE 0 
-                END)) AS saidas
-                    
+                    'PJ' AS tipo_declarado,
+                    d.ug_cnpj AS ni_declarado,
+                    d.ug_razao_social AS nome_declarado,
+                    NULL AS data_nascimento,
+                    d.ug_endereco,
+                    d.ug_numero,
+                    d.ug_complemento,
+                    d.ug_bairro,
+                    d.ug_cidade,
+                    d.ug_estado,
+                    d.ug_cep,
+                    d.ug_id AS id_conta, 
+                    d.ug_nome_fantasia AS nome_conta, 
+                    '1' AS tp_relacao,
+                    d.ug_perfil_saldo AS saldo_atual_conta,
+                    cal.ano_mes_caixa,
+                    COALESCE(m.entradas, 0) AS entradas_conta,
+                    COALESCE(m.saidas, 0) AS saidas_conta,
+                    COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes
                 FROM 
-                    dist_usuarios_games ug
+                    RegrasReporte r
                 JOIN 
-                    dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
+                    DadosUsuario d ON r.ug_id = d.ug_id
+                CROSS JOIN 
+                    Calendario cal
+                LEFT JOIN 
+                    MovimentacaoMensal m ON r.ug_id = m.ug_id 
+                                         AND cal.ano_mes_caixa = m.ano_mes_caixa
                 WHERE 
-                    ug.ug_ativo = 1 
-                    AND sl.dugsl_data_inclusao::date BETWEEN '2025-09-01' AND '2025-09-30'
-                GROUP BY 
-                    ug.ug_id
-            ),
-            DadosUsuario as (
-            	SELECT DISTINCT ON (ug.ug_id) 
-            	    ug.ug_id,
-                	ug.ug_nome_fantasia,
-            	 	ug.ug_razao_social,
-            	 	ug.ug_cnpj,
-            	 	ug.ug_endereco,
-            	 	ug.ug_numero,
-            	 	ug.ug_complemento,
-            	 	ug.ug_bairro,
-            	 	ug.ug_cidade,
-            	 	ug.ug_estado,
-            	 	ug.ug_cep,
-            	 	ug.ug_repr_legal_nome,
-            	 	ug.ug_repr_legal_cpf,
-            	 	ug.ug_repr_legal_data_nascimento,
-                	sl.dugsl_ug_perfil_saldo
-            	FROM 
-                	dist_usuarios_games ug
-            	JOIN 
-                	dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
-            	WHERE 
-                	ug.ug_id IN (SELECT m.ug_id FROM MovimentacaoMensal m)
-                	AND sl.dugsl_data_inclusao::date <= '2025-09-30'
-            	ORDER BY 
-                	ug.ug_id,
-                	sl.dugsl_data_inclusao DESC
-            ),
-            DadosUsuario as (
-            	SELECT DISTINCT ON (ug.ug_id) 
-            	    ug.ug_id,
-                	ug.ug_nome_fantasia,
-            	 	ug.ug_razao_social,
-            	 	ug.ug_cnpj,
-            	 	ug.ug_endereco,
-            	 	ug.ug_numero,
-            	 	ug.ug_complemento,
-            	 	ug.ug_bairro,
-            	 	ug.ug_cidade,
-            	 	ug.ug_estado,
-            	 	ug.ug_cep,
-            	 	ug.ug_repr_legal_nome,
-            	 	ug.ug_repr_legal_cpf,
-            	 	ug.ug_repr_legal_data_nascimento,
-                	sl.dugsl_ug_perfil_saldo
-            	FROM 
-                	dist_usuarios_games ug
-            	JOIN 
-                	dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
-            	WHERE 
-                	ug.ug_id IN (SELECT m.ug_id FROM MovimentacaoMensal m)
-                	AND sl.dugsl_data_inclusao::date <= '2025-09-30'
-            	ORDER BY 
-                	ug.ug_id,
-                	sl.dugsl_data_inclusao DESC
-            )
-            SELECT 
-                m.*,
-                (m.entradas + m.saidas) AS total_movimentado,
-                d.*
-            FROM 
-                MovimentacaoMensal m
-            join 
-            	DadosUsuario d ON d.ug_id = m.ug_id
-            WHERE 
-                (entradas + saidas) > 2000;";
+                    cal.ano_mes_caixa >= r.mes_inicio_reporte
+                ORDER BY
+                    cal.ano_mes_caixa, d.ug_cnpj;";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':data_inicio', $inicio);
+        $stmt->bindParam(':data_fim', $fim);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function obterDadosMovFinPF($inicio, $fim)
+    {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sqlReprLegal = "WITH
+                        MovimentacaoMensal AS (
+                            SELECT 
+                                ug.ug_id,
+                                TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa,
+                                
+                                SUM(CASE 
+                                    WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 
+                                    THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
+                                    ELSE 0 
+                                END) AS entradas,
+                                
+                                ABS(SUM(CASE 
+                                    WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
+                                    THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
+                                    ELSE 0 
+                                END)) AS saidas,
+                                
+                                (
+                                    SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END) +
+                                    ABS(SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END))
+                                ) AS total_movimentado_mes
+                                
+                            FROM 
+                                dist_usuarios_games ug
+                            JOIN 
+                                dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
+                            WHERE 
+                                ug.ug_ativo = 1 
+                                AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                            GROUP BY 
+                                ug.ug_id,
+                                TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
+                        ),
+                        Whitelist AS (
+                            SELECT unnest(ARRAY[]::int[]) AS ug_id -- << COLOQUE OS IDs DA WHITELIST DE CONTAS PJ AQUI
+                        ),
+                        MesAtivacaoRegra AS (
+                            SELECT 
+                                ug_id, 
+                                MIN(ano_mes_caixa) AS mes_ativacao
+                            FROM MovimentacaoMensal
+                            WHERE total_movimentado_mes > 6000
+                            GROUP BY ug_id
+                        ),
+                        RegrasReporte AS (
+                            SELECT 
+                                ug_id,
+                                MIN(mes_inicio) AS mes_inicio_reporte
+                            FROM (
+                                SELECT ug_id, mes_ativacao AS mes_inicio FROM MesAtivacaoRegra
+                                UNION ALL
+                                SELECT ug_id, TO_CHAR(:data_inicio::date, 'YYYYMM') AS mes_inicio FROM Whitelist
+                            ) AS RegrasCombinadas
+                            GROUP BY ug_id
+                        ),
+                        DadosUsuario AS (
+                            SELECT DISTINCT ON (ug.ug_id) 
+                                ug.ug_id,
+                                ug.ug_nome_fantasia,
+                                ug.ug_razao_social,
+                                ug.ug_cnpj,
+                                ug.ug_endereco,
+                                ug.ug_numero,
+                                ug.ug_complemento,
+                                ug.ug_bairro,
+                                ug.ug_cidade,
+                                ug.ug_estado,
+                                ug.ug_cep,
+                                ug.ug_perfil_saldo,
+                                ug.ug_repr_legal_nome,
+                                ug.ug_repr_legal_cpf,
+                                ug.ug_repr_venda_cpf,
+                                ug.ug_repr_legal_data_nascimento
+                            FROM 
+                                dist_usuarios_games ug
+                            WHERE 
+                                ug.ug_id IN (SELECT r.ug_id FROM RegrasReporte r)
+                        ),
+                        Calendario AS (
+                            SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
+                            FROM generate_series(
+                                :data_inicio::date, 
+                                :data_fim::date, 
+                                '1 month'::interval
+                            ) d
+                        ),
+                        ResultadosBase AS (
+                            SELECT 
+                                d.ug_id,
+                                d.ug_nome_fantasia,
+                                d.ug_razao_social,
+                                d.ug_cnpj,
+                                d.ug_endereco,
+                                d.ug_numero,
+                                d.ug_complemento,
+                                d.ug_bairro,
+                                d.ug_cidade,
+                                d.ug_estado,
+                                d.ug_cep,
+                                d.ug_perfil_saldo,
+                                d.ug_repr_legal_nome,
+                                d.ug_repr_legal_cpf,
+                                d.ug_repr_venda_cpf,
+                                d.ug_repr_legal_data_nascimento,
+                                cal.ano_mes_caixa,
+                                m.entradas,
+                                m.saidas,
+                                m.total_movimentado_mes
+                            FROM 
+                                RegrasReporte r
+                            JOIN 
+                                DadosUsuario d ON r.ug_id = d.ug_id
+                            CROSS JOIN 
+                                Calendario cal
+                            LEFT JOIN 
+                                MovimentacaoMensal m ON r.ug_id = m.ug_id 
+                                                     AND cal.ano_mes_caixa = m.ano_mes_caixa
+                            WHERE 
+                                cal.ano_mes_caixa >= r.mes_inicio_reporte
+                        )
+                    SELECT 
+                        'PF' AS tipo_declarado,
+                        CASE 
+                        	WHEN COALESCE(rb.ug_repr_legal_cpf, '') ILIKE '%**%'
+                             	AND SUBSTRING(COALESCE(rb.ug_repr_legal_cpf, '') FROM LENGTH(COALESCE(rb.ug_repr_legal_cpf, '')) - 1 FOR 2) = SUBSTRING(COALESCE(rb.ug_repr_venda_cpf, '') FROM LENGTH(COALESCE(rb.ug_repr_venda_cpf, '')) - 1 FOR 2)
+                            	THEN rb.ug_repr_venda_cpf
+                        	ELSE rb.ug_repr_legal_cpf
+                    	END AS ni_declarado,
+                        rb.ug_repr_legal_nome AS nome_declarado,
+                        rb.ug_repr_legal_data_nascimento AS data_nascimento,
+                        rb.ug_endereco,
+                        rb.ug_numero,
+                        rb.ug_complemento,
+                        rb.ug_bairro,
+                        rb.ug_cidade,
+                        rb.ug_estado,
+                        rb.ug_cep,
+                        rb.ug_id AS id_conta, 
+                        rb.ug_nome_fantasia AS nome_conta, 
+                        '3' AS tp_relacao,
+                        rb.ug_perfil_saldo AS saldo_atual_conta,
+                        rb.ano_mes_caixa,
+                        COALESCE(rb.entradas, 0) AS entradas_conta,
+                        COALESCE(rb.saidas, 0) AS saidas_conta,
+                        COALESCE(rb.total_movimentado_mes, 0) AS total_movimentado_mes
+                    FROM 
+                        ResultadosBase rb
+                    WHERE 
+                        (rb.ug_repr_legal_cpf IS NOT NULL OR rb.ug_repr_venda_cpf IS NOT NULL)
+                        AND rb.ug_repr_legal_nome IS NOT NULL
+                        
+                    ORDER BY
+                        id_conta, ano_mes_caixa;";
+
+        $sqlPFTitular = "WITH 
+                            MovimentacaoPorContaMensal AS (
+                                SELECT 
+                                    ug.ug_id,
+                                    TO_CHAR(sl.ugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa, 
+                                    SUM(CASE 
+                                        WHEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) > 0 
+                                        THEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) ELSE 0 END
+                                    ) AS entradas,
+                                    ABS(SUM(CASE 
+                                        WHEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) < 0 
+                                        THEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) ELSE 0 END
+                                    )) AS saidas,
+                                    (
+                                        SUM(CASE WHEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) > 0 THEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) ELSE 0 END) +
+                                        ABS(SUM(CASE WHEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) < 0 THEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) ELSE 0 END))
+                                    ) AS total_movimentado_conta_mes
+                                FROM 
+                                    usuarios_games ug
+                                JOIN 
+                                    usuarios_games_saldo_log sl ON ug.ug_id = sl.ugsl_ug_id
+                                WHERE 
+                                    ug.ug_ativo = 1 
+                                    AND sl.ugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                                GROUP BY 
+                                    ug.ug_id,
+                                    TO_CHAR(sl.ugsl_data_inclusao::date, 'YYYYMM')
+                            ),
+                            MovimentacaoPessoaMes AS (
+                                SELECT
+                                    ug.ug_cpf,
+                                    m.ano_mes_caixa,
+                                    SUM(m.total_movimentado_conta_mes) AS total_movimentado_pessoa_mes
+                                FROM 
+                                    MovimentacaoPorContaMensal m
+                                JOIN 
+                                    usuarios_games ug ON m.ug_id = ug.ug_id
+                                WHERE ug.ug_cpf IS NOT NULL
+                                GROUP BY ug.ug_cpf, m.ano_mes_caixa
+                            ),
+                            WhitelistContas AS (
+                                SELECT unnest(ARRAY[]::int[]) AS ug_id -- << COLOQUE OS IDs DAS CONTAS (ug_id) NA WHITELIST AQUI
+                            ),
+                            MesAtivacaoPessoa AS (
+                                SELECT 
+                                    ug_cpf, 
+                                    MIN(ano_mes_caixa) AS mes_ativacao
+                                FROM MovimentacaoPessoaMes
+                                WHERE total_movimentado_pessoa_mes > 2000
+                                GROUP BY ug_cpf
+                            ),
+                            CPFsNaWhitelist AS (
+                                SELECT DISTINCT ug.ug_cpf
+                                FROM usuarios_games ug
+                                WHERE ug.ug_id IN (SELECT w.ug_id FROM WhitelistContas w)
+                                  AND ug.ug_cpf IS NOT NULL
+                            ),
+                            RegrasReporteCPF AS (
+                                SELECT 
+                                    ug_cpf,
+                                    MIN(mes_inicio) AS mes_inicio_reporte
+                                FROM (
+                                    SELECT ug_cpf, mes_ativacao AS mes_inicio FROM MesAtivacaoPessoa
+                                    UNION ALL
+                                    SELECT ug_cpf, TO_CHAR(:data_inicio::date, 'YYYYMM') AS mes_inicio FROM CPFsNaWhitelist
+                                ) AS RegrasCombinadas
+                                GROUP BY ug_cpf
+                            ),
+                            DadosUsuarioContas AS (
+                                SELECT 
+                                    ug.ug_id, ug.ug_nome, ug.ug_data_nascimento, ug.ug_cpf,
+                                    ug.ug_endereco, ug.ug_numero, ug.ug_complemento, ug.ug_bairro,
+                                    ug.ug_cidade, ug.ug_estado, ug.ug_cep, ug.ug_perfil_saldo
+                                FROM 
+                                    usuarios_games ug
+                                WHERE 
+                                    ug.ug_cpf IN (SELECT r.ug_cpf FROM RegrasReporteCPF r)
+                            ),
+                            Calendario AS (
+                                SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
+                                FROM generate_series(
+                                    :data_inicio::date, 
+                                    :data_fim::date, 
+                                    '1 month'::interval
+                                ) d
+                            )
+                        SELECT 
+                            'PF' AS tipo_declarado,
+                            d.ug_cpf AS ni_declarado,
+                            d.ug_nome AS nome_declarado,
+                            d.ug_data_nascimento AS data_nascimento,
+                            d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
+                            d.ug_cidade, d.ug_estado, d.ug_cep,
+                            d.ug_id AS id_conta, 
+                            'Conta de Pagamento' AS nome_conta, 
+                            '1' AS tp_relacao, 
+                            d.ug_perfil_saldo AS saldo_atual_conta,
+                            cal.ano_mes_caixa,
+                            COALESCE(m.entradas, 0) AS entradas_conta,
+                            COALESCE(m.saidas, 0) AS saidas_conta,
+                            COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta
+                            
+                        FROM 
+                            RegrasReporteCPF r_cpf
+                        JOIN 
+                            DadosUsuarioContas d ON r_cpf.ug_cpf = d.ug_cpf
+                        CROSS JOIN 
+                            Calendario cal
+                        LEFT JOIN 
+                            MovimentacaoPorContaMensal m ON d.ug_id = m.ug_id 
+                                                         AND cal.ano_mes_caixa = m.ano_mes_caixa
+                        WHERE 
+                            cal.ano_mes_caixa >= r_cpf.mes_inicio_reporte
+                        ORDER BY
+                            cal.ano_mes_caixa, r_cpf.ug_cpf, d.ug_id;";
+
+        $stmtReprLegal = $pdo->prepare($sqlReprLegal);
+        $stmtReprLegal->bindParam(':data_inicio', $inicio);
+        $stmtReprLegal->bindParam(':data_fim', $fim);
+        $stmtReprLegal->execute();
+        $resultReprLegal = $stmtReprLegal->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmtPFTitular = $pdo->prepare($sqlPFTitular);
+        $stmtPFTitular->bindParam(':data_inicio', $inicio);
+        $stmtPFTitular->bindParam(':data_fim', $fim);
+        $stmtPFTitular->execute();
+        $resultPFTitular = $stmtPFTitular->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_merge($resultReprLegal, $resultPFTitular);
+    }
+
+    function agruparDadosEFinanceira(array $dadosPlanos)
+    {
+        $agrupados = [];
+
+        foreach ($dadosPlanos as $registro) {
+            // 1. Define as chaves de agrupamento
+            $chaveDeclarado = $registro['ni_declarado']; // O CPF ou CNPJ
+            $chaveMes = $registro['ano_mes_caixa'];      // O mês (ex: '202501')
+
+            // 2. Cria o "envelope" do Declarado e do Mês, se ainda não existir
+            if (!isset($agrupados[$chaveDeclarado])) {
+                $agrupados[$chaveDeclarado] = [];
+            }
+
+            if (!isset($agrupados[$chaveDeclarado][$chaveMes])) {
+                // Salva os dados do declarado (que são os mesmos para todas as linhas daquele CPF/Mês)
+                $agrupados[$chaveDeclarado][$chaveMes] = [
+                    'dadosDeclarado' => [
+                        'tipo_declarado'  => $registro['tipo_declarado'],
+                        'ni_declarado'    => $registro['ni_declarado'],
+                        'nome_declarado'  => $registro['nome_declarado'],
+                        'data_nascimento' => $registro['data_nascimento'],
+                        'ug_endereco'     => $registro['ug_endereco'],
+                        'ug_numero'       => $registro['ug_numero'],
+                        'ug_complemento'  => $registro['ug_complemento'],
+                        'ug_bairro'       => $registro['ug_bairro'],
+                        'ug_cidade'       => $registro['ug_cidade'],
+                        'ug_estado'       => $registro['ug_estado'],
+                        'ug_cep'          => $registro['ug_cep'],
+                    ],
+                    'contas' => [] // Cria a lista de contas para este mês
+                ];
+            }
+
+            // 3. Adiciona a conta atual (a linha do SQL) na lista de 'contas'
+            //    daquele Declarado/Mês
+            $agrupados[$chaveDeclarado][$chaveMes]['contas'][] = [
+                'id_conta'          => $registro['id_conta'],
+                'nome_conta'        => $registro['nome_conta'],
+                'tp_relacao'        => $registro['tp_relacao'],
+                'saldo_atual_conta' => $registro['saldo_atual_conta'],
+                'entradas_conta'          => $registro['entradas_conta'], // Nome padronizado
+                'saidas_conta'            => $registro['saidas_conta'],   // Nome padronizado
+                'total_movimentado' => $registro['total_movimentado_mes'] // Nome padronizado
+            ];
+        }
+
+        return $agrupados;
+    }
+
+    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
+    {
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio, $fim);
+        $dadosPF = $this->obterDadosMovFinPF($inicio, $fim);
+
+        $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
+        $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+
+        foreach ($dadosPJAgrupados as $pessoa => $meses) {
+            foreach ($meses as $mes => $registro) {
+                $this->gerarMovimentacaoFinanceira(
+                    $registro['dadosDeclarado']['tipo_declarado'],
+                    $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
+                    $registro['dadosDeclarado']['nome_declarado'],
+                    null,
+                    [
+                        'endereco'    => $registro['dadosDeclarado']['ug_endereco'],
+                        'numero'      => $registro['dadosDeclarado']['ug_numero'],
+                        'complemento' => $registro['dadosDeclarado']['ug_complemento'],
+                        'bairro'      => $registro['dadosDeclarado']['ug_bairro'],
+                        'cidade'      => $registro['dadosDeclarado']['ug_cidade'],
+                        'estado'      => $registro['dadosDeclarado']['ug_estado'],
+                        'cep'         => $registro['dadosDeclarado']['ug_cep']
+                    ],
+                    substr($mes, 0, 4), // Ano
+                    substr($mes, 4, 2), // Mês
+                    $registro['contas']
+                );
+            }
+        }
+
+        foreach ($dadosPFAgrupados as $pessoa => $meses) {
+            foreach ($meses as $mes => $registro) {
+                $this->gerarMovimentacaoFinanceira(
+                    $registro['dadosDeclarado']['tipo_declarado'],
+                    $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
+                    $registro['dadosDeclarado']['nome_declarado'],
+                    $registro['dadosDeclarado']['data_nascimento'],
+                    [
+                        'endereco'    => $registro['dadosDeclarado']['ug_endereco'],
+                        'numero'      => $registro['dadosDeclarado']['ug_numero'],
+                        'complemento' => $registro['dadosDeclarado']['ug_complemento'],
+                        'bairro'      => $registro['dadosDeclarado']['ug_bairro'],
+                        'cidade'      => $registro['dadosDeclarado']['ug_cidade'],
+                        'estado'      => $registro['dadosDeclarado']['ug_estado'],
+                        'cep'         => $registro['dadosDeclarado']['ug_cep']
+                    ],
+                    substr($mes, 0, 4), // Ano
+                    substr($mes, 4, 2), // Mês
+                    $registro['contas']
+                );
+            }
+        }
     }
 
     function chamarServicoEnviar($xmlCriptografado, $producao = false, $usarGzip = false)
@@ -294,7 +702,15 @@ class GerarEFinanceira
         return preg_replace('/\D/', '', $documento);
     }
 
-    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, $ug_id, $entradas, $saidas)
+    /**
+     * @param array{
+     *     ug_id: int|string,
+     *     entradas: float|string|int,
+     *     saidas: float|string|int,
+     *     tipo_declarado: string
+     * } $contas_user
+     */
+    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -393,89 +809,96 @@ class GerarEFinanceira
         $mesCaixa->appendChild($movOpFin);
 
         //Conta - grupo
-        $Conta = $dom->createElementNS($namespace, 'Conta');
-        $movOpFin->appendChild($Conta);
+        foreach ($contas_user as $conta_user) {
+            $ug_id = $conta_user['ug_id'];
+            $entradas = $conta_user['entradas'];
+            $saidas = $conta_user['saidas'];
+            $tipo_declarado = $conta_user['tipo_declarado'];
 
-        //infoConta - grupo
-        $infoConta = $dom->createElementNS($namespace, 'infoConta');
-        $Conta->appendChild($infoConta);
+            $Conta = $dom->createElementNS($namespace, 'Conta');
+            $movOpFin->appendChild($Conta);
 
-        //Reportavel - grupo
-        $Reportavel = $dom->createElementNS($namespace, 'Reportavel');
-        $infoConta->appendChild($Reportavel);
+            //infoConta - grupo
+            $infoConta = $dom->createElementNS($namespace, 'infoConta');
+            $Conta->appendChild($infoConta);
 
-        //Pais
-        $PaisReportavel = $dom->createElementNS($namespace, 'Pais', 'BR');
-        $Reportavel->appendChild($PaisReportavel);
+            //Reportavel - grupo
+            $Reportavel = $dom->createElementNS($namespace, 'Reportavel');
+            $infoConta->appendChild($Reportavel);
 
-        //tpConta 1 deposito
-        $tpConta = $dom->createElementNS($namespace, 'tpConta', '1');
-        $infoConta->appendChild($tpConta);
+            //Pais
+            $PaisReportavel = $dom->createElementNS($namespace, 'Pais', 'BR');
+            $Reportavel->appendChild($PaisReportavel);
 
-        //subTpConta 105 conta pré paga 
-        $subTpConta = $dom->createElementNS($namespace, 'subTpConta', '105');
-        $infoConta->appendChild($subTpConta);
+            //tpConta 1 deposito
+            $tpConta = $dom->createElementNS($namespace, 'tpConta', '1');
+            $infoConta->appendChild($tpConta);
 
-        //tpNumConta
-        $tpNumConta = $dom->createElementNS($namespace, 'tpNumConta', 'OECD602');
-        $infoConta->appendChild($tpNumConta);
+            //subTpConta 105 conta pré paga 
+            $subTpConta = $dom->createElementNS($namespace, 'subTpConta', '105');
+            $infoConta->appendChild($subTpConta);
 
-        //numConta
-        $numConta = $dom->createElementNS($namespace, 'numConta', $ug_id);
-        $infoConta->appendChild($numConta);
+            //tpNumConta
+            $tpNumConta = $dom->createElementNS($namespace, 'tpNumConta', 'OECD602');
+            $infoConta->appendChild($tpNumConta);
 
-        //tpRelacaoDeclarado
-        $tpRelacaoDeclarado = $dom->createElementNS($namespace, 'tpRelacaoDeclarado', '1');
-        $infoConta->appendChild($tpRelacaoDeclarado);
+            //numConta
+            $numConta = $dom->createElementNS($namespace, 'numConta', $ug_id);
+            $infoConta->appendChild($numConta);
 
-        //BRL moeda
-        $moeda = $dom->createElementNS($namespace, 'moeda', 'BRL');
-        $infoConta->appendChild($moeda);
+            //tpRelacaoDeclarado
+            $tpRelacaoDeclarado = $dom->createElementNS($namespace, 'tpRelacaoDeclarado', $tipo_declarado);
+            $infoConta->appendChild($tpRelacaoDeclarado);
 
-        //NoTitulares
-        $NoTitulares = $dom->createElementNS($namespace, 'NoTitulares', '1');
-        $infoConta->appendChild($NoTitulares);
+            //BRL moeda
+            $moeda = $dom->createElementNS($namespace, 'moeda', 'BRL');
+            $infoConta->appendChild($moeda);
 
-        //dtEncerramentoConta RESOLVER DEPOIS
+            //NoTitulares
+            $NoTitulares = $dom->createElementNS($namespace, 'NoTitulares', '1');
+            $infoConta->appendChild($NoTitulares);
 
-        //IndInatividade RESOLVER DEPOIS 6 ANOS INATIV
+            //dtEncerramentoConta RESOLVER DEPOIS
 
-        //BalancoConta grupo
-        $BalancoConta = $dom->createElementNS($namespace, 'BalancoConta');
-        $infoConta->appendChild($BalancoConta);
+            //IndInatividade RESOLVER DEPOIS 6 ANOS INATIV
 
-        //totCreditos
+            //BalancoConta grupo
+            $BalancoConta = $dom->createElementNS($namespace, 'BalancoConta');
+            $infoConta->appendChild($BalancoConta);
 
-        $entradas_formatadas = number_format($entradas, 2, ',', '');
-        $totCreditos = $dom->createElementNS($namespace, 'totCreditos', $entradas_formatadas);
-        $BalancoConta->appendChild($totCreditos);
+            //totCreditos
 
-        //totDebitos
-        $saidas_formatadas = number_format($saidas, 2, ',', '');
-        $totDebitos = $dom->createElementNS($namespace, 'totDebitos', $saidas_formatadas);
-        $BalancoConta->appendChild($totDebitos);
+            $entradas_formatadas = number_format($entradas, 2, ',', '');
+            $totCreditos = $dom->createElementNS($namespace, 'totCreditos', $entradas_formatadas);
+            $BalancoConta->appendChild($totCreditos);
 
-        //totCreditosMesmaTitularidade
-        $totCreditosMesmaTitularidade = $dom->createElementNS($namespace, 'totCreditosMesmaTitularidade', '0,00');
-        $BalancoConta->appendChild($totCreditosMesmaTitularidade);
+            //totDebitos
+            $saidas_formatadas = number_format($saidas, 2, ',', '');
+            $totDebitos = $dom->createElementNS($namespace, 'totDebitos', $saidas_formatadas);
+            $BalancoConta->appendChild($totDebitos);
 
-        //totDebitosMesmaTitularidade
-        $totDebitosMesmaTitularidade = $dom->createElementNS($namespace, 'totDebitosMesmaTitularidade', '0,00');
-        $BalancoConta->appendChild($totDebitosMesmaTitularidade);
+            //totCreditosMesmaTitularidade
+            $totCreditosMesmaTitularidade = $dom->createElementNS($namespace, 'totCreditosMesmaTitularidade', '0,00');
+            $BalancoConta->appendChild($totCreditosMesmaTitularidade);
 
-        //vlrUltDia RESOLVER DEPOIS SO MES DEZEMBRO
+            //totDebitosMesmaTitularidade
+            $totDebitosMesmaTitularidade = $dom->createElementNS($namespace, 'totDebitosMesmaTitularidade', '0,00');
+            $BalancoConta->appendChild($totDebitosMesmaTitularidade);
 
-        //PgtosAcum - grupo
-        $PgtosAcum = $dom->createElementNS($namespace, 'PgtosAcum');
-        $infoConta->appendChild($PgtosAcum);
+            //vlrUltDia RESOLVER DEPOIS SO MES DEZEMBRO
 
-        //tpPgto
-        $tpPgto = $dom->createElementNS($namespace, 'tpPgto', '999');
-        $PgtosAcum->appendChild($tpPgto);
+            //PgtosAcum - grupo
+            $PgtosAcum = $dom->createElementNS($namespace, 'PgtosAcum');
+            $infoConta->appendChild($PgtosAcum);
 
-        //totPgtosAcum
-        $totPgtosAcum = $dom->createElementNS($namespace, 'totPgtosAcum', '0,00');
-        $PgtosAcum->appendChild($totPgtosAcum);
+            //tpPgto
+            $tpPgto = $dom->createElementNS($namespace, 'tpPgto', '999');
+            $PgtosAcum->appendChild($tpPgto);
+
+            //totPgtosAcum
+            $totPgtosAcum = $dom->createElementNS($namespace, 'totPgtosAcum', '0,00');
+            $PgtosAcum->appendChild($totPgtosAcum);
+        }
 
         // Gerar XML final
         return ['xml' => $dom, 'id' => $id_formatado];
@@ -801,14 +1224,6 @@ class GerarEFinanceira
             $fechamentoMes->appendChild($doc->createElementNS($ns, 'quantArqTrans', $quantidade));
         }
 
-        // 10. Grupo: ds:Signature (Obrigatório)
-        // Este é o placeholder para a Assinatura Digital XMLDSig.
-        // A assinatura deve ser gerada por uma biblioteca específica (ex: xmlseclibs)
-        // e inserida aqui.
-        $signature = $doc->createElementNS($nsDS, 'ds:Signature');
-        $eFinanceira->appendChild($signature);
-        $signature->appendChild($doc->createComment(' Bloco obrigatório para assinatura digital (XMLDSig) '));
-
         // 11. Exibir o XML
         return ['xml' => $doc, 'id' => $id_formatado];
     }
@@ -836,7 +1251,7 @@ class GerarEFinanceira
         // 2. Loop para injetar as strings dos eventos
         foreach ($eventos as $ev) {
             if (!isset($ev['id'], $ev['xml']) || !is_string($ev['xml'])) {
-                throw new Exception('O evento ' . ($ev['id'] ?? '') . ' não foi passado como uma string XML.');
+                throw new Exception('O evento ' . ($ev['id'] ?: '') . ' não foi passado como uma string XML.');
             }
 
             // 3. Anexa o evento
@@ -1130,53 +1545,5 @@ class GerarEFinanceira
         }
 
         return $resposta;
-    }
-
-
-    /**
-     * Helper que valida um único nó <Signature> usando xmlseclibs.
-     *
-     * @param DOMElement $signatureNode O nó <Signature> a ser validado.
-     * @return string "VÁLIDA" ou uma mensagem de erro.
-     */
-    private function validarAssinaturaNode(DOMElement $signatureNode)
-    {
-        try {
-            // 1. Cria o objeto de segurança e localiza a assinatura
-            $objXMLSecDSig = new XMLSecurityDSig('');
-            $objDSig = $objXMLSecDSig->locateSignature($signatureNode);
-
-            if (!$objDSig) {
-                return "FALHA: Nó <Signature> não pôde ser processado por xmlseclibs.";
-            }
-
-            // 2. Validar o Hash (DigestValue) - a causa do MS0017
-            // Isso recalcula o hash do evento e compara com o DigestValue
-            $objXMLSecDSig->canonicalizeSignedInfo();
-            if (!$objXMLSecDSig->validateReference()) {
-                return "FALHA: Referência (DigestValue) inválida! O hash C14N não bate.";
-            }
-
-            // 3. Localizar a Chave (Certificado)
-            $objKey = $objXMLSecDSig->locateKey();
-            if (!$objKey) {
-                return "FALHA: Chave X509Certificate não encontrada na assinatura.";
-            }
-
-            // 4. Carregar a Chave Pública do Certificado
-            $x509Cert = $objXMLSecDSig->keyInfo[XMLSecurityKey::X509_CERTIFICATE_NODE]->textContent;
-            $objKey->loadKey($x509Cert, false, true); // (content, isFile=false, isCert=true)
-
-            // 5. Verificar a Assinatura (SignatureValue)
-            // Isso usa a chave pública para descriptografar a assinatura
-            if ($objXMLSecDSig->verify($objKey) !== 1) {
-                return "FALHA: Verificação da assinatura (SignatureValue) falhou.";
-            }
-
-            // Se chegou aqui, está válida
-            return "VÁLIDA";
-        } catch (Exception $e) {
-            return "EXCEÇÃO: " . $e->getMessage();
-        }
     }
 }

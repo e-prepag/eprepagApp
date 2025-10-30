@@ -35,36 +35,32 @@ $efinanceira = new GerarEFinanceira();
 //exit();
 //$xmlAbertura = $efinanceira->gerarAbertura('2025-09-01', '2025-09-30');
 //$xmlFechamento = $efinanceira->gerarFechamento('2025-09-01', '2025-09-30');
-//$xmlMov = $efinanceira->gerarMovimentacaoFinanceira(1, '12345678901', 'Joao Mota', '2000-02-10', 'Rua teste da silve', '2025', '09', 1111, 999.99, 200.11);
-$xmlCad = $efinanceira->gerarCadastroDeclarante();
+$xmlMov = $efinanceira->gerarMovimentacaoFinanceira(1, '12345678901', 'Joao Mota', '2000-02-10', 'Rua teste da silve', '2025', '09', 1111, 999.99, 200.11);
 
-$xmlCad['xml'] = $xmlCad['xml']->saveXML($xmlCad['xml']->documentElement);
+$xmlMov['xml'] = $xmlMov['xml']->saveXML($xmlMov['xml']->documentElement);
 
-//$xmlAberturaCert = $efinanceira->assinarXML($xmlAbertura['xml']);
-//$xmlFechamentoCert = $efinanceira->assinarXML($xmlFechamento['xml']);
-//$xmlMovCert = $efinanceira->assinarXML($xmlMov['xml']);
-//$xmlCadCert = $efinanceira->assinarXML($xmlCad['xml']);
+//$xmlCad['xml'] = $xmlCad['xml']->saveXML($xmlCad['xml']->documentElement);
 
 $xmlLote = $efinanceira->gerarLoteAssincrono([
     //['xml' => $xmlAberturaCert, 'id' => $xmlAbertura['id']],
     //['xml' => $xmlFechamentoCert, 'id' => $xmlFechamento['id']],
-    //['xml' => $xmlMovCert, 'id' => $xmlMov['id']],
-    $xmlCad
+    $xmlMov
+    //$xmlCad
 ]);
 
 //$arquivo = '/www/arquivos_gerados/xml_lote_efinanceira.xml';
 //file_put_contents($arquivo, $xmlLote);
 
-$xmlLoteAssinado = $efinanceira->assinarLoteEventos($xmlLote);
+//$xmlLoteAssinado = $efinanceira->assinarLoteEventos($xmlLote);
 
 //file_put_contents('/www/arquivos_gerados/xml_lote_efinanceira-ASSINADO'.date('Y-m-d_h_i').'.xml', $xmlLoteAssinado);
 
-$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado, 'LOTE_20251027_001');
+//$xmlCriptgrafado = $efinanceira->criptografarLoteEF($xmlLoteAssinado, 'LOTE_20251027_001');
 
 // if(eUmaStringXmlValida($xmlLote)) {
      //header('Content-Type: application/xml; charset=utf-8');
 // }
 //echo $efinanceira->validarLoteAssinado($xmlLoteAssinado);
-//echo $xmlLote;
-echo ($xmlLoteAssinado);
-echo $xmlCriptgrafado;
+echo $xmlLote;
+//echo ($xmlLoteAssinado);
+//echo $xmlCriptgrafado;
