@@ -1,9 +1,9 @@
 <?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
-if(!strpos($_SERVER['HTTP_REFERER'],"prepag2/commerce/pagamento_int.php")) {
-    @session_start();
-    session_destroy();    
-}
+// if(!strpos($_SERVER['HTTP_REFERER'],"prepag2/commerce/pagamento_int.php")) {
+//     @session_start();
+//     session_destroy();    
+// }
 
 // Correcao bug sessao Internet Explorer 6,7,8
 //header('P3P: CP="CAO PSA OUR"');

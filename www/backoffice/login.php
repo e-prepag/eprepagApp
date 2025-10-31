@@ -42,8 +42,8 @@ require_once "/www/includes/bourls.php";
           <tr>
             <td height="156">
               <div align="center">
-                <form name="formLog" id="formLog">
-                  <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag. teste</div>
+                <form name="formLog" id="formLog" method="post">
+                  <div class="text-info top20">Acesso permitido somente para usu&aacute;rios expressamente autorizados pela E-Prepag.</div>
                   <table width="40%" border="0" style="margin-top:120px">
                     <tr>
                       <td width="29%" class="text-right text-info">Usu&aacute;rio:</td>

@@ -1,12 +1,12 @@
 <?php
 require_once '/www/db/connect.php';
 require_once '/www/db/ConnectionPDO.php';
-require_once '../libs/xmlseclibs.php';
+//require_once '../libs/xmlseclibs.php';
 require_once '/www/includes/load_dotenv.php';
-require_once '../libs/xmlseclibs.php';
+//require_once '../libs/xmlseclibs.php';
 
-use RobRichards\XMLSecLibs\XMLSecurityKey;
-use RobRichards\XMLSecLibs\XMLSecurityDSig;
+//use RobRichards\XMLSecLibs\XMLSecurityKey;
+//use RobRichards\XMLSecLibs\XMLSecurityDSig;
 
 
 class GerarEFinanceira
@@ -176,8 +176,8 @@ class GerarEFinanceira
                         ) d
                     )
                 SELECT 
-                    'PJ' AS tipo_declarado,
-                    d.ug_cnpj AS ni_declarado,
+                    2 AS tipo_declarado,
+                    regexp_replace(d.ug_cnpj, '[^0-9]', '', 'g') AS ni_declarado,
                     d.ug_razao_social AS nome_declarado,
                     NULL AS data_nascimento,
                     d.ug_endereco,
@@ -187,7 +187,7 @@ class GerarEFinanceira
                     d.ug_cidade,
                     d.ug_estado,
                     d.ug_cep,
-                    d.ug_id AS id_conta, 
+                    ('PD' || d.ug_id) AS id_conta, 
                     d.ug_nome_fantasia AS nome_conta, 
                     '1' AS tp_relacao,
                     d.ug_perfil_saldo AS saldo_atual_conta,
@@ -342,12 +342,12 @@ class GerarEFinanceira
                                 cal.ano_mes_caixa >= r.mes_inicio_reporte
                         )
                     SELECT 
-                        'PF' AS tipo_declarado,
+                        1 AS tipo_declarado,
                         CASE 
                         	WHEN COALESCE(rb.ug_repr_legal_cpf, '') ILIKE '%**%'
                              	AND SUBSTRING(COALESCE(rb.ug_repr_legal_cpf, '') FROM LENGTH(COALESCE(rb.ug_repr_legal_cpf, '')) - 1 FOR 2) = SUBSTRING(COALESCE(rb.ug_repr_venda_cpf, '') FROM LENGTH(COALESCE(rb.ug_repr_venda_cpf, '')) - 1 FOR 2)
-                            	THEN rb.ug_repr_venda_cpf
-                        	ELSE rb.ug_repr_legal_cpf
+                            	THEN regexp_replace(rb.ug_repr_venda_cpf, '[^0-9]', '', 'g')
+                        	ELSE regexp_replace(rb.ug_repr_legal_cpf, '[^0-9]', '', 'g')
                     	END AS ni_declarado,
                         rb.ug_repr_legal_nome AS nome_declarado,
                         rb.ug_repr_legal_data_nascimento AS data_nascimento,
@@ -358,7 +358,7 @@ class GerarEFinanceira
                         rb.ug_cidade,
                         rb.ug_estado,
                         rb.ug_cep,
-                        rb.ug_id AS id_conta, 
+                        ('PD' || rb.ug_id) AS id_conta, 
                         rb.ug_nome_fantasia AS nome_conta, 
                         '3' AS tp_relacao,
                         rb.ug_perfil_saldo AS saldo_atual_conta,
@@ -462,13 +462,13 @@ class GerarEFinanceira
                                 ) d
                             )
                         SELECT 
-                            'PF' AS tipo_declarado,
-                            d.ug_cpf AS ni_declarado,
+                            1 AS tipo_declarado,
+                            regexp_replace(d.ug_cpf, '[^0-9]', '', 'g') AS ni_declarado,
                             d.ug_nome AS nome_declarado,
                             d.ug_data_nascimento AS data_nascimento,
                             d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
                             d.ug_cidade, d.ug_estado, d.ug_cep,
-                            d.ug_id AS id_conta, 
+                            ('GM' || d.ug_id) AS id_conta, 
                             'Conta de Pagamento' AS nome_conta, 
                             '1' AS tp_relacao, 
                             d.ug_perfil_saldo AS saldo_atual_conta,
@@ -506,7 +506,120 @@ class GerarEFinanceira
         return array_merge($resultReprLegal, $resultPFTitular);
     }
 
-    function agruparDadosEFinanceira(array $dadosPlanos)
+    private function buscarEnderecoPorCep($cep)
+    {
+        // Remove tudo que não for número
+        $cep = preg_replace('/\D/', '', $cep);
+
+        // Valida o formato do CEP (8 dígitos)
+        if (strlen($cep) !== 8) {
+            return ['erro' => true, 'mensagem' => 'CEP inválido'];
+        }
+
+        $url = "https://viacep.com.br/ws/{$cep}/json/";
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_USERAGENT => 'ConsultaCEP-PHP/1.0'
+        ]);
+
+        $resposta = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            $erro = curl_error($ch);
+            curl_close($ch);
+            return ['erro' => true, 'mensagem' => "Erro na requisição cURL: $erro"];
+        }
+
+        curl_close($ch);
+
+        $dados = json_decode($resposta, true);
+
+        // Se o CEP não foi encontrado
+        if (isset($dados['erro']) && $dados['erro'] === true) {
+            return ['erro' => true, 'mensagem' => 'CEP não encontrado'];
+        }
+
+        return [
+            'erro' => false,
+            'cep' => $dados['cep'] ?: '',
+            'logradouro' => $dados['logradouro'] ?: '',
+            'bairro' => $dados['bairro'] ?: '',
+            'cidade' => $dados['localidade'] ?: '',
+            'estado' => $dados['uf'] ?: '',
+            'complemento' => $dados['complemento'] ?: '',
+            'ibge' => $dados['ibge'] ?: ''
+        ];
+    }
+
+    private function formatarEnderecoCompleto(
+        $logradouro,
+        $numero,
+        $complemento,
+        $bairro,
+        $cidade,
+        $estado,
+        $cep
+    ) {
+        // Remove espaços em branco desnecessários
+        $logradouro = trim($logradouro);
+        $bairro = trim($bairro);
+        $cidade = trim($cidade);
+        $estado = trim($estado);
+        $cep = preg_replace('/\D/', '', $cep);
+
+        // Verifica se faltam dados críticos para o endereço
+        if (empty($logradouro) || empty($bairro) || empty($cidade) || empty($estado)) {
+
+            // Tenta buscar via API de CEP se o CEP for válido
+            if (strlen($cep) === 8) {
+                $dadosViaCep = $this->buscarEnderecoPorCep($cep);
+
+                if ($dadosViaCep['erro'] === false) {
+
+                    $logradouro  = empty($logradouro) ? $dadosViaCep['logradouro'] : $logradouro;
+                    $bairro      = empty($bairro)     ? $dadosViaCep['bairro']     : $bairro;
+                    $cidade      = empty($cidade)     ? $dadosViaCep['cidade']     : $cidade;
+                    $estado      = empty($estado)     ? $dadosViaCep['estado']     : $estado;
+
+                    // Preenche o complemento se o original estiver vazio E o ViaCEP retornar algo
+                    if (empty($complemento) && !empty($dadosViaCep['complemento'])) {
+                        $complemento = $dadosViaCep['complemento'];
+                    }
+                }
+            }
+        }
+        if (empty($logradouro) && empty($bairro) && empty($cidade) && empty($estado)) {
+            return "Endereco cliente nao encontrado";
+        }
+
+        return $this->garantirUtf8("$logradouro" . ($numero ? " $numero" : "") . ($complemento ? " $complemento" : "") . "/$cep/$cidade/$estado");
+    }
+
+    private function garantirUtf8($texto)
+    {
+        // Detecta o encoding atual
+        $encoding = mb_detect_encoding($texto, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+
+        // Se não detectar, assume ISO-8859-1
+        if ($encoding === false) {
+            $encoding = 'ISO-8859-1';
+        }
+
+        // Se já estiver em UTF-8, apenas retorna
+        if ($encoding === 'UTF-8') {
+            return $texto;
+        }
+
+        // Converte para UTF-8
+        return mb_convert_encoding($texto, 'UTF-8', $encoding);
+    }
+
+    private function agruparDadosEFinanceira(array $dadosPlanos)
     {
         $agrupados = [];
 
@@ -543,72 +656,207 @@ class GerarEFinanceira
             // 3. Adiciona a conta atual (a linha do SQL) na lista de 'contas'
             //    daquele Declarado/Mês
             $agrupados[$chaveDeclarado][$chaveMes]['contas'][] = [
-                'id_conta'          => $registro['id_conta'],
-                'nome_conta'        => $registro['nome_conta'],
-                'tp_relacao'        => $registro['tp_relacao'],
-                'saldo_atual_conta' => $registro['saldo_atual_conta'],
-                'entradas_conta'          => $registro['entradas_conta'], // Nome padronizado
-                'saidas_conta'            => $registro['saidas_conta'],   // Nome padronizado
-                'total_movimentado' => $registro['total_movimentado_mes'] // Nome padronizado
+                'ug_id'          => $registro['id_conta'],
+                'tipo_relacao'        => $registro['tp_relacao'],
+                'entradas'          => $registro['entradas_conta'], // Nome padronizado
+                'saidas'            => $registro['saidas_conta'],   // Nome padronizado
             ];
         }
 
         return $agrupados;
     }
 
+    private function validarCpfCnpj($valor)
+    {
+        // Remove tudo que não for número
+        $valor = preg_replace('/[^0-9]/', '', $valor);
+
+        // Se for CPF
+        if (strlen($valor) === 11) {
+            return $this->validarCpf($valor);
+        }
+
+        // Se for CNPJ
+        if (strlen($valor) === 14) {
+            return $this->validarCnpj($valor);
+        }
+
+        return false;
+    }
+
+    private function validarCpf($cpf)
+    {
+        // Elimina CPFs inválidos conhecidos
+        if (preg_match('/^(.)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        // Calcula os dígitos verificadores
+        for ($t = 9; $t < 11; $t++) {
+            $d = 0;
+            for ($c = 0; $c < $t; $c++) {
+                $d += $cpf[$c] * (($t + 1) - $c);
+            }
+            $d = ((10 * $d) % 11) % 10;
+            if ($cpf[$c] != $d) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function validarCnpj($cnpj)
+    {
+        // Elimina CNPJs inválidos conhecidos
+        if (preg_match('/^(.)\1{13}$/', $cnpj)) {
+            return false;
+        }
+
+        $tamanho = strlen($cnpj) - 2;
+        $numeros = substr($cnpj, 0, $tamanho);
+        $digitos = substr($cnpj, $tamanho);
+        $soma = 0;
+        $pos = $tamanho - 7;
+
+        for ($i = $tamanho; $i >= 1; $i--) {
+            $soma += $numeros[$tamanho - $i] * $pos--;
+            if ($pos < 2) $pos = 9;
+        }
+
+        $resultado = ($soma % 11 < 2) ? 0 : 11 - ($soma % 11);
+        if ($resultado != $digitos[0]) {
+            return false;
+        }
+
+        $tamanho = $tamanho + 1;
+        $numeros = substr($cnpj, 0, $tamanho);
+        $soma = 0;
+        $pos = $tamanho - 7;
+
+        for ($i = $tamanho; $i >= 1; $i--) {
+            $soma += $numeros[$tamanho - $i] * $pos--;
+            if ($pos < 2) $pos = 9;
+        }
+
+        $resultado = ($soma % 11 < 2) ? 0 : 11 - ($soma % 11);
+        return ($resultado == $digitos[1]);
+    }
+
+
     public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
     {
+        // 1. Obtenção e Agrupamento dos Dados
         $dadosPJ = $this->obterDadosMovFinPJ($inicio, $fim);
         $dadosPF = $this->obterDadosMovFinPF($inicio, $fim);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
 
+        // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
+        $movimentacoesAgrupadasPorMes = [];
+
+        // Variável para IDs únicos (opcional, pode ser movida para dentro do loop do mês se preferir recontar)
+        $id_mov = 100;
+
+        // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
-                $this->gerarMovimentacaoFinanceira(
+
+                if(!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])){
+                    continue;
+                }
+                // CRIA O XML (ou o objeto XML/Evento)
+                $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
-                    $registro['dadosDeclarado']['nome_declarado'],
+                    $this->garantirUtf8($registro['dadosDeclarado']['nome_declarado']),
                     null,
-                    [
-                        'endereco'    => $registro['dadosDeclarado']['ug_endereco'],
-                        'numero'      => $registro['dadosDeclarado']['ug_numero'],
-                        'complemento' => $registro['dadosDeclarado']['ug_complemento'],
-                        'bairro'      => $registro['dadosDeclarado']['ug_bairro'],
-                        'cidade'      => $registro['dadosDeclarado']['ug_cidade'],
-                        'estado'      => $registro['dadosDeclarado']['ug_estado'],
-                        'cep'         => $registro['dadosDeclarado']['ug_cep']
-                    ],
+                    $this->formatarEnderecoCompleto(
+                        $registro['dadosDeclarado']['ug_endereco'],
+                        $registro['dadosDeclarado']['ug_numero'],
+                        $registro['dadosDeclarado']['ug_complemento'],
+                        $registro['dadosDeclarado']['ug_bairro'],
+                        $registro['dadosDeclarado']['ug_cidade'],
+                        $registro['dadosDeclarado']['ug_estado'],
+                        $registro['dadosDeclarado']['ug_cep']
+                    ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas']
+                    $registro['contas'],
+                    $id_mov
                 );
+                $id_mov++;
+
+                // ADICIONA O XML AO GRUPO DO MÊS CORRETO
+                $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
 
+        // --- Processa PFs ---
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
-                $this->gerarMovimentacaoFinanceira(
+
+                // CRIA O XML (ou o objeto XML/Evento)
+                $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
-                    $registro['dadosDeclarado']['nome_declarado'],
-                    $registro['dadosDeclarado']['data_nascimento'],
-                    [
-                        'endereco'    => $registro['dadosDeclarado']['ug_endereco'],
-                        'numero'      => $registro['dadosDeclarado']['ug_numero'],
-                        'complemento' => $registro['dadosDeclarado']['ug_complemento'],
-                        'bairro'      => $registro['dadosDeclarado']['ug_bairro'],
-                        'cidade'      => $registro['dadosDeclarado']['ug_cidade'],
-                        'estado'      => $registro['dadosDeclarado']['ug_estado'],
-                        'cep'         => $registro['dadosDeclarado']['ug_cep']
-                    ],
+                    $this->garantirUtf8($registro['dadosDeclarado']['nome_declarado']),
+                    substr($registro['dadosDeclarado']['data_nascimento'], 0, 10),
+                    $this->formatarEnderecoCompleto(
+                        $registro['dadosDeclarado']['ug_endereco'],
+                        $registro['dadosDeclarado']['ug_numero'],
+                        $registro['dadosDeclarado']['ug_complemento'],
+                        $registro['dadosDeclarado']['ug_bairro'],
+                        $registro['dadosDeclarado']['ug_cidade'],
+                        $registro['dadosDeclarado']['ug_estado'],
+                        $registro['dadosDeclarado']['ug_cep']
+                    ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas']
+                    $registro['contas'],
+                    $id_mov
                 );
+                $id_mov++;
+
+                // ADICIONA O XML AO GRUPO DO MÊS CORRETO
+                $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
+
+        return $movimentacoesAgrupadasPorMes;
+    }
+
+    public function gerarLotesMovsFinanceira(array $movimentacoes, $tamanhoLote = 50, $debug = false)
+    {
+        $lotesArray = [];
+
+        // O array $movimentacoes já está agrupado por mês (a chave é o anoMes, ex: '202501')
+        foreach ($movimentacoes as $anoMes => $eventosDoMes) {
+
+            // 1. Divide os eventos do mês em lotes menores (Chunks)
+            // A função array_chunk() do PHP faz isso de forma eficiente.
+            $chunksDeEventos = array_chunk($eventosDoMes, $tamanhoLote);
+
+            $contadorLote = 1;
+
+            // 2. Itera sobre cada lote de eventos
+            foreach ($chunksDeEventos as $eventosDoLote) {
+
+                // Log opcional para acompanhamento
+                if ($debug)
+                    echo "Criando Lote {$contadorLote} para o Mês {$anoMes} com " . count($eventosDoLote) . " eventos...\n";
+
+                $xmlLoteFinal = $this->gerarLoteAssincrono($eventosDoLote);
+
+                // 4. Adiciona o XML do lote final ao array de retorno
+                $lotesArray[] = ['xml' => $xmlLoteFinal, 'ano_mes' => $anoMes, 'lote_numero' => $contadorLote];
+
+                $contadorLote++;
+            }
+        }
+
+        return $lotesArray;
     }
 
     function chamarServicoEnviar($xmlCriptografado, $producao = false, $usarGzip = false)
@@ -676,7 +924,7 @@ class GerarEFinanceira
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result['ultimo_id'] ?: 77;
+        return $result['ultimo_id'] ?: 7;
     }
 
     private function gerarIdFormatado($numero)
@@ -707,10 +955,10 @@ class GerarEFinanceira
      *     ug_id: int|string,
      *     entradas: float|string|int,
      *     saidas: float|string|int,
-     *     tipo_declarado: string
+     *     tipo_relacao: string
      * } $contas_user
      */
-    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
+    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user, $id_mov = null)
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -726,7 +974,7 @@ class GerarEFinanceira
         $dom->appendChild($eFinanceira);
 
         // Criar o elemento evtMovOpFin com atributo id
-        $idNovo = $this->obterUltimoIdEnvio() + 1;
+        $idNovo =  $id_mov ?: $this->obterUltimoIdEnvio() + 1;
 
         $id_formatado = $this->gerarIdFormatado($idNovo);
 
@@ -788,6 +1036,12 @@ class GerarEFinanceira
         $EnderecoLivre = $dom->createElementNS($namespace, 'EnderecoLivre', substr($enderecoCliente, 0, 200));
         $ideDeclarado->appendChild($EnderecoLivre);
 
+        if ($enderecoCliente == "Endereco cliente nao encontrado") {
+            // tpEndereco
+            $tpEndereco = $dom->createElementNS($namespace, 'tpEndereco', 'OECD305');
+            $ideDeclarado->appendChild($tpEndereco);
+        }
+
         //PaisEndereco - grupo
         $PaisEndereco = $dom->createElementNS($namespace, 'PaisEndereco');
         $ideDeclarado->appendChild($PaisEndereco);
@@ -813,7 +1067,7 @@ class GerarEFinanceira
             $ug_id = $conta_user['ug_id'];
             $entradas = $conta_user['entradas'];
             $saidas = $conta_user['saidas'];
-            $tipo_declarado = $conta_user['tipo_declarado'];
+            $tipo_relacao = $conta_user['tipo_relacao'];
 
             $Conta = $dom->createElementNS($namespace, 'Conta');
             $movOpFin->appendChild($Conta);
@@ -847,7 +1101,7 @@ class GerarEFinanceira
             $infoConta->appendChild($numConta);
 
             //tpRelacaoDeclarado
-            $tpRelacaoDeclarado = $dom->createElementNS($namespace, 'tpRelacaoDeclarado', $tipo_declarado);
+            $tpRelacaoDeclarado = $dom->createElementNS($namespace, 'tpRelacaoDeclarado', $tipo_relacao);
             $infoConta->appendChild($tpRelacaoDeclarado);
 
             //BRL moeda
@@ -1147,7 +1401,7 @@ class GerarEFinanceira
         return ['xml' => $dom, 'id' => $id_formatado];
     }
 
-    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre)
+    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre, $arquivosPorMes)
     {
 
         // 1. Definição dos Namespaces
@@ -1157,18 +1411,8 @@ class GerarEFinanceira
         // 2. Dados de Exemplo para o fechamento (1º Semestre de 2025)
         $idNovo = $this->obterUltimoIdEnvio() + 1;
         $id_formatado = $this->gerarIdFormatado($idNovo);
-        $versaoApp = '1.0.0';
-        $ambiente = '2'; // 1 = Produção, 2 = Homologação
-
-        // Exemplo de quantos arquivos evtMovOpFin você enviou por mês
-        $arquivosPorMes = [
-            '202501' => '1500',
-            '202502' => '1450',
-            '202503' => '1600',
-            '202504' => '1520',
-            '202505' => '1580',
-            '202506' => '1700'
-        ];
+        $versaoApp = '00000000000000000001';
+        $ambiente = '1'; // 1 = Produção, 2 = Homologação
 
         // 3. Criação do Documento DOM
         $doc = new DOMDocument('1.0', 'UTF-8');
@@ -1250,8 +1494,11 @@ class GerarEFinanceira
 
         // 2. Loop para injetar as strings dos eventos
         foreach ($eventos as $ev) {
-            if (!isset($ev['id'], $ev['xml']) || !is_string($ev['xml'])) {
-                throw new Exception('O evento ' . ($ev['id'] ?: '') . ' não foi passado como uma string XML.');
+            if (!isset($ev['id'], $ev['xml'])) {
+                throw new Exception('Não foi passado um evento válido para o lote.');
+            }
+            if (!is_string($ev['xml'])) {
+                $ev['xml'] = $ev['xml']->saveXML($ev['xml']->documentElement);
             }
 
             // 3. Anexa o evento
@@ -1353,7 +1600,7 @@ class GerarEFinanceira
         return $resposta;
     }
 
-    public function criptografarLoteEF($xmlConteudo, $idLote)
+    public function criptografarLoteEF($xmlConteudo, $prod = false)
     {
         //$certPath = '/certs/efinanceira.cer'; // caminho do certificado público (ajuste conforme seu container)
 
@@ -1362,9 +1609,17 @@ class GerarEFinanceira
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         // Envia via multipart/form-data, igual ao C# espera (ReadFormAsync)
-        $postFields = [
-            'xml' => $xmlConteudo,
-        ];
+        if ($prod) {
+            $postFields = [
+                'xml' => $xmlConteudo,
+                'cert_path' => "/certs/efinanceira-producao-2025.cer"
+            ];
+        } else {
+            $postFields = [
+                'xml' => $xmlConteudo
+            ];
+        }
+
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
 
