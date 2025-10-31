@@ -491,23 +491,25 @@ if ($ret == "") {
 
                 if ($ip_order_id != "") {
                         // atualiza $venda_id
+                        $pdo = ConnectionPDO::getConnection()->getLink();
                         $sql = "UPDATE tb_integracao_pedido 
-                                SET ip_vg_id = $1, ip_transaction_id = $2
-                                WHERE ip_order_id = $3
-                                  AND ip_store_id = $4
-                                  AND ip_amount = $5";
+                                        SET ip_vg_id = :vg_id, 
+                                            ip_transaction_id = :transaction_id
+                                        WHERE ip_order_id = :order_id
+                                          AND ip_store_id = :store_id
+                                          AND ip_amount = :amount";
 
-                        $params = array(
-                                $venda_id,                          // $1 ip_vg_id
-                                $venda_id,                          // $2 ip_transaction_id
-                                $ip_order_id,                        // $3 ip_order_id
-                                $_SESSION['integracao_origem_id'],   // $4 ip_store_id
-                                $total_carrinho * 100                // $5 ip_amount
-                        );
+                        $stmt = $pdo->prepare($sql);
 
                         grava_log_integracao("Venda - Integração: UPDATE tb_integracao_pedido SET ip_vg_id=$venda_id, ip_transaction_id=$venda_id WHERE ip_order_id=$ip_order_id AND ip_store_id=" . $_SESSION['integracao_origem_id'] . " AND ip_amount=" . ($total_carrinho * 100) . "\n");
 
-                        $ret1 = SQLexecuteQueryParams($sql, $params);
+                        $ret1 = $stmt->execute([
+                                ':vg_id' => $venda_id,
+                                ':transaction_id' => $venda_id,
+                                ':order_id' => $ip_order_id,
+                                ':store_id' => $_SESSION['integracao_origem_id'],
+                                ':amount' => $total_carrinho * 100
+                        ]);
 
                         if (!$ret1) {
                                 echo "Erro ao atualizar transação de integração (3).\n";
@@ -593,7 +595,7 @@ if ($ret == "") {
                 if ($ret)
                         $ret = ""; //limpa resourceId
                 else {
-                        
+
                         //Se deu erro ao inserir um modelo, deleta toda a venda
                         // Deleta modelos da venda
                         $sql = "DELETE FROM tb_venda_games_modelo WHERE vgm_vg_id = $1";
@@ -609,7 +611,7 @@ if ($ret == "") {
 
 
                         $ret = "Erro ao inserir modelo(s) na venda.\n";
-                        if($_SERVER['REMOTE_ADDR'] == '177.37.138.175'){
+                        if ($_SERVER['REMOTE_ADDR'] == '177.37.138.175') {
                                 exit($sql_insert . "\n" . print_r($params_insert, true) . "\n");
                         }
                         break;
