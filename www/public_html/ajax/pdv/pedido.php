@@ -21,6 +21,7 @@ block_direct_calling();
 require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "configIP.php";
 require_once DIR_CLASS . "pdv/classGamesUsuario.php";
+require_once DIR_INCS . "functions.php";
 require_once DIR_INCS . "rs_ws/inc_utils.php";
 require_once DIR_INCS . "pdv/constantes.php";
 @session_start();

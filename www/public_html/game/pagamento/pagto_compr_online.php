@@ -8,10 +8,10 @@ if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
 
 $https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
 
-if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
-    $teste = substr($_SERVER['HTTP_USER_AGENT'], strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') + 4, 4) * 1;
-    echo "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=" . htmlspecialchars($teste) . "\" />";
-}
+// if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
+//     $teste = substr($_SERVER['HTTP_USER_AGENT'], strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') + 4, 4) * 1;
+//     echo "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=" . htmlspecialchars($teste) . "\" />";
+// }
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;

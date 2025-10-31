@@ -245,6 +245,7 @@ if (isset($controller->logado) && $controller->logado) {
                         if (!$ret) {
                                 $msg = "Erro ao inserir venda. Por favor, tente novamente atualizando a página. Obrigado *.\n";
                                 gravaLog_BoletoExpressMoney($msg . "\n" . $sql);
+                                
                         }
                 } //end if(!$msg)
 
@@ -253,11 +254,11 @@ if (isset($controller->logado) && $controller->logado) {
                         $sql = "UPDATE tb_pag_compras SET idvenda = $1 WHERE numcompra = $2";
 
                         $ret = SQLexecuteQueryParams($sql, array(
-                                $param_venda_id,   // $1
-                                $param_numOrder    // $2
+                                $venda_id,   // $1
+                                $numOrder    // $2
                         ));
                         if (!$ret) {
-                                $msg = "Erro ao atualizar transação de pagamento (2a, id_venda=$id_venda, numcompra='" . $numOrder . "').\n";
+                                $msg = "Erro ao atualizar transação de pagamento (2a, id_venda=$venda_id, numcompra='" . $numOrder . "').\n";
                                 gravaLog_BoletoExpressMoney($msg . "\n" . $sql);
                         }
                 } //end if(!$msg)
@@ -471,17 +472,24 @@ function depositoBoleto($total_geral, $usuarioId)
                 //----------------------------------------------------
                 $sql = "
                             INSERT INTO boleto_bancario_games (
-                                bbg_ug_id,
-                                bbg_vg_id,
-                                bbg_data_inclusao,
-                                bbg_valor,
-                                bbg_valor_taxa,
-                                bbg_bco_codigo,
-                                bbg_documento,
-                                bbg_data_venc
-                            ) VALUES (
-                                $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + interval '$7 day'
-                            )
+    bbg_ug_id,
+    bbg_vg_id,
+    bbg_data_inclusao,
+    bbg_valor,
+    bbg_valor_taxa,
+    bbg_bco_codigo,
+    bbg_documento,
+    bbg_data_venc
+) VALUES (
+    $1, 
+    $2, 
+    CURRENT_TIMESTAMP, 
+    $3, 
+    $4, 
+    $5, 
+    $6, 
+    CURRENT_DATE + ($qtde_dias_venc * interval '1 day')
+)
                         ";
 
                 $ret = SQLexecuteQueryParams($sql, array(
@@ -491,7 +499,6 @@ function depositoBoleto($total_geral, $usuarioId)
                         $taxa_adicional,                         // $4 bbg_valor_taxa
                         $bco_codigo,                             // $5 bbg_bco_codigo
                         $num_doc,                                // $6 bbg_documento
-                        $qtde_dias_venc                          // $7 intervalo para vencimento
                 ));
 
                 //atualiza dados do pagamento e status da venda

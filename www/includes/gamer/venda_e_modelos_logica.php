@@ -47,7 +47,7 @@ if(isset($controller->logado) && $controller->logado) {
                                             1 as vgm_qtde, 
                                             vg.vg_deposito_em_saldo_valor as vgm_valor, 
                                             0 as vgm_perc_desconto, 
-                                            'Crédito online EPP Cash (R\$' || to_char(bbg_valor-bbg_valor_taxa,'FM9999.00') || ')' as vgm_nome_produto,
+                                            'Credito online EPP Cash (RS' || to_char(bbg_valor-bbg_valor_taxa,'FM9999.00') || ')' as vgm_nome_produto,
                                             '' as vgm_nome_modelo 
                                     from tb_venda_games vg
                                     inner join boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id 
@@ -61,7 +61,7 @@ if(isset($controller->logado) && $controller->logado) {
                                         1 as vgm_qtde, 
                                         (total/100-taxas) as vgm_valor, 
                                         0 as vgm_perc_desconto, 
-                                        'Crédito online EPP Cash (R\$' || to_char((total/100-taxas),'FM9999.00') || ')' as vgm_nome_produto,
+                                        'Credito online EPP Cash (RS' || to_char((total/100-taxas),'FM9999.00') || ')' as vgm_nome_produto,
                                         '' as vgm_nome_modelo 
                                     from tb_venda_games vg 
                                         inner join tb_pag_compras pg on pg.idvenda = vg.vg_id 
