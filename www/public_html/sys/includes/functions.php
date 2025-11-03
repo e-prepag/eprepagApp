@@ -142,6 +142,20 @@ if (!function_exists("SQLexecuteQuery")) {
 	}
 }
 
+if (!function_exists("SQLexecuteQueryParams")) {
+	function SQLexecuteQueryParams($sql, $params)
+	{
+		$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
+		if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
+			$message  = date("Y-m-d H:i:s") . " ";
+			$message .= "Erro: " . $erro . "<br>\n";
+			$message .= "Query: " . $sql . "<br>\n";
+			gravaLog_SQLexecuteQuery($message);
+		}
+		return $ret;
+	}
+}
+
 function getValue($sql)
 {
 
