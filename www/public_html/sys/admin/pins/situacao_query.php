@@ -148,9 +148,9 @@ if ($debug) {
 //echo "felipe " . $sql;
 
 if (!empty($sql_params)) {
-    $resvalue = SQLexecuteQueryParams($connid, $sql, $sql_params);
+    $resvalue = SQLexecuteQueryParams($sql, $sql_params);
 } else {
-    $resvalue = SQLexecuteQuery($connid, $sql);
+    $resvalue = SQLexecuteQuery($sql);
 }
 $a_valores = array();
 while ($pgvalue = pg_fetch_array($resvalue)) {
@@ -159,7 +159,7 @@ while ($pgvalue = pg_fetch_array($resvalue)) {
 ksort($a_valores);
 
 if ($BtnSearch) {
-        //"--, t4.est_codigo, t4.nome_fantasia  \n";
+    //"--, t4.est_codigo, t4.nome_fantasia  \n";
     $sql_flist = false;
     if ($_SESSION["tipo_acesso_pub"] == 'AT' && $flist_vg_id) {
         $sql_flist = true;
@@ -203,7 +203,7 @@ if ($BtnSearch) {
     $sql_wheres = "";
     $sql_params_main = array();
     $param_count_main = 0;
-    
+
     if ($fcodinterno) {
         $param_count_main++;
         $sql_wheres .= " and (t0.pin_codinterno in ($" . $param_count_main . "))  \n";
@@ -362,11 +362,11 @@ if ($BtnSearch) {
                   )
                 order by pin_datavenda desc, pin_horavenda desc;";
     //echo "felipe: " . $sql;
-    
+
     if (!empty($sql_params_main)) {
-        $resid_count = SQLexecuteQueryParams($connid, $sql, $sql_params_main);
+        $resid_count = SQLexecuteQueryParams($sql, $sql_params_main);
     } else {
-        $resid_count = SQLexecuteQuery($connid, $sql);
+        $resid_count = SQLexecuteQuery($sql);
     }
     $total_table = pg_num_rows($resid_count);
 
@@ -416,8 +416,8 @@ if ($BtnSearch) {
                     t0.pin_datavenda,
                     t0.pin_horavenda,
                     " . ($sql_flist
-        ? "vg_id, 'G' AS vg_canal, "
-        : "") . "
+            ? "vg_id, 'G' AS vg_canal, "
+            : "") . "
                     t0.pin_est_codigo
                 FROM pins t0
                 INNER JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
@@ -443,8 +443,8 @@ if ($BtnSearch) {
                     t0.pin_datavenda,
                     t0.pin_horavenda,
                     " . ($sql_flist
-        ? "vg.vg_id, 'L' AS vg_canal, "
-        : "") . "
+            ? "vg.vg_id, 'L' AS vg_canal, "
+            : "") . "
                     t0.pin_est_codigo
                 FROM pins t0
                 INNER JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
@@ -470,8 +470,8 @@ if ($BtnSearch) {
                     t0.pin_datavenda,
                     t0.pin_horavenda,
                     " . ($sql_flist
-        ? "NULL AS vg_id, 'SEM_CANAL' AS vg_canal, "
-        : "") . "
+            ? "NULL AS vg_id, 'SEM_CANAL' AS vg_canal, "
+            : "") . "
                     t0.pin_est_codigo
                 FROM pins t0
                 INNER JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
@@ -503,11 +503,11 @@ if ($BtnSearch) {
         $sql = preg_replace('/offset [0-9]*/s', '', $sql);
     }
     //echo "felipe2: " . $sql;
-    
+
     if (!empty($sql_params_main)) {
-        $resid = SQLexecuteQueryParams($connid, $sql, $sql_params_main);
+        $resid = SQLexecuteQueryParams($sql, $sql_params_main);
     } else {
-        $resid = SQLexecuteQuery($connid, $sql);
+        $resid = SQLexecuteQuery($sql);
     }
 
     if ($max + $inicial > $total_table) $reg_ate = $total_table;

@@ -4,9 +4,17 @@
 
 ## [v1.0.2] - 2025-10-24
 - ? Fix
+- ?? Branch: `fix/falhaArquivoSQL`
+- ?? Mudanças:
+  -> Ajuste de falha de arquivo:
+
+  ----
+
+## [v1.0.2] - 2025-10-24
+- ? Fix
 - ?? Branch: `SQLinjection/tratativas-v1`
 - ?? Mudanças:
-  -> Ajuste de SQL Injection nos arquivos v2:
+  -> Ajuste de SQL Injection nos arquivos (public_html/prepag2):
 
     (public_html/prepag2)
     -- epp_noify.php
