@@ -94,8 +94,9 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 
 			if ($aux_opr_ip <> 0 && $aux_teste_IP) {
 				$aux_status_value = retorna_status($pin_code, $id);
+				$aux_verifica_venda = verifica_venda($pin_code, $id);
 				//echo $aux_status_value."<br>".$PINS_PUBLISHERS_STATUS_VALUES['V']."<br>".$PINS_PUBLISHERS_STATUS_VALUES['L']."<br>".$PINS_PUBLISHERS_STATUS_VALUES['P']."<br>";
-				if (($aux_status_value == $PINS_PUBLISHERS_STATUS_VALUES['V']) || ($aux_status_value == $PINS_PUBLISHERS_STATUS_VALUES['L']) || ($aux_status_value == $PINS_PUBLISHERS_STATUS_VALUES['P'])) {
+				if ((($aux_status_value == $PINS_PUBLISHERS_STATUS_VALUES['V']) || ($aux_status_value == $PINS_PUBLISHERS_STATUS_VALUES['L']) || ($aux_status_value == $PINS_PUBLISHERS_STATUS_VALUES['P'])) && $aux_verifica_venda == true) {
 					if ($action == '1') {
 						$pin_valido = verifica_validade($pin_code, $id);
 						if ($pin_valido === true) {
