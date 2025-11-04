@@ -527,7 +527,7 @@ class EnvioEmailAutomatico {
 	
 	
     public function getUgID() {
-        return $this->ug_id;
+        return $this->ug_id ?: 0;
     }
     public function setUgID($ug_id) {
         $this->ug_id = $ug_id;

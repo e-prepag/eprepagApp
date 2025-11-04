@@ -198,8 +198,8 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                     }
                 } else {
                     $cpfFinal = substr($cpf, 0, 3) . "." . substr($cpf, 3, 3) . "." . substr($cpf, 6, 3) . "-" . substr($cpf, 9, 2);
-                    $sql = "select * from usuarios_games where ug_cpf like '%" . $cpfFinal . "%' and ug_ativo = 1;";
-                    $buscaUsuario = SQLexecuteQuery($sql);
+                    $sql = "select * from usuarios_games where ug_cpf = $1 and ug_ativo = 1;";
+                    $buscaUsuario = SQLexecuteQueryParams($sql, [$cpfFinal]);
 
                     $linhas = pg_num_rows($buscaUsuario);
 
