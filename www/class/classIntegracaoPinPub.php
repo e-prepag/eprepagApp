@@ -29,13 +29,17 @@ function retorna_id_pin($pin, $id)
 
 function retorna_status($pin, $id)
 {
-	$sql = "SELECT p.pin_status 
-            FROM pins p
-            LEFT JOIN pins_integracao_historico pih 
-                ON p.pin_codinterno = pih.pih_pin_id 
-            WHERE p.pin_codigo = $1 
-              AND p.opr_codigo = $2 
-              AND pih.pih_pin_id IS NULL";
+	$sql = "SELECT p.pin_status
+				FROM pins p
+				WHERE p.pin_codigo = $1
+				  AND p.opr_codigo = $2
+				  AND NOT EXISTS (
+				      SELECT 1
+				      FROM pins_integracao_historico pih
+				      WHERE pih.pih_pin_id = p.pin_codinterno
+				        AND pih.pin_status = 8
+				        AND pih.pih_codretepp = '2'
+				  );";
 
 	$rs_log = SQLexecuteQueryParams($sql, [$pin, $id]);
 
@@ -172,8 +176,7 @@ function verifica_validade($pin, $id)
 	// 2. A query usa placeholders para $pin ($1), $id ($2), e $periodo ($3)
 	// Usamos ($3 || ' day')::interval para construir o intervalo dinâmico
 	// de forma segura dentro do PostgreSQL.
-	$sql = "
-        SELECT 1
+	$sql = "SELECT 1
         FROM pins
         WHERE pin_codigo = $1
           AND opr_codigo = $2

@@ -102,8 +102,8 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 								}
 								elseif($action == '2') {
 										$aux_debug = "";
-										$sql_opr = "select opr_use_check,opr_partner_check from operadoras where opr_codigo=".$id;
-										$rs_oper = SQLexecuteQuery($sql_opr);
+										$sql_opr = "SELECT opr_use_check,opr_partner_check from operadoras where opr_codigo=$1";
+										$rs_oper = SQLexecuteQueryParams($sql_opr, [$id]);
 										$rs_oper_row = pg_fetch_array($rs_oper);
 										if ($rs_oper_row['opr_use_check'] == 1) {
 												
