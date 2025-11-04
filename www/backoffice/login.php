@@ -21,11 +21,11 @@ require_once "/www/includes/bourls.php";
   <title>E-Prepag - BackOffice</title>
   <link rel="stylesheet" href="/css/css_frame.css" type="text/css">
   <link href="/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />
-  <link rel="icon" href="<?= EPREPAG_URL_HTTPS ?>/favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="<?= EPREPAG_URL_HTTPS ?>/favicon.ico" type="image/x-icon">
-  <link href="/css/creditos.css" rel="stylesheet" type="text/css" />
-  <script type="text/javascript" src="<?php echo $server_url_ep; ?>/js/jquery.js"></script>
-  <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
+  <link rel="icon" href="<?= $server_url_ep ?>/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="<?= $server_url_ep ?>/favicon.ico" type="image/x-icon">
+  <link href="<?= $server_url_ep ?>/css/creditos.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="<?= $server_url_ep ?>/js/jquery.js"></script>
+  <link href="<?= $server_url_ep ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
   <script src="/js/jquery-ui.min.js"></script>
 </head>
 
