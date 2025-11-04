@@ -542,9 +542,8 @@ if ($ret == "") {
                         $svalorEPPCASH = $carrinho_val[$modeloId];
                 }
 
-                $ret = false;
+                $ret = $ret1;
 
-                $ret = SQLexecuteQuery($sql);
                 // Buscar dados do modelo e produto
                 $sql_select = "
                                     SELECT 

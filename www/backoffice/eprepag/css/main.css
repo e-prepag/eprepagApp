@@ -1,0 +1,292 @@
+@font-face {
+    font-family: "Verdana";
+    src: local("Verdana"), url('/incs/fonts/Verdana.ttf');
+}
+
+body {
+    margin: 0 auto;
+    font-family: "Verdana", Arial, Serif !important;
+}
+
+b, strong {
+    font-weight: 700;
+}
+
+a:link, a:visited, a:active {
+    text-decoration:none;
+}
+a:hover {
+    text-decoration: underline;
+    color:#96C5F5;
+}
+
+::-webkit-input-placeholder {font-style: italic;text-transform: capitalize;}
+:-moz-placeholder {font-style: italic;text-transform: capitalize;}
+::-moz-placeholder {font-style: italic;text-transform: capitalize;}
+:-ms-input-placeholder {font-style: italic;text-transform: capitalize;}
+
+.topo {
+    z-index: 10;
+    background-color: #F4F3F0;
+}
+
+.faixa {
+    width: 99.9%;
+    height: 45px;
+    padding:0 0 0 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 1px;
+    border: 1px solid #093f85;
+    box-shadow: inset 0 2px 3px 0 rgba(255,255,255,.0), inset 0 -3px 6px 0 rgba(0,0,0,.2), 0 3px 2px 0 rgba(0,0,0,.2);
+    -moz-box-shadow: inset 0 2px 3px 0 rgba(255,255,255,.0), inset 0 -3px 6px 0 rgba(0,0,0,.2), 0 3px 2px 0 rgba(0,0,0,.2);
+    -webkit-box-shadow: inset 0 2px 3px 0 rgba(255,255,255,.0), inset 0 -3px 6px 0 rgba(0,0,0,.2), 0 3px 2px 0 rgba(0,0,0,.2);
+    -o-box-shadow: inset 0 2px 3px 0 rgba(255,255,255,.0), inset 0 -3px 6px 0 rgba(0,0,0,.2), 0 3px 2px 0 rgba(0,0,0,.2);
+
+    background-image: linear-gradient(to bottom, #0b51a7, #093f85 130%);
+    -moz-background-image: linear-gradient(to bottom, #0b51a7, #093f85 130%);
+    -webkit-background-image: linear-gradient(to bottom, #0b51a7, #093f85 130%);
+    -o-background-image: linear-gradient(to bottom, #0b51a7, #093f85 130%);
+    z-index: 9;
+}
+
+.links {
+    width: 790px;
+    margin: 0 auto;
+    padding: 6px 0 0 0;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 25px;
+    font-family: "Verdana", Arial, Serif;
+    z-index: initial;
+}
+
+.principal {
+    margin: 0 auto 0 auto;
+
+    width:850px;
+    border-right:1px solid #CCCCCC;
+    border-left:1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.conteudo_principal {
+    width: 790px;
+    height: auto;
+    margin: 0 auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.corlink {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size:14px;
+    font-family: "Verdana", Arial, Serif;
+}
+
+.topo .faixa .links span::after {
+    content: " | ";
+    font-family: "Verdana";
+    font-size: 13px;
+}
+
+.topo .faixa .links span:last-child::after {
+    content: "";
+}
+
+.titulo {
+    font-size: 14px;
+    color: #0F64CF;
+    font-family: "Verdana", Arial, Serif;
+}
+
+.titulo_cinza {
+    font-size: 14px;
+    color: dimgrey;
+    font-weight: 900;
+    padding-bottom: 7px;
+}
+
+.texto_cinza {
+    font-size: 13px;
+    color: dimgray;
+    font-weight: 400;
+    padding-bottom: 7px;
+}
+
+.titulo > h1 {
+    font-size: 16px;
+    font-weight: 900;
+}
+
+
+.login {
+    margin-right:auto;
+    margin-left:auto;
+    width:850px;
+    margin-top: 32px;
+    height: 140px;
+    color: #0F64CF;
+    font-size: 14px;
+    font-family: "Verdana";
+}
+
+.login .banner_login {
+    position: relative;
+    float:left;
+    margin-top: 25px;
+    margin-left: 35px;
+}
+
+.form_login {
+    position: relative;
+    float: right;
+    width: 30%;
+    margin-right: 21px;
+}
+.form_text {
+    padding: 15px 0 0px 11px;
+    position: absolute;
+    top: 40px;
+    right: 275px;
+    width: 195px;
+    height: 30px;
+    z-index: 0;
+}
+
+.form_inputs {
+    margin-top: 32px;
+    padding-left: 20px;
+    margin-left: -10px;
+    border-left: 1px solid #0F64CF;
+}
+
+.form_inputs input {
+    width: 150px;
+}
+
+.form_inputs input[type="text"] {
+    margin-top: 5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.form_inputs span {
+    margin-top: 10px;
+    padding: 0 110px 0 0;
+    font-style: italic;
+}
+
+.form_inputs span a {
+    color: #515050;
+    font-size: 11px;
+    font-weight: 100;
+}
+
+.select_input {
+    background: transparent;
+    width: 190px;
+    padding: 5px;
+    font-size: 14px;
+    line-height: 1;
+    border: 1px solid #CCC;
+    border-radius: 0;
+    height: 34px;
+    margin-bottom: 5px;
+}
+
+@-moz-document url-prefix() {
+    .login {
+        font-size: 13px;
+    }
+    .form_text {
+        margin-top: 5px;
+        right: 260px;
+        width: 220px;
+    }
+    .form_inputs {
+        height: 70px;
+        margin-top: 40px;
+    }
+    .form_inputs span {
+        margin-right: 90px;
+    }
+}
+
+#login_button {
+    position: absolute;
+    top: 65px;
+    left: 170px;
+    width: 70px;
+    height:26px;
+    border: 0;
+}
+
+.imglogo {
+    float: right;
+    padding: 15px 10px 0 0;
+    width: 150px;
+}
+
+.goodgames {
+    float: left;
+    padding-top: 15px;
+}
+
+.corlink2 {
+    text-decoration: none;
+    color: #0F64CF;
+    font-size:14px;
+    font-family: "Verdana", Arial, Serif;
+    font-weight: bold;
+}
+
+.seja {
+    width: 790px;
+    height: 25px;
+    margin: 0 auto;
+    margin-top: 20px;
+    color: #0F64CF;
+    font-size:14px;
+    font-family: "Verdana", Arial, Serif;
+    font-weight: bold;
+    vertical-align:middle;
+    text-align:right;
+}
+
+.contrato {
+    color: dimgray;
+    font-weight: 500;
+}
+
+/* helpers class */
+.errorForm {
+    background: #fbe3e4;
+    border: 1px solid #fbc2c4;
+    color: #8a1f11;
+}
+
+span.required::after {
+    content: " * ";
+    color: red;
+    font-weight: 900;
+}
+
+.input_form label {
+    margin-right: 10px;
+}
+
+select > option,
+select > optgroup > option
+{
+    width: auto;
+    height: 45px;
+}
+
+.form_obs {
+    color: gray;
+    font-size: 14px;
+    margin-left: 5px;
+}

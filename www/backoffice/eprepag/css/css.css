@@ -1,0 +1,433 @@
+.texto {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #333333;
+	text-decoration: none;
+}
+.textoProduto {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #333333;
+	text-decoration: none;
+}
+.textoEPPCASH {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	vertical-align: middle;
+	color: #333333;
+	text-decoration: none;
+}
+.textoazul {
+
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #00008F;
+	text-decoration: none;
+}
+.form {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #00008F;
+	border: 1px solid #00008F;
+	text-transform: uppercase;
+}
+
+.form_normal {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #00008F;
+	border: 1px solid #00008F;
+}
+
+.rodape {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #787878;
+}
+
+.form_estat
+{
+	color: #666666;
+    text-transform: uppercase;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.login {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #00008F; text-decoration: none; border: #7B9EBD; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}
+
+.botao_login_extranet
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+	width: 21;
+	height: 18;
+}
+
+.botao_simples
+{
+/*	font-size:0.7em;*/
+/*	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #FFFFFF;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+	height: 20;
+*/
+
+}
+
+.botao_search
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+}
+
+.botao_gerarnfe
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FF0000;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+}
+
+.botao_amex_verde
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #006600;
+	border: 1px solid #FFFFFF;
+	text-transform: none;
+	font-weight: bold;
+	width: 66px;
+	height: 20px;
+}
+
+.botao_amex_vermelho
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #FF0000;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+	width: 20px;
+	height: 16px;
+}
+
+.botao_formulario
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+	width: 100px;
+	height: 20px;
+}
+
+.botao_amex
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+}
+
+.drop_down_formulario
+{
+	font-size: 11px;
+	color: #666666;
+}
+
+.text_field_formulario
+{
+    text-transform: uppercase;
+	text-decoration: none font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.ta_formulario
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+
+.ta_fale_conosco
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+
+
+.botao_fale_conosco
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background-color: #A6A6A6;
+	border: none;
+	text-transform: none;
+	font-weight: bold;
+	width: 60px;
+	height: 20px;
+}
+
+.botoes_vendas { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #FFFFFF; background-color: #A6A6A6; border: none; text-transform: none; font-weight: bold; width: 60px; height: 20px}
+.botoes_pesquisa { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #FFFFFF; background-color: #A6A6A6; border: none; text-transform: none; font-weight: bold; width: 50px; height: 17px}
+.botoes_compra { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #F5F5FB; border: 1px solid #00008C; text-transform: none; font-weight: normal; height: 20px}
+.botoes_imprime { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #F5F5FB; border: 1px solid #00008C; text-transform: none; font-weight: normal; height: 20px}
+.campos_login_vendas { text-transform: uppercase; text-decoration: none; color: #666666; vertical-align: middle; border: #A6A6A6; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}
+.link_sublinhado { color: #666666; text-decoration: underline}
+.link { color: #666666; text-decoration: none}
+.link_rodape2 { color: #222222; text-decoration: none}
+.link:hover { color: #666666; text-decoration: underline}
+.link_azul {  text-decoration: none; color: #00008C}
+.link_azul:hover { color: #00008C; text-decoration: underline}
+.link_branco {  text-decoration: none; color: #FFFFFF}
+
+.link_cinza {  text-decoration: none; color: #666666}
+.link_cinza:hover { color: #666666; text-decoration: underline}
+
+
+.link_br
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+
+.link_rodape
+{
+	text-decoration: none;
+	color: #666666;
+	font-size: 9px;
+}
+
+.combo_normal {
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+
+.combo_linha {
+	color: #333333;
+	background-color: #EFEFEF;
+	text-decoration: none;
+	border: 1px solid #00008C;
+	font-weight: bold;
+}
+
+.field_dados {
+    text-transform: uppercase;
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #336666;
+}
+
+.field_dados_noupper {
+	color: #666666;
+	text-decoration: none;
+	border: 1px solid #336666;
+}
+
+.dropdown {
+background-color: #EFEFEF;
+font-family: Arial, Helvetica, sans-serif;
+text-decoration: none;
+font-size: 12px;
+border: 1px solid #999999;
+color: #000000;
+font-variant: normal}
+
+.campos_log {
+    text-transform: uppercase;
+	text-decoration: none font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.campos_ficha {
+    text-transform: uppercase;
+	text-decoration: none font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666666;
+	background-color: #FFFFFF;
+	border: 1px solid #00008C;
+	width: auto;
+}
+
+.campos_ficha2 { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #333366; border: 1px #333366 none;  text-transform: uppercase; text-decoration: none}
+
+body {
+scrollbar-face-color: #FFFFFF;
+scrollbar-shadow-color: #00008C;
+scrollbar-highlight-color: #FFFFFF;
+scrollbar-3dlight-color: #00008C;
+scrollbar-darkshadow-color: #FFFFFF;
+scrollbar-track-color: #FFFFFF;
+scrollbar-arrow-color: #00008C;
+margin-left: 0px;
+margin-top: 0px;
+margin-right: 0px;
+margin-bottom: 0px;
+}
+
+.fonte11 {  font-size: 11px;  text-transform: uppercase; text-decoration: none}
+
+.adesao14 { font-size: 14px; text-decoration: none }
+.adesao13 { font-size: 13px; text-decoration: none }
+.adesao12 { font-size: 12px; text-decoration: none }
+.adesao11 { font-size: 11px; text-decoration: none }
+.adesao10 { font-size: 10px; text-decoration: none }
+
+
+.botao_venda {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 12px;
+color: #336666;
+border: #336666;
+border-style: solid;
+border-top-width: 1px;
+border-right-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 1px;
+font-weight: bold;
+background-color: #FFFFFF;
+}
+
+.botao_index {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 12px;
+color: #00008C;
+border: #00008C;
+border-style: solid;
+border-top-width: 1px;
+border-right-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 1px;
+font-weight: bold;
+background-color: #FFFFFF;
+}
+
+.botoes_ficha {
+font-family: Arial, Helvetica, sans-serif;
+font-size: 12px;
+color: #666666;
+background-color: #F5F5FB;
+border: #333366;
+border-style: solid;
+border-top-width: 1px;
+border-right-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 1px;
+}
+
+.campos_ficha2 { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #666666; background-color: #FFFFFF; border: 1px solid #00008C; vertical-align: middle; width: auto; text-transform: uppercase; text-decoration: none}
+.list11 {  font-size: 11px; color: #666666}
+.camposPesquisa {
+	text-transform: uppercase;
+	text-decoration: none;
+	font-size: 9px;
+	border: 1px solid #00008C;
+	color: #666666;
+}
+
+.campo_pesquisa {
+	text-transform: uppercase;
+	text-decoration: none;
+	font-size: 9px;
+	border: 1px solid #00008C;
+	color: #666666;
+}
+
+
+
+
+
+
+.combo_little {
+	text-decoration: none;
+	font-size: 9px;
+	border: 1px solid #00008C;
+	color: #666666;
+}
+
+.botao_pesquisa {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 9px;
+color: #00008C;
+border: #00008C;
+border-style: solid;
+border-top-width: 1px;
+border-right-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 1px;
+font-weight: bold;
+background-color: #FFFFFF;
+}
+
+.field_pesquisa {
+	color: #666666;
+    text-transform: uppercase;
+	text-decoration: none;
+	border: 1px solid #00008C;
+}
+.texto11 {
+	font-size: 11px;
+}
+
+#captcha_img{
+    padding-top: 10px;
+}
+
+.input-captcha-cpf{
+    margin-top: 10px;
+}
+
+.no-close .ui-dialog-titlebar{
+    display: none;
+}
+
+
+.w100{width: 100px !important;}
+.w95{width: 95px !important;}
+.espacamento-laterais10{padding: 0 6px;}

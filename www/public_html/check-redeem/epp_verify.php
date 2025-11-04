@@ -110,8 +110,8 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 						$pin_valido = verifica_validade($pin_code, $id);
 						if ($pin_valido === true) {
 							if (verifica_valor_pin($pin_code, $pin_value, $id)) {
-								$sql_opr = "select opr_use_check,opr_partner_check from operadoras where opr_codigo=" . $id;
-								$rs_oper = SQLexecuteQuery($sql_opr);
+								$sql_opr = "SELECT opr_use_check,opr_partner_check from operadoras where opr_codigo=$1";
+								$rs_oper = SQLexecuteQueryParams($sql_opr, [$id]);
 								$rs_oper_row = pg_fetch_array($rs_oper);
 								if ($rs_oper_row['opr_use_check'] == 1) {
 									if (empty($dominio_check)) {
@@ -215,7 +215,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										if (is_array($headers)) {
 											//logEventsONGAME('ERROR: ['.print_r($erros_curl,true).']'.PHP_EOL.'VERSION: '.print_r(curl_version(),true).PHP_EOL);
 											//logEventsONGAME('URL: ['.$url.']'.PHP_EOL.'BUFFER Partner_Check = ['.$buffer.']'.PHP_EOL);
-										}//end if(is_array($headers))
+										} //end if(is_array($headers))
 										send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] CURL ERROR', 'ERROR: [<PRE>' . print_r($erros_curl, true) . '] <br> VERSION: ' . print_r(curl_version(), true) . 'Post parameters: ' . print_r($post_parameters, true) . '</PRE>', $partner_dep, $id);
 										gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'ERROR: [' . print_r($erros_curl, true) . ']' . PHP_EOL . 'Post parameters: ' . print_r($post_parameters, true) . PHP_EOL);
 
@@ -227,9 +227,24 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 
 										//	echo "Name= ".$name." Value=".$value."<br>";
 										if ($value == "1") {
-											$sql = "update pins set pin_status='" . $PINS_PUBLISHERS_STATUS_VALUES['U'] . "' where (pin_status= '" . $PINS_PUBLISHERS_STATUS_VALUES['V'] . "' OR pin_status= '" . $PINS_PUBLISHERS_STATUS_VALUES['L'] . "' OR pin_status= '" . $PINS_PUBLISHERS_STATUS_VALUES['P'] . "') AND pin_codinterno=" . retorna_id_pin($pin_code, $id);
-											//echo $sql;
-											$rs_pin_update = SQLexecuteQuery($sql);
+											$sql = "UPDATE pins 
+													    SET pin_status = $1
+													    WHERE (
+													        pin_status = $2 
+													        OR pin_status = $3 
+													        OR pin_status = $4
+													    )
+													    AND pin_codinterno = $5
+													";
+
+											$params = [
+												$PINS_PUBLISHERS_STATUS_VALUES['U'],  // novo status
+												$PINS_PUBLISHERS_STATUS_VALUES['V'],  // condição 1
+												$PINS_PUBLISHERS_STATUS_VALUES['L'],  // condição 2
+												$PINS_PUBLISHERS_STATUS_VALUES['P'],  // condição 3
+												retorna_id_pin($pin_code, $id)        // id do pin
+											];
+											$rs_pin_update = SQLexecuteQueryParams($sql, $params);
 											if (!$rs_pin_update) {
 												$aux_codretepp = $notify_list_values['EU'];
 											} else {
@@ -246,23 +261,36 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 													$aux_codretepp = $notify_list_values['EU'];
 													gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'A atualização para PIN Utilizado nãoa afetou N E N H U M registro.' . PHP_EOL . $sql . PHP_EOL . 'Resposta EPP: CODRETEPP=' . $notify_list_values['EU'] . PHP_EOL);
 												}
-
 											}
 										} elseif ($value == "2") {
 											$aux_codretepp = $notify_list_values['EG'];
 											if (is_array($headers)) {
 												//logEventsONGAME('A consulta Partner_Check retornou 2'.PHP_EOL);
-											}//end if(is_array($headers))
+											} //end if(is_array($headers))
 											send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] Partner_Check', 'A consulta Partner_Check retornou 2<br>', $partner_dep, $id);
 											gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'A consulta Partner_Check retornou 2' . PHP_EOL);
-
 										}
-									}//end else do if(empty($dominio_check))
+									} //end else do if(empty($dominio_check))
 
 								} elseif ($rs_oper_row['opr_use_check'] == 2) {
-									$sql = "update pins set pin_status='" . $PINS_PUBLISHERS_STATUS_VALUES['U'] . "' where (pin_status= '" . $PINS_PUBLISHERS_STATUS_VALUES['V'] . "' OR pin_status= '" . $PINS_PUBLISHERS_STATUS_VALUES['L'] . "' OR pin_status= '" . $PINS_PUBLISHERS_STATUS_VALUES['P'] . "') AND pin_codinterno=" . retorna_id_pin($pin_code, $id);
-									//echo $sql;
-									$rs_pin_update = SQLexecuteQuery($sql);
+									$sql = "UPDATE pins 
+													    SET pin_status = $1
+													    WHERE (
+													        pin_status = $2 
+													        OR pin_status = $3 
+													        OR pin_status = $4
+													    )
+													    AND pin_codinterno = $5
+													";
+
+									$params = [
+										$PINS_PUBLISHERS_STATUS_VALUES['U'],  // novo status
+										$PINS_PUBLISHERS_STATUS_VALUES['V'],  // condição 1
+										$PINS_PUBLISHERS_STATUS_VALUES['L'],  // condição 2
+										$PINS_PUBLISHERS_STATUS_VALUES['P'],  // condição 3
+										retorna_id_pin($pin_code, $id)        // id do pin
+									];
+									$rs_pin_update = SQLexecuteQueryParams($sql, $params);
 									if (!$rs_pin_update) {
 										$aux_codretepp = $notify_list_values['EU'];
 									} else {
@@ -327,5 +355,3 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 else {
 	die("Access Denied!");
 }
-
-?>

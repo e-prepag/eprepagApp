@@ -9,90 +9,90 @@ USE_CHECK	=> 1 = Utiliza confirmação de solicitação através do PARTNETR_CHECK
 PRODUCT_TYPE=> 1 = Utiliza somente PINs Produto
 			=> 2 = Utiliza somente PINs Moeda
 			=> 3 = Utiliza PINs Produto e PINs Moeda simultaneamente 
-*******************************************************/
+ *******************************************************/
 
 //Dados de depuração
 $partner_dep = array(
 	'13' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'47' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'48' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'51' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'73' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'81' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'86' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'88' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'89' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'90' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'96' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'102' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'103' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'124' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'137' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'142' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'143' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'144' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'147' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 	'148' => array(
-				'email'		=> 'wagner@e-prepag.com.br',
-				'depurar'	=> false,
-				),
+		'email'		=> 'wagner@e-prepag.com.br',
+		'depurar'	=> false,
+	),
 );
 
 // CODRETEPP VALORES INTERNOS
@@ -200,88 +200,89 @@ $notify_list_pub = array(
 	$notify_list_values_pub['IM'] => 'Idade informada menor que a mínima permitida',
 );
 
-function converte_detalhe_codretepp($valor){
-	global $notify_list_values,$notify_list_values_pub;
+function converte_detalhe_codretepp($valor)
+{
+	global $notify_list_values, $notify_list_values_pub;
 	switch ($valor) {
-		case $notify_list_values['SV'] : 
-				return $notify_list_values_pub['SV'];
-				break;
-		case $notify_list_values['SU'] : 
-				return $notify_list_values_pub['SU'];
-				break;
+		case $notify_list_values['SV']:
+			return $notify_list_values_pub['SV'];
+
+		case $notify_list_values['SU']:
+			return $notify_list_values_pub['SU'];
+
 		case $notify_list_values['FC']:
-				return $notify_list_values_pub['FP'];
-				break;
+			return $notify_list_values_pub['FP'];
+
 		case $notify_list_values['FV']:
-				return $notify_list_values_pub['FP'];
-				break;
+			return $notify_list_values_pub['FP'];
+
 		case $notify_list_values['FA']:
-				return $notify_list_values_pub['FP'];
-				break;
+			return $notify_list_values_pub['FP'];
+
 		case $notify_list_values['FI']:
-				return $notify_list_values_pub['FP'];
-				break;
+			return $notify_list_values_pub['FP'];
+
 		case $notify_list_values['F4']:
-				return $notify_list_values_pub['FP'];
-				break;
+			return $notify_list_values_pub['FP'];
+
 		case $notify_list_values['VD']:
-				return $notify_list_values_pub['VD'];
-				break;
+			return $notify_list_values_pub['VD'];
+
 		case $notify_list_values['ID']:
-				return $notify_list_values_pub['PO'];
-				break;
+			return $notify_list_values_pub['PO'];
+
 		case $notify_list_values['PU']:
-				return $notify_list_values_pub['PU'];
-				break;
+			return $notify_list_values_pub['PU'];
+
 		case $notify_list_values['SD']:
-				return $notify_list_values_pub['SD'];
-				break;
+			return $notify_list_values_pub['SD'];
+
 		case $notify_list_values['PO']:
-				return $notify_list_values_pub['PO'];
-				break;
+			return $notify_list_values_pub['PO'];
+
 		case $notify_list_values['ND']:
-				return $notify_list_values_pub['ND'];
-				break;
+			return $notify_list_values_pub['ND'];
+
 		case $notify_list_values['EU']:
-				return $notify_list_values_pub['EU'];
-				break;
+			return $notify_list_values_pub['EU'];
+
 		case $notify_list_values['EG']:
-				return $notify_list_values_pub['EG'];
-				break;
+			return $notify_list_values_pub['EG'];
+
 		case $notify_list_values['OL']:
-				return $notify_list_values_pub['OL'];
-				break;
+			return $notify_list_values_pub['OL'];
+
 		case $notify_list_values['PF']:
-				return $notify_list_values_pub['PF'];
-				break;
+			return $notify_list_values_pub['PF'];
+
 		case $notify_list_values['OF']:
-				return $notify_list_values_pub['OF'];
-				break;
+			return $notify_list_values_pub['OF'];
+
 		case $notify_list_values['CF']:
-				return $notify_list_values_pub['CF'];
-				break;
+			return $notify_list_values_pub['CF'];
+
 		case $notify_list_values['BK']:
-				return $notify_list_values_pub['BK'];
-				break;
+			return $notify_list_values_pub['BK'];
+
 		case $notify_list_values['IN']:
-				return $notify_list_values_pub['IN'];
-				break;
+			return $notify_list_values_pub['IN'];
+
 		case $notify_list_values['FD']:
-				return $notify_list_values_pub['FD'];
-				break;
+			return $notify_list_values_pub['FD'];
+
 		case $notify_list_values['DE']:
-				return $notify_list_values_pub['DE'];
-				break;
+			return $notify_list_values_pub['DE'];
+
 		case $notify_list_values['TD']:
-				return $notify_list_values_pub['TD'];
-				break;
+			return $notify_list_values_pub['TD'];
+
 		case $notify_list_values['IM']:
-				return $notify_list_values_pub['IM'];
-				break;
+			return $notify_list_values_pub['IM'];
 	}
 }
 
-function retorna_ip_acesso() {
+function retorna_ip_acesso()
+{
 	$realip = "";
 	if (isset($_SERVER)) {
 		if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -291,7 +292,7 @@ function retorna_ip_acesso() {
 		} else {
 			$ip = $_SERVER['REMOTE_ADDR'];
 		}
-   } else {
+	} else {
 		if (getenv('HTTP_X_FORWARDED_FOR')) {
 			$ip = getenv('HTTP_X_FORWARDED_FOR');
 		} elseif (getenv('HTTP_CLIENT_IP')) {
@@ -299,92 +300,116 @@ function retorna_ip_acesso() {
 		} else {
 			$ip = getenv('REMOTE_ADDR');
 		}
-   }
-   return $ip;
+	}
+	return $ip;
 }
 
-function retorna_dominio($opr_codigo) {
-	$sql = "select opr_partner_dominio from operadoras where opr_codigo=".$opr_codigo." and opr_partner_dominio!='';";
-	$rs_log = SQLexecuteQuery($sql);
-	if(!$rs_log) {
-	}
-	else { 
+function retorna_dominio($opr_codigo)
+{
+	// Query usa $1 como placeholder e LIMIT 1 para otimização
+	$sql = "SELECT opr_partner_dominio 
+            FROM operadoras 
+            WHERE opr_codigo = $1 AND opr_partner_dominio != '' 
+            LIMIT 1";
+
+	// Executa a query com parâmetros
+	$rs_log = SQLexecuteQueryParams($sql, [$opr_codigo]);
+
+	// Lógica simplificada: se a query rodou e encontrou uma linha, retorna o valor
+	if ($rs_log && pg_num_rows($rs_log) > 0) {
 		$rs_log_row = pg_fetch_array($rs_log);
-		if ($rs_log_row['opr_partner_dominio'] != '')
-			return $rs_log_row['opr_partner_dominio'];
-		else return '';
+		return $rs_log_row['opr_partner_dominio'];
+	} else {
+		// Se a query falhou ou não encontrou, retorna string vazia (como no original)
+		return '';
 	}
 }
 
-function retorna_ip_integracao($opr_codigo) {
-	$sql = "select opr_ip from operadoras where opr_codigo=".$opr_codigo." and opr_ip!='';";
-	$rs_log = SQLexecuteQuery($sql);
-	if(!$rs_log) {
-	}
-	else { 
+function retorna_ip_integracao($opr_codigo)
+{
+	// Query usa $1 como placeholder e LIMIT 1
+	$sql = "SELECT opr_ip 
+            FROM operadoras 
+            WHERE opr_codigo = $1 AND opr_ip != '' 
+            LIMIT 1";
+
+	// Executa a query com parâmetros
+	$rs_log = SQLexecuteQueryParams($sql, [$opr_codigo]);
+
+	if ($rs_log && pg_num_rows($rs_log) > 0) {
 		$rs_log_row = pg_fetch_array($rs_log);
-		if ($rs_log_row['opr_ip'] != '')
-			return $rs_log_row['opr_ip'];
+		return $rs_log_row['opr_ip'];
+	} else {
 		// informa zero (0) quando nao foi encontrado -- ATENCAUN
-		else return '0';
+		// (Mantendo a lógica original de retornar '0')
+		return '0';
 	}
 }
 
-function existeIdVendaGoCASH($venda_id_rand){
+function existeIdVendaGoCASH($venda_id_rand)
+{
+	// SQL usa $1 como placeholder
+	$sql = "SELECT COUNT(*) AS qtde FROM pins_gocash WHERE pgc_vg_id = $1";
 
+	// Executa a query com parâmetros
+	$rs = SQLexecuteQueryParams($sql, [$venda_id_rand]);
+
+	// Lógica original: assume que existe por padrão
 	$ret = true;
-	 
-	//SQL
-	$sql = "select count(*) as qtde from pins_gocash ";
-	$sql .= " where pgc_vg_id = " . SQLaddFields($venda_id_rand, "");
-	$rs = SQLexecuteQuery($sql);
-	if($rs && pg_num_rows($rs) > 0){
+
+	if ($rs && pg_num_rows($rs) > 0) {
 		$rs_row = pg_fetch_array($rs);
-		if($rs_row['qtde'] == 0) $ret = false;
-	}			
-		
-	return $ret;   	
+		if ($rs_row['qtde'] == 0) {
+			$ret = false; // Só é falso se a contagem for explicitamente 0
+		}
+	}
+
+	// Nota: Se a query falhar ($rs = false), a função retornará 'true',
+	// pois essa era a lógica original.
+	return $ret;
 }
 
-function obterIdVendaValidoGoCASH(){
+function obterIdVendaValidoGoCASH()
+{
 
-	$maxID = 1000-1;
+	$maxID = 1000 - 1;
 	$nmax = 10;
 	$n = 1;
 	$s_ids = "";
 
 	$time_start_stats = getmicrotime();
 
-	$venda_id_rand = date('YmdHis').mt_rand(1, $maxID);
-	$s_ids .= $venda_id_rand.", ";
-	while(existeIdVendaGoCASH($venda_id_rand)){
+	$venda_id_rand = date('YmdHis') . mt_rand(1, $maxID);
+	$s_ids .= $venda_id_rand . ", ";
+	while (existeIdVendaGoCASH($venda_id_rand)) {
 
-		$venda_id_rand = date('YmdHis').mt_rand(1, $maxID);
+		$venda_id_rand = date('YmdHis') . mt_rand(1, $maxID);
 
-		$s_ids .= $venda_id_rand.", ";
+		$s_ids .= $venda_id_rand . ", ";
 		$n++;
 	}
-	
-	$msg = (($n==1)?"Just one shot!!! ":"ntentativas: $n ")." ($s_ids)";
+
+	$msg = (($n == 1) ? "Just one shot!!! " : "ntentativas: $n ") . " ($s_ids)";
 	gravaLog_obterIdVendaValidoGoCASH($msg);
 
-	if($n>1) {
-		$msg = "Elapsed time ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.')."s";
+	if ($n > 1) {
+		$msg = "Elapsed time " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "s";
 		gravaLog_obterIdVendaValidoGoCASH($msg);
 	}
-	if($n>=$nmax) {
+	if ($n >= $nmax) {
 		$msg = "Demorou muito para encontrar um id_venda ($n>=$nmax).";
 		gravaLog_obterIdVendaValidoGoCASH($msg);
 	}
-	
+
 	return $venda_id_rand;
 }
 
-function gravaLog_obterIdVendaValidoGoCASH($mensagem){
+function gravaLog_obterIdVendaValidoGoCASH($mensagem)
+{
 
 	//Arquivo
 	$file = $GLOBALS['raiz_do_projeto'] . "log/logObterIdVendaValidoGoCASH.txt";
-	
+
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $mensagem . PHP_EOL;
 
@@ -392,23 +417,22 @@ function gravaLog_obterIdVendaValidoGoCASH($mensagem){
 	if ($handle = fopen($file, 'a+')) {
 		fwrite($handle, $mensagem);
 		fclose($handle);
-	} 
-
+	}
 }
 
-function send_debug_info_by_email_PINCASH($subject, $body, $vetor_tmp, $id) {
-	if($vetor_tmp[$id]['depurar']){
+function send_debug_info_by_email_PINCASH($subject, $body, $vetor_tmp, $id)
+{
+	if ($vetor_tmp[$id]['depurar']) {
 		$s_testing_email = $vetor_tmp[$id]['email'];
-		if($s_testing_email != "") {
+		if ($s_testing_email != "") {
 			enviaEmail(
-					$s_testing_email,
-					"",
-					"",
-					$subject,
-					$body
-					//str_replace(PHP_EOL, "<br>", $body)
+				$s_testing_email,
+				"",
+				"",
+				$subject,
+				$body
+				//str_replace(PHP_EOL, "<br>", $body)
 			);
 		}
-	}//end if($vetor_tmp[$id]['depurar'])
+	} //end if($vetor_tmp[$id]['depurar'])
 }
-?>

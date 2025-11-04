@@ -75,8 +75,8 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 	$aux_pin_valueTOP = null;
 
 	if ($auxOnLineTop) {
-		$sql_opr = "select opr_product_type from operadoras where opr_codigo=".$id;
-		$rs_oper = SQLexecuteQuery($sql_opr);
+		$sql_opr = "SELECT opr_product_type from operadoras where opr_codigo=$1";
+		$rs_oper = SQLexecuteQueryParams($sql_opr, [$id]);
 		if($rs_oper) {
 			if($rs_oper_row = pg_fetch_array($rs_oper)) {
                     			switch($rs_oper_row['opr_product_type'])
@@ -154,18 +154,18 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
      if($action == '2' && (($id*1) == 124 || ($id*1) == 137)){
 	
 		if(converte_detalhe_codretepp($aux_codreteppTOP) == 2 || converte_detalhe_codretepp($aux_codreteppTOP) == 1 || converte_detalhe_codretepp($aux_codreteppTOP) == 5 || converte_detalhe_codretepp($aux_codreteppTOP) == 6){
-			$sql_id = "select pin_codinterno from pins where pin_codigo ='$pin_code'";
-			$rs_id = SQLexecuteQuery($sql_id);
+			$sql_id = "SELECT pin_codinterno from pins where pin_codigo =$1";
+			$rs_id = SQLexecuteQueryParams($sql_id, [$pin_code]);
 			$rsiD = pg_fetch_array($rs_id);
 			
-			$sql_venda_user = "select * from tb_venda_games inner join tb_venda_games_modelo on vg_id= vgm_vg_id inner join tb_venda_games_modelo_pins on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =".$rsiD["pin_codinterno"];
-			$rs_venda_user = SQLexecuteQuery($sql_venda_user);
+			$sql_venda_user = "SELECT * from tb_venda_games inner join tb_venda_games_modelo on vg_id= vgm_vg_id inner join tb_venda_games_modelo_pins on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =$1";
+			$rs_venda_user = SQLexecuteQueryParams($sql_venda_user, [$rsiD["pin_codinterno"]]);
 			$rs_user = pg_fetch_array($rs_venda_user);
 			
 			if(pg_num_rows($rs_venda_user) == 0 || $rs_venda_user == false){
 			
-				$sql_venda_pdv = "select * from tb_dist_venda_games inner join tb_dist_venda_games_modelo on vg_id= vgm_vg_id inner join tb_dist_venda_games_modelo_pins on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =".$rsiD["pin_codinterno"];
-				$rs_venda_pdv = SQLexecuteQuery($sql_venda_pdv);
+				$sql_venda_pdv = "SELECT * from tb_dist_venda_games inner join tb_dist_venda_games_modelo on vg_id= vgm_vg_id inner join tb_dist_venda_games_modelo_pins on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =$1";
+				$rs_venda_pdv = SQLexecuteQueryParams($sql_venda_pdv, [$rsiD["pin_codinterno"]]);
 				$rs_pdv = pg_fetch_array($rs_venda_pdv);
 				
 				if(pg_num_rows($rs_venda_pdv) > 0 ){
@@ -186,8 +186,8 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 					}
 				}elseif($rs_user["vg_pagto_tipo"] == 13){
 					
-					$sql_venda_pincash = "select * from pins_store_pag_epp_pin where tpc_idvenda =".$rs_user["vg_id"];
-					$rs_venda_pin_cash = SQLexecuteQuery($sql_venda_pincash);
+					$sql_venda_pincash = "SELECT * from pins_store_pag_epp_pin where tpc_idvenda =$1";
+					$rs_venda_pin_cash = SQLexecuteQueryParams($sql_venda_pincash, [$rs_user["vg_id"]]);
 					$pdv = false;
 					while($row_rs_cash = pg_fetch_array($rs_venda_pin_cash)){
 						if($row_rs_cash["pspep_canal"] == 'L'){
