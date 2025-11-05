@@ -19,15 +19,58 @@ if (!empty($_POST)) {
     }
 
     if (!empty($_FILES['anexo']["tmp_name"])) {
-        if ($retImg = $valida->imagem($_FILES['anexo'])) {
-            $erro = $retImg; //retorna array
+
+        // Validar erro de upload
+        if ($_FILES['anexo']['error'] !== UPLOAD_ERR_OK) {
+            $erro[] = "Erro no upload do arquivo.";
+        } elseif ($retImg = $valida->imagem($_FILES['anexo'])) {
+            $erro = $retImg;
         } else {
-            $attach = "";
+
             $file = $_FILES['anexo'];
-            if (!move_uploaded_file(basename($file["tmp_name"]), DIR_CACHE . basename($file["name"])))
-                $erro[] = "Erro ao gravar imngem";
-            else
-                $attach = DIR_CACHE . $file["name"];
+
+            // 1. SANITIZAR o nome do arquivo
+            $originalName = basename($file["name"]);
+            $originalName = preg_replace('/[^a-zA-Z0-9._-]/', '', $originalName);
+
+            // 2. VALIDAR extensão
+            $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (!in_array($extension, $allowedExtensions)) {
+                $erro[] = "Tipo de arquivo não permitido.";
+            } else {
+
+                // 3. GERAR nome único para evitar sobrescrita
+                $uniqueName = uniqid('img_', true) . '.' . $extension;
+
+                // 4. RESOLVER caminho base
+                $baseDir = realpath(DIR_CACHE);
+
+                if ($baseDir === false) {
+                    $erro[] = "Erro de configuração: diretório de cache inválido.";
+                } else {
+
+                    // 5. CONSTRUIR caminho de destino
+                    $destPath = $baseDir . DIRECTORY_SEPARATOR . $uniqueName;
+
+                    // 6. VERIFICAR que o destino está dentro do diretório permitido
+                    $parentDir = realpath(dirname($destPath));
+
+                    if ($parentDir === false || strpos($parentDir, $baseDir) !== 0) {
+                        $erro[] = "Erro de segurança: caminho inválido.";
+                    } else {
+
+                        // 7. MOVER arquivo (tmp_name SEM basename!)
+                        if (!move_uploaded_file($file["tmp_name"], $destPath)) {
+                            $erro[] = "Erro ao gravar imagem.";
+                        } else {
+                            // 8. Salvar caminho completo
+                            $attach = $destPath;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -36,7 +79,8 @@ if (!empty($_POST)) {
     }
 
     // Validação de CPF ou CNPJ
-    function validaCpfCnpj($value) {
+    function validaCpfCnpj($value)
+    {
         $value = preg_replace('/\D/', '', $value);
 
         if (strlen($value) == 11) {
@@ -53,11 +97,11 @@ if (!empty($_POST)) {
         } elseif (strlen($value) == 14) {
             // Validação de CNPJ
             if (preg_match('/(\d)\1{13}/', $value)) return false;
-            $t = [5,4,3,2,9,8,7,6,5,4,3,2];
+            $t = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
             for ($i = 0, $s = 0; $i < 12; $i++) $s += $value[$i] * $t[$i];
             $r = $s % 11;
             if ($value[12] != ($r < 2 ? 0 : 11 - $r)) return false;
-            $t = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+            $t = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
             for ($i = 0, $s = 0; $i < 13; $i++) $s += $value[$i] * $t[$i];
             $r = $s % 11;
             if ($value[13] != ($r < 2 ? 0 : 11 - $r)) return false;
