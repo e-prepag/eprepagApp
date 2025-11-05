@@ -1476,36 +1476,27 @@ class UsuarioGames
 
     function existeEmail($email0, $usuario_id_excessao)
     {
-
         $ret = true;
-        $email = $email0;
 
-        $err_cod = "";
+        $email = strtoupper(trim($email0));
 
-        $params = array(
-            'email' => array(
-                '0' => $email,
-                '1' => 'S',
-                '2' => '1'
-            )
-        );
-        $params = sanitize_input_data_array($params, $err_cod);
-        extract($params, EXTR_OVERWRITE);
+        $sql = "SELECT count(*) AS qtde FROM usuarios_games WHERE ug_email = $1";
+        $params = [$email];
 
-        $email = strtoupper(trim($email));
+        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao)) {
 
-        //SQL
-        $sql = "select count(*) as qtde from usuarios_games ";
-        $sql .= " where ug_email = " . SQLaddFields($email, "s");
-        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-            $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
+            $sql .= " AND ug_id <> $2";
 
-        $rs = SQLexecuteQuery($sql);
+            // Adiciona o valor do ID ao array de parâmetros
+            $params[] = trim($usuario_id_excessao);
+        }
+
+        $rs = SQLexecuteQueryParams($sql, $params);
+
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
         }
-        //gravaLog_Temporario("SQL UsuarioGames::existeEmail('$email0' -> '$email', ".(($usuario_id_excessao)?"TRUE":"FALSE").") => ".(($ret)?"TRUE":"FALSE")." (qtde: ".$rs_row['qtde'].")\n  ".$sql."\n");
 
         return $ret;
     }
@@ -1516,7 +1507,7 @@ class UsuarioGames
         $sql = "select count(ug_id) from usuarios_games where UPPER(ug_login) = UPPER(:ug_login)";
 
         if ($id_excessao)
-            $sql .= " and ug_id <> " . $id_excessao;
+            $sql .= " and ug_id <> :ug_id_excecao";
         //Inicializando conexao PDO
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
@@ -1529,6 +1520,10 @@ class UsuarioGames
         $login = strtoupper($login);
         $param = ':ug_login';
         $rs->bindParam($param, $login, PDO::PARAM_STR);
+
+        if($id_excessao){
+            $rs->bindParam(':ug_id_excecao', $id_excessao);
+        }
 
         //executando query
         $rs->execute();
