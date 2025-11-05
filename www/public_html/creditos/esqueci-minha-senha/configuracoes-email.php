@@ -2,7 +2,7 @@
 	
 	require_once "/www/class/phpmailer/class.phpmailer.php";
 	require_once "/www/class/phpmailer/class.smtp.php";
-        require_once "/www/class/includes/load_dotenv.php";
+        require_once "/www/includes/load_dotenv.php";
 	
 	function disparaEmail($to, $cc, $bcc, $subject, $body_html, $body_plain, $codigoValidacao) {
                 $mail = new PHPMailer();

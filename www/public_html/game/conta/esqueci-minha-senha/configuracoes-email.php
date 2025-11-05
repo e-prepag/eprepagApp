@@ -2,7 +2,7 @@
 	
 	require_once "/www/class/phpmailer/class.phpmailer.php";
 	require_once "/www/class/phpmailer/class.smtp.php";
-        require_once "/www/class/includes/load_dotenv.php";
+        require_once "/www/includes/load_dotenv.php";
 	
 	function disparaEmail($to, $cc, $bcc, $subject, $body_html, $body_plain, $codigoValidacao) {
                 $mail = new PHPMailer();
@@ -49,19 +49,19 @@
                 $mail->AltBody = $body_plain;
 
                 // Enviar e capturar o resultado
-                if(!$mail->Send()) {
+                $enviado = $mail->Send();
+                if(!$enviado) {
                         $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Erro: Ao enviar e-mail para: {$to} - Erro: " . $mail->ErrorInfo;
                 } else {
-                        $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Sucesso: E-mail encaminhado para: {$to} CÃ“DIGO: {$codigoValidacao}";
+                        $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Sucesso: E-mail encaminhado para: {$to} CÓDIGO: {$codigoValidacao}";
                 }
 
-
         //Mensagem
-		//$mensagemLog = "E-mail encaminhado para: {$to} Cï¿½DIGO: {$codigoValidacao}";
+		//$mensagemLog = "E-mail encaminhado para: {$to} CoDIGO: {$codigoValidacao}";
 		
 		$arquivoLog = '/www/log/envioEmailEsqueciMinhaSenha.log';
 		
 		geraLogEnvioEmail($arquivoLog, $mensagemLog);
 		
-        return $mail->Send();
+        return $mensagemLog;
 }
