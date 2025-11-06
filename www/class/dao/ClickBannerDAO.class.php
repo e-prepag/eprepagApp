@@ -4,10 +4,10 @@ class ClickBannerDAO {
     public $clicks = array();
     protected $erros = array();
     
-    public function get($sql){
+    public function get($sql, $params = array()){
         
         $this->clicks = array();
-        $clicks = SQLexecuteQuery($sql);
+        $clicks = SQLexecuteQueryParams($sql, $params);
         $totalLinhas = pg_num_rows($clicks);
         if($totalLinhas > 0){
             
@@ -25,9 +25,9 @@ class ClickBannerDAO {
     }
     
     public function insert($id){
-        $sql = "insert into tb_banner_store_clicks (bs_click_data_cadastro, bs_id) values (CURRENT_DATE, $id)";
+        $sql = "insert into tb_banner_store_clicks (bs_click_data_cadastro, bs_id) values (CURRENT_DATE, $1)";
         
-        $clicks = SQLexecuteQuery($sql);
+        $clicks = SQLexecuteQueryParams($sql, [$id]);
         if($clicks) {
             return true;
         }else{

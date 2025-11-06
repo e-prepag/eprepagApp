@@ -1,5 +1,5 @@
 <?php
-header("Content-Type: text/html; charset=ISO-8859-1",true);
+require __DIR__ . '/.. /.php'; header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 

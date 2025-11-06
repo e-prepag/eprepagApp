@@ -18,61 +18,7 @@ if (!empty($_POST)) {
         $erro[] = "Email inválido.";
     }
 
-    if (!empty($_FILES['anexo']["tmp_name"])) {
-
-        // Validar erro de upload
-        if ($_FILES['anexo']['error'] !== UPLOAD_ERR_OK) {
-            $erro[] = "Erro no upload do arquivo.";
-        } elseif ($retImg = $valida->imagem($_FILES['anexo'])) {
-            $erro = $retImg;
-        } else {
-
-            $file = $_FILES['anexo'];
-
-            // 1. SANITIZAR o nome do arquivo
-            $originalName = basename($file["name"]);
-            $originalName = preg_replace('/[^a-zA-Z0-9._-]/', '', $originalName);
-
-            // 2. VALIDAR extensão
-            $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-            if (!in_array($extension, $allowedExtensions)) {
-                $erro[] = "Tipo de arquivo não permitido.";
-            } else {
-
-                // 3. GERAR nome único para evitar sobrescrita
-                $uniqueName = uniqid('img_', true) . '.' . $extension;
-
-                // 4. RESOLVER caminho base
-                $baseDir = realpath(DIR_CACHE);
-
-                if ($baseDir === false) {
-                    $erro[] = "Erro de configuração: diretório de cache inválido.";
-                } else {
-
-                    // 5. CONSTRUIR caminho de destino
-                    $destPath = $baseDir . DIRECTORY_SEPARATOR . $uniqueName;
-
-                    // 6. VERIFICAR que o destino está dentro do diretório permitido
-                    $parentDir = realpath(dirname($destPath));
-
-                    if ($parentDir === false || strpos($parentDir, $baseDir) !== 0) {
-                        $erro[] = "Erro de segurança: caminho inválido.";
-                    } else {
-
-                        // 7. MOVER arquivo (tmp_name SEM basename!)
-                        if (!move_uploaded_file($file["tmp_name"], $destPath)) {
-                            $erro[] = "Erro ao gravar imagem.";
-                        } else {
-                            // 8. Salvar caminho completo
-                            $attach = $destPath;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    $attach = null;
 
     if ($valida->letras($_POST['nome'])) {
         $erro[] = "Nome inválido.";
@@ -216,8 +162,6 @@ if (!empty($_POST)) {
 						Equipe E-Prepag</body></html>";
 
             if (enviaEmail4($to, $_POST['email'], $bcc, $subject, $corpoMsg, null, $attach, false, '', $_POST['email'])) {
-                if ($attach != "")
-                    unlink($attach);
 
                 $titulo = "E-Prepag - Créditos";
                 $modalMsg = "Email enviado com sucesso.";
@@ -298,14 +242,6 @@ if (!empty($_POST)) {
                 <div class="col-md-12 top5">
                     <input type="text" placeholder="CPF/CNPJ *" id="cpfcnpj" name="cpfcnpj" class="form-control" maxlength="18" required>
                 </div>
-                <div class="col-md-12 top5">
-                    <label for="anexo" class="text-left fontsize-p">Anexar
-                        <input type="file" class="custom-file-input" name="anexo" id="anexo" value="">
-                    </label>
-                </div>
-                <div class="col-md-12 text-right fontsize-p">
-                    Se julgar necessário você pode anexar um arquivo ou comprovante.
-                </div>
             </div>
             <div class="col-md-6">
                 <div class="row form-group text-left">
@@ -344,10 +280,6 @@ if (!empty($_POST)) {
 
             if (!valida())
                 return false;
-        });
-
-        $("#btnanexo").click(function() {
-            $("#anexo").trigger("click");
         });
     });
 </script>
