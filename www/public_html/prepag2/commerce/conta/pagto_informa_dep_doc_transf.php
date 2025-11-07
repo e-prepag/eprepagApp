@@ -118,7 +118,7 @@ if ($btSubmit) {
                         if ($resolvedPath === false || strpos($resolvedPath, $BASE_UPLOAD_DIR) !== 0) {
                             $msg = "Erro de segurança: Caminho de arquivo inválido.\n";
                         } else {
-                            // 6. Realizar o upload apenas se todas as verificações passarem
+                            file_put_contents("/www/log/arquivoSubiu.txt", "Source: $fileSource, Dest: $fileDest");
                             if (!move_uploaded_file($fileSource, $fileDest)) {
                                 $msg = "Não foi possível realizar o upload do comprovante, tente novamente.\n";
                             }
