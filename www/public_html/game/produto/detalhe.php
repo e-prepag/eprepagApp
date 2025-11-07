@@ -6,6 +6,7 @@ require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once DIR_INCS."pdv/captura_inc.php";
 require_once DIR_CLASS."gamer/classAlawarGames.php";
 $controller = new HeaderController;
+
 /*
  * Início controller
  */
@@ -13,7 +14,7 @@ $controller = new HeaderController;
 if(isset($_GET['token'])){
     
     $objEncryption = new Encryption();
-    $token = unserialize($objEncryption->decrypt($_GET['token']));
+    $token = json_decode($objEncryption->decrypt($_GET['token']), true);
     $prod = $token['produto'];
 	
 	if($token == null || $token == ""){

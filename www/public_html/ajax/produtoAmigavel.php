@@ -27,7 +27,7 @@
 		require_once $raiz_do_projeto."class/business/BannerBO.class.php";
 		require_once $raiz_do_projeto."class/classEncryption.php";
 		
-		$str = serialize(["produto" => $prod]);
+		$str = json_encode(["produto" => $prod]);
 		$objEncryption = new Encryption();
 		$key = $objEncryption->encrypt($str);
 		header("location: " . EPREPAG_URL_HTTPS . "/game/produto/detalhe.php?token=".$key);

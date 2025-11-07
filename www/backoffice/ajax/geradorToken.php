@@ -14,7 +14,7 @@ require_once $raiz_do_projeto."class/classEncryption.php";
 if(Util::isAjaxRequest() && $_POST['cript']){
     
     unset($_POST['cript']);
-    $str = serialize($_POST);
+    $str = json_encode($_POST);
     $objEncryption = new Encryption();
     echo $objEncryption->encrypt($str);
 }

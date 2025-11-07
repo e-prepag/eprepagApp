@@ -10,9 +10,8 @@ $qtdFeedsIndex = 5;
 $controller = new ProdutosController;
 
 if (isset($_GET['token'])) {
-
     $objEncryption = new Encryption();
-    $token = unserialize($objEncryption->decrypt($_GET['token']));
+    $token = json_decode($objEncryption->decrypt($_GET['token']), true);
     $_POST["prod"] = $token['produto'];
 }
 
