@@ -1,209 +1,198 @@
 <?php
 require_once '../../includes/constantes.php';
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";	
 
-###############################################################
-# File Download 1.3
-###############################################################
-# Visit http://www.zubrag.com/scripts/ for updates
-###############################################################
-# Sample call:
-#    download.php?f=phptutorial.zip
-#
-# Sample call (browser will try to save with new file name):
-#    download.php?f=phptutorial.zip&fc=php123tutorial.zip
-###############################################################
+if (!function_exists('finfo_open')) {
 
-// Allow direct file download (hotlinking)?
-// Empty - allow hotlinking
-// If set to nonempty value (Example: example.com) will only allow downloads when referrer contains this text
-define('ALLOWED_REFERRER', '');
+  /**
+   * Define a constante que a função original usa, se não estiver definida.
+   */
+  if (!defined('FILEINFO_MIME_TYPE')) {
+    define('FILEINFO_MIME_TYPE', 16); // Este é o valor padrão da constante
+  }
 
-// Download folder, i.e. folder where you keep all files for download.
-// MUST end with slash (i.e. "/" )
-//	$file_path = "C:/Sites/E-Prepag/www/web/images/tmp_txt/";
-define('BASE_DIR', $raiz_do_projeto . 'public_html/tmp/txt/');
+  /**
+   * Cria uma função 'finfo_open' de substituição.
+   */
+  function finfo_open($options = 0, $magic_file = null)
+  {
+    $finfo = new stdClass(); // Cria um objeto genérico
+    $finfo->options = $options; // Armazena as opções (vamos precisar no finfo_file)
+    return $finfo;
+  }
 
-// log downloads?  true/false
-define('LOG_DOWNLOADS',false);
+  /**
+   * Cria uma função 'finfo_file' de substituição.
+   */
+  function finfo_file($finfo, $filename)
+  {
+    // Pega a extensão do arquivo em letras minúsculas
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-// log file name
-define('LOG_FILE','downloads.log');
+    // Lista de tipos MIME básicos (MUITO incompleta!)
+    $mime_types = [
+      'jpg'  => 'image/jpeg',
+      'jpeg' => 'image/jpeg',
+      'png'  => 'image/png',
+      'gif'  => 'image/gif',
+      'pdf'  => 'application/pdf',
+      'doc'  => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls'  => 'application/vnd.ms-excel',
+      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'txt'  => 'text/plain',
+      'csv'  => 'text/csv',
+    ];
 
-// Allowed extensions list in format 'extension' => 'mime type'
-// If myme type is set to empty string then script will try to detect mime type 
-// itself, which would only work if you have Mimetype or Fileinfo extensions
-// installed on server.
-$allowed_ext = array (
+    // Se a extensão estiver na lista, retorna o tipo MIME.
+    // Caso contrário, retorna um tipo genérico.
+    $mime_type = $mime_types[$extension] ?: 'application/octet-stream';
 
-  // text files
-  'txt' => 'text/plain'
+    // Verifica se o usuário pediu especificamente o MIME_TYPE
+    if ($finfo->options === FILEINFO_MIME_TYPE) {
+      return $mime_type;
+    }
 
-  // archives
-//  'zip' => 'application/zip',
+    // A função original podia retornar outras coisas, mas simplificamos
+    return $mime_type;
+  }
 
-  // documents
-//  'pdf' => 'application/pdf',
-//  'doc' => 'application/msword',
-//  'xls' => 'application/vnd.ms-excel',
-//  'ppt' => 'application/vnd.ms-powerpoint',
-  
-  // executables
-//  'exe' => 'application/octet-stream',
+  /**
+   * Cria uma função 'finfo_close' de substituição.
+   * Não faz nada, apenas retorna true.
+   */
+  function finfo_close($finfo)
+  {
+    unset($finfo); // Libera o objeto da memória
+    return true;
+  }
+}
 
-  // images
-//  'gif' => 'image/gif',
-//  'png' => 'image/png',
-//  'jpg' => 'image/jpeg',
-//  'jpeg' => 'image/jpeg',
+// Configurações
+define('BASE_DIR', realpath($raiz_do_projeto . 'public_html/tmp/txt'));
+define('LOG_DOWNLOADS', false);
+define('LOG_FILE', BASE_DIR . '/downloads.log');
 
-  // audio
-//  'mp3' => 'audio/mpeg',
-//  'wav' => 'audio/x-wav',
-
-  // video
-//  'mpeg' => 'video/mpeg',
-//  'mpg' => 'video/mpeg',
-//  'mpe' => 'video/mpeg',
-//  'mov' => 'video/quicktime',
-//  'avi' => 'video/x-msvideo'
+$allowed_ext = array(
+    'txt' => 'text/plain'
 );
 
-
-
-####################################################################
-###  DO NOT CHANGE BELOW
-####################################################################
-
-// If hotlinking not allowed then make hackers think there are some server problems
-if (ALLOWED_REFERRER !== ''
-&& (!isset($_SERVER['HTTP_REFERER']) || strpos(strtoupper($_SERVER['HTTP_REFERER']),strtoupper(ALLOWED_REFERRER)) === false)
-) {
-  die("Internal server error. Please contact system administrator.");
+// Validar BASE_DIR
+if (BASE_DIR === false || !is_dir(BASE_DIR)) {
+    error_log("BASE_DIR inválido");
+    die("Erro de configuração.");
 }
 
-// Make sure program execution doesn't time out
-// Set maximum script execution time in seconds (0 means no limit)
-set_time_limit(0);
-
-if (!isset($_GET['f']) || empty($_GET['f'])) {
-  die("Please specify file name for download.");
+// 1. Validar parâmetro
+if (!isset($_GET['f']) || !is_string($_GET['f']) || empty($_GET['f'])) {
+    die("Nome de arquivo não especificado.");
 }
 
-// Get real file name.
-// Remove any path info to avoid hacking by adding relative path, etc.
+// 2. Sanitizar
 $fname = basename($_GET['f']);
+$fname = preg_replace('/[^a-zA-Z0-9._-]/', '', $fname);
 
-// Check if the file exists
-// Check in subfolders too
-function find_file ($dirname, $fname, &$file_path) {
-
-  $dir = opendir($dirname);
-
-  if(is_dir($dirname)) {
-    while ($file = readdir($dir)) {
-      if (empty($file_path) && $file != '.' && $file != '..') {
-        if (is_dir($dirname.'/'.$file)) {
-          find_file($dirname.'/'.$file, $fname, $file_path);
-        }
-        else {
-          if (file_exists($dirname.'/'.$fname)) {
-            $file_path = $dirname.'/'.$fname;
-            return;
-          }
-        }
-      }
-    }
-  }
-
-} // find_file
-
-// get full file path (including subfolders)
-$file_path = '';
-find_file(BASE_DIR, $fname, $file_path);
-
-if (!is_file($file_path)) {
-  die("File does not exist. Make sure you specified correct file name."); 
+if (empty($fname)) {
+    die("Nome de arquivo inválido.");
 }
 
-// file size in bytes
-$fsize = filesize($file_path); 
+// 3. Validar extensão
+$fext = strtolower(pathinfo($fname, PATHINFO_EXTENSION));
 
-// file extension
-$fext = strtolower(substr(strrchr($fname,"."),1));
-
-// check if allowed extension
 if (!array_key_exists($fext, $allowed_ext)) {
-  die("Not allowed file type."); 
+    die("Tipo de arquivo não permitido.");
 }
 
-// get mime type
-if ($allowed_ext[$fext] == '') {
-  $mtype = '';
-  // mime type is not set, get from server settings
-  if (function_exists('mime_content_type')) {
-    $mtype = mime_content_type($file_path);
-  }
-  else if (function_exists('finfo_file')) {
-    $finfo = finfo_open(FILEINFO_MIME); // return mime type
-    $mtype = finfo_file($finfo, $file_path);
-    finfo_close($finfo);  
-  }
-  if ($mtype == '') {
-    $mtype = "application/force-download";
-  }
-}
-else {
-  // get mime type defined by admin
-  $mtype = $allowed_ext[$fext];
+// 4. Construir caminho (SEM busca recursiva!)
+$file_path = BASE_DIR . DIRECTORY_SEPARATOR . $fname;
+
+// 5. Resolver caminho real
+$real_path = realpath($file_path);
+
+// 6. CRÍTICO: Verificar que está dentro do BASE_DIR
+if ($real_path === false || strpos($real_path, BASE_DIR . DIRECTORY_SEPARATOR) !== 0) {
+    die("Arquivo não encontrado.");
 }
 
-// Browser will try to save file with this filename, regardless original filename.
-// You can override it if needed.
-
-if (!isset($_GET['fc']) || empty($_GET['fc'])) {
-  $asfname = $fname;
-}
-else {
-  // remove some bad chars
-  $asfname = str_replace(array('"',"'",'\\','/'), '', $_GET['fc']);
-  if ($asfname === '') $asfname = 'NoName';
+// 7. Verificar se é arquivo
+if (!is_file($real_path)) {
+    die("Arquivo não encontrado.");
 }
 
-// set headers
+// 8. Validar MIME type real
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$real_mime = finfo_file($finfo, $real_path);
+finfo_close($finfo);
+
+if ($real_mime !== 'text/plain') {
+    die("Tipo de arquivo inválido.");
+}
+
+// 9. Tamanho
+$fsize = filesize($real_path);
+
+// 10. Nome de download customizado
+if (isset($_GET['fc']) && is_string($_GET['fc']) && !empty($_GET['fc'])) {
+    $asfname = basename($_GET['fc']);
+    $asfname = preg_replace('/[^a-zA-Z0-9._-]/', '', $asfname);
+    
+    if (pathinfo($asfname, PATHINFO_EXTENSION) !== $fext) {
+        $asfname = pathinfo($asfname, PATHINFO_FILENAME) . '.' . $fext;
+    }
+} else {
+    $asfname = $fname;
+}
+
+if (empty($asfname)) {
+    $asfname = 'download.txt';
+}
+
+// 11. Timeout
+set_time_limit(300);
+
+// 12. Limpar buffer
+if (ob_get_level()) {
+    ob_end_clean();
+}
+
+// 13. Headers
 header("Pragma: public");
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("Cache-Control: public");
 header("Content-Description: File Transfer");
-header("Content-Type: $mtype");
-header("Content-Disposition: attachment; filename=\"$asfname\"");
+header("Content-Type: text/plain; charset=utf-8");
+header("Content-Disposition: attachment; filename=\"" . addslashes($asfname) . "\"");
 header("Content-Transfer-Encoding: binary");
 header("Content-Length: " . $fsize);
 
-// download
-// @readfile($file_path);
+// 14. Enviar arquivo
+$file = fopen($real_path, "rb");
+if ($file === false) {
+    die("Erro ao abrir arquivo.");
+}
 
-$file = @fopen($file_path,"rb");
-if ($file) {
-  while(!feof($file)) {
-    print(fread($file, 1024*8));
+while (!feof($file)) {
+    echo fread($file, 8192);
     flush();
-    if (connection_status()!=0) {
-      @fclose($file);
-      die();
+    
+    if (connection_status() != 0) {
+        fclose($file);
+        exit;
     }
-  }
-  @fclose($file);
 }
 
-// log downloads
-if (!LOG_DOWNLOADS) die();
+fclose($file);
 
-$f = @fopen(LOG_FILE, 'a+');
-if ($f) {
-  @fputs($f, date("m.d.Y g:ia")."  ".$_SERVER['REMOTE_ADDR']."  ".$fname."\n");
-  @fclose($f);
+// 15. Log
+if (LOG_DOWNLOADS) {
+    $log_entry = sprintf(
+        "[%s] IP: %s | File: %s\n",
+        date("Y-m-d H:i:s"),
+        $_SERVER['REMOTE_ADDR'] ?: 'unknown',
+        $fname
+    );
+    
+    error_log($log_entry, 3, LOG_FILE);
 }
 
-?>
+exit;

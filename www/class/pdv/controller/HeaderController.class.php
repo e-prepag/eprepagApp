@@ -252,7 +252,9 @@ function salvar_log_req($pdo, $usuario_id, $blacklist = null)
             'card_number',
             'cvv',
             'ssn',
-            'cpf'
+            'cpf',
+            'passMestra',
+            'g-recaptcha-response'
         );
     }
 

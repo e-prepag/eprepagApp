@@ -18,25 +18,15 @@ if (!empty($_POST)) {
         $erro[] = "Email inválido.";
     }
 
-    if (!empty($_FILES['anexo']["tmp_name"])) {
-        if ($retImg = $valida->imagem($_FILES['anexo'])) {
-            $erro = $retImg; //retorna array
-        } else {
-            $attach = "";
-            $file = $_FILES['anexo'];
-            if (!move_uploaded_file(basename($file["tmp_name"]), DIR_CACHE . basename($file["name"])))
-                $erro[] = "Erro ao gravar imngem";
-            else
-                $attach = DIR_CACHE . $file["name"];
-        }
-    }
+    $attach = null;
 
     if ($valida->letras($_POST['nome'])) {
         $erro[] = "Nome inválido.";
     }
 
     // Validação de CPF ou CNPJ
-    function validaCpfCnpj($value) {
+    function validaCpfCnpj($value)
+    {
         $value = preg_replace('/\D/', '', $value);
 
         if (strlen($value) == 11) {
@@ -53,11 +43,11 @@ if (!empty($_POST)) {
         } elseif (strlen($value) == 14) {
             // Validação de CNPJ
             if (preg_match('/(\d)\1{13}/', $value)) return false;
-            $t = [5,4,3,2,9,8,7,6,5,4,3,2];
+            $t = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
             for ($i = 0, $s = 0; $i < 12; $i++) $s += $value[$i] * $t[$i];
             $r = $s % 11;
             if ($value[12] != ($r < 2 ? 0 : 11 - $r)) return false;
-            $t = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+            $t = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
             for ($i = 0, $s = 0; $i < 13; $i++) $s += $value[$i] * $t[$i];
             $r = $s % 11;
             if ($value[13] != ($r < 2 ? 0 : 11 - $r)) return false;
@@ -172,8 +162,6 @@ if (!empty($_POST)) {
 						Equipe E-Prepag</body></html>";
 
             if (enviaEmail4($to, $_POST['email'], $bcc, $subject, $corpoMsg, null, $attach, false, '', $_POST['email'])) {
-                if ($attach != "")
-                    unlink($attach);
 
                 $titulo = "E-Prepag - Créditos";
                 $modalMsg = "Email enviado com sucesso.";
@@ -254,14 +242,6 @@ if (!empty($_POST)) {
                 <div class="col-md-12 top5">
                     <input type="text" placeholder="CPF/CNPJ *" id="cpfcnpj" name="cpfcnpj" class="form-control" maxlength="18" required>
                 </div>
-                <div class="col-md-12 top5">
-                    <label for="anexo" class="text-left fontsize-p">Anexar
-                        <input type="file" class="custom-file-input" name="anexo" id="anexo" value="">
-                    </label>
-                </div>
-                <div class="col-md-12 text-right fontsize-p">
-                    Se julgar necessário você pode anexar um arquivo ou comprovante.
-                </div>
             </div>
             <div class="col-md-6">
                 <div class="row form-group text-left">
@@ -300,10 +280,6 @@ if (!empty($_POST)) {
 
             if (!valida())
                 return false;
-        });
-
-        $("#btnanexo").click(function() {
-            $("#anexo").trigger("click");
         });
     });
 </script>

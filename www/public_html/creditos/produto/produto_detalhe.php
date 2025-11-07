@@ -10,9 +10,8 @@ $qtdFeedsIndex = 5;
 $controller = new ProdutosController;
 
 if (isset($_GET['token'])) {
-
     $objEncryption = new Encryption();
-    $token = unserialize($objEncryption->decrypt($_GET['token']));
+    $token = json_decode($objEncryption->decrypt($_GET['token']), true);
     $_POST["prod"] = $token['produto'];
 }
 
@@ -384,6 +383,19 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                 let html = "R$" + valor + ",00";
                 $.post("/game/ajax/epp_info.php", {
                         valor: valor,
+                    },
+                    function(data) {
+                        let html = data;
+                        $(".span-valor").html(html);
+                    });
+                $(".error-list").html("");
+            }
+        });
+    });
+</script>
+<?php
+require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/footer.php";
+?>                       valor: valor,
                     },
                     function(data) {
                         let html = data;

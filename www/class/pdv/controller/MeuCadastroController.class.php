@@ -41,48 +41,6 @@ class MeuCadastroController extends HeaderController{
             $objUsuarios->setFaturaMediaMensal($post['faturamento_medio']);
             $objUsuarios->setReprVendaMSN($post['skype']);
             $objUsuarios->setSite($post['site']);
-			
-			if(isset($post["corCaixa"]) && isset($post["corBotao"]) && isset($post["corFundo"]) && isset($post["corTexto"])){
-				$nomeArquivo = ($file["logo"]["error"] == 0 && $file["logo"]["size"] > 0)?$this->usuarios->getId().".".pathinfo($file["logo"]["name"], PATHINFO_EXTENSION): $name_file_old;
-				$extensoesPermitidas = array("png", "jpg", "");
-			    if(!in_array(strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION)), $extensoesPermitidas)){
-					$this->erros = "Esses tipo de arquivo não é permitido";
-					return false;
-				}
-				if(!empty($post['emailMark'])){
-					if(filter_var($post['emailMark'], FILTER_VALIDATE_EMAIL)){
-						$emailMarketing = $post['emailMark']; 
-					}else{
-						$this->erros = "O e-mail marketing digitado está invalido";
-					    return false;
-					}
-				}else{
-					$emailMarketing = "";
-				}
-				// todas as cores não podem ser pretas #000000
-				if($post["corCaixa"] != "#000000" || $post["corBotao"] != "#000000" || $post["corFundo"] != "#000000"){ 
-					$objUsuarios->setReprLegalMSN(json_encode(["caixa"=> $post["corCaixa"], "botao"=> $post["corBotao"], "fundo"=> $post["corFundo"], "logo"=> $nomeArquivo, "texto"=> $post["corTexto"], "emailMark" => $emailMarketing]));
-					if(!empty($file["logo"]["name"])){	
-						 $files = scandir("/www/public_html/imagens/pdv/logos");
-						 foreach($files as $key => $value){
-							 if($value != "." && $value != ".."){
-								 $nomeNoDir = pathinfo($value, PATHINFO_FILENAME);
-								 if($nomeNoDir == $this->usuarios->getId()){
-									 unlink("/www/public_html/imagens/pdv/logos/".$value);
-								 }
-							 }
-						 }
-						 $caminho = "/www/public_html/imagens/pdv/logos/".$nomeArquivo;
-						 if(!move_uploaded_file($file["logo"]["tmp_name"], $caminho)){
-							 $this->erros = "Não foi possivel cadastrar seu logo";
-							 return false;
-						 }	
-				    }
-				}else{
-					 $this->erros = "Todas as cores não podem ser iguais";
-					 return false;
-				}
-			}
 
             if ($objUsuarios->getTipoEstabelecimento() == "Outros") 
             {

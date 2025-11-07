@@ -402,7 +402,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        group by id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
+                        group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
 
                     union all
 
@@ -438,7 +438,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        group by id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
+                        group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
 
                     union all
 
@@ -474,7 +474,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        group by id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
+                        group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
 
                     union all
 
@@ -510,7 +510,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        group by id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
+                        group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
 
                     union all
 
@@ -546,7 +546,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        group by id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
+                        group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
 
                     union all
 
@@ -555,8 +555,6 @@ if($BtnSearch) {
                                 1 as forma_pagamento,
                                 'L' as vg_canal,
                                 vg.vg_id as id,
-                                -- vgm_cpf as ug_cpf, 
-                                -- vgm_nome_cpf as ug_nome,
                                 ug_cnpj as ug_cpf,
                                 ug_razao_social as ug_nome, ".PHP_EOL;               
             if($dd_opr_codigo && $possui_totalizacao_utilizacao) {
@@ -609,8 +607,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        -- group by id,tipo,vgm_cpf, vgm_nome_cpf, data, forma_pagamento )  
-                        group by id,tipo,ug_cnpj, ug_razao_social, data, forma_pagamento )
+                        group by vg.vg_id,tipo,ug_cnpj, ug_razao_social, data, forma_pagamento )
                     ";
         }//end if($dd_canal != "CARD")
 
@@ -646,7 +643,7 @@ if($BtnSearch) {
                                 and (pih_id=".$dd_opr_codigo.")  ".PHP_EOL;
              }
             $sql .= "
-                        group by id,tipo,picc_cpf, picc_nome, pih_data, forma_pagamento )
+                        group by pih_id,tipo,picc_cpf, picc_nome, pih_data, forma_pagamento )
                         ";
         } //end if($dd_canal == "CARD" || empty($dd_canal)) 
         
@@ -684,7 +681,7 @@ if($BtnSearch) {
                                 and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
             }
             $sql .= "
-                        group by id,vg_canal,tipo,vgcbe_cpf, vgcbe_nome_cpf, vg_data_concilia, forma_pagamento )
+                        group by vg_id,vg_canal,tipo,vgcbe_cpf, vgcbe_nome_cpf, vg_data_concilia, forma_pagamento )
                         ";
         }//end if($dd_canal != "CARD")
         
@@ -694,7 +691,7 @@ if($BtnSearch) {
                 ";
         //echo "<pre>".$sql."</pre>";
         //die();
-    if($_SERVER["REMOTE_ADDR"] == "187.18.252.183"){
+    if($_SERVER["REMOTE_ADDR"] == "177.37.138.113"){
         echo $sql;
     }
 	$resid = pg_exec($connid, $sql);

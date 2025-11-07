@@ -94,7 +94,7 @@ $msg = htmlentities($msg, ENT_QUOTES,'ISO-8859-1');
                         </div>
 
                         <a class="decoration-none txt-cinza"
-                            href="https://www.e-prepag.com.br/game/conta/esqueci-minha-senha/index.php?redirected=true&origemUsuario=gamer"><em>Esqueci
+                            href="/game/conta/esqueci-minha-senha/index.php?redirected=true&origemUsuario=gamer"><em>Esqueci
                                 minha senha</em></a>
 
                     </div>

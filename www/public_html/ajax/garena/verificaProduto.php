@@ -202,6 +202,8 @@ if (isset($_POST["valid"])) {
 		$codPinFile = $_POST["codigo"];
 	}
 
+	$codPinFile = preg_replace('/[^0-9]/', '', $codPinFile);
+
 	sleep(1);
 	if (file_exists('/www/log/' . $codPinFile)) {
 		sleep(10);

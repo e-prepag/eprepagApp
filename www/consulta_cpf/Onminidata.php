@@ -123,9 +123,9 @@ class Onminidata {
 				
 				$arquivo = '/www/log/logONMINIDATAerror.txt';
 
-				$abre_arquivo = fopen($error, 'a+');
+				$abre_arquivo = fopen($arquivo, 'a+');
 
-				fwrite($abre_arquivo, $response . "\n");
+				fwrite($abre_arquivo, $response . $error . "\n");
 
 				fclose($abre_arquivo);
 				

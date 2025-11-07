@@ -1,6 +1,7 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-class UsuarioGames {
+class UsuarioGames
+{
 
     var $ug_id;
     var $ug_sSenha;
@@ -56,19 +57,69 @@ class UsuarioGames {
 
     //login
     var $login;
-    
+
     var $ug_nome_cpf;
-    
-	// VIPs
-	var $idsVIP = [19090, 9845, 16265, 55430,
-            55124, 34785, 112046, 48462,
-            49589, 2182, 89860, 133265, 55031, 156625, 38978, 121029, 94568, 128815, 4030, 42175, 152869,
-            195456, 339998, 24092, 46198,
-            33105,647539,568667,626049,541858,197491,324815,52030,599703,629217,184723,544704,625467,622017,421717,38812,472850,527404,633080,
-            9016, 515601, 829346, 1135164, 1211443,1335408, 1331495, 1343839, 1344036,1344144, 1341779
-        ];
-	
-	/*
+
+    // VIPs
+    var $idsVIP = [
+        19090,
+        9845,
+        16265,
+        55430,
+        55124,
+        34785,
+        112046,
+        48462,
+        49589,
+        2182,
+        89860,
+        133265,
+        55031,
+        156625,
+        38978,
+        121029,
+        94568,
+        128815,
+        4030,
+        42175,
+        152869,
+        195456,
+        339998,
+        24092,
+        46198,
+        33105,
+        647539,
+        568667,
+        626049,
+        541858,
+        197491,
+        324815,
+        52030,
+        599703,
+        629217,
+        184723,
+        544704,
+        625467,
+        622017,
+        421717,
+        38812,
+        472850,
+        527404,
+        633080,
+        9016,
+        515601,
+        829346,
+        1135164,
+        1211443,
+        1335408,
+        1331495,
+        1343839,
+        1344036,
+        1344144,
+        1341779
+    ];
+
+    /*
 		19090 - "ELIANA AP.ANDREOTTI PETTA", 9845 - "REINALDO Pï¿½REZ Sï¿½NCHEZ KAIZEN", 16265 - "SILVIA CRISTINA PARISOTTO BALDIN" 
 		55430 - "NIKOLAS VINICIUS DE OLIVEIRA"
 		adicionado em 2012-07-25 
@@ -120,46 +171,47 @@ class UsuarioGames {
 	*/
 
 
-    function UsuarioGames(	$ug_id 				= null,
-						    $ug_sSenha 			= null,
-						    $ug_blAtivo 		= null,
-						    $ug_dDataInclusao 	= null,
-							$ug_dDataUltimoAcesso= null,
-							$ug_iQtdeAcessos	= null,
-						
-						    $ug_sEmail 			= null,
-						    $ug_sNome 			= null,
-						    $ug_sCPF 			= null,
-						    $ug_sRG 			= null,
-						    $ug_dDataNascimento = null,
-						    $ug_cSexo 			= null,
-						    $ug_sTipoEnd 		= null,
-						    $ug_sEndereco 		= null,
-						    $ug_sNumero 		= null,
-						    $ug_sComplemento 	= null,
-						    $ug_sBairro 		= null,
-						    $ug_sCidade 		= null,
-						    $ug_sEstado 		= null,
-						    $ug_sCEP 			= null,
-						    $ug_sTelDDI 		= null,
-						    $ug_sTelDDD 		= null,
-						    $ug_sTel 			= null,
-						    $ug_sCelDDI 		= null,
-						    $ug_sCelDDD 		= null,
-						    $ug_sCel 			= null,
-						    $ug_sHabboId		= null,
-                                $ug_NewsLetter		= null, 
+    function UsuarioGames(
+        $ug_id                 = null,
+        $ug_sSenha             = null,
+        $ug_blAtivo         = null,
+        $ug_dDataInclusao     = null,
+        $ug_dDataUltimoAcesso = null,
+        $ug_iQtdeAcessos    = null,
 
-                                $ug_compet_lh_ug_id	= null, 
-                                $ug_compet_jogo		= null, 
-                                $ug_compet_aceito_regulamento	= null, 
-                                $ug_compet_aceito_data_aceito	= null,
-                                $ug_use_cielo					= null,
+        $ug_sEmail             = null,
+        $ug_sNome             = null,
+        $ug_sCPF             = null,
+        $ug_sRG             = null,
+        $ug_dDataNascimento = null,
+        $ug_cSexo             = null,
+        $ug_sTipoEnd         = null,
+        $ug_sEndereco         = null,
+        $ug_sNumero         = null,
+        $ug_sComplemento     = null,
+        $ug_sBairro         = null,
+        $ug_sCidade         = null,
+        $ug_sEstado         = null,
+        $ug_sCEP             = null,
+        $ug_sTelDDI         = null,
+        $ug_sTelDDD         = null,
+        $ug_sTel             = null,
+        $ug_sCelDDI         = null,
+        $ug_sCelDDD         = null,
+        $ug_sCel             = null,
+        $ug_sHabboId        = null,
+        $ug_NewsLetter        = null,
 
-                                $ug_saldo_fidelizacao			= null,
-                                $ug_categoria_fidelizacao		= null,
-                                $login = null
-							) {
+        $ug_compet_lh_ug_id    = null,
+        $ug_compet_jogo        = null,
+        $ug_compet_aceito_regulamento    = null,
+        $ug_compet_aceito_data_aceito    = null,
+        $ug_use_cielo                    = null,
+
+        $ug_saldo_fidelizacao            = null,
+        $ug_categoria_fidelizacao        = null,
+        $login = null
+    ) {
 
         $this->setId($ug_id);
         $this->setSenha($ug_sSenha);
@@ -200,303 +252,415 @@ class UsuarioGames {
         $this->setSaldoFidelizacao($ug_saldo_fidelizacao);
         $this->setCategoriaFidelizacao($ug_categoria_fidelizacao);
         $this->setLogin($login);
-		
-		$this->getIdsVIP($idsVIP);
+
+        $this->getIdsVIP($idsVIP);
     }
-	
-	public function getIdsVIP() {
-		return $this->idsVIP;
-	}
-	
-    public function getLogin() {
+
+    public function getIdsVIP()
+    {
+        return $this->idsVIP;
+    }
+
+    public function getLogin()
+    {
         return $this->login;
     }
 
-    public function setLogin($login) {
+    public function setLogin($login)
+    {
         $this->login = $login;
         return $this;
     }
 
-    function getId() {
+    function getId()
+    {
         return $this->ug_id;
     }
-	
-    function setId($ug_id) {
+
+    function setId($ug_id)
+    {
         $this->ug_id = $ug_id;
     }
 
-    function getSenha() {
+    function getSenha()
+    {
         return $this->ug_sSenha;
     }
-    function setSenha($ug_sSenha) {
+    function setSenha($ug_sSenha)
+    {
         $this->ug_sSenha = $ug_sSenha;
     }
 
-    function getAtivo() {
+    function getAtivo()
+    {
         return $this->ug_blAtivo;
     }
-    function setAtivo($ug_blAtivo) {
+    function setAtivo($ug_blAtivo)
+    {
         if (!is_null($ug_blAtivo)) {
             if ($ug_blAtivo == 1 || $ug_blAtivo == "1" || $ug_blAtivo === "true") $ug_blAtivo = 1;
-            elseif($ug_blAtivo == '' || $ug_blAtivo == '0' || $ug_blAtivo == 0 || $ug_blAtivo == "false") $ug_blAtivo = 2;
+            elseif ($ug_blAtivo == '' || $ug_blAtivo == '0' || $ug_blAtivo == 0 || $ug_blAtivo == "false") $ug_blAtivo = 2;
             else $ug_blAtivo = $ug_blAtivo;
         } //end if (!is_null($ug_blAtivo))
         else $ug_blAtivo = 2;
         $this->ug_blAtivo = $ug_blAtivo;
     }
 
-    function getDataInclusao() {
+    function getDataInclusao()
+    {
         return $this->ug_dDataInclusao;
     }
-    function setDataInclusao($ug_dDataInclusao) {
+    function setDataInclusao($ug_dDataInclusao)
+    {
         $this->ug_dDataInclusao = $ug_dDataInclusao;
     }
 
-    function getDataUltimoAcesso() {
+    function getDataUltimoAcesso()
+    {
         return $this->ug_dDataUltimoAcesso;
     }
-    function setDataUltimoAcesso($ug_dDataUltimoAcesso) {
+    function setDataUltimoAcesso($ug_dDataUltimoAcesso)
+    {
         $this->ug_dDataUltimoAcesso = $ug_dDataUltimoAcesso;
     }
 
-    function getQtdeAcessos() {
+    function getQtdeAcessos()
+    {
         return $this->ug_iQtdeAcessos;
     }
-    function setQtdeAcessos($ug_iQtdeAcessos) {
+    function setQtdeAcessos($ug_iQtdeAcessos)
+    {
         $this->ug_iQtdeAcessos = $ug_iQtdeAcessos;
     }
 
-    function getEmail() {
+    function getEmail()
+    {
         return $this->ug_sEmail;
     }
-    function setEmail($ug_sEmail) {
+    function setEmail($ug_sEmail)
+    {
         $this->ug_sEmail = $ug_sEmail;
     }
 
-    function getNome() {
+    function getNome()
+    {
         return $this->ug_sNome;
     }
-    function setNome($ug_sNome) {
+    function setNome($ug_sNome)
+    {
         $this->ug_sNome = $ug_sNome;
     }
 
-    function getCPF() {
+    function getCPF()
+    {
         return $this->ug_sCPF;
     }
-    function setCPF($ug_sCPF) {
+    function setCPF($ug_sCPF)
+    {
         $this->ug_sCPF = $ug_sCPF;
     }
 
-    function getRG() {
+    function getRG()
+    {
         return $this->ug_sRG;
     }
-    function setRG($ug_sRG) {
+    function setRG($ug_sRG)
+    {
         if (!is_null($ug_sRG)) $ug_sRG = preg_replace("/[\.-]/", "", $ug_sRG);
         $this->ug_sRG = $ug_sRG;
     }
 
-    function getDataNascimento() {
+    function getDataNascimento()
+    {
         return $this->ug_dDataNascimento;
     }
-    function setDataNascimento($ug_dDataNascimento) {
+    function setDataNascimento($ug_dDataNascimento)
+    {
         $this->ug_dDataNascimento = $ug_dDataNascimento;
     }
 
-    function getSexo() {
+    function getSexo()
+    {
         return $this->ug_cSexo;
     }
-    function setSexo($ug_cSexo) {
+    function setSexo($ug_cSexo)
+    {
         $this->ug_cSexo = $ug_cSexo;
     }
 
-    
-    function getEndereco() {
+
+    function getEndereco()
+    {
         return $this->ug_sEndereco;
     }
-    function setEndereco($ug_sEndereco) {
+    function setEndereco($ug_sEndereco)
+    {
         $this->ug_sEndereco = $ug_sEndereco;
     }
 
-    function getTipoEnd() {
+    function getTipoEnd()
+    {
         return $this->ug_sTipoEnd;
     }
-    function setTipoEnd($ug_sTipoEnd) {
+    function setTipoEnd($ug_sTipoEnd)
+    {
         $this->ug_sTipoEnd = $ug_sTipoEnd;
     }
 
-    function getNumero() {
+    function getNumero()
+    {
         return $this->ug_sNumero;
     }
-    function setNumero($ug_sNumero) {
+    function setNumero($ug_sNumero)
+    {
         $this->ug_sNumero = $ug_sNumero;
     }
 
-    function getComplemento() {
+    function getComplemento()
+    {
         return $this->ug_sComplemento;
     }
-    function setComplemento($ug_sComplemento) {
+    function setComplemento($ug_sComplemento)
+    {
         $this->ug_sComplemento = $ug_sComplemento;
     }
 
-    function getBairro() {
+    function getBairro()
+    {
         return $this->ug_sBairro;
     }
-    function setBairro($ug_sBairro) {
+    function setBairro($ug_sBairro)
+    {
         $this->ug_sBairro = $ug_sBairro;
     }
 
-    function getCidade() {
+    function getCidade()
+    {
         return $this->ug_sCidade;
     }
-    function setCidade($ug_sCidade) {
+    function setCidade($ug_sCidade)
+    {
         $this->ug_sCidade = $ug_sCidade;
     }
 
-    function getEstado() {
+    function getEstado()
+    {
         return $this->ug_sEstado;
     }
-    function setEstado($ug_sEstado) {
+    function setEstado($ug_sEstado)
+    {
         $this->ug_sEstado = $ug_sEstado;
     }
 
-    function getCEP() {
+    function getCEP()
+    {
         return $this->ug_sCEP;
     }
-    function setCEP($ug_sCEP) {
+    function setCEP($ug_sCEP)
+    {
         $this->ug_sCEP = $ug_sCEP;
     }
 
-    function getTelDDI() {
+    function getTelDDI()
+    {
         return $this->ug_sTelDDI;
     }
-    function setTelDDI($ug_sTelDDI) {
+    function setTelDDI($ug_sTelDDI)
+    {
         $this->ug_sTelDDI = $ug_sTelDDI;
     }
 
-    function getTelDDD() {
+    function getTelDDD()
+    {
         return $this->ug_sTelDDD;
     }
-    function setTelDDD($ug_sTelDDD) {
+    function setTelDDD($ug_sTelDDD)
+    {
         $this->ug_sTelDDD = $ug_sTelDDD;
     }
 
-    function getTel() {
+    function getTel()
+    {
         return $this->ug_sTel;
     }
-    function setTel($ug_sTel) {
+    function setTel($ug_sTel)
+    {
         $this->ug_sTel = $ug_sTel;
     }
 
-    function getCelDDI() {
+    function getCelDDI()
+    {
         return $this->ug_sCelDDI;
     }
-    function setCelDDI($ug_sCelDDI) {
+    function setCelDDI($ug_sCelDDI)
+    {
         $this->ug_sCelDDI = $ug_sCelDDI;
     }
 
-    function getCelDDD() {
+    function getCelDDD()
+    {
         return $this->ug_sCelDDD;
     }
-    function setCelDDD($ug_sCelDDD) {
+    function setCelDDD($ug_sCelDDD)
+    {
         $this->ug_sCelDDD = $ug_sCelDDD;
     }
 
-    function getCel() {
+    function getCel()
+    {
         return $this->ug_sCel;
     }
-    function setCel($ug_sCel) {
+    function setCel($ug_sCel)
+    {
         $this->ug_sCel = $ug_sCel;
     }
 
-    function getHabboId() {
+    function getHabboId()
+    {
         return $this->ug_sHabboId;
     }
-    function setHabboId($ug_sHabboId) {
+    function setHabboId($ug_sHabboId)
+    {
         $this->ug_sHabboId = $ug_sHabboId;
     }
 
-    function getNewsLetter() {
+    function getNewsLetter()
+    {
         return $this->ugNewsLetter;
     }
-    function setNewsLetter($ugNewsLetter) {
+    function setNewsLetter($ugNewsLetter)
+    {
         // Se nï¿½o for H - HTML ou N - Nï¿½o entï¿½o cadastra T - Text
         if (strtoupper($ugNewsLetter) != 'H' && strtoupper($ugNewsLetter) != 'N') $ugNewsLetter = 't';
         $this->ugNewsLetter = $ugNewsLetter;
     }
 
-    function getUseCielo() {
+    function getUseCielo()
+    {
         return $this->ug_use_cielo;
     }
-    function setUseCielo($ug_use_cielo) {
+    function setUseCielo($ug_use_cielo)
+    {
         $this->ug_use_cielo = $ug_use_cielo;
     }
 
-    function getOBS() {
+    function getOBS()
+    {
         return $this->ug_obs;
     }
-    function setOBS($ug_obs) {
+    function setOBS($ug_obs)
+    {
         $this->ug_obs = $ug_obs;
     }
 
-    function getNomedaMae() {
+    function getNomedaMae()
+    {
         return $this->ug_nome_da_mae;
     }
-    function setNomedaMae($ug_nome_da_mae) {
+    function setNomedaMae($ug_nome_da_mae)
+    {
         $this->ug_nome_da_mae = $ug_nome_da_mae;
     }
-    
-    public function getNomeCPF() {
+
+    public function getNomeCPF()
+    {
         return $this->ug_nome_cpf;
     }
 
-    public function setNomeCPF($ug_nome_cpf) {
+    public function setNomeCPF($ug_nome_cpf)
+    {
         $this->ug_nome_cpf = $ug_nome_cpf;
         return $this;
     }
 
-    function getCompet_lh_ug_id(){ return $this->ug_compet_lh_ug_id; }
-	function setCompet_lh_ug_id($ug_compet_lh_ug_id){ $this->ug_compet_lh_ug_id = $ug_compet_lh_ug_id; }
+    function getCompet_lh_ug_id()
+    {
+        return $this->ug_compet_lh_ug_id;
+    }
+    function setCompet_lh_ug_id($ug_compet_lh_ug_id)
+    {
+        $this->ug_compet_lh_ug_id = $ug_compet_lh_ug_id;
+    }
 
-	function getCompet_jogo(){ return $this->ug_compet_jogo; }
-	function setCompet_jogo($ug_compet_jogo){ $this->ug_compet_jogo = $ug_compet_jogo; }
+    function getCompet_jogo()
+    {
+        return $this->ug_compet_jogo;
+    }
+    function setCompet_jogo($ug_compet_jogo)
+    {
+        $this->ug_compet_jogo = $ug_compet_jogo;
+    }
 
-	function getCompet_aceito_regulamento(){ return $this->ug_compet_aceito_regulamento; }
-	function setCompet_aceito_regulamento($ug_compet_aceito_regulamento){ $this->ug_compet_aceito_regulamento = $ug_compet_aceito_regulamento; }
+    function getCompet_aceito_regulamento()
+    {
+        return $this->ug_compet_aceito_regulamento;
+    }
+    function setCompet_aceito_regulamento($ug_compet_aceito_regulamento)
+    {
+        $this->ug_compet_aceito_regulamento = $ug_compet_aceito_regulamento;
+    }
 
-	function getCompet_aceito_data_aceito(){ return $this->ug_compet_aceito_data_aceito; }
-	function setCompet_aceito_data_aceito($ug_compet_aceito_data_aceito){ $this->ug_compet_aceito_data_aceito = $ug_compet_aceito_data_aceito; }
+    function getCompet_aceito_data_aceito()
+    {
+        return $this->ug_compet_aceito_data_aceito;
+    }
+    function setCompet_aceito_data_aceito($ug_compet_aceito_data_aceito)
+    {
+        $this->ug_compet_aceito_data_aceito = $ug_compet_aceito_data_aceito;
+    }
 
-	function getPerfilSaldo(){ return $this->ug_fPerfilSaldo;}
-	function setPerfilSaldo($ug_fPerfilSaldo){ $this->ug_fPerfilSaldo = $ug_fPerfilSaldo;}
+    function getPerfilSaldo()
+    {
+        return $this->ug_fPerfilSaldo;
+    }
+    function setPerfilSaldo($ug_fPerfilSaldo)
+    {
+        $this->ug_fPerfilSaldo = $ug_fPerfilSaldo;
+    }
 
     //Metodos de SET e GET para o Campo ug_saldo_fidelizacao - Contem o Saldo de Fidelizaï¿½ï¿½o
-	function getSaldoFidelizacao(){ return $this->ug_saldo_fidelizacao; }
-	function setSaldoFidelizacao($ug_saldo_fidelizacao){	$this->ug_saldo_fidelizacao = $ug_saldo_fidelizacao; }
+    function getSaldoFidelizacao()
+    {
+        return $this->ug_saldo_fidelizacao;
+    }
+    function setSaldoFidelizacao($ug_saldo_fidelizacao)
+    {
+        $this->ug_saldo_fidelizacao = $ug_saldo_fidelizacao;
+    }
 
     //Metodos de SET e GET para o Campo ug_categoria_fidelizacao - Contem a Categoria de Fidelizaï¿½ï¿½o
-	function getCategoriaFidelizacao(){ return $this->ug_categoria_fidelizacao; }
-	function setCategoriaFidelizacao($ug_categoria_fidelizacao){	$this->ug_categoria_fidelizacao = $ug_categoria_fidelizacao; }
+    function getCategoriaFidelizacao()
+    {
+        return $this->ug_categoria_fidelizacao;
+    }
+    function setCategoriaFidelizacao($ug_categoria_fidelizacao)
+    {
+        $this->ug_categoria_fidelizacao = $ug_categoria_fidelizacao;
+    }
 
-    function getIdUsuarioGamerByEmail($ug_email) {
+    function getIdUsuarioGamerByEmail($ug_email)
+    {
         $sql = "select ug_id from usuarios_games where ug_ativo = 1 and ug_email = '" . trim(strtoupper($ug_email)) . "'";
         $rs = SQLexecuteQuery($sql);
         $dataUser = pg_fetch_array($rs);
 
         return $dataUser['ug_id'];
     }
-	
-	function getEmailUsuarioGamerById($ug_id) {
-		$sql = "select ug_email from usuarios_games where ug_ativo = 1 and ug_id = " . $ug_id . "";
+
+    function getEmailUsuarioGamerById($ug_id)
+    {
+        $sql = "select ug_email from usuarios_games where ug_ativo = 1 and ug_id = " . $ug_id . "";
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
-		$stmt = $pdo->prepare($sql);
-		$stmt->execute();
-		
-		$dataUser = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+
+        $dataUser = $stmt->fetch(PDO::FETCH_ASSOC);
         return $dataUser['ug_email'];
-	}
-    
-    function inserir(&$objGamesUsuario) {
+    }
+
+    function inserir(&$objGamesUsuario)
+    {
 
         $ret = UsuarioGames::validarCampos($objGamesUsuario, true);
 
@@ -536,11 +700,11 @@ class UsuarioGames {
 
             //SQL
             $sql = "insert into usuarios_games(ug_senha, ug_ativo, ug_data_inclusao, " .
-                    "ug_data_ultimo_acesso, ug_qtde_acessos, ug_email, ug_nome, ug_cpf, ug_rg, " .
-                    "ug_data_nascimento, ug_sexo, ug_tipo_end, ug_endereco, ug_numero, ug_complemento, " .
-                    "ug_bairro, ug_cidade, ug_estado, ug_cep, ug_tel_ddi, ug_tel_ddd, ug_tel, " .
-                    "ug_cel_ddi, ug_cel_ddd, ug_cel, ug_habbo_id, ug_news, " .
-                    "ug_compet_lh_ug_id, ug_compet_jogo, ug_compet_aceito_regulamento, ug_compet_aceito_data_aceito ";
+                "ug_data_ultimo_acesso, ug_qtde_acessos, ug_email, ug_nome, ug_cpf, ug_rg, " .
+                "ug_data_nascimento, ug_sexo, ug_tipo_end, ug_endereco, ug_numero, ug_complemento, " .
+                "ug_bairro, ug_cidade, ug_estado, ug_cep, ug_tel_ddi, ug_tel_ddd, ug_tel, " .
+                "ug_cel_ddi, ug_cel_ddd, ug_cel, ug_habbo_id, ug_news, " .
+                "ug_compet_lh_ug_id, ug_compet_jogo, ug_compet_aceito_regulamento, ug_compet_aceito_data_aceito ";
 
             $sql .= ") values (";
 
@@ -623,16 +787,15 @@ class UsuarioGames {
                     $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'CadastroGamer');
                     $objEnvioEmailAutomatico->setUgID($objGamesUsuario->getId());
                     $objEnvioEmailAutomatico->MontaEmailEspecifico();
-
-                    }
+                }
             }
-
-            }
+        }
 
         return $ret;
     }
 
-    function inserir_simple($store_id_novo, $email_novo) {
+    function inserir_simple($store_id_novo, $email_novo)
+    {
 
         $id_novo = 0;
         if ($ret == "") {
@@ -652,13 +815,13 @@ class UsuarioGames {
             $dataUltimoAcesso = "CURRENT_TIMESTAMP";
             $qtdeAcessos = 1;  // Este ï¿½ o primeiro acesso
             $news_letter = "h";  // usuï¿½rio recebe news
-            
-//SQL
+
+            //SQL
             $sql = "insert into usuarios_games(ug_senha, ug_ativo, ug_data_inclusao, " .
-                    "ug_data_ultimo_acesso, ug_qtde_acessos, ug_integracao_origem, ug_nome, ug_email, " .
-                    "ug_origem_parceiro, " .
-                    "ug_sexo, ug_endereco, ug_numero, ug_complemento, ug_bairro, ug_cidade, ug_estado, ug_cep, ug_tel_ddi, ug_tel_ddd, ug_tel, ug_cel_ddi, ug_cel_ddd, ug_cel, " .
-                    "ug_news) values (";
+                "ug_data_ultimo_acesso, ug_qtde_acessos, ug_integracao_origem, ug_nome, ug_email, " .
+                "ug_origem_parceiro, " .
+                "ug_sexo, ug_endereco, ug_numero, ug_complemento, ug_bairro, ug_cidade, ug_estado, ug_cep, ug_tel_ddi, ug_tel_ddd, ug_tel, ug_cel_ddi, ug_cel_ddd, ug_cel, " .
+                "ug_news) values (";
 
             $sql .= SQLaddFields($senha, "s") . ",";
             $sql .= SQLaddFields(1, "") . ",";
@@ -672,15 +835,15 @@ class UsuarioGames {
             $sql .= SQLaddFields(trim(strtoupper($store_id_novo)), "s") . ", ";
 
             $sql .= "'', '', '', '', '', '', '', '', '', '', '', '', '', '', ";
-            
+
             $sql .= SQLaddFields($news_letter, "s") . "";
 
             $sql .= ");";
-//echo "$sql<br>";
-//grava_log_integracao("Integraï¿½ï¿½o Debug 4: ".date("Y-m-d H:i:s")."\n  $sql \n");
+            //echo "$sql<br>";
+            //grava_log_integracao("Integraï¿½ï¿½o Debug 4: ".date("Y-m-d H:i:s")."\n  $sql \n");
             $ret = SQLexecuteQuery($sql);
             if (!$ret) $ret = "Erro ao inserir usuário.\n";
-            else { 
+            else {
                 $ret = "";
                 $rs_id = SQLexecuteQuery("select currval('usuarios_games_id_seq') as last_id");
                 if ($rs_id && pg_num_rows($rs_id) > 0) {
@@ -715,13 +878,13 @@ class UsuarioGames {
                      */
                 }
             }
-
-            }
+        }
 
         return $id_novo;
     }
 
-    function atualizar($objGamesUsuario) {
+    function atualizar($objGamesUsuario)
+    {
 
         $ret = $this->validarCampos($objGamesUsuario, false);
 
@@ -747,50 +910,50 @@ class UsuarioGames {
         if ($ret == "") {
 
             //Formata
- 			if(!is_null($objGamesUsuario->getDataNascimento())) $dataNascimento = formata_data($objGamesUsuario->getDataNascimento(), 1);
+            if (!is_null($objGamesUsuario->getDataNascimento())) $dataNascimento = formata_data($objGamesUsuario->getDataNascimento(), 1);
 
             //SQL
             $sql = "update usuarios_games set ";
- 			if(!is_null($objGamesUsuario->getAtivo())) 			$sql .= " ug_ativo = " 			. SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
- 			if(!is_null($objGamesUsuario->getEmail())) 			$sql .= " ug_email = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getNome())) 			$sql .= " ug_nome = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCPF())) 			$sql .= " ug_cpf = " 			. SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getRG())) 			$sql .= " ug_rg = " 			. SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
+            if (!is_null($objGamesUsuario->getAtivo()))             $sql .= " ug_ativo = "             . SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
+            if (!is_null($objGamesUsuario->getEmail()))             $sql .= " ug_email = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
+            if (!is_null($objGamesUsuario->getNome()))             $sql .= " ug_nome = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
+            if (!is_null($objGamesUsuario->getCPF()))             $sql .= " ug_cpf = "             . SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
+            if (!is_null($objGamesUsuario->getRG()))             $sql .= " ug_rg = "             . SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
             if (verifica_data($objGamesUsuario->getDataNascimento()) == 1) {
-	 			if(!is_null($objGamesUsuario->getDataNascimento())) $sql .= " ug_data_nascimento = ". SQLaddFields(trim($dataNascimento), "s") . ",";
+                if (!is_null($objGamesUsuario->getDataNascimento())) $sql .= " ug_data_nascimento = " . SQLaddFields(trim($dataNascimento), "s") . ",";
             }
- 			if(!is_null($objGamesUsuario->getSexo())) 			$sql .= " ug_sexo = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTipoEnd())) 		$sql .= " ug_tipo_end = ". SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEnd())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getEndereco())) 		$sql .= " ug_endereco = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getEndereco())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getNumero())) 		$sql .= " ug_numero = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getComplemento())) 	$sql .= " ug_complemento = " 	. SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getBairro())) 		$sql .= " ug_bairro = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getBairro())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCidade())) 		$sql .= " ug_cidade = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getCidade())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getEstado())) 		$sql .= " ug_estado = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCEP())) 			$sql .= " ug_cep = " 			. SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTelDDI())) 		$sql .= " ug_tel_ddi = " 		. SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTelDDD())) 		$sql .= " ug_tel_ddd = " 		. SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTel())) 			$sql .= " ug_tel = " 			. SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCelDDI())) 		$sql .= " ug_cel_ddi = " 		. SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCelDDD())) 		$sql .= " ug_cel_ddd = " 		. SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCelDDD())) 		$sql .= " ug_cel = " 			. SQLaddFields(trim($objGamesUsuario->getCel()), "s") . " ,";
-			if(!is_null($objGamesUsuario->getHabboId())) 		$sql .= " ug_habbo_id = "		. SQLaddFields(trim($objGamesUsuario->getHabboId()), "s") . ",";
+            if (!is_null($objGamesUsuario->getSexo()))             $sql .= " ug_sexo = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getTipoEnd()))         $sql .= " ug_tipo_end = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEnd())), "s") . ",";
+            if (!is_null($objGamesUsuario->getEndereco()))         $sql .= " ug_endereco = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getEndereco())), "s") . ",";
+            if (!is_null($objGamesUsuario->getNumero()))         $sql .= " ug_numero = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
+            if (!is_null($objGamesUsuario->getComplemento()))     $sql .= " ug_complemento = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
+            if (!is_null($objGamesUsuario->getBairro()))         $sql .= " ug_bairro = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getBairro())), "s") . ",";
+            if (!is_null($objGamesUsuario->getCidade()))         $sql .= " ug_cidade = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getCidade())), "s") . ",";
+            if (!is_null($objGamesUsuario->getEstado()))         $sql .= " ug_estado = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
+            if (!is_null($objGamesUsuario->getCEP()))             $sql .= " ug_cep = "             . SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTelDDI()))         $sql .= " ug_tel_ddi = "         . SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTelDDD()))         $sql .= " ug_tel_ddd = "         . SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTel()))             $sql .= " ug_tel = "             . SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCelDDI()))         $sql .= " ug_cel_ddi = "         . SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel_ddd = "         . SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel = "             . SQLaddFields(trim($objGamesUsuario->getCel()), "s") . " ,";
+            if (!is_null($objGamesUsuario->getHabboId()))         $sql .= " ug_habbo_id = "        . SQLaddFields(trim($objGamesUsuario->getHabboId()), "s") . ",";
             if (!is_null($objGamesUsuario->getNewsLetter())) {
                 $sql .= " ug_news = " . SQLaddFields(trim($objGamesUsuario->getNewsLetter()), "s") . ",";
             }
-			if(!is_null($objGamesUsuario->getCompet_lh_ug_id())) 	$sql .= " ug_compet_lh_ug_id = "	. SQLaddFields(trim($objGamesUsuario->getCompet_lh_ug_id()), "") . ",";
-			if(!is_null($objGamesUsuario->getCompet_jogo())) 		$sql .= " ug_compet_jogo = "		. SQLaddFields(trim($objGamesUsuario->getCompet_jogo()), "") . ",";
-			if(!is_null($objGamesUsuario->getCompet_aceito_regulamento())) 		$sql .= " ug_compet_aceito_regulamento = "	. SQLaddFields(trim($objGamesUsuario->getCompet_aceito_regulamento()), "s") . ",";
-			if(!is_null($objGamesUsuario->getCompet_aceito_data_aceito())) 		$sql .= " ug_compet_aceito_data_aceito = "	. SQLaddFields(trim($objGamesUsuario->getCompet_aceito_data_aceito()), "s") . ",";
-			if(!is_null($objGamesUsuario->getUseCielo())) 						$sql .= " ug_use_cielo = " 					. SQLaddFields(trim($objGamesUsuario->getUseCielo()), "") . ",";
- 			if(!is_null($objGamesUsuario->getSaldoFidelizacao())) 				$sql .= " ug_saldo_fidelizacao = " 			. SQLaddFields(trim($objGamesUsuario->getSaldoFidelizacao()), "") . ",";
- 			if(!is_null($objGamesUsuario->getCategoriaFidelizacao())) 			$sql .= " ug_categoria_fidelizacao = " 		. SQLaddFields(trim($objGamesUsuario->getCategoriaFidelizacao()), "") . ",";
+            if (!is_null($objGamesUsuario->getCompet_lh_ug_id()))     $sql .= " ug_compet_lh_ug_id = "    . SQLaddFields(trim($objGamesUsuario->getCompet_lh_ug_id()), "") . ",";
+            if (!is_null($objGamesUsuario->getCompet_jogo()))         $sql .= " ug_compet_jogo = "        . SQLaddFields(trim($objGamesUsuario->getCompet_jogo()), "") . ",";
+            if (!is_null($objGamesUsuario->getCompet_aceito_regulamento()))         $sql .= " ug_compet_aceito_regulamento = "    . SQLaddFields(trim($objGamesUsuario->getCompet_aceito_regulamento()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCompet_aceito_data_aceito()))         $sql .= " ug_compet_aceito_data_aceito = "    . SQLaddFields(trim($objGamesUsuario->getCompet_aceito_data_aceito()), "s") . ",";
+            if (!is_null($objGamesUsuario->getUseCielo()))                         $sql .= " ug_use_cielo = "                     . SQLaddFields(trim($objGamesUsuario->getUseCielo()), "") . ",";
+            if (!is_null($objGamesUsuario->getSaldoFidelizacao()))                 $sql .= " ug_saldo_fidelizacao = "             . SQLaddFields(trim($objGamesUsuario->getSaldoFidelizacao()), "") . ",";
+            if (!is_null($objGamesUsuario->getCategoriaFidelizacao()))             $sql .= " ug_categoria_fidelizacao = "         . SQLaddFields(trim($objGamesUsuario->getCategoriaFidelizacao()), "") . ",";
 
-			if(substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
+            if (substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
             $sql .= " where ug_id = " . SQLaddFields($objGamesUsuario->getId(), "");
 
             $ret = SQLexecuteQuery($sql);
-			if(!$ret) $ret = "Erro ao atualizar usuário.\n";
+            if (!$ret) $ret = "Erro ao atualizar usuário.\n";
             else {
                 $ret = "";
 
@@ -820,112 +983,104 @@ class UsuarioGames {
                       ";
                       $msgEmail .= email_rodape($parametros);
                      */
-//					$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
+                    //					$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
                     if (!is_null($usuarioGames->getEmail()) && $objGamesUsuario->getId() == $usuarioGames->getId()) {
-//						enviaEmail($usuarioGames->getEmail(), null, null, "E-Prepag - Atualizaï¿½ï¿½o de Cadastro", $msgEmail);
+                        //						enviaEmail($usuarioGames->getEmail(), null, null, "E-Prepag - Atualizaï¿½ï¿½o de Cadastro", $msgEmail);
 
 
                         /* ---Wagner */
                         $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoCadastro');
                         $objEnvioEmailAutomatico->setUgID($usuarioGames->getId());
                         $objEnvioEmailAutomatico->MontaEmailEspecifico();
-
-                        }//end if(!is_null($usuarioGames->getEmail()))
+                    } //end if(!is_null($usuarioGames->getEmail()))
                 }
-
-                }
-
-                }
+            }
+        }
 
         return $ret;
     }
-    
-    function atualizar_dados_endereco($objGamesUsuario, &$erro = array()) {
 
-            if(is_numeric($objGamesUsuario->getId())) {
-                
-                try{
-                        //Inicializando conexao PDO
-                        $con = ConnectionPDO::getConnection();
-                        $pdo = $con->getLink();
-                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    function atualizar_dados_endereco($objGamesUsuario, &$erro = array())
+    {
 
-                        if(!is_null($objGamesUsuario->getEndereco()))
-                            $fields[":ug_endereco"] = (string) trim(strtoupper($objGamesUsuario->getEndereco()));
+        if (is_numeric($objGamesUsuario->getId())) {
 
-                        if(!is_null($objGamesUsuario->getNumero()))
-                            $fields[":ug_numero"] = (string) trim(strtoupper($objGamesUsuario->getNumero()));
+            try {
+                //Inicializando conexao PDO
+                $con = ConnectionPDO::getConnection();
+                $pdo = $con->getLink();
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                        if(!is_null($objGamesUsuario->getBairro()))
-                            $fields[":ug_bairro"] = (string) trim(strtoupper($objGamesUsuario->getBairro()));
+                if (!is_null($objGamesUsuario->getEndereco()))
+                    $fields[":ug_endereco"] = (string) trim(strtoupper($objGamesUsuario->getEndereco()));
 
-                        if(!is_null($objGamesUsuario->getCidade()))
-                            $fields[":ug_cidade"] = (string) trim(strtoupper($objGamesUsuario->getCidade()));
+                if (!is_null($objGamesUsuario->getNumero()))
+                    $fields[":ug_numero"] = (string) trim(strtoupper($objGamesUsuario->getNumero()));
 
-                        if(!is_null($objGamesUsuario->getComplemento()))
-                            $fields[":ug_complemento"] = (string) trim(strtoupper($objGamesUsuario->getComplemento()));
+                if (!is_null($objGamesUsuario->getBairro()))
+                    $fields[":ug_bairro"] = (string) trim(strtoupper($objGamesUsuario->getBairro()));
 
-                        if(!is_null($objGamesUsuario->getEstado()))
-                            $fields[":ug_estado"] = (string) trim(strtoupper($objGamesUsuario->getEstado()));
+                if (!is_null($objGamesUsuario->getCidade()))
+                    $fields[":ug_cidade"] = (string) trim(strtoupper($objGamesUsuario->getCidade()));
 
-                        if(!is_null($objGamesUsuario->getCEP()))
-                            $fields[":ug_cep"] = (string) trim(strtoupper($objGamesUsuario->getCEP()));
+                if (!is_null($objGamesUsuario->getComplemento()))
+                    $fields[":ug_complemento"] = (string) trim(strtoupper($objGamesUsuario->getComplemento()));
+
+                if (!is_null($objGamesUsuario->getEstado()))
+                    $fields[":ug_estado"] = (string) trim(strtoupper($objGamesUsuario->getEstado()));
+
+                if (!is_null($objGamesUsuario->getCEP()))
+                    $fields[":ug_cep"] = (string) trim(strtoupper($objGamesUsuario->getCEP()));
 
 
-                        if(!empty($fields)){                
-                            $fields[":ug_id"] = (int) $objGamesUsuario->getId();
+                if (!empty($fields)) {
+                    $fields[":ug_id"] = (int) $objGamesUsuario->getId();
 
-                            foreach($fields as $field => $value){
-                                $strF[] = " ".str_replace(":","",$field)." = ".$field;
-                            }
+                    foreach ($fields as $field => $value) {
+                        $strF[] = " " . str_replace(":", "", $field) . " = " . $field;
+                    }
 
-                            //SQL
-                            $sql = "update 
+                    //SQL
+                    $sql = "update 
                                         usuarios_games set 
-                                        ".implode(",",$strF)."
+                                        " . implode(",", $strF) . "
                                     where 
                                         ug_id = :ug_id";
-                            //Tentando executar a Query de Insert
-                            $rs = $pdo->prepare($sql);
+                    //Tentando executar a Query de Insert
+                    $rs = $pdo->prepare($sql);
 
-                            if($rs->execute($fields)){
-                                //Log na base
-                                usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], null, null);
+                    if ($rs->execute($fields)) {
+                        //Log na base
+                        usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], null, null);
 
-                                    /* ---Wagner */
-                                $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoCadastro');
-                                $objEnvioEmailAutomatico->setUgID($objGamesUsuario->getId());
-                                $objEnvioEmailAutomatico->MontaEmailEspecifico();
-                                $objGamesUsuario->adicionarLoginSession_ByID($objGamesUsuario->getId());
-                                return true;
-
-                            }
-                            else{
-                                $erro[] = "ERRO 215535. Tivemos um problema, favor entrar em contato com nosso suporte. Obrigado!";
-                            }
-                        }
-                        else{
-                            $erro[] = "ERRO 2155357. Houve algum erro no momento de informar os dados. Por favor, tente a operação novamente. Obrigado!";
-                        }
- 
-                    
-                } catch (Exception $ex) {
-                    $erro[] = "ERRO 2155351. Tivemos um problema, favor se o erro persistir, entrar em contato com nosso suporte. Obrigado!";
+                        /* ---Wagner */
+                        $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoCadastro');
+                        $objEnvioEmailAutomatico->setUgID($objGamesUsuario->getId());
+                        $objEnvioEmailAutomatico->MontaEmailEspecifico();
+                        $objGamesUsuario->adicionarLoginSession_ByID($objGamesUsuario->getId());
+                        return true;
+                    } else {
+                        $erro[] = "ERRO 215535. Tivemos um problema, favor entrar em contato com nosso suporte. Obrigado!";
+                    }
+                } else {
+                    $erro[] = "ERRO 2155357. Houve algum erro no momento de informar os dados. Por favor, tente a operação novamente. Obrigado!";
                 }
+            } catch (Exception $ex) {
+                $erro[] = "ERRO 2155351. Tivemos um problema, favor se o erro persistir, entrar em contato com nosso suporte. Obrigado!";
+            }
 
-                UsuarioGames::logEvents("ERRO 2155351 ".implode(" / ",$erro));
-                return false;
-                
-            
+            UsuarioGames::logEvents("ERRO 2155351 " . implode(" / ", $erro));
+            return false;
         } //end if(is_numeric($objGamesUsuario->getId()))
-        else{
+        else {
             $erro[] = "Sua sessÃ£o expirou. Volte no jogo e tente novamente. Obrigado!";
             UsuarioGames::logEvents("ERRO - Sem sucesso ao capturar o ID do usuário (objGamesUsuario->getId())");
             return false;
         }
-    }//end atualizar_dados_endereco()
+    } //end atualizar_dados_endereco()
 
-    function validarCamposLogin($senha, $senhaConf, $login) {
+    function validarCamposLogin($senha, $senhaConf, $login)
+    {
 
         $ret = "";
 
@@ -934,8 +1089,8 @@ class UsuarioGames {
         $login = trim($login);
 
         //Senha
-		if(is_null($senha) || $senha == "") 				$ret .= "A Senha deve ser preenchida.\n";
-		elseif(strlen($senha) < 10 || strlen($senha) > 35) 	$ret .= "A Senha deve ter entre 10 e 35 caracteres.\n";
+        if (is_null($senha) || $senha == "")                 $ret .= "A Senha deve ser preenchida.\n";
+        elseif (strlen($senha) < 10 || strlen($senha) > 35)     $ret .= "A Senha deve ter entre 10 e 35 caracteres.\n";
 
         //SenhaConf 		
         if ($senha != $senhaConf) {
@@ -943,14 +1098,15 @@ class UsuarioGames {
         }
 
         //login
- 		if(is_null($login) || $login == "") $ret .= "O Email deve ser preenchido.\n";
-		elseif(strlen($login) > 100) 		$ret .= "O Email deve ter atï¿½ 100 caracteres.\n";
-		elseif(!verifica_email($login)) 	$ret .= "O Email ï¿½ invï¿½lido.\n";
+        if (is_null($login) || $login == "") $ret .= "O Email deve ser preenchido.\n";
+        elseif (strlen($login) > 100)         $ret .= "O Email deve ter atï¿½ 100 caracteres.\n";
+        elseif (!verifica_email($login))     $ret .= "O Email ï¿½ invï¿½lido.\n";
 
         return $ret;
     }
 
-    function validarCampos($objGamesUsuario, $blCompleto) {
+    function validarCampos($objGamesUsuario, $blCompleto)
+    {
 
         $ret = "";
 
@@ -962,34 +1118,34 @@ class UsuarioGames {
         $email = $objGamesUsuario->getEmail();
         if (!is_null($email) || $blCompleto) {
             $email = trim($objGamesUsuario->getEmail());
-	 		if(is_null($email) || $email == "") $ret .= "O Email deve ser preenchido.\n";
-			elseif(strlen($email) > 100) 		$ret .= "O Email deve ter até 100 caracteres.\n";
-			elseif(!verifica_email($email)) 	$ret .= "O Email é inválido.\n";
+            if (is_null($email) || $email == "") $ret .= "O Email deve ser preenchido.\n";
+            elseif (strlen($email) > 100)         $ret .= "O Email deve ter até 100 caracteres.\n";
+            elseif (!verifica_email($email))     $ret .= "O Email é inválido.\n";
         }
 
         //Nome
         $nome = $objGamesUsuario->getNome();
         if (!is_null($nome) || $blCompleto) {
             $nome = trim($objGamesUsuario->getNome());
- 			if(is_null($nome) || $nome == "") 	$ret .= "O Nome deve ser preenchido.\n";
- 			elseif(strlen($nome) > 100) 		$ret .= "O Nome deve ter até 100 caracteres.\n";
+            if (is_null($nome) || $nome == "")     $ret .= "O Nome deve ser preenchido.\n";
+            elseif (strlen($nome) > 100)         $ret .= "O Nome deve ter até 100 caracteres.\n";
         }
 
         //CPF
         //$CPF = $objGamesUsuario->getCPF();
-// 		if(!is_null($CPF) || $blCompleto){
-//	 		$CPF = trim($objGamesUsuario->getCPF());
-// 			if(is_null($CPF) || $CPF == "") 	$ret .= "O CPF deve ser preenchido.\n";
-// 			elseif(verificaCPFEx($CPF) == 0) 		$ret .= "O CPF invï¿½lido. Utilize o formato xxx.xxx.xxx-xx\n";
-// 		}
- 		
+        // 		if(!is_null($CPF) || $blCompleto){
+        //	 		$CPF = trim($objGamesUsuario->getCPF());
+        // 			if(is_null($CPF) || $CPF == "") 	$ret .= "O CPF deve ser preenchido.\n";
+        // 			elseif(verificaCPFEx($CPF) == 0) 		$ret .= "O CPF invï¿½lido. Utilize o formato xxx.xxx.xxx-xx\n";
+        // 		}
+
         //RG
         //$RG = $objGamesUsuario->getRG();
-// 		if(!is_null($RG) || $blCompleto){
-//	 		$RG = trim($objGamesUsuario->getRG());
-// 			if(is_null($RG) || $RG == "") 	$ret .= "O RG deve ser preenchido.\n";
-// 			elseif(verificaRG($RG) == 0) 	$ret .= "O RG invï¿½lido.\n";
-// 		}
+        // 		if(!is_null($RG) || $blCompleto){
+        //	 		$RG = trim($objGamesUsuario->getRG());
+        // 			if(is_null($RG) || $RG == "") 	$ret .= "O RG deve ser preenchido.\n";
+        // 			elseif(verificaRG($RG) == 0) 	$ret .= "O RG invï¿½lido.\n";
+        // 		}
 
         //CPF e RG
         //if(!is_null($CPF) || !is_null($RG) || $blCompleto){
@@ -1001,7 +1157,7 @@ class UsuarioGames {
         //			if(verificaCPFEx($CPF) == 0) $ret .= "O CPF ï¿½ invï¿½lido. Utilize o formato xxx.xxx.xxx-xx\n";
         //		}
         //		if(!is_null($RG) && $RG != ""){
-//					if(!eregi("^[A-Z0-9\.-/]{7,13}$", $RG)) $ret .= "O RG ï¿½ invï¿½lido.\n";
+        //					if(!eregi("^[A-Z0-9\.-/]{7,13}$", $RG)) $ret .= "O RG ï¿½ invï¿½lido.\n";
         //			if(!eregi("^[A-Z0-9/.-]{7,13}$", $RG)) $ret .= "O RG ï¿½ invï¿½lido.\n";
         //		}
         //	}
@@ -1011,16 +1167,16 @@ class UsuarioGames {
         $dataNascimento = $objGamesUsuario->getDataNascimento();
         if (!is_null($dataNascimento) || $blCompleto) {
             $dataNascimento = trim($objGamesUsuario->getDataNascimento());
- 			if(is_null($dataNascimento) || $dataNascimento == "") 	$ret .= "A Data de Nascimento deve ser preenchida.\n";
- 			elseif(verifica_data($dataNascimento) == 0)				$ret .= "A Data de Nascimento é invï¿½lida.\n";
+            if (is_null($dataNascimento) || $dataNascimento == "")     $ret .= "A Data de Nascimento deve ser preenchida.\n";
+            elseif (verifica_data($dataNascimento) == 0)                $ret .= "A Data de Nascimento é invï¿½lida.\n";
         }
 
         //Sexo
         $sexo = $objGamesUsuario->getSexo();
         if (!is_null($sexo) || $blCompleto) {
             $sexo = trim($objGamesUsuario->getSexo());
- 			if(is_null($sexo) || $sexo == "") 							$ret .= "O Sexo deve ser preenchida.\n";
- 			elseif(strtoupper($sexo) != "M" && strtoupper($sexo) != "F")$ret .= "O Sexo é inválido.\n";
+            if (is_null($sexo) || $sexo == "")                             $ret .= "O Sexo deve ser preenchida.\n";
+            elseif (strtoupper($sexo) != "M" && strtoupper($sexo) != "F") $ret .= "O Sexo é inválido.\n";
         }
 
         /*
@@ -1065,96 +1221,97 @@ class UsuarioGames {
         $cidade = $objGamesUsuario->getCidade();
         if (!is_null($cidade) || $blCompleto) {
             $cidade = trim($objGamesUsuario->getCidade());
- 			if(is_null($cidade) || $cidade == "") 	$ret .= "O Cidade deve ser preenchido.\n";
- 			elseif(strlen($cidade) > 100) 			$ret .= "O Cidade deve ter até 100 caracteres.\n";
+            if (is_null($cidade) || $cidade == "")     $ret .= "O Cidade deve ser preenchido.\n";
+            elseif (strlen($cidade) > 100)             $ret .= "O Cidade deve ter até 100 caracteres.\n";
         }
 
         //Estado
         $estado = $objGamesUsuario->getEstado();
         if (!is_null($estado) || $blCompleto) {
             $estado = trim($objGamesUsuario->getEstado());
- 			if(is_null($estado) || $estado == "") 	$ret .= "O Estado deve ser preenchido.\n";
- 			elseif(strlen($estado) <> 2) 			$ret .= "O Estado deve ter 2 caracteres.\n";
+            if (is_null($estado) || $estado == "")     $ret .= "O Estado deve ser preenchido.\n";
+            elseif (strlen($estado) <> 2)             $ret .= "O Estado deve ter 2 caracteres.\n";
         }
 
         //CEP
         $CEP = $objGamesUsuario->getCEP();
         if (!is_null($CEP) || $blCompleto) {
             $CEP = trim($objGamesUsuario->getCEP());
-	 		if(is_null($CEP) || $CEP == "")	$ret .= "O CEP deve ser preenchido.\n";
- 			elseif(strlen($CEP) <> 8) 		$ret .= "O CEP deve ser no formato 00000000.\n";
- 			elseif(!verifica_cepEx($CEP, false)) 		$ret .= "O CEP é inválido. Utilize o formato 00000000.\n";
+            if (is_null($CEP) || $CEP == "")    $ret .= "O CEP deve ser preenchido.\n";
+            elseif (strlen($CEP) <> 8)         $ret .= "O CEP deve ser no formato 00000000.\n";
+            elseif (!verifica_cepEx($CEP, false))         $ret .= "O CEP é inválido. Utilize o formato 00000000.\n";
         }
 
         //Tel DDI
         $TelDDI = $objGamesUsuario->getTelDDI();
-        
+
         if ((!is_null($TelDDI) && $TelDDI != "") || $blCompleto) {
             $TelDDI = trim($objGamesUsuario->getTelDDI());
- 			if(is_null($TelDDI) || $TelDDI == "")	$ret .= "O CÃ³digo do PaÃ­s do Telefone deve ser preenchido.\n";
- 			elseif(strlen($TelDDI) <> 2) 			$ret .= "O CÃ³digo do PaÃ­s do Telefone deve ter 2 dÃ­gitos.\n";
- 			elseif(!is_numeric($TelDDI)) 			$ret .= "O CÃ³digo do PaÃ­s do Telefone deve ser nÃºmerico.\n";
+            if (is_null($TelDDI) || $TelDDI == "")    $ret .= "O CÃ³digo do PaÃ­s do Telefone deve ser preenchido.\n";
+            elseif (strlen($TelDDI) <> 2)             $ret .= "O CÃ³digo do PaÃ­s do Telefone deve ter 2 dÃ­gitos.\n";
+            elseif (!is_numeric($TelDDI))             $ret .= "O CÃ³digo do PaÃ­s do Telefone deve ser nÃºmerico.\n";
         }
 
         //Tel DDD
         $TelDDD = $objGamesUsuario->getTelDDD();
         if ((!is_null($TelDDD) && $TelDDD != "") || $blCompleto) {
             $TelDDD = trim($objGamesUsuario->getTelDDD());
- 			if(is_null($TelDDD) || $TelDDD == "")	$ret .= "O DDD do Telefone deve ser preenchido.\n";
- 			elseif(strlen($TelDDD) <> 2) 			$ret .= "O DDD do Telefone deve ter 2 dÃ­gitos.\n";
- 			elseif(!is_numeric($TelDDD)) 			$ret .= "O DDD do Telefone deve ser nÃºmerico.\n";
- 			elseif($TelDDD <= 10 || ($TelDDD % 10 == 0)) $ret .= "O DDD do Telefone é inválido.\n";
+            if (is_null($TelDDD) || $TelDDD == "")    $ret .= "O DDD do Telefone deve ser preenchido.\n";
+            elseif (strlen($TelDDD) <> 2)             $ret .= "O DDD do Telefone deve ter 2 dÃ­gitos.\n";
+            elseif (!is_numeric($TelDDD))             $ret .= "O DDD do Telefone deve ser nÃºmerico.\n";
+            elseif ($TelDDD <= 10 || ($TelDDD % 10 == 0)) $ret .= "O DDD do Telefone é inválido.\n";
         }
 
         //Tel 
         $Tel = $objGamesUsuario->getTel();
-//echo $Tel
+        //echo $Tel
         if ((!is_null($Tel) &&  $Tel != "") || $blCompleto) {
             $Tel = trim($objGamesUsuario->getTel());
- 			if(is_null($Tel) || $Tel == "")	$ret .= "O Telefone deve ser preenchido.\n";
+            if (is_null($Tel) || $Tel == "")    $ret .= "O Telefone deve ser preenchido.\n";
             //			elseif(verifica_tel($Tel) == 0)		$ret .= "O Telefone ï¿½ invï¿½lido.\n";
- 			elseif(!is_numeric($Tel) || (strlen($Tel)!=8))		$ret .= "O Telefone é inválido.\n";
+            elseif (!is_numeric($Tel) || (strlen($Tel) != 8))        $ret .= "O Telefone é inválido.\n";
         }
 
         //Cel DDI
         $CelDDI = $objGamesUsuario->getCelDDI();
         if ((!is_null($CelDDI) && $CelDDI != "") || $blCompleto) {
             $CelDDI = trim($objGamesUsuario->getCelDDI());
- 			if(is_null($CelDDI) || $CelDDI == "")	$ret .= "O CÃ³digo do PaÃ­s do Celular deve ser preenchido.\n";
- 			elseif(strlen($CelDDI) <> 2) 			$ret .= "O CÃ³digo do PaÃ­s do Celular deve ter 2 dÃ­gitos.\n";
- 			elseif(!is_numeric($CelDDI)) 			$ret .= "O CÃ³digo do PaÃ­s do Celular deve ser nÃºmerico.\n";
+            if (is_null($CelDDI) || $CelDDI == "")    $ret .= "O CÃ³digo do PaÃ­s do Celular deve ser preenchido.\n";
+            elseif (strlen($CelDDI) <> 2)             $ret .= "O CÃ³digo do PaÃ­s do Celular deve ter 2 dÃ­gitos.\n";
+            elseif (!is_numeric($CelDDI))             $ret .= "O CÃ³digo do PaÃ­s do Celular deve ser nÃºmerico.\n";
         }
 
         //Cel DDD
         $CelDDD = $objGamesUsuario->getCelDDD();
         if (!is_null($CelDDD) || $blCompleto) {
             $CelDDD = trim($objGamesUsuario->getCelDDD());
- 			if(is_null($CelDDD) || $CelDDD == "")	$ret .= "O DDD do Celular deve ser preenchido.\n";
- 			elseif(strlen($CelDDD) <> 2) 			$ret .= "O DDD do Celular deve ter 2 dÃ­gitos.\n";
- 			elseif(!is_numeric($CelDDD)) 			$ret .= "O DDD do Celular deve ser nÃºmerico.\n";
- 			elseif($CelDDD <= 10 || ($CelDDD % 10 == 0)) $ret .= "O DDD do Celular é inválido.\n";
+            if (is_null($CelDDD) || $CelDDD == "")    $ret .= "O DDD do Celular deve ser preenchido.\n";
+            elseif (strlen($CelDDD) <> 2)             $ret .= "O DDD do Celular deve ter 2 dÃ­gitos.\n";
+            elseif (!is_numeric($CelDDD))             $ret .= "O DDD do Celular deve ser nÃºmerico.\n";
+            elseif ($CelDDD <= 10 || ($CelDDD % 10 == 0)) $ret .= "O DDD do Celular é inválido.\n";
         }
 
         //Cel 
         $Cel = $objGamesUsuario->getCel();
         if (!is_null($Cel) || $blCompleto) {
             $Cel = trim($objGamesUsuario->getCel());
-	 		if(is_null($Cel) || $Cel == "")	$ret .= "O Celular deve ser preenchido.\n";
-// 			elseif(verifica_tel($Cel) == 0)		$ret .= "O Celular ï¿½ invï¿½lido.\n";
- 			elseif(!is_numeric($Cel) || ((strlen($Cel)!=8) && (strlen($Cel)!=9)))		$ret .= "O Celular é inválido.\n";
+            if (is_null($Cel) || $Cel == "")    $ret .= "O Celular deve ser preenchido.\n";
+            // 			elseif(verifica_tel($Cel) == 0)		$ret .= "O Celular ï¿½ invï¿½lido.\n";
+            elseif (!is_numeric($Cel) || ((strlen($Cel) != 8) && (strlen($Cel) != 9)))        $ret .= "O Celular é inválido.\n";
         }
 
         //Habbo Id
         $habboId = $objGamesUsuario->getHabboId();
         if (!is_null($habboId) || $blCompleto) {
             $habboId = trim($objGamesUsuario->getHabboId());
- 			if(strlen($habboId) > 50) 				$ret .= "O Nome Habbo deve ter até 50 caracteres.\n";
+            if (strlen($habboId) > 50)                 $ret .= "O Nome Habbo deve ter até 50 caracteres.\n";
         }
 
         return $ret;
     }
 
-    function obter($filtro, $orderBy, &$rs) {
+    function obter($filtro, $orderBy, &$rs)
+    {
 
         $ret = "";
         $filtro = array_map("strtoupper", $filtro);
@@ -1308,77 +1465,76 @@ class UsuarioGames {
              */
         }
 
-		if(!is_null($orderBy)) $sql .= " order by " . $orderBy;
-//gravaLog_DebugTMP("Cria usuï¿½rio : \n  $sql \n");
+        if (!is_null($orderBy)) $sql .= " order by " . $orderBy;
+        //gravaLog_DebugTMP("Cria usuï¿½rio : \n  $sql \n");
 
         $rs = SQLexecuteQuery($sql);
-		if(!$rs) $ret = "Erro ao obter usuário(s).\n";
+        if (!$rs) $ret = "Erro ao obter usuário(s).\n";
 
         return $ret;
-
     }
 
-    function existeEmail($email0, $usuario_id_excessao) {
-
+    function existeEmail($email0, $usuario_id_excessao)
+    {
         $ret = true;
-        $email = $email0;
 
-        $err_cod = "";
+        $email = strtoupper(trim($email0));
 
-        $params = array('email' => array('0' => $email,
-                '1' => 'S',
-                '2' => '1'
-            )
-        );
-        $params = sanitize_input_data_array($params, $err_cod);
-        extract($params, EXTR_OVERWRITE);
+        $sql = "SELECT count(*) AS qtde FROM usuarios_games WHERE ug_email = $1";
+        $params = [$email];
 
-        $email = strtoupper(trim($email));
+        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao)) {
 
-        //SQL
-        $sql = "select count(*) as qtde from usuarios_games ";
-        $sql .= " where ug_email = " . SQLaddFields($email, "s");
-        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-            $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
+            $sql .= " AND ug_id <> $2";
 
-        $rs = SQLexecuteQuery($sql);
+            // Adiciona o valor do ID ao array de parâmetros
+            $params[] = trim($usuario_id_excessao);
+        }
+
+        $rs = SQLexecuteQueryParams($sql, $params);
+
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
-			if($rs_row['qtde'] == 0) $ret = false;
+            if ($rs_row['qtde'] == 0) $ret = false;
         }
-//gravaLog_Temporario("SQL UsuarioGames::existeEmail('$email0' -> '$email', ".(($usuario_id_excessao)?"TRUE":"FALSE").") => ".(($ret)?"TRUE":"FALSE")." (qtde: ".$rs_row['qtde'].")\n  ".$sql."\n");
 
         return $ret;
     }
-    
-    public static function existeLogin($login,$id_excessao = null) {
-        
+
+    public static function existeLogin($login, $id_excessao = null)
+    {
+
         $sql = "select count(ug_id) from usuarios_games where UPPER(ug_login) = UPPER(:ug_login)";
 
-        if($id_excessao)
-            $sql .= " and ug_id <> ".$id_excessao;
+        if ($id_excessao)
+            $sql .= " and ug_id <> :ug_id_excecao";
         //Inicializando conexao PDO
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
+
         //passando a query de select
         $rs = $pdo->prepare($sql);
-        
+
         //bindando os valores com a referencia, variavel e tipo
         $login = strtoupper($login);
         $param = ':ug_login';
         $rs->bindParam($param, $login, PDO::PARAM_STR);
-        
+
+        if($id_excessao){
+            $rs->bindParam(':ug_id_excecao', $id_excessao);
+        }
+
         //executando query
         $rs->execute();
-        
+
         //retornando quantidade de registros
         return ($rs->fetchColumn() > 0) ? true : false;
     }
-	
-	public static function existeCPFCadastro($cpf) {
-        
+
+    public static function existeCPFCadastro($cpf)
+    {
+
         try {
             $sql = "select count(ug_id) as contas from usuarios_games where ug_cpf = :ug_cpf;";
 
@@ -1386,17 +1542,17 @@ class UsuarioGames {
             $con = ConnectionPDO::getConnection();
             $pdo = $con->getLink();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
+
             //passando a query de select
             $rs = $pdo->prepare($sql);
             $param = ':ug_cpf';
             $rs->bindParam($param, $cpf, PDO::PARAM_STR);
             //executando query
             $rs->execute();
-            
-		    $info = $rs->fetch(PDO::FETCH_ASSOC);
-            
-		    if ($info != false) {
+
+            $info = $rs->fetch(PDO::FETCH_ASSOC);
+
+            if ($info != false) {
                 // Cadastro de usuarios: aqui valida a quantidade de usuários criados, antes era 2 e agora é um.
                 if (isset($info["contas"]) && $info["contas"] == 0) {
                     return "";
@@ -1414,10 +1570,11 @@ class UsuarioGames {
             return "Erro inesperado, tente novamente";
         }
         //retornando quantidade de registros
-       // return ($rs->fetchColumn() > 0) ? true : false;
+        // return ($rs->fetchColumn() > 0) ? true : false;
     }
 
-    function existeEmail_get_ID($email) {
+    function existeEmail_get_ID($email)
+    {
 
         $ret_id = 0;
         $email = strtoupper(trim($email));
@@ -1425,7 +1582,7 @@ class UsuarioGames {
         //SQL
         $sql = "select ug_id from usuarios_games ";
         $sql .= " where ug_email = " . SQLaddFields($email, "s");
-//echo "$sql<br>";
+        //echo "$sql<br>";
 
         $rs = SQLexecuteQuery($sql);
         if ($rs && pg_num_rows($rs) > 0) {
@@ -1435,39 +1592,40 @@ class UsuarioGames {
 
         return $ret_id;
     }
-    
 
-    function existeCPF($cpf, $usuario_id_excessao) {
 
-        try{
-                // Inicializando a query base
+    function existeCPF($cpf, $usuario_id_excessao)
+    {
+
+        try {
+            // Inicializando a query base
             $sql = "select count(ug_id) as contas from usuarios_games where ug_cpf = :ug_cpf";
-            
+
             // Se o userId for fornecido, adicionar uma condição para excluir esse ID da verificação
             if ($usuario_id_excessao !== null) {
                 $sql .= " and ug_id != :ug_id";
             }
-        
+
             // Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
             $pdo = $con->getLink();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
+
             // Passando a query de select
             $rs = $pdo->prepare($sql);
             $cpf = SQLaddFields(trim($cpf), "s");
             $rs->bindParam(':ug_cpf', $cpf, PDO::PARAM_STR);
-        
+
             // Se o userId for fornecido, bindar o parâmetro do ID também
             if ($usuario_id_excessao !== null) {
                 $user_id = SQLaddFields(trim($usuario_id_excessao), "");
                 $rs->bindParam(':ug_id', $user_id, PDO::PARAM_INT);
             }
-        
+
             // Executando a query
             $rs->execute();
             $info = $rs->fetch(PDO::FETCH_ASSOC);
-        
+
             if ($info != false) {
                 // Cadastro de usuarios: aqui valida a quantidade de usuários criados, antes era 2 e agora é um.
                 if (isset($info["contas"]) && $info["contas"] == 0) {
@@ -1487,7 +1645,8 @@ class UsuarioGames {
         }
     }
 
-    function existeRG($rg, $usuario_id_excessao) {
+    function existeRG($rg, $usuario_id_excessao)
+    {
 
         return false;
 
@@ -1498,30 +1657,32 @@ class UsuarioGames {
         $sql .= " where ug_rg IS NOT NULL and ug_rg <> '' and ug_rg = " . SQLaddFields(trim($rg), "s");
         if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
             $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
-//echo $sql."<br>";
+        //echo $sql."<br>";
         $rs = SQLexecuteQuery($sql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
-			if($rs_row['qtde'] == 0) $ret = false;
+            if ($rs_row['qtde'] == 0) $ret = false;
         }
 
         return $ret;
     }
-	
-	function existe_session() {
-		
-		if(
-			$GLOBALS['_SESSION']['usuarioGames_ser'] !== null &&
-			$GLOBALS['_SESSION']['usuarioGames.horarioLogin'] !== null &&
-			$GLOBALS['_SESSION']['usuarioGames.horarioInatividade'] !== null
-		) {
-			return true;
-		}
-		
-		return false;
-	}
 
-    function autenticarLogin($login, $senha) {
+    function existe_session()
+    {
+
+        if (
+            $GLOBALS['_SESSION']['usuarioGames_ser'] !== null &&
+            $GLOBALS['_SESSION']['usuarioGames.horarioLogin'] !== null &&
+            $GLOBALS['_SESSION']['usuarioGames.horarioInatividade'] !== null
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function autenticarLogin($login, $senha)
+    {
         $senha0 = $senha;
 
         $ret = false;
@@ -1559,8 +1720,8 @@ class UsuarioGames {
         $stmt->execute(array($login, $senha));
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if ( $stmt->rowCount() > 0 ) {
-			
+        if ($stmt->rowCount() > 0) {
+
             $ret = true;
         }
 
@@ -1572,33 +1733,31 @@ class UsuarioGames {
 
         if ($ret) {
 
-			$two_factor = new TwoFactorAuthenticator('USER', $fetch[0]["ug_id"], $fetch[0]["ug_nome"], $fetch[0]["ug_email"]);
-			
-			$resend = $two_factor->verify_time();
-			$is_verified = $two_factor->verify_activate($fetch[0]["ug_id"]);
-			
-			if($is_verified) {
-				$instUsuarioGames = new UsuarioGames();
-				$ret = $instUsuarioGames->adicionarLoginSession($login);
+            $two_factor = new TwoFactorAuthenticator('USER', $fetch[0]["ug_id"], $fetch[0]["ug_nome"], $fetch[0]["ug_email"]);
 
-				//Atualiza ultimo acesso
-				//------------------------------------------------------------------
-				//SQL
-				$sql = "update usuarios_games set ";
-				$sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
-				$sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
-				$sql .= " where ug_email = " . SQLaddFields($login, "s");
-				$rs = SQLexecuteQuery($sql);
-					
-				//Log na base
-				usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
-			}
-			else {
-				if($resend) {
-					$two_factor->send_email();
-				}
-				else {
-					/*$instUsuarioGames = new UsuarioGames();
+            $resend = $two_factor->verify_time();
+            $is_verified = $two_factor->verify_activate($fetch[0]["ug_id"]);
+
+            if ($is_verified) {
+                $instUsuarioGames = new UsuarioGames();
+                $ret = $instUsuarioGames->adicionarLoginSession($login);
+
+                //Atualiza ultimo acesso
+                //------------------------------------------------------------------
+                //SQL
+                $sql = "update usuarios_games set ";
+                $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
+                $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
+                $sql .= " where ug_email = " . SQLaddFields($login, "s");
+                $rs = SQLexecuteQuery($sql);
+
+                //Log na base
+                usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
+            } else {
+                if ($resend) {
+                    $two_factor->send_email();
+                } else {
+                    /*$instUsuarioGames = new UsuarioGames();
 					$ret = $instUsuarioGames->adicionarLoginSession($login);
 
 					//Atualiza ultimo acesso
@@ -1612,9 +1771,9 @@ class UsuarioGames {
 						
 					//Log na base
 					usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);*/
-					$ret = -1;
-				}
-			}
+                    $ret = -1;
+                }
+            }
         } else {
             gravaLog_Login("Login de gamer falhou ($senha0): '$sql'.\n", true);
         }
@@ -1622,12 +1781,13 @@ class UsuarioGames {
         return $ret;
     }
 
-    function autenticarUgLogin($login, $senha) {
+    function autenticarUgLogin($login, $senha)
+    {
 
         $ret = false;
 
         if (!filter_var($login, FILTER_VALIDATE_EMAIL)) {
-            
+
             //Autentica usuario
             //------------------------------------------------------------------
             $objEncryption = new Encryption();
@@ -1644,45 +1804,44 @@ class UsuarioGames {
             $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if ($fetch[0]['qtde'] > 0) {
-                
-				if($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
-					$two_factor = new TwoFactorAuthenticator('USER', $fetch[0]["ug_id"], $fetch[0]["ug_nome"], $fetch[0]["ug_email"]);
-					
-					$two_factor->send_email();
-					exit;
-				} 
-				else {
-					 //Adiciona objeto usuario no session
-					$instUsuarioGames = new UsuarioGames();
-					$ret = $instUsuarioGames->adicionarLoginSession($fetch[0]['ug_email']);
 
-					//Atualiza ultimo acesso
-					$sql = "update usuarios_games 
+                if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
+                    $two_factor = new TwoFactorAuthenticator('USER', $fetch[0]["ug_id"], $fetch[0]["ug_nome"], $fetch[0]["ug_email"]);
+
+                    $two_factor->send_email();
+                    exit;
+                } else {
+                    //Adiciona objeto usuario no session
+                    $instUsuarioGames = new UsuarioGames();
+                    $ret = $instUsuarioGames->adicionarLoginSession($fetch[0]['ug_email']);
+
+                    //Atualiza ultimo acesso
+                    $sql = "update usuarios_games 
 								set ug_data_ultimo_acesso = CURRENT_TIMESTAMP, 
 									ug_qtde_acessos = ug_qtde_acessos + 1
 							where UPPER(ug_login) = UPPER(?) ";
-					$stmt2 = $pdo->prepare($sql);
-					$stmt2->execute(array($login));
-	 
-					//Log na base
-					usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
-				}
-            }
-            else {
+                    $stmt2 = $pdo->prepare($sql);
+                    $stmt2->execute(array($login));
+
+                    //Log na base
+                    usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
+                }
+            } else {
                 gravaLog_Login("Login de gamer falhou ($senha): '$sql'.\n", true);
             }
+        } //end if (!filter_var($login, FILTER_VALIDATE_EMAIL))
 
-        }//end if (!filter_var($login, FILTER_VALIDATE_EMAIL))
-        
         return $ret;
-        
-    }//end function autenticarUgLogin
+    } //end function autenticarUgLogin
 
     /* Wagner -- Mï¿½todos novos login integraï¿½ï¿½o */
-    function autenticarLoginIntegracao($login, $senha) {
+    function autenticarLoginIntegracao($login, $senha)
+    {
         $ret = false;
         $err_cod = "";
-        $params = array('login' => array('0' => $login,
+        $params = array(
+            'login' => array(
+                '0' => $login,
                 '1' => 'S',
                 '2' => '1'
             )
@@ -1705,7 +1864,7 @@ class UsuarioGames {
         $rs = SQLexecuteQuery($sql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
-			if($rs_row['qtde'] > 0) $ret = true;
+            if ($rs_row['qtde'] > 0) $ret = true;
         } //end if($rs && pg_num_rows($rs) > 0)			
 
         if ($ret) {
@@ -1723,19 +1882,20 @@ class UsuarioGames {
                     $rs = SQLexecuteQuery($sql);
                     //Log na base
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN_INTEGRACAO'], null, null);
-                }//end if(get_Integracao_order_id_is_sessao_logged()<>'')
-				else $ret = false;
+                } //end if(get_Integracao_order_id_is_sessao_logged()<>'')
+                else $ret = false;
             } //end if(function_exists('get_Integracao_order_id_is_sessao_logged'))
-			else $ret = false;
+            else $ret = false;
         } //end if($ret)
         return $ret;
-    }// function autenticarLoginIntegracao($login, $senha)
+    } // function autenticarLoginIntegracao($login, $senha)
 
     /* Wagner -- fim bloco -- Mï¿½todos novos login integraï¿½ï¿½o */
 
-    function getUsuarioGamesById($usuario_id) {
+    function getUsuarioGamesById($usuario_id)
+    {
 
-		if(!$usuario_id || $usuario_id == "" || !is_numeric($usuario_id)) return null;
+        if (!$usuario_id || $usuario_id == "" || !is_numeric($usuario_id)) return null;
 
         $rs = null;
         $filtro['ug_id'] = $usuario_id;
@@ -1743,12 +1903,12 @@ class UsuarioGames {
         $instUsuarioGames = new UsuarioGames();
         $ret = $instUsuarioGames->obter($filtro, null, $rs);
         return $instUsuarioGames->create($rs);
-		
     }
 
-    function getUsuarioGamesByLogin($login) {
+    function getUsuarioGamesByLogin($login)
+    {
 
-		if(!$login || $login == "") return null;
+        if (!$login || $login == "") return null;
 
         $rs = null;
         $filtro['ug_login'] = $login;
@@ -1756,21 +1916,21 @@ class UsuarioGames {
         $ret = UsuarioGames::obter($filtro, null, $rs);
 
         return UsuarioGames::create($rs);
-		
     }
 
-	
-    function adicionarLoginSession($login) {
 
-		if(!$login || $login == "") return false;
+    function adicionarLoginSession($login)
+    {
+
+        if (!$login || $login == "") return false;
 
         $rs = null;
         $filtro['ug_email'] = $login;
         $filtro['ug_ativo'] = 1;
-        
+
         $instUsuarioGames = new UsuarioGames();
         $ret = $instUsuarioGames->obter($filtro, null, $rs);
-        
+
         $usuarioGames = $instUsuarioGames->create($rs);
 
         if ($usuarioGames != null) {
@@ -1785,7 +1945,6 @@ class UsuarioGames {
             $GLOBALS['_SESSION']['integracao_origem_id'] = "";
             $GLOBALS['_SESSION']['integracao_order_id'] = "";
             $GLOBALS['_SESSION']['integracao_autenticado'] = "";
-
         } else {
             $ret = false;
         }
@@ -1793,7 +1952,8 @@ class UsuarioGames {
         return $ret;
     }
 
-    function create($rs) {
+    function create($rs)
+    {
 
         $usuarioGames = null;
 
@@ -1811,7 +1971,7 @@ class UsuarioGames {
             $usuarioGames->setNome($rs_row['ug_nome']);
             $usuarioGames->setCPF($rs_row['ug_cpf']);
             $usuarioGames->setRG($rs_row['ug_rg']);
-            if($rs_row['ug_data_nascimento'] != '') $usuarioGames->setDataNascimento(formata_data_ts($rs_row['ug_data_nascimento'], 0, true, true));
+            if ($rs_row['ug_data_nascimento'] != '') $usuarioGames->setDataNascimento(formata_data_ts($rs_row['ug_data_nascimento'], 0, true, true));
             $usuarioGames->setSexo($rs_row['ug_sexo']);
             $usuarioGames->setTipoEnd($rs_row['ug_tipo_end']);
             $usuarioGames->setEndereco($rs_row['ug_endereco']);
@@ -1830,8 +1990,8 @@ class UsuarioGames {
             $usuarioGames->setHabboId($rs_row['ug_habbo_id']);
             $usuarioGames->setNewsLetter($rs_row['ug_news_letter']);
 
-//			$objEncryption = new Encryption();
-//			$usuarioGames->setPerfilSaldo($objEncryption->decrypt(trim($rs_row['ug_perfil_saldo'])));
+            //			$objEncryption = new Encryption();
+            //			$usuarioGames->setPerfilSaldo($objEncryption->decrypt(trim($rs_row['ug_perfil_saldo'])));
             $usuarioGames->setPerfilSaldo($rs_row['ug_perfil_saldo']);
 
             $usuarioGames->setCompet_lh_ug_id($rs_row['ug_compet_lh_ug_id']);
@@ -1850,13 +2010,13 @@ class UsuarioGames {
             $usuarioGames->setSaldoFidelizacao($rs_row['ug_saldo_fidelizacao']);
             $usuarioGames->setCategoriaFidelizacao($rs_row['ug_categoria_fidelizacao']);
             //Buscando Informaï¿½ï¿½es de observaï¿½ï¿½es
-            $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM usuarios_games_obs WHERE ug_id = ".$rs_row['ug_id'].";";
+            $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . ";";
             $rs_usuario_obs = SQLexecuteQuery($sql);
             $ug_obs = NULL;
-            if(pg_num_rows($rs_usuario_obs) > 0) { 
-                    while($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
-                        $ug_obs .= "Em ".$rs_usuario_obs_row['data'].PHP_EOL."Autor: ".$rs_usuario_obs_row['ugo_user_insert'].PHP_EOL."Observação:".PHP_EOL.$rs_usuario_obs_row['ug_obs'].PHP_EOL.str_repeat("-",40).PHP_EOL;
-                    }//end while
+            if (pg_num_rows($rs_usuario_obs) > 0) {
+                while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
+                    $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observação:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
+                } //end while
             } //end if(pg_num_rows($rs_usuario) > 0)
             $usuarioGames->setOBS($ug_obs);
             $usuarioGames->setNomedaMae($rs_row['ug_nome_da_mae']);
@@ -1864,22 +2024,23 @@ class UsuarioGames {
         }
         return $usuarioGames;
     }
-	
-	function adicionarLoginSessionByIdDjx($ug_id) {
-		if(!$ug_id || $ug_id == "") return false;
-		
-		$con = ConnectionPDO::getConnection();
+
+    function adicionarLoginSessionByIdDjx($ug_id)
+    {
+        if (!$ug_id || $ug_id == "") return false;
+
+        $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
-		$sql = "SELECT * FROM usuarios_games where ug_id = :UG_ID";
-		$query = $pdo->prepare($sql);
-		$query->bindValue(':UG_ID', $ug_id);
-		$query->execute();
-		
-		if($query->rowCount() > 0) {
-			
-			$ret = $query->fetch(PDO::FETCH_ASSOC);
-			
-			$usuarioGames = new UsuarioGames();
+        $sql = "SELECT * FROM usuarios_games where ug_id = :UG_ID";
+        $query = $pdo->prepare($sql);
+        $query->bindValue(':UG_ID', $ug_id);
+        $query->execute();
+
+        if ($query->rowCount() > 0) {
+
+            $ret = $query->fetch(PDO::FETCH_ASSOC);
+
+            $usuarioGames = new UsuarioGames();
             $usuarioGames->setId($ret['ug_id']);
             $usuarioGames->setLogin($ret['ug_login']);
             $usuarioGames->setSenha($ret['ug_senha']);
@@ -1921,8 +2082,8 @@ class UsuarioGames {
 
             $usuarioGames->setSaldoFidelizacao($ret['ug_saldo_fidelizacao']);
             $usuarioGames->setCategoriaFidelizacao($ret['ug_categoria_fidelizacao']);
-			
-			$GLOBALS['_SESSION']['usuarioGames_ser'] = serialize($usuarioGames);
+
+            $GLOBALS['_SESSION']['usuarioGames_ser'] = serialize($usuarioGames);
             $GLOBALS['_SESSION']['usuarioGames.horarioLogin'] = date("U");
             $GLOBALS['_SESSION']['usuarioGames.horarioInatividade'] = date("U");
 
@@ -1930,14 +2091,15 @@ class UsuarioGames {
             $GLOBALS['_SESSION']['integracao_origem_id'] = "";
             $GLOBALS['_SESSION']['integracao_order_id'] = "";
             $GLOBALS['_SESSION']['integracao_autenticado'] = "";
-			
-			return $ret;
-		}
-	}
 
-    function adicionarLoginSession_ByID($ug_id) {
+            return $ret;
+        }
+    }
 
-		if(!$ug_id || $ug_id == "") return false;
+    function adicionarLoginSession_ByID($ug_id)
+    {
+
+        if (!$ug_id || $ug_id == "") return false;
 
         $rs = null;
         $filtro['ug_id'] = $ug_id;
@@ -2008,7 +2170,8 @@ class UsuarioGames {
     }
 
 
-    function alterarSenha($senha, $senhaAtual, $login) {
+    function alterarSenha($senha, $senhaAtual, $login)
+    {
 
         $ret = false;
 
@@ -2027,7 +2190,7 @@ class UsuarioGames {
         $rs = SQLexecuteQuery($sql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
-			if($rs_row['qtde'] > 0) $ret = true;
+            if ($rs_row['qtde'] > 0) $ret = true;
         }
 
         //Atualiza ultimo acesso
@@ -2076,26 +2239,26 @@ class UsuarioGames {
                     $objEnvioEmailAutomatico->setUgID($usuarioGames->getId());
                     $objEnvioEmailAutomatico->MontaEmailEspecifico();
                 }
-				
             }
         }
 
         return $ret;
     }
 
-	public function getDadosVip() {
-		$ug_id = $this->getId();
-		
-		$sql = "select * from tb_gamers_vip where ug_id = ". $ug_id .";";
-			$rs = SQLexecuteQuery($sql);
-			$dados = pg_fetch_array($rs);
-			
-			return $dados;
-	}
+    public function getDadosVip()
+    {
+        $ug_id = $this->getId();
+
+        $sql = "select * from tb_gamers_vip where ug_id = " . $ug_id . ";";
+        $rs = SQLexecuteQuery($sql);
+        $dados = pg_fetch_array($rs);
+
+        return $dados;
+    }
 
 
 
-/*
+    /*
 	ORIGINAL
     function b_IsLogin_pagamento_vip($op = null, &$aret = null) {
 
@@ -2114,8 +2277,9 @@ class UsuarioGames {
 
 
     // Ver get_lista_usuarios_VIP() para usar a lista VIP
-	
-    function b_IsLogin_pagamento_vip($op = null, &$aret = null) {
+
+    function b_IsLogin_pagamento_vip($op = null, &$aret = null)
+    {
 
         $usuarios_pagamento_online_vip_id = $this->getDadosVip();
         if ($op == 1) {
@@ -2128,7 +2292,8 @@ class UsuarioGames {
         return false;
     }
 
-    function b_IsLogin_pagamento_free() {
+    function b_IsLogin_pagamento_free()
+    {
 
         // 53916 - "WAGNER DE MIRANDA" 
         $usuarios_pagamento_online_free_id = array(53916);
@@ -2139,7 +2304,8 @@ class UsuarioGames {
         return false;
     }
 
-    function b_IsLogin_pagamento() {
+    function b_IsLogin_pagamento()
+    {
         /*
           $usuarios_liberados = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
 
@@ -2152,43 +2318,44 @@ class UsuarioGames {
         return true;
     }
 
-    function b_IsLogin_Reinaldo() {
+    function b_IsLogin_Reinaldo()
+    {
 
         if (strtoupper($this->getEmail()) == "WAGNER@E-PREPAG.COM.BR") {
             return true;
         }
         return false;
-
     }
 
-    function b_IsLogin_Wagner() {
+    function b_IsLogin_Wagner()
+    {
 
         if (strtoupper($this->getEmail()) == "WAGNER@E-PREPAG.COM.BR") {
             return true;
         }
         return false;
-
     }
 
-    function b_IsLogin_Tamy() {
+    function b_IsLogin_Tamy()
+    {
 
         if (strtoupper($this->getEmail()) == "TAMY@E-PREPAG.COM.BR") {
             return true;
         }
         return false;
-
     }
 
-    function b_IsLogin_Glaucia() {
+    function b_IsLogin_Glaucia()
+    {
 
         if (strtoupper($this->getEmail()) == "GLAUCIA@E-PREPAG.COM.BR") {
             return true;
         }
         return false;
-
     }
 
-    function b_IsLogin_pagamento_minimo_1_real() {
+    function b_IsLogin_pagamento_minimo_1_real()
+    {
 
         $aIsLogin_pagamento_mini_1_real = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "TESTE_SCOPUS@TEST.COM");
         if (in_array(strtoupper($this->getEmail()), $aIsLogin_pagamento_mini_1_real)) {
@@ -2197,7 +2364,8 @@ class UsuarioGames {
         return false;
     }
 
-    function b_IsLogin_pagamento_em_carteira() {
+    function b_IsLogin_pagamento_em_carteira()
+    {
         return true;
 
         /*
@@ -2211,11 +2379,12 @@ class UsuarioGames {
     }
 
 
-    function b_isCampeonato() {
+    function b_isCampeonato()
+    {
         // acabou em 2011-08-02
         return false;
 
-//		return true;
+        //		return true;
         /*
           $usuarios_campeonatos = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
 
@@ -2227,14 +2396,16 @@ class UsuarioGames {
     }
 
     // Aceitaram paraticipar do campeonato
-    function b_IsGamer_Competicao_Aceito() {
+    function b_IsGamer_Competicao_Aceito()
+    {
         if (strtoupper($this->getCompet_aceito_regulamento()) == "S") {
             return true;
         }
         return false;
     }
 
-    function b_IsGamer_Competicao_Com_LH() {
+    function b_IsGamer_Competicao_Com_LH()
+    {
         if ($this->getCompet_lh_ug_id() > 0) {
             return true;
         }
@@ -2242,26 +2413,28 @@ class UsuarioGames {
     }
 
 
-    function b_IsGamer_Competicao_Pago($ogpm_id, &$vg_id) {
+    function b_IsGamer_Competicao_Pago($ogpm_id, &$vg_id)
+    {
         $prod_id = $GLOBALS['CAMPEONATO_PROD_ID'];
         $pagtos_valor = 0;
 
         $pagtos_n = get_Campeonato_Pagto_Completo($this->ug_id, $prod_id, $pagtos_valor);
 
-//gravaLog_Temporario("SQL em b_IsGamer_Competicao_Pago($ogpm_id, &$vg_id)".$sql);
+        //gravaLog_Temporario("SQL em b_IsGamer_Competicao_Pago($ogpm_id, &$vg_id)".$sql);
 
         return ($pagtos_n > 0);
     }
 
-    function atualizarCompet_participa($ug_id, $tf_ug_id, $ug_compet_jogo, $ug_compet_aceito_regulamento) {
+    function atualizarCompet_participa($ug_id, $tf_ug_id, $ug_compet_jogo, $ug_compet_aceito_regulamento)
+    {
         $sql = "update usuarios_games set ";
         $sql .= " ug_compet_lh_ug_id = " . $tf_ug_id . ", ";
         $sql .= " ug_compet_jogo = " . $ug_compet_jogo . ", ";
         $sql .= " ug_compet_aceito_regulamento = '" . $ug_compet_aceito_regulamento . "', ";
         $sql .= " ug_compet_aceito_data_aceito = CURRENT_TIMESTAMP ";
         $sql .= " where ug_id = " . $ug_id . "";
-//echo $sql."<br>";
-//die("");
+        //echo $sql."<br>";
+        //die("");
         $ret = SQLexecuteQuery($sql);
 
         if ($ret) {
@@ -2270,12 +2443,13 @@ class UsuarioGames {
         return false;
     }
 
-    function atualizarCompet_LH($ug_id, $tf_ug_id_lh) {
+    function atualizarCompet_LH($ug_id, $tf_ug_id_lh)
+    {
         $sql = "update usuarios_games set ";
         $sql .= " ug_compet_lh_ug_id = " . $tf_ug_id_lh . " ";
         $sql .= " where ug_id = " . $ug_id . "";
-//echo $sql."<br>";
-//die("");
+        //echo $sql."<br>";
+        //die("");
         $ret = SQLexecuteQuery($sql);
 
         if ($ret) {
@@ -2284,7 +2458,8 @@ class UsuarioGames {
         return false;
     }
 
-    function b_IsLogin_pagamento_bancodobrasil() {
+    function b_IsLogin_pagamento_bancodobrasil()
+    {
         /*
           $usuarios_liberados_bancodobrasil = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
 
@@ -2295,10 +2470,10 @@ class UsuarioGames {
          */
         // Libera para todos os usuï¿½rios
         return true;
-
     }
 
-    function b_IsLogin_pagamento_bancoitau() {
+    function b_IsLogin_pagamento_bancoitau()
+    {
         /*
           $usuarios_liberados_bancoitau = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
 
@@ -2309,24 +2484,24 @@ class UsuarioGames {
          */
         // Libera para todos os usuï¿½rios
         return true;
-
     }
 
-    function b_IsLogin_pagamento_bancoepp() {
+    function b_IsLogin_pagamento_bancoepp()
+    {
         // Libera para todos os usuï¿½rios
         return true;
-
     }
 
-    function b_IsLogin_pagamento_usa_produto_treinamento() {
+    function b_IsLogin_pagamento_usa_produto_treinamento()
+    {
 
         $bret = ($this->b_IsLogin_pagamento_paypal() || $this->b_IsLogin_pagamento_hipay() || $this->b_IsLogin_pagamento_pin_eprepag());
         return $bret;
-
     }
 
 
-    function b_IsLogin_pagamento_paypal() {
+    function b_IsLogin_pagamento_paypal()
+    {
 
         $usuarios_liberados_paypal = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
 
@@ -2336,11 +2511,12 @@ class UsuarioGames {
         return false;
 
         // Libera para todos os usuï¿½rios
-//		return true;
+        //		return true;
 
     }
 
-    function b_IsLogin_pagamento_hipay() {
+    function b_IsLogin_pagamento_hipay()
+    {
 
         $usuarios_liberados_hipay = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
 
@@ -2350,11 +2526,12 @@ class UsuarioGames {
         return false;
 
         // Libera para todos os usuï¿½rios
-//		return true;
+        //		return true;
 
     }
 
-    function b_Is_Boleto_Itau() {
+    function b_Is_Boleto_Itau()
+    {
         /*
           // Boleto Itau - Liberados todos em 2010-10-15
           $usuarios_usa_boleto_itau = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA-E-PREPAG@HOTMAIL.COM");
@@ -2366,10 +2543,10 @@ class UsuarioGames {
          */
         // Libera para todos os usuï¿½rios
         return true;
-
     }
 
-    function b_Is_Boleto_Banespa() {
+    function b_Is_Boleto_Banespa()
+    {
         // Boleto Santander
         /*
           $usuarios_usa_boleto_itau = array("GLAUCIA-E-PREPAG@HOTMAIL.COM");
@@ -2386,10 +2563,10 @@ class UsuarioGames {
          */
         // Libera para todos os usuï¿½rios
         return false;
-
     }
 
-    function b_Is_Boleto_Bradesco() {
+    function b_Is_Boleto_Bradesco()
+    {
         /*
         // Boleto Bradesco - Liberados todos em 2016-07-07
         $usuarios_usa_boleto_itau = array("WAGNER.PLAYER@GMAIL.COM", "GLAUCIA-E-PREPAG@HOTMAIL.COM", "TAMY@E-PREPAG.COM");
@@ -2403,7 +2580,8 @@ class UsuarioGames {
         return true;
     } //end function b_Is_Boleto_Bradesco
 
-    function b_Is_Campeonato_Teste() {
+    function b_Is_Campeonato_Teste()
+    {
         /*
           // Campeonato_Teste
           $usuarios_Campeonato_Teste = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA-E-PREPAG@HOTMAIL.COM", "ODECIO@GREGIO.COM.BR", "JPTREVISAN@GMAIL.COM", "JOAO123@MEUDOMINIO.COM");
@@ -2416,25 +2594,26 @@ class UsuarioGames {
         return true;
     }
 
-    function b_IsLogin_reinaldopshotmail() {
+    function b_IsLogin_reinaldopshotmail()
+    {
 
         if (strtoupper($this->getEmail()) == "WAGNER@E-PREPAG.COM.BR") {
             return true;
         }
         return false;
-
     }
 
-    function b_IsLogin_reinaldopsyahoo() {
+    function b_IsLogin_reinaldopsyahoo()
+    {
 
         if (strtoupper($this->getEmail()) == "WAGNER@E-PREPAG.COM.BR") {
             return true;
         }
         return false;
-
     }
 
-    function b_IsLogin_pagamento_pin_eprepag() {
+    function b_IsLogin_pagamento_pin_eprepag()
+    {
         $usuarios_liberados_pin_eprepag = array("GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "WAGNER@E-PREPAG.COM.BR");
 
         if (in_array(strtoupper($this->getEmail()), $usuarios_liberados_pin_eprepag)) {
@@ -2442,15 +2621,16 @@ class UsuarioGames {
         }
         return false;
     }
-	
-function b_IsLogin_pagamento_pin_Personalizado() {
-	
-	return true;
-	
-}
+
+    function b_IsLogin_pagamento_pin_Personalizado()
+    {
+
+        return true;
+    }
 
     // Para bloquear o uso de PINs EPP Cash por usuï¿½rios (usar jnto com b_pin_forma_pagamento())
-    function b_IsLogin_pagamento_pin_EPP_Cash() {
+    function b_IsLogin_pagamento_pin_EPP_Cash()
+    {
         //return false; 
         return true;
 
@@ -2465,7 +2645,8 @@ function b_IsLogin_pagamento_pin_Personalizado() {
          */
     }
 
-    function b_IsLogin_pagamento_Cielo(&$lista_usuarios = null) {
+    function b_IsLogin_pagamento_Cielo(&$lista_usuarios = null)
+    {
         return $this->getUseCielo();
         /*
           $usuarios_liberados_cielo = array("WAGNER@E-PREPAG.COM.BR", "JOAO.TREVISAN@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
@@ -2478,13 +2659,14 @@ function b_IsLogin_pagamento_pin_Personalizado() {
          */
     }
 
-    function b_IsLogin_pagamento_Cielo_Integracao(&$lista_usuarios = null) {
-//		return $this->getUseCielo();
+    function b_IsLogin_pagamento_Cielo_Integracao(&$lista_usuarios = null)
+    {
+        //		return $this->getUseCielo();
 
         $usuarios_liberados_cielo_integracao = array("JOAO.TREVISAN@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "WAGNER@E-PREPAG.COM.BR");
         $lista_usuarios = $usuarios_liberados_cielo_integracao;
 
-//echo strtoupper($this->getEmail());
+        //echo strtoupper($this->getEmail());
 
         if ((in_array(strtoupper($this->getEmail()), $usuarios_liberados_cielo_integracao))) {
             return true;
@@ -2492,8 +2674,9 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return false;
     }
 
-    function b_IsLogin_pagamento_Cielo_debito(&$lista_usuarios = null) {
-//		return $this->getUseCielo();
+    function b_IsLogin_pagamento_Cielo_debito(&$lista_usuarios = null)
+    {
+        //		return $this->getUseCielo();
 
         $usuarios_liberados_cielo_debito = array("JOAO.TREVISAN@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "WAGNER@E-PREPAG.COM.BR");
         $lista_usuarios = $usuarios_liberados_cielo;
@@ -2504,10 +2687,11 @@ function b_IsLogin_pagamento_pin_Personalizado() {
     }
 
     // Liberado 2012-11-05
-    function b_IsLogin_pagamento_Elex_nova_pagina(&$lista_usuarios = null) {
+    function b_IsLogin_pagamento_Elex_nova_pagina(&$lista_usuarios = null)
+    {
         return true;
 
-//		return $this->getUseCielo();
+        //		return $this->getUseCielo();
         /*
           $usuarios_liberados_cielo_debito = array("JOAO.TREVISAN@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "WAGNER@E-PREPAG.COM.BR");
           $lista_usuarios = $usuarios_liberados_cielo;
@@ -2519,9 +2703,10 @@ function b_IsLogin_pagamento_pin_Personalizado() {
          */
     }
 
-    function atualiza_ultimo_acesso($semail0) {
+    function atualiza_ultimo_acesso($semail0)
+    {
 
-//		$semail = ($semail0)?$semail0:($this->getEmail());
+        //		$semail = ($semail0)?$semail0:($this->getEmail());
         $semail = $semail0;
         //Atualiza ultimo acesso
         //------------------------------------------------------------------
@@ -2531,13 +2716,14 @@ function b_IsLogin_pagamento_pin_Personalizado() {
             $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP, ";
             $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
             $sql .= " where ug_email = " . SQLaddFields($semail, "s");
-//grava_log_integracao("Integraï¿½ï¿½o Debug 5: ".date("Y-m-d H:i:s")."\n  $sql \n");
+            //grava_log_integracao("Integraï¿½ï¿½o Debug 5: ".date("Y-m-d H:i:s")."\n  $sql \n");
             $rs = SQLexecuteQuery($sql);
         }
     }
 
-    function b_IsLogin_extrato_UG($op = null, &$aret = null) {
-//		$usuarios_liberados_extrato_UG = array("GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "WAGNER@E-PREPAG.COM.BR", "IGORTACE@GMAIL.COM", "TAMY@E-PREPAG.COM.BR", "JOAO.TREVISAN@E-PREPAG.COM.BR");
+    function b_IsLogin_extrato_UG($op = null, &$aret = null)
+    {
+        //		$usuarios_liberados_extrato_UG = array("GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "WAGNER@E-PREPAG.COM.BR", "IGORTACE@GMAIL.COM", "TAMY@E-PREPAG.COM.BR", "JOAO.TREVISAN@E-PREPAG.COM.BR");
 
         $usuarios_liberados_extrato_id = array(16, 9943, 97619, 8972, 46198, 9093, 2745, 53916, 9016, 237209, 54276);
 
@@ -2551,7 +2737,8 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return false;
     }
 
-    function b_IsLogin_valorPINEPPCash() {
+    function b_IsLogin_valorPINEPPCash()
+    {
 
         //return false;		/// <<<<<<<<<<
 
@@ -2562,14 +2749,16 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return false;
     }
 
-    function b_extrato_UG($bloqueio = true) {
+    function b_extrato_UG($bloqueio = true)
+    {
         if ($bloqueio) {
             return true;
         }
         return false;
     }
 
-    function b_listaJogos_Alawar() {
+    function b_listaJogos_Alawar()
+    {
         $usuarios_liberados_alawar = array("GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "WAGNER@E-PREPAG.COM.BR", "FABIOSS@E-PREPAG.COM.BR");
         if (in_array(strtoupper($this->getEmail()), $usuarios_liberados_alawar)) {
             return true;
@@ -2577,7 +2766,8 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return false;
     }
 
-    function b_lista_ofertas() {
+    function b_lista_ofertas()
+    {
         $usuarios_liberados_ofertas = array("GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR", "WAGNER@E-PREPAG.COM.BR",  "JOAO.TREVISAN@E-PREPAG.COM.BR");
         if (in_array(strtoupper($this->getEmail()), $usuarios_liberados_ofertas)) {
             return true;
@@ -2585,20 +2775,20 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         return false;
     }
 
-    function atualizar_sem_validar($objGamesUsuario, $editaSemLogin = false, $acessa) {
+    function atualizar_sem_validar($objGamesUsuario, $editaSemLogin = false, $acessa)
+    {
 
 
         //$ret = UsuarioGames::validarCampos($objGamesUsuario, false);
 
         if ($ret == "") {
-			if($acessa){
-			    if (UsuarioGames::existeEmail($objGamesUsuario->getEmail(), $objGamesUsuario->getId())) {
-					$ret = "Email já cadastrado.";
-				}	
-			}
-
+            if ($acessa) {
+                if (UsuarioGames::existeEmail($objGamesUsuario->getEmail(), $objGamesUsuario->getId())) {
+                    $ret = "Email já cadastrado.";
+                }
+            }
         }
-        
+
         if ($ret == "" && $editaSemLogin === false) {
             if (UsuarioGames::existeLogin($objGamesUsuario->getLogin(), $objGamesUsuario->getId())) {
                 $ret = "Login já cadastrado.";
@@ -2611,7 +2801,7 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                 $ret = $msgCPF;
             }
         }
-/*
+        /*
         if ($ret == "") {
             if (UsuarioGames::existeRG($objGamesUsuario->getRG(), $objGamesUsuario->getId())) {
                 $ret = "RG jï¿½ cadastrado.";
@@ -2621,87 +2811,87 @@ function b_IsLogin_pagamento_pin_Personalizado() {
         if ($ret == "") {
 
             //Formata
- 			$dataNascimento = (!is_null($objGamesUsuario->getDataNascimento()) && $objGamesUsuario->getDataNascimento() != '') ? SQLaddFields(trim(formata_data($objGamesUsuario->getDataNascimento(), 1)), "s") : "null";
-                
+            $dataNascimento = (!is_null($objGamesUsuario->getDataNascimento()) && $objGamesUsuario->getDataNascimento() != '') ? SQLaddFields(trim(formata_data($objGamesUsuario->getDataNascimento(), 1)), "s") : "null";
+
             //SQL
             $sql = "update usuarios_games set ";
- 			if(!is_null($objGamesUsuario->getAtivo())) 			$sql .= " ug_ativo = " 			. SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
- 			if(!is_null($objGamesUsuario->getEmail())) 			$sql .= " ug_email = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getNome())) 			$sql .= " ug_nome = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
-            if(!is_null($objGamesUsuario->getLogin())) 			$sql .= " ug_login = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getLogin())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCPF())) 			$sql .= " ug_cpf = " 			. SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getRG())) 			$sql .= " ug_rg = " 			. SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
- 			$sql .= " ug_data_nascimento = ". trim($dataNascimento).",";
- 			if(!is_null($objGamesUsuario->getSexo())) 			$sql .= " ug_sexo = " 			. SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTipoEnd())) 		$sql .= " ug_tipo_end = ". SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEnd())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getEndereco())) 		$sql .= " ug_endereco = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getEndereco())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getNumero())) 		$sql .= " ug_numero = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getComplemento())) 	$sql .= " ug_complemento = " 	. SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getBairro())) 		$sql .= " ug_bairro = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getBairro())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCidade())) 		$sql .= " ug_cidade = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getCidade())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getEstado())) 		$sql .= " ug_estado = " 		. SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCEP())) 			$sql .= " ug_cep = " 			. SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTelDDI())) 		$sql .= " ug_tel_ddi = " 		. SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTelDDD())) 		$sql .= " ug_tel_ddd = " 		. SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getTel())) 			$sql .= " ug_tel = " 			. SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCelDDI())) 		$sql .= " ug_cel_ddi = " 		. SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCelDDD())) 		$sql .= " ug_cel_ddd = " 		. SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
- 			if(!is_null($objGamesUsuario->getCelDDD())) 		$sql .= " ug_cel = " 			. SQLaddFields(trim($objGamesUsuario->getCel()), "s") . " ,";
-			if(!is_null($objGamesUsuario->getHabboId())) 		$sql .= " ug_habbo_id = "		. SQLaddFields(trim($objGamesUsuario->getHabboId()), "s") . ",";
-                        if (!is_null($objGamesUsuario->getNewsLetter())) {
-                            $sql .= " ug_news = " . SQLaddFields(trim($objGamesUsuario->getNewsLetter()), "s") . ",";
-                        }
-			if(!is_null($objGamesUsuario->getCompet_lh_ug_id()))            $sql .= " ug_compet_lh_ug_id = "            . SQLaddFields(trim($objGamesUsuario->getCompet_lh_ug_id()), "") . ",";
-			if(!is_null($objGamesUsuario->getCompet_jogo())) 		$sql .= " ug_compet_jogo = "                . SQLaddFields(trim($objGamesUsuario->getCompet_jogo()), "") . ",";
-			if(!is_null($objGamesUsuario->getCompet_aceito_regulamento())) 	$sql .= " ug_compet_aceito_regulamento = "  . SQLaddFields(trim($objGamesUsuario->getCompet_aceito_regulamento()), "s") . ",";
-			if(!is_null($objGamesUsuario->getCompet_aceito_data_aceito())) 	$sql .= " ug_compet_aceito_data_aceito = "  . SQLaddFields(trim($objGamesUsuario->getCompet_aceito_data_aceito()), "s") . ",";
-			if(!is_null($objGamesUsuario->getUseCielo())) 			$sql .= " ug_use_cielo = "                  . SQLaddFields(trim($objGamesUsuario->getUseCielo()), "") . ",";
- 			if(!is_null($objGamesUsuario->getSaldoFidelizacao())) 		$sql .= " ug_saldo_fidelizacao = "          . SQLaddFields(trim($objGamesUsuario->getSaldoFidelizacao()), "") . ",";
- 			if(!is_null($objGamesUsuario->getCategoriaFidelizacao())) 	$sql .= " ug_categoria_fidelizacao = "      . SQLaddFields(trim($objGamesUsuario->getCategoriaFidelizacao()), "") . ","; 			
- 			if(!is_null($objGamesUsuario->getNomedaMae())) 			$sql .= " ug_nome_da_mae = "                . SQLaddFields(trim($objGamesUsuario->getNomedaMae()), "s") . ","; 			
-            if(!is_null($objGamesUsuario->getNomeCPF())) 			$sql .= " ug_nome_cpf = "                . SQLaddFields(trim($objGamesUsuario->getNomeCPF()), "s") . ","; 		        
- 			if(!is_null($objGamesUsuario->getOBS())) {
-                            if(trim($objGamesUsuario->getOBS()) != "") {  
-                                $sql_insert_obs = "INSERT INTO usuarios_games_obs VALUES (".$objGamesUsuario->getId().",". SQLaddFields(trim($objGamesUsuario->getOBS()), "s") . ",'".$GLOBALS['_SESSION']['userlogin_bko']."');";
-                                //echo $sql_insert_obs;
-                                $ret_insert_obs = SQLexecuteQuery($sql_insert_obs);
-                                if(!$ret_insert_obs) echo "Erro ao atualizar Observação do Usuário.".PHP_EOL;
-                            }//end if(trim($objGamesUsuario->getOBS()) != "")
-                        } //end if(!is_null($objGamesUsuario->getOBS())) 
-                        
-            
-			if(substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
+            if (!is_null($objGamesUsuario->getAtivo()))             $sql .= " ug_ativo = "             . SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
+            if (!is_null($objGamesUsuario->getEmail()))             $sql .= " ug_email = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
+            if (!is_null($objGamesUsuario->getNome()))             $sql .= " ug_nome = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
+            if (!is_null($objGamesUsuario->getLogin()))             $sql .= " ug_login = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getLogin())), "s") . ",";
+            if (!is_null($objGamesUsuario->getCPF()))             $sql .= " ug_cpf = "             . SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
+            if (!is_null($objGamesUsuario->getRG()))             $sql .= " ug_rg = "             . SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
+            $sql .= " ug_data_nascimento = " . trim($dataNascimento) . ",";
+            if (!is_null($objGamesUsuario->getSexo()))             $sql .= " ug_sexo = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getTipoEnd()))         $sql .= " ug_tipo_end = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEnd())), "s") . ",";
+            if (!is_null($objGamesUsuario->getEndereco()))         $sql .= " ug_endereco = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getEndereco())), "s") . ",";
+            if (!is_null($objGamesUsuario->getNumero()))         $sql .= " ug_numero = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
+            if (!is_null($objGamesUsuario->getComplemento()))     $sql .= " ug_complemento = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
+            if (!is_null($objGamesUsuario->getBairro()))         $sql .= " ug_bairro = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getBairro())), "s") . ",";
+            if (!is_null($objGamesUsuario->getCidade()))         $sql .= " ug_cidade = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getCidade())), "s") . ",";
+            if (!is_null($objGamesUsuario->getEstado()))         $sql .= " ug_estado = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
+            if (!is_null($objGamesUsuario->getCEP()))             $sql .= " ug_cep = "             . SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTelDDI()))         $sql .= " ug_tel_ddi = "         . SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTelDDD()))         $sql .= " ug_tel_ddd = "         . SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTel()))             $sql .= " ug_tel = "             . SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCelDDI()))         $sql .= " ug_cel_ddi = "         . SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel_ddd = "         . SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel = "             . SQLaddFields(trim($objGamesUsuario->getCel()), "s") . " ,";
+            if (!is_null($objGamesUsuario->getHabboId()))         $sql .= " ug_habbo_id = "        . SQLaddFields(trim($objGamesUsuario->getHabboId()), "s") . ",";
+            if (!is_null($objGamesUsuario->getNewsLetter())) {
+                $sql .= " ug_news = " . SQLaddFields(trim($objGamesUsuario->getNewsLetter()), "s") . ",";
+            }
+            if (!is_null($objGamesUsuario->getCompet_lh_ug_id()))            $sql .= " ug_compet_lh_ug_id = "            . SQLaddFields(trim($objGamesUsuario->getCompet_lh_ug_id()), "") . ",";
+            if (!is_null($objGamesUsuario->getCompet_jogo()))         $sql .= " ug_compet_jogo = "                . SQLaddFields(trim($objGamesUsuario->getCompet_jogo()), "") . ",";
+            if (!is_null($objGamesUsuario->getCompet_aceito_regulamento()))     $sql .= " ug_compet_aceito_regulamento = "  . SQLaddFields(trim($objGamesUsuario->getCompet_aceito_regulamento()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCompet_aceito_data_aceito()))     $sql .= " ug_compet_aceito_data_aceito = "  . SQLaddFields(trim($objGamesUsuario->getCompet_aceito_data_aceito()), "s") . ",";
+            if (!is_null($objGamesUsuario->getUseCielo()))             $sql .= " ug_use_cielo = "                  . SQLaddFields(trim($objGamesUsuario->getUseCielo()), "") . ",";
+            if (!is_null($objGamesUsuario->getSaldoFidelizacao()))         $sql .= " ug_saldo_fidelizacao = "          . SQLaddFields(trim($objGamesUsuario->getSaldoFidelizacao()), "") . ",";
+            if (!is_null($objGamesUsuario->getCategoriaFidelizacao()))     $sql .= " ug_categoria_fidelizacao = "      . SQLaddFields(trim($objGamesUsuario->getCategoriaFidelizacao()), "") . ",";
+            if (!is_null($objGamesUsuario->getNomedaMae()))             $sql .= " ug_nome_da_mae = "                . SQLaddFields(trim($objGamesUsuario->getNomedaMae()), "s") . ",";
+            if (!is_null($objGamesUsuario->getNomeCPF()))             $sql .= " ug_nome_cpf = "                . SQLaddFields(trim($objGamesUsuario->getNomeCPF()), "s") . ",";
+            if (!is_null($objGamesUsuario->getOBS())) {
+                if (trim($objGamesUsuario->getOBS()) != "") {
+                    $sql_insert_obs = "INSERT INTO usuarios_games_obs VALUES (" . $objGamesUsuario->getId() . "," . SQLaddFields(trim($objGamesUsuario->getOBS()), "s") . ",'" . $GLOBALS['_SESSION']['userlogin_bko'] . "');";
+                    //echo $sql_insert_obs;
+                    $ret_insert_obs = SQLexecuteQuery($sql_insert_obs);
+                    if (!$ret_insert_obs) echo "Erro ao atualizar Observação do Usuário." . PHP_EOL;
+                } //end if(trim($objGamesUsuario->getOBS()) != "")
+            } //end if(!is_null($objGamesUsuario->getOBS())) 
+
+
+            if (substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
             $sql .= " where ug_id = " . SQLaddFields($objGamesUsuario->getId(), "");
             $ret = SQLexecuteQuery($sql);
-			if(!$ret) $ret = "Erro ao atualizar usuário.\n";
+            if (!$ret) $ret = "Erro ao atualizar usuário.\n";
             else {
                 $ret = "";
             }
-
         }
 
         return $ret;
     }
-    
-    public function inserirMelhorado($params = []){
+
+    public function inserirMelhorado($params = [])
+    {
         $erro = array();
 
         if (UsuarioGames::existeEmail($this->getEmail(), null)) {
-            $erro[] = "<p>E-mail '".$this->getEmail(). "' já cadastrado.</p>";
+            $erro[] = "<p>E-mail '" . $this->getEmail() . "' já cadastrado.</p>";
         }
 
-        if (UsuarioGames::existeLogin($this->getLogin())){
-            $erro[] = "<p>Login '".$this->getLogin()."' já cadastrado.</p>";
+        if (UsuarioGames::existeLogin($this->getLogin())) {
+            $erro[] = "<p>Login '" . $this->getLogin() . "' já cadastrado.</p>";
         }
-		
+
         $msgCpf = UsuarioGames::existeCPFCadastro($this->getCPF());
-		if ($msgCpf != ""){
+        if ($msgCpf != "") {
             $erro[] = "<p>$msgCpf.</p>";
         }
-		
-		
 
-        if(empty($erro)){
+
+
+        if (empty($erro)) {
             try {
                 //Formata
                 $objEncryption = new Encryption();
@@ -2715,97 +2905,95 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                 $dataNascimento = (!is_null($this->getDataNascimento())) ? formata_data($this->getDataNascimento(), 1) : null;
                 //Array para a Query de Insert
                 $tmpArray = array(
-                                    ':ug_login'                 => (string) trim(strtoupper($this->getLogin())),
-                                    ':ug_senha'                 => (string) $senha,
-                                    ':ug_ativo'                 => 1,//trim($this->getAtivo()),
-                                    ':ug_data_inclusao'         => date("Y-m-d H:i:s"),
-                                    ':ug_data_ultimo_acesso'    => date("Y-m-d H:i:s"),
-                                    ':ug_qtde_acessos'          => 1,
-                                    ':ug_email'                 => (string) trim(strtoupper($this->getEmail())),
-                                    ':ug_endereco'              => (string) trim($this->getEndereco()),
-                                    ':ug_tipo_end'              => (string) trim($this->getTipoEnd()),
-                                    ':ug_numero'                => (string) trim(strtoupper($this->getNumero())),
-                                    ':ug_complemento'           => (string) trim(strtoupper($this->getComplemento())),
-                                    ':ug_bairro'                => (string) trim($this->getBairro()),
-                                    ':ug_cidade'                => (string) trim($this->getCidade()),
-                                    ':ug_estado'                => (string) trim(strtoupper($this->getEstado())),
-                                    ':ug_cep'                   => (string) trim($this->getCEP()),
-                                    ':ug_nome'                  => (string) trim(strtoupper($this->getNome())),
-									':ug_nome_cpf'              => (string) trim(strtoupper($this->getNomeCPF())),
-									':ug_data_cpf_informado'    => date("Y-m-d H:i:s").".8418-03",
-                                    ':ug_cpf'                   => (string) trim($this->getCPF()),
-                                    ':ug_rg'                    => (string) trim($this->getRG()),
-                                    ':ug_data_nascimento'       => $dataNascimento,
-                                    ':ug_sexo'                  => (string) trim(strtoupper($this->getSexo())),
-                                    ':ug_tel_ddi'               => (string) trim(strtoupper($this->getTelDDI())),
-                                    ':ug_tel_ddd'               => (string) trim(strtoupper($this->getTelDDD())),
-                                    ':ug_tel'                   => (string) trim(strtoupper($this->getTel())),
-                                    ':ug_cel_ddi'               => (string) trim(strtoupper($this->getCelDDI())),
-                                    ':ug_cel_ddd'               => (string) trim(strtoupper($this->getCelDDD())),
-                                    ':ug_cel'                   => (string) trim(strtoupper($this->getCel())),
-                                    ':ug_news'                  => (string) trim(strtoupper($this->getNewsLetter()))
-                                  );
+                    ':ug_login'                 => (string) trim(strtoupper($this->getLogin())),
+                    ':ug_senha'                 => (string) $senha,
+                    ':ug_ativo'                 => 1, //trim($this->getAtivo()),
+                    ':ug_data_inclusao'         => date("Y-m-d H:i:s"),
+                    ':ug_data_ultimo_acesso'    => date("Y-m-d H:i:s"),
+                    ':ug_qtde_acessos'          => 1,
+                    ':ug_email'                 => (string) trim(strtoupper($this->getEmail())),
+                    ':ug_endereco'              => (string) trim($this->getEndereco()),
+                    ':ug_tipo_end'              => (string) trim($this->getTipoEnd()),
+                    ':ug_numero'                => (string) trim(strtoupper($this->getNumero())),
+                    ':ug_complemento'           => (string) trim(strtoupper($this->getComplemento())),
+                    ':ug_bairro'                => (string) trim($this->getBairro()),
+                    ':ug_cidade'                => (string) trim($this->getCidade()),
+                    ':ug_estado'                => (string) trim(strtoupper($this->getEstado())),
+                    ':ug_cep'                   => (string) trim($this->getCEP()),
+                    ':ug_nome'                  => (string) trim(strtoupper($this->getNome())),
+                    ':ug_nome_cpf'              => (string) trim(strtoupper($this->getNomeCPF())),
+                    ':ug_data_cpf_informado'    => date("Y-m-d H:i:s") . ".8418-03",
+                    ':ug_cpf'                   => (string) trim($this->getCPF()),
+                    ':ug_rg'                    => (string) trim($this->getRG()),
+                    ':ug_data_nascimento'       => $dataNascimento,
+                    ':ug_sexo'                  => (string) trim(strtoupper($this->getSexo())),
+                    ':ug_tel_ddi'               => (string) trim(strtoupper($this->getTelDDI())),
+                    ':ug_tel_ddd'               => (string) trim(strtoupper($this->getTelDDD())),
+                    ':ug_tel'                   => (string) trim(strtoupper($this->getTel())),
+                    ':ug_cel_ddi'               => (string) trim(strtoupper($this->getCelDDI())),
+                    ':ug_cel_ddd'               => (string) trim(strtoupper($this->getCelDDD())),
+                    ':ug_cel'                   => (string) trim(strtoupper($this->getCel())),
+                    ':ug_news'                  => (string) trim(strtoupper($this->getNewsLetter()))
+                );
 
                 $sql = "insert into usuarios_games";
 
-                foreach($tmpArray as $ind => $val){
-                    if(isset($columns)){
-                        $columns .= ", ".str_replace(":","",$ind);
-                        $values  .= ", ".$ind;
-                    }else{
-                        $columns    = str_replace(":","",$ind);
+                foreach ($tmpArray as $ind => $val) {
+                    if (isset($columns)) {
+                        $columns .= ", " . str_replace(":", "", $ind);
+                        $values  .= ", " . $ind;
+                    } else {
+                        $columns    = str_replace(":", "", $ind);
                         $values     = $ind;
                     }
-
                 } //end foreach
 
-                $sql .= "(".$columns.") values (".$values.");";
+                $sql .= "(" . $columns . ") values (" . $values . ");";
 
 
                 //Tentando executar a Query de Insert
                 $rs = $pdo->prepare($sql);
 
-                if($rs->execute($tmpArray)){
+                if ($rs->execute($tmpArray)) {
                     $sql = "SELECT ug_id FROM usuarios_games WHERE ug_email = :email";
                     $getid = $pdo->prepare($sql);
-                                    
+
                     // Bind o valor com o placeholder de forma segura
                     $getid->bindValue(':email', strtoupper($this->getEmail()), PDO::PARAM_STR);
-                                    
+
                     if ($getid->execute()) {
                         $res = $getid->fetch(PDO::FETCH_ASSOC);
 
                         $this->salvaAceiteTermos($params['location'], $params['device'], $params['version'], $params['ipAdress'], $res['ug_id']);
                         //Log na base
                         usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CRIACAO_DO_CADASTRO'], $res['ug_id'], null);
-                        $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER,'CadastroGamer');
+                        $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'CadastroGamer');
                         $envioEmail->setUgID($res['ug_id']);
                         $envioEmail->MontaEmailEspecifico();
 
                         $this->adicionarLoginSession_ByID($res['ug_id']);
                         return true;
-
-                    }else{
+                    } else {
                         $erro[] = "ERRO 215533. Tivemos um problema. Por favor, entre em contato com nosso suporte.";
                     }
-                }else{
+                } else {
                     $erro[] = "ERRO 215534. Tivemos um problema, favor entrar em contato com nosso suporte.";
                 }
-
-            } catch(PDOException $e) {
+            } catch (PDOException $e) {
                 UsuarioGames::logEvents($e->getMessage());
                 $erro[] = $e->getMessage();
             }
         }
-        
-        if(empty($erro)){
+
+        if (empty($erro)) {
             $erro[] = "ERRO 215535. Tivemos um problema, favor entrar em contato com nosso suporte.";
         }
-        
+
         return $erro;
     }
 
-    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id){
+    private function salvaAceiteTermos($location, $device, $version, $ipAdress, $ug_id)
+    {
         try {
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -2822,14 +3010,13 @@ function b_IsLogin_pagamento_pin_Personalizado() {
             $stmt->bindValue(':ip', $ipAdress, PDO::PARAM_STR);
             $stmt->bindValue(':aceitou', true, PDO::PARAM_BOOL);
             $stmt->execute();
-
         } catch (PDOException $e) {
             UsuarioGames::logEvents($e->getMessage());
         }
-
     }
 
-    public function salvaAceiteTermosGamer($location, $device, $version, $ipAdress, $ug_id) {
+    public function salvaAceiteTermosGamer($location, $device, $version, $ipAdress, $ug_id)
+    {
         try {
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -2846,30 +3033,31 @@ function b_IsLogin_pagamento_pin_Personalizado() {
             $stmt->bindValue(':ip', $ipAdress, PDO::PARAM_STR);
             $stmt->bindValue(':aceitou', true, PDO::PARAM_BOOL);
             return $stmt->execute();
-
         } catch (PDOException $e) {
             UsuarioGames::logEvents($e->getMessage());
             return false;
         }
     }
-    
-    function logEvents($msg) {
-            global $raiz_do_projeto;
-        
-            $fileLog = $raiz_do_projeto."log/log_class_users_GAMERs_PDO-Errors.log";
 
-            $log  = "=================================================================================================".PHP_EOL;
-            $log .= "DATA -> ".date("d/m/Y - H:i:s")."".PHP_EOL;
-            $log .= "---------------------------------".PHP_EOL;
-            $log .= htmlspecialchars_decode($msg);			
+    function logEvents($msg)
+    {
+        global $raiz_do_projeto;
 
-            $fp = fopen($fileLog, 'a+');
-            fwrite($fp, $log);
-            fclose($fp);		
-    }//end function logEvents
-    
-    public function atualizarMelhorado($editaSemLogin = false) {
-        
+        $fileLog = $raiz_do_projeto . "log/log_class_users_GAMERs_PDO-Errors.log";
+
+        $log  = "=================================================================================================" . PHP_EOL;
+        $log .= "DATA -> " . date("d/m/Y - H:i:s") . "" . PHP_EOL;
+        $log .= "---------------------------------" . PHP_EOL;
+        $log .= htmlspecialchars_decode($msg);
+
+        $fp = fopen($fileLog, 'a+');
+        fwrite($fp, $log);
+        fclose($fp);
+    } //end function logEvents
+
+    public function atualizarMelhorado($editaSemLogin = false)
+    {
+
         $ret = UsuarioGames::validarCampos($this, false);
 
         if ($ret == "") {
@@ -2877,143 +3065,141 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                 $ret = "E-mail já cadastrado.";
             }
         }
-        
+
         if ($ret == "" && $editaSemLogin === false) {
             if (UsuarioGames::existeLogin($this->getLogin(), $this->getId())) {
                 $ret = "Login já cadastrado.";
             }
         }
-        
-        if($ret == ""){
-            
-            try{
+
+        if ($ret == "") {
+
+            try {
                 //Inicializando conexao PDO
                 $con = ConnectionPDO::getConnection();
                 $pdo = $con->getLink();
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 //Formata
-                if(!is_null($this->getLogin()))
+                if (!is_null($this->getLogin()))
                     $fields[":ug_login"] = (string) strtoupper($this->getLogin());
-                                
-                if(!is_null($this->getAtivo()))
+
+                if (!is_null($this->getAtivo()))
                     $fields[":ug_ativo"] = (int) $this->getAtivo();
-                
-                if(!is_null($this->getDataNascimento())){
-                    
+
+                if (!is_null($this->getDataNascimento())) {
+
                     $dataNascimento = formata_data($this->getDataNascimento(), 1);
-                    
+
                     if (verifica_data($this->getDataNascimento()) == 1)
-                        $fields[":ug_data_nascimento"] = (string) trim($dataNascimento) ;
+                        $fields[":ug_data_nascimento"] = (string) trim($dataNascimento);
                 }
 
-                if(!is_null($this->getEmail()))
-                    $fields[":ug_email"] = (string) trim(strtoupper($this->getEmail())) ;
+                if (!is_null($this->getEmail()))
+                    $fields[":ug_email"] = (string) trim(strtoupper($this->getEmail()));
 
-                if(!is_null($this->getNome()))
+                if (!is_null($this->getNome()))
                     $fields[":ug_nome"] = (string) trim($this->getNome());
-                
-                if(!is_null($this->getNomeCPF())){
+
+                if (!is_null($this->getNomeCPF())) {
                     $fields[":ug_nome_cpf"] = (string) trim($this->getNomeCPF());
                     $fields[":ug_data_cpf_informado"] = "NOW()";
                 }
-                if(!is_null($this->getCPF()))
-                    $fields[":ug_cpf"] = (string) trim($this->getCPF()) ;
+                if (!is_null($this->getCPF()))
+                    $fields[":ug_cpf"] = (string) trim($this->getCPF());
 
-                if(!is_null($this->getSexo()))
-                    $fields[":ug_sexo"] = (string) trim(strtoupper($this->getSexo())) ;
+                if (!is_null($this->getSexo()))
+                    $fields[":ug_sexo"] = (string) trim(strtoupper($this->getSexo()));
 
-                if(!is_null($this->getEndereco()))
+                if (!is_null($this->getEndereco()))
                     $fields[":ug_endereco"] = (string) trim(strtoupper($this->getEndereco()));
 
-                if(!is_null($this->getNumero()))
+                if (!is_null($this->getNumero()))
                     $fields[":ug_numero"] = (string) trim(strtoupper($this->getNumero()));
 
-                if($this->getComplemento())
+                if ($this->getComplemento())
                     $fields[":ug_complemento"] = (string) trim(strtoupper($this->getComplemento()));
 
-                if(!is_null($this->getBairro()))
+                if (!is_null($this->getBairro()))
                     $fields[":ug_bairro"] = (string) trim(strtoupper($this->getBairro()));
 
-                if(!is_null($this->getCidade()))
+                if (!is_null($this->getCidade()))
                     $fields[":ug_cidade"] = (string) trim(strtoupper($this->getCidade()));
 
-                if(!is_null($this->getEstado()))
+                if (!is_null($this->getEstado()))
                     $fields[":ug_estado"] = (string) trim(strtoupper($this->getEstado()));
 
-                if(!is_null($this->getCEP()))
+                if (!is_null($this->getCEP()))
                     $fields[":ug_cep"] = (string) trim($this->getCEP());
 
-                if(!is_null($this->getCelDDI()))
+                if (!is_null($this->getCelDDI()))
                     $fields[":ug_cel_ddi"] = (string) trim($this->getCelDDI());
 
-                if(!is_null($this->getCelDDD()))
+                if (!is_null($this->getCelDDD()))
                     $fields[":ug_cel_ddd"] = (string) trim($this->getCelDDD());
 
-                if(!is_null($this->getCel()))
+                if (!is_null($this->getCel()))
                     $fields[":ug_cel"] = (string) trim($this->getCel());
 
-                if (!is_null($this->getNewsLetter())) 
+                if (!is_null($this->getNewsLetter()))
                     $fields[":ug_news"] = (string) trim($this->getNewsLetter());
 
-                if(!empty($fields)){
-                    
+                if (!empty($fields)) {
+
                     $fields[":ug_id"] = (int) $this->getId();
 
-                    foreach($fields as $field => $value){
-                        $strF[] = " ".str_replace(":","",$field)." = ".$field;
+                    foreach ($fields as $field => $value) {
+                        $strF[] = " " . str_replace(":", "", $field) . " = " . $field;
                     }
-                    
+
                     //SQL
                     $sql = "update 
                                 usuarios_games set 
-                                ".implode(",",$strF)."
+                                " . implode(",", $strF) . "
                             where 
                                 ug_id = :ug_id";
 
                     //Tentando executar a Query de Insert
                     $rs = $pdo->prepare($sql);
 
-                    if($rs->execute($fields)){
+                    if ($rs->execute($fields)) {
                         //Log na base
                         usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], null, null, "Alt. cadastro pelo user");
 
-                            /* ---Wagner */
+                        /* ---Wagner */
                         $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoCadastro');
                         $objEnvioEmailAutomatico->setUgID($this->getId());
                         $objEnvioEmailAutomatico->MontaEmailEspecifico();
                         $this->adicionarLoginSession_ByID($this->getId());
                         return true;
-
-                    }else{
+                    } else {
                         throw new PDOException("ERRO 215535. Tivemos um problema, favor entrar em contato com nosso suporte.");
                     }
-                }else{
+                } else {
                     $erro[] = "NÃ£o há campos a serem atualizados.";
                 }
-
-            } catch(PDOException $e) {
+            } catch (PDOException $e) {
                 $erro[] = "ERRO 2155356. Tivemos um problema, favor se o erro persistir, entrar em contato com nosso suporte. Obrigado!";
             }
-        }else{
+        } else {
             $erro[] = $ret;
         }
-        
-        UsuarioGames::logEvents("ERRO 2155356 ".implode(" / ",$erro));
-        
-        return $erro;
 
+        UsuarioGames::logEvents("ERRO 2155356 " . implode(" / ", $erro));
+
+        return $erro;
     }
-    
-    public function alteraDadoAcesso($campo, $valor, $senhaAtual) {
+
+    public function alteraDadoAcesso($campo, $valor, $senhaAtual)
+    {
 
         $ret = false;
-        
+
         //Inicializando conexao PDO
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
+
         //Autentica usuario
         //------------------------------------------------------------------
         $objEncryption = new Encryption();
@@ -3026,54 +3212,54 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                 from 
                     usuarios_games 
                 where 
-                    ug_email = '".$this->getEmail()."' and ug_senha = '$senhaAtual'";
-        
-        if($campo == "ug_email"){
+                    ug_email = '" . $this->getEmail() . "' and ug_senha = '$senhaAtual'";
+
+        if ($campo == "ug_email") {
             $valor = strtoupper($valor);
-            if($this->existeEmail($valor, $this->getId())){
+            if ($this->existeEmail($valor, $this->getId())) {
                 $ret = utf8_encode("E-mail já cadastrado em nossa base de dados.");
             }
-        }else if($campo == "ug_login"){
+        } else if ($campo == "ug_login") {
             $valor = strtoupper($valor);
-            if($this->existeLogin($valor, $this->getId())){
+            if ($this->existeLogin($valor, $this->getId())) {
                 $ret = utf8_encode("Login já cadastrado em nossa base de dados. Insira um novo Login.");
             }
-        }else if($campo == "ug_senha"){
+        } else if ($campo == "ug_senha") {
             //SQL
             $sqlValida = "select 
                         count(*) as qtde 
                     from 
                         usuarios_games 
                     where 
-                        ug_email = '".$this->getEmail()."' and ug_senha = '".$objEncryption->encrypt(trim($valor))."'";
-            
+                        ug_email = '" . $this->getEmail() . "' and ug_senha = '" . $objEncryption->encrypt(trim($valor)) . "'";
+
             //Tentando executar a Query de Insert
             $rs = $pdo->prepare($sqlValida);
 
-            if($rs->execute()){
+            if ($rs->execute()) {
 
-                if($rs->fetchColumn() > 0) {
-                    $ret =utf8_encode( "A nova senha é identica a senha atual.");
+                if ($rs->fetchColumn() > 0) {
+                    $ret = utf8_encode("A nova senha é identica a senha atual.");
                 }
             }
         }
 
-        if(!$ret){
-            try{
-            
+        if (!$ret) {
+            try {
+
                 //Tentando executar a Query de Insert
                 $rs = $pdo->prepare($sql);
 
-                if($rs->execute()){
+                if ($rs->execute()) {
 
-                    if($rs->fetchColumn() > 0) {
+                    if ($rs->fetchColumn() > 0) {
 
                         $sql = "update usuarios_games set $campo = :valor where ug_email = :ug_email and ug_senha = :senhaAtual";
 
-                        if($campo == "ug_senha"){
+                        if ($campo == "ug_senha") {
                             $fields[':valor'] = $objEncryption->encrypt(trim($valor));
-                        }else{
-                            $fields[':valor'] = $valor;    
+                        } else {
+                            $fields[':valor'] = $valor;
                         }
 
                         $fields[':ug_email'] = $this->getEmail();
@@ -3082,25 +3268,22 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                         //Tentando executar a Query de Insert
                         $rs = $pdo->prepare($sql);
 
-                        if($rs->execute($fields)){
+                        if ($rs->execute($fields)) {
                             //Log na baseALTERACAO_DO_CADASTRO
                             if ($campo == "ug_senha") {
                                 usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['TROCA_DE_SENHA'], null, null, "Alt. senha pelo user");
-                            }else if($campo == "ug_email"){
+                            } else if ($campo == "ug_email") {
                                 usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], null, null, "Alt. e-mail pelo user");
-                            }else{
+                            } else {
                                 usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], null, null, "Alt. login pelo user");
                             }
 
-                            if($campo == "ug_email"){
+                            if ($campo == "ug_email") {
                                 $this->setEmail($valor);
-
-                            }else if($campo == "ug_senha"){
+                            } else if ($campo == "ug_senha") {
                                 $this->setSenha($senhaAtual);
-
-                            }else if($campo == 'ug_login'){
+                            } else if ($campo == 'ug_login') {
                                 $this->setLogin($valor);
-
                             }
 
                             $_SESSION['usuarioGames_ser'] = serialize($this);
@@ -3109,65 +3292,63 @@ function b_IsLogin_pagamento_pin_Personalizado() {
                             //--------------------------------------------------------------------------------
                             if ($campo == "ug_senha") {
                                 $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoSenha');
-                                
-                            }else if($campo == "ug_email"){
+                            } else if ($campo == "ug_email") {
                                 $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoCadastro');
-                                
-                            }else if($campo == "ug_login"){
+                            } else if ($campo == "ug_login") {
                                 $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoCadastro');
-                                
                             }
-                            
+
                             $objEnvioEmailAutomatico->setUgID($this->getId());
                             $objEnvioEmailAutomatico->MontaEmailEspecifico();
 
                             $ret = true;
-                        }else{
+                        } else {
                             $ret = utf8_encode("Erro desconhecido, favor entrar em contato com o nosso suporte.");
                         }
-
-                    }else{
+                    } else {
                         $ret = utf8_encode("A senha atual está incorreta.");
                     }
                 }
-            } catch(PDOException $e) {
-                UsuarioGames::logEvents("ERRO 2155351 ".$e->getMessage());
+            } catch (PDOException $e) {
+                UsuarioGames::logEvents("ERRO 2155351 " . $e->getMessage());
                 $ret = "ERRO 2155351. Tivemos um problema, favor se o erro persistir, entrar em contato com nosso suporte. Obrigado!";
             }
         }
-        
-        
-        
+
+
+
         return $ret;
     }
-	
-	function verifica_situacao_cpf($cpf) {
-	
-	    $con = ConnectionPDO::getConnection();
+
+    function verifica_situacao_cpf($cpf)
+    {
+
+        $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$retorno = ["black" => false, "white"=> false];
-	   
-		$tt = $pdo->prepare("select * from cpf_black_list where cpf =".$cpf.";");
-		$tt->execute();
-		$dados = $tt->fetch();
-			
-		if($dados != false && count($dados) > 0){
-		  $retorno["black"] = true;
-		}
-		
-		$rs = $pdo->prepare("select * from cpf_white_list where cpf =".$cpf.";");
-		$rs->execute();
-		$dados = $rs->fetch();
-	
-	    if($dados != false && count($dados) > 0){
-		  $retorno["white"] = true;
-		} 
-	
-      return $retorno;  
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $retorno = ["black" => false, "white" => false];
+
+        $tt = $pdo->prepare("select * from cpf_black_list where cpf =" . $cpf . ";");
+        $tt->execute();
+        $dados = $tt->fetch();
+
+        if ($dados != false && count($dados) > 0) {
+            $retorno["black"] = true;
+        }
+
+        $rs = $pdo->prepare("select * from cpf_white_list where cpf =" . $cpf . ";");
+        $rs->execute();
+        $dados = $rs->fetch();
+
+        if ($dados != false && count($dados) > 0) {
+            $retorno["white"] = true;
+        }
+
+        return $retorno;
     }
-	
-	public static function Validar_CPF_Via_Calculo($cpf) {
+
+    public static function Validar_CPF_Via_Calculo($cpf)
+    {
         // Remove qualquer máscara do CPF
         $cpf = preg_replace('/[^0-9]/', '', $cpf);
 
@@ -3201,7 +3382,8 @@ function b_IsLogin_pagamento_pin_Personalizado() {
 
 // retorna true -> Usa Itaï¿½
 // retorna false -> Usa Bradesco
-function b_Is_Boleto_Express_Itau($email, $opr_codigo) {
+function b_Is_Boleto_Express_Itau($email, $opr_codigo)
+{
 
     // Libera Itaï¿½ para todos os Express Money em 2011-11-11
     return false;
@@ -3240,22 +3422,23 @@ function b_Is_Boleto_Express_Itau($email, $opr_codigo) {
 }
 
 // Funï¿½ï¿½o que Habilita/Desabilita Boleto SANTANDER
-function b_Is_Boleto_Express_Santander() {
+function b_Is_Boleto_Express_Santander()
+{
 
     // Libera Santander para todos os Express Money 
     return false;
-
 }
 
 // Funï¿½ï¿½o que Habilita/Desabilita Boleto Bradesco
-function b_Is_Boleto_Express_Bradesco() {
+function b_Is_Boleto_Express_Bradesco()
+{
 
     // Libera Bradesco para todos os Express Money 
     return true;
-
 }
 
-function b_IsLogin_boleto_novo_prazo_vencimento($email) {
+function b_IsLogin_boleto_novo_prazo_vencimento($email)
+{
 
     $b_IsLogin_boleto_novo_prazo_vencimento = array("WAGNER@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "ODECIO@GREGIO.COM.BR");
     if (in_array(strtoupper($email), $b_IsLogin_boleto_novo_prazo_vencimento)) {
@@ -3265,19 +3448,21 @@ function b_IsLogin_boleto_novo_prazo_vencimento($email) {
 }
 
 
-function get_random_password($length) {
-//		srand(date("s")); 
-//		$possible_characters = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
+function get_random_password($length)
+{
+    //		srand(date("s")); 
+    //		$possible_characters = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
     $possible_characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     $string = "";
     while (strlen($string) < $length) {
         $string .= substr($possible_characters, rand() % (strlen($possible_characters)), 1);
     }
-    return($string);
+    return ($string);
 }
 
 // Para bloquear o uso de PINs EPP Cash global - usar junto com UsuarioGames::b_IsLogin_pagamento_pin_EPP_Cash()
-function b_pin_forma_pagamento($bloqueio = true) {
+function b_pin_forma_pagamento($bloqueio = true)
+{
 
     /*
       // Para desabilitar a opï¿½ï¿½o de pagamento EPP cash -> libera o retorno false
@@ -3301,13 +3486,15 @@ function b_pin_forma_pagamento($bloqueio = true) {
     return false;
 }
 
-function b_cielo_forma_pagamento($bloqueio = true) {
+function b_cielo_forma_pagamento($bloqueio = true)
+{
     if ($bloqueio) {
         return true;
     }
     return false;
 }
-function suspendeContaUsuario($usuario_id) {
+function suspendeContaUsuario($usuario_id)
+{
     $msgAcao = "";
     if ($usuario_id) {
         $cad_usuarioGames = new UsuarioGames($usuario_id);
@@ -3320,8 +3507,7 @@ function suspendeContaUsuario($usuario_id) {
             $rs = SQLexecuteQuery($sql);
             if (!$rs) {
                 return false;
-			}
-			else {
+            } else {
                 unset($GLOBALS['_SESSION']['usuarioGames_ser']);
                 return true;
             }
@@ -3330,7 +3516,8 @@ function suspendeContaUsuario($usuario_id) {
     return false;
 }
 
-function get_lista_usuarios_VIP() {
+function get_lista_usuarios_VIP()
+{
     //
     $aret = array();
     $class = new UsuarioGames();

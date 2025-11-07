@@ -82,21 +82,49 @@ if ($btSubmit) {
             ($pagto_banco == "104" && $pagto_local == "06")
         ) {
 
-            $fileName = $HTTP_POST_FILES['comprovante']['name'];
-            $fileSource = $HTTP_POST_FILES['comprovante']['tmp_name'];
-            $fileDest = $FOLDER_COMMERCE_UPLOAD_TMP . "money_comprovante_" . $venda_id . "_" . $pagto_banco . "_" . $pagto_local . "_" . $fileName;
+            if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK) {
 
-            if (($fileSource != 'none') && ($fileSource != '')) {
+                $uploadedFileName = $_FILES['comprovante']['name'];
+                $fileSource = $_FILES['comprovante']['tmp_name'];
 
-                if (strlen($fileName) > 4) $fileExtensao = strtoupper(substr(strrchr($fileName, '.'), 1));
-                if ($fileExtensao != 'JPG' && $fileExtensao != 'GIF' && $fileExtensao != 'PNG') {
-                    $msg .= "Arquivo de comprovante inválido. Deve ser do tipo JPG, GIF ou PNG.\n";
-                } else if (!move_uploaded_file($fileSource, $fileDest)) {
-                    $msg = "Não foi possivel realizar o upload do comprovante, tente novamente.\n";
+                // 1. Sanitizar nome do arquivo
+                $safeFileName = basename($uploadedFileName);
+
+                // 2. Remover caracteres especiais adicionais
+                $safeFileName = preg_replace('/[^a-zA-Z0-9._-]/', '', $safeFileName);
+
+                // 3. Validar extensão ANTES de qualquer operação
+                $fileExtensao = '';
+                if (strlen($safeFileName) > 4) {
+                    $fileExtensao = strtoupper(pathinfo($safeFileName, PATHINFO_EXTENSION));
                 }
 
-                //				} else {
-                //					$msg .= "Arquivo de comprovante não fornecido.\n";
+                if (!in_array($fileExtensao, ['JPG', 'GIF', 'PNG'])) {
+                    $msg .= "Arquivo de comprovante inválido. Deve ser do tipo JPG, GIF ou PNG.\n";
+                } else {
+
+                    // 4. Construir caminho de destino
+                    $BASE_UPLOAD_DIR = realpath($FOLDER_COMMERCE_UPLOAD_TMP);
+
+                    if ($BASE_UPLOAD_DIR === false) {
+                        $msg = "Erro de configuração: diretório de upload inválido.\n";
+                    } else {
+                        $prefixo_nome = "money_comprovante_" . $venda_id . "_" . $pagto_banco . "_" . $pagto_local . "_";
+                        $fileDest = $BASE_UPLOAD_DIR . DIRECTORY_SEPARATOR . $prefixo_nome . $safeFileName;
+
+                        // 5. VERIFICAR o caminho ANTES do upload
+                        $resolvedPath = realpath(dirname($fileDest));
+
+                        if ($resolvedPath === false || strpos($resolvedPath, $BASE_UPLOAD_DIR) !== 0) {
+                            $msg = "Erro de segurança: Caminho de arquivo inválido.\n";
+                        } else {
+                            file_put_contents("/www/log/arquivoSubiu.txt", "Source: $fileSource, Dest: $fileDest");
+                            if (!move_uploaded_file($fileSource, $fileDest)) {
+                                $msg = "Não foi possível realizar o upload do comprovante, tente novamente.\n";
+                            }
+                        }
+                    }
+                }
             }
         }
     }

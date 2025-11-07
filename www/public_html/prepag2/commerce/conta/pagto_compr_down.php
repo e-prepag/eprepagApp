@@ -8,27 +8,34 @@ validaSessao();
 
 require_once DIR_INCS . "gamer/venda_e_modelos_logica_epp.php";
 
-$file = $FOLDER_COMMERCE_UPLOAD . $arquivo;
+// Usa basename() para remover qualquer informação de diretório (como ../)
+// da variável $arquivo. Isso neutraliza o Path Traversal.
+$safe_filename = basename($arquivo);
+$file = $FOLDER_COMMERCE_UPLOAD . $safe_filename; // Agora $file está seguro
 
 $msg = "";
 
-//Validacao
+//Validacao (agora usa o $file seguro)
 if(!is_file($file)) $msg = "Nenhum arquivo encontrado.\n";
 
 //Redireciona se ha algum dado invalido
 //----------------------------------------------------
 if($msg != ""){
-	$strRedirect = "/prepag2/commerce/mensagem.php?msg=" . urlencode($msg) . "&pt=" . urlencode("Comprovante") . "&link=" . urlencode("/prepag2/commerce/conta/lista_vendas.php");
-	redirect($strRedirect);
+    $strRedirect = "/prepag2/commerce/mensagem.php?msg=" . urlencode($msg) . "&pt=" . urlencode("Comprovante") . "&link=" . urlencode("/prepag2/commerce/conta/lista_vendas.php");
+    redirect($strRedirect);
 }
 
 ob_clean(); 
 
-$extensao = substr(strrchr($arquivo, "."), 1);
+// Usa a variável segura ($safe_filename) aqui também
+$extensao = substr(strrchr($safe_filename, "."), 1);
 header("Content-Type: " . obtemContentType($extensao));
 header("Content-Length: " . (string) filesize($file));
-header("Content-Disposition: inline; filename=" . $arquivo);
 
+// Usa a variável segura ($safe_filename) no header
+header("Content-Disposition: inline; filename=" . $safe_filename);
+
+// O restante do código de leitura agora é seguro
 $handle = fopen($file, "rb");
 print(fread($handle, filesize($file)));
 fclose($handle);

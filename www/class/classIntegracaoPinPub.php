@@ -36,9 +36,7 @@ function retorna_status($pin, $id)
 				  AND NOT EXISTS (
 				      SELECT 1
 				      FROM pins_integracao_historico pih
-				      WHERE pih.pih_pin_id = p.pin_codinterno
-				        AND pih.pin_status = 8
-				        AND pih.pih_codretepp = '2'
+				      WHERE pih.pih_pin_id = p.pin_codinterno AND (pih.pin_status = 8 AND pih.pih_codretepp = '2' OR pih.pin_status = 9 AND pih.pih_codretepp = 'F')
 				  );";
 
 	$rs_log = SQLexecuteQueryParams($sql, [$pin, $id]);
