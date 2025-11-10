@@ -7,6 +7,14 @@ require_once DIR_INCS ."gamer/constantes.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 require_once DIR_INCS . 'gamer/functions.php';
 $controller = new HeaderController;
+
+$ug_id = ($controller->usuario) ? $controller->usuario->getId() : 0;
+
+if(in_array($ug_id, [1354068, 8972, 1368770, 1368828])) {
+    require_once "./passo-1_teste.php";
+    exit;
+}
+
 $controller->setHeader();
 /*
  * Início controller
