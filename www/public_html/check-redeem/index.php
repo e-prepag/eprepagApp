@@ -19,7 +19,7 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
         
 		$dataAtual = date('Y-m-d H:i:s');
 		$informacoesPOST = $_POST;
-		$ipReq = $_SERVER['REMOTE_ADDR'];
+		$ipReq = $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
 		$infoAdicional = json_encode($_SERVER, JSON_UNESCAPED_UNICODE);
 
 		if (!empty($_POST)) {
