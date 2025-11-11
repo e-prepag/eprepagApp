@@ -146,8 +146,10 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											$url = "http://";
 										}
 
+										$headers_enviar = array();
+
 										if (($id * 1) == 90 || ($id * 1) == 88) {
-											$headers[] = "Content-Type: application/x-www-form-urlencoded";
+											$headers_enviar[] = "Content-Type: application/x-www-form-urlencoded";
 											$post_parameters['CHECKOUT_ID'] = $checkout_id;
 											$post_parameters = http_build_query($post_parameters);
 										}
@@ -158,7 +160,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										if ((($id * 1) == 13 || ($id * 1) == 166) && ($varAuxIP == "201.77.235.18" || $varAuxIP == "201.77.235.30")) {
 											$dominio_check = "loja.ongame.net";
 											$rs_oper_row['opr_partner_check'] = "payment/eprepag/pingback/";
-											$headers[] = "Host: loja.ongame.net";
+											$headers_enviar[] = "Host: loja.ongame.net";
 										}
 
 										$url .= $dominio_check . "/" . $rs_oper_row['opr_partner_check'];
@@ -166,8 +168,8 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										$curl_handle = curl_init();
 										curl_setopt($curl_handle, CURLOPT_URL, $url);
 										//Teste solução headers para caso TLSv1.2
-										if (is_array($headers)) {
-											curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers);
+										if (is_array($headers_enviar)) {
+											curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers_enviar);
 											curl_setopt($curl_handle, CURLOPT_FAILONERROR, true);
 											curl_setopt($curl_handle, CURLOPT_VERBOSE, true);
 											$errorFileLog = fopen("/www/log/error_epp_verify.log", "a+");
@@ -206,6 +208,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											date('d-m-Y H:i:s') . PHP_EOL .
 											'IP ' . $_SERVER['REMOTE_ADDR'] . PHP_EOL .
 											'Corpo ' . $body . PHP_EOL .
+											'HEADERS' . print_r($headers, true) . PHP_EOL .
 											'CURL: ' . PHP_EOL . $dados_CURL . PHP_EOL .
 											'BUFFER ' . PHP_EOL . $dados_buffer . PHP_EOL .
 											'ERRORs: ' . PHP_EOL . $erros_curl . PHP_EOL .
