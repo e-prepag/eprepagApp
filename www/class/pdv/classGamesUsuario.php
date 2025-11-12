@@ -2,7 +2,6 @@
 <?php
 
 require_once "/www/class/classSecureEncryption.php";
-<?php
 class UsuarioGames {
 
     var $ug_id;
