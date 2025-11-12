@@ -1,5 +1,8 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
+
+require_once "/www/class/classSecureEncryption.php";
+<?php
 class UsuarioGames {
 
     var $ug_id;

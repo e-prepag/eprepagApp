@@ -3,6 +3,8 @@
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 
+require_once "/www/class/classSecureEncryption.php";
+
 class ChaveMestra{
 
     private $conexao;
