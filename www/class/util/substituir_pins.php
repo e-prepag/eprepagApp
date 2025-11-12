@@ -130,11 +130,11 @@ $inputPins = [];
 
 $placeholders = implode(',', array_fill(0, count($inputPins), '?'));
 
-$sql = "
-    SELECT 
+$sql = "SELECT 
         p.pin_codinterno,
         p.pin_codigo,
         p.pin_valor,
+        vm.vgm_pin_valor,
         p.opr_codigo,
         p.pin_status,
         p.pin_datavenda,
@@ -164,6 +164,7 @@ $sql = "
     JOIN operadoras o 
         ON o.opr_codigo = p.opr_codigo
     WHERE p.pin_codigo IN ($placeholders) and p.pin_desc <> 'Substituido'
+    ORDER BY vm.vgm_pin_valor ASC
 ";
 
 $stmt = $pdo->prepare($sql);
@@ -191,9 +192,12 @@ fputcsv($fp, [
 $generator = new PinGenerator();
 $operadorasCache = [];
 
+$pin_valor_anterior = 0;
+$vgm_id_anterior = 0;
+
 foreach ($pinsEncontrados as $row) {
     $orig_pin   = $row['pin_codigo'];
-    $pin_valor  = $row['pin_valor'];
+    $pin_valor  = $row['pin_valor'] == 0 ? $row['vgm_pin_valor'] : $row['pin_valor'];
     $opr_codigo = $row['opr_codigo'];
     $vgm_id     = $row['vgm_id'];
     $vg_id     = $row['vg_id'];
@@ -270,26 +274,19 @@ foreach ($pinsEncontrados as $row) {
             ':opr'    => $opr_codigo,
             ':valor'  => $pin_valor,
             ':lote'   => $ilote,
-            ':desc'   => $orig_pin,
+            ':desc'   => ("Pin antigo: " . $orig_pin),
         ]);
         $novoPinRow = $stmtPins->fetch();
         $pin_codinterno = $novoPinRow['pin_codinterno'];
 
-        $status = 'ok';
+        $status = 'ok (PIN antigo marcado como substituído)';
 
         if ($pin_status == '6') {
             $query6 = "UPDATE pins SET pin_desc = 'Substituido', pin_status = '9', pin_valor = 0 WHERE pin_codigo = ?";
             $pdo->prepare($query6)->execute([$orig_pin]);
 
-            $query7 = "UPDATE pins SET pin_datavenda = ?, pin_horavenda = ?, pin_datapedido = ?, pin_horapedido = ? WHERE pin_codinterno = ?";
-            $pdo->prepare($query7)->execute([$pin_datavenda, $pin_horavenda, $pin_datavenda, $pin_horavenda, $pin_codinterno]);
-
-            $query3 = "INSERT INTO tb_dist_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) VALUES (?, ?)";
-            $pdo->prepare($query3)->execute([$vgm_id, $pin_codinterno]);
-
-            // copia para pins_dist
-            $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
-            $pdo->prepare($query4)->execute([$pin_codinterno]);
+            $query7 = "UPDATE tb_dist_venda_games_modelo SET vgm_qtde = GREATEST(vgm_qtde - 1, 0) WHERE vgm_id = ?";
+            $pdo->prepare($query7)->execute([$vgm_id]);
 
             $query9 = "DELETE FROM pins_dist WHERE pin_codigo = ?";
             $pdo->prepare($query9)->execute([$orig_pin]);
@@ -298,21 +295,10 @@ foreach ($pinsEncontrados as $row) {
             $pdo->prepare($query10)->execute([$pin_codinterno_old]);
 
             $status = 'ok (PIN antigo cancelado)';
-            $vg_id_novo = '-';
         } else if ($pin_status == '9') {
 
             $query6 = "UPDATE pins SET pin_desc = 'Substituido', pin_valor = 0 WHERE pin_codigo = ?";
             $pdo->prepare($query6)->execute([$orig_pin]);
-
-            $query7 = "UPDATE pins SET pin_datavenda = ?, pin_horavenda = ?, pin_datapedido = ?, pin_horapedido = ? WHERE pin_codinterno = ?";
-            $pdo->prepare($query7)->execute([$pin_datavenda, $pin_horavenda, $pin_datavenda, $pin_horavenda, $pin_codinterno]);
-
-            $query3 = "INSERT INTO tb_dist_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) VALUES (?, ?)";
-            $pdo->prepare($query3)->execute([$vgm_id, $pin_codinterno]);
-
-            // copia para pins_dist
-            $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
-            $pdo->prepare($query4)->execute([$pin_codinterno]);
 
             $query9 = "DELETE FROM pins_dist WHERE pin_codigo = ?";
             $pdo->prepare($query9)->execute([$orig_pin]);
@@ -321,8 +307,9 @@ foreach ($pinsEncontrados as $row) {
             $pdo->prepare($query10)->execute([$pin_codinterno_old]);
 
             $status = 'ok (PIN antigo ja estava cancelado)';
-            $vg_id_novo = '-';
-        } else {
+        }
+
+        if ($pin_valor != $pin_valor_anterior) {
             // venda
             $query1 = "INSERT INTO tb_dist_venda_games (vg_ug_id, vg_data_inclusao, vg_pagto_tipo, vg_ultimo_status, vg_id) VALUES (?, CURRENT_TIMESTAMP, 2, 5, (select (max(vg_id) + 1) from tb_dist_venda_games)) RETURNING vg_id";
             $stmtVenda = $pdo->prepare($query1);
@@ -337,22 +324,28 @@ foreach ($pinsEncontrados as $row) {
             $stmtVendaModelo->execute([$vg_id_novo, $nome_produto, $vgm_nome_modelo, $pin_valor, 1, $vgm_ogp_id, $vgm_ogpm_id, $opr_codigo, $pin_valor, $vgm_perc_desconto, $vgm_cpf, $vgm_cpf_data_nascimento, $vgm_nome_cpf]);
             $novaVendaModeloRow = $stmtVendaModelo->fetch();
             $vgm_id_novo = $novaVendaModeloRow['vgm_id'];
-
-            // associa ao vgm_id
-            $query3 = "INSERT INTO tb_dist_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) VALUES (?, ?)";
-            $pdo->prepare($query3)->execute([$vgm_id_novo, $pin_codinterno]);
-
-            // copia para pins_dist
-            $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
-            $pdo->prepare($query4)->execute([$pin_codinterno]);
-
-            $query6 = "UPDATE pins SET pin_desc = 'Substituido' WHERE pin_codigo = ?";
-            $pdo->prepare($query6)->execute([$orig_pin]);
-
-            $status = 'ok (PIN antigo marcado como substituído)';
+        } else {
+            $query1 = "UPDATE tb_dist_venda_games_modelo SET vgm_qtde = vgm_qtde + 1 WHERE vgm_id = ?";
+            $stmtVenda = $pdo->prepare($query1);
+            $stmtVenda->execute([$vgm_id_anterior]);
+            $novaVendaRow = $stmtVenda->fetch();
+            $vgm_id_novo = $vgm_id_anterior;
         }
+        // associa ao vgm_id
+        $query3 = "INSERT INTO tb_dist_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) VALUES (?, ?)";
+        $pdo->prepare($query3)->execute([$vgm_id_novo, $pin_codinterno]);
+
+        // copia para pins_dist
+        $query4 = "INSERT INTO pins_dist SELECT * FROM pins WHERE pin_codinterno = ?";
+        $pdo->prepare($query4)->execute([$pin_codinterno]);
+
+        $query6 = "UPDATE pins SET pin_desc = 'Substituido' WHERE pin_codigo = ?";
+        $pdo->prepare($query6)->execute([$orig_pin]);
 
         $pdo->commit();
+
+        $pin_valor_anterior = $pin_valor;
+        $vgm_id_anterior = $vgm_id_novo;
 
         printFeedback($orig_pin, $spin_codigo, $vg_id_novo, $vg_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, $spin_serial, $status, '');
         fputcsv($fp, [$orig_pin, $spin_codigo, $vg_id_novo, $vg_id, $opr_nome, $nome_produto, $ug_nome, $pin_valor, $spin_serial, $status, '']);
