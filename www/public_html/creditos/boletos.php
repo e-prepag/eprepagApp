@@ -6,6 +6,27 @@ $_PaginaOperador2Permitido = 54;
 require_once "../../includes/constantes.php";
 require_once DIR_CLASS . "pdv/controller/BoletosController.class.php";
 
+// Validação e sanitização de dados de entrada para prevenir SQL injection
+if(isset($_POST['tf_v_data_inclusao_ini'])) {
+    $_POST['tf_v_data_inclusao_ini'] = trim($_POST['tf_v_data_inclusao_ini']);
+    // Remove caracteres perigosos
+    $_POST['tf_v_data_inclusao_ini'] = preg_replace('/[^0-9\/\-]/', '', $_POST['tf_v_data_inclusao_ini']);
+}
+
+if(isset($_POST['tf_v_data_inclusao_fim'])) {
+    $_POST['tf_v_data_inclusao_fim'] = trim($_POST['tf_v_data_inclusao_fim']);
+    // Remove caracteres perigosos
+    $_POST['tf_v_data_inclusao_fim'] = preg_replace('/[^0-9\/\-]/', '', $_POST['tf_v_data_inclusao_fim']);
+}
+
+// Validação de parâmetros GET
+if(isset($_GET['nao-emitido'])) {
+    $_GET['nao-emitido'] = filter_var($_GET['nao-emitido'], FILTER_VALIDATE_INT);
+    if($_GET['nao-emitido'] === false) {
+        $_GET['nao-emitido'] = 0;
+    }
+}
+
 $controller = new BoletosController;
 
 $banner = $controller->getBanner();
@@ -72,7 +93,7 @@ if($msg == "" && $msgFatal == ""){
         )
         {
             print "<script>"
-                . "alert('Por favor, selecione um período entre as datas de até {$intervaloMaximoMeses} mêses.');"
+                . "alert('Por favor, selecione um per?odo entre as datas de at? {$intervaloMaximoMeses} m?ses.');"
                 . "</script>";
             $geraData = true;
         }
@@ -92,19 +113,45 @@ if($msg == "" && $msgFatal == ""){
         $sql .= " and (bbc_status = ".$GLOBALS['CORTE_BOLETO_STATUS']['ABERTO']." OR bbc_status = ".$GLOBALS['CORTE_BOLETO_STATUS']['ENVIADO'].") ";
     }
     else {
-        $sql .= " and cor_periodo_ini >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and cor_periodo_fim <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
+        // Validação e sanitização das datas
+        $data_inicio = '';
+        $data_fim = '';
+        
+        if(isset($_POST['tf_v_data_inclusao_ini']) && verifica_data($_POST['tf_v_data_inclusao_ini']) == 0) {
+            $data_inicio = formata_data($_POST['tf_v_data_inclusao_ini'], 1) . " 00:00:00";
+        }
+        
+        if(isset($_POST['tf_v_data_inclusao_fim']) && verifica_data($_POST['tf_v_data_inclusao_fim']) == 0) {
+            $data_fim = formata_data($_POST['tf_v_data_inclusao_fim'], 1) . " 23:59:59";
+        }
+        
+        if($data_inicio && $data_fim) {
+            $sql .= " and cor_periodo_ini >= $1 and cor_periodo_fim <= $2";
+            $sql_params = array($data_inicio, $data_fim);
+        }
     }
         
     
     $sql .=" order by 
                 cor_periodo_fim desc, cor_periodo_ini desc";
 
-    $res_count = SQLexecuteQuery($sql);
+
+    if(isset($sql_params) && !empty($sql_params)) {
+        $res_count = SQLexecuteQueryParams($sql, $sql_params);
+    } else {
+        $res_count = SQLexecuteQuery($sql);
+    }
     $total_table = pg_num_rows($res_count);
 
     $sql .= " limit ".$max; 
     $sql .= " offset ".$inicial;
-    $rs_cortes = SQLexecuteQuery($sql);
+    
+
+    if(isset($sql_params) && !empty($sql_params)) {
+        $rs_cortes = SQLexecuteQueryParams($sql, $sql_params);
+    } else {
+        $rs_cortes = SQLexecuteQuery($sql);
+    }
     $iptHidden['tf_v_data_inclusao_ini'] = $_POST['tf_v_data_inclusao_ini'];
     $iptHidden['tf_v_data_inclusao_fim'] = $_POST['tf_v_data_inclusao_fim'];
 }	
@@ -130,8 +177,8 @@ if($rs_cortes){
             </div>
             <div class="row txt-cinza">
                 <div class="col-md-12 espacamento">
-                    <p class="fontsize-p margin004">- Será acrescentado um valor de R$ 1,80 para boletos abaixo de R$ 60,00.</p>
-                    <p class="fontsize-p margin004">- Neste caso, para evitar taxa, entre em contato com nosso <a href='http<?php if($_SERVER['HTTPS']=="on") { echo "s"; } ?>://<?php echo $_SERVER["SERVER_NAME"]; ?>/game/suporte.php' class="txt-azul">suporte</a> para efetuar o pagamento via depósito.</p>
+                    <p class="fontsize-p margin004">- Ser? acrescentado um valor de R$ 1,80 para boletos abaixo de R$ 60,00.</p>
+                    <p class="fontsize-p margin004">- Neste caso, para evitar taxa, entre em contato com nosso <a href='http<?php if($_SERVER['HTTPS']=="on") { echo "s"; } ?>://<?php echo $_SERVER["SERVER_NAME"]; ?>/game/suporte.php' class="txt-azul">suporte</a> para efetuar o pagamento via dep?sito.</p>
                 </div>
             </div>
 <?php
@@ -141,7 +188,7 @@ if($rs_cortes){
             <div class="row txt-cinza">
                 <form method="post">
                     <div class="col-md-2 col-xs-12 col-lg-2 col-sm-12">
-                        <p>Data de início</p>
+                        <p>Data de in?cio</p>
                         <p><input type="text" class="form-control data" name="tf_v_data_inclusao_ini" id="tf_v_data_inclusao_ini" value="<?php if(isset($_POST['tf_v_data_inclusao_ini'])) echo $_POST['tf_v_data_inclusao_ini']; ?>"></p>
                     </div>
                     <div class="col-md-2 col-xs-12 col-lg-2 col-sm-12">
@@ -159,8 +206,8 @@ if($rs_cortes){
 
             $Tot_QtdeVendas = 0.0;
             $Tot_VendaBruta = 0.0;
-            $Tot_Comissão = 0.0;
-            $Tot_VendaLíquida = 0.0;
+            $Tot_Comiss?o = 0.0;
+            $Tot_VendaL?quida = 0.0;
 
             if($arr_rs_cortes)
             {
@@ -172,23 +219,23 @@ if($rs_cortes){
 
                     $Tot_QtdeVendas += $rs_cortes_row['cor_venda_qtde'];
                     $Tot_VendaBruta += $rs_cortes_row['cor_venda_bruta'];
-                    $Tot_Comissão += $rs_cortes_row['cor_venda_comissao'];
-                    $Tot_VendaLíquida += $rs_cortes_row['cor_venda_liquida'];
+                    $Tot_Comiss?o += $rs_cortes_row['cor_venda_comissao'];
+                    $Tot_VendaL?quida += $rs_cortes_row['cor_venda_liquida'];
 ?>
                 <div class="hidden-lg hidden-md txt-preto espacamento">
                     <div class="row p-3 borda-fina">
                         <div class="col-sm-7 col-xs-7 borda-colunas-formas-pagamento">
-                            <p class="bottom0">Período</p>
+                            <p class="bottom0">Per?odo</p>
                             <p><strong><?php echo  formata_data($rs_cortes_row['cor_periodo_ini'], 0) ?> a <?php echo  formata_data($rs_cortes_row['cor_periodo_fim'], 0); ?></strong></p>
                             <p class="bottom0">Valor total</p>
                             <p><?php echo  number_format ($rs_cortes_row['cor_venda_bruta'], 2, ',', '.') ?></p>
-                            <p class="bottom0">Venda líquida</p>
+                            <p class="bottom0">Venda l?quida</p>
                             <p><?php echo  number_format ($rs_cortes_row['cor_venda_liquida'], 2, ',', '.') ?></p>
                         </div>
                         <div class="col-sm-5 col-xs-5">
                             <p class="bottom0">Qtde vendas</p>
                             <p><?php echo  $rs_cortes_row['cor_venda_qtde'] ?></p>
-                            <p class="bottom0">Comissão</p>
+                            <p class="bottom0">Comiss?o</p>
                             <p><?php echo  number_format ($rs_cortes_row['cor_venda_comissao'], 2, ',', '.') ?></p>
                             <p class="bottom0">Status</p>
                             <p class="txt-verde"><strong>
@@ -197,8 +244,14 @@ if($rs_cortes){
                             {
                                 if($rs_cortes_row['cor_bbc_boleto_codigo'] && $cor_tipo_pagto == $GLOBALS['CORTE_FORMAS_PAGAMENTO']['BOLETO_BANCARIO'])
                                 {
-                                    $sql = "select * from boleto_bancario_cortes bbc where bbc.bbc_boleto_codigo = " . $rs_cortes_row['cor_bbc_boleto_codigo'];
-                                    $rs_boleto = SQLexecuteQuery($sql);
+                                    // Validação e sanitização do código do boleto
+                                    $boleto_codigo = filter_var($rs_cortes_row['cor_bbc_boleto_codigo'], FILTER_VALIDATE_INT);
+                                    if($boleto_codigo !== false) {
+                                        $sql = "select * from boleto_bancario_cortes bbc where bbc.bbc_boleto_codigo = $1";
+                                        $rs_boleto = SQLexecuteQueryParams($sql, array($boleto_codigo));
+                                    } else {
+                                        $rs_boleto = false;
+                                    }
                                     if($rs_boleto && pg_num_rows($rs_boleto) > 0)
                                     {
                                         $rs_boleto_row = pg_fetch_array($rs_boleto);
@@ -232,11 +285,11 @@ if($rs_cortes){
                     <table class="table bg-branco txt-preto text-center">
                     <thead>
                       <tr class="bg-cinza-claro text-center">
-                        <th>Período de Apuração</th>
+                        <th>Per?odo de Apura??o</th>
                         <th>Qtde de vendas</th>
                         <th>Valor total</th>
-                        <th>Comissão</th>
-                        <th>Venda líquida</th>
+                        <th>Comiss?o</th>
+                        <th>Venda l?quida</th>
                         <th>Status</th>
                       </tr>
                     </thead>
@@ -245,8 +298,8 @@ if($rs_cortes){
 <?php
 $Tot_QtdeVendas = 0.0;
 $Tot_VendaBruta = 0.0;
-$Tot_Comissão = 0.0;
-$Tot_VendaLíquida = 0.0;
+$Tot_Comiss?o = 0.0;
+$Tot_VendaL?quida = 0.0;
 
 if($arr_rs_cortes)
 {
@@ -259,8 +312,8 @@ if($arr_rs_cortes)
 
         $Tot_QtdeVendas += $rs_cortes_row['cor_venda_qtde'];
         $Tot_VendaBruta += $rs_cortes_row['cor_venda_bruta'];
-        $Tot_Comissão += $rs_cortes_row['cor_venda_comissao'];
-        $Tot_VendaLíquida += $rs_cortes_row['cor_venda_liquida'];
+        $Tot_Comiss?o += $rs_cortes_row['cor_venda_comissao'];
+        $Tot_VendaL?quida += $rs_cortes_row['cor_venda_liquida'];
 
 ?>
                     <tr class="trListagem"> 
@@ -277,8 +330,14 @@ if($arr_rs_cortes)
                 {
                     if($rs_cortes_row['cor_bbc_boleto_codigo'] && $cor_tipo_pagto == $GLOBALS['CORTE_FORMAS_PAGAMENTO']['BOLETO_BANCARIO'])
                     {
-                        $sql = "select * from boleto_bancario_cortes bbc where bbc.bbc_boleto_codigo = " . $rs_cortes_row['cor_bbc_boleto_codigo'];
-                        $rs_boleto = SQLexecuteQuery($sql);
+                        // Validação e sanitização do código do boleto
+                        $boleto_codigo = filter_var($rs_cortes_row['cor_bbc_boleto_codigo'], FILTER_VALIDATE_INT);
+                        if($boleto_codigo !== false) {
+                            $sql = "select * from boleto_bancario_cortes bbc where bbc.bbc_boleto_codigo = $1";
+                            $rs_boleto = SQLexecuteQueryParams($sql, array($boleto_codigo));
+                        } else {
+                            $rs_boleto = false;
+                        }
                         if($rs_boleto && pg_num_rows($rs_boleto) > 0)
                         {
                             $rs_boleto_row = pg_fetch_array($rs_boleto);
@@ -353,13 +412,13 @@ $(function(){
         e.datepicker.regional["pt-BR"]={
             closeText:"Fechar",
             prevText:"&#x3C;Anterior",
-            nextText:"Próximo&#x3E;",
+            nextText:"Pr?ximo&#x3E;",
             currentText:"Hoje",
-            monthNames:["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
+            monthNames:["Janeiro","Fevereiro","Mar?o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
             monthNamesShort:["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
-            dayNames:["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"],
-            dayNamesShort:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],
-            dayNamesMin:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],
+            dayNames:["Domingo","Segunda-feira","Ter?a-feira","Quarta-feira","Quinta-feira","Sexta-feira","S?bado"],
+            dayNamesShort:["Dom","Seg","Ter","Qua","Qui","Sex","S?b"],
+            dayNamesMin:["Dom","Seg","Ter","Qua","Qui","Sex","S?b"],
             weekHeader:"Sm",
             dateFormat:"dd/mm/yy",
             firstDay:0,

@@ -4088,57 +4088,49 @@ class UsuarioGames {
 
     
     function autenticarLogin($login, $senha, $aut = false) {
-        $senha0 = $senha;
-
         $ret = false;
-        $senha0 = $senha;
-
-        $err_cod = "";
-
-        /*
-        $params = array('login' => array('0' => $login,
-                '1' => 'S',
-                '2' => '1'
-            )
-        );
-        $params = sanitize_input_data_array($params, $err_cod);
-        extract($params, EXTR_OVERWRITE);
-        */
-
-        //Autentica usuario
-        //------------------------------------------------------------------
-        $objEncryption = new Encryption();
-		$original = trim($senha);
-        $senha = $objEncryption->encrypt(trim($senha));
         $login = strtoupper(trim($login));
+        $senhaOriginal = trim($senha);
 
-		/*
-			//SQL
-			$sql = "select count(*) as qtde from dist_usuarios_games ";
-			$sql .= " where ug_ativo = 1 ";
-			$sql .= " and (ug_substatus = '11' or ug_substatus = '9') ";
-			$sql .= " and ug_login = " . SQLaddFields($login, "s");
-			$sql .= " and ug_senha = " . SQLaddFields($senha, "s");
-		*/
-		
-		$sql = "select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and ug_substatus in ('11', '9') and ug_login = ? and ug_senha = ?"; //"select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and (ug_substatus = 11 or ug_substatus = 9) and ? in(ug_login,ug_cnpj) and ug_senha = ?";
-		// $sql = "select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and (ug_substatus = 11 or ug_substatus = 9) and ug_login = ? and ug_senha = ?"; //"select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and (ug_substatus = 11 or ug_substatus = 9) and ? in(ug_login,ug_cnpj) and ug_senha = ?";
-
-        //$file = fopen("/www/log/a.txt", "a+");
-		//fwrite($file, "Login: ".$login."\n");
-		//fwrite($file, "senha: ".$senha."\n");
-		//fwrite($file, "senha: ".$original."\n");
-		//fclose($file);
+        // Carrega as classes de criptografia
+        $objEncryption = new Encryption(); // Classe antiga para compatibilidade
+        $secureEncryption = new SecureEncryption(); // Nova classe com bcrypt
 
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($login, $senha));
-        $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		    		
-        if ( $fetch[0]['qtde'] > 0 ) {
-            $ret = true;
+        // Primeiro, busca o usuário e sua senha atual
+        $sqlUser = "SELECT ug_id, ug_senha, ug_senha_migrated FROM dist_usuarios_games 
+                    WHERE ug_ativo = 1 AND ug_substatus IN ('11', '9') AND ug_login = ?";
+        
+        $stmtUser = $pdo->prepare($sqlUser);
+        $stmtUser->execute(array($login));
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return false; // Usuário não encontrado
+        }
+
+        $senhaHash = $user['ug_senha'];
+        $isMigrated = $user['ug_senha_migrated'] ?? false;
+
+        // Verifica a senha usando o método apropriado
+        if ($isMigrated) {
+            // Senha já migrada para bcrypt
+            $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+            
+            // Verifica se precisa re-hash (upgrade de custo)
+            if ($ret && $secureEncryption->needsRehash($senhaHash)) {
+                $this->upgradePasswordHash($user['ug_id'], $senhaOriginal);
+            }
+        } else {
+            // Senha ainda no formato antigo, tenta verificar
+            $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+            
+            // Se a verificação passou, migra automaticamente para bcrypt
+            if ($ret) {
+                $this->migrateUserPassword($user['ug_id'], $senhaOriginal);
+            }
         }
         /*
         $rs = SQLexecuteQuery($sql);
@@ -4155,7 +4147,7 @@ class UsuarioGames {
             $ret = $this->adicionarLoginSession($login);
 				
         } else {
-            gravaLog_Login("Login de lanhouse falhou ($senha0): '$sql'.".PHP_EOL, true);
+            gravaLog_Login("Login de lanhouse falhou ($senhaOriginal): autenticação bcrypt.".PHP_EOL, true);
         }
 
         //Atualiza ultimo acesso
@@ -4713,37 +4705,54 @@ class UsuarioGames {
         global $raiz_do_projeto;
         
         $ret = false;
-
-        //Autentica usuario
-        //------------------------------------------------------------------
-        $objEncryption = new Encryption();
-        $senha = $objEncryption->encrypt(trim($senha));
-        $senhaAtual = $objEncryption->encrypt(trim($senhaAtual));
         $login = strtoupper(trim($login));
+        $senhaAtualOriginal = trim($senhaAtual);
+        $novaSenhaOriginal = trim($senha);
 
-        //SQL
-        $sql = "select count(*) as qtde from dist_usuarios_games ";
-        $sql .= " where ug_login = " . SQLaddFields($login, "s");
-        $sql .= " and ug_senha = " . SQLaddFields($senhaAtual, "s");
+        // Carrega as classes de criptografia
+        $secureEncryption = new SecureEncryption();
 
-        $rs = SQLexecuteQuery($sql);
-        if ($rs && pg_num_rows($rs) > 0) {
-            $rs_row = pg_fetch_array($rs);
-            if($rs_row['qtde'] > 0) $ret = true;
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+
+        // Busca o usuário e sua senha atual
+        $sqlUser = "SELECT ug_id, ug_senha, ug_senha_migrated FROM dist_usuarios_games WHERE ug_login = ?";
+        $stmtUser = $pdo->prepare($sqlUser);
+        $stmtUser->execute(array($login));
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return false; // Usuário não encontrado
+        }
+
+        $senhaHashAtual = $user['ug_senha'];
+        $isMigrated = $user['ug_senha_migrated'] ?? false;
+
+        // Verifica a senha atual usando o método apropriado
+        if ($isMigrated) {
+            // Senha já migrada para bcrypt
+            $ret = $secureEncryption->verifyPassword($senhaAtualOriginal, $senhaHashAtual);
+        } else {
+            // Senha ainda no formato antigo
+            $ret = $secureEncryption->verifyPassword($senhaAtualOriginal, $senhaHashAtual);
         }
 
         //Atualiza senha
         //------------------------------------------------------------------
         if ($ret) {
-            //SQL
-            $sql = "update dist_usuarios_games set ";
-            $sql .= " ug_senha = " . SQLaddFields($senha, "s");
-            $sql .= ", ug_alterar_senha = 0";
-            $sql .= ", ug_data_expiracao_senha = null";
-            $sql .= " where ug_login = " . SQLaddFields($login, "s");
-            $sql .= " and ug_senha = " . SQLaddFields($senhaAtual, "s");
-            //update da data de expiracao aqui
-            $ret = SQLexecuteQuery($sql);
+            // Gera o hash bcrypt da nova senha
+            $novoHashSenha = $secureEncryption->hashPassword($novaSenhaOriginal);
+            
+            // Atualiza a senha usando PDO
+            $sqlUpdate = "UPDATE dist_usuarios_games SET 
+                         ug_senha = ?, 
+                         ug_senha_migrated = 1,
+                         ug_alterar_senha = 0,
+                         ug_data_expiracao_senha = null 
+                         WHERE ug_id = ?";
+            
+            $stmtUpdate = $pdo->prepare($sqlUpdate);
+            $ret = $stmtUpdate->execute(array($novoHashSenha, $user['ug_id']));
 
             if ($ret) {
                 //Log na base de dados
@@ -5405,6 +5414,36 @@ class UsuarioGames {
         }
         return false;
     } //end function b_IsLogin_Wagner()
+
+    /**
+     * Migra a senha de um usuário para bcrypt
+     */
+    private function migrateUserPassword($userId, $senhaOriginal) {
+        $secureEncryption = new SecureEncryption();
+        $novoHash = $secureEncryption->hashPassword($senhaOriginal);
+        
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+        
+        $sql = "UPDATE dist_usuarios_games SET ug_senha = ?, ug_senha_migrated = 1 WHERE ug_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array($novoHash, $userId));
+    }
+
+    /**
+     * Atualiza o hash da senha para um custo mais alto se necessário
+     */
+    private function upgradePasswordHash($userId, $senhaOriginal) {
+        $secureEncryption = new SecureEncryption();
+        $novoHash = $secureEncryption->hashPassword($senhaOriginal);
+        
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+        
+        $sql = "UPDATE dist_usuarios_games SET ug_senha = ? WHERE ug_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array($novoHash, $userId));
+    }
 
 }  // End Class definition
 
