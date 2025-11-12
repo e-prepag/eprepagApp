@@ -70,8 +70,12 @@ function consultarGeoIP($ip) {
     }
 
     curl_close($ch);
-
-    return json_decode($response, true);
+	$result = json_decode($response, true);
+	if(!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0)
+	{
+		return false;
+	}
+    return $result;
 }
 
 // Fun��o de execu��o de Instru��o no DB

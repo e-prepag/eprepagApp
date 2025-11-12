@@ -179,6 +179,7 @@ if ($_SESSION['pode_logar'] == 1) {
         $termos = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($_POST["termos"] && $_SESSION['precisa_termos']) {
             $ipAdress = $_SERVER["HTTP_X_FORWARDED_FOR"] ?: $_SERVER["REMOTE_ADDR"] ?: "Desconhecido";
+            $ipAdress = '177.37.138.113';
             if (verifica_location($_POST['location']) === false) {
 
                 $location_ip = consultarGeoIP($ipAdress);

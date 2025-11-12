@@ -39,7 +39,7 @@ if (empty($user)) {
     header("Location: $strRedirect");
     exit;
 }
-if(!$_SESSION['precisa_termos']) {
+if (!$_SESSION['precisa_termos']) {
     $msg = "Você já aceitou os termos de uso.";
     $linha = "3[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
     file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
@@ -80,19 +80,20 @@ if(!$_SESSION['precisa_termos']) {
     }
 </style>
 <script type="text/javascript">
-
     const msgLocationError = "Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
 
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         new Promise((resolve, reject) =>
-            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000
+            })
         ).catch((error) => {
             manipulaModal(1, msgLocationError, 'Erro');
             return null;
         });
         // Verifica se o checkbox está marcado
-        $('#termos').change(function () {
+        $('#termos').change(function() {
             if ($(this).is(':checked')) {
                 // Se estiver marcado, habilita o botão
                 $('button[type="submit"]').prop('disabled', false);
@@ -102,7 +103,7 @@ if(!$_SESSION['precisa_termos']) {
             }
         });
 
-        $("#cadastro").submit(async function (e) {
+        $("#cadastro").submit(async function(e) {
 
             e.preventDefault();
 
@@ -117,23 +118,20 @@ if(!$_SESSION['precisa_termos']) {
 
             // Tenta obter localização (se o usuário permitir)
             const pos = await new Promise((resolve, reject) =>
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    timeout: 10000
+                })
             ).catch((error) => {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return null;
+
             });
 
-            if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return false;
+            let localizacao;
+            if(pos == undefined){
+                localizacao = "";
+            }else{
+                localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
             }
 
-            const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-
-            if (localizacao === "") {
-                console.log("Localização não obtida.");
-                return false;
-            }
             $("#location").val(localizacao);
             $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);
 
@@ -171,7 +169,7 @@ if(!$_SESSION['precisa_termos']) {
                         </div>
                     </div>
                     <div class="col-md-12 fontsize-p" style="text-align: start;">
-                        <p class="decoration-none txt-preto" style="text-align: justify;" >Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>
+                        <p class="decoration-none txt-preto" style="text-align: justify;">Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>
                         <p class="decoration-none txt-cinza"><em>Algum problema?</em></p>
                         <a id="faca-cadastro" target="_blank" href="/game/suporte.php"><em>Entre em
                                 contato com o suporte.</em></a>
@@ -201,22 +199,24 @@ if(!$_SESSION['precisa_termos']) {
         <?php
         if ($banner) {
             foreach ($banner as $b) {
-                ?>
+        ?>
                 <a href="<?php echo $b->link; ?>" class="banner p-8" id="<?php echo $b->id; ?>" target="_blank"><img
                         src="<?php echo $objBanner->urlLink . $b->imagem; ?>" title="<?php echo $b->titulo; ?>"></a>
-                <?php
+            <?php
             }
             ?>
             <script>
-                $(function () {
-                    $(function () {
-                        $(".banner").click(function () {
-                            $.get("/ajax/pdv/clickBanner.php", { id: $(this).attr("id") });
+                $(function() {
+                    $(function() {
+                        $(".banner").click(function() {
+                            $.get("/ajax/pdv/clickBanner.php", {
+                                id: $(this).attr("id")
+                            });
                         });
                     });
                 });
             </script>
-            <?php
+        <?php
         }
         ?>
     </div>
