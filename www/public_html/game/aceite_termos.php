@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        if (!isset($location)) {
+        if (!isset($location) || empty($location)) {
             $erros[] = "<p>Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
         } else {
 
@@ -208,21 +208,16 @@ $termosDeUso = strip_tags($termosDeUso);
                     timeout: 10000
                 })
             ).catch((error) => {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return null;
             });
 
+            let localizacao;
+
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return false;
+                localizacao = "";
+            }else{
+                localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
             }
 
-            const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-
-            if (localizacao === "") {
-                console.log("Localização não obtida.");
-                return false;
-            }
             $("#location").val(localizacao);
             $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);
 
