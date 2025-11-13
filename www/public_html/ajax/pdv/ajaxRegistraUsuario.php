@@ -13,27 +13,27 @@ require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 
 if (!isset($_POST['termos']) || empty($_POST['termos'])) {
-    die("Erro: Você deve aceitar os termos de uso para prosseguir.");
+    die("Erro: Vocï¿½ deve aceitar os termos de uso para prosseguir.");
 }
 // Step 1
 $username = getInputRequest('username');
 if (preg_match('/[\[\]{}*;()"\']/', $username) || $username == "") {
 
-    die("Erro: O user $username não pode ser vazio ou possuir caracteres não permitidos. (, ), [, ], {, }, *, ;, \", ')");
+    die("Erro: O user $username nï¿½o pode ser vazio ou possuir caracteres nï¿½o permitidos. (, ), [, ], {, }, *, ;, \", ')");
 }
 $email = getInputRequest('email');
 if (!isValidEmail($email)) {
-    die("Erro: O e-mail fornecido é inválido.");
+    die("Erro: O e-mail fornecido ï¿½ invï¿½lido.");
 }
 $email_confirmacao = getInputRequest('email_confirmacao');
 if (!isValidEmail($email_confirmacao)) {
-    die("Erro: O e-mail de confirmação é inválido.");
+    die("Erro: O e-mail de confirmaï¿½ï¿½o ï¿½ invï¿½lido.");
 }
 $password = getInputRequest('password');
 $password_confirmacao = getInputRequest('password_confirmacao');
 
 if ($password !== $password_confirmacao) {
-    die("Erro: A senha e a confirmação de senha são diferentes.");
+    die("Erro: A senha e a confirmaï¿½ï¿½o de senha sï¿½o diferentes.");
 }
 
 require_once DIR_CLASS . "util/Validate.class.php";
@@ -44,7 +44,7 @@ $validate = new Validate;
 $clsLogin = new Login($password);
 
 if ($clsLogin->valida() > 0) {
-    $erros[] = "<p>Senha não atinge os níveis de segurança desejados.</p>";
+    $erros[] = "<p>Senha nï¿½o atinge os nï¿½veis de seguranï¿½a desejados.</p>";
 }
 
 // Step 2
@@ -137,12 +137,13 @@ if (getenv('AMBIENTE') == "HOMOLOGACAO") {
         exit;
     }
 } else {
-    echo "Você deve realizar a verificação do RECAPTCHA para prosseguir.<br>";
+    echo "Vocï¿½ deve realizar a verificaï¿½ï¿½o do RECAPTCHA para prosseguir.<br>";
     exit;
 }
 
-$msgErroLocation = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
+$msgErroLocation = "Para seguir com o cadastro, precisamos da sua autorizaï¿½ï¿½o para acessar sua localizaï¿½ï¿½o. Essa informaï¿½ï¿½o nos ajuda a garantir mais seguranï¿½a no processo. Sua geolocalizaï¿½ï¿½o serï¿½ usada somente para esse fim e protegida conforme a Lei Geral de Proteï¿½ï¿½o de Dados (LGPD).";
 
+$erro_location = false;
 if (isset($_POST["location"]) && !empty($_POST["location"])) {
 
     preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $_POST['location'], $matches);
@@ -151,13 +152,23 @@ if (isset($_POST["location"]) && !empty($_POST["location"])) {
     $lon = floatval($matches[3]);
 
     if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
-        //echo $msgErroLocation;
-        //exit;
+        $erro_location = true;
     }
 } else {
-    //echo $msgErroLocation;
-    //exit;
+    $erro_location = true;
 }
+
+if ($erro_location) {
+    $ipAdress = $_SERVER["HTTP_X_FORWARDED_FOR"] ?: $_SERVER["REMOTE_ADDR"] ?: "Desconhecido";
+    $location_ip = consultarGeoIP($ipAdress);
+    if ($location_ip) {
+        $location = "Lat: " . $location_ip['results']['latitude'] . ", " . "Lon: " . $location_ip['results']['longitude'];
+    } else {
+        echo $msgErroLocation;
+        exit;
+    }
+}
+
 
 $cad_usuarioGames = new UsuarioGames(
     null, // $ug_id
@@ -331,7 +342,7 @@ if ($msg == "") {
         curl_exec($ch);
         curl_close($ch);
     } else {
-        die("Não foi possível cadastrar o usuário");
+        die("Nï¿½o foi possï¿½vel cadastrar o usuï¿½rio");
     }
 }
 
@@ -377,13 +388,13 @@ function splitTelphoneNumber($number, $isMobile = false)
     return array('ddd' => $matches[1][0], 'number' => str_replace('-', '', $matches[2][0]));
 }
 
-// Função para remover caracteres especiais indesejados
+// Funï¿½ï¿½o para remover caracteres especiais indesejados
 function sanitizeInput($input)
 {
     return preg_replace('/[\[\]{}*;()"\']/', '', $input);
 }
 
-// Função para validar e-mail
+// Funï¿½ï¿½o para validar e-mail
 function isValidEmail($email)
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL);

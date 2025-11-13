@@ -55,24 +55,40 @@ if (empty($user)) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if (!isset($_POST['termos']) || !isset($_POST['termos_responsaveis'])){
+    if (!isset($_POST['termos']) || !isset($_POST['termos_responsaveis'])) {
         $erros[] = "<p>Você deve concordar com os termos de uso e termos dos responsáveis.</p>";
+    } else {
 
-    } else if (isset($_POST["location"]) && !empty($_POST["location"])) {
+        $ipAdress = $_SERVER["HTTP_X_FORWARDED_FOR"] ?: $_SERVER["REMOTE_ADDR"] ?: "Desconhecido";
+        
+        if (isset($_POST["location"]) && !empty($_POST["location"])) {
+            preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $_POST['location'], $matches);
 
-        preg_match('/^Lat:\s*(-?\d+(\.\d+)?),\s*Lon:\s*(-?\d+(\.\d+)?)/', $_POST['location'], $matches);
+            $lat = floatval($matches[1]);
+            $lon = floatval($matches[3]);
 
-        $lat = floatval($matches[1]);
-        $lon = floatval($matches[3]);
+            if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+                $location_ip = consultarGeoIP($ipAdress);
+                if ($location_ip) {
+                    $location = "Lat: " . $location_ip['results']['latitude'] . ", " . "Lon: " . $location_ip['results']['longitude'];
+                }
+            } else {
+                $location = $_POST["location"];
+            }
+        } else {
+            $location_ip = consultarGeoIP($ipAdress);
+            if ($location_ip) {
+                $location = "Lat: " . $location_ip['results']['latitude'] . ", " . "Lon: " . $location_ip['results']['longitude'];
+            }
+        }
 
-        if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
+        if (!isset($location) || empty($location)) {
             $erros[] = "<p>Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
         } else {
 
-            $location = $_POST["location"];
             $device = $_POST["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
             $version = "v1 Termos Uso | v1 Termo Respons. ou pais";
-            $ipAdress = $_SERVER["REMOTE_ADDR"] ? $_SERVER["REMOTE_ADDR"] : "Desconhecido";
+
 
             $usuarios_func = new UsuarioGames();
             $salvou = $usuarios_func->salvaAceiteTermosGamer($location, $device, $version, $ipAdress, $id_do_usuario);
@@ -83,8 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $erros[] = "<p>Ocorreu um erro ao salvar os termos. Tente novamente novamente, se o erro persistir, entre em contato com o suporte.</p>";
             }
         }
-    } else {
-        $erros[] = "<p>Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>";
     }
 }
 
@@ -102,7 +116,6 @@ $termosDeUso = strip_tags($termosDeUso);
         print "manipulaModal(1,\"" . implode($erros) . "\",'Atenção');";
     }
     ?>
-
 </script>
 <style>
     .form1 {
@@ -122,12 +135,12 @@ $termosDeUso = strip_tags($termosDeUso);
         justify-content: stretch;
     }
 
-    .container-custom{
+    .container-custom {
         width: 1150px;
     }
 
     @media (max-width: 1200px) {
-        .container-custom{
+        .container-custom {
             width: 100%;
         }
     }
@@ -140,19 +153,20 @@ $termosDeUso = strip_tags($termosDeUso);
     }
 </style>
 <script type="text/javascript">
-
     const msgLocationError = "Para seguir com a confirmação, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
 
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         new Promise((resolve, reject) =>
-            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000
+            })
         ).catch((error) => {
             manipulaModal(1, msgLocationError, 'Erro');
             return null;
         });
         // Verifica se o checkbox está marcado
-        $('#termos').change(function () {
+        $('#termos').change(function() {
             if ($(this).is(':checked')) {
                 // Se estiver marcado, habilita o botão
                 if ($('#termos_responsaveis').is(':checked')) {
@@ -163,7 +177,7 @@ $termosDeUso = strip_tags($termosDeUso);
                 $('button[type="submit"]').prop('disabled', true);
             }
         });
-        $('#termos_responsaveis').change(function () {
+        $('#termos_responsaveis').change(function() {
             if ($(this).is(':checked')) {
                 // Se estiver marcado, habilita o botão
                 if ($('#termos').is(':checked')) {
@@ -175,7 +189,7 @@ $termosDeUso = strip_tags($termosDeUso);
             }
         });
 
-        $("#cadastro").submit(async function (e) {
+        $("#cadastro").submit(async function(e) {
 
             e.preventDefault();
 
@@ -190,23 +204,20 @@ $termosDeUso = strip_tags($termosDeUso);
 
             // Tenta obter localização (se o usuário permitir)
             const pos = await new Promise((resolve, reject) =>
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    timeout: 10000
+                })
             ).catch((error) => {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return null;
             });
 
+            let localizacao;
+
             if (!pos || !pos.coords || typeof pos.coords.latitude === 'undefined' || typeof pos.coords.longitude === 'undefined') {
-                manipulaModal(1, msgLocationError, 'Erro');
-                return false;
+                localizacao = "";
+            }else{
+                localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
             }
 
-            const localizacao = `Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-
-            if (localizacao === "") {
-                console.log("Localização não obtida.");
-                return false;
-            }
             $("#location").val(localizacao);
             $("#device").val(`${dispositivo} | ${plataforma} | ${linguagem}`);
 
@@ -249,7 +260,7 @@ $termosDeUso = strip_tags($termosDeUso);
                         </div>
                     </div>
                     <div class="col-md-12 fontsize-p" style="text-align: start;">
-                        <p class="decoration-none txt-preto" style="text-align: justify;" >Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>
+                        <p class="decoration-none txt-preto" style="text-align: justify;">Precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).</p>
                         <p class="decoration-none txt-cinza"><em>Algum problema?</em></p>
                         <a id="faca-cadastro" target="_blank" href="/game/suporte.php"><em>Entre em
                                 contato com o suporte.</em></a>

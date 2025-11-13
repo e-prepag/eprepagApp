@@ -1,5 +1,8 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once "../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
@@ -175,19 +178,28 @@ if ($_SESSION['pode_logar'] == 1) {
         $stmt->execute([$login_id]);
         $termos = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($_POST["termos"] && $_SESSION['precisa_termos']) {
+            $ipAdress = $_SERVER["HTTP_X_FORWARDED_FOR"] ?: $_SERVER["REMOTE_ADDR"] ?: "Desconhecido";
+            $ipAdress = '177.37.138.113';
             if (verifica_location($_POST['location']) === false) {
-                $msgAuth = "Não foi possível obter a localização.\n";
 
-                $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-                file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+                $location_ip = consultarGeoIP($ipAdress);
+                if ($location_ip) {
+                    $location = "Lat: " . $location_ip['results']['latitude'] . ", " . "Lon: " . $location_ip['results']['longitude'];
+                } else {
+                    $msgAuth = "Não foi possível obter a localização.\n";
 
-                header("Location: aceite_termos.php");
-                exit;
+                    $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
+                    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+
+                    header("Location: aceite_termos.php");
+                    exit;
+                }
+            } else {
+                $location = $_POST['location'] ? $_POST['location'] : 'Desconhecido';
             }
-            $location = $_POST['location'] ? $_POST['location'] : 'Desconhecido';
+
             $device = $_POST["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
             $version = 'v1 termos de uso PDV';
-            $ipAdress = $_SERVER['REMOTE_ADDR'] ? $_SERVER['REMOTE_ADDR'] : 'Desconhecido';
 
             $classUsuario = new UsuarioGames();
             $termos = $classUsuario->salvaAceiteTermos($location, $device, $version, $ipAdress, $login_id);
@@ -269,13 +281,11 @@ $msg = ""; // Define a variável mensagem
 if (!isset($_SESSION["tentativas_login"])) {
 
     $_SESSION["tentativas_login"] = 1;
-
 } else {
 
     if ($_SESSION["tentativas_login"] >= 5) {
 
         bloquearAcesso();
-
     }
 
     $_SESSION["tentativas_login"]++;
@@ -308,7 +318,6 @@ if (isset($_SESSION["bloqueado"]) && $_SESSION["bloqueado"] == true) {
 
         unset($_SESSION["bloqueado"]);
         $_SESSION["tentativas_login"] = 1;
-
     }
 }
 /*
@@ -393,7 +402,6 @@ function bloquearAcesso()
         $query->bindValue(":TENTATIVAS", $_SESSION["tentativas_login"]);
         $query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
         $query->execute();
-
     } else {
 
         $sqlInsert = "insert into bloqueios_login_pdv(id, ug_id, created, ip, login, tentativas, visualizacao) values (default, NULL, :DATE_TIME, :IP, :LOGIN, :TENTATIVAS, 'S');";
@@ -405,12 +413,10 @@ function bloquearAcesso()
         $query->bindValue(":LOGIN", $GLOBALS['login_usuario']);
         $query->bindValue(":TENTATIVAS", $_SESSION["tentativas_login"]);
         $query->execute();
-
     }
 
     header("Location: pagina_bloqueio.php");
     exit;
-
 } // NOTA::: Atualiza ou insere no banco de dados as informações da sessão / login bloqueado.
 
 if ($g_recaptcha_response != "valido") {
@@ -456,7 +462,6 @@ if (file_exists(DIR_INCS . "attrLogin.php")) {
     require_once DIR_INCS . "attrLogin.php";
     $clsLogin->setTempoDesbloqueio($cfgLoginLan->tempoMaxBloqueio);
     $clsLogin->setMaxTentativas($cfgLoginLan->maxTentativas);
-
 }
 
 $clsLogin->setUrlRedirect($strRedirect);
@@ -636,13 +641,13 @@ if ($msg == "") {
                 //Fechando Conexão
                 pg_close($connid);
                 //'Se eh popup, redireciona a janela atual e abre o popup
-                ?>
+?>
                 <html>
 
                 <body
                     OnLoad="window.location.href='<?= $strRedirect ?>';window.open('<?= $pag ?>','','scrollbars=yes,width=467,height=500');">
                     <html>
-                    <?php exit;
+    <?php exit;
             }
         }
         //inicio do bloco de redirecionamento do questionario
@@ -716,4 +721,4 @@ function verifica_location($location)
     }
     return true;
 }
-?>
+    ?>

@@ -1581,7 +1581,7 @@ class UsuarioGames {
                 $location = $dados['location'] ? $dados['location'] : 'Desconhecido';
                 $device = $dados["device"] . " | " . $_SERVER['HTTP_USER_AGENT'];
                 $version = 'v1 termos de uso PDV';
-                $ipAdress = $_SERVER['REMOTE_ADDR'] ? $_SERVER['REMOTE_ADDR'] : 'Desconhecido';
+                $ipAdress = $_SERVER["HTTP_X_FORWARDED_FOR"] ?: $_SERVER["REMOTE_ADDR"] ?: "Desconhecido";
 
                 $this->salvaAceiteTermos($location, $device, $version, $ipAdress, $objGamesUsuario->getId());
                 

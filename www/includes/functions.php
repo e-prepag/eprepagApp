@@ -40,6 +40,44 @@ function getEnvVariable($varName)
 	return $value;
 }
 
+function consultarGeoIP($ip) {
+	if($ip == 'Desconhecido')
+	{
+		return false;
+	}
+    $url = "https://api.hgbrasil.com/geoip";
+    
+    $params = http_build_query([
+        'address' => $ip,
+        'key' => getenv('GEOIP_KEY')
+    ]);
+
+    $full_url = $url . '?' . $params;
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $full_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+    
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        echo 'Erro cURL: ' . curl_error($ch) . "\n";
+        curl_close($ch);
+        return false;
+    }
+
+    curl_close($ch);
+	$result = json_decode($response, true);
+	if(!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0)
+	{
+		return false;
+	}
+    return $result;
+}
+
 // Fun��o de execu��o de Instru��o no DB
 function SQLexecuteQuery($sql)
 {
