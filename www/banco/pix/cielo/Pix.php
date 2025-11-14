@@ -88,7 +88,7 @@ class Pix {
 		$info = curl_getinfo($curl);
 		curl_close($curl);
 		
-		$file = fopen("/www/log/aaaa.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/aaaa.txt", "a+");
 		fwrite($file, $response."\n");
 		fwrite($file, str_repeat("*", 60)."\n");
         fclose($file);

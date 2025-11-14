@@ -84,7 +84,7 @@
 					
 					$compila_erro = "# {$dataHoraFormatada} Erro em listar produtos favoritos {$erro->getMessage()}";
 					
-					$arquivo_de_log = "/www/log/log-favoritos.txt";
+					$arquivo_de_log = "/www/arquivos_gerados/logs/log-favoritos.txt";
 
 					$abre_arquivo = fopen($arquivo_de_log, 'a');
 					fwrite($abre_arquivo, $compila_erro);											

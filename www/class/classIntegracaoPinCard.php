@@ -481,7 +481,7 @@ function flag_pin_card_unblock($pin,$id) {
 function gravaLog_EPPCARD($mensagem){
     
         //Arquivo
-        $file = $GLOBALS['raiz_do_projeto'] . "log/log_integracao_PIN_Cartao.txt";
+        $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_integracao_PIN_Cartao.txt";
     
         //Mensagem
         $mensagem =  str_repeat("-", 80).PHP_EOL.date('Y-m-d H:i:s'). " " .$GLOBALS['_SERVER']['SCRIPT_FILENAME'] . PHP_EOL . $mensagem . PHP_EOL;

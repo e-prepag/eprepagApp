@@ -22,7 +22,7 @@ if( isset($_REQUEST['formsubmit']) ){
     //ob_clean();
     $_REQUEST['cpf'] = preg_replace('/[^0-9]/', '', $_REQUEST['cpf']);
 	
-	$ff = fopen("/www/log/ttcpf.txt", "a+");
+	$ff = fopen("/www/arquivos_gerados/logs/ttcpf.txt", "a+");
 	fwrite($ff, $_REQUEST['cpf']."\r");
 	fclose($ff);
 
@@ -94,7 +94,7 @@ if( isset($_REQUEST['formsubmit']) ){
 				
 			elseif(CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB){
 					
-				$file = fopen("/www/log/retorno_cpf.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
 				fwrite($file, "DATA ".date("d-m-Y H:i:s")."\n");
 				fwrite($file, "codigo cpf: ".$testeCPF."\n");
 				fwrite($file, "resultado: ".json_encode($resposta)."\n");
@@ -139,7 +139,7 @@ if( isset($_REQUEST['formsubmit']) ){
 			}
             elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
 				
-				    $file = fopen("/www/log/retorno_cpf.txt", "a+");
+				    $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
 					fwrite($file, "DATA ".date("d-m-Y H:i:s")."\n");
 					fwrite($file, "parametros ".json_encode($parametros)."\n");
 					fwrite($file, "resultado PASSO 4 ".$testeCPF."\n");
@@ -209,7 +209,7 @@ if( isset($_REQUEST['formsubmit']) ){
 
             } //end  elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
 			
-			$file = fopen("/www/log/retorno_cpf.txt", "a+");
+			$file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
 			fwrite($file, "hud do desenvolvedor \n");
 			fwrite($file, "resultado code ".$testeCPF."\n");
 			fwrite($file, "resultado json ".json_encode($resposta)."\n");

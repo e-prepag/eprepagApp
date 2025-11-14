@@ -389,7 +389,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                     }
                                                                 }
 
-                                                                /*$ff = fopen("/www/log/disparo.txt","a+");
+                                                                /*$ff = fopen("/www/arquivos_gerados/logs/disparo.txt","a+");
                                                                                                     fwrite($ff, PIX_REGISTER."\r\n");
                                                                                                     fwrite($ff, str_replace('-', '', str_replace('.', '', $usuarioGames->ug_sCNPJ))."\r\n");
                                                                                                     fwrite($ff, $usuarioGames->ug_sRazaoSocial."\r\n");

@@ -142,7 +142,7 @@ class RecebeBoleto
 	{
 
 		$confirmaConciliacao = ($novoStatus != $antigoStatus) ? "CONCILIADO COM SUCESSO" : "PEDIDO JA CONCILIADO";
-		$file = fopen("/www/log/log_webhook.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/log_webhook.txt", "a+");
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 		fwrite($file, "ID VENDA: " . $idVenda . "\n");
@@ -236,7 +236,7 @@ class RecebeBoleto
 			if ($retornoEmail) { //
 
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
-				$file = fopen("/www/log/emailwebhook.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");
@@ -246,7 +246,7 @@ class RecebeBoleto
 				echo "e-mail enviado com sucesso";
 			} else {
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
-				$file = fopen("/www/log/emailwebhook.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");

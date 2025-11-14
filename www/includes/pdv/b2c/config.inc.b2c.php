@@ -1076,13 +1076,13 @@ define("B2C_PIN_STATUS_CANCELADO",		"CANCELADO");
 define("B2C_MSG_USER_PARSING_WSDL",		"Este código de serviço não foi identificado (ERRO: WS758).<br>Por favor, verifique se o serviço foi selecionado corretamente ou entre em contato com o <a href='mailto:suporte@e-prepag.com.br'>suporte@e-prepag.com.br</a><br>");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_B2C_WS_ERRORS",		$raiz_do_projeto . "log/log_B2C_WS-Errors.log");
+define("LOG_FILE_B2C_WS_ERRORS",		$raiz_do_projeto . "arquivos_gerados/logs/log_B2C_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_B2C_WS_TRANSACTIONS",	$raiz_do_projeto . "log/log_B2C_WS-Transactions.log");
+define("LOG_FILE_B2C_WS_TRANSACTIONS",	$raiz_do_projeto . "arquivos_gerados/logs/log_B2C_WS-Transactions.log");
 
 // Arquivo com monitor de contatos ao WebService
-define("B2C_MONITOR_FILE", $raiz_do_projeto . "log/monitor_B2C_online.txt");
+define("B2C_MONITOR_FILE", $raiz_do_projeto . "arquivos_gerados/logs/monitor_B2C_online.txt");
 
 // Arquivo com funções específicas para o módulo B2C
 //include_once("B2C_functions.php");

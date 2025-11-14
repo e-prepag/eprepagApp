@@ -936,7 +936,7 @@ $GLOBALS["jquery"] = true;
                                     'itens' => $itens,
                                     'venda_id' => $venda_id
                                 );
-                                $arquivo = '/www/log/requisicao-mercadopago.txt';
+                                $arquivo = '/www/arquivos_gerados/logs/requisicao-mercadopago.txt';
 
                                 $abre_arquivo = fopen($arquivo, 'a+');
 

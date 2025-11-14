@@ -199,7 +199,7 @@ class Genebra{
 			return false;
 		}
 		$service = curl_init();
-		$fileService = fopen("/www/genebra/log/service.txt", "w+");
+		$fileService = fopen("/www/genebra/arquivos_gerados/logs/service.txt", "w+");
 		$hash_access = base64_encode($this->keys[$this->environment]["key"].":".$this->keys[$this->environment]["pass"]);
 		curl_setopt_array($service, [
 		    CURLOPT_URL => $this->url,
@@ -224,13 +224,13 @@ class Genebra{
 		curl_close($service);
 		
 		if($infoService["http_code"] == 200){
-			$this->writeLog($data, "/www/genebra/log/request.txt");
+			$this->writeLog($data, "/www/genebra/arquivos_gerados/logs/request.txt");
 			return $data;
 		}else if($infoService["http_code"] == 0){
-            $this->writeLog($data, "/www/genebra/log/erroService.txt");			
+            $this->writeLog($data, "/www/genebra/arquivos_gerados/logs/erroService.txt");			
 			return $data;
 		}else{
-			$this->writeLog($data, "/www/genebra/log/erroService.txt");	 
+			$this->writeLog($data, "/www/genebra/arquivos_gerados/logs/erroService.txt");	 
 			return $data; 
 		}
 	}

@@ -3,7 +3,7 @@
 	// require "/www/banco/pix/cielo/config.inc.pix.php";
 
     // $transacoes = Pix::buscaTransacoes();
-	// $fileLog = fopen("/www/log/pix-log-cielo.txt", "a+");
+	// $fileLog = fopen("/www/arquivos_gerados/logs/pix-log-cielo.txt", "a+");
 	// if(count($transacoes) > 0){
 		 // foreach($transacoes as $key => $pix){
 			 // Pix::travaTransacoes($pix["numcompra"]);

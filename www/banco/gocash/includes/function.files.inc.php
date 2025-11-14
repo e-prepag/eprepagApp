@@ -115,7 +115,7 @@ function gocash_monitor_save($params_out) {
 function gravaLog_GoCash($mensagem){
 	
 		//Arquivo
-		$file = $raiz_do_projeto . "log/log_GoCash.txt";
+		$file = $raiz_do_projeto . "arquivos_gerados/logs/log_GoCash.txt";
 	
 		//Mensagem
 		$mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s'). " " .$GLOBALS['_SERVER']['SCRIPT_FILENAME'] . "\n" . $mensagem . "\n";

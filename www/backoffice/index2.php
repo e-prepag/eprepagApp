@@ -163,7 +163,7 @@ function gravaLog_LoginBKO($mensagem)
 {
 
     //Arquivo
-    $file = $GLOBALS['raiz_do_projeto'] . "log/log_LoginBKO.txt";
+    $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_LoginBKO.txt";
 
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;

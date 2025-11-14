@@ -163,7 +163,7 @@ class classCPF
                                 //Chamando o serviço
                                 $resultWS = $this->soapClient->__soapCall($typeOfService, $cpfRequestRecord);
 
-                                $file = fopen("/www/log/retorno_cpf.txt", "a+");
+                                $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                 fwrite($file, "retorno omnidata soap = PASSO 1 " . json_encode($resultWS) . "\n");
                                 fwrite($file, str_repeat("*", 50) . "\n");
@@ -263,7 +263,7 @@ class classCPF
 
                                 $serialCheck = new verificaCPF_OMNIDATA();
                                 $serialCheckResponseObj = $serialCheck->getRequestData($requestParams);
-                                $file = fopen("/www/log/retorno_cpf.txt", "a+");
+                                $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                 fwrite($file, "params felipe: " . json_encode($requestParams) . "\n");
                                 fwrite($file, "resposta omnidata = verificaCPF_OMNIDATA " . json_encode($serialCheckResponseObj) . "\n");
@@ -288,7 +288,7 @@ class classCPF
                         elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
                                 $serialCheck = new verificaCPF_OMNIDATA();
                                 $serialCheckResponseObj = $serialCheck->getResponseData($soapResponseData);
-                                $file = fopen("/www/log/retorno_cpf.txt", "a+");
+                                $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                 fwrite($file, "params felipe: " . json_encode($soapResponseData) . "\n");
                                 fwrite($file, "resposta omnidata = soapResponseData " . json_encode($serialCheckResponseObj) . "\n");
@@ -341,7 +341,7 @@ class classCPF
                                                         $caf = new ClassCAF();
                                                         $lista_resposta = $caf->consultaCPF($requestParams['cpfcnpj'], $requestParams['data_nascimento']);
 
-                                                        $file = fopen("/www/log/logCaf.txt", "a+");
+                                                        $file = fopen("/www/arquivos_gerados/logs/logCaf.txt", "a+");
                                                         fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                         fwrite($file, "resposta lista_resposta: " . json_encode($lista_resposta) . "\n");
                                                         fwrite($file, str_repeat("*", 50) . "\n");
@@ -382,7 +382,7 @@ class classCPF
                                                         ///sleep(5);
                                                         $tempoRetorno = 0;
                                                         $lista_resposta = $onminidata->result_status_search($id_search);
-                                                        $file = fopen("/www/log/logONMINIDATA.txt", "a+");
+                                                        $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
                                                         fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                         fwrite($file, "params felipe: " . json_encode($result) . "\n");
                                                         fwrite($file, "resposta id_search: " . json_encode($id_search) . "\n");
@@ -402,7 +402,7 @@ class classCPF
                                                                 $lista_resposta = $onminidata->result_status_search($id_search);
                                                                 $tempoRetorno++;
                                                                 sleep(10);
-                                                                $file = fopen("/www/log/logONMINIDATA.txt", "a+");
+                                                                $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
                                                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                                 fwrite($file, "params felipe: " . json_encode($result) . "\n");
                                                                 fwrite($file, "tentativa numero: " . $tempoRetorno . "\n");
@@ -420,7 +420,7 @@ class classCPF
                                                 }//end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
                                                 elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
 
-                                                        $file = fopen("/www/log/logONMINIDATA.txt", "a+");
+                                                        $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
                                                         fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                         fwrite($file, "params felipe: " . json_encode($responseCPF) . "\n");
                                                         fwrite($file, "resposta CPF_PARTNER_OMNIDATA: " . json_encode($lista_resposta) . "\n");
@@ -561,7 +561,7 @@ class classCPF
                 $curlInfo = curl_getinfo($curl);
                 curl_close($curl);
 
-                $file_log = fopen("/www/log/retorono_hub_desenvolvedor.txt", "a+");
+                $file_log = fopen("/www/arquivos_gerados/logs/retorono_hub_desenvolvedor.txt", "a+");
                 fwrite($file_log, "data: " . date("d-m-Y H:i:s") . "\n");
                 fwrite($file_log, "resultado: " . json_encode($retorno) . "\n");
                 fwrite($file_log, str_repeat("*", 50) . "\n");

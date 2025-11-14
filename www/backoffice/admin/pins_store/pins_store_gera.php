@@ -194,7 +194,7 @@ include "pins_store_menu.php";
 </html>
 <?php
 if (!empty($pin_valor)) {
-	$fp = fopen($raiz_do_projeto.'log/geracao_pin.txt', 'a+');
+	$fp = fopen($raiz_do_projeto.'arquivos_gerados/logs/geracao_pin.txt', 'a+');
 	$conteudo = PHP_EOL."====================Inicio EPP CASH============================".PHP_EOL;
 	$conteudo .= " Segundos: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL;
 	$conteudo .= " Qtde de PINs : ".number_format($qtde, 0, '.', '.').PHP_EOL;

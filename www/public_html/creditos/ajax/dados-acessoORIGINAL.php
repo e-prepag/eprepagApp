@@ -55,7 +55,7 @@ if(Util::isAjaxRequest()){
 		
 		if(!verificaPOST("", $_POST)){ 
 		    
-			/*$ff = fopen("/www/log/aaa.txt", "a+");
+			/*$ff = fopen("/www/arquivos_gerados/logs/aaa.txt", "a+");
 			fwrite($ff, (verificaPOST("", $_POST) == true)? 1: 0);
 			fclose($ff);*/
 		

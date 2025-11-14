@@ -569,7 +569,7 @@ class classBexs{
                 $resultado = utf8_encode("<strong>ERRO 177</strong>: No envio das informações da remessa ao Web Service Bexs foi retornado o seguinte erro:<br>Cód.: ".$response_ws['numero']." - ".utf8_encode($response_ws['descricao'])."<br>Por favor, ajuste os erros e reenvie!<br><br>");
                         
                 $assunto_falha = (checkIP()?"[DEV] ":"[PROD] ")."Requisição ao Web Service BEXS retornou resposta de ERRO";
-                $msg_falha = "<u>A requisição enviada ao Web Service BEXS retornou um erro como resposta</u><br><br><u>Erro retornado</u>: ".$response_ws['descricao']."<br><br>Verifique o log de erros localizado em: <u>C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/log_BEXS_WS-Errors.log</u>";
+                $msg_falha = "<u>A requisição enviada ao Web Service BEXS retornou um erro como resposta</u><br><br><u>Erro retornado</u>: ".$response_ws['descricao']."<br><br>Verifique o log de erros localizado em: <u>C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/log_BEXS_WS-Errors.log</u>";
                 
                 $status_bexs = $GLOBALS['ARRAY_STATUS']['ERRO_WS'];
 
@@ -611,7 +611,7 @@ class classBexs{
         } //end if($response_ws != FALSE && isset($response_ws)) 
         else {
             $assunto_falha = (checkIP()?"[DEV] ":"[PROD] ")."Falha na comunicação com Web Service BEXS";
-            $msg_falha = "<u>Houve um problema na comunicação com o Web Service BEXS</u><br><br>O envio das informações da remessa via Web Service BEXS, referente a <strong>".$this->getNomeMerchant()."</strong>, <u>FALHOU</u>!<br><br>Verifique o log de erros localizado em: <u>C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/log_BEXS_WS-Errors.log</u>";
+            $msg_falha = "<u>Houve um problema na comunicação com o Web Service BEXS</u><br><br>O envio das informações da remessa via Web Service BEXS, referente a <strong>".$this->getNomeMerchant()."</strong>, <u>FALHOU</u>!<br><br>Verifique o log de erros localizado em: <u>C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/log_BEXS_WS-Errors.log</u>";
 
             $resultado = utf8_encode("<strong>ERRO 170</strong>: Houve um problema de comunicação com o Web Service BEXS.<br>Por favor, entre em contato com o setor de T.I.<br><br>");
             $status_bexs = $GLOBALS['ARRAY_STATUS']['ERRO_ACESSO_WS'];
@@ -711,7 +711,7 @@ class classBexs{
                         $err_ret = $enviou_sftp;
 
                         $assunto_falha = (checkIP()?"[DEV] ":"[PROD] ")."Falha na transmissão de arquivo via sFTP ao BEXS";
-                        $msg_falha = "<u>Houve um problema na transmissão do arquivo de operações via sFTP ao BEXS</u><br><br>O envio das operações da remessa via sFTP BEXS, referente a <strong>".$this->getNomeMerchant()."</strong>, <u>FALHOU</u>!<br><br><u>Erro Retornado</u>: ".$err_ret."<br><br>Verifique o log de erros localizado em: <u>C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/log_BEXS_WS-Errors.log</u>";
+                        $msg_falha = "<u>Houve um problema na transmissão do arquivo de operações via sFTP ao BEXS</u><br><br>O envio das operações da remessa via sFTP BEXS, referente a <strong>".$this->getNomeMerchant()."</strong>, <u>FALHOU</u>!<br><br><u>Erro Retornado</u>: ".$err_ret."<br><br>Verifique o log de erros localizado em: <u>C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/log_BEXS_WS-Errors.log</u>";
 
                         $resultado .= utf8_encode("<strong>ERRO 171</strong>: Problema ao enviar o arquivo que contém as operações da remessa!<br>Por favor, entre em contato com o setor de T.I.<br><br>");
 

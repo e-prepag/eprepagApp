@@ -12,10 +12,10 @@ $ENTRE_CONTATO_CENTRAL = "Por favor, entre em contato com nossa Central de Atend
 $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY_LH'] = 8576; // cadastro de ReinaldoLH (reinaldops@hotmail.com)
 
 //Log de comandos SQL	
-//	$ARQUIVO_LOG_SQL_EXECUTE_QUERY = $raiz_do_projeto . "log/log_dist_commerce_sql_execute_query.txt";	
+//	$ARQUIVO_LOG_SQL_EXECUTE_QUERY = $raiz_do_projeto . "arquivos_gerados/logs/log_dist_commerce_sql_execute_query.txt";	
 
 //Log de vendas Bilheteria	
-$ARQUIVO_LOG_VENDAS_BILHETERIA = $raiz_do_projeto . "log/log_ingressos.txt";	
+$ARQUIVO_LOG_VENDAS_BILHETERIA = $raiz_do_projeto . "arquivos_gerados/logs/log_ingressos.txt";	
 $RC4_PASSW = "@#\$eprepag";
 
 //Diretorio de arquivos upload - comprovante

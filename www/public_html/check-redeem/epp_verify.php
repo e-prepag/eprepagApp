@@ -172,7 +172,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers_enviar);
 											curl_setopt($curl_handle, CURLOPT_FAILONERROR, true);
 											curl_setopt($curl_handle, CURLOPT_VERBOSE, true);
-											$errorFileLog = fopen("/www/log/error_epp_verify.log", "a+");
+											$errorFileLog = fopen("/www/arquivos_gerados/logs/error_epp_verify.log", "a+");
 											curl_setopt($curl_handle, CURLOPT_STDERR, $errorFileLog);
 											curl_setopt($curl_handle, CURLOPT_HEADER, 0);
 										}
@@ -199,7 +199,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 
 										$infoCURL = curl_getinfo($curl_handle);
 
-										$file = fopen("/www/log/ongame.txt", "a+");
+										$file = fopen("/www/arquivos_gerados/logs/ongame.txt", "a+");
 										$data = date('d-m-Y H:i:s');
 										$body = json_encode($post_parameters);
 										$dados_CURL = json_encode($infoCURL);

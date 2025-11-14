@@ -112,7 +112,7 @@ function existeIdItau($itau_id_rand){
 function gravaLog_obterIdItauValido($mensagem){
 
     //Arquivo
-    $file = $GLOBALS['raiz_do_projeto']."log/log_obterIdItauValido.txt";
+    $file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_obterIdItauValido.txt";
 
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $mensagem . PHP_EOL;

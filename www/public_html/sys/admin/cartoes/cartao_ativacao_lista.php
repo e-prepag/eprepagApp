@@ -377,7 +377,7 @@ function mandaEmail() {
                 $cabecalho = ";;;;;;5K;5K;5K;10K;10K;10K;15K;15K;15K;20K;20K;20K";
                 $subCabecalho = LANG_CARDS_NAME.";".LANG_CARDS_FULL_NAME.";5K;10K;15K;20K;".LANG_CARDS_TOTAL_QUANTITY.";".LANG_CARDS_START.";".LANG_CARDS_END.";".LANG_CARDS_TOTAL_QUANTITY.";".LANG_CARDS_START.";".LANG_CARDS_END.";".LANG_CARDS_TOTAL_QUANTITY.";".LANG_CARDS_START.";".LANG_CARDS_END.";".LANG_CARDS_TOTAL_QUANTITY.";".LANG_CARDS_START.";".LANG_CARDS_END;
                 
-                $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto."public_html/cache/");
+                $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto."arquivos_gerados/csv/");
                 $objCsv->setCabecalho();
                 
                 $objCsv->setLine($subCabecalho);

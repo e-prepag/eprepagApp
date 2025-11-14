@@ -250,7 +250,7 @@ class UsuarioGamesOperador {
                                 if($cmdtuples > 0) {
                                     
                                         //Grava no arquivo o ID do PDV para Exclusão de todas as Sessões abertas
-                                        $nome_tmp = $raiz_do_projeto."log/idsOpPDVs.txt";
+                                        $nome_tmp = $raiz_do_projeto."arquivos_gerados/logs/idsOpPDVs.txt";
                                         if ($handle = fopen($nome_tmp, 'a+')) {
                                                 fwrite($handle, $objOperadorGamesUsuario->getId().PHP_EOL);
                                                 fclose($handle);

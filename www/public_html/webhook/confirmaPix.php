@@ -28,7 +28,7 @@ $teste = '{
 $dados = file_get_contents('php://input');
 $infomacoesRecebidas = json_decode($dados); //$teste
 
-//$file = fopen("/www/log/log_webhook.txt", "a+");
+//$file = fopen("/www/arquivos_gerados/logs/log_webhook.txt", "a+");
 //fwrite($file, str_repeat("*", 50)."\n");
 //fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 //fwrite($file, "ID VENDA: ".$dados."\n");
@@ -244,7 +244,7 @@ class RecebePix
 	{
 
 		$confirmaConciliacao = ($novoStatus != $antigoStatus) ? "CONCILIADO COM SUCESSO" : "PEDIDO JÝ CONCILIADO";
-		$file = fopen("/www/log/log_webhook.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/log_webhook.txt", "a+");
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 		fwrite($file, "ID VENDA: " . $idVenda . "\n");
@@ -311,7 +311,7 @@ class RecebePix
 			if ($retornoEmail) { //
 
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
-				$file = fopen("/www/log/emailwebhook.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");
@@ -321,7 +321,7 @@ class RecebePix
 				echo "e-mail enviado com sucesso";
 			} else {
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
-				$file = fopen("/www/log/emailwebhook.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");

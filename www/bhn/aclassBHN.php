@@ -116,7 +116,7 @@ class classBHN {
                 //Salvando informações para variável por referência
                 $lista_resposta = $responseBHN;
 				
-				$file = fopen("/www/log/bhn_response.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/bhn_response.txt", "a+");
 				fwrite($file, "DATA ".date("d-m-Y H:i:s")."\n");
 				fwrite($file, "enviados: ".json_encode($requestParams)."\n");
 				fwrite($file, "resultado: ".json_encode($lista_resposta)."\n");

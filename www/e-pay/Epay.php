@@ -56,7 +56,7 @@ class Epay{
 	   $info = curl_getinfo($curlConnect);
 	   curl_close($curlConnect);
 	 
-	   $this->log_epay("connect", $result, Epay::URL[$indexUrl], "receipt", "/www/log/connect_EPAY.txt");
+	   $this->log_epay("connect", $result, Epay::URL[$indexUrl], "receipt", "/www/arquivos_gerados/logs/connect_EPAY.txt");
 	 
 	   if($info["http_code"] == 200){
 		   $this->environment = Epay::URL[$indexUrl];
@@ -96,7 +96,7 @@ class Epay{
 	   $info = curl_getinfo($curlCatolog);
 	   curl_close($curlCatolog);
 	 
-	   $this->log_epay("catalog", $result, $this->environment, "receipt", "/www/log/catalog_EPAY.txt");
+	   $this->log_epay("catalog", $result, $this->environment, "receipt", "/www/arquivos_gerados/logs/catalog_EPAY.txt");
 	   if($info["http_code"] == 200){
 		   return $result;
 	   }elseif($info["http_code"] != 200 || $result == "" || $result == false || $result == null){
@@ -135,7 +135,7 @@ class Epay{
 		    $data["TXREF"] = $txref;
 	   }
 	   
-	   $this->log_epay("sale", json_encode($data), $this->environment, "send", "/www/log/sale_send_EPAY.txt");
+	   $this->log_epay("sale", json_encode($data), $this->environment, "send", "/www/arquivos_gerados/logs/sale_send_EPAY.txt");
 	   $curlSale = curl_init();
 	   curl_setopt_array($curlSale, [
 	   
@@ -157,7 +157,7 @@ class Epay{
 	    if($mode == "DIRECT"){
 			   // variavel que força cancelamento automatico da venda
 			   $testeAutomatic = false;
-			   $this->log_epay("sale", $result, $this->environment, "receipt", "/www/log/sale_EPAY.txt");
+			   $this->log_epay("sale", $result, $this->environment, "receipt", "/www/arquivos_gerados/logs/sale_EPAY.txt");
 			   if($con["http_code"] == 200 && $codErro == 0){
 				    $mensage = json_decode($result, true);
 				    if(($mensage["RESULT"] == "9996" || json_last_error() != JSON_ERROR_NONE) || $testeAutomatic == true){
@@ -167,7 +167,7 @@ class Epay{
 							if($cancel["RESULT"] == 0){
 								return "cancelada"; //return $infoCancel;
 							}else{
-								$fileName = '/www/log/epay/erro/error.txt';
+								$fileName = '/www/arquivos_gerados/logs/epay/erro/error.txt';
 							    $file = fopen($fileName, "a+");
 							    fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 							    fwrite($file, "ERRO AO CANCELAR TRANSACAO E-PAY\n");
@@ -197,7 +197,7 @@ class Epay{
 					    if($cancel["RESULT"] == 0){
 								return "cancelada"; //return $infoCancel;
 						}else{
-							$fileName = '/www/log/epay/erro/error.txt';
+							$fileName = '/www/arquivos_gerados/logs/epay/erro/error.txt';
 							$file = fopen($fileName, "a+");
 							fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 							fwrite($file, "ERRO AO CANCELAR TRANSACAO E-PAY\n");
@@ -212,7 +212,7 @@ class Epay{
 			   }   
 	   
 		}else{
-			$this->log_epay("sale", $result, $this->environment, "receipt", "/www/log/sale_EPAY.txt");
+			$this->log_epay("sale", $result, $this->environment, "receipt", "/www/arquivos_gerados/logs/sale_EPAY.txt");
 			$mensage = json_decode($result, true);
 			return $mensage;
 		}
@@ -238,7 +238,7 @@ class Epay{
 			 "PRODUCTID" => $product
 	   ];
         
-	  $this->log_epay("cancel", json_encode($data), $this->environment, "send", "/www/log/cancel_send_EPAY.txt");
+	  $this->log_epay("cancel", json_encode($data), $this->environment, "send", "/www/arquivos_gerados/logs/cancel_send_EPAY.txt");
       $curlCancel = curl_init();
       curl_setopt_array($curlCancel, [
 	   
@@ -256,7 +256,7 @@ class Epay{
 	   $con = curl_getinfo($curlCancel);
 	   curl_close($curlCancel);
 	   
-	   $this->log_epay("cancel", $result, $this->environment, "receipt", "/www/log/cancel_EPAY.txt");
+	   $this->log_epay("cancel", $result, $this->environment, "receipt", "/www/arquivos_gerados/logs/cancel_EPAY.txt");
 	   if($con["http_code"] == 200){
 		   
 		   if($type != "sale"){
@@ -285,7 +285,7 @@ class Epay{
 				   $updateTable->execute();
 				   
 				}catch(PDOException $Exception){
-				   $fileName = '/www/log/epay/erro/error.txt';
+				   $fileName = '/www/arquivos_gerados/logs/epay/erro/error.txt';
 				   $file = fopen($fileName, "a+");
 				   fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 				   fwrite($file, "SQL: ".$sql."\n");
@@ -434,7 +434,7 @@ class Epay{
 			   return false;   
 		   }
 	   }catch(PDOException $Exception){
-		   $fileName = '/www/log/epay/erro/error.txt';
+		   $fileName = '/www/arquivos_gerados/logs/epay/erro/error.txt';
 		   $file = fopen($fileName, "a+");
 		   fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 		   fwrite($file, "SQL: ".$sql."\n");
@@ -476,7 +476,7 @@ class Epay{
 		
 		$msg = "";
 	 	
-		$arquivo_local = "/www/log/epay/recebidos/eprepag_daily_transactions_".date("Ymd").".csv";
+		$arquivo_local = "/www/arquivos_gerados/logs/epay/recebidos/eprepag_daily_transactions_".date("Ymd").".csv";
 		$arquivo_remoto = "/eprepag_daily_transactions_".date("Ymd").".csv";
 		
 	    $connection = ssh2_connect($sftpServer, $sftpPort);
@@ -513,7 +513,7 @@ class Epay{
 		fclose($file);		   
 
 	   /*
-       $fileName = "/www/log/epay/eprepag_daily_transactions_".date("Ymd").".csv";
+       $fileName = "/www/arquivos_gerados/logs/epay/eprepag_daily_transactions_".date("Ymd").".csv";
        
 	   $file = fopen($fileName, "w+");
 	   $header = "Transaction Date;TransactionID;Amount;Serial number;Name;EAN;Currency;Store ID;Store Name;Retailer name (Division name);Operator;Branding\n";
@@ -578,7 +578,7 @@ class Epay{
 		   }
 		   
 	    }catch(PDOException $Exception){
-		   $fileName = '/www/log/epay/erro/error.txt';
+		   $fileName = '/www/arquivos_gerados/logs/epay/erro/error.txt';
 		   $file = fopen($fileName, "a+");
 		   fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 		   fwrite($file, "SQL: ".$sqlUpdate."\n");

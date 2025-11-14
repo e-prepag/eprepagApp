@@ -134,7 +134,7 @@ $tf_tipo = "q";
 // Tomado de CodeIgniter (ver POS lista_transacoes_gr.php)
 function grava_arquivo_emails_user($mensagem) {
 
-		$file_path = RAIZ_DO_PROJETO . "public_html/tmp/txt/";
+		$file_path = RAIZ_DO_PROJETO . "arquivos_gerados/txts/txt/";
 		$web_path = "/tmp/txt/";
 		$expiration = 200;
 

@@ -2,7 +2,7 @@
     $dif_max = 180;
     $contents = "";
     try {
-        $smonfilename = $raiz_do_projeto . 'log/monitorprocessapagtoonline9.txt';
+        $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitorprocessapagtoonline9.txt';
         if ($handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             // Exemplo:

@@ -71,7 +71,7 @@ class CPF extends classCPF
             } // end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
             elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB) {
 
-                $file = fopen("/www/log/retorno_cpf.txt", "a+");
+                $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
                 fwrite($file, "hud do desenvolvedor \n");
                 fwrite($file, "resultado code " . $testeCPF . "\n");
                 fwrite($file, "resultado json " . json_encode($resposta) . "\n");
@@ -108,7 +108,7 @@ class CPF extends classCPF
 
             } else {
 
-                $file = fopen("/www/log/retorno_cpf.txt", "a+");
+                $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
                 fwrite($file, "resultado " . $testeCPF . "\n");
                 fwrite($file, str_repeat("*", 50));
                 fclose($file);

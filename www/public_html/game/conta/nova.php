@@ -17,7 +17,7 @@ $usuarios = new UsuarioGames;
 
 if (isset($_POST['login']) && !empty($_POST['login'])) {
 
-    $fileLog = fopen("/www/log/cadastro_games.txt", "a+");
+    $fileLog = fopen("/www/arquivos_gerados/logs/cadastro_games.txt", "a+");
     fwrite($fileLog, "Dta requisão: " . date("d-m-Y H:i:s") . "\n");
     fwrite($fileLog, "Dados recebidos: " . json_encode($_POST) . "\n");
     fwrite($fileLog, str_repeat("*", 50) . "\n\r");

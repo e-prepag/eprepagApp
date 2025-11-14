@@ -6,7 +6,7 @@ die("Stop");
 */
 
 /*
-$file = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/export_table.html";
+$file = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/export_table.html";
 
 //Grava mensagem no arquivo
 if ($handle = fopen($file, 'w')) {

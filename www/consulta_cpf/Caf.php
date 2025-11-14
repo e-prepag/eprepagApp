@@ -63,7 +63,7 @@ class ClassCaf
                 // Verifique se a resposta é uma matriz e se contém pelo menos um elemento
                 if (is_array($data) && count($data) > 0 && isset($data["data"]["taxIdNumber"])) {
 
-                    $arquivo = '/www/log/logCaf.txt';
+                    $arquivo = '/www/arquivos_gerados/logs/logCaf.txt';
 
                     $abre_arquivo = fopen($arquivo, 'a+');
 
@@ -96,7 +96,7 @@ class ClassCaf
 
                     $error = 'Erro ao fazer a requisicaoo cURL: ' . curl_error($ch);
 
-                    $arquivo = '/www/log/logCaferror.txt';
+                    $arquivo = '/www/arquivos_gerados/logs/logCaferror.txt';
 
                     $abre_arquivo = fopen($arquivo, 'a+');
 
@@ -116,7 +116,7 @@ class ClassCaf
 
                 $error = 'Erro ao fazer a requisicaoo cURL: ' . curl_error($ch);
 
-                $arquivo = '/www/log/logCaferror.txt';
+                $arquivo = '/www/arquivos_gerados/logs/logCaferror.txt';
 
                 $abre_arquivo = fopen($arquivo, 'a+');
 

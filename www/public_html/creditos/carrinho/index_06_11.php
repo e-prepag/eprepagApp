@@ -446,7 +446,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
             if(((float)$controller->usuarios->getPerfilSaldo() - (float)$modelos['total_repasse']) < 0) 
             {
                 
-				$file = fopen("/www/log/c.txt", "a+");
+				$file = fopen("/www/arquivos_gerados/logs/c.txt", "a+");
 				fwrite($file, "saldo perfil ".$controller->usuarios->getPerfilSaldo()."\n");
 				fwrite($file, "repasse ".$modelos['total_repasse']."\n");
 				fwrite($file, "const ".(($controller->usuarios->getPerfilSaldo() - $modelos['total_repasse']) < 0)."\n");

@@ -9,7 +9,7 @@ require_once "/www/includes/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 
-     $file = fopen("/www/log/log_notifica_estoque.txt", "a+");
+     $file = fopen("/www/arquivos_gerados/logs/log_notifica_estoque.txt", "a+");
      fwrite($file, "INICIO DE EXECUÇÃO : ".date("m-d-Y H:i:s")."\n");
     /**
      * Início do procedimento

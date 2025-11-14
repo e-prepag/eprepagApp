@@ -1,1 +1,1 @@
-cd /www/background/; php -q "pep_cruzamento.php" >>../log/pep_cruzamento.log
+cd /www/background/; php -q "pep_cruzamento.php" >>../arquivos_gerados/logs/pep_cruzamento.log

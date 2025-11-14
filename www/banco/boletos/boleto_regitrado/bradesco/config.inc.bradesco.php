@@ -10,10 +10,10 @@ define("BRADESCO_MSG_ERROR_LOG", "ERROR_LOG");
 define("BRADESCO_MSG_TRANSACTION_LOG","TRANSACTION_LOG");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_BRADESCO_WS_ERRORS",	$raiz_do_projeto . "log/log_BRADESCO_WS-Errors.log");
+define("LOG_FILE_BRADESCO_WS_ERRORS",	$raiz_do_projeto . "arquivos_gerados/logs/log_BRADESCO_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_BRADESCO_WS_TRANSACTIONS",	$raiz_do_projeto . "log/log_BRADESCO_WS-Transactions.log");
+define("LOG_FILE_BRADESCO_WS_TRANSACTIONS",	$raiz_do_projeto . "arquivos_gerados/logs/log_BRADESCO_WS-Transactions.log");
 
 $BRADESCO_CODE_STATUS_PROTOCOL_HTTP = array(
                                 '401' => "Credenciais de acesso não estão presentes no cabeçalho da requisição BASE_64(MerchantID:ChaveDeSeguranca)", 

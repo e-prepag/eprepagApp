@@ -1,1 +1,1 @@
-cd /www/background/; php -q "corte.php" processaZeraLimiteBoletoVencido  >>../log/processaZeraLimiteBoletoVencido.log
+cd /www/background/; php -q "corte.php" processaZeraLimiteBoletoVencido  >>../arquivos_gerados/logs/processaZeraLimiteBoletoVencido.log

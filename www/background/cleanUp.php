@@ -25,7 +25,7 @@ if( preg_match('/--debug/', $shellcomm, $matches) )
 
 if($debug)  echo "Escaneando arquivos .locked ... ".PHP_EOL;
 
-$path = $raiz_do_projeto."log/";
+$path = $raiz_do_projeto."arquivos_gerados/logs/";
 $files = glob($path . "*.locked");
 
 if($debug && count($files)==0)  echo "Nao foi encontrado nenhum arquivo .locked ... ".PHP_EOL;

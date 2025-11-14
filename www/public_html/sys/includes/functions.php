@@ -132,7 +132,7 @@ if (!function_exists("SQLexecuteQuery")) {
 			$separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
 
 			// Caminho do arquivo de log
-			$logFile = '/www/log/sql_logs/logs_' . date('d_m_y') . '.log';
+			$logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
 
 			// Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
 			file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
@@ -177,7 +177,7 @@ function gravaLog_SQLexecuteQuery($mensagem)
 
 	//Arquivo
 	//		$file = $GLOBALS['ARQUIVO_LOG_SQL_EXECUTE_QUERY'];
-	$file = $GLOBALS['raiz_do_projeto'] . "log/log_sql_execute_query.txt";
+	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_sql_execute_query.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -1792,7 +1792,7 @@ function gravaLog_EstabelecimentoMovimentacao($EM_mensagem)
 {
 	global $raiz_do_projeto;
 	//Arquivo
-	$file = $raiz_do_projeto . 'log/log_estabelecimento_movimentacao.txt';
+	$file = $raiz_do_projeto . 'arquivos_gerados/logs/log_estabelecimento_movimentacao.txt';
 
 	//Mensagem
 	$EM_mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $EM_mensagem . "\n";

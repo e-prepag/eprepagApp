@@ -154,7 +154,7 @@
 		$query->bindValue(':STATUS', utf8_encode($status));
 		$query->execute();
 	
-		$arquivoLog = '/www/log/logEsqueciMinhaSenha.log';
+		$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha.log';
 					
 		$mensagemLog = "ID: {$idUsuario}\nIP: {$ipUsuario}\nLOGIN: {$loginUsuario}\nE-MAIL: {$emailUsuario}\nCÓDIGO: {$codigoValidacao}";
 
@@ -229,7 +229,7 @@
 		
 		}
 		
-		$arquivoLog = '/www/log/logEsqueciMinhaSenha.log';
+		$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha.log';
 					
 		$mensagemLog = "O código {$codigoValidacao} está {$retorno}\nData da atualização {$dataHoraAtual}";
 		

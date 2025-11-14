@@ -22,7 +22,7 @@ define('ALLOWED_REFERRER', '');
 // Download folder, i.e. folder where you keep all files for download.
 // MUST end with slash (i.e. "/" )
 //	$file_path = "C:/Sites/E-Prepag/www/web/images/tmp_txt/";
-define('BASE_DIR', $raiz_do_projeto . 'public_html/tmp/txt/');
+define('BASE_DIR', $raiz_do_projeto . 'arquivos_gerados/txts/txt/');
 
 // log downloads?  true/false
 define('LOG_DOWNLOADS',false);

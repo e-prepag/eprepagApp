@@ -28,7 +28,7 @@ $user = $fetch;
 if (empty($user)) {
     $msg = "Usuario inválido.\n";
     $linha = "3[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
-    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+    file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
     //$pag = $server_url . $pag;
     $strRedirect = $server_url .
         "/creditos/login.php?msg=" .
@@ -42,7 +42,7 @@ if (empty($user)) {
 if (!$_SESSION['precisa_termos']) {
     $msg = "Você já aceitou os termos de uso.";
     $linha = "3[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
-    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+    file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
     $strRedirect = $server_url .
         "/creditos/login.php?msg=" .
         urlencode($msg) .

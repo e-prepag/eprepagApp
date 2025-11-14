@@ -99,7 +99,7 @@ gravaLog_TMP1($slog);
 	function gravaLog_TMP1($mensagem){
 	
 		//Arquivo
-		$file = $raiz_do_projeto . "/log/log_TMP1.txt";
+		$file = $raiz_do_projeto . "/arquivos_gerados/logs/log_TMP1.txt";
 		
 		//Mensagem
 		$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

@@ -63,10 +63,10 @@ define("BHN_MSG_TRANSACTION_LOG",	"TRANSACTION_LOG");
 define("BHN_MSG_USER_PARSING_WSDL",	"Este código de serviço não foi identificado (ERRO: WS547).<br>Por favor, verifique se o serviço foi selecionado corretamente ou entre em contato com o <a href='mailto:suporte@e-prepag.com.br'>suporte@e-prepag.com.br</a><br>");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_BHN_WS_ERRORS",	$raiz_do_projeto . "/log/log_BHN_WS-Errors.log");
+define("LOG_FILE_BHN_WS_ERRORS",	$raiz_do_projeto . "/arquivos_gerados/logs/log_BHN_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_BHN_WS_TRANSACTIONS",	$raiz_do_projeto . "/log/log_BHN_WS-Transactions.log");
+define("LOG_FILE_BHN_WS_TRANSACTIONS",	$raiz_do_projeto . "/arquivos_gerados/logs/log_BHN_WS-Transactions.log");
 
 //Código de Sucesso da Transação
 $BHN_CODE_SUCESS = array(

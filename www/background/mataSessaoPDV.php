@@ -26,8 +26,8 @@ if(!$arquivoLog->haveFile())
     {
         $arquivoIDsTMP = $arrArquivoIDsTMP[$ind];
         //Verificando se existe arquivo com IDs para ser processado
-        $fullNameArquivoIDs = RAIZ_DO_PROJETO . "log/".$arquivoIDs;
-        $fullNameArquivoIDsTMP = RAIZ_DO_PROJETO . "log/".$arquivoIDsTMP;
+        $fullNameArquivoIDs = RAIZ_DO_PROJETO . "arquivos_gerados/logs/".$arquivoIDs;
+        $fullNameArquivoIDsTMP = RAIZ_DO_PROJETO . "arquivos_gerados/logs/".$arquivoIDsTMP;
         
         if(file_exists($fullNameArquivoIDs)) 
         {

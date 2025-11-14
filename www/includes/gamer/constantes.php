@@ -24,9 +24,9 @@
 	$GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] = 7909;
 
 	//Log de comandos SQL	
-	$ARQUIVO_LOG_SQL_EXECUTE_QUERY = $raiz_do_projeto . "log/log_commerce_sql_execute_query.txt";	
+	$ARQUIVO_LOG_SQL_EXECUTE_QUERY = $raiz_do_projeto . "arquivos_gerados/logs/log_commerce_sql_execute_query.txt";	
 	//Log de HTTP_REFERER	
-	$ARQUIVO_LOG_HTTP_REFERER = $raiz_do_projeto . "log/log_commerce_http_referer.txt";	
+	$ARQUIVO_LOG_HTTP_REFERER = $raiz_do_projeto . "arquivos_gerados/logs/log_commerce_http_referer.txt";	
 
 	//Diretorio de arquivos upload - comprovante
 	$FOLDER_COMMERCE_UPLOAD = $raiz_do_projeto . "/backoffice/offweb/upload_arquivos/commerce/";

@@ -110,13 +110,13 @@ try {
 
 } catch (Exception $ex) {
 
-    $logFile = '/www/log/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
+    $logFile = '/www/arquivos_gerados/logs/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
     $logMessage = date('Y-m-d H:i:s') . " | Exception: " . $ex->getMessage() . PHP_EOL;
     file_put_contents($logFile, $logMessage, FILE_APPEND);
 
 } catch (PDOException $ex) {
 
-    $logFile = '/www/log/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
+    $logFile = '/www/arquivos_gerados/logs/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
     $logMessage = date('Y-m-d H:i:s') . " | PDOException: " . $ex->getMessage() . PHP_EOL;
     $logMessage .= "Trace: " . $ex->getTraceAsString() . PHP_EOL; // Inclui o rastreamento da exceção
     file_put_contents($logFile, $logMessage, FILE_APPEND);

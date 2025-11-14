@@ -1630,7 +1630,7 @@ class UsuarioGames {
     function logEvents($msg) {
             global $raiz_do_projeto;
 
-            $fileLog = $raiz_do_projeto.'log/log_class_users_LANs_PDO-Errors.log';
+            $fileLog = $raiz_do_projeto.'arquivos_gerados/logs/log_class_users_LANs_PDO-Errors.log';
 
             $log  = "=================================================================================================".PHP_EOL;
             $log .= "DATA -> ".date("d/m/Y - H:i:s")."".PHP_EOL;
@@ -4124,7 +4124,7 @@ class UsuarioGames {
 		$sql = "select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and ug_substatus in ('11', '9') and ug_login = ? and ug_senha = ?"; //"select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and (ug_substatus = 11 or ug_substatus = 9) and ? in(ug_login,ug_cnpj) and ug_senha = ?";
 		// $sql = "select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and (ug_substatus = 11 or ug_substatus = 9) and ug_login = ? and ug_senha = ?"; //"select count(*) as qtde from dist_usuarios_games where ug_ativo = 1 and (ug_substatus = 11 or ug_substatus = 9) and ? in(ug_login,ug_cnpj) and ug_senha = ?";
 
-        //$file = fopen("/www/log/a.txt", "a+");
+        //$file = fopen("/www/arquivos_gerados/logs/a.txt", "a+");
 		//fwrite($file, "Login: ".$login."\n");
 		//fwrite($file, "senha: ".$senha."\n");
 		//fwrite($file, "senha: ".$original."\n");
@@ -4758,7 +4758,7 @@ class UsuarioGames {
                 $envioEmail->MontaEmailEspecifico();
 
                 //Grava no arquivo o ID do PDV para Exclusão de todas as Sessões abertas
-                $nome_tmp = $raiz_do_projeto.'log/idsPDVs.txt';
+                $nome_tmp = $raiz_do_projeto.'arquivos_gerados/logs/idsPDVs.txt';
                 if ($handle = fopen($nome_tmp, 'a+')) {
                         fwrite($handle, $objGamesUsuario->ug_id.PHP_EOL);
                         fclose($handle);

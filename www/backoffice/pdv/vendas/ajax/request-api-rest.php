@@ -75,7 +75,7 @@
 	
 	curl_close($chama_api);
 	
-	$arquivo = "/www/log/log-concilia.txt";
+	$arquivo = "/www/arquivos_gerados/logs/log-concilia.txt";
 
 	$abre_arquivo = fopen($arquivo, 'a');
 

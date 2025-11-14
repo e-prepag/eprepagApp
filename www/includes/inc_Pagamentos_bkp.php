@@ -677,7 +677,7 @@ function getTransacaoPagamentoOK($stipo, $sid, &$aline) {
 function gravaLog_TMP_conciliacao_pag($mensagem){
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto']."log/log_pagamento_TMP_conciliacao_pag.txt";
+	$file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_TMP_conciliacao_pag.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -1217,7 +1217,7 @@ function formataAssinatura($entrada) {
 function gravaLog_TMP_Retorno($mensagem){
 
         //Arquivo
-        $file = $GLOBALS['raiz_do_projeto']."log/log_pagamento_TMP.txt";
+        $file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_TMP.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;

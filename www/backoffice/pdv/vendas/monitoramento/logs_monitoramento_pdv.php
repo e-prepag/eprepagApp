@@ -2,7 +2,7 @@
 $contents = "";
     
 try {
-    $smonfilename = $raiz_do_projeto . 'log/monitoragendamentos12.txt';
+    $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitoragendamentos12.txt';
     if (file_exists($smonfilename) && $handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             $contents = fread($handle, filesize($smonfilename));
@@ -12,7 +12,7 @@ try {
     } else {
             echo "\n<font color='#FF0000'>Error: Couldn't open Monitor File for reading</font><br>\n";
     }
-    $smonfilename = $raiz_do_projeto . 'log/monitoragendamentos34.txt';
+    $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitoragendamentos34.txt';
     if (file_exists($smonfilename) && $handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             $contents .= fread($handle, filesize($smonfilename));
@@ -22,7 +22,7 @@ try {
     } else {
             echo "\n<font color='#FF0000'>Error: Couldn't open Monitor File for reading</font><br>\n";
     }
-    $smonfilename = $raiz_do_projeto . 'log/monitoragendamentos56.txt';
+    $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitoragendamentos56.txt';
     if (file_exists($smonfilename) && $handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             $contents .= fread($handle, filesize($smonfilename));
@@ -32,7 +32,7 @@ try {
     } else {
             echo "\n<font color='#FF0000'>Error: Couldn't open Monitor File for reading</font><br>\n";
     }
-    $smonfilename = $raiz_do_projeto . 'log/monitoragendamentos78.txt';
+    $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitoragendamentos78.txt';
     if (file_exists($smonfilename) && $handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             $contents .= fread($handle, filesize($smonfilename));
@@ -42,7 +42,7 @@ try {
     } else {
             echo "\n<font color='#FF0000'>Error: Couldn't open Monitor File for reading</font><br>\n";
     }
-    $smonfilename = $raiz_do_projeto . 'log/monitoragendamentos90.txt';
+    $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitoragendamentos90.txt';
     if (file_exists($smonfilename) && $handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             $contents .= fread($handle, filesize($smonfilename));

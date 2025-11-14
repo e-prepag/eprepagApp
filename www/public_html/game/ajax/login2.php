@@ -104,7 +104,7 @@ if (Util::isAjaxRequest()) {
 				$msgAuth = "Login ou senha inválidos.\n";
 
 				$linha = "2g[" . date('Y-m-d H:i:s') . "] [$login] $msgAuth" . PHP_EOL;
-				file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+				file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
 				echo RETURN_WRONG;
 				exit;
@@ -123,7 +123,7 @@ if (Util::isAjaxRequest()) {
 					$msgAuth = "Você precisa adicionar um autenticador para poder realizar seu login.\n";
 
 					$linha = "2g[" . date('Y-m-d H:i:s') . "] [$login] $msgAuth" . PHP_EOL;
-					file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+					file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
 					echo $msgAuth;
 					exit;
@@ -135,7 +135,7 @@ if (Util::isAjaxRequest()) {
 						$msgAuth = "Token inválido.\n";
 
 						$linha = "2g[" . date('Y-m-d H:i:s') . "] [$login] $msgAuth" . PHP_EOL;
-						file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+						file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
 						echo $msgAuth;
 						exit;

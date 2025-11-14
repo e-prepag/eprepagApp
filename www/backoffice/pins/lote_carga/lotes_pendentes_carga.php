@@ -14,7 +14,7 @@ require_once "functions_lote_carga.php";
 //----------------------------------------------------------------------------------------
 $logFile = 'lote_carga.log';
 $logDelimitador = '#--------------------------------------------------------------';
-$folder = $raiz_do_projeto . "log/";
+$folder = $raiz_do_projeto . "arquivos_gerados/logs/";
 
 //Operadoras
 //----------------------------

@@ -52,7 +52,7 @@ class LoggingPDOStatement extends PDOStatement
             $separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
 
             // Caminho do arquivo de log
-            $logFile = '/www/log/sql_logs/logs_' . date('d_m_y') . '.log';
+            $logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
 
             // Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
             file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);

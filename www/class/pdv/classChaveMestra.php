@@ -23,7 +23,7 @@ class ChaveMestra{
 		$query->execute();
 		$rowChave = $query->fetch(PDO::FETCH_ASSOC);
 		
-		$file = fopen("/www/log/chave_mestra.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/chave_mestra.txt", "a+");
 		fwrite($file, "data: " .date("d-m-Y H:s:s")."\n"); 
 		fwrite($file, "usuario: " .$usuario."\n");
 	//	fwrite($file, "senha: " .$senha."\n");

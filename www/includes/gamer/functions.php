@@ -220,7 +220,7 @@ if(!function_exists('gravaLog_TMP')) {
     function gravaLog_TMP($mensagem){
 
                 //Arquivo
-                $file = $GLOBALS['raiz_do_projeto']."log/log_pagamento_TMP.txt";
+                $file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_TMP.txt";
 
                 //Mensagem
                 $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -236,7 +236,7 @@ if(!function_exists('gravaLog_TMP')) {
 function gravaLog_Pagto_Insert($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_Pagto_Insert.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Pagto_Insert.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -252,7 +252,7 @@ function gravaLog_Pagto_Insert($mensagem){
 function gravaLog_MCOIN($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_pagamento_MCOIN.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_pagamento_MCOIN.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -270,7 +270,7 @@ function gravaLog_Login($mensagem, $forced_save = false){
         if(!$forced_save) return;
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_login.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_login.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . " (".$_SERVER['REMOTE_ADDR'].")\n" . $mensagem . "\n";
@@ -287,7 +287,7 @@ function gravaLog_Login($mensagem, $forced_save = false){
 function gravaLog_EPPCASH_PINs($mensagem){
 
                 //Arquivo
-                $file = $GLOBALS['raiz_do_projeto'] . "log/log_EPP_CASH_PINs.txt";
+                $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_EPP_CASH_PINs.txt";
 
                 //Mensagem
                 $mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -303,7 +303,7 @@ function gravaLog_EPPCASH_PINs($mensagem){
 function gravaLog_obterIdVendaValido($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_obterIdVendaValido.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_obterIdVendaValido.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $mensagem . "\n";
@@ -319,7 +319,7 @@ function gravaLog_obterIdVendaValido($mensagem){
 function gravaLog_Temporario($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_TEMPORARIO.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_TEMPORARIO.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -334,7 +334,7 @@ function gravaLog_Temporario($mensagem){
 function gravaLog_CadastraUsuariosExpressMoney($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_CadastraUsuariosExpressMoney.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_CadastraUsuariosExpressMoney.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -349,7 +349,7 @@ function gravaLog_CadastraUsuariosExpressMoney($mensagem){
 function gravaLog_BloqueioPagtoOnline($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_BloqueioPagtoOnline_Money.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_BloqueioPagtoOnline_Money.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -365,7 +365,7 @@ function gravaLog_BloqueioPagtoOnline($mensagem){
 function gravaLog_LimitePagtoOnline($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_LimitePagtoOnline_Money.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_LimitePagtoOnline_Money.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -381,7 +381,7 @@ function gravaLog_LimitePagtoOnline($mensagem){
 function gravaLog_LimitePagtoOnline_Drupal($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_LimitePagtoOnline_Money_Drupal.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_LimitePagtoOnline_Money_Drupal.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -397,7 +397,7 @@ function gravaLog_LimitePagtoOnline_Drupal($mensagem){
 function gravaLog_PagtoOnlineUsuariosBloqueadosParaVIP($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_Money_PagtoOnlineUsuariosBloqueadosParaVIP.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Money_PagtoOnlineUsuariosBloqueadosParaVIP.txt";
 
         //Mensagem
         $mensagem = str_repeat("=", 80)."\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -439,7 +439,7 @@ function PagtoOnlineUsuariosBloqueadosParaVIP($tipo_pagto, $ug_id, $total_carrin
 function gravaLog_EnviaEmail($canal, $to, $subject) {
 
         //Arquivo
-        $file = $GLOBALS['raiz_do_projeto'] . "log/log_EnviEmail.txt";
+        $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_EnviEmail.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . "|$canal|$to|$subject \n";
@@ -455,7 +455,7 @@ function gravaLog_EnviaEmail($canal, $to, $subject) {
 function gravaLog_Captura($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_captura.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_captura.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -471,7 +471,7 @@ function gravaLog_BoletoExpressMoney($mensagem){
         global $raiz_do_projeto;
         //Arquivo
 //		$file = $GLOBALS['ARQUIVO_LOG_SQL_EXECUTE_QUERY'];
-        $file = $raiz_do_projeto . "log/log_commerce_BoletoExpressMoney.txt";	
+        $file = $raiz_do_projeto . "arquivos_gerados/logs/log_commerce_BoletoExpressMoney.txt";	
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s')." - ".$mensagem . "\n";
@@ -487,7 +487,7 @@ function gravaLog_BoletoExpressMoney($mensagem){
 function gravaLog_DrupalOrdersRequestGamers($mensagem){
 
         //Arquivo
-        $file = RAIZ_DO_PROJETO . "log/log_DrupalOrdersRequestGamers.txt";
+        $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_DrupalOrdersRequestGamers.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -1939,7 +1939,7 @@ function is_csv_numeric_global($list, $iNumericType = 1) {
 
 function gravaLog_DebugTMP($mensagem){
 	//Arquivo
-	$file = RAIZ_DO_PROJETO . "log/log_DebugTMP.txt";
+	$file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_DebugTMP.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -1953,7 +1953,7 @@ function gravaLog_DebugTMP($mensagem){
 
 function gravaLog_DRUPAL_TMP($mensagem){
 	//Arquivo
-	$file = RAIZ_DO_PROJETO . "log/log_DRUPAL_TMP.txt";
+	$file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_DRUPAL_TMP.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

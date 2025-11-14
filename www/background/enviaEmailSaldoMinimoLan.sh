@@ -1,1 +1,1 @@
-cd /www/background/; php -q "enviaEmailSaldoMinimoLan.php" >>../log/enviaEmailSaldoMinimoLan.log
+cd /www/background/; php -q "enviaEmailSaldoMinimoLan.php" >>../arquivos_gerados/logs/enviaEmailSaldoMinimoLan.log

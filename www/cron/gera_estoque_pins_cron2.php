@@ -39,7 +39,7 @@ $chars = '0123456789';
 
 function saveLog($pins, $lote, $operadora, $valor) {
     try {
-        $file = fopen("/www/log/cron_estoque_pins.txt", "a+");
+        $file = fopen("/www/arquivos_gerados/logs/cron_estoque_pins.txt", "a+");
         fwrite($file, str_repeat("*", 50)."\n");
         fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
         fwrite($file, "OPERADORA: ".$operadora. "\n");

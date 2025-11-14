@@ -15,7 +15,7 @@ if($opr_codigo==0)
 
 //Diretorio repositorio
 //$folder = "/home/sites/backoffice/offweb/dist_commerce/lotes/";
-$folder = $raiz_do_projeto . "log/";
+$folder = $raiz_do_projeto . "arquivos_gerados/logs/";
 $file = $folder . $opr_codigo . "/" . $arquivo;
 if(isset($tipo)) $file = $folder . $opr_codigo . "/" . $tipo . "/" . $arquivo;
 

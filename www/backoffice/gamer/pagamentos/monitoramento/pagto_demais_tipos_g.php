@@ -2,7 +2,7 @@
     $dif_max = 180;
     $contents = "";
     try {
-        $smonfilename = $raiz_do_projeto . 'log/monitorprocessapagtoonline.txt';
+        $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitorprocessapagtoonline.txt';
         if ($handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             // Exemplo:
@@ -25,7 +25,7 @@
     $dif_max = 180;
     $contents = "";
     try {
-        $smonfilename = $raiz_do_projeto . 'log/monitor_concilia.txt';
+        $smonfilename = $raiz_do_projeto . 'arquivos_gerados/logs/monitor_concilia.txt';
         if ($handle = fopen($smonfilename, 'r')) { 
             //echo "\nMonitor File opened\n";
             // Exemplo:

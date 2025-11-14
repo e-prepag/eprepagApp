@@ -1,7 +1,7 @@
 <?php
 // Colocar no /usr/share/php e no php ini na opção auto_append_file
 // --- Configurações do Log de Performance ---
-$PERF_LOG_FILE_PATH = '/www/log/performance-' . date('Y-m-d') . '.log';
+$PERF_LOG_FILE_PATH = '/www/arquivos_gerados/logs/performance-' . date('Y-m-d') . '.log';
 $PERF_LOG_OWNER_USER = 'www-data';
 $PERF_LOG_OWNER_GROUP = 'www-data';
 // ------------------------------------------

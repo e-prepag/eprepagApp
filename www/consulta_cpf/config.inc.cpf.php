@@ -129,13 +129,13 @@ define("CPF_MSG_TRANSACTION_LOG",		"TRANSACTION_LOG");
 define("CPF_MSG_USER_PARSING_WSDL",		"Este código de serviço não foi identificado (ERRO: WS758).<br>Por favor, verifique se o serviço foi selecionado corretamente ou entre em contato com o <a href='mailto:suporte@e-prepag.com.br'>suporte@e-prepag.com.br</a><br>");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_CPF_WS_ERRORS",		RAIZ_DO_PROJETO . "log/log_CPF_WS-Errors.log");
+define("LOG_FILE_CPF_WS_ERRORS",		RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_CPF_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_CPF_WS_TRANSACTIONS",		RAIZ_DO_PROJETO . "log/log_CPF_WS-Transactions.log");
+define("LOG_FILE_CPF_WS_TRANSACTIONS",		RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_CPF_WS-Transactions.log");
 
 // Arquivo com monitor de contatos ao WebService
-define("CPF_MONITOR_FILE", 			RAIZ_DO_PROJETO . "log/monitor_CPF_online.txt");
+define("CPF_MONITOR_FILE", 			RAIZ_DO_PROJETO . "arquivos_gerados/logs/monitor_CPF_online.txt");
 
 // Classes do módulo CPF
 include_once("classGerais.php");

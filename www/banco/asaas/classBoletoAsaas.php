@@ -59,7 +59,7 @@ class classBoleto
 
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
-        $logFilePath = "/www/log/Asaas_boleto.txt";
+        $logFilePath = "/www/arquivos_gerados/logs/Asaas_boleto.txt";
         $ff = fopen($logFilePath, "a+");
 
         if ($ff) {
@@ -180,7 +180,7 @@ class classBoleto
         // Verifica se a resposta contém os dados esperados
         if (!isset($data['bankSlipUrl'])) {
             // Extrai os dados de interesse
-            file_put_contents('/www/log/Asaas_boleto_erro.txt',$response);
+            file_put_contents('/www/arquivos_gerados/logs/Asaas_boleto_erro.txt',$response);
             return false;
         }
 

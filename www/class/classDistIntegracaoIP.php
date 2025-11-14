@@ -288,7 +288,7 @@ class DistIntegracaoIP {
 function gravaLog_DistIntegracaoIP($mensagem){
         
 		//Arquivo
-		$file = RAIZ_DO_PROJETO . "log/log_DistIntegracaoIP.txt";
+		$file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_DistIntegracaoIP.txt";
 	
 		//Mensagem
 		$mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s'). " " .$GLOBALS['_SERVER']['SCRIPT_FILENAME'] . "\n" . $mensagem . "\n";

@@ -2,7 +2,7 @@
 function gravaLog_EPPCASH_Sonda($mensagem){
 	
 		//Arquivo
-		$file =  $GLOBALS['raiz_do_projeto']."log/log_EPP_CASH_Sonda.txt";
+		$file =  $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_EPP_CASH_Sonda.txt";
 	
 		//Mensagem
 		$mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

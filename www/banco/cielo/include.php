@@ -1,6 +1,6 @@
 <?php
 define("ENDERECO_BASE_CIELO_PAG_INCLUDES", $raiz_do_projeto . "banco/cielo/");
-$logFile = $raiz_do_projeto."log/log_cielo.log";
+$logFile = $raiz_do_projeto."arquivos_gerados/logs/log_cielo.log";
 
 require ENDERECO_BASE_CIELO_PAG_INCLUDES.'errorHandling.php';
 require_once ENDERECO_BASE_CIELO_PAG_INCLUDES.'classPedido.php';
@@ -235,7 +235,7 @@ function getSondaCielo($numero,&$a_resp){
 function gravaLog_CIELO($mensagem){
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto']."log/log_pagamento_CIELO.txt";
+	$file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_CIELO.txt";
 	
 	//Mensagem
 	$mensagem = str_repeat("-", 80).PHP_EOL.date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -250,7 +250,7 @@ function gravaLog_CIELO($mensagem){
 function gravaLog_CIELO_TMP($mensagem){
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto']."log/log_pagamento_CIELO_TMP.txt";
+	$file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_CIELO_TMP.txt";
 	
 	//Mensagem
 	$mensagem = str_repeat("-", 80).PHP_EOL.date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;

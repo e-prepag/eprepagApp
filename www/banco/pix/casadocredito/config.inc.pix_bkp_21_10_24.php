@@ -51,10 +51,10 @@ define("PIX_MSG_ERROR_LOG",		"ERROR_LOG");
 define("PIX_MSG_TRANSACTION_LOG",	"TRANSACTION_LOG");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("PIX_ERROR_LOG_FILE", RAIZ_DO_PROJETO . "log/log_PIX_WS-Errors.log");
+define("PIX_ERROR_LOG_FILE", RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_PIX_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_PIX_WS_ERRORS",RAIZ_DO_PROJETO . "log/log_PIX_WS-Hearders.log");
+define("LOG_FILE_PIX_WS_ERRORS",RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_PIX_WS-Hearders.log");
 
 //Código de Sucesso da Transação
 $PIX_CODE_SUCESS = array(

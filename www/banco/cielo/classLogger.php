@@ -5,7 +5,7 @@ class Logger
 	
 	public function logOpen()
 	{
-		$this->fp = fopen($GLOBALS['raiz_do_projeto'] . "log/log_xml_cielo.log", 'a');
+		$this->fp = fopen($GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_xml_cielo.log", 'a');
 	}
 	 
 	public function logWrite($strMessage, $transacao)

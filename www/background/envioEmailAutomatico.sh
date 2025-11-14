@@ -1,1 +1,1 @@
-cd /www/background/; php -q "envioEmailAutomatico.php" >>../log/envioEmailAutomatico.log
+cd /www/background/; php -q "envioEmailAutomatico.php" >>../arquivos_gerados/logs/envioEmailAutomatico.log

@@ -1,1 +1,1 @@
-cd /www/background/; php -q "financial_processing.php" >>../log/financial_processing.log
+cd /www/background/; php -q "financial_processing.php" >>../arquivos_gerados/logs/financial_processing.log

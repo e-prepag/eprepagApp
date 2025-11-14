@@ -43,11 +43,11 @@ class classPIX {
 			
             $resposta = json_decode($resposta);
 			
-			// $ff = fopen("/www/log/teste_PIX_cria.txt","a+");
+			// $ff = fopen("/www/arquivos_gerados/logs/teste_PIX_cria.txt","a+");
 			// $timestamp = date("Y-m-d H:i:s");
 			// fwrite($ff, "resultado data:".$timestamp.": ".json_encode($resposta)."----". serialize($resposta)."\r\n");
 			// fclose($ff);
-			$logFilePath = "/www/log/teste_PIX_cria.txt";
+			$logFilePath = "/www/arquivos_gerados/logs/teste_PIX_cria.txt";
 			$ff = fopen($logFilePath, "a+");
 			//felipe
 //echo "Nº do deposito: ".$params["venda_id"];
@@ -139,7 +139,7 @@ class classPIX {
 					
             $resposta = $this->sendJSON($params);
 			
-			$ff = fopen("/www/log/teste_PIX.txt","a+");
+			$ff = fopen("/www/arquivos_gerados/logs/teste_PIX.txt","a+");
 			$timestamp = date("Y-m-d H:i:s");
 			fwrite($ff, "resultado data:".$timestamp.": ". $resposta."\r\n");
 			fclose($ff);
@@ -303,7 +303,7 @@ class classPIX {
         
             $resultado = NULL;
 
-            $errorFileLog = fopen("/www/log/log_PIX_WS-Hearders.log", "a+");
+            $errorFileLog = fopen("/www/arquivos_gerados/logs/log_PIX_WS-Hearders.log", "a+");
             $log  = "=================================================================================================".PHP_EOL;
             $log .= "DATA -> ".date("d/m/Y - H:i:s")." -> Send JSON to Get QRCode".PHP_EOL;
             $log .= "---------------------------------------------------".PHP_EOL;

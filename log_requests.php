@@ -5,7 +5,7 @@ if (!defined('SCRIPT_START_TIME')) {
     define('SCRIPT_START_TIME', microtime(true));
 }
 
-$LOG_FILE_PATH = '/www/log/requests-' . date('Y-m-d') . '.log'; // O caminho completo para o arquivo de log DIÁRIO
+$LOG_FILE_PATH = '/www/arquivos_gerados/logs/requests-' . date('Y-m-d') . '.log'; // O caminho completo para o arquivo de log DIÁRIO
 $LOG_OWNER_USER = 'www-data'; // Usuário que DEVE ser o dono (usuário do FPM)
 $LOG_OWNER_GROUP = 'www-data'; // Grupo que DEVE ser o dono
 

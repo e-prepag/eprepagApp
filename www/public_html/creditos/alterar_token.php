@@ -26,7 +26,7 @@ if ($_SESSION['usuario_operador']) {
     if (empty($user)) {
         $msg = "Usuario inválido.\n";
         $linha = "4[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
             "/creditos/login.php?msg=" .
@@ -50,7 +50,7 @@ if ($_SESSION['usuario_operador']) {
         if (!empty($authData['ugo_chave_autenticador'])) {
             $msg = "Usuario inválido.\n";
             $linha = "4[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
-            file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+            file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
             //$pag = $server_url . $pag;
             $strRedirect = $server_url .
                 "/creditos/login.php?msg=" .
@@ -113,7 +113,7 @@ if ($_SESSION['usuario_operador']) {
     if (empty($user)) {
         $msg = "Usuario inválido.\n";
         $linha = "4[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
             "/creditos/login.php?msg=" .
@@ -137,7 +137,7 @@ if ($_SESSION['usuario_operador']) {
         if (!empty($authData['ug_chave_autenticador'])) {
             $msg = "Usuario inválido.\n";
             $linha = "4[" . date('Y-m-d H:i:s') . "] [" . $_SESSION['login_usuario'] . "] $msg" . PHP_EOL;
-            file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+            file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
             //$pag = $server_url . $pag;
             $strRedirect = $server_url .
                 "/creditos/login.php?msg=" .

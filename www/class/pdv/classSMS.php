@@ -34,7 +34,7 @@ class SMS {
 
 		$response = curl_exec($curl);
 		
-		$file = fopen("/www/log/sms.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/sms.txt", "a+");
 		fwrite($file, "data: ".date("d-m-Y H:i:s")."\n");
 		fwrite($file, "conteudo: ".$response."\n");
 		fclose($file);

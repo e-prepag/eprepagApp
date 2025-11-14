@@ -75,7 +75,7 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
 
 function verificaEstoque($venda_id)
 {
-    $ff = fopen("/www/log/livrodjx.txt", "a+");
+    $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
     fwrite($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
 
@@ -444,7 +444,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 }
 
                 if ($vgm_ogp_id == 488) {
-                    $ff = fopen("/www/log/livrodjx.txt", "a+");
+                    $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                     fwrite($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
 
@@ -454,7 +454,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                         $pin_codinterno = $geraPinEpp->gerar();
 
-                        $ff = fopen("/www/log/livrodjx.txt", "a+");
+                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                         fwrite($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
                         fwrite($ff, "VGM_ID: " . $vgm_id . "\n");
@@ -499,7 +499,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                             continue;
                         }
                     } catch (Exception $err) {
-                        $ff = fopen("/www/log/livrodjx.txt", "a+");
+                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                         fwrite($ff, "Gerar PIN deu erro: " . $err->getMessage() . "\n");
 
@@ -532,7 +532,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $vg_somente_debito == 0 &&
                         $vgm_pin_request == 0
                     ) {
-                        $ff = fopen("/www/log/livrodjx.txt", "a+");
+                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
                         fwrite($ff, "Entra aqui ??? " . $vgm_ogp_id);
                         fclose($ff);
                         // Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter
@@ -1748,7 +1748,7 @@ function processaAgendamentos($lista = null)
         if (
             $handle = fopen(
                 $raiz_do_projeto .
-                "log/monitoragendamentos" .
+                "arquivos_gerados/logs/monitoragendamentos" .
                 str_replace(",", "", $lista) .
                 ".txt",
                 "w"
@@ -4018,7 +4018,7 @@ function gravaLog_TMP_conciliacao($mensagem)
     global $raiz_do_projeto;
 
     //Arquivo
-    $file = $raiz_do_projeto . "log/log_pagamento_TMP_conciliacao.txt";
+    $file = $raiz_do_projeto . "arquivos_gerados/logs/log_pagamento_TMP_conciliacao.txt";
 
     //Mensagem
     $mensagem =

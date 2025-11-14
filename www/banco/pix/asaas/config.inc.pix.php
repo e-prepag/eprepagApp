@@ -67,10 +67,10 @@ else {
 define("PIX_TIMEOUT",		"90000"); 
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("PIX_ERROR_LOG_FILE", "/www/log/log_PIX_WS-Errors.log");
+define("PIX_ERROR_LOG_FILE", "/www/arquivos_gerados/logs/log_PIX_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_PIX_WS_ERRORS", "/www/log/log_PIX_WS-Hearders.log");
+define("LOG_FILE_PIX_WS_ERRORS", "/www/arquivos_gerados/logs/log_PIX_WS-Hearders.log");
 
 //Código de Sucesso da Transação
 $PIX_CODE_SUCESS = array(

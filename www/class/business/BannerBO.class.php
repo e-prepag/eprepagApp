@@ -262,7 +262,7 @@ class BannerBO extends BannerDAO
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);    // true - verifica certificado
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);    // 1 - então, também verifica nome no certificado
 
-        $fp_err = fopen(RAIZ_DO_PROJETO . 'log/curl_err.log', 'ab+');
+        $fp_err = fopen(RAIZ_DO_PROJETO . 'arquivos_gerados/logs/curl_err.log', 'ab+');
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
         curl_setopt($ch, CURLOPT_FAILONERROR, true);
         curl_setopt($ch, CURLOPT_STDERR, $fp_err);

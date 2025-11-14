@@ -33,7 +33,7 @@ if ($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']) {
 function gravaLog_PIX($mensagem){
 	
         //Arquivo
-        $file =  RAIZ_DO_PROJETO . "log/log_PIX.txt";
+        $file =  RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_PIX.txt";
 
         //Mensagem
         $mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

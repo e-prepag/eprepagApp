@@ -2,7 +2,7 @@
 	require_once('hipay_mapi/mapi_package.php');
 	require_once('hipay_inc.php');
  
-	$f_log_hipay = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/LOG_pagtos_hipay.txt";
+	$f_log_hipay = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/LOG_pagtos_hipay.txt";
  	// Receipt of the notification from the Hipay platform 
 	// The XML feed [C] is sent by POST, in the field "xml" 
 	// The function analyzeNotificationXML processes the XML feed from the Hipay platform 

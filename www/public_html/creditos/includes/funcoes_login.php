@@ -83,7 +83,7 @@ function buscarUsuariosSemLog($pdo, $ug_id)
         return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
     } catch (PDOException $e) {
         //echo "Erro ao verificar dados: " . $e->getMessage();
-        file_put_contents('/www/log/log_login.txt', "Erro ao verificar dados: " . $e->getMessage(), FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', "Erro ao verificar dados: " . $e->getMessage(), FILE_APPEND);
         return false;
     }
 }

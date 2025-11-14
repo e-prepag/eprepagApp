@@ -51,7 +51,7 @@ require $_SERVER['DOCUMENT_ROOT']."/incs/functions.php";
    // echo 'post: ';
    // print_r($_POST);
    // echo "<hr>";
-//$f_log_paypal_sucess = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/LOG_pagtos_paypal_sucess.txt";
+//$f_log_paypal_sucess = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/LOG_pagtos_paypal_sucess.txt";
   
   $i = 0;
   $slog = "";

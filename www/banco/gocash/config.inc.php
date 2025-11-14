@@ -51,13 +51,13 @@ define('GC_MSG_USER_PARSING_WSDL', 'Este PIN não foi identificado (AWS23).<br>Po
 
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_GOCASH_WS_ERRORS", $raiz_do_projeto . "log/log_GoCashWS-Errors.log");
+define("LOG_FILE_GOCASH_WS_ERRORS", $raiz_do_projeto . "arquivos_gerados/logs/log_GoCashWS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_GOCASH_WS_TRANSACTIONS", $raiz_do_projeto . "log/log_GoCashWS-Transactions.log");
+define("LOG_FILE_GOCASH_WS_TRANSACTIONS", $raiz_do_projeto . "arquivos_gerados/logs/log_GoCashWS-Transactions.log");
 
 // Arquivo com monitor de contatos ao WebService
-define("GC_MONITOR_FILE", $raiz_do_projeto . "log/monitor_gocash_online.txt");
+define("GC_MONITOR_FILE", $raiz_do_projeto . "arquivos_gerados/logs/monitor_gocash_online.txt");
 
 require_once $raiz_do_projeto . "banco/gocash/includes/GoCash_functions.php";
 

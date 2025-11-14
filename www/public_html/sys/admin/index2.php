@@ -232,7 +232,7 @@ function gravaLog_LoginSys($mensagem, $forced_save = false)
     if (!$forced_save) return;
 
     //Arquivo
-    $file = $raiz_do_projeto . "log/log_login_sys.txt";
+    $file = $raiz_do_projeto . "arquivos_gerados/logs/log_login_sys.txt";
 
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . " (" . $_SERVER['REMOTE_ADDR'] . ")\n" . $mensagem . "\n";

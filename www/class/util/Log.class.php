@@ -15,8 +15,8 @@ class Log {
         $this->message = date("Y-m-d H:i:s")." - ".implode(PHP_EOL,$message).PHP_EOL;
         
         $this->dir = (isset($raiz_do_projeto)) ?
-                                        $raiz_do_projeto.'log/' :
-                                        '/www/log/';
+                                        $raiz_do_projeto.'arquivos_gerados/logs/' :
+                                        '/www/arquivos_gerados/logs/';
         $this->generate();
     }
     

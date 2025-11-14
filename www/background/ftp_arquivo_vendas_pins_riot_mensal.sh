@@ -1,1 +1,1 @@
-cd /www/background/; php -q "ftp_arquivo_vendas_pins_riot_mensal.php" >>../log/ftp_arquivo_vendas_pins_riot_mensal.log
+cd /www/background/; php -q "ftp_arquivo_vendas_pins_riot_mensal.php" >>../arquivos_gerados/logs/ftp_arquivo_vendas_pins_riot_mensal.log

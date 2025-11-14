@@ -2689,7 +2689,7 @@ function get_POST_as_string($b_only_required)
 // ================================================
 function grava_log_integracao($mensagem)
 {
-	$ARQUIVO_LOG_HTTP_REFERER = $GLOBALS['raiz_do_projeto'] . "log/log_integracao.txt";
+	$ARQUIVO_LOG_HTTP_REFERER = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_integracao.txt";
 
 	//Arquivo
 	$file = $ARQUIVO_LOG_HTTP_REFERER;
@@ -2708,7 +2708,7 @@ function grava_log_integracao($mensagem)
 // ================================================
 function grava_log_integracao_tmp($mensagem)
 {
-	$ARQUIVO_LOG_HTTP_REFERER = $GLOBALS['raiz_do_projeto'] . "log/log_integracao_tmp.txt";
+	$ARQUIVO_LOG_HTTP_REFERER = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_integracao_tmp.txt";
 
 	//Arquivo
 	$file = $ARQUIVO_LOG_HTTP_REFERER;
@@ -2740,7 +2740,7 @@ function getPartner_amount_free_By_ID($id)
 // ================================================
 function grava_log_integracao_ip_notify($mensagem)
 {
-	$ARQUIVO_LOG_HTTP_REFERER = $GLOBALS['raiz_do_projeto'] . "log/log_integracao_ip_notify.txt";
+	$ARQUIVO_LOG_HTTP_REFERER = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_integracao_ip_notify.txt";
 
 	//Arquivo
 	$file = $ARQUIVO_LOG_HTTP_REFERER;

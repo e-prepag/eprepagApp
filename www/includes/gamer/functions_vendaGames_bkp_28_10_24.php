@@ -447,7 +447,7 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
                 echo "  - Valor total da venda (venda_id: $venda_id) ".$total_geral.PHP_EOL;
         }
 
-        $fileLog = fopen("/www/log/log_vendaPIX.txt", "a+");
+        $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         fwrite($fileLog, "ID VENDA CONCILIAÇÃO ONLINE: ".$venda_id."\n");
 
         //Recupera a venda
@@ -1229,7 +1229,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros){
 
         $msg = "";
 
-        $fileLog = fopen("/www/log/log_vendaPIX.txt", "a+");
+        $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         fwrite($fileLog, "ID VENDA PROCESSA VENDA: ".$venda_id."\n");
 
         // Levanta venda de Campeonato
@@ -1551,7 +1551,7 @@ function processaEmailVendaGames($venda_id, $parametros){
     $msg = "";
     $isExpressMoney = false;
 
-    $fileLog = fopen("/www/log/log_vendaPIX.txt", "a+");
+    $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
 	fwrite($fileLog, "ID VENDA PROCESSA VENDA EMAIL: ".$venda_id."\n");
 	
     
@@ -3684,7 +3684,7 @@ function gravaLog_MonitorPedidosDuplicados($mensagem){
         if($bDebug) echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")".PHP_EOL;
         // Salva o file monitor para mostrar no Backoffice
         try {
-                if ($handle = fopen($raiz_do_projeto . 'log/monitor_integracao_pedidos_duplicados.txt', 'w')) { 
+                if ($handle = fopen($raiz_do_projeto . 'arquivos_gerados/logs/monitor_integracao_pedidos_duplicados.txt', 'w')) { 
                         fwrite($handle, $mensagem."<br>");
 
                         fclose($handle);
@@ -3700,7 +3700,7 @@ function gravaLog_MonitorPedidosDuplicados($mensagem){
 function gravaLog_TMP_conciliacao($mensagem){
         global $raiz_do_projeto;
         //Arquivo
-        $file = $raiz_do_projeto . "log/log_pagamento_TMP_conciliacao.txt";
+        $file = $raiz_do_projeto . "arquivos_gerados/logs/log_pagamento_TMP_conciliacao.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -3719,7 +3719,7 @@ function gravaLog_MonitorGamer($mensagem,$tipopagamento = null){
         if($bDebug) echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")".PHP_EOL;
         // Salva o file monitor para mostrar no Backoffice
         try {
-                if ($handle = fopen($raiz_do_projeto . 'log/monitorprocessapagtoonline'.$tipopagamento.'.txt', 'w')) { 
+                if ($handle = fopen($raiz_do_projeto . 'arquivos_gerados/logs/monitorprocessapagtoonline'.$tipopagamento.'.txt', 'w')) { 
                         fwrite($handle, $mensagem."<br>");
 
                         fclose($handle);
@@ -3737,7 +3737,7 @@ function gravaLog_Debug($mensagem){
         global $raiz_do_projeto;
 
         //Arquivo
-        $file = $raiz_do_projeto . "log/log_Debug.txt";
+        $file = $raiz_do_projeto . "arquivos_gerados/logs/log_Debug.txt";
 
         //Mensagem
         $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -4670,7 +4670,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0) {
         $irows=0;
         if($rs_transacoes) {
 
-				$fileLog = fopen("/www/log/log_vendaPIX.txt", "a+");
+				$fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
 				fwrite($fileLog, "DATA DE REQUISIÇÃO: ".date("d-m-Y H:i:s")."\n");
 				fwrite($fileLog, "MODO DE CONCILIAÇÃO: ".(($webhook === true)? "WEBHOOK": "SONDA")."\n");
 

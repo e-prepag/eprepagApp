@@ -104,10 +104,10 @@ define("BHN_EGIFT_MSG_ERROR_LOG", "ERROR_LOG");
 define("BHN_EGIFT_MSG_TRANSACTION_LOG","TRANSACTION_LOG");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_BHN_EGIFT_WS_ERRORS",	$raiz_do_projeto . "log/log_BHN_EGIFT_WS-Errors.log");
+define("LOG_FILE_BHN_EGIFT_WS_ERRORS",	$raiz_do_projeto . "arquivos_gerados/logs/log_BHN_EGIFT_WS-Errors.log");
 
 // Arquivo de Log onde serao registrados todos os cabecalhos de Request/Response
-define("LOG_FILE_BHN_EGIFT_WS_TRANSACTIONS",	$raiz_do_projeto . "log/log_BHN_EGIFT_WS-Transactions.log");
+define("LOG_FILE_BHN_EGIFT_WS_TRANSACTIONS",	$raiz_do_projeto . "arquivos_gerados/logs/log_BHN_EGIFT_WS-Transactions.log");
 
 		
 

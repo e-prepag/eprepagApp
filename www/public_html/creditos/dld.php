@@ -71,7 +71,7 @@ if (!function_exists('finfo_open')) {
 }
 
 // Configurações
-define('BASE_DIR', realpath(RAIZ_DO_PROJETO . 'public_html/tmp/txt'));
+define('BASE_DIR', realpath(RAIZ_DO_PROJETO . 'arquivos_gerados/txts/txt'));
 define('LOG_DOWNLOADS', false);
 define('LOG_FILE', BASE_DIR . '/downloads.log');
 

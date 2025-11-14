@@ -339,7 +339,7 @@ function GP_popupAlertMsg(msg) {
 
                         $cabecalho = LANG_PINS_ID.";".LANG_PINS_IMPORT.";".LANG_PINS_OPERATOR.";".LANG_PINS_VALUE.";".LANG_PINS_LOT.";".LANG_PINS_SERIAL_PIN.";".LANG_PINS_CODIGO_PIN.";".LANG_PINS_CARACTER_PIN.";".LANG_PINS_CHANNEL.";".LANG_PINS_STATUS;
 
-                        $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto."public_html/cache/");
+                        $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto."arquivos_gerados/csv/");
                         $objCsv->setCabecalho();
 ?> 
                         <table id="table" class="table bg-branco txt-preto fontsize-p">

@@ -263,7 +263,7 @@ function gravaLog_DebugPromocao($mensagem){
         global $raiz_do_projeto;
         
 	//Arquivo
-	$file = $raiz_do_projeto . "log/log_Debug.txt";
+	$file = $raiz_do_projeto . "arquivos_gerados/logs/log_Debug.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

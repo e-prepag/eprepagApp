@@ -1,1 +1,1 @@
-cd /www/background/; php -q "cpf_cache.php" >>../log/cpf_cache.log
+cd /www/background/; php -q "cpf_cache.php" >>../arquivos_gerados/logs/cpf_cache.log

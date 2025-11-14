@@ -174,7 +174,7 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
         $total_diario_boletos = getVendasLHTotalDiarioBoletos($controller->usuarios->getId());
 
 
-        $file = fopen("/www/log/dados_saldo_pdv.txt", "a+");
+        $file = fopen("/www/arquivos_gerados/logs/dados_saldo_pdv.txt", "a+");
         fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
         fwrite($file, "CONTEUDO " . json_encode($_POST) . "\n");
         fwrite($file, "USUARIO " . $controller->usuarios->getId() . "\n");

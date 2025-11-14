@@ -55,9 +55,9 @@ define("DIR_CLASS",RAIZ_DO_PROJETO."class/");
 
 define("DIR_JSON",RAIZ_DO_PROJETO."json/");
 
-define("DIR_CACHE",DIR_WEB."cache/");
+define("DIR_CSV",RAIZ_DO_PROJETO."arquivos_gerados/csv/");
 
-define("DIR_LOG",RAIZ_DO_PROJETO."log/");
+define("DIR_LOG",RAIZ_DO_PROJETO."arquivos_gerados/logs/");
 
 define("DIR_DB",RAIZ_DO_PROJETO."db/");
 

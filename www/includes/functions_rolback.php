@@ -15,7 +15,7 @@ function SQLexecuteQuery($sql) {
 //Gerador de LOG de erro de instru��es no DB
 function gravaLog_SQLexecuteQuery($mensagem) {
     //Arquivo
-    $file = $GLOBALS['raiz_do_projeto'] . "log/log_sql_execute_query.txt";
+    $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_sql_execute_query.txt";
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\nDEBUG:\n".print_r(debug_backtrace(),true)."\n";
     //Grava mensagem no arquivo
@@ -1645,7 +1645,7 @@ function insere_EstabelecimentoMovimentacao(	$var_est_codigo,
 function gravaLog_EstabelecimentoMovimentacao($EM_mensagem) {
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . 'log/log_estabelecimento_movimentacao.txt';
+	$file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/logs/log_estabelecimento_movimentacao.txt';
 
 	//Mensagem
 	$EM_mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $EM_mensagem . "\n";
@@ -1762,7 +1762,7 @@ function imprimeComboSeuBanco($mensagem) {
 
 function gravaLog_PagtoPINEPP($mensagem) {
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . "log/log_PagtoPINEPP.txt";
+	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_PagtoPINEPP.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -2028,7 +2028,7 @@ function verifica_valor_moeda_neg($val)
 //Gerador de LOG de altera��es dos manuais
 function gravaLog_Manuais($mensagem) {
     //Arquivo
-    $file = $GLOBALS['raiz_do_projeto'] . "log/log_manuais.txt";
+    $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_manuais.txt";
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\nDEBUG:\n".print_r(debug_backtrace(),true)."\n";
     //Grava mensagem no arquivo

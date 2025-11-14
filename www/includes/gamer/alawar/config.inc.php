@@ -3,7 +3,7 @@
 
 define("PATH_API_ALAWAR", $raiz_do_projeto . "includes/gamer/alawar/");
 define("PATH_INCLUDE_GAMER", $raiz_do_projeto . "includes/gamer/");
-define("LOG_FILE_ALAWAR", $raiz_do_projeto . "log/logAlawarAPI.log");
+define("LOG_FILE_ALAWAR", $raiz_do_projeto . "arquivos_gerados/logs/logAlawarAPI.log");
 
 define("PATH_LOAD_REMOTE_GAMEID_LIST_ALAWAR", "C:\\Sites\\E-Prepag\\backoffice\\offweb\\tarefas\\");
 define("LOG_FILE_AUTOMATIC_TASKS_ALAWAR", "C:\\Sites\\E-Prepag\\backoffice\\offweb\\tarefas\\log\\logAlawar_LoadGameList.log");

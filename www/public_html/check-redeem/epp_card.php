@@ -226,7 +226,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
                                                     curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers);
                                                     curl_setopt($curl_handle, CURLOPT_FAILONERROR, true);
                                                     curl_setopt($curl_handle, CURLOPT_VERBOSE, true);
-                                                    //$errorFileLog = fopen($raiz_do_projeto . "log/log_ONGAME_DEBUG.log", "a+");
+                                                    //$errorFileLog = fopen($raiz_do_projeto . "arquivos_gerados/logs/log_ONGAME_DEBUG.log", "a+");
                                                     //curl_setopt($curl_handle, CURLOPT_STDERR, $errorFileLog);
                                                     curl_setopt($curl_handle, CURLOPT_HEADER, 0);
                                                 }

@@ -3043,7 +3043,7 @@ class UsuarioGames
     {
         global $raiz_do_projeto;
 
-        $fileLog = $raiz_do_projeto . "log/log_class_users_GAMERs_PDO-Errors.log";
+        $fileLog = $raiz_do_projeto . "arquivos_gerados/logs/log_class_users_GAMERs_PDO-Errors.log";
 
         $log  = "=================================================================================================" . PHP_EOL;
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . "" . PHP_EOL;

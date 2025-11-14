@@ -54,7 +54,7 @@ if ($_SESSION['pode_logar'] == 1) {
         $msgAuth = "Login ou senha inválidos.\n";
 
         $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         $strRedirect = "login.php?msg=" .
             urlencode($msgAuth) .
@@ -79,7 +79,7 @@ if ($_SESSION['pode_logar'] == 1) {
                 $msgAuth = "Você precisa adicionar um autenticador para poder realizar seu login.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-                file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+                file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
                 $strRedirect = "login.php?msg=" .
                     urlencode($msgAuth) .
@@ -102,7 +102,7 @@ if ($_SESSION['pode_logar'] == 1) {
                 $msgAuth = "Token inválido.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-                file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+                file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
                 $strRedirect = "login.php?msg=" .
                     urlencode($msgAuth) .
@@ -130,7 +130,7 @@ if ($_SESSION['pode_logar'] == 1) {
         $msgAuth = "Login ou senha inválidos.\n";
 
         $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         $strRedirect = "login.php?msg=" .
             urlencode($msgAuth) .
@@ -155,7 +155,7 @@ if ($_SESSION['pode_logar'] == 1) {
                 $msgAuth = "Você precisa adicionar um autenticador para poder realizar seu login.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-                file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+                file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
                 $strRedirect = "login.php?msg=" .
                     urlencode($msgAuth) .
@@ -189,7 +189,7 @@ if ($_SESSION['pode_logar'] == 1) {
                     $msgAuth = "Não foi possível obter a localização.\n";
 
                     $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-                    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+                    file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
                     header("Location: aceite_termos.php");
                     exit;
@@ -213,7 +213,7 @@ if ($_SESSION['pode_logar'] == 1) {
                 $msgAuth = "Token inválido.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-                file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+                file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
                 $strRedirect = "login.php?msg=" .
                     urlencode($msgAuth) .
@@ -231,7 +231,7 @@ if ($_SESSION['pode_logar'] == 1) {
             $msgAuth = "precisa aceitar os termos de uso para continuar.\n";
 
             $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
-            file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+            file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
             $_SESSION['precisa_termos'] = true;
             header("Location: aceite_termos.php");
@@ -486,7 +486,7 @@ if (!$senha || $senha == "") {
 
 if ($msg != "") {
     $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msg" . PHP_EOL;
-    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+    file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
     $strRedirect = "https://" . $server_url . "/creditos/login.php?pag=" . urlencode($pag) . "&msg=" . urlencode($msg) . "&login=" . urlencode($login_usuario . "&tentativas=" . urlencode($_SESSION["tentativas_login"]));
 }
 

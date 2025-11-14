@@ -61,7 +61,7 @@ function gravaLog_MonitorConcilia($mensagem){
 
     // Salva o file monitor para mostrar no Backoffice
     try {
-            if ($handle = fopen($raiz_do_projeto.'log/monitor_concilia.txt', 'w')) { 
+            if ($handle = fopen($raiz_do_projeto.'arquivos_gerados/logs/monitor_concilia.txt', 'w')) { 
                     fwrite($handle, $mensagem.PHP_EOL);
 
                     fclose($handle);

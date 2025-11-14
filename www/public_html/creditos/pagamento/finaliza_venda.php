@@ -33,7 +33,7 @@ $OrderId = $_SESSION['pagamento.numorder'];
 $OrderAtual = $_SESSION['pagamento.numorder'];
 $idUsuario = $usuarioGames->getId();
 // Define o caminho do arquivo de log com base no ID do usuário
-$log_directory = __DIR__ . "/log/";  // Diretório 'log' na mesma pasta do script
+$log_directory = __DIR__ . "/arquivos_gerados/logs/";  // Diretório 'log' na mesma pasta do script
 $log_filename = "finaliza_venda_user_" . $idUsuario . ".txt";
 $log_filepath = $log_directory . $log_filename;
 
@@ -42,7 +42,7 @@ if (!is_dir($log_directory)) {
         //die('Erro ao criar o diretório de log: ' . $log_directory);
     }
 }
-// $ff = fopen("/www/log/finaliza_venda.txt", "a+");
+// $ff = fopen("/www/arquivos_gerados/logs/finaliza_venda.txt", "a+");
 $ff = fopen($log_filepath, "a+");
 fwrite($ff, "\r\n");
 fwrite($ff, "***************************************************\r\n");
