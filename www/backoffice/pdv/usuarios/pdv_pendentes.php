@@ -40,7 +40,7 @@
 		   for($num = 0; $num < count($listArquivo); $num++){
 		       $dataArq = substr($listArquivo[$num], 4, 8);
 			   if($dataArq >= str_replace("-", "", $_POST["dtMin"]) && $dataArq <= str_replace("-", "", $_POST["dtMax"])){
-				  $fileName = "/www/public_html/creditos/layout/pdvLog/".$listArquivo[$num];
+				  $fileName = "/www/arquivos_gerados/pdvLog/".$listArquivo[$num];
 				  $file = fopen($fileName, "r");
                   while(!feof($file)){
 					  $linha = explode(",", fgets($file));
