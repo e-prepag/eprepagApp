@@ -1172,7 +1172,6 @@ function getMeiosPagamentosBloqueados($tipoId, $libera_pagamento){
         require_once $raiz_do_projeto."/class/util/Json.class.php";
 
         $json = new Json;
-        $json->setFullPath(DIR_JSON);
         $json->setArrJsonFiles(unserialize(ARR_JSON_PRODUTOS_MEIOS_DE_PAGAMENTOS_BLOQUEADOS_GAMER));
         $obj = $json->getJsonRecursive();
 

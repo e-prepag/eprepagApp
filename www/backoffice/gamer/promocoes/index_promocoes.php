@@ -23,7 +23,7 @@ if($acao == 'inserir')
 	$ext	= explode('/',$_FILES['promo_banner']['type']);
 
 	if(in_array($ext[1],$formatos)) {
-		$pasta = DIR_WEB."imagens/promocoes/";
+		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["promo_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor, renomear antes.<br>";
 			$promo_banner = null;

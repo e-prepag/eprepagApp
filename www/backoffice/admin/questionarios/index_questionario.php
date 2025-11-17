@@ -31,7 +31,7 @@ if($acao == 'inserir')
 	$ext	= explode('/',$_FILES['quest_banner']['type']);
 
 	if(isset($ext[1]) && in_array($ext[1],$formatos)) {
-		$pasta = DIR_WEB . "imagens/questionario/";
+		$pasta = "/www/arquivos_gerados/imagens/questionario/";
 		if(file_exists("$pasta".$_FILES["quest_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor, renomear antes.<br>";
 			$quest_banner = null;
@@ -155,7 +155,7 @@ if($acao == 'atualizar')
 	
 	if(!empty($_FILES["quest_banner"]["name"])) {
 		$ext	= explode('/',$_FILES['quest_banner']['type']);
-		$pasta = DIR_WEB . "imagens/questionario/";
+		$pasta = "/www/arquivos_gerados/imagens/questionario/";
 		if(file_exists("$pasta".$_FILES["quest_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor renomear antes.<br>";
 			$quest_banner = null;

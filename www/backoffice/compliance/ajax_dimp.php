@@ -14,7 +14,7 @@ $id_request = $_POST['requisicao_id'];
 if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
     list($mes, $ano) = explode("/", $_POST['data_inicial']);
 
-    $diretorio = "../dimp/" . date('Ymd');
+    $diretorio = "/www/arquivos_gerados/dimp/" . date('Ymd');
     $nomeBase = $_POST['estado'] . '_TEF-DIMP_' . $mes . $ano;
     $ultimoArquivo = null;
     $ultimaModificacao = 0;
@@ -3148,12 +3148,12 @@ echo $msg;
 
 $output = ob_get_clean();
 
-$dir = "/www/backoffice/dimp/" . date('Ymd') . "/";
+$dir = "/www/dimp/" . date('Ymd') . "/";
 
 // cria a pasta se não existir
 if (!is_dir($dir)) {
     mkdir($dir, 0777, true);
 }
 // Salva no arquivo de log
-file_put_contents("/www/backoffice/dimp/" . date('Ymd') . "/result_" . $id_request . ".txt", $output, FILE_APPEND);
+file_put_contents("/www/arquivos_gerados/dimp/" . date('Ymd') . "/result_" . $id_request . ".txt", $output, FILE_APPEND);
 ?>

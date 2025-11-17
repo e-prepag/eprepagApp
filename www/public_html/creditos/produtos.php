@@ -11,7 +11,6 @@ $filtro['_ug_possui_restricao_produtos'] = $controller->usuarios->getPossuiRestr
 $arrJsonFiles = unserialize(ARR_PRODUTOS_CREDITOS);
 
 $busca = new Busca;
-$busca->setFullPath(DIR_JSON);
 $busca->setArrJsonFiles($arrJsonFiles);
 $busca->setFiltro($filtro);
 $arrProdutosOrdemAlfabetica = $arrProdutos = $busca->getAllJsonByFilter();

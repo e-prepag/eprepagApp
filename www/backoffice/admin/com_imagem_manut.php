@@ -3,7 +3,7 @@ require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once "/www/includes/bourls.php";
 
-$dir_imgs = DIR_WEB."imagens/uploads/";
+$dir_imgs = "/www/arquivos_gerados/imagens/uploads/";
 
 $imagem_del = isset($_GET['imagem_del']) ? $_GET['imagem_del'] : '';
 

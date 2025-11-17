@@ -34,7 +34,6 @@ if(Util::isAjaxRequest())
     }
 
     $busca = new Busca;
-    $busca->setFullPath(DIR_JSON);
     $busca->setArrJsonFiles($arrJsonFiles);
     $busca->setCategoria($categoria);
 

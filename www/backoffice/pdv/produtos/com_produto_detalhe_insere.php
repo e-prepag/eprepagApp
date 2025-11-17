@@ -53,7 +53,6 @@ if($msg == ""){
 
                     $arrJsonFiles = unserialize(ARR_PRODUTOS_CREDITOS);
                     $busca = new Busca;
-                    $busca->setFullPath(DIR_JSON);
                     $busca->setArrJsonFiles($arrJsonFiles);
                     $instProduto = new Produto();
                     $ret = $instProduto->obterMelhorado($filtro, null, $rs);

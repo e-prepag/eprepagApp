@@ -54,7 +54,6 @@ if($msg == ""){
                     $categoria = "Gamer";
                     $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
                     $busca = new Busca;
-                    $busca->setFullPath(DIR_JSON);
                     $busca->setArrJsonFiles($arrJsonFiles);
                     $busca->setCategoria($categoria);
 

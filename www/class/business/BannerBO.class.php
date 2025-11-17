@@ -23,7 +23,6 @@ class BannerBO extends BannerDAO
     {
         $fullPath = RAIZ_DO_PROJETO . "json/";
         $this->_json = new Json;
-        $this->_json->setFullPath($fullPath);
     }
 
     public function getCategoria()
@@ -235,7 +234,7 @@ class BannerBO extends BannerDAO
         // 6. Mover o arquivo
         if (!move_uploaded_file($file["tmp_name"], $destino_local)) {
             $this->erros[] = "Erro ao gravar imagem localmente.";
-        } 
+        }
         return (!empty($this->erros))
             ? false : true;
     }
@@ -263,13 +262,13 @@ class BannerBO extends BannerDAO
         }
 
         return (strlen($post["bs_titulo"]) < 4 ||
-                strlen($post["bs_link"]) < 8 ||
-                strlen($post["bs_data_inicio"]) < 10 ||
-                strlen($post["bs_data_fim"]) < 10 ||
-                $post["bsc_id"] <= 0 ||
-                $post["bsp_id"] <= 0 ||
-                ($post["bs_status"] != 0 && $post["bs_status"] != 1) ||
-                $urlErro)
+            strlen($post["bs_link"]) < 8 ||
+            strlen($post["bs_data_inicio"]) < 10 ||
+            strlen($post["bs_data_fim"]) < 10 ||
+            $post["bsc_id"] <= 0 ||
+            $post["bsp_id"] <= 0 ||
+            ($post["bs_status"] != 0 && $post["bs_status"] != 1) ||
+            $urlErro)
             ? false : true;
     }
 
@@ -292,7 +291,7 @@ class BannerBO extends BannerDAO
 
     public function jsonBanners()
     {
-        $where[] = ["bs_status", "=" , 1];
+        $where[] = ["bs_status", "=", 1];
         $where[] = ["bs_data_inicio", "<=", date('Y-m-d 00:00:00')];
         $where[] = ["bs_data_fim", ">=", date('Y-m-d 00:00:00')];
         $empty = array("Vazio");
@@ -384,24 +383,37 @@ class BannerBO extends BannerDAO
 
     public function getBannersFromJson($posicao, $categoria, $currJsonFile = 1)
     {
-
         try {
-            $jsonFile = $this->_json->getFullPath() . $categoria . "-banners-" . $currJsonFile . ".json";
+            // 1. Definir o NOME do JSON a ser buscado no banco
+            $nomeJson = $categoria . "-banners-" . $currJsonFile . ".json";
 
-            $json = Util::jsonVerify($jsonFile);
-            $posicao = html_entity_decode($posicao);
-            return isset($json->$posicao) ? $json->$posicao : false;
+            // 2. Usar a classe Json refatorada para buscar do DB
+            $json = $this->_json
+                ->setArrJsonFiles([$nomeJson]) // Define o 'nome' a ser buscado
+                ->getJsonRecursive();         // Executa o SELECT no banco
+
+            // 3. Verificar o resultado
+            if ($json) {
+                // getJsonRecursive() já retorna o objeto/array decodificado
+                $posicao = html_entity_decode($posicao);
+                return isset($json->$posicao) ? $json->$posicao : false;
+            } else {
+                // Se $json for false, o DB não encontrou.
+                // Lançamos uma exceção para acionar a lógica de fallback (tentar -2.json, -3.json)
+                throw new Exception("JSON '$nomeJson' não encontrado no banco.");
+            }
         } catch (Exception $ex) {
             $this->erros[] = $ex->getMessage();
-            $geraLog = new Log("FEEDRSS", array(
+            $geraLog = new Log("FEEDRSS_DB", array( // (Opcional) Mudei o nome do Log
                 "ERROR: " . $ex->getMessage(),
                 "FILE: " . $ex->getFile(),
                 "LINE " . $ex->getLine()
             ));
 
-            //setando qual arquivo json será usado em caso de erro
+            // setando qual arquivo json será usado em caso de erro
             $currJsonFile++;
 
+            // A lógica de fallback é mantida
             if ($currJsonFile <= 3) {
                 return $this->getBannersFromJson($posicao, $categoria, $currJsonFile);
             } else {

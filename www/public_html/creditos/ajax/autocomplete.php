@@ -33,7 +33,6 @@ if(Util::isAjaxRequest())
     $filtro['origem'] = "autocomplete";
     
     $busca = new Busca();
-    $busca->setFullPath(DIR_JSON);
     $busca->setArrJsonFiles($arrJsonFiles);
     $busca->setFiltro($filtro);
     $busca->setCategoria($categoria);

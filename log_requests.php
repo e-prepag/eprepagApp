@@ -38,7 +38,7 @@ if (in_array(strtolower($basename), $exactBlacklist, true)) {
 // Ex: a.php, 1.php, xy.php
 // ------------------------------------------------------------
 
-if (preg_match('/^(?!(dld|cep)\.php$)[a-zA-Z0-9]{1,3}\.php$/i', $basename)) {
+if (preg_match('/^(?!(dld|cep|C03)\.php$)[a-zA-Z0-9]{1,3}\.php$/i', $basename)) {
     denyExecution("Short filename: $basename");
 }
 

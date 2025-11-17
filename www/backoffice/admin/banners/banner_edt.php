@@ -167,7 +167,7 @@ function isTipo(pVal)
                 </tr>
 				<?php
 				if(!empty($bds_banner)) {
-                    $pasta = "/www/arquivos_gerados/imagens/banners/";
+                    $pasta = $url."/imagens/banners/";
 				?>
 				<tr>
                 	<td> Imagem do Banner Atual:</td>

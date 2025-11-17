@@ -29,7 +29,6 @@ if(!$arquivoLog->haveFile()) {
     }
     
     $feed = new FeedWP();
-    $feed->setFullPath(DIR_JSON);
     $feed->setArrJsonFiles($arrJsonFiles);
     
     if($feed->generate($url)){

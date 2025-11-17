@@ -24,6 +24,7 @@ class Busca extends Json{
         
     public function __construct($filtro = array(), $strBusca = "", $arrProduto = array(), $_jsonPath = "")
     {
+        parent::__construct();
         $this->strBusca = $strBusca;
         $this->arrProduto = $arrProduto;
         $this->_jsonPath = $_jsonPath;

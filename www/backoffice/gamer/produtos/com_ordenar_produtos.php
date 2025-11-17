@@ -31,7 +31,6 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
         require_once  $raiz_do_projeto."class/util/Busca.class.php";
         $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
         $busca = new Busca;
-        $busca->setFullPath(DIR_JSON);
         $busca->setArrJsonFiles($arrJsonFiles);
         $classProd = new Produto();
         $ret = $classProd->obterMelhorado($filtro, null, $rs);

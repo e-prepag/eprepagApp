@@ -35,19 +35,6 @@ if($acao == 'inserir')
 		}
 		else {
 			move_uploaded_file($_FILES["bds_banner"]["tmp_name"],"$pasta".$_FILES["bds_banner"]["name"]);
-			$bds_banner = $_FILES["bds_banner"]["name"];
-                        $nome_arquivo = $bds_banner;
-                        $arquivo = $pasta . $_FILES["bds_banner"]["name"];
-                        if(SFTP_TRANSFER && file_exists($arquivo)){
-                            $arq = trim(str_replace('/', '\\', $arquivo));
-                            //enviar para os servidores via sFTP
-                            $sftp = new SFTPConnection($server, $port);
-                            $sftp->login($user, $pass);
-                            $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/commerce/images/banners/".$nome_arquivo);
-
-                            //$msg .= "<br><br>Imagem de produto enviada ao servidor Windows 2003";
-
-                        }
 		}
 	}
 	//else $msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
@@ -123,19 +110,6 @@ if($acao == 'atualizar')
 		}
 		else {
 			move_uploaded_file($_FILES["bds_banner"]["tmp_name"],"$pasta".$_FILES["bds_banner"]["name"]);
-			$bds_banner = $_FILES["bds_banner"]["name"];
-                        $nome_arquivo = $bds_banner;
-                        $arquivo = $pasta . $_FILES["bds_banner"]["name"];
-                        if(SFTP_TRANSFER && file_exists($arquivo)){
-                            $arq = trim(str_replace('/', '\\', $arquivo));
-                            //enviar para os servidores via sFTP
-                            $sftp = new SFTPConnection($server, $port);
-                            $sftp->login($user, $pass);
-                            $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/commerce/images/banners/".$nome_arquivo);
-
-                            //$msg .= "<br><br>Imagem de produto enviada ao servidor Windows 2003";
-
-                        }
 		}
 		if(!in_array($ext[1],$formatos)) {
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";

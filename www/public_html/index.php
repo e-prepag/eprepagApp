@@ -37,7 +37,6 @@ if(isset($_SESSION['epp_origem'])){
 $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
 
 $busca = new Busca;
-$busca->setFullPath(DIR_JSON);
 $busca->setArrJsonFiles($arrJsonFiles);
 
 if(isset($filtro) && !empty($filtro)){
@@ -88,7 +87,6 @@ $inicio = $i;
 //COMENTADO POIS FOI SUBSTITUIDO POR UMA IMAGEM FIXA COM LINK PARA O BLOG
 //
 //$objJson = new Json;
-//$objJson->setFullPath(DIR_JSON);
 //$arrJsonFiles = unserialize(ARR_JSON_FEED_GAMER);
 //$objJson->setArrJsonFiles($arrJsonFiles);
 //$feeds = $objJson->getJsonRecursive();

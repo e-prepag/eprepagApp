@@ -21,7 +21,6 @@ if(isset($_SESSION['epp_origem'])){
 $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
 
 $busca = new Busca;
-$busca->setFullPath(DIR_JSON);
 $busca->setArrJsonFiles($arrJsonFiles);
 
 if(isset($filtro) && !empty($filtro)){

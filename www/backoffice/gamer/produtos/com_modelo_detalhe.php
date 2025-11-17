@@ -41,7 +41,6 @@ $instProdMod = new ProdutoModelo();
                            require_once  $raiz_do_projeto."class/util/Busca.class.php";
                            $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
                            $busca = new Busca;
-                           $busca->setFullPath(DIR_JSON);
                            $busca->setArrJsonFiles($arrJsonFiles);
 
                            $ret = $instProd->obterMelhorado($filtro, null, $rs);

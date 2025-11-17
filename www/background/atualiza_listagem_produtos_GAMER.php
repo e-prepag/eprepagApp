@@ -35,7 +35,6 @@ if(!$arquivoLog->haveFile()) {
     
     $categoria = "Gamer";
     $busca = new Busca;
-    $busca->setFullPath(DIR_JSON);
     $busca->setArrJsonFiles($arrJsonFiles);
     $busca->setCategoria($categoria);
 

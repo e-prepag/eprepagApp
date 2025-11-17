@@ -39,7 +39,6 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
                 require_once  $raiz_do_projeto . "class/util/Busca.class.php";
                 $arrJsonFiles = unserialize(ARR_PRODUTOS_CREDITOS);
                 $busca = new Busca;
-                $busca->setFullPath(DIR_JSON);
                 $busca->setArrJsonFiles($arrJsonFiles);
                 
                 $instProduto = new Produto();
