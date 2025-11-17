@@ -13,7 +13,7 @@ class BannerBO extends BannerDAO
 {
 
     private $formatos = array('jpg', 'jpeg', 'gif', 'png');
-    private $pasta = "public_html/imagens/banners/";
+    private $pasta = "/www/arquivos_gerados/imagens/banners/";
     public $urlLink = "/imagens/banners/";
     private $categoria;
     private $posicao;

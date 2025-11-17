@@ -45,7 +45,7 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 					   'Informações Adicionais do Servidor: ' . $infoAdicional . PHP_EOL . 
 					   '****#### FIM ####****' . PHP_EOL . PHP_EOL;
 
-		$fileLog = "/www/arquivos_gerados/logs/logCheckRedeemALL.txt";
+		$fileLog = "../../log/logCheckRedeemALL.txt";
 		$file = fopen($fileLog, 'a+');
 		if ($file) {
 			fwrite($file, $mensagemLog);
