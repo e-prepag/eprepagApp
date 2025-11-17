@@ -235,22 +235,7 @@ class BannerBO extends BannerDAO
         // 6. Mover o arquivo
         if (!move_uploaded_file($file["tmp_name"], $destino_local)) {
             $this->erros[] = "Erro ao gravar imagem localmente.";
-        } else {
-
-            $nome_arquivo = $safe_filename; // Nome seguro
-            $arquivo = $destino_local;      // Caminho seguro
-
-            if (SFTP_TRANSFER && file_exists($arquivo)) {
-
-                $arq = trim(str_replace('/', '\\', $arquivo));
-
-                // enviar para os servidores via sFTP
-                $sftp = new SFTPConnection($server, $port);
-                $sftp->login($user, $pass);
-
-                $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/commerce/images/banners/" . $nome_arquivo);
-            }
-        }
+        } 
         return (!empty($this->erros))
             ? false : true;
     }

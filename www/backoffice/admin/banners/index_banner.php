@@ -28,7 +28,7 @@ if($acao == 'inserir')
 	$ext	= explode('/',$_FILES['bds_banner']['type']);
 
 	if(in_array($ext[1],$formatos)) {
-		$pasta = DIR_WEB."imagens/banners/";
+		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["bds_banner"]["name"])){
 			$msg .= "<span class='txt-vermelho'>Imagem de Banner já existe com este mesmo nome.<br>Favor, renomear antes.</span><br>";
 			$bds_banner = null;
@@ -116,7 +116,7 @@ if($acao == 'atualizar')
 	
 	if(!empty($_FILES["bds_banner"]["name"])) {
 		$ext	= explode('/',$_FILES['bds_banner']['type']);
-		$pasta = DIR_WEB."imagens/banners/";
+		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["bds_banner"]["name"])){
 			$msg .= "<span class='txt-vermelho'>Imagem de Banner já existe com este mesmo nome.<br>Favor, renomear antes.</span><br>";
 			$bds_banner = null;
