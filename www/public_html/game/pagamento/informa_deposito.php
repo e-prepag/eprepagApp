@@ -2,6 +2,9 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
+//Para depositos, não é mais utilizado
+die("Acesso negado");
+
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;
@@ -18,7 +21,7 @@ if (isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser
 
 require_once DIR_INCS . "gamer/venda_e_modelos_logica.php";
 
-require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_verificacoes.php";
+//require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_verificacoes.php";
 
 //if($msg) $msg = $_POST['msg'];
 
@@ -27,11 +30,11 @@ $pagto_data_data_full = $pagto_data_data . " " . $pagto_data_horas . ":" . $pagt
 
 //Limpa arquivos temporarios da venda
 $venda_id = (int) $venda_id;
-$arquivos = buscaArquivosIniciaCom($FOLDER_COMMERCE_UPLOAD_TMP, 'nome', 'asc', "money_comprovante_" . $venda_id . "_");
-for ($j = 0; $j < count($arquivos); $j++) {
-    if (is_file($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j]))
-        unlink($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j]);
-}
+// $arquivos = buscaArquivosIniciaCom($FOLDER_COMMERCE_UPLOAD_TMP, 'nome', 'asc', "money_comprovante_" . $venda_id . "_");
+// for ($j = 0; $j < count($arquivos); $j++) {
+//     if (is_file($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j]))
+//         unlink($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j]);
+// }
 
 // Obtem o valor total deste pedido
 $libera_pagamento = array(
@@ -74,49 +77,49 @@ foreach ($arrPagtosBloqueados as $ind => $val) {
 
 if ($btSubmit && !$pagtoInvalido) {
 
-    require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_validacoes.php";
+    // require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_validacoes.php";
 
-    //Valida arquivo upload - comprovante
-    if ($msg == "") {
-        if (
-            ($pagto_banco == "001" && $pagto_local == "06") ||
-            ($pagto_banco == "237" && $pagto_local == "06") ||
-            ($pagto_banco == "104" && $pagto_local == "06")
-        ) {
+    // //Valida arquivo upload - comprovante
+    // if ($msg == "") {
+    //     if (
+    //         ($pagto_banco == "001" && $pagto_local == "06") ||
+    //         ($pagto_banco == "237" && $pagto_local == "06") ||
+    //         ($pagto_banco == "104" && $pagto_local == "06")
+    //     ) {
 
-            $uploadedFileName = $HTTP_POST_FILES['comprovante']['name'];
-            $fileSource = $HTTP_POST_FILES['comprovante']['tmp_name'];
+    //         $uploadedFileName = $HTTP_POST_FILES['comprovante']['name'];
+    //         $fileSource = $HTTP_POST_FILES['comprovante']['tmp_name'];
 
-            if (($fileSource != 'none') && ($fileSource != '')) {
+    //         if (($fileSource != 'none') && ($fileSource != '')) {
 
-                $safeFileName = basename($uploadedFileName);
+    //             $safeFileName = basename($uploadedFileName);
 
-                $fileDest = $FOLDER_COMMERCE_UPLOAD_TMP . "money_comprovante_" . $venda_id . "_" . $pagto_banco . "_" . $pagto_local . "_" . $safeFileName;
+    //             $fileDest = $FOLDER_COMMERCE_UPLOAD_TMP . "money_comprovante_" . $venda_id . "_" . $pagto_banco . "_" . $pagto_local . "_" . $safeFileName;
 
-                $fileContent = file_get_contents($fileSource);
-                if (strpos($fileContent, '<?php') !== false || strpos($fileContent, '<?') !== false) {
+    //             $fileContent = file_get_contents($fileSource);
+    //             if (strpos($fileContent, '<?php') !== false || strpos($fileContent, '<?') !== false) {
 
-                    $msg .= "Arquivo de comprovante inválido. Conteúdo malicioso detectado.\n";
-                } else {
+    //                 $msg .= "Arquivo de comprovante inválido. Conteúdo malicioso detectado.\n";
+    //             } else {
 
-                    $imageInfo = @getimagesize($fileSource);
+    //                 $imageInfo = @getimagesize($fileSource);
 
-                    // Lista de tipos de imagem permitidos
-                    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+    //                 // Lista de tipos de imagem permitidos
+    //                 $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
 
-                    if ($imageInfo === false || !isset($imageInfo['mime']) || !in_array($imageInfo['mime'], $allowedMimes)) {
+    //                 if ($imageInfo === false || !isset($imageInfo['mime']) || !in_array($imageInfo['mime'], $allowedMimes)) {
 
-                        $msg .= "Arquivo de comprovante inválido. Deve ser do tipo JPG, GIF ou PNG.\n";
-                    } else {
+    //                     $msg .= "Arquivo de comprovante inválido. Deve ser do tipo JPG, GIF ou PNG.\n";
+    //                 } else {
 
-                        if (!move_uploaded_file($fileSource, $fileDest)) {
-                            $msg = "Não foi possivel realizar o upload do comprovante, tente novamente.\n";
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                     if (!move_uploaded_file($fileSource, $fileDest)) {
+    //                         $msg = "Não foi possivel realizar o upload do comprovante, tente novamente.\n";
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     if ($msg == "") {
 
