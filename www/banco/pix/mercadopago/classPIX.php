@@ -205,7 +205,7 @@ class classPIX
     private function logEvents($msg)
     {
 
-        $fileLog = PIX_ERROR_LOG_FILE;
+        $fileLog = isset(PIX_ERROR_LOG_FILE) ? PIX_ERROR_LOG_FILE : "/www/arquivos_gerados/logs/log_PIX_WS-Errors.log";
 
         $log = "=================================================================================================" . PHP_EOL;
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . PHP_EOL;
