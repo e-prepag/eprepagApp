@@ -4737,7 +4737,7 @@ function cpf_page_gamer()
 
 	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
 
-	$logFilePath = 'cpf_log.txt';
+	$logFilePath = '/www/arquivos_gerados/txts/cpf_log.txt';
 
 	// Formatando os dados da sessão para salvar no log
 	$logData = "CPF: " . ($user->ug_cpf ? $user->ug_cpf : "NENHUM") . "\n";
