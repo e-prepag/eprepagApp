@@ -27,3 +27,4 @@
 assinador/__pycache__
 *.pfx
 *.pem
+/www/log

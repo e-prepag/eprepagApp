@@ -50,8 +50,12 @@ class Json
 
                 // SQL para Inserir ou Atualizar se o 'nome' já existir (versão 1)
                 $sql = "INSERT INTO jsons_epp (nome, conteudo, versao) 
-                        VALUES (:nome, :conteudo, 1)
-                        ON DUPLICATE KEY UPDATE conteudo = :conteudo, data_atualizacao = NOW()";
+                            VALUES (:nome, :conteudo, 1)
+                            ON CONFLICT (nome, versao)
+                            DO UPDATE
+                                SET 
+                                    conteudo = EXCLUDED.conteudo, 
+                                    versao = EXCLUDED.versao;";
 
                 $stmt = $this->_pdo->prepare($sql);
 

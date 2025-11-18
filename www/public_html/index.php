@@ -1,7 +1,7 @@
 <?php
-// error_reporting(E_ALL); // Exibe todos os tipos de erros
-// ini_set('display_errors', 1); // Exibe os erros diretamente na tela
-// ini_set('log_errors', 1); // Habilita o registro de erros no log do PHP
+error_reporting(E_ALL); // Exibe todos os tipos de erros
+ini_set('display_errors', 1); // Exibe os erros diretamente na tela
+ini_set('log_errors', 1); // Habilita o registro de erros no log do PHP
 
 require_once "../includes/constantes.php";
 require_once "../includes/constantes_url.php";
@@ -36,8 +36,12 @@ if(isset($_SESSION['epp_origem'])){
 
 $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
 
+print_r($arrJsonFiles);
+
 $busca = new Busca;
 $busca->setArrJsonFiles($arrJsonFiles);
+
+
 
 if(isset($filtro) && !empty($filtro)){
     $filtro['gamer'] = true;
@@ -45,6 +49,8 @@ if(isset($filtro) && !empty($filtro)){
 }
 
 $json = $busca->getAllJsonByFilter();
+
+printf($json);
 
 $qtdProdutoPorPagina = 8;
 $inicio = 0;
