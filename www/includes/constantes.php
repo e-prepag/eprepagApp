@@ -37,6 +37,7 @@ if (isset($baseUrl)) {
 }//end if (isset($GLOBALS['_SERVER']['SERVER_PORT']))
 
 define("DIR_WEB",RAIZ_DO_PROJETO."public_html/");
+define("DIR_IMG",RAIZ_DO_PROJETO."arquivos_gerados/");
 
 define("DIR_BACKOFFICE",RAIZ_DO_PROJETO."backoffice/");
 define("DIR_BACKOFFICE_ADMIN",DIR_BACKOFFICE."admin/");

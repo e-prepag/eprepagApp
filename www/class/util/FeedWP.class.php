@@ -148,7 +148,7 @@ class FeedWP extends Json
 
             // 2. O resto da lógica de limpeza de diretório (está correta)
             if (!file_exists($this->_imagesDir))
-                throw new Exception("DIRETÓRIO '" . DIR_WEB . $this->_imagesDir . "' NÃO EXISTE.");
+                throw new Exception("DIRETÓRIO '" . DIR_IMG . $this->_imagesDir . "' NÃO EXISTE.");
 
             $diretorio = dir($this->_imagesDir);
             $logArquivos = "";

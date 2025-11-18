@@ -44,7 +44,7 @@ foreach($arrProdutos as $produto){
 		if(!isset($produto['object']->imagem)){
         $height = 0;
 		}else{
-			list($width, $height) = getimagesize(DIR_WEB . DIR_W_IMG_PRODUTOS . $produto['object']->imagem);
+			list($width, $height) = getimagesize(DIR_IMG . DIR_W_IMG_PRODUTOS . $produto['object']->imagem);
 		}
 		$array_imagem[$produto['object']->imagem] = $height;
 		if($height > $maiorAltura) {
@@ -122,7 +122,7 @@ if(is_array($arrProdutos) && !empty($arrProdutos)){
 <?php 
             if( $produto['object']->imagem && 
             $produto['object']->imagem != "" && 
-            file_exists(DIR_WEB . DIR_W_IMG_PRODUTOS . $produto['object']->imagem)){ 
+            file_exists(DIR_IMG . DIR_W_IMG_PRODUTOS . $produto['object']->imagem)){ 
 ?>                    
                     <img border="0" class="img-produto" style="margin-top: <?php echo ($maiorAltura - $array_imagem[$produto['object']->imagem])/2 ?>px" src="<?php echo DIR_W_IMG_PRODUTOS . $produto['object']->imagem?>">
 <?php 

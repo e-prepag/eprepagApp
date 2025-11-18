@@ -170,7 +170,7 @@ $controller->setHeader();
                     <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
                         <p class="bottom0">
                             <?php
-                            if ($produto->getNomeImagem() && $produto->getNomeImagem() != "" && file_exists(DIR_WEB . DIR_G_IMG_PRODUTOS . $produto->getNomeImagem())) {
+                            if ($produto->getNomeImagem() && $produto->getNomeImagem() != "" && file_exists(DIR_IMG . DIR_G_IMG_PRODUTOS . $produto->getNomeImagem())) {
                             ?>
                                 <img border="0" style="max-width: 100%" src="<?php echo DIR_G_IMG_PRODUTOS . $produto->getNomeImagem() ?>">
                             <?php

@@ -1,7 +1,7 @@
 <?php
-error_reporting(E_ALL); // Exibe todos os tipos de erros
-ini_set('display_errors', 1); // Exibe os erros diretamente na tela
-ini_set('log_errors', 1); // Habilita o registro de erros no log do PHP
+// error_reporting(E_ALL); // Exibe todos os tipos de erros
+// ini_set('display_errors', 1); // Exibe os erros diretamente na tela
+// ini_set('log_errors', 1); // Habilita o registro de erros no log do PHP
 
 require_once "../includes/constantes.php";
 require_once "../includes/constantes_url.php";
@@ -75,7 +75,7 @@ $maiorAltura = 0;
 $array_imagem = array();
 
 foreach($productResult as $produto){
-    list($width, $height) = getimagesize(DIR_WEB . DIR_G_IMG_PRODUTOS . $produto['object']->imagem);
+    list($width, $height) = getimagesize(DIR_IMG . DIR_G_IMG_PRODUTOS . $produto['object']->imagem);
     $array_imagem[$produto['object']->imagem] = $height;
     if($height > $maiorAltura) {
         $maiorAltura = $height;
@@ -226,7 +226,7 @@ if(is_array($productResult) && !empty($productResult)){
 <?php 
         if( $produto['object']->imagem && 
         $produto['object']->imagem != "" && 
-        file_exists(DIR_WEB . DIR_G_IMG_PRODUTOS . $produto['object']->imagem)){ 
+        file_exists(DIR_IMG . DIR_G_IMG_PRODUTOS . $produto['object']->imagem)){ 
 ?>              
                   
                     <img border="0" class="img-produto" style="margin-top: <?php echo (($maiorAltura - $array_imagem[$produto['object']->imagem])/2) - 1 ; ?>px" src="<?php echo DIR_G_IMG_PRODUTOS . $produto['object']->imagem?>">

@@ -20,7 +20,7 @@ $PEP_EXTENSOES = array("csv", "zip");
 //PArte do Nome do arquivo PEP zipado
 $PEP_FILE_NAME = "PEP";
 //Diretório destino do arquivo do PEP
-$DIR_PEP_ARQ_RETORNO = $raiz_do_projeto . "/backoffice/compliance/pep/";
+$DIR_PEP_ARQ_RETORNO = $raiz_do_projeto . "/arquivos_gerados/compliance/pep/";
 //Indices a serem considerados
 $IDX_VETOR_ARQ_EXPLODE = array(
                                'cpf'  => 0,

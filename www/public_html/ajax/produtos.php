@@ -95,9 +95,9 @@ if(Util::isAjaxRequest())
             $height = 0;
         }else{
             if($categoria == "Gamer"){
-                list($width, $height) = getimagesize(DIR_WEB . DIR_G_IMG_PRODUTOS . $produto['object']->imagem);
+                list($width, $height) = getimagesize(DIR_IMG . DIR_G_IMG_PRODUTOS . $produto['object']->imagem);
             }else{
-                list($width, $height) = getimagesize(DIR_WEB . DIR_W_IMG_PRODUTOS . $produto['object']->imagem);
+                list($width, $height) = getimagesize(DIR_IMG . DIR_W_IMG_PRODUTOS . $produto['object']->imagem);
             }
         }
         $array_imagem[$produto['object']->imagem] = $height;
