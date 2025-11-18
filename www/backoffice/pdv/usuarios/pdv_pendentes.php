@@ -5,14 +5,6 @@
    require_once $raiz_do_projeto."backoffice/includes/topo.php";
    
    if(isset($_POST["btn-envia"])){
-	    
-	   $listArquivo = [];
-	   $arquivosDir = scandir("/www/public_html/creditos/layout/pdvLog");
-	   for($num = 0; $num < count($arquivosDir); $num++){
-		   if($arquivosDir[$num] != "." && $arquivosDir[$num] != ".."){
-			   array_push($listArquivo, $arquivosDir[$num]);
-		   }
-	   }
 	  
 	   function estruturaExcel($info){
 		   $html = "<table border='1'>";

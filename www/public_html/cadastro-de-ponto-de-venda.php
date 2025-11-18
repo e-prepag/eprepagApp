@@ -727,13 +727,6 @@ if (!empty($msg)) { ?>
                         $('#ourError').removeClass('hidden').fancybox().trigger('click');
                         return false;
                     }
-                    if (currentIndex === 0) {
-                        $.post('/creditos/layout/pdv_pendente.php', {
-                            email: $('#email').val(),
-                            username: $("#username").val()
-                        }, function(data) {});
-                    }
-
                     if (newIndex > 0) {
                         $('#info2').hide('slow');
                         $('#explicacao').hide('slow');
