@@ -36,8 +36,6 @@ if(isset($_SESSION['epp_origem'])){
 
 $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
 
-print_r($arrJsonFiles);
-
 $busca = new Busca;
 $busca->setArrJsonFiles($arrJsonFiles);
 
