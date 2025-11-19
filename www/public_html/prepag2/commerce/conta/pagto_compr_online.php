@@ -22,17 +22,6 @@ require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "constantes.php";
 validaSessao();
 
-if ($_SERVER['REMOTE_ADDR'] == '187.18.199.57') {
-	$logFilePath = 'session_log.txt';
-
-	// Formatando os dados da sessão para salvar no log
-	$logData = "Sessão em " . date('Y-m-d H:i:s') . ":\n";
-	$logData .= print_r($_SESSION, true) . "\n"; // Converte $_SESSION em string legível
-
-	// Escrevendo no arquivo de log
-	$result = file_put_contents($logFilePath, $logData, FILE_APPEND);
-}
-
 //Recupera usuario
 if (isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser'])) {
 	$usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
