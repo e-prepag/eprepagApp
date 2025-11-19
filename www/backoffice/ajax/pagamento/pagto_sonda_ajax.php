@@ -1,5 +1,6 @@
 <?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
+require_once "/www/includes/bourls.php";
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -104,7 +105,7 @@ echo "<span style='font-size:10px; font-family: tahoma,arial,sans serif'>" . $da
 		$curl = curl_init();
 
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => '' . EPREPAG_URL_HTTPS . '/webhook/confirmaPix.php',
+			CURLOPT_URL => $server_url_bo.'/pix/confirmaPix.php',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,

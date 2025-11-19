@@ -1,7 +1,9 @@
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-
+if (!defined('ACCESS_ALLOWED')) {
+    die('Acesso direto não permitido.');
+}
 //Verificando se a execução foi acionada a apartir CHECK-REDEEM
 $teste = debug_backtrace();
 if (strpos($teste[0]["file"], "check-redeem/index.php")) {

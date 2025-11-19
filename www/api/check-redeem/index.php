@@ -3,6 +3,8 @@
 
 
 */
+define('ACCESS_ALLOWED', true);
+
 if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 
         set_time_limit(300);

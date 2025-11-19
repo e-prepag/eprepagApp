@@ -1,5 +1,8 @@
 <?php
 //Verificando se a execução foi acionada a apartir CHECK-REDEEM
+if (!defined('ACCESS_ALLOWED')) {
+    die('Acesso direto não permitido.');
+}
 $teste = debug_backtrace();
 if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 
