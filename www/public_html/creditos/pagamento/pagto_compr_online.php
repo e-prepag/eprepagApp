@@ -74,9 +74,6 @@ if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) ||
         $rs_pagto_id_row = pg_fetch_array($rs_pagto_id);
         $id_transacao_itau = $rs_pagto_id_row['id_transacao_itau'];
     }
-
-    require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
-    require_once RAIZ_DO_PROJETO . "banco/itau/inc_urls_bancoitau.php";
 }
 
 $numOrder = $OrderId;

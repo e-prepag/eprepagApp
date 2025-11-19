@@ -183,10 +183,6 @@ if ($controller->usuario->b_IsLogin_pagamento()) {
                 $numOrder = $orderId;
                 $cesta_descricao = montaCesta_pag();
         } elseif ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']) {
-
-                // gera nova ordem em tb_pag_compras
-                require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
-                require_once RAIZ_DO_PROJETO . "banco/itau/inc_gen_order_bit.php"; // 
                 $numOrder = $orderId;
                 $pagto_venda = $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC;        // convert to numeric value to allow storing in tb_dist_venda_games
 

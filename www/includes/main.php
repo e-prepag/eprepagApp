@@ -147,7 +147,6 @@ require_once $raiz_do_projeto.'class/classEmailAutomatico.php';
 require_once $raiz_do_projeto.'class/classEncryption.php';
 require_once $raiz_do_projeto.'includes/configIP.php';
 require_once $raiz_do_projeto.'banco/bradesco/config.inc.urls_bradesco.php';
-require_once $raiz_do_projeto.'banco/itau/inc_config.php';
 
 	// Strict-Transport-Security (HSTS)
 	header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");

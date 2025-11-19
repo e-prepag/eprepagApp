@@ -141,8 +141,6 @@ if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) ||
 	}
 
 	include DIR_INCS . "gamer/venda_e_modelos_calculate.php";
-	require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
-	require_once RAIZ_DO_PROJETO . "banco/itau/inc_urls_bancoitau.php";
 } else if ($pagto_tipo == $PAGAMENTO_HIPAY_ONLINE_NUMERIC) {
 	include DIR_INCS . "gamer/venda_e_modelos_calculate.php";
 	//		include "../../pag/bep/inc_urls_bancoeprepag.php";
