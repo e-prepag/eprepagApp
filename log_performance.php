@@ -1,7 +1,13 @@
 <?php
-// Colocar no /usr/share/php e no php ini na opção auto_append_file
-// --- Configurações do Log de Performance ---
-$PERF_LOG_FILE_PATH = '/www/arquivos_gerados/logs/performance-' . date('Y-m-d') . '.log';
+// Obtém a hora atual no formato 24h (de 0 a 23)
+$hora_atual = (int)date('G');
+
+// Divide a hora por 6 para descobrir o bloco (0, 1, 2, ou 3)
+// (PHP trata a divisão de inteiros e arredonda para baixo)
+$bloco_do_dia = (int)($hora_atual / 6); 
+
+// Monta o nome do arquivo usando a data E o bloco
+$PERF_LOG_FILE_PATH = '/www/arquivos_gerados/logs/performance-' . date('Y-m-d') . '-bloco-' . $bloco_do_dia . '.log';
 $PERF_LOG_OWNER_USER = 'www-data';
 $PERF_LOG_OWNER_GROUP = 'www-data';
 // ------------------------------------------

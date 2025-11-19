@@ -1,4 +1,4 @@
-<?php 
+<?php ///
 session_start();
 if(empty($_SESSION["iduser_bko_pub"]))
     {
@@ -17,21 +17,38 @@ if($_SESSION["tipo_acesso_pub"]=='PU') {
 	ob_end_flush();
 }
 
-$varArquivo	=	isset($_GET['varArquivo'])	? $_GET['varArquivo']	: null;
+$diretorioBase = '/www/arquivos_gerados/lotes/'; 
 
-// set headers
+$varArquivo = isset($_GET['varArquivo']) ? $_GET['varArquivo'] : null;
+
+if (!$varArquivo) {
+    die("Arquivo não especificado.");
+}
+
+$nomeArquivoSeguro = basename($varArquivo);
+
+$caminhoCompleto = $diretorioBase . $nomeArquivoSeguro;
+
+if (!file_exists($caminhoCompleto) || !is_file($caminhoCompleto) || !is_readable($caminhoCompleto)) {
+    http_response_code(404);
+    die("Arquivo não encontrado.");
+}
+
 header('Content-Description: File Transfer');
-header('Cache-Control: private',false);
-header('Content-type: application/force-download'); 
-header('Content-Type: text/plain');
-header('Content-Disposition: attachment; filename='.basename($varArquivo));
+header('Cache-Control: private', false);
+header('Content-Type: application/octet-stream'); // "octet-stream" é mais padrão que "force-download"
+header('Content-Disposition: attachment; filename="' . $nomeArquivoSeguro . '"');
 header('Content-Transfer-Encoding: binary');
 header('Expires: 0');
 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 header('Pragma: public');
-header('Content-Length: ' . filesize($varArquivo));
+header('Content-Length: ' . filesize($caminhoCompleto));
 header('Connection: close');
-  
-readfile($varArquivo);
 
+ob_clean();
+flush();
+
+readfile($caminhoCompleto);
+exit;
 ?>
+
