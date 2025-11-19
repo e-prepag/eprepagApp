@@ -59,13 +59,11 @@ $forbiddenDirs = [
     '/temp/',
     '/cache/',
     '/log/',
-    '/logs/',
     '/upload/',
     '/uploads/',
     '/img/',
     '/image/',
     '/images/',
-    '/imagens/',
 ];
 
 // Detecta diretórios proibidos
