@@ -302,7 +302,7 @@ class classPIX
             "date_of_expiration" => $dateOfExpiration,
             "payment_method_id" => "pix",
             "external_reference" => $vendaId,
-            "notification_url" => "https://www.e-prepag.com.br/webhook/mercadoPago.php",
+            "notification_url" => "https://api.eprepag.com.br/webhook/mercadoPago.php",
             "description" => "PIX pagto id: $vendaId",
 
             "payer" => [
