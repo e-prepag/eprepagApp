@@ -601,10 +601,10 @@ if ($msg == "") {
             $infoRow["ug_substatus"] == "12"
         ) {
             $msg = "Para sua segurança, seu PDV está inativo. Para reativá-lo, entre em contato com o suporte E-Prepag.\n";
-            gravaLog_Login("Para sua segurança, seu PDV está inativo. Para reativá-lo, entre em contato com o suporte E-Prepag: '$login_usuario', '$senha'.\n");
+            gravaLog_Login("Para sua segurança, seu PDV está inativo. Para reativá-lo, entre em contato com o suporte E-Prepag: '$login_usuario'.\n");
         } else {
             $msg = "Login ou senha inválidos.\n";
-            gravaLog_Login("Login ou senha inválidos: '$login_usuario', '$senha'.\n");
+            gravaLog_Login("Login ou senha inválidos: '$login_usuario'.\n");
         }
         $strRedirect =
             "http" .
@@ -619,7 +619,7 @@ if ($msg == "") {
             urlencode($login_usuario);
         // $strRedirect = "https://" . $server_url . "/creditos/login.php?pag=" . urlencode($pag) . "&msg=" . urlencode($msg) . "&login=" . urlencode($login . "&tentativas=" . urlencode($_SESSION["tentativas_login"]));
     } else {
-        gravaLog_Login("Login com sucesso: '$login_usuario', '$senha'.\n");
+        gravaLog_Login("Login com sucesso: '$login_usuario'.\n");
         //'Pagina default de redirecionamento apos login
         $strRedirect = "https://" . $server_url . "/creditos/";
         //'Se foi passado pagina de redirecionamento

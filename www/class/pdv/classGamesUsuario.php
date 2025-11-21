@@ -4155,7 +4155,7 @@ class UsuarioGames {
             $ret = $this->adicionarLoginSession($login);
 				
         } else {
-            gravaLog_Login("Login de lanhouse falhou ($senha0): '$sql'.".PHP_EOL, true);
+            gravaLog_Login("Login de lanhouse falhou ($login).".PHP_EOL, true);
         }
 
         //Atualiza ultimo acesso

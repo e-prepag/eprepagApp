@@ -219,10 +219,10 @@ if (Util::isAjaxRequest()) {
 
 				if (!$ret) {
 					$erro = true;
-					$geraLog = new Log("log_login", array("Login ou senha inválidos: '" . $_POST['login'] . "', '" . $_POST['senha']));
+					$geraLog = new Log("log_login", array("Login ou senha inválidos: '" . $_POST['login']));
 					registrarTentativaFalha($_POST['login']);
 				} else {
-					$geraLog = new Log("log_login", array("Login com sucesso: '" . $_POST['login'] . "', '" . $_POST['senha']));
+					$geraLog = new Log("log_login", array("Login com sucesso: '" . $_POST['login']));
 				}
 			}
 
@@ -254,11 +254,11 @@ if (Util::isAjaxRequest()) {
 
 			if (!$ret) {
 				$erro = true;
-				$geraLog = new Log("log_login", array("Login ou senha inválidos: '" . $_POST['login'] . "', '" . $_POST['senha'] . "'"));
+				$geraLog = new Log("log_login", array("Login ou senha inválidos: '" . $_POST['login']));
 				registrarTentativaFalha($_POST['login']);
 
 			} else {
-				$geraLog = new Log("log_login", array("Login com sucesso: '" . $_POST['login'] . "', '" . $_POST['senha'] . "'"));
+				$geraLog = new Log("log_login", array("Login com sucesso: '" . $_POST['login']));
 			}
 
 			if ($erro) {

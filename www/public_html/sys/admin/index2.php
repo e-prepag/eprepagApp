@@ -46,7 +46,7 @@ $Enviar = true;
 
 if ($Enviar) {
 
-    gravaLog_LoginSys("Login: '" . $user . "', '" . $passw . "'", true);
+    gravaLog_LoginSys("Login: '" . $user, true);
 
     $_SESSION["iduser_bko_pub"] = "";
     $_SESSION["tipo_acesso_pub"] = "";

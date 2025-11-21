@@ -158,7 +158,7 @@ if (Util::isAjaxRequest()) {
 
                 if (!$ret) {
                     $erro = true;
-                    $geraLog = new Log("log_login", array("Login ou senha inválidos gamer: '" . $_POST['login'] . "', '" . $_POST['senha']));
+                    $geraLog = new Log("log_login", array("Login ou senha inválidos gamer: '" . $_POST['login']));
                     registrarTentativaFalha($_POST['login']);
                 }
             }
@@ -209,7 +209,7 @@ if (Util::isAjaxRequest()) {
 
             if (!$ret) {
                 $erro = true;
-                $geraLog = new Log("log_login", array("Login ou senha inválidos gamer: '" . $_POST['login'] . "', '" . $_POST['senha'] . "'"));
+                $geraLog = new Log("log_login", array("Login ou senha inválidos gamer: '" . $_POST['login']));
                 registrarTentativaFalha($_POST['login']);
             }
 
