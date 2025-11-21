@@ -35,7 +35,7 @@
 	//Imagens dos produtos e modelos
 	$IMAGES_PRODUTO_EXTENSOES = array("gif", "jpg", "png");
 	$URL_DIR_IMAGES_PRODUTO = "/imagens/gamer/produtos/";
-	$FIS_DIR_IMAGES_PRODUTO = $raiz_do_projeto . "public_html/imagens/gamer/produtos/";
+	$FIS_DIR_IMAGES_PRODUTO = $raiz_do_projeto . "arquivos_gerados/imagens/gamer/produtos/";
 	
 	//Imagens dos banners
 	$IMAGES_BANNER_EXTENSOES = array("gif", "jpg", "png", "jpeg");

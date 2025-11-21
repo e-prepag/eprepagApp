@@ -17,7 +17,7 @@ if($acao == 'inserir')
 	$ext	= explode('/',$_FILES['mat_promo_banner']['type']);
 
 	if(in_array($ext[1],$formatos)) {
-		$pasta = $raiz_do_projeto."public_html/imagens/pdv/material_promocional/";
+		$pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/material_promocional/";
 		if(file_exists("$pasta".$_FILES["mat_promo_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor, renomear antes.<br>";
 			$mat_promo_banner = null;

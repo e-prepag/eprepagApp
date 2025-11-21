@@ -25,7 +25,7 @@ $FOLDER_COMMERCE_UPLOAD_TMP = $raiz_do_projeto . "/backoffice/offweb/upload_arqu
 //Imagens dos produtos e modelos
 $IMAGES_PRODUTO_EXTENSOES = array("gif", "jpg", "png");
 $URL_DIR_IMAGES_PRODUTO = "/imagens/pdv/produtos/";
-$FIS_DIR_IMAGES_PRODUTO = $raiz_do_projeto . "public_html/imagens/pdv/produtos/";
+$FIS_DIR_IMAGES_PRODUTO = $raiz_do_projeto . "arquivos_gerados/imagens/pdv/produtos/";
 
 //Imagens dos banners
 $IMAGES_BANNER_EXTENSOES = array("gif", "jpg", "png", "jpeg");
