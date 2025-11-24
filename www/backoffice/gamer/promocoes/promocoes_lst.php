@@ -95,7 +95,7 @@ $sql = "SELECT
 		to_char(promo_data_fim,'DD/MM/YYYY') as promo_data_fim,
 		promo_banner,
 		promo_valor,
-		CASE WHEN (promo_ativo = '1' AND promo_data_inicio <= NOW() AND (promo_data_fim + interval '1 day')   >= NOW()) THEN '<div style=\'background-color:orange;color:blue;text-align:center\'>Sim</div>' WHEN promo_ativo = '1' THEN 'Sim' ELSE 'N&atilde;o' END as promo_ativo
+		CASE WHEN (promo_ativo = '1' AND promo_data_inicio <= NOW() AND (promo_data_fim + interval '1 day')   >= NOW()) THEN '<div style=''background-color:orange;color:blue;text-align:center''>Sim</div>' WHEN promo_ativo = '1' THEN 'Sim' ELSE 'N&atilde;o' END as promo_ativo
 	FROM promocoes p
 		LEFT JOIN operadoras o ON (p.opr_codigo = o.opr_codigo)";
 if (!empty($promo_nome))

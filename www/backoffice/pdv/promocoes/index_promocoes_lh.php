@@ -1,4 +1,7 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 $acao				= isset($_REQUEST['acao'])				? $_REQUEST['acao']								: 'listar';
@@ -70,13 +73,15 @@ if($acao == 'atualizar')
 {
 	if(!empty($_FILES["promolh_banner"]["name"])) {
 		$ext	= explode('/',$_FILES['promolh_banner']['type']);
-		$pasta = $raiz_do_projeto."public_html/imagens/pdv/promocoes/";
+		$pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/promocoes/";
 		if(file_exists("$pasta".$_FILES["promolh_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor renomear antes.<br>";
 			$promolh_banner = '';
 		}
 		else {
-			move_uploaded_file($_FILES["promolh_banner"]["tmp_name"],"$pasta".$_FILES["promolh_banner"]["name"]);
+			if(!move_uploaded_file($_FILES["promolh_banner"]["tmp_name"],"$pasta".$_FILES["promolh_banner"]["name"])){
+				die("erro");
+			}
 			$promolh_banner = $_FILES["promolh_banner"]["name"];
 		}
 		if(!in_array($ext[1],$formatos)) {

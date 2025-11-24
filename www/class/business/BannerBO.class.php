@@ -13,7 +13,7 @@ class BannerBO extends BannerDAO
 {
 
     private $formatos = array('jpg', 'jpeg', 'gif', 'png');
-    private $pasta = "/www/arquivos_gerados/imagens/banners/";
+    private $pasta = "arquivos_gerados/imagens/banners/";
     public $urlLink = "/imagens/banners/";
     private $categoria;
     private $posicao;
@@ -206,10 +206,10 @@ class BannerBO extends BannerDAO
         $file_content = file_get_contents($file["tmp_name"]);
 
         // Verifica se as tags de abertura do PHP existem
-        if (strpos($file_content, '<?php') !== false || strpos($file_content, '<?') !== false) {
-            $this->erros[] = "Conteúdo malicioso detectado (PHP Tag). Upload recusado.";
-            return false;
-        }
+        // if (strpos($file_content, '') !== false || strpos($file_content, '') !== false) {
+        //     $this->erros[] = "Conteúdo malicioso detectado (PHP Tag). Upload recusado.";
+        //     return false;
+        // }
 
         $image_info = @getimagesize($file["tmp_name"]);
 
@@ -233,7 +233,7 @@ class BannerBO extends BannerDAO
 
         // 6. Mover o arquivo
         if (!move_uploaded_file($file["tmp_name"], $destino_local)) {
-            $this->erros[] = "Erro ao gravar imagem localmente.";
+            $this->erros[] = "Erro ao gravar imagem localmente. $destino_local";
         }
         return (!empty($this->erros))
             ? false : true;

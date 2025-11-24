@@ -332,7 +332,7 @@ if ($msg == "") {
 
         $senha = 'P@8v#Xz4!Tm9';
 
-        $url = "" . EPREPAG_URL_HTTPS . "/creditos/layout/ajaxEmail.php?type=email&email=" . urlencode($email) . "&username=" . urlencode($username) . "&password=" . urlencode($senha);
+        $url = "https://api.eprepag.com.br/webhook/pdv/ajaxEmail.php?type=email&email=" . urlencode($email) . "&username=" . urlencode($username) . "&password=" . urlencode($senha);
 
         $ch = curl_init();
 

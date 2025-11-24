@@ -131,7 +131,7 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
             $verificaParteVazia = (array_search("", $dataQuebrada) === false) ? true : false;
             if ($verificaNumeroDePartes === true && $verificaParteVazia === true && strlen($dataNascimento) == 10) {
 
-                $url = "" . EPREPAG_URL_HTTPS . "/ajax/ajaxCpf.php";
+                $url = "https://api.eprepag.com.br/webhook/ajaxCpf.php";
 
                 $postFields = [
                     'cpf' => $cpf,

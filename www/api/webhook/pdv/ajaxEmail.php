@@ -1,7 +1,8 @@
 <?php
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once "../../../includes/constantes.php";
+define('ACCESS_ALLOWED', true);
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 	
     if (array_key_exists('type', $_GET) ) {

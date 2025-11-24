@@ -93,7 +93,7 @@ $sql = "SELECT
 		SUBSTRING(bds_data_inicio::varchar,0, 11) as bds_data_inicio,
 		SUBSTRING(bds_data_fim::varchar,0, 11) as bds_data_fim,
 		CASE WHEN bds_tipo_usuario = 'L' THEN 'LAN HOUSE' WHEN bds_tipo_usuario = 'G' THEN 'Gamers' END as bds_tipo_usuario,
-		CASE WHEN (bds_ativo = '1' AND bds_data_inicio <= NOW() AND (bds_data_fim + interval '1 day')   >= NOW()) THEN '<div style=\'background-color:orange;color:blue;text-align:center\'>Sim</div>' WHEN bds_ativo = '1' THEN 'Sim' ELSE 'N&atilde;o' END as bds_ativo
+		CASE WHEN (bds_ativo = '1' AND bds_data_inicio <= NOW() AND (bds_data_fim + interval '1 day')   >= NOW()) THEN '<div style=''background-color:orange;color:blue;text-align:center''>Sim</div>' WHEN bds_ativo = '1' THEN 'Sim' ELSE 'N&atilde;o' END as bds_ativo
 	FROM tb_banner_drop_shadow ";
 if (!empty($bds_nome))
 	$sbds_aux[] = "upper(bds_texto) LIKE '%" . strtoupper($bds_nome) . "%'";

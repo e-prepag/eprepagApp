@@ -48,8 +48,6 @@ if(isset($filtro) && !empty($filtro)){
 
 $json = $busca->getAllJsonByFilter();
 
-printf($json);
-
 $qtdProdutoPorPagina = 8;
 $inicio = 0;
 $pagina = 1;

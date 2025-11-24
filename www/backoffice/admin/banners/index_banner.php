@@ -1,8 +1,13 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto.'sftp/connect.php';
 require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
+
+$bds_banner = $_FILES["bds_banner"]["name"] ?: null;
 
 $acao	= isset($_REQUEST['acao']) ? $_REQUEST['acao'] : 'listar';
 
@@ -200,7 +205,7 @@ if($acao == 'listar')
 {
     include 'banner_lst.php';
 }
-//echo $msg;
+echo $msg;
 ?>
 <script type="text/javascript">
 	document.getElementById("msg").innerHTML = "<?php echo $msg;?>";
