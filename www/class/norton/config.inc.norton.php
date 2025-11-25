@@ -39,13 +39,13 @@ define("NORTON_PRODUCT_SKU", "21416528");
 
 //LOG's
 define("NORTON_ERROR_LOG", "ERROR_LOG");
-define("NORTON_ERROR_LOG_FILE", RAIZ_DO_PROJETO . "log/log_NORTON_WS-Errors.log");
+define("NORTON_ERROR_LOG_FILE", RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_NORTON_WS-Errors.log");
 
 define("NORTON_ELETRONIC_PURCHASE_LOG", "ELETRONIC_PURCHASE_LOG");
-define("NORTON_ELETRONIC_PURCHASE_LOG_FILE", RAIZ_DO_PROJETO . "log/log_NORTON_WS-Eletronic_purchase.log");
+define("NORTON_ELETRONIC_PURCHASE_LOG_FILE", RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_NORTON_WS-Eletronic_purchase.log");
 
 define("NORTON_REFUND_TRANSACTION_LOG", "REFUND_TRANSACTION_LOG");
-define("NORTON_REFUND_TRANSACTION_LOG_FILE", RAIZ_DO_PROJETO . "log/log_NORTON_WS-Refund_transaction.log");
+define("NORTON_REFUND_TRANSACTION_LOG_FILE", RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_NORTON_WS-Refund_transaction.log");
 //
 
 

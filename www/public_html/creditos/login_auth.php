@@ -81,7 +81,7 @@ if(getenv("AMBIENTE") == "HOMOLOGACAO") {
         $msg = "Captcha inválido.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         $strRedirect = $server_url .
             "/creditos/login.php?msg=" .
@@ -96,7 +96,7 @@ if(getenv("AMBIENTE") == "HOMOLOGACAO") {
     $msg = "Captcha inválido.\n";
 
     $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-    file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+    file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
     //$pag = $server_url . $pag;
     $strRedirect = $server_url .
         "/creditos/login.php?msg=" .
@@ -160,7 +160,7 @@ if (empty($user)) {
         $msg = "Login ou senha inválidos.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .
@@ -182,7 +182,7 @@ if ($usuario_operador) {
     if($verificaBlock != null){
         $msg = utf8_decode($verificaBlock['motivo']) . " Seu PDV está bloqueado.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
@@ -190,7 +190,7 @@ if ($usuario_operador) {
     if (temLogInconsistente($user['pdv_id'], $pdo)) {
         $msg = "(BLQ101) Os dados do seu PDV estão inconsistentes.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         adicionarUsuarioBloqueado($user['pdv_id'], $msg);
         enviaEmailReport($msg, $user);
@@ -203,7 +203,7 @@ if ($usuario_operador) {
     if(buscarUsuariosSemLog($pdo, $user['pdv_id'])) {
         $msg = "(BLQ102) Este PDV ainda não foi validado para acesso ao sistema.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         adicionarUsuarioBloqueado($user['pdv_id'], $msg);
         enviaEmailReport($msg, $user);
@@ -240,7 +240,7 @@ if ($usuario_operador) {
     if($verificaBlock != null){
         $msg = utf8_decode($verificaBlock['motivo']) . " Seu PDV está bloqueado.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
@@ -248,7 +248,7 @@ if ($usuario_operador) {
     if (temLogInconsistente($user['ug_id'], $pdo)) {
         $msg = "(BLQ101) Os dados do seu PDV estão inconsistentes.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         adicionarUsuarioBloqueado($user['ug_id'], $msg);
         enviaEmailReport($msg, $user);
@@ -261,7 +261,7 @@ if ($usuario_operador) {
     if(buscarUsuariosSemLog($pdo, $user['ug_id'])) {
         $msg = "(BLQ102) Este PDV ainda não foi validado para acesso ao sistema.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         adicionarUsuarioBloqueado($user['ug_id'], $msg);
         enviaEmailReport($msg, $user);

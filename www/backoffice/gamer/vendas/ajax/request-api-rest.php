@@ -1,6 +1,6 @@
 <?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
-
+	require_once "/www/includes/bourls.php";
 	require_once "/www/db/connect.php";
 	require_once "/www/db/ConnectionPDO.php";
 	
@@ -11,7 +11,7 @@
 
 	$dataHoraFormatada = $dataHoraAtual->format('Y-m-d H:i:s');
 
-	$chama_api = curl_init("" . EPREPAG_URL_HTTPS . "/webhook/confirmaPix.php");
+	$chama_api = curl_init($server_url_bo.'/pix/confirmaPix.php');
 	$data = [
 		'http_status_code' => 200,
 		'http_status_message' => 'OK',
@@ -75,7 +75,7 @@
 	
 	curl_close($chama_api);
 	
-	$arquivo = "/www/log/log-concilia.txt";
+	$arquivo = "/www/arquivos_gerados/logs/log-concilia.txt";
 
 	$abre_arquivo = fopen($arquivo, 'a');
 

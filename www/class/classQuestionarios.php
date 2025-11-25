@@ -624,7 +624,7 @@ gravaLog_DebugQuestionario($msg_debug);
 
 function gravaLog_DebugQuestionario($mensagem){
 	//Arquivo
-	$file = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/log/log_Debug_Questionario.txt";
+	$file = "C:/Sites/E-Prepag/backoffice/offweb/tarefas/arquivos_gerados/logs/log_Debug_Questionario.txt";
 
 	//Mensagem
 	$mensagem = "\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

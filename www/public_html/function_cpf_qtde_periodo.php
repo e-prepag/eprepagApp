@@ -55,7 +55,7 @@ else {
 
     //Arquivo
 
-    $file = $raiz_do_projeto."log/log_Debug_Dupla_Funcao.txt";
+    $file = $raiz_do_projeto."arquivos_gerados/logs/log_Debug_Dupla_Funcao.txt";
 
     //Mensagem
 

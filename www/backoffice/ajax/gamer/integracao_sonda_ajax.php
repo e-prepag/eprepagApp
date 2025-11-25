@@ -61,7 +61,7 @@
 
 function gravaLog_SondaIntegracao($mensagem){
 	//Arquivo
-	$file = RAIZ_DO_PROJETO . "log/log_integracao_Sonda.txt";
+	$file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_integracao_Sonda.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

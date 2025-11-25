@@ -428,7 +428,7 @@ class Garena
 								$this->setTxn_id($resultado["display_txn_id"]);
 							} else {
 								//array_push($this->error, ["Erro"=>"Erro no cadastro da conta Garena (EPP0014)."]);
-								$file = fopen("/www/log/problema_GARENA.txt", "a+");
+								$file = fopen("/www/arquivos_gerados/logs/problema_GARENA.txt", "a+");
 								fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 								fwrite($file, "ERRO FINAL CONTA USUADA\r");
 								fwrite($file, "CONTA USADA: " . $this->conta . "\r");
@@ -438,7 +438,7 @@ class Garena
 						} else {
 							//$this->destravaProcesso();
 							//array_push($this->error, ["Erro"=>"Erro no cadastro do código gerado pela Garena (EPP0015)."]);
-							$file = fopen("/www/log/problema_GARENA.txt", "a+");
+							$file = fopen("/www/arquivos_gerados/logs/problema_GARENA.txt", "a+");
 							fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 							fwrite($file, "ERRO FINAL GUID GARENA\r");
 							fwrite($file, "CONTA USADA: " . $this->conta . "\r");
@@ -448,7 +448,7 @@ class Garena
 					} else {
 						//$this->destravaProcesso();
 						//array_push($this->error, ["Erro"=>"Erro no cadastro do guid gerado pela EPP (EPP0016)."]);
-						$file = fopen("/www/log/problema_GARENA.txt", "a+");
+						$file = fopen("/www/arquivos_gerados/logs/problema_GARENA.txt", "a+");
 						fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 						fwrite($file, "ERRO FINAL GUID EPP\r");
 						fwrite($file, "CONTA USADA: " . $this->conta . "\r");
@@ -766,7 +766,7 @@ class Garena
 	private function salvaLog($conteudo, $type, $conta, $pin, $tempoDuracao = 0)
 	{
 
-		$fileName = "/www/log/retorno_GARENA.txt";
+		$fileName = "/www/arquivos_gerados/logs/retorno_GARENA.txt";
 		$file = fopen($fileName, "a+");
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 		fwrite($file, "TIPO: " . $type . "\r");
@@ -938,7 +938,7 @@ class Garena
 		$retorno = json_decode($recebido, true);
 		curl_close($curlToken);
 
-		$ff = fopen("/www/log/testeRecap2.txt", "a+");
+		$ff = fopen("/www/arquivos_gerados/logs/testeRecap2.txt", "a+");
 		fwrite($ff, "data: " . date("d-m-Y H:i:s") . "\r\n");
 		fwrite($ff, "ip: " . $_SERVER["REMOTE_ADDR"] . "\r\n");
 		fwrite($ff, "token: " . $token . "\r\n");

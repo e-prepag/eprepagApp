@@ -23,7 +23,7 @@ if($acao == 'inserir')
 	$ext	= explode('/',$_FILES['promo_banner']['type']);
 
 	if(in_array($ext[1],$formatos)) {
-		$pasta = DIR_WEB."imagens/promocoes/";
+		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["promo_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor, renomear antes.<br>";
 			$promo_banner = null;
@@ -113,7 +113,7 @@ if($acao == 'atualizar')
 {
 	if(!empty($_FILES["promo_banner"]["name"])) {
 		$ext	= explode('/',$_FILES['promo_banner']['type']);
-		$pasta = DIR_WEB."imagens/promocoes/";
+		$pasta = DIR_IMG."imagens/promocoes/";
 		if(file_exists("$pasta".$_FILES["promo_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor renomear antes.<br>";
 			$promo_banner = null;
@@ -128,7 +128,7 @@ if($acao == 'atualizar')
 	}
 	if(!empty($_FILES["promo_banner_resposta"]["name"])) {
 		$ext	= explode('/',$_FILES['promo_banner_resposta']['type']);
-		$pasta = DIR_WEB."imagens/promocoes/";
+		$pasta = DIR_IMG."imagens/promocoes/";
 		if(file_exists("$pasta".$_FILES["promo_banner_resposta"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor renomear antes.<br>";
 			$promo_banner_resposta = null;

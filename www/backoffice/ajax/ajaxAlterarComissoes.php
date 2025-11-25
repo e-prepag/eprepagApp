@@ -33,7 +33,7 @@ require_once '../../includes/constantes.php';
 function gravaLog_Comissoes($mensagem){
     global $raiz_do_projeto;
     //Arquivo
-    $file = $raiz_do_projeto . "log/log_Comissoes_Alteracao.txt";
+    $file = $raiz_do_projeto . "arquivos_gerados/logs/log_Comissoes_Alteracao.txt";
 
     //Usuário
     $user_backoffice = strtoupper($GLOBALS['user_backoffice']);

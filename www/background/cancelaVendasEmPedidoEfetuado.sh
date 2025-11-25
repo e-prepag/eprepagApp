@@ -1,1 +1,1 @@
-cd /www/background/; php -q "money.php" cancelaVendasEmPedidoEfetuado >>../log/cancelaVendasEmPedidoEfetuado.log
+cd /www/background/; php -q "money.php" cancelaVendasEmPedidoEfetuado >>../arquivos_gerados/logs/cancelaVendasEmPedidoEfetuado.log

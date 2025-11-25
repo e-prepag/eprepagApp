@@ -1,1 +1,1 @@
-cd /www/background/; php -q "ofac_cruzamento.php" >>../log/ofac_cruzamento.log
+cd /www/background/; php -q "ofac_cruzamento.php" >>../arquivos_gerados/logs/ofac_cruzamento.log

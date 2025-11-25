@@ -1,4 +1,6 @@
 <?php
+//Para depositos, não é mais utilizado
+die("Acesso negado");
 header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'", true);
 require_once "../../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
@@ -16,7 +18,7 @@ $vg_integracao_parceiro_origem_id = $_SESSION['integracao_origem_id'];
 
 require_once DIR_INCS . "gamer/venda_e_modelos_logica_epp.php";
 
-require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_verificacoes.php";
+//require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_verificacoes.php";
 
 if ($msg) $msg = $_REQUEST['msg'];
 
@@ -36,10 +38,10 @@ $pagto_data_data_full = $pagto_data_data . " " . $pagto_data_horas . ":" . $pagt
 
 //echo "data1: $pagto_data_data $pagto_data_horas:$pagto_data_minutos<br>";
 //Limpa arquivos temporarios da venda
-$arquivos = buscaArquivosIniciaCom($FOLDER_COMMERCE_UPLOAD_TMP, 'nome', 'asc', "money_comprovante_" . $venda_id . "_");
-for ($j = 0; $j < count($arquivos); $j++) {
-    if (is_file($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j])) unlink($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j]);
-}
+// $arquivos = buscaArquivosIniciaCom($FOLDER_COMMERCE_UPLOAD_TMP, 'nome', 'asc', "money_comprovante_" . $venda_id . "_");
+// for ($j = 0; $j < count($arquivos); $j++) {
+//     if (is_file($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j])) unlink($FOLDER_COMMERCE_UPLOAD_TMP . $arquivos[$j]);
+// }
 
 
 //Processa pagto
@@ -73,61 +75,61 @@ if ($btSubmit || $btChange) {
 
 if ($btSubmit) {
 
-    require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_validacoes.php";
+    //require_once DIR_INCS . "gamer/pagto_informa_dep_doc_transf_validacoes.php";
 
     //Valida arquivo upload - comprovante
-    if ($msg == "") {
-        if (($pagto_banco == "001" && $pagto_local == "06") ||
-            ($pagto_banco == "237" && $pagto_local == "06") ||
-            ($pagto_banco == "104" && $pagto_local == "06")
-        ) {
+    // if ($msg == "") {
+    //     if (($pagto_banco == "001" && $pagto_local == "06") ||
+    //         ($pagto_banco == "237" && $pagto_local == "06") ||
+    //         ($pagto_banco == "104" && $pagto_local == "06")
+    //     ) {
 
-            if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK) {
+    //         if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK) {
 
-                $uploadedFileName = $_FILES['comprovante']['name'];
-                $fileSource = $_FILES['comprovante']['tmp_name'];
+    //             $uploadedFileName = $_FILES['comprovante']['name'];
+    //             $fileSource = $_FILES['comprovante']['tmp_name'];
 
-                // 1. Sanitizar nome do arquivo
-                $safeFileName = basename($uploadedFileName);
+    //             // 1. Sanitizar nome do arquivo
+    //             $safeFileName = basename($uploadedFileName);
 
-                // 2. Remover caracteres especiais adicionais
-                $safeFileName = preg_replace('/[^a-zA-Z0-9._-]/', '', $safeFileName);
+    //             // 2. Remover caracteres especiais adicionais
+    //             $safeFileName = preg_replace('/[^a-zA-Z0-9._-]/', '', $safeFileName);
 
-                // 3. Validar extensão ANTES de qualquer operação
-                $fileExtensao = '';
-                if (strlen($safeFileName) > 4) {
-                    $fileExtensao = strtoupper(pathinfo($safeFileName, PATHINFO_EXTENSION));
-                }
+    //             // 3. Validar extensão ANTES de qualquer operação
+    //             $fileExtensao = '';
+    //             if (strlen($safeFileName) > 4) {
+    //                 $fileExtensao = strtoupper(pathinfo($safeFileName, PATHINFO_EXTENSION));
+    //             }
 
-                if (!in_array($fileExtensao, ['JPG', 'GIF', 'PNG'])) {
-                    $msg .= "Arquivo de comprovante inválido. Deve ser do tipo JPG, GIF ou PNG.\n";
-                } else {
+    //             if (!in_array($fileExtensao, ['JPG', 'GIF', 'PNG'])) {
+    //                 $msg .= "Arquivo de comprovante inválido. Deve ser do tipo JPG, GIF ou PNG.\n";
+    //             } else {
 
-                    // 4. Construir caminho de destino
-                    $BASE_UPLOAD_DIR = realpath($FOLDER_COMMERCE_UPLOAD_TMP);
+    //                 // 4. Construir caminho de destino
+    //                 $BASE_UPLOAD_DIR = realpath($FOLDER_COMMERCE_UPLOAD_TMP);
 
-                    if ($BASE_UPLOAD_DIR === false) {
-                        $msg = "Erro de configuração: diretório de upload inválido.\n";
-                    } else {
-                        $prefixo_nome = "money_comprovante_" . $venda_id . "_" . $pagto_banco . "_" . $pagto_local . "_";
-                        $fileDest = $BASE_UPLOAD_DIR . DIRECTORY_SEPARATOR . $prefixo_nome . $safeFileName;
+    //                 if ($BASE_UPLOAD_DIR === false) {
+    //                     $msg = "Erro de configuração: diretório de upload inválido.\n";
+    //                 } else {
+    //                     $prefixo_nome = "money_comprovante_" . $venda_id . "_" . $pagto_banco . "_" . $pagto_local . "_";
+    //                     $fileDest = $BASE_UPLOAD_DIR . DIRECTORY_SEPARATOR . $prefixo_nome . $safeFileName;
 
-                        // 5. VERIFICAR o caminho ANTES do upload
-                        $resolvedPath = realpath(dirname($fileDest));
+    //                     // 5. VERIFICAR o caminho ANTES do upload
+    //                     $resolvedPath = realpath(dirname($fileDest));
 
-                        if ($resolvedPath === false || strpos($resolvedPath, $BASE_UPLOAD_DIR) !== 0) {
-                            $msg = "Erro de segurança: Caminho de arquivo inválido.\n";
-                        } else {
-                            file_put_contents("/www/log/arquivoSubiu.txt", "Source: $fileSource, Dest: $fileDest");
-                            if (!move_uploaded_file($fileSource, $fileDest)) {
-                                $msg = "Não foi possível realizar o upload do comprovante, tente novamente.\n";
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                     if ($resolvedPath === false || strpos($resolvedPath, $BASE_UPLOAD_DIR) !== 0) {
+    //                         $msg = "Erro de segurança: Caminho de arquivo inválido.\n";
+    //                     } else {
+    //                         file_put_contents("/www/arquivos_gerados/logs/arquivoSubiu.txt", "Source: $fileSource, Dest: $fileDest");
+    //                         if (!move_uploaded_file($fileSource, $fileDest)) {
+    //                             $msg = "Não foi possível realizar o upload do comprovante, tente novamente.\n";
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     if ($msg == "") {
         //Poe no session

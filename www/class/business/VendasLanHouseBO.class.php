@@ -334,7 +334,7 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                 $sql .= " order by vg_data_inclusao desc offset " . ($p - 1) * $registros . " limit " . $registros;
             $vendas= null;
 			
-			$ff = fopen("/www/log/ajuste-sql.txt", "a+");
+			$ff = fopen("/www/arquivos_gerados/logs/ajuste-sql.txt", "a+");
 			fwrite($ff, $sql."\n");
 			fclose($ff);
 

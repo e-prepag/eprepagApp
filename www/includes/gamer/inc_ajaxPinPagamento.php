@@ -313,7 +313,7 @@ function saveTransactionGoCASH($a_pins_gocash, $venda_id){
 function gravaLog_EPPCASH($mensagem){
 	
 		//Arquivo
-		$file = RAIZ_DO_PROJETO . "log/log_sql_EPP_CASH.txt";
+		$file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_sql_EPP_CASH.txt";
 	
 		//Mensagem
 		$mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s'). " " .$GLOBALS['_SERVER']['SCRIPT_FILENAME'] . "\n" . $mensagem . "\n";
@@ -457,7 +457,7 @@ function valida_pin($cod_pin, $geralog = null) {
 		$aes = new AES($chave256bits->retornaChave());
 		$sql = "select pin_codigo,pin_valor from pins_store where pin_codigo='".base64_encode($aes->encrypt(addslashes($cod_pin)))."' and pin_status='".intval($PINS_STORE_STATUS_VALUES['A'])."'";
 		
-		$ff = fopen("/www/log/erroFile.txt","a+");
+		$ff = fopen("/www/arquivos_gerados/logs/erroFile.txt","a+");
 		fwrite($ff, $sql.date('Y-m-d H:i:s')."\r");
 		fclose($ff);
 		
@@ -502,7 +502,7 @@ function valida_vencimento_pin($cod_pin, $geralog = null) {
         				  and pin_dataentrada >= CURRENT_DATE - INTERVAL '6 months'";
 
 			
-			$ff = fopen("/www/log/erroFile.txt","a+");
+			$ff = fopen("/www/arquivos_gerados/logs/erroFile.txt","a+");
 			fwrite($ff, $sql.date('Y-m-d H:i:s')."\r");
 			fclose($ff);
 			

@@ -31,7 +31,7 @@ gravaLog_EPPCASH_PINs("Vai para mostraCarrinho_pag(false, 0)\n  valor_0 = '$valo
 function gravaLog_EPPCASH($mensagem){
 	
 		//Arquivo
-		$file =  RAIZ_DO_PROJETO . "log/log_EPP_CASH.txt";
+		$file =  RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_EPP_CASH.txt";
 	
 		//Mensagem
 		$mensagem =  str_repeat("-", 80)."\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

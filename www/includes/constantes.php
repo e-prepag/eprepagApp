@@ -37,6 +37,7 @@ if (isset($baseUrl)) {
 }//end if (isset($GLOBALS['_SERVER']['SERVER_PORT']))
 
 define("DIR_WEB",RAIZ_DO_PROJETO."public_html/");
+define("DIR_IMG",RAIZ_DO_PROJETO."arquivos_gerados/");
 
 define("DIR_BACKOFFICE",RAIZ_DO_PROJETO."backoffice/");
 define("DIR_BACKOFFICE_ADMIN",DIR_BACKOFFICE."admin/");
@@ -55,9 +56,9 @@ define("DIR_CLASS",RAIZ_DO_PROJETO."class/");
 
 define("DIR_JSON",RAIZ_DO_PROJETO."json/");
 
-define("DIR_CACHE",DIR_WEB."cache/");
+define("DIR_CSV",RAIZ_DO_PROJETO."arquivos_gerados/csv/");
 
-define("DIR_LOG",RAIZ_DO_PROJETO."log/");
+define("DIR_LOG",RAIZ_DO_PROJETO."arquivos_gerados/logs/");
 
 define("DIR_DB",RAIZ_DO_PROJETO."db/");
 
@@ -97,25 +98,24 @@ define("RETURN_TWO_FACTOR",6);
  * Constantes relacionadas ao blog
  */
 
-define("ARR_JSON_FEED_CREDITOS",  serialize(array("lh-blog-json.json", "lh-blog-json-2.json", "lh-blog-json-3.json")));
-define("ARR_JSON_FEED_GAMER",  serialize(array("gamer-blog.json", "gamer-blog-2.json", "gamer-blog-3.json")));
+define("ARR_JSON_FEED_CREDITOS", serialize(array("lh-blog-json.json")));
+define("ARR_JSON_FEED_GAMER", serialize(array("gamer-blog.json")));
 
-define("URL_BLOG_CREDITOS",'http://e-prepagpdv.com.br/category/blog-pdv/feed/'); //"http://blog.e-prepag.com/categorias/blogpdv/feed/");
-define("URL_BLOG_GAMER",'http://blog.e-prepag.com/categorias/noticias-e-prepag/feed/'); //'http://blog.e-prepag.com/categorias/blog/feed/');
+define("URL_BLOG_CREDITOS", 'http://e-prepagpdv.com.br/category/blog-pdv/feed/');
+define("URL_BLOG_GAMER", 'http://blog.e-prepag.com/categorias/noticias-e-prepag/feed/');
 
-define("MAX_FEEDS_JSON",6);
+define("MAX_FEEDS_JSON", 6);
+
 /*
  * Constantes de produtos
  */
-
-define("ARR_PRODUTOS_CREDITOS",  serialize(array("lh-produtos.json", "lh-produtos-2.json", "lh-produtos-3.json")));
-define("ARR_PRODUTOS_GAMER",  serialize(array("gamer-produtos.json", "gamer-produtos-2.json", "gamer-produtos-3.json")));
+define("ARR_PRODUTOS_CREDITOS", serialize(array("lh-produtos.json")));
+define("ARR_PRODUTOS_GAMER", serialize(array("gamer-produtos.json")));
 
 /*
  * Constantes de modelos x produtos x operadoras
  */
-
-define("ARR_JSON_PRODUTOS_MEIOS_DE_PAGAMENTOS_BLOQUEADOS_GAMER", serialize(array("produtos-meios-de-pagamentos-bloqueados-gamer.json", "produtos-meios-de-pagamentos-bloqueados-gamer-2.json", "produtos-meios-de-pagamentos-bloqueados-gamer-3.json")));
+define("ARR_JSON_PRODUTOS_MEIOS_DE_PAGAMENTOS_BLOQUEADOS_GAMER", serialize(array("produtos-meios-de-pagamentos-bloqueados-gamer.json")));
 
 $ARRAY_INIBI_VENDA_HARDCODE = array(4708);
 

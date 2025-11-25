@@ -773,7 +773,7 @@ if(b_is_Financeiro()) {
 <?php 
 ob_clean();
 
-$dirpath = $raiz_do_projeto . "public_html/tmp/txt/";
+$dirpath = $raiz_do_projeto . "arquivos_gerados/txts/txt/";
 $webpath = "/tmp/txt/";
 $filename = "relatorio-" . time() . ".csv"; 
 

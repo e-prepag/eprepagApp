@@ -1058,7 +1058,7 @@ function grava_arquivo_pin($mensagem)
 
 
 
-    $file_path = RAIZ_DO_PROJETO . 'public_html/tmp/txt/';
+    $file_path = RAIZ_DO_PROJETO . 'arquivos_gerados/txts/txt/';
 
     $web_path = "temp/txt/";
 

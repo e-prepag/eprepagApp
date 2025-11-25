@@ -12,7 +12,7 @@ $success = false;
 //Extensoes de arquivos do BACEN permitidos 
 $BACEN_EXTENSOES = array("zip");
 //Diretório destino do arquivo do BACEN
-$DIR_BACEN_ARQ_RETORNO = $raiz_do_projeto . "backoffice/bacen/";
+$DIR_BACEN_ARQ_RETORNO = $raiz_do_projeto . "arquivos_gerados/bacen/";
 //Número de arquivos contidos no ZIP
 $QTDE_ARQUIVOS = 1;
 //Posição no arquivo dentro do ZIP File

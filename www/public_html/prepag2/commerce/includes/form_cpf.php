@@ -143,7 +143,7 @@ if (isset($_REQUEST['formsubmit'])) {
                 $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0485). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
             }
         } else {
-            $file = fopen("/www/log/retorno_cpf_OMNIDATA.txt", "a+");
+            $file = fopen("/www/arquivos_gerados/logs/retorno_cpf_OMNIDATA.txt", "a+");
             fwrite($file, "logs para teste \n");
             fwrite($file, "resultado code: " . $testeCPF . "\n");
             fwrite($file, "resultado parametros: " . json_encode($parametros) . "\n");

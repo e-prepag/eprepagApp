@@ -1,1 +1,1 @@
-cd /www/background/; php -q "processamento_ranking_lh.php" >>../log/processamento_ranking_lh.log
+cd /www/background/; php -q "processamento_ranking_lh.php" >>../arquivos_gerados/logs/processamento_ranking_lh.log

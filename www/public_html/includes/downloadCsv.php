@@ -6,7 +6,7 @@ if (!isset($raiz_do_projeto)) {
 
 // Lista branca de diretórios permitidos
 $dir = array(
-    "cache" => $raiz_do_projeto . "public_html/cache/",
+    "cache" => $raiz_do_projeto . "arquivos_gerados/csv/",
     "bkov"  => $raiz_do_projeto . "arquivos_gerados/csv/"
 );
 

@@ -1,8 +1,13 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto.'sftp/connect.php';
 require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
+
+$bds_banner = $_FILES["bds_banner"]["name"] ?: null;
 
 $acao	= isset($_REQUEST['acao']) ? $_REQUEST['acao'] : 'listar';
 
@@ -28,26 +33,13 @@ if($acao == 'inserir')
 	$ext	= explode('/',$_FILES['bds_banner']['type']);
 
 	if(in_array($ext[1],$formatos)) {
-		$pasta = DIR_WEB."imagens/banners/";
+		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["bds_banner"]["name"])){
 			$msg .= "<span class='txt-vermelho'>Imagem de Banner já existe com este mesmo nome.<br>Favor, renomear antes.</span><br>";
 			$bds_banner = null;
 		}
 		else {
 			move_uploaded_file($_FILES["bds_banner"]["tmp_name"],"$pasta".$_FILES["bds_banner"]["name"]);
-			$bds_banner = $_FILES["bds_banner"]["name"];
-                        $nome_arquivo = $bds_banner;
-                        $arquivo = $pasta . $_FILES["bds_banner"]["name"];
-                        if(SFTP_TRANSFER && file_exists($arquivo)){
-                            $arq = trim(str_replace('/', '\\', $arquivo));
-                            //enviar para os servidores via sFTP
-                            $sftp = new SFTPConnection($server, $port);
-                            $sftp->login($user, $pass);
-                            $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/commerce/images/banners/".$nome_arquivo);
-
-                            //$msg .= "<br><br>Imagem de produto enviada ao servidor Windows 2003";
-
-                        }
 		}
 	}
 	//else $msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
@@ -116,26 +108,13 @@ if($acao == 'atualizar')
 	
 	if(!empty($_FILES["bds_banner"]["name"])) {
 		$ext	= explode('/',$_FILES['bds_banner']['type']);
-		$pasta = DIR_WEB."imagens/banners/";
+		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["bds_banner"]["name"])){
 			$msg .= "<span class='txt-vermelho'>Imagem de Banner já existe com este mesmo nome.<br>Favor, renomear antes.</span><br>";
 			$bds_banner = null;
 		}
 		else {
 			move_uploaded_file($_FILES["bds_banner"]["tmp_name"],"$pasta".$_FILES["bds_banner"]["name"]);
-			$bds_banner = $_FILES["bds_banner"]["name"];
-                        $nome_arquivo = $bds_banner;
-                        $arquivo = $pasta . $_FILES["bds_banner"]["name"];
-                        if(SFTP_TRANSFER && file_exists($arquivo)){
-                            $arq = trim(str_replace('/', '\\', $arquivo));
-                            //enviar para os servidores via sFTP
-                            $sftp = new SFTPConnection($server, $port);
-                            $sftp->login($user, $pass);
-                            $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/commerce/images/banners/".$nome_arquivo);
-
-                            //$msg .= "<br><br>Imagem de produto enviada ao servidor Windows 2003";
-
-                        }
 		}
 		if(!in_array($ext[1],$formatos)) {
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
@@ -226,7 +205,7 @@ if($acao == 'listar')
 {
     include 'banner_lst.php';
 }
-//echo $msg;
+echo $msg;
 ?>
 <script type="text/javascript">
 	document.getElementById("msg").innerHTML = "<?php echo $msg;?>";

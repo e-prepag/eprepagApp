@@ -21,7 +21,7 @@ define("EPP_CALLBACK_OK", "1");
 define("EPP_CALLBACK_ERROR", "0");
 
 /* Arquivo de Log dos Erros Gerados pelas URLs de Callback */
-define("LOG_FILE_OFFER_ERRORS", $raiz_do_projeto . "log/logOfferErrors.log");
+define("LOG_FILE_OFFER_ERRORS", $raiz_do_projeto . "arquivos_gerados/logs/logOfferErrors.log");
 
 /* Path de Includes da Loja Virtual E-Prepag */
 define("PATH_INCLUDES", "C:\\Sites\\E-Prepag\\www\\web\\prepag2\\commerce\\includes\\");

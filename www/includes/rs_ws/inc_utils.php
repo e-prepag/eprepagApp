@@ -607,7 +607,7 @@ function gravaLog_MonitorPOS($mensagem){
         if($bDebug) echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")\n";
         // Salva o file monitor para mostrar no Backoffice
         try {
-                if ($handle = fopen($raiz_do_projeto . 'log/monitortransacoespos.txt', 'w')) { 
+                if ($handle = fopen($raiz_do_projeto . 'arquivos_gerados/logs/monitortransacoespos.txt', 'w')) { 
                         fwrite($handle, $mensagem."<br>");
 
                         fclose($handle);

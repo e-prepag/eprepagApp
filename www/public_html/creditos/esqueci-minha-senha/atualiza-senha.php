@@ -2,7 +2,7 @@
 
 	if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['checked'] === 'true') {
 		 // Log dos dados recebidos no POST
-		 $arquivoLogPost = '/www/log/logPostData_pdv.log';
+		 $arquivoLogPost = '/www/arquivos_gerados/logs/logPostData_pdv.log';
 		 salvarLog($arquivoLogPost, $_POST);
 
 		 $dadosPost = print_r($_POST, true);
@@ -38,7 +38,7 @@
 	
 				atualizaHistoricoCliente($idUsuario, $idIp, $idDataTrocaSenha);
 				
-				$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log';
+				$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log';
 				
 				$mensagemLog = "C�DIGO: {$codigoValidacao} -- A senha foi atualizada";
 				
@@ -52,7 +52,7 @@
 				
 				defineStatusErro($codigoValidacao);
 				
-				$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log'; 
+				$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log'; 
 				
 				$mensagemLog = 'For�ou entrada de uma senha fora do padr�o';
 				
@@ -65,7 +65,7 @@
 			
 			defineStatusErro($codigoValidacao);
 			
-			$arquivoLog = '/www/log/logEsqueciMinhaSenha_pdv.log'; 
+			$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log'; 
 			
 			$mensagemLog = 'For�ou a entrada de duas senhas que n�o coincidem';
 				

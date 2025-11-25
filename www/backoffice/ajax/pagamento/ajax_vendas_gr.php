@@ -209,7 +209,7 @@ $graph->Stroke($raiz_do_projeto . "backoffice".$img_path.$fname);
 // ================================================
 function grava_log_graph($mensagem){
 	global $_SERVER;
-	$ARQUIVO_LOG_HTTP_REFERER = $raiz_do_projeto . "log/log_graph.txt";	
+	$ARQUIVO_LOG_HTTP_REFERER = $raiz_do_projeto . "arquivos_gerados/logs/log_graph.txt";	
 
 	//Arquivo
 	$file = $ARQUIVO_LOG_HTTP_REFERER;

@@ -25,17 +25,17 @@ class ManipulacaoArquivosLog {
     }
 
     public function createLockedFile() {
-        $newfile = fopen($GLOBALS['raiz_do_projeto']."log/".$this->getNomeArquivo().'.locked', 'w');
+        $newfile = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', 'w');
         fwrite($newfile, getmypid());
         fclose($newfile);
     }//end function createLockedFile
 
     public function deleteLockedFile() {
-        unlink($GLOBALS['raiz_do_projeto']."log/".$this->getNomeArquivo().'.locked');
+        unlink($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked');
     }//end function deleteLockedFile
 
     public function haveFile() {
-        if(file_exists($GLOBALS['raiz_do_projeto']."log/".$this->getNomeArquivo().'.locked')) {
+        if(file_exists($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked')) {
                 if($this->isProcess(trim($this->readFile()))) {
                     return true;
                 } //end if($this->isProcess(trim($this->readFile())))
@@ -43,12 +43,12 @@ class ManipulacaoArquivosLog {
                     $this->deleteLockedFile();
                     return false;
                 }//end else do if($this->isProcess(trim($this->readFile())))
-        } //end if(file_exists($GLOBALS['raiz_do_projeto']."log/".$this->getNomeArquivo().'.locked'))
+        } //end if(file_exists($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked'))
         else return false;
     }//end function haveFile
 
     public function showBusy(){
-        $fp = fopen($GLOBALS['raiz_do_projeto']."log/".$this->getNomeArquivo().".busy","a");
+        $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().".busy","a");
         fwrite($fp, date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] ." ==> Programa em uso.".PHP_EOL);
         fclose($fp);
     }//end function showBusy
@@ -65,7 +65,7 @@ class ManipulacaoArquivosLog {
     }//end function killProcess
     
     private function readFile() {
-        $fp = fopen($GLOBALS['raiz_do_projeto']."log/".$this->getNomeArquivo().'.locked', "r");
+        $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', "r");
         $data = fgets($fp, 1024);
         fclose($fp);
         return $data;
@@ -78,7 +78,7 @@ class ManipulacaoArquivosLog {
 //função para gravar o buffer do echo  através do ob_start
 function callbackLog($buffer){
     global $nome_arquivo;
-    $fp = fopen($GLOBALS['raiz_do_projeto']."log/".$nome_arquivo.".log","a");
+    $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$nome_arquivo.".log","a");
     fwrite($fp, $buffer);
     fclose($fp);
 }//end function callbackLog

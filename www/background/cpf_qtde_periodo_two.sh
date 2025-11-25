@@ -1,1 +1,1 @@
-cd /www/background/; php -q "cpf_qtde_periodo_two.php" >>../log/cpf_qtde_periodo_two.log
+cd /www/background/; php -q "cpf_qtde_periodo_two.php" >>../arquivos_gerados/logs/cpf_qtde_periodo_two.log

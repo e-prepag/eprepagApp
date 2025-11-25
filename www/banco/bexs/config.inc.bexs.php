@@ -96,8 +96,8 @@ define("BEXS_MSG_TRANSACTION_LOG", "TRANSACTION_LOG");
 //Caminho para arquivo de operaações da remessa
 define("PATH_OPERACOES_BEXS", $raiz_do_projeto . "arquivos_gerados/bexs_arquivos_operacoes/");
 
-define("LOG_FILE_BEXS_WS_ERRORS", $raiz_do_projeto."log/log_BEXS_WS-Errors.log");
-define("LOG_FILE_BEXS_WS_TRANSACTIONS", $raiz_do_projeto."log/log_BEXS_WS-Transactions.log");
+define("LOG_FILE_BEXS_WS_ERRORS", $raiz_do_projeto."arquivos_gerados/logs/log_BEXS_WS-Errors.log");
+define("LOG_FILE_BEXS_WS_TRANSACTIONS", $raiz_do_projeto."arquivos_gerados/logs/log_BEXS_WS-Transactions.log");
 
 //Emails a serem utilizados quando o ambiente for DEV e quando o ambiente for PROD
 define("EMAIL_DEV", "estagiario1@e-prepag.com");

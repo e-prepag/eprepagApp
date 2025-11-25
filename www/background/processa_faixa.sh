@@ -1,1 +1,1 @@
-cd /www/background/; php -q "processa_faixa.php" >>../log/processa_faixa.log
+cd /www/background/; php -q "processa_faixa.php" >>../arquivos_gerados/logs/processa_faixa.log

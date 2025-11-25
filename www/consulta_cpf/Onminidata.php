@@ -121,7 +121,7 @@ class Onminidata {
 			if ($response === false) {
 				$error = 'Erro ao fazer a requisição cURL: ' . curl_error($ch);
 				
-				$arquivo = '/www/log/logONMINIDATAerror.txt';
+				$arquivo = '/www/arquivos_gerados/logs/logONMINIDATAerror.txt';
 
 				$abre_arquivo = fopen($arquivo, 'a+');
 
@@ -134,7 +134,7 @@ class Onminidata {
 			} else {
 			  $data = json_decode($response, true);
 			  
-				$arquivo = '/www/log/logONMINIDATA.txt';
+				$arquivo = '/www/arquivos_gerados/logs/logONMINIDATA.txt';
 
 				$abre_arquivo = fopen($arquivo, 'a+');
 

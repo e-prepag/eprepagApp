@@ -14,7 +14,7 @@ $nomeArquivo = "DESTINATARIOS_".date("dmYhis").".txt";
 
 //1SIGEP DESTINATARIO NACIONAL
 $file = new FilePosition($nomeArquivo);
-$file->setDir($raiz_do_projeto."public_html/tmp/txt/");
+$file->setDir($raiz_do_projeto."arquivos_gerados/txts/txt/");
 // Cabeçalho
 $vetorHeader =  array (
                     0 => array('name' => '1',

@@ -120,7 +120,7 @@ class verificaCPF_OMNIDATA {
 
                 //echo "serialsaleRecord[<pre>".print_r($serialsaleRecord,true)."</pre>]";
 				
-			$file = fopen("/www/log/retorno_cpf.txt", "a+");
+			$file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
 			fwrite($file, "DATA ".date("d-m-Y H:i:s")."\n");
 			fwrite($file, "retorno class verificaCPF = PASSO 2 ".json_encode($serialsaleRecord)."\n");
 			fwrite($file, str_repeat("*", 50)."\n"); 

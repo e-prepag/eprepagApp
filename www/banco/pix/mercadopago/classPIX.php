@@ -54,7 +54,7 @@ class classPIX
 
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email, $itens);
 
-        $logFilePath = "/www/log/mercadopago_PIX.txt";
+        $logFilePath = "/www/arquivos_gerados/logs/mercadopago_PIX.txt";
         $ff = fopen($logFilePath, "a+");
 
         if ($ff) {
@@ -157,7 +157,7 @@ class classPIX
             $erro = "Status não identificado";
         }
 
-        $ff = fopen("/www/log/mercadopago_verifica_PIX.txt", "a+");
+        $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "a+");
         $timestamp = date("Y-m-d H:i:s");
         fwrite($ff, "resultado data:" . $timestamp . ": " . $erro . $status . "\r\n");
         fclose($ff);
@@ -170,7 +170,7 @@ class classPIX
                 $name = $data['results'][0]['payer']['first_name'] ? $data['results'][0]['payer']['first_name'] : 'N/A';
                 $reposta_consulta = $data['results'][0]['date_created'] ? $data['results'][0]['date_created'] : date('Y-m-d\TH:i:s.vO');
 
-                $ff = fopen("/www/log/mercadopago_verifica_resposta_PIX.txt", "a+");
+                $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "a+");
                 $timestamp = date("Y-m-d H:i:s");
                 fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta. ", nome: $name, cpf: $cpf\r\n");
                 fclose($ff);
@@ -205,7 +205,7 @@ class classPIX
     private function logEvents($msg)
     {
 
-        $fileLog = PIX_ERROR_LOG_FILE;
+        $fileLog = PIX_ERROR_LOG_FILE !== null ? PIX_ERROR_LOG_FILE : "/www/arquivos_gerados/logs/log_PIX_WS-Errors.log";
 
         $log = "=================================================================================================" . PHP_EOL;
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . PHP_EOL;
@@ -302,7 +302,7 @@ class classPIX
             "date_of_expiration" => $dateOfExpiration,
             "payment_method_id" => "pix",
             "external_reference" => $vendaId,
-            "notification_url" => "https://www.e-prepag.com.br/webhook/mercadoPago.php",
+            "notification_url" => "https://api.eprepag.com.br/webhook/mercadoPago.php",
             "description" => "PIX pagto id: $vendaId",
 
             "payer" => [
@@ -348,7 +348,7 @@ class classPIX
 
         $data = json_decode($response, true);
 
-        $errorFileLog = fopen("/www/log/mercadopago_log_PIX_WS-Hearders.log", "a+");
+        $errorFileLog = fopen("/www/arquivos_gerados/logs/mercadopago_log_PIX_WS-Hearders.log", "a+");
         $log = "=================================================================================================" . PHP_EOL;
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . " -> Send JSON to Get QRCode" . PHP_EOL;
         $log .= "RESPONSE -> " . $response . PHP_EOL;

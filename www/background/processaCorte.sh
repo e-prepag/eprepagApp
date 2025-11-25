@@ -1,1 +1,1 @@
-cd /www/background/; php -q "corte.php" processaCorte  >>../log/processaCorte.log
+cd /www/background/; php -q "corte.php" processaCorte  >>../arquivos_gerados/logs/processaCorte.log

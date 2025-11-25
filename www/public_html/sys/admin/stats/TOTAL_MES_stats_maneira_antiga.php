@@ -427,7 +427,7 @@ if($_REQUEST['btnSubmit']) {
 
                         require_once $raiz_do_projeto."class/util/CSV.class.php";
                                         
-                        $objCsv = new CSV(implode(";", $cabecalho), md5(uniqid()), $raiz_do_projeto."public_html/cache/");
+                        $objCsv = new CSV(implode(";", $cabecalho), md5(uniqid()), $raiz_do_projeto."arquivos_gerados/csv/");
                         $objCsv->setCabecalho();
                         
                         $line = array();

@@ -93,7 +93,6 @@ function geraJsonOperadoraPagamentosBloqueados()
 		if (isset($arrJson)) {
 
 			$json = new Json;
-			$json->setFullPath(DIR_JSON);
 			$json->setArrJsonFiles(unserialize(ARR_JSON_PRODUTOS_MEIOS_DE_PAGAMENTOS_BLOQUEADOS_GAMER));
 			$json->refresh($arrJson);
 		}

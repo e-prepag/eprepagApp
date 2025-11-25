@@ -86,7 +86,7 @@ if (!empty($extratos)) {
 	
 	header('Content-Type: text/csv');
 	
-	$nomeArquivoCSV = 'extrato.csv';
+	$nomeArquivoCSV = '/www/arquivos_gerados/csv/extrato.csv';
 	
 	if (($handle = fopen($nomeArquivoCSV, 'w')) !== false) {
 		// Escreve o cabeçalho do CSV

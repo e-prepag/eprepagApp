@@ -42,7 +42,7 @@ class TwoFactorAuthenticator {
 	
 	public function grava_2fa_log($email) {
 		try {
-			$file = fopen("/www/log/2fa_tokens.txt", "a+");
+			$file = fopen("/www/arquivos_gerados/logs/2fa_tokens.txt", "a+");
 			fwrite($file, str_repeat("*", 50)."\n");
 			fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 			fwrite($file, "Teste Livrodjx". "\n");

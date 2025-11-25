@@ -6,7 +6,6 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 $pagina_titulo = "Edita pagamento";
 require_once $raiz_do_projeto."banco/bradesco/inc_urls_bradesco.php";
 require_once $raiz_do_projeto."banco/bancodobrasil/inc_urls_bancodobrasil.php";
-require_once $raiz_do_projeto."banco/itau/inc_config.php";
 require_once $raiz_do_projeto."includes/constantesPagamento.php";
 require_once $raiz_do_projeto."includes/inc_Pagamentos.php";
 require_once $raiz_do_projeto."includes/functionsPagamento.php";

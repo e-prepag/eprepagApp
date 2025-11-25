@@ -173,7 +173,7 @@ $pinsEncontrados = $stmt->fetchAll();
 
 // CSV amigável
 $data_atual = date('Ymd_His');
-$csvFile =  "/www/log/novos_pins_gerados_$data_atual.csv";
+$csvFile =  "/www/arquivos_gerados/logs/novos_pins_gerados_$data_atual.csv";
 $fp = fopen($csvFile, 'w');
 fputcsv($fp, [
     'PIN Antigo',

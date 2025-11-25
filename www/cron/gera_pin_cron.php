@@ -14,7 +14,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
 
 function saveLog($pins, $venda) {
 	try {
-		$file = fopen("/www/log/cron_pins.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/cron_pins.txt", "a+");
 		fwrite($file, str_repeat("*", 50)."\n");
 		fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 		fwrite($file, "PIN(S): ".$pins."\n");
@@ -28,7 +28,7 @@ function saveLog($pins, $venda) {
 
 function saveLogForRegisters($witch_if){
 	try {
-		$file = fopen("/www/log/cron_pins.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/cron_pins.txt", "a+");
 		fwrite($file, str_repeat("*", 50)."\n");
 		fwrite($file, "Qual condição entrou: ".$witch_if."\n");
 		fwrite($file, str_repeat("*", 50)."\n");

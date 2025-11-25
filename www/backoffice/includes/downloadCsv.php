@@ -4,7 +4,7 @@ if(!isset($raiz_do_projeto)){
     require_once '../../includes/constantes.php';
 }
 
-$dir = array("cache" => $raiz_do_projeto."public_html/cache/",
+$dir = array("cache" => $raiz_do_projeto."arquivos_gerados/csv/",
              "bkov"  => $raiz_do_projeto."arquivos_gerados/csv/");
 
 if(isset($_GET["downloadCsv"]) && $_GET["downloadCsv"] == 1)

@@ -32,7 +32,7 @@ class GeraPinVariavel {
 	
 	function saveLog($pins, $lote, $operadora, $valor) {
 		try {
-			$file = fopen("/www/log/classPinEppCash.txt", "a+");
+			$file = fopen("/www/arquivos_gerados/logs/classPinEppCash.txt", "a+");
 			fwrite($file, str_repeat("*", 50)."\n");
 			fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 			fwrite($file, "OPERADORA: ".$operadora. "\n");

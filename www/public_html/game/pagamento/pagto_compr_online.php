@@ -218,8 +218,6 @@ $GLOBALS["jquery"] = true;
                     $id_transacao_itau = $rs_pagto_id_row['id_transacao_itau'];
                 }
                 include DIR_INCS . "gamer/venda_e_modelos_calculate.php";
-                require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
-                require_once RAIZ_DO_PROJETO . "banco/itau/inc_urls_bancoitau.php";
             } else if ($pagto_tipo == $PAGAMENTO_HIPAY_ONLINE_NUMERIC) {
 
                 foreach ($arrPagtosBloqueados as $ind => $val) {
@@ -936,7 +934,7 @@ $GLOBALS["jquery"] = true;
                                     'itens' => $itens,
                                     'venda_id' => $venda_id
                                 );
-                                $arquivo = '/www/log/requisicao-mercadopago.txt';
+                                $arquivo = '/www/arquivos_gerados/logs/requisicao-mercadopago.txt';
 
                                 $abre_arquivo = fopen($arquivo, 'a+');
 

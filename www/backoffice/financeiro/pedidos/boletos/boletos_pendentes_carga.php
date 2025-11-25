@@ -155,7 +155,7 @@ $logFile = 'boletos_pendentes.log';
 $logDelimitador = '#--------------------------------------------------------------';
 
 //Diretorio repositorio
-$folder =  $raiz_do_projeto . "log/boletos_pendentes/";
+$folder =  $raiz_do_projeto . "arquivos_gerados/logs/boletos_pendentes/";
 //desenvolvimento	
 if(false) $folder = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao\\backoffice\\offweb\\boletos_pendentes\\";
 

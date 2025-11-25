@@ -214,7 +214,7 @@ function gravaLog_BoletoExpressLH($mensagem){
         global $raiz_do_projeto;
         //Arquivo
 //		$file = $GLOBALS['ARQUIVO_LOG_SQL_EXECUTE_QUERY'];
-        $file = $raiz_do_projeto . 'log/log_dist_commerce_BoletoExpressLH.txt';	
+        $file = $raiz_do_projeto . 'arquivos_gerados/logs/log_dist_commerce_BoletoExpressLH.txt';	
 
         //Mensagem
 	$mensagem = date('Y-m-d H:i:s')." - ".$mensagem . PHP_EOL;
@@ -231,7 +231,7 @@ function gravaLog_BloqueioPagtoOnline($mensagem){
         global  $raiz_do_projeto;
 
         //Arquivo
-        $file = $raiz_do_projeto . 'log/log_BloqueioPagtoOnline_LH.txt';
+        $file = $raiz_do_projeto . 'arquivos_gerados/logs/log_BloqueioPagtoOnline_LH.txt';
 
         //Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . " (Lanhouse)".PHP_EOL . $mensagem . PHP_EOL;
@@ -248,7 +248,7 @@ function gravaLog_PagtoOnlineUsuariosBloqueadosParaVIP($mensagem){
         global  $raiz_do_projeto;
 
         //Arquivo
-        $file = $raiz_do_projeto . 'log/log_Money_PagtoOnlineUsuariosBloqueadosParaVIP_LH.txt';
+        $file = $raiz_do_projeto . 'arquivos_gerados/logs/log_Money_PagtoOnlineUsuariosBloqueadosParaVIP_LH.txt';
 
         //Mensagem
 	$mensagem = str_repeat("=", 80).PHP_EOL.date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -265,7 +265,7 @@ function gravaLog_EnviaEmail($canal, $to, $subject) {
         global  $raiz_do_projeto;
 
         //Arquivo
-        $file = $raiz_do_projeto . 'log/log_EnviEmail.txt';
+        $file = $raiz_do_projeto . 'arquivos_gerados/logs/log_EnviEmail.txt';
 
         //Mensagem
 	$mensagem = date('Y-m-d H:i:s') . "|$canal|$to|$subject ".PHP_EOL;
@@ -1653,7 +1653,7 @@ function get_iforma($vg_pagto_tipo) {
 function gravaLog_TMP($mensagem){
         global  $raiz_do_projeto;
         //Arquivo
-        $file =  $raiz_do_projeto . 'log/log_pagamento_TMP_dist.txt';
+        $file =  $raiz_do_projeto . 'arquivos_gerados/logs/log_pagamento_TMP_dist.txt';
 
         //Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -1670,7 +1670,7 @@ function gravaLog_Pagto_Insert($mensagem){
         global  $raiz_do_projeto;
 
         //Arquivo
-        $file =  $raiz_do_projeto . 'log/log_Pagto_Insert.txt';
+        $file =  $raiz_do_projeto . 'arquivos_gerados/logs/log_Pagto_Insert.txt';
 
         //Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -1691,7 +1691,7 @@ function gravaLog_Login($mensagem, $forced_save = false){
         if(!$forced_save) return;
 
         //Arquivo
-        $file =  $raiz_do_projeto . 'log/log_dist_login.txt';
+        $file =  $raiz_do_projeto . 'arquivos_gerados/logs/log_dist_login.txt';
 
         //Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . " (".$_SERVER['REMOTE_ADDR'].")".PHP_EOL . $mensagem . PHP_EOL;
@@ -1709,7 +1709,7 @@ function gravaLog_Captura($mensagem){
         global  $raiz_do_projeto;
 
         //Arquivo
-        $file = $raiz_do_projeto . 'log/log_captura.txt';
+        $file = $raiz_do_projeto . 'arquivos_gerados/logs/log_captura.txt';
 
         //Mensagem
  	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;

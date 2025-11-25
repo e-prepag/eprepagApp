@@ -105,7 +105,7 @@ class classPIX
 
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
-        $logFilePath = "/www/log/Asaas_PIX.txt";
+        $logFilePath = "/www/arquivos_gerados/logs/Asaas_PIX.txt";
         $ff = fopen($logFilePath, "a+");
 
         if ($ff) {
@@ -224,7 +224,7 @@ class classPIX
         $logEntry .= "Response:\n$response\n";
         $logEntry .= "HTTP Status Code: $httpCode\n";
 
-        file_put_contents("/www/log/Asaas_PIX.txt", $logEntry, FILE_APPEND);
+        file_put_contents("/www/arquivos_gerados/logs/Asaas_PIX.txt", $logEntry, FILE_APPEND);
 
         // Converte a resposta JSON para um array associativo
         $data = json_decode($response, true);

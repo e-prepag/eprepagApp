@@ -30,7 +30,7 @@ $logEntry = sprintf(
 	str_repeat("*", 50)
 );
 
-file_put_contents('/www/log/parametros_GARENA.txt', $logEntry, FILE_APPEND);
+file_put_contents('/www/arquivos_gerados/logs/parametros_GARENA.txt', $logEntry, FILE_APPEND);
 
 $_POST["codigo"] = preg_replace("/['\"\s]/", "", $_POST["codigo"]);
 
@@ -205,14 +205,14 @@ if (isset($_POST["valid"])) {
 	$codPinFile = preg_replace('/[^0-9]/', '', $codPinFile);
 
 	sleep(1);
-	if (file_exists('/www/log/' . $codPinFile)) {
+	if (file_exists('/www/arquivos_gerados/logs/' . $codPinFile)) {
 		sleep(10);
 		$mensagemRetono = json_encode(["Erro" => "Não foi possivel realizar seu resgate, entre em contato com o suporte E-Prepag (EPP0345)."]);
 		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
 		echo $mensagemRetono;
 		exit;
 	} else {
-		$file = fopen('/www/log/' . $codPinFile, 'a+');
+		$file = fopen('/www/arquivos_gerados/logs/' . $codPinFile, 'a+');
 	}
 	$classGarena = new Garena($pinCode, $_POST["garena"], $_POST["type"], $semCalculo, $dist, $produto);
 	/// CONTA GARENA DE TESTE: 10000335
@@ -234,7 +234,7 @@ if (isset($_POST["valid"])) {
 	/// verifica se a segunda chamada possui algum erro
 	$resgate = $classGarena->chamaGarena("POST", "producao"); // Para produção passar o segundo parametro 'producao' 
 	if ($resgate !== true) {
-		unlink('/www/log/' . $codPinFile);
+		unlink('/www/arquivos_gerados/logs/' . $codPinFile);
 		$mensagemRetono = $resgate;
 		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
 		echo $mensagemRetono;
@@ -243,7 +243,7 @@ if (isset($_POST["valid"])) {
 
 	if ($authConfirmado === true && $resgate === true) {
 
-		unlink('/www/log/' . $codPinFile);
+		unlink('/www/arquivos_gerados/logs/' . $codPinFile);
 		if (isset($_POST["verifica"]) && !isset($_POST["dist"])) {
 			$data = substr($classGarena->getDataUtilizacao(), 8, 2) . "/" . substr($classGarena->getDataUtilizacao(), 5, 2) . "/" . substr($classGarena->getDataUtilizacao(), 0, 4) . "-" . substr($classGarena->getDataUtilizacao(), 11, 8);
 			$mensagemRetono = json_encode(["Sucesso" => "Resgate realizado com sucesso, creditos encaminhados para conta", "txn_id" => $classGarena->getTxn_id(), "nome" => $nome_produto, "modelo" => utf8_encode($nome_modelo), "pin" => $_POST["codigo"], "valor" => $valor_pin, "data" => $data]);

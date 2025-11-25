@@ -50,7 +50,7 @@ function geraSenha() {
 function gravaLogDepuradorCard($mensagem){
 	
 		//Arquivo
-		$file = $GLOBALS['raiz_do_projeto'] . "log/log_Depurado_Card.txt";
+		$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_Depurado_Card.txt";
 	
 		//Mensagem
 		$mensagem =  str_repeat("-", 80).PHP_EOL.date('Y-m-d H:i:s'). " " .$GLOBALS['_SERVER']['SCRIPT_FILENAME'] . PHP_EOL . $mensagem . PHP_EOL;

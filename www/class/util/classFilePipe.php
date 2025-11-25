@@ -90,7 +90,7 @@ class FilePipe {
                 $this->setNewDir($new_dir);
 		//Arquivo
                 if(is_null($this->getDir())) {
-                    $file = $GLOBALS['raiz_do_projeto'] . 'backoffice/dimp/';
+                    $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/dimp/';
                 }
                 else {
                     $file = $this->getDir();
@@ -117,7 +117,7 @@ class FilePipe {
         function checkFile(){
 		//Arquivo
                 if(is_null($this->getDir())) {
-                    $file = $GLOBALS['raiz_do_projeto'] . 'backoffice/dimp/';
+                    $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/dimp/';
                 }
                 else {
                     $file = $this->getDir();
@@ -150,7 +150,7 @@ class FilePipe {
                 //Define o caminho e nome do arquivo
                 $this->setNewDir($new_dir);
 		if(is_null($this->getDir())) {
-                    $file = $GLOBALS['raiz_do_projeto'] . 'backoffice/dimp/';
+                    $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/dimp/';
                 }
                 else {
                     $file = $this->getDir();

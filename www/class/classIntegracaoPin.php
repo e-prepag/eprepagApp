@@ -408,7 +408,7 @@ function gravaLog_obterIdVendaValidoGoCASH($mensagem)
 {
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . "log/logObterIdVendaValidoGoCASH.txt";
+	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/logObterIdVendaValidoGoCASH.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $mensagem . PHP_EOL;

@@ -30,7 +30,6 @@ class IndexController extends HeaderController{
     public function getFeedBlog($qtd = 5){
         
 
-        $this->objFeed->setFullPath(DIR_JSON);
         $arrJsonFiles = unserialize(ARR_JSON_FEED_CREDITOS);
         $this->objFeed->setArrJsonFiles($arrJsonFiles);
         return $this->objFeed->getJsonRecursive();

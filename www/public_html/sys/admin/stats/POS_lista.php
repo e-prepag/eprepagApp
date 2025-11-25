@@ -429,7 +429,7 @@ function envia_lista(id) {
                                         
                                 $cabecalho = LANG_POS_ESTABLISHMENT.";".LANG_POS_TYPE.";".LANG_POS_CITY.";".LANG_POS_STATE.";".LANG_POS_PHONES.";".LANG_POS_SALES_NUMBER.";".LANG_POS_LAST_SALE.";".LANG_POS_TOTAL;
 
-                                $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto."public_html/cache/");
+                                $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto."arquivos_gerados/csv/");
                                 $objCsv->setCabecalho();
                                 
                                 while ($pgrow = pg_fetch_array($resestat))

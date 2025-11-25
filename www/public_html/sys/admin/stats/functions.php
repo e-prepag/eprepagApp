@@ -74,7 +74,7 @@ if($GLOBALS['varBlDebug']){
 	
 		//Arquivo
 		//$file = $GLOBALS['ARQUIVO_LOG_SQL_EXECUTE_QUERY'];
-		$file = $GLOBALS['raiz_do_projeto'] . "log/log_sql_execute_query.txt";
+		$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_sql_execute_query.txt";
 	
 		//Mensagem
 		$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
@@ -1797,7 +1797,7 @@ function insere_EstabelecimentoMovimentacao(	$var_est_codigo,
 function gravaLog_EstabelecimentoMovimentacao($EM_mensagem){
         global $raiz_do_projeto;
 	//Arquivo
-	$file = $raiz_do_projeto . 'log/log_estabelecimento_movimentacao.txt';
+	$file = $raiz_do_projeto . 'arquivos_gerados/logs/log_estabelecimento_movimentacao.txt';
 
 	//Mensagem
 	$EM_mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $EM_mensagem . "\n";

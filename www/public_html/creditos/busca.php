@@ -24,7 +24,6 @@ if(!isset($_POST['busca']) || $_POST['busca'] == "")
     $filtro['origem'] = "busca";
     
     $busca = new Busca;
-    $busca->setFullPath(DIR_JSON);
     $busca->setArrJsonFiles($arrJsonFiles);
     $busca->setFiltro($filtro);
     $arrProdutos = json_decode($busca->getJson($_POST['busca']));

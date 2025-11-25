@@ -1,1 +1,1 @@
-cd /www/background/; php -q "complice_dados_faltantes.php" >>../log/complice_dados_faltantes.log
+cd /www/background/; php -q "complice_dados_faltantes.php" >>../arquivos_gerados/logs/complice_dados_faltantes.log

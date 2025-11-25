@@ -37,8 +37,9 @@ if(isset($_SESSION['epp_origem'])){
 $arrJsonFiles = unserialize(ARR_PRODUTOS_GAMER);
 
 $busca = new Busca;
-$busca->setFullPath(DIR_JSON);
 $busca->setArrJsonFiles($arrJsonFiles);
+
+
 
 if(isset($filtro) && !empty($filtro)){
     $filtro['gamer'] = true;
@@ -70,7 +71,7 @@ $maiorAltura = 0;
 $array_imagem = array();
 
 foreach($productResult as $produto){
-    list($width, $height) = getimagesize(DIR_WEB . DIR_G_IMG_PRODUTOS . $produto['object']->imagem);
+    list($width, $height) = getimagesize(DIR_IMG . DIR_G_IMG_PRODUTOS . $produto['object']->imagem);
     $array_imagem[$produto['object']->imagem] = $height;
     if($height > $maiorAltura) {
         $maiorAltura = $height;
@@ -88,7 +89,6 @@ $inicio = $i;
 //COMENTADO POIS FOI SUBSTITUIDO POR UMA IMAGEM FIXA COM LINK PARA O BLOG
 //
 //$objJson = new Json;
-//$objJson->setFullPath(DIR_JSON);
 //$arrJsonFiles = unserialize(ARR_JSON_FEED_GAMER);
 //$objJson->setArrJsonFiles($arrJsonFiles);
 //$feeds = $objJson->getJsonRecursive();
@@ -222,7 +222,7 @@ if(is_array($productResult) && !empty($productResult)){
 <?php 
         if( $produto['object']->imagem && 
         $produto['object']->imagem != "" && 
-        file_exists(DIR_WEB . DIR_G_IMG_PRODUTOS . $produto['object']->imagem)){ 
+        file_exists(DIR_IMG . DIR_G_IMG_PRODUTOS . $produto['object']->imagem)){ 
 ?>              
                   
                     <img border="0" class="img-produto" style="margin-top: <?php echo (($maiorAltura - $array_imagem[$produto['object']->imagem])/2) - 1 ; ?>px" src="<?php echo DIR_G_IMG_PRODUTOS . $produto['object']->imagem?>">

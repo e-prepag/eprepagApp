@@ -64,7 +64,7 @@ class InibeAtaque {
 	
 	
 	private function logErrors($msg) {	
-		$fileLog = RAIZ_DO_PROJETO . "log/log_InibeAtaque.log";
+		$fileLog = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_InibeAtaque.log";
 		
 		$log  = "=================================================================================================\n";
 		$log .= "DATA -> ".date("d/m/Y - H:i:s")."\n";

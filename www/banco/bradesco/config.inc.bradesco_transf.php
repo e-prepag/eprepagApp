@@ -6,7 +6,7 @@ require_once RAIZ_DO_PROJETO . 'banco/bradesco/config.inc.urls_bradesco.php';
 define("BRADESCO_MSG_ERROR_LOG", "ERROR_LOG");
 
 // Arquivo de Log onde serao registrados todos os erros gerados  
-define("LOG_FILE_BRADESCO_WS_ERRORS",	RAIZ_DO_PROJETO . "log/log_BRADESCO_TRANSF_WS-Errors.log");
+define("LOG_FILE_BRADESCO_WS_ERRORS",	RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_BRADESCO_TRANSF_WS-Errors.log");
 
 $ARRAY_ERROS = array('-401', '-399', '-398', '-201', '-202', '-203', '-205', '-206', '-207', '-208', '-299', '-501', '-999');
 

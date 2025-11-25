@@ -37,7 +37,7 @@
 		$compila_erro .= $dbh->errorCode();
 		$compila_erro .= "/n";
 		
-		$arquivo = "/www/log/log-concilia.txt";
+		$arquivo = "/www/arquivos_gerados/logs/log-concilia.txt";
 
 		$abre_arquivo = fopen($arquivo, 'a');
 

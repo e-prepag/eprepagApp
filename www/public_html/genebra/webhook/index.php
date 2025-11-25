@@ -1,8 +1,0 @@
-<?php
-
-
-echo "EPP - WEBHOOK";
-
-
-
-?>

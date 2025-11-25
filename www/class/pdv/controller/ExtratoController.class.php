@@ -292,7 +292,7 @@ class ExtratoController extends HeaderController{
 	
         $rs_extrato = SQLexecuteQuery($sql);
 		
-		/*$ff= fopen("/www/log/teste_extrato.php","a+");
+		/*$ff= fopen("/www/arquivos_gerados/logs/teste_extrato.php","a+");
 		fwrite($ff, $sql."\r");
 		fwrite($ff, str_repeat("*", 50)."\r");
 		fclose($ff);*/

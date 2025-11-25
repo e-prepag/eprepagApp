@@ -23,7 +23,8 @@ $chave256bits = new Chave();
 $aes = new AES($chave256bits->retornaChavePub());
 $passw = base64_encode($aes->encrypt(addslashes($passw)));
 
-gravaLog_LoginBKO("Login BKO: '" . $user . "', '" . $passw . "'");
+$ipReq = $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
+gravaLog_LoginBKO("Login BKO: '" . $user . "', '" . $ipReq . "'");
 $Enviar = true;
 if ($Enviar) {
     require_once $raiz_do_projeto . 'db/connect.php';
@@ -62,7 +63,6 @@ if ($Enviar) {
             $tipo_acesso = $pgrow['tipo_acesso'];
             $visualiza_dados = $pgrow['visualiza_dados'];
 
-            gravaLog_LoginBKO("Login BKO - dados usuário: " . print_r($pgrow, true) . "");
             if (!empty($iduser_var)) {
 
                 $dataUltimoAcesso = new DateTime($pgrow['sem_aut_data']);
@@ -163,7 +163,7 @@ function gravaLog_LoginBKO($mensagem)
 {
 
     //Arquivo
-    $file = $GLOBALS['raiz_do_projeto'] . "log/log_LoginBKO.txt";
+    $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_LoginBKO.txt";
 
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;

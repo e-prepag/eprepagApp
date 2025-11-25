@@ -15,7 +15,7 @@ function gravaLog_IntegracaoPIN($mensagem)
 {
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . "log/logCheckRedeem.txt";
+	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/logCheckRedeem.txt";
 
 	//Mensagem
 	$mensagem =  str_repeat("-", 80) . PHP_EOL . date('Y-m-d H:i:s') . " " . $GLOBALS['_SERVER']['SCRIPT_FILENAME'] . PHP_EOL . $mensagem . PHP_EOL;
@@ -49,7 +49,7 @@ function logEventsONGAME($msg)
 	$log .= "---------------------------------" . PHP_EOL;
 	$log .= htmlspecialchars_decode($msg);
 
-	$fp = fopen($raiz_do_projeto . "log/logONGAME_DEBUG.log", 'a+');
+	$fp = fopen($raiz_do_projeto . "arquivos_gerados/logs/logONGAME_DEBUG.log", 'a+');
 	fwrite($fp, $log);
 	fclose($fp);
 } //end function logEventsONGAME($msg)

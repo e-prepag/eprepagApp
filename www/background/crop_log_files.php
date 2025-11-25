@@ -1,6 +1,6 @@
 <?php
-$logs_path = "/www/log/";
-$logs_bkp_path = "/var/log/aplicacao/";
+$logs_path = "/www/arquivos_gerados/logs/";
+$logs_bkp_path = "/var/arquivos_gerados/logs/aplicacao/";
 $atipo_ext = array("LOG", "TXT");
 $max_size = 5*1024*1024; // 5Mb 
 $snome_novo = "_".date("Y_m_d_H");

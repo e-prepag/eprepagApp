@@ -352,7 +352,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 <?php
                         require_once $raiz_do_projeto."/class/util/CSV.class.php";
                         $cabecalho = "Data;Operadora;Qtde;Valor de Face;Valor Total";
-                        $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto . "public_html/cache/");
+                        $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto . "arquivos_gerados/csv/");
                         $objCsv->setCabecalho();
 
                         while ($pgrow = pg_fetch_array($resestat))

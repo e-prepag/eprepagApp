@@ -384,7 +384,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 
 function gravaLog_DebugBanner($mensagem){
 	//Arquivo
-	$file = RAIZ_DO_PROJETO . "log/log_Debug_Banner.txt";
+	$file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Debug_Banner.txt";
 
 	//Mensagem
 	$mensagem = "\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

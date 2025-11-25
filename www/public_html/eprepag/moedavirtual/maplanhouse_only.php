@@ -275,7 +275,7 @@ if($conta > 0) {
 echo '<span style="font-family:Arial, Helvetica, sans-serif;font-size:11px;">Clique no &iacute;cone para ver o endere&ccedil;o</span>'; 
 
 function grava_log_mapa_lhs($mensagem){
-	$ARQUIVO_LOG_HTTP_REFERER = RAIZ_DO_PROJETO . "log/log_mapa_lista_lhs.txt";	
+	$ARQUIVO_LOG_HTTP_REFERER = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_mapa_lista_lhs.txt";	
 
 	//Arquivo
 	$file = $ARQUIVO_LOG_HTTP_REFERER;

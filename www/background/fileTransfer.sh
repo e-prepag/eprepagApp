@@ -1,1 +1,1 @@
-cd /www/background/; php -q "fileTransfer.php"  >> /www/log/fileTransfer.log 2>> /dev/null
+cd /www/background/; php -q "fileTransfer.php"  >> /www/arquivos_gerados/logs/fileTransfer.log 2>> /dev/null

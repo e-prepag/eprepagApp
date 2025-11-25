@@ -91,7 +91,7 @@ $sql = "SELECT
 		mp_descricao,
 		to_char(mp_data_inclusao,'DD/MM/YYYY') as mat_promo_data_inclusao,
 		to_char(mp_data_alteracao,'DD/MM/YYYY') as mat_promo_data_alteracao,
-		CASE WHEN (mp_ativo = '1') THEN '<div style=\'background-color:orange;color:blue;text-align:center\'>Sim</div>' ELSE 'N&atilde;o' END as mat_promo_ativo
+		CASE WHEN (mp_ativo = '1') THEN '<div style=''background-color:orange;color:blue;text-align:center''>Sim</div>' ELSE 'N&atilde;o' END as mat_promo_ativo
 	FROM dist_materiais_promocionais ";
 if (!empty($mat_promo_nome))
 	$smp_aux[] = "upper(mp_descricao) LIKE '%" . strtoupper($mat_promo_nome) . "%'";

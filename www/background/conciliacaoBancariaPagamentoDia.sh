@@ -1,1 +1,1 @@
-cd /www/background/; php -q "conciliacaoBancariaPagamentoDia.php" >>../log/conciliacaoBancariaPagamentoDia.log
+cd /www/background/; php -q "conciliacaoBancariaPagamentoDia.php" >>../arquivos_gerados/logs/conciliacaoBancariaPagamentoDia.log

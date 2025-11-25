@@ -1,1 +1,1 @@
-cd /www/background/; php -q "money.php" conciliacaoAutomaticaBoleto >>../log/conciliacaoAutomaticaBoleto.log
+cd /www/background/; php -q "money.php" conciliacaoAutomaticaBoleto >>../arquivos_gerados/logs/conciliacaoAutomaticaBoleto.log

@@ -1775,7 +1775,7 @@ class UsuarioGames
                 }
             }
         } else {
-            gravaLog_Login("Login de gamer falhou ($senha0): '$sql'.\n", true);
+            gravaLog_Login("Login de gamer falhou ($login).\n", true);
         }
 
         return $ret;
@@ -1827,7 +1827,7 @@ class UsuarioGames
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
                 }
             } else {
-                gravaLog_Login("Login de gamer falhou ($senha): '$sql'.\n", true);
+                gravaLog_Login("Login de gamer falhou ($login).\n", true);
             }
         } //end if (!filter_var($login, FILTER_VALIDATE_EMAIL))
 
@@ -3043,7 +3043,7 @@ class UsuarioGames
     {
         global $raiz_do_projeto;
 
-        $fileLog = $raiz_do_projeto . "log/log_class_users_GAMERs_PDO-Errors.log";
+        $fileLog = $raiz_do_projeto . "arquivos_gerados/logs/log_class_users_GAMERs_PDO-Errors.log";
 
         $log  = "=================================================================================================" . PHP_EOL;
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . "" . PHP_EOL;

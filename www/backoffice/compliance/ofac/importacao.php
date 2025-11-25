@@ -18,7 +18,7 @@ $OFAC_EXTENSOES = array("zip");
 //Nome do arquivo OFAC zipado
 $OFAC_FILE_NAME = "SDN_XML.ZIP";
 //Diretório destino do arquivo do OFAC
-$DIR_OFAC_ARQ_RETORNO = $raiz_do_projeto . "/backoffice/compliance/ofac/";
+$DIR_OFAC_ARQ_RETORNO = $raiz_do_projeto . "/arquivos_gerados/compliance/ofac/";
 //Número de arquivos contidos no ZIP
 $QTDE_ARQUIVOS = 1;
 //Lista de arquivos a serem importados

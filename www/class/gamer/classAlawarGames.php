@@ -519,7 +519,7 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 function gravaLog_AlawarXML($mensagem){
 	//Arquivo
         global $raiz_do_projeto;
-	$file = $raiz_do_projeto . "log/log_AlawarXML.txt";
+	$file = $raiz_do_projeto . "arquivos_gerados/logs/log_AlawarXML.txt";
 
 	//Mensagem
 	$mensagem = str_repeat("=", 80). "\n".date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";

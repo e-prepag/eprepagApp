@@ -89,7 +89,7 @@ if (!function_exists('checkIP')) {
 }//end if (!function_exists('checkIP'))
 else {
     //Arquivo
-    $file = $raiz_do_projeto."log/log_Debug_Dupla_Funcao.txt";
+    $file = $raiz_do_projeto."arquivos_gerados/logs/log_Debug_Dupla_Funcao.txt";
     //Mensagem
     $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\nExistiu tentativa de duplicação de FUNÇÃO neste ponto. (FUNÇÃO: checkIP)\n";
     //Grava mensagem no arquivo

@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
+<?php 
+exit;
+
+require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 require_once "../../../includes/constantes.php";

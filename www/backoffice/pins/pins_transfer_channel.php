@@ -421,7 +421,7 @@ if($bPrint) echo "$sql<br>";
 		//Arquivo
                 global $raiz_do_projeto;
                 
-		$file = $raiz_do_projeto . "log/log_PINsTransferChannel.txt";
+		$file = $raiz_do_projeto . "arquivos_gerados/logs/log_PINsTransferChannel.txt";
 	
 		//Mensagem
 		$mensagem = date('Y-m-d H:i:s') . " " . $GLOBALS['_SERVER']["SCRIPT_FILENAME"] . ", userlogin_bko: '".$_SESSION['userlogin_bko']."'\n     " . $mensagem . "\n";
