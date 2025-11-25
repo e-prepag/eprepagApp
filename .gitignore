@@ -24,7 +24,6 @@
 /www/ssl/private.pem
 /www/ssl/public.pem
 !/www/ssl/.gitkeep
-assinador/__pycache__
 *.pfx
 *.pem
 /www/log

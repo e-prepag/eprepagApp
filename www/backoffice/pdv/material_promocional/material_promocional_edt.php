@@ -91,7 +91,7 @@ function isTipo(pVal)
                 </tr>
                 <?php
                 if(!empty($mat_promo_banner)) {
-                         $pasta = $raiz_do_projeto."public_html/imagens/pdv/material_promocional/";
+                         $pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/material_promocional/";
                 ?>
                 <tr>
                 	<td> Imagem do Banner Atual:</td>

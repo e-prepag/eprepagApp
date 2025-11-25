@@ -92,7 +92,7 @@ $sql = "SELECT
 		dv_descricao,
 		to_char(dv_data_inicio,'DD/MM/YYYY') as dv_data_inicio,
 		to_char(dv_data_fim,'DD/MM/YYYY') as dv_data_fim,
-		CASE WHEN (dv_ativo = '1' AND dv_data_inicio <= NOW() AND (dv_data_fim + interval '1 day')   >= NOW()) THEN '<div style=\'background-color:orange;color:blue;text-align:center\'>Sim</div>' WHEN dv_ativo = '1' THEN 'Sim' ELSE 'N&atilde;o' END as dv_ativo
+		CASE WHEN (dv_ativo = '1' AND dv_data_inicio <= NOW() AND (dv_data_fim + interval '1 day')   >= NOW()) THEN '<div style=''background-color:orange;color:blue;text-align:center''>Sim</div>' WHEN dv_ativo = '1' THEN 'Sim' ELSE 'N&atilde;o' END as dv_ativo
 	FROM dist_videos te ";
 if (!empty($dv_descricao))
 	$sql_aux[] = "UPPER(dv_descricao) LIKE '%" . strtoupper($dv_descricao) . "%'";

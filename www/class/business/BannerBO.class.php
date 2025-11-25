@@ -202,15 +202,6 @@ class BannerBO extends BannerDAO
         // Garante que o nome não contenha caminhos (../)
         $safe_filename = basename($file["name"]);
 
-        // Lê o conteúdo do arquivo temporário para verificar se há código PHP.
-        $file_content = file_get_contents($file["tmp_name"]);
-
-        // Verifica se as tags de abertura do PHP existem
-        // if (strpos($file_content, '') !== false || strpos($file_content, '') !== false) {
-        //     $this->erros[] = "Conteúdo malicioso detectado (PHP Tag). Upload recusado.";
-        //     return false;
-        // }
-
         $image_info = @getimagesize($file["tmp_name"]);
 
         if ($image_info === false) {
