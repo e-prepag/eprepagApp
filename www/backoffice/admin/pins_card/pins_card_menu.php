@@ -24,7 +24,7 @@ if(b_IsBKOUsuarioAdminPINs()) {
 					'Comunicação com Distribuidor'	=> 'pins_card_consulta_distribuidor.php',
 					);
 }
-if(b_IsBKOUsuarioAdminPINsFinanceiro()) {
+else if(b_IsBKOUsuarioAdminPINsFinanceiro()) {
 	$MENU = array (
 					'Estoque'			=> 'index.php',
 					'Hist&oacute;rico de PINs'	=> 'pins_card_historico.php',

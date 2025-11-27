@@ -21,7 +21,7 @@ if(b_IsBKOUsuarioAdminPINs()) {
 					'Cancelar Pins'				=> 'altera_status_para_PINs_cancelados.php',
 					);
 }
-if(b_IsBKOUsuarioAdminPINsFinanceiro()) {
+else if(b_IsBKOUsuarioAdminPINsFinanceiro()) {
 	$MENU = array (
 					'Estoque'						=> 'index.php',
 					'Hist&oacute;rico de PINs'		=> 'pins_store_historico.php',

@@ -63,12 +63,12 @@ function geraSenha()
 
 
 if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
-	$sEmailTo = "daniela.oliveira@e-prepag.com.br";//"tamy@e-prepag.com.br,daniela.oliveira@e-prepag.com.br,financeiro@e-prepag.com.br";
+	$sEmailTo = "daniela.oliveira@e-prepag.com.br"; //"tamy@e-prepag.com.br,daniela.oliveira@e-prepag.com.br,financeiro@e-prepag.com.br";
 	$sEmailToNome = "Daniela Oliveira";
 	//$sEmailTo		= "wagner.mbis@gmail.com";
 	//$sEmailToNome	= "Wagner de Miranda";
 	//$sEmailCc		= "daniela.oliveira@e-prepag.com.br";//tamy@e-prepag.com.br";
-	$sEmailCcNome = "Daniela Oliveira";//Tamlyn Keiko Souza Takahata";
+	$sEmailCcNome = "Daniela Oliveira"; //Tamlyn Keiko Souza Takahata";
 
 	if ($DISTRIBUIDORA_EPP == intval($distributor_codigo)) {
 		$opr_codigo_aux = $OPR_CODIGO_EPP;
@@ -87,7 +87,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 
 		// Deleta arquivos >5horas
 		$now = mktime(date('H'), date('i'), date('s'), date('m'), date('d'), date('Y'));
-		foreach (glob("arquivos/*.rar") as $filename) {
+		foreach (glob("arquivos/*.zip") as $filename) {
 			if (($now - filemtime($filename)) > 5 * 3600) {
 				unlink($filename);
 			}
@@ -137,17 +137,17 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					while ($rs_pins_email_row = pg_fetch_array($rs_pins_email)) {
 						$sArq .= str_pad($rs_pins_email_row['pin_lote_codigo'], 8, "0", STR_PAD_LEFT) . " " . str_pad($rs_pins_email_row['pin_serial'], 16, "0", STR_PAD_LEFT) . " " . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . " 090 " . str_pad($rs_pins_email_row['pin_valor'], 9, "0", STR_PAD_LEFT) . ".00" . PHP_EOL;
 					}
-				}//end if($DISTRIBUIDORA_EPAY != intval($distributor_codigo))
+				} //end if($DISTRIBUIDORA_EPAY != intval($distributor_codigo))
 				else if ($DISTRIBUIDORA_INCOMM_REDETREL == intval($distributor_codigo)) {
 					while ($rs_pins_email_row = pg_fetch_array($rs_pins_email)) {
 						$sArq .= $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . "; " . $rs_pins_email_row['pin_valor'] . ".00" . PHP_EOL;
 					}
-				}//end else if($DISTRIBUIDORA_INCOMM_REDETREL == intval($distributor_codigo)) 
+				} //end else if($DISTRIBUIDORA_INCOMM_REDETREL == intval($distributor_codigo)) 
 				else {
 					while ($rs_pins_email_row = pg_fetch_array($rs_pins_email)) {
 						$sArq .= "0;0;0;" . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . ";" . $rs_pins_email_row['pin_valor'] . "00;" . $rs_pins_email_row['pin_serial'] . ";" . $rs_pins_email_row['pin_lote_codigo'] . PHP_EOL;
 					}
-				}//end else
+				} //end else
 				$handle = fopen($varArquivo, "a+");
 				if (fwrite($handle, $sArq) === FALSE) {
 					$msg_pin .= "<font color='#0000CC'>N&atilde;o foi poss&iacute;vel gravar o Arquivo. </font><br>";
@@ -163,51 +163,32 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					gravaLog_Depurador("Arquivo txt NAUN gerado com sucesso!" . PHP_EOL . "$varArquivo" . PHP_EOL);
 				}
 				//  RAR 
-				$varArquivoRAR = substr($varArquivo, 0, strpos($varArquivo, '.')) . ".rar";
+				$varArquivoRAR = substr($varArquivo, 0, strpos($varArquivo, '.')) . ".zip";
 
 				$senha = geraSenha();
-				$scmd = "rar a -p" . $senha . " -ep " . $varArquivoRAR . " " . $varArquivo;
-				gravaLog_Depurador("Comando de compactação com senha!" . PHP_EOL . "$scmd" . PHP_EOL);
+				$zip = new ZipArchive();
 
-				//**********************************************  Parou de funcionar o comand exec em 29/1/2013
-				exec($scmd);
+				if ($zip->open($varArquivoRAR, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
 
-				// Make a new instance of the COM object
-				//$WshShell = new COM("WScript.Shell");
+					$zip->setPassword($senha);
 
-				// Make the command window but dont show it.
-				//$oExec = $WshShell->Exec("$scmd");
+					$nomeInterno = basename($varArquivo);
 
-				//Testando se executou o 
-				//if($oExec->Status == 0) gravaLog_Depurador(" Executou o Windows Script com sucesso!!".PHP_EOL);
-				//else gravaLog_Depurador(" Não executou o Windows Script com sucesso!!".PHP_EOL);
+					$zip->addFile($varArquivo, $nomeInterno);
+
+					// Tenta criptografia forte primeiro (funciona em muitos PHP 5.6)
+					if (!@$zip->setEncryptionName($nomeInterno, ZipArchive::EM_AES_256)) {
+						// Se não funcionar, cai no PKWARE (100% compatível)
+						$zip->setEncryptionName($nomeInterno, ZipArchive::EM_PKWARE);
+					}
+
+					$zip->close();
+				} else {
+					die("Erro ao criar ZIP em $varArquivoRAR");
+				}
 
 				sleep(2);
-				/*
-							$handle = fopen($varArquivoRAR, "w+");
-							if (fwrite($handle, "Teste") === FALSE) {
-								$msg_pin .= "<font color='#0000CC'>N&atilde;o foi poss&iacute;vel gravar o Arquivo RAR. </font><br>";
-								$msg .= "<font color='#0000CC'>N&atilde;o foi poss&iacute;vel gravar o Arquivo RAR. </font><br>";
-							} else {
-								$msg_pin .= "<font color='#0000CC'>Arquivo RAR gravado com sucesso.</font><br>";
-							}
-							fclose($handle);
-							*/
 
-				if (file_exists($varArquivoRAR)) {
-					gravaLog_Depurador("Arquivo RAR gerado com sucesso!" . PHP_EOL . "$varArquivoRAR" . PHP_EOL);
-				} else {
-					gravaLog_Depurador("Arquivo RAR NAUN gerado com sucesso!" . PHP_EOL . "$varArquivoRAR" . PHP_EOL);
-				}
-				/*********************************************** comentado para naun esxcçluir o arquivo que será compacatado manualmente
-							unlink($varArquivo);
-							if (file_exists($varArquivo)) {
-								gravaLog_Depurador("Arquivo txt NAUN excluido com sucesso!".PHP_EOL."$varArquivo".PHP_EOL);
-							}
-							else  {
-								gravaLog_Depurador("Arquivo txt excluido com sucesso!".PHP_EOL."$varArquivo".PHP_EOL);
-							}
-							*/
 			} //end if (($DISTRIBUIDORA_EPP != intval($distributor_codigo))&&($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo)))
 			else {
 				//tamanho do serial na tabela estoque
@@ -272,20 +253,19 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 									$rs_pins_save_tracer = SQLexecuteQuery($sql);
 									if (!$rs_pins_save_tracer) {
 										$msg .= "Erro ao salvar a rastreabilidade PIN no estoque e na pins_store($sql)<br>";
-									}//end if(!$rs_pins_save)
-								}//end else if(!$rs_pins_estoque)
-							}//end else if(!$rs_pins_save)
+									} //end if(!$rs_pins_save)
+								} //end else if(!$rs_pins_estoque)
+							} //end else if(!$rs_pins_save)
 						}
-
-					}//end while($rs_pins_email_row = pg_fetch_array($rs_pins_email))
+					} //end while($rs_pins_email_row = pg_fetch_array($rs_pins_email))
 					if ($msg_aux == $msg) {
 						$importacaoOk = true;
 					}
-				}//end if(!empty($opr_codigo_aux))
+				} //end if(!empty($opr_codigo_aux))
 				else {
 					$msg .= "<font color='#FF0000'><b>C&oacute;digo de Distribuidor n&atilde;o localizado." . PHP_EOL . "<br></b></font><br>";
 				}
-			}//end else if (($DISTRIBUIDORA_EPP != intval($distributor_codigo))&&($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo)))
+			} //end else if (($DISTRIBUIDORA_EPP != intval($distributor_codigo))&&($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo)))
 
 			try {
 
@@ -393,24 +373,20 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 								}
 							}
 						}
-					}//end if($msg == "")
+					} //end if($msg == "")
 					$msg_pin .= "<font color='#0000CC'>E-mail enviado com sucesso!</font>";
 				} else {
 					gravaLog_Depurador("Email NAUN enviado com sucesso!" . PHP_EOL);
 					$msg_pin .= "<font color='#0000CC'>Erro ao enviar o E-mail!</font>";
 					$msg .= "<font color='#FF0000'><b>Erro ao enviar o E-mail!" . PHP_EOL . "<br></b></font><br>";
 				}
-
 			} catch (Exception $e) {
 				$msgErro = $mail->ErrorInfo;
-				$arquivo = '/www/arquivos_gerados/logs/testePINstore.txt';
+				$arquivo = '/www/log/testePINstore.txt';
 				$abre_arquivo = fopen($arquivo, 'w+');
 				fwrite($abre_arquivo, $msgErro . "\n");
 				fclose($abre_arquivo);
 			}
-
-
-
 		}
 
 		//Linha abaixo força o ROLLBACK
@@ -434,18 +410,17 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 
 		// Unblock da carga no estoque 
 		flag_publisher_unblock($distributor_codigo);
+	} //end else do if(flag_publisher_test($distributor_codigo)) 
 
-	}//end else do if(flag_publisher_test($distributor_codigo)) 
 
-
-}//end if(!empty($BtnGerarArq) && $tf_v_tipo==3) 
+} //end if(!empty($BtnGerarArq) && $tf_v_tipo==3) 
 
 
 function gravaLog_Depurador($mensagem)
 {
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_Depurador.txt";
+	$file = $GLOBALS['raiz_do_projeto'] . "log/log_Depurador.txt";
 
 	//Mensagem
 	$mensagem = str_repeat("-", 80) . PHP_EOL . date('Y-m-d H:i:s') . " " . $GLOBALS['_SERVER']['SCRIPT_FILENAME'] . PHP_EOL . $mensagem . PHP_EOL;
@@ -454,6 +429,4 @@ function gravaLog_Depurador($mensagem)
 		fwrite($handle, $mensagem);
 		fclose($handle);
 	}
-
-}//end function gravaLog_Depurador
-?>
+} //end function gravaLog_Depurador

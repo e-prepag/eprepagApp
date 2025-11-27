@@ -4,6 +4,41 @@ require_once "/www/includes/bourls.php";
 //ini_set("display_errors", 1); 
 //header("Content-Type: text/html; charset=UTF-8",true);
 //header("Content-Type: text/html; charset=ISO-8859-1",true);
+function removerAcentos($array, $recursive = true) {
+    $resultado = [];
+    
+    foreach ($array as $chave => $valor) {
+        if (is_array($valor) && $recursive) {
+            $resultado[$chave] = removerAcentos($valor, $recursive);
+        } elseif (is_string($valor)) {
+            $resultado[$chave] = removerAcentosString($valor);
+        } else {
+            $resultado[$chave] = $valor;
+        }
+    }
+    
+    return $resultado;
+}
+
+function removerAcentosString($texto) {
+    $acentos = [
+        chr(225) => 'a', chr(224) => 'a', chr(227) => 'a', chr(226) => 'a', chr(228) => 'a',
+        chr(233) => 'e', chr(232) => 'e', chr(234) => 'e', chr(235) => 'e',
+        chr(237) => 'i', chr(236) => 'i', chr(238) => 'i', chr(239) => 'i',
+        chr(243) => 'o', chr(242) => 'o', chr(245) => 'o', chr(244) => 'o', chr(246) => 'o',
+        chr(250) => 'u', chr(249) => 'u', chr(251) => 'u', chr(252) => 'u',
+        chr(231) => 'c', chr(241) => 'n',
+        chr(193) => 'A', chr(192) => 'A', chr(195) => 'A', chr(194) => 'A', chr(196) => 'A',
+        chr(201) => 'E', chr(200) => 'E', chr(202) => 'E', chr(203) => 'E',
+        chr(205) => 'I', chr(204) => 'I', chr(206) => 'I', chr(207) => 'I',
+        chr(211) => 'O', chr(210) => 'O', chr(213) => 'O', chr(212) => 'O', chr(214) => 'O',
+        chr(218) => 'U', chr(217) => 'U', chr(219) => 'U', chr(220) => 'U',
+        chr(199) => 'C', chr(209) => 'N'
+    ];
+    
+    return strtr($texto, $acentos);
+}
+
 function BuscaMaiorSequencialAdmnistradora() {
         $sql = "
                 select MAX(nfes_seq) as nfes_seq
@@ -57,7 +92,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."public_html/sys/admin/vendas/vendas_estab/nfesp_lote.php";
 require_once $raiz_do_projeto."includes/configISSCidade.php";
 set_time_limit(3600);
-define("CIDADE_DEFAULT","SÃO PAULO");
+define("CIDADE_DEFAULT","SAO PAULO");
 define("ESTADO_DEFAULT","SP");
 
 /* 
@@ -109,8 +144,10 @@ if(isset($BtnSearch) && $BtnSearch) {
                 //Capturando o número sequencial
                 $varNumeroRPSaux = BuscaMaiorSequencialAdmnistradora();
                 $varLoteAuxADM = $varNumeroRPSaux;
-                while ($rsRow = pg_fetch_array($rs)) {
+                while ($rsRow_acento = pg_fetch_array($rs)) {
                     
+                        $rsRow = removerAcentos($rsRow_acento);
+
                         //Reset no laço as variaveis de Situação RPS e alíquota de ISS
                         $varSituacaoRPS = "T"; //Operação Normal
                         $varAliquotaRPS = "0200";

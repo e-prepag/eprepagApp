@@ -27,7 +27,7 @@ if(!$arquivoLog->haveFile()) {
     $qtde_meses_considerados_apartirde = 1; //qtde de meses considerado na pesquisa
     $subject = "Notificação Automatica de Pedidos de Integração";
     $email = getenv("email_suporte");
-    $cc = "glaucia@e-prepag.com.br"; //"glaucia@e-prepag.com.br";
+    $cc = "glaucia@e-prepag.com.br,jose.carlos@easygroupit.com"; //"glaucia@e-prepag.com.br";
     $bcc = "";
     $msg = "";
 
@@ -90,6 +90,8 @@ if(!$arquivoLog->haveFile()) {
                    // echo "URL:".$notify_url.PHP_EOL;
                    // echo "Parameters: ".$post_parameters.PHP_EOL;
                     $sret = getIntegracaoCURL($notify_url, $post_parameters);
+
+                    file_put_contents("/www/log/teste_curl.txt", $sret . "\n\r");
 
                   //  echo " Pedido ".$rs_row['vg_id']."\t\t=> Conciliado em [".$rs_row['vg_data_concilia']."]\t\t=> Tipo de pagamento [".$rs_row['vg_pagto_tipo']."];".PHP_EOL;
                     $msg .= " Pedido ".$rs_row['vg_id']." => Conciliado em [".$rs_row['vg_data_concilia']."] => Tipo de pagamento [".$rs_row['vg_pagto_tipo']."]; <br>".PHP_EOL;
