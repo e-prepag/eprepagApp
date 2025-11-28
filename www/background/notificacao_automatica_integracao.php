@@ -41,6 +41,7 @@ if (!$arquivoLog->haveFile()) {
             vg.vg_ultimo_status, 
             vg.vg_pagto_tipo,
             vg.vg_data_concilia,
+            (NOW() - vg_data_concilia) > INTERVAL '30 minutes' AS passou_30_min,
             coalesce(vg_id, 0) as vg_id
     from tb_integracao_pedido ip 
         left outer join tb_venda_games vg on ip.ip_vg_id = vg.vg_id 
@@ -97,7 +98,7 @@ if (!$arquivoLog->haveFile()) {
 
             echo "$sret $post_parameters<br>";
 
-            if ($buffer == false || $http_code != 200) {
+            if ($buffer == false || $http_code != 200 || $rs_row['passou_30_min']) {
                 $msg .= " Pedido " . $rs_row['vg_id'] . " => Conciliado em [" . $rs_row['vg_data_concilia'] . "] => Tipo de pagamento [" . $rs_row['vg_pagto_tipo'] . "]; <br>" . PHP_EOL;
             }
         } //end while
