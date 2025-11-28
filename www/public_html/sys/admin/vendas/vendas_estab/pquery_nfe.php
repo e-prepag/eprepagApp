@@ -1,6 +1,6 @@
 <?php 
-error_reporting(E_ALL); 
-ini_set("display_errors", 1);
+// error_reporting(E_ALL); 
+// ini_set("display_errors", 1);
 session_start();
 if (isset($_POST['exportar_excel'])) {
     header('Content-Type: text/csv; charset=utf-8');
@@ -720,7 +720,7 @@ function clearSelection (){
 
 
 	// Arquivo
-	$path = $raiz_do_projeto . "/www/arquivos_gerados";
+	$path = $raiz_do_projeto . "arquivos_gerados";
 	$url = "/vendas_estab/";
 	$file = date("YmdHis").str_pad(rand(0,999), 3, "0", STR_PAD_LEFT).".txt";
 
@@ -734,7 +734,7 @@ function clearSelection (){
   <tr> 
     <td valign="center" bgcolor="#FFFFFF" width="903"><p><font face="Arial, Helvetica, sans-serif" size="2" color="#000000">
 	<h3>NFe para registros listados.</h3>
-	<p>Salvar arquivo <a href="<?php echo $url.$file; ?>">aqui</a>. (Tamanho do arquivo: <?php 
+	<p>Salvar arquivo <a href="<?php echo "/sys/admin/".$url.$file; ?>">aqui</a>. (Tamanho do arquivo: <?php 
 		$f_size = strlen($sNFe);
 		echo ( ($f_size>=1024*1024)?number_format($f_size/1024/1024, 2, ',', '.')."Mb":number_format($f_size/1024, 2, ',', '.')."kB"); 
 		?>)</p>

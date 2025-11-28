@@ -3199,7 +3199,7 @@ function getStatusColor($status)
 }
 
 // ================================================
-function getIntegracaoCURL($url, $post_parameters)
+function getIntegracaoCURL($url, $post_parameters, &$http_code = null)
 {
 
 	$buffer = "";
@@ -3210,7 +3210,7 @@ function getIntegracaoCURL($url, $post_parameters)
 
 	// Some sites may protect themselves from remote logins by checking which site you came from.
 	// http://php.net/manual/en/function.curl-setopt.php
-	$ref_url = "" . EPREPAG_URL_HTTP . "";
+	$ref_url = EPREPAG_URL_HTTP;
 	curl_setopt($curl_handle, CURLOPT_REFERER, $ref_url);
 
 	// http://www.weberdev.com/get_example-4136.html
@@ -3232,24 +3232,9 @@ function getIntegracaoCURL($url, $post_parameters)
 
 	$buffer = curl_exec($curl_handle);
 
-	/*	// Em caso de erro libera aqui
-		$info = curl_getinfo($curl_handle);
-
-		if ($output === false || $info['http_code'] != 200) {
-		  $output = "No cURL data returned for URL [". $info['http_code']. "]";
-		  if (curl_error($curl_handle)) {
-			$output .= "\n". curl_error($curl_handle);
-		  }
-		  echo "CRL Error: ".$output."<br>Buffer: ".$buffer."\n";
-	//echo "<pre>";
-	//print_r($info);
-	//echo "</pre>";
-		} else {
-		  // 'OK' status; format $output data if necessary here:
-		  echo "CRL OK<br>\n";
-		}
-		// Até aqui
-	*/
+	if($buffer != false && $http_code != null){
+		$http_code = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+	}
 	curl_close($curl_handle);
 
 	return $buffer;

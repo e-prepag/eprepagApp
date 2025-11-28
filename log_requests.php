@@ -58,7 +58,7 @@ $forbiddenDirs = [
     '/tmp/',
     '/temp/',
     '/cache/',
-    '/log/',
+    '/arquivos_gerados/logs/',
     '/upload/',
     '/uploads/',
     '/img/',
@@ -96,7 +96,7 @@ if (stripos($dirname . '/', '/includes/') !== false) {
 function denyExecution($reason)
 {
     // Caminho do log (modifique se quiser)
-    $logFile = '/www/log/security_block.log';
+    $logFile = '/www/arquivos_gerados/logs/security_block.log';
 
     $log  = "[" . date('Y-m-d H:i:s') . "] BLOCKED: " . $reason . "\n";
     $log .= "IP: " . ($_SERVER['REMOTE_ADDR'] ?: 'CLI') . "\n";
@@ -124,7 +124,7 @@ $hora_atual = (int)date('G');
 $bloco_do_dia = (int)($hora_atual / 6); 
 
 // Monta o nome do arquivo usando a data E o bloco
-$LOG_FILE_PATH = '/www/log/requests-' . date('Y-m-d') . '-bloco-' . $bloco_do_dia . '.log';
+$LOG_FILE_PATH = '/www/arquivos_gerados/logs/requests-' . date('Y-m-d') . '-bloco-' . $bloco_do_dia . '.log';
 $LOG_OWNER_USER = 'www-data'; // Usuário que DEVE ser o dono (usuário do FPM)
 $LOG_OWNER_GROUP = 'www-data'; // Grupo que DEVE ser o dono
 
