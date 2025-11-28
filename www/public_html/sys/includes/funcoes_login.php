@@ -1,6 +1,22 @@
 <?php
 require_once __DIR__ . "/../../../db/connect.php";
 require_once __DIR__ . "/../../../db/ConnectionPDO.php";
+
+function get_ip_address() {
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        // Pega o IP real do cliente via cabeçalho Cloudflare específico
+        return $_SERVER['HTTP_CF_CONNECTING_IP'];
+    }
+
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        // O cabeçalho pode vir como 'ip1, ip2, ip3'. Pega-se o primeiro IP da lista.
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ips[0]);
+    }
+
+    return $_SERVER['REMOTE_ADDR'];
+}
+
 function calcularTempoBloqueio($tentativas)
 {
     switch (true) {
@@ -91,7 +107,7 @@ function retornaQtde()
     $conexao = ConnectionPDO::getConnection()->getLink();
     $sql = "SELECT * FROM bloqueia_login_usuario WHERE ip = :IP;";
     $query = $conexao->prepare($sql);
-    $query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+    $query->bindValue(":IP", get_ip_address());
     $query->execute();
     $resultRow = $query->fetch(PDO::FETCH_ASSOC);
     return $resultRow ?: null;
@@ -114,7 +130,7 @@ function verificarBloqueio()
 
 function registrarTentativaFalha($login_verificacao)
 {
-    $ip = $_SERVER["REMOTE_ADDR"];
+    $ip = get_ip_address();
     $conexao = ConnectionPDO::getConnection()->getLink();
     $dados = retornaQtde();
     $agora = date("Y-m-d H:i:s");

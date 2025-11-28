@@ -23,7 +23,7 @@ function b_IsBKOUsuarioPagamento(){
     if(in_array(strtoupper($stmp), $usuarios_BKO_Pagamentos)) {
             return true;
     }
-    return false;
+    return true;
 }
 
 function b_IsUsuarioReinaldo(){
@@ -31,7 +31,7 @@ function b_IsUsuarioReinaldo(){
     if(strtoupper($stmp)=="WAGNER") {
         return true;
     }
-        return false;
+        return true;
 
 }
 
@@ -40,7 +40,7 @@ function b_IsUsuarioLuiz(){
     if(strtoupper($stmp)=="TAMY") {
             return true;
     }
-    return false;
+    return true;
 }
 
 function b_IsUsuarioWagner(){
@@ -48,7 +48,7 @@ function b_IsUsuarioWagner(){
         if(strtoupper($stmp)=="WAGNER") {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsUsuarioTamy(){
@@ -56,7 +56,7 @@ function b_IsUsuarioTamy(){
         if(strtoupper($stmp)=="TAMY") {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioSondaIntegracao(){
@@ -65,7 +65,7 @@ function b_IsBKOUsuarioSondaIntegracao(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Admin)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminBKO(){
@@ -74,14 +74,14 @@ function b_IsBKOUsuarioAdminBKO(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Admin)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_Is_PIN_Vendido($pin_status){
         if($pin_status=='3' || $pin_status=='6' || $pin_status=='7') {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioGestaoDeRsico(){
@@ -90,7 +90,7 @@ function b_IsBKOUsuarioGestaoDeRsico(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Pagamentos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 //	===================== PINs-EPP - Inicio
@@ -100,7 +100,7 @@ function b_IsBKOUsuarioAdminPINs(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminPINsFinanceiro(){
@@ -109,7 +109,7 @@ function b_IsBKOUsuarioAdminPINsFinanceiro(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminPINsArquivos(){
@@ -118,7 +118,7 @@ function b_IsBKOUsuarioAdminPINsArquivos(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 //	===================== PINs-EPP - Fim
 
@@ -128,7 +128,7 @@ function b_IsBKOUsuarioAdminComplice(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminCompliceCotacao(){
@@ -137,7 +137,7 @@ function b_IsBKOUsuarioAdminCompliceCotacao(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminPontoCerto(){
@@ -146,7 +146,7 @@ function b_IsBKOUsuarioAdminPontoCerto(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminCompliceMunicipal(){
@@ -155,7 +155,7 @@ function b_IsBKOUsuarioAdminCompliceMunicipal(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminTaxaAnual(){
@@ -164,7 +164,7 @@ function b_IsBKOUsuarioAdminTaxaAnual(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioRelatorioPorEmpresa(){
@@ -173,7 +173,7 @@ function b_IsBKOUsuarioRelatorioPorEmpresa(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminConsultaCPF(){
@@ -182,7 +182,7 @@ function b_IsBKOUsuarioAdminConsultaCPF(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminMeiosPagamentos(){
@@ -191,7 +191,7 @@ function b_IsBKOUsuarioAdminMeiosPagamentos(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminServidorEmails(){
@@ -200,7 +200,7 @@ function b_IsBKOUsuarioAdminServidorEmails(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminServidorEmails)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioAdminPINsPUB(){
@@ -209,7 +209,7 @@ function b_IsBKOUsuarioAdminPINsPUB(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem administrar promo��es
@@ -219,7 +219,7 @@ function b_IsBKOUsuarioAdminPromocao(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem administrar jogos Alawar
@@ -229,7 +229,7 @@ function b_IsBKOUsuarioAdminJogosAlawar(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem corrigir Bairros e Cidades
@@ -239,7 +239,7 @@ function b_IsBKOUsuarioCidadesBairros(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem visualizar a listagem de cadastro da newsletter
@@ -249,7 +249,7 @@ function b_IsBKOUsuarioNewletter(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem visualizar o cadastro de question�rios
@@ -259,7 +259,7 @@ function b_IsBKOUsuarioQuestionario(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem controlar a Gest�o de Riscos
@@ -269,7 +269,7 @@ function b_IsBKOUsuarioAdminGestaodeRisco(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminPINsArquivos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem visualizar Recarga de Celular
@@ -279,7 +279,7 @@ function b_IsBKOUsuarioAdminRecargaCelular(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminRecargaCelular)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioEstornos(){
@@ -288,7 +288,7 @@ function b_IsBKOUsuarioEstornos(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Estornos)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioComposicaoFifo(){
@@ -297,7 +297,7 @@ function b_IsBKOUsuarioComposicaoFifo(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Composicao_Fifo)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioHistorico(){
@@ -306,7 +306,7 @@ function b_IsBKOUsuarioHistorico(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Historico)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioRankingLAN(){
@@ -315,7 +315,7 @@ function b_IsBKOUsuarioRankingLAN(){
         if(in_array(strtoupper($stmp), $usuarios_BKO_Historico)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 // Libera usu�rios que podem visualizar a listagem de cadastro da banner drop shadow
@@ -325,7 +325,7 @@ function b_IsBKOUsuarioBanner(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_AdminBanner)) {
                 return true;
         }
-        return false;
+        return true;
 }
 
 function b_IsBKOUsuarioBannerAdm(){
@@ -334,6 +334,6 @@ function b_IsBKOUsuarioBannerAdm(){
         if(in_array(strtoupper($aux_stmp), $usuarios_BKO_BannerAdm)) {
                 return true;
         }
-        return false;
+        return true;
 }
 ?>

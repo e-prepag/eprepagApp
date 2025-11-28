@@ -152,6 +152,9 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
                 $cesta_descricao = montaCesta_pag();
         } elseif ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']) {
 
+                // gera nova ordem em tb_pag_compras
+                require_once RAIZ_DO_PROJETO . "banco/itau/inc_config.php";
+                require_once RAIZ_DO_PROJETO . "banco/itau/inc_gen_order_bit.php"; // 
                 $numOrder = $orderId;
                 $pagto_venda = $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC;        // convert to numeric value to allow storing in tb_dist_venda_games
 
@@ -812,7 +815,7 @@ if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) {
                         bbg_documento, 
                         bbg_data_venc
                     ) VALUES (
-                        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + interval '$7 day'
+                        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + interval '$qtde_dias_venc day'
                     )
                 ";
 
@@ -822,8 +825,7 @@ if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) {
                 $total_geral + $taxa_adicional, // $3
                 $taxa_adicional,              // $4
                 $bco_codigo,                  // $5
-                $num_doc,                     // $6
-                $qtde_dias_venc               // $7
+                $num_doc                     // $6
         ];
 
         $ret = SQLexecuteQueryParams($sql, $params);
