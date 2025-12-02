@@ -24,7 +24,14 @@
             $cep_so_numero = trim(str_replace('-', '', $cep));
             $url = "https://viacep.com.br/ws/".$cep_so_numero."/json/";
             
-            $content = file_get_contents($url);
+            $ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_URL, $url); // Define a URL
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10); 
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+			$content = curl_exec($ch);
             
             if($content == FALSE){
                 echo "NO_ACCESS";
@@ -64,7 +71,15 @@
             }
         } elseif(CONSULTA_CEP === $vetorCEP['REPUBLICA_VIRTUAL']){
             $url = "http://cep.republicavirtual.com.br/web_cep.php?formato=json&cep=".$cep;
-            $content = file_get_contents($url);
+            $ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_URL, $url); // Define a URL
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10); 
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+			
+			$content = curl_exec($ch);
             
             if($content == FALSE){
                 echo "NO_ACCESS";
