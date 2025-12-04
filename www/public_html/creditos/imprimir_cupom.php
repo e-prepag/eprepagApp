@@ -569,7 +569,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
                             echo "      <tr>
 
-                                             <td colspan='2' height='10px'><strong><i>Ganhe ".(($teste->getPublisher() == 13)?"10.000 Cash Ongame":"1255 Riot Points")." respondendo uma pesquisa!<br>Saiba mais em EPREPAG_URL/pesquisa</i></strong></td>
+                                             <td colspan='2' height='10px'><strong><i>Ganhe ".(($teste->getPublisher() == 13)?"10.000 Cash Ongame":"1255 Riot Points")." respondendo uma pesquisa!<br>Saiba mais em www.e-prepag.com.br/pesquisa</i></strong></td>
 
                                          </tr>
 
@@ -1056,72 +1056,56 @@ else {
 function grava_arquivo_pin($mensagem)
 {
 
-
-
     $file_path = RAIZ_DO_PROJETO . 'arquivos_gerados/txts/txt/';
-
-    $web_path = "temp/txt/";
-
+    
+    // Normaliza e valida o caminho base
+    $real_base_path = realpath($file_path);
+    if ($real_base_path === false || !is_dir($real_base_path)) {
+        return '';
+    }
+    
+    // Garante barra final
+    $real_base_path = rtrim($real_base_path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    
     $expiration = 20;
+    $now = microtime(true);
 
-    // -----------------------------------
-
-    // Remove old files	
-
-    // -----------------------------------
-
-    list($usec, $sec) = explode(" ", microtime());
-
-    $now = ((float) $usec + (float) $sec);
-
-
-
-    $current_dir = @opendir($file_path);
-
-
-
-    while ($filename = @readdir($current_dir)) {
-
-        if ($filename != "." and $filename != ".." and $filename != "index.html") {
-
-            $name = str_replace(".csv", "", $filename);
-
-            if (($name + $expiration) < $now) {
-
-                @unlink($file_path . $filename);
-
+    // Remove arquivos antigos com validação de path
+    $pattern = $real_base_path . '*.csv';
+    $files = glob($pattern);
+    if ($files) {
+        foreach ($files as $file) {
+            // Valida que o arquivo está dentro do diretório permitido
+            $real_file = realpath($file);
+            if ($real_file === false || strpos($real_file, $real_base_path) !== 0) {
+                continue;
             }
-
+            
+            $filename = basename($file);
+            if ($filename !== 'index.html' && preg_match('/^\d+(\.\d+)?\.csv$/', $filename)) {
+                $timestamp = (float) str_replace('.csv', '', $filename);
+                if (($timestamp + $expiration) < $now) {
+                    @unlink($real_file);
+                }
+            }
         }
-
     }
 
-    @closedir($current_dir);
-
-
-
-    //Arquivo
-
-    $file = $file_path . $now . ".csv";
-
-
-
-    //Grava mensagem no arquivo
-
-    if ($handle = fopen($file, 'a+')) {
-
-        fwrite($handle, $mensagem);
-
-        fclose($handle);
-
+    $safe_filename = $now . '.csv';
+    $file = $real_base_path . $safe_filename;
+    
+    // Validação final de segurança
+    if (strpos(realpath(dirname($file)) . DIRECTORY_SEPARATOR, $real_base_path) !== 0) {
+        return '';
     }
 
-    $file_return = $now . ".csv";
+    $bytes = @file_put_contents($file, $mensagem, FILE_APPEND | LOCK_EX);
+    
+    if ($bytes === false) {
+        return '';
+    }
 
-
-
-    return $file_return;
-
+    return $safe_filename;
 }
 
 ?>

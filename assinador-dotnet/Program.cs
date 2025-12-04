@@ -35,7 +35,7 @@ app.MapPost("/assinar", async (HttpRequest request, AssinadorService assinador) 
         var form = await request.ReadFormAsync();
         var xml = form["xml"].ToString();
         var senha = form["senha"].ToString();
-        var pfxPath = form.ContainsKey("pfx_path") ? form["pfx_path"].ToString() : "/certs/cert-eprepag.pfx";
+        var pfxPath = "/certs/cert-eprepag.pfx";
 
         if (string.IsNullOrWhiteSpace(xml))
         {
