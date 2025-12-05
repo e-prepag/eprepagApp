@@ -3,29 +3,42 @@ register_globals();
 
 function register_globals($order = 'gp')
 {
-        // define a subroutine
-        if(!function_exists('register_global_array'))
-        {
-                function register_global_array(array $superglobal)
-                {
-                        foreach($superglobal as $varname => $value)
-                        {
-                                global $$varname;
-                                $$varname = $value;
-                        }
-                }
-        }
+    // Log de entradas
+    $caller = $_SERVER['SCRIPT_FILENAME'];
+    file_put_contents(
+        '/www/log/php_register_globals.log',
+        date('[Y-m-d H:i:s]') . " $caller GET=" . json_encode($_GET) . ' POST=' . json_encode($_POST) . "\n",
+        FILE_APPEND
+    );
 
-        $order = explode("\r\n", trim(chunk_split($order, 1)));
-        foreach($order as $k)
+    // Subfunção
+    if (!function_exists('register_global_array'))
+    {
+        function register_global_array(array $superglobal)
         {
-                switch(strtolower($k))
+            foreach ($superglobal as $varname => $value)
+            {
+                // Não sobrescreve variáveis já existentes
+                if (!array_key_exists($varname, $GLOBALS))
                 {
-                        case 'g':    register_global_array($_GET);        break;
-                        case 'p':    register_global_array($_POST);        break;
+                    $GLOBALS[$varname] = $value;
                 }
+            }
         }
+    }
+
+    // Ordem g p
+    $order = explode("\r\n", trim(chunk_split($order, 1)));
+    foreach ($order as $k)
+    {
+        switch(strtolower($k))
+        {
+            case 'g': register_global_array($_GET);  break;
+            case 'p': register_global_array($_POST); break;
+        }
+    }
 }
+
 
 /**
  * Undo register_globals
