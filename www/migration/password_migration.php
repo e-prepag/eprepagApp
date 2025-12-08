@@ -40,7 +40,7 @@ class PasswordMigration {
         
         // Arquivo de log
         $this->raiz_do_projeto = $raiz_do_projeto;
-        $this->logFile = $this->raiz_do_projeto . "log/password_migration_" . date('Y-m-d_H-i-s') . ".log";
+        $this->logFile = $this->raiz_do_projeto . "arquivos_gerados/logs/password_migration_" . date('Y-m-d_H-i-s') . ".log";
         
         $this->log("=== INÍCIO DA MIGRAÇÃO DE SENHAS ===");
         $this->log("Data/Hora: " . date('Y-m-d H:i:s'));

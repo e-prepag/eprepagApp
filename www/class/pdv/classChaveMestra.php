@@ -207,7 +207,7 @@ class ChaveMestra{
 		$query->execute();
 		
 		// Log da migração
-		$file = fopen("/www/log/chave_mestra_migration.txt", "a+");
+		$file = fopen("/www/arquivos_gerados/logs/chave_mestra_migration.txt", "a+");
 		fwrite($file, "data: " .date("d-m-Y H:i:s")."\n"); 
 		fwrite($file, "usuario: " .$usuario."\n");
 		fwrite($file, "acao: migração para bcrypt\n");
