@@ -31,11 +31,11 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 	$where_operadora = "";
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
+		$dd_operadora = (int)$_SESSION["opr_codigo_pub"]; // Sanitize as integer
 		$dd_mode = "S";
 
-		if(strlen($dd_operadora)>0) { 
-			$where_operadora = " and vgm_opr_codigo='".$dd_operadora."'";
+		if($dd_operadora > 0) { 
+			$where_operadora = " and vgm_opr_codigo=".$dd_operadora;
 		} else {
 			$where_operadora = "";
 		}
@@ -50,7 +50,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 	$dd_operadora_nome = "";
 	if($dd_operadora) {
-		$resopr_nome = pg_exec($connid, "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
+		$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array($dd_operadora));
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome = $pgopr_nome['opr_nome'];
 		} 

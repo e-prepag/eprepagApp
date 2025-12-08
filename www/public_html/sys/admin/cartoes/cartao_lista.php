@@ -116,17 +116,18 @@
 /*
 	if($dd_operadora)
 	{			
-		$res_opr_info = pg_exec($connid, "select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=".$dd_operadora."");
+		$dd_operadora = (int)$dd_operadora; // Sanitize as integer
+		$res_opr_info = SQLexecuteQueryParams("select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=$1", array($dd_operadora));
 		$pg_opr_info = pg_fetch_array($res_opr_info);
 
 		$dd_operadora_nome = $pg_opr_info['opr_nome'];
 	
 		if($pg_opr_info['opr_pin_online'] == 0)
-			$resval = pg_exec($connid, "select pin_valor as valor from pins where opr_codigo='".$pg_opr_info['opr_codigo']."' group by pin_valor order by pin_valor");
+			$resval = SQLexecuteQueryParams("select pin_valor as valor from pins where opr_codigo=$1 group by pin_valor order by pin_valor", array($pg_opr_info['opr_codigo']));
 		else
 		{
-			$resval = pg_exec($connid, "select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = ".$pg_opr_info['opr_codigo']." group by valor_fixo order by valor_fixo");
-			$res_opr_area = pg_exec($connid, "select oparea_codigo, area_nome from operadora_area where opr_codigo=".$pg_opr_info['opr_codigo']." order by oparea_codigo");
+			$resval = SQLexecuteQueryParams("select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = $1 group by valor_fixo order by valor_fixo", array($pg_opr_info['opr_codigo']));
+			$res_opr_area = SQLexecuteQueryParams("select oparea_codigo, area_nome from operadora_area where opr_codigo=$1 order by oparea_codigo", array($pg_opr_info['opr_codigo']));
 		}
 	}
 */

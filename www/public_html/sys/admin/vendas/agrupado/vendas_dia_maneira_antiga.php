@@ -101,6 +101,7 @@ if($dd_canal) {
 }
 
 if($dd_operadora) {
+        $dd_operadora = (int)$dd_operadora; // Sanitize as integer
         $where_opr_cartao = " and (pih_id = ".$dd_operadora.")";
         $where_opr_gocash = " and (pgc_opr_codigo = ".$dd_operadora.") ";
         $where_opr_1 = " and (t0.opr_codigo = ".$dd_operadora.") ";
@@ -121,6 +122,7 @@ if($dd_operadora) {
 }
 
 if($dd_ano) {
+        $dd_ano = (int)$dd_ano; // Sanitize as integer
         $where_ano_1 = " and (extract (year from trn_data) = ".$dd_ano.") ";
         $where_ano_2 = " and (extract (year from ve_data_inclusao) = ".$dd_ano.") ";
         $where_ano_3a = " and (round(CAST (extract (year from vg.vg_data_inclusao::date) as int),0) =".$dd_ano.") ";
@@ -238,14 +240,15 @@ $total_table = pg_num_rows($res_count);
 $ordem = 0;
 $img_seta = "/sys/images/seta_down.gif";	
 
-$resdia = pg_exec($connid, $sql);
+$resdia = SQLexecuteQuery($sql);
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
+        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+        $resopr = SQLexecuteQueryParams($sqlopr, array($dd_operadora));
 } else {
         $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_nome";
+        $resopr = SQLexecuteQuery($sqlopr);
 }
-$resopr = pg_exec($connid, $sqlopr);
 ?>
 <link rel="stylesheet" href="/sys/css/css.css" type="text/css">
 <title>E-Prepag</title>

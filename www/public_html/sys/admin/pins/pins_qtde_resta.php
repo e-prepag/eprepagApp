@@ -38,7 +38,13 @@ if($Submit){
 		$resopr_val = pg_exec($connid, "select opr_codigo from operadoras where opr_codigo='$fopr'");
 
                 $pgopr_val = pg_fetch_array($resopr_val);
-		$resval = pg_exec($connid, "select pin_valor from pins where opr_codigo='".$pgopr_val['opr_codigo']."'". (($fcanal=='s' || $fcanal=='p' || $fcanal=='r' )?" and pin_canal='".$fcanal."' ":""). " group by pin_valor order by pin_valor");
+		$canal_condition = "";
+$params = array($pgopr_val['opr_codigo']);
+if($fcanal=='s' || $fcanal=='p' || $fcanal=='r') {
+    $canal_condition = " and pin_canal=$2";
+    $params[] = $fcanal;
+}
+$resval = SQLexecuteQueryParams("select pin_valor from pins where opr_codigo=$1".$canal_condition." group by pin_valor order by pin_valor", $params);
 
         } 
         else {
@@ -75,7 +81,7 @@ if($Submit){
 	$sql = "select t1.opr_nome, t0.pin_valor, count(t0.pin_valor) as quantidade, (CASE WHEN t0.opr_codigo <> 78 THEN sum(t0.pin_valor) ELSE 0 END) as total_face, t0.opr_codigo, t1.opr_pedido_estoque_prazo as prazo_pedido ";
 	$sql .= "from pins t0, operadoras t1 ";
 	$sql .= "where t0.opr_codigo <> 32 and t1.opr_codigo <> 32 and t1.opr_pin_online = 0 ";
-	// Se procurar por pins de POS apresenta apenas o status 7 - 'Vendido - POS', caso contrario apresenta apenas 3 - 'Vendido' e 6 - 'Vendido – Lan House'
+	// Se procurar por pins de POS apresenta apenas o status 7 - 'Vendido - POS', caso contrario apresenta apenas 3 - 'Vendido' e 6 - 'Vendido ? Lan House'
 	$sql .= " and ".(($fcanal=='p')?"pin_status='7'":"(pin_status='3' or pin_status='6' or pin_status='8')");
 	$sql .= " and (pin_datavenda >='" . date("Y-m-d",strtotime("now -6 days")) . "' and pin_datavenda <='".date("Y-m-d",strtotime("now"))."') ";	
 	if($fopr){ $sql .= "and (t0.opr_codigo='".$fopr."') and (t0.opr_codigo=t1.opr_codigo) "; }

@@ -1,10 +1,10 @@
 <?php
-	$sql = "select bko_autoriza, bko_local_acesso from usuarios where id='".$_SESSION['iduser_bko_pub']."'";
+	$sql = "select bko_autoriza, bko_local_acesso from usuarios where id=$1";
 //echo "sql: $sql<br>";
 //echo "pos_pagina: $pos_pagina<br>";
 //die();
 
-	$result = pg_exec($connid, $sql);   
+	$result = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko_pub']));   
 	$pgrow = pg_fetch_array($result);  
 //echo "pgrow['bko_autoriza']: ".$pgrow['bko_autoriza']."<br>";
 //echo "pgrow['bko_local_acesso']: ".$pgrow['bko_local_acesso']."<br>";
@@ -33,4 +33,4 @@
 
 //die();
 
-?>	
+?>
