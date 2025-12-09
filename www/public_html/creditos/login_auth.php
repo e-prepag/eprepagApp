@@ -108,19 +108,13 @@ if(getenv("AMBIENTE") == "HOMOLOGACAO") {
     exit;
 }
 
-$objEncryption = new Encryption();
-$original = trim($senha);
-$senhaCrip = $objEncryption->encrypt(trim($senha));
-$login = strtoupper(trim($login));
-
-
-$sql = "select * from dist_usuarios_games where ug_login = ? and ug_senha = ? and ug_ativo = 1 and ug_substatus in ('11', '9')";
+$sql = "select * from dist_usuarios_games where ug_login = ? and ug_ativo = 1 and ug_substatus in ('11', '9')";
 
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute(array($login, $senhaCrip));
+$stmt->execute(array($login));
 $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $user = $fetch;
@@ -139,7 +133,6 @@ if (empty($user)) {
             dist_usuarios_games g ON o.ugo_ug_id = g.ug_id
         WHERE 
             o.ugo_login = ?
-            AND o.ugo_senha = ?
             AND o.ugo_ativo = 1
             AND g.ug_ativo = 1
             AND g.ug_substatus IN ('11', '9')
@@ -150,12 +143,17 @@ if (empty($user)) {
     $pdo = $con->getLink();
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(array($login, $senhaCrip));
+    $stmt->execute(array($login));
     $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $user = $fetch;
 
-    if (empty($user)) {
+    $senha_usuario = $user["ugo_senha"] ?: "";
+
+    $secureEncryption = new SecureEncryption();
+    $ret_senha = $secureEncryption->verifyPassword($senha, $senha_usuario);
+
+    if (empty($user) || !$ret_senha) {
 
         $msg = "Login ou senha inválidos.\n";
 
@@ -236,6 +234,29 @@ if ($usuario_operador) {
     }
 
 } else {
+
+    $senha_usuario = $user["ug_senha"];
+
+    $secureEncryption = new SecureEncryption();
+    $ret_senha = $secureEncryption->verifyPassword($senha, $senha_usuario);
+
+    if(!$ret_senha){
+        $msg = "Login ou senha inválidos.\n";
+
+        $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
+        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+
+        //$pag = $server_url . $pag;
+        $strRedirect = $server_url .
+            "/creditos/login.php?msg=" .
+            urlencode($msg) .
+            "&login=" .
+            urlencode($login);
+
+        header("Location: $strRedirect");
+        exit;
+    }
+
     $verificaBlock = obterUsuarioBloqueado($user['ug_id']);
     if($verificaBlock != null){
         $msg = utf8_decode($verificaBlock['motivo']) . " Seu PDV está bloqueado.";
