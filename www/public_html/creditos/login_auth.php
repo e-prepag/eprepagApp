@@ -44,6 +44,7 @@ $id_gocash = 1;
 
 $pag = $_REQUEST["pag"];
 $login = $_REQUEST["login"];
+$login = strtoupper(trim($login));
 $senha = $_REQUEST["senha"];
 $recaptcha = $_REQUEST["g-recaptcha-response"];
 if(getenv("AMBIENTE") == "HOMOLOGACAO") {
@@ -115,9 +116,7 @@ $pdo = $con->getLink();
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute(array($login));
-$fetch = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$user = $fetch;
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $usuario_operador = false;
 
@@ -144,9 +143,7 @@ if (empty($user)) {
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute(array($login));
-    $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $user = $fetch;
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $senha_usuario = $user["ugo_senha"] ?: "";
 
@@ -155,7 +152,7 @@ if (empty($user)) {
 
     if (empty($user) || !$ret_senha) {
 
-        $msg = "Login ou senha inválidos.\n";
+        $msg = "Login ou senha inválidos aaa.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -241,10 +238,10 @@ if ($usuario_operador) {
     $ret_senha = $secureEncryption->verifyPassword($senha, $senha_usuario);
 
     if(!$ret_senha){
-        $msg = "Login ou senha inválidos.\n";
+        $msg = "Login ou senha inválidos sexo.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
-        file_put_contents('/www/log/log_login.txt', $linha, FILE_APPEND);
+        file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
 
         //$pag = $server_url . $pag;
         $strRedirect = $server_url .

@@ -210,7 +210,7 @@ if ($_SESSION['pode_logar'] == 1) {
         if (!checkDevice($login_id, $connection, false) && !$passou_termos) {
             $ga = new PHPGangsta_GoogleAuthenticator();
             if (!$ga->verifyCode($auth['ug_chave_autenticador'], $_REQUEST['token'], 2)) {
-                $msgAuth = "Token inválido.\n";
+                $msgAuth = "Token inválido {$auth['ug_chave_autenticador']}.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
                 file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -242,6 +242,7 @@ if ($_SESSION['pode_logar'] == 1) {
 
 $pag = $_SESSION['pag'];
 $senha = $_SESSION['senha_usuario'];
+//echo $senha; die;
 $g_recaptcha_response = $_SESSION['g-recaptcha-response'];
 
 /*
