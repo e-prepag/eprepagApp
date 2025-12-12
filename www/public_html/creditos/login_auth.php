@@ -152,7 +152,7 @@ if (empty($user)) {
 
     if (empty($user) || !$ret_senha) {
 
-        $msg = "Login ou senha inválidos aaa.\n";
+        $msg = "Login ou senha inválidos.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -238,7 +238,7 @@ if ($usuario_operador) {
     $ret_senha = $secureEncryption->verifyPassword($senha, $senha_usuario);
 
     if(!$ret_senha){
-        $msg = "Login ou senha inválidos sexo.\n";
+        $msg = "Login ou senha inválidos.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);

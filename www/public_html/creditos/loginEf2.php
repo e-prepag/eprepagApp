@@ -210,7 +210,7 @@ if ($_SESSION['pode_logar'] == 1) {
         if (!checkDevice($login_id, $connection, false) && !$passou_termos) {
             $ga = new PHPGangsta_GoogleAuthenticator();
             if (!$ga->verifyCode($auth['ug_chave_autenticador'], $_REQUEST['token'], 2)) {
-                $msgAuth = "Token inválido {$auth['ug_chave_autenticador']}.\n";
+                $msgAuth = "Token inválido.\n";
 
                 $linha = "2[" . date('Y-m-d H:i:s') . "] [$login_usuario] $msgAuth" . PHP_EOL;
                 file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
