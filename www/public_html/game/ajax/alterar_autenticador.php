@@ -19,6 +19,7 @@ require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
 if (Util::isAjaxRequest()) {
 
     require_once DIR_CLASS . "util/Log.class.php";
+    require_once "/www/class/classSecureEncryption.php";
 
     $retorno = new stdClass();
     $retorno->erro = '';
@@ -63,15 +64,14 @@ if (Util::isAjaxRequest()) {
 
             $cad_senhaAtual = $_POST['cad_senhaAtual'];
 
-            $objEncryption = new Encryption();
-            $senhaAtual = $objEncryption->encrypt(trim($cad_senhaAtual));
+            $objEncryption = new SecureEncryption();
 
             $ga = new PHPGangsta_GoogleAuthenticator();
             $checkResult = $ga->verifyCode($secret, $token, 2);
 
             if ($checkResult) {
 
-                $sql = "SELECT ug_chave_autenticador FROM usuarios_games WHERE ug_id = ?";
+                $sql = "SELECT ug_chave_autenticador, ug_senha FROM usuarios_games WHERE ug_id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute(array($cad_id));
                 $authData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -79,12 +79,13 @@ if (Util::isAjaxRequest()) {
                 $checkResult_old = true;
                 if (!empty($authData['ug_chave_autenticador'])) {
                     $checkResult_old = $ga->verifyCode($authData['ug_chave_autenticador'], $token_old, 2);
+                    $checkResult_old = $objEncryption->verifyPassword(trim($cad_senhaAtual), $authData['ug_senha']);
                 }
 
                 if ($checkResult_old) {
-                    $sql = "UPDATE usuarios_games SET ug_chave_autenticador = ? WHERE ug_id = ? and ug_senha = ?";
+                    $sql = "UPDATE usuarios_games SET ug_chave_autenticador = ? WHERE ug_id = ?";
                     $stmt = $pdo->prepare($sql);
-                    $stmt->execute([$secret, $cad_id, $senhaAtual]);
+                    $stmt->execute([$secret, $cad_id]);
 
                     // Verifica se alguma linha foi afetada
                     if ($stmt->rowCount() > 0) {
