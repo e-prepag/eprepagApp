@@ -146,7 +146,7 @@ if($BtnSearch) {
                         INNER JOIN pins_status t3 ON (t0.pin_status=t3.stat_codigo) 
                         LEFT OUTER JOIN pins_riot_id t4 ON (t0.pin_codinterno=t4.pin_codinterno)
                     where 
-                        (t4.pin_channel='L' OR t4.pin_channel IS NULL) ";
+                        (t4.pin_channel='L' OR t4.pin_channel IS NULL) AND t0.pin_status <> '9'";
             
             $sql_params_pins = array();
             $param_count = 1;
