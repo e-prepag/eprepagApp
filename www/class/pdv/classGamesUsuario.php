@@ -1069,8 +1069,8 @@ class UsuarioGames {
         if ($ret == "") {
 
             //Formata
-            $objEncryption = new Encryption();
-            $senha = $objEncryption->encrypt(trim($objGamesUsuario->getSenha()));
+            $objEncryption = new SecureEncryption();
+            $senha = $objEncryption->hashPassword(trim($objGamesUsuario->getSenha()));
             $dataInclusao = "CURRENT_TIMESTAMP";
             $dataUltimoAcesso = "CURRENT_TIMESTAMP";
             $qtdeAcessos = 0;
@@ -1372,8 +1372,8 @@ class UsuarioGames {
         if ($ret == "") {
 
             //Formata
-            $objEncryption = new Encryption();
-            $senha = $objEncryption->encrypt(trim($objGamesUsuario->getSenha()));
+            $objEncryption = new SecureEncryption();
+            $senha = $objEncryption->hashPassword(trim($objGamesUsuario->getSenha()));
             $dataInclusao = "CURRENT_TIMESTAMP";
             $dataUltimoAcesso = "CURRENT_TIMESTAMP";
             $qtdeAcessos = 0;
@@ -4095,7 +4095,6 @@ class UsuarioGames {
         $senhaOriginal = trim($senha);
 
         // Carrega as classes de criptografia
-        $objEncryption = new Encryption(); // Classe antiga para compatibilidade
         $secureEncryption = new SecureEncryption(); // Nova classe com bcrypt
 
         $con = ConnectionPDO::getConnection();
@@ -4114,7 +4113,7 @@ class UsuarioGames {
         }
 
         $senhaHash = $user['ug_senha'];
-        $isMigrated = $user['ug_senha_migrated'] ?? false;
+        $isMigrated = $user['ug_senha_migrated'] ?: false;
 
         // Verifica a senha usando o método apropriado
         if ($isMigrated) {
@@ -4134,14 +4133,6 @@ class UsuarioGames {
                 $this->migrateUserPassword($user['ug_id'], $senhaOriginal);
             }
         }
-        /*
-        $rs = SQLexecuteQuery($sql);
-
-        if ($rs && pg_num_rows($rs) > 0) {
-            $rs_row = pg_fetch_array($rs);
-            if($rs_row['qtde'] > 0) $ret = true;
-        }
-        */
 
         //Adiciona objeto usuario no session
         if ($ret) {
@@ -4728,7 +4719,7 @@ class UsuarioGames {
         }
 
         $senhaHashAtual = $user['ug_senha'];
-        $isMigrated = $user['ug_senha_migrated'] ?? false;
+        $isMigrated = $user['ug_senha_migrated'] ?: false;
 
         // Verifica a senha atual usando o método apropriado
         if ($isMigrated) {

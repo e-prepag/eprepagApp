@@ -29,7 +29,7 @@ class ChaveMestra{
 		
 		if ($rowChave) {
 			$chaveArmazenada = $rowChave['chave'];
-			$isMigrated = $rowChave['chave_migrated'] ?? false;
+			$isMigrated = $rowChave['chave_migrated'] ?: false;
 			
 			$secureEncryption = new SecureEncryption();
 			

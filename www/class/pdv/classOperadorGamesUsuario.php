@@ -506,7 +506,7 @@ class UsuarioGamesOperador {
 		}
 
 		$senhaHash = $user['ugo_senha'];
-		$isMigrated = $user['ugo_senha_migrated'] ?? false;
+		$isMigrated = $user['ugo_senha_migrated'] ?: false;
 		$ugo_ug_id = $user['ugo_ug_id'];
 
 		// Verifica a senha usando o método apropriado
@@ -786,7 +786,7 @@ class UsuarioGamesOperador {
 		}
 
 		$senhaHashAtual = $user['ugo_senha'];
-		$isMigrated = $user['ugo_senha_migrated'] ?? false;
+		$isMigrated = $user['ugo_senha_migrated'] ?: false;
 
 		// Verifica a senha atual usando o método apropriado
 		if ($isMigrated) {
