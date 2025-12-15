@@ -8,6 +8,7 @@ require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 require_once "/www/includes/gamer/chave.php";
 require_once "/www/includes/gamer/AES.class.php";
+require_once "/www/class/classSecureEncryption.php";
 
 $conexao = ConnectionPDO::getConnection()->getLink();
 
@@ -36,9 +37,8 @@ $query = $conexao->prepare("select max(id) as ultimo from usuarios;");
 $query->execute();
 $id = $query->fetch(PDO::FETCH_ASSOC)["ultimo"] + 1;
 
-$chave256bits = new Chave();
-$aes = new AES($chave256bits->retornaChavePub());
-$passw = base64_encode($aes->encrypt(addslashes($_POST["passw"])));
+$chavecript = new SecureEncryption();
+$passw = $chavecript->hashPassword(addslashes($_POST["passw"]));
 $bko_local = ($_POST["tipo"] == 'AT')? '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111': '110000000000';
 
 $insertQuery = $conexao->prepare("insert into usuarios(shn_login,shn_password,id,shn_mail,shn_codigovinculo,bko_autoriza,tipo_acesso,visualiza_dados,bko_local_acesso,opr_codigo)values(:LOGIN,:PASS,:ID,:EMAIL,:COD,:AUTO,:TIPO,:VISU,:BKO,:OPR_CODIGO);");

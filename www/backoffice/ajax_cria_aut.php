@@ -10,6 +10,7 @@ require_once DIR_CLASS . "util/Util.class.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/chave.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/AES.class.php";
 require_once __DIR__ . "/../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once "/www/class/classSecureEncryption.php";
 
 session_start();
 
@@ -25,18 +26,23 @@ try {
         $senha = base64_encode($aes->encrypt(addslashes($_POST['passw'])));
         $login = strtoupper(trim($_POST['user']));
 
-        $sql = "SELECT id, chave_autenticador FROM usuarios WHERE shn_login = ? AND shn_password = ? 
+        $sql = "SELECT id, chave_autenticador, shn_password FROM usuarios WHERE shn_login = ?
         AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='US'))";
 
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($login, $senha));
+        $stmt->execute(array($login));
         $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($stmt->rowCount() > 0) {
-            if (empty($fetch['chave_autenticador'])) {
+
+            $bcrypt = new SecureEncryption();
+
+            if (!$bcrypt->verifyPassword($senha_decript, $fetch['shn_password'])) {
+                $msg = 'Senha incorreta!';
+            } else if (empty($fetch['chave_autenticador'])) {
                 if (!$_SESSION['secret']) {
                     $secret = $ga->createSecret();
                     $_SESSION['secret'] = $secret;
@@ -270,7 +276,6 @@ try {
                             console.error("Erro ao copiar:", err);
                         });
                     }
-                    
                 </script>
 <?php
                 exit;

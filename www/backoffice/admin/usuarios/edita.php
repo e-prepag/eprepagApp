@@ -10,6 +10,8 @@ require_once $raiz_do_projeto . "class/util/Util.class.php";
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Login.class.php";
+require_once "/www/class/classSecureEncryption.php";
+
 
 if (!b_IsBKOUsuarioAdminBKO()) {
     Util::redirect("/");
@@ -75,9 +77,8 @@ if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_
             $msg[] = "A confirmação de senha está diferente.";
         } else {
             //Instanciando Objetos para Descriptografia
-            $chave256bits = new Chave();
-            $aes = new AES($chave256bits->retornaChavePub());
-            $passw = base64_encode($aes->encrypt(addslashes($_POST['nova_senha'])));
+            $chavecript = new SecureEncryption();
+            $passw = $chavecript->hashPassword(addslashes($_POST["passw"]));
         }
     }
 
@@ -107,13 +108,13 @@ if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_
 
         if (count($fetch) == 1) {
 
-            if($_POST["tipo_acesso"] == "PU"){
+            if ($_POST["tipo_acesso"] == "PU") {
                 $opr_codigo = $_POST["publisher"];
-            }else{
+            } else {
                 $opr_codigo = 0;
             }
 
-            if(empty($_POST["tipo_acesso"])){
+            if (empty($_POST["tipo_acesso"])) {
                 $_POST["tipo_acesso"] = "AT";
             }
 

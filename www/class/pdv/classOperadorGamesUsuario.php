@@ -152,8 +152,8 @@ class UsuarioGamesOperador {
  		if($ret == ""){
  			
  			//Formata
- 			$objEncryption = new Encryption();
- 			$senha = $objEncryption->encrypt(trim($objOperadorGamesUsuario->getSenha()));
+ 			$objEncryption = new SecureEncryption();
+ 			$senha = $objEncryption->hashPassword(trim($objOperadorGamesUsuario->getSenha()));
 			$dataInclusao = "CURRENT_TIMESTAMP";
 			$dataUltimoAcesso = "CURRENT_TIMESTAMP";
  			$qtdeAcessos = 0;
@@ -229,8 +229,8 @@ class UsuarioGamesOperador {
  			if(!is_null($objOperadorGamesUsuario->getLogin())) 			$sql .= " ugo_login = " 				. SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getLogin())), "s") . ",";
 
  			if(!is_null($objOperadorGamesUsuario->getSenha())) 	{
-	 			$objEncryption = new Encryption();
- 				$senha = $objEncryption->encrypt(trim($objOperadorGamesUsuario->getSenha()));
+	 			$objEncryption = new SecureEncryption();
+ 				$senha = $objEncryption->hashPassword(trim($objOperadorGamesUsuario->getSenha()));
 				$sql .= " ugo_senha = '". $senha . "',";
 			}
 
@@ -528,17 +528,6 @@ class UsuarioGamesOperador {
 			}
 		}
 
-//echo "<!-- sql: $sql<br>\n -->";
-//die("Para 3223");
-//echo "reta: $ret<br>";
-		/*
-        $rs_id = SQLexecuteQuery($sql);
-		if($rs_id && pg_num_rows($rs_id) > 0){
-			$rs_id_row = pg_fetch_array($rs_id);
-			$ugo_ug_id = $rs_id_row['ugo_ug_id'];
-		}
-		*/
-//echo "ugo_ug_id: ".$ugo_ug_id."<br>";
                 $instUsuarioGames = new UsuarioGames;
 		$objGamesUsuario = $instUsuarioGames->getUsuarioGamesById($ugo_ug_id);
 		if($objGamesUsuario != null) {
@@ -553,11 +542,6 @@ class UsuarioGamesOperador {
 			$sql = "select count(*) as qtde from dist_usuarios_games_operador ";
 			$sql .= " where ugo_ativo = 1 ";
 			$sql .= " and ugo_login = " . SQLaddFields($login, "s");
-	//		$sql .= " and ugo_ug_id = " . SQLaddFields($this->ugo_ug_id, "s");
-			$sql .= " and ugo_senha = " . SQLaddFields($senha, "s");
-//echo "sql: $sql<br>";
-//die("Para 3223");
-//echo "reta: $ret<br>";
 			$rs = SQLexecuteQuery($sql);
 			if($rs && pg_num_rows($rs) > 0){
 				$rs_row = pg_fetch_array($rs);

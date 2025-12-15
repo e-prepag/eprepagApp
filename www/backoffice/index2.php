@@ -17,11 +17,7 @@ require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
 require_once __DIR__ . "/../libs/PHPGangsta/GoogleAuthenticator.php";
-
-//Instanciando Objetos para Descriptografia
-$chave256bits = new Chave();
-$aes = new AES($chave256bits->retornaChavePub());
-$passw = base64_encode($aes->encrypt(addslashes($passw)));
+require_once "/www/class/classSecureEncryption.php";
 
 $ipReq = $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
 gravaLog_LoginBKO("Login BKO: '" . $user . "', '" . $ipReq . "'");
@@ -42,17 +38,26 @@ if ($Enviar) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$_SESSION["id_do_usuario"]]);
     } else {
-        $sql = "SELECT * FROM usuarios WHERE shn_login = ? AND shn_password = ? AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='US'))";
+        $sql = "SELECT * FROM usuarios WHERE shn_login = ? AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='US'))";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($user, $passw));
+        $stmt->execute(array($user));
     }
 
     $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($fetch) == 1) {
+        $pgrow = $fetch[0];
+        if (!$_SESSION["id_do_usuario"]) {
+            $bcrypt = new SecureEncryption();
+            if (!$bcrypt->verifyPassword($passw, $pgrow['shn_password'])) {
+                header("Location: login.php?erro=2");
+                exit;
+            }
+        }
+
         if (!isset($pgrow)) $pgrow = array('bko_autoriza' => false);
         gravaLog_LoginBKO("Login BKO - Autoriza: '" . $pgrow['bko_autoriza'] . "'");
-        $pgrow = $fetch[0];
+        
 
         if ($pgrow['bko_autoriza'] == 'S') {
             $iduser_var         = $pgrow['id'];

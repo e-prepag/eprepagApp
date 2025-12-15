@@ -9,28 +9,35 @@ require_once __DIR__ . "/../db/ConnectionPDO.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/chave.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/AES.class.php";
+require_once "/www/class/classSecureEncryption.php";
 
 try {
     $pdo = ConnectionPDO::getConnection()->getLink();
 
     if (Util::isAjaxRequest()) {
 
-        $chave256bits = new Chave();
-        $aes = new AES($chave256bits->retornaChavePub());
-        $senha = base64_encode($aes->encrypt(addslashes($_POST['passw'])));
-        $login = strtoupper(trim($_POST['user']));
-
-        $sql = "SELECT id, chave_autenticador, sem_aut_data FROM usuarios WHERE shn_login = ? AND shn_password = ? 
+        $sql = "SELECT id, chave_autenticador, sem_aut_data, shn_password FROM usuarios WHERE shn_login = ?
         AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='US'))";
 
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
 
+        $login = strtoupper(trim($_POST['user']));
+
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($login, $senha));
+        $stmt->execute(array($login));
         $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($stmt->rowCount() > 0) {
+
+            $bcrypt = new SecureEncryption();
+
+            if (!$bcrypt->verifyPassword($_POST['passw'], $fetch['shn_password'])) {
+                $teste = $bcrypt->hashPassword($_POST['passw']);
+                echo "<script>alert('Usuário ou senha inválidos {$teste} | {$fetch['shn_password']}');</script>";
+                exit;
+            }
+
             $ret = true;
             if (empty($fetch['chave_autenticador'])) {
 
@@ -46,7 +53,7 @@ try {
             modal_token();
             exit;
         } else {
-            echo "<script>alert('Usuário ou senha inválidos');</script>";
+            echo "<script>alert('Usuário ou senha inválidos aaaa');</script>";
         }
     }
 } catch (PDOException $e) {
@@ -84,11 +91,11 @@ function modal_criar_token($fetch)
                     </div>
                     <?php if ($btn_recusar) { ?>
                         <div class="dislineblock">
-                        <form id="redir" method="POST" action="/index2.php">
-                                    <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                    <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                    <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info" type="submit">Não</button>
-                                </form>
+                            <form id="redir" method="POST" action="/index2.php">
+                                <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info" type="submit">Não</button>
+                            </form>
                         </div>
                     <?php } ?>
                 </div>
@@ -140,7 +147,7 @@ function modal_token()
                     <form action="/index2.php" method="POST">
                         <div class="form-group text-left">
                             <label for="token">Token:</label>
-                            <input type="hidden" name="user" value="<?=  htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                            <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                             <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                             <input type="text" class="form-control" id="token" name="token" placeholder="Token">
                             <div style="margin: 7px 0px; display: flex; align-items: center; gap: 3px;">
@@ -180,18 +187,18 @@ function logar_direto()
 
 function checkDevice($userId, $pdo)
 {
-        if (!isset($_COOKIE['device_token_bko'])) {
-                return false; // Sem cookie, exige login
-        }
+    if (!isset($_COOKIE['device_token_bko'])) {
+        return false; // Sem cookie, exige login
+    }
 
-        $deviceId = $_COOKIE['device_token_bko'];
-        $stmt = $pdo->prepare("SELECT * FROM usuarios_bo_dispositivos WHERE user_id = ? AND device_token = ? AND expires_at > NOW()");
-        $stmt->execute([$userId, $deviceId]);
+    $deviceId = $_COOKIE['device_token_bko'];
+    $stmt = $pdo->prepare("SELECT * FROM usuarios_bo_dispositivos WHERE user_id = ? AND device_token = ? AND expires_at > NOW()");
+    $stmt->execute([$userId, $deviceId]);
 
-        if ($stmt->fetch()) {
-                return true; // Dispositivo válido
-        } else {
-                return false; // Dispositivo inválido ou expirado
-        }
+    if ($stmt->fetch()) {
+        return true; // Dispositivo válido
+    } else {
+        return false; // Dispositivo inválido ou expirado
+    }
 }
 ?>
