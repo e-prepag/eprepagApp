@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once "../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
@@ -9,7 +12,7 @@ require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Login.class.php";
 require_once "/www/class/classSecureEncryption.php";
-
+session_start();
 //Instanciando Objetos para Descriptografia
 $cripto = new SecureEncryption();
 
@@ -50,19 +53,19 @@ if (isset($_POST['pass_old']) && $_POST['pass_old'] != "" && $_SESSION["token_cs
         $stmt = $pdo->prepare($sql);
         $stmt->execute(array($_SESSION["iduser_bko_pub"]));
 
-        $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (count($fetch) == 1) {
-            if (!$bcrypt->verifyPassword($_POST['pass_old'], $fetch['shn_password'])) {
-                $msg = LANG_WRONG_PASSWORD;
+        if ($fetch) {
+            if (!$cripto->verifyPassword($_POST['pass_old'], $fetch['shn_password'])) {
+                $msg = LANG_WRONG_PASSWORD . "Peroca";
                 $color = "txt-vermelho";
             } else {
 
                 $passwNew = $cripto->hashPassword(addslashes($_POST['nova_senha']));
 
-                $update = "UPDATE usuarios set shn_password = ? where id = ? and shn_password = ?";
+                $update = "UPDATE usuarios set shn_password = ? where id = ?";
                 $stmt = $pdo->prepare($update);
-                $stmt->execute(array($passwNew, $_SESSION["iduser_bko_pub"], $passw));
+                $stmt->execute(array($passwNew, $_SESSION["iduser_bko_pub"]));
                 if ($stmt->rowCount() == 1) {
                     $msg = LANG_SUCCESS_CHANGE_PASS;
                     $color = "txt-verde";
@@ -74,7 +77,7 @@ if (isset($_POST['pass_old']) && $_POST['pass_old'] != "" && $_SESSION["token_cs
                 }
             }
         } else {
-            $msg = LANG_WRONG_PASSWORD;
+            $msg = LANG_WRONG_PASSWORD . "Prikito";
             $color = "txt-vermelho";
         }
     }

@@ -6,8 +6,8 @@ require_once $raiz_do_projeto."class/util/Validate.class.php";
 class Login {
     
     private $_senha = "";
-    private $_minCarac = 6; //minimo de caracteres permitidos em uma senha
-    private $_maxCarac = 12; //maximo de caracteres permitidos em uma senha
+    private $_minCarac = 10; //minimo de caracteres permitidos em uma senha
+    private $_maxCarac = 35; //maximo de caracteres permitidos em uma senha
     private $_maxTentativas = 5; //maximo de tentativas permitido para bloquear o acesso
     private $_urlRedirect = ""; //url para redirecionar
     private $_tempoDesbloqueio = 60; //tempo para desbloquear

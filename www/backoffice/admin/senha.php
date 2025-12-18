@@ -1,4 +1,7 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/gamer/chave.php";
@@ -47,7 +50,7 @@ if(isset($_POST['pass_old']) && $_SESSION["token_csrf"] == $_POST["token_csrf"])
         $sql = "SELECT * FROM usuarios WHERE id = ?";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($_SESSION["iduser_bko"], $passw));
+        $stmt->execute(array($_SESSION["iduser_bko"]));
 
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

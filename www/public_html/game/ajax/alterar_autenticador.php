@@ -76,10 +76,9 @@ if (Util::isAjaxRequest()) {
                 $stmt->execute(array($cad_id));
                 $authData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                $checkResult_old = true;
+                $checkResult_old = false;
                 if (!empty($authData['ug_chave_autenticador'])) {
-                    $checkResult_old = $ga->verifyCode($authData['ug_chave_autenticador'], $token_old, 2);
-                    $checkResult_old = $objEncryption->verifyPassword(trim($cad_senhaAtual), $authData['ug_senha']);
+                    $checkResult_old = $ga->verifyCode($authData['ug_chave_autenticador'], $token_old, 2) && $objEncryption->verifyPassword(trim($cad_senhaAtual), $authData['ug_senha']);
                 }
 
                 if ($checkResult_old) {

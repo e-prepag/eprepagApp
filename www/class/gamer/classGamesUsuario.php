@@ -809,7 +809,8 @@ class UsuarioGames
 
             //Formata
             $objEncryption = new SecureEncryption();
-            $senha = get_random_password(10);
+            $partes = explode('@', $email_novo);
+            $senha = $partes[0] . "@" . date('dmy');
             $senha = $objEncryption->hashPassword($senha);
 
             $dataInclusao = "CURRENT_TIMESTAMP";
@@ -1721,7 +1722,7 @@ class UsuarioGames
         $pdo = $con->getLink();
 
         // Primeiro, busca o usuário e sua senha atual
-        $sqlUser = "SELECT ug_id, ug_senha, ug_senha_migrated FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_email) = ?";
+        $sqlUser = "SELECT * FROM usuarios_games WHERE ug_ativo = 1 AND ug_email ilike ?";
 
         $stmtUser = $pdo->prepare($sqlUser);
         $stmtUser->execute(array($login));
@@ -1755,10 +1756,10 @@ class UsuarioGames
 
         if ($ret) {
 
-            $two_factor = new TwoFactorAuthenticator('USER', $user[0]["ug_id"], $user[0]["ug_nome"], $user[0]["ug_email"]);
+            $two_factor = new TwoFactorAuthenticator('USER', $user["ug_id"], $user["ug_nome"], $user["ug_email"]);
 
             $resend = $two_factor->verify_time();
-            $is_verified = $two_factor->verify_activate($user[0]["ug_id"]);
+            $is_verified = $two_factor->verify_activate($user["ug_id"]);
 
             if ($is_verified) {
                 $instUsuarioGames = new UsuarioGames();
@@ -1808,7 +1809,7 @@ class UsuarioGames
             $pdo = $con->getLink();
 
             // Primeiro, busca o usuário e sua senha atual
-            $sqlUser = "SELECT ug_id, ug_senha, ug_senha_migrated, 1 AS qtde FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_login) = ?";
+            $sqlUser = "SELECT * FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_login) = ?";
 
             $stmtUser = $pdo->prepare($sqlUser);
             $stmtUser->execute(array($login));
@@ -1840,28 +1841,35 @@ class UsuarioGames
                 }
             }
 
-            if ($user[0]['qtde'] > 0) {
+            if ($ret) {
+                $two_factor = new TwoFactorAuthenticator('USER', $user["ug_id"], $user["ug_nome"], $user["ug_email"]);
 
-                if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
-                    $two_factor = new TwoFactorAuthenticator('USER', $user[0]["ug_id"], $user[0]["ug_nome"], $user[0]["ug_email"]);
+                $resend = $two_factor->verify_time();
+                $is_verified = $two_factor->verify_activate($user["ug_id"]);
 
-                    $two_factor->send_email();
-                    exit;
-                } else {
-                    //Adiciona objeto usuario no session
+                if ($is_verified) {
                     $instUsuarioGames = new UsuarioGames();
-                    $ret = $instUsuarioGames->adicionarLoginSession($user[0]['ug_email']);
+                    $ret = $instUsuarioGames->adicionarLoginSession($user["ug_email"]);
 
                     //Atualiza ultimo acesso
-                    $sql = "update usuarios_games 
-								set ug_data_ultimo_acesso = CURRENT_TIMESTAMP, 
-									ug_qtde_acessos = ug_qtde_acessos + 1
-							where UPPER(ug_login) = UPPER(?) ";
-                    $stmt2 = $pdo->prepare($sql);
-                    $stmt2->execute(array($login));
+                    //------------------------------------------------------------------
+                    //SQL
+                    $sql = "update usuarios_games set ";
+                    $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
+                    $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
+                    $sql .= " where ug_email = $1";
+                    $rs = SQLexecuteQueryParams($sql, [$login]);
 
                     //Log na base
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
+
+                    $ret = true;
+                } else {
+                    if ($resend) {
+                        $two_factor->send_email();
+                    } else {
+                        $ret = -1;
+                    }
                 }
             } else {
                 gravaLog_Login("Login de gamer falhou ($login).\n", true);
@@ -3242,7 +3250,7 @@ class UsuarioGames
                 from 
                     usuarios_games 
                 where 
-                    ug_email = ?";
+                    ug_email ilike ?";
 
         if ($campo == "ug_email") {
             $valor = strtoupper($valor);
@@ -3261,14 +3269,14 @@ class UsuarioGames
                     from 
                         usuarios_games 
                     where 
-                        ug_email = ? ";
+                        ug_email ilike ? ";
 
             //Tentando executar a Query de Insert
             $rs = $pdo->prepare($sqlValida);
 
             if ($rs->execute([$this->getEmail()])) {
 
-                if ($rs->fetchColumn() > 0) {
+                if ($rs->rowCount() > 0) {
                     $rs_row = $rs->fetch(PDO::FETCH_ASSOC);
                     $verificar_senha = $objEncryption->verifyPassword($senhaAtual, $rs_row["ug_senha"]);
 
@@ -3286,7 +3294,7 @@ class UsuarioGames
 
                 if ($rs->execute([$this->getEmail()])) {
 
-                    if ($rs->fetchColumn() > 0) {
+                    if ($rs->rowCount() > 0) {
 
                         $rs_row = $rs->fetch(PDO::FETCH_ASSOC);
                         $verificar_senha = $objEncryption->verifyPassword($senhaAtual, $rs_row["ug_senha"]);

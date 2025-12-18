@@ -23,5 +23,5 @@ return function (PDO $pdo) {
                     ALTER COLUMN shn_password TYPE VARCHAR(255);
 
                 ALTER TABLE usuarios
-                    ADD COLUMN senha_migrated SMALLINT NOT NULL DEFAULT 0;");
+                    ADD COLUMN senha_migrated BOOLEAN NOT NULL DEFAULT false;");
 };

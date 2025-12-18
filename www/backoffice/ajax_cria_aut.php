@@ -21,9 +21,6 @@ try {
 
     if (Util::isAjaxRequest()) {
 
-        $chave256bits = new Chave();
-        $aes = new AES($chave256bits->retornaChavePub());
-        $senha = base64_encode($aes->encrypt(addslashes($_POST['passw'])));
         $login = strtoupper(trim($_POST['user']));
 
         $sql = "SELECT id, chave_autenticador, shn_password FROM usuarios WHERE shn_login = ?
@@ -40,7 +37,7 @@ try {
 
             $bcrypt = new SecureEncryption();
 
-            if (!$bcrypt->verifyPassword($senha_decript, $fetch['shn_password'])) {
+            if (!$bcrypt->verifyPassword($_POST['passw'], $fetch['shn_password'])) {
                 $msg = 'Senha incorreta!';
             } else if (empty($fetch['chave_autenticador'])) {
                 if (!$_SESSION['secret']) {

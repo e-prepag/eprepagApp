@@ -331,10 +331,10 @@
 	// Função para fazer a criptografia da senha
 	function criptografaSenha($confirmacaoNovaSenha) {
 		
-		require_once "/www/class/classEncryption.php"; 
+		require_once "/www/class/classSecureEncryption.php"; 
 		
-		$criptografia = new Encryption();
-		$senhaCriptografada = $criptografia->encrypt($confirmacaoNovaSenha);
+		$criptografia = new SecureEncryption();
+		$senhaCriptografada = $criptografia->hashPassword($confirmacaoNovaSenha);
 		
 		return $senhaCriptografada;
 		

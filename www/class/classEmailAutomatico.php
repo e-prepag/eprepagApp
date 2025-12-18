@@ -841,8 +841,7 @@ class EnvioEmailAutomatico {
             $this->setUgNome($result_row['ug_nome_full']);
             $this->setUgPerfilSaldo($result_row['ug_perfil_saldo']);
 
-            $objEncryption = new Encryption();
-            $senha = $result_row['ug_senha'];
+            $senha = "";
 
             $this->setUgSenha($senha);
             return true;

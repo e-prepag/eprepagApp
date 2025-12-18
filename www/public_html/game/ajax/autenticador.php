@@ -26,8 +26,10 @@ if (Util::isAjaxRequest()) {
     require_once DIR_INCS . "main.php";
     require_once DIR_INCS . "gamer/main.php";
     require_once "funcoes_login.php";
+    require_once "/www/class/classSecureEncryption.php";
     $validate = new Validate;
 
+    $secureEncryption = new SecureEncryption();
     function checkDevice($userId, $pdo)
     {
         if (!isset($_COOKIE['device_token'])) {
@@ -69,7 +71,6 @@ if (Util::isAjaxRequest()) {
             echo RETURN_CAPTCHA;
             exit;
         }
-
     } else {
         registrarTentativaFalha($_POST['login']);
         $erro = true;
@@ -123,32 +124,40 @@ if (Util::isAjaxRequest()) {
                 $erro = true;
             } else {
 
-                $objEncryption = new Encryption();
-                $senha = $objEncryption->encrypt(trim($_POST['senha']));
                 $login = strtoupper(trim($_POST['login']));
 
-                $sql = "SELECT ug_chave_autenticador, ug_id, ug_acesso_sem_aut FROM usuarios_games WHERE ug_ativo = 1 AND ug_email = ? AND ug_senha = ? ";
+                $sql = "SELECT ug_chave_autenticador, ug_id, ug_acesso_sem_aut, ug_senha FROM usuarios_games WHERE ug_ativo = 1 AND ug_email = ?";
 
                 $con = ConnectionPDO::getConnection();
                 $pdo = $con->getLink();
 
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute(array($login, $senha));
+                $stmt->execute(array($login));
                 $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($stmt->rowCount() > 0) {
-                    $ret = true;
-                    $_SESSION['captcha_passed'] = 1;
-                    if (empty($fetch['ug_chave_autenticador'])) {
-                        $_SESSION['id_do_usuario'] = $fetch['ug_id'];
-                        modal_criar_token($fetch['ug_acesso_sem_aut']);
-                        exit;
-                    }
 
-                    if (checkDevice($fetch['ug_id'], $pdo)) {
-                        //$msg = "Dispositivo já autenticado.";
-                        logar_direto();
-                        exit;
+                    $verifica_senha = $secureEncryption->verifyPassword($_POST['senha'], $fetch['ug_senha']);
+
+                    if ($verifica_senha) {
+
+                        $ret = true;
+
+                        $_SESSION['captcha_passed'] = 1;
+
+                        if (empty($fetch['ug_chave_autenticador'])) {
+                            $_SESSION['id_do_usuario'] = $fetch['ug_id'];
+                            modal_criar_token($fetch['ug_acesso_sem_aut']);
+                            exit;
+                        }
+
+                        if (checkDevice($fetch['ug_id'], $pdo)) {
+                            //$msg = "Dispositivo já autenticado.";
+                            logar_direto();
+                            exit;
+                        }
+                    } else {
+                        $ret = false;
                     }
                 } else {
                     $ret = false;
@@ -168,37 +177,45 @@ if (Util::isAjaxRequest()) {
             } else {
                 modal_token();
             }
-
         } else if ($validate->qtdCaracteres($_POST['login'], 2, 255) == 0) {
             //validar minimo de 3 caracteres e verificar maximo permitido para o capmo ug_login na tabela
             //metodo autenticarUgLogin($_POST['login'],$_POST['senha']);
             if (!filter_var($_POST['login'], FILTER_VALIDATE_EMAIL)) {
-                $objEncryption = new Encryption();
-                $senha = $objEncryption->encrypt(trim($_POST['senha']));
+
                 $login = strtoupper(trim($_POST['login']));
 
-                $sql = "SELECT ug_chave_autenticador, ug_id, ug_acesso_sem_aut FROM usuarios_games WHERE ug_ativo = 1 AND ug_login = ? AND ug_senha = ? ";
+                $sql = "SELECT ug_chave_autenticador, ug_id, ug_acesso_sem_aut, ug_senha FROM usuarios_games WHERE ug_ativo = 1 AND ug_login = ? ";
 
                 $con = ConnectionPDO::getConnection();
                 $pdo = $con->getLink();
 
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute(array($login, $senha));
+                $stmt->execute(array($login));
                 $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($stmt->rowCount() > 0) {
-                    $ret = true;
-                    $_SESSION['captcha_passed'] = 1;
-                    if (empty($fetch['ug_chave_autenticador'])) {
-                        $_SESSION['id_do_usuario'] = $fetch['ug_id'];
-                        modal_criar_token($fetch['ug_acesso_sem_aut']);
-                        exit;
-                    }
 
-                    if (checkDevice($fetch['ug_id'], $pdo)) {
-                        //$msg = "Dispositivo já autenticado.";
-                        logar_direto();
-                        exit;
+                    $verifica_senha = $secureEncryption->verifyPassword($_POST['senha'], $fetch['ug_senha']);
+
+                    if ($verifica_senha) {
+
+                        $ret = true;
+
+                        $_SESSION['captcha_passed'] = 1;
+
+                        if (empty($fetch['ug_chave_autenticador'])) {
+                            $_SESSION['id_do_usuario'] = $fetch['ug_id'];
+                            modal_criar_token($fetch['ug_acesso_sem_aut']);
+                            exit;
+                        }
+
+                        if (checkDevice($fetch['ug_id'], $pdo)) {
+                            //$msg = "Dispositivo já autenticado.";
+                            logar_direto();
+                            exit;
+                        }
+                    } else {
+                        $ret = false;
                     }
                 } else {
                     $ret = false;
@@ -228,7 +245,7 @@ if (Util::isAjaxRequest()) {
 
 function modal_token()
 {
-    ?>
+?>
     <div id="modal-token" class="modal fade" role="dialog">
         <div class="modal-dialog modal-sm">
             <!-- Modal content-->
@@ -261,16 +278,15 @@ function modal_token()
         </div>
     </div>
     <script>
-        $(function () {
-            $("#formLogar").submit(function (e) {
+        $(function() {
+            $("#formLogar").submit(function(e) {
                 e.preventDefault();
 
                 var erro = false;
                 if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                     $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                     erro = true;
-                }
-                else {
+                } else {
                     $("#msg-modal").text("Dados em destaque estão incorretos. Por favor, confira e tente novamente.");
                 }
                 if ($("#login").val().trim() == "") {
@@ -305,10 +321,12 @@ function modal_token()
                         type: 'POST',
                         url: '/game/ajax/login2.php',
                         data: dados,
-                        beforeSend: function () {
-                            waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+                        beforeSend: function() {
+                            waitingDialog.show('Por favor, aguarde...', {
+                                dialogSize: 'sm'
+                            });
                         },
-                        success: function (ret) {
+                        success: function(ret) {
                             waitingDialog.hide();
                             console.log(ret);
                             if (ret == <?php echo RETURN_SUCCESS; ?>) {
@@ -327,8 +345,7 @@ function modal_token()
                             } else if (ret == <?php echo RETURN_MAX_COUNT; ?>) {
                                 erro = true;
                                 window.location.href = "/game/conta/pagina_bloqueio.php";
-                            }
-                            else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
+                            } else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
                                 grecaptcha.reset();
                                 $('#myModal2FA').modal('show');
                             } else {
@@ -339,7 +356,7 @@ function modal_token()
                                 return false;
                             }
                         },
-                        error: function () {
+                        error: function() {
                             grecaptcha.reset();
                             waitingDialog.hide();
                             manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
@@ -359,7 +376,7 @@ function modal_token()
             });
         });
     </script>
-    <?php
+<?php
 }
 
 function modal_criar_token($dia_faltam)
@@ -380,7 +397,7 @@ function modal_criar_token($dia_faltam)
         $btn_recusar = false;
     }
 
-    ?>
+?>
     <div id="modal-token" class="modal fade" role="dialog">
         <div class="modal-dialog modal-md">
             <!-- Modal content-->
@@ -411,15 +428,14 @@ function modal_criar_token($dia_faltam)
     </div>
     <?php if ($btn_recusar) { ?>
         <script>
-            $(function () {
-                $("#logar_sem_token").click(function (e) {
+            $(function() {
+                $("#logar_sem_token").click(function(e) {
 
                     var erro = false;
                     if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                         $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                         erro = true;
-                    }
-                    else {
+                    } else {
                         $("#msg-modal").text("Dados em destaque estão incorretos. Por favor, confira e tente novamente.");
                     }
                     if ($("#login").val().trim() == "") {
@@ -452,10 +468,12 @@ function modal_criar_token($dia_faltam)
                             type: 'POST',
                             url: '/game/ajax/login2.php',
                             data: dados,
-                            beforeSend: function () {
-                                waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+                            beforeSend: function() {
+                                waitingDialog.show('Por favor, aguarde...', {
+                                    dialogSize: 'sm'
+                                });
                             },
-                            success: function (ret) {
+                            success: function(ret) {
                                 waitingDialog.hide();
                                 console.log(ret);
                                 if (ret == <?php echo RETURN_SUCCESS; ?>) {
@@ -474,8 +492,7 @@ function modal_criar_token($dia_faltam)
                                 } else if (ret == <?php echo RETURN_MAX_COUNT; ?>) {
                                     erro = true;
                                     window.location.href = "/game/conta/pagina_bloqueio.php";
-                                }
-                                else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
+                                } else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
                                     grecaptcha.reset();
                                     $('#myModal2FA').modal('show');
                                 } else if (ret.startsWith('<')) {
@@ -489,7 +506,7 @@ function modal_criar_token($dia_faltam)
                                     return false;
                                 }
                             },
-                            error: function () {
+                            error: function() {
                                 waitingDialog.hide();
                                 grecaptcha.reset();
                                 manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
@@ -514,15 +531,14 @@ function modal_criar_token($dia_faltam)
 
 function logar_direto()
 {
-    ?>
+?>
     <script>
-        $(function () {
+        $(function() {
             var erro = false;
             if ((grecaptcha.getResponse() == "" || grecaptcha.getResponse().length == 0) && <?php echo getenv("AMBIENTE") != "HOMOLOGACAO" ? "true" : "false" ?>) {
                 $("#msg-modal").text("Você deve fazer a verificação do RECAPTCHA para fazer o login.");
                 erro = true;
-            }
-            else {
+            } else {
                 $("#msg-modal").text("Dados em destaque estão incorretos. Por favor, confira e tente novamente.");
             }
             if ($("#login").val().trim() == "") {
@@ -555,7 +571,7 @@ function logar_direto()
                     type: 'POST',
                     url: '/game/ajax/login2.php',
                     data: dados,
-                    success: function (ret) {
+                    success: function(ret) {
                         waitingDialog.hide();
                         console.log(ret);
                         if (ret == <?php echo RETURN_SUCCESS; ?>) {
@@ -574,8 +590,7 @@ function logar_direto()
                         } else if (ret == <?php echo RETURN_MAX_COUNT; ?>) {
                             erro = true;
                             window.location.href = "/game/conta/pagina_bloqueio.php";
-                        }
-                        else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
+                        } else if (ret == <?php echo RETURN_TWO_FACTOR; ?>) {
                             grecaptcha.reset();
                             $('#myModal2FA').modal('show');
                         } else {
@@ -586,7 +601,7 @@ function logar_direto()
                             return false;
                         }
                     },
-                    error: function () {
+                    error: function() {
                         grecaptcha.reset();
                         waitingDialog.hide();
                         manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
@@ -604,5 +619,5 @@ function logar_direto()
             }
         });
     </script>
-    <?php
+<?php
 }

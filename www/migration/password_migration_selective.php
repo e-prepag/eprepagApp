@@ -12,6 +12,7 @@
 
 require_once __DIR__ . '/../db/connect.php';
 require_once __DIR__ . '/../class/classSecureEncryption.php';
+require_once "/www/includes/gamer/chave.php";
 require_once __DIR__ . '/../includes/gamer/AES.class.php';
 require_once __DIR__ . '/../class/classEncryption.php';
 
@@ -54,8 +55,8 @@ class PasswordMigrationSelective {
             $this->log("Iniciando migração seletiva...");
             
             // Migra apenas usuários PDV
-            $this->migratePdvUsers();
-            $this->migratePdvOperators();
+            //$this->migratePdvUsers();
+            //$this->migratePdvOperators();
             
             // Migra apenas usuários SYS (backoffice)
             $this->migrateSysUsers();
@@ -195,31 +196,31 @@ class PasswordMigrationSelective {
     private function migrateSysUsers() {
         $this->log("--- Migrando usuários SYS (usuarios - backoffice) ---");
         
-        // Verifica se a tabela existe
-        $checkTable = "SELECT EXISTS (
-            SELECT FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            AND table_name = 'usuarios'
-        )";
+        // // Verifica se a tabela existe
+        // $checkTable = "SELECT EXISTS (
+        //     SELECT FROM information_schema.tables 
+        //     WHERE table_schema = 'public' 
+        //     AND table_name = 'usuarios'
+        // )";
         
-        $stmt = $this->pdo->prepare($checkTable);
-        $stmt->execute();
-        $tableExists = $stmt->fetchColumn();
+        // $stmt = $this->pdo->prepare($checkTable);
+        // $stmt->execute();
+        // $tableExists = $stmt->fetchColumn();
         
-        if (!$tableExists) {
-            $this->log("Tabela 'usuarios' não encontrada, pulando migração SYS");
-            return;
-        }
+        // if (!$tableExists) {
+        //     $this->log("Tabela 'usuarios' não encontrada, pulando migração SYS");
+        //     return;
+        // }
         
         // Adiciona coluna para marcar migração se não existir
         $this->addMigrationColumn('usuarios', 'shn_password_migrated');
         
-        $sql = "SELECT shn_id, shn_login, shn_password 
+        $sql = "SELECT id, shn_login, shn_password 
                 FROM usuarios 
                 WHERE (shn_password_migrated IS NULL OR shn_password_migrated = false)
                 AND shn_password IS NOT NULL 
                 AND shn_password != ''
-                ORDER BY shn_id";
+                ORDER BY id";
         
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
@@ -235,29 +236,31 @@ class PasswordMigrationSelective {
             try {
                 // Para backoffice, pode usar AES ou base64, tenta ambos
                 $decryptedPassword = $this->tryDecryptBackofficePassword($user['shn_password']);
+
+                echo $decryptedPassword;
                 
                 if (!empty($decryptedPassword)) {
                     $newHash = $this->secureEncryption->hashPassword($decryptedPassword);
                     
                     $updateSql = "UPDATE usuarios 
                                   SET shn_password = :new_hash, shn_password_migrated = true 
-                                  WHERE shn_id = :user_id";
+                                  WHERE id = :user_id";
                     
                     $updateStmt = $this->pdo->prepare($updateSql);
                     $updateStmt->execute([
                         ':new_hash' => $newHash,
-                        ':user_id' => $user['shn_id']
+                        ':user_id' => $user['id']
                     ]);
                     
                     $migrated++;
-                    $this->log("Usuário SYS {$user['shn_login']} (ID: {$user['shn_id']}) migrado com sucesso");
+                    $this->log("Usuário SYS {$user['shn_login']} (ID: {$user['id']}) migrado com sucesso");
                 } else {
-                    $this->log("AVISO: Não foi possível descriptografar senha para usuário SYS {$user['shn_login']} (ID: {$user['shn_id']})");
+                    $this->log("AVISO: Não foi possível descriptografar senha para usuário SYS {$user['shn_login']} (ID: {$user['id']})");
                     $errors++;
                 }
                 
             } catch (Exception $e) {
-                $this->log("ERRO ao migrar usuário SYS {$user['shn_login']} (ID: {$user['shn_id']}): " . $e->getMessage());
+                $this->log("ERRO ao migrar usuário SYS {$user['shn_login']} (ID: {$user['id']}): " . $e->getMessage());
                 $errors++;
             }
         }
@@ -291,19 +294,7 @@ class PasswordMigrationSelective {
      * Tenta descriptografar senha usando diferentes métodos
      */
     private function tryDecryptPassword($encryptedPassword) {
-        // Método 1: AES
-        try {
-            if (class_exists('AES')) {
-                $aes = new AES("chave_padrao_aes");
-                $decrypted = $aes->decrypt(base64_decode($encryptedPassword));
-                if (!empty($decrypted) && strlen($decrypted) >= 4) {
-                    return $decrypted;
-                }
-            }
-        } catch (Exception $e) {
-            // Continua para próximo método
-        }
-        
+
         // Método 2: Encryption class
         try {
             if (class_exists('Encryption')) {
@@ -315,21 +306,6 @@ class PasswordMigrationSelective {
             }
         } catch (Exception $e) {
             // Continua para próximo método
-        }
-        
-        // Método 3: Base64
-        try {
-            $decoded = base64_decode($encryptedPassword, true);
-            if ($decoded !== false && strlen($decoded) >= 4) {
-                return $decoded;
-            }
-        } catch (Exception $e) {
-            // Continua para próximo método
-        }
-        
-        // Método 4: Assume que já está em texto plano
-        if (strlen($encryptedPassword) >= 4 && !$this->isBcryptHash($encryptedPassword)) {
-            return $encryptedPassword;
         }
         
         return null;
@@ -342,42 +318,19 @@ class PasswordMigrationSelective {
         // Método 1: AES (mais comum no backoffice)
         try {
             if (class_exists('AES')) {
-                $aes = new AES("chave_padrao_aes");
+                $chave256bits = new Chave();
+                $aes = new AES($chave256bits->retornaChavePub());
+                echo $chave256bits->retornaChavePub();
                 $decrypted = $aes->decrypt(base64_decode($encryptedPassword));
+                echo "\n---=== $encryptedPassword ===---\n";
+                echo "\n---=== $decrypted ===---\n";
                 if (!empty($decrypted) && strlen($decrypted) >= 4) {
+                    //echo "---=== $decrypted ===---";
                     return $decrypted;
                 }
             }
         } catch (Exception $e) {
-            // Continua para próximo método
-        }
-        
-        // Método 2: Encryption class
-        try {
-            if (class_exists('Encryption')) {
-                $encryption = new Encryption();
-                $decrypted = $encryption->decrypt($encryptedPassword);
-                if (!empty($decrypted) && strlen($decrypted) >= 4) {
-                    return $decrypted;
-                }
-            }
-        } catch (Exception $e) {
-            // Continua para próximo método
-        }
-        
-        // Método 3: Base64
-        try {
-            $decoded = base64_decode($encryptedPassword, true);
-            if ($decoded !== false && strlen($decoded) >= 4) {
-                return $decoded;
-            }
-        } catch (Exception $e) {
-            // Continua para próximo método
-        }
-        
-        // Método 4: Texto plano
-        if (strlen($encryptedPassword) >= 4 && !$this->isBcryptHash($encryptedPassword)) {
-            return $encryptedPassword;
+            die($e->getMessage());
         }
         
         return null;
@@ -447,7 +400,7 @@ if (php_sapi_name() === 'cli') {
     try {
         $migration = new PasswordMigrationSelective();
         $migration->migrate();
-        $migration->generateReport();
+        //$migration->generateReport();
         
         echo "\nMigração seletiva concluída com sucesso!\n";
         echo "Verifique o arquivo de log para detalhes.\n";
