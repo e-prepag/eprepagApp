@@ -188,7 +188,7 @@ fbq('track', 'PageView');
     <div class="row top20">
         <div class="col-md-12">
             <span class="glyphicon glyphicon-triangle-right graphycon-big color-blue pull-left"></span>
-            <strong class="pull-left top15 color-blue font20">Compra de créditos wesley</strong>  
+            <strong class="pull-left top15 color-blue font20">Compra de créditos</strong>  
         </div>
     </div>
     <div class="row">
