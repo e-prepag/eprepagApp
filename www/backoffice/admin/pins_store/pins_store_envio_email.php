@@ -188,7 +188,6 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				}
 
 				sleep(2);
-
 			} //end if (($DISTRIBUIDORA_EPP != intval($distributor_codigo))&&($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo)))
 			else {
 				//tamanho do serial na tabela estoque
@@ -238,7 +237,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 						$sql = "select * from pins where pin_codigo = '" . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . "' and opr_codigo = $opr_codigo_aux";
 						$rs_pins_pub = SQLexecuteQuery($sql);
 						if (!$rs_pins_pub || pg_num_rows($rs_pins_pub) == 0) {
-							$sql = "insert into pins (pin_serial, pin_codigo, opr_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_canal, pin_horaentrada,pin_status,pin_validade) values ('" . $spin_serial . "', '" . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . "', " . $opr_codigo_aux . ", " . $rs_pins_email_row['pin_valor'] . ", " . $ilote . ", CURRENT_TIMESTAMP, 's', NOW(),'1',(NOW() + interval '6 month'));";
+							$sql = "insert into pins (pin_serial, pin_codigo, opr_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_canal, pin_horaentrada,pin_status,pin_validade) values ('" . $spin_serial . "', '" . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . "', " . $opr_codigo_aux . ", " . $rs_pins_email_row['pin_valor'] . ", " . $ilote . ", CURRENT_TIMESTAMP, 's', NOW(),'1',(NOW() + interval '2 month'));";
 							$rs_pins_save = SQLexecuteQuery($sql);
 							if (!$rs_pins_save) {
 								$msg .= "Erro ao salvar o novo PIN ($sql)<br>";

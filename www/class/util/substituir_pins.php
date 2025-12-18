@@ -262,7 +262,7 @@ foreach ($pinsEncontrados as $row) {
             ) VALUES (
                 :serial, :codigo, :opr, :valor, :lote,
                 CURRENT_TIMESTAMP, 's', NOW(), '6',
-                (NOW() + interval '6 month'), 1, CURRENT_DATE, '$hora_atual',
+                (NOW() + interval '2 month'), 1, CURRENT_DATE, '$hora_atual',
                 CURRENT_DATE, '$hora_atual', :desc
             )
             RETURNING pin_codinterno
