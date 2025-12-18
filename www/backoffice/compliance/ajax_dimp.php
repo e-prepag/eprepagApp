@@ -3148,7 +3148,7 @@ echo $msg;
 
 $output = ob_get_clean();
 
-$dir = "/www/dimp/" . date('Ymd') . "/";
+$dir = "/www/arquivos_gerados/dimp/" . date('Ymd') . "/";
 
 // cria a pasta se não existir
 if (!is_dir($dir)) {
