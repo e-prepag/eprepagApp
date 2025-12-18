@@ -57,7 +57,7 @@ if (isset($_POST['pass_old']) && $_POST['pass_old'] != "" && $_SESSION["token_cs
 
         if ($fetch) {
             if (!$cripto->verifyPassword($_POST['pass_old'], $fetch['shn_password'])) {
-                $msg = LANG_WRONG_PASSWORD . "Peroca";
+                $msg = LANG_WRONG_PASSWORD;
                 $color = "txt-vermelho";
             } else {
 
@@ -77,7 +77,7 @@ if (isset($_POST['pass_old']) && $_POST['pass_old'] != "" && $_SESSION["token_cs
                 }
             }
         } else {
-            $msg = LANG_WRONG_PASSWORD . "Prikito";
+            $msg = LANG_WRONG_PASSWORD;
             $color = "txt-vermelho";
         }
     }
