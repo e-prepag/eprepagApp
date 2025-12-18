@@ -17,16 +17,18 @@ class LoggingPDOStatement extends PDOStatement
         $callerFile = $backtrace[0]['file'];  // Pega o caminho do arquivo que chamou
         $callerDir = dirname($callerFile);   // Obtém o diretório do arquivo que chamou
 
-        if (strpos($callerDir, 'public_html') === false 
-            && strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false 
-            && stripos($this->queryString, "usuarios") == false) {
+        if (
+            strpos($callerDir, 'public_html') === false
+            && strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false
+            && stripos($this->queryString, "usuarios") == false
+        ) {
             // Se não está na pasta public_html, não faz log
             return parent::execute($bound_input_params);
         }
         // Verifica se a consulta é do tipo INSERT ou UPDATE
         if (preg_match('/^\s*(INSERT|UPDATE|DELETE)/i', $this->queryString)) {
             // Log da consulta SQL e parâmetros
-            $log = date('Y-m-d H:i:s') . " | Query: " . $this->queryString . PHP_EOL ;
+            $log = date('Y-m-d H:i:s') . " | Query: " . $this->queryString . PHP_EOL;
 
             if ($bound_input_params) {
                 $log .= " | Params: " . json_encode($bound_input_params) . PHP_EOL;
@@ -34,29 +36,50 @@ class LoggingPDOStatement extends PDOStatement
 
             $log .= " | Called from: " . $callerFile . PHP_EOL;
 
-            if(isset($_SESSION['dist_usuarioGames_ser'])){
+            if (isset($_SESSION['dist_usuarioGames_ser'])) {
                 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
                 $log .= " | User Id Pdv: " . $usuarioGames->getId() . PHP_EOL;
-            }else if(isset($_SESSION['usuarioGames_ser'])){
+            } else if (isset($_SESSION['usuarioGames_ser'])) {
                 $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
                 $log .= " | User Id Gamer: " . $usuarioGames->getId() . PHP_EOL;
-            }else{
+            } else {
                 $log .= " | No users in the session" . PHP_EOL;
             }
 
-            if($_SERVER['REMOTE_ADDR']){
+            if ($_SERVER['REMOTE_ADDR']) {
                 $log .= " | IP: " . $_SERVER['REMOTE_ADDR'] . PHP_EOL;
             }
 
             // Linha de separação para melhorar a legibilidade
             $separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
 
-            // Caminho do arquivo de log
-            $logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
+            $logDir = '/www/arquivos_gerados/logs/sql_logs';
+            $logFile = $logDir . '/logs_' . date('d_m_y') . '.log';
 
-            // Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
-            file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
+            // Garante que o diretório exista
+            if (!is_dir($logDir)) {
+                if (!mkdir($logDir, 0777, true)) {
+                    throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+                }
+            }
 
+            // Garante extensão .log
+            if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+                throw new Exception("Extensão inválida para arquivo de log.");
+            }
+
+            // Impede path traversal
+            if (strpos($logFile, '..') !== false) {
+                throw new Exception("Caminho inválido detectado.");
+            }
+
+            // Conteúdo do log, com separação
+            $entry = PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL;
+
+            // Escreve no arquivo com segurança
+            if (file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX) === false) {
+                throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+            }
         }
 
         // Executa a consulta normalmente
@@ -82,9 +105,7 @@ class ConnectionPDO
      * Não é necessário instanciar, basta chamar ConnectionPDO::getConnection();
      * Caso queria acessar o PDO diretamente: ConnectionPDO::getConnection()->getLink();
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Conecta a base de dados
@@ -178,5 +199,4 @@ class ConnectionPDO
     {
         return false;
     }
-
 }

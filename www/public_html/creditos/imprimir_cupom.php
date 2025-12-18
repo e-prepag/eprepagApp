@@ -81,7 +81,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
     $con = ConnectionPDO::getConnection();
     $pdo = $con->getLink();
     $estilos = getEstilosUsuarioPDO($usuarioId, $pdo);
-    if (!filter_var($estilos['email_suporte'], FILTER_VALIDATE_EMAIL)){
+    if (!filter_var($estilos['email_suporte'], FILTER_VALIDATE_EMAIL)) {
         $estilos['email_suporte'] = "";
     }
     if (!filter_var($estilos['link_canal'], FILTER_VALIDATE_URL)) {
@@ -105,17 +105,15 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
             if (empty($listaPINs)) {
 
                 $listaPINs = $val;
-
-            }//end if(empty($listaPINs))
+            } //end if(empty($listaPINs))
             else {
 
                 $listaPINs .= "," . $val;
+            } //end else do if(empty($listaPINs))
 
-            }//end else do if(empty($listaPINs))
+        } //end if($key!=str_replace('emitir', '', $key))
 
-        }//end if($key!=str_replace('emitir', '', $key))
-
-    }//end foreach($_POST as $key => $val)
+    } //end foreach($_POST as $key => $val)
 
 
 
@@ -130,8 +128,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
     if (empty($listaPINs)) {
 
         die("<p class='text-red'>Nenhum PIN selecionado.</p>");
-
-    }//end if(empty($listaPINs))
+    } //end if(empty($listaPINs))
 
 
 
@@ -148,7 +145,6 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
     if (checkIP()) {
 
         $server_url = $_SERVER['SERVER_NAME'];
-
     }
 
 
@@ -207,12 +203,11 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
             if (!$ret)
                 $msg = "Erro ao atualizar quantidade de impressões dos cupons.\n";
-
         } //end else do if(!$rs_modelos || pg_num_rows($rs_modelos) == 0)
 
     } //end if($msg == "")
 
-    ?>
+?>
 
     <html>
 
@@ -317,7 +312,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
             if ($_POST['imprimir_ou_csv'] == 'imprimir') {
 
-                ?>
+            ?>
 
 
 
@@ -358,11 +353,11 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
             <?php
 
-            }//end if($_POST['imprimir_ou_csv'] == 'imprimir')
-        
+            } //end if($_POST['imprimir_ou_csv'] == 'imprimir')
+
             if ($msg != "") {
 
-                ?>
+            ?>
 
                 <table border="0" cellspacing="0" align="center" class='noprint'>
 
@@ -380,8 +375,8 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
             <?php
 
-            }//end if($msg != "")
-        
+            } //end if($msg != "")
+
 
 
             $cuponsPorLinha = 2;
@@ -401,15 +396,13 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                         if ((($i) % $cuponsPorLinha) === 0) {
 
                             //echo "QUebra linha Inicio<br>";
-        
+
                             echo "<tr class='texto' valign='middle'>
 
                                      <td width='480px' style='padding: 5px 5px;' align='center'>";
-
                         } else {
 
                             echo "       <td width='480px' style='padding: 5px 5px;' align='center'>";
-
                         }
 
                         echo "<table style='border: solid 1px; padding: 5px 15px;'> 
@@ -429,14 +422,13 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                 echo "              <img src='" . $GLOBALS['URL_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem'] . "' title='" . $aux_matriz[$i]['descricao'] . "' alt='" . $aux_matriz[$i]['descricao'] . "' style='max-width: 145px; max-height: 80px;' border='0'>
 
                          ";
+                            } //end if($rs_modelos_row['ogp_nome_imagem'] && $rs_modelos_row['ogp_nome_imagem'] != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem']))
 
-                            }//end if($rs_modelos_row['ogp_nome_imagem'] && $rs_modelos_row['ogp_nome_imagem'] != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $rs_modelos_row['ogp_nome_imagem']))
-                            
-                            if($estilos['logo_base64']){
-                            echo "               
+                            if ($estilos['logo_base64']) {
+                                echo "               
 
                                         <img src='" . $estilos['logo_base64'] . "' title='$nome_pdv' alt='$nome_pdv' border='0' class='imagem_epp' style='max-width: 130px; max-height: 24px;'>";
-                            }else{
+                            } else {
                                 echo '<span class="imagem_epp" style="
         		  font-size: 18px;
         		  font-weight: bold;
@@ -454,9 +446,8 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                  </td>
 
                              </tr>";
-
                         } //end if($rs_modelos_row['vgm_pin_request'] != 1) 
-        
+
                         $pin_serial = $rs_modelos_row['case_serial'];
 
                         $case_serial = $rs_modelos_row['pin_serial'];
@@ -474,39 +465,36 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
 
                         //	opr_codigo = 44 -> 'Axeso5' , 28 -> 'PayByCash', 34 -> 'Webzen', 100 -> 'Facebook BHN'
-        
+
                         if ($opr_codigo == 28 || $opr_codigo == 44 || $opr_codigo == 34 || $opr_codigo == 100 || $opr_codigo == 106) {
 
                             // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
-        
+
                             // o carregamento no estoque para Facebook BHN foi baseado no Axeso5 que está trocado -> então troca de novo aqui
-        
+
                             $pin_serial = $rs_modelos_row['pin_serial'];
 
                             $case_serial = $rs_modelos_row['case_serial'];
-
                         }
 
                         //	opr_codigo = 100 -> 'Facebook BHN' 
-        
+
                         if ($opr_codigo == 100) {
 
                             $conteudo_instrucoes = "<br><br>Para resgatar este cartão virtual:<br>1. Acesse www.facebook.com/giftcards/redeem.<br>2. Siga as instruções para resgate de cartões.<br>3. Quando solicitado, insira o código PIN.";
 
                             $label_numero_serie = "Cartão";
-
                         } else {
 
                             $label_numero_serie = "Nº de série";
 
                             $conteudo_instrucoes = "";
-
                         }
 
 
 
                         //If para capturar instruções enviadas pelo integração de requisição de PINs
-        
+
                         if ($rs_modelos_row['vgm_pin_request']) {
 
                             $sql_instrucoes = "SELECT bhn_xml_retorno FROM pedidos_bhn WHERE bhn_pin = '" . $rs_modelos_row['pin_codigo'] . "';";
@@ -536,31 +524,28 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                             if (!empty($instrucoes->transaction->receiptsFields->line[$contador]))
 
                                                 $conteudo_instrucoes .= $instrucoes->transaction->receiptsFields->line[$contador] . "<br>";
+                                        } //end if(!is_object($instrucoes->transaction->receiptsFields->line[$contador])) 
 
-                                        }//end if(!is_object($instrucoes->transaction->receiptsFields->line[$contador])) 
-        
-                                    }//end foreach
-        
-                                }//end if($total > 0)
-        
+                                    } //end foreach
+
+                                } //end if($total > 0)
+
                                 if (isset($instrucoes->transaction->termsAndConditions)) {
 
                                     $conteudo_instrucoes .= "<br>Termos de Serviço:<br>" . $instrucoes->transaction->termsAndConditions . "<br><br>";
-
                                 }
 
                                 $label_numero_serie = "Numero de serie";
 
                                 $case_serial = $instrucoes->transaction->additionalTxnFields->activationAccountNumber;
+                            } //end if($rs_instrucoes)
 
-                            }//end if($rs_instrucoes)
-        
-                        }//end if($rs_modelos_row['vgm_pin_request'])
-        
+                        } //end if($rs_modelos_row['vgm_pin_request'])
+
 
 
                         //Teste para impressão do link da pesquisa
-        
+
                         /*Trecho de pesquisa da Ernst Young
 
                         $teste = new classPesquisaEY($pin_serial);
@@ -616,8 +601,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                  </td>
 
                               </tr>";
-
-                        }//end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                        } //end if($rs_modelos_row['vgm_pin_request'] != 1) 
                         else {
 
                             echo " 
@@ -639,9 +623,8 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                               </tr>
 
                     ";
+                        } //end else
 
-                        }//end else
-        
                         echo " 
 
                              <tr class='dados_pin_texto'>
@@ -681,7 +664,6 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                               </tr>
 
                               ";
-
                         }
 
                         echo "<tr>
@@ -753,16 +735,13 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                     </td>
 
                                 </tr>";
-
                             }
-
-                        }//end if(!$rs_modelos_row['vgm_pin_request']) 
+                        } //end if(!$rs_modelos_row['vgm_pin_request']) 
                         $mensagem = "";
 
                         if ($opr_codigo == 113) {
 
                             $mensagem = "Código distribuído através da plataforma E-Prepag.";
-
                         }
 
                         if ($opr_codigo == 166) {
@@ -839,9 +818,8 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                              </tr>
 
                  ";
+                        } //end if($rs_modelos_row['vgm_pin_request'])
 
-                        }//end if($rs_modelos_row['vgm_pin_request'])
-        
                         echo "
 
                               <tr>
@@ -874,9 +852,9 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                  </table>";
 
                         if ((($i + 1) % $cuponsPorLinha) === 0) { //(($i+2) % $cuponsPorLinha) {
-        
+
                             //echo "QUEBRA linha FIM<br>";
-        
+
                             $retorno .= "       </td>
 
                                </tr>
@@ -892,21 +870,17 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                 </tr>
 
                                 ";
-
                         } else {
 
                             $retorno .= "       </td>";
-
                         }
-
                     } //end for($i=0;$i<$rs_modelos_row_total;$i++)
-        
+
                     echo "</table>
 
            </center>";
-
                 } //end if($rs_modelos)
-        
+
             }
 
             if ($_POST['imprimir_ou_csv'] == 'csv') {
@@ -936,17 +910,16 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                         $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 
                         //	opr_codigo = 44 -> 'Axeso5' , 28 -> 'PayByCash', 34 -> 'Webzen', 100 -> 'Facebook BHN', 100 -> 'IMVU BHN'
-        
+
                         if ($opr_codigo == 28 || $opr_codigo == 44 || $opr_codigo == 34 || $opr_codigo == 100 || $opr_codigo == 101 || $opr_codigo == 101 || $opr_codigo == 106) {
 
                             // o carregaemnto no estoque para Axeso5 está trocado -> então troca de novo aqui
-        
+
                             // o carregamento no estoque para Facebook BHN foi baseado no Axeso5 que está trocado -> então troca de novo aqui
-        
+
                             $pin_serial = $rs_modelos_row['pin_serial'];
 
                             $case_serial = $rs_modelos_row['case_serial'];
-
                         }
 
 
@@ -962,30 +935,23 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                 $mensagem .= "Publisher;";
 
                                 $mensagem .= "Produto;";
-
                             }
 
                             $pub = $rs_modelos_row['opr_nome'] . ";";
-
-
-
-                        }//end if($rs_modelos_row['vgm_pin_request'] != 1) 
+                        } //end if($rs_modelos_row['vgm_pin_request'] != 1) 
                         else {
 
                             if ($i == 0) {
 
                                 $mensagem .= "Produto;";
-
                             }
+                        } //end else
 
-                        }//end else
-        
                         if ($i == 0) {
 
                             $mensagem .= "Valor;";
 
                             $mensagem .= "PIN;";
-
                         }
 
 
@@ -995,9 +961,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                             if ($i == 0) {
 
                                 $mensagem .= $label_numero_serie . ";";
-
                             }
-
                         }
 
                         $pin = ($pin_serial && $pin_serial != "") ? $pin_serial : "-";
@@ -1007,109 +971,118 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
 
                         $mensagem .= "\n" . $pub . $rs_modelos_row['vgm_nome_produto'] . (($rs_modelos_row['vgm_nome_modelo'] != "") ? " - " . $rs_modelos_row['vgm_nome_modelo'] : "") . ";" . "R$" . number_format($rs_modelos_row['pin_valor'], 2, ',', '.') . ";" . '="' . $pin . '"' . ";" . '="' . $c_serial . '"';
-
-
-
                     } //end for($i=0;$i<$rs_modelos_row_total;$i++)
-        
+
 
 
                 } //end if($rs_modelos)
-        
+
                 $file_ret = grava_arquivo_pin($mensagem);
 
-                ?>
+            ?>
 
 
 
                 <script>
-
-                    $(document).ready(function () {
+                    $(document).ready(function() {
 
                         location.href = '/creditos/dld.php?f=<?php echo $file_ret; ?>&fc=<?php echo "eprepag_pin_" . date("YmdHis") . ".csv"; ?>';
 
                     });
-
                 </script>
 
 
 
-                <?php
+            <?php
 
             }
+        } //end if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser']))
+        else {
 
-
-
-} //end if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser']))
-else {
-
-    ?>
+            ?>
 
             <p>Seu login expirou. Por favor, faça novamente o login para imprimir seu cupom.</p>
 
-            <?php
+        <?php
 
-}//end else do if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser']))
+        } //end else do if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser']))
 
 
 
-function grava_arquivo_pin($mensagem)
-{
+        function grava_arquivo_pin($mensagem)
+        {
 
-    $file_path = RAIZ_DO_PROJETO . 'arquivos_gerados/txts/txt/';
-    
-    // Normaliza e valida o caminho base
-    $real_base_path = realpath($file_path);
-    if ($real_base_path === false || !is_dir($real_base_path)) {
-        return '';
-    }
-    
-    // Garante barra final
-    $real_base_path = rtrim($real_base_path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-    
-    $expiration = 20;
-    $now = microtime(true);
+            $file_path = RAIZ_DO_PROJETO . 'arquivos_gerados/txts/txt/';
 
-    // Remove arquivos antigos com validação de path
-    $pattern = $real_base_path . '*.csv';
-    $files = glob($pattern);
-    if ($files) {
-        foreach ($files as $file) {
-            // Valida que o arquivo está dentro do diretório permitido
-            $real_file = realpath($file);
-            if ($real_file === false || strpos($real_file, $real_base_path) !== 0) {
-                continue;
+            // Normaliza e valida o caminho base
+            $real_base_path = realpath($file_path);
+            if ($real_base_path === false || !is_dir($real_base_path)) {
+                return '';
             }
-            
-            $filename = basename($file);
-            if ($filename !== 'index.html' && preg_match('/^\d+(\.\d+)?\.csv$/', $filename)) {
-                $timestamp = (float) str_replace('.csv', '', $filename);
-                if (($timestamp + $expiration) < $now) {
-                    @unlink($real_file);
+
+            // Garante barra final
+            $real_base_path = rtrim($real_base_path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+            $expiration = 20;
+            $now = microtime(true);
+
+            // Remove arquivos antigos com validação de path
+            $pattern = $real_base_path . '*.csv';
+            $files = glob($pattern);
+            if ($files) {
+                foreach ($files as $file) {
+                    // Valida que o arquivo está dentro do diretório permitido
+                    $real_file = realpath($file);
+                    if ($real_file === false || strpos($real_file, $real_base_path) !== 0) {
+                        continue;
+                    }
+
+                    $filename = basename($file);
+                    if ($filename !== 'index.html' && preg_match('/^\d+(\.\d+)?\.csv$/', $filename)) {
+                        $timestamp = (float) str_replace('.csv', '', $filename);
+                        if (($timestamp + $expiration) < $now) {
+                            @unlink($real_file);
+                        }
+                    }
                 }
             }
+
+            $safe_filename = $now . '.csv';
+            $file = $real_base_path . $safe_filename;
+
+            // 1. Extensão deve ser .csv
+            if (pathinfo($file, PATHINFO_EXTENSION) !== 'csv') {
+                throw new Exception("Extensão inválida para arquivo CSV.");
+            }
+
+            // 2. Impede tentativa de path traversal (..)
+            if (strpos($file, '..') !== false) {
+                throw new Exception("Caminho inválido detectado.");
+            }
+
+            // 3. Verifica se o diretório real do arquivo está dentro do diretório permitido
+            $realDir = realpath(dirname($file)) . DIRECTORY_SEPARATOR;
+
+            if ($realDir === false || strpos($realDir, $real_base_path) !== 0) {
+                throw new Exception("Tentativa de escrita fora do diretório permitido.");
+            }
+
+            $bytes = @file_put_contents($file, $mensagem, FILE_APPEND | LOCK_EX);
+
+            if ($bytes === false) {
+                throw new Exception("Falha ao escrever no arquivo CSV: $file");
+            }
+
+
+            if ($bytes === false) {
+                return '';
+            }
+
+            return $safe_filename;
         }
-    }
 
-    $safe_filename = $now . '.csv';
-    $file = $real_base_path . $safe_filename;
-    
-    // Validação final de segurança
-    if (strpos(realpath(dirname($file)) . DIRECTORY_SEPARATOR, $real_base_path) !== 0) {
-        return '';
-    }
+        ?>
 
-    $bytes = @file_put_contents($file, $mensagem, FILE_APPEND | LOCK_EX);
-    
-    if ($bytes === false) {
-        return '';
-    }
+        </body>
 
-    return $safe_filename;
-}
-
-?>
-
-    </body>
-
-</html>
+    </html>

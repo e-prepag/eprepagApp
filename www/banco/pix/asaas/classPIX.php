@@ -22,24 +22,23 @@ class classPIX
         } else {
             $this->setAccessToken($token);
         }
-        if($url == "") {
+        if ($url == "") {
             echo ("<br><br>ERRO ao obter endereço do banco!<br>Por favor, entre em
                  contado com o suporte da E-Prepag e informe o erro de código PIX790955 - Asaas.<br>Obrigado.");
-        } else{
+        } else {
             $this->url = $url;
         }
-
-    }///end function __construct()
+    } ///end function __construct()
 
     private function setAccessToken($access_token)
     {
         $this->access_token = $access_token;
-    }//end function setAccessToken
+    } //end function setAccessToken
 
     public function getAccessToken()
     {
         return $this->access_token;
-    }//end function getAccessToken
+    } //end function getAccessToken
 
     public function dadosPagador($idUsuario, $idpedido, $resposta_json)
     {
@@ -114,7 +113,6 @@ class classPIX
                 " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
             fwrite($ff, $logEntry);
             fclose($ff);
-
         }
 
         if ($resposta == false) {
@@ -123,7 +121,6 @@ class classPIX
                             <b>ERRO na Comunicação com o Banco!<br>Por favor, entre em contato com o suporte da E-Prepag e informe o erro de código PIX985235 ou tente novamente mais tarde.<br>Obrigado.</b>
                         </div>";
             return $htmlErro;
-
         } else {
 
             $GLOBALS["_SESSION"]["QRCODE"] = $resposta['payload']; //text-left  
@@ -160,7 +157,6 @@ class classPIX
 
             return $html;
         }
-
     } //end function callService
 
     private function sendJSON($nome, $cpf, $valor, $vendaId, $email = "")
@@ -224,7 +220,33 @@ class classPIX
         $logEntry .= "Response:\n$response\n";
         $logEntry .= "HTTP Status Code: $httpCode\n";
 
-        file_put_contents("/www/arquivos_gerados/logs/Asaas_PIX.txt", $logEntry, FILE_APPEND);
+        $logDir = "/www/arquivos_gerados/logs";
+        $logFile = $logDir . "/Asaas_PIX.txt";
+
+        // Garante que o diretório exista
+        if (!is_dir($logDir)) {
+            if (!mkdir($logDir, 0777, true)) {
+                throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+            }
+        }
+
+        // Garante extensão .txt
+        if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'txt') {
+            throw new Exception("Extensão inválida para arquivo de log.");
+        }
+
+        // Impede path traversal
+        if (strpos($logFile, '..') !== false) {
+            throw new Exception("Caminho inválido detectado.");
+        }
+
+        // Conteúdo do log (mantido conforme seu uso atual)
+        $entry = $logEntry . PHP_EOL;
+
+        // Escreve com segurança
+        if (file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX) === false) {
+            throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+        }
 
         // Converte a resposta JSON para um array associativo
         $data = json_decode($response, true);
@@ -237,10 +259,6 @@ class classPIX
         }
 
         return $data;
-
-    }//end function sendjson
+    } //end function sendjson
 
 } //end class classPIX
-
-
-?>

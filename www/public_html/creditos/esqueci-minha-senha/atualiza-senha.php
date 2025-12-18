@@ -1,87 +1,106 @@
 <?php
 
-	if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['checked'] === 'true') {
-		 // Log dos dados recebidos no POST
-		 $arquivoLogPost = '/www/arquivos_gerados/logs/logPostData_pdv.log';
-		 salvarLog($arquivoLogPost, $_POST);
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['checked'] === 'true') {
+	// Log dos dados recebidos no POST
+	$arquivoLogPost = '/www/arquivos_gerados/logs/logPostData_pdv.log';
+	salvarLog($arquivoLogPost, $_POST);
 
-		 $dadosPost = print_r($_POST, true);
-   		 error_log("Dados recebidos no POST:\n" . $dadosPost);
-		require_once "/www/db/connect.php";
-		require_once "/www/db/ConnectionPDO.php";
-		
-		require_once 'functions-esqueci-minha-senha.php';
-		
-		$novaSenha = $_POST['novaSenha'];
-		$confirmacaoNovaSenha = $_POST['confirmacaoNovaSenha'];
-		$codigoValidacao = $_POST['codigoValidacao'];
-		$origemUsuario = $_POST['origemUsuario'];
+	$dadosPost = print_r($_POST, true);
+	error_log("Dados recebidos no POST:\n" . $dadosPost);
+	require_once "/www/db/connect.php";
+	require_once "/www/db/ConnectionPDO.php";
 
-		// Verifica se as senhas coincidem
-		if ($novaSenha === $confirmacaoNovaSenha) {
-			
-			$validacaoSenha = validarSenha($confirmacaoNovaSenha);
-			
-			if ($validacaoSenha == 'true') {
-				
-				$novaSenhaCriptografada = criptografaSenha($confirmacaoNovaSenha);
-				
-				$dadosUsuario = capturaDadosSolicitacao($codigoValidacao, $origemUsuario);
-				
-				$idUsuario = $dadosUsuario[0]['ug_id'];
-				$idIp = $dadosUsuario[0]['ip'];
-				$idDataTrocaSenha = capturaDataHoraAtual();
-				
-				registraNovaSenha($novaSenhaCriptografada, $idUsuario);
-				
-				defineStatusSenhaAtualizada($codigoValidacao);
-	
-				atualizaHistoricoCliente($idUsuario, $idIp, $idDataTrocaSenha);
-				
-				$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log';
-				
-				$mensagemLog = "C�DIGO: {$codigoValidacao} -- A senha foi atualizada";
-				
-				geraLogAtualizaSolicitacao($arquivoLog, $mensagemLog);
-				
-				redirecionaSucesso();
-				
-			} else {
-				
-				capturaDadosSolicitacao($codigoValidacao, $origemUsuario);
-				
-				defineStatusErro($codigoValidacao);
-				
-				$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log'; 
-				
-				$mensagemLog = 'For�ou entrada de uma senha fora do padr�o';
-				
-				geraLogAtualizaSolicitacao($arquivoLog, $mensagemLog);
-				
-				redirecionaAcessoNaoAutorizado();
-				
-			}
-		} else {
-			
-			defineStatusErro($codigoValidacao);
-			
-			$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log'; 
-			
-			$mensagemLog = 'For�ou a entrada de duas senhas que n�o coincidem';
-				
+	require_once 'functions-esqueci-minha-senha.php';
+
+	$novaSenha = $_POST['novaSenha'];
+	$confirmacaoNovaSenha = $_POST['confirmacaoNovaSenha'];
+	$codigoValidacao = $_POST['codigoValidacao'];
+	$origemUsuario = $_POST['origemUsuario'];
+
+	// Verifica se as senhas coincidem
+	if ($novaSenha === $confirmacaoNovaSenha) {
+
+		$validacaoSenha = validarSenha($confirmacaoNovaSenha);
+
+		if ($validacaoSenha == 'true') {
+
+			$novaSenhaCriptografada = criptografaSenha($confirmacaoNovaSenha);
+
+			$dadosUsuario = capturaDadosSolicitacao($codigoValidacao, $origemUsuario);
+
+			$idUsuario = $dadosUsuario[0]['ug_id'];
+			$idIp = $dadosUsuario[0]['ip'];
+			$idDataTrocaSenha = capturaDataHoraAtual();
+
+			registraNovaSenha($novaSenhaCriptografada, $idUsuario);
+
+			defineStatusSenhaAtualizada($codigoValidacao);
+
+			atualizaHistoricoCliente($idUsuario, $idIp, $idDataTrocaSenha);
+
+			$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log';
+
+			$mensagemLog = "CODIGO: {$codigoValidacao} -- A senha foi atualizada";
+
 			geraLogAtualizaSolicitacao($arquivoLog, $mensagemLog);
-			
+
+			redirecionaSucesso();
+		} else {
+
+			capturaDadosSolicitacao($codigoValidacao, $origemUsuario);
+
+			defineStatusErro($codigoValidacao);
+
+			$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log';
+
+			$mensagemLog = 'Forçou entrada de uma senha fora do padrao';
+
+			geraLogAtualizaSolicitacao($arquivoLog, $mensagemLog);
+
 			redirecionaAcessoNaoAutorizado();
-			
 		}
 	} else {
-		
+
+		defineStatusErro($codigoValidacao);
+
+		$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log';
+
+		$mensagemLog = 'Forçou a entrada de duas senhas que não coincidem';
+
+		geraLogAtualizaSolicitacao($arquivoLog, $mensagemLog);
+
 		redirecionaAcessoNaoAutorizado();
-		
+	}
+} else {
+
+	redirecionaAcessoNaoAutorizado();
+}
+
+function salvarLog($arquivoLog, $dados)
+{
+	// 1. Extensão deve ser .log
+	if (pathinfo($arquivoLog, PATHINFO_EXTENSION) !== 'log') {
+		throw new Exception("Extensão inválida para arquivo de log.");
 	}
 
-	function salvarLog($arquivoLog, $dados) {
-		$dataAtual = date("Y-m-d H:i:s");
-		$mensagem = "[{$dataAtual}] " . print_r($dados, true) . PHP_EOL;
-		file_put_contents($arquivoLog, $mensagem, FILE_APPEND);
+	// 2. Impede tentativa de path traversal
+	if (strpos($arquivoLog, '..') !== false) {
+		throw new Exception("Caminho inválido detectado.");
 	}
+
+	// 3. Gera o conteúdo JSON
+	$logData = [
+		'timestamp' => date("Y-m-d H:i:s"),
+		'data'      => $dados
+	];
+
+	$logEntry = json_encode(
+		$logData,
+		JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+	) . PHP_EOL;
+
+
+	if (file_put_contents($arquivoLog, $logEntry, FILE_APPEND | LOCK_EX) === false) {
+		throw new Exception("Falha ao escrever no arquivo de log: $arquivoLog");
+	}
+}

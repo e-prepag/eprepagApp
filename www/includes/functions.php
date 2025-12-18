@@ -40,42 +40,41 @@ function getEnvVariable($varName)
 	return $value;
 }
 
-function consultarGeoIP($ip) {
-	if($ip == 'Desconhecido')
-	{
+function consultarGeoIP($ip)
+{
+	if ($ip == 'Desconhecido') {
 		return false;
 	}
-    $url = "https://api.hgbrasil.com/geoip";
-    
-    $params = http_build_query([
-        'address' => $ip,
-        'key' => getenv('GEOIP_KEY')
-    ]);
+	$url = "https://api.hgbrasil.com/geoip";
 
-    $full_url = $url . '?' . $params;
+	$params = http_build_query([
+		'address' => $ip,
+		'key' => getenv('GEOIP_KEY')
+	]);
 
-    $ch = curl_init();
+	$full_url = $url . '?' . $params;
 
-    curl_setopt($ch, CURLOPT_URL, $full_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-    
-    $response = curl_exec($ch);
+	$ch = curl_init();
 
-    if (curl_errno($ch)) {
-        echo 'Erro cURL: ' . curl_error($ch) . "\n";
-        curl_close($ch);
-        return false;
-    }
+	curl_setopt($ch, CURLOPT_URL, $full_url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    curl_close($ch);
+	$response = curl_exec($ch);
+
+	if (curl_errno($ch)) {
+		echo 'Erro cURL: ' . curl_error($ch) . "\n";
+		curl_close($ch);
+		return false;
+	}
+
+	curl_close($ch);
 	$result = json_decode($response, true);
-	if(!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0)
-	{
+	if (!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0) {
 		return false;
 	}
-    return $result;
+	return $result;
 }
 
 // Funï¿½ï¿½o de execuï¿½ï¿½o de Instruï¿½ï¿½o no DB
@@ -115,13 +114,35 @@ function SQLexecuteQuery($sql)
 		// Linha de separação para melhorar a legibilidade
 		$separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
 
-		// Caminho do arquivo de log
-		$logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
+		$logDir = '/www/arquivos_gerados/logs/sql_logs';
+		$logFile = $logDir . '/logs_' . date('d_m_y') . '.log';
 
-		// Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
-		file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
+		// Garante que o diretório exista
+		if (!is_dir($logDir)) {
+			if (!mkdir($logDir, 0777, true)) {
+				throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+			}
+		}
+
+		// Garante extensão .log
+		if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+			throw new Exception("Extensão inválida para arquivo de log.");
+		}
+
+		// Impede path traversal
+		if (strpos($logFile, '..') !== false) {
+			throw new Exception("Caminho inválido detectado.");
+		}
+
+		// Conteúdo formatado do log
+		$entry = PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL;
+
+		// Escreve com segurança
+		if (file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX) === false) {
+			throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+		}
 	}
-	
+
 	return $ret;
 } //end function SQLexecuteQuery($sql)
 

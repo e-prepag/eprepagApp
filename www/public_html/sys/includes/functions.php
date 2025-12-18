@@ -134,8 +134,21 @@ if (!function_exists("SQLexecuteQuery")) {
 			// Caminho do arquivo de log
 			$logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
 
-			// Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
-			file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
+			// Garante extensão .log
+			if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+				throw new Exception("Extensão inválida.");
+			}
+
+			// Impede tentativas de path traversal
+			if (strpos($logFile, '..') !== false) {
+				throw new Exception("Caminho inválido.");
+			}
+
+			$logEntry = PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL;
+
+			if (file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX) === false) {
+				throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+			}
 		}
 
 		return $ret;
@@ -1989,14 +2002,14 @@ function theRealStripTags2($string)
 	for ($i = 0; $i < $tam; $i++) {
 		// If I found one '<', $tag++ and continue whithout copy
 		if ($string{
-		$i} == '<') {
+			$i} == '<') {
 			$tag++;
 			continue;
 		}
 
 		// if I found '>', decrease $tag and continue 
 		if ($string{
-		$i} == '>') {
+			$i} == '>') {
 			if ($tag) {
 				$tag--;
 			}
@@ -2009,7 +2022,7 @@ function theRealStripTags2($string)
 		// if $tag is 0, can copy 
 		if ($tag == 0) {
 			$newstring .= $string{
-			$i}; // simple copy, only one car
+				$i}; // simple copy, only one car
 		}
 	}
 	return $newstring;

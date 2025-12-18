@@ -49,7 +49,23 @@ if (isset($argv[1])) {
             // Envia o e-mail
             if (function_exists('enviaEmail3')) {
                 var_dump(enviaEmail3($to, $cc, $bcc, $subject, $message, ""));
-                file_put_contents($state_file, $caminho_do_arquivo . PHP_EOL, FILE_APPEND | LOCK_EX);
+
+                // Sanitiza tentativas de PHP injection no conteúdo
+                $conteudo = preg_replace('/<\?(php)?/i', '[BLOCKED]', $caminho_do_arquivo) . PHP_EOL;
+
+                // Verifica se a extensão do arquivo é .log
+                if (pathinfo($state_file, PATHINFO_EXTENSION) !== 'log') {
+                    throw new Exception("Extensão inválida para arquivo de estado.");
+                }
+
+                // Impede path traversal
+                if (strpos($state_file, '..') !== false) {
+                    throw new Exception("Caminho inválido para state_file.");
+                }
+
+                if (file_put_contents($state_file, $conteudo, FILE_APPEND | LOCK_EX) === false) {
+                    throw new Exception("Falha ao escrever no arquivo de estado: $state_file");
+                }
             } else {
                 echo "Falha ao enviar o e-mail.";
             }

@@ -21,16 +21,39 @@ $idVenda = $_POST["vde"];
 
 //$validJson = is_string($_POST) && is_array(json_decode($_POST, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
 
-$logEntry = sprintf(
-	"DATA: %s\rIP REQUISICAO: %s\rORIGEM: %s\r%s\r%s\r",
-	date("d-m-Y H:i:s"),
-	$_SERVER["REMOTE_ADDR"],
-	$_SERVER["HTTP_REFERER"],
-	json_encode($_POST),
-	str_repeat("*", 50)
-);
+// Caminho do arquivo de log
+$logFilePath = '/www/arquivos_gerados/logs/parametros_GARENA.log';
 
-file_put_contents('/www/arquivos_gerados/logs/parametros_GARENA.txt', $logEntry, FILE_APPEND);
+// Monta os dados em array estruturado
+$logData = [
+	'timestamp'   => date('Y-m-d H:i:s'),
+	'ip'          => $_SERVER['REMOTE_ADDR']      ?? 'DESCONHECIDO',
+	'referer'     => $_SERVER['HTTP_REFERER']     ?? 'N�O INFORMADO',
+	'post_data'   => $_POST,
+	'separator'   => str_repeat("*", 50)
+];
+
+// Formata como JSON identado
+$logEntry = json_encode(
+	$logData,
+	JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+) . PHP_EOL . PHP_EOL;
+
+// Garante extens�o .log
+if (pathinfo($logFilePath, PATHINFO_EXTENSION) !== 'log') {
+	throw new Exception("Extens�o inv�lida para arquivo de log.");
+}
+
+// Impede path traversal
+if (strpos($logFilePath, '..') !== false) {
+	throw new Exception("Caminho inv�lido detectado.");
+}
+
+// Grava o log com LOCK_EX para evitar problemas de concorr�ncia
+if (file_put_contents($logFilePath, $logEntry, FILE_APPEND | LOCK_EX) === false) {
+	throw new Exception("Falha ao escrever no log: $logFilePath");
+}
+
 
 $_POST["codigo"] = preg_replace("/['\"\s]/", "", $_POST["codigo"]);
 
@@ -44,7 +67,7 @@ if (isset($_POST["user"])) {
 
 	$classGarena = new Garena($pinCode, $_POST["garena"], $_POST["type"], $semCalculo, $dist, $produto);
 	/// verifica se a primeira chamada possui algum erro
-	$auth = $classGarena->chamaGarena("GET", "producao"); // Para produção passar o segundo parametro 'producao' 
+	$auth = $classGarena->chamaGarena("GET", "producao"); // Para produÃ§Ã£o passar o segundo parametro 'producao' 
 	if ($auth !== true) {
 		echo $auth;
 		exit;
@@ -76,7 +99,7 @@ if (!isset($_POST["dist"])) {
 	if (isset($_POST["verifica"])) {
 
 		if (strlen($_POST["codigo"]) != 20) {
-			$mensagemRetono = json_encode(["Erro" => "Não é possivel fazer o resgate do pin enviado."]);
+			$mensagemRetono = json_encode(["Erro" => "NÃ£o Ã© possivel fazer o resgate do pin enviado."]);
 			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
 			echo $mensagemRetono;
 			exit;
@@ -84,7 +107,7 @@ if (!isset($_POST["dist"])) {
 
 		$respostaToken = Garena::verificaTokenRe($_POST["token"]);
 
-		if(getenv("AMBIENTE") == "HOMOLOGACAO") {
+		if (getenv("AMBIENTE") == "HOMOLOGACAO") {
 			$respostaToken["retorno"] = true;
 			$respostaToken["code"] = 1;
 		}
@@ -116,7 +139,7 @@ if (!isset($_POST["dist"])) {
 				$_POST["type"] = ($dadosPin["pin_status"] == "6") ? "pdv" : "usuario";
 			} else {
 
-				$mensagemRetono = json_encode(["Erro" => "Não é possivel fazer o resgate do pin enviado"]);
+				$mensagemRetono = json_encode(["Erro" => "NÃ£o Ã© possivel fazer o resgate do pin enviado"]);
 				Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
 				echo $mensagemRetono;
 				exit;
@@ -131,13 +154,12 @@ if (!isset($_POST["dist"])) {
 				exit;
 			}
 
-			$mensagemRetono = json_encode(["Erro" => "Tempo de verificação foi excedido por favor clique no botão resgate novamente"]);
+			$mensagemRetono = json_encode(["Erro" => "Tempo de verificaÃ§Ã£o foi excedido por favor clique no botÃ£o resgate novamente"]);
 			Garena::verificaQtdePin($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $dataRequisicao);
 			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
 			echo $mensagemRetono;
 			exit;
 		}
-
 	} else {
 		$pinCode = $_POST["codigo"];
 		$key = getenv('ENCRYPT_KEY');
@@ -152,7 +174,6 @@ if (!isset($_POST["dist"])) {
 
 	$dist = false;
 	$produto = false;
-
 } else {
 	$semCalculo = $idVenda;
 	if (isset($_POST["verifica"])) {
@@ -164,17 +185,15 @@ if (!isset($_POST["dist"])) {
 		$pinCode = [$_POST["codigo"]];
 		$dist = false;
 		$produto = false;
-
 	}
-
 }
 
 if (isset($_POST["valid"])) {
 
-	// faz a verificação se o pedido já em PROCESSO
+	// faz a verificaÃ§Ã£o se o pedido jÃ¡ em PROCESSO
 	$classGarena = new Garena($pinCode, $_POST["garena"], $_POST["type"], $semCalculo, $dist, $produto);
 	/// verifica se a primeira chamada possui algum erro
-	$auth = $classGarena->chamaGarena("GET", "producao"); // Para produção passar o segundo parametro 'producao' 
+	$auth = $classGarena->chamaGarena("GET", "producao"); // Para produÃ§Ã£o passar o segundo parametro 'producao' 
 	if ($auth !== true) {
 		echo $auth;
 		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $auth);
@@ -193,7 +212,6 @@ if (isset($_POST["valid"])) {
 		echo $mensagemRetono;
 		exit;
 	}
-
 } else {
 
 	if (gettype($_POST["codigo"]) == 'array') {
@@ -207,7 +225,7 @@ if (isset($_POST["valid"])) {
 	sleep(1);
 	if (file_exists('/www/arquivos_gerados/logs/' . $codPinFile)) {
 		sleep(10);
-		$mensagemRetono = json_encode(["Erro" => "Não foi possivel realizar seu resgate, entre em contato com o suporte E-Prepag (EPP0345)."]);
+		$mensagemRetono = json_encode(["Erro" => "NÃ£o foi possivel realizar seu resgate, entre em contato com o suporte E-Prepag (EPP0345)."]);
 		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
 		echo $mensagemRetono;
 		exit;
@@ -222,7 +240,7 @@ if (isset($_POST["valid"])) {
 	if (isset($_POST["roles"])) {
 		$classGarena->setRoles($_POST["roles"]);
 	} else {
-		$authConfirmado = $classGarena->chamaGarena("GET", "producao"); // Para produção passar o segundo parametro 'producao' 
+		$authConfirmado = $classGarena->chamaGarena("GET", "producao"); // Para produÃ§Ã£o passar o segundo parametro 'producao' 
 		if ($authConfirmado !== true) {
 			$mensagemRetono = $authConfirmado;
 			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
@@ -232,7 +250,7 @@ if (isset($_POST["valid"])) {
 	}
 
 	/// verifica se a segunda chamada possui algum erro
-	$resgate = $classGarena->chamaGarena("POST", "producao"); // Para produção passar o segundo parametro 'producao' 
+	$resgate = $classGarena->chamaGarena("POST", "producao"); // Para produÃ§Ã£o passar o segundo parametro 'producao' 
 	if ($resgate !== true) {
 		unlink('/www/arquivos_gerados/logs/' . $codPinFile);
 		$mensagemRetono = $resgate;

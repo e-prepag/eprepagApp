@@ -72,7 +72,7 @@ try {
 
             //Linha de código para verificar se o usuário gamer aceitou os termos de uso, caso não tenha aceitado, redireciona para a página de aceite de termos
             //Caso não aceite, ele não poderá acessar o sistema logado
-            if(isset($_SESSION['acessou_pag_termos']) && $_SESSION['acessou_pag_termos'] === true && $_SERVER['PHP_SELF'] !== '/game/aceite_termos.php') {
+            if (isset($_SESSION['acessou_pag_termos']) && $_SESSION['acessou_pag_termos'] === true && $_SERVER['PHP_SELF'] !== '/game/aceite_termos.php') {
                 $_SESSION['usuarioGames_ser'] = null;
                 $_SESSION['acessou_pag_termos'] = null;
                 header("Refresh:0");
@@ -105,21 +105,66 @@ try {
         }
 
         salvar_log_req($pdo, $id_usuario_gamer);
-
     }
-
 } catch (Exception $ex) {
 
-    $logFile = '/www/arquivos_gerados/logs/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
-    $logMessage = date('Y-m-d H:i:s') . " | Exception: " . $ex->getMessage() . PHP_EOL;
-    file_put_contents($logFile, $logMessage, FILE_APPEND);
+    $logDir = '/www/arquivos_gerados/logs';
+    $logFile = $logDir . '/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
 
+    // Garante que o diretório exista
+    if (!is_dir($logDir)) {
+        if (!mkdir($logDir, 0777, true)) {
+            throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+        }
+    }
+
+    // Garante extensão .log
+    if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão inválida para arquivo de log.");
+    }
+
+    // Impede path traversal
+    if (strpos($logFile, '..') !== false) {
+        throw new Exception("Caminho inválido detectado.");
+    }
+
+    // Mensagem de log (mantida conforme seu uso)
+    $logMessage = date('Y-m-d H:i:s') . " | Exception: " . $ex->getMessage() . PHP_EOL;
+
+    // Escreve com segurança
+    if (file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX) === false) {
+        throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+    }
 } catch (PDOException $ex) {
 
-    $logFile = '/www/arquivos_gerados/logs/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
-    $logMessage = date('Y-m-d H:i:s') . " | PDOException: " . $ex->getMessage() . PHP_EOL;
-    $logMessage .= "Trace: " . $ex->getTraceAsString() . PHP_EOL; // Inclui o rastreamento da exceção
-    file_put_contents($logFile, $logMessage, FILE_APPEND);
+    $logDir = '/www/arquivos_gerados/logs';
+    $logFile = $logDir . '/erro_log_acoes_gamer_' . date('Y-m-d') . '.log';
+
+    // Garante que o diretório exista
+    if (!is_dir($logDir)) {
+        if (!mkdir($logDir, 0777, true)) {
+            throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+        }
+    }
+
+    // Garante extensão .log
+    if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão inválida para arquivo de log.");
+    }
+
+    // Impede path traversal
+    if (strpos($logFile, '..') !== false) {
+        throw new Exception("Caminho inválido detectado.");
+    }
+
+    // Monta a mensagem completa do log
+    $logMessage  = date('Y-m-d H:i:s') . " | PDOException: " . $ex->getMessage() . PHP_EOL;
+    $logMessage .= "Trace: " . $ex->getTraceAsString() . PHP_EOL . PHP_EOL;
+
+    // Escreve com segurança
+    if (file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX) === false) {
+        throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+    }
 }
 
 $sessId = session_id();
@@ -138,8 +183,7 @@ class HeaderController
     public $objBanners;
     public $usuario;
     public $logado = false;
-    private $_loginRedirect = array
-    (
+    private $_loginRedirect = array(
         "/game/pedido/deposito.php",
         "/game/pedido/deposito-informado.php",
         "/game/pedido/finalizado.php",
@@ -223,7 +267,6 @@ class HeaderController
                 validaSessao();
             }
         }
-
     }
 }
 function salvar_log_req($pdo, $usuario_id, $blacklist = null)

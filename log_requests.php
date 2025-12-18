@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AUTO PREPEND SECURITY LAYER
  * Impede execução de arquivos suspeitos ou localizados em diretórios perigosos
@@ -121,7 +122,7 @@ $hora_atual = (int)date('G');
 
 // Divide a hora por 6 para descobrir o bloco (0, 1, 2, ou 3)
 // (PHP trata a divisão de inteiros e arredonda para baixo)
-$bloco_do_dia = (int)($hora_atual / 6); 
+$bloco_do_dia = (int)($hora_atual / 6);
 
 // Monta o nome do arquivo usando a data E o bloco
 $LOG_FILE_PATH = '/www/arquivos_gerados/logs/requests-' . date('Y-m-d') . '-bloco-' . $bloco_do_dia . '.log';
@@ -130,10 +131,24 @@ $LOG_OWNER_GROUP = 'www-data'; // Grupo que DEVE ser o dono
 
 $SENSITIVE_KEYS = [
     // Lista de chaves a serem filtradas
-    'password', 'passw', 'senha', 'key', 'pwd', 'token',
-    'authorization', 'auth', 'access_token', 'secret',
-    'credit_card', 'cc', 'card_number', 'cvv', 'ssn',
-    'cpf', 'passmestra', 'g-recaptcha-response'
+    'password',
+    'passw',
+    'senha',
+    'key',
+    'pwd',
+    'token',
+    'authorization',
+    'auth',
+    'access_token',
+    'secret',
+    'credit_card',
+    'cc',
+    'card_number',
+    'cvv',
+    'ssn',
+    'cpf',
+    'passmestra',
+    'g-recaptcha-response'
 ];
 // ---------------------
 
@@ -191,7 +206,7 @@ try {
     if (php_sapi_name() === 'cli') {
         // --- É UM CRON OU EXECUÇÃO CLI ---
         global $argv; // Garante que $argv esteja no escopo
-        
+
         $logData['type'] = 'CLI';
         $logData['user'] = $_SERVER['USER'] ?: (function_exists('posix_getpwuid') ? posix_getpwuid(posix_geteuid())['name'] : 'unknown');
         $logData['script'] = $_SERVER['SCRIPT_FILENAME'] ?: 'N/A';
@@ -208,7 +223,7 @@ try {
         // Filtra dados da requisição (GET, POST, COOKIE)
         $logData['get_params'] = filter_sensitive_data($_GET, $SENSITIVE_KEYS);
         $logData['post_params'] = filter_sensitive_data($_POST, $SENSITIVE_KEYS);
-        
+
         // Captura o "corpo" da requisição (ex: JSON)
         $rawBody = file_get_contents('php://input');
         $jsonBody = json_decode($rawBody, true);
@@ -246,12 +261,22 @@ try {
     }
 
     // 6. Formata a entrada do log
-    $logEntry = json_encode($logData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . PHP_EOL;
+    $logEntry = json_encode($logData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL;
 
-    // 7. Escreve no arquivo de log
+    $fileExists = file_exists($LOG_FILE_PATH);
+
+    // Garante extensão .log
+    if (pathinfo($LOG_FILE_PATH, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão inválida.");
+    }
+
+    // Impede path traversal
+    if (strpos($LOG_FILE_PATH, '..') !== false) {
+        throw new Exception("Caminho inválido.");
+    }
+
     if (file_put_contents($LOG_FILE_PATH, $logEntry, FILE_APPEND | LOCK_EX) === false) {
-        // Se a escrita falhar, registra e para
-        throw new Exception("Falha ao escrever no log: $LOG_FILE_PATH");
+        throw new Exception("Falha ao escrever no log de performance: $LOG_FILE_PATH");
     }
 
     // 8. --- CORREÇÃO DE PERMISSÃO NA CRIAÇÃO ---
@@ -267,9 +292,7 @@ try {
             @chgrp($LOG_FILE_PATH, $LOG_OWNER_GROUP);
         }
     }
-
 } catch (Exception $e) {
     // Se algo falhar (ex: permissão de escrita), registra no log de erros do PHP
     error_log('Falha no Prepend Logger: ' . $e->getMessage());
 }
-?>

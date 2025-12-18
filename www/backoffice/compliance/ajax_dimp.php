@@ -3148,12 +3148,38 @@ echo $msg;
 
 $output = ob_get_clean();
 
-$dir = "/www/dimp/" . date('Ymd') . "/";
+$baseDir = "/www/arquivos_gerados/dimp";
+$dayFolder = $baseDir . "/" . date('Ymd');
+$logFile = $dayFolder . "/result_" . $id_request . ".txt";
 
-// cria a pasta se não existir
-if (!is_dir($dir)) {
-    mkdir($dir, 0777, true);
+// Impede ID malicioso no nome do arquivo
+if (!preg_match('/^[a-zA-Z0-9_-]+$/', $id_request)) {
+    throw new Exception("ID de request inválido.");
 }
-// Salva no arquivo de log
-file_put_contents("/www/arquivos_gerados/dimp/" . date('Ymd') . "/result_" . $id_request . ".txt", $output, FILE_APPEND);
+
+// Garante que o diretório existe
+if (!is_dir($dayFolder)) {
+    if (!mkdir($dayFolder, 0777, true)) {
+        throw new Exception("Não foi possível criar o diretório: $dayFolder");
+    }
+}
+
+// Garante extensão .txt
+if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'txt') {
+    throw new Exception("Extensão inválida para o arquivo.");
+}
+
+// Impede path traversal
+if (strpos($logFile, '..') !== false) {
+    throw new Exception("Caminho inválido detectado.");
+}
+
+// Conteúdo a ser escrito (sem alterações, conforme seu uso)
+$logEntry = $output . PHP_EOL;
+
+// Escreve usando LOCK_EX
+if (file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX) === false) {
+    throw new Exception("Falha ao escrever no arquivo: $logFile");
+}
+
 ?>

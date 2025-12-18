@@ -1,44 +1,65 @@
 <?php
-header("Content-Type: text/html; charset=ISO-8859-1",true);
-// Pré-Processamento para fechamento financeiro
+header("Content-Type: text/html; charset=ISO-8859-1", true);
+// PrÃ©-Processamento para fechamento financeiro
 // financial_processing.php 
 // - Processa totais por publisher, dia e canal
 
-error_reporting(E_ALL); 
-ini_set("display_errors", 1); 
-function logProcessamento($mensagem) {
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+function logProcessamento($mensagem)
+{
     $data = date("Y-m-d H:i:s");
-    $pastaLogs = "logs"; // Pasta onde os logs serão armazenados
-    $arquivo = "$pastaLogs/log_" . date("Y-m-d") . ".txt";
+    $pastaLogs = __DIR__ . "/logs";
+    $arquivo = "$pastaLogs/log_" . date("Y-m-d") . ".log";
 
-    // Cria a pasta 'logs' se não existir
-    if (!is_dir($pastaLogs)) {
-        mkdir($pastaLogs, 0777, true);
+    // Impede path traversal
+    if (strpos($arquivo, '..') !== false) {
+        throw new Exception("Caminho de log inválido.");
     }
 
-    // Formata a mensagem com data e quebra de linha
-    $mensagemFormatada = "[$data] $mensagem" . PHP_EOL;
+    // Garante extensão .log
+    if (pathinfo($arquivo, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão de arquivo inválida.");
+    }
 
-    // Escreve no arquivo (cria se não existir)
-    file_put_contents($arquivo, $mensagemFormatada, FILE_APPEND);
+    // Cria a pasta de logs com permissão segura
+    if (!is_dir($pastaLogs)) {
+        mkdir($pastaLogs, 0755, true);
+    }
+
+    // Sanitiza a mensagem contra tentativa de injeção PHP
+    $mensagem = preg_replace('/<\?(php)?/i', '[BLOCKED]', $mensagem);
+
+    // Log estruturado
+    $logData = [
+        'timestamp' => $data,
+        'message'   => $mensagem
+    ];
+
+    // JSON legível e seguro
+    $logEntry = json_encode($logData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL;
+
+    // Escreve com lock
+    if (file_put_contents($arquivo, $logEntry, FILE_APPEND | LOCK_EX) === false) {
+        throw new Exception("Falha ao escrever no log: $arquivo");
+    }
 }
 
 $raiz_do_projeto = "/www/";
 require_once "/www/includes/main.php";
-require_once $raiz_do_projeto . "includes/gamer/main.php"; 
+require_once $raiz_do_projeto . "includes/gamer/main.php";
 
-//Esse ID é concatenado no inicio de cada id da operação('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
-$ARRAY_CONCATENA_ID_VENDA = array
-                                    (
-                                        'gamer'          => '10',
-                                        'pdv'            => '20',
-                                        'cards'          => '30',
-                                        'boleto_express' => '40'
-                                    );
+//Esse ID Ã© concatenado no inicio de cada id da operaÃ§Ã£o('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
+$ARRAY_CONCATENA_ID_VENDA = array(
+    'gamer'          => '10',
+    'pdv'            => '20',
+    'cards'          => '30',
+    'boleto_express' => '40'
+);
 
 $time_start_stats = getmicrotime();
 
-//Buscando Publisher que possuem totalização por utilização
+//Buscando Publisher que possuem totalizaÃ§Ã£o por utilizaÃ§Ã£o
 //$vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 // { [13]=> string(22) "2015-08-16 00:00:00-03" [124]=> string(22) "2018-08-28 00:00:00-03" [137]=> string(22) "2018-10-16 00:00:00-03" [143]=> string(22) "2020-01-07 00:00:00-03" [147]=> string(22) "2019-11-30 00:00:00-03" [148]=> string(22) "2020-07-31 00:00:00-03" }
 
@@ -53,17 +74,17 @@ $escolhe = $_GET['i'];
 $vetorPublisherPorUtilizacao = $oar[$escolhe]; // 
 $opr_id = 0;
 // $vetorPublisherPorUtilizacao ;
-if(count($vetorPublisherPorUtilizacao)>0) {
+if (count($vetorPublisherPorUtilizacao) > 0) {
     $where_opr_venda_lan = " AND ( CASE ";
     $where_opr_venda_lan_negativa = " AND ( CASE ";
     $where_opr_utilizacao_lan = " AND ( CASE ";
-    foreach ($vetorPublisherPorUtilizacao as $opr_codigo => $opr_data_inicio_contabilizacao_utilizacao){ 
+    foreach ($vetorPublisherPorUtilizacao as $opr_codigo => $opr_data_inicio_contabilizacao_utilizacao) {
         //echo "ID: ".$opr_codigo." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
-		$opr_id = $opr_codigo;
-        $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ";
-        $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ";
-        $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ";
-    }//end foreach
+        $opr_id = $opr_codigo;
+        $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+        $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+        $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+    } //end foreach
     $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
     $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
     $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
@@ -72,14 +93,14 @@ else {
     $where_opr_venda_lan = "";
     $where_opr_venda_lan_negativa = "";
     $where_opr_utilizacao_lan = "";
-}//end else do if(count($vetorPublisherPorUtilizacao)>0)
+} //end else do if(count($vetorPublisherPorUtilizacao)>0)
 
 $msg = "";
 
-$verificaOpr = (count($vetorPublisherPorUtilizacao)>0)?" and vgm_opr_codigo = $opr_id":" and vgm_opr_codigo not in(124,137,143,147,148,13)";
+$verificaOpr = (count($vetorPublisherPorUtilizacao) > 0) ? " and vgm_opr_codigo = $opr_id" : " and vgm_opr_codigo not in(124,137,143,147,148,13)";
 
-echo PHP_EOL.str_repeat("=", 80).PHP_EOL."Pre-Processamento para fechamento financeiro (".date("Y-m-d H:i:s").")".PHP_EOL.PHP_EOL;
-logProcessamento("Pre-Processamento para fechamento financeiro (".date("Y-m-d H:i:s").")");
+echo PHP_EOL . str_repeat("=", 80) . PHP_EOL . "Pre-Processamento para fechamento financeiro (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . PHP_EOL;
+logProcessamento("Pre-Processamento para fechamento financeiro (" . date("Y-m-d H:i:s") . ")");
 $garena = "SELECT 
     pin_datavenda AS dia,
     canal,
@@ -176,214 +197,213 @@ $rs = SQLexecuteQuery($garena);
 $n_updates = pg_num_rows($rs);
 //echo "Encontrado".(($n_updates>1)?"s":"")." : ".$n_updates." Registro".(($n_updates>1)?"s":"")." para serem verifidos e atualizados".PHP_EOL.PHP_EOL;
 
-if(!$rs || pg_num_rows($rs) == 0) {
-        $msg = "Nenhum usuários selecionado
+if (!$rs || pg_num_rows($rs) == 0) {
+    $msg = "Nenhum usuÃ¡rios selecionado
 ";
 } else {
-	while($rs_row = pg_fetch_array($rs)) {
-            $sql = "
+    while ($rs_row = pg_fetch_array($rs)) {
+        $sql = "
                 select * 
                 from financial_processing 
-                where fp_channel = '".$rs_row['canal']."'
-                    and fp_publisher = ".$rs_row['publisher']."
-                    and fp_date = '".$rs_row['dia']."' ;";
-            echo(" ========= <br> ".$rs_row['dia']);
-            $rs_existe = SQLexecuteQuery($sql);
-            logProcessamento("Dia: ".$rs_row['dia']);
-            logProcessamento($sql);
-            $n_existente  = pg_num_rows($rs_existe);
-            echo(" ========= <br>".$n_existente);
-            //Verificando se existe o registrologProcessamento
-            logProcessamento("qtd registros: ". $n_existente);
-            if($n_existente == 1) {
-					
-                $sql = "
+                where fp_channel = '" . $rs_row['canal'] . "'
+                    and fp_publisher = " . $rs_row['publisher'] . "
+                    and fp_date = '" . $rs_row['dia'] . "' ;";
+        echo (" ========= <br> " . $rs_row['dia']);
+        $rs_existe = SQLexecuteQuery($sql);
+        logProcessamento("Dia: " . $rs_row['dia']);
+        logProcessamento($sql);
+        $n_existente  = pg_num_rows($rs_existe);
+        echo (" ========= <br>" . $n_existente);
+        //Verificando se existe o registrologProcessamento
+        logProcessamento("qtd registros: " . $n_existente);
+        if ($n_existente == 1) {
+
+            $sql = "
                     update financial_processing 
-                    set fp_number = ".$rs_row['n'].",
-                        fp_total = ".$rs_row['total'].",
-                        fp_total_order = ".$rs_row['total_order']."
-                    where fp_channel = '".$rs_row['canal']."'
-                        and fp_publisher = ".$rs_row['publisher']."
-                        and fp_date::DATE = '".$rs_row['dia']."' 
+                    set fp_number = " . $rs_row['n'] . ",
+                        fp_total = " . $rs_row['total'] . ",
+                        fp_total_order = " . $rs_row['total_order'] . "
+                    where fp_channel = '" . $rs_row['canal'] . "'
+                        and fp_publisher = " . $rs_row['publisher'] . "
+                        and fp_date::DATE = '" . $rs_row['dia'] . "' 
                         and fp_freeze = 0;";
-               // echo " ========= <br>SQL do Update: <br>".$sql.PHP_EOL;
-                $ret = SQLexecuteQuery($sql);
-                logProcessamento("Update: ".$sql);
-                if(!$ret) echo "";
-            }//end if($n_existente > 0) 
-            //Verificando se existe erro nos dados
-            elseif($n_existente > 1) {
-                echo "ERRO: EXISTEM MAIS DE UM REGISTRO PARA O PERIODO, CANAL E PUBLISHER **********************************************************************************".PHP_EOL;
-            }//end elseif($n_existente > 1)
-            //Inserindo por não existir o registro
-            else {
-                $sql = "
+            // echo " ========= <br>SQL do Update: <br>".$sql.PHP_EOL;
+            $ret = SQLexecuteQuery($sql);
+            logProcessamento("Update: " . $sql);
+            if (!$ret) echo "";
+        } //end if($n_existente > 0) 
+        //Verificando se existe erro nos dados
+        elseif ($n_existente > 1) {
+            echo "ERRO: EXISTEM MAIS DE UM REGISTRO PARA O PERIODO, CANAL E PUBLISHER **********************************************************************************" . PHP_EOL;
+        } //end elseif($n_existente > 1)
+        //Inserindo por nÃ£o existir o registro
+        else {
+            $sql = "
                    INSERT INTO financial_processing (fp_channel, fp_publisher, fp_date, fp_number, fp_total, fp_total_order)
-VALUES ('".$rs_row['canal']."', ".$rs_row['publisher'].", '".$rs_row['dia']."'::DATE, ".$rs_row['n'].", ".$rs_row['total'].", ".$rs_row['total_order'].");
+VALUES ('" . $rs_row['canal'] . "', " . $rs_row['publisher'] . ", '" . $rs_row['dia'] . "'::DATE, " . $rs_row['n'] . ", " . $rs_row['total'] . ", " . $rs_row['total_order'] . ");
                     ";
-                echo " ========= <br> SQL do Insert: <br> ".$sql.PHP_EOL;
-                $ret = SQLexecuteQuery($sql);
-                logProcessamento("insert: ".$sql);
-                if(!$ret) echo "";
-            }//end else do elseif($n_existente > 1)
-	}//end while
+            echo " ========= <br> SQL do Insert: <br> " . $sql . PHP_EOL;
+            $ret = SQLexecuteQuery($sql);
+            logProcessamento("insert: " . $sql);
+            if (!$ret) echo "";
+        } //end else do elseif($n_existente > 1)
+    } //end while
 }//end else do if(!$rs || pg_num_rows($rs) == 0)
 
 /*********************************************************************** 
- * *****   Marcando os períodos a quais empresas pertencem
- * *****   E se houve movimentação de nacional para internacional
+ * *****   Marcando os perÃ­odos a quais empresas pertencem
+ * *****   E se houve movimentaÃ§Ã£o de nacional para internacional
  * *****   INICIO
  ***********************************************************************/
 $sql = "SELECT opr_nome, opr_codigo, opr_vinculo_empresa, substring(opr_data_inicio_operacoes::varchar from 1 for 19) as data_inicio, opr_internacional_alicota FROM operadoras;";
-echo " ========= <br> scrpt select movimentação: ";
-echo " ========= <br>".$sql.PHP_EOL.PHP_EOL;
+echo " ========= <br> scrpt select movimentaÃ§Ã£o: ";
+echo " ========= <br>" . $sql . PHP_EOL . PHP_EOL;
 $rs_publishers = SQLexecuteQuery($sql);
 $n_publishers = pg_num_rows($rs_publishers);
-//echo PHP_EOL.$sql.PHP_EOL.PHP_EOL."Número total de Publisher Selecionados ".$n_publishers.PHP_EOL.PHP_EOL;
+//echo PHP_EOL.$sql.PHP_EOL.PHP_EOL."NÃºmero total de Publisher Selecionados ".$n_publishers.PHP_EOL.PHP_EOL;
 
 
 
 //Verificando se retornou ao menos 1 Publisher
-if($n_publishers > 0) {
-    while($rs_publishers_row = pg_fetch_array($rs_publishers)) {
+if ($n_publishers > 0) {
+    while ($rs_publishers_row = pg_fetch_array($rs_publishers)) {
 
-        //Verificando se Publisher está vinculado à EPP Pagto
-        if($rs_publishers_row['opr_vinculo_empresa'] == 0) {
-            //echo "Publisher ".$rs_publishers_row['opr_nome']." está vinculado à E-Prepag Pagamentos".PHP_EOL;
-            $sql = "UPDATE financial_processing SET fp_company = ".$rs_publishers_row['opr_vinculo_empresa']." WHERE fp_publisher = ".$rs_publishers_row['opr_codigo'].";";
+        //Verificando se Publisher estÃ¡ vinculado Ã  EPP Pagto
+        if ($rs_publishers_row['opr_vinculo_empresa'] == 0) {
+            //echo "Publisher ".$rs_publishers_row['opr_nome']." estÃ¡ vinculado Ã  E-Prepag Pagamentos".PHP_EOL;
+            $sql = "UPDATE financial_processing SET fp_company = " . $rs_publishers_row['opr_vinculo_empresa'] . " WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . ";";
             echo " ========= <br> UPDATE financial_processing: ";
-            echo " ========= <br>".$sql.PHP_EOL;
+            echo " ========= <br>" . $sql . PHP_EOL;
             $rs_update = SQLexecuteQuery($sql);
-            if(!$rs_update) echo "";
+            if (!$rs_update) echo "";
             //Publisher Internacional
-            if($rs_publishers_row['opr_internacional_alicota'] > 0) {
-                $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo'].";";
-                echo " ========= <br> Todos tempos Internacional: ".PHP_EOL.$sql.PHP_EOL;
+            if ($rs_publishers_row['opr_internacional_alicota'] > 0) {
+                $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . ";";
+                echo " ========= <br> Todos tempos Internacional: " . PHP_EOL . $sql . PHP_EOL;
                 $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Todos os Tempos".PHP_EOL;
-            }//end if($rs_publishers_row['opr_internacional_alicota'] > 0)
+                if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para Todos os Tempos" . PHP_EOL;
+            } //end if($rs_publishers_row['opr_internacional_alicota'] > 0)
             //Publisher Nacional
             else {
-                $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo'].";";
-                echo " ========= <br> Todos tempos Nacional: ".PHP_EOL.$sql.PHP_EOL;
+                $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . ";";
+                echo " ========= <br> Todos tempos Nacional: " . PHP_EOL . $sql . PHP_EOL;
                 $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Todos os Tempos".PHP_EOL;
-            }//end else do if($rs_publishers_row['opr_internacional_alicota'] > 0)
-        }//end if($rs_publishers_row['opr_vinculo_empresa'] == 0)
-        
-        //Para o Publisher que está vinculado à EPP ADM
+                if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para Todos os Tempos" . PHP_EOL;
+            } //end else do if($rs_publishers_row['opr_internacional_alicota'] > 0)
+        } //end if($rs_publishers_row['opr_vinculo_empresa'] == 0)
+
+        //Para o Publisher que estÃ¡ vinculado Ã  EPP ADM
         else {
-            //echo "Publisher ".$rs_publishers_row['opr_nome']." está vinculado à E-Prepag Administradora".(!empty($rs_publishers_row['data_inicio'])?" desde [".$rs_publishers_row['data_inicio']."]":"").PHP_EOL;
-            if(!empty($rs_publishers_row['data_inicio'])) {
-                $sql = "UPDATE financial_processing SET fp_company = ".$rs_publishers_row['opr_vinculo_empresa']." WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date >='".$rs_publishers_row['data_inicio']."';";
+            //echo "Publisher ".$rs_publishers_row['opr_nome']." estÃ¡ vinculado Ã  E-Prepag Administradora".(!empty($rs_publishers_row['data_inicio'])?" desde [".$rs_publishers_row['data_inicio']."]":"").PHP_EOL;
+            if (!empty($rs_publishers_row['data_inicio'])) {
+                $sql = "UPDATE financial_processing SET fp_company = " . $rs_publishers_row['opr_vinculo_empresa'] . " WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date >='" . $rs_publishers_row['data_inicio'] . "';";
                 echo " ========= <br>rs_publishers_row: ";
-                echo " ========= <br>".$sql.PHP_EOL;
+                echo " ========= <br>" . $sql . PHP_EOL;
                 $rs_update = SQLexecuteQuery($sql);
-                if(!$rs_update) echo "";
-                $sql = "UPDATE financial_processing SET fp_company = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date <'".$rs_publishers_row['data_inicio']."';";
+                if (!$rs_update) echo "";
+                $sql = "UPDATE financial_processing SET fp_company = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date <'" . $rs_publishers_row['data_inicio'] . "';";
                 echo " ========= <br> rs_publishers_row rs_update: ";
-                echo " ========= <br>".$sql.PHP_EOL;
+                echo " ========= <br>" . $sql . PHP_EOL;
                 $rs_update = SQLexecuteQuery($sql);
-                if(!$rs_update) echo "";
-            }//end if(!empty($rs_publishers_row['data_inicio']))
+                if (!$rs_update) echo "";
+            } //end if(!empty($rs_publishers_row['data_inicio']))
             else {
-                $sql = "UPDATE financial_processing SET fp_company = ".$rs_publishers_row['opr_vinculo_empresa']." WHERE fp_publisher = ".$rs_publishers_row['opr_codigo'].";";
+                $sql = "UPDATE financial_processing SET fp_company = " . $rs_publishers_row['opr_vinculo_empresa'] . " WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . ";";
                 echo " ========= <br>sem publisher: ";
-                echo " ========= <br>".$sql.PHP_EOL;
+                echo " ========= <br>" . $sql . PHP_EOL;
                 $rs_update = SQLexecuteQuery($sql);
-                if(!$rs_update) echo "";
-            }//end else do if(!empty($rs_publishers_row['data_inicio']))
-            $sql = "SELECT substring(otni_data::varchar from 1 for 19) as data_transferencia,otni_origem,otni_destino FROM operadoras_troca_nacional_internacional WHERE opr_codigo = ".$rs_publishers_row['opr_codigo']." ORDER BY otni_data;";
-            echo "Verificando se teve movimentação de Internacional para nacional e vice-versa para o Publisher [".$rs_publishers_row['opr_codigo']."]:".PHP_EOL.$sql.PHP_EOL;
+                if (!$rs_update) echo "";
+            } //end else do if(!empty($rs_publishers_row['data_inicio']))
+            $sql = "SELECT substring(otni_data::varchar from 1 for 19) as data_transferencia,otni_origem,otni_destino FROM operadoras_troca_nacional_internacional WHERE opr_codigo = " . $rs_publishers_row['opr_codigo'] . " ORDER BY otni_data;";
+            echo "Verificando se teve movimentaÃ§Ã£o de Internacional para nacional e vice-versa para o Publisher [" . $rs_publishers_row['opr_codigo'] . "]:" . PHP_EOL . $sql . PHP_EOL;
             $rs_TrocaNacionalInternacional = SQLexecuteQuery($sql);
-            if(pg_num_rows($rs_TrocaNacionalInternacional) > 0) {
-               // echo "** Publisher [".$rs_publishers_row['opr_codigo']."] POSSUI TROCA ".PHP_EOL;
+            if (pg_num_rows($rs_TrocaNacionalInternacional) > 0) {
+                // echo "** Publisher [".$rs_publishers_row['opr_codigo']."] POSSUI TROCA ".PHP_EOL;
                 $data_anterior = null;
-                while($rs_TrocaNacionalInternacional_row = pg_fetch_array($rs_TrocaNacionalInternacional)) {
-                   // echo "*** Dados coletados: ".$rs_TrocaNacionalInternacional_row['data_transferencia']." Origem = ".$rs_TrocaNacionalInternacional_row['otni_origem']." Destino = ".$rs_TrocaNacionalInternacional_row['otni_destino'].PHP_EOL;
-                    if($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'] == 1) {
-                       // echo "**** Mudou de Nacional para Internacional".PHP_EOL;
-                        if(is_null($data_anterior)) {
-                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date <'".$rs_TrocaNacionalInternacional_row['data_transferencia']."';";
-                            //echo "***** Parte 01 => Início dos tempo até a PRIMEIRA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                while ($rs_TrocaNacionalInternacional_row = pg_fetch_array($rs_TrocaNacionalInternacional)) {
+                    // echo "*** Dados coletados: ".$rs_TrocaNacionalInternacional_row['data_transferencia']." Origem = ".$rs_TrocaNacionalInternacional_row['otni_origem']." Destino = ".$rs_TrocaNacionalInternacional_row['otni_destino'].PHP_EOL;
+                    if ($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'] == 1) {
+                        // echo "**** Mudou de Nacional para Internacional".PHP_EOL;
+                        if (is_null($data_anterior)) {
+                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date <'" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "';";
+                            //echo "***** Parte 01 => InÃ­cio dos tempo atÃ© a PRIMEIRA TROCA: ".PHP_EOL.$sql.PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Início dos tempo até a PRIMEIRA TROCA".PHP_EOL;
-                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date >='".$rs_TrocaNacionalInternacional_row['data_transferencia']."';";
-                            //echo "***** Parte 02 => De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRIMEIRA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para InÃ­cio dos tempo atÃ© a PRIMEIRA TROCA" . PHP_EOL;
+                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date >='" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "';";
+                            //echo "***** Parte 02 => De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." atÃ© o Final dos tempos para a PRIMEIRA TROCA: ".PHP_EOL.$sql.PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para de ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRIMEIRA TROCA".PHP_EOL;
-                        }//end de if(is_null($data_anterior))
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para de " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRIMEIRA TROCA" . PHP_EOL;
+                        } //end de if(is_null($data_anterior))
                         else {
-                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date <'".$rs_TrocaNacionalInternacional_row['data_transferencia']."' AND fp_date >= '".$data_anterior."';";
-                            echo " ========= <br>***** Parte 01 => De ".$data_anterior." até a PRÓXIMA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date <'" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "' AND fp_date >= '" . $data_anterior . "';";
+                            echo " ========= <br>***** Parte 01 => De " . $data_anterior . " atÃ© a PRÃXIMA TROCA: " . PHP_EOL . $sql . PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para De ".$data_anterior." até a PRÓXIMA TROCA".PHP_EOL;
-                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date >='".$rs_TrocaNacionalInternacional_row['data_transferencia']."';";
-                            echo " ========= <br> ***** Parte 02 => De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRÓXIMA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para De " . $data_anterior . " atÃ© a PRÃXIMA TROCA" . PHP_EOL;
+                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date >='" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "';";
+                            echo " ========= <br> ***** Parte 02 => De " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRÃXIMA TROCA: " . PHP_EOL . $sql . PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRÓXIMA TROCA".PHP_EOL;
-                        }//end else do if(is_null($data_anterior))
-                    }//end if($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
-                    elseif($rs_TrocaNacionalInternacional_row['otni_origem'] == 1 && $rs_TrocaNacionalInternacional_row['otni_destino'] == 0) {
-                        echo " ========= <br>**** Mudou de Internacional para Nacional".PHP_EOL;
-                        if(is_null($data_anterior)) {
-                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date <'".$rs_TrocaNacionalInternacional_row['data_transferencia']."';";
-                            echo " ========= <br>**** Parte 01 => Início dos tempo até a PRIMEIRA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para De " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRÃXIMA TROCA" . PHP_EOL;
+                        } //end else do if(is_null($data_anterior))
+                    } //end if($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
+                    elseif ($rs_TrocaNacionalInternacional_row['otni_origem'] == 1 && $rs_TrocaNacionalInternacional_row['otni_destino'] == 0) {
+                        echo " ========= <br>**** Mudou de Internacional para Nacional" . PHP_EOL;
+                        if (is_null($data_anterior)) {
+                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date <'" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "';";
+                            echo " ========= <br>**** Parte 01 => InÃ­cio dos tempo atÃ© a PRIMEIRA TROCA: " . PHP_EOL . $sql . PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Início dos tempo até a PRIMEIRA TROCA".PHP_EOL;
-                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date >='".$rs_TrocaNacionalInternacional_row['data_transferencia']."';";
-                            echo "***** Parte 02 => De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRIMEIRA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para InÃ­cio dos tempo atÃ© a PRIMEIRA TROCA" . PHP_EOL;
+                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date >='" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "';";
+                            echo "***** Parte 02 => De " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRIMEIRA TROCA: " . PHP_EOL . $sql . PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para de ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRIMEIRA TROCA".PHP_EOL;
-                        }//end de if(is_null($data_anterior))
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para de " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRIMEIRA TROCA" . PHP_EOL;
+                        } //end de if(is_null($data_anterior))
                         else {
-                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date <'".$rs_TrocaNacionalInternacional_row['data_transferencia']."' AND fp_date >= '".$data_anterior."';";
-                            echo "***** Parte 01 => De ".$data_anterior." até a PRÓXIMA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date <'" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "' AND fp_date >= '" . $data_anterior . "';";
+                            echo "***** Parte 01 => De " . $data_anterior . " atÃ© a PRÃXIMA TROCA: " . PHP_EOL . $sql . PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para De ".$data_anterior." até a PRÓXIMA TROCA".PHP_EOL;
-                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo']." AND fp_date >='".$rs_TrocaNacionalInternacional_row['data_transferencia']."';";
-                            echo "***** Parte 02 => De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRÓXIMA TROCA: ".PHP_EOL.$sql.PHP_EOL;
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para De " . $data_anterior . " atÃ© a PRÃXIMA TROCA" . PHP_EOL;
+                            $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . " AND fp_date >='" . $rs_TrocaNacionalInternacional_row['data_transferencia'] . "';";
+                            echo "***** Parte 02 => De " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRÃXIMA TROCA: " . PHP_EOL . $sql . PHP_EOL;
                             $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                            if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para De ".$rs_TrocaNacionalInternacional_row['data_transferencia']." até o Final dos tempos para a PRÓXIMA TROCA".PHP_EOL;
-                        }//end else do if(is_null($data_anterior))
-                    }//end do elseif($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
+                            if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar a Troca de Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para De " . $rs_TrocaNacionalInternacional_row['data_transferencia'] . " atÃ© o Final dos tempos para a PRÃXIMA TROCA" . PHP_EOL;
+                        } //end else do if(is_null($data_anterior))
+                    } //end do elseif($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
                     else {
-                        echo "**** Mudança com direção não Identificada".PHP_EOL;
-                    }//end do else do do elseif($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
+                        echo "**** MudanÃ§a com direÃ§Ã£o nÃ£o Identificada" . PHP_EOL;
+                    } //end do else do do elseif($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
                     $data_anterior = $rs_TrocaNacionalInternacional_row['data_transferencia'];
-                }//end while
-            }//end if(pg_num_rows($rs_TrocaNacionalInternacional) > 0)
+                } //end while
+            } //end if(pg_num_rows($rs_TrocaNacionalInternacional) > 0)
             else {
-              //  echo "** Publisher [".$rs_publishers_row['opr_codigo']."] NÃO Possui Troca ".PHP_EOL;
+                //  echo "** Publisher [".$rs_publishers_row['opr_codigo']."] NÃO Possui Troca ".PHP_EOL;
                 //Publisher Internacional
-                if($rs_publishers_row['opr_internacional_alicota'] > 0) {
-                    $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo'].";";
-                    echo "*** Todos tempos Internacional: ".PHP_EOL.$sql.PHP_EOL;
+                if ($rs_publishers_row['opr_internacional_alicota'] > 0) {
+                    $sql = "UPDATE financial_processing SET fp_nationality = 1 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . ";";
+                    echo "*** Todos tempos Internacional: " . PHP_EOL . $sql . PHP_EOL;
                     $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                    if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Todos os Tempos".PHP_EOL;
-                }//end if($rs_publishers_row['opr_internacional_alicota'] > 0)
+                    if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para Todos os Tempos" . PHP_EOL;
+                } //end if($rs_publishers_row['opr_internacional_alicota'] > 0)
                 //Publisher Nacional
                 else {
-                    $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = ".$rs_publishers_row['opr_codigo'].";";
-                    echo "*** Todos tempos Nacional: ".PHP_EOL.$sql.PHP_EOL;
+                    $sql = "UPDATE financial_processing SET fp_nationality = 0 WHERE fp_publisher = " . $rs_publishers_row['opr_codigo'] . ";";
+                    echo "*** Todos tempos Nacional: " . PHP_EOL . $sql . PHP_EOL;
                     $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
-                    if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Todos os Tempos".PHP_EOL;
-                }//end else do if($rs_publishers_row['opr_internacional_alicota'] > 0)
-            }//end else do if(pg_num_rows($rs_TrocaNacionalInternacional) > 0)
-        }//end else do if($rs_publishers_row['opr_vinculo_empresa'] == 0)
+                    if (!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [" . $rs_publishers_row['opr_codigo'] . "] para Todos os Tempos" . PHP_EOL;
+                } //end else do if($rs_publishers_row['opr_internacional_alicota'] > 0)
+            } //end else do if(pg_num_rows($rs_TrocaNacionalInternacional) > 0)
+        } //end else do if($rs_publishers_row['opr_vinculo_empresa'] == 0)
         //echo "=========".str_repeat('-',80).PHP_EOL;
-    }//end while
-}//end if($n_publishers > 0)
+    } //end while
+} //end if($n_publishers > 0)
 else {
-    echo "ERRO: Nenhum Publisher foi selecionado para vínculo entre empresas".PHP_EOL.PHP_EOL;
+    echo "ERRO: Nenhum Publisher foi selecionado para vÃ­nculo entre empresas" . PHP_EOL . PHP_EOL;
 }
 //end else do if($n_publishers > 0)
 /*********************************************************************** 
- * *****   Marcando os períodos a quais empresas pertencem
+ * *****   Marcando os perÃ­odos a quais empresas pertencem
  * *****   FINAL
  ***********************************************************************/
 
-echo str_repeat("_", 80) .PHP_EOL."Elapsed time: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL.str_repeat("=", 80) .PHP_EOL;
+echo str_repeat("_", 80) . PHP_EOL . "Elapsed time: " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . PHP_EOL . str_repeat("=", 80) . PHP_EOL;
 
-logProcessamento("Finalizou (".date("Y-m-d H:i:s").")");
-?>
+logProcessamento("Finalizou (" . date("Y-m-d H:i:s") . ")");

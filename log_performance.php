@@ -1,13 +1,7 @@
 <?php
-// Obtém a hora atual no formato 24h (de 0 a 23)
-$hora_atual = (int)date('G');
-
-// Divide a hora por 6 para descobrir o bloco (0, 1, 2, ou 3)
-// (PHP trata a divisão de inteiros e arredonda para baixo)
-$bloco_do_dia = (int)($hora_atual / 6); 
-
-// Monta o nome do arquivo usando a data E o bloco
-$PERF_LOG_FILE_PATH = '/www/arquivos_gerados/logs/performance-' . date('Y-m-d') . '-bloco-' . $bloco_do_dia . '.log';
+// Colocar no /usr/share/php e no php ini na opção auto_append_file
+// --- Configurações do Log de Performance ---
+$PERF_LOG_FILE_PATH = '/www/log/performance-' . date('Y-m-d') . '.log';
 $PERF_LOG_OWNER_USER = 'www-data';
 $PERF_LOG_OWNER_GROUP = 'www-data';
 // ------------------------------------------
@@ -40,10 +34,21 @@ try {
         'script' => $scriptName,
         'duration_ms' => $executionTimeMs
     ];
-    
-    $logEntry = json_encode($logData) . PHP_EOL;
+
+    // Formata a entrada do log
+    $logEntry = json_encode($logData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL;
 
     $fileExists = file_exists($PERF_LOG_FILE_PATH);
+
+    // Garante extensão .log
+    if (pathinfo($PERF_LOG_FILE_PATH, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão inválida.");
+    }
+
+    // Impede path traversal
+    if (strpos($PERF_LOG_FILE_PATH, '..') !== false) {
+        throw new Exception("Caminho inválido.");
+    }
 
     if (file_put_contents($PERF_LOG_FILE_PATH, $logEntry, FILE_APPEND | LOCK_EX) === false) {
         throw new Exception("Falha ao escrever no log de performance: $PERF_LOG_FILE_PATH");
@@ -51,15 +56,13 @@ try {
 
     // Corrigir Permissão se o arquivo foi criado por root
     if (!$fileExists) {
-        @chmod($PERF_LOG_FILE_PATH, 0664); 
+        @chmod($PERF_LOG_FILE_PATH, 0664);
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
             @chown($PERF_LOG_FILE_PATH, $PERF_LOG_OWNER_USER);
             @chgrp($PERF_LOG_FILE_PATH, $PERF_LOG_OWNER_GROUP);
         }
     }
-
 } catch (Exception $e) {
     // Registra falhas no log de erro principal do PHP
     error_log('Falha no Performance Logger (Append): ' . $e->getMessage());
 }
-?>

@@ -22,13 +22,14 @@ require_once RAIZ_DO_PROJETO . 'includes/configIP.php';
 require_once RAIZ_DO_PROJETO . 'includes/constantes.php';
 require_once RAIZ_DO_PROJETO . "class/util/Busca.class.php";
 
-function obter_endereco_ip_usuario() {
+function obter_endereco_ip_usuario()
+{
     $ipaddress = '';
     if (isset($_SERVER['HTTP_CLIENT_IP']))
         $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-    else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+    else if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
         $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    else if(isset($_SERVER['REMOTE_ADDR']))
+    else if (isset($_SERVER['REMOTE_ADDR']))
         $ipaddress = $_SERVER['REMOTE_ADDR'];
     else
         $ipaddress = 'UNKNOWN';
@@ -41,28 +42,73 @@ try {
     if ($con->isConnected()) {
 
         $id_usuario_gamer = 0;
-        if(isset($_SESSION['dist_usuarioGames_ser'])){
+        if (isset($_SESSION['dist_usuarioGames_ser'])) {
             $usuarioGamesSession = unserialize($_SESSION['dist_usuarioGames_ser']);
             $id_usuario_gamer = $usuarioGamesSession->getId();
         }
         $pdo = $con->getLink();
 
         salvar_log_req($pdo, $id_usuario_gamer);
-
     }
-
 } catch (Exception $ex) {
 
-    $logFile = '/www/arquivos_gerados/logs/erro_log_acoes_pdv_' . date('Y-m-d') . '.log';
-    $logMessage = date('Y-m-d H:i:s') . " | Exception: " . $ex->getMessage() . PHP_EOL;
-    file_put_contents($logFile, $logMessage, FILE_APPEND);
+    $logDir = '/www/arquivos_gerados/logs';
+    $logFile = $logDir . '/erro_log_acoes_pdv_' . date('Y-m-d') . '.log';
 
+    // Garante que o diretório exista
+    if (!is_dir($logDir)) {
+        if (!mkdir($logDir, 0777, true)) {
+            throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+        }
+    }
+
+    // Garante extensão .log
+    if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão inválida para arquivo de log.");
+    }
+
+    // Impede path traversal
+    if (strpos($logFile, '..') !== false) {
+        throw new Exception("Caminho inválido detectado.");
+    }
+
+    // Mensagem de log (mantida conforme seu uso)
+    $logMessage = date('Y-m-d H:i:s') . " | Exception: " . $ex->getMessage() . PHP_EOL;
+
+    // Escreve com segurança
+    if (file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX) === false) {
+        throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+    }
 } catch (PDOException $ex) {
 
-    $logFile = '/www/arquivos_gerados/logs/erro_log_acoes_pdv_' . date('Y-m-d') . '.log';
-    $logMessage = date('Y-m-d H:i:s') . " | PDOException: " . $ex->getMessage() . PHP_EOL;
-    $logMessage .= "Trace: " . $ex->getTraceAsString() . PHP_EOL; // Inclui o rastreamento da exceção
-    file_put_contents($logFile, $logMessage, FILE_APPEND);
+    $logDir = '/www/arquivos_gerados/logs';
+    $logFile = $logDir . '/erro_log_acoes_pdv_' . date('Y-m-d') . '.log';
+
+    // Garante que o diretório exista
+    if (!is_dir($logDir)) {
+        if (!mkdir($logDir, 0777, true)) {
+            throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+        }
+    }
+
+    // Garante extensão .log
+    if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'log') {
+        throw new Exception("Extensão inválida para arquivo de log.");
+    }
+
+    // Impede path traversal
+    if (strpos($logFile, '..') !== false) {
+        throw new Exception("Caminho inválido detectado.");
+    }
+
+    // Monta a mensagem completa do log
+    $logMessage  = date('Y-m-d H:i:s') . " | PDOException: " . $ex->getMessage() . PHP_EOL;
+    $logMessage .= "Trace: " . $ex->getTraceAsString() . PHP_EOL . PHP_EOL;
+
+    // Escreve com segurança
+    if (file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX) === false) {
+        throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+    }
 }
 
 $server_url = "" . EPREPAG_URL . "";
@@ -87,8 +133,7 @@ class HeaderController
     public $saldoLimite = 0;
     public $objBanner;
 
-    private $_paginasRestritas = array
-    (
+    private $_paginasRestritas = array(
         "/creditos/funcionario/edita.php",
         "/creditos/funcionario/novo.php",
         "/creditos/funcionario/novo.php",
@@ -132,10 +177,8 @@ class HeaderController
                 if ($this->validaSenhaExpirada() && $_SERVER['SCRIPT_NAME'] !== "/creditos/alterar_senha.php") {
                     if ($this->lanHouse) {
                         Util::redirect("/creditos/alterar_senha.php");
-
                     } else {
                         Util::redirect("/creditos/erro.php?ERRO=2499");
-
                     }
                 }
             }
@@ -157,7 +200,6 @@ class HeaderController
         $data = explode(" ", $this->usuarios->getDataExpiraSenha());
         $paramDate = Util::getData($data[0], true);
         return (Util::timeSub($paramDate, date("Y-m-d")) <= 0) ? true : false;
-
     }
 
     public function setError($fileError, Exception $ex)
@@ -189,7 +231,6 @@ class HeaderController
         }
 
         return (enviaEmail($to, null, null, $subject, $body_html, null)) ? true : false;
-
     }
 
     public function logout($className, $msg = "", $sendMail = false)

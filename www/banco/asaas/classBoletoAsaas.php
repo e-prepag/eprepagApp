@@ -16,37 +16,75 @@ class classBoleto
             $this->setAccessToken($token);
             $this->url = getenv('ASAAS_API_URL');
         }
+    } //end function __construct()
 
-    }//end function __construct()
-
-    private function removerAcentos($string) {
+    private function removerAcentos($string)
+    {
         $acentos = array(
-            'Á' => 'A', 'À' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A',
-            'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
-            'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
-            'Ó' => 'O', 'Ò' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O',
-            'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
-            'Ç' => 'C', 'Ñ' => 'N',
-            'á' => 'a', 'à' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'å' => 'a',
-            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
-            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
-            'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o',
-            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
-            'ç' => 'c', 'ñ' => 'n'
+            'Á' => 'A',
+            'À' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'Å' => 'A',
+            'É' => 'E',
+            'È' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Í' => 'I',
+            'Ì' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ó' => 'O',
+            'Ò' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ú' => 'U',
+            'Ù' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
+            'Ç' => 'C',
+            'Ñ' => 'N',
+            'á' => 'a',
+            'à' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'ä' => 'a',
+            'å' => 'a',
+            'é' => 'e',
+            'è' => 'e',
+            'ê' => 'e',
+            'ë' => 'e',
+            'í' => 'i',
+            'ì' => 'i',
+            'î' => 'i',
+            'ï' => 'i',
+            'ó' => 'o',
+            'ò' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ö' => 'o',
+            'ú' => 'u',
+            'ù' => 'u',
+            'û' => 'u',
+            'ü' => 'u',
+            'ç' => 'c',
+            'ñ' => 'n'
         );
-        
+
         return strtr($string, $acentos);
     }
 
     private function setAccessToken($access_token)
     {
         $this->access_token = $access_token;
-    }//end function setAccessToken
+    } //end function setAccessToken
 
     public function getAccessToken()
     {
         return $this->access_token;
-    }//end function getAccessToken
+    } //end function getAccessToken
 
     public function callService($params)
     {
@@ -68,10 +106,8 @@ class classBoleto
                 " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
             fwrite($ff, $logEntry);
             fclose($ff);
-
         }
         return $resposta;
-
     } //end function callService
 
     private function sendJSON($nome, $cpf, $valor, $vendaId, $email = "")
@@ -96,7 +132,6 @@ class classBoleto
         if (!empty($data['data']) && isset($data['data'][0]['id'])) {
             // Cliente encontrado
             $customerId = $data['data'][0]['id'];
-
         } else {
             // Cliente não encontrado, criar novo cliente
             $url = $url = $this->url . "customers";
@@ -180,15 +215,37 @@ class classBoleto
         // Verifica se a resposta contém os dados esperados
         if (!isset($data['bankSlipUrl'])) {
             // Extrai os dados de interesse
-            file_put_contents('/www/arquivos_gerados/logs/Asaas_boleto_erro.txt',$response);
+            $logDir = '/www/arquivos_gerados/logs';
+            $logFile = $logDir . '/Asaas_boleto_erro.txt';
+
+            // Garante que o diretório exista
+            if (!is_dir($logDir)) {
+                if (!mkdir($logDir, 0777, true)) {
+                    throw new Exception("Não foi possível criar o diretório de logs: $logDir");
+                }
+            }
+
+            // Garante extensão .txt
+            if (pathinfo($logFile, PATHINFO_EXTENSION) !== 'txt') {
+                throw new Exception("Extensão inválida para arquivo de log.");
+            }
+
+            // Impede path traversal
+            if (strpos($logFile, '..') !== false) {
+                throw new Exception("Caminho inválido detectado.");
+            }
+
+            // Conteúdo do log (mantido igual ao seu uso)
+            $logEntry = $response . PHP_EOL;
+
+            // Escreve com segurança
+            if (file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX) === false) {
+                throw new Exception("Falha ao escrever no arquivo de log: $logFile");
+            }
             return false;
         }
 
         return $data['bankSlipUrl'];
+    } //end function sendjson
 
-    }//end function sendjson
-
-} 
-
-
-?>
+}
