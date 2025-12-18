@@ -8,10 +8,7 @@ require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Login.class.php";
 require_once __DIR__ . "/../../libs/PHPGangsta/GoogleAuthenticator.php";
-
-//Instanciando Objetos para Descriptografia
-$chave256bits = new Chave();
-$aes = new AES($chave256bits->retornaChavePub());
+require_once "/www/class/classSecureEncryption.php";
 
 $con = ConnectionPDO::getConnection();
 if (!$con->isConnected()) {
@@ -28,40 +25,44 @@ if (!$_SESSION['secret']) {
         $erros = 0;
         $msg = "";
 
-        $passw = $_POST['cad_senhaAtual'];
-
-        $passw = base64_encode($aes->encrypt(addslashes($passw)));
-
         $pdo = $con->getLink();
-        $sql = "SELECT * FROM usuarios WHERE id = ? AND shn_password = ?";
+        $sql = "SELECT * FROM usuarios WHERE id = ?";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($_SESSION["iduser_bko"], $passw));
+        $stmt->execute(array($_SESSION["iduser_bko"]));
 
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($fetch) == 1) {
-            $pgrow = $fetch[0];
 
-            $tokenValido = empty($pgrow['chave_autenticador']) ? true : $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token_old'], 2);
-            $tokenNovo = $ga->verifyCode($secret, $_POST['token'], 2);
-            if (!$tokenNovo) {
-                $msg = "Token novo inválido.";
-                $color = "txt-vermelho";
-            } else if (!$tokenValido) {
-                $msg = "Token antigo inválido.";
+            $pgrow = $fetch[0];
+            $bcrypt = new SecureEncryption();
+
+            if (!$bcrypt->verifyPassword($senha_decript, $pgrow['shn_password'])) {
+                $msg = "Senha atual incorreta.";
                 $color = "txt-vermelho";
             } else {
-                $update = "UPDATE usuarios set chave_autenticador = ? where id = ?";
-                $stmt = $pdo->prepare($update);
-                $stmt->execute(array($secret, $_SESSION["iduser_bko"]));
-                if ($stmt->rowCount() == 1) {
-                    $msg = "Autenticador alterado com sucesso.";
-                    $color = "txt-verde";
-                    $_SESSION['secret'] = null;
-                } else {
-                    $msg = "Erro ao alterar autenticador. Entre em contato com o suporte.";
+
+                $tokenValido = empty($pgrow['chave_autenticador']) ? true : $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token_old'], 2);
+                $tokenNovo = $ga->verifyCode($secret, $_POST['token'], 2);
+                if (!$tokenNovo) {
+                    $msg = "Token novo inválido.";
                     $color = "txt-vermelho";
+                } else if (!$tokenValido) {
+                    $msg = "Token antigo inválido.";
+                    $color = "txt-vermelho";
+                } else {
+                    $update = "UPDATE usuarios set chave_autenticador = ? where id = ?";
+                    $stmt = $pdo->prepare($update);
+                    $stmt->execute(array($secret, $_SESSION["iduser_bko"]));
+                    if ($stmt->rowCount() == 1) {
+                        $msg = "Autenticador alterado com sucesso.";
+                        $color = "txt-verde";
+                        $_SESSION['secret'] = null;
+                    } else {
+                        $msg = "Erro ao alterar autenticador. Entre em contato com o suporte.";
+                        $color = "txt-vermelho";
+                    }
                 }
             }
         } else {

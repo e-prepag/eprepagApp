@@ -14,6 +14,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/configuracao.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/languages.php";
 require_once "../../../includes/load_dotenv.php";
 require_once "../includes/funcoes_login.php";
+require_once "/www/class/classSecureEncryption.php";
 
 session_start();
 
@@ -82,22 +83,27 @@ try {
             exit;
         }
 
-        $chave256bits = new Chave();
-        $aes = new AES($chave256bits->retornaChavePub());
-        $senha = base64_encode($aes->encrypt($senha_decript));
         $login = strtoupper(trim($user_decript));
 
-        $sql = "SELECT id, chave_autenticador, sem_aut_data FROM usuarios WHERE shn_login = ? AND shn_password = ? 
+        $sql = "SELECT id, chave_autenticador, sem_aut_data, shn_password FROM usuarios WHERE shn_login = ?
         AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='PU') OR (tipo_acesso='US'))";
 
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($login, $senha));
+        $stmt->execute(array($login));
         $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($stmt->rowCount() > 0) {
+
+            $bcrypt = new SecureEncryption();
+
+            if (!$bcrypt->verifyPassword($senha_decript, $fetch['shn_password'])) {
+                registrarTentativaFalha($login);
+                echo "<script>alert('" . LANG_USER_PASS_INVALID . "');</script>";
+                exit;
+            }
 
             $senha_base64 = null;
             $user_base64 = null;

@@ -159,7 +159,7 @@ $time_start_stats = getmicrotime();
 
 	$dd_operadora_nome = "";
 	if($dd_operadora) {
-		$resopr_nome = SQLexecuteQuery("select opr_nome,opr_cont_mail from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
+		$resopr_nome = SQLexecuteQueryParams("select opr_nome,opr_cont_mail from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array($dd_operadora));
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome	= $pgopr_nome['opr_nome'];
 				$email_destino		= $pgopr_nome['opr_cont_mail'];

@@ -3,6 +3,8 @@
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 
+require_once "/www/class/classSecureEncryption.php";
+
 class ChaveMestra{
 
     private $conexao;
@@ -16,22 +18,50 @@ class ChaveMestra{
 	
 	public function verificaSenha($usuario, $senha){
 	
-		$sql = "select count(*) as quantidade from dist_usuarios_games_chave where usuario = :USUARIO and chave = :SENHA;";
+		// Busca a chave armazenada para o usuário
+		$sql = "select chave, chave_migrated from dist_usuarios_games_chave where usuario = :USUARIO;";
 		$query = $this->conexao->prepare($sql);
 		$query->bindParam(":USUARIO", $usuario);
-		$query->bindParam(":SENHA", $senha);
 		$query->execute();
 		$rowChave = $query->fetch(PDO::FETCH_ASSOC);
+		
+		$quantidade = 0;
+		
+		if ($rowChave) {
+			$chaveArmazenada = $rowChave['chave'];
+			$isMigrated = $rowChave['chave_migrated'] ?: false;
+			
+			$secureEncryption = new SecureEncryption();
+			
+			// Verifica a senha usando o método apropriado
+			if ($isMigrated) {
+				// Chave já migrada para bcrypt
+				if ($secureEncryption->verifyPassword($senha, $chaveArmazenada)) {
+					$quantidade = 1;
+					
+					// Verifica se precisa re-hash (upgrade de custo)
+					if ($secureEncryption->needsRehash($chaveArmazenada)) {
+						$this->upgradeChaveMestraHash($usuario, $senha);
+					}
+				}
+			} else {
+				// Chave ainda no formato antigo
+				if ($secureEncryption->verifyPassword($senha, $chaveArmazenada)) {
+					$quantidade = 1;
+					// Migra automaticamente para bcrypt
+					$this->migrateChaveMestra($usuario, $senha);
+				}
+			}
+		}
 		
 		$file = fopen("/www/arquivos_gerados/logs/chave_mestra.txt", "a+");
 		fwrite($file, "data: " .date("d-m-Y H:s:s")."\n"); 
 		fwrite($file, "usuario: " .$usuario."\n");
-	//	fwrite($file, "senha: " .$senha."\n");
-		fwrite($file, "dados: " .json_encode($rowChave)."\n");
+		fwrite($file, "quantidade: " .$quantidade."\n");
 	    fwrite($file, str_repeat("*", 60)."\n");
 		fclose($file);
 		
-	    return $rowChave["quantidade"];
+	    return $quantidade;
 	}
 	
 	public function inserirSeguro($liberado, $usuario){
@@ -161,6 +191,50 @@ class ChaveMestra{
 			return false; 
 	    }
 		
+	}
+	
+	/**
+	 * Migra a chave mestra do formato antigo para bcrypt
+	 */
+	private function migrateChaveMestra($usuario, $senhaPlaintext) {
+		$secureEncryption = new SecureEncryption();
+		$novoHash = $secureEncryption->hashPassword($senhaPlaintext);
+		
+		$sql = "UPDATE dist_usuarios_games_chave SET chave = :NOVO_HASH, chave_migrated = 1 WHERE usuario = :USUARIO";
+		$query = $this->conexao->prepare($sql);
+		$query->bindParam(":NOVO_HASH", $novoHash);
+		$query->bindParam(":USUARIO", $usuario);
+		$query->execute();
+		
+		// Log da migração
+		$file = fopen("/www/arquivos_gerados/logs/chave_mestra_migration.txt", "a+");
+		fwrite($file, "data: " .date("d-m-Y H:i:s")."\n"); 
+		fwrite($file, "usuario: " .$usuario."\n");
+		fwrite($file, "acao: migração para bcrypt\n");
+		fwrite($file, str_repeat("*", 60)."\n");
+		fclose($file);
+	}
+	
+	/**
+	 * Atualiza o hash da chave mestra se necessário (upgrade de custo)
+	 */
+	private function upgradeChaveMestraHash($usuario, $senhaPlaintext) {
+		$secureEncryption = new SecureEncryption();
+		$novoHash = $secureEncryption->hashPassword($senhaPlaintext);
+		
+		$sql = "UPDATE dist_usuarios_games_chave SET chave = :NOVO_HASH WHERE usuario = :USUARIO";
+		$query = $this->conexao->prepare($sql);
+		$query->bindParam(":NOVO_HASH", $novoHash);
+		$query->bindParam(":USUARIO", $usuario);
+		$query->execute();
+		
+		// Log do upgrade
+		$file = fopen("/www/log/chave_mestra_migration.txt", "a+");
+		fwrite($file, "data: " .date("d-m-Y H:i:s")."\n"); 
+		fwrite($file, "usuario: " .$usuario."\n");
+		fwrite($file, "acao: upgrade hash bcrypt\n");
+		fwrite($file, str_repeat("*", 60)."\n");
+		fclose($file);
 	}
 	
 }

@@ -18,23 +18,28 @@ if ($token && $secret && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
 
     $cad_senhaAtual = $_POST['cad_senhaAtual'];
 
-    $objEncryption = new Encryption();
-    $senhaAtual = $objEncryption->encrypt(trim($cad_senhaAtual));
-
     $ga = new PHPGangsta_GoogleAuthenticator();
     $checkResult = $ga->verifyCode($secret, $token, 2);
 
-    if ($checkResult) {
-        $sql = "UPDATE dist_usuarios_games SET ug_chave_autenticador = ? WHERE ug_id = ? and ug_senha = ?";
+    $sql = "SELECT ug_senha FROM dist_usuarios_games WHERE ug_id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$cad_id]);
+    $senha_usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $secureEncryption = new SecureEncryption();
+    $ret_senha = $secureEncryption->verifyPassword($cad_senhaAtual, $senha_usuario["ug_senha"]);
+
+    if ($checkResult && $ret_senha) {
+        $sql = "UPDATE dist_usuarios_games SET ug_chave_autenticador = ? WHERE ug_id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$secret, $cad_id, $senhaAtual]);
+        $stmt->execute([$secret, $cad_id]);
 
         // Verifica se alguma linha foi afetada
         if ($stmt->rowCount() > 0) {
             $cor = "txt-verde";
             $msg = "Token alterado com sucesso!";
         } else {
-            $msg = "Senha ou Token inválidos! Verifique se o Token atual foi inserido corretamente.";
+            $msg = "Erro ao alterar, tente novamente, caso persista, entre em contato com o suporte.";
             $cor = "text-danger";
         }
     } else {

@@ -140,6 +140,17 @@ if (!function_exists("SQLexecuteQuery")) {
 
 		return $ret;
 	}
+	function SQLexecuteQueryParams($sql, $params)
+{
+	$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
+	if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
+		$message  = date("Y-m-d H:i:s") . " ";
+		$message .= "Erro: " . $erro . "<br>\n";
+		$message .= "Query: " . $sql . "<br>\n";
+		gravaLog_SQLexecuteQuery($message);
+	}
+	return $ret;
+}
 }
 
 if (!function_exists("SQLexecuteQueryParams")) {
@@ -1747,8 +1758,8 @@ function insere_EstabelecimentoMovimentacao(
 	//Configura valores
 	//-----------------------------------------------------------------------------------------------
 	//Verifica se o estabelecimento eh pre ou pos
-	$sql = "SELECT est_tipo_venda from estabelecimentos where est_codigo = " . $var_est_codigo;
-	$result = pg_exec($connid, $sql);
+	$sql = "SELECT est_tipo_venda from estabelecimentos where est_codigo = $1";
+	$result = SQLexecuteQueryParams($sql, array($var_est_codigo));
 	$pgresult = pg_fetch_array($result);
 	$est_tipo_venda = strtoupper(trim($pgresult['est_tipo_venda']));
 
@@ -1776,11 +1787,11 @@ function insere_EstabelecimentoMovimentacao(
 					em_saldo_antes, 
 					em_saldo_depois
 			) values (
-					$var_est_codigo, '$var_tipo', $var_origem, $var_mapeamento, '$var_mapeamento_aux', $var_valor, '$var_descricao', 
-					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $var_est_codigo) $tipo_operador $var_valor,
-					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $var_est_codigo) 
+					$1, $2, $3, $4, $5, $6, $7, 
+					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $1) " . $tipo_operador . " $6,
+					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $1) 
 			)";
-	pg_exec($connid, $sql);
+	SQLexecuteQueryParams($sql, array($var_est_codigo, $var_tipo, $var_origem, $var_mapeamento, $var_mapeamento_aux, $var_valor, $var_descricao));
 
 	//Restaura o error handler
 	restore_error_handler();

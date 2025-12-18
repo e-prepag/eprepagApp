@@ -1,14 +1,16 @@
 <?php
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/gamer/chave.php";
 require_once $raiz_do_projeto."includes/gamer/AES.class.php";
 require_once $raiz_do_projeto."class/util/Login.class.php";
-
+require_once "/www/class/classSecureEncryption.php";
 
 //Instanciando Objetos para Descriptografia
-$chave256bits = new Chave();
-$aes = new AES($chave256bits->retornaChavePub());
+$cripto = new SecureEncryption();
 $minCaracPass = 10;
 $maxCaracPass = 35;
 
@@ -42,18 +44,20 @@ if(isset($_POST['pass_old']) && $_SESSION["token_csrf"] == $_POST["token_csrf"])
     if($erros === 0){
         $passw = $_POST['pass_old'];
         
-        $passw = base64_encode($aes->encrypt(addslashes($passw)));
+        $passw = $cripto->hashPassword(addslashes($passw));
 
         $pdo = $con->getLink();
-        $sql = "SELECT * FROM usuarios WHERE id = ? AND shn_password = ?";
+        $sql = "SELECT * FROM usuarios WHERE id = ?";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($_SESSION["iduser_bko"], $passw));
+        $stmt->execute(array($_SESSION["iduser_bko"]));
 
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($fetch) == 1) {
-            $passw = base64_encode($aes->encrypt(addslashes($_POST['nova_senha'])));
+
+
+            $passw = $cripto->hashPassword(addslashes($_POST['nova_senha']));
 
             $update = "UPDATE usuarios set shn_password = ? where id = ?";
             $stmt = $pdo->prepare($update);

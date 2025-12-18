@@ -1,5 +1,7 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
+
+require_once "/www/class/classSecureEncryption.php";
 class UsuarioGamesOperador {
     
     var $ugo_id;
@@ -150,8 +152,8 @@ class UsuarioGamesOperador {
  		if($ret == ""){
  			
  			//Formata
- 			$objEncryption = new Encryption();
- 			$senha = $objEncryption->encrypt(trim($objOperadorGamesUsuario->getSenha()));
+ 			$objEncryption = new SecureEncryption();
+ 			$senha = $objEncryption->hashPassword(trim($objOperadorGamesUsuario->getSenha()));
 			$dataInclusao = "CURRENT_TIMESTAMP";
 			$dataUltimoAcesso = "CURRENT_TIMESTAMP";
  			$qtdeAcessos = 0;
@@ -227,8 +229,8 @@ class UsuarioGamesOperador {
  			if(!is_null($objOperadorGamesUsuario->getLogin())) 			$sql .= " ugo_login = " 				. SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getLogin())), "s") . ",";
 
  			if(!is_null($objOperadorGamesUsuario->getSenha())) 	{
-	 			$objEncryption = new Encryption();
- 				$senha = $objEncryption->encrypt(trim($objOperadorGamesUsuario->getSenha()));
+	 			$objEncryption = new SecureEncryption();
+ 				$senha = $objEncryption->hashPassword(trim($objOperadorGamesUsuario->getSenha()));
 				$sql .= " ugo_senha = '". $senha . "',";
 			}
 
@@ -483,46 +485,49 @@ class UsuarioGamesOperador {
     function autenticarLogin($login, $senha, $aut = false) { //Autentica usuario
 
 		$ret = false;
-//echo "ret0: ".(($ret)?"ret OK":"Not ret")."<br>";
-		
-		//Autentica usuario
-		//------------------------------------------------------------------
-		$objEncryption = new Encryption();
-		$senha = $objEncryption->encrypt(trim($senha));
 		$login = strtoupper(trim($login));
-/*
-		//SQL
-		$sql = "select ugo_ug_id from dist_usuarios_games_operador ";
-		$sql .= " where ugo_ativo = 1 ";
-		$sql .= " and ugo_login = " . SQLaddFields($login, "s");
-//		$sql .= " and ugo_ug_id = " . SQLaddFields($this->ugo_ug_id, "s");
-		$sql .= " and ugo_senha = " . SQLaddFields($senha, "s");
-        */
+		$senhaOriginal = trim($senha);
 
-        $sql = "select ugo_ug_id from dist_usuarios_games_operador where ugo_ativo = 1 and ugo_login = ? and ugo_senha = ? ";
+		// Carrega as classes de criptografia
+		$secureEncryption = new SecureEncryption();
 
-        $con = ConnectionPDO::getConnection();
-        $pdo = $con->getLink();
+		$con = ConnectionPDO::getConnection();
+		$pdo = $con->getLink();
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($login, $senha));
-        $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		// Busca o operador e sua senha atual
+		$sqlUser = "SELECT ugo_id, ugo_ug_id, ugo_senha, ugo_senha_migrated FROM dist_usuarios_games_operador 
+					WHERE ugo_ativo = 1 AND ugo_login = ?";
+		$stmtUser = $pdo->prepare($sqlUser);
+		$stmtUser->execute(array($login));
+		$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
-        if ( count($fetch) > 0 ) {
-            $ugo_ug_id = $fetch[0]['ugo_ug_id'];
-        }
-
-//echo "<!-- sql: $sql<br>\n -->";
-//die("Para 3223");
-//echo "reta: $ret<br>";
-		/*
-        $rs_id = SQLexecuteQuery($sql);
-		if($rs_id && pg_num_rows($rs_id) > 0){
-			$rs_id_row = pg_fetch_array($rs_id);
-			$ugo_ug_id = $rs_id_row['ugo_ug_id'];
+		if (!$user) {
+			return false; // Operador não encontrado
 		}
-		*/
-//echo "ugo_ug_id: ".$ugo_ug_id."<br>";
+
+		$senhaHash = $user['ugo_senha'];
+		$isMigrated = $user['ugo_senha_migrated'] ?: false;
+		$ugo_ug_id = $user['ugo_ug_id'];
+
+		// Verifica a senha usando o método apropriado
+		if ($isMigrated) {
+			// Senha já migrada para bcrypt
+			$ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+			
+			// Verifica se precisa re-hash (upgrade de custo)
+			if ($ret && $secureEncryption->needsRehash($senhaHash)) {
+				$this->upgradeOperatorPasswordHash($user['ugo_id'], $senhaOriginal);
+			}
+		} else {
+			// Senha ainda no formato antigo, tenta verificar
+			$ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+			
+			// Se a verificação passou, migra automaticamente para bcrypt
+			if ($ret) {
+				$this->migrateOperatorPassword($user['ugo_id'], $senhaOriginal);
+			}
+		}
+
                 $instUsuarioGames = new UsuarioGames;
 		$objGamesUsuario = $instUsuarioGames->getUsuarioGamesById($ugo_ug_id);
 		if($objGamesUsuario != null) {
@@ -537,11 +542,6 @@ class UsuarioGamesOperador {
 			$sql = "select count(*) as qtde from dist_usuarios_games_operador ";
 			$sql .= " where ugo_ativo = 1 ";
 			$sql .= " and ugo_login = " . SQLaddFields($login, "s");
-	//		$sql .= " and ugo_ug_id = " . SQLaddFields($this->ugo_ug_id, "s");
-			$sql .= " and ugo_senha = " . SQLaddFields($senha, "s");
-//echo "sql: $sql<br>";
-//die("Para 3223");
-//echo "reta: $ret<br>";
 			$rs = SQLexecuteQuery($sql);
 			if($rs && pg_num_rows($rs) > 0){
 				$rs_row = pg_fetch_array($rs);
@@ -749,34 +749,52 @@ class UsuarioGamesOperador {
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
 		$ret = false;
-		
-		//Autentica usuario
-		//------------------------------------------------------------------
-		$objEncryption = new Encryption();
-		$senha = $objEncryption->encrypt(trim($senha));
-		$senhaAtual = $objEncryption->encrypt(trim($senhaAtual));
 		$login = strtoupper(trim($login));
+		$senhaAtualOriginal = trim($senhaAtual);
+		$novaSenhaOriginal = trim($senha);
 
-		//SQL
-		$sql = "select count(*) as qtde from dist_usuarios_games_operador ";
-		$sql .= " where ugo_login = " . SQLaddFields($login, "s");
-		$sql .= " and ugo_senha = " . SQLaddFields($senhaAtual, "s");
-			
-		$rs = SQLexecuteQuery($sql);
-		if($rs && pg_num_rows($rs) > 0){
-			$rs_row = pg_fetch_array($rs);
-			if($rs_row['qtde'] > 0) $ret = true;
-		}			
+		// Carrega as classes de criptografia
+		$secureEncryption = new SecureEncryption();
 
-		//Atualiza ultimo acesso
+		$con = ConnectionPDO::getConnection();
+		$pdo = $con->getLink();
+
+		// Busca o operador e sua senha atual
+		$sqlUser = "SELECT ugo_id, ugo_senha, ugo_senha_migrated FROM dist_usuarios_games_operador WHERE ugo_login = ?";
+		$stmtUser = $pdo->prepare($sqlUser);
+		$stmtUser->execute(array($login));
+		$user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+		if (!$user) {
+			return false; // Operador não encontrado
+		}
+
+		$senhaHashAtual = $user['ugo_senha'];
+		$isMigrated = $user['ugo_senha_migrated'] ?: false;
+
+		// Verifica a senha atual usando o método apropriado
+		if ($isMigrated) {
+			// Senha já migrada para bcrypt
+			$ret = $secureEncryption->verifyPassword($senhaAtualOriginal, $senhaHashAtual);
+		} else {
+			// Senha ainda no formato antigo
+			$ret = $secureEncryption->verifyPassword($senhaAtualOriginal, $senhaHashAtual);
+		}
+
+		//Atualiza senha
 		//------------------------------------------------------------------
 		if($ret){
-			//SQL
-			$sql = "update dist_usuarios_games_operador set ";
-			$sql .= " ugo_senha = " . SQLaddFields($senha, "s");
-			$sql .= " where ugo_login = " . SQLaddFields($login, "s");
-			$sql .= " and ugo_senha = " . SQLaddFields($senhaAtual, "s");
-			$ret = SQLexecuteQuery($sql);
+			// Gera o hash bcrypt da nova senha
+			$novoHashSenha = $secureEncryption->hashPassword($novaSenhaOriginal);
+			
+			// Atualiza a senha usando PDO
+			$sqlUpdate = "UPDATE dist_usuarios_games_operador SET 
+						 ugo_senha = ?, 
+						 ugo_senha_migrated = 1
+						 WHERE ugo_id = ?";
+			
+			$stmtUpdate = $pdo->prepare($sqlUpdate);
+			$ret = $stmtUpdate->execute(array($novoHashSenha, $user['ugo_id']));
 			
 			if($ret){
 				
@@ -877,6 +895,36 @@ class UsuarioGamesOperador {
 */
 		return $sret;
 
+	}
+
+	/**
+	 * Migra a senha de um operador para bcrypt
+	 */
+	private function migrateOperatorPassword($operatorId, $senhaOriginal) {
+		$secureEncryption = new SecureEncryption();
+		$novoHash = $secureEncryption->hashPassword($senhaOriginal);
+		
+		$con = ConnectionPDO::getConnection();
+		$pdo = $con->getLink();
+		
+		$sql = "UPDATE dist_usuarios_games_operador SET ugo_senha = ?, ugo_senha_migrated = 1 WHERE ugo_id = ?";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute(array($novoHash, $operatorId));
+	}
+
+	/**
+	 * Atualiza o hash da senha de um operador para um custo mais alto se necessário
+	 */
+	private function upgradeOperatorPasswordHash($operatorId, $senhaOriginal) {
+		$secureEncryption = new SecureEncryption();
+		$novoHash = $secureEncryption->hashPassword($senhaOriginal);
+		
+		$con = ConnectionPDO::getConnection();
+		$pdo = $con->getLink();
+		
+		$sql = "UPDATE dist_usuarios_games_operador SET ugo_senha = ? WHERE ugo_id = ?";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute(array($novoHash, $operatorId));
 	}
 }
 

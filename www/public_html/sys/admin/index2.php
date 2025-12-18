@@ -12,6 +12,7 @@ require_once $raiz_do_projeto . "class/util/Log.class.php";
 require_once "../../../includes/load_dotenv.php";
 require_once __DIR__ . "/../../../libs/PHPGangsta/GoogleAuthenticator.php";
 require_once "../includes/funcoes_login.php";
+require_once "/www/class/classSecureEncryption.php";
 
 if ($_SESSION['RECAPTCHA_TRUE'] != true) {
     header("Location: index.php?Invalido=1");
@@ -37,9 +38,6 @@ if ($okDecript != 1) {
     exit;
 }
 
-$chave256bits = new Chave();
-$aes = new AES($chave256bits->retornaChavePub());
-$passw = base64_encode($aes->encrypt($senha_decript));
 $user = strtoupper($user_decript);
 
 $Enviar = true;
@@ -74,15 +72,25 @@ if ($Enviar) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$_SESSION["id_do_usuario"]]);
     } else {
-        $sql = "SELECT * FROM usuarios WHERE shn_login = ? AND shn_password = ? AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='PU') OR (tipo_acesso='US'))";
+        $sql = "SELECT * FROM usuarios WHERE shn_login = ? AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='PU') OR (tipo_acesso='US'))";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($user, $passw));
+        $stmt->execute(array($user));
     }
 
     $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($fetch) == 1) {
         $pgrow = $fetch[0];
+
+
+        if (!$_SESSION["id_do_usuario"]) {
+            $bcrypt = new SecureEncryption();
+            if (!$bcrypt->verifyPassword($senha_decript, $pgrow['shn_password'])) {
+                header("Location: login.php?erro=2");
+                exit;
+            }
+        }
+
         if ($pgrow['bko_autoriza'] == 'S') {
             $iduser_var   = $pgrow['id'];
             $nome_var   = $pgrow['shn_nome'];

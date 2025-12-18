@@ -239,7 +239,7 @@ class AES {
         **/
         public function decrypt($y) {
                 $cipher = 'aes-256-ecb';
-                $encrypted = openssl_decrypt($y, $cipher, $this->chave, OPENSSL_RAW_DATA);
+                $encrypted = openssl_decrypt($y, $cipher, $this->chave, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, "");
                 return $encrypted;
                 $t = ""; // 16-byte block
                 $x = ""; // returned plain text;

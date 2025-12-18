@@ -6,7 +6,7 @@ function register_globals($order = 'gp')
     // Log de entradas
     $caller = $_SERVER['SCRIPT_FILENAME'];
     file_put_contents(
-        '/www/log/php_register_globals.log',
+        '/www/arquivos_gerados/logs/php_register_globals.log',
         date('[Y-m-d H:i:s]') . " $caller GET=" . json_encode($_GET) . ' POST=' . json_encode($_POST) . "\n",
         FILE_APPEND
     );

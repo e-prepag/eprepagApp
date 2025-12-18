@@ -1,7 +1,7 @@
 <?php
 
-//error_reporting(E_ALL);
-//ini_set("display_errors", 1);
+// error_reporting(E_ALL);
+// ini_set("display_errors", 1);
 
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "util/Util.class.php";
@@ -83,21 +83,19 @@ if (Util::isAjaxRequest()) {
 
 			$connection = ConnectionPDO::getConnection()->getLink();
 
-			$objEncryption = new Encryption();
-			$senha = $objEncryption->encrypt(trim($_POST['senha']));
 			$login = strtoupper(trim($_POST['login']));
 
 			if ($validate->email($_POST['login']) == 0) {
-				$sql = "SELECT ug_acesso_sem_aut, ug_chave_autenticador, ug_id FROM usuarios_games WHERE ug_email = ? AND ug_ativo = 1 AND ug_senha = ?";
+				$sql = "SELECT ug_acesso_sem_aut, ug_chave_autenticador, ug_id FROM usuarios_games WHERE ug_email = ? AND ug_ativo = 1";
 			} else if ($validate->qtdCaracteres($_POST['login'], 2, 255) == 0) {
-				$sql = "SELECT ug_acesso_sem_aut, ug_chave_autenticador, ug_id FROM usuarios_games WHERE ug_login = ? AND ug_ativo = 1 AND ug_senha = ?";
+				$sql = "SELECT ug_acesso_sem_aut, ug_chave_autenticador, ug_id FROM usuarios_games WHERE ug_login = ? AND ug_ativo = 1";
 			} else {
 				echo RETURN_WRONG;
 				exit;
 			}
 
 			$stmt = $connection->prepare($sql);
-			$stmt->execute([$login, $senha]);
+			$stmt->execute([$login]);
 			$auth = $stmt->fetch(PDO::FETCH_ASSOC);
 
 			if (!$auth) {

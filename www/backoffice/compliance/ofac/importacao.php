@@ -78,7 +78,8 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                 $fileDest = $GLOBALS['DIR_OFAC_ARQ_RETORNO'] ."tmp/". $fileDest_nome; 
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
+                $erroSistema = error_get_last();
+                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino: {$erroSistema['message']}".PHP_EOL; 
                 else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
                 if(file_exists($fileSource)) unlink($fileSource);
         }
@@ -124,6 +125,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
             }//end if
             else {
                 $msg = "Arquivo já importado anteriormente".PHP_EOL;
+                $success = true;
             }//end else 
         }//end 
             
@@ -159,36 +161,6 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                         $msg = "Quantidade de registros diferente do total informado no cabeçalho do arquivo".PHP_EOL;
                     }
                     
-                    /*
-                    $fileOFAC = fopen($dirDest.$nome_arquivos[$i]['name'], 'r');
-                    if($fileOFAC) {
-
-                        while (!feof($fileOFAC)) {
-                            $members[] = fgets($fileOFAC);
-                        }
-                        fclose($fileOFAC);
-                        
-                        foreach ($members as $line){
-                            
-                            $vetor_aux = explode('@', $line);
-                            //removendo aspas duplas (")
-                            $vetor_aux[$IDX_VETOR_ARQ_EXPLODE[$nome_arquivos[$i]['name']]] = str_replace('"', '', $vetor_aux[$IDX_VETOR_ARQ_EXPLODE[$nome_arquivos[$i]['name']]]);
-                            echo $vetor_aux[$IDX_VETOR_ARQ_EXPLODE[$nome_arquivos[$i]['name']]]."<pre>".print_r($vetor_aux, true)."</pre>";
-                            if(strstr($vetor_aux[$IDX_VETOR_ARQ_EXPLODE[$nome_arquivos[$i]['name']]], ",")) {
-                                $vetor_nome_aux = explode(',',$vetor_aux[$IDX_VETOR_ARQ_EXPLODE[$nome_arquivos[$i]['name']]]);
-                                $nome_aux = strtoupper(trim($vetor_nome_aux[1]." ".$vetor_nome_aux[0]));
-                            echo "Nome aux: [".$nome_aux."]<br>";
-                                break;
-                            }
-                            else $nome_aux = strtoupper(trim($vetor_aux[$IDX_VETOR_ARQ_EXPLODE[$nome_arquivos[$i]['name']]]));
-                            echo "Nome aux: [".$nome_aux."]<br>";
-
-                        }//end foreach
-                        unset($members);
-                        //echo $msg;
-                    }//end if($fileOFAC) 
-                    else $msg = "Ocorreu um erro ao tentar abrir o Arquivo do OFAC".PHP_EOL;
-                    */
                 }//end if(in_array($nome_arquivos[$i]['name'], $LISTA_ARQUIVOS_IMPORTAR))
             }//end for($i = 0; $i < $numeroArquivos; $i++)
 

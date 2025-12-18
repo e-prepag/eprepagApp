@@ -1,5 +1,6 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
+require_once "/www/class/classSecureEncryption.php";
 class UsuarioGames
 {
 
@@ -686,8 +687,8 @@ class UsuarioGames
         if ($ret == "") {
 
             //Formata
-            $objEncryption = new Encryption();
-            $senha = $objEncryption->encrypt(trim($objGamesUsuario->getSenha()));
+            $objEncryption = new SecureEncryption();
+            $senha = $objEncryption->hashPassword(trim($objGamesUsuario->getSenha()));
             $dataInclusao = "CURRENT_TIMESTAMP";
             $dataUltimoAcesso = "CURRENT_TIMESTAMP";
             $qtdeAcessos = 0;
@@ -807,9 +808,10 @@ class UsuarioGames
         if ($ret == "") {
 
             //Formata
-            $objEncryption = new Encryption();
-            $senha = get_random_password(10);
-            $senha = $objEncryption->encrypt($senha);
+            $objEncryption = new SecureEncryption();
+            $partes = explode('@', $email_novo);
+            $senha = $partes[0] . "@" . date('dmy');
+            $senha = $objEncryption->hashPassword($senha);
 
             $dataInclusao = "CURRENT_TIMESTAMP";
             $dataUltimoAcesso = "CURRENT_TIMESTAMP";
@@ -1521,7 +1523,7 @@ class UsuarioGames
         $param = ':ug_login';
         $rs->bindParam($param, $login, PDO::PARAM_STR);
 
-        if($id_excessao){
+        if ($id_excessao) {
             $rs->bindParam(':ug_id_excecao', $id_excessao);
         }
 
@@ -1681,62 +1683,83 @@ class UsuarioGames
         return false;
     }
 
-    function autenticarLogin($login, $senha)
+    private function upgradePasswordHash($userId, $senhaOriginal)
     {
-        $senha0 = $senha;
-
-        $ret = false;
-
-        $err_cod = "";
-
-        /*
-        $params = array('login' => array('0' => $login,
-                '1' => 'S',
-                '2' => '1'
-            )
-        );
-        $params = sanitize_input_data_array($params, $err_cod);
-        extract($params, EXTR_OVERWRITE);
-        */
-
-        //Autentica usuario
-        //------------------------------------------------------------------
-        $objEncryption = new Encryption();
-        $senha = $objEncryption->encrypt(trim($senha));
-        $login = strtoupper(trim($login));
-        /*
-        //SQL
-        $sql = "select count(*) as qtde from usuarios_games ";
-        $sql .= " where ug_ativo = 1 ";
-        $sql .= " and ug_email = " . SQLaddFields($login, "s");
-        $sql .= " and ug_senha = " . SQLaddFields($senha, "s");
-        */
-        $sql = "SELECT * FROM usuarios_games WHERE ug_ativo = 1 AND ug_email = ? AND ug_senha = ? ";
+        $secureEncryption = new SecureEncryption();
+        $novoHash = $secureEncryption->hashPassword($senhaOriginal);
 
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
 
+        $sql = "UPDATE usuarios_games SET ug_senha = ? WHERE ug_id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($login, $senha));
-        $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute(array($novoHash, $userId));
+    }
 
-        if ($stmt->rowCount() > 0) {
+    private function migrateUserPassword($userId, $senhaOriginal)
+    {
+        $secureEncryption = new SecureEncryption();
+        $novoHash = $secureEncryption->hashPassword($senhaOriginal);
 
-            $ret = true;
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+
+        $sql = "UPDATE usuarios_games SET ug_senha = ?, ug_senha_migrated = 1 WHERE ug_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array($novoHash, $userId));
+    }
+
+    function autenticarLogin($login, $senha)
+    {
+        $ret = false;
+        $login = strtoupper(trim($login));
+        $senhaOriginal = trim($senha);
+
+        // Carrega as classes de criptografia
+        $secureEncryption = new SecureEncryption(); // Nova classe com bcrypt
+
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+
+        // Primeiro, busca o usuário e sua senha atual
+        $sqlUser = "SELECT * FROM usuarios_games WHERE ug_ativo = 1 AND ug_email ilike ?";
+
+        $stmtUser = $pdo->prepare($sqlUser);
+        $stmtUser->execute(array($login));
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return false; // Usuário não encontrado
         }
 
-        /*$rs = SQLexecuteQuery($sql);
-        if ($rs && pg_num_rows($rs) > 0) {
-            $rs_row = pg_fetch_array($rs);
-			if($rs_row['qtde'] > 0) $ret = true;
-        }*/
+        $senhaHash = $user['ug_senha'];
+        $isMigrated = $user['ug_senha_migrated'] ?: false;
+
+        // Verifica a senha usando o método apropriado
+        if ($isMigrated) {
+            // Senha já migrada para bcrypt
+            $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+
+            // Verifica se precisa re-hash (upgrade de custo)
+            if ($ret && $secureEncryption->needsRehash($senhaHash)) {
+                $this->upgradePasswordHash($user['ug_id'], $senhaOriginal);
+            }
+        } else {
+            // Senha ainda no formato antigo, tenta verificar
+            $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+
+            // Se a verificação passou, migra automaticamente para bcrypt
+            if ($ret) {
+                $this->migrateUserPassword($user['ug_id'], $senhaOriginal);
+            }
+        }
 
         if ($ret) {
 
-            $two_factor = new TwoFactorAuthenticator('USER', $fetch[0]["ug_id"], $fetch[0]["ug_nome"], $fetch[0]["ug_email"]);
+            $two_factor = new TwoFactorAuthenticator('USER', $user["ug_id"], $user["ug_nome"], $user["ug_email"]);
 
             $resend = $two_factor->verify_time();
-            $is_verified = $two_factor->verify_activate($fetch[0]["ug_id"]);
+            $is_verified = $two_factor->verify_activate($user["ug_id"]);
 
             if ($is_verified) {
                 $instUsuarioGames = new UsuarioGames();
@@ -1748,8 +1771,8 @@ class UsuarioGames
                 $sql = "update usuarios_games set ";
                 $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
                 $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
-                $sql .= " where ug_email = " . SQLaddFields($login, "s");
-                $rs = SQLexecuteQuery($sql);
+                $sql .= " where ug_email = $1";
+                $rs = SQLexecuteQueryParams($sql, [$login]);
 
                 //Log na base
                 usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
@@ -1757,20 +1780,6 @@ class UsuarioGames
                 if ($resend) {
                     $two_factor->send_email();
                 } else {
-                    /*$instUsuarioGames = new UsuarioGames();
-					$ret = $instUsuarioGames->adicionarLoginSession($login);
-
-					//Atualiza ultimo acesso
-					//------------------------------------------------------------------
-					//SQL
-					$sql = "update usuarios_games set ";
-					$sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
-					$sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
-					$sql .= " where ug_email = " . SQLaddFields($login, "s");
-					$rs = SQLexecuteQuery($sql);
-						
-					//Log na base
-					usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);*/
                     $ret = -1;
                 }
             }
@@ -1790,41 +1799,77 @@ class UsuarioGames
 
             //Autentica usuario
             //------------------------------------------------------------------
-            $objEncryption = new Encryption();
-            $senha = $objEncryption->encrypt(trim($senha));
             $login = strtoupper(trim($login));
-            //SQL
-            $sql = "SELECT count(*) as qtde, ug_email, ug_id, ug_nome FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_login) = ? AND ug_senha = ? group by ug_email, ug_id, ug_nome";
+            $senhaOriginal = trim($senha);
+
+            // Carrega as classes de criptografia
+            $secureEncryption = new SecureEncryption(); // Nova classe com bcrypt
 
             $con = ConnectionPDO::getConnection();
             $pdo = $con->getLink();
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(array($login, $senha));
-            $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Primeiro, busca o usuário e sua senha atual
+            $sqlUser = "SELECT * FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_login) = ?";
 
-            if ($fetch[0]['qtde'] > 0) {
+            $stmtUser = $pdo->prepare($sqlUser);
+            $stmtUser->execute(array($login));
+            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
-                if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
-                    $two_factor = new TwoFactorAuthenticator('USER', $fetch[0]["ug_id"], $fetch[0]["ug_nome"], $fetch[0]["ug_email"]);
+            if (!$user) {
+                return false; // Usuário não encontrado
+            }
 
-                    $two_factor->send_email();
-                    exit;
-                } else {
-                    //Adiciona objeto usuario no session
+            $senhaHash = $user['ug_senha'];
+            $isMigrated = $user['ug_senha_migrated'] ?: false;
+
+            // Verifica a senha usando o método apropriado
+            if ($isMigrated) {
+                // Senha já migrada para bcrypt
+                $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+
+                // Verifica se precisa re-hash (upgrade de custo)
+                if ($ret && $secureEncryption->needsRehash($senhaHash)) {
+                    $this->upgradePasswordHash($user['ug_id'], $senhaOriginal);
+                }
+            } else {
+                // Senha ainda no formato antigo, tenta verificar
+                $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+
+                // Se a verificação passou, migra automaticamente para bcrypt
+                if ($ret) {
+                    $this->migrateUserPassword($user['ug_id'], $senhaOriginal);
+                }
+            }
+
+            if ($ret) {
+                $two_factor = new TwoFactorAuthenticator('USER', $user["ug_id"], $user["ug_nome"], $user["ug_email"]);
+
+                $resend = $two_factor->verify_time();
+                $is_verified = $two_factor->verify_activate($user["ug_id"]);
+
+                if ($is_verified) {
                     $instUsuarioGames = new UsuarioGames();
-                    $ret = $instUsuarioGames->adicionarLoginSession($fetch[0]['ug_email']);
+                    $ret = $instUsuarioGames->adicionarLoginSession($user["ug_email"]);
 
                     //Atualiza ultimo acesso
-                    $sql = "update usuarios_games 
-								set ug_data_ultimo_acesso = CURRENT_TIMESTAMP, 
-									ug_qtde_acessos = ug_qtde_acessos + 1
-							where UPPER(ug_login) = UPPER(?) ";
-                    $stmt2 = $pdo->prepare($sql);
-                    $stmt2->execute(array($login));
+                    //------------------------------------------------------------------
+                    //SQL
+                    $sql = "update usuarios_games set ";
+                    $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
+                    $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
+                    $sql .= " where ug_email = $1";
+                    $rs = SQLexecuteQueryParams($sql, [$login]);
 
                     //Log na base
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN'], null, null);
+
+                    $ret = true;
+                } else {
+                    if ($resend) {
+                        $two_factor->send_email();
+                    } else {
+                        $ret = -1;
+                    }
                 }
             } else {
                 gravaLog_Login("Login de gamer falhou ($login).\n", true);
@@ -1851,21 +1896,47 @@ class UsuarioGames
 
         //Autentica usuario
         //------------------------------------------------------------------
-        $objEncryption = new Encryption();
-        $senha = $objEncryption->encrypt(trim($senha));
         $login = strtoupper(trim($login));
+        $senhaOriginal = trim($senha);
 
-        //SQL
-        $sql = "select count(*) as qtde from usuarios_games ";
-        $sql .= " where ug_ativo = 1 ";
-        $sql .= " and ug_email = " . SQLaddFields($login, "s");
-        $sql .= " and ug_senha = " . SQLaddFields($senha, "s");
+        // Carrega as classes de criptografia
+        $secureEncryption = new SecureEncryption(); // Nova classe com bcrypt
 
-        $rs = SQLexecuteQuery($sql);
-        if ($rs && pg_num_rows($rs) > 0) {
-            $rs_row = pg_fetch_array($rs);
-            if ($rs_row['qtde'] > 0) $ret = true;
-        } //end if($rs && pg_num_rows($rs) > 0)			
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+
+        // Primeiro, busca o usuário e sua senha atual
+        $sqlUser = "SELECT ug_id, ug_senha, ug_senha_migrated FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_email) = ?";
+
+        $stmtUser = $pdo->prepare($sqlUser);
+        $stmtUser->execute(array($login));
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return false; // Usuário não encontrado
+        }
+
+        $senhaHash = $user['ug_senha'];
+        $isMigrated = $user['ug_senha_migrated'] ?: false;
+
+        // Verifica a senha usando o método apropriado
+        if ($isMigrated) {
+            // Senha já migrada para bcrypt
+            $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+
+            // Verifica se precisa re-hash (upgrade de custo)
+            if ($ret && $secureEncryption->needsRehash($senhaHash)) {
+                $this->upgradePasswordHash($user['ug_id'], $senhaOriginal);
+            }
+        } else {
+            // Senha ainda no formato antigo, tenta verificar
+            $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
+
+            // Se a verificação passou, migra automaticamente para bcrypt
+            if ($ret) {
+                $this->migrateUserPassword($user['ug_id'], $senhaOriginal);
+            }
+        }
 
         if ($ret) {
             //testar se ï¿½ integracao retonando false caso negativo
@@ -1878,8 +1949,8 @@ class UsuarioGames
                     //SQL
                     $sql = "update usuarios_games set ";
                     $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP ";
-                    $sql .= " where ug_email = " . SQLaddFields($login, "s");
-                    $rs = SQLexecuteQuery($sql);
+                    $sql .= " where ug_email = $1";
+                    $rs = SQLexecuteQueryParams($sql, [$login]);
                     //Log na base
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['LOGIN_INTEGRACAO'], null, null);
                 } //end if(get_Integracao_order_id_is_sessao_logged()<>'')
@@ -2177,31 +2248,40 @@ class UsuarioGames
 
         //Autentica usuario
         //------------------------------------------------------------------
-        $objEncryption = new Encryption();
-        $senha = $objEncryption->encrypt(trim($senha));
-        $senhaAtual = $objEncryption->encrypt(trim($senhaAtual));
         $login = strtoupper(trim($login));
+        $senhaOriginal = trim($senhaAtual);
 
-        //SQL
-        $sql = "select count(*) as qtde from usuarios_games ";
-        $sql .= " where ug_email = " . SQLaddFields($login, "s");
-        $sql .= " and ug_senha = " . SQLaddFields($senhaAtual, "s");
+        // Carrega as classes de criptografia
+        $secureEncryption = new SecureEncryption(); // Nova classe com bcrypt
 
-        $rs = SQLexecuteQuery($sql);
-        if ($rs && pg_num_rows($rs) > 0) {
-            $rs_row = pg_fetch_array($rs);
-            if ($rs_row['qtde'] > 0) $ret = true;
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+
+        // Primeiro, busca o usuário e sua senha atual
+        $sqlUser = "SELECT ug_id, ug_senha, ug_senha_migrated FROM usuarios_games WHERE ug_ativo = 1 AND UPPER(ug_email) = ?";
+
+        $stmtUser = $pdo->prepare($sqlUser);
+        $stmtUser->execute(array($login));
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return false; // Usuário não encontrado
         }
+
+        $senhaHash = $user['ug_senha'];
+
+        $ret = $secureEncryption->verifyPassword($senhaOriginal, $senhaHash);
 
         //Atualiza ultimo acesso
         //------------------------------------------------------------------
         if ($ret) {
-            //SQL
+
+            $senha_cript = $secureEncryption->hashPassword(trim($senha));
+
             $sql = "update usuarios_games set ";
-            $sql .= " ug_senha = " . SQLaddFields($senha, "s");
-            $sql .= " where ug_email = " . SQLaddFields($login, "s");
-            $sql .= " and ug_senha = " . SQLaddFields($senhaAtual, "s");
-            $ret = SQLexecuteQuery($sql);
+            $sql .= " ug_senha = $1";
+            $sql .= " where ug_id = $2";
+            $ret = SQLexecuteQueryParams($sql, [$senha_cript, $user['ug_id']]);
 
             if ($ret) {
 
@@ -2211,29 +2291,7 @@ class UsuarioGames
                 //Envia email
                 //--------------------------------------------------------------------------------
                 $usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-                /*
-                  $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
-                  $parametros['nome'] = $usuarioGames->getNome();
-                  $parametros['sexo'] = $usuarioGames->getSexo();
 
-                  $msgEmail  = email_cabecalho($parametros);
-                  $msgEmail .= "  <br><br>
-                  <table border='0' cellspacing='0'>
-                  <tr><td>&nbsp;</td></tr>
-                  <tr valign='middle' bgcolor='#FFFFFF'>
-                  <td align='left' class='texto'>
-                  Vocï¿½ acessou nosso site e alterou sua senha.<br><br>
-                  Utilize seu email " . $usuarioGames->getEmail() . " para acessar sua conta e realizar compras em nosso site.<br><br>
-                  </td>
-                  </tr>
-                  <tr><td>&nbsp;</td></tr>
-                  </table>
-                  ";
-                  $msgEmail .= email_rodape($parametros);
-                  enviaEmail($usuarioGames->getEmail(), null, null, "E-Prepag - Alteraï¿½ï¿½o de Senha", $msgEmail);
-                 */
-
-                /* ---Wagner */
                 if (is_object($usuarioGames)) {
                     $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, 'AlteracaoSenha');
                     $objEnvioEmailAutomatico->setUgID($usuarioGames->getId());
@@ -2249,32 +2307,12 @@ class UsuarioGames
     {
         $ug_id = $this->getId();
 
-        $sql = "select * from tb_gamers_vip where ug_id = " . $ug_id . ";";
-        $rs = SQLexecuteQuery($sql);
+        $sql = "select * from tb_gamers_vip where ug_id = $1;";
+        $rs = SQLexecuteQueryParams($sql, [$ug_id]);
         $dados = pg_fetch_array($rs);
 
         return $dados;
     }
-
-
-
-    /*
-	ORIGINAL
-    function b_IsLogin_pagamento_vip($op = null, &$aret = null) {
-
-        $usuarios_pagamento_online_vip_id = $this->getIdsVIP();
-        if ($op == 1) {
-            $aret = $usuarios_pagamento_online_vip_id;
-        }
-
-        if (in_array(strtoupper($this->getId()), $usuarios_pagamento_online_vip_id)) {
-            return true;
-        }
-        return false;
-    }
-*/
-
-
 
     // Ver get_lista_usuarios_VIP() para usar a lista VIP
 
@@ -2894,8 +2932,8 @@ class UsuarioGames
         if (empty($erro)) {
             try {
                 //Formata
-                $objEncryption = new Encryption();
-                $senha = $objEncryption->encrypt(trim($this->getSenha()));
+                $objEncryption = new SecureEncryption();
+                $senha = $objEncryption->hashPassword(trim($this->getSenha()));
 
                 //Inicializando conexao PDO
                 $con = ConnectionPDO::getConnection();
@@ -3200,19 +3238,19 @@ class UsuarioGames
         $pdo = $con->getLink();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+        $senhaAtual = trim($senhaAtual);
         //Autentica usuario
         //------------------------------------------------------------------
-        $objEncryption = new Encryption();
-        $senhaAtual = $objEncryption->encrypt(trim($senhaAtual));
+        $objEncryption = new SecureEncryption();
         $login = strtoupper(trim($login));
 
         //SQL
         $sql = "select 
-                    count(*) as qtde 
+                    ug_id, ug_senha 
                 from 
                     usuarios_games 
                 where 
-                    ug_email = '" . $this->getEmail() . "' and ug_senha = '$senhaAtual'";
+                    ug_email ilike ?";
 
         if ($campo == "ug_email") {
             $valor = strtoupper($valor);
@@ -3227,19 +3265,23 @@ class UsuarioGames
         } else if ($campo == "ug_senha") {
             //SQL
             $sqlValida = "select 
-                        count(*) as qtde 
+                        ug_senha 
                     from 
                         usuarios_games 
                     where 
-                        ug_email = '" . $this->getEmail() . "' and ug_senha = '" . $objEncryption->encrypt(trim($valor)) . "'";
+                        ug_email ilike ? ";
 
             //Tentando executar a Query de Insert
             $rs = $pdo->prepare($sqlValida);
 
-            if ($rs->execute()) {
+            if ($rs->execute([$this->getEmail()])) {
 
-                if ($rs->fetchColumn() > 0) {
-                    $ret = utf8_encode("A nova senha é identica a senha atual.");
+                if ($rs->rowCount() > 0) {
+                    $rs_row = $rs->fetch(PDO::FETCH_ASSOC);
+                    $verificar_senha = $objEncryption->verifyPassword($senhaAtual, $rs_row["ug_senha"]);
+
+                    if ($verificar_senha)
+                        $ret = utf8_encode("A nova senha é identica a senha atual.");
                 }
             }
         }
@@ -3250,20 +3292,25 @@ class UsuarioGames
                 //Tentando executar a Query de Insert
                 $rs = $pdo->prepare($sql);
 
-                if ($rs->execute()) {
+                if ($rs->execute([$this->getEmail()])) {
 
-                    if ($rs->fetchColumn() > 0) {
+                    if ($rs->rowCount() > 0) {
 
-                        $sql = "update usuarios_games set $campo = :valor where ug_email = :ug_email and ug_senha = :senhaAtual";
+                        $rs_row = $rs->fetch(PDO::FETCH_ASSOC);
+                        $verificar_senha = $objEncryption->verifyPassword($senhaAtual, $rs_row["ug_senha"]);
+
+                        if (!$verificar_senha)
+                            return utf8_encode("A senha atual está incorreta.");
+
+                        $sql = "update usuarios_games set $campo = :valor where ug_id = :ug_id";
 
                         if ($campo == "ug_senha") {
-                            $fields[':valor'] = $objEncryption->encrypt(trim($valor));
+                            $fields[':valor'] = $objEncryption->hashPassword(trim($valor));
                         } else {
                             $fields[':valor'] = $valor;
                         }
 
-                        $fields[':ug_email'] = $this->getEmail();
-                        $fields[':senhaAtual'] = (string) $senhaAtual;
+                        $fields[':ug_id'] = $rs_row['ug_id'];
 
                         //Tentando executar a Query de Insert
                         $rs = $pdo->prepare($sql);
@@ -3314,9 +3361,6 @@ class UsuarioGames
                 $ret = "ERRO 2155351. Tivemos um problema, favor se o erro persistir, entrar em contato com nosso suporte. Obrigado!";
             }
         }
-
-
-
         return $ret;
     }
 
