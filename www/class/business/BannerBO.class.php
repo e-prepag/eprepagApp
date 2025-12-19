@@ -218,10 +218,6 @@ class BannerBO extends BannerDAO
         }
 
         $destino_local = RAIZ_DO_PROJETO . $this->pasta . $safe_filename;
-
-        require_once $raiz_do_projeto . 'sftp/connect.php';
-        require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
-
         // 6. Mover o arquivo
         if (!move_uploaded_file($file["tmp_name"], $destino_local)) {
             $this->erros[] = "Erro ao gravar imagem localmente. $destino_local";
