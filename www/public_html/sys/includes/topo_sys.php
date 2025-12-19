@@ -356,6 +356,7 @@ if($_SERVER['HTTPS']!="on") {
 
             // IP real
             $ipKeys = array(
+                'HTTP_CF_CONNECTING_IP',
                 'HTTP_CLIENT_IP',
                 'HTTP_X_FORWARDED_FOR',
                 'HTTP_X_FORWARDED',
