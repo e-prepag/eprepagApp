@@ -1,7 +1,7 @@
 <?php
-  // ini_set('display_errors', 1);
-  // ini_set('display_startup_errors', 1);
-  // error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
@@ -30,7 +30,6 @@ if (!function_exists('isVendaDeposito')) {
     $vg_deposito_em_saldo = (($vg_deposito_em_saldo == 1) ? 1 : 0);
     return $vg_deposito_em_saldo;
   }
-
 }
 
 set_time_limit(3000);
@@ -79,7 +78,7 @@ if ($msg == "") {
     unset($vgm_nome_cpf);
     unset($vgm_cpf);
     unset($vgm_cpf_data_nascimento);
-  }//end if(!empty($vgm_id))
+  } //end if(!empty($vgm_id))
 
   if ($BtnCancelar) {
     //atualiza status
@@ -88,7 +87,6 @@ if ($msg == "") {
       $parametros['ultimo_status_obs'] = $ultimo_status_obs;
       $msgConciliaUsuario = cancelaVendaGames($venda_id, $parametros);
     }
-
   }
 
   if ($BtnProcessa) {
@@ -123,7 +121,6 @@ if ($msg == "") {
             echo "processa '$venda_id' (Pagto Online)<br>";
             echo conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($venda_id);
           }
-
         } else {
           // É processamento normal
           $msgConciliaUsuario = "Agendamento: Agendado com sucesso.\n";
@@ -222,7 +219,7 @@ if ($msg == "") {
               $stmt3->execute([$vgm_id, $pin_codinterno]);
 
               // Passo 4: Atualizar o status do PIN para 6
-              $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+              $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '2 months'";
               $query5 = "UPDATE pins SET pin_status = 6, pin_validade = CURRENT_DATE + $validade_interval WHERE pin_codinterno = ?";
               $stmt5 = $pdo->prepare($query5);
               $stmt5->execute([$pin_codinterno]);
@@ -234,7 +231,6 @@ if ($msg == "") {
 
               // Commit da transaction
               $pdo->commit();
-
             } catch (Exception $e) {
               $pdo->rollBack();
               echo "Erro ao gerar pins novamente.\n";
@@ -248,7 +244,6 @@ if ($msg == "") {
       echo "Erro de conexao: " . $e->getMessage();
     }
   }
-
 }
 
 //Mostra a pagina
@@ -287,7 +282,7 @@ if ($bDebug)
 //Recupera modelos
 if ($msg == "") {
   $sql = "select * from tb_dist_venda_games vg " .
-    "left outer join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .	// inner join
+    "left outer join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .  // inner join
     "where vg.vg_id = " . $venda_id .
     " order by vgm_id";
   $rs_venda_modelos = SQLexecuteQuery($sql);
@@ -367,7 +362,6 @@ if ($msg == "") {
     $ug_nome = $rs_usuario_row['ug_nome'];
     $ug_cpf = $rs_usuario_row['ug_cpf'];
     $ug_rg = $rs_usuario_row['ug_rg'];
-
   }
 }
 
@@ -391,7 +385,6 @@ if ($msg == "") {
       $bbg_data_pago = $rs_boleto_row['bbg_data_pago'];
       $bbg_pago = $rs_boleto_row['bbg_pago'];
     }
-
   } elseif ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['REDECARD_MASTERCARD'] || $vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['REDECARD_DINERS']) {
     $sql = "select * from tb_venda_games_redecard vgrc " .
       "where vgrc.vgrc_vg_id = " . $venda_id;
@@ -434,7 +427,6 @@ if ($msg == "") {
       $vgrc_ret2_nr_hash_cartao = $rs_redecard_row['vgrc_ret2_nr_hash_cartao'];
       $vgrc_ret2_cod_banco = $rs_redecard_row['vgrc_ret2_cod_banco'];
     }
-
   }
 }
 
@@ -478,7 +470,7 @@ ob_end_flush();
 <script language="javascript">
   $(".cpf").mask("999.999.999-99");
   $(".data_nasci").mask("99/99/9999");
-  $(document).ready(function () {
+  $(document).ready(function() {
     document.getElementById("vgm_cpf[1]").style.visibility = 'hidden';
     document.getElementById("vgm_cpf_data_nascimento[1]").style.visibility = 'hidden';
     document.getElementById("botao[1]").style.visibility = 'hidden';
@@ -497,6 +489,7 @@ ob_end_flush();
   }
 
   var searching = false;
+
   function salvaDadosCPF(vgm_id) {
     /*
     Precisa chamar o mesmo ajax que está na alteração de cadastro de gamer q atualiza o nome no hidden $("#vgm_nome_cpf").val(); e altera $("#vgm_id").val(vgm_id); e submit o form.
@@ -511,13 +504,16 @@ ob_end_flush();
         type: "POST",
         url: "/ajax/ajaxCpf.php",
         dataType: "json",
-        data: { cpf: $("input[name='vgm_cpf[" + vgm_id + "]']").val().trim(), dataNascimento: $("input[name='vgm_cpf_data_nascimento[" + vgm_id + "]']").val().trim() },
-        beforeSend: function () {
+        data: {
+          cpf: $("input[name='vgm_cpf[" + vgm_id + "]']").val().trim(),
+          dataNascimento: $("input[name='vgm_cpf_data_nascimento[" + vgm_id + "]']").val().trim()
+        },
+        beforeSend: function() {
           searching = true;
           $("span[name='loading[" + vgm_id + "]']").removeClass("hidden");
           $("span[name='loading[" + vgm_id + "]']").html("<img src='/images/ajax-loader.gif' width='30' height='30' title='Consultando CPF...'>");
         },
-        success: function (txt) {
+        success: function(txt) {
           searching = false;
           if (txt.erros.length > 0) {
             $("span[name='loading[" + vgm_id + "]']").addClass("hidden");
@@ -530,22 +526,23 @@ ob_end_flush();
             $("#form5").submit();
           }
         },
-        error: function (x, y) {
+        error: function(x, y) {
           $("span[name='loading[" + vgm_id + "]']").addClass("hidden");
           searching = false;
           return false;
         }
       });
-    }
-    else {
+    } else {
       alert('Preencha os campos corretamente!');
       document.getElementById("vgm_cpf[" + vgm_id + "]").select();
     }
 
   }
+
   function GP_popupAlertMsg(msg) { //v1.0
     document.MM_returnValue = alert(msg);
   }
+
   function GP_popupConfirmMsg(msg) { //v1.0
     document.MM_returnValue = confirm(msg);
   }
@@ -618,26 +615,26 @@ ob_end_flush();
         <tr bgcolor="#F5F5FB">
           <td><b>PINs vendidos (IDs)</b></td>
           <td><?php
-          echo $vgm_pin_codinterno_tmp . " (";
+              echo $vgm_pin_codinterno_tmp . " (";
 
-          if ($sem_pins) {
-            echo '<font color="#FF0000">ATENÇÃO: Essa venda teve erro ao gerar PINs, <form name="formPins" id="formPins" method="post" action=""><input type="submit" name="BtnReprocessaPins" value="Gerar PINs novamente." onclick="return GP_popupConfirmMsg("Os PINs serão reprocessados. Deseja continuar?");"></form></font>';
-          } else if (trim($vgm_pin_codinterno_tmp) == "") {
-            echo "<font color='#0000FF'>Sem PINs vendidos</font>";
-          } else {
-            echo "<font color='#FF0000'>ATENÇÃO: Já tem PINs vendidos</font>";
-          }
+              if ($sem_pins) {
+                echo '<font color="#FF0000">ATENÇÃO: Essa venda teve erro ao gerar PINs, <form name="formPins" id="formPins" method="post" action=""><input type="submit" name="BtnReprocessaPins" value="Gerar PINs novamente." onclick="return GP_popupConfirmMsg("Os PINs serão reprocessados. Deseja continuar?");"></form></font>';
+              } else if (trim($vgm_pin_codinterno_tmp) == "") {
+                echo "<font color='#0000FF'>Sem PINs vendidos</font>";
+              } else {
+                echo "<font color='#FF0000'>ATENÇÃO: Já tem PINs vendidos</font>";
+              }
 
-          echo ")";
+              echo ")";
 
-          ?></td>
+              ?></td>
         </tr>
         <tr bgcolor="#F5F5FB">
           <td><b>PINs</b></td>
           <td>
             <?php
             if (!empty($vgm_pin_codinterno_tmp)) {
-              ?>
+            ?>
               <table class="table txt-preto fontsize-pp">
                 <tr bgcolor="F0F0F0" class="texto">
                   <td align="center"><b>Valor do PIN</b></td>
@@ -649,18 +646,18 @@ ob_end_flush();
                 $sql = "select pin_valor,pin_codinterno,pin_serial,CASE WHEN pin_caracter IS NULL THEN pin_codigo ELSE pin_caracter END as case_serial from pins where pin_codinterno IN ($vgm_pin_codinterno_tmp) order by pin_valor desc;";
                 $rs_pins = SQLexecuteQuery($sql);
                 while ($rs_pins_row = pg_fetch_array($rs_pins)) {
-                  ?>
+                ?>
                   <tr bgcolor="F0F0F0" class="texto">
                     <td align="center">R$ <?php echo number_format($rs_pins_row['pin_valor'], 2, ',', '.'); ?></td>
                     <td align="center"><?php echo $rs_pins_row['pin_codinterno']; ?></td>
                     <td align="center"><?php echo $rs_pins_row['pin_serial']; ?></td>
                     <td align="center"><?php echo $rs_pins_row['case_serial']; ?></td>
                   </tr>
-                <?php
-                }//end while
-            }//end if(!empty($vgm_pin_codinterno_tmp))
-            ?>
-            </table>
+              <?php
+                } //end while
+              } //end if(!empty($vgm_pin_codinterno_tmp))
+              ?>
+              </table>
           </td>
         </tr>
         <tr bgcolor="#F5F5FB">
@@ -712,13 +709,13 @@ ob_end_flush();
                 $total_desconto += $desconto;
                 $total_repasse += $repasse;
 
-                ?>
+              ?>
                 <tr class="texto" bgcolor="#F5F5FB">
                   <td width="200">
                     &nbsp;&nbsp;
                     <?php echo $rs_venda_modelos_row['vgm_nome_produto'] ?>
                     <?php if ($rs_venda_modelos_row['vgm_nome_modelo'] != "") { ?> -
-                      <?php echo $rs_venda_modelos_row['vgm_nome_modelo'] ?>  <?php } ?>
+                      <?php echo $rs_venda_modelos_row['vgm_nome_modelo'] ?> <?php } ?>
                   </td>
                   <td align="center"><?php echo $qtde ?></td>
                   <td align="right"><?php echo number_format($valor, 2, ',', '.') ?></td>
@@ -866,29 +863,29 @@ ob_end_flush();
         <tr bgcolor="#F5F5FB">
           <td><b>Data Inclusão</b></td>
           <td><?php if ($vg_pagto_data_inclusao)
-            echo formata_data_ts($vg_pagto_data_inclusao, 0, true, true) ?></td>
-          </tr>
-          <tr bgcolor="#F5F5FB">
-            <td><b>Local</b></td>
-            <td><?php echo $GLOBALS['PAGTO_LOCAIS'][$vg_pagto_banco][$vg_pagto_local] ?></td>
+                echo formata_data_ts($vg_pagto_data_inclusao, 0, true, true) ?></td>
+        </tr>
+        <tr bgcolor="#F5F5FB">
+          <td><b>Local</b></td>
+          <td><?php echo $GLOBALS['PAGTO_LOCAIS'][$vg_pagto_banco][$vg_pagto_local] ?></td>
         </tr>
         <tr bgcolor="#F5F5FB">
           <td><b>Data Informada</b></td>
           <td><?php if ($vg_pagto_data)
-            echo formata_data_ts($vg_pagto_data, 0, false, false) ?></td>
-          </tr>
-          <tr bgcolor="#F5F5FB">
-            <td valign="top"><b>Valor Pago</b></td>
-            <td>
+                echo formata_data_ts($vg_pagto_data, 0, false, false) ?></td>
+        </tr>
+        <tr bgcolor="#F5F5FB">
+          <td valign="top"><b>Valor Pago</b></td>
+          <td>
             <?php if ($vg_pagto_valor_pago)
-            echo number_format($vg_pagto_valor_pago, 2, ',', '.') ?><br>
+              echo number_format($vg_pagto_valor_pago, 2, ',', '.') ?><br>
             <?php /* if($vg_pagto_valor_pago != $total_geral){?><font color="FF0000">Atenção!!! Valor informado pelo usuário é diferente do valor da compra.<br>Certifique-se de que o pedido está correto.</font><?php  } */ ?>
           </td>
         </tr>
         <?php
         $pagto_nome_docto_Ar = preg_split("/;/", $PAGTO_NOME_DOCTO[$vg_pagto_banco][$vg_pagto_local]);
         for ($i = 0; $i < count($pagto_nome_docto_Ar); $i++) {
-          ?>
+        ?>
           <tr bgcolor="#F5F5FB">
             <td><b><?php echo (trim($pagto_nome_docto_Ar[$i]) == "" ? "Nro Documento" : $pagto_nome_docto_Ar[$i]); ?></b></td>
             <td><?php echo $pagto_num_docto[$i] ?></td>
@@ -943,7 +940,7 @@ ob_end_flush();
                   </tr>
                   <?php
                   foreach ($vgm_cpf as $key => $value) {
-                    ?>
+                  ?>
                     <tr class="texto" bgcolor="#F5F5FB">
                       <td align="left"><?php echo $vgm_descricao_modelo[$key]; ?></td>
                       <td align="left"><input type="text" name="vgm_cpf[<? echo $key; ?>]" id="vgm_cpf[<? echo $key; ?>]"
@@ -958,7 +955,7 @@ ob_end_flush();
                           onclick="salvaDadosCPF(<?php echo $key; ?>);"></span></td>
                       <td align="right"><span name="loading[<?php echo $key; ?>]"></span></td>
                     </tr>
-                    <?php
+                  <?php
                   } //end foreach ($vgm_cpf as $key => $value)
                   ?>
                 </table>
@@ -982,25 +979,25 @@ ob_end_flush();
           <tr bgcolor="#F5F5FB">
             <td width="250"><b>Data de Inclusão</b></td>
             <td><?php if ($bbg_data_inclusao)
-              echo formata_data_ts($bbg_data_inclusao, 0, true, true) ?></td>
-            </tr>
-            <tr bgcolor="#F5F5FB">
-              <td><b>Banco</b></td>
-              <td><?php echo str_pad($bbg_bco_codigo, 3, "0", STR_PAD_LEFT); ?></td>
+                  echo formata_data_ts($bbg_data_inclusao, 0, true, true) ?></td>
+          </tr>
+          <tr bgcolor="#F5F5FB">
+            <td><b>Banco</b></td>
+            <td><?php echo str_pad($bbg_bco_codigo, 3, "0", STR_PAD_LEFT); ?></td>
           </tr>
           <tr bgcolor="#F5F5FB">
             <td><b>Data de Vencimento</b></td>
             <td><?php if ($bbg_data_venc)
-              echo formata_data_ts($bbg_data_venc, 0, false, false) ?></td>
-            </tr>
-            <tr bgcolor="#F5F5FB">
-              <td><b>Valor</b></td>
-              <td><?php if ($bbg_valor)
-              echo number_format($bbg_valor, 2, ',', '.') ?></td>
-            </tr>
-            <tr bgcolor="#F5F5FB">
-              <td><b>Taxa de Serviço Bancário</b></td>
-              <td><?php echo number_format((($bbg_valor_taxa > 0) ? $bbg_valor_taxa : 0), 2, ',', '.') ?></td>
+                  echo formata_data_ts($bbg_data_venc, 0, false, false) ?></td>
+          </tr>
+          <tr bgcolor="#F5F5FB">
+            <td><b>Valor</b></td>
+            <td><?php if ($bbg_valor)
+                  echo number_format($bbg_valor, 2, ',', '.') ?></td>
+          </tr>
+          <tr bgcolor="#F5F5FB">
+            <td><b>Taxa de Serviço Bancário</b></td>
+            <td><?php echo number_format((($bbg_valor_taxa > 0) ? $bbg_valor_taxa : 0), 2, ',', '.') ?></td>
           </tr>
           <tr bgcolor="#F5F5FB">
             <td><b>N. Docto</b></td>
@@ -1020,7 +1017,7 @@ ob_end_flush();
             $token_crypt = $objEncryption->encrypt($token);
 
             //echo "bbg_bco_codigo: '$bbg_bco_codigo'<br>";
-          
+
             switch ($bbg_bco_codigo) {
               case $BOLETO_MONEY_BANCO_ITAU_COD_BANCO:
                 $sboletoURL = "/SICOB/BoletoWebItauCommerceLH.php";
@@ -1065,25 +1062,25 @@ ob_end_flush();
           <tr bgcolor="#F5F5FB">
             <td width="150"><b>Data de Inclusão</b></td>
             <td><?php if ($vgrc_data_inclusao)
-              echo formata_data_ts($vgrc_data_inclusao, 0, true, true) ?></td>
-            </tr>
-            <tr bgcolor="#F5F5FB">
-              <td><b>Parcelas</b></td>
-              <td><?php echo $vgrc_parcelas ?></td>
+                  echo formata_data_ts($vgrc_data_inclusao, 0, true, true) ?></td>
+          </tr>
+          <tr bgcolor="#F5F5FB">
+            <td><b>Parcelas</b></td>
+            <td><?php echo $vgrc_parcelas ?></td>
           </tr>
           <tr bgcolor="#F5F5FB">
             <td><b>Valor</b></td>
             <td><?php if ($vgrc_total)
-              echo number_format($vgrc_total, 2, ',', '.') ?></td>
-            </tr>
-            <tr bgcolor="#F5F5FB">
-              <td><b>Data de Envio</b></td>
-              <td><?php if ($vgrc_data_envio1)
-              echo formata_data_ts($vgrc_data_envio1, 0, true, true) ?></td>
-            </tr>
-            <tr bgcolor="#F5F5FB">
-              <td><b>IP do usuário</b></td>
-              <td><?php echo $vgrc_usuario_ip ?></td>
+                  echo number_format($vgrc_total, 2, ',', '.') ?></td>
+          </tr>
+          <tr bgcolor="#F5F5FB">
+            <td><b>Data de Envio</b></td>
+            <td><?php if ($vgrc_data_envio1)
+                  echo formata_data_ts($vgrc_data_envio1, 0, true, true) ?></td>
+          </tr>
+          <tr bgcolor="#F5F5FB">
+            <td><b>IP do usuário</b></td>
+            <td><?php echo $vgrc_usuario_ip ?></td>
           </tr>
           <tr bgcolor="#F5F5FB">
             <td><b>TRANSACAO</b></td>
@@ -1364,12 +1361,13 @@ ob_end_flush();
         <input type="hidden" id="venda_id" name="venda_id" value="<?php echo $venda_id; ?>">
         <input type="hidden" id="dados_operador" name="dados_operador" value="<?php echo $_SESSION["userlogin_bko"]; ?>">
         <script>
-          $('.fecha-modal').on('click', function () {
+          $('.fecha-modal').on('click', function() {
             $('.modal-title').empty();
             $('.modal-body h5').empty();
             $('.modal-body p').empty();
             $('.modal-footer').empty();
           });
+
           function mascara_numeros(input) {
             console.log(input.value);
             let parsed = Number.parseInt(input.value);
@@ -1383,7 +1381,7 @@ ob_end_flush();
               $('#modalResultado').modal();
             }
           }
-          $('#btn_concilia').on('click', function () {
+          $('#btn_concilia').on('click', function() {
             let valor_code_payment = $('#code_payment').val();
 
             let parsed = Number.parseInt(valor_code_payment);
@@ -1401,7 +1399,7 @@ ob_end_flush();
                   dados_operador: $("#dados_operador").val(),
                   venda_id: $("#venda_id").val()
                 }
-              }).done(function (mensagem) {
+              }).done(function(mensagem) {
                 if (mensagem == 'Conciliação manual não foi realizada!') {
                   $('.modal-title').append('Ops!');
                   $('.modal-body').append('<h5>' + mensagem + '</h5>');
@@ -1478,8 +1476,7 @@ function get_pins_vendidos($vg_id)
   if (!$rs_mod || pg_num_rows($rs_mod) == 0) {
     $msg = "Nenhum modelo encontrado (vg_id = $vg_id).\n";
   } else {
-    while ($rs_mod_row = pg_fetch_array($rs_mod)) {
-      ;
+    while ($rs_mod_row = pg_fetch_array($rs_mod)) {;
       $vgm_id = $rs_mod_row['vgm_id'] . "";
       $sql_pin = "select vgmp_pin_codinterno from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = $vgm_id;";
       $rs_pin = SQLexecuteQuery($sql_pin);

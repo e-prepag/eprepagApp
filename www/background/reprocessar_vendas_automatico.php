@@ -103,7 +103,7 @@ try {
                     $stmt3->execute([$vgm_id, $pin_codinterno]);
 
                     // Passo 4: Atualizar o status do PIN para 6
-                    $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+                    $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '2 months'";
                     $query5 = "UPDATE pins SET pin_status = 6, pin_validade = CURRENT_DATE + $validade_interval WHERE pin_codinterno = ?";
                     $stmt5 = $pdo->prepare($query5);
                     $stmt5->execute([$pin_codinterno]);
@@ -135,5 +135,3 @@ $tempoExecucao = $fim - $inicio;
 
 // Echo de finalizacao
 echo "O script levou " . number_format($tempoExecucao, 5) . " segundos para ser executado.";
-
-?>

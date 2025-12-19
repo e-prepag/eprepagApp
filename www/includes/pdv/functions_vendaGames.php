@@ -199,7 +199,6 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
 
                 // Adiciona o PIN na lista de ignorados
                 $pin_ignorados[] = $pgpins["pin_codigo"];
-
             } else {
                 // Retorna o PIN válido
                 return [
@@ -214,9 +213,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
                 'pin' => $pgpins
             ];
         }
-
     } while (true);
-
 }
 
 function processaVendaGames($venda_id, $EstabCod, $parametros)
@@ -267,9 +264,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
             ) {
                 $msg =
                     "Venda não esta no status de " .
-                    $GLOBALS["STATUS_VENDA_DESCRICAO"][
-                        $GLOBALS["STATUS_VENDA"]["AGUARDANDO_PROCESSAMENTO"]
-                    ] .
+                    $GLOBALS["STATUS_VENDA_DESCRICAO"][$GLOBALS["STATUS_VENDA"]["AGUARDANDO_PROCESSAMENTO"]] .
                     PHP_EOL;
 
                 //Agendamento
@@ -497,7 +492,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $sql = "UPDATE pins 
                                 SET 
                                     pin_status = '6', 
-                                    pin_validade = CURRENT_DATE + INTERVAL '6 months',
+                                    pin_validade = CURRENT_DATE + INTERVAL '2 months',
                                     pin_desc = 'Pin Eprepag cash PDV variavel'
                                 WHERE pin_codinterno = " . $pin_codinterno;
                         $ret = SQLexecuteQuery($sql);
@@ -517,7 +512,6 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                         fclose($ff);
                     }
-
                 } else {
                     //Sleep para nao sobrecarregar o servidor
                     //sleep(1);
@@ -558,7 +552,6 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                             $pin_codinterno = $pgpins["pin_codinterno"];
                             $pin_valor = $pgpins["pin_valor"];
                             $pin_serial = $pgpins["pin_serial"];
-
                         }
                     }
 
@@ -580,7 +573,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $vg_somente_debito == 0 &&
                         $vgm_pin_request == 0
                     ) {
-                        $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '6 months'";
+                        $validade_interval = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '2 months'";
 
                         $sql = "
                             UPDATE pins SET
@@ -724,17 +717,17 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                 $epay = new Epay();
                                 $dados_pedido = [
                                     "code" =>
-                                        $rs_bhn_row["ogpm_pin_resquest_id"],
+                                    $rs_bhn_row["ogpm_pin_resquest_id"],
                                     "shopid" => $rs_bhn_row["ogpm_provider_id"],
                                     "model" => $vgm_id,
                                     "operator" => $vgm_opr_codigo,
                                     "retailerid" =>
-                                        $rs_bhn_row["ogpm_cod_epay"],
+                                    $rs_bhn_row["ogpm_cod_epay"],
                                     "type_sale" => "PDV",
                                     "value" => $vgm_valor_pin,
                                     "sale" => $venda_id,
                                     "name_prod" =>
-                                        $rs_bhn_variavel_row["ogp_nome"],
+                                    $rs_bhn_variavel_row["ogp_nome"],
                                 ];
                                 $msg = $epay->sale("DIRECT", $dados_pedido);
                             } else {
@@ -746,7 +739,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                     $rs_api = new classBHN();
                                     $parametros = [
                                         "productId" =>
-                                            $rs_bhn_row["ogpm_pin_resquest_id"],
+                                        $rs_bhn_row["ogpm_pin_resquest_id"],
                                         "localTransactionDate" => date("ymd"),
                                         "localTransactionTime" => date("His"),
                                         "retrievalReferenceNumber" => str_pad(
@@ -855,12 +848,12 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     "rc@e-prepag.com.br,relacionamento@e-prepag.com.br",
                     null,
                     (!checkIP() ? "[PROD]" : "[DEV-HOMOLOG]") .
-                    " PDV - Promovido Automáticamente para PDV Aprovado",
+                        " PDV - Promovido Automáticamente para PDV Aprovado",
                     "PDV de ID [" .
-                    $vg_ug_id .
-                    "] foi promovido automáticamente para SubStatus PDV Aprovado após a conciliação automática de sua primeira compra. ID do Pedido [" .
-                    $venda_id .
-                    "]."
+                        $vg_ug_id .
+                        "] foi promovido automáticamente para SubStatus PDV Aprovado após a conciliação automática de sua primeira compra. ID do Pedido [" .
+                        $venda_id .
+                        "]."
                 );
             } //end else do if(!$retSubStatus)
         } //end else do if(!$ret)
@@ -1361,8 +1354,8 @@ function cancelaVendaGames($venda_id, $parametros)
                 null,
                 null,
                 "E-Prepag - " .
-                formata_codigo_venda($venda_id) .
-                " - Cancelado",
+                    formata_codigo_venda($venda_id) .
+                    " - Cancelado",
                 $msgEmail
             );
             if ($ret == "") {
@@ -1407,11 +1400,11 @@ function processaAgendamentos($lista = null)
                                 1 - Distribuidor - Processamento e Envio de Email
         */
     global $cReturn,
-    $cSpaces,
-    $sFontRedOpen,
-    $sFontRedClose,
-    $bHTML,
-    $raiz_do_projeto;
+        $cSpaces,
+        $sFontRedOpen,
+        $sFontRedClose,
+        $bHTML,
+        $raiz_do_projeto;
 
     $bDebug = false;
     $time_start_stats = getmicrotime();
@@ -1576,9 +1569,7 @@ function processaAgendamentos($lista = null)
                     if ($BtnProcessa) {
                         //Associa pins, gera venda e credita saldo
                         if ($msgConcilia == "") {
-                            $parametros[
-                                "ultimo_status_obs"
-                            ] = $ultimo_status_obs;
+                            $parametros["ultimo_status_obs"] = $ultimo_status_obs;
                             //if($bDebug)
                             echo "  Último status $ultimo_status_obs (" .
                                 date("d/m/Y - H:i:s") .
@@ -1640,9 +1631,7 @@ function processaAgendamentos($lista = null)
                                         ",
                                                                                         vg_ultimo_status = " .
                                         SQLaddFields(
-                                            $GLOBALS["STATUS_VENDA"][
-                                                "VENDA_REALIZADA"
-                                            ],
+                                            $GLOBALS["STATUS_VENDA"]["VENDA_REALIZADA"],
                                             ""
                                         ) .
                                         "
@@ -1680,9 +1669,7 @@ function processaAgendamentos($lista = null)
                     if ($BtnProcessaEmail) {
                         //envia email para o cliente
                         if ($msgConcilia == "") {
-                            $parametros[
-                                "ultimo_status_obs"
-                            ] = $ultimo_status_obs;
+                            $parametros["ultimo_status_obs"] = $ultimo_status_obs;
                             $msgConcilia = processaEmailVendaGames(
                                 $venda_id,
                                 $parametros
@@ -1750,9 +1737,9 @@ function processaAgendamentos($lista = null)
         if (
             $handle = fopen(
                 $raiz_do_projeto .
-                "arquivos_gerados/logs/monitoragendamentos" .
-                str_replace(",", "", $lista) .
-                ".txt",
+                    "arquivos_gerados/logs/monitoragendamentos" .
+                    str_replace(",", "", $lista) .
+                    ".txt",
                 "w"
             )
         ) {
@@ -1782,9 +1769,9 @@ function processaAgendamentos($lista = null)
 function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
 {
     global $FORMAS_PAGAMENTO,
-    $FORMAS_PAGAMENTO_DESCRICAO,
-    $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC,
-    $PAGAMENTO_PIX_NUMERIC;
+        $FORMAS_PAGAMENTO_DESCRICAO,
+        $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC,
+        $PAGAMENTO_PIX_NUMERIC;
     global $cReturn, $cSpaces, $sFontRedOpen, $sFontRedClose, $bHTML;
 
     $bDebug = true;
@@ -1928,9 +1915,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         "   tipo: (" .
                         $rs_transacoes_row["iforma"] .
                         ") " .
-                        $FORMAS_PAGAMENTO_DESCRICAO[
-                            $rs_transacoes_row["iforma"]
-                        ] .
+                        $FORMAS_PAGAMENTO_DESCRICAO[$rs_transacoes_row["iforma"]] .
                         "," .
                         $cReturn .
                         "   idvenda: " .
@@ -1945,19 +1930,19 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         echo $msg;
                         gravaLog_TMP(
                             "Erro atualizando registro em processamento (41 PDV)." .
-                            $cReturn .
-                            $sout .
-                            $sql_update .
-                            $cReturn
+                                $cReturn .
+                                $sout .
+                                $sql_update .
+                                $cReturn
                         );
                     } else {
                         echo "Pagamento atualizado com sucesso (PDV)." .
                             $cReturn;
                         gravaLog_TMP(
                             "Pagamento processado com sucesso (PDV):" .
-                            $cReturn .
-                            "   " .
-                            $sout
+                                $cReturn .
+                                "   " .
+                                $sout
                         );
                     }
 
@@ -2008,9 +1993,9 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                                 "'";
                             gravaLog_TMP(
                                 "Arrumar teste OK: [" .
-                                $dataconfirma .
-                                "]" .
-                                PHP_EOL
+                                    $dataconfirma .
+                                    "]" .
+                                    PHP_EOL
                             );
                         } //end if(strlen(str_replace("'", "", $dataconfirma)) == 17)
 
@@ -2055,9 +2040,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                                 date("Y-m-d H:i:s") .
                                 "',
                                                                                         vg_ultimo_status		= " .
-                                $GLOBALS["STATUS_VENDA"][
-                                    "DADOS_PAGTO_RECEBIDO"
-                                ] .
+                                $GLOBALS["STATUS_VENDA"]["DADOS_PAGTO_RECEBIDO"] .
                                 "
                                                                                 where vg_id=" .
                                 $rs_transacoes_row["idvenda"] .
@@ -2091,9 +2074,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                                 "   tipo: (" .
                                 $rs_transacoes_row["iforma"] .
                                 ") " .
-                                $FORMAS_PAGAMENTO_DESCRICAO[
-                                    $rs_transacoes_row["iforma"]
-                                ] .
+                                $FORMAS_PAGAMENTO_DESCRICAO[$rs_transacoes_row["iforma"]] .
                                 "," .
                                 $cReturn .
                                 "   idvenda: " .
@@ -2108,19 +2089,19 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                                 echo $msg;
                                 gravaLog_TMP(
                                     "Erro atualizando registro POR SONDA em processamento (41a PDV)." .
-                                    $cReturn .
-                                    $sout .
-                                    $sql_update .
-                                    $cReturn
+                                        $cReturn .
+                                        $sout .
+                                        $sql_update .
+                                        $cReturn
                                 );
                             } else {
                                 echo "Pagamento atualizado com sucesso." .
                                     $cReturn;
                                 gravaLog_TMP(
                                     "Pagamento processado POR SONDA com sucesso (PDV):" .
-                                    $cReturn .
-                                    "   " .
-                                    $sout
+                                        $cReturn .
+                                        "   " .
+                                        $sout
                                 );
                             }
                         }
@@ -2160,7 +2141,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             " - R\$" .
                             number_format(
                                 $rs_transacoes_row["total"] / 100 -
-                                $rs_transacoes_row["taxas"],
+                                    $rs_transacoes_row["taxas"],
                                 2,
                                 ".",
                                 "."
@@ -2180,7 +2161,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             " - R\$" .
                             number_format(
                                 $rs_transacoes_row["total"] / 100 -
-                                $rs_transacoes_row["taxas"],
+                                    $rs_transacoes_row["taxas"],
                                 2,
                                 ".",
                                 "."
@@ -2236,9 +2217,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
             $GLOBALS["STATUS_VENDA"]["PAGTO_CONFIRMADO"] .
             ")) 
                                                 and ((vg_pagto_tipo = " .
-            $GLOBALS["FORMAS_PAGAMENTO"][
-                "TRANSFERENCIA_ENTRE_CONTAS_BRADESCO"
-            ] .
+            $GLOBALS["FORMAS_PAGAMENTO"]["TRANSFERENCIA_ENTRE_CONTAS_BRADESCO"] .
             ") or 
                                                                 (vg_pagto_tipo = " .
             $GLOBALS["FORMAS_PAGAMENTO"]["PAGAMENTO_FACIL_BRADESCO_DEBITO"] .
@@ -2567,9 +2546,9 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
 function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
 {
     global $FORMAS_PAGAMENTO,
-    $FORMAS_PAGAMENTO_DESCRICAO,
-    $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC,
-    $PAGAMENTO_PIX_NUMERIC;
+        $FORMAS_PAGAMENTO_DESCRICAO,
+        $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC,
+        $PAGAMENTO_PIX_NUMERIC;
     global $cReturn, $cSpaces, $sFontRedOpen, $sFontRedClose, $bHTML;
 
     $bDebug = true;
@@ -2687,9 +2666,9 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             "'20" . str_replace("'", "", $dataconfirma) . "'";
                         gravaLog_TMP(
                             "Arrumar teste OK: [" .
-                            $dataconfirma .
-                            "]" .
-                            PHP_EOL
+                                $dataconfirma .
+                                "]" .
+                                PHP_EOL
                         );
                     } //end if(strlen(str_replace("'", "", $dataconfirma)) == 17)
 
@@ -2768,9 +2747,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             "   tipo: (" .
                             $rs_transacoes_row["iforma"] .
                             ") " .
-                            $FORMAS_PAGAMENTO_DESCRICAO[
-                                $rs_transacoes_row["iforma"]
-                            ] .
+                            $FORMAS_PAGAMENTO_DESCRICAO[$rs_transacoes_row["iforma"]] .
                             "," .
                             $cReturn .
                             "   idvenda: " .
@@ -2785,18 +2762,18 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             echo $msg;
                             gravaLog_TMP(
                                 "Erro atualizando registro POR SONDA em processamento (41a PDV)." .
-                                $cReturn .
-                                $sout .
-                                $sql_update .
-                                $cReturn
+                                    $cReturn .
+                                    $sout .
+                                    $sql_update .
+                                    $cReturn
                             );
                         } else {
                             echo "Pagamento atualizado com sucesso." . $cReturn;
                             gravaLog_TMP(
                                 "Pagamento processado POR SONDA com sucesso (PDV):" .
-                                $cReturn .
-                                "   " .
-                                $sout
+                                    $cReturn .
+                                    "   " .
+                                    $sout
                             );
                         }
                     }
@@ -2834,7 +2811,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         " - R\$" .
                         number_format(
                             $rs_transacoes_row["total"] / 100 -
-                            $rs_transacoes_row["taxas"],
+                                $rs_transacoes_row["taxas"],
                             2,
                             ".",
                             "."
@@ -2856,7 +2833,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         " - R\$" .
                         number_format(
                             $rs_transacoes_row["total"] / 100 -
-                            $rs_transacoes_row["taxas"],
+                                $rs_transacoes_row["taxas"],
                             2,
                             ".",
                             "."

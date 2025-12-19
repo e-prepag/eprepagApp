@@ -77,7 +77,6 @@ class Garena
 							array_push($this->error, ["Erro" => "Esse pedido Já foi resgatado ou já está em processo de resgate (EPP0043)."]);
 						}
 					}
-
 				}
 			} else {
 				array_push($this->error, ["Erro" => "Resgate temporariamente indisponível, tente novamente mais tarde (EPP0001)."]);
@@ -114,35 +113,30 @@ class Garena
 		} else {
 			$this->conta = $conta;
 		}
-
 	}
 
 	private function setDataUtilizacao($data)
 	{
 
 		$this->dataUtilizacao = $data;
-
 	}
 
 	public function getDataUtilizacao()
 	{
 
 		return $this->dataUtilizacao;
-
 	}
 
 	private function setTxn_id($code)
 	{
 
 		$this->txn_id = $code;
-
 	}
 
 	public function getTxn_id()
 	{
 
 		return $this->txn_id;
-
 	}
 
 	private function setCodigo($pin)
@@ -157,9 +151,7 @@ class Garena
 			} else {
 				array_push($this->error, ["Erro" => "O pin selecionado não está disponivel para ser resgatado (EPP0006)."]);
 			}
-
 		}
-
 	}
 
 	private function testeConexaoBanco()
@@ -170,7 +162,6 @@ class Garena
 			return false;
 		}
 		return true;
-
 	}
 
 	public function setRoles($dados)
@@ -201,7 +192,6 @@ class Garena
 					INNER JOIN tb_dist_venda_games_modelo 
 					ON vgm_id = vgmp_vgm_id 
 					WHERE vgmp_pin_codinterno = :idPin";
-
 		} else {
 
 			$this->type = "usuario";
@@ -232,7 +222,6 @@ class Garena
 		$this->codGarena = isset($this->mapaProdutos[$produtoId]) ? $this->mapaProdutos[$produtoId] : 'ERRO';
 
 		return true;
-
 	}
 
 	private function geraHash($conteudo, $ambiente)
@@ -263,7 +252,6 @@ class Garena
 				$this->destravaProcesso();
 				return json_encode($this->error[0]);
 			}
-
 		}
 
 		if ($this->verificaPinLog() === true) {
@@ -319,19 +307,15 @@ class Garena
 						$this->rolesGarena[$num]["code"] = $resultado["roles"][$num]["packed_role_id"];
 						$this->rolesGarena[$num]["nome"] = $resultado["roles"][$num]["role"];
 					}
-
 				} else {
 					$this->destravaProcesso();
 					if ($resultado["error"] == 98 || $resultado["error"] == 99) {
 
 						array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0009)."]);
-
 					} else {
 						array_push($this->error, ["Erro" => $this->catalogoErro($resultado["error"])]);
 					}
-
 				}
-
 			} elseif ($informacoesDisparo["http_code"] == 400) {
 				$this->destravaProcesso();
 				array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0009)."]); //O channel_name garena está invalido
@@ -339,7 +323,6 @@ class Garena
 				$this->destravaProcesso();
 				array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0009)."]); //O IP não está na whitelist
 			}
-
 		} elseif ($metodo == "POST") {
 
 			/// verifica se foi retornado o ROLE ID do usuário garena
@@ -464,9 +447,7 @@ class Garena
 					} else {
 						array_push($this->error, ["Erro" => $this->catalogoErro($resultado["error"])]);
 					}
-
 				}
-
 			} elseif ($informacoesDisparo["http_code"] == 404) {
 				$this->destravaProcesso();
 				array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0012)."]); //O channel_name garena está invalido
@@ -477,12 +458,10 @@ class Garena
 				$this->destravaProcesso();
 				array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0012)."]); //Alguma tipagem dos parametros então invalidas
 			}
-
 		}
 
 		$validacao = $this->verificaProcesso();
 		return $validacao;
-
 	}
 
 	private function verificaProcesso()
@@ -493,7 +472,6 @@ class Garena
 		} else {
 			return true;
 		}
-
 	}
 
 	private function travaProcesso()
@@ -509,7 +487,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function destravaProcesso()
@@ -525,7 +502,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function processoConfirmado()
@@ -555,7 +531,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function situacaoProcesso()
@@ -572,7 +547,6 @@ class Garena
 			return $resultado["pin_status_trava"];
 		}
 		return false;
-
 	}
 
 	private function verificaSituacaoPin($idpin)
@@ -592,10 +566,8 @@ class Garena
 			} else {
 				return true;
 			}
-
 		}
 		return false;
-
 	}
 
 	private function atualizarImpressao()
@@ -615,7 +587,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function cadastroGuid($guid, $idPin)
@@ -632,7 +603,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function cadastroCadastroGarena()
@@ -649,7 +619,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function verificaPinGuid()
@@ -690,7 +659,7 @@ class Garena
 		$sql = "SELECT 1 
 				FROM pins 
 				WHERE pin_codinterno = :PIN 
-				  AND (pin_validade >= CURRENT_DATE OR pin_datavenda > (CURRENT_DATE - INTERVAL '180 day'));";
+				  AND (pin_validade >= CURRENT_DATE OR pin_datavenda > (CURRENT_DATE - INTERVAL '2 month'));";
 
 		$comando = $con->prepare($sql);
 		$comando->bindValue(":PIN", $this->idPin);
@@ -719,7 +688,6 @@ class Garena
 			return true;
 		}
 		return false;
-
 	}
 
 	private function catalogoErro($codigo)
@@ -760,7 +728,6 @@ class Garena
 
 		$retorno = (isset($ERROS[$codigo])) ? $ERROS[$codigo] : "Não foi possivel realizar seu resgate, teste novamente mais tarde (EPP0042).";
 		return $retorno;
-
 	}
 
 	private function salvaLog($conteudo, $type, $conta, $pin, $tempoDuracao = 0)
@@ -776,7 +743,6 @@ class Garena
 		fwrite($file, "TEMPO DURACAO: " . $tempoDuracao . "\r");
 		fwrite($file, str_repeat("*", 50) . "\r");
 		fclose($file);
-
 	}
 
 	public static function BuscaIdPin($pin, $id = "")
@@ -792,7 +758,6 @@ class Garena
 			$retornoPin = $sqlPin->fetch(PDO::FETCH_ASSOC);
 
 			return $retornoPin["pin_codigo"];
-
 		}
 
 		$sqlPin = $conexao->getLink()->prepare("select pin_status from pins where pin_codigo = :PIN;");
@@ -812,7 +777,6 @@ class Garena
 		$sql->bindValue(":PIN", $pin);
 		$sql->execute();
 		return $sql->fetch(PDO::FETCH_ASSOC);
-
 	}
 
 	public static function verificaQtdePin($pin, $ip, $data)
@@ -865,14 +829,11 @@ class Garena
 				if ($update->rowCount() > 0) {
 
 					return true;
-
 				}
 
 				return false;
 			}
-
 		}
-
 	}
 
 	public static function verificaLotePin($ip, $data)
@@ -898,7 +859,6 @@ class Garena
 		}
 
 		return true;
-
 	}
 
 	public static function salvaRetorno($pin, $ip, $dados)
@@ -912,7 +872,6 @@ class Garena
 		$query->bindValue(":DADOS", $dados);
 		$query->bindValue(":PIN", $pin);
 		$query->execute();
-
 	}
 
 	public static function verificaTokenRe($token)
@@ -962,14 +921,10 @@ class Garena
 	{
 		$conexao = ConnectionPDO::getConnection();
 		return $conexao->getLink();
-
 	}
 
 	public function __toString()
 	{
 		return json_encode(["ValorResgate" => $this->valorResgate, "venda" => $this->venda, "codigoGarena" => $this->codGarena, "conta" => $this->conta, "pinVinculado" => $this->idPin, "roles" => $this->rolesGarena]);
 	}
-
-
 }
-?>
