@@ -302,7 +302,12 @@ class BannerBO extends BannerDAO
                     continue;
                 }
 
-                $where[] = ["bsc_id", "=", $categoria->getId()];
+                $index_bsc_id = 3;
+                if (!isset($where[$index_bsc_id])) {
+                    $where[] = ["bsc_id", "=", $categoria->getId()];
+                } else {
+                    $where[$index_bsc_id] = ["bsc_id", "=", $categoria->getId()];
+                }
                 $banners = $this->pegaBanner($where);
                 if (!empty($banners)) {
                     foreach ($banners as $banner) {
