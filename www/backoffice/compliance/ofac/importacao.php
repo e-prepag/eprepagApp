@@ -250,8 +250,8 @@ if(isset($BtnConcluir) && $BtnConcluir) {
             </p>
         </form>
     </div>
-    <div class="col-md-12 txt-vermelho">
-        <p>Efetuar download do arquivo em: ftp://ofacftp.treas.gov/fac_sdn/</p>
+    <div class="col-md-12 txt-verde">
+        <p>Efetuar download do arquivo em: <a>https://sanctionslist.ofac.treas.gov/Home/SdnList</a></p>
     </div>
 <?php 
 if(isset($msg) && $msg != ""){ 
