@@ -752,7 +752,7 @@ try {
                     ),
 
                     5 => array(
-                        'name' => $enderecoEPPPAGTO,
+                        'name' => removerAcentos($enderecoEPPPAGTO),
 
                         'size' => 70
 
@@ -900,10 +900,16 @@ try {
 
                     //Dados dos Publishers vinculados a EPP ADM
 
+                    if($response_epp_adm_row['opr_estado'] != 'SP'){
+                        continue;
+                    }
+
                     unset($vetorLines);
                     $response_epp_adm_row['opr_cidade'] = removerAcentos($response_epp_adm_row['opr_cidade']);
                     $response_epp_adm_row['opr_bairro'] = removerAcentos($response_epp_adm_row['opr_bairro']);
                     $response_epp_adm_row['opr_complemento'] = removerAcentos($response_epp_adm_row['opr_complemento']);
+
+                    $enderecoPublisher = ($response_epp_adm_row['opr_estado'] == "RS") ? 'AVENIDA DAS NACOES UNIDAS, 12901 - SL 25 102 - BROOKLIN PAULISTA - SAO PAULO' : $response_epp_adm_row['opr_endereco'] . ', ' . $response_epp_adm_row['opr_numero'] . ((!empty($response_epp_adm_row['opr_complemento'])) ? ' - ' . $response_epp_adm_row['opr_complemento'] : "") . ((!empty($response_epp_adm_row['opr_bairro'])) ? ' - ' . $response_epp_adm_row['opr_bairro'] : "") . ' - ' . $response_epp_adm_row['opr_cidade'];
 
                     $vetorLines = array(
 
@@ -943,7 +949,7 @@ try {
                         ),
 
                         5 => array(
-                            'name' => ($response_epp_adm_row['opr_estado'] == "RS") ? 'AVENIDA DAS NACOES UNIDAS, 12901 - SL 25 102 - BROOKLIN PAULISTA - SAO PAULO' : $response_epp_adm_row['opr_endereco'] . ', ' . $response_epp_adm_row['opr_numero'] . ((!empty($response_epp_adm_row['opr_complemento'])) ? ' - ' . $response_epp_adm_row['opr_complemento'] : "") . ((!empty($response_epp_adm_row['opr_bairro'])) ? ' - ' . $response_epp_adm_row['opr_bairro'] : "") . ' - ' . $response_epp_adm_row['opr_cidade'],
+                            'name' => removerAcentos($enderecoPublisher),
 
                             'size' => 200
 
@@ -1901,7 +1907,7 @@ try {
                                 where publisher IN (" . $publishers_epp_pagto . ")
 
                                     and opr_status = '1'
-
+                                    and total > 0
                                     and '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' > opr_data_inicio_operacoes
 
                                 group by venda, dia
@@ -2592,7 +2598,7 @@ try {
                             inner join operadoras ON opr_codigo = publisher
 
                             where publisher = " . $total_epp_adm_row['fp_publisher'] . "
-
+                                and total > 0
                                 and opr_status = '1' 
 
                             group by venda, dia
