@@ -89,14 +89,14 @@ $expiration = 600;	// time in seconds to delete image form server
 	$i = 0;
 	list($usec, $sec) = explode(" ", microtime());
 	$now = ((float)$usec + (float)$sec);			
-	$current_dir = @opendir($raiz_do_projeto . "backoffice".$img_path);
-        if(is_dir($raiz_do_projeto . "backoffice".$img_path)) {
+	$current_dir = @opendir($raiz_do_projeto . "arquivos_gerados".$img_path);
+        if(is_dir($raiz_do_projeto . "arquivos_gerados".$img_path)) {
             while($filename = @readdir($current_dir)) {
                     if ($filename != "." and $filename != ".." and $filename != "index.html") {
                             $name = str_replace(".png", "", $filename);		
     //echo "$i: ".$img_path.$filename." - ";
                             if ((($name + $expiration) < $now) && (strpos($filename, ".png")!==false)) {
-                                    @unlink($raiz_do_projeto . "backoffice".$img_path.$filename);
+                                    @unlink($raiz_do_projeto . "arquivos_gerados".$img_path.$filename);
     //echo " delete it";
                             }
                             $i++;
@@ -203,7 +203,7 @@ $band = new PlotBand(HORIZONTAL,BAND_DIAGCROSS,8,18,'gray');
 $band->ShowFrame(false); // No border around the plot band
 $graph->Add($band);
 				
-$graph->Stroke($raiz_do_projeto . "backoffice".$img_path.$fname);
+$graph->Stroke($raiz_do_projeto . "arquivos_gerados".$img_path.$fname);
 
 
 // ================================================

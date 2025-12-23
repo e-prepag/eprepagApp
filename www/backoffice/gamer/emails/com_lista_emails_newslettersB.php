@@ -174,7 +174,7 @@
 
 		global $raiz_do_projeto;
     
-		$file_path = $raiz_do_projeto . "backoffice/includes/download/tmp/";
+		$file_path = $raiz_do_projeto . "arquivos_gerados/includes/download/tmp/";
 		$web_path = "/includes/download/tmp/";
 		$expiration = 20;
 
