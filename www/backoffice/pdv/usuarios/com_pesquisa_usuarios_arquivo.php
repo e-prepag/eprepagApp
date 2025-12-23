@@ -103,7 +103,6 @@ function grava_arquivo_emails_user($mensagem) {
 
                 global $raiz_do_projeto;
 		$file_path = $raiz_do_projeto . "arquivos_gerados/txts/txt/";
-		$web_path = "/tmp/txt/";
 		$expiration = 20;
 
 		// -----------------------------------
