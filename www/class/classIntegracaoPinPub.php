@@ -181,7 +181,7 @@ function verifica_validade($pin, $id)
           AND (
               (pin_validade >= CURRENT_DATE AND opr_codigo <> 166)
               OR
-              ((CURRENT_DATE - INTERVAL '$periodo day') <= pin_datavenda)
+              ((CURRENT_DATE - INTERVAL '2 months') <= pin_datavenda)
           )
         LIMIT 1;
     ";
