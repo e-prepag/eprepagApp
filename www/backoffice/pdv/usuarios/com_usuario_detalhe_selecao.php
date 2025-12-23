@@ -4,7 +4,6 @@ require_once $raiz_do_projeto . "includes/pdv/corte_constantes.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 require_once $raiz_do_projeto."db/connect.php";
-require_once $raiz_do_projeto."includes/inc_register_globals.php";
 header("Content-Type: text/html; charset=UTF-8",true);
 
 $varsel = "&usuario_id=$usuario_id";

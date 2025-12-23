@@ -10,8 +10,6 @@ $banners = $controller->getBanner($posicao);
 
 $controller->setHeader();
 
-require_once DIR_INCS."inc_register_globals.php";
-
 require_once RAIZ_DO_PROJETO . "public_html/game/pagamento/venda_e_modelos_logica.php";
 ?>
 <div class="container txt-cinza bg-branco  p-bottom40">

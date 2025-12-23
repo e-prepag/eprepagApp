@@ -8,8 +8,6 @@ $banners = $controller->getBanner($posicao);
 
 $controller->setHeader();
 
-require_once DIR_INCS ."inc_register_globals.php";
-
 if(empty($data_inicio)) $data_inicio = date('d/m/Y');
 if(empty($data_fim)) $data_fim = date('d/m/Y');
 

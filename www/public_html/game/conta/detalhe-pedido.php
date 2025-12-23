@@ -17,7 +17,6 @@ if(isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser'
         $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
         $usuarioId = $usuarioGames->getId();
 }
-require_once DIR_INCS . "inc_register_globals.php";
 
 if(!isset($venda_id)){
     $msg = "ID da venda não foi informado.";

@@ -1,6 +1,5 @@
 <?php
 require_once '../../../includes/constantes.php';
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";	
 
 ###############################################################
 # File Download 1.3

@@ -15,7 +15,6 @@ exit;
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <?php
-require_once DIR_INCS . "inc_register_globals.php";	
 
 include DIR_INCS . "meta.php";
 include DIR_INCS . "pdv/captura_inc.php"; 

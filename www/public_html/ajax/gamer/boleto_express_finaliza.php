@@ -4,7 +4,6 @@ require_once "../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php";
 
-require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once DIR_CLASS . "gamer/classInibeAtaque.php";
 header("Content-Type: text/html; charset=ISO-8859-1", true);

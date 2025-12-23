@@ -3,8 +3,6 @@ session_start();
 date_default_timezone_set('America/Fortaleza');
 require_once '../includes/constantes.php';
 
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";
-
 $user = strtoupper(filter_input(INPUT_POST, 'user'));
 $passw = filter_input(INPUT_POST, 'passw');
 

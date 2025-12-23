@@ -4,7 +4,6 @@
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 require_once "../../../includes/constantes.php";
-require_once DIR_INCS . "inc_register_globals.php";	
 
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php";

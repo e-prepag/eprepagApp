@@ -10,8 +10,6 @@ $banners = $controller->getBanner($posicao);
 $controller->atualizaSessaoUsuario();
 $controller->setHeader();
 
-require_once DIR_INCS . "inc_register_globals.php";    
-
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
 //Definindo valor Default no caso do include estar conrrompido

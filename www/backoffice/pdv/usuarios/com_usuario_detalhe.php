@@ -1,6 +1,5 @@
 <?php
 
-//require_once("C:/Sites/E-Prepag/www/web/incs/inc_register_globals.php");	
 
 set_time_limit(3000);
 
