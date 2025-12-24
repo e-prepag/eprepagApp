@@ -7,8 +7,6 @@ require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 $controller = new HeaderController;
 
-require_once DIR_INCS . "inc_register_globals.php";
-
 //Permitindo somente usuários logado a executar este programa
 if (isset($controller->logado) && $controller->logado) {
 

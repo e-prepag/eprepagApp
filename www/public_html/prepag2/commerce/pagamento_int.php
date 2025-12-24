@@ -20,7 +20,6 @@ header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'",true
 @require_once DIR_INCS . "gamer/functions_endereco.php";
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 
-@require_once DIR_INCS . "inc_register_globals.php";    	
 @require_once DIR_INCS . "config.MeiosPagamentos.php";	
 
 ini_set('display_errors', 0);

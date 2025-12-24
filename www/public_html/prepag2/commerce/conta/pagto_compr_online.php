@@ -18,7 +18,6 @@ require_once "../../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php";
 require_once DIR_CLASS . "gamer/classIntegracao.php";
-require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "constantes.php";
 validaSessao();
 

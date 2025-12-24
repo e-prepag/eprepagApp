@@ -17,7 +17,6 @@ require_once DIR_CLASS . "gamer/classLimite.php";
 
 require_once DIR_INCS . "gamer/functions_endereco.php";
 
-require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
 

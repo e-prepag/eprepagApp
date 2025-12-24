@@ -12,8 +12,6 @@ $controller->setHeader();
  * Início controller
  */
 
-require_once DIR_INCS . "inc_register_globals.php";
-
 //Recupera carrinho do session
 $carrinho = $_SESSION['carrinho'];
 

@@ -8,7 +8,6 @@ require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;
 $controller->setHeader();
 
-require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "gamer/functions.php";
 
 require_once DIR_INCS . "gamer/venda_e_modelos_logica.php";

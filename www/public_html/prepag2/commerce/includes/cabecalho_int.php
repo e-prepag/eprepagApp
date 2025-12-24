@@ -3,7 +3,6 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-require_once DIR_INCS . "inc_register_globals.php";    	
 // include do arquivo contendo IPs DEV
 require_once DIR_INCS . "configIP.php";
 

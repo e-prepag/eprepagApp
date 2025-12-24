@@ -19,8 +19,6 @@ if(!isset($_POST['email']) || !isset($_POST['confirma_email']) || $_POST['email'
     $link = "/game/pedido/pagamento-offline.php";
 }
 
-require_once DIR_INCS . "inc_register_globals.php";
-
 //Recupera carrinho do session
 $carrinho = $_SESSION['carrinho'];
 

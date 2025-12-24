@@ -40,7 +40,6 @@ $GLOBALS["jquery"] = true;
         <div class="col-md-12">
             <?php
             require_once DIR_CLASS . "gamer/classIntegracao.php";
-            require_once DIR_INCS . "inc_register_globals.php";
 
             //Recupera usuario
             if (isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser'])) {

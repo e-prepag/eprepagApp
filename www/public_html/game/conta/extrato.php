@@ -11,8 +11,6 @@ $banners = $controller->getBanner($posicao);
 
 $controller->setHeader();
 
-require_once DIR_INCS . "inc_register_globals.php";
-
 if (!is_object($controller->usuario) || !$controller->usuario || empty($controller->usuario->getId())) {
     header("Location: /game/conta/login.php");
     die();

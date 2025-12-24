@@ -20,7 +20,6 @@ require_once DIR_CLASS . "gamer/classLimite.php";
 require_once DIR_INCS . "gamer/functions_endereco.php";
 $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 
-require_once DIR_INCS . "inc_register_globals.php";    	
 require_once DIR_INCS . "config.MeiosPagamentos.php";	
 
 //Definindo valor Default no caso do include estar conrrompido

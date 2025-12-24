@@ -3,8 +3,6 @@
 
 session_start();
 
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";		
-
 if($_SERVER['HTTPS']!="on") {
     Header("Location: https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
     die();
