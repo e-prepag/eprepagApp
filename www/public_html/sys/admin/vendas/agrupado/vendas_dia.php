@@ -6,6 +6,13 @@ require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 
+$dd_canal           = $_POST["dd_canal"];
+$dd_operadora       = $_POST["dd_operadora"];
+$dd_mode            = $_POST["dd_mode"];
+$dd_exclui_epp_cash = $_POST["dd_exclui_epp_cash"];
+$dd_mes             = $_POST["dd_mes"];
+$dd_ano             = $_POST["dd_ano"];
+$BtnSearch         = $_POST["BtnSearch"];
 
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 

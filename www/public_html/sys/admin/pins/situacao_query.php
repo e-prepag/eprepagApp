@@ -10,6 +10,29 @@ set_time_limit(3000);
 
 $time_start = getmicrotime();
 
+$ncamp       = $_REQUEST["ncamp"]       ?? "";
+$inicial     = $_REQUEST["inicial"]     ?? "";
+$range       = $_REQUEST["range"]       ?? "";
+$total_table = $_REQUEST["total_table"] ?? "";
+$flistall    = $_REQUEST["flistall"]    ?? "";
+
+// Datas do período de busca
+$tf_data_inicial = $_POST["tf_data_inicial"] ?? "";
+$tf_data_final   = $_POST["tf_data_final"]   ?? "";
+
+// Filtros de identificação (Serial, PIN e Código Interno)
+$fserial         = $_POST["fserial"]         ?? "";
+$fpin            = $_POST["fpin"]            ?? "";
+$fcodinterno     = $_POST["fcodinterno"]     ?? "";
+
+// Filtros de sistema
+$dd_opr_codigo   = $_POST["dd_opr_codigo"]   ?? "";
+$dd_pin_status   = $_POST["dd_pin_status"]   ?? "";
+$fcanal          = $_POST["fcanal"]          ?? "";
+
+// Ação do formulário
+$BtnSearch      = $_POST["BtnSearch"]       ?? "";
+
 if (!$ncamp) $ncamp = 'pin_codinterno';
 if (!$inicial)  $inicial     = 0;
 if (!$range)    $range       = 1;

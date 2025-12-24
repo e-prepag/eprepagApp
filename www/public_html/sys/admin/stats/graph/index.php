@@ -8,6 +8,19 @@ require("dateClass.php");
 require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 $time_start_stats = getmicrotime();
 
+$act              = $_POST['act'] ?? null;
+$tipoconsulta     = $_POST['tipoconsulta'] ?? null;
+$statuspgto       = $_POST['statuspgto'] ?? null;
+$fpgto            = $_POST['fpgto'] ?? null;
+$canais           = $_POST['canais'] ?? null;
+$periodo          = $_POST['periodo'] ?? null;
+
+$tf_data_final    = $_POST['tf_data_final'] ?? null;
+$tf_data_inicial  = $_POST['tf_data_inicial'] ?? null;
+
+$btconsultar      = $_POST['btconsultar'] ?? null;
+
+
 // mostra os dados passados por POST
 //echo '<pre>';
 //print_r($_POST);

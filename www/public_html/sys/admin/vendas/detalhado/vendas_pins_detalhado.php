@@ -1,25 +1,4 @@
 <?php
-/*
- * QUERY  Considerando totaliza��o por utiliza��o ou venda dinamicamente para o canal PDV
- select 
-    t0.pin_codinterno, 
-    pin_codigo as case_codigo, 
-    t1.opr_nome, 
-    t0.pin_valor, 
-    t0.opr_codigo,
-    t0.pin_datavenda,
-    t0.pin_horavenda,
-    'L' as vg_canal
-from pins t0
-    INNER JOIN operadoras t1 ON (t0.opr_codigo=t1.opr_codigo)
-    INNER JOIN pins_status t3 ON (t0.pin_status=t3.stat_codigo) 
-   LEFT OUTER JOIN pins_integracao_historico pih ON pih_pin_id = pin_codinterno
-where CASE WHEN opr_contabiliza_utilizacao != 0 THEN t0.pin_status = '8' ELSE t0.pin_status = '6' END
-    and CASE WHEN opr_contabiliza_utilizacao != 0 THEN pih_codretepp='2' ELSE t0.pin_status = '6' END
-    and CASE WHEN opr_contabiliza_utilizacao != 0 THEN pih_data >= '2017-11-22 00:00:00' ELSE pin_datavenda >= '2017-11-22 00:00:00' END
-    and CASE WHEN opr_contabiliza_utilizacao != 0 THEN pih_data <= '2017-11-22 23:59:59' ELSE pin_datavenda <= '2017-11-22 23:59:59' END
-    and (t0.opr_codigo=13)   
- */
 ob_start();
 
 //error_reporting(E_ALL); 
@@ -34,6 +13,12 @@ set_time_limit (60000) ;
 $time_start = getmicrotime();
 
 $b_debug = false;
+
+$tf_data_inicial = $_POST["tf_data_inicial"];
+$tf_data_final = $_POST["tf_data_final"];
+$dd_opr_codigo = $_POST["dd_opr_codigo"];
+$fcanal = $_POST["fcanal"];
+$BtnSearch = $_POST["BtnSearch"];
 
 if(!$dd_opr_codigo) $dd_opr_codigo = '';
 if(!$tf_data_final)    $tf_data_final   = date('d/m/Y');

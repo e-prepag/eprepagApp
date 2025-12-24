@@ -8,6 +8,16 @@ require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 
+$tf_data_inicial   = $_POST['tf_data_inicial'] ?? null;
+$tf_data_final     = $_POST['tf_data_final'] ?? null;
+
+$dd_opr_codigo     = $_POST['dd_opr_codigo'] ?? null;
+$fcanal          = $_POST['fcanal'] ?? null;
+
+// Botão
+$BtnSearch     = $_POST['BtnSearch'] ?? null;
+
+
 //Disponibilizando acesso restrito
 set_time_limit(60000);
 

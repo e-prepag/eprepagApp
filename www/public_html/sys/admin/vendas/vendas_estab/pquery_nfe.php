@@ -1,6 +1,16 @@
 <?php 
 // error_reporting(E_ALL); 
 // ini_set("display_errors", 1);
+
+$tf_data_inicial  = $_POST['tf_data_inicial'] ?? null;
+$tf_data_final    = $_POST['tf_data_final'] ?? null;
+$dd_canal         = $_POST['dd_canal'] ?? null;
+$dd_operadora     = $_POST['dd_operadora'] ?? null;
+
+// Botões (apenas um deles vem por vez)
+$BtnSearch    = $_POST['BtnSearch'] ?? null;
+$FrmPreencher = $_POST['FrmPreencher'] ?? null;
+
 session_start();
 if (isset($_POST['exportar_excel'])) {
     header('Content-Type: text/csv; charset=utf-8');

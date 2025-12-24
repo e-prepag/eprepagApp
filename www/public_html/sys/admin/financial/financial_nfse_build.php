@@ -11,7 +11,14 @@ if ($_SESSION["tipo_acesso_pub"] == 'PU') {
 $time_start = getmicrotime();
 
 header("Content-Type: text/html;charset=ISO-8859-1");
+$empresa               = $_POST['empresa'] ?? null;
 
+$dd_operadora_multi    = $_POST['dd_operadora_multi'] ?? [];
+
+$valorNota             = $_POST['valorNota'] ?? [];
+$vinculoEmpresa        = $_POST['vinculoEmpresa'] ?? [];
+
+$nfes_periodo          = $_POST['nfes_periodo'] ?? null;
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 set_time_limit(30000);

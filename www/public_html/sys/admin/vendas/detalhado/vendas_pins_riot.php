@@ -12,6 +12,16 @@ require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 
+$tf_data_inicial   = $_POST['tf_data_inicial'] ?? null;
+$tf_data_final     = $_POST['tf_data_final'] ?? null;
+
+$dd_opr_codigo     = $_POST['dd_opr_codigo'] ?? null;
+$fcanal          = $_POST['fcanal'] ?? null;
+
+// Bot?o
+$BtnSearch     = $_POST['BtnSearch'] ?? null;
+
+
 //Declarando valor IOF 6.38 ou 0.38
 $iof = array(6.38,0.38, IOF);
 

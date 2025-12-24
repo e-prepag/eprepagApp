@@ -10,7 +10,27 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . "class/phpmailer/class.smtp.php";
 require_once $raiz_do_projeto . "class/classEmailAutomatico.php";
 
-$meu_ip = '201.93.162.169'; // IP TESTES
+$dd_email                 = $_POST['dd_email'] ?? null;
+$dd_operadora             = $_POST['dd_operadora'] ?? null;
+$type_graphic             = $_POST['type_graphic'] ?? null;
+
+$tf_data_inicial             = $_POST['tf_data_inicial'] ?? null;
+$tf_data_final               = $_POST['tf_data_final'] ?? null;
+
+$facilitadora_perfil_op   = $_POST['facilitadora_perfil_op'] ?? null;
+$nome_merchant            = $_POST['nome_merchant'] ?? null;
+$merchant_id_bexs         = $_POST['merchant_id_bexs'] ?? null;
+
+$grosswired               = $_POST['grosswired'] ?? null;
+$management_fee           = $_POST['management_fee'] ?? null;
+$witholding               = $_POST['witholding'] ?? null;
+$netwired                 = $_POST['netwired'] ?? null;
+$tax                      = $_POST['tax'] ?? null;
+
+$rperiod                  = $_POST['rperiod'] ?? null;
+$email_texto              = $_POST['email_texto'] ?? null;
+$email_destino            = $_POST['email_destino'] ?? null;
+
 
 if($_SESSION['langNome'] == 'pt') {
         //Setando variaveis para captura no m�s refer�ncia

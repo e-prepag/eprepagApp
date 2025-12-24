@@ -17,6 +17,12 @@ if($_SESSION["tipo_acesso_pub"]=='PU') {
 	ob_end_flush();
 }
 
+
+$empresa        = $_POST['empresa'] ?? null;
+$nfes_periodo   = $_POST['nfes_periodo'] ?? null;
+$mudou          = $_POST['mudou'] ?? null;
+$dd_operadora_multi    = $_POST['dd_operadora_multi'] ?? [];
+
 $email_destino	= !empty($_POST['email_destino'])	? $_POST['email_destino']	: "glaucia@e-prepag.com.br";
 $email_texto	= !empty($_POST['email_texto'])		? $_POST['email_texto']		: "Digite aqui o texto complementar do E-mail.";
 $period			= "month";

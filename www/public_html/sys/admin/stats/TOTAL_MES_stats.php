@@ -8,6 +8,14 @@ require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.p
 require_once $raiz_do_projeto . "class/gamer/classIntegracao.php";
 //session_start();
 
+$dd_operadora            = $_POST['dd_operadora'] ?? null;
+$dd_mode                 = $_POST['dd_mode'] ?? null;
+$dd_year                  = $_POST['dd_year'] ?? null;
+$dd_exclui_epp_cash      = $_POST['dd_exclui_epp_cash'] ?? null;
+
+// Bot?o
+$btnSubmit            = $_POST['btnSubmit'] ?? null;
+
 if($_SESSION["tipo_acesso_pub"]=='PU') {
         //redireciona
         $strRedirect = "/sys/admin/commerce/index.php";
