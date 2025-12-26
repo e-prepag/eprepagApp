@@ -1,0 +1,25 @@
+name: EprepagApp
+
+services:
+  app:
+    build: ./Dockerfile_prd
+    extra_hosts:
+      - "e-prepag.com.br:127.0.0.1"
+      - "backoffice.e-prepag.com.br:127.0.0.1"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - eprepag_net
+    volumes:
+      - ./www:/www
+      - ./docker-config/certs:/etc/apache2/certs
+      - ./www/arquivos_gerados:/www/arquivos_gerados
+    environment:
+      TZ: "America/Sao_Paulo"
+      env_file: ./www/.env
+
+
+networks:
+  eprepag_net:
+    driver: bridge

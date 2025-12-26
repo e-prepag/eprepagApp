@@ -27,7 +27,7 @@ RUN groupadd -g 1001 eprepagadm \
 RUN sed -i 's/www-data/eprepagadm/g' /etc/apache2/envvars
 
 RUN rm /etc/apache2/sites-enabled/000-default.conf
-COPY ./docker-config/apache_conf/*.conf /etc/apache2/sites-enabled/
+COPY ./docker-config/apache_conf/prd/*.conf /etc/apache2/sites-enabled/
 
 RUN echo 'SetEnv HOME /www/public_html/' >> /etc/apache2/conf-enabled/environment.conf
 RUN echo 'SetEnv USER eprepagadm' >> /etc/apache2/conf-enabled/environment.conf

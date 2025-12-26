@@ -1,7 +1,7 @@
 name: EprepagApp
 services:
   app:
-    build: .
+    build: ./Dockerfile_hml
     extra_hosts:
       - "hml.e-prepag.com.br:127.0.0.1"
       - "hml.backoffice.e-prepag.com.br:127.0.0.1"
