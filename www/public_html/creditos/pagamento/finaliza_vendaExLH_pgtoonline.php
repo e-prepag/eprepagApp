@@ -275,7 +275,7 @@ if($msg == ""){
     $envioEmail->setPedido(formata_codigo_venda($venda_id));
     $envioEmail->setSaldoAdicionado($saldoAdicionado);
     $envioEmail->setFormaPagamento($formaPagamento);
-    $envioEmail->MontaEmailEspecifico();
+    //$envioEmail->MontaEmailEspecifico();
 }
 
 //Retorno
