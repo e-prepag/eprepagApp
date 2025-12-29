@@ -16,6 +16,19 @@ define('DB_USER', $db_user);
 define('DB_PASS', $db_pass);
 
 // Conectando ao Banco de dados
-$connid = pg_connect("host=" . DB_HOST . " port=" . DB_PORT . " dbname=" . DB_BANCO . " user=" . DB_USER . " password=" . DB_PASS);
+$str_conn = "host=" . DB_HOST . 
+            " port=" . DB_PORT . 
+            " dbname=" . DB_BANCO . 
+            " user=" . DB_USER . 
+            " password=" . DB_PASS . 
+            " connect_timeout=10"; 
+
+// Tenta conectar usando @ para suprimir o warning nativo do PHP na tela
+$connid = @pg_connect($str_conn);
+
+// Se falhar, mata o script com a mensagem
+if (!$connid) {
+    die("Erro de conexão");
+}
 
 ?>
