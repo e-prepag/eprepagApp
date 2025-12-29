@@ -46,7 +46,7 @@ class ChaveMestra{
 				}
 			} else {
 				// Chave ainda no formato antigo
-				if ($secureEncryption->verifyPassword($senha, $chaveArmazenada)) {
+				if (trim($senha) == $chaveArmazenada) {
 					$quantidade = 1;
 					// Migra automaticamente para bcrypt
 					$this->migrateChaveMestra($usuario, $senha);
