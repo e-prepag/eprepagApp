@@ -5,11 +5,6 @@ session_start();
 
 require_once $raiz_do_projeto . "includes/inc_register_globals.php";		
 
-if($_SERVER['HTTPS']!="on") {
-    Header("Location: https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
-    die();
-} //end if($_SERVER['HTTPS']!="on") 
-
 $webstring = "http".(($_SERVER['HTTPS']=='on') ? 's' : '')."://".$_SERVER['SERVER_NAME'];// . ":" . $_SERVER['SERVER_PORT'];
 $raiz_do_sys = $raiz_do_projeto . "public_html/sys/";
 

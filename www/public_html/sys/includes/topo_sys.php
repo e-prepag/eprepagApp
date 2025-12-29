@@ -9,11 +9,6 @@
 
     session_start();
 
-if($_SERVER['HTTPS']!="on") {
-//    Header("Location: https://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
-//    die();
-} //end if($_SERVER['HTTPS']!="on") 
-
     require_once $raiz_do_projeto . "includes/inc_register_globals.php";
 
     if (empty($_SESSION["iduser_bko_pub"])) {
