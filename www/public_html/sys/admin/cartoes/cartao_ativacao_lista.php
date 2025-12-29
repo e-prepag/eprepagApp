@@ -232,7 +232,6 @@ $sql_transform=$estat;
 <html>
 <head>
 
-<link href="../../incs/css.css" rel="stylesheet" type="text/css">
 <title>E-Prepag</title>
 <script language='javascript' src='/js/<?php echo LANG_NAME_CALENDAR_FILE; ?>'></script>
 <script language="JavaScript">

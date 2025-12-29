@@ -100,7 +100,6 @@ if(isValidaSessao()){
         <script src="/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="/js/modalwaitingfor.js"></script>
         <script src="/js/valida.js"></script>
-        <!--<link href="/incs/css.css" rel="stylesheet" type="text/css"/>-->
         </head>
         <body class="bg-cinza-claro txt-preto">
         <div id="modal-load" class="modal fade" role="dialog">

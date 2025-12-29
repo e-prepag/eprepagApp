@@ -21,7 +21,6 @@
 		-->
 	</style>
 	
-	<link href="/incs/css.css" rel="stylesheet" type="text/css">
 	<script language="JavaScript" type="text/JavaScript">
 	<!--
 	function MM_preloadImages() { //v3.0

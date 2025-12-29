@@ -123,7 +123,6 @@ if(isset($BtnConcluir) && $BtnConcluir) {
     <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
     <META HTTP-EQUIV="EXPIRES" CONTENT="0">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <link href="http://<?php echo $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] ?>/incs/css.css" rel="stylesheet" type="text/css">
     <script>
         function fcnOnSubmit(){
 

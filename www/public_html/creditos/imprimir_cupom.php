@@ -222,8 +222,6 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
         <title>Rede E-Prepag Meios de Pagamentos / Prepag Money</title>
 
-        <link href="/incs/css.css" rel="stylesheet" type="text/css">
-
         <style type="text/css">
             <!--
             @media print {

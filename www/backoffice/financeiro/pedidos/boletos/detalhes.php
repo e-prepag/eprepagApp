@@ -69,7 +69,6 @@ echo str_replace("\n", "<br>\n", $sql)."<br>";
 <html>
 <head>
 <title>Boletos Disponiveis</title>
-<link rel="stylesheet" href="../../../../incs/css.css" type="text/css">
 <script language='javascript' src='../../../../incs/js/popcalendar.js'></script>
 <script language="JavaScript">
 function GP_popupConfirmMsg(msg) { 
