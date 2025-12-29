@@ -4,8 +4,8 @@ services:
   app:
     build: .
     extra_hosts:
-      - "e-prepag.com.br:127.0.0.1"
-      - "backoffice.e-prepag.com.br:127.0.0.1"
+      - "dev.e-prepag.com.br:127.0.0.1"
+      - "backoffice-dev.e-prepag.com.br:127.0.0.1"
     ports:
       - "80:80"
       - "443:443"
