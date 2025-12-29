@@ -4,16 +4,6 @@ require_once "/www/class/classIntegracaoGarena.php";
 $dataRequisicao = date("Y-m-d");
 $verificaPinIpLote = Garena::verificaLotePin($_SERVER["REMOTE_ADDR"], $dataRequisicao);
 
-if ($_SERVER["REQUEST_SCHEME"] == "https") {
-	if (strpos($_SERVER["HTTP_ORIGIN"], "http:") !== false) {
-		header("location: " . EPREPAG_URL_HTTPS . "/resgate/garena/creditos.php"); //EPREPAG_URL_HTTPS/
-		exit;
-	}
-} else {
-	header("location: " . EPREPAG_URL_HTTPS . "/resgate/garena/creditos.php"); //EPREPAG_URL_HTTPS/
-	exit;
-}
-
 if ($_GET["game"] == "free_fire") {
 	$logo = "" . EPREPAG_URL_HTTPS . "/sys/imagens/Free_Fire.png";
 } else if ($_GET["game"] == "delta_force") {
