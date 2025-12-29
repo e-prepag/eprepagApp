@@ -7,29 +7,6 @@ require_once $raiz_do_projeto . "public_html/sys/includes/languages.php";
 $username = "Gestor";
 $password = "games2007";
 
-if (!($_SERVER['SERVER_NAME'] == "192.168.200.91" || $_SERVER['SERVER_NAME'] == "192.168.200.65" || $_SERVER['SERVER_NAME'] == "192.168.200.55" || $_SERVER['SERVER_NAME'] == "192.168.200.61" || $_SERVER['SERVER_NAME'] == "192.168.200.51" || $_SERVER['SERVER_NAME'] == "192.168.200.75" || $_SERVER['SERVER_NAME'] == "200.201.132.134" || $_SERVER['SERVER_NAME'] == "189.126.102.34" || $_SERVER['SERVER_NAME'] == "" . EPREPAG_URL . "" || $_SERVER['SERVER_NAME'] == "www.eprepag.com.br" || $_SERVER['SERVER_NAME'] == "www2.e-prepag.com.br" || $_SERVER['SERVER_NAME'] == "sandbox.e-prepag.com.br" || $_SERVER['SERVER_NAME'] == "www2.eprepag.com.br" || $_SERVER['SERVER_NAME'] == "xxxdnn1081.locaweb.com.br" || $_SERVER['SERVER_NAME'] == "e-prepag.com.br" || $_SERVER['SERVER_NAME'] == "eprepag.com.br" || $_SERVER['SERVER_NAME'] == "eprepag.ddns.net")) {
-    if ($PHP_AUTH_USER != $username || $PHP_AUTH_PW != $password) {
-        header("WWW-Authenticate: basic realm=Backoffice");
-        header("HTTP/1.0 401 Unauthorized");
-        echo "<META HTTP-EQUIV='Refresh' Content=0;URL='/mensagens/access_denied.php'>";
-        exit;
-    }
-}
-
-require_once $raiz_do_projeto . "public_html/sys/includes/functions.php";
-if (getenv("AMBIENTE") == "HOMOLOGACAO") {
-} else if ($_SERVER['HTTPS'] != "on" && !checkIP()) {
-    Header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
-    die();
-} //end if($_SERVER['HTTPS']!="on") 
-else if (strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false && !checkIP()) {
-    header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
-    die();
-} elseif (strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), ".br") === false && !checkIP()) {
-    header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);
-    die();
-}
-
 $erro = "";
 if (isset($_GET["Invalido"]) && $_GET["Invalido"] == TRUE) {
     $erro .= "<br><strong>" . LANG_USER_PASS_INVALID . "</strong> (A1b)";
