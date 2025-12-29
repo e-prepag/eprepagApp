@@ -1,9 +1,9 @@
 .env**
 !.env_example
 **/backoffice_old 
-**/arquivos_gerados/logs/*
-**/arquivos_gerados/logs/*/
-!**/arquivos_gerados/logs/.gitkeep
+**/arquivos_gerados/*/
+!**/arquivos_gerados/.keep
+!**/arquivos_gerados/index.php
 **/cache
 *.csv
 *.CSV

@@ -2,7 +2,8 @@ name: EprepagApp
 
 services:
   app:
-    build: ./Dockerfile_prd
+    build: .
+    dockerfile: Dockerfile_prd
     extra_hosts:
       - "e-prepag.com.br:127.0.0.1"
       - "backoffice.e-prepag.com.br:127.0.0.1"
