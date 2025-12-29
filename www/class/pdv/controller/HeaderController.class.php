@@ -70,11 +70,6 @@ if (checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }
 
-if ($_SERVER['HTTPS'] != "on") {
-    redirect("https://" . $server_url . $_SERVER['REQUEST_URI']);
-    die();
-} //end if($_SERVER['HTTPS']!="on") 
-
 class HeaderController
 {
 
