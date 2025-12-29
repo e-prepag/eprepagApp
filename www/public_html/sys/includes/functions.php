@@ -141,16 +141,16 @@ if (!function_exists("SQLexecuteQuery")) {
 		return $ret;
 	}
 	function SQLexecuteQueryParams($sql, $params)
-{
-	$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
-	if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
-		$message  = date("Y-m-d H:i:s") . " ";
-		$message .= "Erro: " . $erro . "<br>\n";
-		$message .= "Query: " . $sql . "<br>\n";
-		gravaLog_SQLexecuteQuery($message);
+	{
+		$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
+		if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
+			$message  = date("Y-m-d H:i:s") . " ";
+			$message .= "Erro: " . $erro . "<br>\n";
+			$message .= "Query: " . $sql . "<br>\n";
+			gravaLog_SQLexecuteQuery($message);
+		}
+		return $ret;
 	}
-	return $ret;
-}
 }
 
 if (!function_exists("SQLexecuteQueryParams")) {
@@ -2000,14 +2000,14 @@ function theRealStripTags2($string)
 	for ($i = 0; $i < $tam; $i++) {
 		// If I found one '<', $tag++ and continue whithout copy
 		if ($string{
-		$i} == '<') {
+			$i} == '<') {
 			$tag++;
 			continue;
 		}
 
 		// if I found '>', decrease $tag and continue 
 		if ($string{
-		$i} == '>') {
+			$i} == '>') {
 			if ($tag) {
 				$tag--;
 			}
@@ -2020,7 +2020,7 @@ function theRealStripTags2($string)
 		// if $tag is 0, can copy 
 		if ($tag == 0) {
 			$newstring .= $string{
-			$i}; // simple copy, only one car
+				$i}; // simple copy, only one car
 		}
 	}
 	return $newstring;
