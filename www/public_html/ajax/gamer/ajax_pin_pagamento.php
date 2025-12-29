@@ -144,7 +144,7 @@ if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodig
 				}//end if(RetonaTamanhoPINEPPCASH)
 
 				//Testando se é PIN GoCASH
-				elseif(RetonaTamanhoPINGoCASH($numpin)) {
+				elseif(false) {
 					//Confirmando existencia e valor do PIN GoCASH
 					$aux_pin_valor = StatusInquiryPIN_Value($numpin); // Wagner
 //echo "A: '$numpin' -> $aux_pin_valor<br>";

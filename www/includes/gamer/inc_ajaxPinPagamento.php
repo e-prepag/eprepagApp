@@ -202,7 +202,7 @@ function deposita_gocash_rollback($vetor, $a_pins_gocash, &$valor_saldo_rollback
 			$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 			foreach ($GLOBALS['_SESSION']['PINEPP'] as $key => $value) {
 				//Testando se é PIN CASH
-				if (RetonaTamanhoPINGoCASH($key)) {
+				if (false) {
 
 					//Canal definido como Cartão
 					$canal		= 'C';
@@ -555,7 +555,7 @@ function monta_array_somente_gocash(&$aux_valor_PINs_GoCASH)
 	$a_pins_gocash = array();
 	foreach ($GLOBALS['_SESSION']['PINEPP'] as $key => $value) {
 		//Testando se é PIN GoCASH
-		if (RetonaTamanhoPINGoCASH($key)) {
+		if (false) {
 			$aux_valor_PINs_GoCASH += $value;
 
 			$a_pins_gocash[$key] = $GLOBALS['_SESSION']['PIN_NOMINAL'][$key];
@@ -898,7 +898,7 @@ function flag_pin_test()
 			} //end if(RetonaTamanhoPINEPPCASH) 
 
 			//Testando se é PIN GoCASH
-			elseif (RetonaTamanhoPINGoCASH($key)) {
+			elseif (false) {
 				if ($lista_pin_gocash != "") {
 					$lista_pin_gocash .= ",";
 				} //end if($lista_pin_gocash != "")
@@ -1023,7 +1023,7 @@ function flag_pin_unblock()
 			} //end if(RetonaTamanhoPINEPPCASH) 
 
 			//Testando se é PIN GoCASH
-			elseif (RetonaTamanhoPINGoCASH($key)) {
+			elseif (false) {
 				if ($lista_pin_gocash != "") {
 					$lista_pin_gocash .= ",";
 				} //end if($lista_pin_gocash != "")
@@ -1424,7 +1424,7 @@ function utilizar_pin()
 													} //end if(RetonaTamanhoPINEPPCASH) 
 
 													//Testando se é PIN GoCASH
-													elseif (RetonaTamanhoPINGoCASH($key)) {
+													elseif (false) {
 														//echo "Tamanho GoCASH[$tamanho_pin]<br>";
 														//A rastreabilidade do depósito esta no id_venda_origem
 														$valor_parcial_gocash += $value;
@@ -1717,7 +1717,7 @@ function utilizar_pin_carga()
 										} //end if(RetonaTamanhoPINEPPCASH) 
 
 										//Testando se é PIN GoCASH
-										elseif (RetonaTamanhoPINGoCASH($key)) {
+										elseif (false) {
 											//$msg .= "AKI GOCASH";
 
 											//Canal definido como Cartão
