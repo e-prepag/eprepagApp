@@ -5,7 +5,7 @@
 */
 define('ACCESS_ALLOWED', true);
 
-if ($_SERVER['HTTP_X_FORWARDED_PROTO']=="on" || $_SERVER['HTTP_X_FORWARDED_PROTO']=="https" || $_SERVER['HTTPS'] == "on") { //descomentar para implementar https
+if (true) { //descomentar para implementar https
 
         set_time_limit(300);
         ini_set('max_execution_time', 300);
