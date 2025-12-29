@@ -48,21 +48,37 @@ class Json
                     $this->moveRecursive($nomeArquivo);
                 }
 
-                // SQL para Inserir ou Atualizar se o 'nome' já existir (versão 1)
-                $sql = "INSERT INTO jsons_epp (nome, conteudo, versao) 
-                            VALUES (:nome, :conteudo, 1)
-                            ON CONFLICT (nome, versao)
-                            DO UPDATE
-                                SET 
-                                    conteudo = EXCLUDED.conteudo, 
-                                    versao = EXCLUDED.versao;";
+                // 1. Tenta ATUALIZAR o registro existente (considerando nome e versao = 1)
+                $sql_update = "UPDATE jsons_epp 
+               SET conteudo = :conteudo 
+               WHERE nome = :nome AND versao = 1";
 
-                $stmt = $this->_pdo->prepare($sql);
-
-                $success = $stmt->execute([
+                $stmt = $this->_pdo->prepare($sql_update);
+                $stmt->execute([
                     ':nome' => $nomeArquivo,
                     ':conteudo' => $jsonContent
                 ]);
+
+                // 2. Verifica se alguma linha foi alterada
+                if ($stmt->rowCount() > 0) {
+                    // Se > 0, o registro já existia e foi atualizado. Sucesso.
+                    $success = true;
+                } else {
+                    // 3. Se retornou 0, o registro não existe. Fazemos o INSERT.
+                    $sql_insert = "INSERT INTO jsons_epp (nome, conteudo, versao) 
+                   VALUES (:nome, :conteudo, 1)";
+
+                    $stmt = $this->_pdo->prepare($sql_insert);
+
+                    try {
+                        $success = $stmt->execute([
+                            ':nome' => $nomeArquivo,
+                            ':conteudo' => $jsonContent
+                        ]);
+                    } catch (PDOException $e) {
+                        $success = false;
+                    }
+                }
 
                 if ($success) {
                     return true;
