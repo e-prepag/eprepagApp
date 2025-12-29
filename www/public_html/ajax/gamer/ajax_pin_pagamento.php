@@ -15,8 +15,6 @@ block_direct_calling();
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php"; 
 
-require_once RAIZ_DO_PROJETO . "banco/gocash/config.inc.php"; 
-
 require_once DIR_INCS . "gamer/inc_ajaxPinPagamento.php";
 
 // Wagner

@@ -19,8 +19,6 @@ require_once DIR_INCS . "gamer/main.php";
 require_once DIR_INCS . "gamer/AES.class.php"; 
 require_once DIR_INCS . "gamer/chave.php"; 
 
-require_once RAIZ_DO_PROJETO . "banco/gocash/config.inc.php"; 
-
 require_once DIR_INCS . "gamer/inc_ajaxPinPagamento.php";
 
 	
