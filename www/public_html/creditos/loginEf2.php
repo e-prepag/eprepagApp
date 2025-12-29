@@ -257,11 +257,6 @@ if (checkIP()) {
     $server_url = $_SERVER["SERVER_NAME"];
 }
 
-if ($_SERVER["HTTPS"] != "on") {
-    redirect("https://" . $server_url . "/creditos/login.php");
-    die();
-} // NOTA::: Faz o redirecionamento adicionando SSL na URL.
-
 session_destroy();
 
 /*
