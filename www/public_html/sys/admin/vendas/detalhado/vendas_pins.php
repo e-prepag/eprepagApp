@@ -47,12 +47,14 @@ if ($BtnSearch) {
                 order by co_opr_codigo, co_canal, co_data_inclusao desc, co_volume_tipo, co_volume_min  
                ";
     $rescommiss = pg_exec($connid, $sql);
-    $vetorComissao = "";
+
+    $vetorComissao = array();
+
     while ($rescommiss_row = pg_fetch_array($rescommiss)) {
         // Atalho para o código da operadora
         $codOpr = $rescommiss_row['co_opr_codigo'];
 
-        // Garante que a "raiz" dessa operadora seja um array antes de começar
+        // 1. Proteção da Raiz: Garante que esta operadora seja um array
         if (!isset($vetorComissao[$codOpr]) || !is_array($vetorComissao[$codOpr])) {
             $vetorComissao[$codOpr] = array();
         }
@@ -66,11 +68,10 @@ if ($BtnSearch) {
                 // Estrutura: [CODIGO][MIN] = VALOR
                 $vetorComissao[$codOpr][$rescommiss_row['co_volume_min']] = $rescommiss_row['co_comissao'];
             } else {
-                // Estrutura: [CODIGO][TIPO][MIN] = VALOR (3 Níveis)
-
-                // Verifica se o nível 'TIPO' colide com um valor escalar anterior
-                // Se existir e NÃO for array, recria como array para evitar o erro fatal
+                // Estrutura: [CODIGO][TIPO][MIN] = VALOR
                 $tipoVolume = $rescommiss_row['co_volume_tipo'];
+
+                // 2. Proteção de Nível 2 (Tipo): Evita colisão se 'TIPO' já for um valor numérico
                 if (isset($vetorComissao[$codOpr][$tipoVolume]) && !is_array($vetorComissao[$codOpr][$tipoVolume])) {
                     $vetorComissao[$codOpr][$tipoVolume] = array();
                 }
@@ -78,7 +79,7 @@ if ($BtnSearch) {
                 $vetorComissao[$codOpr][$tipoVolume][$rescommiss_row['co_volume_min']] = $rescommiss_row['co_comissao'];
             }
         } else {
-            // Cálculo do valor final (lógica do IOF isolada para clareza)
+            // Cálculo do valor final
             $valorComissao = $rescommiss_row['co_comissao'];
 
             if (in_array($rescommiss_row['opr_internacional_alicota'], $iof) && !empty($rescommiss_row['co_comissao'])) {
@@ -86,6 +87,7 @@ if ($BtnSearch) {
             }
 
             // Estrutura: [CODIGO][CANAL] = VALOR
+            // O erro acontecia aqui porque $vetorComissao[$codOpr] não estava se comportando como array
             $vetorComissao[$codOpr][$rescommiss_row['co_canal']] = $valorComissao;
         }
     } //end while
