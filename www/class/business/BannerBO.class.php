@@ -371,6 +371,7 @@ class BannerBO extends BannerDAO
                 return false;
             }
         }
+        return true;
     }
 
     public function getBannersFromJson($posicao, $categoria, $currJsonFile = 1)

@@ -40,6 +40,13 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
                 echo "<script>alert('Problema ao obter banner.'); location.href = 'banners.php';</script>";
         }
     }
+    if($_GET['acao'] == "atualiza"){
+        if($objBanner->jsonBanners()){
+            $msg_success = "Banners atualizados com sucesso no site!";
+        }else{
+            $msg = implode("<br>",$objBanner->erros);
+        }
+    }
 /*
     FIM CONTROLLER
  */

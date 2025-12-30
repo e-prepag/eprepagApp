@@ -51,6 +51,7 @@ if(isset($_POST["busca"])){
 <div class="col-md-12">
     <div style="borda">
         <a href="banners.php?acao=novo" class="btn btn-info btn-sm">Novo Banner</a>
+        <a href="banners.php?acao=atualiza" class="btn btn-success btn-sm">Atualz. Banners no Site</a>
     </div>
 </div>
 <?php
@@ -59,6 +60,14 @@ if(isset($msg))
 ?>
     <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 txt-vermelho top20">
         <strong><h4>Erro: <?php echo $msg?></h4></strong>
+    </div>
+<?php
+}
+if(isset($msg_success))
+{
+?>
+    <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12 txt-verde top20">
+        <strong><h4><?php echo $msg_success?></h4></strong>
     </div>
 <?php
 }
