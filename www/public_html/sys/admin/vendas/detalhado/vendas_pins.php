@@ -49,24 +49,45 @@ if ($BtnSearch) {
     $rescommiss = pg_exec($connid, $sql);
     $vetorComissao = "";
     while ($rescommiss_row = pg_fetch_array($rescommiss)) {
+        // Atalho para o código da operadora
+        $codOpr = $rescommiss_row['co_opr_codigo'];
+
+        // Garante que a "raiz" dessa operadora seja um array antes de começar
+        if (!isset($vetorComissao[$codOpr]) || !is_array($vetorComissao[$codOpr])) {
+            $vetorComissao[$codOpr] = array();
+        }
+
         $rescommiss_row['co_canal'] = trim($rescommiss_row['co_canal']);
+
         if (empty($rescommiss_row['co_canal'])) {
             $rescommiss_row['co_volume_tipo'] = trim($rescommiss_row['co_volume_tipo']);
+
             if (empty($rescommiss_row['co_volume_tipo'])) {
-                $vetorComissao[$rescommiss_row['co_opr_codigo']][$rescommiss_row['co_volume_min']] = $rescommiss_row['co_comissao'];
-            } //end if(empty($rescommiss_row['co_volume_tipo']))
-            else {
-                $vetorComissao[$rescommiss_row['co_opr_codigo']][$rescommiss_row['co_volume_tipo']][$rescommiss_row['co_volume_min']] = $rescommiss_row['co_comissao'];
-            } //end else do if(empty($rescommiss_row['co_volume_tipo']))
-        } //end if(empty($rescommiss_row['co_canal']))
-        else {
+                // Estrutura: [CODIGO][MIN] = VALOR
+                $vetorComissao[$codOpr][$rescommiss_row['co_volume_min']] = $rescommiss_row['co_comissao'];
+            } else {
+                // Estrutura: [CODIGO][TIPO][MIN] = VALOR (3 Níveis)
+
+                // Verifica se o nível 'TIPO' colide com um valor escalar anterior
+                // Se existir e NÃO for array, recria como array para evitar o erro fatal
+                $tipoVolume = $rescommiss_row['co_volume_tipo'];
+                if (isset($vetorComissao[$codOpr][$tipoVolume]) && !is_array($vetorComissao[$codOpr][$tipoVolume])) {
+                    $vetorComissao[$codOpr][$tipoVolume] = array();
+                }
+
+                $vetorComissao[$codOpr][$tipoVolume][$rescommiss_row['co_volume_min']] = $rescommiss_row['co_comissao'];
+            }
+        } else {
+            // Cálculo do valor final (lógica do IOF isolada para clareza)
+            $valorComissao = $rescommiss_row['co_comissao'];
+
             if (in_array($rescommiss_row['opr_internacional_alicota'], $iof) && !empty($rescommiss_row['co_comissao'])) {
-                $vetorComissao[$rescommiss_row['co_opr_codigo']][$rescommiss_row['co_canal']] = $rescommiss_row['co_comissao'] + $rescommiss_row['opr_internacional_alicota'];
-            } //end if(in_array($rescommiss_row['opr_internacional_alicota'], $iof) && !empty($rescommiss_row['co_comissao']))
-            else {
-                $vetorComissao[$rescommiss_row['co_opr_codigo']][$rescommiss_row['co_canal']] = $rescommiss_row['co_comissao'];
-            } //end else
-        } //end else do if(in_array($rescommiss_row['opr_internacional_alicota'], $iof) && !empty($rescommiss_row['co_comissao']))
+                $valorComissao = $rescommiss_row['co_comissao'] + $rescommiss_row['opr_internacional_alicota'];
+            }
+
+            // Estrutura: [CODIGO][CANAL] = VALOR
+            $vetorComissao[$codOpr][$rescommiss_row['co_canal']] = $valorComissao;
+        }
     } //end while
     //echo "<pre>".print_r($vetorComissao,true)."</pre>";
 
@@ -115,7 +136,7 @@ if ($BtnSearch) {
                     from pins t0
                     JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
 					JOIN pins_status t3 ON t0.pin_status = t3.stat_codigo
-					".($por_utilizacao ? "" : "LEFT ")."JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno
+					" . ($por_utilizacao ? "" : "LEFT ") . "JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno
                     where 1=1" . PHP_EOL;
         if ($tf_data_inicial && $tf_data_final) {
             $data_inic = formata_data(trim($tf_data_inicial), 1);
