@@ -27,7 +27,7 @@ Execute o comando abaixo **na raiz do projeto**, gerando os arquivos nas pastas 
 ```bash
 mkcert -key-file docker-config/certs_local/e-prepag.com.br.key \
 -cert-file docker-config/certs_local/e-prepag.com.br.crt \
-localhost hml.backoffice.e-prepag.com.br hml.e-prepag.com.br
+localhost backoffice-dev.e-prepag.com.br dev.e-prepag.com.br
 ```
 
 Isso criará dois arquivos:
@@ -77,8 +77,8 @@ Sem o `.env` o sistema não funcionará corretamente.
 Para que o navegador encontre seu ambiente local, adicione:
 
 ```
-127.0.0.1   hml.backoffice.e-prepag.com.br
-127.0.0.1   hml.e-prepag.com.br
+127.0.0.1   backoffice-dev.e-prepag.com.br
+127.0.0.1   dev.e-prepag.com.br
 ```
 
 ### 📌 **Como editar o hosts:**
@@ -148,8 +148,8 @@ Se aparecer que está "listening" ou sem erros, está rodando.
 
 Depois de tudo configurado, acesse:
 
-* [https://hml.e-prepag.com.br](https://hml.e-prepag.com.br)
-* [https://hml.backoffice.e-prepag.com.br](https://hml.backoffice.e-prepag.com.br)
+* [https://dev.e-prepag.com.br](https://dev.e-prepag.com.br)
+* [https://backoffice-dev.e-prepag.com.br](backoffice-dev.e-prepag.com.br)
 
 ---
 
