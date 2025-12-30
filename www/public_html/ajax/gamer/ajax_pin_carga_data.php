@@ -29,7 +29,7 @@ function usar_pin(){
 		$(document).ready(function(){
 			$.ajax({
 				type: 'POST',
-				url: 'http".(($_SERVER['HTTPS']=="on")?"s":"") ."://" . $server_url . "/ajax/gamer/ajax_pin_carga.php',
+				url: 'https://" . $server_url . "/ajax/gamer/ajax_pin_carga.php',
 				data: ";
 echo "$('#formAddPIN').serialize()";
 $data =  array(
