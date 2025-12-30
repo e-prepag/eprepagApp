@@ -28,6 +28,7 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
 <meta charset="ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- css -->
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <link href="/includes/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="/sys/css/css_frame.css" type="text/css">
 <!-- js -->
@@ -161,7 +162,7 @@ if (isset($_GET["Empty"]) && $_GET["Empty"] == TRUE) {
             $("#formLog").submit(async (e) => {
                 e.preventDefault();
 
-                const res = await fetch('/public-key'); // deve ser HTTPS
+                const res = await fetch('https://<?=EPREPAG_URL?>/public-key');
                 if (!res.ok) alert('<?= LANG_ERROR_PROCESSING_LOGIN ?>');
                 const publicPem = await res.text();
 
