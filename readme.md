@@ -125,13 +125,13 @@ Na raiz do projeto execute:
 ### **Build da imagem:**
 
 ```bash
-docker compose build
+docker compose -f docker-compose_dev.yml build
 ```
 
 ### **Subir os containers em background:**
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose_dev.yml up -d
 ```
 
 ### **Ver logs da aplicação:**
@@ -167,7 +167,7 @@ Se aparecer qualquer erro estranho no log, mensagem incomum ou comportamento ine
 * O correto é rodar **apenas**:
 
 ```
-docker-compose.yml
+docker-compose_dev.yml
 ```
 
 ### ❌ Pastas erradas nos caminhos do Docker
