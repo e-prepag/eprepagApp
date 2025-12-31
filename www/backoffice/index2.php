@@ -17,7 +17,7 @@ require_once $raiz_do_projeto . "class/util/Log.class.php";
 require_once __DIR__ . "/../libs/PHPGangsta/GoogleAuthenticator.php";
 require_once "/www/class/classSecureEncryption.php";
 
-$ipReq = $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
+$ipReq = $_SERVER['HTTP_CF_CONNECTING_IP'] ?: $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
 gravaLog_LoginBKO("Login BKO: '" . $user . "', '" . $ipReq . "'");
 $Enviar = true;
 if ($Enviar) {

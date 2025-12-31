@@ -9,6 +9,8 @@ require_once "/www/includes/bourls.php";
 
 	set_time_limit ( 300 ) ;
 
+$venda_id = $_GET['venda_id'] ?? null;
+
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 

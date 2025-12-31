@@ -11,6 +11,51 @@ require_once $raiz_do_projeto."includes/functions_pagto_reduced.php";
 //echo "<pre>".print_r($SIGLA_REGIOES,true)."</pre>";
 	$time_start = getmicrotime();
 	
+$BtnSearch                     = $_POST['BtnSearch'] ?? null;
+
+$tf_u_so_depositos              = $_POST['tf_u_so_depositos'] ?? null;
+
+$tf_v_codigo                    = $_POST['tf_v_codigo'] ?? null;
+$tf_v_codigo_include            = $_POST['tf_v_codigo_include'] ?? null;
+$tf_v_status                    = $_POST['tf_v_status'] ?? null;
+
+$tf_v_qtde_produtos             = $_POST['tf_v_qtde_produtos'] ?? null;
+$tf_v_qtde_itens                = $_POST['tf_v_qtde_itens'] ?? null;
+$tf_v_valor                     = $_POST['tf_v_valor'] ?? null;
+$tf_v_repasse                   = $_POST['tf_v_repasse'] ?? null;
+
+$tf_v_data_inclusao_ini         = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim         = $_POST['tf_v_data_inclusao_fim'] ?? null;
+
+$tf_v_concilia                  = $_POST['tf_v_concilia'] ?? null;
+$tf_v_data_concilia_ini         = $_POST['tf_v_data_concilia_ini'] ?? null;
+$tf_v_data_concilia_fim         = $_POST['tf_v_data_concilia_fim'] ?? null;
+
+$conciliado_manualmente         = $_POST['conciliado_manualmente'] ?? null;
+
+$tf_v_data_cancelamento_ini     = $_POST['tf_v_data_cancelamento_ini'] ?? null;
+$tf_v_data_cancelamento_fim     = $_POST['tf_v_data_cancelamento_fim'] ?? null;
+
+$tf_d_forma_pagto               = $_POST['tf_d_forma_pagto'] ?? null;
+
+$tf_u_codigo                    = $_POST['tf_u_codigo'] ?? null;
+$tf_u_nome_fantasia             = $_POST['tf_u_nome_fantasia'] ?? null;
+$tf_u_vip                       = $_POST['tf_u_vip'] ?? null;
+$tf_u_rg                        = $_POST['tf_u_rg'] ?? null;
+$tf_u_cnpj                      = $_POST['tf_u_cnpj'] ?? null;
+$tf_u_responsavel               = $_POST['tf_u_responsavel'] ?? null;
+$tf_u_email                     = $_POST['tf_u_email'] ?? null;
+$tf_u_nome                      = $_POST['tf_u_nome'] ?? null;
+$tf_u_cidade                    = $_POST['tf_u_cidade'] ?? null;
+$tf_u_cpf                       = $_POST['tf_u_cpf'] ?? null;
+$tf_u_estado                    = $_POST['tf_u_estado'] ?? null;
+
+$tf_regiao                      = $_POST['tf_regiao'] ?? null;
+$tf_v_drupal                    = $_POST['tf_v_drupal'] ?? null;
+
+$tf_opr_codigo                  = $_POST['tf_opr_codigo'] ?? null;
+$tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
+
 	if(!$ncamp)    $ncamp       = 'vg_data_inclusao';
 	if(!$inicial)  $inicial     = 0;
 	if(!$range)    $range       = 1;

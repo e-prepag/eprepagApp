@@ -8,6 +8,8 @@ require_once $raiz_do_projeto . "includes/gamer/main.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
+$usuario_id = $_GET['usuario_id'] ?? null;
+
 $varsel = "&usuario_id=$usuario_id";
 
 $max = $qtde_reg_tela;
