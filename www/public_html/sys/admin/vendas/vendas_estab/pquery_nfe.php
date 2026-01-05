@@ -1,6 +1,6 @@
 <?php 
-// error_reporting(E_ALL); 
-// ini_set("display_errors", 1);
+error_reporting(E_ALL); 
+ini_set("display_errors", 1);
 session_start();
 if (isset($_POST['exportar_excel'])) {
     header('Content-Type: text/csv; charset=utf-8');
@@ -90,11 +90,8 @@ if($BtnSearch && $BtnSearch!=1 ) {
         $total_table = 0;
 }
 
-$dataObjInicial = DateTime::createFromFormat('Ymd', $tf_data_inicial);
-$dataObjFinal = DateTime::createFromFormat('Ymd', $tf_data_final);
-
-$tf_data_inicial = $dataObjInicial->format('d/m/Y');
-$tf_data_final = $dataObjFinal->format('d/m/Y');
+$tf_data_final = implode("/", array_reverse(explode("-", $tf_data_final)));
+$tf_data_inicial = implode("/", array_reverse(explode("-", $tf_data_inicial)));
 
 $data_inicial_limite = data_menos_n(date('d/m/Y'), 120);
 $data_inicial_limite = '01/08/2004';
@@ -769,13 +766,13 @@ function clearSelection (){
                 <span class="pull-right"><?php echo LANG_PINS_START_DATE; ?></span>
             </div>
             <div class="col-md-3">
-                 <input name="tf_data_inicial" type="text" class="form-control w-ipt-medium pull-left data" id="tf_data_inicial" value="<?php  echo implode("-", array_reverse(explode("/", $tf_data_inicial))) ?>" size="9" maxlength="10">
+                 <input name="tf_data_inicial" type="date" class="form-control w-ipt-medium pull-left data" id="tf_data_inicial" value="<?php  echo implode("-", array_reverse(explode("/", $tf_data_inicial))) ?>" size="9" maxlength="10">
             </div>
             <div class="col-md-2">
                 <span class="pull-right"><?php echo LANG_PINS_END_DATE; ?></span>
             </div>
             <div class="col-md-3">
-                <input name="tf_data_final" type="text" class="form-control w-ipt-medium pull-left data" id="tf_data_final" value="<?php  echo implode("-", array_reverse(explode("/", $tf_data_final))) ?>" size="9" maxlength="10">
+                <input name="tf_data_final" type="date" class="form-control w-ipt-medium pull-left data" id="tf_data_final" value="<?php  echo implode("-", array_reverse(explode("/", $tf_data_final))) ?>" size="9" maxlength="10">
             </div>
             <?php
                 if($_SESSION["tipo_acesso_pub"]=='AT') {
