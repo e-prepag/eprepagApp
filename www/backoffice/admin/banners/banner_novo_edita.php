@@ -42,7 +42,7 @@ $posicoes = $objPosicao->pegaPosicao($where_p);
         </div>
         <div class="col-md-9 col-lg-9 col-xs-12 col-sm-12 top10">
             <input type="file" class="custom-file-input" name="bs_imagem" id="bs_imagem" label="Imagem " value="<?php if (isset($banner)) echo $banner[0]->getImagem(); ?>">
-            <span class="font10">Tipos válidos de imagem: jpg, jpge e png.</span>
+            <span class="font10">Por favor não utilize espaços (troque por _ ) ou caracteres especiais no nome. Tipos válidos de imagem: jpg, jpge e png.</span>
         </div>
         <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12 top10">
             <label for="bs_link" class="w100 left">Link:</label>
@@ -54,13 +54,13 @@ $posicoes = $objPosicao->pegaPosicao($where_p);
             <label for="bs_data_inicio" class="w100 left">Data inicial:</label>
         </div>
         <div class="col-md-9 col-lg-9 col-xs-12 col-sm-12 top10">
-            <input type="text" id="bs_data_inicio" name="bs_data_inicio" char="10" class="form-control w150" label="Data inicial " value="<?php if (isset($banner)) echo $banner[0]->getDataInicio(); ?>">
+            <input type="date" id="bs_data_inicio" name="bs_data_inicio" char="10" class="form-control w150" label="Data inicial " value="<?php if (isset($banner)) echo implode("-", array_reverse(explode("/", $banner[0]->getDataInicio()))); ?>">
         </div>
         <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12 top10">
             <label for="bs_data_fim" class="w100 left">Data final:</label>
         </div>
         <div class="col-md-9 col-lg-9 col-xs-12 col-sm-12 top10">
-            <input type="text" id="bs_data_fim" name="bs_data_fim" char="10" class="form-control w150" label="Data final " value="<?php if (isset($banner)) echo $banner[0]->getDataFim(); ?>">
+            <input type="date" id="bs_data_fim" name="bs_data_fim" char="10" class="form-control w150" label="Data final " value="<?php if (isset($banner)) echo implode("-", array_reverse(explode("/", $banner[0]->getDataFim()))); ?>">
         </div>
         <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12 top10">
             <label for="bsc_id" class="w100 left">Categoria:</label>
@@ -131,76 +131,22 @@ $posicoes = $objPosicao->pegaPosicao($where_p);
         </div>
     </form>
     <?php
-        if (!empty($banner[0]->getImagem())) {
-            $pasta = "https://" . EPREPAG_URL . "/imagens/banners/";
-        ?>
-            <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12 top10">
-                <label for="bsc_id" class="w100 left">Imagem Atual:</label>
-                <img src="<?php echo $pasta . $banner[0]->getImagem(); ?>" alt="Imagem deste Banner" border="0" align="absmiddle" />
-            </div>
-        <?php
-        }
-        ?>
+    if (!empty($banner[0]->getImagem())) {
+        $pasta = "https://" . EPREPAG_URL . "/imagens/banners/";
+    ?>
+        <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12 top10">
+            <label for="bsc_id" class="w100 left">Imagem Atual:</label>
+            <img src="<?php echo $pasta . $banner[0]->getImagem(); ?>" alt="Imagem deste Banner" border="0" align="absmiddle" />
+        </div>
+    <?php
+    }
+    ?>
 </div>
 <link href="<?php echo $server_url_ep; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
 <script src="<?php echo $server_url_ep; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
 <script src="<?php echo $server_url_ep; ?>/js/global.js"></script>
 <script>
-    var imagensPermitidas = "jpge, jpg e png";
-
-    function validaImagem(id) {
-        return ($("#" + id).val() != "" &&
-            (imagensPermitidas.indexOf($("#" + id).val().split('.').pop().toLowerCase()) < 0)) ? false : true;
-    }
-
-    function validateUrl(value) {
-        return ((value.indexOf("http://") >= 0 ||
-                value.indexOf("https://") >= 0) &&
-            value.indexOf(".") >= 0) ? true : false;
-
-    }
-
     $(function() {
-
-        var objDatePicker = new Object();
-
-        objDatePicker.interval = 1000;
-        objDatePicker.maxDate = null;
-        objDatePicker.dateFormat = "dd/mm/yy";
-        objDatePicker.minDate = null;
-        objDatePicker.changeMonth = true;
-
-        objDatePicker.onClose = function(selectedDate, instance) {
-            if (selectedDate != '') {
-                $("#bs_data_fim").datepicker("option", "minDate", selectedDate);
-                var date = $.datepicker.parseDate(instance.settings.dateFormat, selectedDate, instance.settings);
-                date.setMonth(date.getMonth() + objDatePicker.interval);
-                $("#bs_data_fim").datepicker("option", "minDate", selectedDate);
-            }
-        };
-
-        $("#bs_data_inicio").datepicker(objDatePicker);
-
-        var data = $("#bs_data_inicio").datepicker("getDate");
-        if (data) {
-            var tmpData = data;
-            tmpData.setMonth(tmpData.getMonth() + objDatePicker.interval);
-
-            if (tmpData <= currentDate)
-                data.setMonth(tmpData.getMonth());
-            else
-                data = currentDate;
-        } else
-            data = currentDate;
-
-        $("#bs_data_fim").datepicker({
-            maxDate: null,
-            changeMonth: true,
-            dateFormat: objDatePicker.dateFormat,
-            minDate: $("#bs_data_inicio").datepicker("getDate")
-        });
-
-
 
         $("#salvar").click(function() {
             var erro = [];
@@ -218,17 +164,8 @@ $posicoes = $objPosicao->pegaPosicao($where_p);
                 var msgErro = erro.join() + " não estão preenchidos, ou estão preenchidos de forma incorreta.";
                 alert(msgErro);
 
-            } else if (!validaImagem("bs_imagem")) {
-                $("label[for='bs_imagem'").css("color", "red");
-                alert("Imagem já existe ou extensão inválida.");
-
-            } else
-            if (!validateUrl($("#bs_link").val())) {
-                $("label[for='bs_link'").css("color", "red");
-                alert("Link inválido (verifique se contém http:// ou https://).");
             } else {
                 $("#" + $(this).get(0).form.id).submit();
-
             }
         });
     });

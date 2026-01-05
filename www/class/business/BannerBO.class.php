@@ -95,8 +95,8 @@ class BannerBO extends BannerDAO
             $banner->setTitulo($post["bs_titulo"]);
             $banner->setImagem($file["bs_imagem"]["name"]);
             $banner->setLink($post["bs_link"]);
-            $banner->setDataInicio($post["bs_data_inicio"]);
-            $banner->setDataFim($post["bs_data_fim"]);
+            $banner->setDataInicio(implode("/", array_reverse(explode("-", $post["bs_data_inicio"]))));
+            $banner->setDataFim(implode("/", array_reverse(explode("-",$post["bs_data_fim"]))));
             $banner->setStatus($post["bs_status"]);
             $banner->setStatus($post["bs_status"]);
             $banner->setCategoria($post["bsc_id"]);
@@ -161,8 +161,8 @@ class BannerBO extends BannerDAO
             $banner->setTitulo(utf8_decode($post["bs_titulo"]));
             $banner->setImagem(utf8_decode($file["bs_imagem"]["name"]));
             $banner->setLink($post["bs_link"]);
-            $banner->setDataInicio($post["bs_data_inicio"]);
-            $banner->setDataFim($post["bs_data_fim"]);
+            $banner->setDataInicio(implode("/", array_reverse(explode("-",$post["bs_data_inicio"]))));
+            $banner->setDataFim(implode("/", array_reverse(explode("-",$post["bs_data_fim"]))));
             $banner->setStatus($post["bs_status"]);
             $banner->setCategoria($post["bsc_id"]);
             $banner->setPosicao($post["bsp_id"]);
@@ -229,24 +229,6 @@ class BannerBO extends BannerDAO
     private function validaBanner($post)
     {
         $urlErro = false;
-        $ch = curl_init($post["bs_link"]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);    // true - verifica certificado
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);    // 1 - então, também verifica nome no certificado
-
-        $fp_err = fopen(RAIZ_DO_PROJETO . 'arquivos_gerados/logs/curl_err.log', 'ab+');
-        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-        curl_setopt($ch, CURLOPT_FAILONERROR, true);
-        curl_setopt($ch, CURLOPT_STDERR, $fp_err);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_exec($ch);
-        $retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        // $retcode >= 400 -> not found, $retcode = 200, found.
-        curl_close($ch);
-
-        if ($retcode >= 400) {
-            $this->erros[] = "Url inválida.";
-            $urlErro = true;
-        }
 
         return (strlen($post["bs_titulo"]) < 4 ||
             strlen($post["bs_link"]) < 8 ||
