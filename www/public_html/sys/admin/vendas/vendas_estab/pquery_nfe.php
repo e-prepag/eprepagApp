@@ -79,8 +79,8 @@ if(!$dd_mode || ($dd_mode!='V')) {
 $where_mode_data = "vg.vg_data_concilia";
 
 if(!$ncamp)            $ncamp           = 'trn_data';
-if(!$tf_data_final)    $tf_data_final   = date('d/m/Y');
-if(!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
+if(!$tf_data_final)    $tf_data_final   = date('Ymd');
+if(!$tf_data_inicial)  $tf_data_inicial = date('Ymd');
 if(!$inicial)          $inicial         = 0;
 if(!$range)            $range           = 1;
 if(!$ordem)            $ordem           = 1;
@@ -89,6 +89,12 @@ if($BtnSearch && $BtnSearch!=1 ) {
         $range       = 1;
         $total_table = 0;
 }
+
+$dataObjInicial = DateTime::createFromFormat('Ymd', $tf_data_inicial);
+$dataObjFinal = DateTime::createFromFormat('Ymd', $tf_data_final);
+
+$tf_data_inicial = $dataObjInicial->format('d/m/Y');
+$tf_data_final = $dataObjFinal->format('d/m/Y');
 
 $data_inicial_limite = data_menos_n(date('d/m/Y'), 120);
 $data_inicial_limite = '01/08/2004';
@@ -763,13 +769,13 @@ function clearSelection (){
                 <span class="pull-right"><?php echo LANG_PINS_START_DATE; ?></span>
             </div>
             <div class="col-md-3">
-                 <input name="tf_data_inicial" type="date" class="form-control w-ipt-medium pull-left data" id="tf_data_inicial" value="<?php  echo $tf_data_inicial ?>" size="9" maxlength="10">
+                 <input name="tf_data_inicial" type="text" class="form-control w-ipt-medium pull-left data" id="tf_data_inicial" value="<?php  echo implode("-", array_reverse(explode("/", $tf_data_inicial))) ?>" size="9" maxlength="10">
             </div>
             <div class="col-md-2">
                 <span class="pull-right"><?php echo LANG_PINS_END_DATE; ?></span>
             </div>
             <div class="col-md-3">
-                <input name="tf_data_final" type="date" class="form-control w-ipt-medium pull-left data" id="tf_data_final" value="<?php  echo $tf_data_final ?>" size="9" maxlength="10">
+                <input name="tf_data_final" type="text" class="form-control w-ipt-medium pull-left data" id="tf_data_final" value="<?php  echo implode("-", array_reverse(explode("/", $tf_data_final))) ?>" size="9" maxlength="10">
             </div>
             <?php
                 if($_SESSION["tipo_acesso_pub"]=='AT') {
