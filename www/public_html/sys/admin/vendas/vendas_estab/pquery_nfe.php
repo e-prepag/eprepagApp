@@ -763,13 +763,13 @@ function clearSelection (){
                 <span class="pull-right"><?php echo LANG_PINS_START_DATE; ?></span>
             </div>
             <div class="col-md-3">
-                 <input name="tf_data_inicial" type="text" class="form-control w-ipt-medium pull-left data" id="tf_data_inicial" value="<?php  echo $tf_data_inicial ?>" size="9" maxlength="10">
+                 <input name="tf_data_inicial" type="date" class="form-control w-ipt-medium pull-left data" id="tf_data_inicial" value="<?php  echo $tf_data_inicial ?>" size="9" maxlength="10">
             </div>
             <div class="col-md-2">
                 <span class="pull-right"><?php echo LANG_PINS_END_DATE; ?></span>
             </div>
             <div class="col-md-3">
-                <input name="tf_data_final" type="text" class="form-control w-ipt-medium pull-left data" id="tf_data_final" value="<?php  echo $tf_data_final ?>" size="9" maxlength="10">
+                <input name="tf_data_final" type="date" class="form-control w-ipt-medium pull-left data" id="tf_data_final" value="<?php  echo $tf_data_final ?>" size="9" maxlength="10">
             </div>
             <?php
                 if($_SESSION["tipo_acesso_pub"]=='AT') {
