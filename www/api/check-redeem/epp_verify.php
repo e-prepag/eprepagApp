@@ -1,7 +1,7 @@
 <?php
 //Verificando se a execução foi acionada a apartir CHECK-REDEEM
 if (!defined('ACCESS_ALLOWED')) {
-    die('Acesso direto não permitido.');
+	die('Acesso direto não permitido.');
 }
 $teste = debug_backtrace();
 if (strpos($teste[0]["file"], "check-redeem/index.php")) {
@@ -95,6 +95,8 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 			send_debug_info_by_email_PINCASH('Teste ID [' . $id . ']', 'IPs Permitidos: [' . $aux_opr_ip . ']<br>IP Utilizado: [' . retorna_ip_acesso() . ']<br>Verificação de IP retornou: [' . $aux_teste_IP . ']<br>Dominio capturando no if ( controleIP->isInOprRange(aux_opr_ip, retorna_ip_acesso()) ): [' . $dominio_check . ']<br>', $partner_dep, $id);
 			gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'IPs Permitidos: [' . $aux_opr_ip . ']' . PHP_EOL . 'IP Utilizado: [' . retorna_ip_acesso() . ']' . PHP_EOL . 'Verificação de IP retornou: [' . $aux_teste_IP . ']' . PHP_EOL . 'Dominio capturando no if ( controleIP->isInOprRange(aux_opr_ip, retorna_ip_acesso()) ): [' . $dominio_check . ']' . PHP_EOL);
 
+			file_put_contents($fileLogTimer, "a[" . date('Ymd') . "]" . $_POST["pin_code"] . " Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
+
 			if ($aux_opr_ip <> 0 && $aux_teste_IP) {
 				$aux_status_value = retorna_status($pin_code, $id);
 				$aux_verifica_venda = verifica_venda($pin_code, $id);
@@ -142,6 +144,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										 * 147=> IGG Teste
 										 * 148=> IGG
 										 */
+										file_put_contents($fileLogTimer, "b[" . date('Ymd') . "]" . $_POST["pin_code"] . " Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 										$ids_https = array(88, 90, 73, 13, 102, 124, 137, 142, 143, 147, 148, 166, 168);
 										if (in_array($id, $ids_https)) {
 											$url = "https://";
@@ -191,16 +194,22 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $post_parameters);
 										// The number of seconds to wait while trying to connect. 
 										// Use 0 to wait indefinitely.
-										curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 0);
+										curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 10);
 										// The maximum number of seconds to allow cURL functions to execute.
-										curl_setopt($curl_handle, CURLOPT_TIMEOUT, 90);
+										curl_setopt($curl_handle, CURLOPT_TIMEOUT, 20);
 										// send the request and get the response
 
 										$inicio_timer_curl = microtime(true);
+
+										file_put_contents($fileLogTimer, "c[" . date('Ymd') . "]" . $_POST["pin_code"] . " Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 										$buffer = curl_exec($curl_handle);
+
+										file_put_contents($fileLogTimer, "d[" . date('Ymd') . "]" . $_POST["pin_code"] . " Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 
 										//Verificando erro
 										$erros_curl = curl_error($curl_handle);
+
+										$errno = curl_errno($curl_handle);
 
 										$infoCURL = curl_getinfo($curl_handle);
 
@@ -269,6 +278,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 													} //end if($id == 90)
 													$aux_codretepp = $notify_list_values['SU'];
 													$fim_timer = microtime(true);
+													file_put_contents($fileLogTimer, "e[" . date('Ymd') . "]" . $_POST["pin_code"] . " Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 													gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . "O script levou " . round(($fim_timer - $inicio_timer), 4) . " segundos. " . 'Resposta EPP*: CODRETEPP=' . $notify_list_values['SU'] . PHP_EOL);
 												} else {
 													$aux_codretepp = $notify_list_values['EU'];
@@ -280,8 +290,19 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											if (is_array($headers)) {
 												//logEventsONGAME('A consulta Partner_Check retornou 2'.PHP_EOL);
 											} //end if(is_array($headers))
+
 											send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] Partner_Check', 'A consulta Partner_Check retornou 2<br>', $partner_dep, $id);
 											gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'A consulta Partner_Check retornou 2' . PHP_EOL);
+										} else if ($errno === CURLE_OPERATION_TIMEDOUT) {
+
+											$aux_codretepp = $notify_list_values['EU'];
+											send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] Partner_Check', 'A consulta Partner_Check deu timeout<br>', $partner_dep, $id);
+											gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'A consulta Partner_Check deu timeout' . PHP_EOL);
+										} else {
+
+											$aux_codretepp = $notify_list_values['EU'];
+											send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] Partner_Check', 'A consulta Partner_Check deu erro<br>', $partner_dep, $id);
+											gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'A consulta Partner_Check deu erro' . PHP_EOL);
 										}
 									} //end else do if(empty($dominio_check))
 
@@ -364,6 +385,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 			echo ";PIN_VALUE=" . $pinValueFormatted;
 		}
 	}
+	file_put_contents($fileLogTimer, "f[" . date('Ymd') . "]" . $_POST["pin_code"] . " Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 } //end do if(strpos($teste[0]["file"],"check-redeem"))
 else {
 	die("Access Denied!");
