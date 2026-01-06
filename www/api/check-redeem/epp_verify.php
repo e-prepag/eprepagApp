@@ -195,12 +195,16 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										// The maximum number of seconds to allow cURL functions to execute.
 										curl_setopt($curl_handle, CURLOPT_TIMEOUT, 90);
 										// send the request and get the response
+
+										$inicio_timer_curl = microtime(true);
 										$buffer = curl_exec($curl_handle);
 
 										//Verificando erro
 										$erros_curl = curl_error($curl_handle);
 
 										$infoCURL = curl_getinfo($curl_handle);
+
+										$fim_timer = microtime(true);
 
 										$file = fopen("/www/arquivos_gerados/logs/ongame.txt", "a+");
 										$data = date('d-m-Y H:i:s');
@@ -215,6 +219,8 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											'CURL: ' . PHP_EOL . $dados_CURL . PHP_EOL .
 											'BUFFER ' . PHP_EOL . $dados_buffer . PHP_EOL .
 											'ERRORs: ' . PHP_EOL . $erros_curl . PHP_EOL .
+											'Timer Curl: ' . PHP_EOL . "O curl levou " . round(($fim_timer - $inicio_timer_curl), 4) . " segundos." . PHP_EOL .
+											'Timer Script: ' . PHP_EOL . "O script levou " . round(($fim_timer - $inicio_timer), 4) . " segundos." . PHP_EOL .
 											'####### END #######' . PHP_EOL);
 										fclose($file);
 
@@ -262,7 +268,8 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 														publisherOrderId(retorna_id_pin($pin_code, $id), $riot_order_id, 'L');
 													} //end if($id == 90)
 													$aux_codretepp = $notify_list_values['SU'];
-													gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'Resposta EPP*: CODRETEPP=' . $notify_list_values['SU'] . PHP_EOL);
+													$fim_timer = microtime(true);
+													gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . "O script levou " . round(($fim_timer - $inicio_timer), 4) . " segundos. " . 'Resposta EPP*: CODRETEPP=' . $notify_list_values['SU'] . PHP_EOL);
 												} else {
 													$aux_codretepp = $notify_list_values['EU'];
 													gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'A atualização para PIN Utilizado nãoa afetou N E N H U M registro.' . PHP_EOL . $sql . PHP_EOL . 'Resposta EPP: CODRETEPP=' . $notify_list_values['EU'] . PHP_EOL);

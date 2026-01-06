@@ -7,9 +7,8 @@ define('ACCESS_ALLOWED', true);
 
 if (true) { //descomentar para implementar https
 
-        set_time_limit(300);
-        ini_set('max_execution_time', 300);
-        ini_set('default_socket_timeout', 240);
+		$inicio_timer = microtime(true);
+
         require_once "../../includes/main.php";
         require_once $raiz_do_projeto . "includes/gamer/main.php";
         require_once $raiz_do_projeto . "includes/functionsCheckRedeem.php";
