@@ -186,7 +186,7 @@ try {
     $stmt->execute(array($id));
     $fetchGrupos = $stmt->fetchAll(PDO::FETCH_OBJ);
 } catch (PDOException $e) {
-    echo "Erro no banco de dados: " $e->getMessage();
+    echo "Erro no banco de dados: " . $e->getMessage();
 }
 $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 ?>
