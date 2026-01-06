@@ -15,7 +15,7 @@ $time_start = getmicrotime();
 
 $msg = "";
 $msg_notify = "";
-//	$ip_id = $_REQUEST['ip_id'];
+$ip_id = $_REQUEST['ip_id'];
 $store_id = $_REQUEST['store_id'];
 $order_id = $_REQUEST['order_id'];
 

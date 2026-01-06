@@ -10,6 +10,75 @@ require_once $raiz_do_projeto . "includes/pdv/main.php";
 require_once $raiz_do_projeto . "includes/functions_pagto_reduced.php";
 require_once "/www/includes/bourls.php";
 
+$venda_id                         = $_GET['venda_id'] ?? null;
+$fila_ncamp                       = $_GET['fila_ncamp'] ?? null;
+$fila_ordem                       = $_GET['fila_ordem'] ?? null;
+$BtnSearch                        = $_GET['BtnSearch'] ?? null;
+
+$tf_v_codigo                      = $_GET['tf_v_codigo'] ?? null;
+$tf_v_status                      = $_GET['tf_v_status'] ?? null;
+
+$tf_v_data_inclusao_ini            = $_GET['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim            = $_GET['tf_v_data_inclusao_fim'] ?? null;
+
+$tf_v_data_concilia_ini            = $_GET['tf_v_data_concilia_ini'] ?? null;
+$tf_v_data_concilia_fim            = $_GET['tf_v_data_concilia_fim'] ?? null;
+
+$tf_v_data_cancelamento_ini        = $_GET['tf_v_data_cancelamento_ini'] ?? null;
+$tf_v_data_cancelamento_fim        = $_GET['tf_v_data_cancelamento_fim'] ?? null;
+
+$tf_v_concilia                    = $_GET['tf_v_concilia'] ?? null;
+
+$tf_d_forma_pagto                 = $_GET['tf_d_forma_pagto'] ?? null;
+$tf_d_banco                       = $_GET['tf_d_banco'] ?? null;
+$tf_d_local                       = $_GET['tf_d_local'] ?? null;
+
+$tf_d_data_ini                    = $_GET['tf_d_data_ini'] ?? null;
+$tf_d_data_fim                    = $_GET['tf_d_data_fim'] ?? null;
+$tf_d_data_inclusao_ini            = $_GET['tf_d_data_inclusao_ini'] ?? null;
+$tf_d_data_inclusao_fim            = $_GET['tf_d_data_inclusao_fim'] ?? null;
+
+$tf_d_valor_pago                  = $_GET['tf_d_valor_pago'] ?? null;
+$tf_d_num_docto                   = $_GET['tf_d_num_docto'] ?? null;
+
+$tf_u_codigo                      = $_GET['tf_u_codigo'] ?? null;
+$tf_u_nome_fantasia               = $_GET['tf_u_nome_fantasia'] ?? null;
+$tf_u_email                       = $_GET['tf_u_email'] ?? null;
+$tf_u_responsavel                 = $_GET['tf_u_responsavel'] ?? null;
+$tf_u_cnpj                        = $_GET['tf_u_cnpj'] ?? null;
+
+$tf_v_repasse                     = $_GET['tf_v_repasse'] ?? null;
+
+$tf_u_nome                        = $_GET['tf_u_nome'] ?? null;
+$tf_u_rg                          = $_GET['tf_u_rg'] ?? null;
+$tf_u_cpf                         = $_GET['tf_u_cpf'] ?? null;
+
+$tf_v_valor                       = $_GET['tf_v_valor'] ?? null;
+$tf_v_qtde_produtos               = $_GET['tf_v_qtde_produtos'] ?? null;
+$tf_v_qtde_itens                  = $_GET['tf_v_qtde_itens'] ?? null;
+
+$tf_vgm_nome_produto              = $_GET['tf_vgm_nome_produto'] ?? null;
+$tf_vgm_nome_modelo               = $_GET['tf_vgm_nome_modelo'] ?? null;
+
+$tf_o_valor_face                  = $_GET['tf_o_valor_face'] ?? null;
+$tf_u_risco_classif               = $_GET['tf_u_risco_classif'] ?? null;
+
+$tf_v_codigo_include              = $_GET['tf_v_codigo_include'] ?? null;
+
+$tf_u_so_depositos                = $_GET['tf_u_so_depositos'] ?? null;
+$tf_u_cidade                      = $_GET['tf_u_cidade'] ?? null;
+$tf_u_estado                      = $_GET['tf_u_estado'] ?? null;
+$tf_regiao                        = $_GET['tf_regiao'] ?? null;
+
+$tf_v_drupal                      = $_GET['tf_v_drupal'] ?? null;
+$tf_opr_codigo                    = $_GET['tf_opr_codigo'] ?? null;
+$tf_v_origem                      = $_GET['tf_v_origem'] ?? null;
+
+$ex_tf_opr_codigo                 = $_GET['ex_tf_opr_codigo'] ?? null;
+
+$tf_produto                       = $_GET['tf_produto'] ?? null;
+$tf_pins                          = $_GET['tf_pins'] ?? null;
+
 
 if (!function_exists('isVendaDeposito')) {
 
