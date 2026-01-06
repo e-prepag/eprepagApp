@@ -127,11 +127,11 @@ $posicoes = $objPosicao->pegaPosicao($where_p);
             <input type="hidden" name="idb" value="<?php if (isset($banner)) echo $banner[0]->getId(); ?>">
             <input type="hidden" name="bs_ordenacao" value="<?php if (isset($banner)) echo $banner[0]->getOrdenacao(); ?>">
             <input type="hidden" name="<?php echo $method; ?>" value="1">
-            <input type="button" value="Salvar" id="salvar" class="btn btn-sm btn-info">
+            <button type="button" value="Salvar" id="salvar" class="btn btn-sm btn-info">Salvar</button>
         </div>
     </form>
     <?php
-    if (!empty($banner[0]->getImagem())) {
+    if (isset($banner) && !empty($banner[0]->getImagem())) {
         $pasta = "https://" . EPREPAG_URL . "/imagens/banners/";
     ?>
         <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12 top10">
@@ -146,7 +146,7 @@ $posicoes = $objPosicao->pegaPosicao($where_p);
 <script src="<?php echo $server_url_ep; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
 <script src="<?php echo $server_url_ep; ?>/js/global.js"></script>
 <script>
-    $(function() {
+    $(document).ready(function() {
 
         $("#salvar").click(function() {
             var erro = [];
