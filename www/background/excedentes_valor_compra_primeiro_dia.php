@@ -22,9 +22,9 @@ echo PHP_EOL.str_repeat("=", 80).PHP_EOL."Data da Execução do Script: ".date("Y-
 
 if(!empty($vendasExcedentes)){
     // Dados do Email
-    $email  = "rc@e-prepag.com.br";//"tamy@e-prepag.com.br,atendimento1@e-prepag.com.br,everton.almeida@e-prepag.com.br";
-    $cc     = "";//"glaucia@e-prepag.com.br,joao.trevisan@e-prepag.com.br";
-    $bcc    = "wagner@e-prepag.com.br, felipe.freire@e-prepag.com.br";
+    $email  = "rc@e-prepag.com.br";
+    $cc     = "";
+    $bcc    = "";
     $subject= "Relatório de Lan Houses que excederam o valor diário de compras na primeira compra";
     $msg    = "";
 

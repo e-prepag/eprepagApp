@@ -3,11 +3,11 @@
 @session_start();
 if(empty($_SESSION["iduser_bko_pub"]))
     {
-            echo '<script>alert("Faça login novamente");</script>';
+            echo '<script>alert("Faï¿½a login novamente");</script>';
             exit;
     }
 //Alicota EPP Administradora
-$alicota_epp_adm = array(6.38);//6.38;
+$alicota_epp_adm = array(6.38, 3.5);//6.38;
 
 //incluindo o arquivo do fpdf
 require_once "../../../../includes/constantes.php";

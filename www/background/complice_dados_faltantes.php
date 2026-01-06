@@ -20,9 +20,9 @@ $mesAno = date('m/Y',$currentmonth);
 list($mes, $ano) = explode("/", $mesAno);
 
 // Dados do Email
-$email  = "tamy@e-prepag.com.br,atendimento1@e-prepag.com.br,rc@e-prepag.com.br";
-$cc     = "glaucia@e-prepag.com.br,joao.trevisan@e-prepag.com.br";
-$bcc    = "wagner@e-prepag.com.br";
+$email  = "rc@e-prepag.com.br";
+$cc     = "glaucia@e-prepag.com.br";
+$bcc    = "";
 $subject= "Dados Faltantes CPF/Nome para Compliance";
 $msg    = "";
 
