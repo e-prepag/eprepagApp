@@ -76,7 +76,7 @@ try {
             } else {
                 //Instanciando Objetos para Descriptografia
                 $chavecript = new SecureEncryption();
-                $passw = $chavecript->hashPassword(addslashes($_POST["passw"]));
+                $passw = $chavecript->hashPassword(addslashes($_POST["nova_senha"]));
             }
         }
 
