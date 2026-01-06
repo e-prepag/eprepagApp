@@ -63,7 +63,7 @@ if (!in_array($ext, $ALLOWED_EXT, true)) {
 // ---------------------------------------------------
 
 // Apenas caracteres alfanuméricos, underscore, hífen e ponto
-if (!preg_match('/^[a-zA-Z0-9_\-\/\.]+$/', $path)) {
+if (!preg_match('/^[\w\-\/\.\s]+$/', $path)) {
     http_response_code(400);
     exit("Nome de arquivo contém caracteres inválidos");
 }
