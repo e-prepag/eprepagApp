@@ -33,8 +33,7 @@ try {
             $bcrypt = new SecureEncryption();
 
             if (!$bcrypt->verifyPassword($_POST['passw'], $fetch['shn_password'])) {
-                $teste = $bcrypt->hashPassword($_POST['passw']);
-                echo "<script>alert('Usuário ou senha inválidos {$teste} | {$fetch['shn_password']}');</script>";
+                echo "<script>alert('Usuário ou senha inválidos');</script>";
                 exit;
             }
 
