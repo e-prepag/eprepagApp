@@ -34,159 +34,160 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $publishers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Erro no banco de dados";
-}
 
-$grupos_id = unserialize($_SESSION["arrIdGrupos"]);
 
-$msg = array();
-$minCaracPass = 10;
-$maxCaracPass = 35;
+    $grupos_id = unserialize($_SESSION["arrIdGrupos"]);
 
-$pdo = $con->getLink();
-$sql = "SELECT id,shn_login,shn_nome,shn_mail, visualiza_dados, chave_autenticador, tipo_acesso, opr_codigo FROM usuarios where id = ?";
+    $msg = array();
+    $minCaracPass = 10;
+    $maxCaracPass = 35;
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute(array($_POST['id']));
-$fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $pdo = $con->getLink();
+    $sql = "SELECT id,shn_login,shn_nome,shn_mail, visualiza_dados, chave_autenticador, tipo_acesso, opr_codigo FROM usuarios where id = ?";
 
-if (isset($fetch[0]['id']) && isset($fetch[0]['shn_login'])) {
-    $login = $fetch[0]['shn_login'];
-    $id = $fetch[0]['id'];
-    $nome = $fetch[0]['shn_nome'];
-    $email = $fetch[0]['shn_mail'];
-    $visualiza_dados = $fetch[0]['visualiza_dados'];
-    $chave_autenticador = $fetch[0]['chave_autenticador'];
-    $tipo_acesso_var = $fetch[0]['tipo_acesso'];
-    $publisher_var = $fetch[0]['opr_codigo'];
-}
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(array($_POST['id']));
+    $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
+    if (isset($fetch[0]['id']) && isset($fetch[0]['shn_login'])) {
+        $login = $fetch[0]['shn_login'];
+        $id = $fetch[0]['id'];
+        $nome = $fetch[0]['shn_nome'];
+        $email = $fetch[0]['shn_mail'];
+        $visualiza_dados = $fetch[0]['visualiza_dados'];
+        $chave_autenticador = $fetch[0]['chave_autenticador'];
+        $tipo_acesso_var = $fetch[0]['tipo_acesso'];
+        $publisher_var = $fetch[0]['opr_codigo'];
+    }
 
-    $validate = new Validate();
+    if (isset($_POST['nome']) && isset($_POST['email']) && isset($_POST['id']) && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
 
-    if (isset($_POST['nova_senha']) && $_POST['nova_senha'] != "") {
+        $validate = new Validate();
 
-        $clsLogin = new Login($_POST['nova_senha']);
-        $clsLogin->setLimiteCaracteres($minCaracPass, $maxCaracPass);
+        if (isset($_POST['nova_senha']) && $_POST['nova_senha'] != "") {
 
-        if ($clsLogin->valida() > 0) {
-            $msg[] = "Senha não atinge os níveis de segurança desejados.";
-        } elseif ($_POST['nova_senha'] !== $_POST['pass_confirm']) {
-            $msg[] = "A confirmação de senha está diferente.";
-        } else {
-            //Instanciando Objetos para Descriptografia
-            $chavecript = new SecureEncryption();
-            $passw = $chavecript->hashPassword(addslashes($_POST["passw"]));
+            $clsLogin = new Login($_POST['nova_senha']);
+            $clsLogin->setLimiteCaracteres($minCaracPass, $maxCaracPass);
+
+            if ($clsLogin->valida() > 0) {
+                $msg[] = "Senha não atinge os níveis de segurança desejados.";
+            } elseif ($_POST['nova_senha'] !== $_POST['pass_confirm']) {
+                $msg[] = "A confirmação de senha está diferente.";
+            } else {
+                //Instanciando Objetos para Descriptografia
+                $chavecript = new SecureEncryption();
+                $passw = $chavecript->hashPassword(addslashes($_POST["passw"]));
+            }
         }
-    }
 
-    if (isset($_POST["visualiza"]) && in_array(1, $grupos_id)) {
-        $visualiza_dados = $_POST["visualiza"];
-    } else {
-        $visualiza_dados = "N";
-    }
+        if (isset($_POST["visualiza"]) && in_array(1, $grupos_id)) {
+            $visualiza_dados = $_POST["visualiza"];
+        } else {
+            $visualiza_dados = "N";
+        }
 
-    if ($validate->qtdCaracteres($_POST['id'], 1, 20))
-        $msg[] = "Usuário não encontrado.";
+        if ($validate->qtdCaracteres($_POST['id'], 1, 20))
+            $msg[] = "Usuário não encontrado.";
 
-    if ($validate->qtdCaracteres($_POST['nome'], 2, 50))
-        $msg[] = "Nome inválido.";
+        if ($validate->qtdCaracteres($_POST['nome'], 2, 50))
+            $msg[] = "Nome inválido.";
 
-    if ($validate->email($_POST['email']))
-        $msg[] = "E-mail inválido";
+        if ($validate->email($_POST['email']))
+            $msg[] = "E-mail inválido";
 
-    if (empty($msg)) {
-        $pdo = $con->getLink();
-        $sql = "SELECT * FROM usuarios WHERE id = ?";
+        if (empty($msg)) {
+            $pdo = $con->getLink();
+            $sql = "SELECT * FROM usuarios WHERE id = ?";
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array($_POST['id']));
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(array($_POST['id']));
 
-        $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($fetch) == 1) {
+            if (count($fetch) == 1) {
 
-            if ($_POST["tipo_acesso"] == "PU") {
-                $opr_codigo = $_POST["publisher"];
-            } else {
-                $opr_codigo = 0;
-            }
+                if ($_POST["tipo_acesso"] == "PU") {
+                    $opr_codigo = $_POST["publisher"];
+                } else {
+                    $opr_codigo = 0;
+                }
 
-            if (empty($_POST["tipo_acesso"])) {
-                $_POST["tipo_acesso"] = "AT";
-            }
+                if (empty($_POST["tipo_acesso"])) {
+                    $_POST["tipo_acesso"] = "AT";
+                }
 
-            if (isset($passw)) {
-                $update = "UPDATE usuarios set shn_password = ?, shn_nome = ?, shn_mail = ?, visualiza_dados = ?, tipo_acesso = ?, opr_codigo = ? where id = ?";
-                $params = array(
-                    $passw,
-                    $_POST['nome'],
-                    $_POST['email'],
-                    $visualiza_dados,
-                    $_POST["tipo_acesso"],
-                    $opr_codigo,
-                    $_POST['id']
+                if (isset($passw)) {
+                    $update = "UPDATE usuarios set shn_password = ?, shn_nome = ?, shn_mail = ?, visualiza_dados = ?, tipo_acesso = ?, opr_codigo = ? where id = ?";
+                    $params = array(
+                        $passw,
+                        $_POST['nome'],
+                        $_POST['email'],
+                        $visualiza_dados,
+                        $_POST["tipo_acesso"],
+                        $opr_codigo,
+                        $_POST['id']
+                    );
+                } else {
+                    $update = "UPDATE usuarios set shn_nome = ?, shn_mail = ?, visualiza_dados = ?, tipo_acesso = ?, opr_codigo = ? where id = ?";
+                    $params = array(
+                        $_POST['nome'],
+                        $_POST['email'],
+                        $visualiza_dados,
+                        $_POST["tipo_acesso"],
+                        $opr_codigo,
+                        $_POST['id']
+                    );
+                }
+
+
+                $stmt = $pdo->prepare($update);
+                $stmt->execute(
+                    $params
                 );
+                if ($stmt->rowCount() == 1) {
+                    $msg[] = "Dados alterados com sucesso. Clique <a href='lista.php'>aqui</a> para voltar.";
+                    $color = "txt-verde";
+                } else {
+                    var_dump($stmt->rowCount());
+                    $msg[] = "Erro ao alterar senha. Entre em contato com o suporte.";
+                    $color = "txt-vermelho";
+                }
             } else {
-                $update = "UPDATE usuarios set shn_nome = ?, shn_mail = ?, visualiza_dados = ?, tipo_acesso = ?, opr_codigo = ? where id = ?";
-                $params = array(
-                    $_POST['nome'],
-                    $_POST['email'],
-                    $visualiza_dados,
-                    $_POST["tipo_acesso"],
-                    $opr_codigo,
-                    $_POST['id']
-                );
-            }
-
-
-            $stmt = $pdo->prepare($update);
-            $stmt->execute(
-                $params
-            );
-            if ($stmt->rowCount() == 1) {
-                $msg[] = "Dados alterados com sucesso. Clique <a href='lista.php'>aqui</a> para voltar.";
-                $color = "txt-verde";
-            } else {
-                var_dump($stmt->rowCount());
-                $msg[] = "Erro ao alterar senha. Entre em contato com o suporte.";
+                $msg[] = "Usuário para alteração não encontrado.";
                 $color = "txt-vermelho";
             }
         } else {
-            $msg[] = "Usuário para alteração não encontrado.";
             $color = "txt-vermelho";
         }
-    } else {
-        $color = "txt-vermelho";
     }
-}
-if ($_POST["remove_chave"] && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
-    $update = "UPDATE usuarios set chave_autenticador = '' where id = ?";
-    $params = array(
-        $_POST['id']
-    );
-    $stmt = $pdo->prepare($update);
-    $stmt->execute(
-        $params
-    );
-    if ($stmt->rowCount() == 1) {
-        $msg[] = "Autenticador removido com sucesso. Clique <a href='lista.php'>aqui</a> para voltar.";
-        $color = "txt-verde";
-        $chave_autenticador = null;
-    } else {
-        var_dump($stmt->rowCount());
-        $msg[] = "Erro ao remover autenticador. Entre em contato com o suporte.";
-        $color = "txt-vermelho";
+    if ($_POST["remove_chave"] && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
+        $update = "UPDATE usuarios set chave_autenticador = '' where id = ?";
+        $params = array(
+            $_POST['id']
+        );
+        $stmt = $pdo->prepare($update);
+        $stmt->execute(
+            $params
+        );
+        if ($stmt->rowCount() == 1) {
+            $msg[] = "Autenticador removido com sucesso. Clique <a href='lista.php'>aqui</a> para voltar.";
+            $color = "txt-verde";
+            $chave_autenticador = null;
+        } else {
+            var_dump($stmt->rowCount());
+            $msg[] = "Erro ao remover autenticador. Entre em contato com o suporte.";
+            $color = "txt-vermelho";
+        }
     }
+
+    $sql = "SELECT grupos_descricao, g.grupos_id from grupos_usuarios g inner join grupos_acesso_usuarios u on g.grupos_id = u.grupos_id and u.id = ?";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(array($id));
+    $fetchGrupos = $stmt->fetchAll(PDO::FETCH_OBJ);
+} catch (PDOException $e) {
+    echo "Erro no banco de dados: " $e->getMessage();
 }
-
-$sql = "SELECT grupos_descricao, g.grupos_id from grupos_usuarios g inner join grupos_acesso_usuarios u on g.grupos_id = u.grupos_id and u.id = ?";
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute(array($id));
-$fetchGrupos = $stmt->fetchAll(PDO::FETCH_OBJ);
 $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 ?>
 <div class="col-md-12">
