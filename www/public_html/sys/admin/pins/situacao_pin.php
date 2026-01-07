@@ -243,11 +243,12 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                                         $data_utilizado_aux = substr($rs_pin_utilizado_row['pih_data'],0,19);
                                     }else{
                                         $data_utilizado_aux = "--";
+                                        $mensagem_utilizacao = LANG_PINS_STATUS_MSG_8_NO_LOG;
+
                                     }
                                 }//end if($rs_pin_row['pin_status'] == '8')
                                 else {
                                     $data_utilizado_aux = "--";
-                                    $mensagem_utilizacao = LANG_PINS_STATUS_MSG_8_NO_LOG;
                                 } //end else
                             }//end else do  if($isPINCARD)
 
