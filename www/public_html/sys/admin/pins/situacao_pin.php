@@ -238,8 +238,8 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                                 if($rs_pin_row['pin_status'] == '8') {
                                     $sql = "select MIN(pih_data) as pih_data from pins_integracao_historico where pih_pin_id = ".$rs_pin_row['pin_codinterno']." and pin_status = 8 and pih_codretepp = '2';";
                                     $rs_pin_utilizado = SQLexecuteQuery($sql);
-                                    if($rs_pin_utilizado){
-                                        $rs_pin_utilizado_row = pg_fetch_array($rs_pin_utilizado);
+                                    $rs_pin_utilizado_row = pg_fetch_array($rs_pin_utilizado);
+                                    if(!empty($rs_pin_utilizado_row['pih_data'])){
                                         $data_utilizado_aux = substr($rs_pin_utilizado_row['pih_data'],0,19);
                                     }else{
                                         $data_utilizado_aux = "--";
