@@ -1,0 +1,1 @@
+* * * * * bash /www/background/test_cron_franci.sh >> /www/arquivos_gerados/logs_cron/test_cron_franci.log  2>&1
