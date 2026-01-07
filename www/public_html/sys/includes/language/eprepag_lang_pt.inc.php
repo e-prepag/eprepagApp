@@ -194,6 +194,8 @@
 @define('LANG_PINS_STATUS_MSG_8', 'Utilizado');
 @define('LANG_PINS_STATUS_MSG_9', 'Desativado');
 
+@define('LANG_PINS_STATUS_MSG_8_NO_LOG', ' (Status utiliz., mas sem registro de uso)');
+
 @define('LANG_PINS_SERIAL', 'PIN Serial');
 
 @define('LANG_CARDS_PAGE_TITLE', 'Pesquisa Venda Cartões');

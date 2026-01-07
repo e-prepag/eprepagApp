@@ -199,6 +199,8 @@
 @define('LANG_PINS_STATUS_MSG_8', 'Used');
 @define('LANG_PINS_STATUS_MSG_9', 'Deactivated');
 
+@define('LANG_PINS_STATUS_MSG_8_NO_LOG', ' (Used status, but no usage data)');
+
 @define('LANG_PINS_SERIAL', 'PIN Serial');
 
 @define('LANG_CARDS_PAGE_TITLE', 'Search Sales Cards');
