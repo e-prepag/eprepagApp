@@ -8,6 +8,15 @@ require_once "/www/includes/bourls.php";
 <link href="/js/jQCTC/_assets/css/Style.css" rel="stylesheet" type="text/css" />
 <?php 
 
+$tf_data_ini = $_POST['tf_data_ini'] ?? null;
+$tf_data_fim = $_POST['tf_data_fim'] ?? null;
+$tf_v_codigo = $_POST['tf_v_codigo'] ?? null;
+$tf_v_order = $_POST['tf_v_order'] ?? null;
+$tf_v_email = $_POST['tf_v_email'] ?? null;
+$tf_store_id = $_POST['tf_store_id'] ?? null;
+$tf_codretepp = $_POST['tf_codretepp'] ?? null;
+$BtnSearch = $_POST['BtnSearch'] ?? null;
+
 	set_time_limit ( 3000 ) ;
 
 	$time_start = getmicrotime();

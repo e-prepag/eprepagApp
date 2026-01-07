@@ -8,6 +8,10 @@ set_time_limit ( 3000 ) ;
 
 $time_start = getmicrotime();
 
+$fopr    = $_POST['fopr'] ?? null;
+$fvalor  = $_POST['fvalor'] ?? null;
+$fcanal  = $_POST['fcanal'] ?? null;
+$Submit  = $_POST['Submit'] ?? null;
 
 $cor1 = "#F5F5FB";
 $cor2 = "#F5F5FB";

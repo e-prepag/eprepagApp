@@ -13,6 +13,8 @@ require_once $raiz_do_projeto . "class/util/Validate.class.php";
 require_once $raiz_do_projeto . "class/util/Util.class.php";
 require_once $raiz_do_projeto . "includes/complice/functions.php";
 
+$BtnConcluir = $_POST['BtnConcluir'] ?? null;
+
 //Extensoes de arquivos do OFAC permitidos 
 $OFAC_EXTENSOES = array("zip");
 //Nome do arquivo OFAC zipado

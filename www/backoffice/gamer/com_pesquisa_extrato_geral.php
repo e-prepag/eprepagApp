@@ -8,6 +8,15 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 require_once $raiz_do_projeto."includes/inc_Pagamentos.php";
 require_once $raiz_do_projeto."includes/gamer/func_conta_dez_dias.php";
 
+$tf_v_codigo = $_POST['tf_v_codigo'] ?? null;
+$tf_v_data_inclusao_ini = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$btPesquisar = $_POST['btPesquisar'] ?? null;
+$ug_nome = $_POST['ug_nome'] ?? null;
+$dd_compras = $_POST['dd_compras'] ?? null;
+$codigo_user = $_POST['codigo_user'] ?? null;
+
+
 $time_start = getmicrotime();
 
 if(!$inicial)  $inicial     = 0;

@@ -7,6 +7,13 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . 'class/util/Util.class.php';
 require_once $raiz_do_projeto . 'class/util/Json.class.php';
 
+$opr_codigo = $_POST['opr_codigo'] ?? null;
+$opr_nome = $_POST['opr_nome'] ?? null;
+$btn_pesquisar = $_POST['btn_pesquisar'] ?? null;
+$opr_codigo = $_GET['opr_codigo'] ?? null;
+$opr_nome = $_GET['opr_nome'] ?? null;
+$btn_pesquisar = $_GET['btn_pesquisar'] ?? null;
+
 $acao = isset($_REQUEST['acao']) ? $_REQUEST['acao'] : 'listar';
 $msg = "";
 

@@ -4,6 +4,12 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
+$tf_u_so_depositos        = $_POST['tf_u_so_depositos'] ?? null;
+$tf_v_data_inclusao_ini  = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim  = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$tf_u_estado             = $_POST['tf_u_estado'] ?? null;
+$BtnSearch               = $_POST['BtnSearch'] ?? null;
+
 if(b_IsBKOUsuarioRankingLAN()) {
     
 	set_time_limit ( 6000 ) ;

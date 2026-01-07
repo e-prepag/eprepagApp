@@ -4,6 +4,8 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/gamer/main.php";
 
+$produto_id = $_GET['produto_id'] ?? null;
+
 $instProd = new Produto();
 $instProdMod = new ProdutoModelo();
 

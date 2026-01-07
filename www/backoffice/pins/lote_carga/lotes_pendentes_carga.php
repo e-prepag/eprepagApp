@@ -10,6 +10,12 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once "functions_lote_carga.php";
 
+$opr_codigo     = $_POST['opr_codigo'] ?? null;
+$fcanal         = $_POST['fcanal'] ?? null;
+$Registrar      = $_POST['Registrar'] ?? null;
+$loteValor      = $_POST['loteValor'] ?? null;
+$MAX_FILE_SIZE  = $_POST['MAX_FILE_SIZE'] ?? null;
+
 //Constantes
 //----------------------------------------------------------------------------------------
 $logFile = 'lote_carga.log';

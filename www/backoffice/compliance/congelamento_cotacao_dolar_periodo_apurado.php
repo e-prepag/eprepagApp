@@ -4,6 +4,11 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 
 set_time_limit(3600);
 
+$data_inicial = $_POST['data_inicial'] ?? null;
+$data_final = $_POST['data_final'] ?? null;
+$BtnSearch = $_POST['BtnSearch'] ?? null;
+$opr_codigo = $_POST['opr_codigo'] ?? null;
+
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
 <script src="/js/jquery-ui-1.9.2.custom.min.js"></script>

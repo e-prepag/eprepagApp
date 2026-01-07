@@ -2,6 +2,8 @@
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php"; 
 
+$tipo = $_POST['tipo'] ?? null;
+
 $texto = file_get_contents('http://127.0.0.1:81/server-status');
 
 // Verifica tipo de monitor

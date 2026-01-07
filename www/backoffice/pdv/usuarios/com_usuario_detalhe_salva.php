@@ -12,6 +12,68 @@ require_once $raiz_do_projeto . "class/pdv/classChaveMestra.php";
 require_once $raiz_do_projeto . "includes/pdv/functions.php";
 require_once "/www/includes/bourls.php";
 
+$acao        = $_GET['acao'] ?? null;
+$usuario_id  = $_GET['usuario_id'] ?? null;
+
+$v_campo                                = $_POST['v_campo'] ?? null;
+$v_valor_old                            = $_POST['v_valor_old'] ?? null;
+$v_valor_new                            = $_POST['v_valor_new'] ?? null;
+$op                                     = $_POST['op'] ?? null;
+
+$novo_ug_tipo_cadastro                  = $_POST['novo_ug_tipo_cadastro'] ?? null;
+$novo_ug_perfil_forma_pagto             = $_POST['novo_ug_perfil_forma_pagto'] ?? null;
+$novo_ug_perfil_senha_reimpressao        = $_POST['novo_ug_perfil_senha_reimpressao'] ?? null;
+$novo_ug_perfil_limite                  = $_POST['novo_ug_perfil_limite'] ?? null;
+$novo_ug_perfil_limite_sugerido          = $_POST['novo_ug_perfil_limite_sugerido'] ?? null;
+$novo_ug_perfil_corte_dia_semana         = $_POST['novo_ug_perfil_corte_dia_semana'] ?? null;
+$novo_ug_perfil_limite_referencia        = $_POST['novo_ug_perfil_limite_referencia'] ?? null;
+$novo_ug_vip                            = $_POST['novo_ug_vip'] ?? null;
+$novo_ug_possui_restricao_produtos       = $_POST['novo_ug_possui_restricao_produtos'] ?? null;
+$novo_ug_ativo                          = $_POST['novo_ug_ativo'] ?? null;
+$novo_ug_email                          = $_POST['novo_ug_email'] ?? null;
+$novo_ug_status_busca                   = $_POST['novo_ug_status_busca'] ?? null;
+
+$ug_data_expiracao_senha                = $_POST['ug_data_expiracao_senha'] ?? null;
+$ug_ongame                              = $_POST['ug_ongame'] ?? null;
+$ug_te_id                               = $_POST['ug_te_id'] ?? null;
+
+$novo_ug_nome_fantasia                  = $_POST['novo_ug_nome_fantasia'] ?? null;
+$novo_ug_razao_social                   = $_POST['novo_ug_razao_social'] ?? null;
+$novo_ug_cnpj                           = $_POST['novo_ug_cnpj'] ?? null;
+$novo_ug_inscr_estadual                 = $_POST['novo_ug_inscr_estadual'] ?? null;
+$novo_ug_responsavel                    = $_POST['novo_ug_responsavel'] ?? null;
+
+$cad_FaturaMediaMensal                  = $_POST['cad_FaturaMediaMensal'] ?? null;
+$cad_ComputadoresQtde                   = $_POST['cad_ComputadoresQtde'] ?? null;
+
+/* ARRAY */
+$cad_ComunicacaoVisual                  = $_POST['cad_ComunicacaoVisual'] ?? [];
+
+$novo_ug_tipo_venda                     = $_POST['novo_ug_tipo_venda'] ?? null;
+$cor_primaria                           = $_POST['cor_primaria'] ?? null;
+$cor_secundaria                         = $_POST['cor_secundaria'] ?? null;
+
+$novo_ug_repr_legal_nome                = $_POST['novo_ug_repr_legal_nome'] ?? null;
+$novo_ug_repr_legal_data_nascimento     = $_POST['novo_ug_repr_legal_data_nascimento'] ?? null;
+$novo_ug_repr_legal_cpf                 = $_POST['novo_ug_repr_legal_cpf'] ?? null;
+$novo_ug_repr_legal_rg                  = $_POST['novo_ug_repr_legal_rg'] ?? null;
+
+$novo_ug_repr_venda_nome                = $_POST['novo_ug_repr_venda_nome'] ?? null;
+$novo_ug_repr_venda_cpf                 = $_POST['novo_ug_repr_venda_cpf'] ?? null;
+$novo_ug_repr_venda_rg                  = $_POST['novo_ug_repr_venda_rg'] ?? null;
+
+$novo_ug_cep                            = $_POST['novo_ug_cep'] ?? null;
+$novo_ug_tipo_end                       = $_POST['novo_ug_tipo_end'] ?? null;
+$novo_ug_endereco                       = $_POST['novo_ug_endereco'] ?? null;
+$novo_ug_numero                         = $_POST['novo_ug_numero'] ?? null;
+$novo_ug_complemento                    = $_POST['novo_ug_complemento'] ?? null;
+$novo_ug_bairro                         = $_POST['novo_ug_bairro'] ?? null;
+$novo_ug_cidade                         = $_POST['novo_ug_cidade'] ?? null;
+$novo_ug_estado                         = $_POST['novo_ug_estado'] ?? null;
+
+$novo_ug_risco_classif                  = $_POST['novo_ug_risco_classif'] ?? null;
+
+
 $grupos = unserialize($_SESSION["arrIdGrupos"]);
 
 function getEstilosUsuarioPDO($userId, PDO $pdo)
