@@ -108,7 +108,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 					    distinct p.pin_codigo,
 						p.pin_codinterno,
 					    p.pin_valor,
-					    ps.stat_descricao,
+					    CASE WHEN pih.pih_data IS NULL AND p.pin_status = '8' THEN 'Como utiliz., mas sem dados' ELSE ps.stat_descricao END AS stat_descricao,
 						p.pin_validade,
 					    CASE
 					        WHEN pes.pin_status = -1 then 'Cancelado'
@@ -118,7 +118,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 					        WHEN pes.pin_status = 4 then 'Utilizado'
 					        else 'Nao Epp'
 					    	END AS pin_epp_status,
-					    COALESCE(pih.pih_data::text, 'Nao utilizado') AS pin_data_uti,
+					    COALESCE(pih.pih_data::text, 'Sem data utiliz.') AS pin_data_uti,
 					    o.opr_nome,
 					    CASE
 					        WHEN dug.ug_id IS NOT NULL THEN 'PDV'
