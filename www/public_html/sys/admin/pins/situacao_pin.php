@@ -177,7 +177,7 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                 </thead> 
                 </tr>
               <?php 
-                    $mensagem_utilizacao = "";
+                    $mensagem_utilizacao = ".";
                     while($rs_pin_row = pg_fetch_array($rs_pin)) {
                             $valor = 1;
                            			
@@ -243,7 +243,7 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                                         $data_utilizado_aux = substr($rs_pin_utilizado_row['pih_data'],0,19);
                                     }else{
                                         $data_utilizado_aux = "--";
-                                        $mensagem_utilizacao = " " . LANG_PINS_STATUS_MSG_8_NO_LOG;
+                                        $mensagem_utilizacao = " " . LANG_PINS_STATUS_MSG_8_NO_LOG . "*";
                                     }
                                 }//end if($rs_pin_row['pin_status'] == '8')
                                 else {
@@ -275,7 +275,7 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                 <td><?php echo ($isPINCARD?$data_vendido_aux:($rs_pin_row['pin_datavenda']?monta_data($rs_pin_row['pin_datavenda'])." - ".$rs_pin_row['pin_horavenda']: "--")); ?></td>
                 <td><?php echo ($isPINCARD?$data_utilizado_aux:($rs_pin_utilizado_row['pih_data']?monta_data($rs_pin_utilizado_row['pih_data'])." - ".substr($rs_pin_utilizado_row['pih_data'], 11, 8): "--")); ?></td>
                 <td><?php  echo "R$ ".number_format($rs_pin_row['pin_valor'], 2, ',', '.'); ?></td>
-                <td><?php echo "" . ($isPINCARD?($data_vendido_aux=="--"&&$rs_pin_row['pin_status'] == intval($PINS_STORE_STATUS_VALUES['A'])?"PIN Não Ativado no PDV":$PINS_STORE_STATUS[$rs_pin_row['pin_status']]):constant("LANG_PINS_STATUS_MSG_".$rs_pin_row['pin_status'])) . $mensagem_utilizacao . "."; ?></td>
+                <td><?php echo "" . ($isPINCARD?($data_vendido_aux=="--"&&$rs_pin_row['pin_status'] == intval($PINS_STORE_STATUS_VALUES['A'])?"PIN Não Ativado no PDV":$PINS_STORE_STATUS[$rs_pin_row['pin_status']]):constant("LANG_PINS_STATUS_MSG_".$rs_pin_row['pin_status'])) . $mensagem_utilizacao; ?></td>
               </tr>
               <?php  
                             $cor1 = (($cor1==$cor2)?$cor3:$cor2);
