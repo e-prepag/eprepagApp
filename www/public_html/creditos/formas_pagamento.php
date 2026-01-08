@@ -12,6 +12,16 @@ require_once "includes/header.php";
 
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+$token_csrf = $_POST['token_csrf'] ?? null;
+$iforma = $_POST['iforma'] ?? null;
+$idu = $_POST['idu'] ?? null;
+$sno = $_POST['sno'] ?? null;
+$btSubmit = $_POST['btSubmit'] ?? null;
+$produtos_valor = $_POST['produtos_valor'] ?? null;
+$email = $_POST['email'] ?? null;
+$produtos = $_POST['produtos'] ?? null;
+
+
 if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
     header("location: /creditos/index.php");
 }

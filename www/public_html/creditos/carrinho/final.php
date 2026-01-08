@@ -2,6 +2,14 @@
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "pdv/controller/CarrinhoController.class.php";
 
+$listaPINs = $_POST['listaPINs'] ?? null;
+$tf_v_codigo_detalhe = $_POST['tf_v_codigo_detalhe'] ?? null;
+$nao_emitidos = $_POST['nao_emitidos'] ?? null;
+$email = $_POST['email'] ?? null;
+$email2 = $_POST['email2'] ?? null;
+$envia_email = $_POST['envia_email'] ?? null;
+$bt_enviar = $_POST['bt_enviar'] ?? null;
+
 if(isset($pagto_tipo)){
 	$pagina_titulo = "Comprovante " . $GLOBALS['FORMAS_PAGAMENTO_DESCRICAO'][$pagto_tipo];
 }else{
