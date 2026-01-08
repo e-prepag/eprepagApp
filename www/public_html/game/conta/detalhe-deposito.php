@@ -11,6 +11,8 @@ $banners = $controller->getBanner($posicao);
 
 $controller->setHeader();
 
+$venda_id = $_POST['venda_id'] ?? null;
+
 // Marca esta venda como deposito.em.saldo, para uso em venda_e_modelos_logica.php
 $_SESSION['pagamento.pagto.deposito.em.saldo'] = 3;
 $_SESSION['pagamento.pagto.deposito.em.saldo.num.docto'] = true;

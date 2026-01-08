@@ -7,6 +7,13 @@ $controller = new PagamentoOfflineController();
 require_once DIR_WEB . "game/includes/header-off.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+$acao = $_POST['acao'] ?? null;
+$mod = $_POST['mod'] ?? null;
+$codeProd = $_POST['codeProd'] ?? null;
+$valor = $_POST['valor'] ?? null;
+$qtde = $_POST['qtde'] ?? null;
+$totalCarrinho = $_POST['totalCarrinho'] ?? null;
+
 //Recupra carrinho do session
 $carrinho = $_SESSION['carrinho'];
 

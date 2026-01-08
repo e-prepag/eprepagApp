@@ -4,6 +4,8 @@
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 
+$venda_id = $_POST['venda_id'] ?? null;
+
 $posicao = "Inferior Internas";
 $controller = new HeaderController;
 $banners = $controller->getBanner($posicao);

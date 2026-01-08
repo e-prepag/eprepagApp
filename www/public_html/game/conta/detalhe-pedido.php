@@ -11,6 +11,8 @@ $banners = $controller->getBanner($posicao);
 
 $controller->setHeader();
 
+$venda_id = $_POST['venda_id'] ?? null;
+$processar = $_POST['processar'] ?? null;
 
 //Recupera usuario
 if(isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser'])){

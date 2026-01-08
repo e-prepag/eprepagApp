@@ -8,6 +8,11 @@ $banners = $controller->getBanner($posicao);
 
 $controller->setHeader();
 
+$data_inicio = $_POST['data_inicio'] ?? null;
+$data_fim = $_POST['data_fim'] ?? null;
+$processar = $_POST['processar'] ?? null;
+
+
 if(empty($data_inicio)) $data_inicio = date('d/m/Y');
 if(empty($data_fim)) $data_fim = date('d/m/Y');
 
