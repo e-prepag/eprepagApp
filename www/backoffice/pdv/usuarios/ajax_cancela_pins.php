@@ -21,7 +21,21 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	if (isset($_POST["id_pedido"]) && $_POST["id_pedido"] != "") {
 
-		
+		$idPedido = $_POST['id_pedido'] ?? '';
+
+		if (!ctype_digit($idPedido)) {
+			echo json_encode([]);
+			die;
+		}
+
+		// BIGINT máximo = 19 dígitos
+		if (strlen($idPedido) > 19) {
+			echo json_encode([]);
+			die;
+		}
+
+		$idPedido = (int) $idPedido;
+
 		$sql .= "from tb_dist_venda_games vg
 				join tb_dist_venda_games_modelo vm on vm.vgm_vg_id = vg.vg_id 
 				join tb_dist_venda_games_modelo_pins vp on vp.vgmp_vgm_id = vm.vgm_id
@@ -32,10 +46,9 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 				where vg.vg_id = :VG_ID 
 				order by vg.vg_data_inclusao desc;";
 		$selectRows = $conexao->prepare($sql);
-		$selectRows->bindValue(":VG_ID", $_POST["id_pedido"]);
+		$selectRows->bindValue(":VG_ID", $idPedido, PDO::PARAM_INT);
 		$selectRows->execute();
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
-
 	} else if (isset($_POST["pin_cod"]) && $_POST["pin_cod"] != "") {
 
 		$sql .= "from tb_dist_venda_games vg
@@ -51,7 +64,6 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		$selectRows->bindValue(":pin_cod", $_POST["pin_cod"]);
 		$selectRows->execute();
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
-
 	} else {
 		$dt_inicial = isset($_POST["dt_inicial"]) ? str_replace('T', ' ', $_POST["dt_inicial"]) . ":00" : null;
 		$dt_final = isset($_POST["dt_final"]) ? str_replace('T', ' ', $_POST["dt_final"]) . ":59" : null;
@@ -84,13 +96,27 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 			$selectRows->bindValue(":DT_FINAL", $dt_final);
 		}
 
-		$selectRows->bindValue(":UG_ID", $_POST["id_pdv"]);
+		$id_pdv = $_POST['id_pdv'] ?? '';
+
+		if (!ctype_digit($id_pdv)) {
+			echo json_encode([]);
+			die;
+		}
+
+		// BIGINT máximo = 19 dígitos
+		if (strlen($id_pdv) > 19) {
+			echo json_encode([]);
+			die;
+		}
+
+		$id_pdv = (int) $id_pdv;
+
+		$selectRows->bindValue(":UG_ID", $id_pdv, PDO::PARAM_INT);
 		$selectRows->execute();
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
-
 	}
 	//echo $sql;
-	
+
 	if (count($resultRows) > 0) {
 		foreach ($resultRows as $key => $value) {
 			$dataKeys = array_keys($value);
@@ -114,7 +140,6 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	}
 	echo json_encode($data);
 	die;
-
 } else if (isset($_POST["acao"]) && $_POST["acao"] == "todos" && $_POST["dt_inicial"] && $_POST["dt_final"] && $_POST["id_pdv"]) {
 
 	$conexao->beginTransaction();
@@ -189,7 +214,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 		$tipoAcao = "Cancelar todos os pins do pdv";
 
-		if(!is_numeric($_POST["id_pdv"]) || $_POST["id_pdv"] <= 0) {
+		if (!is_numeric($_POST["id_pdv"]) || $_POST["id_pdv"] <= 0) {
 			$_POST["id_pdv"] = 0;
 		}
 
@@ -215,7 +240,6 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 		echo "Ação realizada com sucesso";
 		exit;
-
 	} else {
 		echo "Erro ao realizar a ação";
 	}
@@ -269,7 +293,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 		$tipoAcao = "Cancelar pin id: " . $_POST["pin"];
 
-		if(!is_numeric($_POST["id_pdv"]) || $_POST["id_pdv"] <= 0) {
+		if (!is_numeric($_POST["id_pdv"]) || $_POST["id_pdv"] <= 0) {
 			$_POST["id_pdv"] = 0;
 		}
 
@@ -294,7 +318,6 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 		echo "Ação realizada com sucesso";
 		exit;
-
 	} else {
 		echo "Erro ao realizar a ação";
 	}
@@ -302,4 +325,3 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	echo "Não foi possivel efetuar sua escolha";
 }
 die;
-?>
