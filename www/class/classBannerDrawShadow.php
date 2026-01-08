@@ -114,12 +114,11 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 		$this->setUgId			($ug_id);
 		$this->setTipoUsuario	($bds_tipo_usuario);
 		$prefixo=$server_url;
-                
-                $http = ($_SERVER['HTTPS']=="on") ? "https://" : "http://" ;
-                
-		$this->set_URL			($http.$prefixo."/imagens/banners/");
+                                
+		$this->set_URL			("https://".$prefixo."/imagens/banners/");
 		
 	}//end function __construct
+	
 
 	function BuscarBanner() {
 
@@ -247,8 +246,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
                 
-                $http = ($_SERVER['HTTPS']=="on") ? "https://" : "http://" ;
-                $server_url = $http.$server_url;
+                $server_url = "https://".$server_url;
                 
 		$retorno = "<div id='popup_banner' title='". $this->getTextoBanner()."' align='center'>\n
 						<img id='imagem_banner' src='".$this->get_URL().$this->getBannerBanner()."' style='cursor:pointer;cursor:hand;' alt='Clique para mais informações' title='Clique para mais informações' onClick='javascript: ClickBanner();'>\n
@@ -288,8 +286,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
                 $server_url = $_SERVER['SERVER_NAME'];
                 }
                 
-                $http = ($_SERVER['HTTPS']=="on") ? "https://" : "http://" ;
-                $server_url = $http.$server_url;
+                $server_url = "https://".$server_url;
 
 		$retorno = "<div id='popup_banner' title='". $this->getTextoBanner()."' align='center'>\n
 						<img id='imagem_banner' src='".$this->get_URL().$this->getBannerBanner()."' style='cursor:pointer;cursor:hand;' alt='Clique para mais informações' title='Clique para mais informações' onClick='javascript: ClickBanner();'>\n
