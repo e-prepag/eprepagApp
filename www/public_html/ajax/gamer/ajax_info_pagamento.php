@@ -11,6 +11,8 @@ require_once DIR_INCS . "gamer/main.php";
 require_once RAIZ_DO_PROJETO . "db/connect.php"; 
 require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 
+$numcompra = $_POST['numcompra'] ?? null;
+
 ?>
 <link href="/css/styles.css" rel="stylesheet" type="text/css" />
 <script language="javascript" src="/js/jquery.js"></script>
