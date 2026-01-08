@@ -7,7 +7,13 @@ $produto_idade_minima = "";
 $controller = new CarrinhoController;
 
 $carrinho = $controller->confirmarCompra();
-$modelos = $controller->getCarrinho($_SESSION['dist_carrinho']);
+
+try {
+    $modelos = $controller->getCarrinho($_SESSION['dist_carrinho']);
+} catch (\Throwable $th) {
+    $modelos = false;
+}
+
 $mostra_modal_erros = 0;
 $travaQtdeProduto = false;
 
