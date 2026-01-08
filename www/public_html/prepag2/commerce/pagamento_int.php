@@ -22,6 +22,16 @@ $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
 
 @require_once DIR_INCS . "config.MeiosPagamentos.php";	
 
+$iforma = $_POST['iforma'] ?? null;
+$idu = $_POST['idu'] ?? null;
+$sno = $_POST['sno'] ?? null;
+$integracao_is_parceiro = $_POST['integracao_is_parceiro'] ?? null;
+$integracao_origem_id = $_POST['integracao_origem_id'] ?? null;
+$integracao_order_id = $_POST['integracao_order_id'] ?? null;
+$integracao_client_email = $_POST['integracao_client_email'] ?? null;
+$pagto = $_POST['pagto'] ?? null;
+$btSubmit_EPP_8593 = $_POST['btSubmit_EPP_8593'] ?? null;
+
 ini_set('display_errors', 0);
 error_reporting(0);
 
