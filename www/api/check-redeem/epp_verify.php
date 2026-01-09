@@ -93,9 +93,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 				  }
 							  */
 			send_debug_info_by_email_PINCASH('Teste ID [' . $id . ']', 'IPs Permitidos: [' . $aux_opr_ip . ']<br>IP Utilizado: [' . retorna_ip_acesso() . ']<br>Verificação de IP retornou: [' . $aux_teste_IP . ']<br>Dominio capturando no if ( controleIP->isInOprRange(aux_opr_ip, retorna_ip_acesso()) ): [' . $dominio_check . ']<br>', $partner_dep, $id);
-			gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'IPs Permitidos: [' . $aux_opr_ip . ']' . PHP_EOL . 'IP Utilizado: [' . retorna_ip_acesso() . ']' . PHP_EOL . 'Verificação de IP retornou: [' . $aux_teste_IP . ']' . PHP_EOL . 'Dominio capturando no if ( controleIP->isInOprRange(aux_opr_ip, retorna_ip_acesso()) ): [' . $dominio_check . ']' . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . PHP_EOL);
-
-			file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "a[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
+			gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'IPs Permitidos: [' . $aux_opr_ip . ']' . PHP_EOL . 'IP Utilizado: [' . retorna_ip_acesso() . ']' . PHP_EOL . 'Verificação de IP retornou: [' . $aux_teste_IP . ']' . PHP_EOL . 'Dominio capturando no if ( controleIP->isInOprRange(aux_opr_ip, retorna_ip_acesso()) ): [' . $dominio_check . ']' . PHP_EOL);
 
 			if ($aux_opr_ip <> 0 && $aux_teste_IP) {
 				$aux_status_value = retorna_status($pin_code, $id);
@@ -144,7 +142,6 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										 * 147=> IGG Teste
 										 * 148=> IGG
 										 */
-										file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "b[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 										$ids_https = array(88, 90, 73, 13, 102, 124, 137, 142, 143, 147, 148, 166, 168);
 										if (in_array($id, $ids_https)) {
 											$url = "https://";
@@ -201,10 +198,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 
 										$inicio_timer_curl = microtime(true);
 
-										file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "c[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 										$buffer = curl_exec($curl_handle);
-
-										file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "d[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 
 										//Verificando erro
 										$erros_curl = curl_error($curl_handle);
@@ -244,7 +238,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										//	echo $buffer."<br>";
 										list($name, $value) = explode('=', $buffer);
 										send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] BUFFER Partner_Check', 'URL: [' . $url . ']<br>BUFFER Partner_Check = [' . $buffer . ']<br>', $partner_dep, $id);
-										gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'URL: [' . $url . ']' . PHP_EOL . 'BUFFER Partner_Check = [' . $buffer . ']' . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . PHP_EOL);
+										gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'URL: [' . $url . ']' . PHP_EOL . 'BUFFER Partner_Check = [' . $buffer . ']' . PHP_EOL);
 
 										//	echo "Name= ".$name." Value=".$value."<br>";
 										if ($value == "1") {
@@ -278,7 +272,6 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 													} //end if($id == 90)
 													$aux_codretepp = $notify_list_values['SU'];
 													$fim_timer = microtime(true);
-													file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "e[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 													gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . "O script levou " . round(($fim_timer - $inicio_timer), 4) . " segundos. " . 'Resposta EPP*: CODRETEPP=' . $notify_list_values['SU'] . PHP_EOL);
 												} else {
 													$aux_codretepp = $notify_list_values['EU'];
@@ -385,7 +378,6 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 			echo ";PIN_VALUE=" . $pinValueFormatted;
 		}
 	}
-	file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "f[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 } //end do if(strpos($teste[0]["file"],"check-redeem"))
 else {
 	die("Access Denied!");

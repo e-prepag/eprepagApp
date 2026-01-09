@@ -46,8 +46,6 @@ if (true) { //descomentar para implementar https
 		'Informações Adicionais do Servidor: ' . $infoAdicional . PHP_EOL .
 		'****#### FIM ####****' . PHP_EOL . PHP_EOL;
 
-	$fileLogTimer = "/www/arquivos_gerados/logs/logCheckRedeemTimer.txt";
-
 	$fileLog = "/www/arquivos_gerados/logs/logCheckRedeemALL.txt";
 	$file = fopen($fileLog, 'a+');
 	if ($file) {
@@ -88,14 +86,12 @@ if (true) { //descomentar para implementar https
 			if ($rs_oper_row = pg_fetch_array($rs_oper)) {
 				switch ($rs_oper_row['opr_product_type']) {
 					case '1':
-						file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "1[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 						include "epp_verify.php";
 						break;
 					case '2':
 						include "epp_cash.php";
 						break;
 					case '3':
-						file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "2[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 						include "epp_verify.php";
 						if ($aux_codreteppTOP <> $notify_list_values['SV'] && $aux_codreteppTOP <> $notify_list_values['SU'] && $aux_codreteppTOP <> $notify_list_values['VD'] && $aux_codreteppTOP <> $notify_list_values['PU'] && $aux_codreteppTOP <> $notify_list_values['SD'] && $aux_codreteppTOP <> $notify_list_values['EU']) {
 							include "epp_cash.php";
@@ -113,7 +109,6 @@ if (true) { //descomentar para implementar https
 						if (RetonaTamanhoPINEPPCARD_SINGLEPAGE($pin_code)) {
 							include "epp_card.php";
 						} else {
-							file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "3[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 							include "epp_verify.php";
 						}
 						break;
@@ -124,7 +119,6 @@ if (true) { //descomentar para implementar https
 						if (RetonaTamanhoPINGoCASH($pin_code)) {
 							include "epp_go_cash.php";
 						} else {
-							file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "4[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 							include "epp_verify.php";
 						}
 						break;
@@ -137,7 +131,6 @@ if (true) { //descomentar para implementar https
 						} elseif (RetonaTamanhoPINGoCASH($pin_code)) {
 							include "epp_go_cash.php";
 						} else {
-							file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "5[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 							include "epp_verify.php";
 						}
 						break;
@@ -226,7 +219,6 @@ if (true) { //descomentar para implementar https
 		}
 	}
 
-	file_put_contents("/www/arquivos_gerados/logs/logCheckRedeemTimer2.txt", "g[" . date('Y-m-d') . "] Tempo de execução: " . round((microtime(true) - $inicio_timer), 4) . " segundos.");
 	/* echo "CODRETEPP=".converte_detalhe_codretepp($aux_codreteppTOP);
 	if (!is_null($aux_pin_valueTOP)) {
 		echo ";PIN_VALUE=".$aux_pin_valueTOP."00";
