@@ -190,6 +190,14 @@ if (isset($_REQUEST['formsubmit'])) {
         $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"" . EPREPAG_URL_HTTPS_COM . "/support\");\' style=\'cursor:pointer; color:#2e5984;\'>" . EPREPAG_URL_HTTPS_COM . "/support</span>.";
     } //end else do elseif ($testeCPF != 171)
 
+    $class_usuarios_games = new UsuarioGames();
+
+    $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'));
+
+    if(!empty($verifica_cpf)){
+        $errors[] = "CPF já cadastrado em uma conta E-Prepag";
+    }
+
     if (count($errors) == 0 && !empty($usuarioId)) {
 
         // Vamos certificar que extraimos apenas os numeros do CPF, para depois aplicarmos a mascara
