@@ -395,17 +395,4 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 </script>
 <?php
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/footer.php";
-?>                       valor: valor,
-                    },
-                    function(data) {
-                        let html = data;
-                        $(".span-valor").html(html);
-                    });
-                $(".error-list").html("");
-            }
-        });
-    });
-</script>
-<?php
-require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/footer.php";
 ?>
