@@ -81,16 +81,20 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 					    WHERE pin_codigo IN ($placeholders)
 					),
 					pins_epp_status AS (
-					    SELECT 
+
+						SELECT 
 					        psp.pins_pin_codinterno,
-					        pst.pin_status
+					        pst.pin_status,
+					        max(psh.psah_data) as data_utilizacao_epp
 					    FROM pins_store pst
 					    JOIN tb_pins_store_pins psp ON psp.pins_store_pin_codinterno = pst.pin_codinterno
+					    LEFT JOIN pins_store_apl_historico psh ON pst.pin_codinterno = psh.psah_pin_id  AND psh.pin_status = 4 AND psh.psah_acao = '6'
 					    WHERE psp.pins_pin_codinterno IN (
 					        SELECT pin_codinterno 
 					        FROM pins_filtrados 
 					        WHERE opr_codigo IN (53, 49)
 					    )
+					    GROUP BY psp.pins_pin_codinterno, pst.pin_status
 					),
 					pins_int_status AS (
 					    SELECT 
@@ -118,7 +122,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 					        WHEN pes.pin_status = 4 then 'Utilizado'
 					        else 'Nao Epp'
 					    	END AS pin_epp_status,
-					    COALESCE(pih.pih_data::text, 'Sem data utiliz.') AS pin_data_uti,
+					    COALESCE(pih.pih_data::text, pes.data_utilizacao_epp::text, 'Sem data utiliz.') AS pin_data_uti,
 					    o.opr_nome,
 					    CASE
 					        WHEN dug.ug_id IS NOT NULL THEN 'PDV'
