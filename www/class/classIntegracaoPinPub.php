@@ -134,7 +134,7 @@ function verifica_valor_pin($cod_pin, $valor, $id)
 
 	$rs_oper = SQLexecuteQueryParams($sql, $params);
 
-	sleep(1); // Mantendo o sleep da lógica original
+	//sleep(1); // Mantendo o sleep da lógica original
 
 	if ($rs_oper && pg_num_rows($rs_oper) > 0) {
 		$rs_oper_row = pg_fetch_array($rs_oper);
