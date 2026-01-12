@@ -1538,7 +1538,7 @@ class UsuarioGames
     {
 
         try {
-            $sql = "select count(ug_id) as contas from usuarios_games where ug_cpf = :ug_cpf;";
+            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g');";
 
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -1601,7 +1601,7 @@ class UsuarioGames
 
         try {
             // Inicializando a query base
-            $sql = "select count(ug_id) as contas from usuarios_games where ug_cpf = :ug_cpf";
+            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g');";
 
             // Se o userId for fornecido, adicionar uma condição para excluir esse ID da verificação
             if ($usuario_id_excessao !== null) {
