@@ -3,7 +3,6 @@
 require_once '../../../includes/constantes.php';
 require_once RAIZ_DO_PROJETO . "includes/main.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/main.php";
-require_once RAIZ_DO_PROJETO . "includes/inc_register_globals.php";
 
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);

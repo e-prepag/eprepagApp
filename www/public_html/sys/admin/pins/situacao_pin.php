@@ -15,6 +15,10 @@ set_time_limit ( 3000 ) ;
 
 $operacao_array_tmp	= VetorDistribuidorasCard();
 
+if($_POST["BtnSearch"]){
+    $BtnSearch = $_POST["BtnSearch"];
+}
+$fpin = $_POST["fpin"];
 
 ?>
 <link rel="stylesheet" href="/sys/css/css.css" type="text/css">

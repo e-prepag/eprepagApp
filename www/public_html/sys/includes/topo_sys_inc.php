@@ -3,8 +3,6 @@
 
 session_start();
 
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";		
-
 $webstring = "http".(($_SERVER['HTTPS']=='on') ? 's' : '')."://".$_SERVER['SERVER_NAME'];// . ":" . $_SERVER['SERVER_PORT'];
 $raiz_do_sys = $raiz_do_projeto . "public_html/sys/";
 

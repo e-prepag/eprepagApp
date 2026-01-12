@@ -5,6 +5,21 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/gamer/main.php";
 require_once $raiz_do_projeto."class/util/Util.class.php";
 
+$produto_id = $_POST['produto_id'] ?? null;
+$ogp_ativo = $_POST['ogp_ativo'] ?? null;
+$ogp_mostra_integracao = $_POST['ogp_mostra_integracao'] ?? null;
+$ogp_iof = $_POST['ogp_iof'] ?? null;
+$ogp_nome = $_POST['ogp_nome'] ?? null;
+$ogp_idade_minima = $_POST['ogp_idade_minima'] ?? null;
+$ogp_descricao = $_POST['ogp_descricao'] ?? null;
+$ogp_pin_request = $_POST['ogp_pin_request'] ?? null;
+$ogp_valor_minimo = $_POST['ogp_valor_minimo'] ?? null;
+$ogp_valor_maximo = $_POST['ogp_valor_maximo'] ?? null;
+$ogp_detalhes_utilizacao = $_POST['ogp_detalhes_utilizacao'] ?? null;
+$ogp_termos_condicoes = $_POST['ogp_termos_condicoes'] ?? null;
+$ogp_opr_codigo = $_POST['ogp_opr_codigo'] ?? null;
+$BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
+
 $instProd = new Produto();
 $instProdMod = new ProdutoModelo();
 

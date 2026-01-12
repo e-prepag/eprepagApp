@@ -9,6 +9,11 @@ require_once $raiz_do_projeto . "class/util/Util.class.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . "includes/complice/functions.php";
 
+$dataClickIni = $_POST['dataClickIni'] ?? null;
+$dataClickFim = $_POST['dataClickFim'] ?? null;
+$busca = $_POST['busca'] ?? null;
+$buscar = $_POST['buscar'] ?? null;
+
 if(empty($dataClickIni) || !Util::checkValidDate($dataClickIni)) 
     $dataClickIni = date('d/m/Y');
 if(empty($dataClickFim) || !Util::checkValidDate($dataClickFim)) 

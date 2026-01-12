@@ -11,7 +11,7 @@ $controller = new OfflineController;
 
 require_once "includes/header-offline.php";
 
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = 'https';
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 
@@ -20,6 +20,7 @@ $id_gocash = 1;
 
 // Vetor que cria o drop drown dos estados
 $Resultadoestado = $SIGLA_ESTADOS;
+$msg = $_GET['msg'] ?? null;
 ?>
 <div class="container txt-cinza bg-branco  p-bottom40">
 <?php

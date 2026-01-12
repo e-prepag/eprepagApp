@@ -85,6 +85,16 @@ try {
 
         $envia = false;
 
+        $periodo_risco_baixo = 24; //meses
+        $periodo_risco_medio = 18; //meses
+        $periodo_risco_alto = 12; //meses
+
+        $tipo_risco = [
+            "alto" => 3,
+            "medio" => 2,
+            "baixo" => 1
+        ];
+
         foreach ($merchants as &$merchant) {
             // Verifica se a data de atualização é válida
 
@@ -92,19 +102,19 @@ try {
 
             if (isset($merchant['data_observacao']) && $merchant['data_observacao'] !== null && validarData($merchant['data_observacao'])) {
 
-                if ($merchant['tipo_risco'] == 1 && verificaData($merchant['data_observacao'], 24)) {
+                if ($merchant['tipo_risco'] == $tipo_risco['baixo'] && verificaData($merchant['data_observacao'], $periodo_risco_baixo)) {
 
                     $envia = true;
 
                     $message .= renderMerchantItem($merchant, "Baixo");
 
-                } else if ($merchant['tipo_risco'] == 2 && verificaData($merchant['data_observacao'], 12)) {
+                } else if ($merchant['tipo_risco'] == $tipo_risco['medio'] && verificaData($merchant['data_observacao'], $periodo_risco_medio)) {
 
                     $envia = true;
 
                     $message .= renderMerchantItem($merchant, "Médio");
 
-                } else if ($merchant['tipo_risco'] == 3 && verificaData($merchant['data_observacao'], 6)) {
+                } else if ($merchant['tipo_risco'] == $tipo_risco['alto'] && verificaData($merchant['data_observacao'], $periodo_risco_alto)) {
 
                     $envia = true;
 

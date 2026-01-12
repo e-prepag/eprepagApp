@@ -6,6 +6,20 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 require_once "/www/includes/bourls.php";
 ini_set('memory_limit','512M');
 
+$tf_v_data_inclusao_ini = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$ugl_uglt_id = $_POST['ugl_uglt_id'] ?? null;
+$ug_id = $_POST['ug_id'] ?? null;
+$vg_id = $_POST['vg_id'] ?? null;
+$btn_pesquisar = $_POST['btn_pesquisar'] ?? null;
+$tf_v_data_inclusao_ini = $_GET['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_GET['tf_v_data_inclusao_fim'] ?? null;
+$ugl_uglt_id = $_GET['ugl_uglt_id'] ?? null;
+$ug_id = $_GET['ug_id'] ?? null;
+$vg_id = $_GET['vg_id'] ?? null;
+$btn_pesquisar = $_GET['btn_pesquisar'] ?? null;
+
+
 if (b_IsBKOUsuarioHistorico()) {
 
 //Explicativo

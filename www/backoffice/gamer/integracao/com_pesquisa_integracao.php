@@ -10,6 +10,33 @@ set_time_limit ( 3000 ) ;
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
+$tf_data_ini                = $_POST['tf_data_ini'] ?? null;
+$tf_data_fim                = $_POST['tf_data_fim'] ?? null;
+
+$tf_data_conf_ini           = $_POST['tf_data_conf_ini'] ?? null;
+$tf_data_conf_fim           = $_POST['tf_data_conf_fim'] ?? null;
+
+$tf_data_concilia_ini       = $_POST['tf_data_concilia_ini'] ?? null;
+$tf_data_concilia_fim       = $_POST['tf_data_concilia_fim'] ?? null;
+
+$tf_v_codigo                = $_POST['tf_v_codigo'] ?? null;
+$tf_v_codigo_include        = $_POST['tf_v_codigo_include'] ?? null;
+
+$tf_v_order                 = $_POST['tf_v_order'] ?? null;
+$tf_v_order_include         = $_POST['tf_v_order_include'] ?? null;
+
+$tf_v_email                 = $_POST['tf_v_email'] ?? null;
+$tf_confirmed               = $_POST['tf_confirmed'] ?? null;
+
+$tf_d_forma_pagto           = $_POST['tf_d_forma_pagto'] ?? null;
+$tf_store_id                = $_POST['tf_store_id'] ?? null;
+$tf_cliente_email           = $_POST['tf_cliente_email'] ?? null;
+
+$tf_amount                  = $_POST['tf_amount'] ?? null;
+$tf_v_status                = $_POST['tf_v_status'] ?? null;
+
+$BtnSearch                  = $_POST['BtnSearch'] ?? null;
+
 $time_start = getmicrotime();
 
 if(!$ncamp)    $ncamp       = 'ip_data_inclusao';

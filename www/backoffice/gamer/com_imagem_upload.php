@@ -9,7 +9,6 @@ $webstring = "http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT']
 
 require_once $raiz_do_projeto . "includes/gamer/functions_vendaGames.php";
 require_once $raiz_do_projeto . "class/util/Imagem.class.php";
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";
 require_once $raiz_do_projeto . 'sftp/connect.php';
 require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
 $msg = "";

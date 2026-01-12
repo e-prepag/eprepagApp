@@ -8,6 +8,17 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 $time_start_stats = getmicrotime();
 
+$tf_data_inicial   = $_POST['tf_data_inicial'] ?? null;
+$tf_data_final     = $_POST['tf_data_final'] ?? null;
+
+$tf_opr_codigo     = $_POST['tf_opr_codigo'] ?? null;
+
+// Campo ARRAY (checkbox / multiselect)
+$tf_produto       = $_POST['tf_produto'] ?? [];
+
+// Bot?o
+$btconsultar  = $_POST['btconsultar'] ?? null;
+
 //canais para montagem de grade inicial da tabela com os totais
 $canais_grade = array('P','L','E','M','C','A');
 

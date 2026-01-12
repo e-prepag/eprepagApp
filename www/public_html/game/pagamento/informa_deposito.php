@@ -11,7 +11,6 @@ $controller = new HeaderController;
 $controller->setHeader();
 
 require_once DIR_CLASS . "gamer/classIntegracao.php";
-require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "gamer/functions.php";
 //Recupera usuario
 if (isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser'])) {

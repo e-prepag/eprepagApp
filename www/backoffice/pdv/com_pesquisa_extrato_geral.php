@@ -11,6 +11,15 @@ require_once "/www/includes/bourls.php";
 
 $time_start = getmicrotime();
 
+$tf_v_codigo = $_GET['tf_v_codigo'] ?? null;
+$tf_v_data_inclusao_ini = $_GET['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_GET['tf_v_data_inclusao_fim'] ?? null;
+$btPesquisar = $_GET['btPesquisar'] ?? null;
+$codigo_lan = $_GET['codigo_lan'] ?? null;
+$dd_balancos = $_GET['dd_balancos'] ?? null;
+$dd_boletos = $_GET['dd_boletos'] ?? null;
+$dd_compras = $_GET['dd_compras'] ?? null;
+
 //if(!isset($inicial) || !$inicial)  $inicial     = 0;
 if(!isset($range) || !$range)    $range       = 1;
 if(!isset($ordem) || !$ordem)    $ordem       = 0;

@@ -6,6 +6,14 @@ require_once $raiz_do_projeto . "class/classPinsPublishers.php";
 require_once $raiz_do_projeto . "class/classIntegracaoPinPub.php";
 require_once $raiz_do_projeto . "class/classIntegracaoPin.php";
 
+$p = $_POST['p'] ?? null;
+$pin_operacao = $_POST['pin_operacao'] ?? null;
+$tf_v_data_inclusao_ini = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$pin_codigo = $_POST['pin_codigo'] ?? null;
+$btPesquisar = $_POST['btPesquisar'] ?? null;
+
+
 $opr_codigo = isset($_REQUEST['pin_operacao'])     ? (int) $_REQUEST['pin_operacao']		: null;
 $pin_codigo	= isset($_POST['pin_codigo'])		? $_POST['pin_codigo']				: null;
 $varsel = "&pin_operacao=$opr_codigo&opr_codigo=$opr_codigo&pin_codigo=$pin_codigo";

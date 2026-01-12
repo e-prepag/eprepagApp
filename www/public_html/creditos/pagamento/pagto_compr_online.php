@@ -4,7 +4,6 @@ require_once DIR_INCS . "configIP.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
-require_once DIR_INCS . "inc_register_globals.php";
 
 require_once DIR_CLASS . "pdv/controller/ProdutosController.class.php";
 

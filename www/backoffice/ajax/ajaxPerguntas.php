@@ -32,7 +32,6 @@ if(empty(session_id())){
 
 $pagina_titulo = "E-prepag - Créditos para Games";
 require_once '../../includes/constantes.php';
-require_once $raiz_do_projeto."includes/inc_register_globals.php";	
 require_once "/www/includes/bourls.php";
 $url = $_SERVER['HTTPS']=="on" ? "https://" : "http://";
 $url .= $_SERVER['SERVER_NAME'];

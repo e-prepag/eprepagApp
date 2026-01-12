@@ -15,7 +15,18 @@
 	//include "../../../incs/header.php";
 	//include "../../../incs/functions.php";
 	$time_start = getmicrotime();
-	
+
+$dd_canal          = $_POST['dd_canal'] ?? null;
+$dd_operadora      = $_POST['dd_operadora'] ?? null;
+$dd_mode           = $_POST['dd_mode'] ?? null;
+
+$tf_data_inic   = $_POST['tf_data_inic'] ?? null;
+$tf_data_final     = $_POST['tf_data_final'] ?? null;
+
+// Botão
+$BtnSearch     = $_POST['BtnSearch'] ?? null;
+
+
 //echo "dd_operadora: ".$dd_operadora."<br>";
 //echo "Submit: $Submit<br>";
 	if($_SESSION["tipo_acesso_pub"]=='PU') {

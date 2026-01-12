@@ -5,7 +5,6 @@
  * arquivo para ser replicado em HeaderController posteriormente
  */
 require_once "../../../includes/constantes.php";
-require_once DIR_INCS."inc_register_globals.php";
 
 $server_url = "" . EPREPAG_URL . "";
 if(checkIP()) {

@@ -13,9 +13,42 @@ $run_silently = "OK";
 
 $time_start = getmicrotime();
 
+$ec_tipo = $_POST['ec_tipo'] ?? null;
+$ec_tipo_usuario = $_POST['ec_tipo_usuario'] ?? null;
+$ug_id = $_POST['ug_id'] ?? null;
+$ec_nome = $_POST['ec_nome'] ?? null;
+$ec_email = $_POST['ec_email'] ?? null;
+$ec_data_nascimento = $_POST['ec_data_nascimento'] ?? null;
+$ec_cpf = $_POST['ec_cpf'] ?? null;
+$ec_telefone = $_POST['ec_telefone'] ?? null;
+$vg_id = $_POST['vg_id'] ?? null;
+$ec_data_devolucao = $_POST['ec_data_devolucao'] ?? null;
+$cec_id = $_POST['cec_id'] ?? null;
+$ec_pin_bloqueado = $_POST['ec_pin_bloqueado'] ?? null;
+$opr_codigo = $_POST['opr_codigo'] ?? null;
+$ec_valor = $_POST['ec_valor'] ?? null;
+$ec_data_pedido = $_POST['ec_data_pedido'] ?? null;
+$ec_pin = $_POST['ec_pin'] ?? null;
+$ec_tid = $_POST['ec_tid'] ?? null;
+$ec_cod_boleto = $_POST['ec_cod_boleto'] ?? null;
+$ec_cod_deposito = $_POST['ec_cod_deposito'] ?? null;
+$ec_ip_pedido = $_POST['ec_ip_pedido'] ?? null;
+$ec_cod_autorizacao = $_POST['ec_cod_autorizacao'] ?? null;
+$ec_forma_devolucao = $_POST['ec_forma_devolucao'] ?? null;
+$edb_titular = $_POST['edb_titular'] ?? null;
+$cpfcnpj = $_POST['cpfcnpj'] ?? null;
+$edb_cpf_cnpj = $_POST['edb_cpf_cnpj'] ?? null;
+$edb_banco = $_POST['edb_banco'] ?? null;
+$edb_agencia = $_POST['edb_agencia'] ?? null;
+$edb_conta = $_POST['edb_conta'] ?? null;
+$edb_tipo_conta = $_POST['edb_tipo_conta'] ?? null;
+$ec_id = $_POST['ec_id'] ?? null;
+$novoEstornoChargeback = $_POST['novoEstornoChargeback'] ?? null;
+
+
 $msg = "";
 $msg_notify = "";
-//	$ip_id = $_REQUEST['ip_id'];
+$ip_id = $_REQUEST['ip_id'];
 $store_id = $_REQUEST['store_id'];
 $order_id = $_REQUEST['order_id'];
 

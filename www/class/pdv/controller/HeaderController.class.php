@@ -10,7 +10,6 @@
 @require_once RAIZ_DO_PROJETO . "includes/main.php";
 @require_once RAIZ_DO_PROJETO . "includes/pdv/main.php";
 @require_once RAIZ_DO_PROJETO . "includes/pdv/corte_classPrincipal.php"; //corte_constantes
-@require_once RAIZ_DO_PROJETO . "includes/inc_register_globals.php";
 @require_once RAIZ_DO_PROJETO . "includes/pdv/captura_inc.php";
 require_once RAIZ_DO_PROJETO . "class/util/Log.class.php";
 @require_once RAIZ_DO_PROJETO . "class/pdv/classOperadorGamesUsuario.php";

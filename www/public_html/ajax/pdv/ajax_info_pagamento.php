@@ -8,10 +8,11 @@
      die("Chamada não permitida!");
  
 require_once "../../../includes/constantes.php";
-require_once DIR_INCS . "inc_register_globals.php";	
 require_once RAIZ_DO_PROJETO . "db/connect.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
+
+$numcompra = $_POST['numcompra'] ?? null;
 ?>
 
 <script language="javascript" src="/js/jquery.js"></script>

@@ -9,8 +9,6 @@
 
     session_start();
 
-    require_once $raiz_do_projeto . "includes/inc_register_globals.php";
-
     if (empty($_SESSION["iduser_bko_pub"])) {
 
         header("Location: /sys/admin/index.php");

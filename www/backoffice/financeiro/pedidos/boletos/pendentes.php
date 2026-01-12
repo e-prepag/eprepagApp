@@ -6,6 +6,20 @@ require_once "/www/includes/bourls.php";
 set_time_limit(18000); //	500mins
 $time_start = getmicrotime();
 
+$tf_data_inic = $_POST['tf_data_inic'] ?? null;
+$tf_data_final = $_POST['tf_data_final'] ?? null;
+$tf_data_inic_imp = $_POST['tf_data_inic_imp'] ?? null;
+$tf_data_final_imp = $_POST['tf_data_final_imp'] ?? null;
+$dd_banco = $_POST['dd_banco'] ?? null;
+$dd_situacao = $_POST['dd_situacao'] ?? null;
+$tf_valor_oper = $_POST['tf_valor_oper'] ?? null;
+$tf_valor = $_POST['tf_valor'] ?? null;
+$tf_cod_documento = $_POST['tf_cod_documento'] ?? null;
+$tf_documento = $_POST['tf_documento'] ?? null;
+$dd_usuario = $_POST['dd_usuario'] ?? null;
+$dd_tipodoc = $_POST['dd_tipodoc'] ?? null;
+$BtnSearch = $_POST['BtnSearch'] ?? null;
+
 if (!isset($dd_situacao) || !$dd_situacao) $dd_situacao = "";
 if (!isset($importacao_data) || !$importacao_data) $importacao_data = 0;
 if (!isset($tf_data_inic) || !$tf_data_inic) $tf_data_inic = date('d/m/Y');

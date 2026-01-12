@@ -5,7 +5,6 @@ require_once RAIZ_DO_PROJETO . "includes/gamer/main.php";
 require_once RAIZ_DO_PROJETO . "banco/boletos/include/funcoes_bradesco.php";
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 $https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
-require_once RAIZ_DO_PROJETO . "includes/inc_register_globals.php";
 
 //Controle de acesso de usuario
 //O boleto pode ser visualizado pelo usuario que esta fazendo a compra no site e pelo operador do backoffice.

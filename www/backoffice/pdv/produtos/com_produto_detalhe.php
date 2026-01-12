@@ -6,6 +6,37 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 require_once $raiz_do_projeto."class/util/Util.class.php";
 
 $msg = "";
+$produto_id = $_POST['produto_id'] ?? null;
+$ogp_ativo = $_POST['ogp_ativo'] ?? null;
+$ogp_mostra_integracao_gamer = $_POST['ogp_mostra_integracao_gamer'] ?? null;
+$ogp_iof = $_POST['ogp_iof'] ?? null;
+$ogp_inibi_lojas_online = $_POST['ogp_inibi_lojas_online'] ?? null;
+$ogp_nome = $_POST['ogp_nome'] ?? null;
+$ogp_idade_minima = $_POST['ogp_idade_minima'] ?? null;
+$ogp_descricao = $_POST['ogp_descricao'] ?? null;
+$ogp_descricao_api = $_POST['ogp_descricao_api'] ?? null;
+$ogp_comunicacao_cupom = $_POST['ogp_comunicacao_cupom'] ?? null;
+$ogp_pin_request = $_POST['ogp_pin_request'] ?? null;
+$ogp_valor_minimo = $_POST['ogp_valor_minimo'] ?? null;
+$ogp_valor_maximo = $_POST['ogp_valor_maximo'] ?? null;
+$ogp_opr_codigo = $_POST['ogp_opr_codigo'] ?? null;
+$BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
+$produto_id = $_GET['produto_id'] ?? null;
+$ogp_ativo = $_GET['ogp_ativo'] ?? null;
+$ogp_mostra_integracao_gamer = $_GET['ogp_mostra_integracao_gamer'] ?? null;
+$ogp_iof = $_GET['ogp_iof'] ?? null;
+$ogp_inibi_lojas_online = $_GET['ogp_inibi_lojas_online'] ?? null;
+$ogp_nome = $_GET['ogp_nome'] ?? null;
+$ogp_idade_minima = $_GET['ogp_idade_minima'] ?? null;
+$ogp_descricao = $_GET['ogp_descricao'] ?? null;
+$ogp_descricao_api = $_GET['ogp_descricao_api'] ?? null;
+$ogp_comunicacao_cupom = $_GET['ogp_comunicacao_cupom'] ?? null;
+$ogp_pin_request = $_GET['ogp_pin_request'] ?? null;
+$ogp_valor_minimo = $_GET['ogp_valor_minimo'] ?? null;
+$ogp_valor_maximo = $_GET['ogp_valor_maximo'] ?? null;
+$ogp_opr_codigo = $_GET['ogp_opr_codigo'] ?? null;
+$BtnAtualizar = $_GET['BtnAtualizar'] ?? null;
+
 
 if(!$produto_id) $msg = "Código do produto não fornecido.\n";
 elseif(!is_numeric($produto_id)) $msg = "Código do produto inválido.\n";

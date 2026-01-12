@@ -1,7 +1,6 @@
 <?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 
-	require_once RAIZ_DO_PROJETO . "includes/inc_register_globals.php";	
 	require_once RAIZ_DO_PROJETO . "includes/pdv/inc_utf.php"; 
 
 /* BEGIN BLOQUEIA REGISTRO (ver abaixo) */

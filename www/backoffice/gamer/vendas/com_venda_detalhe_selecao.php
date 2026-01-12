@@ -2,7 +2,6 @@
 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "db/connect.php"; 
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";	
 
 ?>
 <?php

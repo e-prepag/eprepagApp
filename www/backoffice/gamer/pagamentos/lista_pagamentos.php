@@ -15,6 +15,28 @@ require_once "/www/includes/bourls.php";
 $time_start_stats = getmicrotime();
 $bDebug = false;
 
+$id                         = $_POST['id'] ?? null;
+$varsel                     = $_POST['varsel'] ?? null;
+
+$tf_v_canal                 = $_POST['tf_v_canal'] ?? null;
+$tf_v_data_inclusao_ini     = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim     = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$tf_v_tipo_transacao        = $_POST['tf_v_tipo_transacao'] ?? null;
+$tf_v_forma_pagamento       = $_POST['tf_v_forma_pagamento'] ?? null;
+
+$tf_opr_codigo              = $_POST['tf_opr_codigo'] ?? null;
+$tf_ug_id                   = $_POST['tf_ug_id'] ?? null;
+$tf_v_codigo                = $_POST['tf_v_codigo'] ?? null;
+$tf_d_valor_pago            = $_POST['tf_d_valor_pago'] ?? null;
+$tf_v_deposito_em_saldo     = $_POST['tf_v_deposito_em_saldo'] ?? null;
+
+$tf_numcompra               = $_POST['tf_numcompra'] ?? null;
+$id_transacao_itau          = $_POST['id_transacao_itau'] ?? null;
+
+// Botão
+$btPesquisar                = $_POST['btPesquisar'] ?? null;
+
+
 //var_dump($_SESSION);
 
 if(!isset($tf_v_data_inclusao_ini) && !isset($tf_v_data_inclusao_fim)) {

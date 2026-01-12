@@ -4,6 +4,15 @@
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "includes/rs_ws/inc_utils.php";
+
+$tf_v_data_inclusao_ini   = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim   = $_POST['tf_v_data_inclusao_fim'] ?? null;
+
+$ug_id                   = $_POST['ug_id'] ?? null;
+$ug_risco_classif        = $_POST['ug_risco_classif'] ?? null;
+
+$btnSubmit               = $_POST['btnSubmit'] ?? null;
+
 ?>
 <link rel="stylesheet" type="text/css" href="/css/gamer/cssClassLista.css" />
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

@@ -5,6 +5,9 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."class/gamer/classIntegracao.php";
 
+$tf_store_id = $_POST['tf_store_id'] ?? null;
+$BtnSearch = $_POST['BtnSearch'] ?? null;
+
 set_time_limit(300);
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 

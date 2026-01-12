@@ -17,7 +17,6 @@ require_once DIR_CLASS . "gamer/classLimite.php";
 
 require_once DIR_INCS . "gamer/functions_endereco.php";
 
-require_once DIR_INCS . "inc_register_globals.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
 
@@ -31,7 +30,19 @@ include_once "/www/includes/complice/functions.php";
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);*/
 
-
+$prod_camp = $_POST['prod_camp'] ?? null;
+$tipo = $_POST['tipo'] ?? null;
+$btSubmit = $_POST['btSubmit'] ?? null;
+$iforma = $_POST['iforma'] ?? null;
+$idu = $_POST['idu'] ?? null;
+$sno = $_POST['sno'] ?? null;
+$pagto = $_POST['pagto'] ?? null;
+$acao = $_POST['acao'] ?? null;
+$mod = $_POST['mod'] ?? null;
+$codeProd = $_POST['codeProd'] ?? null;
+$valor = $_POST['valor'] ?? null;
+$qtde = $_POST['qtde'] ?? null;
+$totalCarrinho = $_POST['totalCarrinho'] ?? null;
 
 //Definindo valor Default no caso do include estar conrrompido
 if(!defined('PAGAMENTO_BRADESCO')) {

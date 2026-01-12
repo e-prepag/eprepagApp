@@ -4,6 +4,8 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
+$modelo_id = $_GET['modelo_id'] ?? null;
+
 	$msg = "";
 
 	if(!$modelo_id) $msg = "Código do modelo não fornecido.\n";

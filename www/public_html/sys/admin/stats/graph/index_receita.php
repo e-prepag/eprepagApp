@@ -14,6 +14,17 @@ $time_start_stats = getmicrotime();
 //echo '</pre>';
 // fim
 
+$act             = $_POST['act'] ?? null;
+$statuspgto      = $_POST['statuspgto'] ?? null;
+$fpgto           = $_POST['fpgto'] ?? null;
+$canais          = $_POST['canais'] ?? null;
+$periodo         = $_POST['periodo'] ?? null;
+
+$tf_data_final   = $_POST['tf_data_final'] ?? null;
+$tf_data_inicial = $_POST['tf_data_inicial'] ?? null;
+
+$btconsultar     = $_POST['btconsultar'] ?? null;
+
 if($_SESSION["tipo_acesso_pub"]=='PU') {
     header("Location: /sys/admin/commerce/index.php");
     die;

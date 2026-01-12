@@ -15,6 +15,22 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 
+$tf_data_inicial        = $_POST['tf_data_inicial'] ?? null;
+$tf_data_final          = $_POST['tf_data_final'] ?? null;
+
+$dd_opr_codigo          = $_POST['dd_opr_codigo'] ?? null;
+$dd_canal               = $_POST['dd_canal'] ?? null;
+
+$reg_operacao        = $_POST['reg_operacao'] ?? null;
+$cotacao_euro        = $_POST['cotacao_euro'] ?? null;
+$cambial_tele        = $_POST['cambial_tele'] ?? null;
+
+$dd_tipo                = $_POST['dd_tipo'] ?? null;
+$cnpj_instituicao    = $_POST['cnpj_instituicao'] ?? null;
+
+// Bot?o
+$BtnSearch          = $_POST['BtnSearch'] ?? null;
+
 //if(!b_is_AdminPlus()) die("<center><div align='left' style='margin-left:auto;margin-right:auto;width:850px;background-color:#CCCCCC;padding-left:20px;'><br><b>".$GLOBALS['_SESSION']['userlogin_bko'].",<br><br>Por favor, aguarde a finalização dos ajuste para tentarmos contornar o problema de estouro memória para tentar executar este relatório.<br><br>Conto com sua compreensão,<br>Wagner</b><br><br></div></center>");
 
 $vetor_SIGLA_PAIS = array(

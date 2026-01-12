@@ -6,7 +6,6 @@ error_reporting(E_ALL);  // Exibe todos os tipos de erros
 date_default_timezone_set('America/Fortaleza');
 require_once "../../../includes/constantes.php";
 require_once "../../../class/pdv/classGamesUsuario.php";
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/functions.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
 require_once "../../../includes/load_dotenv.php";

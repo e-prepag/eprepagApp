@@ -3,6 +3,7 @@ header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'", tru
 
 //header("location: https://www.e-prepag.com.br/");
 //exit;
+$msg = $_GET['msg'] ?? null;
 
 if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], "/prepag2")) {
     session_start();

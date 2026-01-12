@@ -4,6 +4,14 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 require_once $raiz_do_projeto . "class/classPinsPublishers.php";
 
+$p = $_POST['p'] ?? null;
+$pin_operacao = $_POST['pin_operacao'] ?? null;
+$tf_v_data_inclusao_ini = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$data_venda_exclusao = $_POST['data_venda_exclusao'] ?? null;
+$btPesquisar = $_POST['btPesquisar'] ?? null;
+
+
 $publisher_array = VetorOperadoras();
 
 $opr_codigo 		= isset($_POST['pin_operacao'])     ? (int) $_POST['pin_operacao']		: null;

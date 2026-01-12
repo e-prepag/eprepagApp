@@ -6,7 +6,6 @@ session_start();
 
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 
-require_once $raiz_do_projeto."includes/inc_register_globals.php";	
 
 $url = $_SERVER['HTTPS']=="on" ? "https://" : "http://";
 $url .= $_SERVER['SERVER_NAME'];

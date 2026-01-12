@@ -13,7 +13,6 @@ require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;
 $controller->setHeader();
 $controller->atualizaSessaoUsuario();
-require_once DIR_INCS . "inc_register_globals.php";    
 
 //codigo para deposito em EPP CASH
 $pagto_tipo = 13;

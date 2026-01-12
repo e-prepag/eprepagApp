@@ -3,7 +3,6 @@
         session_start();
 
 	require_once '../../../../includes/constantes.php';
-        require_once $raiz_do_projeto."includes/inc_register_globals.php";
         require_once $raiz_do_projeto."includes/access_functions.php";
         require_once $raiz_do_projeto.'includes/configIP.php';
         require_once $raiz_do_projeto."includes/configuracaoBO.php";

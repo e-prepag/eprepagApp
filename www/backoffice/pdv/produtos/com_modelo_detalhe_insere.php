@@ -7,6 +7,8 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 
 	$msg = "";
 
+  $produto_id = $_GET['produto_id'] ?? null;
+
 	if(!$produto_id) $msg = "Código do produto não fornecido.\n";
 	elseif(!is_numeric($produto_id)) $msg = "Código do produto inválido.\n";
 

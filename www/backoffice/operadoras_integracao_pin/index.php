@@ -5,6 +5,21 @@ require_once $raiz_do_projeto."includes/constantes_opr.php";
 ?>
 <link rel="stylesheet" type="text/css" href="/css/cssClassLista.css" />
 <?php
+
+$acao = $_POST['acao'] ?? null;
+$opr_codigo = $_POST['opr_codigo'] ?? null;
+$opr_product_type = $_POST['opr_product_type'] ?? null;
+$opr_use_check = $_POST['opr_use_check'] ?? null;
+$opr_partner_check = $_POST['opr_partner_check'] ?? null;
+$opr_partner_dominio = $_POST['opr_partner_dominio'] ?? null;
+$opr_ip = $_POST['opr_ip'] ?? null;
+$ip_inicial = $_POST['ip_inicial'] ?? null;
+$ip_final = $_POST['ip_final'] ?? null;
+$opr_partner_email = $_POST['opr_partner_email'] ?? null;
+$Submit = $_POST['Submit'] ?? null;
+$acao = $_GET['acao'] ?? null;
+$opr_codigo = $_GET['opr_codigo'] ?? null;
+
 $acao		= isset($_REQUEST['acao'])		? $_REQUEST['acao']			: 'listar';
 $opr_codigo	= isset($_REQUEST['opr_codigo'])? $_REQUEST['opr_codigo']	: NULL;
 $msg	= "";

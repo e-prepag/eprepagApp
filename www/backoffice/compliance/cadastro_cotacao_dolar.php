@@ -10,6 +10,17 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . "includes/complice/functions.php";
 require_once $raiz_do_projeto . "class/util/Util.class.php";
 
+$periodo = $_POST['periodo'] ?? null;
+$multiCotacao124 = $_POST['multiCotacao124'] ?? null;
+$multiCotacaoValor124 = $_POST['multiCotacaoValor124'] ?? null;
+$multiCotacaoInicio124 = $_POST['multiCotacaoInicio124'] ?? null;
+$multiCotacaoCongelada124 = $_POST['multiCotacaoCongelada124'] ?? null;
+$multiCotacaoFim124 = $_POST['multiCotacaoFim124'] ?? null;
+$cotacao = $_POST['cotacao'] ?? null;
+$multiCotacao40 = $_POST['multiCotacao40'] ?? null;
+$multiCotacao37 = $_POST['multiCotacao37'] ?? null;
+
+
 //Variavel para teste contendo o ultimo mês permitido
 $currentmonthVerify = Util::getTimeByMonth(-1);
 $lastMonth = Util::getTimeByMonth(0);

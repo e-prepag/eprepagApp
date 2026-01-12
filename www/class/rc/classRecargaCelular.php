@@ -3,7 +3,6 @@
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
-require_once $raiz_do_projeto . "includes/inc_register_globals.php";	
 require_once $raiz_do_projeto . "db/connect.php";
 
 $ARQUIVO_RC_VECTOR_OPERADORAS = $raiz_do_projeto . "/includes/rc/inc_vector.php";

@@ -9,7 +9,15 @@ $controller = new HeaderController;
 $controller->setHeader();
 $controller->atualizaSessaoUsuario();
 
-require_once DIR_INCS . "inc_register_globals.php";    
+$token_csrf = $_POST['token_csrf'] ?? null;
+$produtos_valor = $_POST['produtos_valor'] ?? null;
+$pagto = $_POST['pagto'] ?? null;
+$iforma = $_POST['iforma'] ?? null;
+$idu = $_POST['idu'] ?? null;
+$sno = $_POST['sno'] ?? null;
+$tipo = $_POST['tipo'] ?? null;
+$btSubmit = $_POST['btSubmit'] ?? null;
+
 require_once DIR_INCS . "gamer/functions_endereco.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 
