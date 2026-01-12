@@ -1601,7 +1601,7 @@ class UsuarioGames
 
         try {
             // Inicializando a query base
-            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g');";
+            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
 
             // Se o userId for fornecido, adicionar uma condição para excluir esse ID da verificação
             if ($usuario_id_excessao !== null) {
