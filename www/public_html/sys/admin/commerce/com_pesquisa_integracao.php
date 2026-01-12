@@ -3,31 +3,6 @@ set_time_limit ( 3000 ) ;
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
-
-/*
-	
-	********************* ##### *********************
-	
-	NOTA:
-	Registros com 
-	
-	iph_ip_status_confirmed = '9999'
-	ip_status_confirmed = '9999'
-	
-	estão desativados devido a algum erro no sistema
-	- Victor
-	
-	********************* ##### *********************
-
-*/
-
-
-
-
-
-
-//include "../../../../backoffice/web/bkov2_prepag/commerce/includes/classPrincipal.php"; 
-//include "includes/classPrincipal.php"; 
 require_once "../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 
@@ -38,6 +13,29 @@ require_once $raiz_do_projeto . "includes/gamer/functions_pagto.php";
 //ini_set("display_errors", 1); 
 
 //echo "<pre>".print_r($_POST, true)."</pre>";
+
+$tf_data_ini = $_POST['tf_data_ini'] ?? null;
+$tf_data_fim = $_POST['tf_data_fim'] ?? null;
+$tf_data_conf_ini = $_POST['tf_data_conf_ini'] ?? null;
+$tf_data_conf_fim = $_POST['tf_data_conf_fim'] ?? null;
+$tf_data_concilia_ini = $_POST['tf_data_concilia_ini'] ?? null;
+$tf_data_concilia_fim = $_POST['tf_data_concilia_fim'] ?? null;
+$tf_v_codigo = $_POST['tf_v_codigo'] ?? null;
+$tf_v_codigo_include = $_POST['tf_v_codigo_include'] ?? null;
+$tf_v_order = $_POST['tf_v_order'] ?? null;
+$tf_v_order_include = $_POST['tf_v_order_include'] ?? null;
+$tf_v_email = $_POST['tf_v_email'] ?? null;
+$tf_confirmed = $_POST['tf_confirmed'] ?? null;
+$tf_d_forma_pagto = $_POST['tf_d_forma_pagto'] ?? null;
+$tf_store_id = $_POST['tf_store_id'] ?? null;
+$tf_cliente_email = $_POST['tf_cliente_email'] ?? null;
+$tf_amount = $_POST['tf_amount'] ?? null;
+$tf_v_status = $_POST['tf_v_status'] ?? null;
+$BtnSearch = $_POST['BtnSearch'] ?? null;
+$ncamp = $_REQUEST['ncamp'] ?? null;
+$inicial = $_REQUEST['inicial'] ?? null;
+$range = $_REQUEST['range'] ?? null;
+$ordem = $_REQUEST['ordem'] ?? null;
 
 //echo getListaCodigoNumericoParaPagtoOnline()."<br>";	// -> 5,6,7,9,10,13,11,12,999
 //echo getListaCharacterParaPagtoOnline()."<br>";	//	-> '5','6','7','9','A','E','B','P','Z'
