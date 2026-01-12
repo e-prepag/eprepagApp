@@ -14,7 +14,7 @@ else {
 }
 ?>
 <title>E-Prepag - Créditos para games online</title>
-<link href="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://<?php echo $server_url; ?>/eprepag/incs/landingpage.css" rel="stylesheet" type="text/css" />
+<link href="https://<?php echo $server_url; ?>/eprepag/incs/landingpage.css" rel="stylesheet" type="text/css" />
 <body>
 <div class="principal">
     <div class="faixa">
@@ -23,16 +23,16 @@ else {
             <a href="<?= EPREPAG_URL_HTTPS_COM ?>/" target="_blank" class="corlink">E-Prepag</a> | <a href="<?= EPREPAG_URL_HTTPS_COM ?>/support" target="_blank" class="corlink">Suporte</a> | <a href="http://blog.e-prepag.com/seja-um-ponto-de-venda/" target="_blank" class="corlink">Seja um ponto autorizado</a>
     </div>
     <div class="dadosparceiro">
-        <img src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://<?php echo $server_url; ?>/imagens/logo_xcloud_mapa.jpg" class="goodgames" width="150"/>
+        <img src="https://<?php echo $server_url; ?>/imagens/logo_xcloud_mapa.jpg" class="goodgames" width="150"/>
         <span class="textocentral">
             Encontre aqui um Ponto de Venda autorizado
         </span>
-        <img src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://<?php echo $server_url; ?>/imagens/logo_mapa.gif" class="imglogo" />
+        <img src="https://<?php echo $server_url; ?>/imagens/logo_mapa.gif" class="imglogo" />
     </div>
     <br>
     <center>
     <div>
-        <iframe src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://<?php echo $server_url; ?>/eprepag/moedavirtual/lan_houses_cartao.php" width="790" style="margin:0 auto; overflow: hidden;" height="730" frameborder="0" scrolling="no">
+        <iframe src="https://<?php echo $server_url; ?>/eprepag/moedavirtual/lan_houses_cartao.php" width="790" style="margin:0 auto; overflow: hidden;" height="730" frameborder="0" scrolling="no">
         </iframe>
     </div>
     </center>
@@ -42,7 +42,7 @@ else {
         </a>
     </div>
 </div>    
-<script src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script src="https://www.google-analytics.com/urchin.js" type="text/javascript"></script>
 <script type="text/javascript">
     _uacct = "UA-1903237-3";
     urchinTracker();

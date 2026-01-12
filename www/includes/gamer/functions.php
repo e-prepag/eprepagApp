@@ -543,7 +543,7 @@ function redirect($strRedirect){
         ob_end_clean();
 
         if(substr($strRedirect, 0, 4) != "http")
-                $strRedirect = (strtoupper($_SERVER['HTTPS']) == "ON"?"https":"http") . "://" . $_SERVER['HTTP_HOST'] . $strRedirect;
+                $strRedirect = "https://" . $_SERVER['HTTP_HOST'] . $strRedirect;
         //redirect externo
         ?><html><body onload="window.location='<?php echo $strRedirect?>'"><?php
         exit;

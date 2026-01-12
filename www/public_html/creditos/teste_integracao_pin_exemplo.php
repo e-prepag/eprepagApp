@@ -43,7 +43,7 @@ function verifica()
     <td height="22,5" valign="center" align="center" bgcolor="#00008C"><font face="Arial, Helvetica, sans-serif" size="3" color="#FFFFFF"><b>Teste de Integra&ccedil;&atilde;o de PINs E-PREPAG</b></font></td>
   </tr>
   <tr>
-    <td><form name="form1" method="post" action="http<?php echo (($_SERVER['HTTPS']=="on")?"s":"")."://" . $server_url; ?>/check-redeem/">
+    <td><form name="form1" method="post" action="https://" . $server_url; ?>/check-redeem/">
         <table width="100%" border='0' cellpadding="2" cellspacing="1">
           <tr>
             <td width="30%" bgcolor="#00008C"><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><b> C&oacute;digo do Parceiro:<b></font></td>

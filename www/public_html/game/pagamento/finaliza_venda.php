@@ -21,7 +21,7 @@ require_once DIR_INCS . "config.MeiosPagamentos.php";
 require_once DIR_CLASS . "gamer/classIntegracao.php";
 require_once DIR_CLASS . "gamer/classLimite.php";
 
-$https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
+$https = "https://";
 
 $pagto = $_SESSION['pagamento.pagto'];
 $pagto_ja_fiz = $_SESSION['pagamento.pagto_ja_fiz'];

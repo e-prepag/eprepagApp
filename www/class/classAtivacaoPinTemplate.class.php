@@ -147,7 +147,6 @@ class AtivacaoPinTemplate {
                 if(checkIP()) {
                     $server_url = $_SERVER['SERVER_NAME'];
                 }
-//		$urlAtivacao = "http".(($_SERVER['HTTPS']=="on")?"s":"")."://" . $server_url;
 		$urlAtivacao = "";
                 
 		if($urlParam == '') {
@@ -162,9 +161,6 @@ class AtivacaoPinTemplate {
 		} else {
 			$urlAtivacao .= $urlParam;
 		}
-//		if($_SERVER['HTTPS']=="on") {
-//			$urlAtivacao = str_replace("http:", "https:", $urlAtivacao);
-//		}
 		
 		return $urlAtivacao;
 	}
@@ -529,13 +525,6 @@ class AtivacaoPinTemplate {
 														</tr>
 														
 															";
-/************************ Incluir este trecho abaixo no codigo acima quando dispo nibilizar o bonus ************************************************************
-														<tr class='box-resumo-item-pin bg_color_odd'>
-															<td class='box-resumo-item-pin-bonus'>+ Bônus<img src='http<_?php echo (($_SERVER['HTTPS']=="on")?"s":"") ?_>://www.e-prepag.com.br/prepag2/commerce/ativacao_pin/images/ajuda_pin.gif' /></td>
-															<td align='right'><span class='box-resumo-item-pin-bonus-valor'>".number_format(($values['BONUS']*100),0,',','.')."</span></td>
-															<td class='box-resumo-item-pin-excluir'></td>
-														</tr>						
-************************************************************************************/
 
 			}//end foreach
 			return $paginaAtivacaoPin;

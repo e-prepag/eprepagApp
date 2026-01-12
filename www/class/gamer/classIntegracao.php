@@ -4208,7 +4208,7 @@ function SolicitaCPF($ug_id)
 	if (checkIP()) {
 		$server_url = $_SERVER['SERVER_NAME'];
 	}
-	$server_url = "http" . (($_SERVER['HTTPS'] == "on") ? "s" : "") . "://" . $server_url;
+	$server_url = "https://" . $server_url;
 
 	$sql = "SELECT *
                     FROM usuarios_games
@@ -4669,7 +4669,7 @@ function integracao_layout($type, $data = false)
 	$usr = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 
 	if ($type == "css" || $type == "includes") {
-		$url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
+		$url = "https://" . $_SERVER['SERVER_NAME'];
 		$html = "";
 		//        $html .= '<link rel="stylesheet" href="'.$url.'/prepag2/css/form_cpf.css" type="text/css" />';
 		if (!isset($GLOBALS["jquery"]))

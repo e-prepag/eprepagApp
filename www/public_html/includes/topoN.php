@@ -1,11 +1,7 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php 		
-$sProtocol = (($_SERVER['HTTPS']=="on")?"HTTPS":"HTTP");
-$spref = "";
-if(($GLOBALS['_SERVER']['HTTPS']=="on") && ($GLOBALS['_SERVER']['SERVER_PORT']==443)) {
-	$spref = "s";
-}
-
+$sProtocol = "HTTPS";
+$spref = "s";
 
 ?><link href="/css/home2.css" rel="stylesheet" type="text/css">
 <div id="topo"><div id="logo"><a href="/" border="0"><img src="/imagens/logo_eprepag.gif" title="E-PREPAG<?php echo (($_SESSION["OrigemId"])?" (" . $_SESSION["OrigemId"] . ")":"") ?>" border="0" /></a></div>

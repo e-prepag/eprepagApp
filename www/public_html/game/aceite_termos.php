@@ -17,7 +17,7 @@ require_once RAIZ_DO_PROJETO . 'consulta_cpf/config.inc.cpf.php';
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-$https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
+$https = "https://";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : EPREPAG_URL);
 
 session_start();

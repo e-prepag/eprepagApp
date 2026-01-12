@@ -19,7 +19,7 @@
 
 	$PROCESS_AUTOM_IDUSER_BKO = '0401121156014';
 //	$BOLETO_TAXA_ADICIONAL = 2.00;
-	$PREPAG_DOMINIO = "http".(($_SERVER['HTTPS']=="on")?"s":"")."://" . EPREPAG_URL . "";
+	$PREPAG_DOMINIO = "https://" . EPREPAG_URL . "";
 	$ENTRE_CONTATO_CENTRAL = "Por favor, entre em contato com nossa Central de Atendimento através do e-mail suporte@e-prepag.com.br";
 	$GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] = 7909;
 

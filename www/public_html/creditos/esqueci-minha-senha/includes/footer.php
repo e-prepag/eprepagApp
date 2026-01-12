@@ -5,7 +5,7 @@
 			<div class="container top20">
 				<div class="col-md-9">
 					<div class="row">
-						<a href="http<?php if($_SERVER['HTTPS']=="on") { echo "s"; } ?>://<?php echo $_SERVER['SERVER_NAME']?>" class="txt-cinza fontsize-p" alt="Portal E-prepag" title="Portal E-prepag"  target="_blank">Portal E-prepag</a><span class="espacamento-laterais txt-cinza">|</span>
+						<a href="https://<?php echo $_SERVER['SERVER_NAME']?>" class="txt-cinza fontsize-p" alt="Portal E-prepag" title="Portal E-prepag"  target="_blank">Portal E-prepag</a><span class="espacamento-laterais txt-cinza">|</span>
 						<a href="/creditos/termos-de-uso.php" alt="Termos de uso - Lojas" title="Termos de uso - Lojas"  target="_blank" class="txt-cinza fontsize-p">Termos de uso - Lojas</a><span class="espacamento-laterais txt-cinza">|</span>
 						<a href="http://blog.e-prepag.com/compra-segura/" alt="Políticas de segurança" title="Políticas de segurança"  target="_blank" class="txt-cinza fontsize-p">Políticas de segurança</a><span class="espacamento-laterais txt-cinza">|</span>
 						<a href="/game/politica-de-privacidade.php" alt="Política de Privacidade" title="Política de Privacidade"  target="_blank" class="txt-cinza fontsize-p">Política de Privacidade</a><span class="espacamento-laterais txt-cinza">|</span>

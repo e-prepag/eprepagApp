@@ -2,7 +2,7 @@
 <?php
 if(!empty($_SERVER['HTTP_REFERER']))
     $url_referer = parse_url($_SERVER['HTTP_REFERER']);
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = "https://";
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../../../includes/constantes.php";
 require_once  DIR_INCS . "main.php";

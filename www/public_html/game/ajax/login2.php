@@ -57,7 +57,7 @@ if (Util::isAjaxRequest()) {
 				time() + (31 * 24 * 60 * 60), // Expiracao (timestamp)
 				'/',              // Caminho
 				'',               // Domonio (vazio = padrao)
-				isset($_SERVER['HTTPS']), // Secure: apenas HTTPS
+				true, // Secure: apenas HTTPS
 				true              // HttpOnly: bloqueia acesso via JS
 			);
 		}

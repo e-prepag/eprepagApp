@@ -65,13 +65,8 @@ function carregaBanner(){
 	
 			$arquivo = $sPath.$rs_bannersSuperiores_row['arquivo'];
 			$url = $rs_bannersSuperiores_row['urladdress'];
-			$spref = "";
-
-			if(($GLOBALS['_SERVER']['HTTPS']=="on") && ($GLOBALS['_SERVER']['SERVER_PORT']==443)) {
-				$url = str_replace("http", "https", strtolower($url));
-				$spref = "s";
-			}
-
+			$spref = "s";
+			$url = str_replace("http", "https", strtolower($url));
 	?>
 			rs_bannersSuperiores[<?php echo $linha?>] = "<?php echo $arquivo; ?>";
 			rs_bannersSuperioresURL[<?php echo $linha?>] = "<?php echo $url; ?>";

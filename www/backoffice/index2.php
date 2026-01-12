@@ -223,7 +223,7 @@ function setDeviceCookie($deviceId)
         time() + (31 * 24 * 60 * 60), // Expiração (timestamp)
         '/',              // Caminho
         '',               // Domínio (vazio = padrão)
-        isset($_SERVER['HTTPS']), // Secure: apenas HTTPS
+        true, // Secure: apenas HTTPS
         true              // HttpOnly: bloqueia acesso via JS
     );
 }

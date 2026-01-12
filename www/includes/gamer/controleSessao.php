@@ -105,7 +105,7 @@ require_once $raiz_do_projeto . "class/classQuestionarios.php";
                                     echo "<SCRIPT language=\"JavaScript\">\n <!-- \n top.location ='$strRedirect';\n //-->\n </SCRIPT>";
                             } else {
                                     ob_end_clean();
-                                    $location = (strtoupper($_SERVER['HTTPS'])=="ON"?"https":"http") . "://" . $_SERVER['HTTP_HOST'] . $strRedirect;
+                                    $location = "https://" . $_SERVER['HTTP_HOST'] . $strRedirect;
                                     header("Location: " . $location);
                             }
                             exit;

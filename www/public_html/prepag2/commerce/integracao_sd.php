@@ -37,24 +37,6 @@ require_once DIR_CLASS . "gamer/classIntegracao.php";
 // Define Stardoll Integration
 $INTEGRACAO_STORE_ID = "10406";
 
-// Flow - step 2
-// Payment request
-// aeria -> EPP
-
-// error_reporting(E_ALL);
-// ini_set("display_errors", 1);
-
-if ($_SERVER['HTTPS'] == "on") {
-	//	echo "HTTPS está correto<br>";
-	//echo "<pre>";
-	//print_r($_SERVER);
-	//echo "</pre>";
-
-} else {
-	echo "Esta página funciona apenas com HTTPS<br>";
-	die("Stop");
-}
-
 $send_to_url = $INTEGRACAO_URL_EPP_GATEWAY;
 
 $partner_params = array(

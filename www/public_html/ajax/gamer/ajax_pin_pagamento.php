@@ -9,8 +9,6 @@ require_once DIR_INCS . "gamer/inc_ajax.php";
 
 block_direct_calling();
 
-//	if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
-
 //Include com conexão não persistente
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php"; 
@@ -28,14 +26,12 @@ if(!isset($venda_id)) $venda_id = $_SESSION['venda'];
 
 validaSessao(1);
 
-if($_SERVER['HTTPS']=="on") {
-	if(isset($_SESSION['usuarioGames_ser'])) {
-		gravaLog_EPPCASH("HTTPS : Existe usuarioGames_ser na SESSION\n");
-	}
-	else {
-		gravaLog_EPPCASH("HTTPS : NAUN existe usuarioGames_ser na SESSION\n");
-	}
-}//if($_SERVER['HTTPS']=="on") 
+if(isset($_SESSION['usuarioGames_ser'])) {
+	gravaLog_EPPCASH("HTTPS : Existe usuarioGames_ser na SESSION\n");
+}
+else {
+	gravaLog_EPPCASH("HTTPS : NAUN existe usuarioGames_ser na SESSION\n");
+}
 
 // Atualiza valor saldo do BD
 $saldo		= getSaldoUsuarioFunc();

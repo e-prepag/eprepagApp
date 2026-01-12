@@ -178,7 +178,7 @@ if($rs_cortes){
             <div class="row txt-cinza">
                 <div class="col-md-12 espacamento">
                     <p class="fontsize-p margin004">- Ser? acrescentado um valor de R$ 1,80 para boletos abaixo de R$ 60,00.</p>
-                    <p class="fontsize-p margin004">- Neste caso, para evitar taxa, entre em contato com nosso <a href='http<?php if($_SERVER['HTTPS']=="on") { echo "s"; } ?>://<?php echo $_SERVER["SERVER_NAME"]; ?>/game/suporte.php' class="txt-azul">suporte</a> para efetuar o pagamento via dep?sito.</p>
+                    <p class="fontsize-p margin004">- Neste caso, para evitar taxa, entre em contato com nosso <a href='https://<?php echo $_SERVER["SERVER_NAME"]; ?>/game/suporte.php' class="txt-azul">suporte</a> para efetuar o pagamento via dep?sito.</p>
                 </div>
             </div>
 <?php

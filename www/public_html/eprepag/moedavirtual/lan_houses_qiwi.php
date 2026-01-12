@@ -5,7 +5,7 @@ if(!empty($_SERVER['HTTP_REFERER'])){
     $url_referer = parse_url($_SERVER['HTTP_REFERER']);
     $withLogo = ($url_referer['path'] == '/eprepag/revendedores/index.php');
 }
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = "https://";
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../../../includes/constantes.php";
 require_once  DIR_INCS . "main.php";
@@ -13,7 +13,7 @@ require_once  DIR_INCS . "pdv/main.php";
 require_once  DIR_INCS . "configIP.php";
 require_once  DIR_INCS . "functions_captcha.php";
 
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = "https://";
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();

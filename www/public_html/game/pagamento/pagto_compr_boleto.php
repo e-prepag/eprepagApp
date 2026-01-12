@@ -3,7 +3,7 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-$https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
+$https = "https://";
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;
@@ -88,7 +88,7 @@ $pagina_titulo = "Comprovante";
                 $server_url = $_SERVER['SERVER_NAME'];
             }
 
-            $parametros['prepag_dominio'] = "http" . (($_SERVER['HTTPS'] == "on") ? "s" : "") . "://" . $server_url;
+            $parametros['prepag_dominio'] = "https://" . $server_url;
 
             if (BANCO_BOLETO == "asaas" || $controller->usuario->getId() == 1354068) {
                 require_once "../../../banco/asaas/classBoletoAsaas.php";

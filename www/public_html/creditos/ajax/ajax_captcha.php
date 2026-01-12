@@ -15,7 +15,7 @@ block_direct_calling();
 require_once "../../../includes/configIP.php";
 require_once "../../../includes/functions_captcha.php";
 
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = "https://";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 $randomcode = generateRandomCode();	

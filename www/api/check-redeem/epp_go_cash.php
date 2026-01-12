@@ -2,7 +2,6 @@
 if (!defined('ACCESS_ALLOWED')) {
     die('Acesso direto não permitido.');
 }
-if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 
 
 	$pin_code 	= isset($_POST["pin_code"])		? $_POST["pin_code"]	: null;
@@ -210,5 +209,4 @@ if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
 			echo ";PIN_VALUE=".($aux_pin_value*100);
 		}
 	}
-}	// end do teste HTTPS //descomentar para implementar https
 ?>

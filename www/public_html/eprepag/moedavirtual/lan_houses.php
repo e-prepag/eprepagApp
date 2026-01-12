@@ -7,7 +7,7 @@ require_once  DIR_INCS . "pdv/main.php";
 require_once  DIR_INCS . "configIP.php";
 require_once  DIR_INCS . "functions_captcha.php";
 
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = "https://";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 

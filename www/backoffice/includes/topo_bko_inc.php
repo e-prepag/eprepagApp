@@ -7,7 +7,7 @@ session_start();
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 
-$url = $_SERVER['HTTPS']=="on" ? "https://" : "http://";
+$url = "https://";
 $url .= $_SERVER['SERVER_NAME'];
 
 $webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];

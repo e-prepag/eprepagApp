@@ -2,7 +2,7 @@
 
 if (!function_exists('modal_includes')) {
     function modal_includes($fancybox=true){
-        $url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
+        $url = "https://" . $_SERVER['SERVER_NAME'];
 
         $html = '';
 

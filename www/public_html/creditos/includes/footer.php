@@ -24,9 +24,7 @@
 		<div class="container top20">
 			<div class="col-md-9">
 				<div class="row">
-					<a href="http<?php if ($_SERVER['HTTPS'] == "on") {
-						echo "s";
-					} ?>://<?php echo $_SERVER['SERVER_NAME'] ?>"
+					<a href="https://<?php echo $_SERVER['SERVER_NAME'] ?>"
 						class="txt-cinza fontsize-p" alt="Portal E-prepag" title="Portal E-prepag" target="_blank">Portal
 						E-prepag</a><span class="espacamento-laterais txt-cinza">|</span>
 					<a href="/creditos/termos-de-uso.php" alt="Termos de uso - Lojas" title="Termos de uso - Lojas"
@@ -204,9 +202,7 @@ if ($controller->mktzap()) {
 <?php
 }
 ?>
-<script src="http<?php if ($_SERVER['HTTPS'] == "on") {
-	echo "s";
-} ?>://www.google-analytics.com/urchin.js"
+<script src="https://www.google-analytics.com/urchin.js"
 	type="text/javascript"></script>
 <script type="text/javascript">
 	_uacct = "UA-1903237-3";

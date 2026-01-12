@@ -27,7 +27,7 @@ else {
         <span class="textocentral">
             Encontre aqui um Ponto de Venda autorizado
         </span>
-        <img src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://<?php echo $server_url; ?>/imagens/logo_mapa.gif" class="imglogo" />
+        <img src="https://<?php echo $server_url; ?>/imagens/logo_mapa.gif" class="imglogo" />
     </div>
     <br>
     <center>
@@ -42,7 +42,7 @@ else {
         </a>
     </div>
 </div> 
-<script src="http<?php echo (($_SERVER['HTTPS']=="on")?"s":""); ?>://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script src="https://www.google-analytics.com/urchin.js" type="text/javascript"></script>
 <script type="text/javascript">
     _uacct = "UA-1903237-3";
     urchinTracker();

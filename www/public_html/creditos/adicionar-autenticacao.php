@@ -10,7 +10,7 @@ $controller = new OfflineController;
 
 require_once "includes/header-offline.php";
 
-$https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
+$https = "https://";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 $id_do_usuario = $_SESSION['id_do_usuario'];
