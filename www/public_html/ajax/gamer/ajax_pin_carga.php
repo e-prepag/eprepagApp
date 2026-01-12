@@ -9,8 +9,6 @@ require_once DIR_INCS . "gamer/inc_ajax.php";
 
 block_direct_calling();
 
-//	if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
-
 //Include com conexão não persistente
 require_once RAIZ_DO_PROJETO . "db/connect.php";
 require_once DIR_INCS . "main.php";

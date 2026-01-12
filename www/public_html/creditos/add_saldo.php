@@ -70,7 +70,7 @@ $valor_maximo_0 = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS
                         <strong>SUPORTE PARA PDVs</strong>
                     </div>
                     <div class="col-md-12 espacamento">
-                        <div class="row p-3"><a href="http<?php if($_SERVER['HTTPS']=="on") { echo "s"; } ?>://<?php echo $_SERVER["SERVER_NAME"] ?>/game/suporte.php" target="_blank"><img style="width: 30px; height: 30px;" src="/imagens/lh-support.png"/><strong> Área de suporte</strong></a></div>
+                        <div class="row p-3"><a href="https://<?php echo $_SERVER["SERVER_NAME"] ?>/game/suporte.php" target="_blank"><img style="width: 30px; height: 30px;" src="/imagens/lh-support.png"/><strong> Área de suporte</strong></a></div>
                         <div class="row p-3"><a href="mailto:suporte@e-prepag.com.br" target="_blank"><img style="width: 30px; height: 30px;" src="/imagens/lh-email.png"/><strong> Escrever e-mail</strong></a></div>
                     </div>
                 </div>

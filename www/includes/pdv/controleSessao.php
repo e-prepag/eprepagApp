@@ -124,7 +124,7 @@ function validaSessao(){
                                         echo "<html><body OnLoad=\"opener.location.href='$strRedirect';window.close();\"></body></html>";
                                 } else {
                                         ob_end_clean();
-                                        $location = (strtoupper($_SERVER['HTTPS'])=="ON"?"https":"http") . "://" . $_SERVER['HTTP_HOST'] . $strRedirect;
+                                        $location = "https://" . $_SERVER['HTTP_HOST'] . $strRedirect;
                                         echo "<script>
                                                 top.location.href = '".$location."';
                                              </script>";

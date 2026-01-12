@@ -7,7 +7,7 @@
         require_once "../../../includes/constantes.php";
         require_once DIR_INCS."main.php";
         require_once DIR_INCS."pdv/main.php";
-        $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+        $https = "https://";
         require_once DIR_INCS."configIP.php";
 
         $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');

@@ -9,7 +9,7 @@ $pagina_titulo = "E-prepag - Créditos para Games";
  
 $controller->setHeader();
 
-$url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on") ? "s" : "") . '://' . $server_url;
+$url = "https://" . $server_url;
 
 define("DESTINATARIO_EMAIL_PROD", "canal.denuncias@e-prepag.com");  //rc@e-prepag.com.br,rc1@e-prepag.com.br
 

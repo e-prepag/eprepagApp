@@ -319,7 +319,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
     <script type="text/javascript" src="/js/global.js"></script>
     <?php
     $GLOBALS["jquery"] = true;
-    $url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
+    $url = "https://" . $_SERVER['SERVER_NAME'];
     echo '<script src="/js/jquery.mask.min.js"></script>';
     ?>
 </head>

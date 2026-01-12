@@ -113,7 +113,7 @@ if($is_int){
     echo integracao_layout('css');
 }
 echo modal_includes();
-$url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
+$url = "https://" . $_SERVER['SERVER_NAME'];
 echo '<script src="'.$url.'/js/jquery.mask.min.js"></script>';
 ?>
 

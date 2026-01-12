@@ -7,14 +7,6 @@ require_once DIR_CLASS . "gamer/classIntegracao.php";
 
 ?>
 <?php
-// error_reporting(E_ALL); 
-// ini_set("display_errors", 1); 
-
-//	echo "_SERVER['HTTPS']: <b>".$_SERVER['HTTPS']."</b><br>\n";
-//	echo "_SERVER['SERVER_PORT']: <b>".$_SERVER['SERVER_PORT']."</b><br>\n";
-
-//echo "<pre>".print_r($_POST, true)."</pre>";
-
 // Default
 $codretepp = "3"; // Order not found
 

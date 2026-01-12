@@ -95,7 +95,7 @@ if(isset($_POST['formsubmitEnd'])){
 <?php echo integracao_layout('css'); ?>
 <?php echo modal_includes(); ?>
 <?php 
-$url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
+$url = "https://" . $_SERVER['SERVER_NAME'];
 echo '<script src="'.$url.'/js/jquery.mask.min.js"></script>';
 ?>
 

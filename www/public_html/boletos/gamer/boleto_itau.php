@@ -237,12 +237,12 @@ echo str_replace("\n", "<br>", $msg);
 	//
 	-->
 </script>
-<script language="JavaScript" src="http<?php echo (($_SERVER['HTTPS'] == "on") ? "s" : "") ?>://www.googleadservices.com/pagead/conversion.js">
+<script language="JavaScript" src="https://www.googleadservices.com/pagead/conversion.js">
 </script>
 <noscript>
-	<img height="1" width="1" border="0" src="http<?php echo (($_SERVER['HTTPS'] == "on") ? "s" : "") ?>://www.googleadservices.com/pagead/conversion/1052651518/?value=<?php echo str_replace(",", ".", $valor_boleto) ?>&label=VieMCNqaZRD-3_j1Aw&guid=ON&script=0" />
+	<img height="1" width="1" border="0" src="https://www.googleadservices.com/pagead/conversion/1052651518/?value=<?php echo str_replace(",", ".", $valor_boleto) ?>&label=VieMCNqaZRD-3_j1Aw&guid=ON&script=0" />
 </noscript>
-<script src="http<?php echo (($_SERVER['HTTPS'] == "on") ? "s" : "") ?>://www.google-analytics.com/urchin.js" type="text/javascript">
+<script src="https://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
 <script type="text/javascript">
 	_uacct = "UA-1903237-3";

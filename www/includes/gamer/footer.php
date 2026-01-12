@@ -146,9 +146,7 @@
         })
     });
 </script>
-<script src="http<?php if ($_SERVER['HTTPS'] == "on") {
-    echo "s";
-} ?>://www.google-analytics.com/urchin.js"
+<script src="https://www.google-analytics.com/urchin.js"
     type="text/javascript"></script>
 <script type="text/javascript">
     _uacct = "UA-1903237-3";

@@ -19,8 +19,6 @@ block_direct_calling();
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "gamer/main.php"; 
 
-//	if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
-
 //validaSessao(1);
 
 echo "<script language='javascript' type='text/javascript'>
@@ -54,7 +52,6 @@ echo ",
 		});
 }
 </script>";
-//} //end if ($_SERVER['HTTPS']=="on")
 
 //Fechando Conexão
 pg_close($connid);

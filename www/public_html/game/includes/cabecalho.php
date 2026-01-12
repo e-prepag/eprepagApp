@@ -13,11 +13,8 @@ if(checkIP()) {
 
 //exibindo o banner somente para usuários de NÃO Integração
 if (!b_isIntegracao()) {
-    $sProtocol = (($_SERVER['HTTPS']=="on")?"HTTPS":"HTTP");
-    $spref = "";
-    if(($GLOBALS['_SERVER']['HTTPS']=="on") && ($GLOBALS['_SERVER']['SERVER_PORT']==443)) {
-            $spref = "s";
-    }
+    $sProtocol = "HTTPS";
+    $spref = "s";
     
     //  Começa bloco para novo banner 
     // ### Define banner superior

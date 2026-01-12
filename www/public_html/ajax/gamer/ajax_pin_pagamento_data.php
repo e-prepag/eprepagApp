@@ -19,8 +19,6 @@ if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
     }
 
-//	if ($_SERVER['HTTPS']=="on") { //descomentar para implementar https
-
 //validaSessao(1);
 
 echo "<script language='javascript' type='text/javascript'>
@@ -57,7 +55,6 @@ echo ",
 		});
 }
 </script>";
-//} //end if ($_SERVER['HTTPS']=="on")
 
 //Fechando Conexão
 pg_close($connid);

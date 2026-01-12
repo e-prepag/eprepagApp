@@ -283,7 +283,7 @@ function redirect($strRedirect){
         ob_end_clean();
 
         if(substr($strRedirect, 0, 4) != "http")
-                $strRedirect = (strtoupper($_SERVER['HTTPS']) == "ON"?"https":"http") . "://" . $_SERVER['HTTP_HOST'] . $strRedirect;
+                $strRedirect = "https://" . $_SERVER['HTTP_HOST'] . $strRedirect;
 
         //Reidrect interno
         //header("Location: " . $strRedirect);

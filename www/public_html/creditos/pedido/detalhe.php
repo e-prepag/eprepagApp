@@ -700,9 +700,7 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 										$.ajax({
 											type: 'POST',
-											url: 'http<?php if ($_SERVER['HTTPS'] == "on") {
-												echo "s";
-											} ?>://<?php echo $server_url; ?>/creditos/ajax/emailCupom.php',
+											url: 'https://<?php echo $server_url; ?>/creditos/ajax/emailCupom.php',
 											data: showValues(),
 											beforeSend: function () {
 												$('#box-lan-hope').html("<img src='/imagens/loading1.gif' border='0' title='Pedido aguardando processamento....'/><p class='text-red'>Pedido aguardando processamento.</p>");

@@ -369,7 +369,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
     <?php echo integracao_layout('css'); ?>
     <?php echo modal_includes(); ?>
     <?php
-    $url = 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "s" : "") . '://' . $_SERVER['SERVER_NAME'];
+    $url = "https://" . $_SERVER['SERVER_NAME'];
     //echo '<link href="'.$url.'/prepag2/js/jqueryui/css/custom-theme/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">';
     //echo '<script src="'.$url.'/prepag2/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>';
     echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';

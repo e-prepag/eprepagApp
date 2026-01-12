@@ -3,7 +3,7 @@
 
 session_start();
 
-$webstring = "http".(($_SERVER['HTTPS']=='on') ? 's' : '')."://".$_SERVER['SERVER_NAME'];// . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "https://".$_SERVER['SERVER_NAME'];// . ":" . $_SERVER['SERVER_PORT'];
 $raiz_do_sys = $raiz_do_projeto . "public_html/sys/";
 
 if($_SERVER['SCRIPT_NAME'] <> "/sys/admin/pins/situacao_pin.php") {       

@@ -19,7 +19,7 @@
         $strVersao .= ".".$build;        
 
 
-        $https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+        $https = "https://";
 // URL's para redirecionamento
 	$url_session_expires = $https.'://'.$_SERVER['HTTP_HOST'].'/sys/admin/index.php?SessionExpires=1';
 	$url_user_blocked = $https.'://'.$_SERVER['HTTP_HOST'].'/sys/admin/index.php?UserBlocked=1';

@@ -20,7 +20,7 @@ if (!function_exists('random_bytes')) {
     }
 }
 
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$protocol = "https";
 
 // Nome do host
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
@@ -72,7 +72,7 @@ define("DIR_EPREPAG","/");
 
 define('IOF', 3.5);
 
-(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=="on" ? define("PROTOCOL","HTTPS"):define("PROTOCOL","HTTP"));
+define("PROTOCOL","HTTPS");
 
 $origem = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? $_SERVER['HTTP_REFERER'] : $_SERVER['SCRIPT_NAME'];
 

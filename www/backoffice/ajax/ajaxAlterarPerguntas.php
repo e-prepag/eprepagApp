@@ -28,7 +28,7 @@ if(empty(session_id())){
 $pagina_titulo = "E-prepag - Créditos para Games";
 require_once '../../includes/constantes.php';
 
-$url = $_SERVER['HTTPS']=="on" ? "https://" : "http://";
+$url = "https://";
 $url .= $_SERVER['SERVER_NAME'];
 
 $webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];

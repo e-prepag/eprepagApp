@@ -12,7 +12,7 @@ $centro	 	= $_POST['centro'];
 $zoom	 	= $_POST['zoom'];
 $chk_ug_id	= $_POST['chk_ug_id'];
 
-$https = 'http' . (($_SERVER['HTTPS']=='on') ? 's' : '');
+$https = "https://";
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
 
 if(count($chk_ug_id)>0) {

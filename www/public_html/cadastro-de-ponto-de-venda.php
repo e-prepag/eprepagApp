@@ -1733,7 +1733,7 @@ if (!empty($msg)) { ?>
 </script>
 
 <script src="/js/validaSenha.js"></script>
-<script src="http<?php echo (($_SERVER['HTTPS'] == "on") ? "s" : ""); ?>://www.google-analytics.com/urchin.js"
+<script src="https://www.google-analytics.com/urchin.js"
     type="text/javascript">
 </script>
 <script type="text/javascript">

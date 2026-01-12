@@ -348,7 +348,7 @@ function setDeviceCookie($deviceId)
         time() + (31 * 24 * 60 * 60), // Expiração (timestamp)
         '/',              // Caminho
         '',               // Domínio (vazio = padrão)
-        isset($_SERVER['HTTPS']), // Secure: apenas HTTPS
+        true, // Secure: apenas HTTPS
         true              // HttpOnly: bloqueia acesso via JS
     );
 }
@@ -428,7 +428,7 @@ if ($g_recaptcha_response != "valido") {
    */
 
 if (substr($pag, 0, 23) == "/creditos/") {
-    $pag = "http" . ($_SERVER["HTTPS"] == "on" ? "s" : "") . "://" . $server_url . $pag;
+    $pag = "https://" . $server_url . $pag;
     //	echo "new pag: '".$pag."'<br>";
 }
 
@@ -603,9 +603,7 @@ if ($msg == "") {
             gravaLog_Login("Login ou senha inválidos: '$login_usuario'.\n");
         }
         $strRedirect =
-            "http" .
-            ($_SERVER["HTTPS"] == "on" ? "s" : "") .
-            "://" .
+            "https://" .
             $server_url .
             "/creditos/login.php?pag=" .
             urlencode($pag) .
@@ -663,9 +661,7 @@ if ($msg == "") {
         if ($questionario->getRedireciona()) {
             //'Pagina questionario de redirecionamento apos login
             $strRedirect =
-                "http" .
-                ($_SERVER["HTTPS"] == "on" ? "s" : "") .
-                "://" .
+                "https://" .
                 $server_url .
                 "/creditos/questionario.php?ug_id=" .
                 $ug_id .
@@ -676,9 +672,7 @@ if ($msg == "") {
         if ($ug_alterar_senha == 1) {
             //'Pagina alteração de senha no redirecionamento apos login
             $strRedirect =
-                "http" .
-                ($_SERVER["HTTPS"] == "on" ? "s" : "") .
-                "://" .
+                "https://" .
                 $server_url .
                 "/creditos/alterar_senha.php";
         }

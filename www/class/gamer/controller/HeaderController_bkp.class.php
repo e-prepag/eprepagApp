@@ -11,11 +11,6 @@ if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }
 
-if($_SERVER['HTTPS']!="on") {
-    Header("Location: https://".$server_url.$_SERVER['REQUEST_URI']);
-    die();
-} //end if($_SERVER['HTTPS']!="on") 
-
 if(!checkIP()){
     if(strpos(strtolower($GLOBALS['_SERVER']['SERVER_NAME']), "www.") === false){
         header("Location: " . EPREPAG_URL_HTTPS . "" . $_SERVER['REQUEST_URI']);

@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 
-$https = 'http' . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
+$https = "https://";
 
 if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
 	$teste = substr($_SERVER['HTTP_USER_AGENT'], strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') + 4, 4) * 1;
