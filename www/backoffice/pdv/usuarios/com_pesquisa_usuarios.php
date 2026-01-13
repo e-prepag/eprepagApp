@@ -92,6 +92,12 @@ $dd_opr_codigo                     = $_POST['dd_opr_codigo'] ?? null;
 $tf_u_saldo_positivo               = $_POST['tf_u_saldo_positivo'] ?? null;
 $como_conheceu                     = $_POST['como_conheceu'] ?? null;
 $tf_u_observacoes                  = $_POST['tf_u_observacoes'] ?? null;
+$tf_u_com_totais_vendas            = $_POST['tf_u_com_totais_vendas'] ?? null;
+
+$ncamp = $_REQUEST['ncamp'] ?? null;
+$inicial = $_REQUEST['inicial'] ?? null;
+$range = $_REQUEST['range'] ?? null;
+$ordem = $_REQUEST['ordem'] ?? null;
 
 if(!$ncamp)    $ncamp       = 'ug_id';
 if(!$inicial)  $inicial     = 0;
