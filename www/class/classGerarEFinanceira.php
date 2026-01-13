@@ -1,13 +1,7 @@
 <?php
 require_once '/www/db/connect.php';
 require_once '/www/db/ConnectionPDO.php';
-//require_once '../libs/xmlseclibs.php';
 require_once '/www/includes/load_dotenv.php';
-//require_once '../libs/xmlseclibs.php';
-
-//use RobRichards\XMLSecLibs\XMLSecurityKey;
-//use RobRichards\XMLSecLibs\XMLSecurityDSig;
-
 
 class GerarEFinanceira
 {
@@ -120,7 +114,7 @@ class GerarEFinanceira
                         JOIN 
                             dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                         WHERE 
-                            ug.ug_ativo = 1 
+                            (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta :data_inicio AND :data_fim)
                             AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
                         GROUP BY 
                             ug.ug_id,
@@ -161,7 +155,8 @@ class GerarEFinanceira
                             ug.ug_cidade,
                             ug.ug_estado,
                             ug.ug_cep,
-                            ug.ug_perfil_saldo -- Adicionando o saldo atual
+                            ug.ug_perfil_saldo,
+                            ug.ug_ativo, ug.ug_data_encerramento_conta
                         FROM 
                             dist_usuarios_games ug
                         WHERE 
@@ -194,7 +189,8 @@ class GerarEFinanceira
                     cal.ano_mes_caixa,
                     COALESCE(m.entradas, 0) AS entradas_conta,
                     COALESCE(m.saidas, 0) AS saidas_conta,
-                    COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes
+                    COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes,
+                    d.ug_ativo, d.ug_data_encerramento_conta
                 FROM 
                     RegrasReporte r
                 JOIN 
@@ -248,7 +244,7 @@ class GerarEFinanceira
                             JOIN 
                                 dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                             WHERE 
-                                ug.ug_ativo = 1 
+                                (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta :data_inicio AND :data_fim)
                                 AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
                             GROUP BY 
                                 ug.ug_id,
@@ -293,7 +289,8 @@ class GerarEFinanceira
                                 ug.ug_repr_legal_nome,
                                 ug.ug_repr_legal_cpf,
                                 ug.ug_repr_venda_cpf,
-                                ug.ug_repr_legal_data_nascimento
+                                ug.ug_repr_legal_data_nascimento,
+                                ug.ug_ativo, ug.ug_data_encerramento_conta
                             FROM 
                                 dist_usuarios_games ug
                             WHERE 
@@ -328,7 +325,8 @@ class GerarEFinanceira
                                 cal.ano_mes_caixa,
                                 m.entradas,
                                 m.saidas,
-                                m.total_movimentado_mes
+                                m.total_movimentado_mes,
+                                d.ug_ativo, d.ug_data_encerramento_conta
                             FROM 
                                 RegrasReporte r
                             JOIN 
@@ -397,7 +395,7 @@ class GerarEFinanceira
                                 JOIN 
                                     usuarios_games_saldo_log sl ON ug.ug_id = sl.ugsl_ug_id
                                 WHERE 
-                                    ug.ug_ativo = 1 
+                                    (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta :data_inicio AND :data_fim)
                                     AND sl.ugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
                                 GROUP BY 
                                     ug.ug_id,
@@ -447,7 +445,7 @@ class GerarEFinanceira
                                 SELECT 
                                     ug.ug_id, ug.ug_nome, ug.ug_data_nascimento, ug.ug_cpf,
                                     ug.ug_endereco, ug.ug_numero, ug.ug_complemento, ug.ug_bairro,
-                                    ug.ug_cidade, ug.ug_estado, ug.ug_cep, ug.ug_perfil_saldo
+                                    ug.ug_cidade, ug.ug_estado, ug.ug_cep, ug.ug_perfil_saldo, ug.ug_ativo, ug.ug_data_encerramento_conta
                                 FROM 
                                     usuarios_games ug
                                 WHERE 
@@ -475,8 +473,8 @@ class GerarEFinanceira
                             cal.ano_mes_caixa,
                             COALESCE(m.entradas, 0) AS entradas_conta,
                             COALESCE(m.saidas, 0) AS saidas_conta,
-                            COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta
-                            
+                            COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta,
+                            d.ug_ativo, d.ug_data_encerramento_conta
                         FROM 
                             RegrasReporteCPF r_cpf
                         JOIN 
