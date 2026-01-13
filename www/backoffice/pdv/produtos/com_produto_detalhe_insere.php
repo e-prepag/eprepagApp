@@ -8,6 +8,23 @@ require_once "/www/includes/bourls.php";
 
 $msg = "";
 
+$BtnInserir              = $_POST['BtnInserir']              ?? null;
+$check_valor_variavel   = $_POST['check_valor_variavel']   ?? null;
+
+$ogp_valor_minimo       = $_POST['ogp_valor_minimo']       ?? null;
+$ogp_valor_maximo       = $_POST['ogp_valor_maximo']       ?? null;
+
+$produto_id             = $_REQUEST['produto_id']             ?? null;
+$ogp_nome               = $_POST['ogp_nome']               ?? null;
+$ogp_descricao          = $_POST['ogp_descricao']          ?? null;
+$ogp_ativo              = $_POST['ogp_ativo']              ?? null;
+$ogp_opr_codigo         = $_POST['ogp_opr_codigo']         ?? null;
+$ogp_mostra_integracao  = $_POST['ogp_mostra_integracao']  ?? null;
+$ogp_iof                = $_POST['ogp_iof']                ?? null;
+$ogp_pin_request        = $_POST['ogp_pin_request']        ?? null;
+$ogp_detalhes_utilizacao= $_POST['ogp_detalhes_utilizacao']?? null;
+$ogp_termos_condicoes   = $_POST['ogp_termos_condicoes']   ?? null;
+
 //Processa acoes
 //----------------------------------------------------------------------------------------------------------
 if($msg == ""){
