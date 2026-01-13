@@ -223,7 +223,7 @@ if(is_array($json) && !empty($json) && (!isset($arrBuscaProduto) || empty($arrBu
 <?php 
             if( $objProdutos->object->imagem && 
                 $objProdutos->object->imagem != "" && 
-                file_exists(DIR_WEB .DIR_G_IMG_PRODUTOS . $objProdutos->object->imagem))
+                file_exists(DIR_IMG .DIR_G_IMG_PRODUTOS . $objProdutos->object->imagem))
             {
 ?>
                 <img border="0" class="img-produto" src="<?php echo DIR_G_IMG_PRODUTOS . $objProdutos->object->imagem;?>">
