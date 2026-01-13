@@ -4,7 +4,7 @@ if (!empty($_SERVER['HTTP_REFERER'])) {
     $url_referer = parse_url($_SERVER['HTTP_REFERER']);
     $withLogo = ($url_referer['path'] == '/eprepag/revendedores/index.php');
 }
-$https = "https://";
+$https = "https";
 
 //Id do Publisher
 $opr_codigo = 166;

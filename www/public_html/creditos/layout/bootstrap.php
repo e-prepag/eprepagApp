@@ -4,7 +4,7 @@
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 
-$https = "https://";
+$https = "https";
 
 
 require_once DIR_INCS . "configIP.php";

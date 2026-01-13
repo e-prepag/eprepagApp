@@ -18,7 +18,7 @@ require_once DIR_INCS . "gamer/main.php";
 require_once DIR_CLASS . "gamer/classIntegracao.php";
 require_once DIR_CLASS . "gamer/classLimite.php";
 require_once DIR_INCS . "gamer/functions_endereco.php";
-$https = "https://";
+$https = "https";
 
 require_once DIR_INCS . "config.MeiosPagamentos.php";	
 

@@ -35,7 +35,7 @@ function checkDevice($userId, $pdo, $operador)
     }
 }
 
-$https = "https://";
+$https = "https";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 session_start();
 

@@ -3,7 +3,7 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-$https = "https://";
+$https = "https";
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . 'gamer/controller/HeaderController.class.php';
 $controller = new HeaderController;

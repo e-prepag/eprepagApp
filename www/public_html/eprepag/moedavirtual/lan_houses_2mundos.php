@@ -14,7 +14,7 @@ session_start();
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
 
-$https = "https://";
+$https = "https";
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
 
 // Deixa o drop down nos valores que estavam selecionados antes do reload.

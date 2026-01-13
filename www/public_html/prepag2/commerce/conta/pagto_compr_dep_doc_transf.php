@@ -7,7 +7,7 @@ require_once DIR_CLASS . "gamer/classIntegracao.php";
 
 validaSessao(); 
 require_once DIR_INCS . "gamer/venda_e_modelos_logica_epp.php";
-$https = "https://";
+$https = "https";
 
 $pagina_titulo = "Comprovante " . $GLOBALS['FORMAS_PAGAMENTO_DESCRICAO']['1'];
 $cabecalho_file = isset($GLOBALS['_SESSION']['is_integration']) && $GLOBALS['_SESSION']['is_integration'] == true ? "../includes/cabecalho_int.php" : "../includes/cabecalho.php";

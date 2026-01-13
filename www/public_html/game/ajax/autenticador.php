@@ -381,7 +381,7 @@ function modal_token()
 
 function modal_criar_token($dia_faltam)
 {
-    $https = "https://";
+    $https = "https";
     $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : EPREPAG_URL);
 
     $dataUltimoAcesso = new DateTime($dia_faltam);

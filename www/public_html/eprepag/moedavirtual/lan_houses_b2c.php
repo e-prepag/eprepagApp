@@ -17,7 +17,7 @@ $valorRequestEstado = filter_var($_POST['estado'], FILTER_SANITIZE_STRING);
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
 
-$https = "https://";
+$https = "https";
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
 
 if ((isset($_REQUEST['cidade'])) and (isset($_REQUEST['bairro']))){

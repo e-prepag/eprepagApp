@@ -14,7 +14,7 @@ if(!empty($_SERVER['HTTP_REFERER'])){
     $withLogo = ($url_referer['path'] == '/eprepag/revendedores/index.php');
 }
 
-$https = "https://";
+$https = "https";
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
 //$server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : 'EPREPAG_URL');
 session_start();

@@ -1,6 +1,6 @@
 <?php
 
-$https = "https://";
+$https = "https";
 header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'", true);
 require_once "../../../../includes/constantes.php";
 require_once DIR_INCS . "main.php";

@@ -5,7 +5,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../../../includes/constantes.php";
 require_once  DIR_INCS . "main.php";
 require_once  DIR_INCS . "pdv/main.php";
-$https = "https://";
+$https = "https";
 require_once DIR_INCS . "configIP.php";
 
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');

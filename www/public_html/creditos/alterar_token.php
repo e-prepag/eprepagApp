@@ -6,7 +6,7 @@ require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php
 
 $controller = new OfflineController;
 
-$https = "https://";
+$https = "https";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
 
 $id_do_usuario = $_SESSION['id_do_usuario'] ? $_SESSION['id_do_usuario'] : 0;

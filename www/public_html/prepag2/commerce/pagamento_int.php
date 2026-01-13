@@ -18,7 +18,7 @@ header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'",true
 @require_once DIR_CLASS . "gamer/classIntegracao.php";
 @require_once DIR_CLASS . "gamer/classLimite.php";
 @require_once DIR_INCS . "gamer/functions_endereco.php";
-$https = "https://";
+$https = "https";
 
 @require_once DIR_INCS . "config.MeiosPagamentos.php";	
 

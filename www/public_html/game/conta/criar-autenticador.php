@@ -15,7 +15,7 @@ require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-$https = "https://";
+$https = "https";
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : EPREPAG_URL);
 
 $id_do_usuario = $_SESSION['id_do_usuario'] ? $_SESSION['id_do_usuario'] : 0;

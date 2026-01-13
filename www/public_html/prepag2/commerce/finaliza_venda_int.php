@@ -8,7 +8,7 @@ require_once DIR_CLASS . "gamer/classIntegracao.php";
 @session_start();
 validaSessao();
 
-$https = "https://";
+$https = "https";
 
 $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
 $pagto = $_SESSION['pagamento.pagto'];
