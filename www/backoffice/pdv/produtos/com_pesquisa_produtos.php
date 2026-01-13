@@ -16,17 +16,10 @@ $tf_ogp_mostra_integracao_gamer = $_POST['tf_ogp_mostra_integracao_gamer'] ?? nu
 $tf_ogp_opr_codigo = $_POST['tf_ogp_opr_codigo'] ?? null;
 $tf_opr_status = $_POST['tf_opr_status'] ?? null;
 $BtnSearch = $_POST['BtnSearch'] ?? null;
-$tf_ogp_id = $_GET['tf_ogp_id'] ?? null;
-$tf_ogp_ativo = $_GET['tf_ogp_ativo'] ?? null;
-$tf_ogp_nome = $_GET['tf_ogp_nome'] ?? null;
-$tf_ogp_descricao = $_GET['tf_ogp_descricao'] ?? null;
-$tf_ogp_data_inclusao_ini = $_GET['tf_ogp_data_inclusao_ini'] ?? null;
-$tf_ogp_data_inclusao_fim = $_GET['tf_ogp_data_inclusao_fim'] ?? null;
-$tf_ogp_mostra_integracao_gamer = $_GET['tf_ogp_mostra_integracao_gamer'] ?? null;
-$tf_ogp_opr_codigo = $_GET['tf_ogp_opr_codigo'] ?? null;
-$tf_opr_status = $_GET['tf_opr_status'] ?? null;
-$BtnSearch = $_GET['BtnSearch'] ?? null;
-
+$ncamp = $_REQUEST['ncamp'] ?? null;
+$inicial = $_REQUEST['inicial'] ?? null;
+$range = $_REQUEST['range'] ?? null;
+$ordem = $_REQUEST['ordem'] ?? null;
 
 if(!$ncamp)    $ncamp       = 'ogp_id';
 if(!$inicial)  $inicial     = 0;

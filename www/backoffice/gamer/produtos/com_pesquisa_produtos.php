@@ -16,6 +16,10 @@ $tf_ogp_mostra_integracao = $_POST['tf_ogp_mostra_integracao'] ?? null;
 $tf_ogp_opr_codigo = $_POST['tf_ogp_opr_codigo'] ?? null;
 $tf_opr_status = $_POST['tf_opr_status'] ?? null;
 $BtnSearch = $_POST['BtnSearch'] ?? null;
+$ncamp = $_REQUEST['ncamp'] ?? null;
+$inicial = $_REQUEST['inicial'] ?? null;
+$range = $_REQUEST['range'] ?? null;
+$ordem = $_REQUEST['ordem'] ?? null;
 
 $time_start = getmicrotime();
 
