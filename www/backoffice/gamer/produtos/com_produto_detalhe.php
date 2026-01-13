@@ -5,7 +5,7 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/gamer/main.php";
 require_once $raiz_do_projeto."class/util/Util.class.php";
 
-$produto_id = $_POST['produto_id'] ?? null;
+$produto_id = $_REQUEST['produto_id'] ?? null;
 $ogp_ativo = $_POST['ogp_ativo'] ?? null;
 $ogp_mostra_integracao = $_POST['ogp_mostra_integracao'] ?? null;
 $ogp_iof = $_POST['ogp_iof'] ?? null;
