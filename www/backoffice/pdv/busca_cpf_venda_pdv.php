@@ -11,18 +11,13 @@ require_once $raiz_do_projeto."class/util/Util.class.php";
 require_once $raiz_do_projeto."includes/gamer/constantes.php";
 require_once $raiz_do_projeto."includes/complice/functions.php";
 
-$dataClickIni = $_POST['dataClickIni'] ?? null;
-$dataClickFim = $_POST['dataClickFim'] ?? null;
-$publishers = $_POST['publishers'] ?? null;
-$cpf = $_POST['cpf'] ?? null;
-$busca = $_POST['busca'] ?? null;
-$buscar = $_POST['buscar'] ?? null;
-$dataClickIni = $_GET['dataClickIni'] ?? null;
-$dataClickFim = $_GET['dataClickFim'] ?? null;
-$publishers = $_GET['publishers'] ?? null;
-$cpf = $_GET['cpf'] ?? null;
-$busca = $_GET['busca'] ?? null;
-$buscar = $_GET['buscar'] ?? null;
+$dataClickIni = $_REQUEST['dataClickIni'] ?? null;
+$dataClickFim = $_REQUEST['dataClickFim'] ?? null;
+$publishers = $_REQUEST['publishers'] ?? null;
+$cpf = $_REQUEST['cpf'] ?? null;
+$busca = $_REQUEST['busca'] ?? null;
+$buscar = $_REQUEST['buscar'] ?? null;
+
 
 if(empty($dataClickIni) || !Util::checkValidDate($dataClickIni)) 
     $dataClickIni = date('d/m/Y');
