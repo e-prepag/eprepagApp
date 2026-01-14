@@ -74,6 +74,27 @@ $novo_ug_estado                         = $_POST['novo_ug_estado'] ?? null;
 $novo_ug_risco_classif                  = $_POST['novo_ug_risco_classif'] ?? null;
 
 
+$novo_ug_data_aprovacao = $_POST['novo_ug_data_aprovacao'] ?? null;
+
+$novo_ug_abertura_mes = $_POST['novo_ug_abertura_mes'] ?? null;
+$novo_ug_abertura_ano = $_POST['novo_ug_abertura_ano'] ?? null;
+
+$novo_ug_canais_venda = $_POST['novo_ug_canais_venda'] ?? null;
+
+$novo_ug_repr_legal_cel_ddi = $_POST['novo_ug_repr_legal_cel_ddi'] ?? null;
+$novo_ug_repr_legal_del_ddd = $_POST['novo_ug_repr_legal_del_ddd'] ?? null;
+$novo_ug_repr_legal_cel = $_POST['novo_ug_repr_legal_cel'] ?? null;
+
+$novo_ug_contato01_cargo = $_POST['novo_ug_contato01_cargo'] ?? null;
+
+$novo_ug_cel_ddi = $_POST['novo_ug_cel_ddi'] ?? null;
+$novo_ug_cel_ddd = $_POST['novo_ug_cel_ddd'] ?? null;
+$novo_ug_cel = $_POST['novo_ug_cel'] ?? null;
+
+$novo_ug_observacoes = $_POST['novo_ug_observacoes'] ?? null;
+
+$novo_ug_substatus = $_POST['novo_ug_substatus'] ?? null;
+
 $grupos = unserialize($_SESSION["arrIdGrupos"]);
 
 function getEstilosUsuarioPDO($userId, PDO $pdo)
