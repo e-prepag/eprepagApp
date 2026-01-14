@@ -18,7 +18,7 @@ function compararDatas($data_inicial, $data_final) {
         return 0; // erro na data
     }
 }
-function gerarXmlMovimentacao($data_inicial, $data_final, $tipo_cliente)
+function gerarXmlMovimentacao($data_inicial, $data_final)
 {
 	if(compararDatas($data_inicial, $data_final) < 1){
 		return [];
@@ -30,6 +30,63 @@ function gerarXmlMovimentacao($data_inicial, $data_final, $tipo_cliente)
 
 	$xmls = $efinanceira->gerarLotesMovsFinanceira($movimentacoes);
 
+    
+
 	return $xmls;
 }
 
+function xmlViewer($xmlString, $id = 'xmlViewer') {
+    if (empty($xmlString)) {
+        return '<div class="alert alert-warning">XML vazio</div>';
+    }
+
+    return <<<HTML
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Visualizador de XML</strong>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary me-2" onclick="copiarXml('$id')">
+                Copiar
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleXml('$id')">
+                Expandir / Colapsar
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <pre class="xml-box" id="$id"><code class="language-xml">$xmlString</code></pre>
+    </div>
+</div>
+HTML;
+}
+
+function gerarZipLotes(array $lotes, string $nomeZip): string
+{
+    $dirTemp = sys_get_temp_dir();
+    $zipPath = $dirTemp . '/' . $nomeZip;
+
+    $zip = new ZipArchive();
+
+    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        throw new Exception('Não foi possível criar o ZIP');
+    }
+
+    foreach ($lotes as $lote) {
+
+        $nomeArquivo = "lote_{$lote['ano_mes']}_{$lote['lote_numero']}";
+
+        if ($lote['xml'] instanceof DOMDocument) {
+            $conteudo = $lote['xml']->saveXML();
+        } elseif (is_string($lote['xml'])) {
+            $conteudo = $lote['xml'];
+        } else {
+            throw new Exception('XML inválido para o arquivo ' . $nomeArquivo);
+        }
+
+        $zip->addFromString($nomeArquivo . '.xml', $conteudo);
+    }
+
+    $zip->close();
+
+    return $zipPath;
+}

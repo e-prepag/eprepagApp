@@ -1,19 +1,21 @@
 <?php
 require_once '/www/includes/constantes.php';
-require_once $raiz_do_projeto . "backoffice/includes/topo.php";
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL); 
+require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
-$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] . " 23:59:59" : "";
+$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
 $data_final_sem_hora = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
 $tipo_cliente = isset($_GET['tipo_cliente']) ? $_GET['tipo_cliente'] : 4;
-$data_atual = date('Y-m-d', strtotime('-1 Day'));
+$data_atual = date('Y-m-d');
 $horario_str = isset($_GET['horario_str']) ? $_GET['horario_str'] : 1;
 
 $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs' : ($tipo_cliente == 2 ? 'Gamers' : 'Desconhecido'));
 ?>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
@@ -23,6 +25,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 		left: 50px;
 
 	}
+
 	#data-help-icon::after {
 		left: 20px;
 	}
@@ -155,6 +158,18 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 		font-size: 21px;
 	}
 
+	.xml-box {
+		font-size: 14px;
+		max-height: 500px;
+		overflow: auto;
+		background: #f8f9fa;
+		border-radius: 6px;
+		padding: 15px;
+	}
+
+	.xml-colapsado {
+		max-height: 120px !important;
+	}
 
 	@media (max-width: 480px) {
 
@@ -174,16 +189,6 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 </style>
 
 <div>
-	<div class="col-md-12">
-		<ol class="breadcrumb top10">
-			<li><a href="#" class="muda-aba" ordem="<?php echo $currentAba->getOrdem(); ?>">BackOffice -
-					<?php echo $currentAba->getDescricao(); ?></a></li>
-			<li class="active"><?php echo $sistema->menu[0]->getDescricao(); ?></li>
-			<li class="active"><a
-					href="<?php echo $sistema->item->getLink(); ?>"><?php echo $sistema->item->getDescricao(); ?></a>
-			</li>
-		</ol>
-	</div>
 	<h2 class="titulo-vencimento">Saldos diários - Lista</h2>
 	<form id="form1" action="#" method="get" class="form-solicitacoes">
 		<div class="container-cancel-pins">
@@ -213,7 +218,7 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 		<div class="d-flex top10 custom-justify">
 			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
 				<a class="btn btn-success btn-info"
-					href="gerar_csv.php?
+					href="gerar_zip.php?
 					data_inicial=<?= urlencode($data_inicial) ?>
 					&data_final=<?= urlencode($data_final_sem_hora) ?>
 					&tipo_cliente=<?= urlencode($tipo_cliente) ?>"
@@ -232,14 +237,29 @@ $tipo_cliente_texto = $tipo_cliente == 4 ? 'Todos' : ($tipo_cliente == 3 ? 'PDVs
 	</div>
 
 	<?php
-	require_once __DIR__ . "/functions_saldos.php";
-	$dados = buscarSaldosDiarios($data_inicial, $data_final, $tipo_cliente);
-	echo gerarTabelaClientes($dados, $tipo_cliente);
+	require_once __DIR__ . "/functions_e_financeira.php";
+	$dados = gerarXmlMovimentacao($data_inicial, $data_final);
+	foreach ($dados as $dado) {
+		echo xmlViewer(utf8_decode(htmlspecialchars($dado['xml'])), "{$dado['ano_mes']}_{$dado['lote_numero']}");
+	}
 	//echo json_encode($dados);
 	?>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
+	function copiarXml(id) {
+		const text = document.getElementById(id).innerText;
+		navigator.clipboard.writeText(text).then(() => {
+			alert('XML copiado com sucesso!');
+		});
+	}
+
+	function toggleXml(id) {
+		$('#' + id).toggleClass('xml-colapsado');
+	}
 	$(document).ready(function() {
+		hljs.highlightAll();
+
 		document.querySelectorAll('.help-icon').forEach(icon => {
 			icon.addEventListener('click', () => {
 				const tooltip = icon.querySelector('.tooltiptext');

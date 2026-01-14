@@ -114,7 +114,7 @@ class GerarEFinanceira
                         JOIN 
                             dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                         WHERE 
-                            (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta :data_inicio AND :data_fim)
+                            (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio AND :data_fim)
                             AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
                         GROUP BY 
                             ug.ug_id,
@@ -244,7 +244,7 @@ class GerarEFinanceira
                             JOIN 
                                 dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                             WHERE 
-                                (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta :data_inicio AND :data_fim)
+                                (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio AND :data_fim)
                                 AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
                             GROUP BY 
                                 ug.ug_id,
@@ -395,7 +395,7 @@ class GerarEFinanceira
                                 JOIN 
                                     usuarios_games_saldo_log sl ON ug.ug_id = sl.ugsl_ug_id
                                 WHERE 
-                                    (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta :data_inicio AND :data_fim)
+                                    (ug.ug_ativo = 1 OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio AND :data_fim)
                                     AND sl.ugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
                                 GROUP BY 
                                     ug.ug_id,
@@ -742,11 +742,27 @@ class GerarEFinanceira
     }
 
 
+    private function inicioDoSemestre(string $data): string
+    {
+        $dt = new DateTime($data);
+        $ano = $dt->format('Y');
+        $mes = (int) $dt->format('m');
+
+        if ($mes <= 6) {
+            return "$ano-01-01";
+        }
+
+        return "$ano-07-01";
+    }
+
+
     public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
     {
         // 1. Obtenção e Agrupamento dos Dados
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio, $fim);
-        $dadosPF = $this->obterDadosMovFinPF($inicio, $fim);
+        $inicio_semestre = $this->inicioDoSemestre($inicio);
+
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $fim);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $fim);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
@@ -757,11 +773,16 @@ class GerarEFinanceira
         // Variável para IDs únicos (opcional, pode ser movida para dentro do loop do mês se preferir recontar)
         $id_mov = 100;
 
+        $inicioMesAno = substr(str_replace($inicio, '-', ''), 0, 6);
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if(!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])){
+                if($inicioMesAno >= $mes){
+                    continue;
+                }
+                
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
                 }
                 // CRIA O XML (ou o objeto XML/Evento)
@@ -1478,7 +1499,7 @@ class GerarEFinanceira
      * @return string O XML completo do lote (sem criptografia).
      * @throws Exception
      */
-    public function gerarLoteAssincrono(array $eventos)
+    /*public function gerarLoteAssincrono(array $eventos)
     {
         $nsLote = 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0';
 
@@ -1513,9 +1534,49 @@ class GerarEFinanceira
 
         // 5. Retorna a string XML completa
         return $xmlString;
+    }*/
+    public function gerarLoteAssincrono(array $eventos)
+    {
+        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom->formatOutput = true;
+
+        $root = $dom->createElementNS(
+            'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0',
+            'eFinanceira'
+        );
+
+        $dom->appendChild($root);
+
+        $lote = $dom->createElement('loteEventosAssincrono');
+        $root->appendChild($lote);
+
+        $lote->appendChild($dom->createElement('cnpjDeclarante', $this->cnpjEPP));
+
+        $eventosNode = $dom->createElement('eventos');
+        $lote->appendChild($eventosNode);
+
+        foreach ($eventos as $ev) {
+            if ($ev['xml'] instanceof DOMDocument) {
+                $ev['xml'] = $ev['xml']->saveXML($ev['xml']->documentElement);
+            }
+
+            $evento = $dom->createElement('evento');
+            $evento->setAttribute('id', $ev['id']);
+
+            $eventoDom = new DOMDocument();
+            $eventoDom->loadXML($ev['xml']);
+
+            $imported = $dom->importNode(
+                $eventoDom->documentElement,
+                true
+            );
+
+            $evento->appendChild($imported);
+            $eventosNode->appendChild($evento);
+        }
+
+        return $dom->saveXML();
     }
-
-
 
     private function obterTagEventoAssinar(DOMElement $eventoElement)
     {
