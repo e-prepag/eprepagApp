@@ -9,7 +9,6 @@ require_once $raiz_do_projeto."includes/pdv/inc_pesquisa_usuarios_sql.php";
 
 set_time_limit ( 30000 ) ;
 
-$tf_u_com_totais_vendas         = $_POST['tf_u_com_totais_vendas'] ?? null;
 $dd_opr_codigo                 = $_POST['dd_opr_codigo'] ?? null;
 $produtos_query                = $_POST['produtos_query'] ?? null;
 $tf_u_codigo                   = $_POST['tf_u_codigo'] ?? null;
@@ -83,7 +82,9 @@ $tf_ug_possui_restricao_produtos = $_POST['tf_ug_possui_restricao_produtos'] ?? 
 $tf_u_tipo_venda               = $_POST['tf_u_tipo_venda'] ?? null;
 $tf_tipo                       = $_POST['tf_tipo'] ?? null;
 $isAjax                        = $_POST['isAjax'] ?? null;
-
+$tf_v_data_inclusao_ini             = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim             = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$tf_u_com_totais_vendas            = $_POST['tf_u_com_totais_vendas'] ?? null;
 
 $run_silently = "OK";
 

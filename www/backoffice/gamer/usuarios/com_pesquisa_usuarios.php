@@ -57,7 +57,12 @@ $tf_u_integracao_origem              = $_POST['tf_u_integracao_origem'] ?? null;
 
 $tf_u_habilitado_cielo               = $_POST['tf_u_habilitado_cielo'] ?? null;
 $tf_u_usuario_vip                    = $_POST['tf_u_usuario_vip'] ?? null;
+$tf_u_com_totais_vendas            = $_POST['tf_u_com_totais_vendas'] ?? null;
 
+$ncamp = $_REQUEST['ncamp'] ?? null;
+$inicial = $_REQUEST['inicial'] ?? null;
+$range = $_REQUEST['range'] ?? null;
+$ordem = $_REQUEST['ordem'] ?? null;
 
 if(!$ncamp)    $ncamp       = 'ug_id';
 if(!$inicial)  $inicial     = 0;
