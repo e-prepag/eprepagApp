@@ -82,7 +82,7 @@ $novo_ug_abertura_ano = $_POST['novo_ug_abertura_ano'] ?? null;
 $novo_ug_canais_venda = $_POST['novo_ug_canais_venda'] ?? null;
 
 $novo_ug_repr_legal_cel_ddi = $_POST['novo_ug_repr_legal_cel_ddi'] ?? null;
-$novo_ug_repr_legal_del_ddd = $_POST['novo_ug_repr_legal_del_ddd'] ?? null;
+$novo_ug_repr_legal_cel_ddd = $_POST['novo_ug_repr_legal_cel_ddd'] ?? null;
 $novo_ug_repr_legal_cel = $_POST['novo_ug_repr_legal_cel'] ?? null;
 
 $novo_ug_contato01_cargo = $_POST['novo_ug_contato01_cargo'] ?? null;
@@ -1278,7 +1278,7 @@ if (!$usuario_id || !is_numeric($usuario_id)) {
                             <td><b>Celular</b></td>
                             <td>(<input type="text" name="novo_ug_repr_legal_cel_ddi"
                                     value="<?php echo $objUsuarioGames->getReprLegalCelDDI() ?>" maxlength="2" size="2"
-                                    class="texto">) (<input type="text" name="novo_ug_repr_legal_del_ddd"
+                                    class="texto">) (<input type="text" name="novo_ug_repr_legal_cel_ddd"
                                     value="<?php echo $objUsuarioGames->getReprLegalCelDDD() ?>" maxlength="2" size="2"
                                     class="texto">) <input type="text" name="novo_ug_repr_legal_cel"
                                     value="<?php echo $objUsuarioGames->getReprLegalCel() ?>" maxlength="9" size="9"
