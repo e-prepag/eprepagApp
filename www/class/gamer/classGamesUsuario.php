@@ -1600,6 +1600,13 @@ class UsuarioGames
     {
 
         try {
+
+            // Caso especifico de cadastro sem CPF
+            $cpfLimpo = preg_replace('/\D/', '', trim((string)$cpf));
+            if ($cpfLimpo === '') {
+                return;
+            }
+
             // Inicializando a query base
             $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
 
