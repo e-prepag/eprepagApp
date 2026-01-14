@@ -5,7 +5,6 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
-require_once $raiz_do_projeto."includes/pdv/inc_pesquisa_usuarios_sql.php";
 
 set_time_limit ( 30000 ) ;
 
@@ -85,6 +84,8 @@ $isAjax                        = $_POST['isAjax'] ?? null;
 $tf_v_data_inclusao_ini             = $_POST['tf_v_data_inclusao_ini'] ?? null;
 $tf_v_data_inclusao_fim             = $_POST['tf_v_data_inclusao_fim'] ?? null;
 $tf_u_com_totais_vendas            = $_POST['tf_u_com_totais_vendas'] ?? null;
+
+require_once $raiz_do_projeto."includes/pdv/inc_pesquisa_usuarios_sql.php";
 
 $run_silently = "OK";
 
