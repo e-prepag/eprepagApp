@@ -4,6 +4,9 @@ require_once "/www/includes/bourls.php";
 //ini_set("display_errors", 1); 
 //header("Content-Type: text/html; charset=UTF-8",true);
 //header("Content-Type: text/html; charset=ISO-8859-1",true);
+
+$BtnSearch = $_POST['BtnSearch'] ?? null;
+
 function removerAcentos($array, $recursive = true) {
     $resultado = [];
     
