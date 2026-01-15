@@ -85,9 +85,9 @@ $novo_ug_repr_legal_cel_ddi = $_POST['novo_ug_repr_legal_cel_ddi'] ?? null;
 $novo_ug_repr_legal_cel_ddd = $_POST['novo_ug_repr_legal_cel_ddd'] ?? null;
 $novo_ug_repr_legal_cel = $_POST['novo_ug_repr_legal_cel'] ?? null;
 
-$novo_ug_repr_legal_tel_ddi = $_POST['novo_ug_repr_legal_tel_ddi'] ?? null;
+$novo_ug_repr_legal_cel_ddi = $_POST['novo_ug_repr_legal_tel_ddi'] ?? null;
 $novo_ug_repr_legal_tel_ddd = $_POST['novo_ug_repr_legal_tel_ddd'] ?? null;
-$novo_ug_repr_legal_tel = $_POST['novo_ug_repr_legal_tel'] ?? null;
+$novo_ug_repr_legal_cel = $_POST['novo_ug_repr_legal_tel'] ?? null;
 
 
 $novo_ug_contato01_cargo = $_POST['novo_ug_contato01_cargo'] ?? null;
@@ -99,6 +99,10 @@ $novo_ug_cel = $_POST['novo_ug_cel'] ?? null;
 $novo_ug_observacoes = $_POST['novo_ug_observacoes'] ?? null;
 
 $novo_ug_substatus = $_POST['novo_ug_substatus'] ?? null;
+
+$novo_ug_site = $_POST['novo_ug_site'] ?? null;
+
+$novo_ug_repr_legal_email = $_POST['novo_ug_repr_legal_email'] ?? null;
 
 $grupos = unserialize($_SESSION["arrIdGrupos"]);
 
