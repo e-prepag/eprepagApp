@@ -1595,6 +1595,46 @@ class UsuarioGames
         return $ret_id;
     }
 
+    // Caso especifico - CPF duplicado (mesmo usuário)
+    function validaDuplicidadeCorreta($cpf, $usuario_id_excessao)
+    {
+        $sql = "
+            SELECT COUNT(ug_id) AS contas
+            FROM usuarios_games ug
+            WHERE regexp_replace(ug.ug_cpf, '[^0-9]', '', 'g')
+                = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')
+            AND NOT EXISTS (
+                SELECT 1
+                FROM usuarios_games ug2
+                WHERE ug2.ug_id = :ug_id
+                    AND regexp_replace(ug2.ug_cpf, '[^0-9]', '', 'g')
+                        = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')
+            )
+        ";
+
+        // Conexão PDO
+        $con = ConnectionPDO::getConnection();
+        $pdo = $con->getLink();
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Prepare
+        $rs = $pdo->prepare($sql);
+
+        // Bind CPF
+        $cpf = SQLaddFields(trim($cpf), "s");
+        $rs->bindParam(':ug_cpf', $cpf, PDO::PARAM_STR);
+
+        // Bind ID de exceção
+        $user_id = SQLaddFields(trim($usuario_id_excessao), "");
+        $rs->bindParam(':ug_id', $user_id, PDO::PARAM_INT);
+
+        // Execução
+        $rs->execute();
+        $info = $rs->fetch(PDO::FETCH_ASSOC);
+
+        // TRUE = CPF válido (não duplicado)
+        return isset($info['contas']) && $info['contas'] == 0;
+    }
 
     function existeCPF($cpf, $usuario_id_excessao)
     {
@@ -1612,6 +1652,13 @@ class UsuarioGames
 
             // Se o userId for fornecido, adicionar uma condição para excluir esse ID da verificação
             if ($usuario_id_excessao !== null) {
+
+                // Caso especifico - CPF duplicado (mesmo usuário)
+                $duplicidadeValida = UsuarioGames::validaDuplicidadeCorreta($cpf, $usuario_id_excessao);
+                if ($duplicidadeValida == true) {
+                    return "";
+                }
+
                 $sql .= " and ug_id != :ug_id";
             }
 
