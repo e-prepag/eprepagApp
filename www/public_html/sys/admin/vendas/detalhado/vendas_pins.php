@@ -131,7 +131,60 @@ if ($BtnSearch) {
                 FROM (
                 ";
     if (strtoupper($fcanal) == 'L' || empty($fcanal)) {
-        $sql .= "
+        if ($por_utilizacao) {
+
+            $sql .= "(SELECT DISTINCT
+                            t0.pin_codinterno,
+                            t0.pin_codigo AS case_codigo,
+                            t1.opr_nome,
+                            t0.pin_valor,
+                            t0.opr_codigo,
+                            t0.pin_datavenda,
+                            t0.pin_horavenda,
+                            CASE 
+                                WHEN t0.pin_status = '3' THEN 'G'
+                                WHEN t0.pin_status IN ('6','8') THEN 'L'
+                            END AS vg_canal
+                        FROM pins t0
+                        JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
+                        JOIN pins_status t3 ON t0.pin_status = t3.stat_codigo
+                        JOIN pins_integracao_historico pih 
+                               ON pih.pih_pin_id = t0.pin_codinterno 
+                        LEFT JOIN tb_venda_games_modelo_pins vp 
+                               ON vp.vgmp_pin_codinterno = t0.pin_codinterno
+                        WHERE pih.pin_status = 8 AND pih.pih_codretepp = '2' AND vp.vgmp_pin_codinterno IS NULL";
+
+            if ($tf_data_inicial && $tf_data_final) {
+                $data_inic = formata_data(trim($tf_data_inicial), 1);
+                $data_fim = formata_data(trim($tf_data_final), 1);
+                $sql .= " and (pih.pih_data between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "  23:59:59')  " . PHP_EOL;
+            }
+            if ($dd_opr_codigo) {
+                $sql .= " and t0.opr_codigo=" . $dd_opr_codigo . " and t0.pin_status <> '9'" . PHP_EOL;
+            }
+
+            $sql .= "UNION ALL
+
+                        SELECT DISTINCT
+                            t0.pin_codinterno,
+                            t0.pin_codigo AS case_codigo,
+                            t1.opr_nome,
+                            t0.pin_valor,
+                            t0.opr_codigo,
+                            t0.pin_datavenda,
+                            t0.pin_horavenda,
+                            CASE 
+                                WHEN t0.pin_status = '3' THEN 'G'
+                                WHEN t0.pin_status IN ('6','8') THEN 'L'
+                            END AS vg_canal
+                        FROM pins t0
+                        JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
+                        JOIN pins_status t3 ON t0.pin_status = t3.stat_codigo
+                        JOIN tb_venda_games_modelo_pins vp 
+                             ON vp.vgmp_pin_codinterno = t0.pin_codinterno
+                        WHERE 1=1 ";
+        } else {
+            $sql .= "
                    (select 
                         distinct t0.pin_codinterno, 
                         pin_codigo as case_codigo, 
@@ -148,25 +201,18 @@ if ($BtnSearch) {
                     from pins t0
                     JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
 					JOIN pins_status t3 ON t0.pin_status = t3.stat_codigo
-					" . ($por_utilizacao ? "" : "LEFT ") . "JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno AND pih.pin_status = 8 AND pih.pih_codretepp = '2'
+					LEFT JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno
                     where 1=1" . PHP_EOL;
+        }
         if ($tf_data_inicial && $tf_data_final) {
             $data_inic = formata_data(trim($tf_data_inicial), 1);
             $data_fim = formata_data(trim($tf_data_final), 1);
-            if ($por_utilizacao) {
-                $sql .= " 
-                        and (pih.pih_data between '" . trim($data_inic) . "' and  '" . trim($data_fim) . " 23:59:59')  " . PHP_EOL;
-            }else{
-                $sql .= " 
-                        and (pin_datavenda between '" . trim($data_inic) . "' and  '" . trim($data_fim) . " 23:59:59')  " . PHP_EOL;
-            }
+            $sql .= " and (pin_datavenda between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
         }
         if ($dd_opr_codigo) {
-            $sql .= " 
-                        and (t0.opr_codigo=" . $dd_opr_codigo . ")" . PHP_EOL;
+            $sql .= " and (t0.opr_codigo=" . $dd_opr_codigo . ") and t0.pin_status <> '9'" . PHP_EOL;
         }
-        $sql .= " 
-                     ) " . PHP_EOL;
+        $sql .= " ) " . PHP_EOL;
     } //end if($fcanal == 'L') 
 
     if (strtoupper($fcanal) == 'C' || empty($fcanal)) {
