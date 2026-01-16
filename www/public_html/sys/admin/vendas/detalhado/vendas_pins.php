@@ -163,7 +163,7 @@ if ($BtnSearch) {
         }
         if ($dd_opr_codigo) {
             $sql .= " 
-                        and (t0.opr_codigo=" . $dd_opr_codigo . ") and t0.pin_status <> '9'" . PHP_EOL;
+                        and (t0.opr_codigo=" . $dd_opr_codigo . ")" . PHP_EOL;
         }
         $sql .= " 
                      ) " . PHP_EOL;
