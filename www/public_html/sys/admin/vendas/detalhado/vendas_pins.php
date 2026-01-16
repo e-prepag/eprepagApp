@@ -148,13 +148,18 @@ if ($BtnSearch) {
                     from pins t0
                     JOIN operadoras t1 ON t0.opr_codigo = t1.opr_codigo
 					JOIN pins_status t3 ON t0.pin_status = t3.stat_codigo
-					" . ($por_utilizacao ? "" : "LEFT ") . "JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno
+					" . ($por_utilizacao ? "" : "LEFT ") . "JOIN pins_integracao_historico pih ON pih.pih_pin_id = t0.pin_codinterno AND pih.pin_status = 8 AND pih.pih_codretepp = '2'
                     where 1=1" . PHP_EOL;
         if ($tf_data_inicial && $tf_data_final) {
             $data_inic = formata_data(trim($tf_data_inicial), 1);
             $data_fim = formata_data(trim($tf_data_final), 1);
-            $sql .= " 
+            if ($por_utilizacao) {
+                $sql .= " 
+                        and (pih.pih_data between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
+            }else{
+                $sql .= " 
                         and (pin_datavenda between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
+            }
         }
         if ($dd_opr_codigo) {
             $sql .= " 
