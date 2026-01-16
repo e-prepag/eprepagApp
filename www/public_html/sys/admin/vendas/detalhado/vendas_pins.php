@@ -155,10 +155,10 @@ if ($BtnSearch) {
             $data_fim = formata_data(trim($tf_data_final), 1);
             if ($por_utilizacao) {
                 $sql .= " 
-                        and (pih.pih_data between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
+                        and (pih.pih_data::date between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
             }else{
                 $sql .= " 
-                        and (pin_datavenda between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
+                        and (pin_datavenda::date between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
             }
         }
         if ($dd_opr_codigo) {
