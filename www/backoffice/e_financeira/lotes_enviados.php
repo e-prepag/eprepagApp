@@ -216,12 +216,6 @@ $data_atual = date('Y-m');
 					&data_final=<?= urlencode($data_final) ?>
 					&acao=criptografar"
 					target="_blank">Baixar Cript. e Assin.</a>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=enviar"
-					target="_blank">Enviar</a>
 			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>

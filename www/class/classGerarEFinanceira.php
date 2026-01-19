@@ -758,6 +758,18 @@ class GerarEFinanceira
 
     public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
     {
+        $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
+        $data_fim = DateTime::createFromFormat('Y-m', $fim);
+
+        $erros = DateTime::getLastErrors();
+
+        if ($data_inicio === false || $data_fim === false || $erros['error_count'] > 0) {
+            return false;
+        }
+
+        $inicio = $data_inicio->format('Y-m-01');
+        $fim = $data_fim->format('Y-m-t');
+
         // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
@@ -773,15 +785,15 @@ class GerarEFinanceira
         // Variável para IDs únicos (opcional, pode ser movida para dentro do loop do mês se preferir recontar)
         $id_mov = 100;
 
-        $inicioMesAno = substr(str_replace($inicio, '-', ''), 0, 6);
+        $inicioMesAno = substr(str_replace('-', '', $inicio), 0, 6);
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if($inicioMesAno >= $mes){
+                if ($inicioMesAno >= $mes) {
                     continue;
                 }
-                
+
                 if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
                 }
@@ -816,6 +828,13 @@ class GerarEFinanceira
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
+                if ($inicioMesAno >= $mes) {
+                    continue;
+                }
+
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                    continue;
+                }
                 // CRIA O XML (ou o objeto XML/Evento)
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
@@ -876,63 +895,6 @@ class GerarEFinanceira
         }
 
         return $lotesArray;
-    }
-
-    function chamarServicoEnviar($xmlCriptografado, $producao = false, $usarGzip = false)
-    {
-        // 1. Montar a URL com os query parameters
-        $urlBase = 'http://assinador:5000/assinar';
-        $queryParams = [
-            'producao' => $producao ? 'true' : 'false',
-            'usar_gzip' => $usarGzip ? 'true' : 'false'
-        ];
-        $url = $urlBase . '?' . http_build_query($queryParams);
-
-        // 2. Montar os cabeçalhos (headers)
-        $headers = [
-            // O Python espera a senha neste cabeçalho
-            'X-Certificate-Password: ' . $this->senhaCertificado,
-            // Essencial: Informa que o body é XML cru
-            'Content-Type: application/xml; charset=utf-8',
-            'Content-Length: ' . strlen($xmlCriptografado)
-        ];
-
-        // 3. Configurar o cURL
-        $ch = curl_init($url);
-
-        curl_setopt_array($ch, [
-            // Define o método como POST
-            CURLOPT_POST => true,
-            // Envia o XML criptografado "cru" no body
-            CURLOPT_POSTFIELDS => $xmlCriptografado,
-            // Define os cabeçalhos (incluindo a senha)
-            CURLOPT_HTTPHEADER => $headers,
-            // Queremos a resposta como string
-            CURLOPT_RETURNTRANSFER => true,
-            // Timeouts
-            CURLOPT_TIMEOUT => 150, // Timeout total (120s da Receita + 30s de margem)
-            CURLOPT_CONNECTTIMEOUT => 30
-        ]);
-
-        // 4. Executar e tratar erros
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-
-        curl_close($ch);
-
-        if ($response === false) {
-            throw new Exception("Falha de cURL ao chamar /enviar: " . $curlError);
-        }
-
-        // Se o microsserviço retornar um erro (ex: 400, 500), ele manda JSON
-        if ($httpCode !== 200) {
-            // A $response provavelmente é um JSON com {"erro": ...}
-            throw new Exception("Serviço /enviar retornou erro HTTP $httpCode: " . $response);
-        }
-
-        // Se $httpCode é 200, a $response é o XML da Receita
-        return $response;
     }
 
     private function obterUltimoIdEnvio()
@@ -1637,6 +1599,18 @@ class GerarEFinanceira
         return null;
     }
 
+    private function is_xml($data)
+    {
+        if (empty($data)) return false;
+
+        // Desativa erros do libxml para não poluir o log e limpa depois
+        libxml_use_internal_errors(true);
+        $doc = simplexml_load_string($data);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+
+        return $doc !== false && empty($errors);
+    }
 
     public function assinarLoteEventos($xml)
     {
@@ -1650,10 +1624,17 @@ class GerarEFinanceira
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $resposta = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
         if ($resposta === false) {
             throw new Exception("Falha ao chamar serviço de assinatura");
+        }
+        if ($httpCode !== 200) {
+            throw new Exception("O serviço retornou um erro HTTP: $httpCode. Resposta: " . substr($resposta, 0, 100));
+        }
+        if (!$this->is_xml($resposta)) {
+            throw new Exception("A resposta do serviço não é um XML válido.");
         }
 
         return $resposta;
@@ -1671,7 +1652,7 @@ class GerarEFinanceira
         if ($prod) {
             $postFields = [
                 'xml' => $xmlConteudo,
-                'cert_path' => "/certs/efinanceira-producao-2025.cer"
+                'prod' => "true"
             ];
         } else {
             $postFields = [
@@ -1689,6 +1670,9 @@ class GerarEFinanceira
         if ($resposta === false || $httpCode !== 200) {
             throw new Exception("Falha ao chamar serviço de criptografia (HTTP $httpCode): " . $resposta);
         }
+        if (!$this->is_xml($resposta)) {
+            throw new Exception("A resposta do serviço não é um XML válido.");
+        }
 
         return $resposta;
     }
@@ -1698,7 +1682,7 @@ class GerarEFinanceira
     {
         // Definir endpoint
         if ($producao) {
-            $urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
+            //$urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
         } else {
             $urlBase = 'https://pre-efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
         }
@@ -1726,14 +1710,10 @@ class GerarEFinanceira
                 'Content-Length: ' . strlen($xmlString)
             ],
 
-            // --- CORREÇÃO AQUI ---
             // Autenticação mútua TLS com PFX
             CURLOPT_SSLCERT => $this->certificado, // O caminho para /certs/cert-eprepag.pfx
             CURLOPT_SSLCERTPASSWD => $this->senhaCertificado,
             CURLOPT_SSLCERTTYPE => 'P12',
-            // A linha CURLOPT_SSLKEY foi removida
-            // --- FIM DA CORREÇÃO ---
-
             // Segurança TLS
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,

@@ -76,7 +76,12 @@ app.MapPost("/criptografar", async (HttpRequest request, CriptografadorService c
 
         var form = await request.ReadFormAsync();
         var xml = form["xml"].ToString();
-        var certPath = "/certs/pre-efinanceira-receita-fazenda-gov-br-2025.cer";
+        var certPath;
+        if(form["prod"].ToString() == "true"){
+            certPath = "/certs/efinanceira-receita-fazenda-gov-br-2025.cer";
+        }else{
+            certPath = "/certs/pre-efinanceira-receita-fazenda-gov-br-2025.cer";
+        }
 
         if (string.IsNullOrWhiteSpace(xml))
             return Results.BadRequest(new { erro = "XML é obrigatório" });
