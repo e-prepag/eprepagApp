@@ -5,6 +5,16 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
 $modelo_id = $_GET['modelo_id'] ?? null;
+$ogpm_ogp_id = $_POST['ogpm_ogp_id'] ?? null;
+$ogpm_ativo = $_POST['ogpm_ativo'] ?? null;
+$ogpm_pin_valor = $_POST['ogpm_pin_valor'] ?? null;
+$ogpm_valor = $_POST['ogpm_valor'] ?? null;
+$ogpm_valor_eppcash = $_POST['ogpm_valor_eppcash'] ?? null;
+$opr_markup = $_POST['opr_markup'] ?? null;
+$ogpm_nome = $_POST['ogpm_nome'] ?? null;
+$ogpm_descricao = $_POST['ogpm_descricao'] ?? null;
+$ogpm_pin_resquest_id = $_POST['ogpm_pin_resquest_id'] ?? null;
+$BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
 
 	$msg = "";
 
