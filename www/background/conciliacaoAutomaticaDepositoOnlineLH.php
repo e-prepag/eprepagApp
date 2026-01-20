@@ -5,7 +5,6 @@ ini_set('max_execution_time', 3600);
 
 // include do arquivo contendo IPs DEV
 require_once "../includes/main.php";
-require_once $raiz_do_projeto . "bhn/config.inc.bhn.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
 require_once $raiz_do_projeto . "class/class_bank_sonda.php";
 require_once $raiz_do_projeto . "includes/inc_Pagamentos.php";
