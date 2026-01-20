@@ -20,18 +20,17 @@ class classPIX
             $this->setAccessToken($token);
             $this->url = getenv('mp_url_api');
         }
-
-    }//end function __construct()
+    } //end function __construct()
 
     private function setAccessToken($access_token)
     {
         $this->access_token = $access_token;
-    }//end function setAccessToken
+    } //end function setAccessToken
 
     public function getAccessToken()
     {
         return $this->access_token;
-    }//end function getAccessToken
+    } //end function getAccessToken
 
     public function callService($params)
     {
@@ -63,7 +62,6 @@ class classPIX
                 " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
             fwrite($ff, $logEntry);
             fclose($ff);
-
         }
 
         if ($resposta == false) {
@@ -72,7 +70,6 @@ class classPIX
                             <b>ERRO na Comunicação com o Banco!<br>Por favor, entre em contato com o suporte da E-Prepag e informe o erro de código PIX985235 ou tente novamente mais tarde.<br>Obrigado.</b>
                         </div>";
             return $htmlErro;
-
         } else {
 
             $GLOBALS["_SESSION"]["QRCODE"] = $resposta['point_of_interaction']['transaction_data']['qr_code']; //text-left  
@@ -109,7 +106,6 @@ class classPIX
 
             return $html;
         }
-
     } //end function callService
 
     public function callSonda($params, &$reposta_consulta)
@@ -152,8 +148,7 @@ class classPIX
             $status = $data['results'][0]['status'];
         } else if (isset($data['error'])) {
             $erro = $data['error'];
-        }
-        else{
+        } else {
             $erro = "Status não identificado";
         }
 
@@ -172,7 +167,7 @@ class classPIX
 
                 $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "a+");
                 $timestamp = date("Y-m-d H:i:s");
-                fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta. ", nome: $name, cpf: $cpf\r\n");
+                fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
                 fclose($ff);
 
                 $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = '" . substr($params['idpedido'], 2, 17) . "'; "; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
@@ -187,20 +182,110 @@ class classPIX
                                             '" . substr($params['idpedido'], 2, 17) . "', 
                                             '" . $cpf . "',
                                             '" . $name . "',
-                                            '" . json_encode($data ) . "');";
+                                            '" . json_encode($data) . "');";
                     $rs = SQLexecuteQuery($sql);
                     if ($rs)
                         $this->logEvents("Sucesso no INSERT: " . PHP_EOL . $sql . PHP_EOL);
                     else
                         $this->logEvents("ERRO no INSERT: " . PHP_EOL . $sql . PHP_EOL);
-                }//end if(pg_num_rows($rs_teste_existencia) == 0)
+                } //end if(pg_num_rows($rs_teste_existencia) == 0)
                 else
                     $this->logEvents("Já existe registro de dados do pagador para o pagamento " . substr($params['idpedido'], 2, 17) . PHP_EOL);
-            }//end if($resposta->status == PIX_SONDA_PAGO_OK)
+            } //end if($resposta->status == PIX_SONDA_PAGO_OK)
             return $status;
         } //end else if($resposta->codigo == PIX_ERRO)
 
     } //end function callSonda
+
+    public function callSondaById($id, &$numPedido)
+    {
+        // URL e token da API
+        $url = $this->url . '/v1/payments/' . $id;
+
+        $accessToken = $this->getAccessToken();
+
+        // Inicializa o cURL
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                "Authorization: Bearer $accessToken",
+            ],
+        ]);
+
+        // Executa a requisição
+        $response = curl_exec($curl);
+
+        // Verifica se houve erro na requisição
+        if (curl_errno($curl)) {
+            echo 'Erro ao realizar a requisição: ' . curl_error($curl);
+            curl_close($curl);
+            exit;
+        }
+
+        curl_close($curl);
+
+        // Decodifica a resposta JSON para um array PHP
+        $data = json_decode($response, true);
+        $erro = "";
+        $status = false;
+        // Verifica se há resultados na resposta
+        if (isset($data['status'])) {
+            $status = $data['status'];
+        } else if (isset($data['error'])) {
+            $erro = $data['error'];
+        } else {
+            $erro = "Status não identificado";
+        }
+
+        $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "a+");
+        $timestamp = date("Y-m-d H:i:s");
+        fwrite($ff, "resultado data:" . $timestamp . ": " . $erro . $status . "\r\n");
+        fclose($ff);
+
+        if (!$status) {
+            echo ("<br><br>ERRO na Comunicação com o Banco!<br>Por favor, entre em contado com o suporte da E-Prepag e informe o erro de código PIX985235.<br>Obrigado.");
+        } else {
+            if ($status == PIX_SONDA_PAGO_OK) {
+                $numPedido = $data['external_reference'];
+                $cpf = $data['payer']['identification']['number'] ? $data['payer']['identification']['number'] : 'N/A';
+                $name = $data['payer']['first_name'] ? $data['payer']['first_name'] : 'N/A';
+                $reposta_consulta = $data['date_created'] ? $data['date_created'] : date('Y-m-d\TH:i:s.vO');
+
+                $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "a+");
+                $timestamp = date("Y-m-d H:i:s");
+                fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
+                fclose($ff);
+
+                $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = '" . substr($numPedido, 2, 17) . "'; "; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
+                $rs_teste_existencia = SQLexecuteQuery($sql);
+                if (pg_num_rows($rs_teste_existencia) == 0) {
+                    $sql = "INSERT INTO tb_pag_pix( 
+                                                numcompra, 
+                                                cpf_cnpj_pagador, 
+                                                nome_pagador, 
+                                                json_resposta)
+                                    VALUES (
+                                            '" . substr($numPedido, 2, 17) . "', 
+                                            '" . $cpf . "',
+                                            '" . $name . "',
+                                            '" . json_encode($data) . "');";
+                    $rs = SQLexecuteQuery($sql);
+                    if ($rs)
+                        $this->logEvents("Sucesso no INSERT: " . PHP_EOL . $sql . PHP_EOL);
+                    else
+                        $this->logEvents("ERRO no INSERT: " . PHP_EOL . $sql . PHP_EOL);
+                } //end if(pg_num_rows($rs_teste_existencia) == 0)
+                else
+                    $this->logEvents("Já existe registro de dados do pagador para o pagamento " . substr($numPedido, 2, 17) . PHP_EOL);
+            } //end if($resposta->status == PIX_SONDA_PAGO_OK)
+            return $status;
+        } //end else if($resposta->codigo == PIX_ERRO)
+
+    }
 
     private function logEvents($msg)
     {
@@ -215,7 +300,7 @@ class classPIX
         $fp = fopen($fileLog, 'a+');
         fwrite($fp, $log);
         fclose($fp);
-    }//end function logEvents
+    } //end function logEvents
 
     private function generateRandomString($length = 32)
     {
@@ -261,7 +346,8 @@ class classPIX
         return ['nome' => $nome, 'sobrenome' => $sobrenome];
     }
 
-    private function utf8ize($data) {
+    private function utf8ize($data)
+    {
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 $data[$key] = $this->utf8ize($value);
@@ -362,8 +448,7 @@ class classPIX
         }
 
         return $data;
-
-    }//end function sendjson
+    } //end function sendjson
 
 } //end class classPIX
 
@@ -416,8 +501,18 @@ function getSondaPIX($numero, &$a_resp)
         } else {
             return false;
         }
+    } //end else do if(!$rs_sonda) 
+} //end function getSondaPIX
 
-    }//end else do if(!$rs_sonda) 
-}//end function getSondaPIX
+function getSondaPIXbyId($id)
+{
+    $numPedido = null;
+    $consulta = new classPIX();
+    $auxChecagem = $consulta->callSondaById($id, $numPedido);
 
-?>
+    if ($auxChecagem != PIX_SONDA_PAGO_OK || $numPedido == null) {
+        return false;
+    }
+
+    return $numPedido;
+} //end function getSondaPIX
