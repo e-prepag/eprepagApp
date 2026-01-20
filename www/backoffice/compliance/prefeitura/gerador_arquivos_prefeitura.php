@@ -104,7 +104,7 @@ if (count($vetorPublisherPorUtilizacao) > 0) {
         $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
         $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
         $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-    }//end foreach
+    } //end foreach
     $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
     $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
     $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
@@ -113,7 +113,7 @@ else {
     $where_opr_venda_lan = "";
     $where_opr_venda_lan_negativa = "";
     $where_opr_utilizacao_lan = "";
-}//end else do if(count($vetorPublisherPorUtilizacao)>0)
+} //end else do if(count($vetorPublisherPorUtilizacao)>0)
 
 
 // Exibindo o Período de Apuração
@@ -124,7 +124,7 @@ echo "<b>Mês/Ano do período de apuração: [<span style='color: red'>" . $mesAno .
 $testeData = $ano . $mes;
 if ($testeData < $dataInicioOperacao) {
     die("O mês ano deve ser obrigatóriamente superior a " . $dataInicioOperacao . " (AAAAMM).<br>" . PHP_EOL);
-}// end if($testeData < 201403)
+} // end if($testeData < 201403)
 
 
 //================================== Inicio da Geração do Arquivo Layout SUREM10
@@ -323,7 +323,7 @@ if (!empty($verificadorPublishers)) {
                  " . $where_opr_utilizacao_lan . "
             group by opr_cnpj,opr_ie,opr_codigo,opr_estado,opr_cidade,opr_cep,num_docto,data) 
             ";
-    }//end if(count($vetorPublisherPorUtilizacao)>0)
+    } //end if(count($vetorPublisherPorUtilizacao)>0)
 
     $sql .= " 
             
@@ -418,7 +418,7 @@ if (!empty($verificadorPublishersNovos)) {
         union all
 
             ";
-        }//end if($insere_union_all > 1)
+        } //end if($insere_union_all > 1)
         $sql .= "
              (select 
                     o.opr_cnpj, 
@@ -497,7 +497,7 @@ if (!empty($verificadorPublishersNovos)) {
                  and pih_data >= '" . substr($vetorPublisherPorUtilizacao[$value], 0, 19) . "'
             group by opr_cnpj,opr_ie,opr_codigo,opr_estado,opr_cidade,opr_cep,num_docto,data) 
                     ";
-        }//end if (array_key_exists($value, $vetorPublisherPorUtilizacao)) 
+        } //end if (array_key_exists($value, $vetorPublisherPorUtilizacao)) 
 
         $sql .= " 
 
@@ -582,7 +582,7 @@ if (!empty($verificadorPublishersNovos)) {
 
                  ";
         $insere_union_all++;
-    }//end foreach
+    } //end foreach
 } //end if(!empty($verificadorPublishersNovos))
 $sql .= "
             
@@ -668,8 +668,6 @@ else {
                     ),
                 );
                 $file->setVetorLines($vetorLines);
-
-
             } // end if(!empty($cnpjAnterior) && $cnpjAnterior != str_replace("-","",str_replace(".", "", trim($rs_row['opr_cnpj']))))
 
             //Capturando CNPJ anterior
@@ -794,8 +792,6 @@ else {
                 ),
             );
             $file->setVetorLines($vetorLines);
-
-
         } // end if(!empty($cnpjAnterior) && $cnpjAnterior != str_replace("-","",str_replace(".", "", trim($rs_row['opr_cnpj']))))
 
         //Capturando CNPJ anterior
@@ -910,8 +906,7 @@ else {
         ),
     );
     $file->setVetorLines($vetorLines);
-
-}//end else do if(!$rs)
+} //end else do if(!$rs)
 
 
 //=========================================================================================================================
@@ -1001,13 +996,16 @@ if ($file->checkFile()) {
 $nomeArquivoSUREM10Zipado = "SUREM10_" . $mes . $ano . ".zip"; //Exemplo: SUREM10_122014.zip
 @$file = new FilePosition($nomeArquivoSUREM10Zipado);
 @$file->createZip($nomeArquivoSUREM10, true);
-echo "Arquivo Mensal Zipado Criado com Sucesso: <a href='/bacen/" . date('Ymd') . "/" . strtolower($nomeArquivoSUREM10Zipado) . "' download>" . $nomeArquivoSUREM10Zipado . "</a><br><hr><br><br>" . PHP_EOL;
+echo "Arquivo Mensal Zipado Criado com Sucesso: 
+<a href='/arquivos_gerados/bacen/" . date('Ymd') . "/" . strtolower($nomeArquivoSUREM10Zipado) . "' download>
+" . $nomeArquivoSUREM10Zipado . "
+</a><br><hr><br><br>" . PHP_EOL;
 //==================================  Fim do trecho compactando arquivos Semestrais para serem enviados para Prefeitura
 
 //==================================  Início do trecho da alteração para já em arquivo para Prefeitura 
 if (!empty($verificadorPublishersNovos)) {
     alteracaoPublisherNovosJaArquivoMunicipais($vetorPublisherNovos);
-}//end if(!empty($verificadorPublishersNovos))
+} //end if(!empty($verificadorPublishersNovos))
 //==================================  Fim do trecho da alteração para já em arquivo para Prefeitura 
 
 
