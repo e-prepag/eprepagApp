@@ -140,7 +140,9 @@ class FilePosition
         $this->setNewDir($new_dir);
         //Arquivo
         if (is_null($this->getDir())) {
-            $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/bacen/';
+            // $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/bacen/';
+
+            $file = $_SERVER['DOCUMENT_ROOT'] . '/arquivos_gerados/bacen/';
         } else {
             $file = $this->getDir();
         }
@@ -167,7 +169,9 @@ class FilePosition
     {
         //Arquivo
         if (is_null($this->getDir())) {
-            $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/bacen/';
+            // $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/bacen/';
+
+            $file = $_SERVER['DOCUMENT_ROOT'] . '/arquivos_gerados/bacen/';
         } else {
             $file = $this->getDir();
         }
@@ -199,7 +203,9 @@ class FilePosition
         //Define o caminho e nome do arquivo
         $this->setNewDir($new_dir);
         if (is_null($this->getDir())) {
-            $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/bacen/';
+            // $file = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/bacen/';
+
+            $file = $_SERVER['DOCUMENT_ROOT'] . '/arquivos_gerados/bacen/';
         } else {
             $file = $this->getDir();
         }
