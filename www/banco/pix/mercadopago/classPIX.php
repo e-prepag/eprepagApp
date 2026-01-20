@@ -149,7 +149,7 @@ class classPIX
         } else if (isset($data['error'])) {
             $erro = $data['error'];
         } else {
-            $erro = "Status não identificado";
+            $erro = $response;
         }
 
         $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "a+");
