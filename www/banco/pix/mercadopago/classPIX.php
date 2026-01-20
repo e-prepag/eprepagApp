@@ -134,7 +134,6 @@ class classPIX
         if (curl_errno($curl)) {
             echo 'Erro ao realizar a requisição: ' . curl_error($curl);
             curl_close($curl);
-            exit;
         }
 
         curl_close($curl);
