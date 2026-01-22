@@ -210,18 +210,6 @@ $data_atual = date('Y-m');
 					&data_final=<?= urlencode($data_final) ?>
 					&acao=baixar"
 					target="_blank">Baixar Lotes</a>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=criptografar"
-					target="_blank">Baixar Cript. e Assin.</a>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=enviar"
-					target="_blank">Enviar</a>
 			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>
@@ -236,9 +224,10 @@ $data_atual = date('Y-m');
 
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
-	$dados = gerarXmlMovimentacao($data_inicial, $data_final);
+	$efinanceira = new GerarEFinanceira();
+	$dados = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
 	foreach ($dados as $dado) {
-		echo xmlViewer(utf8_decode(htmlspecialchars($dado['xml'])), "{$dado['ano_mes']}_{$dado['lote_numero']}");
+		echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
 	}
 	//echo json_encode($dados);
 	?>
