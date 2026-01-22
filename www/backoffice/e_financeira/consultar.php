@@ -185,20 +185,36 @@ $data_atual = date('Y-m');
 </style>
 
 <div>
-	<h2 class="titulo-vencimento">Saldos diários - Lista</h2>
+	<h2 class="titulo-vencimento">E-Financeira - Consulta</h2>
 	<form id="form1" action="#" method="get" class="form-solicitacoes">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
-				<label for="dt_inicial">Início período
+				<label for="tipo_busca">Tipo de busca
 				</label>
-				<input id="dt_inicial" name="dt_inicial" max="<?php echo $data_atual; ?>" value="<?php echo $data_inicial; ?>" class="form-control"
-					type="month">
+				<select id="tipo_busca" name="tipo_busca" class="form-control">
+					<option value="lotexml" selected>Lote por XML</option>
+					<option value="loteprotocol">Lote por num. protocolo</option>
+				</select>
 			</div>
 			<div class="col-cancel-pins">
-				<label for="dt_final">Final período
+				<label for="protocolo">Núm Protocolo<span class="help-icon">?
+						<span class="tooltiptext">
+							Número de protocolo recebido na resposta.
+						</span>
+					</span>
 				</label>
-				<input id="dt_final" name="dt_final" max="<?php echo $data_atual; ?>" value="<?php echo $data_final; ?>" class="form-control"
-					type="month">
+				<input id="protocolo" name="protocolo" class="form-control"
+					type="text">
+			</div>
+			<div class="col-cancel-pins">
+				<label for="arquivo">XML Resposta: <span class="help-icon">?
+						<span class="tooltiptext">
+							O XML tem que ser o recebido quando for enviado.
+						</span>
+					</span>
+				</label>
+				<input id="arquivo" name="arquivo" 
+					type="file">
 			</div>
 		</div>
 
@@ -230,11 +246,7 @@ $data_atual = date('Y-m');
 
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
-	$dados = gerarXmlMovimentacao($data_inicial, $data_final);
-	foreach ($dados as $dado) {
-		echo xmlViewer(utf8_decode(htmlspecialchars($dado['xml'])), "{$dado['ano_mes']}_{$dado['lote_numero']}");
-	}
-	//echo json_encode($dados);
+
 	?>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
