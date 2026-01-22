@@ -42,6 +42,7 @@ class GerarEFinanceira
     private $caminhoCertificadoPublico;
     private $certificado_privado_epp;
     private $chave_privada_epp;
+    private $versao_aplicacao;
 
     public function __construct()
     {
@@ -76,11 +77,12 @@ class GerarEFinanceira
         $this->dddTelefoneReprLegal = '11';
         $this->cpfReprLegal = '16806289843';
         $this->codMunicipioEPP = '3550308';
-        $this->certificado = '../ssl/cert-eprepag.pfx';
+        $this->certificado = __DIR__ . '/../ssl/cert-eprepag.pfx';
         $this->senhaCertificado = getenv('senha_certificado_digital');
         $this->caminhoCertificadoPublico = '/www/ssl/pre-efinanceira-receita-fazenda-gov-br-2025.cer';
         $this->certificado_privado_epp = '/www/ssl/private-epp-cert.pem';
         $this->chave_privada_epp = '/www/ssl/key-epp-cert.pem';
+        $this->versao_aplicacao = '00000000000000000001';
     }
 
     private function obterDadosMovFinPJ($inicio, $fim)
@@ -865,6 +867,39 @@ class GerarEFinanceira
         return $movimentacoesAgrupadasPorMes;
     }
 
+    private function compararDatas($data_inicial, $data_final)
+    {
+        if ($data_inicial == "" || $data_final == "") {
+            return 0;
+        }
+        try {
+            $d1 = new DateTime($data_inicial);
+            $d2 = new DateTime($data_final);
+
+            if ($d1 < $d2) {
+                return 1;   // data inicial menor (normal)
+            } else {
+                return -1;  // data inicial maior ou igual
+            }
+        } catch (Exception $e) {
+            return 0; // erro na data
+        }
+    }
+    public function gerarXmlMovimentacao($data_inicial, $data_final)
+    {
+        if ($this->compararDatas($data_inicial, $data_final) < 1) {
+            return [];
+        }
+
+        $efinanceira = new GerarEFinanceira();
+
+        $movimentacoes = $efinanceira->gerarMovimentacaoFinanceiraCompleta($data_inicial, $data_final);
+
+        $xmls = $efinanceira->gerarLotesMovsFinanceira($movimentacoes);
+
+        return $xmls;
+    }
+
     public function gerarLotesMovsFinanceira(array $movimentacoes, $tamanhoLote = 50, $debug = false)
     {
         $lotesArray = [];
@@ -890,6 +925,8 @@ class GerarEFinanceira
                 // 4. Adiciona o XML do lote final ao array de retorno
                 $lotesArray[] = ['xml' => $xmlLoteFinal, 'ano_mes' => $anoMes, 'lote_numero' => $contadorLote];
 
+
+
                 $contadorLote++;
             }
         }
@@ -914,11 +951,11 @@ class GerarEFinanceira
         $prefixo = 'ID';
 
         // Define o comprimento total da parte numérica
-        $comprimentoNumerico = 18;
+        $comprimentoNumerico = 17;
 
         // Usa str_pad para preencher o número com '0' à esquerda (STR_PAD_LEFT)
         // até que ele atinja o comprimento de 18 caracteres.
-        $parteNumerica = str_pad($numero, $comprimentoNumerico, '0', STR_PAD_LEFT);
+        $parteNumerica = '1' . str_pad($numero, $comprimentoNumerico, '0', STR_PAD_LEFT);
 
         // Concatena o prefixo com a parte numérica
         return $prefixo . $parteNumerica;
@@ -929,6 +966,60 @@ class GerarEFinanceira
         // A expressão regular /\D/ significa "qualquer caractere que NÃO seja um dígito".
         // A função preg_replace substitui todos eles por uma string vazia ('').
         return preg_replace('/\D/', '', $documento);
+    }
+
+    private function getSemestreFormatado($dataString)
+    {
+        $date = new DateTime($dataString);
+        $ano = $date->format('Y');
+        $mes = (int)$date->format('n'); // 'n' retorna o mês de 1 a 12 sem zeros à esquerda
+
+        $semestre = ($mes <= 6) ? 1 : 2;
+
+        return "{$ano}.{$semestre}";
+    }
+
+    private function buscar_movimentacoes(string $ano_mes, string $cpfcnpj): int
+    {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        // 1. Tenta buscar o ID existente
+        $sql = "SELECT id FROM public.envios_e_financeira 
+            WHERE data_anomes = :anomes 
+              AND cpfcnpj_declarado = :cpfcnpj 
+              AND tipo = 'MOVIMENTACAO'
+              AND retificado = false
+            LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':anomes'  => $ano_mes,
+            ':cpfcnpj' => $cpfcnpj
+        ]);
+
+        $idEncontrado = $stmt->fetchColumn();
+
+        // Se encontrou, retorna o ID imediatamente
+        if ($idEncontrado) {
+            return (int) $idEncontrado;
+        }
+
+        // 2. Se não encontrou, prepara os dados para criar um novo
+
+        $semetre = $this->getSemestreFormatado($ano_mes . "-01");
+
+        $dadosParaCriar = [
+            'tipo'              => 'MOVIMENTACAO',
+            'status_envio'      => 'PENDENTE',      // Valor padrão
+            'versao_efin'       => 'v1_2_1',         // Valor padrão obrigatório
+            'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
+            'nome_arquivo'      => "none",
+            'cpfcnpj_declarado' => $cpfcnpj,
+            'data_anomes'       => $ano_mes,
+            'retificado'        => 'false',
+            'semestre_ano'      => $semetre
+        ];
+
+        return $this->criarEnvioFinanceira($dadosParaCriar);
     }
 
     /**
@@ -954,10 +1045,11 @@ class GerarEFinanceira
         );
         $dom->appendChild($eFinanceira);
 
-        // Criar o elemento evtMovOpFin com atributo id
-        $idNovo =  $id_mov ?: $this->obterUltimoIdEnvio() + 1;
+        $cpfCnpjNum = $this->apenasNumeros($cpfCnpj);
 
-        $id_formatado = $this->gerarIdFormatado($idNovo);
+        $id_evento = $this->buscar_movimentacoes("{$ano}-{$mes}", $cpfCnpjNum);
+
+        $id_formatado = $this->gerarIdFormatado($id_evento);
 
         $evtMovOpFin = $dom->createElementNS($namespace, 'evtMovOpFin');
         $evtMovOpFin->setAttribute('id', $id_formatado);
@@ -980,7 +1072,7 @@ class GerarEFinanceira
         $ideEvento->appendChild($aplicEmi);
 
         // verAplic
-        $verAplic = $dom->createElementNS($namespace, 'verAplic', '00000000000000000001');
+        $verAplic = $dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao);
         $ideEvento->appendChild($verAplic);
 
         // ideDeclarante - grupo
@@ -999,7 +1091,6 @@ class GerarEFinanceira
         $ideDeclarado->appendChild($tpNI);
 
         // NIDeclarado cpf ou cnpj
-        $cpfCnpjNum = $this->apenasNumeros($cpfCnpj);
         $NIDeclarado = $dom->createElementNS($namespace, 'NIDeclarado', $cpfCnpjNum);
         $ideDeclarado->appendChild($NIDeclarado);
 
@@ -1165,7 +1256,7 @@ class GerarEFinanceira
         $ideEvento->appendChild($dom->createElementNS($namespace, 'indRetificacao', '1'));
         $ideEvento->appendChild($dom->createElementNS($namespace, 'tpAmb', '1'));
         $ideEvento->appendChild($dom->createElementNS($namespace, 'aplicEmi', '1'));
-        $ideEvento->appendChild($dom->createElementNS($namespace, 'verAplic', '00000000000000000001'));
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao));
         $evtCadDeclarante->appendChild($ideEvento);
 
         // ideDeclarante
@@ -1224,7 +1315,7 @@ class GerarEFinanceira
         $aplicEmi = $dom->createElementNS($namespace, 'aplicEmi', '1');
         $ideEvento->appendChild($aplicEmi);
         // Versão do aplicativo de emissão do evento
-        $verAplic = $dom->createElementNS($namespace, 'verAplic', '0000000000000001');
+        $verAplic = $dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao);
         $ideEvento->appendChild($verAplic);
 
         $evt->appendChild($ideEvento);
@@ -1392,7 +1483,6 @@ class GerarEFinanceira
         // 2. Dados de Exemplo para o fechamento (1º Semestre de 2025)
         $idNovo = $this->obterUltimoIdEnvio() + 1;
         $id_formatado = $this->gerarIdFormatado($idNovo);
-        $versaoApp = '00000000000000000001';
         $ambiente = '1'; // 1 = Produção, 2 = Homologação
 
         // 3. Criação do Documento DOM
@@ -1416,7 +1506,7 @@ class GerarEFinanceira
         $ideEvento->appendChild($doc->createElementNS($ns, 'indRetificacao', '1')); // 1 = Original
         $ideEvento->appendChild($doc->createElementNS($ns, 'tpAmb', $ambiente));
         $ideEvento->appendChild($doc->createElementNS($ns, 'aplicEmi', '1')); // 1 = Aplicativo da empresa
-        $ideEvento->appendChild($doc->createElementNS($ns, 'verAplic', $versaoApp));
+        $ideEvento->appendChild($doc->createElementNS($ns, 'verAplic', $this->versao_aplicacao));
 
         // 7. Grupo: ideDeclarante (Obrigatório)
         $ideDeclarante = $doc->createElementNS($ns, 'ideDeclarante');
@@ -1461,7 +1551,7 @@ class GerarEFinanceira
      * @return string O XML completo do lote (sem criptografia).
      * @throws Exception
      */
-    /*public function gerarLoteAssincrono(array $eventos)
+    public function gerarLoteAssincrono(array $eventos)
     {
         $nsLote = 'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0';
 
@@ -1496,48 +1586,6 @@ class GerarEFinanceira
 
         // 5. Retorna a string XML completa
         return $xmlString;
-    }*/
-    public function gerarLoteAssincrono(array $eventos)
-    {
-        $dom = new DOMDocument('1.0', 'utf-8');
-        $dom->formatOutput = true;
-
-        $root = $dom->createElementNS(
-            'http://www.eFinanceira.gov.br/schemas/envioLoteEventosAssincrono/v1_0_0',
-            'eFinanceira'
-        );
-
-        $dom->appendChild($root);
-
-        $lote = $dom->createElement('loteEventosAssincrono');
-        $root->appendChild($lote);
-
-        $lote->appendChild($dom->createElement('cnpjDeclarante', $this->cnpjEPP));
-
-        $eventosNode = $dom->createElement('eventos');
-        $lote->appendChild($eventosNode);
-
-        foreach ($eventos as $ev) {
-            if ($ev['xml'] instanceof DOMDocument) {
-                $ev['xml'] = $ev['xml']->saveXML($ev['xml']->documentElement);
-            }
-
-            $evento = $dom->createElement('evento');
-            $evento->setAttribute('id', $ev['id']);
-
-            $eventoDom = new DOMDocument();
-            $eventoDom->loadXML($ev['xml']);
-
-            $imported = $dom->importNode(
-                $eventoDom->documentElement,
-                true
-            );
-
-            $evento->appendChild($imported);
-            $eventosNode->appendChild($evento);
-        }
-
-        return $dom->saveXML();
     }
 
     private function obterTagEventoAssinar(DOMElement $eventoElement)
@@ -1677,6 +1725,101 @@ class GerarEFinanceira
         return $resposta;
     }
 
+    public function atualizarEnvioParaEnviado($id, $protocolo, $nomeArquivo)
+    {
+
+        $idFormatado = (int) substr($id, 3);
+
+        $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sql = "UPDATE envios_e_financeira 
+                SET status_envio = 'ENVIADO',
+                    nome_arquivo = :nome_arquivo,
+                    num_protocolo = :num_protocolo,
+                    data_envio = NOW()
+                WHERE id = :id";
+
+        try {
+            $stmt = $pdo->prepare($sql);
+
+            $stmt->execute([
+                ':id' => $idFormatado,
+                ':nome_arquivo' => $nomeArquivo,
+                'num_protocolo' => $protocolo
+            ]);
+
+            return $stmt->rowCount();
+
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao atualizar status do envio: " . $e->getMessage());
+        }
+    }
+
+    private function criarEnvioFinanceira(array $dados)
+    {
+        // 1. Definição da Query SQL
+        $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sql = "INSERT INTO envios_e_financeira (
+            tipo, 
+            status_envio, 
+            versao_efin, 
+            versao_epp, 
+            nome_arquivo, 
+            data_envio, 
+            semestre_ano, 
+            retificado, 
+            descricao,
+            cpfcnpj_declarado,
+            data_anomes,
+            id_retificacao,
+            num_protocolo
+        ) VALUES (
+            :tipo, 
+            :status_envio, 
+            :versao_efin, 
+            :versao_epp, 
+            :nome_arquivo, 
+            :data_envio, 
+            :semestre_ano, 
+            :retificado, 
+            :descricao,
+            :cpfcnpj_declarado,
+            :data_anomes,
+            :id_retificacao,
+            :num_protocolo
+        )";
+
+        try {
+            $stmt = $pdo->prepare($sql);
+
+            $params = [
+                // Campos Obrigatórios
+                ':tipo'         => $dados['tipo'],
+                ':status_envio' => $dados['status_envio'],
+                ':versao_efin'  => $dados['versao_efin'],
+                ':versao_epp'   => $dados['versao_epp'],
+                ':nome_arquivo' => $dados['nome_arquivo'],
+
+                // Campos Opcionais
+                ':data_envio'   => $dados['data_envio'] ?? null,
+                ':semestre_ano' => $dados['semestre_ano'] ?? null,
+                ':retificado'   => $dados['retificado'] ?? 'false',
+                ':descricao'    => $dados['descricao'] ?? null,
+                ':cpfcnpj_declarado' => $dados['cpfcnpj_declarado'] ?? null,
+                ':data_anomes'       => $dados['data_anomes'] ?? null,
+                ':id_retificacao'    => $dados['id_retificacao'] ?? null,
+                ':num_protocolo'     => $dados['num_protocolo'] ?? null,
+            ];
+
+            $stmt->execute($params);
+
+            // Retornar o ID gerado
+            return $pdo->lastInsertId();
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao inserir em envios_e_financeira: " . $e->getMessage());
+        }
+    }
 
     public function enviarLoteEFinanceira($xmlLoteCriptografado, $usarGzip = false, $producao = false)
     {
