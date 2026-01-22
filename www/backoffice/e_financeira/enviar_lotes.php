@@ -1,13 +1,6 @@
 <?php
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
-$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
-$data_atual = date('Y-m');
 
 ?>
 <link rel="stylesheet"
@@ -136,7 +129,7 @@ $data_atual = date('Y-m');
 		flex: 1;
 		min-width: 100px;
 		margin: 0;
-		max-width: 180px;
+		max-width: 250px;
 		/* Remove margens laterais desnecessárias */
 	}
 
@@ -185,38 +178,23 @@ $data_atual = date('Y-m');
 </style>
 
 <div>
-	<h2 class="titulo-vencimento">Saldos diários - Lista</h2>
-	<form id="form1" action="#" method="get" class="form-solicitacoes">
+	<h2 class="titulo-vencimento">E-Financeira - Enviar Lotes</h2>
+	<form id="form1" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
-				<label for="dt_inicial">Início período
+				<label for="arquivo">Envie um XML ou um ZIP: <span class="help-icon">?
+						<span class="tooltiptext">
+							O ZIP contém os XMLs dos lotes, o lote será criptografado e assinado automaticamente com o envio, após enviar, será possível fazer o download dos retornos.
+						</span>
+					</span>
 				</label>
-				<input id="dt_inicial" name="dt_inicial" max="<?php echo $data_atual; ?>" value="<?php echo $data_inicial; ?>" class="form-control"
-					type="month">
+				<input id="arquivo" name="arquivo"
+					type="file">
 			</div>
-			<div class="col-cancel-pins">
-				<label for="dt_final">Final período
-				</label>
-				<input id="dt_final" name="dt_final" max="<?php echo $data_atual; ?>" value="<?php echo $data_final; ?>" class="form-control"
-					type="month">
-			</div>
+
 		</div>
 
 		<div class="d-flex top10 custom-justify">
-			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=baixar"
-					target="_blank">Baixar Lotes</a>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=criptografar"
-					target="_blank">Baixar Cript. e Assin.</a>
-			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>
 
@@ -230,11 +208,12 @@ $data_atual = date('Y-m');
 
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
-	$dados = gerarXmlMovimentacao($data_inicial, $data_final);
-	foreach ($dados as $dado) {
-		echo xmlViewer(utf8_decode(htmlspecialchars($dado['xml'])), "{$dado['ano_mes']}_{$dado['lote_numero']}");
+	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo'])) {
+		$lotes_xml = obterXmlFromZip('arquivo');
+		enviarLotesEfinanceira($lotes_xml);
+	}else{
+		echo "pindamonhagaba";
 	}
-	//echo json_encode($dados);
 	?>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
