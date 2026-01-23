@@ -13,6 +13,8 @@ if (isset($GLOBALS['_SESSION']['usuarioGames_ser']) && !is_null($GLOBALS['_SESSI
 }
 
 //Recupera Id da venda
+$venda_id_request_nome = $_REQUEST['venda_id_request_nome'] ?? null;
+
 if (!$venda_id_request_nome) $venda_id_request_nome = 'venda';
 $venda_id = $GLOBALS['_REQUEST'][$venda_id_request_nome];
 if (!$venda_id) $venda_id = $GLOBALS['_SESSION']['venda'];
