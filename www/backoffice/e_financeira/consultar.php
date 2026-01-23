@@ -181,7 +181,7 @@ $data_atual = date('Y-m');
 
 <div>
 	<h2 class="titulo-vencimento">E-Financeira - Consulta</h2>
-	<form id="form1" action="#" method="get" class="form-solicitacoes">
+	<form id="form1" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
 				<label for="tipo_busca">Tipo de busca
@@ -208,7 +208,7 @@ $data_atual = date('Y-m');
 						</span>
 					</span>
 				</label>
-				<input id="arquivo" name="arquivo" 
+				<input id="arquivo" name="arquivo"
 					type="file">
 			</div>
 		</div>
@@ -229,16 +229,97 @@ $data_atual = date('Y-m');
 	require_once __DIR__ . "/functions_e_financeira.php";
 
 	$efinanceira = new GerarEFinanceira();
-	if($_POST['tipo_busca'] == 'lotexml'){
+	if ($_POST['tipo_busca'] == 'lotexml' && isset($_FILES['arquivo'])) {
 
-		//LER XML
-		$protocolo = ""; //Pega do xml
+		$arquivoUpload = $_FILES['arquivo'];
 
-	}else if($_POST['tipo_busca'] == 'loteprotocol'){
+		// Verifica erros básicos de upload
+		if ($arquivoUpload['error'] !== UPLOAD_ERR_OK) {
+			echo "<div class='alert alert-danger'>Erro no upload do arquivo.</div>";
+			return;
+		}
+
+		$extensao = strtolower(pathinfo($arquivoUpload['name'], PATHINFO_EXTENSION));
+		$xmlsParaProcessar = []; // Array que guardará ['nome' => 'x.xml', 'conteudo' => '...']
+
+		// --- CENÁRIO 1: É UM ZIP ---
+		if ($extensao === 'zip') {
+			$pastaDestino = '/tmp/consulta_' . uniqid(); // Pasta temporária
+
+			try {
+				// Usa sua função extrairZip (certifique-se que ela está disponível aqui)
+				$arquivos = extrairZip($arquivoUpload['tmp_name'], $pastaDestino);
+
+				foreach ($arquivos as $nomeArquivo) {
+					if (strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION)) !== 'xml') continue;
+
+					$caminhoCompleto = $pastaDestino . DIRECTORY_SEPARATOR . $nomeArquivo;
+					$conteudo = file_get_contents($caminhoCompleto);
+
+					if ($conteudo) {
+						$xmlsParaProcessar[] = ['nome' => $nomeArquivo, 'conteudo' => $conteudo];
+					}
+					unlink($caminhoCompleto); // Limpa arquivo
+				}
+				rmdir($pastaDestino); // Limpa pasta
+			} catch (Exception $e) {
+				echo "<div class='alert alert-danger'>Erro ao processar ZIP: " . $e->getMessage() . "</div>";
+			}
+
+			// --- CENÁRIO 2: É UM XML ÚNICO ---
+		} elseif ($extensao === 'xml') {
+			$conteudo = file_get_contents($arquivoUpload['tmp_name']);
+			if ($conteudo) {
+				$xmlsParaProcessar[] = ['nome' => $arquivoUpload['name'], 'conteudo' => $conteudo];
+			}
+		} else {
+			echo "<div class='alert alert-warning'>Por favor, envie um arquivo .XML ou .ZIP</div>";
+		}
+		if (!empty($xmlsParaProcessar)) {
+			echo "<h4>Resultados da Consulta por Arquivo</h4>";
+
+			foreach ($xmlsParaProcessar as $item) {
+				$xmlString = $item['conteudo'];
+				$nomeArq   = $item['nome'];
+
+				// 1. Parse do XML para pegar o protocolo
+				// Usamos str_replace para facilitar a leitura ignorando namespaces
+				$xmlLimpo = str_replace('xmlns=', 'ns=', $xmlString);
+				$xmlObj   = simplexml_load_string($xmlLimpo);
+
+				// Busca a tag protocoloEnvio em qualquer lugar do XML
+				// Ajuste 'protocoloEnvio' se a tag no seu XML tiver outro nome (ex: nRec)
+				$nodeProtocolo = $xmlObj->xpath("//*[local-name()='protocoloEnvio']");
+
+				$protocolo = !empty($nodeProtocolo) ? (string)$nodeProtocolo[0] : null;
+
+				if ($protocolo) {
+					echo "<div class='card mb-3'><div class='card-header'>Arquivo: <strong>$nomeArq</strong> | Protocolo: <strong>$protocolo</strong></div><div class='card-body'>";
+
+					try {
+						// 2. Consulta na Receita usando o protocolo extraído
+						$retorno_consulta = $efinanceira->consultarLoteEFinanceira($protocolo);
+
+						// 3. Exibe o resultado
+						echo xmlViewer($retorno_consulta, "Retorno da Consulta ($protocolo)");
+					} catch (Exception $e) {
+						echo "<div class='alert alert-danger'>Erro na consulta: " . $e->getMessage() . "</div>";
+					}
+
+					echo "</div></div>";
+				} else {
+					echo "<div class='alert alert-warning'>Arquivo <strong>$nomeArq</strong>: Não foi possível encontrar a tag &lt;protocoloEnvio&gt; neste XML.</div>";
+					// Opcional: Mostrar o XML para debug
+					// echo xmlViewer($xmlString, "XML Sem Protocolo");
+				}
+			}
+		}
+	} else if ($_POST['tipo_busca'] == 'loteprotocol') {
 
 		$retorno_consulta = $efinanceira->consultarLoteEFinanceira($_POST['protocolo']);
 
-		xmlViewer($retorno_consulta, $_POST['protocolo']);
+		echo xmlViewer($retorno_consulta, $_POST['protocolo']);
+		echo "pindamonhagaba";
 	}
 
 	?>
