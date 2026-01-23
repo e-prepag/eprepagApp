@@ -906,7 +906,7 @@ function verificaEstoque($venda_id)
                         // Teste se o PIN não é de requisição
                         if ($vgm_pin_request == 0) {
 
-                                if ($produto_operadora != 560) {
+                                if (!in_array($produto_operadora, [560, 146, 145])) {
 
                                         //PINS
                                         //---------------------------------------------------------------------------------------------------
