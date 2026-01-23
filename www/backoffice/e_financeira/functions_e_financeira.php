@@ -106,68 +106,109 @@ function enviarLotesEfinanceira(array $lotes)
             $xmlRespostaString = $efinanceira->enviarLoteEFinanceira($lote_criptografado);
 
             if ($xmlRespostaString) {
-                // Extrair Protocolo da Resposta
+                
+                // Limpa namespaces para facilitar leitura
                 $xmlRespLimpo = str_replace('xmlns=', 'ns=', $xmlRespostaString);
                 $xmlRespObj   = simplexml_load_string($xmlRespLimpo);
-                $protocolo = null;
-                $nodeProtocolo = $xmlRespObj->xpath("//*[local-name()='protocoloEnvio']");
 
-                if (!empty($nodeProtocolo)) {
-                    $protocolo = (string)$nodeProtocolo[0];
-                }
+                // --- VERIFICAÇÃO DE STATUS (cdResposta) ---
+                $nodeCdResposta = $xmlRespObj->xpath("//*[local-name()='cdResposta']");
+                $cdResposta = $nodeCdResposta ? (int)$nodeCdResposta[0] : 0;
 
-                echo "Protocolo: <strong>" . ($protocolo ? $protocolo : "NÃO GERADO") . "</strong><br>";
+                // Pegamos a descrição da resposta principal
+                $nodeDescResposta = $xmlRespObj->xpath("//*[local-name()='descResposta']");
+                $descResposta = $nodeDescResposta ? (string)$nodeDescResposta[0] : 'Sem descrição';
 
-                if ($protocolo) {
-                    // Lote Enviado (Assinado)
-                    file_put_contents(
-                        $pathLotesEnviados . DIRECTORY_SEPARATOR . $nomeArquivoOriginal,
-                        $lote_assinado
-                    );
+                // SE FOR SUCESSO (1)
+                if ($cdResposta === 1) {
+                    
+                    // Extrair Protocolo
+                    $protocolo = null;
+                    $nodeProtocolo = $xmlRespObj->xpath("//*[local-name()='protocoloEnvio']");
 
-                    // Resposta da Receita
-                    $nomeArquivoResposta = pathinfo($nomeArquivoOriginal, PATHINFO_FILENAME) . "_resposta.xml";
-                    file_put_contents(
-                        $pathRespostas . DIRECTORY_SEPARATOR . $nomeArquivoResposta,
-                        $xmlRespostaString
-                    );
+                    if (!empty($nodeProtocolo)) {
+                        $protocolo = (string)$nodeProtocolo[0];
+                    }
 
-                    $xmlLoteLimpo = str_replace(['xmlns=', 'eFinanceira:'], ['ns=', ''], $conteudoXmlOriginal);
-                    $xmlLoteObj   = simplexml_load_string($xmlLoteLimpo);
+                    echo "<div class='alert alert-success'>";
+                    echo "Status: <strong>Sucesso</strong><br>";
+                    echo "Protocolo: <strong>" . ($protocolo ? $protocolo : "NÃO GERADO") . "</strong>";
+                    echo "</div>";
 
-                    // Busca todas as tags <evento> dentro do lote
-                    $eventos = $xmlLoteObj->xpath("//evento");
+                    if ($protocolo) {
+                        // 1. Salvar Arquivos
+                        file_put_contents(
+                            $pathLotesEnviados . DIRECTORY_SEPARATOR . $nomeArquivoOriginal,
+                            $lote_assinado
+                        );
 
-                    foreach ($eventos as $evento) {
-                        // Pega o atributo 'id' da tag <evento id="...">
-                        $idAttribute = (string)$evento['id'];
+                        $nomeArquivoResposta = pathinfo($nomeArquivoOriginal, PATHINFO_FILENAME) . "_resposta.xml";
+                        file_put_contents(
+                            $pathRespostas . DIRECTORY_SEPARATOR . $nomeArquivoResposta,
+                            $xmlRespostaString
+                        );
 
-                        if ($idAttribute) {
+                        // 2. Atualizar Banco de Dados
+                        $xmlLoteLimpo = str_replace(['xmlns=', 'eFinanceira:'], ['ns=', ''], $conteudoXmlOriginal);
+                        $xmlLoteObj   = simplexml_load_string($xmlLoteLimpo);
 
-                            $linhasAfetadas = $efinanceira->atualizarEnvioParaEnviado(
-                                $idAttribute,
-                                $protocolo,
-                                $nomeArquivoOriginal
-                            );
+                        $eventos = $xmlLoteObj->xpath("//evento");
 
-                            if ($linhasAfetadas > 0) {
-                                echo "<span style='color:green'>$idAttribute atualizado com sucesso.</span><br>";
-                            } else {
-                                echo "<span style='color:red'>Falha ao atualizar $idAttribute (Não encontrado?).</span><br>";
+                        foreach ($eventos as $evento) {
+                            $idAttribute = (string)$evento['id'];
+
+                            if ($idAttribute) {
+                                // SUA LOGICA DE UPDATE
+                                $linhasAfetadas = $efinanceira->atualizarEnvioParaEnviado(
+                                    $idAttribute,
+                                    $protocolo,
+                                    $nomeArquivoOriginal
+                                );
+
+                                if ($linhasAfetadas > 0) {
+                                    echo "<span style='color:green'>Evento $idAttribute atualizado.</span><br>";
+                                } else {
+                                    echo "<span style='color:orange'>Evento $idAttribute não atualizado (ID não encontrado?).</span><br>";
+                                }
                             }
                         }
+                    } else {
+                        echo "<div class='alert alert-warning'>Atenção: Protocolo não encontrado apesar do sucesso. Nada salvo.</div>";
                     }
+
                 } else {
-                    echo "<div class='alert alert-warning'>Atenção: Protocolo não encontrado. O banco não foi atualizado.</div>";
+                    // --- SE FOR ERRO (DIFERENTE DE 1) ---
+                    echo "<div class='alert alert-danger'>";
+                    echo "<h4>Erro no Envio (Cód: " . utf8_decode($cdResposta) . ")</h4>";
+                    echo "<p><strong>Mensagem:</strong> " . utf8_decode($descResposta) . "</p>";
+                    
+                    // Busca ocorrências de erro
+                    $ocorrencias = $xmlRespObj->xpath("//*[local-name()='ocorrencia']");
+                    
+                    if (!empty($ocorrencias)) {
+                        echo "<hr><strong>Detalhes das Ocorrências:</strong><ul>";
+                        foreach ($ocorrencias as $oco) {
+                            echo "<li>";
+                            echo "<strong>Código:</strong> " . utf8_decode($oco->codigo) . "<br>";
+                            echo "<strong>Tipo:</strong> " . utf8_decode($oco->tipo) . "<br>";
+                            echo "<strong>Descrição:</strong> " . utf8_decode($oco->descricao);
+                            echo "</li><br>";
+                        }
+                        echo "</ul>";
+                    }
+                    echo "</div>";
+                    echo "<strong>Atenção:</strong> O banco de dados NÃO foi atualizado e os arquivos NÃO foram salvos devido ao erro.";
                 }
 
-                // Visualização do XML de Resposta
-                echo xmlViewer($xmlRespostaString, "Resposta ($nomeArquivoOriginal)");
-            }else{
-                echo "Sem resposta para o arquivo $nomeArquivoOriginal";
+                // Visualização do XML de Resposta (Sempre útil, mesmo com erro)
+                echo xmlViewer($xmlRespostaString, "Resposta Recebida ($nomeArquivoOriginal)");
+
+            } else {
+                echo "<div class='alert alert-warning'>Sem resposta do servidor para o arquivo $nomeArquivoOriginal</div>";
             }
+
         } catch (Exception $e) {
-            echo "<div class='alert alert-danger'>Erro ao processar $nomeArquivoOriginal: " . $e->getMessage() . "</div>";
+            echo "<div class='alert alert-danger'>Erro crítico ao processar $nomeArquivoOriginal: " . $e->getMessage() . "</div>";
         }
 
         echo "<hr>";

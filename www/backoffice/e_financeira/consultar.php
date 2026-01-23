@@ -1,12 +1,7 @@
 <?php
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
-$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
-$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
 $data_atual = date('Y-m');
 
 ?>
@@ -219,20 +214,6 @@ $data_atual = date('Y-m');
 		</div>
 
 		<div class="d-flex top10 custom-justify">
-			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=baixar"
-					target="_blank">Baixar Lotes</a>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=criptografar"
-					target="_blank">Baixar Cript. e Assin.</a>
-			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
 		</div>
 
@@ -246,6 +227,19 @@ $data_atual = date('Y-m');
 
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
+
+	$efinanceira = new GerarEFinanceira();
+	if($_POST['tipo_busca'] == 'lotexml'){
+
+		//LER XML
+		$protocolo = ""; //Pega do xml
+
+	}else if($_POST['tipo_busca'] == 'loteprotocol'){
+
+		$retorno_consulta = $efinanceira->consultarLoteEFinanceira($_POST['protocolo']);
+
+		xmlViewer($retorno_consulta, $_POST['protocolo']);
+	}
 
 	?>
 </div>
