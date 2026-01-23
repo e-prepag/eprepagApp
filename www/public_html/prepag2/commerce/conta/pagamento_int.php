@@ -53,6 +53,7 @@ if(!defined('PAGAMENTO_PIX')) {
 }// end if
 
 $btSubmit_EPP_8593 = $_REQUEST['btSubmit_EPP_8593'];
+$iforma = $_REQUEST['iforma'];
 
 $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
 $partner_produto_id = 0;
