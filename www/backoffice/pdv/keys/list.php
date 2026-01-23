@@ -10,7 +10,11 @@ $conexao_new_epp = function () {
 	try {
 		$username = 'eprepaga_pagorama';
 		$password = '3yARhv6HcJN';
-		$pdo = new PDO('mysql:host=10.204.168.21;port=3306;dbname=eprepaga_pag', $username, $password);
+		$pdo = new PDO('mysql:host=10.204.168.21;port=3306;dbname=eprepaga_pag', $username, $password, 
+		[
+        PDO::ATTR_TIMEOUT => 5, // segundos
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ]);
 	} catch (PDOEXCEPTION $e) { //5433 
 		echo "Error: " . $e->getMessage();
 		return false;
@@ -18,11 +22,10 @@ $conexao_new_epp = function () {
 	return $pdo;
 };
 
-$query = $conexao_new_epp()->prepare("select preferredName,cod_situacao,id_eprepag,access_token,api.datahora from user u 
+
+$query = $conexao_new_epp()->prepare("select preferredName,cod_situacao,id_eprepag from user u 
 	 inner join oauth_clients c on c.user_id = u.id_new 
-	 inner join situacao_chave_api ch on ch.cod_usuario = u.id_new 
-	 inner join oauth_access_tokens t on t.user_id = u.id_new 
-	 inner join AT_ApisUso api on api.token = t.access_token group by preferredName order by api.datahora;");
+	 inner join situacao_chave_api ch on ch.cod_usuario = u.id_new group by preferredName;");
 $query->execute();
 $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 
@@ -91,7 +94,6 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 			<tr>
 				<th>ID</th>
 				<th>PDV</th>
-				<th>Primeira Utilização</th>
 				<th>Situação chave</th>
 			</tr>
 		</thead>
@@ -99,12 +101,10 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 			<?php
 			if (count($resultadoSelecao) > 0) {
 				foreach ($resultadoSelecao as $key => $value) {
-					$date = new DateTimeImmutable($value["datahora"]);
 					?>
 					<tr>
 						<td><?php echo $value["id_eprepag"]; ?></td>
 						<td><?php echo $value["preferredName"]; ?></td>
-						<td><?php echo $date->format("d-m-Y H:i:s"); ?></td>
 						<td class="<?php echo ($value["cod_situacao"] == 1) ? 'active' : 'inactive'; ?>">
 							<?php echo ($value["cod_situacao"] == 1) ? 'Ativo' : 'Inativo'; ?></td>
 					</tr>
