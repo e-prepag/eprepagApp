@@ -22,6 +22,8 @@ $numpin 	= isset($_POST["pin_number"])		? $_POST["pin_number"]		: null;
 $op			= isset($_POST["op"])				? $_POST["op"]				: null;
 $vercod		= isset($_POST["verificationCode"])	? strtolower($_POST["verificationCode"]): null;
 $pagto		= isset($_POST["pagto"])			? $_POST["pagto"]			: null;
+$venda_id   = $_POST["venda_id"] ?? null;
+
 if(!isset($venda_id)) $venda_id = $_SESSION['venda'];
 
 validaSessao(1);
