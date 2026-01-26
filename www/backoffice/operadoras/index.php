@@ -7,12 +7,90 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . 'class/util/Util.class.php';
 require_once $raiz_do_projeto . 'class/util/Json.class.php';
 
-$opr_codigo = $_POST['opr_codigo'] ?? null;
-$opr_nome = $_POST['opr_nome'] ?? null;
-$btn_pesquisar = $_POST['btn_pesquisar'] ?? null;
-$opr_codigo = $_GET['opr_codigo'] ?? null;
-$opr_nome = $_GET['opr_nome'] ?? null;
-$btn_pesquisar = $_GET['btn_pesquisar'] ?? null;
+$opr_codigo = $_REQUEST['opr_codigo'] ?? null;
+$opr_nome = $_REQUEST['opr_nome'] ?? null;
+$btn_pesquisar = $_REQUEST['btn_pesquisar'] ?? null;
+$opr_flag_possui_restricao_pagto              = $_POST['opr_flag_possui_restricao_pagto'] ?? null;
+$opr_tipo_pagto_bloqueados                    = $_POST['opr_tipo_pagto_bloqueados'] ?? null;
+$opr_cnpj                                    = $_POST['opr_cnpj'] ?? null;
+$opr_razao                                   = $_POST['opr_razao'] ?? null;
+$opr_im                                      = $_POST['opr_im'] ?? null;
+$opr_endereco                                = $_POST['opr_endereco'] ?? null;
+$opr_numero                                  = $_POST['opr_numero'] ?? null;
+$opr_complemento                             = $_POST['opr_complemento'] ?? null;
+$opr_bairro                                  = $_POST['opr_bairro'] ?? null;
+$opr_cep                                     = $_POST['opr_cep'] ?? null;
+$opr_cidade                                  = $_POST['opr_cidade'] ?? null;
+$opr_estado                                  = $_POST['opr_estado'] ?? null;
+$opr_pais                                    = $_POST['opr_pais'] ?? null;
+$opr_codigo                                  = $_POST['opr_codigo'] ?? null;
+$opr_nome                                    = $_POST['opr_nome'] ?? null;
+$opr_nome_loja                               = $_POST['opr_nome_loja'] ?? null;
+$opr_internacional                           = $_POST['opr_internacional'] ?? null;
+
+$opr_numero_conta                            = $_POST['opr_numero_conta'] ?? null;
+$opr_tipo_conta                              = $_POST['opr_tipo_conta'] ?? null;
+$opr_numero_roteamento                       = $_POST['opr_numero_roteamento'] ?? null;
+$opr_banco_nome                              = $_POST['opr_banco_nome'] ?? null;
+$opr_banco_endereco                          = $_POST['opr_banco_endereco'] ?? null;
+$opr_banco_cidade                            = $_POST['opr_banco_cidade'] ?? null;
+$opr_banco_telefone                          = $_POST['opr_banco_telefone'] ?? null;
+$opr_moeda_corrente                          = $_POST['opr_moeda_corrente'] ?? null;
+$opr_iban                                    = $_POST['opr_iban'] ?? null;
+$opr_bic_code                                = $_POST['opr_bic_code'] ?? null;
+$opr_numero_contrato                         = $_POST['opr_numero_contrato'] ?? null;
+
+$opr_contato                                 = $_POST['opr_contato'] ?? null;
+$opr_status                                  = $_POST['opr_status'] ?? null;
+$opr_contato_epp                             = $_POST['opr_contato_epp'] ?? null;
+$opr_min_repasse                             = $_POST['opr_min_repasse'] ?? null;
+$opr_internacional_alicota                   = $_POST['opr_internacional_alicota'] ?? null;
+$opr_possui_detalhe                          = $_POST['opr_possui_detalhe'] ?? null;
+$opr_site                                    = $_POST['opr_site'] ?? null;
+$opr_cont_fone                               = $_POST['opr_cont_fone'] ?? null;
+$opr_email_dimp                              = $_POST['opr_email_dimp'] ?? null;
+$opr_cotacao_dolar                           = $_POST['opr_cotacao_dolar'] ?? null;
+$opr_cont_mail                               = $_POST['opr_cont_mail'] ?? null;
+
+$opr_ban_pos                                 = $_POST['opr_ban_pos'] ?? null;
+$opr_ddd                                    = $_POST['opr_ddd'] ?? null;
+$opr_importa                                = $_POST['opr_importa'] ?? null;
+$opr_prestacao_lote                          = $_POST['opr_prestacao_lote'] ?? null;
+$opr_ordem                                  = $_POST['opr_ordem'] ?? null;
+$opr_mostra_remuneracao                      = $_POST['opr_mostra_remuneracao'] ?? null;
+$opr_pin_online                              = $_POST['opr_pin_online'] ?? null;
+$opr_seq                                    = $_POST['opr_seq'] ?? null;
+$opr_master_codigo                           = $_POST['opr_master_codigo'] ?? null;
+
+$opr_pedido_estoque_prazo                    = $_POST['opr_pedido_estoque_prazo'] ?? null;
+$opr_pedido_estoque_prazo_comentario         = $_POST['opr_pedido_estoque_prazo_comentario'] ?? null;
+$opr_faturamento_ordem                       = $_POST['opr_faturamento_ordem'] ?? null;
+$opr_need_cpf_lh                             = $_POST['opr_need_cpf_lh'] ?? null;
+$opr_vinculo_empresa                         = $_POST['opr_vinculo_empresa'] ?? null;
+$opr_desmembra_cartao                        = $_POST['opr_desmembra_cartao'] ?? null;
+$opr_emite_cartao_conosco                    = $_POST['opr_emite_cartao_conosco'] ?? null;
+$opr_distribui_ponto_certo                   = $_POST['opr_distribui_ponto_certo'] ?? null;
+$opr_prefixo_ponto_certo                     = $_POST['opr_prefixo_ponto_certo'] ?? null;
+$opr_contabiliza_utilizacao                  = $_POST['opr_contabiliza_utilizacao'] ?? null;
+
+$opr_banco_intermediario                     = $_POST['opr_banco_intermediario'] ?? null;
+$opr_bslan                                   = $_POST['opr_bslan'] ?? null;
+$opr_bslan_rule                              = $_POST['opr_bslan_rule'] ?? null;
+
+$opr_data_inicio_operacoes                   = $_POST['opr_data_inicio_operacoes'] ?? null;
+$opr_data_inicio_contabilizacao_utilizacao   = $_POST['opr_data_inicio_contabilizacao_utilizacao'] ?? null;
+
+$opr_pin_epp_formato                         = $_POST['opr_pin_epp_formato'] ?? null;
+$opr_markup                                  = $_POST['opr_markup'] ?? null;
+$opr_facilitadora                            = $_POST['opr_facilitadora'] ?? null;
+$merchant_id_bexs                            = $_POST['merchant_id_bexs'] ?? null;
+
+$opr_valores                                 = $_POST['opr_valores'] ?? null;
+
+$obi_banco_nome                              = $_POST['obi_banco_nome'] ?? null;
+$obi_bic_code                                = $_POST['obi_bic_code'] ?? null;
+$obi_numero_conta                            = $_POST['obi_numero_conta'] ?? null;
+
 
 $acao = isset($_REQUEST['acao']) ? $_REQUEST['acao'] : 'listar';
 $msg = "";
