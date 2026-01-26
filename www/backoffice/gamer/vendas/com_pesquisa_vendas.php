@@ -13,7 +13,6 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/gamer/main.php";
 require_once $raiz_do_projeto."includes/inc_Pagamentos.php"; 
-require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 require_once "/www/includes/bourls.php";
 
 set_time_limit ( 60000 ) ;
@@ -61,6 +60,8 @@ $ncamp = $_REQUEST['ncamp'] ?? null;
 $inicial = $_REQUEST['inicial'] ?? null;
 $range = $_REQUEST['range'] ?? null;
 $ordem = $_REQUEST['ordem'] ?? null;
+
+require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 
 //if(!empty($ex_tf_opr_codigo)) echo "EXCLUI [".$ex_tf_opr_codigo."]<br>";
 
