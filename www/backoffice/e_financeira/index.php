@@ -7,6 +7,8 @@ error_reporting(E_ALL);
 
 $data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
 $data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
+$sel_tipo = $_GET['sel_tipo'] ?? "pretty";
+
 $data_atual = date('Y-m');
 
 ?>
@@ -200,6 +202,14 @@ $data_atual = date('Y-m');
 				<input id="dt_final" name="dt_final" max="<?php echo $data_atual; ?>" value="<?php echo $data_final; ?>" class="form-control"
 					type="month">
 			</div>
+			<div class="col-cancel-pins">
+				<label for="sel_tipo">Tipo Visualização
+				</label>
+				<select id="sel_tipo" name="sel_tipo" class="form-control">
+					<option value="pretty" <?php echo ($sel_tipo == "pretty" ? "selected" : ""); ?> >Simplificada</option>
+					<option value="xml" <?php echo ($sel_tipo == "xml" ? "selected" : ""); ?> >XML</option>
+				</select>
+			</div>
 		</div>
 
 		<div class="d-flex top10 custom-justify">
@@ -225,11 +235,17 @@ $data_atual = date('Y-m');
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
 	$efinanceira = new GerarEFinanceira();
-	$dados = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
-	foreach ($dados as $dado) {
-		echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
+	if ($sel_tipo == 'xml') {
+		$dados = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
+		foreach ($dados as $dado) {
+			echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
+		}
+	} else {
+		$dados = $efinanceira->gerarMovimentacaoFinanceiraCompletaDados($data_inicial, $data_final);
+		echo gerarRelatorioPorCompetencia($dados);
 	}
-	//echo json_encode($dados);
+
+
 	?>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
