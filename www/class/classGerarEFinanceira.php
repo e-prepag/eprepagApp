@@ -784,9 +784,6 @@ class GerarEFinanceira
         // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
 
-        // Variável para IDs únicos (opcional, pode ser movida para dentro do loop do mês se preferir recontar)
-        $id_mov = 100;
-
         $inicioMesAno = substr(str_replace('-', '', $inicio), 0, 6);
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
@@ -816,10 +813,8 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas'],
-                    $id_mov
+                    $registro['contas']
                 );
-                $id_mov++;
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
                 $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
@@ -854,13 +849,73 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas'],
-                    $id_mov
+                    $registro['contas']
                 );
-                $id_mov++;
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
                 $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
+            }
+        }
+
+        return $movimentacoesAgrupadasPorMes;
+    }
+
+    public function gerarMovimentacaoFinanceiraCompletaDados($inicio, $fim)
+    {
+        $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
+        $data_fim = DateTime::createFromFormat('Y-m', $fim);
+
+        $erros = DateTime::getLastErrors();
+
+        if ($data_inicio === false || $data_fim === false || $erros['error_count'] > 0) {
+            return false;
+        }
+
+        $inicio = $data_inicio->format('Y-m-01');
+        $fim = $data_fim->format('Y-m-t');
+
+        // 1. Obtenção e Agrupamento dos Dados
+        $inicio_semestre = $this->inicioDoSemestre($inicio);
+
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $fim);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $fim);
+
+        $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
+        $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+
+        // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
+        $movimentacoesAgrupadasPorMes = [];
+
+        $inicioMesAno = substr(str_replace('-', '', $inicio), 0, 6);
+        // --- Processa PJs ---
+        foreach ($dadosPJAgrupados as $pessoa => $meses) {
+            foreach ($meses as $mes => $registro) {
+
+                if ($inicioMesAno >= $mes) {
+                    continue;
+                }
+
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                    continue;
+                }
+
+                $movimentacoesAgrupadasPorMes[$mes][] = $registro;
+            }
+        }
+
+        // --- Processa PFs ---
+        foreach ($dadosPFAgrupados as $pessoa => $meses) {
+            foreach ($meses as $mes => $registro) {
+
+                if ($inicioMesAno >= $mes) {
+                    continue;
+                }
+
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                    continue;
+                }
+
+                $movimentacoesAgrupadasPorMes[$mes][] = $registro;
             }
         }
 
@@ -1030,7 +1085,7 @@ class GerarEFinanceira
      *     tipo_relacao: string
      * } $contas_user
      */
-    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user, $id_mov = null)
+    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
