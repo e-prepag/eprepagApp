@@ -137,9 +137,7 @@ $NAT_OPER = "2";                                             // Informar a natur
 
 //Esse ID é concatenado no inicio de cada id da operação('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
 
-$ARRAY_CONCATENA_ID_VENDA = array
-
-(
+$ARRAY_CONCATENA_ID_VENDA = array(
 
     'gamer' => '10',
 
@@ -215,11 +213,11 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
     <ol class="breadcrumb top10">
 
-        <li><a href="#" class="muda-aba" ordem="<?php echo $currentAba->getOrdem(); ?>">BackOffice - <?php echo $currentAba->getDescricao();?></a></li>
+        <li><a href="#" class="muda-aba" ordem="<?php echo $currentAba->getOrdem(); ?>">BackOffice - <?php echo $currentAba->getDescricao(); ?></a></li>
 
         <li class="active"><?php echo $sistema->menu[0]->getDescricao(); ?></li>
 
-        <li class="active"><?php echo $sistema->item->getDescricao() ; ?></li>
+        <li class="active"><?php echo $sistema->item->getDescricao(); ?></li>
 
     </ol>
 
@@ -250,114 +248,114 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                 <select id="estado" name="estado" class="form form-control">
 
                     <option value="AC" <?php if (isset($estado) && $estado == "AC")
-                        echo 'selected="selected" '; ?>>Acre
+                                            echo 'selected="selected" '; ?>>Acre
                     </option>
 
                     <option value="AL" <?php if (isset($estado) && $estado == "AL")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Alagoas
                     </option>
 
                     <option value="AP" <?php if (isset($estado) && $estado == "AP")
-                        echo 'selected="selected" '; ?>>Amapá
+                                            echo 'selected="selected" '; ?>>Amapá
                     </option>
 
                     <option value="AM" <?php if (isset($estado) && $estado == "AM")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Amazonas</option>
 
                     <option value="BA" <?php if (isset($estado) && $estado == "BA")
-                        echo 'selected="selected" '; ?>>Bahia
+                                            echo 'selected="selected" '; ?>>Bahia
                     </option>
 
                     <option value="CE" <?php if (isset($estado) && $estado == "CE")
-                        echo 'selected="selected" '; ?>>Ceará
+                                            echo 'selected="selected" '; ?>>Ceará
                     </option>
 
                     <option value="DF" <?php if (isset($estado) && $estado == "DF")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Distrito Federal</option>
 
                     <option value="ES" <?php if (isset($estado) && $estado == "ES")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Espírito Santo</option>
 
                     <option value="GO" <?php if (isset($estado) && $estado == "GO")
-                        echo 'selected="selected" '; ?>>Goiás
+                                            echo 'selected="selected" '; ?>>Goiás
                     </option>
 
                     <option value="MA" <?php if (isset($estado) && $estado == "MA")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Maranhão</option>
 
                     <option value="MT" <?php if (isset($estado) && $estado == "MT")
-                        echo 'selected="selected" '; ?>>Mato
+                                            echo 'selected="selected" '; ?>>Mato
                         Grosso</option>
 
                     <option value="MS" <?php if (isset($estado) && $estado == "MS")
-                        echo 'selected="selected" '; ?>>Mato
+                                            echo 'selected="selected" '; ?>>Mato
                         Grosso do Sul</option>
 
                     <option value="MG" <?php if (isset($estado) && $estado == "MG")
-                        echo 'selected="selected" '; ?>>Minas
+                                            echo 'selected="selected" '; ?>>Minas
                         Gerais</option>
 
                     <option value="PA" <?php if (isset($estado) && $estado == "PA")
-                        echo 'selected="selected" '; ?>>Pará
+                                            echo 'selected="selected" '; ?>>Pará
                     </option>
 
                     <option value="PB" <?php if (isset($estado) && $estado == "PB")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Paraíba
                     </option>
 
                     <option value="PR" <?php if (isset($estado) && $estado == "PR")
-                        echo 'selected="selected" '; ?>>Paraná
+                                            echo 'selected="selected" '; ?>>Paraná
                     </option>
 
                     <option value="PE" <?php if (isset($estado) && $estado == "PE")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Pernambuco</option>
 
                     <option value="PI" <?php if (isset($estado) && $estado == "PI")
-                        echo 'selected="selected" '; ?>>Piauí
+                                            echo 'selected="selected" '; ?>>Piauí
                     </option>
 
                     <option value="RJ" <?php if (isset($estado) && $estado == "RJ")
-                        echo 'selected="selected" '; ?>>Rio de
+                                            echo 'selected="selected" '; ?>>Rio de
                         Janeiro</option>
 
                     <option value="RN" <?php if (isset($estado) && $estado == "RN")
-                        echo 'selected="selected" '; ?>>Rio
+                                            echo 'selected="selected" '; ?>>Rio
                         Grande do Norte</option>
 
                     <option value="RS" <?php if (isset($estado) && $estado == "RS")
-                        echo 'selected="selected" '; ?>>Rio
+                                            echo 'selected="selected" '; ?>>Rio
                         Grande do Sul</option>
 
                     <option value="RO" <?php if (isset($estado) && $estado == "RO")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Rondônia</option>
 
                     <option value="RR" <?php if (isset($estado) && $estado == "RR")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Roraima
                     </option>
 
                     <option value="SC" <?php if (isset($estado) && $estado == "SC")
-                        echo 'selected="selected" '; ?>>Santa
+                                            echo 'selected="selected" '; ?>>Santa
                         Catarina</option>
 
                     <option value="SP" <?php if (empty($estado) || (isset($estado) && $estado == "SP"))
-                        echo 'selected="selected" '; ?>>São Paulo</option>
+                                            echo 'selected="selected" '; ?>>São Paulo</option>
 
                     <option value="SE" <?php if (isset($estado) && $estado == "SE")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Sergipe
                     </option>
 
                     <option value="TO" <?php if (isset($estado) && $estado == "TO")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Tocantins</option>
 
                 </select>
@@ -379,23 +377,23 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                 <select name="cod_fin" id="cod_fin" class="form form-control" onchange="changeSelect();">
 
                     <option value="1" <?php if (empty($cod_fin) || (isset($cod_fin) && $cod_fin == "1"))
-                        echo 'selected="selected" '; ?>>Remessa de arquivo normal</option>
+                                            echo 'selected="selected" '; ?>>Remessa de arquivo normal</option>
 
                     <option value="2" <?php if (isset($cod_fin) && $cod_fin == "2")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Remessa
                         de arquivo retificador</option>
 
                     <option value="3" <?php if (isset($cod_fin) && $cod_fin == "3")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Remessa
                         de arquivo para atender notificação</option>
 
                     <!-- option value="4" <?php if (isset($cod_fin) && $cod_fin == "4")
-                        echo 'selected="selected" '; ?>>Remessa de arquivo zerado</option -->
+                                                echo 'selected="selected" '; ?>>Remessa de arquivo zerado</option -->
 
                     <option value="5" <?php if (isset($cod_fin) && $cod_fin == "5")
-                        echo 'selected="selected" '; ?>>
+                                            echo 'selected="selected" '; ?>>
                         Remessa
                         de arquivo de encerramento de atividades</option>
 
@@ -413,10 +411,10 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
         </div>
 
         <div class="col-md-12 col-sm-12 col-xs-12 text-right cod_fin-3" <?php if ((isset($cod_fin) && $cod_fin != "3") || empty($cod_fin))
-            echo "hidden"; ?>><br></div>
+                                                                            echo "hidden"; ?>><br></div>
 
         <div class="col-md-12 col-sm-12 col-xs-12 text-right cod_fin-3" <?php if ((isset($cod_fin) && $cod_fin != "3") || empty($cod_fin))
-            echo "hidden"; ?>>
+                                                                            echo "hidden"; ?>>
 
             <div class="col-md-6 col-sm-6 col-xs-6 text-right">CPF/CNPJ:</div>
 
@@ -463,12 +461,11 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-
-    jQuery(function (e) {
-
+    jQuery(function(e) {
 
 
-        $("#cpfcnpj").keypress(function () {
+
+        $("#cpfcnpj").keypress(function() {
 
             if ($('#cpfcnpj').val().length > 13) {
 
@@ -476,9 +473,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                 $("#cpfcnpj").mask("99.999.999/9999-99");
 
-            }
-
-            else {
+            } else {
 
                 $("#cpfcnpj").mask("999.999.999-99");
 
@@ -529,7 +524,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
             maxDate: "y -1m w d",
 
-            minDate: "y -10m w d",
+            minDate: "y -40m w d",
 
             setDate: 'today',
 
@@ -539,7 +534,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
             monthNamesShort: ['Janeiro', 'Fevereiro', 'Mar&ccedil;o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
 
-            onClose: function (dateText, inst) {
+            onClose: function(dateText, inst) {
 
                 $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
 
@@ -553,7 +548,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 
 
-    $(function () {
+    $(function() {
 
         $("#modal-load").removeClass('show');
 
@@ -563,8 +558,8 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
         $("#modal-load").modal('hide');
 
-        $(document).ready(function () {
-            $('#congelamento').on('submit', function (e) {
+        $(document).ready(function() {
+            $('#congelamento').on('submit', function(e) {
                 e.preventDefault();
 
                 // Exibe mensagem de carregamento na div resultado
@@ -581,14 +576,14 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     url: './ajax_dimp.php',
                     method: 'POST',
                     data: formData,
-                    success: function (response) {
+                    success: function(response) {
                         if (response.trim() === '') {
                             iniciarVerificacao(formData);
                         } else {
                             $('#resultado').html(response);
                         }
                     },
-                    error: function () {
+                    error: function() {
                         $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisição.</div></div>');
 
                     }
@@ -596,28 +591,98 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
             });
 
             // Função que verifica o status do processamento de tempos em tempos
-            function iniciarVerificacao(formData) {
-                $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="40px" />Ainda processando, esse processo pode demorar 15 minutos ou mais, por favor aguarde...</div></div>');
+            let intervaloVerificacao = null;
+            let requisicaoEmAndamento = false;
 
-                const intervalo = setInterval(function () {
+            function iniciarVerificacao(formData) {
+
+                // proteção: evita iniciar duas vezes
+                if (intervaloVerificacao !== null) {
+                    console.warn('Verificação já em andamento.');
+                    return;
+                }
+
+                // HTML padrão de "processando"
+                const htmlProcessando = `
+            <div class="row">
+                <div class="col-md-12 text-center top50"
+                     style="background-color:white;
+                            color:black;
+                            font-weight:bold;
+                            font-size:1.2em;
+                            border-radius:8px;
+                            padding:15px;">
+                    <img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="40px" />
+                    Ainda processando, esse processo pode demorar 15 minutos ou mais, por favor aguarde...
+                </div>
+            </div>
+        `;
+
+                $('#resultado').html(htmlProcessando);
+
+                // inicia o intervalo
+                intervaloVerificacao = setInterval(function() {
+
+                    // evita chamadas paralelas se a anterior não terminou
+                    if (requisicaoEmAndamento) {
+                        return;
+                    }
+
+                    requisicaoEmAndamento = true;
+
+                    // garante que o parâmetro exista
+                    formData.set('verificar', 'true');
+
                     $.ajax({
                         url: './ajax_dimp.php',
-                        method: 'POST',
-                        data: formData + '&verificar=true',
-                        success: function (statusResponse) {
-                            if (statusResponse.trim() !== 'aguardando') {
-                                clearInterval(intervalo);
-                                $('#resultado').html(statusResponse);
+                        type: 'POST',
+                        data: formData,
+                        processData: false, // obrigatório para FormData
+                        contentType: false, // obrigatório para FormData
+                        timeout: 30000, // 30s de timeout
+                        success: function(response) {
+
+                            const status = response.trim();
+
+                            if (status !== 'aguardando') {
+                                // finalizou ? para o intervalo
+                                clearInterval(intervaloVerificacao);
+                                intervaloVerificacao = null;
+
+                                $('#resultado').html(response);
                             } else {
-                                $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="40px" />Ainda processando, esse processo pode demorar 15 minutos ou mais, por favor aguarde...</div></div>');
+                                // ainda processando
+                                $('#resultado').html(htmlProcessando);
                             }
                         },
-                        error: function () {
-                            clearInterval(intervalo);
-                            $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao verificar o processamento.</div></div>');
+                        error: function(xhr, status, error) {
+
+                            console.error('Erro AJAX:', status, error);
+
+                            clearInterval(intervaloVerificacao);
+                            intervaloVerificacao = null;
+
+                            $('#resultado').html(`
+                        <div class="row">
+                            <div class="col-md-12 text-center top50"
+                                 style="background-color:white;
+                                        color:black;
+                                        font-weight:bold;
+                                        font-size:1.2em;
+                                        border-radius:8px;
+                                        padding:15px;">
+                                Erro ao verificar o processamento. Tente novamente.
+                            </div>
+                        </div>
+                    `);
+                        },
+                        complete: function() {
+                            // libera para próxima execução
+                            requisicaoEmAndamento = false;
                         }
                     });
-                }, 10000); // A cada 10 segundos
+
+                }, 10000); // 10 segundos
             }
         });
 
@@ -632,9 +697,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
             $('.cod_fin-3').removeAttr("hidden");
 
-        }
-
-        else {
+        } else {
 
             $('.cod_fin-3').attr("hidden", "hidden");
 
@@ -643,7 +706,6 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
         }
 
     }
-
 </script>
 
 

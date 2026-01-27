@@ -1,10 +1,45 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-set_time_limit(0);
-ini_set('memory_limit', '1024M');
-//error_reporting(E_ALL);
-//ini_set('error_log', 'erro.log');
-//ini_set('display_errors', 1);
+
+if (isset($_GET['directory']) && isset($_GET['name'])) {
+    $baseDir = __DIR__ . '/downloads';
+
+    $directory = $_GET['directory'] ?? '';
+    $filename  = $_GET['name'] ?? '';
+
+    if (!preg_match('/^[a-zA-Z0-9_-]+$/', $directory)) {
+        http_response_code(400);
+        exit('Diretório inválido.');
+    }
+
+    if (!preg_match('/^[a-zA-Z0-9_-]+\.txt$/', $filename)) {
+        http_response_code(400);
+        exit('Nome de arquivo inválido.');
+    }
+
+    $fullPath = $baseDir . '/' . $directory . '/' . $filename;
+
+    $realBase = realpath($baseDir);
+    $realFile = realpath($fullPath);
+
+    if ($realFile === false || strpos($realFile, $realBase) !== 0) {
+        http_response_code(403);
+        exit('Acesso negado.');
+    }
+
+    if (!is_file($realFile) || !is_readable($realFile)) {
+        http_response_code(404);
+        exit('Arquivo não encontrado.');
+    }
+
+    header('Content-Type: text/plain; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . basename($realFile) . '"');
+    header('Content-Length: ' . filesize($realFile));
+    header('X-Content-Type-Options: nosniff');
+
+    readfile($realFile);
+    exit;
+}
 
 ignore_user_abort(true);
 ob_start();
@@ -40,7 +75,15 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
     }
 
     if ($ultimoArquivo) {
-        echo '<div class="row"><div class="col-md-12 text-center top50"><a href="/dimp/' . date('Ymd') . '/' . strtoupper($ultimoArquivo) . '" class="btn btn-info" download="' . strtoupper($ultimoArquivo) . '">Download Arquivo DIMP</a><div></div>';
+        echo '<div class="row">
+                <div class="col-md-12 text-center top50">
+                    <a href="www/backoffice/compliance/ajax_dimp.php
+                        ?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
+                        class="btn btn-info" 
+                        target="_blank">Download Arquivo DIMP
+                    </a>
+                <div>
+            </div>';
 
         ob_end_flush();
         flush();
@@ -900,7 +943,7 @@ try {
 
                     //Dados dos Publishers vinculados a EPP ADM
 
-                    if($response_epp_adm_row['opr_estado'] != 'SP'){
+                    if ($response_epp_adm_row['opr_estado'] != 'SP') {
                         continue;
                     }
 
@@ -3113,7 +3156,15 @@ try {
             //
 
 
-            echo '<div class="row"><div class="col-md-12 text-center top50"><a href="/dimp/' . date('Ymd') . '/' . strtoupper($nomeArquivo) . '" class="btn btn-info" download="' . strtoupper($nomeArquivo) . '">Download Arquivo DIMP</a><div></div>';
+            echo '<div class="row">
+                <div class="col-md-12 text-center top50">
+                    <a href="www/backoffice/compliance/ajax_dimp.php
+                        ?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
+                        class="btn btn-info" 
+                        target="_blank">Download Arquivo DIMP
+                    </a>
+                <div>
+            </div>';
 
             //ob_end_flush();
 
