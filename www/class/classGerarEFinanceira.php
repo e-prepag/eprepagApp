@@ -1077,6 +1077,48 @@ class GerarEFinanceira
         return $this->criarEnvioFinanceira($dadosParaCriar);
     }
 
+    private function buscar_aberturas(string $data_inicial, string $data_final): int
+    {
+        $periodo = $data_inicial . "_" . $data_final;
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        // 1. Tenta buscar o ID existente
+        $sql = "SELECT id FROM public.envios_e_financeira 
+            WHERE data_anomes = :anomes 
+              AND cpfcnpj_declarado = :cpfcnpj 
+              AND tipo = 'ABERTURA'
+              AND retificado = false
+            LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':anomes'  => $periodo,
+        ]);
+
+        $idEncontrado = $stmt->fetchColumn();
+
+        // Se encontrou, retorna o ID imediatamente
+        if ($idEncontrado) {
+            return (int) $idEncontrado;
+        }
+
+        // 2. Se não encontrou, prepara os dados para criar um novo
+
+        $semetre = $this->getSemestreFormatado($data_inicial);
+
+        $dadosParaCriar = [
+            'tipo'              => 'ABERTURA',
+            'status_envio'      => 'PENDENTE',      // Valor padrão
+            'versao_efin'       => 'v1_2_1',         // Valor padrão obrigatório
+            'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
+            'nome_arquivo'      => "none",
+            'data_anomes'       => $periodo,
+            'retificado'        => 'false',
+            'semestre_ano'      => $semetre
+        ];
+
+        return $this->criarEnvioFinanceira($dadosParaCriar);
+    }
+
     /**
      * @param array{
      *     ug_id: int|string,
@@ -1804,7 +1846,6 @@ class GerarEFinanceira
             ]);
 
             return $stmt->rowCount();
-
         } catch (PDOException $e) {
             throw new Exception("Erro ao atualizar status do envio: " . $e->getMessage());
         }
