@@ -49,6 +49,129 @@ function xmlViewer($xmlString, $id = 'xmlViewer')
 HTML;
 }
 
+function gerarRelatorioPorCompetencia(array $dados)
+{
+    if (empty($dados)) {
+        return '<div class="alert alert-warning">Nenhum dado para exibir.</div>';
+    }
+
+    // CSS para deixar o relatório visualmente hierárquico
+    $html = '<style>
+        .rel-container { font-family: "Segoe UI", Arial, sans-serif; max-width: 1000px; margin: 0 auto; color: #333; }
+        
+        /* Estilo do Bloco do Mês */
+        .mes-section { margin-bottom: 40px; border: 1px solid #268fbd; border-radius: 8px; overflow: hidden; }
+        .mes-header { background-color: #268fbd; color: #fff; padding: 15px; font-size: 1.3em; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Estilo do Card do Declarado */
+        .declarado-card { background-color: #fff; border-bottom: 5px solid #f0f2f5; padding: 20px; }
+        .declarado-card:last-child { border-bottom: none; }
+        
+        .declarado-info { margin-bottom: 15px; border-left: 4px solid #28a745; padding-left: 15px; }
+        .declarado-nome { font-size: 1.2em; font-weight: 700; color: #2c3e50; margin: 0 0 5px 0; }
+        .declarado-doc { font-size: 0.9em; color: #555; font-weight: 600; background: #e9ecef; padding: 2px 6px; border-radius: 4px; }
+        .declarado-end { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
+
+        /* Tabela de Contas */
+        .table-contas { width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .table-contas th { background-color: #f8f9fa; text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6; color: #495057; }
+        .table-contas td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .col-money { text-align: right; font-family: Consolas, monospace; }
+        
+        .val-entrada { color: #28a745; }
+        .val-saida { color: #dc3545; }
+        .val-saldo { font-weight: bold; }
+        .badge-relacao { background: #17a2b8; color: white; font-size: 0.75em; padding: 2px 5px; border-radius: 3px; }
+    </style>';
+
+    $html .= '<div class="rel-container">';
+
+    // 1. Loop Principal: Itera sobre os MESES (Chaves principais do array)
+    foreach ($dados as $anoMes => $listaDeclarados) {
+
+        // Formata 202402 para Fevereiro/2024 (ou 02/2024)
+        $ano = substr($anoMes, 0, 4);
+        $mes = substr($anoMes, 4, 2);
+        $dataLabel = "$mes/$ano";
+
+        $html .= '<div class="mes-section">';
+        $html .= '  <div class="mes-header">Mês e ano: ' . $dataLabel . '</div>';
+
+        // 2. Loop Secundário: Itera sobre os DECLARADOS dentro daquele mês
+        foreach ($listaDeclarados as $registro) {
+
+            $dd = $registro['dadosDeclarado'];
+
+            // Monta Endereço
+            $endereco = implode(', ', array_filter([
+                $dd['ug_endereco'],
+                $dd['ug_numero'],
+                $dd['ug_complemento'],
+                $dd['ug_bairro'],
+                $dd['ug_cidade'] . '-' . $dd['ug_estado'],
+                $dd['ug_cep'] ? 'CEP: ' . $dd['ug_cep'] : null
+            ]));
+
+            $html .= '<div class="declarado-card">';
+
+            // Dados do Declarado
+            $cpf_cnpj = $dd['tipo_declarado'] == 1 ? "CPF" : "CNPJ";
+            $html .= '  <div class="declarado-info">';
+            $html .= '      <h3 class="declarado-nome">' . htmlspecialchars($dd['nome_declarado']) . '</h3>';
+            $html .= '      <span class="declarado-doc">' . $cpf_cnpj . ': ' . htmlspecialchars($dd['ni_declarado']) . '</span>';
+            $html .= '      <div class="declarado-end">Endereço: ' . htmlspecialchars($endereco) . '</div>';
+            $html .= '  </div>';
+
+            // 3. Tabela de Contas
+            if (!empty($registro['contas'])) {
+                $html .= '<table class="table-contas">';
+                $html .= '<thead>
+                            <tr>
+                                <th>Conta (ID)</th>
+                                <th>Relação</th>
+                                <th class="col-money">Entradas</th>
+                                <th class="col-money">Saídas</th>
+                            </tr>
+                          </thead><tbody>';
+
+                foreach ($registro['contas'] as $conta) {
+                    $entradas = (float)$conta['entradas'];
+                    $saidas   = (float)$conta['saidas'];
+                    $saldo    = $entradas - $saidas;
+
+                    $classeSaldo = $saldo >= 0 ? 'val-entrada' : 'val-saida';
+
+                    $html .= '<tr>';
+                    $html .= '  <td><strong>' . htmlspecialchars($conta['ug_id']) . '</strong></td>';
+
+                    $tipos = [
+                        1 => 'Titular',
+                        3 => 'Representante Legal',
+                    ];
+
+                    $tipoRelacao = $tipos[$conta['tipo_relacao']] ?? 'Desconhecido';
+                    $html .= '  <td><span class="badge-relacao">Tipo: ' . htmlspecialchars($tipoRelacao) . '</span></td>';
+
+                    $html .= '  <td class="col-money val-entrada">R$ ' . number_format($entradas, 2, ',', '.') . '</td>';
+                    $html .= '  <td class="col-money val-saida">R$ ' . number_format($saidas, 2, ',', '.') . '</td>';
+                    $html .= '</tr>';
+                }
+                $html .= '</tbody></table>';
+            } else {
+                $html .= '<p style="color:#999; margin-left:15px;">Sem movimentação de contas.</p>';
+            }
+
+            $html .= '</div>'; // Fim declarado-card
+        }
+
+        $html .= '</div>'; // Fim mes-section
+    }
+
+    $html .= '</div>'; // Fim container
+
+    return $html;
+}
+
 function gerarZipLotes(array $lotes, string $nomeZip): string
 {
     $dirTemp = sys_get_temp_dir();
@@ -106,7 +229,7 @@ function enviarLotesEfinanceira(array $lotes)
             $xmlRespostaString = $efinanceira->enviarLoteEFinanceira($lote_criptografado);
 
             if ($xmlRespostaString) {
-                
+
                 // Limpa namespaces para facilitar leitura
                 $xmlRespLimpo = str_replace('xmlns=', 'ns=', $xmlRespostaString);
                 $xmlRespObj   = simplexml_load_string($xmlRespLimpo);
@@ -121,7 +244,7 @@ function enviarLotesEfinanceira(array $lotes)
 
                 // SE FOR SUCESSO (1)
                 if ($cdResposta === 1) {
-                    
+
                     // Extrair Protocolo
                     $protocolo = null;
                     $nodeProtocolo = $xmlRespObj->xpath("//*[local-name()='protocoloEnvio']");
@@ -175,16 +298,15 @@ function enviarLotesEfinanceira(array $lotes)
                     } else {
                         echo "<div class='alert alert-warning'>Atenção: Protocolo não encontrado apesar do sucesso. Nada salvo.</div>";
                     }
-
                 } else {
                     // --- SE FOR ERRO (DIFERENTE DE 1) ---
                     echo "<div class='alert alert-danger'>";
                     echo "<h4>Erro no Envio (Cód: " . utf8_decode($cdResposta) . ")</h4>";
                     echo "<p><strong>Mensagem:</strong> " . utf8_decode($descResposta) . "</p>";
-                    
+
                     // Busca ocorrências de erro
                     $ocorrencias = $xmlRespObj->xpath("//*[local-name()='ocorrencia']");
-                    
+
                     if (!empty($ocorrencias)) {
                         echo "<hr><strong>Detalhes das Ocorrências:</strong><ul>";
                         foreach ($ocorrencias as $oco) {
@@ -202,11 +324,9 @@ function enviarLotesEfinanceira(array $lotes)
 
                 // Visualização do XML de Resposta (Sempre útil, mesmo com erro)
                 echo xmlViewer($xmlRespostaString, "Resposta Recebida ($nomeArquivoOriginal)");
-
             } else {
                 echo "<div class='alert alert-warning'>Sem resposta do servidor para o arquivo $nomeArquivoOriginal</div>";
             }
-
         } catch (Exception $e) {
             echo "<div class='alert alert-danger'>Erro crítico ao processar $nomeArquivoOriginal: " . $e->getMessage() . "</div>";
         }
