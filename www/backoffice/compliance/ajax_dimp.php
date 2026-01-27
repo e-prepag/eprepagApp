@@ -77,8 +77,7 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
     if ($ultimoArquivo) {
         echo '<div class="row">
                 <div class="col-md-12 text-center top50">
-                    <a href="www/backoffice/compliance/ajax_dimp.php
-                        ?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
+                    <a href="www/backoffice/compliance/ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
                         class="btn btn-info" 
                         target="_blank">Download Arquivo DIMP
                     </a>
@@ -3158,8 +3157,7 @@ try {
 
             echo '<div class="row">
                 <div class="col-md-12 text-center top50">
-                    <a href="www/backoffice/compliance/ajax_dimp.php
-                        ?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
+                    <a href="www/backoffice/compliance/ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
                         class="btn btn-info" 
                         target="_blank">Download Arquivo DIMP
                     </a>
