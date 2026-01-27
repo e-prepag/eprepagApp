@@ -2,7 +2,7 @@
 <?php
 
 if (isset($_GET['directory']) && isset($_GET['name'])) {
-    $baseDir = __DIR__ . '/downloads';
+    $baseDir = '/www/arquivos_gerados/dimp';
 
     $directory = $_GET['directory'] ?? '';
     $filename  = $_GET['name'] ?? '';
