@@ -12,7 +12,7 @@ if (isset($_GET['directory']) && isset($_GET['name'])) {
         exit('Diretório inválido.');
     }
 
-    if (!preg_match('/^[a-zA-Z0-9_-]+\.txt$/', $filename)) {
+    if (!preg_match('/^[a-zA-Z0-9_-]+\.txt$/i', $filename)) {
         http_response_code(400);
         exit('Nome de arquivo inválido.');
     }
@@ -77,7 +77,7 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
     if ($ultimoArquivo) {
         echo '<div class="row">
                 <div class="col-md-12 text-center top50">
-                    <a href="www/backoffice/compliance/ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
+                    <a href="/ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
                         class="btn btn-info" 
                         target="_blank">Download Arquivo DIMP
                     </a>
@@ -3157,7 +3157,7 @@ try {
 
             echo '<div class="row">
                 <div class="col-md-12 text-center top50">
-                    <a href="www/backoffice/compliance/ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
+                    <a href="/ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($ultimoArquivo) . '"
                         class="btn btn-info" 
                         target="_blank">Download Arquivo DIMP
                     </a>
