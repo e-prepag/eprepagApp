@@ -523,11 +523,31 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
 
         //Verifica estoque
-        if ($msg == "") {
-                if ($b_isVendaCampeonato) {
-                        gravaLog_TMP("Testing Campeonato PagOnline - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  Venda de Campeonato - SEM  verificaEstoque(), (vg_id = $venda_id)" . PHP_EOL);
+        // if ($msg == "") {
+        //         if ($b_isVendaCampeonato) {
+        //                 gravaLog_TMP("Testing Campeonato PagOnline - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  Venda de Campeonato - SEM  verificaEstoque(), (vg_id = $venda_id)" . PHP_EOL);
+        //         } else {
+        //                 $msg = verificaEstoque($venda_id);
+        //         }
+        // }
+
+        if ($msg !== "") {
+                /* ===============================
+                * Verifica pedido de integração
+                * =============================== */
+                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id " . $venda_id;
+                $pedidoIntegracao = SQLexecuteQuery($sqlIntegracao);
+                $existeIntegracao = $pedidoIntegracao && pg_num_rows($pedidoIntegracao) > 0;
+
+                if (!$existeIntegracao) {
+
+                        if ($b_isVendaCampeonato) {
+                                gravaLog_TMP("Testing Campeonato PagOnline - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  Venda de Campeonato - SEM  verificaEstoque(), (vg_id = $venda_id)" . PHP_EOL);
+                        } else {
+                                $msg = verificaEstoque($venda_id);
+                        }
                 } else {
-                        $msg = verificaEstoque($venda_id);
+                        grava_log_integracao("Pedido de integração, bypass de estoque aplicado. Pedido: $venda_id");
                 }
         }
 
@@ -906,7 +926,7 @@ function verificaEstoque($venda_id)
                         // Teste se o PIN não é de requisição
                         if ($vgm_pin_request == 0) {
 
-                                if (!in_array($produto_operadora, [560, 146, 145])) {
+                                if ($produto_operadora != 560) {
 
                                         //PINS
                                         //---------------------------------------------------------------------------------------------------
