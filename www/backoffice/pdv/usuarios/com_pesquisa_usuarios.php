@@ -2304,7 +2304,10 @@ function gerarArquivoCorreios() {
 ?>
 					<!--<td>R$ <?php echo number_format($rs_usuario_row['ug_perfil_limite'], 2, '.', '.') ?></td>-->
 					<td><font color='<?php echo (($rs_usuario_row['ug_perfil_saldo']<0)?"red":(($rs_usuario_row['ug_perfil_saldo']>0)?"blue":"black")); ?>'>R$ <?php echo number_format($rs_usuario_row['ug_perfil_saldo'], 2, '.', '.') ?></td>
-                    <td ><?php echo (new DateTime($rs_usuario_row['ultima_data_compra']))->format('Y-m-d') ?></td>
+                    <td ><?php echo !empty($rs_usuario_row['ultima_data_compra']) 
+    ? date('Y-m-d', strtotime($rs_usuario_row['ultima_data_compra'])) 
+    : 'Não possui';
+ ?></td>
 <?php
 				$statusMaps = $rs_usuario_row['ug_google_maps_status'];
 
