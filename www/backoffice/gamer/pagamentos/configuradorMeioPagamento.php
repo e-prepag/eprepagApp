@@ -8,6 +8,21 @@ if (b_IsBKOUsuarioAdminMeiosPagamentos()) {
     /* 
     CONTROLLER
  */
+
+    $conf_bradesco        = $_POST['conf_bradesco']        ?? null;
+    $conf_banco_brasil    = $_POST['conf_banco_brasil']    ?? null;
+    $conf_itau            = $_POST['conf_itau']            ?? null;
+    $conf_boleto          = $_POST['conf_boleto']          ?? null;
+    $banc_boleto          = $_POST['banc_boleto']          ?? null;
+    $conf_eprepag_cash    = $_POST['conf_eprepag_cash']    ?? null;
+    $conf_cielo           = $_POST['conf_cielo']           ?? null;
+    $conf_pix             = $_POST['conf_pix']             ?? null;
+    $troca                = $_POST['troca']                ?? null;
+    $conf_pix_provedor    = $_POST['conf_pix_provedor']    ?? null;
+    $conf_pix_provedor2   = $_POST['conf_pix_provedor2']   ?? null;
+    $valor_troca          = isset($_POST['valor_troca']) ? (float) $_POST['valor_troca'] : null;
+    $BtnSearch            = $_POST['BtnSearch'] ?? null;
+
     if (isset($BtnSearch) && $BtnSearch) {
         // Variável de OUTPUT
         $msg = '';
