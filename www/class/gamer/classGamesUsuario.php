@@ -1559,17 +1559,17 @@ class UsuarioGames
                 if (isset($info["contas"]) && $info["contas"] == 0) {
                     return "";
                 }
-                return "CPF $cpf JÁ CADASTRADO";
+                return "CPF $cpf já cadastrado";
             }
-            return "ERRO NA CONSULTA, TENTE NOVAMENTE";
+            return "Erro interno, se o problema persistir, entre em contato com o suporte";
         } catch (PDOException $e) {
             // Log do erro
             error_log("Erro no banco de dados: " . $e->getMessage());
-            return "Erro no banco de dados, tente novamente";
+            return "Erro geral, se o problema persistir, entre em contato com o suporte";
         } catch (Exception $e) {
             // Log de qualquer outro erro
             error_log("Erro inesperado: " . $e->getMessage());
-            return "Erro inesperado, tente novamente";
+            return "Erro inesperado, se o problema persistir, entre em contato com o suporte";
         }
         //retornando quantidade de registros
         // return ($rs->fetchColumn() > 0) ? true : false;

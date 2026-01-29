@@ -35,6 +35,7 @@ if (isset($_REQUEST['formsubmit'])) {
 
     ob_clean();
     $_REQUEST['cpf'] = preg_replace('/[^0-9]/', '', $_REQUEST['cpf']);
+    $cpf = $_REQUEST['cpf'];
 
     $contagemErroDia = verificaContagem();
     if ($contagemErroDia["contagem"] != false && $contagemErroDia["contagem"] >= 5) {
@@ -195,7 +196,7 @@ if (isset($_REQUEST['formsubmit'])) {
     $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'));
 
     if(!empty($verifica_cpf)){
-        $errors[] = "CPF já cadastrado em uma conta E-Prepag";
+        $errors[] = "Erro: $verifica_cpf";
     }
 
     if (count($errors) == 0 && !empty($usuarioId)) {
