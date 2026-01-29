@@ -535,7 +535,7 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
                 /* ===============================
                 * Verifica pedido de integração
                 * =============================== */
-                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id " . $venda_id;
+                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id = " . $venda_id;
                 $pedidoIntegracao = SQLexecuteQuery($sqlIntegracao);
                 $existeIntegracao = $pedidoIntegracao && pg_num_rows($pedidoIntegracao) > 0;
 
