@@ -162,7 +162,7 @@ if(Util::isAjaxRequest()){
         
         if(empty($retorno->erro)){
             if(isset($campo) && isset($valor)){                
-                $alteraDado = $usuario->alteraDadoAcesso($campo, $valor, $_POST['senha']);
+                $alteraDado = $usuario->alteraDadoAcesso($campo, $valor, $_POST['senha'], $_POST['login']);
                 if($alteraDado === true){
                     $retorno->sucesso = true;                    
                 }else{

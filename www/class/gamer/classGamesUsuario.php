@@ -3282,7 +3282,7 @@ class UsuarioGames
         return $erro;
     }
 
-    public function alteraDadoAcesso($campo, $valor, $senhaAtual)
+    public function alteraDadoAcesso($campo, $valor, $senhaAtual, $login)
     {
 
         $ret = false;
