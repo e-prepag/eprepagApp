@@ -193,7 +193,7 @@ if (isset($_REQUEST['formsubmit'])) {
 
     $class_usuarios_games = new UsuarioGames();
 
-    $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'));
+    $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'), $usuarioId);
 
     if(!empty($verifica_cpf)){
         $errors[] = "Erro: $verifica_cpf";

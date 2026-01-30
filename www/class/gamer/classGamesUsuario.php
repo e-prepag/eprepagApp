@@ -1534,11 +1534,15 @@ class UsuarioGames
         return ($rs->fetchColumn() > 0) ? true : false;
     }
 
-    public static function existeCPFCadastro($cpf)
+    public static function existeCPFCadastro($cpf, $usuarioId = null)
     {
 
         try {
-            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g');";
+            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
+
+            if(!empty($usuarioId) && $usuarioId > 0){
+                $sql .= " AND ug_id <> :ug_id";
+            }
 
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -1549,6 +1553,11 @@ class UsuarioGames
             $rs = $pdo->prepare($sql);
             $param = ':ug_cpf';
             $rs->bindParam($param, $cpf, PDO::PARAM_STR);
+            if(!empty($usuarioId) && $usuarioId > 0){
+                $usuarioId = (int) $usuarioId;
+
+                $rs->bindParam(":ug_id", $usuarioId, PDO::PARAM_INT);
+            }
             //executando query
             $rs->execute();
 
