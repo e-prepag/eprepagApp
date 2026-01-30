@@ -254,7 +254,7 @@ class UsuarioGames
         $this->setCategoriaFidelizacao($ug_categoria_fidelizacao);
         $this->setLogin($login);
 
-        $this->getIdsVIP($idsVIP);
+        $this->getIdsVIP();
     }
 
     public function getIdsVIP()
@@ -299,9 +299,11 @@ class UsuarioGames
     function setAtivo($ug_blAtivo)
     {
         if (!is_null($ug_blAtivo)) {
-            if ($ug_blAtivo == 1 || $ug_blAtivo == "1" || $ug_blAtivo === "true") $ug_blAtivo = 1;
-            elseif ($ug_blAtivo == '' || $ug_blAtivo == '0' || $ug_blAtivo == 0 || $ug_blAtivo == "false") $ug_blAtivo = 2;
-            else $ug_blAtivo = $ug_blAtivo;
+            if ($ug_blAtivo == 1 || $ug_blAtivo == "1" || $ug_blAtivo === "true") {
+                $ug_blAtivo = 1;
+            } elseif ($ug_blAtivo == '' || $ug_blAtivo == '0' || $ug_blAtivo == 0 || $ug_blAtivo == "false") {
+                $ug_blAtivo = 2;
+            }
         } //end if (!is_null($ug_blAtivo))
         else $ug_blAtivo = 2;
         $this->ug_blAtivo = $ug_blAtivo;
@@ -799,6 +801,7 @@ class UsuarioGames
     {
 
         $id_novo = 0;
+        $ret = "";
         if ($ret == "") {
             if (UsuarioGames::existeEmail($email_novo, null)) {
                 $ret = "Email já cadastrado.";
@@ -1698,6 +1701,41 @@ class UsuarioGames
             // Log de qualquer outro erro
             error_log("Erro inesperado: " . $e->getMessage());
             return "Erro inesperado, tente novamente";
+        }
+    }
+
+    public function existeCPFdoUsuario($usuario_id)
+    {
+
+        try {
+            // Inicializando a query base
+            $sql = "select ug_cpf from usuarios_games where ug_id = :ug_id";
+
+            // Inicializando conexao PDO
+            $con = ConnectionPDO::getConnection();
+            $pdo = $con->getLink();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Passando a query de select
+            $rs = $pdo->prepare($sql);
+
+            $rs->bindParam(':ug_id', $usuario_id, PDO::PARAM_INT);
+
+            // Executando a query
+            $rs->execute();
+            $info = $rs->fetch(PDO::FETCH_ASSOC);
+
+            if ($info != false) {
+                if (isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"])) {
+                    return "";
+                }
+                return "CPF INVALIDO";
+            }
+            return "ERRO CONSULTA";
+        } catch (PDOException $e) {
+            return "ERRO BANCO";
+        } catch (Exception $e) {
+            return "ERRO GERAL";
         }
     }
 
@@ -2771,7 +2809,7 @@ class UsuarioGames
         //		return $this->getUseCielo();
 
         $usuarios_liberados_cielo_debito = array("JOAO.TREVISAN@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "WAGNER@E-PREPAG.COM.BR");
-        $lista_usuarios = $usuarios_liberados_cielo;
+        $lista_usuarios = isset($usuarios_liberados_cielo) ? $usuarios_liberados_cielo : [];
         if ((in_array(strtoupper($this->getEmail()), $usuarios_liberados_cielo_debito))) {
             return true;
         }
@@ -2872,7 +2910,7 @@ class UsuarioGames
 
 
         //$ret = UsuarioGames::validarCampos($objGamesUsuario, false);
-
+        $ret = "";
         if ($ret == "") {
             if ($acessa) {
                 if (UsuarioGames::existeEmail($objGamesUsuario->getEmail(), $objGamesUsuario->getId())) {
@@ -3597,7 +3635,7 @@ function suspendeContaUsuario($usuario_id)
     if ($usuario_id) {
         $cad_usuarioGames = new UsuarioGames($usuario_id);
         $cad_usuarioGames->setAtivo('2');
-        $msgAcao = UsuarioGames::atualizar($cad_usuarioGames);
+        $msgAcao = (new UsuarioGames)->atualizar($cad_usuarioGames);
         echo $msgAcao;
         if (empty($msgAcao)) {
             $sql = "INSERT INTO usuarios_games_cancelado (ug_id,ugc_data_cancelamento) VALUES (" . $usuario_id . ",NOW())";
