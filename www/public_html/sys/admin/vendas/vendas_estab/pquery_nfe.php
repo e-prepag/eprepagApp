@@ -7,15 +7,6 @@ $tf_data_final    = $_POST['tf_data_final'] ?? null;
 $dd_canal         = $_POST['dd_canal'] ?? null;
 $dd_operadora     = $_POST['dd_operadora'] ?? null;
 
-error_log(" ");
-error_log("=================================================");
-error_log("DEBUG NFE - Entrou no IF BtnGerarNFe");
-error_log("Data/Hora: " . date('Y-m-d H:i:s'));
-error_log("=================================================");
-error_log(" ");
-
-
-
 
 // Botões (apenas um deles vem por vez)
 $BtnSearch    = $_POST['BtnSearch'] ?? null;
@@ -615,9 +606,8 @@ if ($FrmEnviar == 1) {
         }
         $sNFe .= gera_rodape($n_linhas, $val_total);
 
-        $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
-
         if (false) {
+            $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
 
             $handle = fopen($varArquivo, "w+");
             if (fwrite($handle, $sNFe) === FALSE) {
@@ -629,10 +619,6 @@ if ($FrmEnviar == 1) {
             }
             fclose($handle);
         }
-
-        // $varArquivo2 = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
-
-        header("Location: download_arquivo_nfe.php?file=" . urlencode($varArquivo));
     }
 
     $estat .= " limit " . $max;
