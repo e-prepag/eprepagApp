@@ -7,7 +7,6 @@ $tf_data_final    = $_POST['tf_data_final'] ?? null;
 $dd_canal         = $_POST['dd_canal'] ?? null;
 $dd_operadora     = $_POST['dd_operadora'] ?? null;
 
-
 // Botões (apenas um deles vem por vez)
 $BtnSearch    = $_POST['BtnSearch'] ?? null;
 $FrmPreencher = $_POST['FrmPreencher'] ?? null;
@@ -606,19 +605,21 @@ if ($FrmEnviar == 1) {
         }
         $sNFe .= gera_rodape($n_linhas, $val_total);
 
-        if (false) {
-            $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
+        // if (false) {
+        $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
 
-            $handle = fopen($varArquivo, "w+");
-            if (fwrite($handle, $sNFe) === FALSE) {
-                $msg = "Não foi possível gravar em '$varArquivo' (2).";
-                echo $msg;
-                die("Stop");
-            } else {
-                echo "<font color='#0000CC'>Arquivo de lote N" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . " gravado com sucesso em " . $varArquivo . "</font>";
-            }
-            fclose($handle);
+        $handle = fopen($varArquivo, "w+");
+        if (fwrite($handle, $sNFe) === FALSE) {
+            $msg = "Não foi possível gravar em '$varArquivo' (2).";
+            echo $msg;
+            die("Stop");
+        } else {
+            echo "<font color='#0000CC'>Arquivo de lote N" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . " gravado com sucesso em " . $varArquivo . "</font>";
         }
+        header("Location: pquery_nfe_download.php?file=" . urlencode($varArquivo));
+        fclose($handle);
+        // }
+
     }
 
     $estat .= " limit " . $max;
