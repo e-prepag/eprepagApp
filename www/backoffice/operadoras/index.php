@@ -23,7 +23,6 @@ $opr_cep                                     = $_POST['opr_cep'] ?? null;
 $opr_cidade                                  = $_POST['opr_cidade'] ?? null;
 $opr_estado                                  = $_POST['opr_estado'] ?? null;
 $opr_pais                                    = $_POST['opr_pais'] ?? null;
-$opr_codigo                                  = $_POST['opr_codigo'] ?? null;
 $opr_nome                                    = $_POST['opr_nome'] ?? null;
 $opr_nome_loja                               = $_POST['opr_nome_loja'] ?? null;
 $opr_internacional                           = $_POST['opr_internacional'] ?? null;
@@ -85,7 +84,7 @@ $opr_markup                                  = $_POST['opr_markup'] ?? null;
 $opr_facilitadora                            = $_POST['opr_facilitadora'] ?? null;
 $merchant_id_bexs                            = $_POST['merchant_id_bexs'] ?? null;
 
-$opr_valores                                 = $_POST['opr_valores'] ?? null;
+$opr_valores                                 = $_POST['opr_valores'] ?? [];
 
 $obi_banco_nome                              = $_POST['obi_banco_nome'] ?? null;
 $obi_bic_code                                = $_POST['obi_bic_code'] ?? null;
