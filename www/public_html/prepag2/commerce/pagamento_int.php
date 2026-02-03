@@ -263,9 +263,10 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
                                 $cliente_email = $retorno_cpf['ug_email'];
                                 criarVinculoUsuario($retorno_cpf['ug_id'], $integracao_client_email);
                             } else {
-                                // cadastra novo usuário vindo de Integração, apenas email
+                                // cadastra novo usuário vindo de Integração, email e cpf
                                 $ug_id_cliente = $classUsuarioGames->inserir_simple($integracao_store_id, $integracao_client_email, $CPF_cliente, converterDataParaISO($data_nascimento_cliente), $nome_CPF_cliente);
                                 $cliente_email = $integracao_client_email;
+                                $envia_email_conta_nova = true;
                             }
                         }
 
@@ -278,7 +279,7 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
 
                             // Envia email de novo uisuário 
                             $usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-                            if ($usuarioGames && $retorno_cpf) {
+                            if ($usuarioGames && isset($envia_email_conta_nova)) {
                                 $ug_id = $usuarioGames->getId();
 
                                 /* ---Wagner */
