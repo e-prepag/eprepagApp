@@ -4573,8 +4573,8 @@ function endereco_page($preencher_endereco)
 
 function cpf_page($partner_list)
 {
-
 	if (isset($GLOBALS['_SESSION']['usuarioGames_ser']) && !is_null($GLOBALS['_SESSION']['usuarioGames_ser'])) {
+		
 		$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 		$usuarioId = $usuarioGames->getId();
 	}
@@ -4647,11 +4647,95 @@ function cpf_page($partner_list)
 
 }
 
+function converterDataParaISO($data)
+{
+    // Se a variável estiver vazia ou não for string, retorna false
+    if (empty($data) || !is_string($data)) {
+        return false;
+    }
+
+    // TENTATIVA 1: Verifica se é formato Brasileiro (dd/mm/yyyy)
+    $d = DateTime::createFromFormat('d/m/Y', $data);
+    
+    // O operador && verifica duas coisas:
+    // 1. Se o objeto DateTime foi criado com sucesso ($d)
+    // 2. Se a formatação de volta para string é idêntica à entrada (Isso evita datas como 30/02/2023 virarem 02/03/2023)
+    if ($d && $d->format('d/m/Y') === $data) {
+        return $d->format('Y-m-d');
+    }
+
+    // TENTATIVA 2: Verifica se já é formato ISO (yyyy-mm-dd)
+    $d = DateTime::createFromFormat('Y-m-d', $data);
+    
+    if ($d && $d->format('Y-m-d') === $data) {
+        return $data; // Já está no formato certo
+    }
+
+    // Se não casou com nenhum dos dois formatos ou é data inválida
+    return false;
+}
+
+function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
+{
+	global $partner_list;
+
+	$user = getUserFromId($usuarioId);
+
+	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
+
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+
+	if ($is_data_valid && $vg_integracao_parceiro_origem_id == 10422) {
+
+		$date = new DateTime($user->ug_data_nascimento);
+		$interval = $date->diff(new DateTime(date('Y-m-d')));
+		if ($interval->format('%Y') < 18) {
+			echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>O produto é destinado para maiores de 18 anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.</div></div</div>";
+			die();
+		}
+	}
+
+	if (($partner['partner_need_cpf'] == 1 && !$is_data_valid) || ($partner['partner_need_cpf'] == 2 && !$is_data_valid && !isset($GLOBALS['_SESSION']['skip']))) {
+		include RAIZ_DO_PROJETO . '/public_html/prepag2/commerce/includes/form_cpf_off.php';
+		die();
+	} else {
+		if (($partner['partner_need_cpf'] == 1) || ($partner['partner_need_cpf'] == 2 && !isset($GLOBALS['_SESSION']['skip']))) {
+			require_once RAIZ_DO_PROJETO . "consulta_cpf/config.inc.cpf.php";
+			//require_once RAIZ_DO_PROJETO . "public_html/includes/functions.php";
+			$parametros = array(
+				'cpfcnpj' => preg_replace('/[^0-9]/', '', $user->ug_cpf)
+			);
+			$testeDadosAdicionais = new classCPF(false);
+			if ($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite()) {
+				if (empty($user->ug_nome_da_mae) || empty($user->ug_endereco) || empty($user->ug_numero) || empty($user->ug_bairro) || empty($user->ug_cidade) || empty($user->ug_estado) || empty($user->ug_cep) || (empty($user->ug_tel_ddd) && empty($user->ug_cel_ddd)) || (empty($user->ug_tel) && empty($user->ug_cel))) {
+					echo modal_includes();
+					$mensagem = "Olá " . $user->ug_nome . "!<br><br>Agradecemos sua preferência pela E-Prepag, porém o CPF cadastrado apresenta um grande volume de transações.<br><br>Para prosseguir com esta compra, precisamos que você acesse o formulário abaixo e envie os documentos solicitados. Após análise, sua conta poderá ser liberada em até um dia útil.<br><br>OBS: Utilize os navegadores Google Chrome ou Mozilla Firefox para visualizar o formulário corretamente.<br><br><span onclick='window.open(\"http://e-prepagpdv.com.br/e-prepag-limite-de-compras-com-cpf/\");' style='cursor:pointer; color:#2e5984;'>Clique aqui</span> para enviar os documentos.";
+					echo "<script>$(function(){ showMessage('" . str_replace("'", "\'", $mensagem) . "'); });</script>";
+					echo "</table><div class='m-top20'>" . $mensagem . "</div></div></div>";
+					die();
+				} //end 
+			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
+
+			//Validando a data da consulta
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+				$_REQUEST['formsubmit'] = true;
+				$_REQUEST['cpf'] = $user->ug_cpf;
+				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
+				$_REQUEST['consulta_automatica'] = '1';
+				include RAIZ_DO_PROJETO . '/public_html/prepag2/commerce/includes/form_cpf_off.php';
+				die();
+			} //end if(!verificaDataCPFInformado($user->ug_data_cpf_informado))
+
+		} //end if( ( $partner['partner_need_cpf']==1) || ( $partner['partner_need_cpf']==2 && !isset($GLOBALS['_SESSION']['skip']) ) )
+	} //end else do if(!$is_data_valid)
+
+}
+
 function getUserFromId($id)
 {
 	$instUsuarioGames = new UsuarioGames;
 	$instUsuarioGames->obter(array('ug_id' => $id), 'ug_id', $rs);
-	if ($rs instanceof PgSql\Result) {
+	if ($rs != null) {
 		return pg_fetch_object($rs);
 	} else {
 		return false;
@@ -4827,5 +4911,42 @@ function verificaIdadeMinima($dataNascimento)
 	} else {
 		return ($interval->format('%Y') >= 12);
 	}
+}
+
+function buscarVinculoPorEmail(string $email) 
+{
+	$emailUpper = strtoupper($email);
+	$pdo = ConnectionPDO::getConnection()->getLink();
+
+    $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
+				JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
+				WHERE UPPER(ugv.email) = :email LIMIT 1";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $resultado ?? null;
+}
+
+function criarVinculoUsuario(int $ugId, string $email): void 
+{
+	$pdo = ConnectionPDO::getConnection()->getLink();
+    try {
+        $emailUpper = strtoupper($email);
+
+        $sql = "INSERT INTO usuarios_games_vinculo (ug_id, email) VALUES (:ug_id, :email)";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':ug_id', $ugId, PDO::PARAM_INT);
+        $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+        
+        $stmt->execute();
+
+    } catch (PDOException $e) {
+        error_log("Erro ao inserir em usuarios_games_vinculo: " . $e->getMessage());
+    }
 }
 ?>
