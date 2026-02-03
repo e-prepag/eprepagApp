@@ -2,10 +2,6 @@
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
-set_time_limit(0);
-ini_set('max_execution_time', 0);
-ini_set('memory_limit', '1024M');
-
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "class/util/Validate.class.php";
@@ -53,7 +49,7 @@ if (isset($_POST["BtnConcluir"]) && !empty($_POST["BtnConcluir"])) {
     //Validacao
     $msg = "";
 
-    $caminho = "/www/backoffice/compliance/pep";
+    $caminho = "/www/arquivos_gerados/compliance/pep";
     $zip = new ZipArchive;
     $zip->open($_FILES['arquivo']['tmp_name']);
     if ($zip->extractTo($caminho) != true) {
@@ -176,7 +172,7 @@ if (isset($_POST["BtnConcluir"]) && !empty($_POST["BtnConcluir"])) {
         $fileDest = $GLOBALS['DIR_PEP_ARQ_RETORNO'] . "/" . $data_arquivo_pep . "/" . $fileDest_nome;
 
         //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-        if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino." . PHP_EOL;
+        if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino 2." . PHP_EOL;
         else if ((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido." . PHP_EOL;
         if (file_exists($fileSource)) unlink($fileSource);
 
