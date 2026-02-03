@@ -22,6 +22,19 @@ $https = "https";
 
 @require_once DIR_INCS . "config.MeiosPagamentos.php";
 
+if (isset($_SESSION['parceiros_params_buffer'])) {
+    $_POST = array_merge($_SESSION['parceiros_params_buffer'], $_POST);
+    $_SESSION['parceiros_params_buffer'] = null;
+}
+if (isset($_SESSION['CPF_USUARIO']) && isset($_SESSION['DATA_NASCIMENTO'])) {
+    $CPF_cliente = $_SESSION['CPF_USUARIO'];
+    $nome_CPF_cliente = $_SESSION['NOME_CPF'];
+    $data_nascimento_cliente = $_SESSION['DATA_NASCIMENTO'];
+    $_SESSION['CPF_USUARIO']     = null;
+    $_SESSION['NOME_CPF']        = null;
+    $_SESSION['DATA_NASCIMENTO'] = null;
+}
+
 $iforma = $_POST['iforma'] ?? null;
 $idu = $_POST['idu'] ?? null;
 $sno = $_POST['sno'] ?? null;
@@ -179,9 +192,12 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
 
                         $retorno_cpf = $classUsuarioGames->existeCPFdoUsuario($idcliente);
 
-                        if($retorno_cpf == "CPF INVALIDO"){
-                            cpf_page();
-                        }else if(strpos($retorno_cpf, "ERRO")){
+                        if ($retorno_cpf == "CPF INVALIDO") {
+                            require_once DIR_CLASS . "pdv/classHelper.php";
+                            $_SESSION['integracao_origem_id'] = $integracao_store_id;
+                            $_SESSION['parceiros_params_buffer'] = $parceiro_params;
+                            cpf_page_inicial($idcliente, $integracao_store_id);
+                        } else if (strpos($retorno_cpf, "ERRO")) {
                             die($retorno_cpf);
                         }
                         // Faz login de usuário
@@ -223,21 +239,46 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
                             send_debug_info_by_email("E-Prepag - Testing integration - Error 12", "Error: Integration request failed: client not allowed to login", 0);
                         }
                     } else {
-                        grava_log_integracao("Integração Debug 1_pag_int: " . date("Y-m-d H:i:s") . "\n  cadastra novo usuário vindo de Integração, apenas email \n  integracao_store_id: $integracao_store_id\n  integracao_client_email: $integracao_client_email \n");
 
-                        // cadastra novo usuário vindo de Integração, apenas email
-                        $ug_id_novo = $classUsuarioGames->inserir_simple($integracao_store_id, $integracao_client_email);
+                        $usuario_vinculo = buscarVinculoPorEmail($integracao_client_email);
+
+                        if ($usuario_vinculo) {
+
+                            $ug_id_cliente = $usuario_vinculo['ug_id'];
+                            $cliente_email = $usuario_vinculo['ug_email'];
+
+                        } else {
+                            if (!(isset($CPF_cliente) && isset($data_nascimento_cliente))) {
+                                require_once DIR_CLASS . "pdv/classHelper.php";
+                                $_SESSION['integracao_origem_id'] = $integracao_store_id;
+                                $_SESSION['parceiros_params_buffer'] = $parceiro_params;
+                                cpf_page_inicial($idcliente, $integracao_store_id);
+                            }
+
+                            grava_log_integracao("Integração Debug 1_pag_int: " . date("Y-m-d H:i:s") . "\n  cadastra novo usuário vindo de Integração, apenas email \n  integracao_store_id: $integracao_store_id\n  integracao_client_email: $integracao_client_email \n");
+
+                            $retorno_cpf = $classUsuarioGames->buscaContaCPF($CPF_cliente);
+                            if ($retorno_cpf > 0) {
+                                $ug_id_cliente = $retorno_cpf['ug_id'];
+                                $cliente_email = $retorno_cpf['ug_email'];
+                                criarVinculoUsuario($retorno_cpf['ug_id'], $integracao_client_email);
+                            } else {
+                                // cadastra novo usuário vindo de Integração, apenas email
+                                $ug_id_cliente = $classUsuarioGames->inserir_simple($integracao_store_id, $integracao_client_email, $CPF_cliente, converterDataParaISO($data_nascimento_cliente), $nome_CPF_cliente);
+                                $cliente_email = $integracao_client_email;
+                            }
+                        }
 
                         grava_log_integracao("Integração Debug 2: " . date("Y-m-d H:i:s") . "\n  msg: $msg \n");
-                        if ($ug_id_novo > 0) {
+                        if ($ug_id_cliente > 0) {
                             //"faz login"
-                            $classUsuarioGames->adicionarLoginSession($integracao_client_email);
+                            $classUsuarioGames->adicionarLoginSession($cliente_email);
 
                             grava_log_integracao("Integração +++ Passou UsuarioGames::adicionarLoginSession($integracao_client_email): " . date("Y-m-d H:i:s") . "\n");
 
                             // Envia email de novo uisuário 
                             $usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-                            if ($usuarioGames) {
+                            if ($usuarioGames && $retorno_cpf) {
                                 $ug_id = $usuarioGames->getId();
 
                                 /* ---Wagner */
