@@ -10,6 +10,7 @@ $dd_operadora     = $_POST['dd_operadora'] ?? null;
 // Botões (apenas um deles vem por vez)
 $BtnSearch    = $_POST['BtnSearch'] ?? null;
 $FrmPreencher = $_POST['FrmPreencher'] ?? null;
+$BtnGerarNFe = $_POST['BtnGerarNFe'] ?? null;
 
 session_start();
 if (isset($_POST['exportar_excel'])) {
@@ -606,7 +607,13 @@ if ($FrmEnviar == 1) {
         $sNFe .= gera_rodape($n_linhas, $val_total);
 
         if (false) {
-            $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
+            // $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
+            $path = $raiz_do_projeto . "arquivos_gerados";
+            $url  = "/vendas_estab/";
+            $file = date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT) . ".txt";
+
+            $arquivoCompleto = $path . $url . $file;
+            $varArquivo = $file;
 
             $handle = fopen($varArquivo, "w+");
             if (fwrite($handle, $sNFe) === FALSE) {
@@ -731,14 +738,24 @@ function GP_popupConfirmMsg(msg) { //v1.0
 
 
                         // Arquivo
-                        $path = $raiz_do_projeto . "arquivos_gerados";
-                        $url = "/vendas_estab/";
+                        $path = rtrim($raiz_do_projeto, '/') . '/arquivos_gerados';
+                        $url  = '/vendas_estab/';
                         $file = date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT) . ".txt";
 
-                        //Grava mensagem no arquivo
-                        if ($handle = fopen($path . $url . $file, 'a+')) {
+                        $fullPath = $path . $url;
+
+                        // garante que o diretório exista
+                        if (!is_dir($fullPath)) {
+                            mkdir($fullPath, 0775, true);
+                        }
+
+                        $arquivoCompleto = $fullPath . $file;
+
+                        if ($handle = fopen($arquivoCompleto, 'a+')) {
                             fwrite($handle, $sNFe);
                             fclose($handle);
+                        } else {
+                            error_log("Falha ao criar arquivo: " . $arquivoCompleto);
                         }
 
                     ?>
@@ -747,10 +764,19 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                 <p>
                                     <font face="Arial, Helvetica, sans-serif" size="2" color="#000000">
                                         <h3>NFe para registros listados.</h3>
-                                        <p>Salvar arquivo <a href="<?php echo "/sys/admin/" . $url . $file; ?>">aqui</a>. (Tamanho do arquivo: <?php
-                                                                                                                                                $f_size = strlen($sNFe);
-                                                                                                                                                echo (($f_size >= 1024 * 1024) ? number_format($f_size / 1024 / 1024, 2, ',', '.') . "Mb" : number_format($f_size / 1024, 2, ',', '.') . "kB");
-                                                                                                                                                ?>)</p>
+                                        <p>
+                                            Salvar arquivo
+                                            <a href="<?php echo '/sys/admin/vendas/vendas_estab/pquery_nfe_download.php?file=' . urlencode($file); ?>">
+                                                aqui
+                                            </a>.
+                                            (Tamanho do arquivo:
+                                            <?php
+                                            $f_size = strlen($sNFe);
+                                            echo ($f_size >= 1024 * 1024)
+                                                ? number_format($f_size / 1024 / 1024, 2, ',', '.') . " Mb"
+                                                : number_format($f_size / 1024, 2, ',', '.') . " kB";
+                                            ?>)
+                                        </p>
 
                                         <SCRIPT LANGUAGE=JAVASCRIPT>
                                             <!--

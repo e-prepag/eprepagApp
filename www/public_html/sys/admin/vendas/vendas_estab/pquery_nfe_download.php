@@ -10,7 +10,7 @@ if (empty($_GET['file'])) {
 $filename = basename($_GET['file']);
 
 // Caminho REAL do arquivo no servidor/container
-$baseDir  = '/www/arquivos_gerados/lotes/';
+$baseDir  = '/www/arquivos_gerados/vendas_estab/';
 $filePath = $baseDir . $filename;
 
 // Verifica existência
