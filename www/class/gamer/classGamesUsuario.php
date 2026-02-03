@@ -1539,7 +1539,7 @@ class UsuarioGames
         return ($rs->fetchColumn() > 0) ? true : false;
     }
 
-    public static function existeCPFCadastro($cpf)
+    public static function existeCPFCadastro($cpf, $usuarioId = null)
     {
         // Mapeamento para obter o nome baseado no status do banco
         $mapStatus = array(
@@ -1552,6 +1552,9 @@ class UsuarioGames
 
         try {
             $sql = "SELECT ug_ativo FROM usuarios_games WHERE regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
+            if(!empty($usuarioId) && $usuarioId > 0){
+                $sql .= " AND ug_id <> :ug_id";
+            }
 
             $con = ConnectionPDO::getConnection();
             $pdo = $con->getLink();
@@ -1559,6 +1562,11 @@ class UsuarioGames
 
             $rs = $pdo->prepare($sql);
             $rs->bindValue(':ug_cpf', $cpf, PDO::PARAM_STR);
+            if(!empty($usuarioId) && $usuarioId > 0){
+                $usuarioId = (int) $usuarioId;
+
+                $rs->bindParam(":ug_id", $usuarioId, PDO::PARAM_INT);
+            }
 
             $rs->execute();
 
