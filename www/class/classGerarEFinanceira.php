@@ -1084,7 +1084,6 @@ class GerarEFinanceira
         // 1. Tenta buscar o ID existente
         $sql = "SELECT id FROM public.envios_e_financeira 
             WHERE data_anomes = :anomes 
-              AND cpfcnpj_declarado = :cpfcnpj 
               AND tipo = 'ABERTURA'
               AND retificado = false
             LIMIT 1";
@@ -1109,6 +1108,47 @@ class GerarEFinanceira
             'tipo'              => 'ABERTURA',
             'status_envio'      => 'PENDENTE',      // Valor padrão
             'versao_efin'       => 'v1_2_1',         // Valor padrão obrigatório
+            'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
+            'nome_arquivo'      => "none",
+            'data_anomes'       => $periodo,
+            'retificado'        => 'false',
+            'semestre_ano'      => $semetre
+        ];
+
+        return $this->criarEnvioFinanceira($dadosParaCriar);
+    }
+
+    private function buscar_fechamento(string $data_inicial, string $data_final): int
+    {
+        $periodo = $data_inicial . "_" . $data_final;
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        // 1. Tenta buscar o ID existente
+        $sql = "SELECT id FROM public.envios_e_financeira 
+            WHERE data_anomes = :anomes 
+              AND tipo = 'FECHAMENTO'
+              AND retificado = false
+            LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':anomes'  => $periodo,
+        ]);
+
+        $idEncontrado = $stmt->fetchColumn();
+
+        // Se encontrou, retorna o ID imediatamente
+        if ($idEncontrado) {
+            return (int) $idEncontrado;
+        }
+
+        // 2. Se não encontrou, prepara os dados para criar um novo
+
+        $semetre = $this->getSemestreFormatado($data_inicial);
+
+        $dadosParaCriar = [
+            'tipo'              => 'FECHAMENTO',
+            'status_envio'      => 'PENDENTE',      // Valor padrão
+            'versao_efin'       => 'v1_2_2',         // Valor padrão obrigatório
             'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
             'nome_arquivo'      => "none",
             'data_anomes'       => $periodo,
@@ -1393,7 +1433,7 @@ class GerarEFinanceira
         $dom->appendChild($eFinanceira);
 
         // <evtAberturaeFinanceira id="...">
-        $idNovo = $this->obterUltimoIdEnvio() + 1;
+        $idNovo = $this->buscar_aberturas($data_inicio, $data_fim);
 
         $id_formatado = $this->gerarIdFormatado($idNovo);
         $evt = $dom->createElementNS($namespace, 'evtAberturaeFinanceira');
@@ -1578,7 +1618,7 @@ class GerarEFinanceira
         $nsDS = 'http://www.w3.org/2000/09/xmldsig#';
 
         // 2. Dados de Exemplo para o fechamento (1º Semestre de 2025)
-        $idNovo = $this->obterUltimoIdEnvio() + 1;
+        $idNovo = $this->buscar_fechamento($dataInicioSemestre, $dataFimSemestre);
         $id_formatado = $this->gerarIdFormatado($idNovo);
         $ambiente = '1'; // 1 = Produção, 2 = Homologação
 
