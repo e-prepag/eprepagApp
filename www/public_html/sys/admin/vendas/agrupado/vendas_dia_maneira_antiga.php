@@ -5,6 +5,15 @@ set_time_limit( 300 );
 require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
+
+$dd_canal           = $_POST['dd_canal'] ?? null;
+$dd_operadora       = $_POST['dd_operadora'] ?? null;
+$dd_mode            = $_POST['dd_mode'] ?? null;
+$dd_exclui_epp_cash = $_POST['dd_exclui_epp_cash'] ?? null;
+$dd_mes             = $_POST['dd_mes'] ?? null;
+$dd_ano             = $_POST['dd_ano'] ?? null;
+$BtnSearch          = $_POST['BtnSearch'] ?? null;
+
 $pos_pagina = $seg_auxilar;
 
 $time_start = getmicrotime();
