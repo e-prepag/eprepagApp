@@ -291,13 +291,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="col-cancel-pins">
                     <label for="data_inicio">Início período
                     </label>
-                    <input id="data_inicio" name="data_inicio" max="<?php echo date('Y-m-d'); ?>" value="<?php echo $data_inicio; ?>" onchange="gerarCamposMeses()" class="form-control"
+                    <input id="data_inicio" name="data_inicio" value="<?php echo $data_inicio; ?>" onchange="gerarCamposMeses()" class="form-control"
                         type="date">
                 </div>
                 <div class="col-cancel-pins">
                     <label for="data_fim">Final período
                     </label>
-                    <input id="data_fim" name="data_fim" max="<?php echo date('Y-m-d'); ?>" value="<?php echo $data_fim; ?>" onchange="gerarCamposMeses()" class="form-control"
+                    <input id="data_fim" name="data_fim" value="<?php echo $data_fim; ?>" onchange="gerarCamposMeses()" class="form-control"
                         type="date">
                 </div>
             </div>
@@ -340,61 +340,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
+    const valoresRecarregados = <?php echo json_encode($_POST['qtd_mes'] ?? []); ?>;
+
     function gerarCamposMeses() {
         const tipo = document.getElementById('tipoFiltro').value;
         const container = document.getElementById('container-campos-dinamicos');
-        container.innerHTML = ''; // Limpa antes de gerar
+        container.innerHTML = '';
 
         let mesesParaGerar = [];
 
+        // --- Lógica de Semestre ---
         if (tipo === 'semestre') {
             const ano = document.getElementById('ano').value;
             const semestre = document.getElementById('semestre').value;
-            const mesInicio = (semestre == '1') ? 1 : 7;
+            if (!ano) return;
 
+            const mesInicio = (semestre == '1') ? 1 : 7;
             for (let i = 0; i < 6; i++) {
-                let m = mesInicio + i;
                 mesesParaGerar.push({
                     ano: ano,
-                    mes: m
+                    mes: mesInicio + i
                 });
             }
-        } else if (tipo === 'periodo') {
-            let dataInic = new Date(document.getElementById('data_inicio').value + 'T00:00:00');
-            let dataFim = new Date(document.getElementById('data_fim').value + 'T00:00:00');
+        }
+        // --- Lógica de Período ---
+        else if (tipo === 'periodo') {
+            let dataInicStr = document.getElementById('data_inicio').value;
+            let dataFimStr = document.getElementById('data_fim').value;
 
-            if (!isNaN(dataInic) && !isNaN(dataFim) && dataInic <= dataFim) {
-                let atual = new Date(dataInic.getFullYear(), dataInic.getMonth(), 1);
-                while (atual <= dataFim) {
-                    mesesParaGerar.push({
-                        ano: atual.getFullYear(),
-                        mes: atual.getMonth() + 1
-                    });
-                    atual.setMonth(atual.getMonth() + 1);
+            if (dataInicStr && dataFimStr) {
+                let dataInic = new Date(dataInicStr + 'T00:00:00');
+                let dataFim = new Date(dataFimStr + 'T00:00:00');
+
+                if (dataInic <= dataFim) {
+                    let atual = new Date(dataInic.getFullYear(), dataInic.getMonth(), 1);
+                    while (atual <= dataFim) {
+                        mesesParaGerar.push({
+                            ano: atual.getFullYear(),
+                            mes: atual.getMonth() + 1
+                        });
+                        atual.setMonth(atual.getMonth() + 1);
+                    }
                 }
             }
         }
 
-        // Cria os inputs HTML
         const nomesMeses = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
         mesesParaGerar.forEach(item => {
             const mesStr = item.mes.toString().padStart(2, '0');
+            const chaveAnoMes = `${item.ano}${mesStr}`; // Ex: 202601
+
+            // VERIFICAÇÃO: Se existir o valor no objeto recarregado, usa ele, senão usa 0
+            const valorExistente = valoresRecarregados[chaveAnoMes] !== undefined ? valoresRecarregados[chaveAnoMes] : 0;
+
             const label = `${nomesMeses[item.mes]} / ${item.ano}`;
-            const inputName = `qtd_mes[${item.ano}${mesStr}]`;
+            const inputName = `qtd_mes[${chaveAnoMes}]`;
 
             const div = document.createElement('div');
-            div.className = 'mb-2';
+            div.className = 'form-group d-flex align-items-center mb-2';
             div.innerHTML = `
             <label style="width: 150px; margin-bottom:0;">${label}:</label>
-            <input type="number" name="${inputName}" class="form-control"  value="0" min="0" required>
+            <input type="number" name="${inputName}" class="form-control" 
+                   style="width: 100px;" value="${valorExistente}" min="0" required>
         `;
             container.appendChild(div);
         });
     }
 
-    // Chamar ao carregar a página caso já venha com dados
-    window.onload = gerarCamposMeses;
+    // Garante que ao carregar a página (com ou sem POST), os campos apareçam
+    document.addEventListener('DOMContentLoaded', function() {
+        gerarCamposMeses();
+    });
 
     function alterarFiltro() {
         const tipo = document.getElementById('tipoFiltro').value;

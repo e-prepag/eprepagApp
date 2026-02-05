@@ -1,12 +1,12 @@
 <?php
 require __DIR__ . '/functions_e_financeira.php';
 
-$data_inicial = isset($_GET['data_inicial']) ? urldecode($_GET['data_inicial']) : date('Y-m', strtotime('-1 Month'));
-$data_final = isset($_GET['data_final']) ? urldecode($_GET['data_final']) : date('Y-m');
+if ($_GET['acao'] == "movimentacoes") {
 
-if ($_GET['acao'] == "baixar") {
-    
-	$efinanceira = new GerarEFinanceira();
+    $data_inicial = isset($_GET['data_inicial']) ? urldecode($_GET['data_inicial']) : date('Y-m', strtotime('-1 Month'));
+    $data_final = isset($_GET['data_final']) ? urldecode($_GET['data_final']) : date('Y-m');
+
+    $efinanceira = new GerarEFinanceira();
     $lotes = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
 
     if ($lotes) {
@@ -25,7 +25,11 @@ if ($_GET['acao'] == "baixar") {
 
         readfile($caminho);
         unlink($caminho);
-    }else{
+    } else {
         echo "Erro ao gerar o arquivo";
     }
+}else if ($_GET['acao'] == "abertura") {
+
+}else if ($_GET['acao'] == "fechamento") {
+
 }
