@@ -306,21 +306,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="container-campos-dinamicos">
                 </div>
             </div>
-
-            <div class="d-flex top10 custom-justify">
-                <?php if (!empty($data_inicio) && !empty($data_fim)) { ?>
-                    <a class="btn btn-success btn-info"
-                        href="gerar_zip.php?
-					data_inicio=<?= urlencode($data_inicio) ?>
-					&data_fim=<?= urlencode($data_fim) ?>
-					&acao=baixar"
-                        target="_blank">Baixar Lote</a>
-                <?php } ?>
-                <button type="submit" class="btn btn-success btn-busca">Buscar</button>
-            </div>
         </div>
     </form>
+    <div class="d-flex top10 custom-justify">
+        <?php if (!empty($data_inicio) && !empty($data_fim)) { ?>
+            <form id="form2" action="gerar_zip.php" method="POST" target="_blank">
+                <?php
+                $datasParaXml = ['data_inicio', 'data_fim'];
 
+                foreach ($datasParaXml as $campo) {
+                    if (isset($_POST[$campo])) {
+                        $valor = htmlspecialchars($_POST[$campo]);
+                        echo "<input type='hidden' form='form2' name='{$campo}' value='{$valor}'>\n";
+                    }
+                }
+
+                if (isset($_POST['qtd_mes']) && is_array($_POST['qtd_mes'])) {
+                    foreach ($_POST['qtd_mes'] as $anoMes => $quantidade) {
+                        $chave = htmlspecialchars($anoMes);
+                        $valor = htmlspecialchars($quantidade);
+                        // Isso recria a estrutura qtd_mes[202501] etc.
+                        echo "<input type='hidden' form='form2' name='qtd_mes[{$chave}]' value='{$valor}'>\n";
+                    }
+                }
+                ?>
+                <input name="acao" type="hidden" value="fechamento" form="form2">
+                <button type="submit" form="form2" class="btn btn-primary">
+                    <i class="fa fa-download"></i> Baixar XML
+                </button>
+            </form>
+        <?php } ?>
+        <button type="submit" form="form1" class="btn btn-success btn-busca">Gerar</button>
+    </div>
 </div>
 <div style="overflow-x: auto; padding-top: 20px;">
     <div class="relatorio-info">
@@ -334,8 +351,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dados = $efinanceira->gerarFechamento($data_inicio, $data_fim, $arquivosPorMes);
         echo xmlViewer($dados['xml']->saveXML(), $dados['id']);
     }
-
-
     ?>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

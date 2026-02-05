@@ -290,14 +290,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         type="date">
                 </div>
             </div>
-            <div class="col-cancel-pins">
-                <label for="sel_tipo">Tipo Visualização
-                </label>
-                <select id="sel_tipo" name="sel_tipo" class="form-control">
-                    <option value="pretty" <?php echo ($sel_tipo == "pretty" ? "selected" : ""); ?>>Simplificada</option>
-                    <option value="xml" <?php echo ($sel_tipo == "xml" ? "selected" : ""); ?>>XML</option>
-                </select>
-            </div>
         </div>
 
         <div class="d-flex top10 custom-justify">
@@ -306,10 +298,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     href="gerar_zip.php?
 					data_inicio=<?= urlencode($data_inicio) ?>
 					&data_fim=<?= urlencode($data_fim) ?>
-					&acao=baixar"
-                    target="_blank">Baixar Lote</a>
+					&acao=abertura"
+                    target="_blank">Baixar XML</a>
             <?php } ?>
-            <button type="submit" class="btn btn-success btn-busca">Buscar</button>
+            <button type="submit" class="btn btn-success btn-busca">Gerar</button>
         </div>
 
     </form>

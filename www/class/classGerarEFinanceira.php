@@ -2099,6 +2099,161 @@ class GerarEFinanceira
         //return $this->processarRespostaConsulta($response, $httpCode);
         return $response;
     }
+
+    /**
+     * Consulta Informações Cadastrais
+     */
+    public function consultarInformacoesCadastrais($cnpj, $producao = false)
+    {
+        if (empty($cnpj)) {
+            throw new Exception("CNPJ é obrigatório.");
+        }
+
+        $endpoint = "/informacoes-cadastrais";
+        
+        $params = [
+            'cnpj' => $cnpj
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Consulta Lista e-Financeira (Mov. Financeira e Previdência)
+     */
+    public function consultarListaEFinanceira($cnpj, $situacaoInformacao, $dataInicio, $dataFim, $producao = false)
+    {
+        // Validações básicas
+        if (empty($cnpj) || empty($dataInicio) || empty($dataFim)) {
+            throw new Exception("CNPJ, Data Início e Data Fim são obrigatórios.");
+        }
+
+        $endpoint = "/lista-efinanceira-movimento";
+
+        $params = [
+            'cnpj'               => $cnpj,
+            'situacaoInformacao' => $situacaoInformacao,
+            'dataInicio'         => $dataInicio, // Formato esperado geralmente é AAAA-MM-DD ou AAAA-MM-DDTHH:MM:SS
+            'dataFim'            => $dataFim
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Consulta Informações Movimento Operação Financeira
+     */
+    public function consultarMovimentoOpFin($cnpj, $situacaoInformacao, $anoMesInicio, $anoMesTermino, $tipoIdentificacao, $identificacao, $producao = false)
+    {
+        $endpoint = "/informacoes-mov-op-fin";
+
+        $params = [
+            'cnpj'                    => $cnpj,
+            'situacaoInformacao'      => $situacaoInformacao,
+            'anoMesInicioVigencia'    => $anoMesInicio,   // Ex: 202501
+            'anoMesTerminoVigencia'   => $anoMesTermino,  // Ex: 202506
+            'tipoIdentificacao'       => $tipoIdentificacao,
+            'identificacao'           => $identificacao
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Consulta Informações Movimento Operação Financeira Anual
+     */
+    public function consultarMovimentoOpFinAnual($cnpj, $situacaoInformacao, $anoMesInicio, $anoMesTermino, $tipoIdentificacao, $identificacao, $producao = false)
+    {
+        $endpoint = "/informacoes-mov-op-fin-anual";
+
+        $params = [
+            'cnpj'                    => $cnpj,
+            'situacaoInformacao'      => $situacaoInformacao,
+            'anoMesInicioVigencia'    => $anoMesInicio,
+            'anoMesTerminoVigencia'   => $anoMesTermino,
+            'tipoIdentificacao'       => $tipoIdentificacao,
+            'identificacao'           => $identificacao
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Método auxiliar privado para realizar o POST com cURL
+     * Reutiliza a lógica de certificado do seu exemplo
+     */
+    private function executarRequestPost($endpointSuffix, $params, $producao)
+    {
+        // Define a URL Base
+        $baseUrl = $producao 
+            ? "https://efinanceira.receita.fazenda.gov.br/consulta" // Ajustar se a base for diferente de /consulta
+            : "https://pre-efinanceira.receita.fazenda.gov.br/consulta";
+
+        $urlCompleta = $baseUrl . $endpointSuffix;
+
+        // Verificar certificado (igual ao seu código original)
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($urlCompleta);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+            
+            // CONFIGURAÇÃO DE POST PARA FORM-URLENCODED
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($params), // Transforma o array em string query
+            
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/x-www-form-urlencoded',
+                'Accept: application/xml', // Geralmente a resposta é XML
+                'Content-Length: ' . strlen(http_build_query($params))
+            ],
+
+            // Configurações de SSL (Mantidas do seu exemplo)
+            CURLOPT_SSLCERT        => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE    => 'PEM',
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeouts
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão cURL ({$endpointSuffix}): " . $curlError);
+        }
+
+        // Você pode tratar o HTTP Code aqui se quiser
+        if ($httpCode >= 400) {
+             // throw new Exception("Erro HTTP $httpCode: " . $response);
+        }
+
+        return $response;
+    }
     public function validarLoteAssinado($xmlAssinado)
     {
         $senha = $this->senhaCertificado;
