@@ -678,7 +678,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 												'saldo' => $saldo_aux,
 												'valor_pedido' => ($total_geral_epp_cash / 100 + $taxa),
 												'saldo_final' => $saldo_final_aux,
-												'email' => $_SESSION['integracao_client_email'],
+												'email' => $aux_saldo->ug_sEmail,
 											);
 											$ativacaoPinTemplate2 = new AtivacaoPinTemplate($paramList);
 											echo $ativacaoPinTemplate2->boxAtivacaoPin();

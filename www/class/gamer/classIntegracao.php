@@ -318,8 +318,8 @@ $partner_list = array(
 	),
 	'Bilagames' => array(
 		// partner_ip	 return_url							notify_url
-// 112.223.50.60	 http://test-lastwarbill.bilagames.com/EprepagComplete.aspx	http://bilabill.payletter.co.kr/Eprepag/EprepagNotify.aspx
-/*
+		// 112.223.50.60	 http://test-lastwarbill.bilagames.com/EprepagComplete.aspx	http://bilabill.payletter.co.kr/Eprepag/EprepagNotify.aspx
+		/*
 	2011-01-28
 				 partner_ip		return_url														notify_url
  TEST MODE		112.223.50.60	http://lastwarbill.bilagames.com/Fillup/EprepagComplete.aspx	http://bilabill.payletter.co.kr/Fillup/Eprepag/EprepagNotify.aspx
@@ -590,7 +590,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		//'partner_ip_defined_list' => '190.8.151.76,190.102.137.84,38.82.217.164,38.82.217.170,38.82.217.11,38.82.217.12',//'38.82.217.11,38.82.217.12',
 		//'partner_ip_defined_list' => '66.231.244.196,66.231.244.142,66.231.244.143,38.82.217.11,38.82.217.12',//'38.82.217.11,38.82.217.12',
 		'notify_url' => 'http://shop.softnyxbrasil.com/eprepag/eprepag_pb.asp',	//'https://shop.softnyx.com/shop/Charge_Eprepag_OK.asp', //'https://shop.softnyx.com/shop/Bra_Eprepag_Ok.asp',
-		'return_url' => 'https://billing.softnyxbrasil.com/History/Default.aspx?menuseq=3',//'http://www.softnyxbrasil.com/cash/03_Charge_05Eprepag_Completed.asp', //'https://shop.softnyx.com/shop/Bra_Eprepag_Completed.asp',
+		'return_url' => 'https://billing.softnyxbrasil.com/History/Default.aspx?menuseq=3', //'http://www.softnyxbrasil.com/cash/03_Charge_05Eprepag_Completed.asp', //'https://shop.softnyx.com/shop/Bra_Eprepag_Completed.asp',
 		'sonda_url' => 'http://shop.softnyxbrasil.com/eprepag/eprepag_pb.asp',	//'https://shop.softnyx.com/shop/Charge_Eprepag_OK.asp',
 		'partner_produto_id' => 105,	// Softnyx - 105, Treinamento - $INTEGRACAO_STORE_TREINAMENTO_PRODUTO_ID_STR
 		'partner_testing_email' => 0,
@@ -615,7 +615,8 @@ partner_do_notify COM NOTIFICAÇÃO
 		/*
 			ATENÇÃO: QDO for para produção alterar o ID do PUBLISHER
 		 *              E do PRODUTO
-		 *  */ 'partner_opr_codigo' => '78',
+		 *  */
+		'partner_opr_codigo' => '78',
 		'partner_active' => '1',
 		'partner_currency_code' => 'BRL',
 		'partner_url' => 'https://s1.varoke.net',
@@ -895,10 +896,10 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_active' => '0',
 		'partner_currency_code' => 'BRL',
 		//					'partner_url' => 'http://billtest.gamerage.com/Fillup/RechargePoint.aspx',
-//					'partner_ip' => '216.39.108.142',
-//					'notify_url' => 'http://billtest.gamerage.com/Fillup/prepaid/EprepagNotify.aspx',
-//					'return_url' => 'http://billtest.gamerage.com/Fillup/prepaid/EprepagComplete.aspx ',
-//					'sonda_url' => 'http://billtest.gamerage.com/Fillup/prepaid/EprepagSonda.aspx',
+		//					'partner_ip' => '216.39.108.142',
+		//					'notify_url' => 'http://billtest.gamerage.com/Fillup/prepaid/EprepagNotify.aspx',
+		//					'return_url' => 'http://billtest.gamerage.com/Fillup/prepaid/EprepagComplete.aspx ',
+		//					'sonda_url' => 'http://billtest.gamerage.com/Fillup/prepaid/EprepagSonda.aspx',
 		'partner_url' => 'http://billtest.gamerage.com/Fillup/RechargePoint.aspx',
 		'partner_ip' => '216.39.108.144',
 		'notify_url' => 'https://bill.gamerage.com/Fillup/prepaid/EprepagNotify.aspx',
@@ -930,7 +931,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_currency_code' => 'BRL',
 
 		'partner_url' => 'https://br.payment.z8games.com/eprepag/eprepagprocess.aspx',
-		'partner_ip' => '198.49.88.91',//107.6.40.116
+		'partner_ip' => '198.49.88.91', //107.6.40.116
 		//'partner_ip_defined_list' => '198.49.88.91',
 		'notify_url' => 'https://br.payment.z8games.com/eprepag/eprepagnotify.aspx',
 		'return_url' => 'https://br.crossfire.z8games.com/depositCompleted.aspx',
@@ -962,7 +963,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_currency_code' => 'BRL',
 
 		'partner_url' => 'https://br.bill.z8games.com/Fillup/E-Wallet/EprePag/EprePagFrm.aspx', //'http://g4box.payletter.co.kr/Fillup/E-Wallet/EprePag/EprePagFrm.aspx',
-		'partner_ip' => '198.49.88.91',//'67.210.208.159',//'67.210.208.187', //'74.200.6.187', //'203.238.156.137',  // 107.6.40.116
+		'partner_ip' => '198.49.88.91', //'67.210.208.159',//'67.210.208.187', //'74.200.6.187', //'203.238.156.137',  // 107.6.40.116
 		'partner_ip_defined_list' => '107.6.40.116,192.49.88.72,198.49.89.207,198.49.89.209,198.49.88.90,198.49.88.91',
 		'notify_url' => 'https://br.bill.z8games.com/Fillup/E-Wallet/EprePag/EprepagNotify.aspx', //'http://g4box.payletter.co.kr/Fillup/E-Wallet/EprePag/EprepagNotify.aspx',
 		'return_url' => 'https://br.bill.z8games.com/Fillup/E-Wallet/EprePag/EprePagResult.aspx', //'http://g4box.payletter.co.kr/Fillup/E-Wallet/EprePag/EprePagResult.aspx',
@@ -1220,8 +1221,8 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_ip' => '121.160.9.111',
 		'partner_ip_defined_list' => '121.160.9.111,121.160.9.112',
 		//	antigo				'notify_url' => 'http://gamengame.payletter.co.kr/EPREPAG/EPrepagNoti.aspx',
-//	antigo				'return_url' => 'http://gamengame.payletter.co.kr/EPREPAG/EPrepagComplete.aspx',
-//	antigo				'sonda_url' => 'http://gamengame.payletter.co.kr/EPREPAG/EPrepagSonda.aspx',
+		//	antigo				'return_url' => 'http://gamengame.payletter.co.kr/EPREPAG/EPrepagComplete.aspx',
+		//	antigo				'sonda_url' => 'http://gamengame.payletter.co.kr/EPREPAG/EPrepagSonda.aspx',
 		'notify_url' => 'https://bill.gamengame.com/FillUp/EPrepag/EPrepagNoti.aspx',
 		'return_url' => 'https://bill.gamengame.com/FillUp/EPrepag/EPrepagComplete.aspx',
 		'sonda_url' => 'https://bill.gamengame.com/FillUp/EPrepag/EPrepagSonda.aspx',
@@ -1231,7 +1232,6 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_do_notify' => 1,
 		'partner_do_renotify_automatico' => 0,
 		'partner_bypass_ip_check' => 1,
-		'partner_img_logo' => '',
 		'partner_img_logo' => '' . EPREPAG_URL_HTTPS . '/prepag2/commerce/images/gamengame_login_logo.gif',
 		'amount_free' => 0,
 		'lista_formas_pagto_bloqueadas' => '',
@@ -2010,7 +2010,7 @@ partner_do_notify COM NOTIFICAÇÃO
 		'partner_currency_code' => 'BRL',
 		'partner_url' => 'http://testpay.garena.sg',
 		'partner_ip' => '103.247.205.29',
-		'partner_ip_defined_list' => '103.247.205.39',	
+		'partner_ip_defined_list' => '103.247.205.39',
 		'notify_url' => 'http://testpay.garena.sg/api/callback/eprepag/notify',
 		'return_url' => 'http://testpay.garena.sg/',
 		'sonda_url' => 'http://testpay.garena.sg/api/callback/eprepag/sonda',
@@ -2117,7 +2117,7 @@ function is_Integracao()
 	// Permite acesso para páginas no nosso site
 	$epp_http_referer = "" . EPREPAG_URL_HTTPS . "/prepag2/commerce/";
 	$epp_remote_addr = "187.45.247.106";	//"189.38.238.205";
-//	$epp_remote_addr_1 = "201.6.243.44";
+	//	$epp_remote_addr_1 = "201.6.243.44";
 
 	$remote_server_ip_address = gethostbyname(get_server_DNS_by_URL($GLOBALS['_SERVER']['HTTP_REFERER']));
 	$s_server_vars = "SERVER Information in \$_SERVER\n";
@@ -2142,7 +2142,7 @@ function is_Integracao()
 
 	$b_epp = ((isset($GLOBALS['_SERVER']['HTTP_REFERER']) &&
 		(strpos(strtoupper($GLOBALS['_SERVER']['HTTP_REFERER']), strtoupper($epp_http_referer)) !== false)) &&
-			/*
+		/*
 							(	(isset($GLOBALS['_SERVER']['REMOTE_ADDR']) &&
 								(strpos(strtoupper($GLOBALS['_SERVER']['REMOTE_ADDR']) , strtoupper($epp_remote_addr))!==false) ) ||
 								(isset($GLOBALS['_SERVER']['REMOTE_ADDR']) &&
@@ -2169,12 +2169,12 @@ function is_Integracao()
 	grava_log_integracao("\nEm is_Integracao($partner_id_tmp, IP: '$ip_remote_address') IP valid?: " . (($b_ip_valid) ? "SIM" : "não") . " \n*******************\n");
 
 	//echo $partner_id_tmp."<br>";
-//echo $url_parceiro_tmp."-".$ip_parceiro_tmp."<br>";
+	//echo $url_parceiro_tmp."-".$ip_parceiro_tmp."<br>";
 
 	if ($INTEGRACAO_PERMITIDO == "1") {
 		// Pedido vem do site da EPP ou do site cadastrado para o parceiro
-//				(isset($GLOBALS['_SERVER']['REMOTE_ADDR']) &&
-//				(strpos(strtoupper($GLOBALS['_SERVER']['REMOTE_ADDR']) , strtoupper($ip_parceiro_tmp))!==false) ))
+		//				(isset($GLOBALS['_SERVER']['REMOTE_ADDR']) &&
+		//				(strpos(strtoupper($GLOBALS['_SERVER']['REMOTE_ADDR']) , strtoupper($ip_parceiro_tmp))!==false) ))
 
 		/*
 		// Teste antigo, não é o que tem qeu testar
@@ -2219,6 +2219,8 @@ function is_Integracao_valida()
 {
 	global $partner_list;
 
+	$partner_id_tmp = isset($partner_id_tmp) ? $partner_id_tmp : null;
+
 	$integracao_b_origem = get_Integracao_origem();
 	//echo "integracao_b_origem: $integracao_b_origem<br>";
 	$bret = is_Partner_valido($integracao_b_origem);
@@ -2233,11 +2235,11 @@ function is_Integracao_valida()
 	return $bret;
 
 	//	foreach($partner_list as $key => $val) {
-//		if($val["partner_id"]==$integracao_b_origem && $val["partner_active"]=="1") {
-//			return true;
-//		}
-//	}
-//	return false;
+	//		if($val["partner_id"]==$integracao_b_origem && $val["partner_active"]=="1") {
+	//			return true;
+	//		}
+	//	}
+	//	return false;
 }
 
 function is_Partner_valido($partner_id)
@@ -2247,7 +2249,7 @@ function is_Partner_valido($partner_id)
 	//echo "partner_id: $partner_id<br>";
 	foreach ($partner_list as $key => $val) {
 		//echo "'$key' =&gt; partner_id: '".$val['partner_id']."'; partner_active: '".$val['partner_active']."'<br>";
-//echo "Conditions".($val['partner_id']==$partner_id)."/".($val['partner_active']=="1")."<br>";
+		//echo "Conditions".($val['partner_id']==$partner_id)."/".($val['partner_active']=="1")."<br>";
 		if ($val['partner_id'] == $partner_id && $val['partner_active'] == "1") {
 			return true;
 		}
@@ -2261,7 +2263,7 @@ function is_Partner_valido($partner_id)
 function is_Integracao_params_valida($params, &$mensagem = null)
 {
 	//	global $INTEGRACAO_STORE_ID;
-/*
+	/*
 echo " <font color='green'>is_Integracao_params_valida".(	(($params["store_id"]==$INTEGRACAO_STORE_ID) &&
 		(is_numeric($params["amount"])) &&
 		(is_numeric($params["order_id"])) &&
@@ -2299,8 +2301,8 @@ echo " <font color='green'>is_Integracao_params_valida".(	(($params["store_id"]=
 	grava_log_integracao("In is_Integracao_params_valida: (store_id=" . $params["store_id"] . "), (amount=" . $params["amount"] . ") - TESTING AMOUNT:  " . ((($params["amount"] / 100) <= $GLOBALS['RISCO_GAMERS_FREE_MAXIMO_POR_PEDIDO']) ? "OK" : "Too much") . " (amount: " . ($params["amount"] / 100) . ", Max: " . $GLOBALS['RISCO_GAMERS_FREE_MAXIMO_POR_PEDIDO'] . ")\n");
 
 	//	if(!is_numeric($params["client_id"]))		{ $msg .= "client_id invalid (".get_param_value($params["client_id"]).")\n"; }
-//	if(!is_numeric($params["transaction_id"]))	{ $msg .= "transaction_id invalid (".get_param_value($params["transaction_id"]).")\n"; }
-//	if(!($params["transaction_id"]))			{ $msg .= "transaction_id invalid - missing value ('".get_param_value($params["transaction_id"])."')\n"; }
+	//	if(!is_numeric($params["transaction_id"]))	{ $msg .= "transaction_id invalid (".get_param_value($params["transaction_id"]).")\n"; }
+	//	if(!($params["transaction_id"]))			{ $msg .= "transaction_id invalid - missing value ('".get_param_value($params["transaction_id"])."')\n"; }
 
 	//validando email
 	$varRegExp = '/^[\+_a-z0-9-]+(\.[\+_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i';
@@ -2339,6 +2341,9 @@ echo " <font color='green'>is_Integracao_params_valida".(	(($params["store_id"]=
 	} else {
 		$s_msg .= "\nParams: NOT ARRAY or EMPTY\n" . print_r($params, true) . "\n";
 	}
+
+	$b_testing_email = isset($b_testing_email) ? $b_testing_email : null;
+
 	grava_log_integracao($s_msg . "\nb_testing_email: " . $b_testing_email . "\n");
 	send_debug_info_by_email("E-Prepag - Testing integration (Validate parameters)", $s_msg, $params["store_id"]);
 
@@ -2353,7 +2358,7 @@ function get_Integracao_params_from_POST()
 	if (isset($GLOBALS['_POST']['store_id']))
 		$params['store_id'] = $GLOBALS['_POST']['store_id'];
 	//	if(isset($GLOBALS['_POST']['return_url']))			$params['return_url']			= $GLOBALS['_POST']['return_url'];
-//	if(isset($GLOBALS['_POST']['notify_url']))			$params['notify_url']			= $GLOBALS['_POST']['notify_url'];
+	//	if(isset($GLOBALS['_POST']['notify_url']))			$params['notify_url']			= $GLOBALS['_POST']['notify_url'];
 
 	if (isset($GLOBALS['_POST']['currency_code']))
 		$params['currency_code'] = $GLOBALS['_POST']['currency_code'];
@@ -2396,8 +2401,8 @@ function get_Integracao_params_from_POST()
 		$params['cmd'] = $GLOBALS['_POST']['cmd'];
 
 	//echo "<pre>";
-//print_r($params);
-//echo "</pre>";
+	//print_r($params);
+	//echo "</pre>";
 
 	return $params;
 }
@@ -2444,9 +2449,9 @@ function get_Integracao_modelo($store_id, $valor, &$iativo, &$nome, $product_id 
 	}
 	$sql .= "order by ogp_id desc";
 	//		"	--and (0=1 or ogp.ogp_ativo = 1) "
-//if($store_id=="10407") echo "".str_replace("\n","<br>\n",$sql)."<br>";
-//echo "".$sql."<br>";
-//die("Stop");
+	//if($store_id=="10407") echo "".str_replace("\n","<br>\n",$sql)."<br>";
+	//echo "".$sql."<br>";
+	//die("Stop");
 
 	//grava_log_integracao("In get_Integracao_modelo (ASDERF): $sql\n");
 	$rs = SQLexecuteQuery($sql);
@@ -2567,7 +2572,6 @@ function verifica_nome_operadora($store_id)
 			return $resultado;
 		}
 	}
-
 }
 
 
@@ -2695,8 +2699,8 @@ function grava_log_integracao($mensagem)
 	$file = $ARQUIVO_LOG_HTTP_REFERER;
 
 	//Mensagem
-//	$mensagem = date('Y-m-d H:i:s') . " " . (($GLOBALS['_SERVER']['HTTP_REFERER'])?$GLOBALS['_SERVER']['HTTP_REFERER']:'Empty') . " - " . $GLOBALS['_SERVER']["REMOTE_ADDR"] . "\n";
-//echo 	$mensagem;
+	//	$mensagem = date('Y-m-d H:i:s') . " " . (($GLOBALS['_SERVER']['HTTP_REFERER'])?$GLOBALS['_SERVER']['HTTP_REFERER']:'Empty') . " - " . $GLOBALS['_SERVER']["REMOTE_ADDR"] . "\n";
+	//echo 	$mensagem;
 	$mensagem = $GLOBALS['_SERVER']['SCRIPT_NAME'] . "\n" . $mensagem;
 	//Grava mensagem no arquivo
 	if ($handle = fopen($file, 'a+')) {
@@ -2714,8 +2718,8 @@ function grava_log_integracao_tmp($mensagem)
 	$file = $ARQUIVO_LOG_HTTP_REFERER;
 
 	//Mensagem
-//	$mensagem = date('Y-m-d H:i:s') . " " . (($GLOBALS['_SERVER']['HTTP_REFERER'])?$GLOBALS['_SERVER']['HTTP_REFERER']:'Empty') . " - " . $GLOBALS['_SERVER']["REMOTE_ADDR"] . "\n";
-//echo 	$mensagem;
+	//	$mensagem = date('Y-m-d H:i:s') . " " . (($GLOBALS['_SERVER']['HTTP_REFERER'])?$GLOBALS['_SERVER']['HTTP_REFERER']:'Empty') . " - " . $GLOBALS['_SERVER']["REMOTE_ADDR"] . "\n";
+	//echo 	$mensagem;
 	//Grava mensagem no arquivo
 	if ($handle = fopen($file, 'a+')) {
 		fwrite($handle, $mensagem);
@@ -2746,8 +2750,8 @@ function grava_log_integracao_ip_notify($mensagem)
 	$file = $ARQUIVO_LOG_HTTP_REFERER;
 
 	//Mensagem
-//	$mensagem = date('Y-m-d H:i:s') . " " . (($GLOBALS['_SERVER']['HTTP_REFERER'])?$GLOBALS['_SERVER']['HTTP_REFERER']:'Empty') . " - " . $GLOBALS['_SERVER']["REMOTE_ADDR"] . "\n";
-//echo 	$mensagem;
+	//	$mensagem = date('Y-m-d H:i:s') . " " . (($GLOBALS['_SERVER']['HTTP_REFERER'])?$GLOBALS['_SERVER']['HTTP_REFERER']:'Empty') . " - " . $GLOBALS['_SERVER']["REMOTE_ADDR"] . "\n";
+	//echo 	$mensagem;
 	//Grava mensagem no arquivo
 	if ($handle = fopen($file, 'a+')) {
 		fwrite($handle, $mensagem);
@@ -3135,6 +3139,8 @@ function getPartner_payments_list($id)
 	//echo "sql: $sql<br>";
 	$retCompra = SQLexecuteQuery($sql);
 	if (!$retCompra) {
+		$numOrder = isset($numOrder) ? $numOrder : null;
+
 		echo "Erro ao recuperar transação de integração (A) ('$numOrder').<br>\n";
 		die("Stop");
 	}
@@ -3157,7 +3163,6 @@ function getPartner_payments_list($id)
 			echo "<td align='center'><nobr>" . getPartner_name_By_ID($pgCompra['ip_store_id']) . " (" . $pgCompra['ip_store_id'] . ")</nobr></td ><td>" . $pgCompra['ip_order_id'] . "</td> <td>" . $pgCompra['ip_amount'] . "</td> <td align='center'>" . $pgCompra['ip_currency_code'] . "</td> <td>" . $pgCompra['ip_vg_id'] . "</td> <td>" . $pgCompra['ip_client_id'] . "</td> <td>" . $pgCompra['ip_client_email'] . "</td> <td title='status: " . $pgCompra['status'] . "' align='center'><font color='" . getStatusColor($pgCompra['status']) . "'>" . getStatusDescription($pgCompra['status']) . "</font></td> <td align='center'><font color='" . (($pgCompra['ip_status_confirmed'] == 1) ? "#0000FF" : "#CCCCFF") . "'>" . (($pgCompra['ip_status_confirmed'] == 1) ? "Sim" : "Não") . "</font></td>\n";
 
 			echo "</tr>\n";
-
 		}
 
 		echo "</table>\n";
@@ -3232,7 +3237,7 @@ function getIntegracaoCURL($url, $post_parameters, &$http_code = null)
 
 	$buffer = curl_exec($curl_handle);
 
-	if($buffer != false && $http_code != null){
+	if ($buffer != false && $http_code != null) {
 		$http_code = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
 	}
 	curl_close($curl_handle);
@@ -3313,12 +3318,12 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 					and ip_currency_code = '" . $currency_code . "'
 				order by ip_id desc";
 		//					left outer join tb_pag_compras pc on ip.ip_vg_id = pc.idvenda
-//				order by pc.datainicio desc";
-//					"and ip_id = '".$transaction_id."'"
-//					"and "pc.iforma='Z' "
-//					"and ip_client_id = '".$client_id."' "
-//					and ip_transaction_id = '".$transaction_id."'
-//echo "sql: $sql<br>";
+		//				order by pc.datainicio desc";
+		//					"and ip_id = '".$transaction_id."'"
+		//					"and "pc.iforma='Z' "
+		//					"and ip_client_id = '".$client_id."' "
+		//					and ip_transaction_id = '".$transaction_id."'
+		//echo "sql: $sql<br>";
 		grava_log_integracao("Integração em setNotifyPartnerAboutTransaction: " . date("Y-m-d H:i:s") . "\n  $sql\n");
 
 		$rs = SQLexecuteQuery($sql);
@@ -3335,7 +3340,7 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 			//echo "ID: $ip_id =&gt; ip_status_confirmed: '$ip_status_confirmed' (ip_data_confirmed: '$ip_data_confirmed')<br>";
 			if ($ip_status_confirmed == 1) {
 				// Pedido já foi confirmado -> Do nothing
-/*
+				/*
 				echo "<font color='blue'>Pedido já foi notificado em '$ip_data_confirmed'</font><br>(store_id = '".$store_id."'<br>
 					order_id = '".$order_id."'<br>
 					amount = '".$amount."'<br>
@@ -3389,7 +3394,6 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 	}
 	// Sem Notificação válida
 	return false;
-
 }
 
 function get_param_value($param_value)
@@ -3404,14 +3408,13 @@ function send_debug_email($to, $cc, $bcc, $subjectEmail, $msgEmail)
 function get_server_DNS_by_URL($sname0)
 {
 	//	echo "sname0: $sname0\n";
-//	echo "<hr>$sname0<br>";
+	//	echo "<hr>$sname0<br>";
 	$i_start = strpos($sname0, "//") + 2;
 	@$i_stop = strpos($sname0, "/", $i_start) - 1;
 	//	echo "[$i_start - $i_stop] = ".($i_stop-$i_start+1)."<br>";
 	$sname = substr($sname0, $i_start, ($i_stop - $i_start + 1));
 	//	echo "$sname<hr>";
 	return $sname;
-
 }
 
 /*
@@ -3510,7 +3513,7 @@ function b_is_address_valid($partner_id, $ip_client)
 	// Testa bloco de IP
 	elseif ($partner_ip_block_start && $partner_ip_block_end) {
 		//echo "Bloco: <br>";
-//		echo "('$partner_id' -> '($ip_client' IP block) <br>\n";
+		//		echo "('$partner_id' -> '($ip_client' IP block) <br>\n";
 		$ip_lng = ip2long($ip_client);
 		$ip0_lng = ip2long($partner_ip_block_start);
 		$ipN_lng = ip2long($partner_ip_block_end);
@@ -3523,7 +3526,7 @@ function b_is_address_valid($partner_id, $ip_client)
 	// Testa lista CSV de IPs
 	elseif ($partner_ip_defined_list) {
 		//echo "Defined List: <br>";
-//		echo "('$partner_id' IP list) <br>\n";
+		//		echo "('$partner_id' IP list) <br>\n";
 		$aIPs = explode(",", $partner_ip_defined_list);
 		foreach ($aIPs as $key => $val) {
 			if (trim($val) == trim($ip_client)) {
@@ -3553,7 +3556,7 @@ function sanitize_input_data($params, &$err_cod)
 	$err_cod = "00";
 	foreach ($params as $key => $val) {
 		//			echo "<font color='blue'>Campo (key: '$key')</font><br>";
-//gravaLog_WS_processing("Em sanitize_input_data (A) (".date("Y-m-d H:i:s")."): Campo (key: '$key')\n");
+		//gravaLog_WS_processing("Em sanitize_input_data (A) (".date("Y-m-d H:i:s")."): Campo (key: '$key')\n");
 		switch ($key) {
 
 			//String
@@ -3588,8 +3591,8 @@ function sanitize_input_data($params, &$err_cod)
 			case 'pin_valor':
 
 				// Simulate um error in input data
-//					$val .= "S";
-//gravaLog_WS_processing("Em sanitize_input_data (Int) (".date("Y-m-d H:i:s")."): (key: $key, val: '$val')\n");
+				//					$val .= "S";
+				//gravaLog_WS_processing("Em sanitize_input_data (Int) (".date("Y-m-d H:i:s")."): (key: $key, val: '$val')\n");
 				$val_mod = sanitize_general($val);
 				//gravaLog_WS_processing("Em sanitize_input_data (Int) (".date("Y-m-d H:i:s")."): (key: $key, val_mod: '$val_mod')\n");
 				if (filter_var($val_mod, FILTER_VALIDATE_INT) === false) {
@@ -3631,10 +3634,9 @@ function sanitize_input_data($params, &$err_cod)
 					$val_sanitized = sanitize_input_data($val, $err_cod);
 				} else {
 					//						echo "<font color='red'>&nbsp;&nbsp;Campo desconhecido (key: '$key', val: <pre>".print_r($val,true)."</pre>)</font><br>";
-//gravaLog_WS_processing("Em sanitize_input_data (DEFAULT) (".date("Y-m-d H:i:s")."): (val: '".print_r($val,true)."')\n");
+					//gravaLog_WS_processing("Em sanitize_input_data (DEFAULT) (".date("Y-m-d H:i:s")."): (val: '".print_r($val,true)."')\n");
 				}
 				break;
-
 		}
 		//gravaLog_WS_processing("Em sanitize_input_data (B) (".date("Y-m-d H:i:s")."): Campo processado (key: '$key', err_cod: '$err_cod', val: ".print_r($val_sanitized,true)."\n");
 
@@ -3848,7 +3850,7 @@ function getIntegracaoSonda($store_id, $order_id, &$a_retorno)
 
 		$post_parameters = "" . $s_sonda_param_name . "=" . $order_id . "";
 		//echo "sonda_url: ".$sonda_url."<br>";
-//echo "post_parameters: ".$post_parameters."<br>";
+		//echo "post_parameters: ".$post_parameters."<br>";
 		$ret_integracao = getIntegracaoCURL($sonda_url, $post_parameters);
 
 		//echo "ret_integracao: ".$ret_integracao."<br>";
@@ -3858,9 +3860,9 @@ function getIntegracaoSonda($store_id, $order_id, &$a_retorno)
 		//echo "<hr>ret_integracao: <br>".$ret_integracao."<hr>";
 		parse_str($ret_integracao, $a_retorno);
 		//echo "In getIntegracaoSonda('$store_id', '$order_id', -- )<br>";
-//echo "In getIntegracaoSonda: ".$sonda_url."<br>".$post_parameters."<br>";
-//echo "ret: ".str_replace("¿ÀÈÄ", "", $ret_integracao)."<br>";
-//echo "<pre>".print_r($a_retorno, true)."</pre>";
+		//echo "In getIntegracaoSonda: ".$sonda_url."<br>".$post_parameters."<br>";
+		//echo "ret: ".str_replace("¿ÀÈÄ", "", $ret_integracao)."<br>";
+		//echo "<pre>".print_r($a_retorno, true)."</pre>";
 		$ret = $a_retorno['retcod'];
 	}
 
@@ -4010,8 +4012,8 @@ function get_lista_produtos_integracao()
 function rand_string($length)
 {
 	//	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-//	          00000000001111111111222222
-//            01234567890123456789012345
+	//	          00000000001111111111222222
+	//            01234567890123456789012345
 	$chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	$numbers = "0123456789";
 
@@ -4111,10 +4113,10 @@ function retornaIdsIntegracao($opr_codigo)
 	foreach ($GLOBALS['partner_list'] as $key => $value) {
 		if ($value['partner_opr_codigo'] == $opr_codigo) {
 			$retorno[$value['partner_id']] = $key;
-		}//end if
-	}//end foreach
+		} //end if
+	} //end foreach
 	return $retorno;
-}//end function retornaIdsIntegração()
+} //end function retornaIdsIntegração()
 
 function montaSelectIdsIntegracao($dd_operadora, $dd_ids_integracao = null)
 {
@@ -4129,12 +4131,12 @@ function montaSelectIdsIntegracao($dd_operadora, $dd_ids_integracao = null)
 			$retorno .= "
                            <option value='$key' " . (($key == $dd_ids_integracao) ? "selected" : "") . ">$value</option>
                     ";
-		}//end foreach
+		} //end foreach
 		$retorno .= "
         </select>";
-	}//end if(count($idsIntegracao)>0)
+	} //end if(count($idsIntegracao)>0)
 	return $retorno;
-}//end function montaSelectIdsIntegracao($dd_operadora, $dd_ids_integracao = null)
+} //end function montaSelectIdsIntegracao($dd_operadora, $dd_ids_integracao = null)
 
 
 // ================================================
@@ -4151,7 +4153,7 @@ function getAutoClose_By_ID($id)
 		}
 	}
 	return $partner_auto_close;
-}//end function getAutoClose_By_ID
+} //end function getAutoClose_By_ID
 
 // ================================================
 function getLinkURL_By_ID($id)
@@ -4167,7 +4169,7 @@ function getLinkURL_By_ID($id)
 		}
 	}
 	return $partner_link_url;
-}//end function getLinkURL_By_ID
+} //end function getLinkURL_By_ID
 
 // ================================================
 function partnerNeedCPF($id)
@@ -4183,7 +4185,7 @@ function partnerNeedCPF($id)
 		}
 	}
 	return $partner_cpf;
-}//end function partnerNeedCPF
+} //end function partnerNeedCPF
 
 function partnerKindCPF($id)
 {
@@ -4198,7 +4200,7 @@ function partnerKindCPF($id)
 		}
 	}
 	return $partner_cpf;
-}//end function partnerKindCPF
+} //end function partnerKindCPF
 
 function SolicitaCPF($ug_id)
 {
@@ -4220,6 +4222,13 @@ function SolicitaCPF($ug_id)
 
 	if ($rs_cpf && pg_num_rows($rs_cpf) > 0) {
 		require($_SERVER['DOCUMENT_ROOT'] . '/prepag2/incs/rf_cpf/funcoes.php');
+
+		if (!function_exists("getCaptchaToken")) {
+			function getCaptchaToken()
+			{
+				return false;
+			}
+		}
 		$getCaptchaToken = getCaptchaToken();
 
 		// pf, seja mais criativo
@@ -4358,8 +4367,7 @@ function SolicitaCPF($ug_id)
 			$retorno .= "<script type='text/javascript' src='" . $server_url . "/prepag2/js/jqueryui/popup_cpf_opcional.js'></script>";
 		} //end elseif(partnerKindCPF($id_partner) == $CPF_OPICIONAL)
 		return $retorno;
-
-	}// end  if($rs_cpf && pg_num_rows($rs_cpf) > 0)
+	} // end  if($rs_cpf && pg_num_rows($rs_cpf) > 0)
 	else {
 		// ~* Matches regular expression, case insensitive
 		$sql = "SELECT ug_nome
@@ -4439,10 +4447,9 @@ function SolicitaCPF($ug_id)
 			} //end elseif(partnerKindCPF($id_partner) == $CPF_OPICIONAL)
 
 			return $retorno;
-		}// end  if($rs_cpf && pg_num_rows($rs_cpf) > 0)
+		} // end  if($rs_cpf && pg_num_rows($rs_cpf) > 0)
 	}
-
-}//end function SolicitaCPF()
+} //end function SolicitaCPF()
 
 function mask($val, $mask)
 {
@@ -4458,7 +4465,7 @@ function mask($val, $mask)
 		}
 	}
 	return $maskared;
-}//end function
+} //end function
 
 function verificaCPF_int($cpf)
 {
@@ -4470,49 +4477,49 @@ function verificaCPF_int($cpf)
 		return 0;
 	} else
 		if ($RecebeCPF == "00000000000" || $RecebeCPF == "11111111111") {
-			return 0;
-		} else {
-			$Numero[1] = intval(substr($RecebeCPF, 1 - 1, 1));
-			$Numero[2] = intval(substr($RecebeCPF, 2 - 1, 1));
-			$Numero[3] = intval(substr($RecebeCPF, 3 - 1, 1));
-			$Numero[4] = intval(substr($RecebeCPF, 4 - 1, 1));
-			$Numero[5] = intval(substr($RecebeCPF, 5 - 1, 1));
-			$Numero[6] = intval(substr($RecebeCPF, 6 - 1, 1));
-			$Numero[7] = intval(substr($RecebeCPF, 7 - 1, 1));
-			$Numero[8] = intval(substr($RecebeCPF, 8 - 1, 1));
-			$Numero[9] = intval(substr($RecebeCPF, 9 - 1, 1));
-			$Numero[10] = intval(substr($RecebeCPF, 10 - 1, 1));
-			$Numero[11] = intval(substr($RecebeCPF, 11 - 1, 1));
+		return 0;
+	} else {
+		$Numero[1] = intval(substr($RecebeCPF, 1 - 1, 1));
+		$Numero[2] = intval(substr($RecebeCPF, 2 - 1, 1));
+		$Numero[3] = intval(substr($RecebeCPF, 3 - 1, 1));
+		$Numero[4] = intval(substr($RecebeCPF, 4 - 1, 1));
+		$Numero[5] = intval(substr($RecebeCPF, 5 - 1, 1));
+		$Numero[6] = intval(substr($RecebeCPF, 6 - 1, 1));
+		$Numero[7] = intval(substr($RecebeCPF, 7 - 1, 1));
+		$Numero[8] = intval(substr($RecebeCPF, 8 - 1, 1));
+		$Numero[9] = intval(substr($RecebeCPF, 9 - 1, 1));
+		$Numero[10] = intval(substr($RecebeCPF, 10 - 1, 1));
+		$Numero[11] = intval(substr($RecebeCPF, 11 - 1, 1));
 
-			$soma = 10 * $Numero[1] + 9 * $Numero[2] + 8 * $Numero[3] + 7 * $Numero[4] + 6 * $Numero[5] + 5 *
-				$Numero[6] + 4 * $Numero[7] + 3 * $Numero[8] + 2 * $Numero[9];
+		$soma = 10 * $Numero[1] + 9 * $Numero[2] + 8 * $Numero[3] + 7 * $Numero[4] + 6 * $Numero[5] + 5 *
+			$Numero[6] + 4 * $Numero[7] + 3 * $Numero[8] + 2 * $Numero[9];
+		$soma = $soma - (11 * (intval($soma / 11)));
+
+		if ($soma == 0 || $soma == 1) {
+			$resultado1 = 0;
+		} else {
+			$resultado1 = 11 - $soma;
+		}
+
+		if ($resultado1 == $Numero[10]) {
+			$soma = $Numero[1] * 11 + $Numero[2] * 10 + $Numero[3] * 9 + $Numero[4] * 8 + $Numero[5] * 7 + $Numero[6] * 6 + $Numero[7] * 5 +
+				$Numero[8] * 4 + $Numero[9] * 3 + $Numero[10] * 2;
 			$soma = $soma - (11 * (intval($soma / 11)));
 
 			if ($soma == 0 || $soma == 1) {
-				$resultado1 = 0;
+				$resultado2 = 0;
 			} else {
-				$resultado1 = 11 - $soma;
+				$resultado2 = 11 - $soma;
 			}
-
-			if ($resultado1 == $Numero[10]) {
-				$soma = $Numero[1] * 11 + $Numero[2] * 10 + $Numero[3] * 9 + $Numero[4] * 8 + $Numero[5] * 7 + $Numero[6] * 6 + $Numero[7] * 5 +
-					$Numero[8] * 4 + $Numero[9] * 3 + $Numero[10] * 2;
-				$soma = $soma - (11 * (intval($soma / 11)));
-
-				if ($soma == 0 || $soma == 1) {
-					$resultado2 = 0;
-				} else {
-					$resultado2 = 11 - $soma;
-				}
-				if ($resultado2 == $Numero[11]) {
-					return TRUE;
-				} else {
-					return 0;
-				}
+			if ($resultado2 == $Numero[11]) {
+				return TRUE;
 			} else {
 				return 0;
 			}
+		} else {
+			return 0;
 		}
+	}
 }
 
 function verificaDataCPFInformado($data_cpf_informado)
@@ -4535,7 +4542,6 @@ function verificaDataCPFInformado($data_cpf_informado)
 	} else {
 		return FALSE;      //NECESSITA DE OUTRA CONSULTA
 	}
-
 }
 
 function verificaNome($nome)
@@ -4547,7 +4553,6 @@ function verificaNome($nome)
 		return TRUE;
 	}
 	return FALSE;
-
 }
 
 function endereco_page($preencher_endereco)
@@ -4568,8 +4573,8 @@ function endereco_page($preencher_endereco)
 
 function cpf_page($partner_list)
 {
-
 	if (isset($GLOBALS['_SESSION']['usuarioGames_ser']) && !is_null($GLOBALS['_SESSION']['usuarioGames_ser'])) {
+		
 		$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 		$usuarioId = $usuarioGames->getId();
 	}
@@ -4624,7 +4629,7 @@ function cpf_page($partner_list)
 					echo "<script>$(function(){ showMessage('" . str_replace("'", "\'", $mensagem) . "'); });</script>";
 					echo "</table><div class='m-top20'>" . $mensagem . "</div></div></div>";
 					die();
-				}//end 
+				} //end 
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
@@ -4635,9 +4640,93 @@ function cpf_page($partner_list)
 				$_REQUEST['consulta_automatica'] = '1';
 				include RAIZ_DO_PROJETO . '/public_html/prepag2/commerce/includes/form_cpf.php';
 				die();
-			}//end if(!verificaDataCPFInformado($user->ug_data_cpf_informado))
+			} //end if(!verificaDataCPFInformado($user->ug_data_cpf_informado))
 
-		}//end if( ( $partner['partner_need_cpf']==1) || ( $partner['partner_need_cpf']==2 && !isset($GLOBALS['_SESSION']['skip']) ) )
+		} //end if( ( $partner['partner_need_cpf']==1) || ( $partner['partner_need_cpf']==2 && !isset($GLOBALS['_SESSION']['skip']) ) )
+	} //end else do if(!$is_data_valid)
+
+}
+
+function converterDataParaISO($data)
+{
+    // Se a variável estiver vazia ou não for string, retorna false
+    if (empty($data) || !is_string($data)) {
+        return false;
+    }
+
+    // TENTATIVA 1: Verifica se é formato Brasileiro (dd/mm/yyyy)
+    $d = DateTime::createFromFormat('d/m/Y', $data);
+    
+    // O operador && verifica duas coisas:
+    // 1. Se o objeto DateTime foi criado com sucesso ($d)
+    // 2. Se a formatação de volta para string é idêntica à entrada (Isso evita datas como 30/02/2023 virarem 02/03/2023)
+    if ($d && $d->format('d/m/Y') === $data) {
+        return $d->format('Y-m-d');
+    }
+
+    // TENTATIVA 2: Verifica se já é formato ISO (yyyy-mm-dd)
+    $d = DateTime::createFromFormat('Y-m-d', $data);
+    
+    if ($d && $d->format('Y-m-d') === $data) {
+        return $data; // Já está no formato certo
+    }
+
+    // Se não casou com nenhum dos dois formatos ou é data inválida
+    return false;
+}
+
+function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
+{
+	global $partner_list;
+
+	$user = getUserFromId($usuarioId);
+
+	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
+
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+
+	if ($is_data_valid && $vg_integracao_parceiro_origem_id == 10422) {
+
+		$date = new DateTime($user->ug_data_nascimento);
+		$interval = $date->diff(new DateTime(date('Y-m-d')));
+		if ($interval->format('%Y') < 18) {
+			echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>O produto é destinado para maiores de 18 anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.</div></div</div>";
+			die();
+		}
+	}
+
+	if (($partner['partner_need_cpf'] == 1 && !$is_data_valid) || ($partner['partner_need_cpf'] == 2 && !$is_data_valid && !isset($GLOBALS['_SESSION']['skip']))) {
+		include RAIZ_DO_PROJETO . '/public_html/prepag2/commerce/includes/form_cpf_off.php';
+		die();
+	} else {
+		if (($partner['partner_need_cpf'] == 1) || ($partner['partner_need_cpf'] == 2 && !isset($GLOBALS['_SESSION']['skip']))) {
+			require_once RAIZ_DO_PROJETO . "consulta_cpf/config.inc.cpf.php";
+			//require_once RAIZ_DO_PROJETO . "public_html/includes/functions.php";
+			$parametros = array(
+				'cpfcnpj' => preg_replace('/[^0-9]/', '', $user->ug_cpf)
+			);
+			$testeDadosAdicionais = new classCPF(false);
+			if ($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite()) {
+				if (empty($user->ug_nome_da_mae) || empty($user->ug_endereco) || empty($user->ug_numero) || empty($user->ug_bairro) || empty($user->ug_cidade) || empty($user->ug_estado) || empty($user->ug_cep) || (empty($user->ug_tel_ddd) && empty($user->ug_cel_ddd)) || (empty($user->ug_tel) && empty($user->ug_cel))) {
+					echo modal_includes();
+					$mensagem = "Olá " . $user->ug_nome . "!<br><br>Agradecemos sua preferência pela E-Prepag, porém o CPF cadastrado apresenta um grande volume de transações.<br><br>Para prosseguir com esta compra, precisamos que você acesse o formulário abaixo e envie os documentos solicitados. Após análise, sua conta poderá ser liberada em até um dia útil.<br><br>OBS: Utilize os navegadores Google Chrome ou Mozilla Firefox para visualizar o formulário corretamente.<br><br><span onclick='window.open(\"http://e-prepagpdv.com.br/e-prepag-limite-de-compras-com-cpf/\");' style='cursor:pointer; color:#2e5984;'>Clique aqui</span> para enviar os documentos.";
+					echo "<script>$(function(){ showMessage('" . str_replace("'", "\'", $mensagem) . "'); });</script>";
+					echo "</table><div class='m-top20'>" . $mensagem . "</div></div></div>";
+					die();
+				} //end 
+			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
+
+			//Validando a data da consulta
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+				$_REQUEST['formsubmit'] = true;
+				$_REQUEST['cpf'] = $user->ug_cpf;
+				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
+				$_REQUEST['consulta_automatica'] = '1';
+				include RAIZ_DO_PROJETO . '/public_html/prepag2/commerce/includes/form_cpf_off.php';
+				die();
+			} //end if(!verificaDataCPFInformado($user->ug_data_cpf_informado))
+
+		} //end if( ( $partner['partner_need_cpf']==1) || ( $partner['partner_need_cpf']==2 && !isset($GLOBALS['_SESSION']['skip']) ) )
 	} //end else do if(!$is_data_valid)
 
 }
@@ -4646,7 +4735,11 @@ function getUserFromId($id)
 {
 	$instUsuarioGames = new UsuarioGames;
 	$instUsuarioGames->obter(array('ug_id' => $id), 'ug_id', $rs);
-	return pg_fetch_object($rs);
+	if ($rs != null) {
+		return pg_fetch_object($rs);
+	} else {
+		return false;
+	}
 }
 
 function array_query($key, $val, $arr)
@@ -4693,7 +4786,6 @@ function integracao_layout($type, $data = false)
 		//return Helper::transform( $data, file_get_contents($_SERVER['DOCUMENT_ROOT'] . "\prepag2\commerce\includes\\" . $template_file) );
 		include($_SERVER['DOCUMENT_ROOT'] . "/prepag2/commerce/includes/" . $template_file);
 	}
-
 }
 
 //Função que verifica se o publisher exige CPF do Gamer
@@ -4705,7 +4797,7 @@ function checkingNeedCPF($opr_codigo)
 		$opr_need_cpf_lh = $rs_function_row['opr_need_cpf_lh'];
 	}
 	return $opr_need_cpf_lh;
-}//end function checkingNeedCPF
+} //end function checkingNeedCPF
 
 
 function cpf_page_gamer()
@@ -4741,7 +4833,7 @@ function cpf_page_gamer()
 	} elseif (!verificaIdadeMinima($user->ug_data_nascimento)) {
 		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>O produto " . $GLOBALS["produto_idade_minima"] . " é destinado para maiores de " . $GLOBALS["IDADE_MINIMA"] . " anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.</div></div</div>";
 		//        echo "</div></div><div class='top20'></div></class='container-fluid>";
-//        require_once DIR_WEB . "game/includes/footer.php";
+		//        require_once DIR_WEB . "game/includes/footer.php";
 		die();
 	} else {
 
@@ -4759,7 +4851,7 @@ function cpf_page_gamer()
 				echo "</table><div class='m-top20'>" . $mensagem . "</div></div></div>";
 				require_once DIR_WEB . "game/includes/footer.php";
 				die();
-			}//end 
+			} //end 
 		} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 		//Validando a data da consulta
@@ -4774,7 +4866,7 @@ function cpf_page_gamer()
 				require_once DIR_WEB . "game/includes/footer.php";
 			} //end if(isset($controller->logado) && $controller->logado)            
 			die();
-		}//end if(!verificaDataCPFInformado($user->ug_data_cpf_informado))
+		} //end if(!verificaDataCPFInformado($user->ug_data_cpf_informado))
 
 	} //end else do if(!$is_data_valid)
 
@@ -4808,7 +4900,7 @@ function lista_pedidos_bancos_pagos_com_EPPCASH()
 	}
 	$sret .= "</table>\n";
 	return $sret;
-}//end function lista_pedidos_bancos_pagos_com_EPPCASH()
+} //end function lista_pedidos_bancos_pagos_com_EPPCASH()
 
 function verificaIdadeMinima($dataNascimento)
 {
@@ -4819,5 +4911,42 @@ function verificaIdadeMinima($dataNascimento)
 	} else {
 		return ($interval->format('%Y') >= 12);
 	}
+}
+
+function buscarVinculoPorEmail(string $email) 
+{
+	$emailUpper = strtoupper($email);
+	$pdo = ConnectionPDO::getConnection()->getLink();
+
+    $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
+				JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
+				WHERE UPPER(ugv.email) = :email LIMIT 1";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $resultado ?? null;
+}
+
+function criarVinculoUsuario(int $ugId, string $email): void 
+{
+	$pdo = ConnectionPDO::getConnection()->getLink();
+    try {
+        $emailUpper = strtoupper($email);
+
+        $sql = "INSERT INTO usuarios_games_vinculo (ug_id, email) VALUES (:ug_id, :email)";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':ug_id', $ugId, PDO::PARAM_INT);
+        $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+        
+        $stmt->execute();
+
+    } catch (PDOException $e) {
+        error_log("Erro ao inserir em usuarios_games_vinculo: " . $e->getMessage());
+    }
 }
 ?>
