@@ -209,9 +209,28 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
 	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo'])) {
-		$lotes_xml = obterXmlFromZip('arquivo');
+
+		$caminho_temp = $_FILES['arquivo']['tmp_name'];
+
+		// Descobre o tipo real do arquivo
+		$mime_type = mime_content_type($caminho_temp);
+
+		$lotes_xml = [];
+
+		if ($mime_type === 'application/zip' || $mime_type === 'application/x-zip-compressed') {
+			$lotes_xml = obterXmlFromZip('arquivo');
+		}
+		elseif ($mime_type === 'text/xml' || $mime_type === 'application/xml') {
+			$xml_conteudo = file_get_contents($caminho_temp);
+			$lotes_xml = [
+                    'nome' => basename($_FILES['arquivo']['name']),
+                    'conteudo' => $xml_conteudo
+                ];
+		} else {
+			$erro = "O arquivo deve ser ZIP ou XML.";
+		}
 		enviarLotesEfinanceira($lotes_xml);
-	}else{
+	} else {
 		echo "pindamonhagaba";
 	}
 	?>
