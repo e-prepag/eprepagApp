@@ -96,7 +96,11 @@ $pdf->SetFillColor(255, 255, 255);
 //hora do conteudo do artigo
 $pdf->SetFont('arial', '', 8);
 
-if (!in_array($_POST['tax'], $alicota_epp_adm)) {
+
+if (
+        $_POST['dd_operadora'] == 90 ||
+        !in_array($_POST['tax'], $alicota_epp_adm)
+) {
         $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
         Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
         tel 11-3030-9101/ 11-3030-9102
@@ -728,7 +732,10 @@ if (intval($_POST['grosswiredcard']) != 0 && intval($_POST['witholdingcard']) !=
         //hora do conteudo do artigo
         $pdf->SetFont('arial', '', 8);
 
-        if (!in_array($_POST['tax'], $alicota_epp_adm)) {
+        if (
+                $_POST['dd_operadora'] == 90 ||
+                !in_array($_POST['tax'], $alicota_epp_adm)
+        ) {
                 $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
                 Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
                 tel 11-3030-9101/ 11-3030-9102
