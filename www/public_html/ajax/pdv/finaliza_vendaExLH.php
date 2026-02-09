@@ -15,19 +15,17 @@ $_PaginaOperador1Permitido = 53;
 require_once DIR_INCS . "pdv/corte_constantes.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 //validacao
-$msg = "";
 
-//echo "<pre>";
-//print_r($GLOBALS['QUERY_STRING']);
-//print_r($GLOBALS['FORM']);
-//echo "</pre>";
-//die();
+$token_csrf      = $_REQUEST['token_csrf'] ?? null;
+$iforma          = $_REQUEST['iforma'] ?? null;
+$idu             = $_REQUEST['idu'] ?? null;
+$sno             = $_REQUEST['sno'] ?? null;
+$btSubmit        = $_REQUEST['btSubmit'] ?? null;
+$produtos_valor  = $_REQUEST['produtos_valor'] ?? null;
+$email           = $_REQUEST['email'] ?? null;
+$produtos        = $_REQUEST['produtos'] ?? null;
+$msg        	 = htmlspecialchars($_REQUEST['msg']) ?? "";
 
-//echo "<pre>";
-//print_r($GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY']);
-//echo "</pre>";
-
-//Produtos
 if ($msg == "") {
 	if (!$produtos)
 		$msg = "Nenhum produto selecionado.\n";
