@@ -96,7 +96,11 @@ $pdf->SetFillColor(255, 255, 255);
 //hora do conteudo do artigo
 $pdf->SetFont('arial', '', 8);
 
-if (!in_array($_POST['tax'], $alicota_epp_adm)) {
+
+if (
+        $_POST['dd_operadora'] == 90 ||
+        !in_array($_POST['tax'], $alicota_epp_adm)
+) {
         $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
         Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
         tel 11-3030-9101/ 11-3030-9102
@@ -136,13 +140,13 @@ if (!in_array($_POST['tax'], $alicota_epp_adm)) {
         $pdf->SetX("59");
 
         $novo = $opr_razao . " 
-" . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
+        " . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
         if (!empty($opr_bairro)) {
                 $novo .= ", " . $opr_bairro;
         }
         $novo .= "
-" . $opr_cidade . " " . $opr_estado . "
-" . $opr_pais;
+        " . $opr_cidade . " " . $opr_estado . "
+        " . $opr_pais;
 
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(100, 4, $novo, 0, 'L');
@@ -315,24 +319,24 @@ if (!in_array($_POST['tax'], $alicota_epp_adm)) {
         $pdf->SetX("25");
         if ($_POST['dd_operadora'] == 16) {
                 $novo = "Account Owner:
-Account Number:
-Account Type:
-Routing Number:
-Bank Name:
-Bank City:
-Currency:";
+                Account Number:
+                Account Type:
+                Routing Number:
+                Bank Name:
+                Bank City:
+                Currency:";
         } else {
                 $novo = "Account Owner:
-Account Number:
-Account Type:
-Routing Number:
-Bank Name:
-Bank Address:
-Bank City:
-Bank Tel. Number:
-Currency:
-IBAN:
-SWIFT / BIC Code:";
+                Account Number:
+                Account Type:
+                Routing Number:
+                Bank Name:
+                Bank Address:
+                Bank City:
+                Bank Tel. Number:
+                Currency:
+                IBAN:
+                SWIFT / BIC Code:";
         }
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(35, 4, $novo, 0, 'L');
@@ -343,16 +347,16 @@ SWIFT / BIC Code:";
         $pdf->SetX("60");
 
         $novo = $opr_razao . "
-" . $opr_numero_conta . " 
-" . $opr_tipo_conta . "
-" . $opr_numero_roteamento . "
-" . $opr_banco_nome . "
-" . $opr_banco_endereco . "
-" . $opr_banco_cidade . "
-" . $opr_banco_telefone . "
-" . $opr_moeda_corrente . "
-" . $opr_iban . "
-" . $opr_bic_code;
+        " . $opr_numero_conta . " 
+        " . $opr_tipo_conta . "
+        " . $opr_numero_roteamento . "
+        " . $opr_banco_nome . "
+        " . $opr_banco_endereco . "
+        " . $opr_banco_cidade . "
+        " . $opr_banco_telefone . "
+        " . $opr_moeda_corrente . "
+        " . $opr_iban . "
+        " . $opr_bic_code;
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(125, 4, $novo, 0, 'L');
 
@@ -374,8 +378,8 @@ SWIFT / BIC Code:";
                 //posiciona horizontalmente em mm
                 $pdf->SetX("25");
                 $novo = "SWIFT / BIC Code:
-Bank Name:
-Account Number:";
+                Bank Name:
+                Account Number:";
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(35, 4, $novo, 0, 'L');
 
@@ -385,8 +389,8 @@ Account Number:";
                 $pdf->SetX("60");
 
                 $novo = $obi_bic_code . "
-" . $obi_banco_nome . "
-" . $obi_numero_conta;
+                " . $obi_banco_nome . "
+                " . $obi_numero_conta;
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(125, 4, $novo, 0, 'L');
         }
@@ -477,13 +481,13 @@ else {
         $pdf->SetX("59");
 
         $novo = $opr_razao . " 
-" . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
+        " . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
         if (!empty($opr_bairro)) {
                 $novo .= ", " . $opr_bairro;
         }
         $novo .= "
-" . $opr_cidade . " " . $opr_estado . "
-" . $opr_pais;
+        " . $opr_cidade . " " . $opr_estado . "
+        " . $opr_pais;
 
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(100, 4, $novo, 0, 'L');
@@ -728,7 +732,10 @@ if (intval($_POST['grosswiredcard']) != 0 && intval($_POST['witholdingcard']) !=
         //hora do conteudo do artigo
         $pdf->SetFont('arial', '', 8);
 
-        if (!in_array($_POST['tax'], $alicota_epp_adm)) {
+        if (
+                $_POST['dd_operadora'] == 90 ||
+                !in_array($_POST['tax'], $alicota_epp_adm)
+        ) {
                 $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
                 Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
                 tel 11-3030-9101/ 11-3030-9102
