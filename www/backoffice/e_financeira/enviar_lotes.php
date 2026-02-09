@@ -229,7 +229,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 		} else {
 			$erro = "O arquivo deve ser ZIP ou XML.";
 		}
-		enviarLotesEfinanceira($lotes_xml);
+		enviarLotesEfinanceira([$lotes_xml]);
 	} else {
 		echo "pindamonhagaba";
 	}

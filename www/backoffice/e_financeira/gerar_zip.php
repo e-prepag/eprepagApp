@@ -44,7 +44,7 @@ if ($_REQUEST['acao'] == "movimentacoes") {
             header('Cache-Control: no-cache, no-store, must-revalidate'); // Limpa cache
             header('Pragma: no-cache');
 
-            echo $lotes['xml']->saveXML();
+            echo $efinanceira->gerarLoteAssincrono([$lotes]);
         } else {
             echo "Erro ao gerar o arquivo";
         }
@@ -77,7 +77,7 @@ if ($_REQUEST['acao'] == "movimentacoes") {
             header('Cache-Control: no-cache, no-store, must-revalidate'); // Limpa cache
             header('Pragma: no-cache');
 
-            echo $lotes['xml']->saveXML();
+            echo $efinanceira->gerarLoteAssincrono([$lotes]);
         } else {
             echo "Erro ao gerar o arquivo";
         }
