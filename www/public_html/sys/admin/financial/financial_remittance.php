@@ -96,14 +96,6 @@ $pdf->SetFillColor(255, 255, 255);
 //hora do conteudo do artigo
 $pdf->SetFont('arial', '', 8);
 
-echo "<script>
-const debugPHP = {
-tax: " . json_encode($_POST['tax']) . ",
-alicota_epp_adm: " . json_encode($alicota_epp_adm) . "
-};
-console.log('DEBUG PHP:', debugPHP);
-</script>";
-
 if (!in_array($_POST['tax'], $alicota_epp_adm)) {
         $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
         Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
