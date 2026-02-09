@@ -1,13 +1,12 @@
 <?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 @session_start();
-if(empty($_SESSION["iduser_bko_pub"]))
-    {
-            echo '<script>alert("Fa�a login novamente");</script>';
-            exit;
-    }
+if (empty($_SESSION["iduser_bko_pub"])) {
+        echo '<script>alert("Fa�a login novamente");</script>';
+        exit;
+}
 //Alicota EPP Administradora
-$alicota_epp_adm = array(6.38, 3.5);//6.38;
+$alicota_epp_adm = array(6.38, 3.5); //6.38;
 
 //incluindo o arquivo do fpdf
 require_once "../../../../includes/constantes.php";
@@ -72,7 +71,7 @@ if (!empty($_POST['dd_operadora'])) {
                         }
                 }
         }
-}//end if dd_operadora n�o est� vazio
+} //end if dd_operadora n�o est� vazio
 //echo $msg."<br>";
 //instancia a classe.. P=Retrato, mm =tipo de medida utilizada no casso milimetros, tipo de folha =A4
 $pdf = new FPDF("P", "mm", "A4");
@@ -271,8 +270,7 @@ if (!in_array($_POST['tax'], $alicota_epp_adm)) {
                 //posiciona horizontalmente em mm
                 $pdf->SetX("163");
                 $pdf->Cell(37, 10, 'R$ ' . $_POST['netwired'], 1, 1, 'C');
-
-        }else{
+        } else {
 
                 $valorbruto = str_replace(".", "", $_POST['grosswired']);
                 $valorbruto = str_replace(",", ".", $valorbruto);
@@ -391,14 +389,13 @@ Account Number:";
 " . $obi_numero_conta;
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
         }
 
         //        //posiciona verticalmente em mm
-//        $pdf->SetY("229");
-//        //posiciona horizontalmente em mm
-//        $pdf->SetX("25");
-//        $pdf->Cell(162, 13,'', 1, 3, 'C');
+        //        $pdf->SetY("229");
+        //        //posiciona horizontalmente em mm
+        //        $pdf->SetX("25");
+        //        $pdf->Cell(162, 13,'', 1, 3, 'C');
 
         $pdf->SetFont('arial', '', 8);
 
@@ -668,7 +665,6 @@ Account Number:";
 " . $obi_numero_conta;
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
         }
 
         $pdf->SetFont('arial', '', 8);
@@ -953,7 +949,6 @@ Account Number:";
 " . $obi_numero_conta;
                         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                         $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
                 }
 
                 $pdf->SetFont('arial', '', 8);
@@ -989,8 +984,7 @@ Account Number:";
                 $pdf->Cell(0, 5, $conteudo, 0, 1, 'R');
 
                 $pdf->Close();
-
-        }//end if(!in_array($_POST['tax'], $alicota_epp_adm)) 
+        } //end if(!in_array($_POST['tax'], $alicota_epp_adm)) 
         else {
 
                 //Tratando valores para ser utilizados nos campos da remessa
@@ -1227,7 +1221,6 @@ Account Number:";
 " . $obi_numero_conta;
                         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                         $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
                 }
 
                 $pdf->SetFont('arial', '', 8);
@@ -1263,10 +1256,10 @@ Account Number:";
                 $pdf->Cell(0, 5, $conteudo, 0, 1, 'R');
         } //end else do if(!in_array($_POST['tax'], $alicota_epp_adm)) 
 
-}//end if(!empty($_POST['grosswired']) && !empty($_POST['witholding']) && !empty($_POST['netwired']))
+} //end if(!empty($_POST['grosswired']) && !empty($_POST['witholding']) && !empty($_POST['netwired']))
 else {
         $pdf->SetDisplayMode('fullpage');
-}//end else
+} //end else
 
 //imprime a saida do arquivo..
 //$pdf->Output();
