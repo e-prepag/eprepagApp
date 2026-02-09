@@ -64,12 +64,31 @@ class ChaveMestra{
 	    return $quantidade;
 	}
 	
+	private function getClientIP()
+	{
+		if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+			return $_SERVER['HTTP_CF_CONNECTING_IP']; // Cloudflare
+		}
+
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			// Pode ter múltiplos IPs: pega o primeiro
+			$ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+			return trim($ips[0]);
+		}
+
+		if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+			return $_SERVER['HTTP_X_REAL_IP'];
+		}
+
+		return $_SERVER['REMOTE_ADDR']; // fallback
+	}
+
 	public function inserirSeguro($liberado, $usuario){
 		
 		$sql = "select usuario from dist_usuarios_games_chave_seguro where usuario = :USUARIO and ip = :IP;";
 		$query = $this->conexao->prepare($sql);
 		$query->bindValue(":USUARIO", $usuario);
-		$query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+		$query->bindValue(":IP", $this->getClientIP());
 		$query->execute();
 		$rowSeguro = $query->fetch(PDO::FETCH_ASSOC);
 		
@@ -77,7 +96,7 @@ class ChaveMestra{
 			
 			$sql = "insert into dist_usuarios_games_chave_seguro(ip,liberado,usuario)values(:IP,:LIBERADO,:USUARIO);";
 			$query = $this->conexao->prepare($sql);
-			$query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+			$query->bindValue(":IP", $this->getClientIP());
 			$query->bindValue(":LIBERADO", $liberado);
 			$query->bindValue(":USUARIO", $usuario);
 			$query->execute();
@@ -140,7 +159,7 @@ class ChaveMestra{
 				
 		$sql = "SELECT liberado FROM dist_usuarios_games_chave_seguro where ip = :IP;";
 		$query = $this->conexao->prepare($sql);
-		$query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+		$query->bindValue(":IP", $this->getClientIP());
 		$query->execute();
 		$rowIP = $query->fetch(PDO::FETCH_ASSOC);
 		
@@ -180,7 +199,7 @@ class ChaveMestra{
 		$rowIP = $query->fetch(PDO::FETCH_ASSOC);
 			
 		if($rowIP != false){
-			if($_SERVER["REMOTE_ADDR"] == $rowIP["ugl_ip"]){
+			if($this->getClientIP() == $rowIP["ugl_ip"]){
 			
 			    return true;
 		    }else{

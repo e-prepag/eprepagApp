@@ -84,11 +84,14 @@ class Provedor
 			$origemLegenda = 'token';
 		}
 		if ($resultado == false) {
+			$code = $this->code ?? 999;
+			$provedora = utf8_decode($this->name) ?? "Desconhecida";
+			$agente = $_SERVER["HTTP_USER_AGENT"] ?? "Desconhecido";
 			$query = $conexao->prepare("insert into inform_pdv(provedora,agent,usuario,code_provedora,estado,ip,uf_cidade,origem_data,pais)values(:PROVEDORA,:AGENT,:USUARIO,:CODE,:ESTADO,:IP,:UF,:ORIGEM,:PAIS);");
-			$query->bindValue(":PROVEDORA", utf8_decode($this->name));
-			$query->bindValue(":AGENT", $_SERVER["HTTP_USER_AGENT"]);
+			$query->bindValue(":PROVEDORA", $provedora);
+			$query->bindValue(":AGENT", $agente);
 			$query->bindValue(":USUARIO", $usuario);
-			$query->bindValue(":CODE", $this->code ?? "Desconhecido");
+			$query->bindValue(":CODE", $code);
 			$query->bindValue(":IP", $this->getClientIP());
 			$query->bindValue(":ESTADO", utf8_decode($this->state));
 			$query->bindValue(":UF", utf8_decode($this->uf));
