@@ -7,7 +7,7 @@ require_once $raiz_do_projeto . "includes/gamer/main.php";
 $instProd = new Produto();
 $instProdMod = new ProdutoModelo();
 
-$modelo_id = $_GET['modelo_id'] ?? null;
+$modelo_id = $_REQUEST['modelo_id'] ?? null;
 
 $ogpm_ogp_id = $_POST['ogpm_ogp_id'] ?? null;
 $ogpm_ativo = $_POST['ogpm_ativo'] ?? null;

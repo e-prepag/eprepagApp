@@ -1,8 +1,4 @@
 <?php
-//error_reporting(E_ALL); 
-//ini_set("display_errors", 1); 
-set_time_limit(1200);
-ini_set('max_execution_time', 1200); 
 
 //Variavel de verificação de sucesso
 $success = false;

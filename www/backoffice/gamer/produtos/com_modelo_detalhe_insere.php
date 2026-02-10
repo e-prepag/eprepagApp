@@ -4,7 +4,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/gamer/main.php";
 
-$produto_id = $_GET['produto_id'] ?? null;
+$produto_id = $_REQUEST['produto_id'] ?? null;
 $modelo_id = $_REQUEST['modelo_id'] ?? null;
 $ogpm_ogp_id = $_POST['ogpm_ogp_id'] ?? null;
 $ogpm_ativo = $_POST['ogpm_ativo'] ?? null;

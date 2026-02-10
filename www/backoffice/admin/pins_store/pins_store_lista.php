@@ -21,6 +21,10 @@ $BtnGerarArq		= isset($_POST['hidgerar'])			? $_POST['hidgerar']		: null;
 $tf_v_tipo			= isset($_POST['tf_v_tipo'])		? $_POST['tf_v_tipo']		: null;
 $tf_v_formato		= isset($_POST['tf_v_formato'])		? $_POST['tf_v_formato']	: null;
 $ids_temp			= isset($_POST['chkPIN'])           ? $_POST['chkPIN']          : null;
+
+$tf_v_data_inclusao_ini			= isset($_POST['tf_v_data_inclusao_ini'])           ? $_POST['tf_v_data_inclusao_ini']          : null;
+$tf_v_data_inclusao_fim			= isset($_POST['tf_v_data_inclusao_fim'])           ? $_POST['tf_v_data_inclusao_fim']          : null;
+$btPesquisar			= isset($_POST['btPesquisar'])           ? $_POST['btPesquisar']          : null;
 $time_start_stats	= getmicrotime();
 ?>
 <script language="JavaScript">

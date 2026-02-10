@@ -8,18 +8,27 @@ require_once $raiz_do_projeto . "class/classIntegracaoPinCash.php";
 require_once $raiz_do_projeto . "includes/inc_functions.php";
 require_once $raiz_do_projeto . "class/classPinsStore.php";   
 
+$p                      = $_POST['p'] ?? null;
+$pin_operacao           = $_POST['pin_operacao'] ?? null;
+$tf_v_tipo              = $_POST['tf_v_tipo'] ?? null;
+$tf_v_data_inclusao_ini = $_POST['tf_v_data_inclusao_ini'] ?? null;
+$tf_v_data_inclusao_fim = $_POST['tf_v_data_inclusao_fim'] ?? null;
+$pin_valor              = $_POST['pin_valor'] ?? null;
+$tf_v_formato           = $_POST['tf_v_formato'] ?? null;
+$pin_lote               = $_POST['pin_lote'] ?? null;
+$pin_codigo             = $_POST['pin_codigo'] ?? null;
+$pin_serial             = $_POST['pin_serial'] ?? null;
+$pin_codinterno         = $_POST['pin_codinterno'] ?? null;
+$btPesquisar            = $_POST['btPesquisar'] ?? null;
+$op						= $_POST['op'] ?? null;
+$pin_bloqueio			= $_POST['pin_bloqueio'] ?? null;
+
+$ids_temp			= isset($_POST['chkPIN']) ? $_POST['chkPIN'] : null;
+
 $chave256bits = new Chave();
 $pc = new AES($chave256bits->retornaChave());
 
 $operacao_array		= VetorDistribuidoras();
-$distributor_codigo	= isset($_POST['pin_operacao'])     ? $_POST['pin_operacao']	: null;
-$lote				= isset($_POST['pin_lote'])         ? $_POST['pin_lote']        : null;
-$valor				= isset($_POST['pin_valor'])        ? $_POST['pin_valor']       : null;
-$op					= isset($_POST['op'])				? $_POST['op']				: null;
-$tf_v_tipo			= isset($_POST['tf_v_tipo'])		? $_POST['tf_v_tipo']		: null;
-$tf_v_formato		= isset($_POST['tf_v_formato'])		? $_POST['tf_v_formato']	: null;
-$pin_codigo			= isset($_POST['pin_codigo'])		? $_POST['pin_codigo']		: null;
-$ids_temp			= isset($_POST['chkPIN'])           ? $_POST['chkPIN']          : null;
 $time_start_stats	= getmicrotime();
 
 //paginacao

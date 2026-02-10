@@ -5,8 +5,20 @@ require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.p
 require_once $raiz_do_projeto . "class/gamer/classIntegracao.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once "/www/includes/bourls.php";
-//error_reporting(E_ALL); 
-//ini_set("display_errors", 1); 
+
+$tf_data_inicial = $_REQUEST['tf_data_inicial'] ?? null;
+$tf_data_final   = $_REQUEST['tf_data_final'] ?? null;
+$dd_canal        = $_REQUEST['dd_canal'] ?? null;
+$dd_mode         = $_REQUEST['dd_mode'] ?? null;
+$dd_operadora    = $_REQUEST['dd_operadora'] ?? null;
+$dd_valor        = $_REQUEST['dd_valor'] ?? null;
+$BtnSearch       = $_REQUEST['BtnSearch'] ?? null;
+
+$ncamp       = $_REQUEST['ncamp'] ?? null;
+$inicial       = $_REQUEST['inicial'] ?? null;
+$range       = $_REQUEST['range'] ?? null;
+$ordem       = $_REQUEST['ordem'] ?? null;
+
 
 	set_time_limit ( 3000 ) ;
 	$pos_pagina = $seg_auxilar;
