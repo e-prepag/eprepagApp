@@ -806,6 +806,10 @@ class UsuarioGames
             return 0;
         }
 
+        if (UsuarioGames::existeCPFCadastro($cpf, null)) {
+            return 0;
+        }
+
         try {
             $objEncryption = new SecureEncryption();
             $partes = explode('@', $email_novo);

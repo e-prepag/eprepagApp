@@ -2629,7 +2629,7 @@ function set_Integracao_error_msg($msg, $breset)
 	if ($breset) {
 		$GLOBALS['_SESSION']['integracao_error_msg'] = "";
 	}
-	$GLOBALS['_SESSION']['integracao_error_msg'] .= $msg;
+	$GLOBALS['_SESSION']['integracao_error_msg'] .= " " . $msg;
 }
 
 // ================================================
@@ -4920,7 +4920,7 @@ function buscarVinculoPorEmail(string $email)
 
     $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
 				JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
-				WHERE UPPER(ugv.email) = :email LIMIT 1";
+				WHERE UPPER(ugv.email) = :email AND ug_ativo = 1 LIMIT 1";
     
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
