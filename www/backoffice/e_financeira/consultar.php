@@ -180,45 +180,109 @@ $data_atual = date('Y-m');
 </style>
 
 <div>
-	<h2 class="titulo-vencimento">E-Financeira - Consulta</h2>
-	<form id="form1" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
+	<h2 class="titulo-vencimento">Consulta e-Financeira</h2>
+
+	<form id="formConsulta" action="#" method="post" class="form-solicitacoes">
+
 		<div class="container-cancel-pins">
+
 			<div class="col-cancel-pins">
-				<label for="tipo_busca">Tipo de busca
-				</label>
-				<select id="tipo_busca" name="tipo_busca" class="form-control">
-					<option value="lotexml" selected>Lote por XML</option>
-					<option value="loteprotocol">Lote por num. protocolo</option>
+				<label for="sel_consulta">Tipo de Consulta</label>
+				<select id="sel_consulta" name="sel_consulta" class="form-control" onchange="atualizarCampos()">
+					<option value="lote" <?php echo ($sel_consulta == 'lote' ? 'selected' : ''); ?>>Consultar por Protocolo (Retornado na resposta)</option>
+					<option value="cadastro" <?php echo ($sel_consulta == 'cadastro' ? 'selected' : ''); ?>>Informações Cadastrais</option>
+					<option value="lista" <?php echo ($sel_consulta == 'lista' ? 'selected' : ''); ?>>Lista e-Financeira (Movimento)</option>
+					<option value="mov_fin" <?php echo ($sel_consulta == 'mov_fin' ? 'selected' : ''); ?>>Mov. Operação Financeira (Mensal)</option>
+					<option value="mov_fin_anual" <?php echo ($sel_consulta == 'mov_fin_anual' ? 'selected' : ''); ?>>Mov. Operação Financeira (Anual)</option>
 				</select>
 			</div>
+
 			<div class="col-cancel-pins">
-				<label for="protocolo">Núm Protocolo<span class="help-icon">?
-						<span class="tooltiptext">
-							Número de protocolo recebido na resposta.
-						</span>
-					</span>
-				</label>
-				<input id="protocolo" name="protocolo" class="form-control"
-					type="text">
+				<label for="ambiente">Ambiente</label>
+				<select id="ambiente" name="ambiente" class="form-control">
+					<option value="homologacao" <?php echo ($ambiente == 'homologacao' ? 'selected' : ''); ?>>Pre-Produção (Homologação)</option>
+					<option value="producao" <?php echo ($ambiente == 'producao' ? 'selected' : ''); ?>>Produção</option>
+				</select>
 			</div>
+
 			<div class="col-cancel-pins">
-				<label for="arquivo">XML Resposta: <span class="help-icon">?
-						<span class="tooltiptext">
-							O XML tem que ser o recebido quando for enviado.
-						</span>
-					</span>
-				</label>
-				<input id="arquivo" name="arquivo"
-					type="file">
+				<label for="sel_tipo_visualizacao">Visualização</label>
+				<select id="sel_tipo_visualizacao" name="sel_tipo_visualizacao" class="form-control">
+					<option value="pretty" <?php echo ($sel_tipo_visualizacao == "pretty" ? "selected" : ""); ?>>Simplificada</option>
+					<option value="xml" <?php echo ($sel_tipo_visualizacao == "xml" ? "selected" : ""); ?>>XML Puro</option>
+				</select>
 			</div>
+		</div>
+
+		<div class="container-cancel-pins">
+
+			<div class="col-cancel-pins group-dynamic" id="grp_lote">
+				<label for="numero_lote">Número do Protocolo</label>
+				<input type="text" id="numero_lote" name="numero_lote" class="form-control" placeholder="Apenas números">
+			</div>
+
+			<div class="col-cancel-pins group-dynamic" id="grp_cnpj" style="display:none;">
+				<label for="cnpj">CNPJ do Declarante</label>
+				<input type="text" id="cnpj" name="cnpj" class="form-control" placeholder="00.000.000/0000-00">
+			</div>
+
+			<div class="col-cancel-pins group-dynamic" id="grp_situacao" style="display:none;">
+				<label for="situacao_informacao">Situação</label>
+				<select id="situacao_informacao" name="situacao_informacao" class="form-control">
+					<option value="1">1 - Ativa</option>
+					<option value="2">2 - Retificadora</option>
+					<option value="3">3 - Cancelada</option>
+				</select>
+			</div>
+
+		</div>
+
+		<div class="container-cancel-pins">
+
+			<div class="col-cancel-pins group-dynamic" id="grp_data_ini" style="display:none;">
+				<label for="dt_inicial">Data Início</label>
+				<input id="dt_inicial" name="dt_inicial" type="date" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+			</div>
+
+			<div class="col-cancel-pins group-dynamic" id="grp_data_fim" style="display:none;">
+				<label for="dt_final">Data Fim</label>
+				<input id="dt_final" name="dt_final" type="date" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+			</div>
+
+			<div class="col-cancel-pins group-dynamic" id="grp_mes_ini" style="display:none;">
+				<label for="anomes_inicio">Mês Início (Vigência)</label>
+				<input id="anomes_inicio" name="anomes_inicio" type="month" class="form-control" value="<?php echo $data_atual; ?>">
+			</div>
+
+			<div class="col-cancel-pins group-dynamic" id="grp_mes_fim" style="display:none;">
+				<label for="anomes_termino">Mês Término (Vigência)</label>
+				<input id="anomes_termino" name="anomes_termino" type="month" class="form-control" value="<?php echo $data_atual; ?>">
+			</div>
+
+		</div>
+
+		<div class="container-cancel-pins">
+
+			<div class="col-cancel-pins group-dynamic" id="grp_tipo_id" style="display:none;">
+				<label for="tipo_identificacao">Tipo Identificação</label>
+				<select id="tipo_identificacao" name="tipo_identificacao" class="form-control">
+					<option value="1">1 - CPF</option>
+					<option value="2">2 - CNPJ</option>
+				</select>
+			</div>
+
+			<div class="col-cancel-pins group-dynamic" id="grp_identificacao" style="display:none;">
+				<label for="identificacao">Nº Identificação (CPF/CNPJ)</label>
+				<input type="text" id="identificacao" name="identificacao" class="form-control">
+			</div>
+
 		</div>
 
 		<div class="d-flex top10 custom-justify">
-			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
+			<button type="submit" class="btn btn-success btn-busca">Consultar</button>
 		</div>
 
 	</form>
-
 </div>
 <div style="overflow-x: auto; padding-top: 20px;">
 	<div class="relatorio-info">
@@ -229,103 +293,102 @@ $data_atual = date('Y-m');
 	require_once __DIR__ . "/functions_e_financeira.php";
 
 	$efinanceira = new GerarEFinanceira();
-	if ($_POST['tipo_busca'] == 'lotexml' && isset($_FILES['arquivo'])) {
+	if ($_POST) {
+		try {
+			// Instancia sua classe (Exemplo)
+			// $api = new EFinanceiraClient(...); 
 
-		$arquivoUpload = $_FILES['arquivo'];
+			$producao = false;
+			$tipoConsulta = $_POST['sel_consulta'];
+			$resultado = null;
 
-		// Verifica erros básicos de upload
-		if ($arquivoUpload['error'] !== UPLOAD_ERR_OK) {
-			echo "<div class='alert alert-danger'>Erro no upload do arquivo.</div>";
-			return;
-		}
+			switch ($tipoConsulta) {
+				case 'lote':
+					$lote = $_POST['numero_lote'];
+					$resultado = $efinanceira->consultarLoteEFinanceira($lote, $producao);
+					break;
 
-		$extensao = strtolower(pathinfo($arquivoUpload['name'], PATHINFO_EXTENSION));
-		$xmlsParaProcessar = []; // Array que guardará ['nome' => 'x.xml', 'conteudo' => '...']
+				case 'cadastro':
+					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
+					$resultado = $efinanceira->consultarInformacoesCadastrais($cnpj, $producao);
+					break;
 
-		// --- CENÁRIO 1: É UM ZIP ---
-		if ($extensao === 'zip') {
-			$pastaDestino = '/tmp/consulta_' . uniqid(); // Pasta temporária
+				case 'lista':
+					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
+					$sit = $_POST['situacao_informacao'];
+					$dtIni = $_POST['dt_inicial'];
+					$dtFim = $_POST['dt_final'];
+					$resultado = $efinanceira->consultarListaEFinanceira($cnpj, $sit, $dtIni, $dtFim, $producao);
+					break;
 
-			try {
-				// Usa sua função extrairZip (certifique-se que ela está disponível aqui)
-				$arquivos = extrairZip($arquivoUpload['tmp_name'], $pastaDestino);
+				case 'mov_fin':
+				case 'mov_fin_anual':
+					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
+					$sit = $_POST['situacao_informacao'];
 
-				foreach ($arquivos as $nomeArquivo) {
-					if (strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION)) !== 'xml') continue;
+					// Transforma '2025-01' (input type month) para '202501' (Formato API)
+					$mesIni = str_replace('-', '', $_POST['anomes_inicio']);
+					$mesFim = str_replace('-', '', $_POST['anomes_termino']);
 
-					$caminhoCompleto = $pastaDestino . DIRECTORY_SEPARATOR . $nomeArquivo;
-					$conteudo = file_get_contents($caminhoCompleto);
+					$tipoId = $_POST['tipo_identificacao'];
+					$ident = preg_replace('/[^0-9]/', '', $_POST['identificacao']);
 
-					if ($conteudo) {
-						$xmlsParaProcessar[] = ['nome' => $nomeArquivo, 'conteudo' => $conteudo];
+					if ($tipoConsulta === 'mov_fin') {
+						$resultado = $efinanceira->consultarMovimentoOpFin($cnpj, $sit, $mesIni, $mesFim, $tipoId, $ident, $producao);
+					} else {
+						$resultado = $efinanceira->consultarMovimentoOpFinAnual($cnpj, $sit, $mesIni, $mesFim, $tipoId, $ident, $producao);
 					}
-					unlink($caminhoCompleto); // Limpa arquivo
-				}
-				rmdir($pastaDestino); // Limpa pasta
-			} catch (Exception $e) {
-				echo "<div class='alert alert-danger'>Erro ao processar ZIP: " . $e->getMessage() . "</div>";
+					break;
 			}
 
-			// --- CENÁRIO 2: É UM XML ÚNICO ---
-		} elseif ($extensao === 'xml') {
-			$conteudo = file_get_contents($arquivoUpload['tmp_name']);
-			if ($conteudo) {
-				$xmlsParaProcessar[] = ['nome' => $arquivoUpload['name'], 'conteudo' => $conteudo];
-			}
-		} else {
-			echo "<div class='alert alert-warning'>Por favor, envie um arquivo .XML ou .ZIP</div>";
+			// Exibição do Resultado
+			echo xmlViewer($resultado, $lote ?? "1234");
+		} catch (Exception $e) {
+			echo "<div class='alert alert-danger'>Erro: " . $e->getMessage() . "</div>";
 		}
-		if (!empty($xmlsParaProcessar)) {
-			echo "<h4>Resultados da Consulta por Arquivo</h4>";
-
-			foreach ($xmlsParaProcessar as $item) {
-				$xmlString = $item['conteudo'];
-				$nomeArq   = $item['nome'];
-
-				// 1. Parse do XML para pegar o protocolo
-				// Usamos str_replace para facilitar a leitura ignorando namespaces
-				$xmlLimpo = str_replace('xmlns=', 'ns=', $xmlString);
-				$xmlObj   = simplexml_load_string($xmlLimpo);
-
-				// Busca a tag protocoloEnvio em qualquer lugar do XML
-				// Ajuste 'protocoloEnvio' se a tag no seu XML tiver outro nome (ex: nRec)
-				$nodeProtocolo = $xmlObj->xpath("//*[local-name()='protocoloEnvio']");
-
-				$protocolo = !empty($nodeProtocolo) ? (string)$nodeProtocolo[0] : null;
-
-				if ($protocolo) {
-					echo "<div class='card mb-3'><div class='card-header'>Arquivo: <strong>$nomeArq</strong> | Protocolo: <strong>$protocolo</strong></div><div class='card-body'>";
-
-					try {
-						// 2. Consulta na Receita usando o protocolo extraído
-						$retorno_consulta = $efinanceira->consultarLoteEFinanceira($protocolo);
-
-						// 3. Exibe o resultado
-						echo xmlViewer($retorno_consulta, "Retorno da Consulta ($protocolo)");
-					} catch (Exception $e) {
-						echo "<div class='alert alert-danger'>Erro na consulta: " . $e->getMessage() . "</div>";
-					}
-
-					echo "</div></div>";
-				} else {
-					echo "<div class='alert alert-warning'>Arquivo <strong>$nomeArq</strong>: Não foi possível encontrar a tag &lt;protocoloEnvio&gt; neste XML.</div>";
-					// Opcional: Mostrar o XML para debug
-					// echo xmlViewer($xmlString, "XML Sem Protocolo");
-				}
-			}
-		}
-	} else if ($_POST['tipo_busca'] == 'loteprotocol') {
-
-		$retorno_consulta = $efinanceira->consultarLoteEFinanceira($_POST['protocolo']);
-
-		echo xmlViewer($retorno_consulta, $_POST['protocolo']);
-		echo "pindamonhagaba";
 	}
 
 	?>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
+	function atualizarCampos() {
+		const tipo = document.getElementById('sel_consulta').value;
+
+		// Função auxiliar para mostrar/esconder
+		const setDisplay = (id, show) => {
+			document.getElementById(id).style.display = show ? 'block' : 'none';
+		};
+
+		// Reseta tudo primeiro (esconde todos os grupos dinâmicos)
+		const grupos = document.querySelectorAll('.group-dynamic');
+		grupos.forEach(el => el.style.display = 'none');
+
+		// Lógica de exibição baseada no PHP
+		if (tipo === 'lote') {
+			setDisplay('grp_lote', true);
+		} else if (tipo === 'cadastro') {
+			setDisplay('grp_cnpj', true);
+		} else if (tipo === 'lista') {
+			setDisplay('grp_cnpj', true);
+			setDisplay('grp_situacao', true);
+			setDisplay('grp_data_ini', true);
+			setDisplay('grp_data_fim', true);
+		} else if (tipo === 'mov_fin' || tipo === 'mov_fin_anual') {
+			setDisplay('grp_cnpj', true);
+			setDisplay('grp_situacao', true);
+			setDisplay('grp_mes_ini', true);
+			setDisplay('grp_mes_fim', true);
+			setDisplay('grp_tipo_id', true);
+			setDisplay('grp_identificacao', true);
+		}
+	}
+
+	// Roda ao carregar a página para garantir estado correto (caso venha de um submit)
+	document.addEventListener("DOMContentLoaded", function() {
+		atualizarCampos();
+	});
+
 	function copiarXml(id) {
 		const text = document.getElementById(id).innerText;
 		navigator.clipboard.writeText(text).then(() => {

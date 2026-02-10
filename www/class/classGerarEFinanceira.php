@@ -2245,6 +2245,109 @@ class GerarEFinanceira
 
         return $response;
     }
+
+    public function consultarDetalhesPorProtocolo($tipo, $numeroProtocolo, $producao = false)
+    {
+        // 1. Sanitização
+        $numeroProtocolo = preg_replace('/[^0-9]/', '', $numeroProtocolo);
+
+        if (empty($numeroProtocolo)) {
+            throw new Exception("Número de protocolo inválido ou vazio.");
+        }
+
+        // 2. Mapeamento dos Endpoints (Conforme sua lista)
+        $mapaEndpoints = [
+            'cadastro'      => 'informacoes-cadastrais',
+            'lista'         => 'lista-efinanceira-movimento',
+            'mov_fin'       => 'informacoes-mov-op-fin',
+            'mov_fin_anual' => 'informacoes-mov-op-fin-anual',
+            'mov_pp'        => 'informacoes-mov-pp',
+            'intermediario' => 'informacoes-intermediario',
+            'patrocinado'   => 'informacoes-patrocinado',
+            'rerct'         => 'informacoes-rerct'
+        ];
+
+        if (!array_key_exists($tipo, $mapaEndpoints)) {
+            throw new Exception("Tipo de consulta por protocolo desconhecido: " . $tipo);
+        }
+
+        $sufixoUrl = $mapaEndpoints[$tipo];
+
+        // 3. Definição da URL Base
+        $baseUrl = $producao
+            ? "https://efinanceira.receita.fazenda.gov.br/consulta"
+            : "https://pre-efinanceira.receita.fazenda.gov.br/consulta";
+
+        // Monta a URL final: {Base}/{Sufixo}/{Protocolo}
+        $urlCompleta = "{$baseUrl}/{$sufixoUrl}/{$numeroProtocolo}";
+
+        // 4. Executa a requisição GET
+        return $this->executarRequestGet($urlCompleta);
+    }
+
+    /**
+     * Método auxiliar privado para requisições GET (Reutiliza configurações de SSL)
+     */
+    private function executarRequestGet($url)
+    {
+        // Verificar certificado
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($url);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPGET        => true, // Força método GET
+            CURLOPT_HTTPHEADER     => [
+                'Accept: application/xml',
+            ],
+
+            // Autenticação mútua TLS (Mesma lógica do consultarLote)
+            CURLOPT_SSLCERT        => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE    => 'PEM',
+
+            // Segurança TLS
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeouts
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão cURL: " . $curlError);
+        }
+
+        // Opcional: Tratar erros 404/500 se quiser lançar exception
+        // if ($httpCode >= 400) { throw new Exception("Erro HTTP $httpCode"); }
+
+        return $response;
+    }
+
     public function validarLoteAssinado($xmlAssinado)
     {
         $senha = $this->senhaCertificado;
