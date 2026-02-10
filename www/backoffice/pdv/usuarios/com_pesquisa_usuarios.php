@@ -2032,7 +2032,7 @@ function gerarArquivoCorreios() {
 ?>
                 <!--<td align="center"><strong>Perfil&nbsp;Limite</strong></td>-->
                 <td align="center"><strong><a href="<?php echo $default_add."?ordem=".$ordem."&ncamp=ug_perfil_saldo&inicial=".$inicial.$varsel ?>">Perfil Saldo</a></strong></td>
-                <td align="center"><strong>Data última compra</a></strong></td>
+                <td align="center"><strong>Data última compra/venda</a></strong></td>
 
                 <td align="center"><strong><a href="<?php echo $default_add."?ordem=".$ordem."&ncamp=ug_coord_lng&inicial=".$inicial.$varsel ?>">GMaps</a></strong></td>
                 <td align="center"><strong>VMaps</strong></td>
