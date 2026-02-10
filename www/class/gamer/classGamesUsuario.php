@@ -254,7 +254,7 @@ class UsuarioGames
         $this->setCategoriaFidelizacao($ug_categoria_fidelizacao);
         $this->setLogin($login);
 
-        $this->getIdsVIP($idsVIP);
+        $this->getIdsVIP();
     }
 
     public function getIdsVIP()
@@ -299,9 +299,11 @@ class UsuarioGames
     function setAtivo($ug_blAtivo)
     {
         if (!is_null($ug_blAtivo)) {
-            if ($ug_blAtivo == 1 || $ug_blAtivo == "1" || $ug_blAtivo === "true") $ug_blAtivo = 1;
-            elseif ($ug_blAtivo == '' || $ug_blAtivo == '0' || $ug_blAtivo == 0 || $ug_blAtivo == "false") $ug_blAtivo = 2;
-            else $ug_blAtivo = $ug_blAtivo;
+            if ($ug_blAtivo == 1 || $ug_blAtivo == "1" || $ug_blAtivo === "true") {
+                $ug_blAtivo = 1;
+            } elseif ($ug_blAtivo == '' || $ug_blAtivo == '0' || $ug_blAtivo == 0 || $ug_blAtivo == "false") {
+                $ug_blAtivo = 2;
+            }
         } //end if (!is_null($ug_blAtivo))
         else $ug_blAtivo = 2;
         $this->ug_blAtivo = $ug_blAtivo;
@@ -795,91 +797,98 @@ class UsuarioGames
         return $ret;
     }
 
-    function inserir_simple($store_id_novo, $email_novo)
+    function inserir_simple($store_id_novo, $email_novo, $cpf = null, $data_nascimento = null, $nome_cliente = null)
     {
-
         $id_novo = 0;
-        if ($ret == "") {
-            if (UsuarioGames::existeEmail($email_novo, null)) {
-                $ret = "Email já cadastrado.";
-            }
+
+        // 1. Validação inicial (mantida)
+        if (UsuarioGames::existeEmail($email_novo, null)) {
+            return 0;
         }
 
-        if ($ret == "") {
+        if (UsuarioGames::existeCPFCadastro($cpf, null)) {
+            return 0;
+        }
 
-            //Formata
+        try {
             $objEncryption = new SecureEncryption();
             $partes = explode('@', $email_novo);
-            $senha = $partes[0] . "@" . date('dmy');
-            $senha = $objEncryption->hashPassword($senha);
+            // Gera senha baseada no email + data
+            $senha_raw = $partes[0] . "@" . date('dmy');
+            $senha_hash = $objEncryption->hashPassword($senha_raw);
 
-            $dataInclusao = "CURRENT_TIMESTAMP";
-            $dataUltimoAcesso = "CURRENT_TIMESTAMP";
-            $qtdeAcessos = 1;  // Este ï¿½ o primeiro acesso
-            $news_letter = "h";  // usuï¿½rio recebe news
+            $email_formatado = trim(strtoupper($email_novo));
 
-            //SQL
-            $sql = "insert into usuarios_games(ug_senha, ug_ativo, ug_data_inclusao, " .
-                "ug_data_ultimo_acesso, ug_qtde_acessos, ug_integracao_origem, ug_nome, ug_email, " .
-                "ug_origem_parceiro, " .
-                "ug_sexo, ug_endereco, ug_numero, ug_complemento, ug_bairro, ug_cidade, ug_estado, ug_cep, ug_tel_ddi, ug_tel_ddd, ug_tel, ug_cel_ddi, ug_cel_ddd, ug_cel, " .
-                "ug_news) values (";
+            $nome_final = !empty($nome_cliente) ? strtoupper(trim($nome_cliente)) : $email_formatado;
 
-            $sql .= SQLaddFields($senha, "s") . ",";
-            $sql .= SQLaddFields(1, "") . ",";
-            $sql .= SQLaddFields($dataInclusao, "") . ",";
-            $sql .= SQLaddFields($dataUltimoAcesso, "") . ",";
-            $sql .= SQLaddFields($qtdeAcessos, "") . ",";
-            $sql .= SQLaddFields($store_id_novo, "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($email_novo)), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($email_novo)), "s") . ", ";
+            $nome_cpf = !empty($nome_cliente) ? strtoupper(trim($nome_cliente)) : '';
 
-            $sql .= SQLaddFields(trim(strtoupper($store_id_novo)), "s") . ", ";
+            $cpf_limpo = !empty($cpf) ? $cpf : '';
 
-            $sql .= "'', '', '', '', '', '', '', '', '', '', '', '', '', '', ";
+            $data_cpf_info = !empty($cpf_limpo) ? date('Y-m-d H:i:s') : null;
 
-            $sql .= SQLaddFields($news_letter, "s") . "";
+            $data_nasc_final = !empty($data_nascimento) ? $data_nascimento : null;
 
-            $sql .= ");";
-            //echo "$sql<br>";
-            //grava_log_integracao("Integraï¿½ï¿½o Debug 4: ".date("Y-m-d H:i:s")."\n  $sql \n");
-            $ret = SQLexecuteQuery($sql);
-            if (!$ret) $ret = "Erro ao inserir usuário.\n";
-            else {
-                $ret = "";
-                $rs_id = SQLexecuteQuery("select currval('usuarios_games_id_seq') as last_id");
-                if ($rs_id && pg_num_rows($rs_id) > 0) {
-                    $rs_id_row = pg_fetch_array($rs_id);
-                    $id_novo = $rs_id_row['last_id'];
+            $con = ConnectionPDO::getConnection();
+            $pdo = $con->getLink();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                    //Log na base
+            $sql = "INSERT INTO usuarios_games (
+                    ug_senha, ug_ativo, ug_data_inclusao, ug_data_ultimo_acesso, 
+                    ug_qtde_acessos, ug_integracao_origem, ug_nome, ug_email, 
+                    ug_origem_parceiro, ug_news,
+                    ug_sexo, ug_endereco, ug_numero, ug_complemento, ug_bairro, 
+                    ug_cidade, ug_estado, ug_cep, ug_tel_ddi, ug_tel_ddd, ug_tel, 
+                    ug_cel_ddi, ug_cel_ddd, ug_cel,
+                    ug_cpf, ug_data_nascimento, ug_nome_cpf, ug_data_cpf_informado
+                ) VALUES (
+                    :senha, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 
+                    1, :store_id, :nome, :email, 
+                    :origem_parceiro, 'h',
+                    '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                    :ug_cpf, :ug_data_nascimento, :ug_nome_cpf, :ug_data_cpf_informado
+                )";
+
+            $stmt = $pdo->prepare($sql);
+
+            $stmt->bindValue(':senha', $senha_hash, PDO::PARAM_STR);
+            $stmt->bindValue(':store_id', $store_id_novo, PDO::PARAM_STR);
+            $stmt->bindValue(':nome', $nome_final, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $email_formatado, PDO::PARAM_STR);
+            $stmt->bindValue(':origem_parceiro', $store_id_novo, PDO::PARAM_STR);
+            $stmt->bindValue(':ug_cpf', $cpf_limpo, PDO::PARAM_STR);
+            $stmt->bindValue(':ug_nome_cpf', $nome_cpf, PDO::PARAM_STR);
+
+            // Tratamento especial para datas (NULL vs Data)
+            if ($data_nasc_final) {
+                $stmt->bindValue(':ug_data_nascimento', $data_nasc_final);
+            } else {
+                $stmt->bindValue(':ug_data_nascimento', null, PDO::PARAM_NULL);
+            }
+
+            if ($data_cpf_info) {
+                $stmt->bindValue(':ug_data_cpf_informado', $data_cpf_info);
+            } else {
+                $stmt->bindValue(':ug_data_cpf_informado', null, PDO::PARAM_NULL);
+            }
+
+            $stmt->execute();
+
+            $id_novo = $pdo->lastInsertId('usuarios_games_id_seq');
+
+            if ($id_novo > 0) {
+                // Log na base
+                if (function_exists('usuarios_games_log')) {
                     usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CRIACAO_DO_CADASTRO'], $id_novo, null);
-
-                    /* 					
-                      //Envia email
-                      //--------------------------------------------------------------------------------
-                      $parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
-                      $parametros['nome'] = "";
-                      $parametros['sexo'] = "";
-
-                      $msgEmail  = email_cabecalho($parametros);
-                      $msgEmail .= "  <br><br>
-                      <table border='0' cellspacing='0'>
-                      <tr><td>&nbsp;</td></tr>
-                      <tr valign='middle' bgcolor='#FFFFFF'>
-                      <td align='left' class='texto'>
-                      Obrigado por se cadastrar conosco.<br><br>
-                      Utilize seu email " . $email_novo . " para acessar sua conta e realizar compras em nosso site.
-                      </td>
-                      </tr>
-                      <tr><td>&nbsp;</td></tr>
-                      </table>
-                      ";
-                      $msgEmail .= email_rodape($parametros);
-                      enviaEmail($email_novo, null, null, "E-Prepag - Cadastro (parceiro)", $msgEmail);
-                     */
                 }
             }
+        } catch (PDOException $e) {
+            // Log de erro silencioso ou throw dependendo da sua arquitetura
+            error_log("Erro ao inserir usuario_games: " . $e->getMessage());
+            return 0; // Retorna 0 em caso de erro
+        } catch (Exception $e) {
+            error_log("Erro geral: " . $e->getMessage());
+            return 0;
         }
 
         return $id_novo;
@@ -1536,13 +1545,77 @@ class UsuarioGames
 
     public static function existeCPFCadastro($cpf, $usuarioId = null)
     {
+        // Mapeamento para obter o nome baseado no status do banco
+        $mapStatus = array(
+            2 => 'inativo',
+            3 => 'com suspeita de fraude',
+            4 => 'suspeito',
+            5 => 'suspenso',
+            6 => 'inativo por falta de uso',
+        );
 
         try {
-            $sql = "select count(ug_id) as contas from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
-
+            $sql = "SELECT ug_ativo FROM usuarios_games WHERE regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
             if(!empty($usuarioId) && $usuarioId > 0){
                 $sql .= " AND ug_id <> :ug_id";
             }
+
+            $con = ConnectionPDO::getConnection();
+            $pdo = $con->getLink();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $rs = $pdo->prepare($sql);
+            $rs->bindValue(':ug_cpf', $cpf, PDO::PARAM_STR);
+            if(!empty($usuarioId) && $usuarioId > 0){
+                $usuarioId = (int) $usuarioId;
+
+                $rs->bindParam(":ug_id", $usuarioId, PDO::PARAM_INT);
+            }
+
+            $rs->execute();
+
+            $resultados = $rs->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($resultados)) {
+                return "";
+            }
+
+            // Variável de controle para verificar se encontramos contas ativas
+            $contasAtivas = 0;
+
+            // Itera sobre os resultados para verificar o status
+            foreach ($resultados as $row) {
+                $statusId = (int)$row['ug_ativo'];
+
+                if ($statusId !== 1) {
+                    $nomeStatus = isset($mapStatus[$statusId]) ? $mapStatus[$statusId] : "com status desconhecido";
+
+                    return "Você possui um cadastro {$nomeStatus} nesse CPF, entre em contato com o suporte para entender o caso.";
+                }
+
+                $contasAtivas++;
+            }
+
+            if ($contasAtivas > 1) {
+                return "Constam múltiplos cadastros ativos para este CPF ($cpf). Entre em contato com o suporte.";
+            }
+
+            // Retorno padrão para 1 usuário ativo já existente
+            return "CPF $cpf já cadastrado";
+        } catch (PDOException $e) {
+            error_log("Erro no banco de dados (existeCPFCadastro): " . $e->getMessage());
+            return "Erro geral, se o problema persistir, entre em contato com o suporte";
+        } catch (Exception $e) {
+            error_log("Erro inesperado (existeCPFCadastro): " . $e->getMessage());
+            return "Erro inesperado, se o problema persistir, entre em contato com o suporte";
+        }
+    }
+
+    public static function buscaContaCPF($cpf)
+    {
+
+        try {
+            $sql = "SELECT ug_id, ug_email from usuarios_games where regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g') AND ug_ativo = 1 ORDER BY ug_data_ultimo_acesso DESC NULLS LAST LIMIT 1;";
 
             //Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -1553,35 +1626,24 @@ class UsuarioGames
             $rs = $pdo->prepare($sql);
             $param = ':ug_cpf';
             $rs->bindParam($param, $cpf, PDO::PARAM_STR);
-            if(!empty($usuarioId) && $usuarioId > 0){
-                $usuarioId = (int) $usuarioId;
-
-                $rs->bindParam(":ug_id", $usuarioId, PDO::PARAM_INT);
-            }
             //executando query
             $rs->execute();
 
             $info = $rs->fetch(PDO::FETCH_ASSOC);
 
-            if ($info != false) {
-                // Cadastro de usuarios: aqui valida a quantidade de usuários criados, antes era 2 e agora é um.
-                if (isset($info["contas"]) && $info["contas"] == 0) {
-                    return "";
-                }
-                return "CPF $cpf já cadastrado";
+            if ($info) {
+                return $info;
             }
-            return "Erro interno, se o problema persistir, entre em contato com o suporte";
+            return false;
         } catch (PDOException $e) {
             // Log do erro
             error_log("Erro no banco de dados: " . $e->getMessage());
-            return "Erro geral, se o problema persistir, entre em contato com o suporte";
+            return false;
         } catch (Exception $e) {
             // Log de qualquer outro erro
             error_log("Erro inesperado: " . $e->getMessage());
-            return "Erro inesperado, se o problema persistir, entre em contato com o suporte";
+            return false;
         }
-        //retornando quantidade de registros
-        // return ($rs->fetchColumn() > 0) ? true : false;
     }
 
     function existeEmail_get_ID($email)
@@ -1707,6 +1769,41 @@ class UsuarioGames
             // Log de qualquer outro erro
             error_log("Erro inesperado: " . $e->getMessage());
             return "Erro inesperado, tente novamente";
+        }
+    }
+
+    public function existeCPFdoUsuario($usuario_id)
+    {
+
+        try {
+            // Inicializando a query base
+            $sql = "select ug_cpf from usuarios_games where ug_id = :ug_id";
+
+            // Inicializando conexao PDO
+            $con = ConnectionPDO::getConnection();
+            $pdo = $con->getLink();
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Passando a query de select
+            $rs = $pdo->prepare($sql);
+
+            $rs->bindParam(':ug_id', $usuario_id, PDO::PARAM_INT);
+
+            // Executando a query
+            $rs->execute();
+            $info = $rs->fetch(PDO::FETCH_ASSOC);
+
+            if ($info != false) {
+                if (isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"])) {
+                    return "";
+                }
+                return "CPF INVALIDO";
+            }
+            return "ERRO CONSULTA";
+        } catch (PDOException $e) {
+            return "ERRO BANCO";
+        } catch (Exception $e) {
+            return "ERRO GERAL";
         }
     }
 
@@ -2780,7 +2877,7 @@ class UsuarioGames
         //		return $this->getUseCielo();
 
         $usuarios_liberados_cielo_debito = array("JOAO.TREVISAN@E-PREPAG.COM.BR", "GLAUCIA@E-PREPAG.COM.BR", "WAGNER@E-PREPAG.COM.BR");
-        $lista_usuarios = $usuarios_liberados_cielo;
+        $lista_usuarios = isset($usuarios_liberados_cielo) ? $usuarios_liberados_cielo : [];
         if ((in_array(strtoupper($this->getEmail()), $usuarios_liberados_cielo_debito))) {
             return true;
         }
@@ -2881,7 +2978,7 @@ class UsuarioGames
 
 
         //$ret = UsuarioGames::validarCampos($objGamesUsuario, false);
-
+        $ret = "";
         if ($ret == "") {
             if ($acessa) {
                 if (UsuarioGames::existeEmail($objGamesUsuario->getEmail(), $objGamesUsuario->getId())) {
@@ -3606,7 +3703,7 @@ function suspendeContaUsuario($usuario_id)
     if ($usuario_id) {
         $cad_usuarioGames = new UsuarioGames($usuario_id);
         $cad_usuarioGames->setAtivo('2');
-        $msgAcao = UsuarioGames::atualizar($cad_usuarioGames);
+        $msgAcao = (new UsuarioGames)->atualizar($cad_usuarioGames);
         echo $msgAcao;
         if (empty($msgAcao)) {
             $sql = "INSERT INTO usuarios_games_cancelado (ug_id,ugc_data_cancelamento) VALUES (" . $usuario_id . ",NOW())";

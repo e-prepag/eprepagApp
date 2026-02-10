@@ -1,22 +1,10 @@
 <?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
-//error_reporting(E_ALL); 
-//ini_set("display_errors", 1); 
+
 ob_clean();
-set_time_limit(120);
 
 require_once RAIZ_DO_PROJETO . "consulta_cpf/config.inc.cpf.php";
 require_once "/www/consulta_cpf/trocaAutomatica.php";
-
-//Include do modelo antigo
-//include 'C:\Sites\E-Prepag\www\web\prepag2\incs\rf_cpf\funcoes.php';
-
-//var_dump($GLOBALS['_SESSION']); die;
-
-//var_dump($usuarioGames); 
-
-//error_reporting(E_ALL); 
-//ini_set("display_errors", 1); 
 
 $partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
@@ -193,36 +181,31 @@ if (isset($_REQUEST['formsubmit'])) {
 
     $class_usuarios_games = new UsuarioGames();
 
-    if ($usuarioId != null && $usuarioId > 0) {
-        $tem_conta_cpf = $class_usuarios_games::buscaContaCPF($cpf);
-    }
 
-    if (!isset($tem_conta_cpf) || !isset($tem_conta_cpf['ug_id'])) {
+
+    if (!empty($usuarioId)) {
+
         $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'), $usuarioId);
-    } else {
-        $verifica_cpf = '';
-    }
 
-    if (!empty($verifica_cpf)) {
-        $errors[] = "Erro: $verifica_cpf";
-    }
+        if (!empty($verifica_cpf)) {
+            $errors[] = "Erro: $verifica_cpf";
+        }
 
-    if (count($errors) == 0 && !empty($usuarioId)) {
+        if (count($errors) == 0) {
+            // Vamos certificar que extraimos apenas os numeros do CPF, para depois aplicarmos a mascara
+            $matches = array();
+            preg_match_all('!\d+!', $_REQUEST['cpf'], $matches);
 
-        // Vamos certificar que extraimos apenas os numeros do CPF, para depois aplicarmos a mascara
-        $matches = array();
-        preg_match_all('!\d+!', $_REQUEST['cpf'], $matches);
+            $cpf = implode('', $matches[0]);
 
-        $cpf = implode('', $matches[0]);
+            // formata valores em PHP (antes do bind)
+            $cpfMasked  = mask($cpf, '###.###.###-##');
+            $nomeFixed  = fix_name($name);
+            $dataNasc   = $data_nascimento;
 
-        // formata valores em PHP (antes do bind)
-        $cpfMasked  = mask($cpf, '###.###.###-##');
-        $nomeFixed  = fix_name($name);
-        $dataNasc   = $data_nascimento;
+            $usuarioIdInt = (int) $usuarioId;
 
-        $usuarioIdInt = (int) $usuarioId;
-
-        $sql = "
+            $sql = "
             UPDATE usuarios_games
             SET
                 ug_cpf = $1,
@@ -233,28 +216,39 @@ if (isset($_REQUEST['formsubmit'])) {
             WHERE ug_id = $5
         ";
 
-        $params = [
-            $cpfMasked,     // $1
-            $nomeFixed,     // $2
-            $nomeFixed,     // $3
-            $dataNasc,      // $4
-            $usuarioIdInt   // $5
-        ];
+            $params = [
+                $cpfMasked,     // $1
+                $nomeFixed,     // $2
+                $nomeFixed,     // $3
+                $dataNasc,      // $4
+                $usuarioIdInt   // $5
+            ];
 
-        $res = SQLexecuteQueryParams($sql, $params);
+            $res = SQLexecuteQueryParams($sql, $params);
 
-        if ($res) {
-            (new UsuarioGames)->adicionarLoginSession_ByID($usuarioId);
-        } else {
-            $errors[] = "Problema ao atualizar os dados.<br>Por favor entre com nosso suporte. Obrigado!";
+            if ($res) {
+                (new UsuarioGames)->adicionarLoginSession_ByID($usuarioId);
+            } else {
+                $errors[] = "Problema ao atualizar os dados.<br>Por favor entre com nosso suporte. Obrigado!";
+            }
+
+            //Atualizando no Qtde de Contas com o mesmo CPF
+            $rs_api->adicionaQtdeContas($cpf, fix_name($name), $data_nascimento);
+
+            header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);
         }
+    }
+    if (empty($usuarioId) && count($errors) == 0) {
+        $matches = array();
+        preg_match_all('!\d+!', $_REQUEST['cpf'], $matches);
 
-        //Atualizando no Qtde de Contas com o mesmo CPF
-        $rs_api->adicionaQtdeContas($cpf, fix_name($name), $data_nascimento);
+        $cpf = implode('', $matches[0]);
 
+        // formata valores em PHP (antes do bind)
+        $_SESSION['CPF_USUARIO']     = mask($cpf, '###.###.###-##');
+        $_SESSION['NOME_CPF']        = fix_name($name);
+        $_SESSION['DATA_NASCIMENTO'] = $data_nascimento;
         header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);
-    } elseif (empty($usuarioId)) {
-        $errors[] = "Sua sessão expirou. Por favor, faça login no sistema novamente. Obrigado!";
     }
 
     if (count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1') {
@@ -275,9 +269,6 @@ if (!isset($_REQUEST['formsubmit'])) {
     $form_cpf = "";
     $form_data_nascimento = "";
 }
-
-//$name_valid = verificaNome($form_name);
-//$cpf_valid  = verificaCPF_int($form_cpf);
 
 $server_url = $_SERVER['SERVER_NAME'];
 
@@ -356,6 +347,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                              </script>
                         </div>
                 ";
+
 ?>
 <html>
 
@@ -375,77 +367,106 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
 </head>
 
 <body class="bg-cinza txt-preto">
-    <?php echo integracao_layout('css'); ?>
     <?php echo modal_includes(); ?>
     <?php
     $url = "https://" . $_SERVER['SERVER_NAME'];
-    //echo '<link href="'.$url.'/prepag2/js/jqueryui/css/custom-theme/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">';
-    //echo '<script src="'.$url.'/prepag2/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>';
     echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
     ?>
+    <script src="/js/form_cpf_valida.js"></script>
 
     <body>
 
         <?php
-
         echo integracao_layout('header');
-
-        echo integracao_layout('order');
-
         if (count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1') {
             echo "<script>$(function(){ showMessage('" . $msg . "'); });</script>";
             die();
-        } //end if(count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1')
+        } 
         ?>
-        <div class="wrapper txt-preto int-box">
-            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-                <h4 class="c1 txt-azul">Por favor, complete o campo abaixo com o seu CPF <a href="#"
-                        class="btn-question glyphicon glyphicon-question-sign txt-vermelho c-pointer t0"
-                        data-msg="<h2>O que é isso?</h2>Agora todas as transações financeiras de jogos online no Brasil são condicionadas ao fornecimento de um CPF. Esta informação será solicitada em algumas compras, mas não sempre. Agradecemos a sua compreensão."
-                        style="position: relative;"></a></h4>
-                <p><i>O CPF será solicitado apenas na sua primeira compra no jogo.</i></p>
-                <div class="int-form1" style="position: relative;">
-                    <form action="" id="cpfForm" method="POST">
-                        <input type="hidden" name="formsubmit" value="OK" style="display: none;" />
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <!--<label for="cpf">Cpf:</label>-->
-                                <input type="text" class="form-control w160" id="cpf" name="cpf" maxlength="14"
-                                    value="<?php echo htmlspecialchars($form_cpf, ENT_QUOTES, 'UTF-8'); ?>"
-                                    placeholder="CPF">
-                            </div>
-                            <div class="form-group bottom0">
-                                <!--<label for="cpf">Data de Nascimento (<i>(DD/MM/AAAA)</i>):</label>-->
-                                <input type="text" class="form-control datepicker w160"
-                                    value="<?php echo htmlspecialchars($form_data_nascimento, ENT_QUOTES, 'UTF-8'); ?>"
-                                    placeholder="Data de Nascimento" name="data_nascimento" id="data_nascimento">
-                            </div>
-                            <span
-                                style="font-style: italic; color: #444; float: left; font-size: 12px; margin-top: 0px;">(DD/MM/AAAA)</span><br>
-                            <div class="form-group">
-                                <input type="button" class="int-btn1 grad2 btn btn-sm btn-success pull-right"
-                                    value="Agora não"
-                                    style="display: inline-block; visibility: <?php echo $partner['partner_need_cpf'] == 2 ? "visible" : "hidden"; ?>;"
-                                    id="skipform" />
-                                <input type="button" class="int-btn1 grad1 btn btn-sm btn-success pull-left"
-                                    id="btn_submit" value="Confirmar" />
-                            </div>
+        <div class="wrapper txt-preto int-box" style="width: 100% !important; max-width: 100% !important;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12 text-center" style="margin-bottom: 20px;">
+                        <h4 class="c1 txt-azul" style="display: inline-block;">
+                            Por favor, complete o campo abaixo com o seu CPF
+                        </h4>
+                        <a href="#"
+                            class="btn-question glyphicon glyphicon-question-sign txt-vermelho c-pointer t0"
+                            data-msg="<h2>O que é isso?</h2>Agora todas as transações financeiras de jogos online no Brasil são condicionadas ao fornecimento de um CPF. Esta informação será solicitada em algumas compras, mas não sempre. Agradecemos a sua compreensão."
+                            style="position: relative; top: -2px; text-decoration: none;">
+                        </a>
+                        <p class="text-muted" style="margin-top: 5px;">
+                            <i>O CPF será solicitado apenas na sua primeira compra no jogo.</i>
+                        </p>
+                    </div>
+                </div>
 
-                            <?php
-                            echo $retorno;
-                            ?>
-                    </form>
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 
-                    <?php foreach ($errors as $key => $error) { ?>
-                        <script>
-                            $(function() {
-                                showMessage('<?php echo str_replace("\n", " ", $error); ?>');
-                            });
-                        </script>
-                        <?php break; ?>
-                    <?php } ?>
+                        <div class="int-form1" style="background-color: #fff; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+
+                            <form action="" id="cpfForm" method="POST">
+                                <input type="hidden" name="formsubmit" value="OK" />
+
+                                <div class="form-group">
+                                    <label for="cpf" class="sr-only">CPF</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-user" style="top: 0 !important;"></i></span>
+                                        <input type="text" class="form-control input-lg" id="cpf" name="cpf" maxlength="14"
+                                            value="<?php echo htmlspecialchars($form_cpf, ENT_QUOTES, 'UTF-8'); ?>"
+                                            placeholder="Digite seu CPF">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="data_nascimento" class="sr-only">Data de Nascimento</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar" style="top: 0 !important;"></i></span>
+                                        <input type="text" class="form-control datepicker input-lg"
+                                            value="<?php echo htmlspecialchars($form_data_nascimento, ENT_QUOTES, 'UTF-8'); ?>"
+                                            placeholder="Data de Nascimento" name="data_nascimento" id="data_nascimento">
+                                    </div>
+                                    <small class="help-block text-right" style="margin-top: 5px; font-style: italic;">(DD/MM/AAAA)</small>
+                                </div>
+
+                                <div class="form-group" style="margin-top: 25px; margin-bottom: 0;">
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <input type="button" class="btn btn-default btn-block"
+                                                value="Agora não"
+                                                style="visibility: <?php echo $partner['partner_need_cpf'] == 2 ? "visible" : "hidden"; ?>;"
+                                                id="skipform" />
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <input type="button" class="int-btn1 grad1 btn btn-success btn-block" style="margin-left: auto; width: fit-content !important;"
+                                                id="btn_submit" value="Confirmar" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <?php echo isset($retorno) ? $retorno : ''; ?>
+                            </form>
+                        </div>
+
+                    </div>
                 </div>
             </div>
+
+            <?php if (isset($errors) && is_array($errors)) { ?>
+                <?php foreach ($errors as $key => $error) { ?>
+                    <script>
+                        $(function() {
+                            if (typeof showMessage === 'function') {
+                                showMessage('<?php echo str_replace("\n", " ", $error); ?>');
+                            } else {
+                                alert('<?php echo str_replace("\n", " ", $error); ?>');
+                            }
+                        });
+                    </script>
+                    <?php break; ?>
+                <?php } ?>
+            <?php } ?>
         </div>
 
         <script>

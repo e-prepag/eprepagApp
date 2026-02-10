@@ -3,21 +3,21 @@ header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'", tru
 
 //header("location: https://www.e-prepag.com.br/");
 //exit;
-$msg = $_GET['msg'] ?? null;
+$msg = htmlentities($_GET['msg'], ENT_QUOTES,'ISO-8859-1') ?? null;
 
 if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], "/prepag2")) {
     session_start();
 
 
     if (isset($GLOBALS['_SESSION']['integracao_error_msg']) && $GLOBALS['_SESSION']['integracao_error_msg'] != "") {
-        echo $GLOBALS['_SESSION']['integracao_error_msg'] . "<br>";
+        $msg .= $GLOBALS['_SESSION']['integracao_error_msg'] . "<br>";
     }//end if
     else {
-        echo "Ops, parece que algo deu errado!<br>
+        $msg .= "Ops, parece que algo deu errado!<br>
          Por favor, faça um novo pedido para concluir a compra.";
     }//end else
     session_destroy();
-    die();
+    //die();
 }//end if 
 
 require_once "../../../includes/constantes.php";
@@ -30,10 +30,6 @@ if ($controller->logado)
 else
     require_once RAIZ_DO_PROJETO . "public_html/game/includes/header-off.php";
 
-if (isset($GLOBALS['_SESSION']['integracao_error_msg']) && $GLOBALS['_SESSION']['integracao_error_msg'] != "") {
-    $msg = $GLOBALS['_SESSION']['integracao_error_msg'];
-}
-$msg = htmlentities($msg, ENT_QUOTES,'ISO-8859-1');
 ?>
 <div class="container txt-cinza bg-branco " style="padding-bottom: 60px;margin-top: 29px;">
     <div class="row top40">
