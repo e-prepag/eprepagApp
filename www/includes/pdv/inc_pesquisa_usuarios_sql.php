@@ -5,7 +5,7 @@
 $sql  = "select *, (SELECT vg_data_inclusao
      FROM tb_dist_venda_games 
      WHERE vg_ug_id = ug.ug_id and vg_ultimo_status = 5
-     ORDER BY ug_data_inclusao DESC 
+     ORDER BY vg_data_inclusao DESC 
      LIMIT 1) AS ultima_data_compra
 		 from dist_usuarios_games ug\n";
 if($tf_u_com_totais_vendas ) {	//&& $dd_opr_codigo
