@@ -8,179 +8,35 @@ $data_atual = date('Y-m');
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
+<link href="styles.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
-
-<style>
-	#data-help-icon {
-		left: 50px;
-
-	}
-
-	#data-help-icon::after {
-		left: 20px;
-	}
-
-	.help-icon {
-		position: relative;
-		margin-left: 5px;
-		cursor: pointer;
-		background: rgb(0, 0, 0, 0.1);
-		color: #606060;
-		border-radius: 50%;
-		width: 18px;
-		height: 18px;
-		text-align: center;
-		line-height: 18px;
-		font-size: 12px;
-		user-select: none;
-		display: inline-block;
-	}
-
-	.help-icon .tooltiptext {
-		visibility: hidden;
-		width: 135px;
-		bottom: 100%;
-		left: 50%;
-		margin-left: -60px;
-		background-color: rgba(0, 0, 0, 0.9);
-		color: #fff;
-		text-align: center;
-		border-radius: 6px;
-		padding: 5px;
-		font-weight: bold;
-		font-size: 11px;
-
-		/* Position the tooltip */
-		position: absolute;
-		z-index: 1;
-	}
-
-	.help-icon .tooltiptext::after {
-		content: " ";
-		position: absolute;
-		top: 100%;
-		/* At the bottom of the tooltip */
-		left: 50%;
-		margin-left: -5px;
-		border-width: 5px;
-		border-style: solid;
-		border-color: black transparent transparent transparent;
-	}
-
-	.help-icon:hover .tooltiptext,
-	.tooltiptext.show {
-		visibility: visible;
-		pointer-events: auto;
-	}
-
-	.relatorio-info {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 20px;
-		font-size: 16px;
-	}
-
-	.tabela-clientes {
-		width: 100%;
-		border-collapse: collapse;
-		background: #fff;
-	}
-
-	.tabela-clientes th,
-	.tabela-clientes td {
-		border: 1px solid #ccc;
-		padding: 10px;
-		text-align: center;
-	}
-
-	.tabela-clientes th {
-		background-color: #e0e0e0;
-	}
-
-	.tabela-clientes tr:nth-child(even) {
-		background-color: #f9f9f9;
-	}
-
-	.total {
-		font-weight: bold;
-		background: #dfe6e9;
-	}
-
-	.align-right {
-		margin-left: auto;
-	}
-
-	.custom-justify {
-		display: flex;
-		width: 100%;
-		flex-wrap: wrap;
-		gap: 15px;
-	}
-
-	.container-cancel-pins {
-		display: flex;
-		justify-content: left;
-		flex-wrap: wrap;
-		gap: 20px;
-		/* Adiciona uma margem entre as colunas */
-	}
-
-	/* Colunas (ajuste para uma largura proporcional) */
-	.col-cancel-pins {
-		flex: 1;
-		min-width: 100px;
-		margin: 0;
-		max-width: 180px;
-		/* Remove margens laterais desnecessárias */
-	}
-
-	.data-input {
-		min-width: 200px;
-	}
-
-	.titulo-vencimento {
-		font-weight: bold;
-		color: #333333;
-		font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-		text-align: left;
-		margin-left: 25px;
-		padding-bottom: 15px;
-		font-size: 21px;
-	}
-
-	.xml-box {
-		font-size: 14px;
-		max-height: 500px;
-		overflow: auto;
-		background: #f8f9fa;
-		border-radius: 6px;
-		padding: 15px;
-	}
-
-	.xml-colapsado {
-		max-height: 120px !important;
-	}
-
-	@media (max-width: 480px) {
-
-		input,
-		label {
-			font-size: 11px;
-			/* Diminuir ainda mais o tamanho da fonte */
-		}
-
-		button {
-			font-size: 10px;
-			/* Diminuir o tamanho da fonte do botão */
-			padding: 6px 10px;
-			/* Diminuir o padding do botão */
-		}
-	}
-</style>
-
 <div>
-	<h2 class="titulo-vencimento">Consulta e-Financeira</h2>
+	<div style="height: 15px;"></div>
+	<nav class="navbar navbar-outline">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-outline">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+
+			<div class="collapse navbar-collapse" id="menu-outline">
+				<ul class="nav navbar-nav">
+					<li><a href="index.php">Gerar mov.</a></li>
+					<li><a href="abertura.php">Gerar abert.</a></li>
+					<li><a href="fechamento.php">Gerar Fech.</a></li>
+					<li><a href="enviar_lotes.php">Enviar Lotes</a></li>
+					<li class="active"><a href="#">Consulta e-Fin</a></li>
+					<li><a href="lotes_enviados.php">Enviados</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<h2 class="titulo-vencimento">Consulta - E-Financeira</h2>
 
 	<form id="formConsulta" action="#" method="post" class="form-solicitacoes">
 
@@ -310,7 +166,10 @@ $data_atual = date('Y-m');
 
 				case 'cadastro':
 					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
-					$resultado = $efinanceira->consultarInformacoesCadastrais($cnpj, $producao);
+					$resultado_chamado = $efinanceira->consultarInformacoesCadastrais($cnpj, $producao);
+					$protocolo_lote = extrairProtocoloEFinanceira($resultado_chamado);
+					sleep(30);
+					$resultado = $efinanceira->consultarDetalhesPorProtocolo('cadastro', $protocolo_lote);
 					break;
 
 				case 'lista':
@@ -419,13 +278,7 @@ $data_atual = date('Y-m');
 				}, 3000);
 			});
 		});
-		$('.container').removeClass('container');
-		$('#tabela-clientes').DataTable({
-			"ordering": true,
-			"paging": false,
-			"searching": false,
-			"info": false
-		});
+		
 	});
 </script>
 <?php

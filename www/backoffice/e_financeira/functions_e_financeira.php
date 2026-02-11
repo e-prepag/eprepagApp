@@ -49,6 +49,33 @@ function xmlViewer($xmlString, $id = 'xmlViewer')
 HTML;
 }
 
+function extrairProtocoloEFinanceira($xmlString)
+{
+    // 1. Carrega o XML
+    // LIBXML_NOCDATA é opcional, mas ajuda se houver blocos CDATA futuramente
+    $xml = simplexml_load_string($xmlString, "SimpleXMLElement", LIBXML_NOCDATA);
+
+    if ($xml === false) {
+        return "Erro: XML inválido ou corrompido.";
+    }
+
+    // 2. Registra o Namespace
+    // O link deve ser EXATAMENTE igual ao que está no xmlns do cabeçalho do XML
+    $namespaceUrl = "http://www.eFinanceira.gov.br/schemas/retornoSolicitacaoConsultaAssincrona/v1_0_0";
+    $xml->registerXPathNamespace('ns', $namespaceUrl);
+
+    // 3. Busca o valor usando XPath
+    // //ns: significa "busque em qualquer profundidade dentro desse namespace"
+    $resultado = $xml->xpath('//ns:protocoloConsulta');
+
+    // 4. Retorna o valor string ou null se não achar
+    if (!empty($resultado)) {
+        return (string)$resultado[0];
+    } else {
+        return null;
+    }
+}
+
 function gerarRelatorioPorCompetencia(array $dados)
 {
     if (empty($dados)) {
@@ -220,6 +247,11 @@ function enviarLotesEfinanceira(array $lotes)
         $nomeArquivoOriginal = $lote['nome'];
         $conteudoXmlOriginal = $lote['conteudo'];
 
+        if(empty($nomeArquivoOriginal) || empty($conteudoXmlOriginal)){
+            echo "Arquivo ou conteúdo vazio, pulando";
+            continue;
+        }
+
         try {
             echo "<h4>Processando: $nomeArquivoOriginal</h4>";
 
@@ -277,23 +309,31 @@ function enviarLotesEfinanceira(array $lotes)
 
                         $eventos = $xmlLoteObj->xpath("//evento");
 
+                        $idsParaAtualizar = [];
                         foreach ($eventos as $evento) {
-                            $idAttribute = (string)$evento['id'];
+                            $idString = (string)$evento['id'];
 
-                            if ($idAttribute) {
-                                // SUA LOGICA DE UPDATE
-                                $linhasAfetadas = $efinanceira->atualizarEnvioParaEnviado(
-                                    $idAttribute,
+                            // Remove o prefixo
+                            $idLimpo = (int) substr($idString, 3);
+
+                            if ($idLimpo) {
+                                $idsParaAtualizar[] = $idLimpo;
+                            }
+                        }
+                        if (!empty($idsParaAtualizar)) {
+                            try {
+                                $totalAtualizados = $efinanceira->atualizarLoteParaEnviado(
+                                    $idsParaAtualizar,
                                     $protocolo,
                                     $nomeArquivoOriginal
                                 );
 
-                                if ($linhasAfetadas > 0) {
-                                    echo "<span style='color:green'>Evento $idAttribute atualizado.</span><br>";
-                                } else {
-                                    echo "<span style='color:orange'>Evento $idAttribute não atualizado (ID não encontrado?).</span><br>";
-                                }
+                                echo "<span style='color:green'>Sucesso! Total de eventos atualizados: <strong>$totalAtualizados</strong></span><br>";
+                            } catch (Exception $e) {
+                                echo "<span style='color:red'>Erro ao atualizar lote: " . $e->getMessage() . "</span><br>";
                             }
+                        } else {
+                            echo "<span style='color:orange'>Nenhum ID válido encontrado para atualizar.</span><br>";
                         }
                     } else {
                         echo "<div class='alert alert-warning'>Atenção: Protocolo não encontrado apesar do sucesso. Nada salvo.</div>";
@@ -329,6 +369,7 @@ function enviarLotesEfinanceira(array $lotes)
             }
         } catch (Exception $e) {
             echo "<div class='alert alert-danger'>Erro crítico ao processar $nomeArquivoOriginal: " . $e->getMessage() . "</div>";
+            echo "<pre>".htmlentities($conteudoXmlOriginal)."</pre>";
         }
 
         echo "<hr>";

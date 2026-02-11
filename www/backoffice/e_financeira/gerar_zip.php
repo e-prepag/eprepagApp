@@ -10,7 +10,8 @@ if ($_REQUEST['acao'] == "movimentacoes") {
     $lotes = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
 
     if ($lotes) {
-        $caminho = gerarZipLotes($lotes, "lotes_{$data_final}_{$data_inicial}_" . date('Ymd_Hi') . ".zip");
+        $nome_arquivo = "lotes_{$data_final}_{$data_inicial}_" . date('Ymd_Hi') . ".zip";
+        $caminho = gerarZipLotes($lotes, $nome_arquivo);
 
         // Validação básica
         if (!$caminho || !file_exists($caminho)) {
@@ -19,7 +20,7 @@ if ($_REQUEST['acao'] == "movimentacoes") {
         }
 
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="' . $arquivo . '"');
+        header('Content-Disposition: attachment; filename="' . $nome_arquivo . '"');
         header('Content-Length: ' . filesize($caminho));
         header('Cache-Control: no-cache');
 

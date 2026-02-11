@@ -43,6 +43,7 @@ class GerarEFinanceira
     private $certificado_privado_epp;
     private $chave_privada_epp;
     private $versao_aplicacao;
+    private $cacheIdsEventos = [];
 
     public function __construct()
     {
@@ -748,6 +749,143 @@ class GerarEFinanceira
         return "$ano-07-01";
     }
 
+    private function preCarregarIdsMovimentacoes(array $dadosAgrupados)
+    {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $listaParaVerificar = [];
+        $chavesMap = [];
+
+        // $dadosAgrupados vem no formato [cpf => [mes => dados]]
+        foreach ($dadosAgrupados as $cpfCnpj => $meses) {
+            foreach ($meses as $mes => $registro) {
+                $chave = "{$mes}-{$cpfCnpj}";
+
+                if (!isset($this->cacheIdsEventos[$chave])) {
+                    $listaParaVerificar[$chave] = [
+                        'anomes' => $mes,
+                        'cpfcnpj' => $cpfCnpj
+                    ];
+                }
+            }
+        }
+
+        if (empty($listaParaVerificar)) {
+            return;
+        }
+
+        $filtros = [];
+        $params = [];
+        $i = 0;
+        $placeholders = [];
+
+        foreach ($listaParaVerificar as $item) {
+            $placeholders[] = "(:anomes{$i}, :cpf{$i})";
+            $params[":anomes{$i}"] = $item['anomes'];
+            $params[":cpf{$i}"] = $item['cpfcnpj'];
+            $i++;
+        }
+
+        // Vamos processar de 1000 em 1000 itens
+        $chunks = array_chunk($listaParaVerificar, 1000, true);
+
+        foreach ($chunks as $chunk) {
+            $this->processarLoteSQL($chunk, $pdo);
+        }
+    }
+
+    private function processarLoteSQL($itens, $pdo)
+    {
+        // Buscar Existentes
+        $tupleStr = [];
+        $params = [];
+        $i = 0;
+
+        foreach ($itens as $item) {
+            $tupleStr[] = "(:a$i, :c$i)";
+            $params[":a$i"] = $item['anomes'];
+            $params[":c$i"] = $item['cpfcnpj'];
+            $i++;
+        }
+
+        $sqlSelect = "SELECT id, data_anomes, cpfcnpj_declarado 
+                  FROM public.envios_e_financeira 
+                  WHERE tipo = 'MOVIMENTACAO' 
+                  AND retificado = false 
+                  AND (data_anomes, cpfcnpj_declarado) IN (" . implode(',', $tupleStr) . ")";
+
+        $stmt = $pdo->prepare($sqlSelect);
+        $stmt->execute($params);
+        $encontrados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $chavesEncontradas = [];
+        foreach ($encontrados as $row) {
+            $chave = "{$row['data_anomes']}-{$row['cpfcnpj_declarado']}";
+            $this->cacheIdsEventos[$chave] = $row['id'];
+            $chavesEncontradas[$chave] = true;
+        }
+
+        // Identificar quem falta (Diff)
+        $novosParaInserir = [];
+        foreach ($itens as $item) {
+            $chave = "{$item['anomes']}-{$item['cpfcnpj']}";
+            if (!isset($chavesEncontradas[$chave])) {
+                $novosParaInserir[] = $item;
+            }
+        }
+
+        if (empty($novosParaInserir)) {
+            return;
+        }
+
+        // Inserir Novos em Lote (Bulk Insert)
+        $values = [];
+        $insertParams = [];
+        $j = 0;
+
+        // Valores padrão
+        $tipo = 'MOVIMENTACAO';
+        $status = 'PENDENTE';
+        $vEfin = 'v1_2_1';
+        $vEpp = $this->versao_aplicacao;
+        $retificado = 'false';
+        $nomeArq = 'none';
+
+        foreach ($novosParaInserir as $novo) {
+            $semestre = $this->getSemestreFormatado($novo['anomes'] . "-01");
+
+            $values[] = "(:tipo$j, :status$j, :vefin$j, :vepp$j, :arq$j, :anomes$j, :cpf$j, :ret$j, :sem$j)";
+
+            $insertParams[":tipo$j"] = $tipo;
+            $insertParams[":status$j"] = $status;
+            $insertParams[":vefin$j"] = $vEfin;
+            $insertParams[":vepp$j"] = $vEpp;
+            $insertParams[":arq$j"] = $nomeArq;
+            $insertParams[":anomes$j"] = $novo['anomes'];
+            $insertParams[":cpf$j"] = $novo['cpfcnpj'];
+            $insertParams[":ret$j"] = $retificado;
+            $insertParams[":sem$j"] = $semestre;
+            $j++;
+        }
+
+        $sqlInsert = "INSERT INTO envios_e_financeira 
+                  (tipo, status_envio, versao_efin, versao_epp, nome_arquivo, data_anomes, cpfcnpj_declarado, retificado, semestre_ano)
+                  VALUES " . implode(',', $values) . "
+                  RETURNING id, data_anomes, cpfcnpj_declarado";
+
+        try {
+            $stmtInsert = $pdo->prepare($sqlInsert);
+            $stmtInsert->execute($insertParams);
+            $inseridos = $stmtInsert->fetchAll(PDO::FETCH_ASSOC);
+
+            // Adiciona os recém criados ao cache
+            foreach ($inseridos as $row) {
+                $chave = "{$row['data_anomes']}-{$row['cpfcnpj_declarado']}";
+                $this->cacheIdsEventos[$chave] = $row['id'];
+            }
+        } catch (PDOException $e) {
+            throw new Exception("Erro no Bulk Insert: " . $e->getMessage());
+        }
+    }
 
     public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
     {
@@ -771,6 +909,9 @@ class GerarEFinanceira
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+
+        $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
+        $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
 
         // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
@@ -1174,8 +1315,14 @@ class GerarEFinanceira
         $dom->appendChild($eFinanceira);
 
         $cpfCnpjNum = $this->apenasNumeros($cpfCnpj);
+        $chaveCache = "{$ano}{$mes}-{$cpfCnpjNum}";
 
-        $id_evento = $this->buscar_movimentacoes("{$ano}-{$mes}", $cpfCnpjNum);
+        if (isset($this->cacheIdsEventos[$chaveCache])) {
+            $id_evento = $this->cacheIdsEventos[$chaveCache];
+        } else {
+            // Fallback: Se por algum motivo não estiver no cache, busca no banco
+            $id_evento = $this->buscar_movimentacoes("{$ano}{$mes}", $cpfCnpjNum);
+        }
 
         $id_formatado = $this->gerarIdFormatado($id_evento);
 
@@ -1601,73 +1748,83 @@ class GerarEFinanceira
         return ['xml' => $dom, 'id' => $id_formatado];
     }
 
-    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre, $arquivosPorMes)
+    /**
+     * Gera o XML de Fechamento (Versão 1.3.0)
+     * * @param string $dataInicioSemestre Formato YYYY-MM-DD
+     * @param string $dataFimSemestre    Formato YYYY-MM-DD
+     * @param bool   $temMovimento       true = Teve movimento, false = Sem movimento
+     */
+    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre, $temMovimento)
     {
+        // 1. Definição dos Namespaces (Versão 1.3.0)
+        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_3_0';
 
-        // 1. Definição dos Namespaces
-        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_2_2';
-        $nsDS = 'http://www.w3.org/2000/09/xmldsig#';
-
-        // 2. Dados de Exemplo para o fechamento (1º Semestre de 2025)
+        // 2. Busca ID e Formata
+        // Nota: Assumindo que você tem lógica para buscar/criar o ID de fechamento
         $idNovo = $this->buscar_fechamento($dataInicioSemestre, $dataFimSemestre);
         $id_formatado = $this->gerarIdFormatado($idNovo);
-        $ambiente = '1'; // 1 = Produção, 2 = Homologação
+
+        $ambiente = '1'; // 1 = Produção, 2 = Homologação (Pode virar parâmetro se quiser)
 
         // 3. Criação do Documento DOM
         $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->formatOutput = false;
         $doc->preserveWhiteSpace = true;
 
-        // 4. Elemento Raiz (eFinanceira)
+        // 4. Elemento Raiz
         $eFinanceira = $doc->createElementNS($ns, 'eFinanceira');
         $doc->appendChild($eFinanceira);
 
-        // 5. Elemento do Evento (evtFechamentoeFinanceira)
+        // 5. Evento
         $evtFechamento = $doc->createElementNS($ns, 'evtFechamentoeFinanceira');
         $evtFechamento->setAttribute('id', $id_formatado);
         $eFinanceira->appendChild($evtFechamento);
 
-        // 6. Grupo: ideEvento (Obrigatório)
+        // 6. ideEvento
         $ideEvento = $doc->createElementNS($ns, 'ideEvento');
         $evtFechamento->appendChild($ideEvento);
 
-        $ideEvento->appendChild($doc->createElementNS($ns, 'indRetificacao', '1')); // 1 = Original
+        $ideEvento->appendChild($doc->createElementNS($ns, 'indRetificacao', '1'));
         $ideEvento->appendChild($doc->createElementNS($ns, 'tpAmb', $ambiente));
-        $ideEvento->appendChild($doc->createElementNS($ns, 'aplicEmi', '1')); // 1 = Aplicativo da empresa
+        $ideEvento->appendChild($doc->createElementNS($ns, 'aplicEmi', '1'));
         $ideEvento->appendChild($doc->createElementNS($ns, 'verAplic', $this->versao_aplicacao));
 
-        // 7. Grupo: ideDeclarante (Obrigatório)
+        // 7. ideDeclarante
         $ideDeclarante = $doc->createElementNS($ns, 'ideDeclarante');
         $evtFechamento->appendChild($ideDeclarante);
 
         $ideDeclarante->appendChild($doc->createElementNS($ns, 'cnpjDeclarante', $this->cnpjEPP));
 
-        // 8. Grupo: infoFechamento (Obrigatório)
+        // 8. infoFechamento
         $infoFechamento = $doc->createElementNS($ns, 'infoFechamento');
         $evtFechamento->appendChild($infoFechamento);
 
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtInicio', $dataInicioSemestre));
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtFim', $dataFimSemestre));
-        $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0')); // 0 = Não se aplica
+        $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0'));
 
-        // 9. Grupo: FechamentoMovOpFin (Funcionalmente Obrigatório para você)
-        // Este grupo é minOccurs="0" no XSD, mas obrigatório pela regra de negócio do seu módulo.
-        $fechamentoMovOpFin = $doc->createElementNS($ns, 'FechamentoMovOpFin');
-        $evtFechamento->appendChild($fechamentoMovOpFin);
-
-        // Você DEVE adicionar um 'FechamentoMes' para cada mês do semestre.
-        foreach ($arquivosPorMes as $anoMes => $quantidade) {
-            // Grupo: FechamentoMes (Obrigatório dentro de FechamentoMovOpFin)
-            $fechamentoMes = $doc->createElementNS($ns, 'FechamentoMes');
-            $fechamentoMovOpFin->appendChild($fechamentoMes);
-
-            // anoMesCaixa (Obrigatório)
-            $fechamentoMes->appendChild($doc->createElementNS($ns, 'anoMesCaixa', $anoMes));
-            // quantArqTrans (Obrigatório)
-            $fechamentoMes->appendChild($doc->createElementNS($ns, 'quantArqTrans', $quantidade));
+        // Se NÃO tiver movimento nenhum (nem financeiro, nem previdência, nada), 
+        // a versão 1.3.0 permite usar a tag abaixo. 
+        // Mas geralmente enviamos o grupo FechamentoMovOpFin zerado para ser mais específico.
+        /*
+        if (!$temMovimento) {
+            $infoFechamento->appendChild($doc->createElementNS($ns, 'nadaADeclarar', '1'));
         }
+        */
 
-        // 11. Exibir o XML
+        // 9. Grupo: FechamentoMovOpFin
+        // Define o indicador: '1' se true, '0' se false
+        $indicador = $temMovimento ? '1' : '0';
+
+        $fechamentoMovOpFinGroup = $doc->createElementNS($ns, 'FechamentoMovOpFin');
+        $evtFechamento->appendChild($fechamentoMovOpFinGroup);
+
+        // Tag Filha: FechamentoMovOpFin (Flag 0 ou 1)
+        // Sim, o nome da tag é igual ao do grupo pai no Schema
+        $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'FechamentoMovOpFin', $indicador));
+
+        // Nota: Se houver info de FATCA (EntDecExterior), adiciona aqui dentro do $fechamentoMovOpFinGroup
+
         return ['xml' => $doc, 'id' => $id_formatado];
     }
 
@@ -1853,33 +2010,45 @@ class GerarEFinanceira
         return $resposta;
     }
 
-    public function atualizarEnvioParaEnviado($id, $protocolo, $nomeArquivo)
+    public function atualizarLoteParaEnviado(array $ids, $protocolo, $nomeArquivo)
     {
-
-        $idFormatado = (int) substr($id, 3);
+        if (empty($ids)) {
+            return 0;
+        }
 
         $pdo = ConnectionPDO::getConnection()->getLink();
+        $totalLinhasAfetadas = 0;
 
-        $sql = "UPDATE envios_e_financeira 
+        // Divide o array de IDs em pedaços de 1000
+        $lotesDeIds = array_chunk($ids, 1000);
+
+        foreach ($lotesDeIds as $loteAtual) {
+
+            $placeholders = implode(',', array_fill(0, count($loteAtual), '?'));
+
+            $sql = "UPDATE envios_e_financeira 
                 SET status_envio = 'ENVIADO',
-                    nome_arquivo = :nome_arquivo,
-                    num_protocolo = :num_protocolo,
+                    nome_arquivo = ?,
+                    num_protocolo = ?,
                     data_envio = NOW()
-                WHERE id = :id";
+                WHERE id IN ($placeholders)";
 
-        try {
-            $stmt = $pdo->prepare($sql);
+            try {
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([
-                ':id' => $idFormatado,
-                ':nome_arquivo' => $nomeArquivo,
-                'num_protocolo' => $protocolo
-            ]);
+                $params = [$nomeArquivo, $protocolo];
 
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            throw new Exception("Erro ao atualizar status do envio: " . $e->getMessage());
+                $params = array_merge($params, $loteAtual);
+
+                $stmt->execute($params);
+
+                $totalLinhasAfetadas += $stmt->rowCount();
+            } catch (PDOException $e) {
+                throw new Exception("Erro no Bulk Update: " . $e->getMessage());
+            }
         }
+
+        return $totalLinhasAfetadas;
     }
 
     private function criarEnvioFinanceira(array $dados)
@@ -2248,9 +2417,6 @@ class GerarEFinanceira
 
     public function consultarDetalhesPorProtocolo($tipo, $numeroProtocolo, $producao = false)
     {
-        // 1. Sanitização
-        $numeroProtocolo = preg_replace('/[^0-9]/', '', $numeroProtocolo);
-
         if (empty($numeroProtocolo)) {
             throw new Exception("Número de protocolo inválido ou vazio.");
         }
@@ -2261,10 +2427,6 @@ class GerarEFinanceira
             'lista'         => 'lista-efinanceira-movimento',
             'mov_fin'       => 'informacoes-mov-op-fin',
             'mov_fin_anual' => 'informacoes-mov-op-fin-anual',
-            'mov_pp'        => 'informacoes-mov-pp',
-            'intermediario' => 'informacoes-intermediario',
-            'patrocinado'   => 'informacoes-patrocinado',
-            'rerct'         => 'informacoes-rerct'
         ];
 
         if (!array_key_exists($tipo, $mapaEndpoints)) {
@@ -2280,6 +2442,8 @@ class GerarEFinanceira
 
         // Monta a URL final: {Base}/{Sufixo}/{Protocolo}
         $urlCompleta = "{$baseUrl}/{$sufixoUrl}/{$numeroProtocolo}";
+
+        echo $urlCompleta;
 
         // 4. Executa a requisição GET
         return $this->executarRequestGet($urlCompleta);
