@@ -317,6 +317,23 @@ if (!empty($msg)) { ?>
     ul li:first-child a {
         display: none !important;
     }
+
+    .wizard>.actions a[href="#finish"] {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+
+    .finish-img-wrapper {
+        display: block;
+    }
+
+    .finish-img {
+        width: 125px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        cursor: pointer;
+    }
 </style>
 <div class="container p0 bg-branco p-bottom40 txt-cinza box-principal">
     <div style="background-color: #276e8d;" class="col-lg-9 col-md-9 col-sm-12 col-xs-12 lista_preenchimento">
@@ -664,9 +681,12 @@ if (!empty($msg)) { ?>
                 titleTemplate: tituloTmpl,
                 startIndex: 0,
                 container: 'tooltip',
-                /* Labels */
+
                 labels: {
-                    finish: "Finalizar Cadastro",
+                    finish: '<span class="finish-img-wrapper">' +
+                        '<img src="./imagens/botao_continuar.png" ' +
+                        'alt="Finalizar Cadastro" class="finish-img">' +
+                        '</span>',
                     next: "Próximo",
                     previous: "Anterior",
                     loading: "Carregando ..."
@@ -811,7 +831,7 @@ if (!empty($msg)) { ?>
                                 });
 
 
-                                location.href = "/cadastro_finalizado.php";
+                                location.href = "/completar_cadastro.php";
                             } else {
                                 if (txt.indexOf("Email") !== -1) {
                                     if (txt.indexOf("cadastrado") !== -1) {
