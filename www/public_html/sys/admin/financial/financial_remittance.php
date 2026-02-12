@@ -98,7 +98,7 @@ $pdf->SetFont('arial', '', 8);
 
 
 if (
-        $_POST['dd_operadora'] == 90 || $_POST['dd_operadora'] == 63 ||
+        $_POST['dd_operadora'] == 90 || $_POST['dd_operadora'] == 124 ||
         !in_array($_POST['tax'], $alicota_epp_adm)
 ) {
         $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
@@ -733,7 +733,7 @@ if (intval($_POST['grosswiredcard']) != 0 && intval($_POST['witholdingcard']) !=
         $pdf->SetFont('arial', '', 8);
 
         if (
-                $_POST['dd_operadora'] == 90 || $_POST['dd_operadora'] == 63 ||
+                $_POST['dd_operadora'] == 90 || $_POST['dd_operadora'] == 124 ||
                 !in_array($_POST['tax'], $alicota_epp_adm)
         ) {
                 $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
