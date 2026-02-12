@@ -1760,11 +1760,10 @@ class GerarEFinanceira
         $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_3_0';
 
         // 2. Busca ID e Formata
-        // Nota: Assumindo que você tem lógica para buscar/criar o ID de fechamento
         $idNovo = $this->buscar_fechamento($dataInicioSemestre, $dataFimSemestre);
         $id_formatado = $this->gerarIdFormatado($idNovo);
 
-        $ambiente = '1'; // 1 = Produção, 2 = Homologação (Pode virar parâmetro se quiser)
+        $ambiente = '1'; // 1 = Produção, 2 = Homologação
 
         // 3. Criação do Documento DOM
         $doc = new DOMDocument('1.0', 'UTF-8');
@@ -1803,27 +1802,14 @@ class GerarEFinanceira
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtFim', $dataFimSemestre));
         $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0'));
 
-        // Se NÃO tiver movimento nenhum (nem financeiro, nem previdência, nada), 
-        // a versão 1.3.0 permite usar a tag abaixo. 
-        // Mas geralmente enviamos o grupo FechamentoMovOpFin zerado para ser mais específico.
-        /*
-        if (!$temMovimento) {
-            $infoFechamento->appendChild($doc->createElementNS($ns, 'nadaADeclarar', '1'));
-        }
-        */
-
-        // 9. Grupo: FechamentoMovOpFin
         // Define o indicador: '1' se true, '0' se false
         $indicador = $temMovimento ? '1' : '0';
 
         $fechamentoMovOpFinGroup = $doc->createElementNS($ns, 'FechamentoMovOpFin');
         $evtFechamento->appendChild($fechamentoMovOpFinGroup);
 
-        // Tag Filha: FechamentoMovOpFin (Flag 0 ou 1)
-        // Sim, o nome da tag é igual ao do grupo pai no Schema
         $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'FechamentoMovOpFin', $indicador));
 
-        // Nota: Se houver info de FATCA (EntDecExterior), adiciona aqui dentro do $fechamentoMovOpFinGroup
 
         return ['xml' => $doc, 'id' => $id_formatado];
     }
@@ -2442,8 +2428,6 @@ class GerarEFinanceira
 
         // Monta a URL final: {Base}/{Sufixo}/{Protocolo}
         $urlCompleta = "{$baseUrl}/{$sufixoUrl}/{$numeroProtocolo}";
-
-        echo $urlCompleta;
 
         // 4. Executa a requisição GET
         return $this->executarRequestGet($urlCompleta);

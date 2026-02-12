@@ -6,20 +6,12 @@ $erro = '';
 $data_inicio = '';
 $data_fim = '';
 $tipo = $_POST['tipo'] ?? '';
-$arquivosPorMes = [];
+
+$tem_movimentacoes = $_POST['tem_movimentacoes'] ?? 1;
 
 $hoje = new DateTime('today');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    foreach ($_POST['qtd_mes'] as $anoMes => $quantidade) {
-
-        // Convertendo para garantir que é inteiro
-        $quantidade = (int)$quantidade;
-
-        // Armazenando na sua variável final
-        $arquivosPorMes[$anoMes] = $quantidade;
-    }
 
     if ($tipo === 'semestre') {
 
@@ -88,29 +80,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
 <div>
     <div style="height: 15px;"></div>
-	<nav class="navbar navbar-outline">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-outline">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-			</div>
+    <nav class="navbar navbar-outline">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-outline">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
 
-			<div class="collapse navbar-collapse" id="menu-outline">
-				<ul class="nav navbar-nav">
-					<li><a href="index.php">Gerar mov.</a></li>
-					<li><a href="abertura.php">Gerar abert.</a></li>
-					<li class="active"><a href="#">Gerar Fech.</a></li>
-					<li><a href="enviar_lotes.php">Enviar Lotes</a></li>
-					<li><a href="consultar.php">Consulta e-Fin</a></li>
-					<li><a href="lotes_enviados.php">Enviados</a></li>
-				</ul>
-			</div>
-		</div>
-	</nav>
+            <div class="collapse navbar-collapse" id="menu-outline">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.php">Gerar mov.</a></li>
+                    <li><a href="abertura.php">Gerar abert.</a></li>
+                    <li class="active"><a href="#">Gerar Fech.</a></li>
+                    <li><a href="enviar_lotes.php">Enviar Lotes</a></li>
+                    <li><a href="consultar.php">Consulta e-Fin</a></li>
+                    <li><a href="lotes_enviados.php">Enviados</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <h2 class="titulo-vencimento">Gerar Fechamento - E-Financeira</h2>
     <?php if ($erro): ?>
         <div class="erro"><?= $erro ?></div>
@@ -121,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-cancel-pins">
                 <label for="tipo">Tipo Criação
                 </label>
-                <select class="form-control" id="tipoFiltro" name="tipo" onchange="alterarFiltro(); gerarCamposMeses();">
+                <select class="form-control" id="tipoFiltro" name="tipo" onchange="alterarFiltro();">
                     <option value="">Selecione...</option>
                     <option value="periodo" <?= $tipo === 'periodo' ? 'selected' : '' ?>>Data inicial e final</option>
                     <option value="semestre" <?= $tipo === 'semestre' ? 'selected' : '' ?>>Por semestre</option>
@@ -132,12 +124,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="ano">Ano
                     </label>
                     <input id="ano" name="ano" min="2000" max="2100" class="form-control" value="<?= $_POST['ano'] ?? date('Y') ?>"
-                        type="number" onchange="gerarCamposMeses()">
+                        type="number">
                 </div>
                 <div class="col-cancel-pins">
                     <label for="semestre">Semestre
                     </label>
-                    <select id="semestre" name="semestre" class="form-control" onchange="gerarCamposMeses()">
+                    <select id="semestre" name="semestre" class="form-control">
                         <option value="1" <?= ($_POST['semestre'] ?? '') == '1' ? 'selected' : '' ?>>1º Semestre</option>
                         <option value="2" <?= ($_POST['semestre'] ?? '') == '2' ? 'selected' : '' ?>>2º Semestre</option>
                     </select>
@@ -147,20 +139,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="col-cancel-pins">
                     <label for="data_inicio">Início período
                     </label>
-                    <input id="data_inicio" name="data_inicio" value="<?php echo $data_inicio; ?>" onchange="gerarCamposMeses()" class="form-control"
+                    <input id="data_inicio" name="data_inicio" value="<?php echo $data_inicio; ?>" class="form-control"
                         type="date">
                 </div>
                 <div class="col-cancel-pins">
                     <label for="data_fim">Final período
                     </label>
-                    <input id="data_fim" name="data_fim" value="<?php echo $data_fim; ?>" onchange="gerarCamposMeses()" class="form-control"
+                    <input id="data_fim" name="data_fim" value="<?php echo $data_fim; ?>" class="form-control"
                         type="date">
                 </div>
             </div>
-            <div id="col-cancel-pins">
-                <label>Quantidade de Arquivos por Mês</label>
-                <div id="container-campos-dinamicos">
-                </div>
+            <div class="col-cancel-pins">
+                <label for="tem_movimentacoes">Teve movimentações
+                </label>
+                <select id="tem_movimentacoes" name="tem_movimentacoes" class="form-control">
+                        <option value="1" <?= ($tem_movimentacoes) == 1 ? 'selected' : '' ?>>Sim</option>
+                        <option value="0" <?= ($tem_movimentacoes) == 0 ? 'selected' : '' ?>>Não</option>
+                    </select>
             </div>
         </div>
     </form>
@@ -171,15 +166,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 echo "<input type='hidden' form='form2' name='data_inicio' value='{$data_inicio}'>\n";
                 echo "<input type='hidden' form='form2' name='data_fim' value='{$data_fim}'>\n";
+                echo "<input type='hidden' form='form2' name='tem_movimentacoes' value='{$tem_movimentacoes}'>\n";
 
-                if (isset($_POST['qtd_mes']) && is_array($_POST['qtd_mes'])) {
-                    foreach ($_POST['qtd_mes'] as $anoMes => $quantidade) {
-                        $chave = htmlspecialchars($anoMes);
-                        $valor = htmlspecialchars($quantidade);
-                        // Isso recria a estrutura qtd_mes[202501] etc.
-                        echo "<input type='hidden' form='form2' name='qtd_mes[{$chave}]' value='{$valor}'>\n";
-                    }
-                }
                 ?>
                 <input name="acao" type="hidden" value="fechamento" form="form2">
                 <button type="submit" form="form2" class="btn btn-primary">
@@ -199,86 +187,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . "/functions_e_financeira.php";
     $efinanceira = new GerarEFinanceira();
     if (!$erro && $data_inicio && $data_fim) {
-        $dados = $efinanceira->gerarFechamento($data_inicio, $data_fim, $arquivosPorMes);
+        $dados = $efinanceira->gerarFechamento($data_inicio, $data_fim, $tem_movimentacoes == 1);
         echo xmlViewer($dados['xml']->saveXML(), $dados['id']);
     }
     ?>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-    const valoresRecarregados = <?php echo json_encode($_POST['qtd_mes'] ?? []); ?>;
-
-    function gerarCamposMeses() {
-        const tipo = document.getElementById('tipoFiltro').value;
-        const container = document.getElementById('container-campos-dinamicos');
-        container.innerHTML = '';
-
-        let mesesParaGerar = [];
-
-        // --- Lógica de Semestre ---
-        if (tipo === 'semestre') {
-            const ano = document.getElementById('ano').value;
-            const semestre = document.getElementById('semestre').value;
-            if (!ano) return;
-
-            const mesInicio = (semestre == '1') ? 1 : 7;
-            for (let i = 0; i < 6; i++) {
-                mesesParaGerar.push({
-                    ano: ano,
-                    mes: mesInicio + i
-                });
-            }
-        }
-        // --- Lógica de Período ---
-        else if (tipo === 'periodo') {
-            let dataInicStr = document.getElementById('data_inicio').value;
-            let dataFimStr = document.getElementById('data_fim').value;
-
-            if (dataInicStr && dataFimStr) {
-                let dataInic = new Date(dataInicStr + 'T00:00:00');
-                let dataFim = new Date(dataFimStr + 'T00:00:00');
-
-                if (dataInic <= dataFim) {
-                    let atual = new Date(dataInic.getFullYear(), dataInic.getMonth(), 1);
-                    while (atual <= dataFim) {
-                        mesesParaGerar.push({
-                            ano: atual.getFullYear(),
-                            mes: atual.getMonth() + 1
-                        });
-                        atual.setMonth(atual.getMonth() + 1);
-                    }
-                }
-            }
-        }
-
-        const nomesMeses = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-        mesesParaGerar.forEach(item => {
-            const mesStr = item.mes.toString().padStart(2, '0');
-            const chaveAnoMes = `${item.ano}${mesStr}`; // Ex: 202601
-
-            // VERIFICAÇÃO: Se existir o valor no objeto recarregado, usa ele, senão usa 0
-            const valorExistente = valoresRecarregados[chaveAnoMes] !== undefined ? valoresRecarregados[chaveAnoMes] : 0;
-
-            const label = `${nomesMeses[item.mes]} / ${item.ano}`;
-            const inputName = `qtd_mes[${chaveAnoMes}]`;
-
-            const div = document.createElement('div');
-            div.className = 'form-group d-flex align-items-center mb-2';
-            div.innerHTML = `
-            <label style="width: 150px; margin-bottom:0;">${label}:</label>
-            <input type="number" name="${inputName}" class="form-control" 
-                   style="width: 100px;" value="${valorExistente}" min="0" required>
-        `;
-            container.appendChild(div);
-        });
-    }
-
-    // Garante que ao carregar a página (com ou sem POST), os campos apareçam
-    document.addEventListener('DOMContentLoaded', function() {
-        gerarCamposMeses();
-    });
-
     function alterarFiltro() {
         const tipo = document.getElementById('tipoFiltro').value;
 

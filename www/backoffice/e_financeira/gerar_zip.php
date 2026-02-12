@@ -57,19 +57,11 @@ if ($_REQUEST['acao'] == "movimentacoes") {
 
     $data_inicio = $_POST['data_inicio'] ?? '';
     $data_fim    = $_POST['data_fim'] ?? '';
-
-    foreach ($_POST['qtd_mes'] as $anoMes => $quantidade) {
-
-        // Convertendo para garantir que é inteiro
-        $quantidade = (int)$quantidade;
-
-        // Armazenando na sua variável final
-        $arquivosPorMes[$anoMes] = $quantidade;
-    }
+    $tem_movimentacoes = $_POST['tem_movimentacoes'] ?? 0;
 
     $efinanceira = new GerarEFinanceira();
     if ($data_inicio && $data_fim) {
-        $lotes = $efinanceira->gerarFechamento($data_inicio, $data_fim, $arquivosPorMes);
+        $lotes = $efinanceira->gerarFechamento($data_inicio, $data_fim, $tem_movimentacoes);
 
         if ($lotes) {
 

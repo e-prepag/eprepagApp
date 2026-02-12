@@ -45,11 +45,10 @@ $data_atual = date('Y-m');
 			<div class="col-cancel-pins">
 				<label for="sel_consulta">Tipo de Consulta</label>
 				<select id="sel_consulta" name="sel_consulta" class="form-control" onchange="atualizarCampos()">
-					<option value="lote" <?php echo ($sel_consulta == 'lote' ? 'selected' : ''); ?>>Consultar por Protocolo (Retornado na resposta)</option>
+					<option value="lote" <?php echo ($sel_consulta == 'lote' ? 'selected' : ''); ?>>Protocolo do lote (Retornado no envio)</option>
 					<option value="cadastro" <?php echo ($sel_consulta == 'cadastro' ? 'selected' : ''); ?>>Informações Cadastrais</option>
-					<option value="lista" <?php echo ($sel_consulta == 'lista' ? 'selected' : ''); ?>>Lista e-Financeira (Movimento)</option>
+					<option value="lista" <?php echo ($sel_consulta == 'lista' ? 'selected' : ''); ?>>Lista e-Financeira (Abertura e fechamento)</option>
 					<option value="mov_fin" <?php echo ($sel_consulta == 'mov_fin' ? 'selected' : ''); ?>>Mov. Operação Financeira (Mensal)</option>
-					<option value="mov_fin_anual" <?php echo ($sel_consulta == 'mov_fin_anual' ? 'selected' : ''); ?>>Mov. Operação Financeira (Anual)</option>
 				</select>
 			</div>
 
@@ -85,9 +84,6 @@ $data_atual = date('Y-m');
 			<div class="col-cancel-pins group-dynamic" id="grp_situacao" style="display:none;">
 				<label for="situacao_informacao">Situação</label>
 				<select id="situacao_informacao" name="situacao_informacao" class="form-control">
-					<option value="1">1 - Ativa</option>
-					<option value="2">2 - Retificadora</option>
-					<option value="3">3 - Cancelada</option>
 				</select>
 			</div>
 
@@ -144,98 +140,98 @@ $data_atual = date('Y-m');
 	<div class="relatorio-info">
 		<div><strong>Data:</strong> <?php echo date('d/m/Y H:m:i'); ?></div>
 	</div>
-
-	<?php
-	require_once __DIR__ . "/functions_e_financeira.php";
-
-	$efinanceira = new GerarEFinanceira();
-	if ($_POST) {
-		try {
-			// Instancia sua classe (Exemplo)
-			// $api = new EFinanceiraClient(...); 
-
-			$producao = false;
-			$tipoConsulta = $_POST['sel_consulta'];
-			$resultado = null;
-
-			switch ($tipoConsulta) {
-				case 'lote':
-					$lote = $_POST['numero_lote'];
-					$resultado = $efinanceira->consultarLoteEFinanceira($lote, $producao);
-					break;
-
-				case 'cadastro':
-					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
-					$resultado_chamado = $efinanceira->consultarInformacoesCadastrais($cnpj, $producao);
-					$protocolo_lote = extrairProtocoloEFinanceira($resultado_chamado);
-					sleep(30);
-					$resultado = $efinanceira->consultarDetalhesPorProtocolo('cadastro', $protocolo_lote);
-					break;
-
-				case 'lista':
-					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
-					$sit = $_POST['situacao_informacao'];
-					$dtIni = $_POST['dt_inicial'];
-					$dtFim = $_POST['dt_final'];
-					$resultado = $efinanceira->consultarListaEFinanceira($cnpj, $sit, $dtIni, $dtFim, $producao);
-					break;
-
-				case 'mov_fin':
-				case 'mov_fin_anual':
-					$cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
-					$sit = $_POST['situacao_informacao'];
-
-					// Transforma '2025-01' (input type month) para '202501' (Formato API)
-					$mesIni = str_replace('-', '', $_POST['anomes_inicio']);
-					$mesFim = str_replace('-', '', $_POST['anomes_termino']);
-
-					$tipoId = $_POST['tipo_identificacao'];
-					$ident = preg_replace('/[^0-9]/', '', $_POST['identificacao']);
-
-					if ($tipoConsulta === 'mov_fin') {
-						$resultado = $efinanceira->consultarMovimentoOpFin($cnpj, $sit, $mesIni, $mesFim, $tipoId, $ident, $producao);
-					} else {
-						$resultado = $efinanceira->consultarMovimentoOpFinAnual($cnpj, $sit, $mesIni, $mesFim, $tipoId, $ident, $producao);
-					}
-					break;
-			}
-
-			// Exibição do Resultado
-			echo xmlViewer($resultado, $lote ?? "1234");
-		} catch (Exception $e) {
-			echo "<div class='alert alert-danger'>Erro: " . $e->getMessage() . "</div>";
-		}
-	}
-
-	?>
+	<div id="resultadoConsultaAjax"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 	function atualizarCampos() {
-		const tipo = document.getElementById('sel_consulta').value;
+		const selConsulta = document.getElementById('sel_consulta');
+		const tipo = selConsulta.value;
+		const selectSituacao = document.getElementById('situacao_informacao');
 
 		// Função auxiliar para mostrar/esconder
 		const setDisplay = (id, show) => {
-			document.getElementById(id).style.display = show ? 'block' : 'none';
+			const el = document.getElementById(id);
+			if (el) el.style.display = show ? 'block' : 'none';
 		};
 
-		// Reseta tudo primeiro (esconde todos os grupos dinâmicos)
+		// 1. Reseta a visibilidade dos grupos
 		const grupos = document.querySelectorAll('.group-dynamic');
 		grupos.forEach(el => el.style.display = 'none');
 
-		// Lógica de exibição baseada no PHP
+		// 2. Lógica de Opções Dinâmicas para o Select de Situação
+		let novasOpcoes = [];
+
+		// CASO A: Lista e-Financeira (0 a 4, onde 1 é Em Andamento e 2 é Ativa)
+		if (tipo === 'lista') {
+			novasOpcoes = [{
+					val: '0',
+					text: '0 - Todas'
+				},
+				{
+					val: '1',
+					text: '1 - Em Andamento'
+				},
+				{
+					val: '2',
+					text: '2 - Ativa'
+				},
+				{
+					val: '3',
+					text: '3 - Retificada'
+				},
+				{
+					val: '4',
+					text: '4 - Excluída'
+				}
+			];
+		}
+		// CASO B: Movimento Financeiro e Anual (0 a 3, onde 1 já é Ativa)
+		else if (tipo === 'mov_fin' || tipo === 'mov_fin_anual') {
+			novasOpcoes = [{
+					val: '0',
+					text: '0 - Todas'
+				},
+				{
+					val: '1',
+					text: '1 - Ativa'
+				},
+				{
+					val: '2',
+					text: '2 - Retificada'
+				},
+				{
+					val: '3',
+					text: '3 - Excluída'
+				}
+			];
+		}
+
+		// 3. Renderiza as opções no Select (se houver mudança de contexto)
+		// Limpa as opções atuais
+		if (novasOpcoes.length > 0) {
+			selectSituacao.innerHTML = '';
+			novasOpcoes.forEach(opt => {
+				let option = document.createElement('option');
+				option.value = opt.val;
+				option.text = opt.text;
+				selectSituacao.appendChild(option);
+			});
+		}
+
+		// 4. Lógica de Exibição dos Campos (Display)
 		if (tipo === 'lote') {
 			setDisplay('grp_lote', true);
 		} else if (tipo === 'cadastro') {
 			setDisplay('grp_cnpj', true);
 		} else if (tipo === 'lista') {
 			setDisplay('grp_cnpj', true);
-			setDisplay('grp_situacao', true);
+			setDisplay('grp_situacao', true); // Mostra o select populado com Caso A
 			setDisplay('grp_data_ini', true);
 			setDisplay('grp_data_fim', true);
 		} else if (tipo === 'mov_fin' || tipo === 'mov_fin_anual') {
 			setDisplay('grp_cnpj', true);
-			setDisplay('grp_situacao', true);
+			setDisplay('grp_situacao', true); // Mostra o select populado com Caso B
 			setDisplay('grp_mes_ini', true);
 			setDisplay('grp_mes_fim', true);
 			setDisplay('grp_tipo_id', true);
@@ -243,7 +239,7 @@ $data_atual = date('Y-m');
 		}
 	}
 
-	// Roda ao carregar a página para garantir estado correto (caso venha de um submit)
+	// Inicializa ao carregar a página
 	document.addEventListener("DOMContentLoaded", function() {
 		atualizarCampos();
 	});
@@ -259,26 +255,70 @@ $data_atual = date('Y-m');
 		$('#' + id).toggleClass('xml-colapsado');
 	}
 	$(document).ready(function() {
-		hljs.highlightAll();
 
-		document.querySelectorAll('.help-icon').forEach(icon => {
-			icon.addEventListener('click', () => {
-				const tooltip = icon.querySelector('.tooltiptext');
+		$('#formConsulta').on('submit', function(e) {
+			e.preventDefault(); // Impede o reload da página
 
-				// Remove outros tooltips visíveis
-				document.querySelectorAll('.tooltiptext.show').forEach(other => {
-					if (other !== tooltip) other.classList.remove('show');
-				});
+			// Limpa resultado anterior
+			$('#resultadoConsultaAjax').html('');
 
-				tooltip.classList.add('show');
+			// Pega os dados do form
+			var formData = new FormData(this);
 
-				// Remove após 3 segundos
-				setTimeout(() => {
-					tooltip.classList.remove('show');
-				}, 3000);
+			// Exibe SweetAlert de Carregamento
+			Swal.fire({
+				title: 'Consultando e-Financeira',
+				html: 'Aguardando resposta da Receita Federal...<br>Isso pode levar alguns segundos (ou 30s se for assíncrono).',
+				allowOutsideClick: false,
+				allowEscapeKey: false,
+				didOpen: () => {
+					Swal.showLoading();
+				}
+			});
+
+			// Requisição AJAX
+			$.ajax({
+				url: 'ajax_processar_consulta.php', // Nome do arquivo backend criado no Passo 1
+				type: 'POST',
+				data: formData,
+				processData: false, // Importante para FormData
+				contentType: false, // Importante para FormData
+				success: function(response) {
+					// Fecha o SweetAlert
+					Swal.close();
+
+					// Insere o HTML retornado na div de resultado
+					$('#resultadoConsultaAjax').html(response);
+
+					// Reativa o highlight.js nos novos elementos carregados
+					document.querySelectorAll('pre code').forEach((el) => {
+						hljs.highlightElement(el);
+					});
+
+					// Toast de sucesso (opcional)
+					const Toast = Swal.mixin({
+						toast: true,
+						position: 'top-end',
+						showConfirmButton: false,
+						timer: 3000
+					});
+					Toast.fire({
+						icon: 'success',
+						title: 'Consulta realizada!'
+					});
+				},
+				error: function(xhr, status, error) {
+					Swal.fire({
+						icon: 'error',
+						title: 'Erro na Consulta',
+						text: 'Ocorreu um erro ao processar a solicitação: ' + error
+					});
+				}
 			});
 		});
-		
+
+		hljs.highlightAll();
+
 	});
 </script>
 <?php
