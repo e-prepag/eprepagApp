@@ -621,6 +621,8 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                 $('#resultado').html(htmlProcessando);
 
                 // inicia o intervalo
+                formData = formData + '&verificar=true';
+                
                 intervaloVerificacao = setInterval(function() {
 
                     // evita chamadas paralelas se a anterior não terminou
@@ -629,9 +631,6 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     }
 
                     requisicaoEmAndamento = true;
-
-                    // garante que o parâmetro exista
-                    formData.set('verificar', 'true');
 
                     $.ajax({
                         url: './ajax_dimp.php',
