@@ -91,13 +91,13 @@ if (isset($_POST["estado"]) && isset($_POST['data_inicial'])) {
 }
 
 if (isset($_POST['verificar']) && isset($_POST['requisicao_id'])) {
-    $dir = "/www/backoffice/dimp/" . date('Ymd') . "/";
+    $dir = "/www/arquivos_gerados/dimp/" . date('Ymd') . "/";
 
     // cria a pasta se não existir
     if (!is_dir($dir)) {
         mkdir($dir, 0777, true);
     }
-    $arquivo = '/www/backoffice/dimp/' . date('Ymd') . '/result_' . $id_request . '.txt';
+    $arquivo = $dir . 'result_' . $id_request . '.txt';
 
     if (file_exists($arquivo)) {
         $conteudo = file_get_contents($arquivo);
