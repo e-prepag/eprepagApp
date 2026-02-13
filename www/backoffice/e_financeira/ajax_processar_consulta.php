@@ -17,7 +17,7 @@ ob_start();
 try {
     $efinanceira = new GerarEFinanceira();
 
-    $producao = ($_POST['ambiente'] === 'producao');
+    $producao = ($_POST['ambiente'] === 'producao11111');
     $tipoConsulta = $_POST['sel_consulta'];
 
     // Variáveis de controle
@@ -84,7 +84,7 @@ try {
             echo "<h4 style='color:red'>Falha na Solicitação Inicial</h4>";
             echo "<p>Não foi possível obter um número de protocolo.</p>";
             // Mostra o XML de erro imediatamente e para
-            echo xmlViewer($xmlSolicitacao, "Erro na Solicitação", true);
+            echo xmlViewer($xmlSolicitacao, "Erro na Solicitação", true, true);
             throw new Exception("Protocolo não retornado pela Receita.");
         }
 
@@ -130,13 +130,13 @@ try {
         processarRetornoConsultaAssincrona($xmlFinal, $tipoConsultaTexto);
 
         // Exibição do código XML
-        echo xmlViewer($xmlFinal, $protocolo ?? "XML de Retorno", true);
+        echo xmlViewer($xmlFinal, $protocolo ?? "XML de Retorno", true, true);
     }
 } catch (Exception $e) {
     echo "<div class='alert alert-danger'><strong>Erro:</strong> " . $e->getMessage() . "</div>";
     // Se falhou mas temos um XML de solicitação (erro na solicitação), mostramos ele para debug
     if (isset($xmlSolicitacao)) {
-        echo xmlViewer($xmlSolicitacao, "XML da Solicitação (Com Erro)", true);
+        echo xmlViewer($xmlSolicitacao, "XML da Solicitação (Com Erro)", true, true);
     }
 }
 

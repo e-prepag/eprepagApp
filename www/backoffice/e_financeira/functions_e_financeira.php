@@ -21,7 +21,7 @@ function formatarXml(string $xmlBruto): string
     return $dom->saveXML();
 }
 
-function xmlViewer($xmlString, $id = 'xmlViewer', $utf8 = false)
+function xmlViewer($xmlString, $id = 'xmlViewer', $utf8 = false, $download = false)
 {
     if (empty($xmlString)) {
         return '<div class="alert alert-warning">XML vazio</div>';
@@ -39,6 +39,20 @@ function xmlViewer($xmlString, $id = 'xmlViewer', $utf8 = false)
     // Esse comando reverte APENAS as entidades numéricas (acentos) para que o navegador as renderize,
     $xml_formatado = preg_replace('/&amp;(#\d+|#[xX][0-9a-fA-F]+);/', '&$1;', $xml_formatado);
 
+    $botaoDownloadHtml = '';
+
+    if ($download) {
+        // Gera um nome seguro para o arquivo baseado no ID
+        $nomeArquivo = 'xml_download_' . preg_replace('/[^a-zA-Z0-9_-]/', '', $id) . '.xml';
+
+        // Cria o HTML do botão
+        $botaoDownloadHtml = <<<HTML
+        <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="baixarXml('$id', '$nomeArquivo')" title="Baixar arquivo XML">
+            <i class="fa fa-download"></i> Baixar
+        </button>
+HTML;
+    }
+
     return <<<HTML
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -50,6 +64,7 @@ function xmlViewer($xmlString, $id = 'xmlViewer', $utf8 = false)
             <button class="btn btn-sm btn-outline-secondary" onclick="toggleXml('$id')">
                 Expandir / Colapsar
             </button>
+            $botaoDownloadHtml
         </div>
     </div>
     <div class="card-body">

@@ -901,6 +901,8 @@ class GerarEFinanceira
         $inicio = $data_inicio->format('Y-m-01');
         $fim = $data_fim->format('Y-m-t');
 
+
+
         // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
@@ -917,11 +919,12 @@ class GerarEFinanceira
         $movimentacoesAgrupadasPorMes = [];
 
         $inicioMesAno = substr(str_replace('-', '', $inicio), 0, 6);
+
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if ($inicioMesAno >= $mes) {
+                if ($inicioMesAno > $mes) {
                     continue;
                 }
 
@@ -957,7 +960,7 @@ class GerarEFinanceira
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if ($inicioMesAno >= $mes) {
+                if ($inicioMesAno > $mes) {
                     continue;
                 }
 
@@ -1023,7 +1026,7 @@ class GerarEFinanceira
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if ($inicioMesAno >= $mes) {
+                if ($inicioMesAno > $mes) {
                     continue;
                 }
 
@@ -1039,7 +1042,7 @@ class GerarEFinanceira
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if ($inicioMesAno >= $mes) {
+                if ($inicioMesAno > $mes) {
                     continue;
                 }
 
@@ -1063,10 +1066,10 @@ class GerarEFinanceira
             $d1 = new DateTime($data_inicial);
             $d2 = new DateTime($data_final);
 
-            if ($d1 < $d2) {
-                return 1;   // data inicial menor (normal)
+            if ($d1 <= $d2) {
+                return 1;   // data inicial menor ou igual (normal)
             } else {
-                return -1;  // data inicial maior ou igual
+                return -1;  // data inicial maior 
             }
         } catch (Exception $e) {
             return 0; // erro na data
@@ -1994,6 +1997,53 @@ class GerarEFinanceira
         }
 
         return $resposta;
+    }
+
+    /**
+     * Atualiza o status de múltiplos eventos (Bulk Update)
+     * @param array $ids Lista de IDs (inteiros)
+     * @param string $protocolo Protocolo do lote
+     * @param string $nomeArquivo Nome do arquivo enviado
+     * @param string $status O status para gravar ('ENVIADO', 'ERRO', 'REJEITADO', etc)
+     */
+    public function atualizarLoteStatus(array $ids, $protocolo, $nomeArquivo, $status)
+    {
+        if (empty($ids)) return 0;
+
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $totalLinhas = 0;
+
+        // Divide em chunks de 1000 para segurança do PDO
+        $lotesDeIds = array_chunk($ids, 1000);
+
+        foreach ($lotesDeIds as $loteAtual) {
+            $placeholders = implode(',', array_fill(0, count($loteAtual), '?'));
+
+            // Adicionei a coluna status_envio = ? na query
+            $sql = "UPDATE envios_e_financeira 
+                SET status_envio = ?,
+                    nome_arquivo = ?,
+                    num_protocolo = ?,
+                    data_envio = NOW()
+                WHERE id IN ($placeholders)";
+
+            try {
+                $stmt = $pdo->prepare($sql);
+
+                // Parâmetros: Status, Nome, Protocolo
+                $params = [$status, $nomeArquivo, $protocolo];
+
+                // Merge com os IDs
+                $params = array_merge($params, $loteAtual);
+
+                $stmt->execute($params);
+                $totalLinhas += $stmt->rowCount();
+            } catch (PDOException $e) {
+                throw new Exception("Erro no update de status ($status): " . $e->getMessage());
+            }
+        }
+
+        return $totalLinhas;
     }
 
     public function atualizarLoteParaEnviado(array $ids, $protocolo, $nomeArquivo)

@@ -251,6 +251,31 @@ $data_atual = date('Y-m');
 		});
 	}
 
+	function baixarXml(elementId, filename) {
+		// Pega o texto do elemento. 
+		// .innerText é CRUCIAL aqui: ele pega o XML puro (<tag>), revertendo o &lt;tag&gt;
+		var content = document.getElementById(elementId).innerText;
+
+		// Cria um Blob (arquivo em memória)
+		var blob = new Blob([content], {
+			type: "text/xml;charset=utf-8"
+		});
+
+		// Cria um link invisível para download
+		var link = document.createElement("a");
+		var url = URL.createObjectURL(blob);
+
+		link.setAttribute("href", url);
+		link.setAttribute("download", filename);
+		link.style.visibility = 'hidden';
+
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		URL.revokeObjectURL(url);
+	}
+
 	function toggleXml(id) {
 		$('#' + id).toggleClass('xml-colapsado');
 	}

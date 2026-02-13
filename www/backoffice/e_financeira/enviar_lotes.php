@@ -35,7 +35,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 		</div>
 	</nav>
 	<h2 class="titulo-vencimento">Enviar Lotes - E-Financeira</h2>
-	<form id="form1" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
+	<form id="formEnvio" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
 				<label for="arquivo">Envie um XML ou um ZIP: <span class="help-icon">?
@@ -61,35 +61,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 	<div class="relatorio-info">
 		<div><strong>Data:</strong> <?php echo date('d/m/Y H:m:i'); ?></div>
 	</div>
-
-	<?php
-	require_once __DIR__ . "/functions_e_financeira.php";
-	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo'])) {
-
-		$caminho_temp = $_FILES['arquivo']['tmp_name'];
-
-		// Descobre o tipo real do arquivo
-		$mime_type = mime_content_type($caminho_temp);
-
-		$lotes_xml = [];
-
-		if ($mime_type === 'application/zip' || $mime_type === 'application/x-zip-compressed') {
-			$lotes_xml = obterXmlFromZip('arquivo');
-		}
-		elseif ($mime_type === 'text/xml' || $mime_type === 'application/xml') {
-			$xml_conteudo = file_get_contents($caminho_temp);
-			$lotes_xml[] = [
-                    'nome' => basename($_FILES['arquivo']['name']),
-                    'conteudo' => $xml_conteudo
-                ];
-		} else {
-			$erro = "O arquivo deve ser ZIP ou XML.";
-		}
-		enviarLotesEfinanceira($lotes_xml);
-	} else {
-		echo "pindamonhagaba";
-	}
-	?>
+	<div id="resultadoEnvioAjax"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
@@ -100,10 +72,92 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 		});
 	}
 
+	function baixarXml(elementId, filename) {
+		// Pega o texto do elemento. 
+		// .innerText é CRUCIAL aqui: ele pega o XML puro (<tag>), revertendo o &lt;tag&gt;
+		var content = document.getElementById(elementId).innerText;
+
+		// Cria um Blob (arquivo em memória)
+		var blob = new Blob([content], {
+			type: "text/xml;charset=utf-8"
+		});
+
+		// Cria um link invisível para download
+		var link = document.createElement("a");
+		var url = URL.createObjectURL(blob);
+
+		link.setAttribute("href", url);
+		link.setAttribute("download", filename);
+		link.style.visibility = 'hidden';
+
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		URL.revokeObjectURL(url);
+	}
+
 	function toggleXml(id) {
 		$('#' + id).toggleClass('xml-colapsado');
 	}
 	$(document).ready(function() {
+		$('#formEnvio').on('submit', function(e) {
+			e.preventDefault();
+
+			// Limpa resultado anterior
+			$('#resultadoEnvioAjax').html('');
+
+			// Cria o FormData com o arquivo selecionado
+			var formData = new FormData(this);
+
+			Swal.fire({
+				title: 'Enviando Lote',
+				html: 'Processando arquivo, assinando e transmitindo...<br>Aguarde o retorno da Receita.',
+				allowOutsideClick: false,
+				didOpen: () => {
+					Swal.showLoading();
+				}
+			});
+
+			$.ajax({
+				url: 'ajax_processar_envio.php', // Arquivo backend criado no Passo 1
+				type: 'POST',
+				data: formData,
+				// AS DUAS LINHAS ABAIXO SÃO OBRIGATÓRIAS PARA UPLOAD
+				processData: false,
+				contentType: false,
+				success: function(response) {
+					Swal.close();
+
+					$('#resultadoEnvioAjax').html(response);
+
+					// Reativa o highlight.js nos novos XMLs retornados
+					document.querySelectorAll('pre code').forEach((el) => {
+						hljs.highlightElement(el);
+					});
+
+					// Toast de sucesso
+					const Toast = Swal.mixin({
+						toast: true,
+						position: 'top-end',
+						showConfirmButton: false,
+						timer: 3000
+					});
+					Toast.fire({
+						icon: 'success',
+						title: 'Processamento concluído!'
+					});
+				},
+				error: function(xhr, status, error) {
+					Swal.fire({
+						icon: 'error',
+						title: 'Erro no Envio',
+						text: 'Falha na comunicação com o servidor: ' + error
+					});
+				}
+			});
+		});
+
 		hljs.highlightAll();
 
 		document.querySelectorAll('.help-icon').forEach(icon => {
@@ -123,7 +177,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 				}, 3000);
 			});
 		});
-		
+
 	});
 </script>
 <?php
