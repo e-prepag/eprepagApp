@@ -622,7 +622,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                 // inicia o intervalo
                 formData = formData + '&verificar=true';
-                
+
                 intervaloVerificacao = setInterval(function() {
 
                     // evita chamadas paralelas se a anterior não terminou
@@ -636,8 +636,6 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         url: './ajax_dimp.php',
                         type: 'POST',
                         data: formData,
-                        processData: false, // obrigatório para FormData
-                        contentType: false, // obrigatório para FormData
                         timeout: 30000, // 30s de timeout
                         success: function(response) {
 
