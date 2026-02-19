@@ -95,8 +95,14 @@ $data_atual = date('Y-m');
 	if (!empty($data_inicial) && !empty($data_final)) {
 		if ($sel_tipo == 'xml') {
 			$dados = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
+			
+			$contador = 0;
 			foreach ($dados as $dado) {
 				echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
+				if($contador++ == 20){
+					echo '<div class="alert alert-warning">Muitas movimentações geradas, por favor, baixe os XMLs para visualizar todas.</div>';
+					break;
+				}
 			}
 		} else if ($sel_tipo == 'pretty') {
 			$dados = $efinanceira->gerarMovimentacaoFinanceiraCompletaDados($data_inicial, $data_final);

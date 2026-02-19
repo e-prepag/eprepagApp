@@ -86,8 +86,11 @@ class GerarEFinanceira
         $this->versao_aplicacao = '00000000000000000001';
     }
 
-    public function obterDadosMovFinPJ($inicio, $fim)
+    public function obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
     {
+
+        $sql_limit_offset = ($offset != null && $limit != null) ? "LIMIT :limit OFFSET :offset" : "";
+
         $pdo = ConnectionPDO::getConnection()->getLink();
         $sql = "WITH -- Busca todas as movimentações no período, sem filtrar status do usuário ainda
                     MovimentacaoMensal AS (
@@ -114,7 +117,7 @@ class GerarEFinanceira
                             dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                         WHERE 
                             -- Alterado conforme solicitado: Apenas filtro de data do log
-                            sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                            sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
                         GROUP BY 
                             ug.ug_id,
                             TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
@@ -152,7 +155,7 @@ class GerarEFinanceira
                             -- Otimização: Traz usuários que tem movimentação NO PERÍODO ou Estão Ativos (para regra de Dezembro)
                             ug.ug_id IN (SELECT ug_id FROM MovimentacaoMensal)
                             OR ug.ug_ativo = 1
-                            OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio AND :data_fim
+                            OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
                     ),
                     -- Gera a lista de meses do período selecionado
                     Calendario AS (
@@ -162,70 +165,108 @@ class GerarEFinanceira
                             :data_fim::date, 
                             '1 month'::interval
                         ) d
-                    ) 
-                -- SELECT FINAL COM AS REGRAS DE NEGÓCIO APLICADAS NO FILTRO
+                    ),
+                    -- SELECT FINAL COM AS REGRAS DE NEGÓCIO APLICADAS NO FILTRO
+                    RelatorioFiltrado AS (
+                        SELECT 
+                            d.ug_id,
+                            d.ni_declarado,
+                            d.ug_razao_social AS nome_declarado,
+                            d.ug_endereco,
+                            d.ug_numero,
+                            d.ug_complemento,
+                            d.ug_bairro,
+                            d.ug_cidade,
+                            d.ug_estado,
+                            d.ug_cep,
+                            d.ug_nome_fantasia AS nome_conta, 
+                            d.ug_perfil_saldo AS saldo_atual_conta,
+                            cal.ano_mes_caixa,
+                            COALESCE(m.entradas, 0) AS entradas_conta,
+                            COALESCE(m.saidas, 0) AS saidas_conta,
+                            COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes,
+                            d.ug_ativo, 
+                            d.ug_data_encerramento_conta,
+                            d.mes_encerramento
+                        FROM 
+                            DadosUsuario d
+                        CROSS JOIN 
+                            Calendario cal
+                        LEFT JOIN 
+                            MovimentacaoMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
+                        LEFT JOIN
+                            GatilhoLimiar g ON d.ug_id = g.ug_id
+                        WHERE 
+                            (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
+                            AND (
+                                (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
+                                OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                OR (d.mes_encerramento = cal.ano_mes_caixa)
+                            )
+                    )
+                -- SELECT FINAL COM O CÁLCULO DO vlrUltDia via LATERAL
                 SELECT 
                     2 AS tipo_declarado,
-                    d.ni_declarado,
-                    d.ug_razao_social AS nome_declarado,
+                    f.ni_declarado,
+                    f.nome_declarado,
                     NULL AS data_nascimento,
-                    d.ug_endereco,
-                    d.ug_numero,
-                    d.ug_complemento,
-                    d.ug_bairro,
-                    d.ug_cidade,
-                    d.ug_estado,
-                    d.ug_cep,
-                    ('PD' || d.ug_id) AS id_conta, 
-                    d.ug_nome_fantasia AS nome_conta, 
+                    f.ug_endereco,
+                    f.ug_numero,
+                    f.ug_complemento,
+                    f.ug_bairro,
+                    f.ug_cidade,
+                    f.ug_estado,
+                    f.ug_cep,
+                    ('PD' || f.ug_id) AS id_conta, 
+                    f.nome_conta, 
                     '1' AS tp_relacao,
-                    d.ug_perfil_saldo AS saldo_atual_conta,
-                    cal.ano_mes_caixa,
-                    COALESCE(m.entradas, 0) AS entradas_conta,
-                    COALESCE(m.saidas, 0) AS saidas_conta,
-                    COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes,
-                    d.ug_ativo, 
-                    d.ug_data_encerramento_conta
+                    f.saldo_atual_conta,
+                    f.ano_mes_caixa,
+                    f.entradas_conta,
+                    f.saidas_conta,
+                    f.total_movimentado_mes,
+                    f.ug_ativo, 
+                    f.ug_data_encerramento_conta,
+                    COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
                 FROM 
-                    DadosUsuario d
-                CROSS JOIN 
-                    Calendario cal
-                LEFT JOIN 
-                    MovimentacaoMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
-                LEFT JOIN
-                    GatilhoLimiar g ON d.ug_id = g.ug_id
-                WHERE 
-                    -- Se a conta encerrou, NUNCA mostrar meses posteriores ao encerramento
-                    (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
-                    AND (
-                        -- REGRA 1: LIMIAR (> 6000)
-                        -- Se em algum momento estourou o limite, mostra o mês do estouro e todos os seguintes
-                        (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
-                        OR
-                        -- REGRA 2: DEZEMBRO (OBRIGATÓRIO)
-                        -- Se for Dezembro E (Usuário está Ativo OU Encerrou a conta neste exato Dezembro)
-                        (
-                            RIGHT(cal.ano_mes_caixa, 2) = '12' 
-                            AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa)
-                        )
-                        OR
-                        -- REGRA 3: MÊS DE ENCERRAMENTO CONTA
-                        -- Se for o mês exato do encerramento, deve aparecer independente de valores
-                        (d.mes_encerramento = cal.ano_mes_caixa)
-                    )
+                    RelatorioFiltrado f
+                LEFT JOIN LATERAL (
+                    SELECT sl.dugsl_ug_perfil_saldo AS vlrUltDia
+                    FROM dist_usuarios_games_saldo_log sl
+                    WHERE sl.dugsl_ug_id = f.ug_id
+                      AND sl.dugsl_data_inclusao < (
+                          CASE 
+                              -- Se for o mês de encerramento, pega os logs antes da data de encerramento (isso pega até 23:59:59 do dia anterior)
+                              WHEN f.ano_mes_caixa = f.mes_encerramento 
+                              THEN f.ug_data_encerramento_conta::date
+
+                              -- Para Dezembro (ou qualquer outro mês normal), pega até o último segundo do último dia do mês corrente
+                              ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                          END
+                      )
+                    ORDER BY sl.dugsl_data_inclusao DESC
+                    LIMIT 1
+                ) saldo_calc ON true
                 ORDER BY
-                    cal.ano_mes_caixa, d.ni_declarado;";
+                    f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
         $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmt->bindParam(':data_inicio', $inicio);
         $stmt->bindParam(':data_fim', $fim);
+        if($offset != null && $limit != null){
+            $stmt->bindParam(':limit', $limit);
+            $stmt->bindParam(':offset', $offset);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function obterDadosMovFinPF($inicio, $fim)
+    public function obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
     {
         $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sql_limit_offset = ($offset != null && $limit != null) ? "LIMIT :limit OFFSET :offset" : "";
 
         $sqlReprLegal = "WITH 
                             -- Movimentação bruta (sem filtro de status)
@@ -252,7 +293,7 @@ class GerarEFinanceira
                                 JOIN 
                                     dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                                 WHERE 
-                                    sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                                    sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
                                 GROUP BY 
                                     ug.ug_id,
                                     TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
@@ -296,7 +337,7 @@ class GerarEFinanceira
                                     AND (
                                         ug.ug_id IN (SELECT ug_id FROM MovimentacaoMensal)
                                         OR ug.ug_ativo = 1
-                                        OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio AND :data_fim
+                                        OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
                                     )
                             ),
                             -- Calendário
@@ -307,59 +348,68 @@ class GerarEFinanceira
                                     :data_fim::date, 
                                     '1 month'::interval
                                 ) d
-                            )
-                        SELECT 
-                            1 AS tipo_declarado,
-                            CASE 
-                                WHEN COALESCE(d.ug_repr_legal_cpf, '') ILIKE '%**%'
-                                     AND SUBSTRING(COALESCE(d.ug_repr_legal_cpf, '') FROM LENGTH(COALESCE(d.ug_repr_legal_cpf, '')) - 1 FOR 2) = SUBSTRING(COALESCE(d.ug_repr_venda_cpf, '') FROM LENGTH(COALESCE(d.ug_repr_venda_cpf, '')) - 1 FOR 2)
-                                     THEN regexp_replace(d.ug_repr_venda_cpf, '[^0-9]', '', 'g')
-                                ELSE regexp_replace(d.ug_repr_legal_cpf, '[^0-9]', '', 'g')
-                            END AS ni_declarado,
-                            d.ug_repr_legal_nome AS nome_declarado,
-                            d.ug_repr_legal_data_nascimento AS data_nascimento,
-                            d.ug_endereco,
-                            d.ug_numero,
-                            d.ug_complemento,
-                            d.ug_bairro,
-                            d.ug_cidade,
-                            d.ug_estado,
-                            d.ug_cep,
-                            ('PD' || d.ug_id) AS id_conta, 
-                            d.ug_nome_fantasia AS nome_conta, 
-                            '3' AS tp_relacao,
-                            d.ug_perfil_saldo AS saldo_atual_conta,
-                            cal.ano_mes_caixa,
-                            COALESCE(m.entradas, 0) AS entradas_conta,
-                            COALESCE(m.saidas, 0) AS saidas_conta,
-                            COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes,
-                            d.ug_ativo, d.ug_data_encerramento_conta
-                        FROM 
-                            DadosUsuario d
-                        CROSS JOIN 
-                            Calendario cal
-                        LEFT JOIN 
-                            MovimentacaoMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
-                        LEFT JOIN
-                            GatilhoLimiar g ON d.ug_id = g.ug_id
-                        WHERE 
-                            -- TRAVA GLOBAL: Se a conta encerrou, NUNCA mostrar meses posteriores ao encerramento
-                            (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
-                            AND (
-                                -- REGRA 1: LIMIAR (> 6000)
-                                (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
-                                OR
-                                -- REGRA 2: DEZEMBRO (OBRIGATÓRIO)
-                                (
-                                    RIGHT(cal.ano_mes_caixa, 2) = '12' 
-                                    AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa)
+                            ),
+                            RelatorioFiltrado AS (
+                                    SELECT 
+                                        d.ug_id, d.ug_repr_legal_cpf, d.ug_repr_venda_cpf, d.ug_repr_legal_nome,
+                                        d.ug_repr_legal_data_nascimento, d.ug_endereco, d.ug_numero,
+                                        d.ug_complemento, d.ug_bairro, d.ug_cidade, d.ug_estado, d.ug_cep,
+                                        d.ug_nome_fantasia, d.ug_perfil_saldo, d.ug_ativo, d.ug_data_encerramento_conta,
+                                        d.mes_encerramento, cal.ano_mes_caixa,
+                                        COALESCE(m.entradas, 0) AS entradas_conta,
+                                        COALESCE(m.saidas, 0) AS saidas_conta,
+                                        COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes
+                                    FROM DadosUsuario d
+                                    CROSS JOIN Calendario cal
+                                    LEFT JOIN MovimentacaoMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
+                                    LEFT JOIN GatilhoLimiar g ON d.ug_id = g.ug_id
+                                    WHERE 
+                                        (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
+                                        AND (
+                                            (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
+                                            OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                            OR (d.mes_encerramento = cal.ano_mes_caixa)
+                                        )
                                 )
-                                OR
-                                -- REGRA 3: MÊS DE ENCERRAMENTO CONTA
-                                (d.mes_encerramento = cal.ano_mes_caixa)
-                            )
-                        ORDER BY
-                            cal.ano_mes_caixa, ni_declarado;";
+                            -- SELECT FINAL
+                            SELECT 
+                                1 AS tipo_declarado,
+                                CASE 
+                                    WHEN COALESCE(f.ug_repr_legal_cpf, '') ILIKE '%**%'
+                                         AND SUBSTRING(COALESCE(f.ug_repr_legal_cpf, '') FROM LENGTH(COALESCE(f.ug_repr_legal_cpf, '')) - 1 FOR 2) = SUBSTRING(COALESCE(f.ug_repr_venda_cpf, '') FROM LENGTH(COALESCE(f.ug_repr_venda_cpf, '')) - 1 FOR 2)
+                                         THEN regexp_replace(f.ug_repr_venda_cpf, '[^0-9]', '', 'g')
+                                    ELSE regexp_replace(f.ug_repr_legal_cpf, '[^0-9]', '', 'g')
+                                END AS ni_declarado,
+                                f.ug_repr_legal_nome AS nome_declarado,
+                                f.ug_repr_legal_data_nascimento AS data_nascimento,
+                                f.ug_endereco, f.ug_numero, f.ug_complemento, f.ug_bairro,
+                                f.ug_cidade, f.ug_estado, f.ug_cep,
+                                ('PD' || f.ug_id) AS id_conta, 
+                                f.ug_nome_fantasia AS nome_conta, 
+                                '3' AS tp_relacao,
+                                f.ug_perfil_saldo AS saldo_atual_conta,
+                                f.ano_mes_caixa,
+                                f.entradas_conta,
+                                f.saidas_conta,
+                                f.total_movimentado_mes,
+                                f.ug_ativo, 
+                                f.ug_data_encerramento_conta,
+                                COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                            FROM RelatorioFiltrado f
+                            LEFT JOIN LATERAL (
+                                SELECT sl.dugsl_ug_perfil_saldo AS vlrUltDia
+                                FROM dist_usuarios_games_saldo_log sl
+                                WHERE sl.dugsl_ug_id = f.ug_id
+                                  AND sl.dugsl_data_inclusao < (
+                                      CASE 
+                                          WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
+                                          ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                      END
+                                  )
+                                ORDER BY sl.dugsl_data_inclusao DESC
+                                LIMIT 1
+                            ) saldo_calc ON true
+                            ORDER BY f.ano_mes_caixa, ni_declarado $sql_limit_offset;";
 
         $sqlPFTitular = "WITH 
                             -- Movimentação por CONTA (bruta)
@@ -385,7 +435,7 @@ class GerarEFinanceira
                                 JOIN 
                                     usuarios_games_saldo_log sl ON ug.ug_id = sl.ugsl_ug_id
                                 WHERE 
-                                    sl.ugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                                    sl.ugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
                                 GROUP BY 
                                     ug.ug_id, ug.ug_cpf,
                                     TO_CHAR(sl.ugsl_data_inclusao::date, 'YYYYMM')
@@ -398,7 +448,7 @@ class GerarEFinanceira
                                     SUM(total_movimentado_conta_mes) AS total_movimentado_pessoa_mes
                                 FROM 
                                     MovimentacaoPorContaMensal
-                                WHERE ug_cpf IS NOT NULL
+                                WHERE ug_cpf IS NOT NULL AND ug_cpf <> '' AND ug_cpf <> '..-'
                                 GROUP BY ug_cpf, ano_mes_caixa
                             ),
                             -- Identifica gatilho por CPF (> 2000)
@@ -422,11 +472,11 @@ class GerarEFinanceira
                                 FROM 
                                     usuarios_games ug
                                 WHERE 
-                                    ug.ug_cpf IS NOT NULL
+                                    ug.ug_cpf IS NOT NULL AND ug.ug_cpf <> '' AND ug.ug_cpf <> '..-'
                                     AND (
                                         ug.ug_id IN (SELECT ug_id FROM MovimentacaoPorContaMensal)
                                         OR ug.ug_ativo = 1
-                                        OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio AND :data_fim
+                                        OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
                                     )
                             ),
                             -- Calendário
@@ -437,64 +487,85 @@ class GerarEFinanceira
                                     :data_fim::date, 
                                     '1 month'::interval
                                 ) d
+                            ),
+                        RelatorioFiltrado AS (
+                                SELECT 
+                                    d.ug_id, d.ug_cpf, d.ug_nome, d.ug_data_nascimento,
+                                    d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
+                                    d.ug_cidade, d.ug_estado, d.ug_cep, d.ug_perfil_saldo, 
+                                    d.ug_ativo, d.ug_data_encerramento_conta, d.mes_encerramento,
+                                    cal.ano_mes_caixa,
+                                    COALESCE(m.entradas, 0) AS entradas_conta,
+                                    COALESCE(m.saidas, 0) AS saidas_conta,
+                                    COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta
+                                FROM DadosUsuarioContas d
+                                CROSS JOIN Calendario cal
+                                LEFT JOIN MovimentacaoPorContaMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
+                                LEFT JOIN GatilhoLimiarCPF g ON d.ug_cpf = g.ug_cpf
+                                WHERE 
+                                    (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
+                                    AND (
+                                        (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
+                                        OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                        OR (d.mes_encerramento = cal.ano_mes_caixa)
+                                    )
                             )
+                        -- SELECT FINAL
                         SELECT 
                             1 AS tipo_declarado,
-                            regexp_replace(d.ug_cpf, '[^0-9]', '', 'g') AS ni_declarado,
-                            d.ug_nome AS nome_declarado,
-                            d.ug_data_nascimento AS data_nascimento,
-                            d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
-                            d.ug_cidade, d.ug_estado, d.ug_cep,
-                            ('GM' || d.ug_id) AS id_conta, 
+                            regexp_replace(f.ug_cpf, '[^0-9]', '', 'g') AS ni_declarado,
+                            f.ug_nome AS nome_declarado,
+                            f.ug_data_nascimento AS data_nascimento,
+                            f.ug_endereco, f.ug_numero, f.ug_complemento, f.ug_bairro,
+                            f.ug_cidade, f.ug_estado, f.ug_cep,
+                            ('GM' || f.ug_id) AS id_conta, 
                             'Conta de Pagamento' AS nome_conta, 
                             '1' AS tp_relacao, 
-                            d.ug_perfil_saldo AS saldo_atual_conta,
-                            cal.ano_mes_caixa,
-                            COALESCE(m.entradas, 0) AS entradas_conta,
-                            COALESCE(m.saidas, 0) AS saidas_conta,
-                            COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta,
-                            d.ug_ativo, d.ug_data_encerramento_conta
-                        FROM 
-                            DadosUsuarioContas d
-                        CROSS JOIN 
-                            Calendario cal
-                        LEFT JOIN 
-                            MovimentacaoPorContaMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
-                        LEFT JOIN
-                            GatilhoLimiarCPF g ON d.ug_cpf = g.ug_cpf
-                        WHERE 
-                            -- TRAVA GLOBAL: Se a CONTA ESPECÍFICA encerrou, não mostra meses posteriores
-                            (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
-                            AND (
-                                -- REGRA 1: LIMIAR CPF (> 2000)
-                                -- Se o CPF estourou o limite, mostra todas as contas dele daquele mês em diante
-                                (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
-                                OR
-                                -- REGRA 2: DEZEMBRO
-                                -- Se é Dezembro e a conta está ativa ou fechou neste mês
-                                (
-                                    RIGHT(cal.ano_mes_caixa, 2) = '12' 
-                                    AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa)
-                                )
-                                OR
-                                -- REGRA 3: MÊS DE ENCERRAMENTO CONTA
-                                (d.mes_encerramento = cal.ano_mes_caixa)
-                            )
-                        ORDER BY
-                            cal.ano_mes_caixa, ni_declarado, id_conta;";
+                            f.ug_perfil_saldo AS saldo_atual_conta,
+                            f.ano_mes_caixa,
+                            f.entradas_conta,
+                            f.saidas_conta,
+                            f.total_movimentado_conta,
+                            f.ug_ativo, 
+                            f.ug_data_encerramento_conta,
+                            COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                        FROM RelatorioFiltrado f
+                        LEFT JOIN LATERAL (
+                            SELECT sl.ugsl_ug_perfil_saldo AS vlrUltDia
+                            FROM usuarios_games_saldo_log sl
+                            WHERE sl.ugsl_ug_id = f.ug_id
+                              AND sl.ugsl_data_inclusao < (
+                                  CASE 
+                                      WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
+                                      ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                  END
+                              )
+                            ORDER BY sl.ugsl_data_inclusao DESC
+                            LIMIT 1
+                        ) saldo_calc ON true
+                        ORDER BY f.ano_mes_caixa, ni_declarado, id_conta $sql_limit_offset;";
 
         $stmtReprLegal = $pdo->prepare($sqlReprLegal);
+        $stmtReprLegal->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmtReprLegal->bindParam(':data_inicio', $inicio);
         $stmtReprLegal->bindParam(':data_fim', $fim);
+        if($offset != null && $limit != null){
+            $stmtReprLegal->bindParam(':limit', $limit);
+            $stmtReprLegal->bindParam(':offset', $offset);
+        }
         $stmtReprLegal->execute();
         $resultReprLegal = $stmtReprLegal->fetchAll(PDO::FETCH_ASSOC);
 
         $stmtPFTitular = $pdo->prepare($sqlPFTitular);
+        $stmtPFTitular->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmtPFTitular->bindParam(':data_inicio', $inicio);
         $stmtPFTitular->bindParam(':data_fim', $fim);
         $stmtPFTitular->execute();
         $resultPFTitular = $stmtPFTitular->fetchAll(PDO::FETCH_ASSOC);
-
+        if($offset != null && $limit != null){
+            $stmtReprLegal->bindParam(':limit', $limit);
+            $stmtReprLegal->bindParam(':offset', $offset);
+        }
         return array_merge($resultReprLegal, $resultPFTitular);
     }
 
@@ -629,17 +700,20 @@ class GerarEFinanceira
                 // Salva os dados do declarado (que são os mesmos para todas as linhas daquele CPF/Mês)
                 $agrupados[$chaveDeclarado][$chaveMes] = [
                     'dadosDeclarado' => [
-                        'tipo_declarado'  => $registro['tipo_declarado'],
-                        'ni_declarado'    => $registro['ni_declarado'],
-                        'nome_declarado'  => $registro['nome_declarado'],
-                        'data_nascimento' => $registro['data_nascimento'],
-                        'ug_endereco'     => $registro['ug_endereco'],
-                        'ug_numero'       => $registro['ug_numero'],
-                        'ug_complemento'  => $registro['ug_complemento'],
-                        'ug_bairro'       => $registro['ug_bairro'],
-                        'ug_cidade'       => $registro['ug_cidade'],
-                        'ug_estado'       => $registro['ug_estado'],
-                        'ug_cep'          => $registro['ug_cep'],
+                        'tipo_declarado'             => $registro['tipo_declarado'],
+                        'ni_declarado'               => $registro['ni_declarado'],
+                        'nome_declarado'             => $registro['nome_declarado'],
+                        'data_nascimento'            => $registro['data_nascimento'],
+                        'ug_endereco'                => $registro['ug_endereco'],
+                        'ug_numero'                  => $registro['ug_numero'],
+                        'ug_complemento'             => $registro['ug_complemento'],
+                        'ug_bairro'                  => $registro['ug_bairro'],
+                        'ug_cidade'                  => $registro['ug_cidade'],
+                        'ug_estado'                  => $registro['ug_estado'],
+                        'ug_cep'                     => $registro['ug_cep'],
+                        'ug_ativo'                   => $registro['ug_ativo'],
+                        'ug_data_encerramento_conta' => $registro['ug_data_encerramento_conta'],
+                        'vlrUltDia'                  => $registro['vlrultdia'],
                     ],
                     'contas' => [] // Cria a lista de contas para este mês
                 ];
@@ -753,7 +827,6 @@ class GerarEFinanceira
     {
         $pdo = ConnectionPDO::getConnection()->getLink();
         $listaParaVerificar = [];
-        $chavesMap = [];
 
         // $dadosAgrupados vem no formato [cpf => [mes => dados]]
         foreach ($dadosAgrupados as $cpfCnpj => $meses) {
@@ -761,7 +834,7 @@ class GerarEFinanceira
                 $chave = "{$mes}-{$cpfCnpj}";
 
                 if (!isset($this->cacheIdsEventos[$chave])) {
-                    $listaParaVerificar[$chave] = [
+                    $listaParaVerificar[] = [ // Mudei de $listaParaVerificar[$chave] para [] para economizar chaves associativas pesadas
                         'anomes' => $mes,
                         'cpfcnpj' => $cpfCnpj
                     ];
@@ -773,29 +846,22 @@ class GerarEFinanceira
             return;
         }
 
-        $filtros = [];
-        $params = [];
-        $i = 0;
-        $placeholders = [];
+        // REMOVIDO O BLOCO QUE ESTOURAVA A MEMÓRIA AQUI
 
-        foreach ($listaParaVerificar as $item) {
-            $placeholders[] = "(:anomes{$i}, :cpf{$i})";
-            $params[":anomes{$i}"] = $item['anomes'];
-            $params[":cpf{$i}"] = $item['cpfcnpj'];
-            $i++;
-        }
-
-        // Vamos processar de 1000 em 1000 itens
-        $chunks = array_chunk($listaParaVerificar, 1000, true);
+        // Processa de 1000 em 1000 itens (O 'true' no array_chunk não é necessário se usamos índice sequencial)
+        $chunks = array_chunk($listaParaVerificar, 1000);
 
         foreach ($chunks as $chunk) {
             $this->processarLoteSQL($chunk, $pdo);
         }
+
+        // Libera a memória da lista gigante logo após terminar
+        unset($listaParaVerificar, $chunks);
     }
 
     private function processarLoteSQL($itens, $pdo)
     {
-        // Buscar Existentes
+        // 1. Buscar Existentes no Lote Atual
         $tupleStr = [];
         $params = [];
         $i = 0;
@@ -808,10 +874,10 @@ class GerarEFinanceira
         }
 
         $sqlSelect = "SELECT id, data_anomes, cpfcnpj_declarado 
-                  FROM public.envios_e_financeira 
-                  WHERE tipo = 'MOVIMENTACAO' 
-                  AND retificado = false 
-                  AND (data_anomes, cpfcnpj_declarado) IN (" . implode(',', $tupleStr) . ")";
+              FROM public.envios_e_financeira 
+              WHERE tipo = 'MOVIMENTACAO' 
+              AND retificado = false 
+              AND (data_anomes, cpfcnpj_declarado) IN (" . implode(',', $tupleStr) . ")";
 
         $stmt = $pdo->prepare($sqlSelect);
         $stmt->execute($params);
@@ -824,7 +890,7 @@ class GerarEFinanceira
             $chavesEncontradas[$chave] = true;
         }
 
-        // Identificar quem falta (Diff)
+        // 2. Identificar quem falta (Diff)
         $novosParaInserir = [];
         foreach ($itens as $item) {
             $chave = "{$item['anomes']}-{$item['cpfcnpj']}";
@@ -837,12 +903,11 @@ class GerarEFinanceira
             return;
         }
 
-        // Inserir Novos em Lote (Bulk Insert)
+        // 3. Inserir Novos em Lote (Bulk Insert)
         $values = [];
         $insertParams = [];
         $j = 0;
 
-        // Valores padrão
         $tipo = 'MOVIMENTACAO';
         $status = 'PENDENTE';
         $vEfin = 'v1_2_1';
@@ -868,9 +933,9 @@ class GerarEFinanceira
         }
 
         $sqlInsert = "INSERT INTO envios_e_financeira 
-                  (tipo, status_envio, versao_efin, versao_epp, nome_arquivo, data_anomes, cpfcnpj_declarado, retificado, semestre_ano)
-                  VALUES " . implode(',', $values) . "
-                  RETURNING id, data_anomes, cpfcnpj_declarado";
+              (tipo, status_envio, versao_efin, versao_epp, nome_arquivo, data_anomes, cpfcnpj_declarado, retificado, semestre_ano)
+              VALUES " . implode(',', $values) . "
+              RETURNING id, data_anomes, cpfcnpj_declarado";
 
         try {
             $stmtInsert = $pdo->prepare($sqlInsert);
@@ -906,11 +971,13 @@ class GerarEFinanceira
         // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $fim);
-        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $fim);
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
+        unset($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+        unset($dadosPF);
 
         $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
         $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
@@ -918,20 +985,27 @@ class GerarEFinanceira
         // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
 
-        $inicioMesAno = substr(str_replace('-', '', $inicio), 0, 6);
-
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
-
-                if ($inicioMesAno > $mes) {
-                    continue;
-                }
 
                 if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
                 }
                 // CRIA O XML (ou o objeto XML/Evento)
+
+                $ug_data_encerramento_conta = null;
+                $vlrUltDia = null;
+                if ((int) $registro['dadosDeclarado']['ug_ativo'] != 1 && date('Ym', strtotime($registro['dadosDeclarado']['ug_data_encerramento_conta'])) == $mes) {
+                    $ug_data_encerramento_conta = $registro['dadosDeclarado']['ug_data_encerramento_conta'];
+                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
+                    echo "passou dados $vlrUltDia";
+                }
+                if (substr($mes, 4, 2) == '12') {
+                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
+                    echo "passou dados $vlrUltDia";
+                }
+
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
@@ -948,7 +1022,9 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas']
+                    $registro['contas'],
+                    $ug_data_encerramento_conta,
+                    $vlrUltDia
                 );
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
@@ -956,18 +1032,29 @@ class GerarEFinanceira
             }
         }
 
+        unset($dadosPJAgrupados);
+
         // --- Processa PFs ---
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
-
-                if ($inicioMesAno > $mes) {
-                    continue;
-                }
 
                 if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
                 }
                 // CRIA O XML (ou o objeto XML/Evento)
+
+                $ug_data_encerramento_conta = null;
+                $vlrUltDia = null;
+                if ((int) $registro['dadosDeclarado']['ug_ativo'] != 1 && date('Ym', strtotime($registro['dadosDeclarado']['ug_data_encerramento_conta'])) == $mes) {
+                    $ug_data_encerramento_conta = $registro['dadosDeclarado']['ug_data_encerramento_conta'];
+                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
+                    echo "passou dados $vlrUltDia";
+                }
+                if (substr($mes, 4, 2) == '12') {
+                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
+                    echo "passou dados $vlrUltDia";
+                }
+
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
@@ -984,13 +1071,17 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas']
+                    $registro['contas'],
+                    $ug_data_encerramento_conta,
+                    $vlrUltDia
                 );
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
                 $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
+
+        unset($dadosPFAgrupados);
 
         return $movimentacoesAgrupadasPorMes;
     }
@@ -1012,23 +1103,20 @@ class GerarEFinanceira
         // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $fim);
-        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $fim);
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
+        unset($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+        unset($dadosPF);
 
         // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
 
-        $inicioMesAno = substr(str_replace('-', '', $inicio), 0, 6);
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
-
-                if ($inicioMesAno > $mes) {
-                    continue;
-                }
 
                 if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
@@ -1037,15 +1125,13 @@ class GerarEFinanceira
                 $movimentacoesAgrupadasPorMes[$mes][] = $registro;
             }
         }
+
+        unset($dadosPJAgrupados);
 
         // --- Processa PFs ---
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if ($inicioMesAno > $mes) {
-                    continue;
-                }
-
                 if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
                 }
@@ -1053,6 +1139,8 @@ class GerarEFinanceira
                 $movimentacoesAgrupadasPorMes[$mes][] = $registro;
             }
         }
+
+        unset($dadosPFAgrupados);
 
         return $movimentacoesAgrupadasPorMes;
     }
@@ -1090,32 +1178,46 @@ class GerarEFinanceira
         return $xmls;
     }
 
-    public function gerarLotesMovsFinanceira(array $movimentacoes, $tamanhoLote = 50, $debug = false)
+    public function gerarLotesMovsFinanceira(array &$movimentacoes, $tamanhoLote = 50, $debug = false)
     {
         $lotesArray = [];
 
-        // O array $movimentacoes já está agrupado por mês (a chave é o anoMes, ex: '202501')
-        foreach ($movimentacoes as $anoMes => $eventosDoMes) {
+        // 2. Pegamos as chaves (meses) para iterar com segurança enquanto apagamos os dados
+        $meses = array_keys($movimentacoes);
 
-            // 1. Divide os eventos do mês em lotes menores (Chunks)
-            // A função array_chunk() do PHP faz isso de forma eficiente.
+        foreach ($meses as $anoMes) {
+
+            // Pega os eventos apenas desse mês
+            $eventosDoMes = $movimentacoes[$anoMes];
+
+            // MEGA WIN 1: Apaga esse mês do array gigante original IMEDIATAMENTE!
+            // Isso libera a memória para o novo XML que vamos montar.
+            unset($movimentacoes[$anoMes]);
+
             $chunksDeEventos = array_chunk($eventosDoMes, $tamanhoLote);
+
+            // MEGA WIN 2: Apaga o array temporário
+            unset($eventosDoMes);
 
             $contadorLote = 1;
 
-            // 2. Itera sobre cada lote de eventos
-            foreach ($chunksDeEventos as $eventosDoLote) {
+            foreach ($chunksDeEventos as $index => $eventosDoLote) {
 
-                // Log opcional para acompanhamento
-                if ($debug)
+                if ($debug) {
                     echo "Criando Lote {$contadorLote} para o Mês {$anoMes} com " . count($eventosDoLote) . " eventos...\n";
+                }
 
+                // Gera a string do lote
                 $xmlLoteFinal = $this->gerarLoteAssincrono($eventosDoLote);
 
-                // 4. Adiciona o XML do lote final ao array de retorno
-                $lotesArray[] = ['xml' => $xmlLoteFinal, 'ano_mes' => $anoMes, 'lote_numero' => $contadorLote];
+                $lotesArray[] = [
+                    'xml' => $xmlLoteFinal,
+                    'ano_mes' => $anoMes,
+                    'lote_numero' => $contadorLote
+                ];
 
-
+                // MEGA WIN 3: Apaga o chunk da memória assim que o XML final é gerado
+                unset($chunksDeEventos[$index]);
 
                 $contadorLote++;
             }
@@ -1302,7 +1404,7 @@ class GerarEFinanceira
      *     tipo_relacao: string
      * } $contas_user
      */
-    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
+    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user, $data_encerramento = null, $vlr_ult_dia = null)
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -1463,8 +1565,12 @@ class GerarEFinanceira
             $infoConta->appendChild($NoTitulares);
 
             //dtEncerramentoConta RESOLVER DEPOIS
+            if ($data_encerramento != null) {
+                $dataFormatada = date('Y-m-d', strtotime($data_encerramento));
 
-            //IndInatividade RESOLVER DEPOIS 6 ANOS INATIV
+                $dtEncerramentoConta = $dom->createElementNS($namespace, 'dtEncerramentoConta', $dataFormatada);
+                $infoConta->appendChild($dtEncerramentoConta);
+            }
 
             //BalancoConta grupo
             $BalancoConta = $dom->createElementNS($namespace, 'BalancoConta');
@@ -1489,7 +1595,13 @@ class GerarEFinanceira
             $totDebitosMesmaTitularidade = $dom->createElementNS($namespace, 'totDebitosMesmaTitularidade', '0,00');
             $BalancoConta->appendChild($totDebitosMesmaTitularidade);
 
-            //vlrUltDia RESOLVER DEPOIS SO MES DEZEMBRO
+            //vlrUltDia
+            if ($vlr_ult_dia != null) {
+                $valorFormatado = number_format((float) $vlr_ult_dia, 2, ',', '');
+                $vlrUltDia = $dom->createElementNS($namespace, 'vlrUltDia', $valorFormatado);
+                $BalancoConta->appendChild($vlrUltDia);
+                echo "passou func";
+            }
 
             //PgtosAcum - grupo
             $PgtosAcum = $dom->createElementNS($namespace, 'PgtosAcum');
