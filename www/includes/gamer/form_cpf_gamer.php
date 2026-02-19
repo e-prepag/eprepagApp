@@ -157,7 +157,15 @@ if (isset($_POST['formsubmit'])) {
 
         $class_usuarios_games = new UsuarioGames();
 
-        $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'), $usuarioId);
+        if($usuarioId != null && $usuarioId > 0){
+            $tem_conta_cpf = $class_usuarios_games::buscaContaCPF($cpf);
+        }
+
+        if(!isset($tem_conta_cpf) || !isset($tem_conta_cpf['ug_id'])){
+            $verifica_cpf = $class_usuarios_games::existeCPFCadastro(mask($cpf, '###.###.###-##'), $usuarioId);
+        }else{
+            $verifica_cpf = '';
+        }
 
         if (!empty($verifica_cpf)) {
             $errors[] = "Erro: $verifica_cpf";

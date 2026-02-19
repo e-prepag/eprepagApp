@@ -715,7 +715,7 @@ if (is_object($usuarioGames)) {
                 $objEnvioEmailAutomatico = new EnvioEmailAutomatico(TIPO_USUARIO_GAMER, $stipoEmail);
 
                 $ug_id = $usuarioGames->getId();        // 9093;	//
-                $ug_email = $usuarioGames->getEmail();        // "reynaldo@e-prepag.com.br";// 
+                $ug_email = $_SESSION['integracao_client_email'];        // "reynaldo@e-prepag.com.br";// 
                 $objEnvioEmailAutomatico->setPedido($venda_id);
                 $objEnvioEmailAutomatico->setListaCreditoOferta($aux_lista);
                 $objEnvioEmailAutomatico->setUgID($ug_id);

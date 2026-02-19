@@ -15,5 +15,3 @@
     <div style="clear: both;"></div>
     
 </div>
-
-<?php die; ?>
