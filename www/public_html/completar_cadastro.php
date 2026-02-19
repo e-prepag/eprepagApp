@@ -36,14 +36,46 @@ $controller->setHeader();
 <div class="container txt-azul-claro bg-branco p-bottom40">
 	<div class="col-md-12 conteudo_principal">
 		<h1 style="margin: 20px 0 30px 0" class="txt-azul-claro">
-			<strong>Estamos quase lá!</strong>
+			<strong>Falta pouco para você começar a vender!</strong>
 		</h1>
-		<h2 style="font-size: 20px; margin: 10px 0;">Para finalizar o seu cadastro, precisamos que preencha o formulário enviado para o seu e-mail.
+		<h2 style="font-size: 20px; margin: 10px 0;">
+			<strong>Assista ao vídeo</strong> - em menos de 1 minuto, veja como concluir seu
+			cadastro sem complicação.
 		</h2>
-		<h3 style="font-size: 17px; margin: 10px 0;">Para que tudo dê certo, utilize o seu celular, vamos precisar de fotos legíveis para validar o documento e a selfie do representante legal da empresa.</h3>
-		<div style="display: flex; height: 25vh; justify-content: center; align-items: center; margin: 20px auto;">
-			<a href="https://cadastro.io/92af1f1040a6f03c42f4082ee30d92b1" title="Completar Cadastro" style="background: #62bd6e; color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 16px; text-transform: uppercase; font-weight: bold; transition: background-color 0.3s ease-in-out;" onmouseover="this.style.backgroundColor='#268fbd'" onmouseout="this.style.backgroundColor='#62bd6e';">Completar cadastro</a>
+
+		<div style="display: flex; justify-content: center; align-items: center; margin: auto;">
+			<iframe width="560" height="315"
+				src="https://www.youtube.com/embed/pt45qYvdv08"
+				title="YouTube video player"
+				frameborder="0"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+				allowfullscreen>
+			</iframe>
 		</div>
+
+		<br><br>
+		<h3 style="font-size: 17px; margin: 10px 0;">
+			Tenha em mãos: o número do seu CNPJ, imagem do seu canal de vendas (física/online) e um documento de identidade com foto.
+			<br><br>
+			<strong>Dica:</strong> você pode concluir seu cadastro pelo celular.
+		</h3>
+
+		<div style="display: flex; justify-content: center; align-items: center; margin: auto;">
+			<a href="https://cadastro.io/?token=92af1f1040a6f03c42f4082ee30d92b1">
+				<!-- /home/marcos/eprepagApp/www/backoffice/images/botao_completar_cadastro.png -->
+				<!-- <img src="https://www.e-prepag.com.br/sys/imagens/botao_completar_cadastro.png" width="400" style="display:block; border:0;"> -->
+				<img src="/imagens/botao_completar_cadastro.png" width="200" style="display:block; border:0;">
+
+			</a>
+		</div>
+		<h3 style="font-size: 17px; margin: 10px 0;">
+			Assim que finalizar, nossa equipe realiza a análise e, em até 1 dia útil, seu <strong>PDV estará pronto para operar, vender produtos digitais e
+				aproveitar todos os benefícios da parceria E-prepag</strong>
+			<br><br>
+			<!-- Em caso de dúvidas, entre em contato com o nosso suporte através do e-mail:
+			<a href="mailto:suporte@e-prepag.com.br">suporte@e-prepag.com.br</a> -->
+		</h3>
+
 		<div class="txt-cinza">
 			<p>Esse processo é essencial para garantir a segurança do seu ponto de venda, e a conformidade regulatória.</p>
 			<p>Se tiver alguma dúvida, entre em contato com o nosso suporte, pelo e-mail <a href="mailto:suporte@eprepag.com.br">suporte@eprepag.com.br</a> ou pelo chat disponível em nosso site que responderemos em até um dia útil.
