@@ -8,11 +8,9 @@ if ($_REQUEST['acao'] == "movimentacoes") {
 
     $efinanceira = new GerarEFinanceira();
     $lotes = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
-
-    if ($lotes) {
-        $nome_arquivo = "lotes_{$data_final}_{$data_inicial}_" . date('Ymd_Hi') . ".zip";
-        $caminho = gerarZipLotes($lotes, $nome_arquivo);
-
+    if ($lotes['xmls']) {
+        $nome_arquivo = "lotes_{$data_final}_{$data_inicial}_" . date('Ymd_Hi') . "_{$lotes['total_eventos']}.zip";
+        $caminho = gerarZipLotes($lotes['xmls'], $nome_arquivo);
         // Validação básica
         if (!$caminho || !file_exists($caminho)) {
             http_response_code(404);

@@ -17,7 +17,7 @@ ob_start();
 try {
     $efinanceira = new GerarEFinanceira();
 
-    $producao = ($_POST['ambiente'] === 'producao11111');
+    $producao = false;
     $tipoConsulta = $_POST['sel_consulta'];
 
     // Variáveis de controle
@@ -41,7 +41,7 @@ try {
     } else {
         // Consultas Assíncronas (Cadastro, Lista, Movimento)
 
-        $cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
+        $cnpj = preg_replace('/[^0-9]/', '', $efinanceira->cnpjEPP);
         if (empty($cnpj)) throw new Exception("CNPJ do Declarante é obrigatório.");
 
         switch ($tipoConsulta) {
@@ -170,6 +170,10 @@ function obterStatusConsultaRapido($xmlString)
 
 function processarRetornoConsultaAssincrona($xmlString, $visualizadorConsulta)
 {
+    if($visualizadorConsulta == 'lote'){
+        processarRetornoConsultaLote($xmlString);
+        return;
+    }
     // 1. Carregar o XML removendo a "casca" do CDATA automaticamente (LIBXML_NOCDATA)
     $xml = simplexml_load_string($xmlString, "SimpleXMLElement", LIBXML_NOCDATA);
 
@@ -683,4 +687,186 @@ function processarRetornoMovOpFin($xmlString)
     echo "</div>";
 
     return $dadosRetorno;
+}
+
+function processarRetornoConsultaLote($xmlProcessamento)
+{
+    // 2. Parser
+    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlProcessamento);
+    $xmlObj = simplexml_load_string($xmlLimpo);
+
+    if (!$xmlObj) {
+        return [
+            'status_lote' => 9,
+            'mensagem_lote' => 'XML de retorno inválido ou corrompido.',
+            'detalhes' => [],
+            'qtd_sucesso' => 0,
+            'qtd_erro' => 0
+        ];
+    }
+
+    $statusGeralLote = (int)($xmlObj->xpath("//status/cdResposta")[0] ?? 0);
+    $msgGeralLote = (string)($xmlObj->xpath("//status/descResposta")[0] ?? '');
+
+    $idsSucesso = [];
+    $idsErro = [];
+    $detalhesEventos = [];
+
+    // 3. Decisão baseada no Status do Lote
+
+    // Status 2 (Sucesso Total) ou 3 (Com Ocorrências) -> Vamos ler os eventos
+    if ($statusGeralLote === 2 || $statusGeralLote === 3) {
+
+        $eventosRetorno = $xmlObj->xpath("//retornoEventos/evento");
+
+        if (!empty($eventosRetorno)) {
+            foreach ($eventosRetorno as $evt) {
+                // ID do Wrapper (ID100...)
+                $idEventoWrapper = (string)$evt['id'];
+
+                // Busca o retornoEvento interno
+                $retornoEvento = $evt->xpath(".//retornoEvento"); // Simplificado pois removemos namespace
+
+                if (!empty($retornoEvento)) {
+                    $nodeRetorno = $retornoEvento[0];
+
+                    $idEventoReal = (string)$nodeRetorno->attributes()->id;
+                    $idBanco = (int)substr($idEventoReal, 3);
+
+                    $descRetornoEvt = (string)($nodeRetorno->xpath("status/descRetorno")[0] ?? '');
+
+                    // Verificação Definitiva de Sucesso: EXISTÊNCIA DE RECIBO
+                    $recibo = (string)($nodeRetorno->xpath("dadosReciboEntrega/numeroRecibo")[0] ?? '');
+
+                    // Coleta Erros/Avisos do Evento
+                    $errosMsg = [];
+                    $ocorrencias = $nodeRetorno->xpath("status/dadosRegistroOcorrenciaEvento/ocorrencias");
+                    if (!empty($ocorrencias)) {
+                        foreach ($ocorrencias as $oc) {
+                            $tipo = (string)$oc->tipo; // 1=Erro, 2=Aviso
+                            $prefixo = ($tipo == '2') ? '[AVISO]' : '[ERRO]';
+                            $errosMsg[] = "$prefixo " . $oc->descricao;
+                        }
+                    }
+
+                    // Lógica para Banco de Dados
+                    // Se tem Recibo = Sucesso (ENVIADO)
+                    // Se não tem Recibo = Erro (ERRO)
+                    if (!empty($recibo)) {
+                        if ($idBanco) $idsSucesso[] = $idBanco;
+                        $statusDb = 'ENVIADO';
+                    } else {
+                        if ($idBanco) $idsErro[] = $idBanco;
+                        $statusDb = 'ERRO';
+                    }
+
+                    $detalhesEventos[] = [
+                        'id' => $idEventoReal,
+                        'status_db' => $statusDb,
+                        'mensagem' => $descRetornoEvt,
+                        'recibo' => $recibo,
+                        'erros' => $errosMsg
+                    ];
+                }
+            }
+        }
+    }
+    // Status 4, 5, 9 -> Erros Globais (Não há eventos para processar)
+    else {
+        // Pega as ocorrências globais do lote, se houver
+        $ocorrenciasLote = $xmlObj->xpath("//status/ocorrencias/ocorrencia");
+        $errosGlobais = [];
+        foreach ($ocorrenciasLote as $oc) {
+            $errosGlobais[] = "[LOTE] " . $oc->descricao;
+        }
+
+        // Adiciona um item "falso" no detalhe para mostrar o erro global na tabela
+        $detalhesEventos[] = [
+            'id' => 'LOTE',
+            'status_db' => 'ERRO',
+            'mensagem' => $msgGeralLote,
+            'recibo' => '',
+            'erros' => $errosGlobais
+        ];
+    }
+
+    $dadosProcessamento = [
+        'status_lote' => $statusGeralLote,
+        'mensagem_lote' => $msgGeralLote,
+        'detalhes' => $detalhesEventos,
+        'qtd_sucesso' => count($idsSucesso),
+        'qtd_erro' => count($idsErro)
+    ];
+
+     $html = "";
+    $statusLote = $dadosProcessamento['status_lote'];
+
+    $html .= "<div class='card mb-3'>";
+    $html .= "<div class='card-header'><strong>Resultado: </strong></div>";
+    $html .= "<div class='card-body'>";
+
+    // Cores baseadas nos status novos
+    // 2 = Sucesso Total (Verde)
+    // 3 = Processado com Ocorrências (Amarelo/Laranja)
+    // 4, 5, 9 = Erro (Vermelho)
+    // 1 = Processando (Azul) - Teimou em ficar processando
+
+    $alertClass = 'danger';
+    if ($statusLote === 2) $alertClass = 'success';
+    elseif ($statusLote === 3) $alertClass = 'warning';
+    elseif ($statusLote === 1) $alertClass = 'info';
+
+    $html .= "<div class='alert alert-$alertClass'>";
+    $html .= "<strong>Status do Lote ($statusLote):</strong> " . $dadosProcessamento['mensagem_lote'];
+    $html .= "</div>";
+
+    // Resumo Quantitativo
+    if ($statusLote === 2 || $statusLote === 3) {
+        $html .= "<div class='row mb-2'>";
+        $html .= "<div class='col-md-6'><span class='badge badge-success'>Sucesso: {$dadosProcessamento['qtd_sucesso']}</span></div>";
+        $html .= "<div class='col-md-6'><span class='badge badge-danger'>Erros: {$dadosProcessamento['qtd_erro']}</span></div>";
+        $html .= "</div>";
+    }
+
+    // Tabela de Detalhes
+    if (!empty($dadosProcessamento['detalhes'])) {
+        $html .= "<table class='table table-bordered table-sm'>";
+        $html .= "<thead><tr class='active'><th>ID Evento</th><th>Status</th><th>Detalhes / Recibo</th></tr></thead>";
+        $html .= "<tbody>";
+
+        foreach ($dadosProcessamento['detalhes'] as $det) {
+            $label = ($det['status_db'] == 'ENVIADO') ? 'success' : 'danger';
+
+            // Se for um erro global de lote, destaca a linha
+            $rowClass = ($det['id'] === 'LOTE') ? 'class="danger"' : '';
+
+            $html .= "<tr $rowClass>";
+            $html .= "<td>{$det['id']}</td>";
+            $html .= "<td><span class='label label-$label'>{$det['status_db']}</span></td>";
+
+            $html .= "<td>";
+            if (!empty($det['recibo'])) {
+                $html .= "<div><strong>Recibo:</strong> " . $det['recibo'] . "</div>";
+            }
+            // Mensagem principal do evento
+            if (!empty($det['mensagem']) && $det['mensagem'] !== 'SUCESSO') {
+                $html .= "<div><em>" . $det['mensagem'] . "</em></div>";
+            }
+            // Lista de Ocorrências
+            if (!empty($det['erros'])) {
+                $html .= "<div class='text-danger mt-1' style='font-size:0.9em; background:#fff0f0; padding:5px; border-radius:3px;'>";
+                foreach ($det['erros'] as $err) {
+                    $html .= "<div>• $err</div>";
+                }
+                $html .= "</div>";
+            }
+            $html .= "</td>";
+            $html .= "</tr>";
+        }
+        $html .= "</tbody></table>";
+    }
+
+    $html .= "</div></div>"; // Fim Card
+
+    echo $html;
 }

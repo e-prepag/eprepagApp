@@ -102,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</div>
 	</nav>
     <h2 class="titulo-vencimento">Gerar Abertura - E-Financeira</h2>
+    <div class="alert alert-info">Enviar abertura antes de enviar as movimentações.</div>
     <?php if ($erro): ?>
         <div class="erro"><?= $erro ?></div>
     <?php endif; ?>

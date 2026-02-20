@@ -35,14 +35,19 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 		</div>
 	</nav>
 	<h2 class="titulo-vencimento">Enviar Lotes - E-Financeira</h2>
+	<div class="alert alert-info">
+		Você pode enviar um arquivo <strong>XML</strong> ou um arquivo <strong>ZIP contendo vários XMLs (lotes)</strong>.
+		Os arquivos enviados serão <strong>assinados digitalmente e criptografados automaticamente</strong>.
+	</div>
+
+	<div class="alert alert-warning">
+		<strong>Importante:</strong> Se enviar um arquivo ZIP, inclua <strong>no máximo 5 XMLs</strong>.
+		No mês de <strong>dezembro</strong>, são gerados muitos lotes, e quantidade de arquivos grande podem causar falhas no processamento.
+	</div>
 	<form id="formEnvio" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
-				<label for="arquivo">Envie um XML ou um ZIP: <span class="help-icon">?
-						<span class="tooltiptext">
-							O ZIP contém os XMLs dos lotes, o lote será criptografado e assinado automaticamente com o envio, após enviar, será possível fazer o download dos retornos.
-						</span>
-					</span>
+				<label for="arquivo">Envie um XML ou um ZIP:
 				</label>
 				<input id="arquivo" name="arquivo"
 					type="file">
@@ -51,7 +56,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_teste.php";
 		</div>
 
 		<div class="d-flex top10 custom-justify">
-			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
+			<button type="submit" class="btn btn-success btn-busca">Enviar</button>
 		</div>
 
 	</form>

@@ -76,7 +76,7 @@ app.MapPost("/criptografar", async (HttpRequest request, CriptografadorService c
 
         var form = await request.ReadFormAsync();
         var xml = form["xml"].ToString();
-        var certPath;
+        var certPath = "";
         if(form["prod"].ToString() == "true"){
             certPath = "/certs/efinanceira-receita-fazenda-gov-br-2025.cer";
         }else{

@@ -9,6 +9,11 @@ $data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
 $data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
 $sel_tipo = $_GET['sel_tipo'] ?? "pretty";
 
+// --- VARIÁVEIS DE PAGINAÇÃO ---
+$limite_registros = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+$pagina_atual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
+$offset = ($pagina_atual - 1) * $limite_registros;
+
 $data_atual = date('Y-m');
 
 ?>
@@ -45,7 +50,11 @@ $data_atual = date('Y-m');
 		</div>
 	</nav>
 	<h2 class="titulo-vencimento">Gerar movimentações - E-Financeira</h2>
+	<div class="alert alert-warning">
+		<strong>Importante:</strong> O mês de dezembro gera movimentações para todos os usuários, então é normal possuir muitos arquivos.
+	</div>
 	<form id="form1" action="#" method="get" class="form-solicitacoes">
+		<input type="hidden" name="limit" value="<?php echo $limite_registros; ?>">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
 				<label for="dt_inicial">Início período
@@ -72,13 +81,14 @@ $data_atual = date('Y-m');
 		<div class="d-flex top10 custom-justify">
 			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
 				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=movimentacoes"
-					target="_blank">Baixar Lotes</a>
+					href="gerar_zip.php?data_inicial=<?= urlencode($data_inicial) ?>&data_final=<?= urlencode($data_final) ?>&acao=movimentacoes"
+					target="_blank">Baixar Todos os Lotes</a><span class="help-icon">?
+						<span class="tooltiptext">
+							Baixar um ZIP de todos os eventos no período separados em lotes XMLs com 50 eventos no máximo
+						</span>
+					</span>
 			<?php } ?>
-			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
+			<button type="submit" class="btn btn-success btn-busca">Buscar Lotes</button>
 		</div>
 
 	</form>
@@ -86,30 +96,82 @@ $data_atual = date('Y-m');
 </div>
 <div style="overflow-x: auto; padding-top: 20px;">
 	<div class="relatorio-info">
-		<div><strong>Data:</strong> <?php echo date('d/m/Y H:m:i'); ?></div>
+		<div><strong>Data:</strong> <?php echo date('d/m/Y H:i:s'); ?></div>
 	</div>
 
 	<?php
 	require_once __DIR__ . "/functions_e_financeira.php";
 	$efinanceira = new GerarEFinanceira();
+
+	$dados = [];
+	$quantidade_registros_reais = 0; // Nova variável para guardar a contagem real
+	$tem_proxima_pagina = false;
+
 	if (!empty($data_inicial) && !empty($data_final)) {
 		if ($sel_tipo == 'xml') {
-			$dados = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final);
-			
-			$contador = 0;
-			foreach ($dados as $dado) {
-				echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
-				if($contador++ == 20){
-					echo '<div class="alert alert-warning">Muitas movimentações geradas, por favor, baixe os XMLs para visualizar todas.</div>';
-					break;
+			$resultado = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final, $limite_registros, $offset);
+			$dados = $resultado['xmls'];
+			$quantidade_registros_reais = $resultado['total_eventos'];
+
+			if (empty($dados)) {
+				echo '<div class="alert alert-info">Nenhum registro encontrado nesta página.</div>';
+			} else {
+				foreach ($dados as $dado) {
+					echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
 				}
 			}
 		} else if ($sel_tipo == 'pretty') {
-			$dados = $efinanceira->gerarMovimentacaoFinanceiraCompletaDados($data_inicial, $data_final);
-			echo gerarRelatorioPorCompetencia($dados);
+			$dados = $efinanceira->gerarMovimentacaoFinanceiraCompletaDados($data_inicial, $data_final, $limite_registros, $offset);
+
+			if (empty($dados)) {
+				echo '<div class="alert alert-info">Nenhum registro encontrado nesta página.</div>';
+			} else {
+				// Conta os eventos reais dentro do array agrupado do "pretty"
+				foreach ($dados as $mes => $eventos) {
+					$quantidade_registros_reais += count($eventos);
+				}
+				echo gerarRelatorioPorCompetencia($dados);
+			}
+		}
+
+		// A métrica agora avalia a contagem REAL dos arrays internos
+		if ($quantidade_registros_reais >= 1) {
+			$tem_proxima_pagina = true;
 		}
 	}
 	?>
+
+	<?php if (!empty($data_inicial) && !empty($data_final)): ?>
+		<div class="paginacao" style="margin-top: 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
+			<div>
+				<?php if ($pagina_atual > 1): ?>
+					<a href="?dt_inicial=<?= urlencode($data_inicial) ?>&dt_final=<?= urlencode($data_final) ?>&sel_tipo=<?= urlencode($sel_tipo) ?>&limit=<?= $limite_registros ?>&pagina=<?= $pagina_atual - 1 ?>" class="btn btn-primary">&laquo; Anterior</a>
+				<?php else: ?>
+					<button class="btn btn-default" disabled>&laquo; Anterior</button>
+				<?php endif; ?>
+			</div>
+			<div style="text-align: center;">
+				<strong>Página <?= $pagina_atual ?></strong><br>
+				<span style="color: #666; font-size: 0.9em;">
+					<?php if ($pagina_atual == 1 && !$tem_proxima_pagina): ?>
+						(Exibindo todos os resultados)
+					<?php elseif (!$tem_proxima_pagina): ?>
+						(Última página - Fim dos resultados)
+					<?php else: ?>
+						(Mostrando até <?= $limite_registros ?> registros)
+					<?php endif; ?>
+				</span>
+			</div>
+			<div>
+				<?php if ($tem_proxima_pagina): ?>
+					<a href="?dt_inicial=<?= urlencode($data_inicial) ?>&dt_final=<?= urlencode($data_final) ?>&sel_tipo=<?= urlencode($sel_tipo) ?>&limit=<?= $limite_registros ?>&pagina=<?= $pagina_atual + 1 ?>" class="btn btn-primary">Próximo &raquo;</a>
+				<?php else: ?>
+					<button class="btn btn-default" disabled>Próximo &raquo;</button>
+				<?php endif; ?>
+			</div>
+		</div>
+	<?php endif; ?>
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
@@ -130,20 +192,18 @@ $data_atual = date('Y-m');
 			icon.addEventListener('click', () => {
 				const tooltip = icon.querySelector('.tooltiptext');
 
-				// Remove outros tooltips visíveis
 				document.querySelectorAll('.tooltiptext.show').forEach(other => {
 					if (other !== tooltip) other.classList.remove('show');
 				});
 
 				tooltip.classList.add('show');
 
-				// Remove após 3 segundos
 				setTimeout(() => {
 					tooltip.classList.remove('show');
 				}, 3000);
 			});
 		});
-		
+
 	});
 </script>
 <?php

@@ -41,7 +41,6 @@ $data_atual = date('Y-m');
 	<form id="formConsulta" action="#" method="post" class="form-solicitacoes">
 
 		<div class="container-cancel-pins">
-
 			<div class="col-cancel-pins">
 				<label for="sel_consulta">Tipo de Consulta</label>
 				<select id="sel_consulta" name="sel_consulta" class="form-control" onchange="atualizarCampos()">
@@ -51,22 +50,6 @@ $data_atual = date('Y-m');
 					<option value="mov_fin" <?php echo ($sel_consulta == 'mov_fin' ? 'selected' : ''); ?>>Mov. Operação Financeira (Mensal)</option>
 				</select>
 			</div>
-
-			<div class="col-cancel-pins">
-				<label for="ambiente">Ambiente</label>
-				<select id="ambiente" name="ambiente" class="form-control">
-					<option value="homologacao" <?php echo ($ambiente == 'homologacao' ? 'selected' : ''); ?>>Pre-Produção (Homologação)</option>
-					<option value="producao" <?php echo ($ambiente == 'producao' ? 'selected' : ''); ?>>Produção</option>
-				</select>
-			</div>
-
-			<div class="col-cancel-pins">
-				<label for="sel_tipo_visualizacao">Visualização</label>
-				<select id="sel_tipo_visualizacao" name="sel_tipo_visualizacao" class="form-control">
-					<option value="pretty" <?php echo ($sel_tipo_visualizacao == "pretty" ? "selected" : ""); ?>>Simplificada</option>
-					<option value="xml" <?php echo ($sel_tipo_visualizacao == "xml" ? "selected" : ""); ?>>XML Puro</option>
-				</select>
-			</div>
 		</div>
 
 		<div class="container-cancel-pins">
@@ -74,11 +57,6 @@ $data_atual = date('Y-m');
 			<div class="col-cancel-pins group-dynamic" id="grp_lote">
 				<label for="numero_lote">Número do Protocolo</label>
 				<input type="text" id="numero_lote" name="numero_lote" class="form-control" placeholder="Apenas números">
-			</div>
-
-			<div class="col-cancel-pins group-dynamic" id="grp_cnpj" style="display:none;">
-				<label for="cnpj">CNPJ do Declarante</label>
-				<input type="text" id="cnpj" name="cnpj" class="form-control" placeholder="00.000.000/0000-00">
 			</div>
 
 			<div class="col-cancel-pins group-dynamic" id="grp_situacao" style="display:none;">
@@ -223,14 +201,11 @@ $data_atual = date('Y-m');
 		if (tipo === 'lote') {
 			setDisplay('grp_lote', true);
 		} else if (tipo === 'cadastro') {
-			setDisplay('grp_cnpj', true);
 		} else if (tipo === 'lista') {
-			setDisplay('grp_cnpj', true);
 			setDisplay('grp_situacao', true); // Mostra o select populado com Caso A
 			setDisplay('grp_data_ini', true);
 			setDisplay('grp_data_fim', true);
 		} else if (tipo === 'mov_fin' || tipo === 'mov_fin_anual') {
-			setDisplay('grp_cnpj', true);
 			setDisplay('grp_situacao', true); // Mostra o select populado com Caso B
 			setDisplay('grp_mes_ini', true);
 			setDisplay('grp_mes_fim', true);

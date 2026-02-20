@@ -129,11 +129,13 @@ function gerarRelatorioPorCompetencia(array $dados)
         .table-contas th { background-color: #f8f9fa; text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6; color: #495057; }
         .table-contas td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
         .col-money { text-align: right; font-family: Consolas, monospace; }
+        .col-center { text-align: center; }
         
         .val-entrada { color: #28a745; }
         .val-saida { color: #dc3545; }
-        .val-saldo { font-weight: bold; }
+        .val-saldo { font-weight: bold; color: #17a2b8; }
         .badge-relacao { background: #17a2b8; color: white; font-size: 0.75em; padding: 2px 5px; border-radius: 3px; }
+        .badge-inativo { background: #dc3545; color: white; font-size: 0.75em; padding: 2px 5px; border-radius: 3px; }
     </style>';
 
     $html .= '<div class="rel-container">';
@@ -183,15 +185,30 @@ function gerarRelatorioPorCompetencia(array $dados)
                                 <th>Relação</th>
                                 <th class="col-money">Entradas</th>
                                 <th class="col-money">Saídas</th>
+                                <th class="col-money">Saldo Últ. Dia</th>
+                                <th class="col-center">Encerramento</th>
                             </tr>
                           </thead><tbody>';
 
                 foreach ($registro['contas'] as $conta) {
                     $entradas = (float)$conta['entradas'];
                     $saidas   = (float)$conta['saidas'];
-                    $saldo    = $entradas - $saidas;
+                    
+                    // LÓGICA DO SALDO (vlrUltDia)
+                    $vlrUltDiaHtml = '-';
+                    if (((int)$conta['ug_ativo'] !== 1 && date('Ym', strtotime($conta['ug_data_encerramento_conta'])) == $anoMes) || (int)$mes === 12) {
+                        $vlrUltDia = (float)($conta['vlrUltDia'] ?? 0);
+                        $vlrUltDiaHtml = 'R$ ' . number_format($vlrUltDia, 2, ',', '.');
+                    }
 
-                    $classeSaldo = $saldo >= 0 ? 'val-entrada' : 'val-saida';
+                    // LÓGICA DO ENCERRAMENTO (dtEncerramentoConta)
+                    $dtEncerramentoHtml = '-';
+                    if ((int)$conta['ug_ativo'] !== 1) {
+                        if (!empty($conta['ug_data_encerramento_conta']) && date('Ym', strtotime($conta['ug_data_encerramento_conta'])) == $anoMes) {
+                            // Converte a data do banco para o padrão brasileiro DD/MM/YYYY
+                            $dtEncerramentoHtml = '<span class="badge-inativo">' . date('d/m/Y', strtotime($conta['ug_data_encerramento_conta'])) . '</span>';
+                        }
+                    }
 
                     $html .= '<tr>';
                     $html .= '  <td><strong>' . htmlspecialchars($conta['ug_id']) . '</strong></td>';
@@ -206,6 +223,11 @@ function gerarRelatorioPorCompetencia(array $dados)
 
                     $html .= '  <td class="col-money val-entrada">R$ ' . number_format($entradas, 2, ',', '.') . '</td>';
                     $html .= '  <td class="col-money val-saida">R$ ' . number_format($saidas, 2, ',', '.') . '</td>';
+                    
+                    // Novas colunas adicionadas aqui
+                    $html .= '  <td class="col-money val-saldo">' . $vlrUltDiaHtml . '</td>';
+                    $html .= '  <td class="col-center">' . $dtEncerramentoHtml . '</td>';
+                    
                     $html .= '</tr>';
                 }
                 $html .= '</tbody></table>';
@@ -224,7 +246,7 @@ function gerarRelatorioPorCompetencia(array $dados)
     return $html;
 }
 
-function gerarZipLotes(array $lotes, string $nomeZip): string
+function gerarZipLotes(array &$lotes, string $nomeZip): string
 {
     $dirTemp = sys_get_temp_dir();
     $zipPath = $dirTemp . '/' . $nomeZip;
@@ -235,170 +257,25 @@ function gerarZipLotes(array $lotes, string $nomeZip): string
         throw new Exception('Não foi possível criar o ZIP');
     }
 
-    foreach ($lotes as $lote) {
+    foreach ($lotes as $key => $lote) {
 
         $nomeArquivo = "lote_{$lote['ano_mes']}_{$lote['lote_numero']}";
 
+        // Jogamos o conteúdo direto para o ZIP, sem criar a variável $conteudo
         if ($lote['xml'] instanceof DOMDocument) {
-            $conteudo = $lote['xml']->saveXML();
+            $zip->addFromString($nomeArquivo . '.xml', $lote['xml']->saveXML());
         } elseif (is_string($lote['xml'])) {
-            $conteudo = $lote['xml'];
+            $zip->addFromString($nomeArquivo . '.xml', $lote['xml']);
         } else {
             throw new Exception('XML inválido para o arquivo ' . $nomeArquivo);
         }
 
-        $zip->addFromString($nomeArquivo . '.xml', $conteudo);
+        unset($lotes[$key]);
     }
 
     $zip->close();
 
     return $zipPath;
-}
-
-function enviarLotesEfinanceira(array $lotes)
-{
-    $efinanceira = new GerarEFinanceira();
-
-    // Caminhos das pastas
-    $pathLotesEnviados = '/www/arquivos_gerados/efinanceira/lotes_enviados';
-    $pathRespostas     = '/www/arquivos_gerados/efinanceira/respostas_envio';
-
-    // Garante criação das pastas
-    if (!is_dir($pathLotesEnviados)) mkdir($pathLotesEnviados, 0755, true);
-    if (!is_dir($pathRespostas))     mkdir($pathRespostas, 0755, true);
-
-    foreach ($lotes as $lote) {
-
-        $nomeArquivoOriginal = $lote['nome'];
-        $conteudoXmlOriginal = $lote['conteudo'];
-
-        if (empty($nomeArquivoOriginal) || empty($conteudoXmlOriginal)) {
-            echo "Arquivo ou conteúdo vazio, pulando";
-            continue;
-        }
-
-        try {
-            echo "<h4>Processando: $nomeArquivoOriginal</h4>";
-
-            $lote_assinado      = $efinanceira->assinarLoteEventos($conteudoXmlOriginal);
-            $lote_criptografado = $efinanceira->criptografarLoteEF($lote_assinado);
-
-            $xmlRespostaString = $efinanceira->enviarLoteEFinanceira($lote_criptografado);
-
-            if ($xmlRespostaString) {
-
-                // Limpa namespaces para facilitar leitura
-                $xmlRespLimpo = str_replace('xmlns=', 'ns=', $xmlRespostaString);
-                $xmlRespObj   = simplexml_load_string($xmlRespLimpo);
-
-                // --- VERIFICAÇÃO DE STATUS (cdResposta) ---
-                $nodeCdResposta = $xmlRespObj->xpath("//*[local-name()='cdResposta']");
-                $cdResposta = $nodeCdResposta ? (int)$nodeCdResposta[0] : 0;
-
-                // Pegamos a descrição da resposta principal
-                $nodeDescResposta = $xmlRespObj->xpath("//*[local-name()='descResposta']");
-                $descResposta = $nodeDescResposta ? (string)$nodeDescResposta[0] : 'Sem descrição';
-
-                // SE FOR SUCESSO (1)
-                if ($cdResposta === 1) {
-
-                    // Extrair Protocolo
-                    $protocolo = null;
-                    $nodeProtocolo = $xmlRespObj->xpath("//*[local-name()='protocoloEnvio']");
-
-                    if (!empty($nodeProtocolo)) {
-                        $protocolo = (string)$nodeProtocolo[0];
-                    }
-
-                    echo "<div class='alert alert-success'>";
-                    echo "Status: <strong>Sucesso</strong><br>";
-                    echo "Protocolo: <strong>" . ($protocolo ? $protocolo : "NÃO GERADO") . "</strong>";
-                    echo "</div>";
-
-                    if ($protocolo) {
-                        // 1. Salvar Arquivos
-                        file_put_contents(
-                            $pathLotesEnviados . DIRECTORY_SEPARATOR . $nomeArquivoOriginal,
-                            $lote_assinado
-                        );
-
-                        $nomeArquivoResposta = pathinfo($nomeArquivoOriginal, PATHINFO_FILENAME) . "_resposta.xml";
-                        file_put_contents(
-                            $pathRespostas . DIRECTORY_SEPARATOR . $nomeArquivoResposta,
-                            $xmlRespostaString
-                        );
-
-                        // 2. Atualizar Banco de Dados
-                        $xmlLoteLimpo = str_replace(['xmlns=', 'eFinanceira:'], ['ns=', ''], $conteudoXmlOriginal);
-                        $xmlLoteObj   = simplexml_load_string($xmlLoteLimpo);
-
-                        $eventos = $xmlLoteObj->xpath("//evento");
-
-                        $idsParaAtualizar = [];
-                        foreach ($eventos as $evento) {
-                            $idString = (string)$evento['id'];
-
-                            // Remove o prefixo
-                            $idLimpo = (int) substr($idString, 3);
-
-                            if ($idLimpo) {
-                                $idsParaAtualizar[] = $idLimpo;
-                            }
-                        }
-                        if (!empty($idsParaAtualizar)) {
-                            try {
-                                $totalAtualizados = $efinanceira->atualizarLoteParaEnviado(
-                                    $idsParaAtualizar,
-                                    $protocolo,
-                                    $nomeArquivoOriginal
-                                );
-
-                                echo "<span style='color:green'>Sucesso! Total de eventos atualizados: <strong>$totalAtualizados</strong></span><br>";
-                            } catch (Exception $e) {
-                                echo "<span style='color:red'>Erro ao atualizar lote: " . $e->getMessage() . "</span><br>";
-                            }
-                        } else {
-                            echo "<span style='color:orange'>Nenhum ID válido encontrado para atualizar.</span><br>";
-                        }
-                    } else {
-                        echo "<div class='alert alert-warning'>Atenção: Protocolo não encontrado apesar do sucesso. Nada salvo.</div>";
-                    }
-                } else {
-                    // --- SE FOR ERRO (DIFERENTE DE 1) ---
-                    echo "<div class='alert alert-danger'>";
-                    echo "<h4>Erro no Envio (Cód: " . utf8_decode($cdResposta) . ")</h4>";
-                    echo "<p><strong>Mensagem:</strong> " . utf8_decode($descResposta) . "</p>";
-
-                    // Busca ocorrências de erro
-                    $ocorrencias = $xmlRespObj->xpath("//*[local-name()='ocorrencia']");
-
-                    if (!empty($ocorrencias)) {
-                        echo "<hr><strong>Detalhes das Ocorrências:</strong><ul>";
-                        foreach ($ocorrencias as $oco) {
-                            echo "<li>";
-                            echo "<strong>Código:</strong> " . utf8_decode($oco->codigo) . "<br>";
-                            echo "<strong>Tipo:</strong> " . utf8_decode($oco->tipo) . "<br>";
-                            echo "<strong>Descrição:</strong> " . utf8_decode($oco->descricao);
-                            echo "</li><br>";
-                        }
-                        echo "</ul>";
-                    }
-                    echo "</div>";
-                    echo "<strong>Atenção:</strong> O banco de dados NÃO foi atualizado e os arquivos NÃO foram salvos devido ao erro.";
-                }
-
-                // Visualização do XML de Resposta (Sempre útil, mesmo com erro)
-                echo xmlViewer($xmlRespostaString, "Resposta Recebida ($nomeArquivoOriginal)");
-            } else {
-                echo "<div class='alert alert-warning'>Sem resposta do servidor para o arquivo $nomeArquivoOriginal</div>";
-            }
-        } catch (Exception $e) {
-            echo "<div class='alert alert-danger'>Erro crítico ao processar $nomeArquivoOriginal: " . $e->getMessage() . "</div>";
-            echo "<pre>" . htmlentities($conteudoXmlOriginal) . "</pre>";
-        }
-
-        echo "<hr>";
-    }
 }
 
 function extrairZip(string $caminhoZip, string $destino): array

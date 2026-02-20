@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($erro): ?>
         <div class="erro"><?= $erro ?></div>
     <?php endif; ?>
-    <div>Enviar o fechamento apenas após enviar todas as movimentações</div>
+    <div class="alert alert-info">Enviar o fechamento apenas após enviar todas as movimentações.</div>
     <form id="form1" action="#" method="post" class="form-solicitacoes">
         <div class="container-cancel-pins">
             <div class="col-cancel-pins">

@@ -6,7 +6,7 @@ require_once '/www/includes/load_dotenv.php';
 class GerarEFinanceira
 {
 
-    private $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    public $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $razaoEPP;  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $enderecoEPP;    // Endereço da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $bairroEPP;
@@ -88,8 +88,7 @@ class GerarEFinanceira
 
     public function obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
     {
-
-        $sql_limit_offset = ($offset != null && $limit != null) ? "LIMIT :limit OFFSET :offset" : "";
+        $sql_limit_offset = ($offset !== null && $limit !== null) ? "LIMIT :limit OFFSET :offset" : "";
 
         $pdo = ConnectionPDO::getConnection()->getLink();
         $sql = "WITH -- Busca todas as movimentações no período, sem filtrar status do usuário ainda
@@ -254,7 +253,7 @@ class GerarEFinanceira
         $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmt->bindParam(':data_inicio', $inicio);
         $stmt->bindParam(':data_fim', $fim);
-        if($offset != null && $limit != null){
+        if ($offset !== null && $limit !== null) {
             $stmt->bindParam(':limit', $limit);
             $stmt->bindParam(':offset', $offset);
         }
@@ -266,7 +265,7 @@ class GerarEFinanceira
     {
         $pdo = ConnectionPDO::getConnection()->getLink();
 
-        $sql_limit_offset = ($offset != null && $limit != null) ? "LIMIT :limit OFFSET :offset" : "";
+        $sql_limit_offset = ($offset !== null && $limit !== null) ? "LIMIT :limit OFFSET :offset" : "";
 
         $sqlReprLegal = "WITH 
                             -- Movimentação bruta (sem filtro de status)
@@ -549,7 +548,7 @@ class GerarEFinanceira
         $stmtReprLegal->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmtReprLegal->bindParam(':data_inicio', $inicio);
         $stmtReprLegal->bindParam(':data_fim', $fim);
-        if($offset != null && $limit != null){
+        if ($offset !== null && $limit !== null) {
             $stmtReprLegal->bindParam(':limit', $limit);
             $stmtReprLegal->bindParam(':offset', $offset);
         }
@@ -560,12 +559,13 @@ class GerarEFinanceira
         $stmtPFTitular->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmtPFTitular->bindParam(':data_inicio', $inicio);
         $stmtPFTitular->bindParam(':data_fim', $fim);
+        if ($offset !== null && $limit !== null) {
+            $stmtPFTitular->bindParam(':limit', $limit);
+            $stmtPFTitular->bindParam(':offset', $offset);
+        }
         $stmtPFTitular->execute();
         $resultPFTitular = $stmtPFTitular->fetchAll(PDO::FETCH_ASSOC);
-        if($offset != null && $limit != null){
-            $stmtReprLegal->bindParam(':limit', $limit);
-            $stmtReprLegal->bindParam(':offset', $offset);
-        }
+
         return array_merge($resultReprLegal, $resultPFTitular);
     }
 
@@ -711,9 +711,6 @@ class GerarEFinanceira
                         'ug_cidade'                  => $registro['ug_cidade'],
                         'ug_estado'                  => $registro['ug_estado'],
                         'ug_cep'                     => $registro['ug_cep'],
-                        'ug_ativo'                   => $registro['ug_ativo'],
-                        'ug_data_encerramento_conta' => $registro['ug_data_encerramento_conta'],
-                        'vlrUltDia'                  => $registro['vlrultdia'],
                     ],
                     'contas' => [] // Cria a lista de contas para este mês
                 ];
@@ -722,10 +719,13 @@ class GerarEFinanceira
             // 3. Adiciona a conta atual (a linha do SQL) na lista de 'contas'
             //    daquele Declarado/Mês
             $agrupados[$chaveDeclarado][$chaveMes]['contas'][] = [
-                'ug_id'          => $registro['id_conta'],
-                'tipo_relacao'        => $registro['tp_relacao'],
-                'entradas'          => $registro['entradas_conta'], // Nome padronizado
-                'saidas'            => $registro['saidas_conta'],   // Nome padronizado
+                'ug_id'                      => $registro['id_conta'],
+                'tipo_relacao'               => $registro['tp_relacao'],
+                'entradas'                   => $registro['entradas_conta'], // Nome padronizado
+                'saidas'                     => $registro['saidas_conta'],   // Nome padronizado
+                'ug_data_encerramento_conta' => $registro['ug_data_encerramento_conta'],
+                'vlrUltDia'                  => $registro['vlrultdia'],
+                'ug_ativo'                   => $registro['ug_ativo'],
             ];
         }
 
@@ -876,6 +876,7 @@ class GerarEFinanceira
         $sqlSelect = "SELECT id, data_anomes, cpfcnpj_declarado 
               FROM public.envios_e_financeira 
               WHERE tipo = 'MOVIMENTACAO' 
+              AND status_envio <> 'ERRO'
               AND retificado = false 
               AND (data_anomes, cpfcnpj_declarado) IN (" . implode(',', $tupleStr) . ")";
 
@@ -952,7 +953,7 @@ class GerarEFinanceira
         }
     }
 
-    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
+    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim, $limit = null, $offset = null)
     {
         $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
         $data_fim = DateTime::createFromFormat('Y-m', $fim);
@@ -971,8 +972,8 @@ class GerarEFinanceira
         // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim);
-        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim);
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         unset($dadosPJ);
@@ -994,18 +995,6 @@ class GerarEFinanceira
                 }
                 // CRIA O XML (ou o objeto XML/Evento)
 
-                $ug_data_encerramento_conta = null;
-                $vlrUltDia = null;
-                if ((int) $registro['dadosDeclarado']['ug_ativo'] != 1 && date('Ym', strtotime($registro['dadosDeclarado']['ug_data_encerramento_conta'])) == $mes) {
-                    $ug_data_encerramento_conta = $registro['dadosDeclarado']['ug_data_encerramento_conta'];
-                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
-                    echo "passou dados $vlrUltDia";
-                }
-                if (substr($mes, 4, 2) == '12') {
-                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
-                    echo "passou dados $vlrUltDia";
-                }
-
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
@@ -1022,9 +1011,7 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas'],
-                    $ug_data_encerramento_conta,
-                    $vlrUltDia
+                    $registro['contas']
                 );
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
@@ -1043,18 +1030,6 @@ class GerarEFinanceira
                 }
                 // CRIA O XML (ou o objeto XML/Evento)
 
-                $ug_data_encerramento_conta = null;
-                $vlrUltDia = null;
-                if ((int) $registro['dadosDeclarado']['ug_ativo'] != 1 && date('Ym', strtotime($registro['dadosDeclarado']['ug_data_encerramento_conta'])) == $mes) {
-                    $ug_data_encerramento_conta = $registro['dadosDeclarado']['ug_data_encerramento_conta'];
-                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
-                    echo "passou dados $vlrUltDia";
-                }
-                if (substr($mes, 4, 2) == '12') {
-                    $vlrUltDia = $registro['dadosDeclarado']['vlrUltDia'];
-                    echo "passou dados $vlrUltDia";
-                }
-
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
@@ -1071,9 +1046,7 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas'],
-                    $ug_data_encerramento_conta,
-                    $vlrUltDia
+                    $registro['contas']
                 );
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
@@ -1086,7 +1059,7 @@ class GerarEFinanceira
         return $movimentacoesAgrupadasPorMes;
     }
 
-    public function gerarMovimentacaoFinanceiraCompletaDados($inicio, $fim)
+    public function gerarMovimentacaoFinanceiraCompletaDados($inicio, $fim, $limit = null, $offset = null)
     {
         $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
         $data_fim = DateTime::createFromFormat('Y-m', $fim);
@@ -1103,13 +1076,16 @@ class GerarEFinanceira
         // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim);
-        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim);
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         unset($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
         unset($dadosPF);
+
+        $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
+        $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
 
         // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
@@ -1163,19 +1139,31 @@ class GerarEFinanceira
             return 0; // erro na data
         }
     }
-    public function gerarXmlMovimentacao($data_inicial, $data_final)
+    public function gerarXmlMovimentacao($data_inicial, $data_final, $limit = null, $offset = null)
     {
         if ($this->compararDatas($data_inicial, $data_final) < 1) {
-            return [];
+            return ['xmls' => [], 'total_eventos' => 0];
         }
 
-        $efinanceira = new GerarEFinanceira();
+        // Chama o método para pegar os dados brutos agrupados por mês
+        $movimentacoes = $this->gerarMovimentacaoFinanceiraCompleta($data_inicial, $data_final, $limit, $offset);
 
-        $movimentacoes = $efinanceira->gerarMovimentacaoFinanceiraCompleta($data_inicial, $data_final);
+        // CONTAGEM EXATA: Soma a quantidade de eventos dentro de cada mês
+        $total_eventos = 0;
+        if (is_array($movimentacoes)) {
+            foreach ($movimentacoes as $mes => $eventos) {
+                $total_eventos += count($eventos);
+            }
+        }
 
-        $xmls = $efinanceira->gerarLotesMovsFinanceira($movimentacoes);
+        // Transforma em XML
+        $xmls = $this->gerarLotesMovsFinanceira($movimentacoes);
 
-        return $xmls;
+        // Retorna os XMLs e a quantidade real de linhas do banco
+        return [
+            'xmls' => $xmls,
+            'total_eventos' => $total_eventos
+        ];
     }
 
     public function gerarLotesMovsFinanceira(array &$movimentacoes, $tamanhoLote = 50, $debug = false)
@@ -1279,6 +1267,7 @@ class GerarEFinanceira
             WHERE data_anomes = :anomes 
               AND cpfcnpj_declarado = :cpfcnpj 
               AND tipo = 'MOVIMENTACAO'
+              AND status_envio <> 'ERRO'
               AND retificado = false
             LIMIT 1";
 
@@ -1322,6 +1311,7 @@ class GerarEFinanceira
         $sql = "SELECT id FROM public.envios_e_financeira 
             WHERE data_anomes = :anomes 
               AND tipo = 'ABERTURA'
+              AND status_envio <> 'ERRO'
               AND retificado = false
             LIMIT 1";
 
@@ -1363,6 +1353,7 @@ class GerarEFinanceira
         $sql = "SELECT id FROM public.envios_e_financeira 
             WHERE data_anomes = :anomes 
               AND tipo = 'FECHAMENTO'
+              AND status_envio <> 'ERRO'
               AND retificado = false
             LIMIT 1";
 
@@ -1396,6 +1387,15 @@ class GerarEFinanceira
         return $this->criarEnvioFinanceira($dadosParaCriar);
     }
 
+    public function limparTextoSped($texto, $tamanhoMaximo)
+    {
+        $proibidos = ['"', "'", '--', '#'];
+        $textoLimpo = str_replace($proibidos, '', $texto);
+        $textoCortado = substr($textoLimpo, 0, $tamanhoMaximo);
+
+        return htmlspecialchars($textoCortado, ENT_QUOTES | ENT_XML1, 'UTF-8');
+    }
+
     /**
      * @param array{
      *     ug_id: int|string,
@@ -1404,7 +1404,7 @@ class GerarEFinanceira
      *     tipo_relacao: string
      * } $contas_user
      */
-    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user, $data_encerramento = null, $vlr_ult_dia = null)
+    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -1475,17 +1475,27 @@ class GerarEFinanceira
         $ideDeclarado->appendChild($NIDeclarado);
 
         // NomeDeclarado
-        $NomeDeclarado = $dom->createElementNS($namespace, 'NomeDeclarado', substr($nomeDeclarado, 0, 100));
+        $NomeDeclarado = $dom->createElementNS(
+            $namespace,
+            'NomeDeclarado',
+            $this->limparTextoSped($nomeDeclarado, 100)
+        );
         $ideDeclarado->appendChild($NomeDeclarado);
 
-        if ($tipoNI == 1) {
-            // DataNasc
-            $DataNasc = $dom->createElementNS($namespace, 'DataNasc', $dataNascimento);
-            $ideDeclarado->appendChild($DataNasc);
+        if ($tipoNI == 1 && !empty($dataNascimento)) {
+            // Valida se a data é maior ou igual a 01/01/1900
+            if (strtotime($dataNascimento) >= strtotime('1900-01-01')) {
+                $DataNasc = $dom->createElementNS($namespace, 'DataNasc', $dataNascimento);
+                $ideDeclarado->appendChild($DataNasc);
+            }
         }
 
         // EnderecoLivre
-        $EnderecoLivre = $dom->createElementNS($namespace, 'EnderecoLivre', substr($enderecoCliente, 0, 200));
+        $EnderecoLivre = $dom->createElementNS(
+            $namespace,
+            'EnderecoLivre',
+            $this->limparTextoSped($enderecoCliente, 200)
+        );
         $ideDeclarado->appendChild($EnderecoLivre);
 
         if ($enderecoCliente == "Endereco cliente nao encontrado") {
@@ -1520,6 +1530,9 @@ class GerarEFinanceira
             $entradas = $conta_user['entradas'];
             $saidas = $conta_user['saidas'];
             $tipo_relacao = $conta_user['tipo_relacao'];
+            $data_encerramento = $conta_user['ug_data_encerramento_conta'];
+            $vlr_ult_dia = $conta_user['vlrUltDia'];
+            $ug_ativo = $conta_user['ug_ativo'];
 
             $Conta = $dom->createElementNS($namespace, 'Conta');
             $movOpFin->appendChild($Conta);
@@ -1564,8 +1577,8 @@ class GerarEFinanceira
             $NoTitulares = $dom->createElementNS($namespace, 'NoTitulares', '1');
             $infoConta->appendChild($NoTitulares);
 
-            //dtEncerramentoConta RESOLVER DEPOIS
-            if ($data_encerramento != null) {
+            //dtEncerramentoConta
+            if ((int) $ug_ativo !== 1 && date('Ym', strtotime($data_encerramento)) == "{$ano}{$mes}") {
                 $dataFormatada = date('Y-m-d', strtotime($data_encerramento));
 
                 $dtEncerramentoConta = $dom->createElementNS($namespace, 'dtEncerramentoConta', $dataFormatada);
@@ -1596,11 +1609,10 @@ class GerarEFinanceira
             $BalancoConta->appendChild($totDebitosMesmaTitularidade);
 
             //vlrUltDia
-            if ($vlr_ult_dia != null) {
+            if (((int) $ug_ativo !== 1 && date('Ym', strtotime($data_encerramento)) == "{$ano}{$mes}") || (int) $mes == 12) {
                 $valorFormatado = number_format((float) $vlr_ult_dia, 2, ',', '');
                 $vlrUltDia = $dom->createElementNS($namespace, 'vlrUltDia', $valorFormatado);
                 $BalancoConta->appendChild($vlrUltDia);
-                echo "passou func";
             }
 
             //PgtosAcum - grupo
@@ -1917,14 +1929,12 @@ class GerarEFinanceira
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtFim', $dataFimSemestre));
         $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0'));
 
-        // Define o indicador: '1' se true, '0' se false
+        // 10. Operações Financeiras (O seu módulo principal)
         $indicador = $temMovimento ? '1' : '0';
-
         $fechamentoMovOpFinGroup = $doc->createElementNS($ns, 'FechamentoMovOpFin');
         $evtFechamento->appendChild($fechamentoMovOpFinGroup);
 
         $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'FechamentoMovOpFin', $indicador));
-
 
         return ['xml' => $doc, 'id' => $id_formatado];
     }
@@ -2677,5 +2687,70 @@ class GerarEFinanceira
         }
 
         return $resposta;
+    }
+
+    public function limparDadosTesteProducaoRestrita($cnpjDeclarante)
+    {
+        // URL fixa para o ambiente de testes (Produção Restrita) com o CNPJ na Query String
+        $urlCompleta = "https://pre-efinanceira.receita.fazenda.gov.br/recepcao/limpezaDadosTesteProducaoRestrita?cnpjDeclarante=" . urlencode($cnpjDeclarante);
+
+        // Verificar certificado
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($urlCompleta);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+
+            // Define o método HTTP como DELETE
+            CURLOPT_CUSTOMREQUEST  => "DELETE",
+
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/xml'
+            ],
+
+            // Configurações de SSL
+            CURLOPT_SSLCERT        => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE    => 'PEM',
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeouts
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha no certificado
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão cURL (limpezaDadosTeste): " . $curlError);
+        }
+
+        // Retorna tanto o código HTTP quanto a resposta para facilitar o debug
+        return [
+            'httpCode' => $httpCode,
+            'response' => $response
+        ];
     }
 }

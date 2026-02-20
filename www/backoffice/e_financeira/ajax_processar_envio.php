@@ -36,6 +36,12 @@ try {
         throw new Exception("O arquivo deve ser ZIP ou XML.");
     }
 
+    // TRAVA DE SEGURANÇA: Verifica a quantidade de arquivos extraídos
+    $quantidade_arquivos = count($lotes_xml);
+    if ($quantidade_arquivos > 15) {
+        throw new Exception("O arquivo contém {$quantidade_arquivos} XMLs. O limite máximo permitido é de 15 arquivos por envio.");
+    }
+
     if (empty($lotes_xml)) {
         throw new Exception("Nenhum arquivo XML válido encontrado.");
     }
@@ -161,9 +167,10 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
         'xml_resposta_envio' => $xmlResposta
     ];
 }
-function etapa2_monitorarProcessamento($protocolo, $producao = false) {
+function etapa2_monitorarProcessamento($protocolo, $producao = false)
+{
     $efinanceira = new GerarEFinanceira();
-    
+
     $tentativa = 0;
     $maxTentativas = 24; // 2 minutos (24 * 5s)
     $xmlFinal = null;
@@ -171,7 +178,7 @@ function etapa2_monitorarProcessamento($protocolo, $producao = false) {
 
     do {
         // Espera 5 segundos antes de consultar
-        sleep(5); 
+        sleep(5);
         $tentativa++;
 
         $xmlFinal = $efinanceira->consultarLoteEFinanceira($protocolo, $producao);
@@ -179,12 +186,12 @@ function etapa2_monitorarProcessamento($protocolo, $producao = false) {
         // Remove namespaces para leitura rápida do status
         $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlFinal);
         $obj = simplexml_load_string($xmlLimpo);
-        
+
         if ($obj === false) {
             // Se o XML vier quebrado, tenta de novo na próxima iteração
             continue;
         }
-        
+
         // Pega o status do lote
         // Caminho: eFinanceira -> retornoLoteEventosAssincrono -> status -> cdResposta
         $statusLote = (int)($obj->xpath("//status/cdResposta")[0] ?? 0);
@@ -202,18 +209,19 @@ function etapa2_monitorarProcessamento($protocolo, $producao = false) {
     return $xmlFinal;
 }
 
-function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $protocolo, $nomeArquivoOriginal) {
+function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $protocolo, $nomeArquivoOriginal)
+{
     $efinanceira = new GerarEFinanceira();
-    
+
     // 1. IO (Salvar Arquivos)
     $pathEnviados = '/www/arquivos_gerados/efinanceira/lotes_enviados';
     $pathRespostas = '/www/arquivos_gerados/efinanceira/respostas_envio';
-    
+
     if (!is_dir($pathEnviados)) mkdir($pathEnviados, 0755, true);
     if (!is_dir($pathRespostas)) mkdir($pathRespostas, 0755, true);
 
     file_put_contents($pathEnviados . '/' . $nomeArquivoOriginal, $xmlEnvioAssinado);
-    
+
     $nomeResp = pathinfo($nomeArquivoOriginal, PATHINFO_FILENAME) . "_retorno.xml";
     file_put_contents($pathRespostas . '/' . $nomeResp, $xmlProcessamento);
 
@@ -223,10 +231,11 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
 
     if (!$xmlObj) {
         return [
-            'status_lote' => 9, 
+            'status_lote' => 9,
             'mensagem_lote' => 'XML de retorno inválido ou corrompido.',
-            'detalhes' => [], 
-            'qtd_sucesso' => 0, 'qtd_erro' => 0
+            'detalhes' => [],
+            'qtd_sucesso' => 0,
+            'qtd_erro' => 0
         ];
     }
 
@@ -238,31 +247,31 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
     $detalhesEventos = [];
 
     // 3. Decisão baseada no Status do Lote
-    
+
     // Status 2 (Sucesso Total) ou 3 (Com Ocorrências) -> Vamos ler os eventos
     if ($statusGeralLote === 2 || $statusGeralLote === 3) {
-        
+
         $eventosRetorno = $xmlObj->xpath("//retornoEventos/evento");
 
         if (!empty($eventosRetorno)) {
             foreach ($eventosRetorno as $evt) {
                 // ID do Wrapper (ID100...)
                 $idEventoWrapper = (string)$evt['id'];
-                
+
                 // Busca o retornoEvento interno
                 $retornoEvento = $evt->xpath(".//retornoEvento"); // Simplificado pois removemos namespace
 
                 if (!empty($retornoEvento)) {
                     $nodeRetorno = $retornoEvento[0];
-                    
-                    $idEventoReal = (string)$nodeRetorno->attributes()->id; 
-                    $idBanco = (int)substr($idEventoReal, 3); 
-                    
+
+                    $idEventoReal = (string)$nodeRetorno->attributes()->id;
+                    $idBanco = (int)substr($idEventoReal, 3);
+
                     $descRetornoEvt = (string)($nodeRetorno->xpath("status/descRetorno")[0] ?? '');
-                    
+
                     // Verificação Definitiva de Sucesso: EXISTÊNCIA DE RECIBO
                     $recibo = (string)($nodeRetorno->xpath("dadosReciboEntrega/numeroRecibo")[0] ?? '');
-                    
+
                     // Coleta Erros/Avisos do Evento
                     $errosMsg = [];
                     $ocorrencias = $nodeRetorno->xpath("status/dadosRegistroOcorrenciaEvento/ocorrencias");
@@ -295,16 +304,16 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
                 }
             }
         }
-    } 
+    }
     // Status 4, 5, 9 -> Erros Globais (Não há eventos para processar)
     else {
         // Pega as ocorrências globais do lote, se houver
         $ocorrenciasLote = $xmlObj->xpath("//status/ocorrencias/ocorrencia");
         $errosGlobais = [];
-        foreach($ocorrenciasLote as $oc) {
+        foreach ($ocorrenciasLote as $oc) {
             $errosGlobais[] = "[LOTE] " . $oc->descricao;
         }
-        
+
         // Adiciona um item "falso" no detalhe para mostrar o erro global na tabela
         $detalhesEventos[] = [
             'id' => 'LOTE',
@@ -317,10 +326,9 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
 
     // 4. Atualização no Banco
     if (!empty($idsSucesso)) {
-        echo "passou aqui";
         $efinanceira->atualizarLoteStatus($idsSucesso, $protocolo, $nomeArquivoOriginal, 'ENVIADO');
     }
-    
+
     if (!empty($idsErro)) {
         $efinanceira->atualizarLoteStatus($idsErro, $protocolo, $nomeArquivoOriginal, 'ERRO');
     }
@@ -335,10 +343,11 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
     ];
 }
 
-function etapa4_renderizarVisualizacao($dadosProcessamento, $xmlProcessamento, $nomeArquivo) {
+function etapa4_renderizarVisualizacao($dadosProcessamento, $xmlProcessamento, $nomeArquivo)
+{
     $html = "";
     $statusLote = $dadosProcessamento['status_lote'];
-    
+
     $html .= "<div class='card mb-3'>";
     $html .= "<div class='card-header'><strong>Resultado: $nomeArquivo</strong></div>";
     $html .= "<div class='card-body'>";
@@ -348,7 +357,7 @@ function etapa4_renderizarVisualizacao($dadosProcessamento, $xmlProcessamento, $
     // 3 = Processado com Ocorrências (Amarelo/Laranja)
     // 4, 5, 9 = Erro (Vermelho)
     // 1 = Processando (Azul) - Teimou em ficar processando
-    
+
     $alertClass = 'danger';
     if ($statusLote === 2) $alertClass = 'success';
     elseif ($statusLote === 3) $alertClass = 'warning';
@@ -371,24 +380,24 @@ function etapa4_renderizarVisualizacao($dadosProcessamento, $xmlProcessamento, $
         $html .= "<table class='table table-bordered table-sm'>";
         $html .= "<thead><tr class='active'><th>ID Evento</th><th>Status</th><th>Detalhes / Recibo</th></tr></thead>";
         $html .= "<tbody>";
-        
+
         foreach ($dadosProcessamento['detalhes'] as $det) {
             $label = ($det['status_db'] == 'ENVIADO') ? 'success' : 'danger';
-            
+
             // Se for um erro global de lote, destaca a linha
             $rowClass = ($det['id'] === 'LOTE') ? 'class="danger"' : '';
-            
+
             $html .= "<tr $rowClass>";
             $html .= "<td>{$det['id']}</td>";
             $html .= "<td><span class='label label-$label'>{$det['status_db']}</span></td>";
-            
+
             $html .= "<td>";
             if (!empty($det['recibo'])) {
                 $html .= "<div><strong>Recibo:</strong> " . $det['recibo'] . "</div>";
             }
             // Mensagem principal do evento
             if (!empty($det['mensagem']) && $det['mensagem'] !== 'SUCESSO') {
-                 $html .= "<div><em>" . $det['mensagem'] . "</em></div>";
+                $html .= "<div><em>" . $det['mensagem'] . "</em></div>";
             }
             // Lista de Ocorrências
             if (!empty($det['erros'])) {
@@ -408,6 +417,6 @@ function etapa4_renderizarVisualizacao($dadosProcessamento, $xmlProcessamento, $
 
     // XML Viewer
     $html .= xmlViewer($xmlProcessamento, "xml_" . md5($nomeArquivo), true, true);
-    
+
     return $html;
 }
