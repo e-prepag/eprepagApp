@@ -6,12 +6,12 @@ require_once "../../../includes/functions.php";
 require_once "/www/includes/load_dotenv.php";
 
 $ipsBloqueados = ["65.108.44.39", "201.46.218.115", "187.65.200.122"];
-if (in_array($_SERVER["REMOTE_ADDR"], $ipsBloqueados)) {
+if (in_array(Garena::getClientIP(), $ipsBloqueados)) {
 	http_response_code(400);
 	exit;
 }
 
-/*if($_SERVER["REMOTE_ADDR"] == "191.181.57.158"){
+/*if(Garena::getClientIP() == "191.181.57.158"){
 	   //ini_set('display_errors', 1);
 	   //ini_set('display_startup_errors', 1);
 	   //error_reporting(E_ALL);
@@ -24,7 +24,7 @@ $idVenda = $_POST["vde"];
 $logEntry = sprintf(
 	"DATA: %s\rIP REQUISICAO: %s\rORIGEM: %s\r%s\r%s\r",
 	date("d-m-Y H:i:s"),
-	$_SERVER["REMOTE_ADDR"],
+	Garena::getClientIP(),
 	$_SERVER["HTTP_REFERER"],
 	json_encode($_POST),
 	str_repeat("*", 50)
@@ -56,7 +56,7 @@ if (isset($_POST["user"])) {
 
 if (!isset($_POST["dist"])) {
 
-	// if($_SERVER["REMOTE_ADDR"] == "191.181.57.158"){
+	// if(Garena::getClientIP() == "191.181.57.158"){
 	//	echo json_encode($_SERVER);
 	//	exit;
 	//}
@@ -77,7 +77,7 @@ if (!isset($_POST["dist"])) {
 
 		if (strlen($_POST["codigo"]) != 20) {
 			$mensagemRetono = json_encode(["Erro" => "Não é possivel fazer o resgate do pin enviado."]);
-			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+			Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 			echo $mensagemRetono;
 			exit;
 		}
@@ -89,18 +89,18 @@ if (!isset($_POST["dist"])) {
 			$respostaToken["code"] = 1;
 		}
 
-		//if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
+		//if(Garena::getClientIP() == "201.93.162.169"){
 		//$respostaToken = ["retorno" => true, "code" => 0];
 		//}
 
 		$dataRequisicao = date("Y-m-d");
 		if ($respostaToken["retorno"] === true) {
 
-			$verificaPinIp = Garena::verificaQtdePin($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $dataRequisicao);
-			$verificaPinIpLote = Garena::verificaLotePin($_SERVER["REMOTE_ADDR"], $dataRequisicao);
+			$verificaPinIp = Garena::verificaQtdePin($_POST["codigo"], Garena::getClientIP(), $dataRequisicao);
+			$verificaPinIpLote = Garena::verificaLotePin(Garena::getClientIP(), $dataRequisicao);
 			if ($verificaPinIp != true || $verificaPinIpLote != true) {
 				$mensagemRetono = json_encode(["Erro" => "Seu resgate foi invalidado (EPP0044)."]);
-				Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+				Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 				echo $mensagemRetono;
 				exit;
 			}
@@ -117,7 +117,7 @@ if (!isset($_POST["dist"])) {
 			} else {
 
 				$mensagemRetono = json_encode(["Erro" => "Não é possivel fazer o resgate do pin enviado"]);
-				Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+				Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 				echo $mensagemRetono;
 				exit;
 			}
@@ -125,15 +125,15 @@ if (!isset($_POST["dist"])) {
 
 			if ($respostaToken["code"] == 1) {
 				$mensagemRetono = json_encode(["Erro" => "Seu resgate foi invalidado (EPP0045)."]);
-				Garena::verificaQtdePin($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $dataRequisicao);
-				Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+				Garena::verificaQtdePin($_POST["codigo"], Garena::getClientIP(), $dataRequisicao);
+				Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 				echo $mensagemRetono;
 				exit;
 			}
 
 			$mensagemRetono = json_encode(["Erro" => "Tempo de verificação foi excedido por favor clique no botão resgate novamente"]);
-			Garena::verificaQtdePin($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $dataRequisicao);
-			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+			Garena::verificaQtdePin($_POST["codigo"], Garena::getClientIP(), $dataRequisicao);
+			Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 			echo $mensagemRetono;
 			exit;
 		}
@@ -177,19 +177,19 @@ if (isset($_POST["valid"])) {
 	$auth = $classGarena->chamaGarena("GET", "producao"); // Para produção passar o segundo parametro 'producao' 
 	if ($auth !== true) {
 		echo $auth;
-		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $auth);
+		Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $auth);
 		exit;
 	}
 
 	if (isset($_POST["verifica"]) && !isset($_POST["dist"])) {
 		$papel = json_decode($classGarena->getRoles(), true);
 		$mensagemRetono = json_encode(["usuario" => $papel[0], "nome" => $nome_produto, "modelo" => utf8_encode($nome_modelo), "pin" => $_POST["codigo"], "valor" => $valor_pin]);
-		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+		Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 		echo $mensagemRetono;
 		exit;
 	} else {
 		$mensagemRetono = $classGarena->getRoles();
-		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+		Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 		echo $mensagemRetono;
 		exit;
 	}
@@ -208,7 +208,7 @@ if (isset($_POST["valid"])) {
 	if (file_exists('/www/arquivos_gerados/logs/' . $codPinFile)) {
 		sleep(10);
 		$mensagemRetono = json_encode(["Erro" => "Não foi possivel realizar seu resgate, entre em contato com o suporte E-Prepag (EPP0345)."]);
-		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+		Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 		echo $mensagemRetono;
 		exit;
 	} else {
@@ -225,7 +225,7 @@ if (isset($_POST["valid"])) {
 		$authConfirmado = $classGarena->chamaGarena("GET", "producao"); // Para produção passar o segundo parametro 'producao' 
 		if ($authConfirmado !== true) {
 			$mensagemRetono = $authConfirmado;
-			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+			Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 			echo $mensagemRetono;
 			exit;
 		}
@@ -236,7 +236,7 @@ if (isset($_POST["valid"])) {
 	if ($resgate !== true) {
 		unlink('/www/arquivos_gerados/logs/' . $codPinFile);
 		$mensagemRetono = $resgate;
-		Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+		Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 		echo $mensagemRetono;
 		exit;
 	}
@@ -247,12 +247,12 @@ if (isset($_POST["valid"])) {
 		if (isset($_POST["verifica"]) && !isset($_POST["dist"])) {
 			$data = substr($classGarena->getDataUtilizacao(), 8, 2) . "/" . substr($classGarena->getDataUtilizacao(), 5, 2) . "/" . substr($classGarena->getDataUtilizacao(), 0, 4) . "-" . substr($classGarena->getDataUtilizacao(), 11, 8);
 			$mensagemRetono = json_encode(["Sucesso" => "Resgate realizado com sucesso, creditos encaminhados para conta", "txn_id" => $classGarena->getTxn_id(), "nome" => $nome_produto, "modelo" => utf8_encode($nome_modelo), "pin" => $_POST["codigo"], "valor" => $valor_pin, "data" => $data]);
-			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+			Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 			echo $mensagemRetono;
 		} else {
 			$data = substr($classGarena->getDataUtilizacao(), 8, 2) . "/" . substr($classGarena->getDataUtilizacao(), 5, 2) . "/" . substr($classGarena->getDataUtilizacao(), 0, 4) . "-" . substr($classGarena->getDataUtilizacao(), 11, 8);
 			$mensagemRetono = json_encode(["Sucesso" => "Resgate realizado com sucesso, creditos encaminhados para conta", "dataUtilizacao" => $data]);
-			Garena::salvaRetorno($_POST["codigo"], $_SERVER["REMOTE_ADDR"], $mensagemRetono);
+			Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 			echo $mensagemRetono;
 		}
 	}

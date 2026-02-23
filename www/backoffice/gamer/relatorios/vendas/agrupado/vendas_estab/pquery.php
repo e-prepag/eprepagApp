@@ -3,14 +3,21 @@ require_once '../../../../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 
-$tf_data_inicial = $_POST['tf_data_inicial'] ?? null;
-$tf_data_final = $_POST['tf_data_final'] ?? null;
-$dd_operadora = $_POST['dd_operadora'] ?? null;
-$dd_valor = $_POST['dd_valor'] ?? null;
+$tf_data_inicial = $_REQUEST['tf_data_inicial'] ?? null;
+$tf_data_final = $_REQUEST['tf_data_final'] ?? null;
+$dd_operadora = $_REQUEST['dd_operadora'] ?? null;
+$dd_valor = $_REQUEST['dd_valor'] ?? null;
+
+$BtnSearch = $_REQUEST['BtnSearch'] ?? null;
+$inicial = $_REQUEST['inicial'] ?? null;
+$range = $_REQUEST['range'] ?? null;
+$ordem = $_REQUEST['ordem'] ?? null;
+$seg_auxilar = $_REQUEST['seg_auxilar'] ?? null;
 
 $pos_pagina = isset($seg_auxilar) ? $seg_auxilar : null;
 
 $time_start = getmicrotime();
+
 
 if (!isset($ncamp))            $ncamp           = 'trn_data';
 if (!isset($tf_data_final))    $tf_data_final   = date('d/m/Y');
@@ -245,6 +252,17 @@ if ($FrmEnviar == 1) {
 $sql_transform = $estat;
 
 $resestat = pg_exec($connid, $estat);
+
+if ($resestat === false) {
+    echo "Erro ao executar query: " . pg_last_error($connid);
+    error_log("Erro ao executar query: " . pg_last_error($connid));
+} else {
+    $status = pg_result_status($resestat);
+    if ($status !== PGSQL_COMMAND_OK && $status !== PGSQL_TUPLES_OK) {
+        echo "Erro PostgreSQL: " . pg_result_error($resestat);
+        error_log("Erro PostgreSQL: " . pg_result_error($resestat));
+    }
+}
 
 if ($max + $inicial > $total_table)
   $reg_ate = $total_table;

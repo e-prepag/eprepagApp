@@ -1,13 +1,12 @@
 <?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
 <?php
 @session_start();
-if(empty($_SESSION["iduser_bko_pub"]))
-    {
-            echo '<script>alert("Fa�a login novamente");</script>';
-            exit;
-    }
+if (empty($_SESSION["iduser_bko_pub"])) {
+        echo '<script>alert("Fa�a login novamente");</script>';
+        exit;
+}
 //Alicota EPP Administradora
-$alicota_epp_adm = array(6.38, 3.5);//6.38;
+$alicota_epp_adm = array(6.38, 3.5); //6.38;
 
 //incluindo o arquivo do fpdf
 require_once "../../../../includes/constantes.php";
@@ -72,7 +71,7 @@ if (!empty($_POST['dd_operadora'])) {
                         }
                 }
         }
-}//end if dd_operadora n�o est� vazio
+} //end if dd_operadora n�o est� vazio
 //echo $msg."<br>";
 //instancia a classe.. P=Retrato, mm =tipo de medida utilizada no casso milimetros, tipo de folha =A4
 $pdf = new FPDF("P", "mm", "A4");
@@ -97,7 +96,11 @@ $pdf->SetFillColor(255, 255, 255);
 //hora do conteudo do artigo
 $pdf->SetFont('arial', '', 8);
 
-if (!in_array($_POST['tax'], $alicota_epp_adm)) {
+
+if (
+        $_POST['dd_operadora'] == 90 || $_POST['dd_operadora'] == 124 ||
+        !in_array($_POST['tax'], $alicota_epp_adm)
+) {
         $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
         Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
         tel 11-3030-9101/ 11-3030-9102
@@ -137,13 +140,13 @@ if (!in_array($_POST['tax'], $alicota_epp_adm)) {
         $pdf->SetX("59");
 
         $novo = $opr_razao . " 
-" . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
+        " . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
         if (!empty($opr_bairro)) {
                 $novo .= ", " . $opr_bairro;
         }
         $novo .= "
-" . $opr_cidade . " " . $opr_estado . "
-" . $opr_pais;
+        " . $opr_cidade . " " . $opr_estado . "
+        " . $opr_pais;
 
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(100, 4, $novo, 0, 'L');
@@ -271,8 +274,7 @@ if (!in_array($_POST['tax'], $alicota_epp_adm)) {
                 //posiciona horizontalmente em mm
                 $pdf->SetX("163");
                 $pdf->Cell(37, 10, 'R$ ' . $_POST['netwired'], 1, 1, 'C');
-
-        }else{
+        } else {
 
                 $valorbruto = str_replace(".", "", $_POST['grosswired']);
                 $valorbruto = str_replace(",", ".", $valorbruto);
@@ -317,24 +319,24 @@ if (!in_array($_POST['tax'], $alicota_epp_adm)) {
         $pdf->SetX("25");
         if ($_POST['dd_operadora'] == 16) {
                 $novo = "Account Owner:
-Account Number:
-Account Type:
-Routing Number:
-Bank Name:
-Bank City:
-Currency:";
+                Account Number:
+                Account Type:
+                Routing Number:
+                Bank Name:
+                Bank City:
+                Currency:";
         } else {
                 $novo = "Account Owner:
-Account Number:
-Account Type:
-Routing Number:
-Bank Name:
-Bank Address:
-Bank City:
-Bank Tel. Number:
-Currency:
-IBAN:
-SWIFT / BIC Code:";
+                Account Number:
+                Account Type:
+                Routing Number:
+                Bank Name:
+                Bank Address:
+                Bank City:
+                Bank Tel. Number:
+                Currency:
+                IBAN:
+                SWIFT / BIC Code:";
         }
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(35, 4, $novo, 0, 'L');
@@ -345,16 +347,16 @@ SWIFT / BIC Code:";
         $pdf->SetX("60");
 
         $novo = $opr_razao . "
-" . $opr_numero_conta . " 
-" . $opr_tipo_conta . "
-" . $opr_numero_roteamento . "
-" . $opr_banco_nome . "
-" . $opr_banco_endereco . "
-" . $opr_banco_cidade . "
-" . $opr_banco_telefone . "
-" . $opr_moeda_corrente . "
-" . $opr_iban . "
-" . $opr_bic_code;
+        " . $opr_numero_conta . " 
+        " . $opr_tipo_conta . "
+        " . $opr_numero_roteamento . "
+        " . $opr_banco_nome . "
+        " . $opr_banco_endereco . "
+        " . $opr_banco_cidade . "
+        " . $opr_banco_telefone . "
+        " . $opr_moeda_corrente . "
+        " . $opr_iban . "
+        " . $opr_bic_code;
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(125, 4, $novo, 0, 'L');
 
@@ -376,8 +378,8 @@ SWIFT / BIC Code:";
                 //posiciona horizontalmente em mm
                 $pdf->SetX("25");
                 $novo = "SWIFT / BIC Code:
-Bank Name:
-Account Number:";
+                Bank Name:
+                Account Number:";
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(35, 4, $novo, 0, 'L');
 
@@ -387,18 +389,17 @@ Account Number:";
                 $pdf->SetX("60");
 
                 $novo = $obi_bic_code . "
-" . $obi_banco_nome . "
-" . $obi_numero_conta;
+                " . $obi_banco_nome . "
+                " . $obi_numero_conta;
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
         }
 
         //        //posiciona verticalmente em mm
-//        $pdf->SetY("229");
-//        //posiciona horizontalmente em mm
-//        $pdf->SetX("25");
-//        $pdf->Cell(162, 13,'', 1, 3, 'C');
+        //        $pdf->SetY("229");
+        //        //posiciona horizontalmente em mm
+        //        $pdf->SetX("25");
+        //        $pdf->Cell(162, 13,'', 1, 3, 'C');
 
         $pdf->SetFont('arial', '', 8);
 
@@ -480,13 +481,13 @@ else {
         $pdf->SetX("59");
 
         $novo = $opr_razao . " 
-" . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
+        " . $opr_endereco . " " . $opr_numero . " " . $opr_complemento;
         if (!empty($opr_bairro)) {
                 $novo .= ", " . $opr_bairro;
         }
         $novo .= "
-" . $opr_cidade . " " . $opr_estado . "
-" . $opr_pais;
+        " . $opr_cidade . " " . $opr_estado . "
+        " . $opr_pais;
 
         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
         $pdf->MultiCell(100, 4, $novo, 0, 'L');
@@ -668,7 +669,6 @@ Account Number:";
 " . $obi_numero_conta;
                 //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                 $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
         }
 
         $pdf->SetFont('arial', '', 8);
@@ -732,7 +732,10 @@ if (intval($_POST['grosswiredcard']) != 0 && intval($_POST['witholdingcard']) !=
         //hora do conteudo do artigo
         $pdf->SetFont('arial', '', 8);
 
-        if (!in_array($_POST['tax'], $alicota_epp_adm)) {
+        if (
+                $_POST['dd_operadora'] == 90 || $_POST['dd_operadora'] == 124 ||
+                !in_array($_POST['tax'], $alicota_epp_adm)
+        ) {
                 $novo = utf8_decode("E-PREPAG Pagamentos Eletrônicos Ltda
                 Rua Dep Lacerda Franco, 300 - cj 26 a 28 - São Paulo - SP - Brasil
                 tel 11-3030-9101/ 11-3030-9102
@@ -953,7 +956,6 @@ Account Number:";
 " . $obi_numero_conta;
                         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                         $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
                 }
 
                 $pdf->SetFont('arial', '', 8);
@@ -989,8 +991,7 @@ Account Number:";
                 $pdf->Cell(0, 5, $conteudo, 0, 1, 'R');
 
                 $pdf->Close();
-
-        }//end if(!in_array($_POST['tax'], $alicota_epp_adm)) 
+        } //end if(!in_array($_POST['tax'], $alicota_epp_adm)) 
         else {
 
                 //Tratando valores para ser utilizados nos campos da remessa
@@ -1227,7 +1228,6 @@ Account Number:";
 " . $obi_numero_conta;
                         //escreve o conteudo de novo.. parametros posicao inicial,altura,conteudo(*texto),borda,quebra de linha,alinhamento
                         $pdf->MultiCell(125, 4, $novo, 0, 'L');
-
                 }
 
                 $pdf->SetFont('arial', '', 8);
@@ -1263,10 +1263,10 @@ Account Number:";
                 $pdf->Cell(0, 5, $conteudo, 0, 1, 'R');
         } //end else do if(!in_array($_POST['tax'], $alicota_epp_adm)) 
 
-}//end if(!empty($_POST['grosswired']) && !empty($_POST['witholding']) && !empty($_POST['netwired']))
+} //end if(!empty($_POST['grosswired']) && !empty($_POST['witholding']) && !empty($_POST['netwired']))
 else {
         $pdf->SetDisplayMode('fullpage');
-}//end else
+} //end else
 
 //imprime a saida do arquivo..
 //$pdf->Output();

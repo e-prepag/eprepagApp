@@ -309,7 +309,6 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
                         }
                     }
 
-
                     if ($integracao_is_parceiro == "OK" && $integracao_origem_id != "") {
                         // Monta carrinho para Integração
                         // $carrinho = get_Integracao_carrinho($parceiro_params);
@@ -363,7 +362,7 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
                             send_debug_info_by_email("E-Prepag - Testing integration - Error 23", "Integration request failed: model not found (B)", 0);
                         }
                     } else {
-                        set_Integracao_error_msg("Integration request failed: user didn't login successfully ($integracao_client_email)", true);
+                        set_Integracao_error_msg("Integration request failed: user didn't login successfully ($integracao_client_email)", false);
                         // Modelo não encontrado -> não va emfrente 
                         grava_log_integracao("Integração falhou - Usuário não fez login: " . date("Y-m-d H:i:s") . "\n  integracao_mod: $integracao_mod\n  integracao_client_email: $integracao_client_email\n");
 
