@@ -24,6 +24,7 @@
 /www/ssl/private.pem
 /www/ssl/public.pem
 !/www/ssl/.gitkeep
+efinanceira-receita-fazenda-gov-br-2025.cer
 *.pfx
 *.pem
 /www/log
