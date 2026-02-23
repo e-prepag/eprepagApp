@@ -2086,8 +2086,6 @@ class GerarEFinanceira
 
     public function criptografarLoteEF($xmlConteudo, $prod = false)
     {
-        //$certPath = '/certs/efinanceira.cer'; // caminho do certificado público (ajuste conforme seu container)
-
         $ch = curl_init('http://assinador:5000/criptografar');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2279,7 +2277,7 @@ class GerarEFinanceira
     {
         // Definir endpoint
         if ($producao) {
-            //$urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
+            $urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
         } else {
             $urlBase = 'https://pre-efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
         }

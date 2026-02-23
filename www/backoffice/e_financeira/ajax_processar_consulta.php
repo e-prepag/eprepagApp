@@ -17,7 +17,7 @@ ob_start();
 try {
     $efinanceira = new GerarEFinanceira();
 
-    $producao = false;
+    $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? false : true;
     $tipoConsulta = $_POST['sel_consulta'];
 
     // Variáveis de controle
