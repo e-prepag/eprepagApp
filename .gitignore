@@ -6,6 +6,7 @@
 !**/arquivos_gerados/index.php
 **/cache
 *.csv
+*.cer
 *.CSV
 *.RET
 *.log
