@@ -337,7 +337,7 @@ class Garena
 
 			$test = ($ambiente == "homologacao") ? 1 : 0;
 			$currecy = "BRL";
-			$ip = $_SERVER["REMOTE_ADDR"];
+			$ip = self::getClientIP();
 
 
 			// Livrodjx has been here	
@@ -836,6 +836,25 @@ class Garena
 		}
 	}
 
+	public static function getClientIP()
+	{
+		if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+			return $_SERVER['HTTP_CF_CONNECTING_IP']; // Cloudflare
+		}
+
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			// Pode ter m�ltiplos IPs: pega o primeiro
+			$ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+			return trim($ips[0]);
+		}
+
+		if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+			return $_SERVER['HTTP_X_REAL_IP'];
+		}
+
+		return $_SERVER['REMOTE_ADDR']; // fallback
+	}
+
 	public static function verificaLotePin($ip, $data)
 	{
 
@@ -877,7 +896,7 @@ class Garena
 	public static function verificaTokenRe($token)
 	{
 
-		$dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY_V3"), "response" => $token, "remoteip" => $_SERVER["REMOTE_ADDR"]];
+		$dados = ["secret" => getenv("RECAPTCHA_SECRET_KEY_V3"), "response" => $token, "remoteip" => self::getClientIP()];
 		$curlToken = curl_init();
 		curl_setopt_array($curlToken, [
 			CURLOPT_URL => getenv("RECAPTCHA_URL"),
@@ -899,7 +918,7 @@ class Garena
 
 		$ff = fopen("/www/arquivos_gerados/logs/testeRecap2.txt", "a+");
 		fwrite($ff, "data: " . date("d-m-Y H:i:s") . "\r\n");
-		fwrite($ff, "ip: " . $_SERVER["REMOTE_ADDR"] . "\r\n");
+		fwrite($ff, "ip: " . self::getClientIP() . "\r\n");
 		fwrite($ff, "token: " . $token . "\r\n");
 		fwrite($ff, "dados: " . json_encode($dados) . "\r\n");
 		fwrite($ff, "dados-recebidos: " . json_encode($retorno) . "\r\n");
