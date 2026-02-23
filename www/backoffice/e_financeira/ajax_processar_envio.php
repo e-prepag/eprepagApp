@@ -4,6 +4,7 @@ set_time_limit(0); // Importante: Processar vários arquivos pode demorar muito
 
 require_once '/www/includes/constantes.php';
 require_once __DIR__ . "/functions_e_financeira.php";
+require_once __DIR__ . "/../../includes/load_dotenv.php";
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -52,7 +53,7 @@ try {
 
     // Defina se é produção ou homologação (se tiver input no form, pegue aqui)
     // Ex: $producao = ($_POST['ambiente'] === 'producao');
-    $producao = false;
+    $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? false : true;
 
     echo "<div class='container-resultados'>";
 
@@ -134,10 +135,10 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
         $lote_assinado = $efinanceira->assinarLoteEventos($conteudoXmlOriginal);
 
         // 2. Criptografar
-        $lote_criptografado = $efinanceira->criptografarLoteEF($lote_assinado);
+        $lote_criptografado = $efinanceira->criptografarLoteEF($lote_assinado, $producao);
 
         // 3. Enviar
-        $xmlResposta = $efinanceira->enviarLoteEFinanceira($lote_criptografado);
+        $xmlResposta = $efinanceira->enviarLoteEFinanceira($lote_criptografado, false, $producao);
     } catch (Exception $e) {
         throw new Exception("Erro durante preparação/envio do arquivo $nomeArquivo: " . $e->getMessage());
     }

@@ -42,6 +42,7 @@ $data_atual = date('Y-m');
 		</div>
 	</nav>
 	<h2 class="titulo-vencimento">Lotes Enviados - E-Financeira</h2>
+	<?php die("Trabalho em progresso...") ?>
 	<form id="form1" action="#" method="get" class="form-solicitacoes">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
