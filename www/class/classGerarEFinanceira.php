@@ -1,18 +1,12 @@
 <?php
 require_once '/www/db/connect.php';
 require_once '/www/db/ConnectionPDO.php';
-//require_once '../libs/xmlseclibs.php';
 require_once '/www/includes/load_dotenv.php';
-//require_once '../libs/xmlseclibs.php';
-
-//use RobRichards\XMLSecLibs\XMLSecurityKey;
-//use RobRichards\XMLSecLibs\XMLSecurityDSig;
-
 
 class GerarEFinanceira
 {
 
-    private $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    public $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $razaoEPP;  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $enderecoEPP;    // Endereço da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $bairroEPP;
@@ -48,6 +42,8 @@ class GerarEFinanceira
     private $caminhoCertificadoPublico;
     private $certificado_privado_epp;
     private $chave_privada_epp;
+    private $versao_aplicacao;
+    private $cacheIdsEventos = [];
 
     public function __construct()
     {
@@ -82,78 +78,65 @@ class GerarEFinanceira
         $this->dddTelefoneReprLegal = '11';
         $this->cpfReprLegal = '16806289843';
         $this->codMunicipioEPP = '3550308';
-        $this->certificado = '../ssl/cert-eprepag.pfx';
+        $this->certificado = __DIR__ . '/../ssl/cert-eprepag.pfx';
         $this->senhaCertificado = getenv('senha_certificado_digital');
         $this->caminhoCertificadoPublico = '/www/ssl/pre-efinanceira-receita-fazenda-gov-br-2025.cer';
         $this->certificado_privado_epp = '/www/ssl/private-epp-cert.pem';
         $this->chave_privada_epp = '/www/ssl/key-epp-cert.pem';
+        $this->versao_aplicacao = '00000000000000000001';
     }
 
-    private function obterDadosMovFinPJ($inicio, $fim)
+    public function obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
     {
+        $sql_limit_offset = ($offset !== null && $limit !== null) ? "LIMIT :limit OFFSET :offset" : "";
+
         $pdo = ConnectionPDO::getConnection()->getLink();
-        $sql = "WITH 
+        $sql = "WITH -- Busca todas as movimentações no período, sem filtrar status do usuário ainda
                     MovimentacaoMensal AS (
                         SELECT 
                             ug.ug_id,
                             TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa,
-                            
                             SUM(CASE 
                                 WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 
                                 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
                                 ELSE 0 
                             END) AS entradas,
-                            
                             ABS(SUM(CASE 
                                 WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
                                 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
                                 ELSE 0 
                             END)) AS saidas,
-                            
                             (
                                 SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END) +
                                 ABS(SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END))
                             ) AS total_movimentado_mes
-                            
                         FROM 
                             dist_usuarios_games ug
                         JOIN 
                             dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                         WHERE 
-                            ug.ug_ativo = 1 
-                            AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                            -- Alterado conforme solicitado: Apenas filtro de data do log
+                            sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
                         GROUP BY 
                             ug.ug_id,
                             TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
                     ),
-                    Whitelist AS (
-                        SELECT unnest(ARRAY[]::int[]) AS ug_id -- << COLOQUE OS IDs DA WHITELIST AQUI
-                    ),
-                    MesAtivacaoRegra AS (
+                    -- Identifica qual foi o PRIMEIRO mês que o usuário estourou o limite (> 6000)
+                    GatilhoLimiar AS (
                         SELECT 
                             ug_id, 
-                            MIN(ano_mes_caixa) AS mes_ativacao
+                            MIN(ano_mes_caixa) AS mes_primeiro_estouro
                         FROM MovimentacaoMensal
                         WHERE total_movimentado_mes > 6000
                         GROUP BY ug_id
                     ),
-                    RegrasReporte AS (
-                        SELECT 
-                            ug_id,
-                            MIN(mes_inicio) AS mes_inicio_reporte
-                        FROM (
-                            SELECT ug_id, mes_ativacao AS mes_inicio FROM MesAtivacaoRegra
-                            UNION ALL
-                            SELECT ug_id, TO_CHAR(:data_inicio::date, 'YYYYMM') AS mes_inicio FROM Whitelist
-                        ) AS RegrasCombinadas
-                        GROUP BY ug_id
-                    ),
+                    -- Dados cadastrais para o relatório (Trazemos todos que tiveram movimento OU estão ativos)
                     DadosUsuario AS (
-                        SELECT DISTINCT ON (ug.ug_id) 
+                        SELECT 
                             ug.ug_id,
                             ug.ug_nome_fantasia,
                             ug.ug_razao_social,
-                            ug.ug_cnpj,
+                            regexp_replace(ug.ug_cnpj, '[^0-9]', '', 'g') AS ni_declarado,
                             ug.ug_endereco,
                             ug.ug_numero,
                             ug.ug_complemento,
@@ -161,12 +144,19 @@ class GerarEFinanceira
                             ug.ug_cidade,
                             ug.ug_estado,
                             ug.ug_cep,
-                            ug.ug_perfil_saldo -- Adicionando o saldo atual
+                            ug.ug_perfil_saldo,
+                            ug.ug_ativo, 
+                            ug.ug_data_encerramento_conta,
+                            TO_CHAR(ug.ug_data_encerramento_conta, 'YYYYMM') as mes_encerramento
                         FROM 
                             dist_usuarios_games ug
-                        WHERE 
-                            ug.ug_id IN (SELECT r.ug_id FROM RegrasReporte r)
+                        WHERE
+                            -- Otimização: Traz usuários que tem movimentação NO PERÍODO ou Estão Ativos (para regra de Dezembro)
+                            ug.ug_id IN (SELECT ug_id FROM MovimentacaoMensal)
+                            OR ug.ug_ativo = 1
+                            OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
                     ),
+                    -- Gera a lista de meses do período selecionado
                     Calendario AS (
                         SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
                         FROM generate_series(
@@ -174,211 +164,258 @@ class GerarEFinanceira
                             :data_fim::date, 
                             '1 month'::interval
                         ) d
+                    ),
+                    -- SELECT FINAL COM AS REGRAS DE NEGÓCIO APLICADAS NO FILTRO
+                    RelatorioFiltrado AS (
+                        SELECT 
+                            d.ug_id,
+                            d.ni_declarado,
+                            d.ug_razao_social AS nome_declarado,
+                            d.ug_endereco,
+                            d.ug_numero,
+                            d.ug_complemento,
+                            d.ug_bairro,
+                            d.ug_cidade,
+                            d.ug_estado,
+                            d.ug_cep,
+                            d.ug_nome_fantasia AS nome_conta, 
+                            d.ug_perfil_saldo AS saldo_atual_conta,
+                            cal.ano_mes_caixa,
+                            COALESCE(m.entradas, 0) AS entradas_conta,
+                            COALESCE(m.saidas, 0) AS saidas_conta,
+                            COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes,
+                            d.ug_ativo, 
+                            d.ug_data_encerramento_conta,
+                            d.mes_encerramento
+                        FROM 
+                            DadosUsuario d
+                        CROSS JOIN 
+                            Calendario cal
+                        LEFT JOIN 
+                            MovimentacaoMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
+                        LEFT JOIN
+                            GatilhoLimiar g ON d.ug_id = g.ug_id
+                        WHERE 
+                            (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
+                            AND (
+                                (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
+                                OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                OR (d.mes_encerramento = cal.ano_mes_caixa)
+                            )
                     )
+                -- SELECT FINAL COM O CÁLCULO DO vlrUltDia via LATERAL
                 SELECT 
                     2 AS tipo_declarado,
-                    regexp_replace(d.ug_cnpj, '[^0-9]', '', 'g') AS ni_declarado,
-                    d.ug_razao_social AS nome_declarado,
+                    f.ni_declarado,
+                    f.nome_declarado,
                     NULL AS data_nascimento,
-                    d.ug_endereco,
-                    d.ug_numero,
-                    d.ug_complemento,
-                    d.ug_bairro,
-                    d.ug_cidade,
-                    d.ug_estado,
-                    d.ug_cep,
-                    ('PD' || d.ug_id) AS id_conta, 
-                    d.ug_nome_fantasia AS nome_conta, 
+                    f.ug_endereco,
+                    f.ug_numero,
+                    f.ug_complemento,
+                    f.ug_bairro,
+                    f.ug_cidade,
+                    f.ug_estado,
+                    f.ug_cep,
+                    ('PD' || f.ug_id) AS id_conta, 
+                    f.nome_conta, 
                     '1' AS tp_relacao,
-                    d.ug_perfil_saldo AS saldo_atual_conta,
-                    cal.ano_mes_caixa,
-                    COALESCE(m.entradas, 0) AS entradas_conta,
-                    COALESCE(m.saidas, 0) AS saidas_conta,
-                    COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes
+                    f.saldo_atual_conta,
+                    f.ano_mes_caixa,
+                    f.entradas_conta,
+                    f.saidas_conta,
+                    f.total_movimentado_mes,
+                    f.ug_ativo, 
+                    f.ug_data_encerramento_conta,
+                    COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
                 FROM 
-                    RegrasReporte r
-                JOIN 
-                    DadosUsuario d ON r.ug_id = d.ug_id
-                CROSS JOIN 
-                    Calendario cal
-                LEFT JOIN 
-                    MovimentacaoMensal m ON r.ug_id = m.ug_id 
-                                         AND cal.ano_mes_caixa = m.ano_mes_caixa
-                WHERE 
-                    cal.ano_mes_caixa >= r.mes_inicio_reporte
+                    RelatorioFiltrado f
+                LEFT JOIN LATERAL (
+                    SELECT sl.dugsl_ug_perfil_saldo AS vlrUltDia
+                    FROM dist_usuarios_games_saldo_log sl
+                    WHERE sl.dugsl_ug_id = f.ug_id
+                      AND sl.dugsl_data_inclusao < (
+                          CASE 
+                              -- Se for o mês de encerramento, pega os logs antes da data de encerramento (isso pega até 23:59:59 do dia anterior)
+                              WHEN f.ano_mes_caixa = f.mes_encerramento 
+                              THEN f.ug_data_encerramento_conta::date
+
+                              -- Para Dezembro (ou qualquer outro mês normal), pega até o último segundo do último dia do mês corrente
+                              ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                          END
+                      )
+                    ORDER BY sl.dugsl_data_inclusao DESC
+                    LIMIT 1
+                ) saldo_calc ON true
                 ORDER BY
-                    cal.ano_mes_caixa, d.ug_cnpj;";
+                    f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
         $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmt->bindParam(':data_inicio', $inicio);
         $stmt->bindParam(':data_fim', $fim);
+        if ($offset !== null && $limit !== null) {
+            $stmt->bindParam(':limit', $limit);
+            $stmt->bindParam(':offset', $offset);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function obterDadosMovFinPF($inicio, $fim)
+    public function obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
     {
         $pdo = ConnectionPDO::getConnection()->getLink();
 
-        $sqlReprLegal = "WITH
-                        MovimentacaoMensal AS (
+        $sql_limit_offset = ($offset !== null && $limit !== null) ? "LIMIT :limit OFFSET :offset" : "";
+
+        $sqlReprLegal = "WITH 
+                            -- Movimentação bruta (sem filtro de status)
+                            MovimentacaoMensal AS (
+                                SELECT 
+                                    ug.ug_id,
+                                    TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa,
+                                    SUM(CASE 
+                                        WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 
+                                        THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
+                                        ELSE 0 
+                                    END) AS entradas,
+                                    ABS(SUM(CASE 
+                                        WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
+                                        THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
+                                        ELSE 0 
+                                    END)) AS saidas,
+                                    (
+                                        SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END) +
+                                        ABS(SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END))
+                                    ) AS total_movimentado_mes
+                                FROM 
+                                    dist_usuarios_games ug
+                                JOIN 
+                                    dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
+                                WHERE 
+                                    sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
+                                GROUP BY 
+                                    ug.ug_id,
+                                    TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
+                            ),
+                            -- Identifica gatilho (> 6000)
+                            GatilhoLimiar AS (
+                                SELECT 
+                                    ug_id, 
+                                    MIN(ano_mes_caixa) AS mes_primeiro_estouro
+                                FROM MovimentacaoMensal
+                                WHERE total_movimentado_mes > 6000
+                                GROUP BY ug_id
+                            ),
+                            -- Dados Cadastrais (Filtra quem tem CPF e nome preenchidos)
+                            DadosUsuario AS (
+                                SELECT 
+                                    ug.ug_id,
+                                    ug.ug_nome_fantasia,
+                                    ug.ug_razao_social,
+                                    ug.ug_cnpj,
+                                    ug.ug_endereco,
+                                    ug.ug_numero,
+                                    ug.ug_complemento,
+                                    ug.ug_bairro,
+                                    ug.ug_cidade,
+                                    ug.ug_estado,
+                                    ug.ug_cep,
+                                    ug.ug_perfil_saldo,
+                                    ug.ug_repr_legal_nome,
+                                    ug.ug_repr_legal_cpf,
+                                    ug.ug_repr_venda_cpf,
+                                    ug.ug_repr_legal_data_nascimento,
+                                    ug.ug_ativo, 
+                                    ug.ug_data_encerramento_conta,
+                                    TO_CHAR(ug.ug_data_encerramento_conta, 'YYYYMM') as mes_encerramento
+                                FROM 
+                                    dist_usuarios_games ug
+                                WHERE 
+                                    (ug.ug_repr_legal_cpf IS NOT NULL OR ug.ug_repr_venda_cpf IS NOT NULL)
+                                    AND ug.ug_repr_legal_nome IS NOT NULL
+                                    AND (
+                                        ug.ug_id IN (SELECT ug_id FROM MovimentacaoMensal)
+                                        OR ug.ug_ativo = 1
+                                        OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
+                                    )
+                            ),
+                            -- Calendário
+                            Calendario AS (
+                                SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
+                                FROM generate_series(
+                                    :data_inicio::date, 
+                                    :data_fim::date, 
+                                    '1 month'::interval
+                                ) d
+                            ),
+                            RelatorioFiltrado AS (
+                                    SELECT 
+                                        d.ug_id, d.ug_repr_legal_cpf, d.ug_repr_venda_cpf, d.ug_repr_legal_nome,
+                                        d.ug_repr_legal_data_nascimento, d.ug_endereco, d.ug_numero,
+                                        d.ug_complemento, d.ug_bairro, d.ug_cidade, d.ug_estado, d.ug_cep,
+                                        d.ug_nome_fantasia, d.ug_perfil_saldo, d.ug_ativo, d.ug_data_encerramento_conta,
+                                        d.mes_encerramento, cal.ano_mes_caixa,
+                                        COALESCE(m.entradas, 0) AS entradas_conta,
+                                        COALESCE(m.saidas, 0) AS saidas_conta,
+                                        COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes
+                                    FROM DadosUsuario d
+                                    CROSS JOIN Calendario cal
+                                    LEFT JOIN MovimentacaoMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
+                                    LEFT JOIN GatilhoLimiar g ON d.ug_id = g.ug_id
+                                    WHERE 
+                                        (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
+                                        AND (
+                                            (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
+                                            OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                            OR (d.mes_encerramento = cal.ano_mes_caixa)
+                                        )
+                                )
+                            -- SELECT FINAL
                             SELECT 
-                                ug.ug_id,
-                                TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa,
-                                
-                                SUM(CASE 
-                                    WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 
-                                    THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
-                                    ELSE 0 
-                                END) AS entradas,
-                                
-                                ABS(SUM(CASE 
-                                    WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 
-                                    THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) 
-                                    ELSE 0 
-                                END)) AS saidas,
-                                
-                                (
-                                    SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) > 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END) +
-                                    ABS(SUM(CASE WHEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) < 0 THEN (sl.dugsl_ug_perfil_saldo - sl.dugsl_ug_perfil_saldo_antes) ELSE 0 END))
-                                ) AS total_movimentado_mes
-                                
-                            FROM 
-                                dist_usuarios_games ug
-                            JOIN 
-                                dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
-                            WHERE 
-                                ug.ug_ativo = 1 
-                                AND sl.dugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
-                            GROUP BY 
-                                ug.ug_id,
-                                TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
-                        ),
-                        Whitelist AS (
-                            SELECT unnest(ARRAY[]::int[]) AS ug_id -- << COLOQUE OS IDs DA WHITELIST DE CONTAS PJ AQUI
-                        ),
-                        MesAtivacaoRegra AS (
-                            SELECT 
-                                ug_id, 
-                                MIN(ano_mes_caixa) AS mes_ativacao
-                            FROM MovimentacaoMensal
-                            WHERE total_movimentado_mes > 6000
-                            GROUP BY ug_id
-                        ),
-                        RegrasReporte AS (
-                            SELECT 
-                                ug_id,
-                                MIN(mes_inicio) AS mes_inicio_reporte
-                            FROM (
-                                SELECT ug_id, mes_ativacao AS mes_inicio FROM MesAtivacaoRegra
-                                UNION ALL
-                                SELECT ug_id, TO_CHAR(:data_inicio::date, 'YYYYMM') AS mes_inicio FROM Whitelist
-                            ) AS RegrasCombinadas
-                            GROUP BY ug_id
-                        ),
-                        DadosUsuario AS (
-                            SELECT DISTINCT ON (ug.ug_id) 
-                                ug.ug_id,
-                                ug.ug_nome_fantasia,
-                                ug.ug_razao_social,
-                                ug.ug_cnpj,
-                                ug.ug_endereco,
-                                ug.ug_numero,
-                                ug.ug_complemento,
-                                ug.ug_bairro,
-                                ug.ug_cidade,
-                                ug.ug_estado,
-                                ug.ug_cep,
-                                ug.ug_perfil_saldo,
-                                ug.ug_repr_legal_nome,
-                                ug.ug_repr_legal_cpf,
-                                ug.ug_repr_venda_cpf,
-                                ug.ug_repr_legal_data_nascimento
-                            FROM 
-                                dist_usuarios_games ug
-                            WHERE 
-                                ug.ug_id IN (SELECT r.ug_id FROM RegrasReporte r)
-                        ),
-                        Calendario AS (
-                            SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
-                            FROM generate_series(
-                                :data_inicio::date, 
-                                :data_fim::date, 
-                                '1 month'::interval
-                            ) d
-                        ),
-                        ResultadosBase AS (
-                            SELECT 
-                                d.ug_id,
-                                d.ug_nome_fantasia,
-                                d.ug_razao_social,
-                                d.ug_cnpj,
-                                d.ug_endereco,
-                                d.ug_numero,
-                                d.ug_complemento,
-                                d.ug_bairro,
-                                d.ug_cidade,
-                                d.ug_estado,
-                                d.ug_cep,
-                                d.ug_perfil_saldo,
-                                d.ug_repr_legal_nome,
-                                d.ug_repr_legal_cpf,
-                                d.ug_repr_venda_cpf,
-                                d.ug_repr_legal_data_nascimento,
-                                cal.ano_mes_caixa,
-                                m.entradas,
-                                m.saidas,
-                                m.total_movimentado_mes
-                            FROM 
-                                RegrasReporte r
-                            JOIN 
-                                DadosUsuario d ON r.ug_id = d.ug_id
-                            CROSS JOIN 
-                                Calendario cal
-                            LEFT JOIN 
-                                MovimentacaoMensal m ON r.ug_id = m.ug_id 
-                                                     AND cal.ano_mes_caixa = m.ano_mes_caixa
-                            WHERE 
-                                cal.ano_mes_caixa >= r.mes_inicio_reporte
-                        )
-                    SELECT 
-                        1 AS tipo_declarado,
-                        CASE 
-                        	WHEN COALESCE(rb.ug_repr_legal_cpf, '') ILIKE '%**%'
-                             	AND SUBSTRING(COALESCE(rb.ug_repr_legal_cpf, '') FROM LENGTH(COALESCE(rb.ug_repr_legal_cpf, '')) - 1 FOR 2) = SUBSTRING(COALESCE(rb.ug_repr_venda_cpf, '') FROM LENGTH(COALESCE(rb.ug_repr_venda_cpf, '')) - 1 FOR 2)
-                            	THEN regexp_replace(rb.ug_repr_venda_cpf, '[^0-9]', '', 'g')
-                        	ELSE regexp_replace(rb.ug_repr_legal_cpf, '[^0-9]', '', 'g')
-                    	END AS ni_declarado,
-                        rb.ug_repr_legal_nome AS nome_declarado,
-                        rb.ug_repr_legal_data_nascimento AS data_nascimento,
-                        rb.ug_endereco,
-                        rb.ug_numero,
-                        rb.ug_complemento,
-                        rb.ug_bairro,
-                        rb.ug_cidade,
-                        rb.ug_estado,
-                        rb.ug_cep,
-                        ('PD' || rb.ug_id) AS id_conta, 
-                        rb.ug_nome_fantasia AS nome_conta, 
-                        '3' AS tp_relacao,
-                        rb.ug_perfil_saldo AS saldo_atual_conta,
-                        rb.ano_mes_caixa,
-                        COALESCE(rb.entradas, 0) AS entradas_conta,
-                        COALESCE(rb.saidas, 0) AS saidas_conta,
-                        COALESCE(rb.total_movimentado_mes, 0) AS total_movimentado_mes
-                    FROM 
-                        ResultadosBase rb
-                    WHERE 
-                        (rb.ug_repr_legal_cpf IS NOT NULL OR rb.ug_repr_venda_cpf IS NOT NULL)
-                        AND rb.ug_repr_legal_nome IS NOT NULL
-                        
-                    ORDER BY
-                        id_conta, ano_mes_caixa;";
+                                1 AS tipo_declarado,
+                                CASE 
+                                    WHEN COALESCE(f.ug_repr_legal_cpf, '') ILIKE '%**%'
+                                         AND SUBSTRING(COALESCE(f.ug_repr_legal_cpf, '') FROM LENGTH(COALESCE(f.ug_repr_legal_cpf, '')) - 1 FOR 2) = SUBSTRING(COALESCE(f.ug_repr_venda_cpf, '') FROM LENGTH(COALESCE(f.ug_repr_venda_cpf, '')) - 1 FOR 2)
+                                         THEN regexp_replace(f.ug_repr_venda_cpf, '[^0-9]', '', 'g')
+                                    ELSE regexp_replace(f.ug_repr_legal_cpf, '[^0-9]', '', 'g')
+                                END AS ni_declarado,
+                                f.ug_repr_legal_nome AS nome_declarado,
+                                f.ug_repr_legal_data_nascimento AS data_nascimento,
+                                f.ug_endereco, f.ug_numero, f.ug_complemento, f.ug_bairro,
+                                f.ug_cidade, f.ug_estado, f.ug_cep,
+                                ('PD' || f.ug_id) AS id_conta, 
+                                f.ug_nome_fantasia AS nome_conta, 
+                                '3' AS tp_relacao,
+                                f.ug_perfil_saldo AS saldo_atual_conta,
+                                f.ano_mes_caixa,
+                                f.entradas_conta,
+                                f.saidas_conta,
+                                f.total_movimentado_mes,
+                                f.ug_ativo, 
+                                f.ug_data_encerramento_conta,
+                                COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                            FROM RelatorioFiltrado f
+                            LEFT JOIN LATERAL (
+                                SELECT sl.dugsl_ug_perfil_saldo AS vlrUltDia
+                                FROM dist_usuarios_games_saldo_log sl
+                                WHERE sl.dugsl_ug_id = f.ug_id
+                                  AND sl.dugsl_data_inclusao < (
+                                      CASE 
+                                          WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
+                                          ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                      END
+                                  )
+                                ORDER BY sl.dugsl_data_inclusao DESC
+                                LIMIT 1
+                            ) saldo_calc ON true
+                            ORDER BY f.ano_mes_caixa, ni_declarado $sql_limit_offset;";
 
         $sqlPFTitular = "WITH 
+                            -- Movimentação por CONTA (bruta)
                             MovimentacaoPorContaMensal AS (
                                 SELECT 
                                     ug.ug_id,
+                                    ug.ug_cpf,
                                     TO_CHAR(sl.ugsl_data_inclusao::date, 'YYYYMM') AS ano_mes_caixa, 
                                     SUM(CASE 
                                         WHEN (sl.ugsl_ug_perfil_saldo - sl.ugsl_ug_perfil_saldo_antes) > 0 
@@ -397,62 +434,51 @@ class GerarEFinanceira
                                 JOIN 
                                     usuarios_games_saldo_log sl ON ug.ug_id = sl.ugsl_ug_id
                                 WHERE 
-                                    ug.ug_ativo = 1 
-                                    AND sl.ugsl_data_inclusao::date BETWEEN :data_inicio AND :data_fim
+                                    sl.ugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
                                 GROUP BY 
-                                    ug.ug_id,
+                                    ug.ug_id, ug.ug_cpf,
                                     TO_CHAR(sl.ugsl_data_inclusao::date, 'YYYYMM')
                             ),
+                            -- Movimentação por PESSOA (CPF) - Para checar o Limiar de 2000
                             MovimentacaoPessoaMes AS (
                                 SELECT
-                                    ug.ug_cpf,
-                                    m.ano_mes_caixa,
-                                    SUM(m.total_movimentado_conta_mes) AS total_movimentado_pessoa_mes
+                                    ug_cpf,
+                                    ano_mes_caixa,
+                                    SUM(total_movimentado_conta_mes) AS total_movimentado_pessoa_mes
                                 FROM 
-                                    MovimentacaoPorContaMensal m
-                                JOIN 
-                                    usuarios_games ug ON m.ug_id = ug.ug_id
-                                WHERE ug.ug_cpf IS NOT NULL
-                                GROUP BY ug.ug_cpf, m.ano_mes_caixa
+                                    MovimentacaoPorContaMensal
+                                WHERE ug_cpf IS NOT NULL AND ug_cpf <> '' AND ug_cpf <> '..-'
+                                GROUP BY ug_cpf, ano_mes_caixa
                             ),
-                            WhitelistContas AS (
-                                SELECT unnest(ARRAY[]::int[]) AS ug_id -- << COLOQUE OS IDs DAS CONTAS (ug_id) NA WHITELIST AQUI
-                            ),
-                            MesAtivacaoPessoa AS (
+                            -- Identifica gatilho por CPF (> 2000)
+                            GatilhoLimiarCPF AS (
                                 SELECT 
                                     ug_cpf, 
-                                    MIN(ano_mes_caixa) AS mes_ativacao
+                                    MIN(ano_mes_caixa) AS mes_primeiro_estouro
                                 FROM MovimentacaoPessoaMes
                                 WHERE total_movimentado_pessoa_mes > 2000
                                 GROUP BY ug_cpf
                             ),
-                            CPFsNaWhitelist AS (
-                                SELECT DISTINCT ug.ug_cpf
-                                FROM usuarios_games ug
-                                WHERE ug.ug_id IN (SELECT w.ug_id FROM WhitelistContas w)
-                                  AND ug.ug_cpf IS NOT NULL
-                            ),
-                            RegrasReporteCPF AS (
-                                SELECT 
-                                    ug_cpf,
-                                    MIN(mes_inicio) AS mes_inicio_reporte
-                                FROM (
-                                    SELECT ug_cpf, mes_ativacao AS mes_inicio FROM MesAtivacaoPessoa
-                                    UNION ALL
-                                    SELECT ug_cpf, TO_CHAR(:data_inicio::date, 'YYYYMM') AS mes_inicio FROM CPFsNaWhitelist
-                                ) AS RegrasCombinadas
-                                GROUP BY ug_cpf
-                            ),
+                            -- Dados Cadastrais das Contas
                             DadosUsuarioContas AS (
                                 SELECT 
                                     ug.ug_id, ug.ug_nome, ug.ug_data_nascimento, ug.ug_cpf,
                                     ug.ug_endereco, ug.ug_numero, ug.ug_complemento, ug.ug_bairro,
-                                    ug.ug_cidade, ug.ug_estado, ug.ug_cep, ug.ug_perfil_saldo
+                                    ug.ug_cidade, ug.ug_estado, ug.ug_cep, ug.ug_perfil_saldo, 
+                                    ug.ug_ativo, 
+                                    ug.ug_data_encerramento_conta,
+                                    TO_CHAR(ug.ug_data_encerramento_conta, 'YYYYMM') as mes_encerramento
                                 FROM 
                                     usuarios_games ug
                                 WHERE 
-                                    ug.ug_cpf IN (SELECT r.ug_cpf FROM RegrasReporteCPF r)
+                                    ug.ug_cpf IS NOT NULL AND ug.ug_cpf <> '' AND ug.ug_cpf <> '..-'
+                                    AND (
+                                        ug.ug_id IN (SELECT ug_id FROM MovimentacaoPorContaMensal)
+                                        OR ug.ug_ativo = 1
+                                        OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
+                                    )
                             ),
+                            -- Calendário
                             Calendario AS (
                                 SELECT TO_CHAR(d, 'YYYYMM') as ano_mes_caixa
                                 FROM generate_series(
@@ -460,46 +486,83 @@ class GerarEFinanceira
                                     :data_fim::date, 
                                     '1 month'::interval
                                 ) d
+                            ),
+                        RelatorioFiltrado AS (
+                                SELECT 
+                                    d.ug_id, d.ug_cpf, d.ug_nome, d.ug_data_nascimento,
+                                    d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
+                                    d.ug_cidade, d.ug_estado, d.ug_cep, d.ug_perfil_saldo, 
+                                    d.ug_ativo, d.ug_data_encerramento_conta, d.mes_encerramento,
+                                    cal.ano_mes_caixa,
+                                    COALESCE(m.entradas, 0) AS entradas_conta,
+                                    COALESCE(m.saidas, 0) AS saidas_conta,
+                                    COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta
+                                FROM DadosUsuarioContas d
+                                CROSS JOIN Calendario cal
+                                LEFT JOIN MovimentacaoPorContaMensal m ON d.ug_id = m.ug_id AND cal.ano_mes_caixa = m.ano_mes_caixa
+                                LEFT JOIN GatilhoLimiarCPF g ON d.ug_cpf = g.ug_cpf
+                                WHERE 
+                                    (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
+                                    AND (
+                                        (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
+                                        OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                        OR (d.mes_encerramento = cal.ano_mes_caixa)
+                                    )
                             )
+                        -- SELECT FINAL
                         SELECT 
                             1 AS tipo_declarado,
-                            regexp_replace(d.ug_cpf, '[^0-9]', '', 'g') AS ni_declarado,
-                            d.ug_nome AS nome_declarado,
-                            d.ug_data_nascimento AS data_nascimento,
-                            d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
-                            d.ug_cidade, d.ug_estado, d.ug_cep,
-                            ('GM' || d.ug_id) AS id_conta, 
+                            regexp_replace(f.ug_cpf, '[^0-9]', '', 'g') AS ni_declarado,
+                            f.ug_nome AS nome_declarado,
+                            f.ug_data_nascimento AS data_nascimento,
+                            f.ug_endereco, f.ug_numero, f.ug_complemento, f.ug_bairro,
+                            f.ug_cidade, f.ug_estado, f.ug_cep,
+                            ('GM' || f.ug_id) AS id_conta, 
                             'Conta de Pagamento' AS nome_conta, 
                             '1' AS tp_relacao, 
-                            d.ug_perfil_saldo AS saldo_atual_conta,
-                            cal.ano_mes_caixa,
-                            COALESCE(m.entradas, 0) AS entradas_conta,
-                            COALESCE(m.saidas, 0) AS saidas_conta,
-                            COALESCE(m.total_movimentado_conta_mes, 0) AS total_movimentado_conta
-                            
-                        FROM 
-                            RegrasReporteCPF r_cpf
-                        JOIN 
-                            DadosUsuarioContas d ON r_cpf.ug_cpf = d.ug_cpf
-                        CROSS JOIN 
-                            Calendario cal
-                        LEFT JOIN 
-                            MovimentacaoPorContaMensal m ON d.ug_id = m.ug_id 
-                                                         AND cal.ano_mes_caixa = m.ano_mes_caixa
-                        WHERE 
-                            cal.ano_mes_caixa >= r_cpf.mes_inicio_reporte
-                        ORDER BY
-                            cal.ano_mes_caixa, r_cpf.ug_cpf, d.ug_id;";
+                            f.ug_perfil_saldo AS saldo_atual_conta,
+                            f.ano_mes_caixa,
+                            f.entradas_conta,
+                            f.saidas_conta,
+                            f.total_movimentado_conta,
+                            f.ug_ativo, 
+                            f.ug_data_encerramento_conta,
+                            COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                        FROM RelatorioFiltrado f
+                        LEFT JOIN LATERAL (
+                            SELECT sl.ugsl_ug_perfil_saldo AS vlrUltDia
+                            FROM usuarios_games_saldo_log sl
+                            WHERE sl.ugsl_ug_id = f.ug_id
+                              AND sl.ugsl_data_inclusao < (
+                                  CASE 
+                                      WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
+                                      ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                  END
+                              )
+                            ORDER BY sl.ugsl_data_inclusao DESC
+                            LIMIT 1
+                        ) saldo_calc ON true
+                        ORDER BY f.ano_mes_caixa, ni_declarado, id_conta $sql_limit_offset;";
 
         $stmtReprLegal = $pdo->prepare($sqlReprLegal);
+        $stmtReprLegal->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmtReprLegal->bindParam(':data_inicio', $inicio);
         $stmtReprLegal->bindParam(':data_fim', $fim);
+        if ($offset !== null && $limit !== null) {
+            $stmtReprLegal->bindParam(':limit', $limit);
+            $stmtReprLegal->bindParam(':offset', $offset);
+        }
         $stmtReprLegal->execute();
         $resultReprLegal = $stmtReprLegal->fetchAll(PDO::FETCH_ASSOC);
 
         $stmtPFTitular = $pdo->prepare($sqlPFTitular);
+        $stmtPFTitular->bindParam(':data_inicio_semestre', $inicio_semestre);
         $stmtPFTitular->bindParam(':data_inicio', $inicio);
         $stmtPFTitular->bindParam(':data_fim', $fim);
+        if ($offset !== null && $limit !== null) {
+            $stmtPFTitular->bindParam(':limit', $limit);
+            $stmtPFTitular->bindParam(':offset', $offset);
+        }
         $stmtPFTitular->execute();
         $resultPFTitular = $stmtPFTitular->fetchAll(PDO::FETCH_ASSOC);
 
@@ -637,17 +700,17 @@ class GerarEFinanceira
                 // Salva os dados do declarado (que são os mesmos para todas as linhas daquele CPF/Mês)
                 $agrupados[$chaveDeclarado][$chaveMes] = [
                     'dadosDeclarado' => [
-                        'tipo_declarado'  => $registro['tipo_declarado'],
-                        'ni_declarado'    => $registro['ni_declarado'],
-                        'nome_declarado'  => $registro['nome_declarado'],
-                        'data_nascimento' => $registro['data_nascimento'],
-                        'ug_endereco'     => $registro['ug_endereco'],
-                        'ug_numero'       => $registro['ug_numero'],
-                        'ug_complemento'  => $registro['ug_complemento'],
-                        'ug_bairro'       => $registro['ug_bairro'],
-                        'ug_cidade'       => $registro['ug_cidade'],
-                        'ug_estado'       => $registro['ug_estado'],
-                        'ug_cep'          => $registro['ug_cep'],
+                        'tipo_declarado'             => $registro['tipo_declarado'],
+                        'ni_declarado'               => $registro['ni_declarado'],
+                        'nome_declarado'             => $registro['nome_declarado'],
+                        'data_nascimento'            => $registro['data_nascimento'],
+                        'ug_endereco'                => $registro['ug_endereco'],
+                        'ug_numero'                  => $registro['ug_numero'],
+                        'ug_complemento'             => $registro['ug_complemento'],
+                        'ug_bairro'                  => $registro['ug_bairro'],
+                        'ug_cidade'                  => $registro['ug_cidade'],
+                        'ug_estado'                  => $registro['ug_estado'],
+                        'ug_cep'                     => $registro['ug_cep'],
                     ],
                     'contas' => [] // Cria a lista de contas para este mês
                 ];
@@ -656,10 +719,13 @@ class GerarEFinanceira
             // 3. Adiciona a conta atual (a linha do SQL) na lista de 'contas'
             //    daquele Declarado/Mês
             $agrupados[$chaveDeclarado][$chaveMes]['contas'][] = [
-                'ug_id'          => $registro['id_conta'],
-                'tipo_relacao'        => $registro['tp_relacao'],
-                'entradas'          => $registro['entradas_conta'], // Nome padronizado
-                'saidas'            => $registro['saidas_conta'],   // Nome padronizado
+                'ug_id'                      => $registro['id_conta'],
+                'tipo_relacao'               => $registro['tp_relacao'],
+                'entradas'                   => $registro['entradas_conta'], // Nome padronizado
+                'saidas'                     => $registro['saidas_conta'],   // Nome padronizado
+                'ug_data_encerramento_conta' => $registro['ug_data_encerramento_conta'],
+                'vlrUltDia'                  => $registro['vlrultdia'],
+                'ug_ativo'                   => $registro['ug_ativo'],
             ];
         }
 
@@ -744,29 +810,191 @@ class GerarEFinanceira
     }
 
 
-    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim)
+    private function inicioDoSemestre(string $data): string
     {
+        $dt = new DateTime($data);
+        $ano = $dt->format('Y');
+        $mes = (int) $dt->format('m');
+
+        if ($mes <= 6) {
+            return "$ano-01-01";
+        }
+
+        return "$ano-07-01";
+    }
+
+    private function preCarregarIdsMovimentacoes(array $dadosAgrupados)
+    {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $listaParaVerificar = [];
+
+        // $dadosAgrupados vem no formato [cpf => [mes => dados]]
+        foreach ($dadosAgrupados as $cpfCnpj => $meses) {
+            foreach ($meses as $mes => $registro) {
+                $chave = "{$mes}-{$cpfCnpj}";
+
+                if (!isset($this->cacheIdsEventos[$chave])) {
+                    $listaParaVerificar[] = [ // Mudei de $listaParaVerificar[$chave] para [] para economizar chaves associativas pesadas
+                        'anomes' => $mes,
+                        'cpfcnpj' => $cpfCnpj
+                    ];
+                }
+            }
+        }
+
+        if (empty($listaParaVerificar)) {
+            return;
+        }
+
+        // REMOVIDO O BLOCO QUE ESTOURAVA A MEMÓRIA AQUI
+
+        // Processa de 1000 em 1000 itens (O 'true' no array_chunk não é necessário se usamos índice sequencial)
+        $chunks = array_chunk($listaParaVerificar, 1000);
+
+        foreach ($chunks as $chunk) {
+            $this->processarLoteSQL($chunk, $pdo);
+        }
+
+        // Libera a memória da lista gigante logo após terminar
+        unset($listaParaVerificar, $chunks);
+    }
+
+    private function processarLoteSQL($itens, $pdo)
+    {
+        // 1. Buscar Existentes no Lote Atual
+        $tupleStr = [];
+        $params = [];
+        $i = 0;
+
+        foreach ($itens as $item) {
+            $tupleStr[] = "(:a$i, :c$i)";
+            $params[":a$i"] = $item['anomes'];
+            $params[":c$i"] = $item['cpfcnpj'];
+            $i++;
+        }
+
+        $sqlSelect = "SELECT id, data_anomes, cpfcnpj_declarado 
+              FROM public.envios_e_financeira 
+              WHERE tipo = 'MOVIMENTACAO' 
+              AND status_envio <> 'ERRO'
+              AND retificado = false 
+              AND (data_anomes, cpfcnpj_declarado) IN (" . implode(',', $tupleStr) . ")";
+
+        $stmt = $pdo->prepare($sqlSelect);
+        $stmt->execute($params);
+        $encontrados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $chavesEncontradas = [];
+        foreach ($encontrados as $row) {
+            $chave = "{$row['data_anomes']}-{$row['cpfcnpj_declarado']}";
+            $this->cacheIdsEventos[$chave] = $row['id'];
+            $chavesEncontradas[$chave] = true;
+        }
+
+        // 2. Identificar quem falta (Diff)
+        $novosParaInserir = [];
+        foreach ($itens as $item) {
+            $chave = "{$item['anomes']}-{$item['cpfcnpj']}";
+            if (!isset($chavesEncontradas[$chave])) {
+                $novosParaInserir[] = $item;
+            }
+        }
+
+        if (empty($novosParaInserir)) {
+            return;
+        }
+
+        // 3. Inserir Novos em Lote (Bulk Insert)
+        $values = [];
+        $insertParams = [];
+        $j = 0;
+
+        $tipo = 'MOVIMENTACAO';
+        $status = 'PENDENTE';
+        $vEfin = 'v1_2_1';
+        $vEpp = $this->versao_aplicacao;
+        $retificado = 'false';
+        $nomeArq = 'none';
+
+        foreach ($novosParaInserir as $novo) {
+            $semestre = $this->getSemestreFormatado($novo['anomes'] . "-01");
+
+            $values[] = "(:tipo$j, :status$j, :vefin$j, :vepp$j, :arq$j, :anomes$j, :cpf$j, :ret$j, :sem$j)";
+
+            $insertParams[":tipo$j"] = $tipo;
+            $insertParams[":status$j"] = $status;
+            $insertParams[":vefin$j"] = $vEfin;
+            $insertParams[":vepp$j"] = $vEpp;
+            $insertParams[":arq$j"] = $nomeArq;
+            $insertParams[":anomes$j"] = $novo['anomes'];
+            $insertParams[":cpf$j"] = $novo['cpfcnpj'];
+            $insertParams[":ret$j"] = $retificado;
+            $insertParams[":sem$j"] = $semestre;
+            $j++;
+        }
+
+        $sqlInsert = "INSERT INTO envios_e_financeira 
+              (tipo, status_envio, versao_efin, versao_epp, nome_arquivo, data_anomes, cpfcnpj_declarado, retificado, semestre_ano)
+              VALUES " . implode(',', $values) . "
+              RETURNING id, data_anomes, cpfcnpj_declarado";
+
+        try {
+            $stmtInsert = $pdo->prepare($sqlInsert);
+            $stmtInsert->execute($insertParams);
+            $inseridos = $stmtInsert->fetchAll(PDO::FETCH_ASSOC);
+
+            // Adiciona os recém criados ao cache
+            foreach ($inseridos as $row) {
+                $chave = "{$row['data_anomes']}-{$row['cpfcnpj_declarado']}";
+                $this->cacheIdsEventos[$chave] = $row['id'];
+            }
+        } catch (PDOException $e) {
+            throw new Exception("Erro no Bulk Insert: " . $e->getMessage());
+        }
+    }
+
+    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim, $limit = null, $offset = null)
+    {
+        $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
+        $data_fim = DateTime::createFromFormat('Y-m', $fim);
+
+        $erros = DateTime::getLastErrors();
+
+        if ($data_inicio === false || $data_fim === false || $erros['error_count'] > 0) {
+            return false;
+        }
+
+        $inicio = $data_inicio->format('Y-m-01');
+        $fim = $data_fim->format('Y-m-t');
+
+
+
         // 1. Obtenção e Agrupamento dos Dados
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio, $fim);
-        $dadosPF = $this->obterDadosMovFinPF($inicio, $fim);
+        $inicio_semestre = $this->inicioDoSemestre($inicio);
+
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
+        unset($dadosPJ);
         $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+        unset($dadosPF);
+
+        $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
+        $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
 
         // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
-
-        // Variável para IDs únicos (opcional, pode ser movida para dentro do loop do mês se preferir recontar)
-        $id_mov = 100;
 
         // --- Processa PJs ---
         foreach ($dadosPJAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
-                if(!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])){
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                     continue;
                 }
                 // CRIA O XML (ou o objeto XML/Evento)
+
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
@@ -783,21 +1011,25 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas'],
-                    $id_mov
+                    $registro['contas']
                 );
-                $id_mov++;
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
                 $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
 
+        unset($dadosPJAgrupados);
+
         // --- Processa PFs ---
         foreach ($dadosPFAgrupados as $pessoa => $meses) {
             foreach ($meses as $mes => $registro) {
 
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                    continue;
+                }
                 // CRIA O XML (ou o objeto XML/Evento)
+
                 $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                     $registro['dadosDeclarado']['tipo_declarado'],
                     $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
@@ -814,106 +1046,172 @@ class GerarEFinanceira
                     ),
                     substr($mes, 0, 4), // Ano
                     substr($mes, 4, 2), // Mês
-                    $registro['contas'],
-                    $id_mov
+                    $registro['contas']
                 );
-                $id_mov++;
 
                 // ADICIONA O XML AO GRUPO DO MÊS CORRETO
                 $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
 
+        unset($dadosPFAgrupados);
+
         return $movimentacoesAgrupadasPorMes;
     }
 
-    public function gerarLotesMovsFinanceira(array $movimentacoes, $tamanhoLote = 50, $debug = false)
+    public function gerarMovimentacaoFinanceiraCompletaDados($inicio, $fim, $limit = null, $offset = null)
+    {
+        $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
+        $data_fim = DateTime::createFromFormat('Y-m', $fim);
+
+        $erros = DateTime::getLastErrors();
+
+        if ($data_inicio === false || $data_fim === false || $erros['error_count'] > 0) {
+            return false;
+        }
+
+        $inicio = $data_inicio->format('Y-m-01');
+        $fim = $data_fim->format('Y-m-t');
+
+        // 1. Obtenção e Agrupamento dos Dados
+        $inicio_semestre = $this->inicioDoSemestre($inicio);
+
+        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
+        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
+
+        $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
+        unset($dadosPJ);
+        $dadosPFAgrupados = $this->agruparDadosEFinanceira($dadosPF);
+        unset($dadosPF);
+
+        $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
+        $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
+
+        // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
+        $movimentacoesAgrupadasPorMes = [];
+
+        // --- Processa PJs ---
+        foreach ($dadosPJAgrupados as $pessoa => $meses) {
+            foreach ($meses as $mes => $registro) {
+
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                    continue;
+                }
+
+                $movimentacoesAgrupadasPorMes[$mes][] = $registro;
+            }
+        }
+
+        unset($dadosPJAgrupados);
+
+        // --- Processa PFs ---
+        foreach ($dadosPFAgrupados as $pessoa => $meses) {
+            foreach ($meses as $mes => $registro) {
+
+                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                    continue;
+                }
+
+                $movimentacoesAgrupadasPorMes[$mes][] = $registro;
+            }
+        }
+
+        unset($dadosPFAgrupados);
+
+        return $movimentacoesAgrupadasPorMes;
+    }
+
+    private function compararDatas($data_inicial, $data_final)
+    {
+        if ($data_inicial == "" || $data_final == "") {
+            return 0;
+        }
+        try {
+            $d1 = new DateTime($data_inicial);
+            $d2 = new DateTime($data_final);
+
+            if ($d1 <= $d2) {
+                return 1;   // data inicial menor ou igual (normal)
+            } else {
+                return -1;  // data inicial maior 
+            }
+        } catch (Exception $e) {
+            return 0; // erro na data
+        }
+    }
+    public function gerarXmlMovimentacao($data_inicial, $data_final, $limit = null, $offset = null)
+    {
+        if ($this->compararDatas($data_inicial, $data_final) < 1) {
+            return ['xmls' => [], 'total_eventos' => 0];
+        }
+
+        // Chama o método para pegar os dados brutos agrupados por mês
+        $movimentacoes = $this->gerarMovimentacaoFinanceiraCompleta($data_inicial, $data_final, $limit, $offset);
+
+        // CONTAGEM EXATA: Soma a quantidade de eventos dentro de cada mês
+        $total_eventos = 0;
+        if (is_array($movimentacoes)) {
+            foreach ($movimentacoes as $mes => $eventos) {
+                $total_eventos += count($eventos);
+            }
+        }
+
+        // Transforma em XML
+        $xmls = $this->gerarLotesMovsFinanceira($movimentacoes);
+
+        // Retorna os XMLs e a quantidade real de linhas do banco
+        return [
+            'xmls' => $xmls,
+            'total_eventos' => $total_eventos
+        ];
+    }
+
+    public function gerarLotesMovsFinanceira(array &$movimentacoes, $tamanhoLote = 50, $debug = false)
     {
         $lotesArray = [];
 
-        // O array $movimentacoes já está agrupado por mês (a chave é o anoMes, ex: '202501')
-        foreach ($movimentacoes as $anoMes => $eventosDoMes) {
+        // 2. Pegamos as chaves (meses) para iterar com segurança enquanto apagamos os dados
+        $meses = array_keys($movimentacoes);
 
-            // 1. Divide os eventos do mês em lotes menores (Chunks)
-            // A função array_chunk() do PHP faz isso de forma eficiente.
+        foreach ($meses as $anoMes) {
+
+            // Pega os eventos apenas desse mês
+            $eventosDoMes = $movimentacoes[$anoMes];
+
+            // MEGA WIN 1: Apaga esse mês do array gigante original IMEDIATAMENTE!
+            // Isso libera a memória para o novo XML que vamos montar.
+            unset($movimentacoes[$anoMes]);
+
             $chunksDeEventos = array_chunk($eventosDoMes, $tamanhoLote);
+
+            // MEGA WIN 2: Apaga o array temporário
+            unset($eventosDoMes);
 
             $contadorLote = 1;
 
-            // 2. Itera sobre cada lote de eventos
-            foreach ($chunksDeEventos as $eventosDoLote) {
+            foreach ($chunksDeEventos as $index => $eventosDoLote) {
 
-                // Log opcional para acompanhamento
-                if ($debug)
+                if ($debug) {
                     echo "Criando Lote {$contadorLote} para o Mês {$anoMes} com " . count($eventosDoLote) . " eventos...\n";
+                }
 
+                // Gera a string do lote
                 $xmlLoteFinal = $this->gerarLoteAssincrono($eventosDoLote);
 
-                // 4. Adiciona o XML do lote final ao array de retorno
-                $lotesArray[] = ['xml' => $xmlLoteFinal, 'ano_mes' => $anoMes, 'lote_numero' => $contadorLote];
+                $lotesArray[] = [
+                    'xml' => $xmlLoteFinal,
+                    'ano_mes' => $anoMes,
+                    'lote_numero' => $contadorLote
+                ];
+
+                // MEGA WIN 3: Apaga o chunk da memória assim que o XML final é gerado
+                unset($chunksDeEventos[$index]);
 
                 $contadorLote++;
             }
         }
 
         return $lotesArray;
-    }
-
-    function chamarServicoEnviar($xmlCriptografado, $producao = false, $usarGzip = false)
-    {
-        // 1. Montar a URL com os query parameters
-        $urlBase = 'http://assinador:5000/assinar';
-        $queryParams = [
-            'producao' => $producao ? 'true' : 'false',
-            'usar_gzip' => $usarGzip ? 'true' : 'false'
-        ];
-        $url = $urlBase . '?' . http_build_query($queryParams);
-
-        // 2. Montar os cabeçalhos (headers)
-        $headers = [
-            // O Python espera a senha neste cabeçalho
-            'X-Certificate-Password: ' . $this->senhaCertificado,
-            // Essencial: Informa que o body é XML cru
-            'Content-Type: application/xml; charset=utf-8',
-            'Content-Length: ' . strlen($xmlCriptografado)
-        ];
-
-        // 3. Configurar o cURL
-        $ch = curl_init($url);
-
-        curl_setopt_array($ch, [
-            // Define o método como POST
-            CURLOPT_POST => true,
-            // Envia o XML criptografado "cru" no body
-            CURLOPT_POSTFIELDS => $xmlCriptografado,
-            // Define os cabeçalhos (incluindo a senha)
-            CURLOPT_HTTPHEADER => $headers,
-            // Queremos a resposta como string
-            CURLOPT_RETURNTRANSFER => true,
-            // Timeouts
-            CURLOPT_TIMEOUT => 150, // Timeout total (120s da Receita + 30s de margem)
-            CURLOPT_CONNECTTIMEOUT => 30
-        ]);
-
-        // 4. Executar e tratar erros
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-
-        curl_close($ch);
-
-        if ($response === false) {
-            throw new Exception("Falha de cURL ao chamar /enviar: " . $curlError);
-        }
-
-        // Se o microsserviço retornar um erro (ex: 400, 500), ele manda JSON
-        if ($httpCode !== 200) {
-            // A $response provavelmente é um JSON com {"erro": ...}
-            throw new Exception("Serviço /enviar retornou erro HTTP $httpCode: " . $response);
-        }
-
-        // Se $httpCode é 200, a $response é o XML da Receita
-        return $response;
     }
 
     private function obterUltimoIdEnvio()
@@ -933,11 +1231,11 @@ class GerarEFinanceira
         $prefixo = 'ID';
 
         // Define o comprimento total da parte numérica
-        $comprimentoNumerico = 18;
+        $comprimentoNumerico = 17;
 
         // Usa str_pad para preencher o número com '0' à esquerda (STR_PAD_LEFT)
         // até que ele atinja o comprimento de 18 caracteres.
-        $parteNumerica = str_pad($numero, $comprimentoNumerico, '0', STR_PAD_LEFT);
+        $parteNumerica = '1' . str_pad($numero, $comprimentoNumerico, '0', STR_PAD_LEFT);
 
         // Concatena o prefixo com a parte numérica
         return $prefixo . $parteNumerica;
@@ -950,6 +1248,154 @@ class GerarEFinanceira
         return preg_replace('/\D/', '', $documento);
     }
 
+    private function getSemestreFormatado($dataString)
+    {
+        $date = new DateTime($dataString);
+        $ano = $date->format('Y');
+        $mes = (int)$date->format('n'); // 'n' retorna o mês de 1 a 12 sem zeros à esquerda
+
+        $semestre = ($mes <= 6) ? 1 : 2;
+
+        return "{$ano}.{$semestre}";
+    }
+
+    private function buscar_movimentacoes(string $ano_mes, string $cpfcnpj): int
+    {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        // 1. Tenta buscar o ID existente
+        $sql = "SELECT id FROM public.envios_e_financeira 
+            WHERE data_anomes = :anomes 
+              AND cpfcnpj_declarado = :cpfcnpj 
+              AND tipo = 'MOVIMENTACAO'
+              AND status_envio <> 'ERRO'
+              AND retificado = false
+            LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':anomes'  => $ano_mes,
+            ':cpfcnpj' => $cpfcnpj
+        ]);
+
+        $idEncontrado = $stmt->fetchColumn();
+
+        // Se encontrou, retorna o ID imediatamente
+        if ($idEncontrado) {
+            return (int) $idEncontrado;
+        }
+
+        // 2. Se não encontrou, prepara os dados para criar um novo
+
+        $semetre = $this->getSemestreFormatado($ano_mes . "-01");
+
+        $dadosParaCriar = [
+            'tipo'              => 'MOVIMENTACAO',
+            'status_envio'      => 'PENDENTE',      // Valor padrão
+            'versao_efin'       => 'v1_2_1',         // Valor padrão obrigatório
+            'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
+            'nome_arquivo'      => "none",
+            'cpfcnpj_declarado' => $cpfcnpj,
+            'data_anomes'       => $ano_mes,
+            'retificado'        => 'false',
+            'semestre_ano'      => $semetre
+        ];
+
+        return $this->criarEnvioFinanceira($dadosParaCriar);
+    }
+
+    private function buscar_aberturas(string $data_inicial, string $data_final): int
+    {
+        $periodo = $data_inicial . "_" . $data_final;
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        // 1. Tenta buscar o ID existente
+        $sql = "SELECT id FROM public.envios_e_financeira 
+            WHERE data_anomes = :anomes 
+              AND tipo = 'ABERTURA'
+              AND status_envio <> 'ERRO'
+              AND retificado = false
+            LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':anomes'  => $periodo,
+        ]);
+
+        $idEncontrado = $stmt->fetchColumn();
+
+        // Se encontrou, retorna o ID imediatamente
+        if ($idEncontrado) {
+            return (int) $idEncontrado;
+        }
+
+        // 2. Se não encontrou, prepara os dados para criar um novo
+
+        $semetre = $this->getSemestreFormatado($data_inicial);
+
+        $dadosParaCriar = [
+            'tipo'              => 'ABERTURA',
+            'status_envio'      => 'PENDENTE',      // Valor padrão
+            'versao_efin'       => 'v1_2_1',         // Valor padrão obrigatório
+            'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
+            'nome_arquivo'      => "none",
+            'data_anomes'       => $periodo,
+            'retificado'        => 'false',
+            'semestre_ano'      => $semetre
+        ];
+
+        return $this->criarEnvioFinanceira($dadosParaCriar);
+    }
+
+    private function buscar_fechamento(string $data_inicial, string $data_final): int
+    {
+        $periodo = $data_inicial . "_" . $data_final;
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        // 1. Tenta buscar o ID existente
+        $sql = "SELECT id FROM public.envios_e_financeira 
+            WHERE data_anomes = :anomes 
+              AND tipo = 'FECHAMENTO'
+              AND status_envio <> 'ERRO'
+              AND retificado = false
+            LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':anomes'  => $periodo,
+        ]);
+
+        $idEncontrado = $stmt->fetchColumn();
+
+        // Se encontrou, retorna o ID imediatamente
+        if ($idEncontrado) {
+            return (int) $idEncontrado;
+        }
+
+        // 2. Se não encontrou, prepara os dados para criar um novo
+
+        $semetre = $this->getSemestreFormatado($data_inicial);
+
+        $dadosParaCriar = [
+            'tipo'              => 'FECHAMENTO',
+            'status_envio'      => 'PENDENTE',      // Valor padrão
+            'versao_efin'       => 'v1_2_2',         // Valor padrão obrigatório
+            'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
+            'nome_arquivo'      => "none",
+            'data_anomes'       => $periodo,
+            'retificado'        => 'false',
+            'semestre_ano'      => $semetre
+        ];
+
+        return $this->criarEnvioFinanceira($dadosParaCriar);
+    }
+
+    public function limparTextoSped($texto, $tamanhoMaximo)
+    {
+        $proibidos = ['"', "'", '--', '#'];
+        $textoLimpo = str_replace($proibidos, '', $texto);
+        $textoCortado = substr($textoLimpo, 0, $tamanhoMaximo);
+
+        return htmlspecialchars($textoCortado, ENT_QUOTES | ENT_XML1, 'UTF-8');
+    }
+
     /**
      * @param array{
      *     ug_id: int|string,
@@ -958,7 +1404,7 @@ class GerarEFinanceira
      *     tipo_relacao: string
      * } $contas_user
      */
-    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user, $id_mov = null)
+    public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
     {
         // Criar o objeto DOMDocument
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -973,10 +1419,17 @@ class GerarEFinanceira
         );
         $dom->appendChild($eFinanceira);
 
-        // Criar o elemento evtMovOpFin com atributo id
-        $idNovo =  $id_mov ?: $this->obterUltimoIdEnvio() + 1;
+        $cpfCnpjNum = $this->apenasNumeros($cpfCnpj);
+        $chaveCache = "{$ano}{$mes}-{$cpfCnpjNum}";
 
-        $id_formatado = $this->gerarIdFormatado($idNovo);
+        if (isset($this->cacheIdsEventos[$chaveCache])) {
+            $id_evento = $this->cacheIdsEventos[$chaveCache];
+        } else {
+            // Fallback: Se por algum motivo não estiver no cache, busca no banco
+            $id_evento = $this->buscar_movimentacoes("{$ano}{$mes}", $cpfCnpjNum);
+        }
+
+        $id_formatado = $this->gerarIdFormatado($id_evento);
 
         $evtMovOpFin = $dom->createElementNS($namespace, 'evtMovOpFin');
         $evtMovOpFin->setAttribute('id', $id_formatado);
@@ -999,7 +1452,7 @@ class GerarEFinanceira
         $ideEvento->appendChild($aplicEmi);
 
         // verAplic
-        $verAplic = $dom->createElementNS($namespace, 'verAplic', '00000000000000000001');
+        $verAplic = $dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao);
         $ideEvento->appendChild($verAplic);
 
         // ideDeclarante - grupo
@@ -1018,22 +1471,31 @@ class GerarEFinanceira
         $ideDeclarado->appendChild($tpNI);
 
         // NIDeclarado cpf ou cnpj
-        $cpfCnpjNum = $this->apenasNumeros($cpfCnpj);
         $NIDeclarado = $dom->createElementNS($namespace, 'NIDeclarado', $cpfCnpjNum);
         $ideDeclarado->appendChild($NIDeclarado);
 
         // NomeDeclarado
-        $NomeDeclarado = $dom->createElementNS($namespace, 'NomeDeclarado', substr($nomeDeclarado, 0, 100));
+        $NomeDeclarado = $dom->createElementNS(
+            $namespace,
+            'NomeDeclarado',
+            $this->limparTextoSped($nomeDeclarado, 100)
+        );
         $ideDeclarado->appendChild($NomeDeclarado);
 
-        if ($tipoNI == 1) {
-            // DataNasc
-            $DataNasc = $dom->createElementNS($namespace, 'DataNasc', $dataNascimento);
-            $ideDeclarado->appendChild($DataNasc);
+        if ($tipoNI == 1 && !empty($dataNascimento)) {
+            // Valida se a data é maior ou igual a 01/01/1900
+            if (strtotime($dataNascimento) >= strtotime('1900-01-01')) {
+                $DataNasc = $dom->createElementNS($namespace, 'DataNasc', $dataNascimento);
+                $ideDeclarado->appendChild($DataNasc);
+            }
         }
 
         // EnderecoLivre
-        $EnderecoLivre = $dom->createElementNS($namespace, 'EnderecoLivre', substr($enderecoCliente, 0, 200));
+        $EnderecoLivre = $dom->createElementNS(
+            $namespace,
+            'EnderecoLivre',
+            $this->limparTextoSped($enderecoCliente, 200)
+        );
         $ideDeclarado->appendChild($EnderecoLivre);
 
         if ($enderecoCliente == "Endereco cliente nao encontrado") {
@@ -1068,6 +1530,9 @@ class GerarEFinanceira
             $entradas = $conta_user['entradas'];
             $saidas = $conta_user['saidas'];
             $tipo_relacao = $conta_user['tipo_relacao'];
+            $data_encerramento = $conta_user['ug_data_encerramento_conta'];
+            $vlr_ult_dia = $conta_user['vlrUltDia'];
+            $ug_ativo = $conta_user['ug_ativo'];
 
             $Conta = $dom->createElementNS($namespace, 'Conta');
             $movOpFin->appendChild($Conta);
@@ -1112,9 +1577,13 @@ class GerarEFinanceira
             $NoTitulares = $dom->createElementNS($namespace, 'NoTitulares', '1');
             $infoConta->appendChild($NoTitulares);
 
-            //dtEncerramentoConta RESOLVER DEPOIS
+            //dtEncerramentoConta
+            if ((int) $ug_ativo !== 1 && date('Ym', strtotime($data_encerramento)) == "{$ano}{$mes}") {
+                $dataFormatada = date('Y-m-d', strtotime($data_encerramento));
 
-            //IndInatividade RESOLVER DEPOIS 6 ANOS INATIV
+                $dtEncerramentoConta = $dom->createElementNS($namespace, 'dtEncerramentoConta', $dataFormatada);
+                $infoConta->appendChild($dtEncerramentoConta);
+            }
 
             //BalancoConta grupo
             $BalancoConta = $dom->createElementNS($namespace, 'BalancoConta');
@@ -1139,7 +1608,12 @@ class GerarEFinanceira
             $totDebitosMesmaTitularidade = $dom->createElementNS($namespace, 'totDebitosMesmaTitularidade', '0,00');
             $BalancoConta->appendChild($totDebitosMesmaTitularidade);
 
-            //vlrUltDia RESOLVER DEPOIS SO MES DEZEMBRO
+            //vlrUltDia
+            if (((int) $ug_ativo !== 1 && date('Ym', strtotime($data_encerramento)) == "{$ano}{$mes}") || (int) $mes == 12) {
+                $valorFormatado = number_format((float) $vlr_ult_dia, 2, ',', '');
+                $vlrUltDia = $dom->createElementNS($namespace, 'vlrUltDia', $valorFormatado);
+                $BalancoConta->appendChild($vlrUltDia);
+            }
 
             //PgtosAcum - grupo
             $PgtosAcum = $dom->createElementNS($namespace, 'PgtosAcum');
@@ -1184,7 +1658,7 @@ class GerarEFinanceira
         $ideEvento->appendChild($dom->createElementNS($namespace, 'indRetificacao', '1'));
         $ideEvento->appendChild($dom->createElementNS($namespace, 'tpAmb', '1'));
         $ideEvento->appendChild($dom->createElementNS($namespace, 'aplicEmi', '1'));
-        $ideEvento->appendChild($dom->createElementNS($namespace, 'verAplic', '00000000000000000001'));
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao));
         $evtCadDeclarante->appendChild($ideEvento);
 
         // ideDeclarante
@@ -1224,7 +1698,7 @@ class GerarEFinanceira
         $dom->appendChild($eFinanceira);
 
         // <evtAberturaeFinanceira id="...">
-        $idNovo = $this->obterUltimoIdEnvio() + 1;
+        $idNovo = $this->buscar_aberturas($data_inicio, $data_fim);
 
         $id_formatado = $this->gerarIdFormatado($idNovo);
         $evt = $dom->createElementNS($namespace, 'evtAberturaeFinanceira');
@@ -1243,7 +1717,7 @@ class GerarEFinanceira
         $aplicEmi = $dom->createElementNS($namespace, 'aplicEmi', '1');
         $ideEvento->appendChild($aplicEmi);
         // Versão do aplicativo de emissão do evento
-        $verAplic = $dom->createElementNS($namespace, 'verAplic', '0000000000000001');
+        $verAplic = $dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao);
         $ideEvento->appendChild($verAplic);
 
         $evt->appendChild($ideEvento);
@@ -1401,17 +1875,21 @@ class GerarEFinanceira
         return ['xml' => $dom, 'id' => $id_formatado];
     }
 
-    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre, $arquivosPorMes)
+    /**
+     * Gera o XML de Fechamento (Versão 1.3.0)
+     * * @param string $dataInicioSemestre Formato YYYY-MM-DD
+     * @param string $dataFimSemestre    Formato YYYY-MM-DD
+     * @param bool   $temMovimento       true = Teve movimento, false = Sem movimento
+     */
+    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre, $temMovimento)
     {
+        // 1. Definição dos Namespaces (Versão 1.3.0)
+        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_3_0';
 
-        // 1. Definição dos Namespaces
-        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_2_2';
-        $nsDS = 'http://www.w3.org/2000/09/xmldsig#';
-
-        // 2. Dados de Exemplo para o fechamento (1º Semestre de 2025)
-        $idNovo = $this->obterUltimoIdEnvio() + 1;
+        // 2. Busca ID e Formata
+        $idNovo = $this->buscar_fechamento($dataInicioSemestre, $dataFimSemestre);
         $id_formatado = $this->gerarIdFormatado($idNovo);
-        $versaoApp = '00000000000000000001';
+
         $ambiente = '1'; // 1 = Produção, 2 = Homologação
 
         // 3. Criação do Documento DOM
@@ -1419,56 +1897,45 @@ class GerarEFinanceira
         $doc->formatOutput = false;
         $doc->preserveWhiteSpace = true;
 
-        // 4. Elemento Raiz (eFinanceira)
+        // 4. Elemento Raiz
         $eFinanceira = $doc->createElementNS($ns, 'eFinanceira');
         $doc->appendChild($eFinanceira);
 
-        // 5. Elemento do Evento (evtFechamentoeFinanceira)
+        // 5. Evento
         $evtFechamento = $doc->createElementNS($ns, 'evtFechamentoeFinanceira');
         $evtFechamento->setAttribute('id', $id_formatado);
         $eFinanceira->appendChild($evtFechamento);
 
-        // 6. Grupo: ideEvento (Obrigatório)
+        // 6. ideEvento
         $ideEvento = $doc->createElementNS($ns, 'ideEvento');
         $evtFechamento->appendChild($ideEvento);
 
-        $ideEvento->appendChild($doc->createElementNS($ns, 'indRetificacao', '1')); // 1 = Original
+        $ideEvento->appendChild($doc->createElementNS($ns, 'indRetificacao', '1'));
         $ideEvento->appendChild($doc->createElementNS($ns, 'tpAmb', $ambiente));
-        $ideEvento->appendChild($doc->createElementNS($ns, 'aplicEmi', '1')); // 1 = Aplicativo da empresa
-        $ideEvento->appendChild($doc->createElementNS($ns, 'verAplic', $versaoApp));
+        $ideEvento->appendChild($doc->createElementNS($ns, 'aplicEmi', '1'));
+        $ideEvento->appendChild($doc->createElementNS($ns, 'verAplic', $this->versao_aplicacao));
 
-        // 7. Grupo: ideDeclarante (Obrigatório)
+        // 7. ideDeclarante
         $ideDeclarante = $doc->createElementNS($ns, 'ideDeclarante');
         $evtFechamento->appendChild($ideDeclarante);
 
         $ideDeclarante->appendChild($doc->createElementNS($ns, 'cnpjDeclarante', $this->cnpjEPP));
 
-        // 8. Grupo: infoFechamento (Obrigatório)
+        // 8. infoFechamento
         $infoFechamento = $doc->createElementNS($ns, 'infoFechamento');
         $evtFechamento->appendChild($infoFechamento);
 
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtInicio', $dataInicioSemestre));
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtFim', $dataFimSemestre));
-        $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0')); // 0 = Não se aplica
+        $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0'));
 
-        // 9. Grupo: FechamentoMovOpFin (Funcionalmente Obrigatório para você)
-        // Este grupo é minOccurs="0" no XSD, mas obrigatório pela regra de negócio do seu módulo.
-        $fechamentoMovOpFin = $doc->createElementNS($ns, 'FechamentoMovOpFin');
-        $evtFechamento->appendChild($fechamentoMovOpFin);
+        // 10. Operações Financeiras (O seu módulo principal)
+        $indicador = $temMovimento ? '1' : '0';
+        $fechamentoMovOpFinGroup = $doc->createElementNS($ns, 'FechamentoMovOpFin');
+        $evtFechamento->appendChild($fechamentoMovOpFinGroup);
 
-        // Você DEVE adicionar um 'FechamentoMes' para cada mês do semestre.
-        foreach ($arquivosPorMes as $anoMes => $quantidade) {
-            // Grupo: FechamentoMes (Obrigatório dentro de FechamentoMovOpFin)
-            $fechamentoMes = $doc->createElementNS($ns, 'FechamentoMes');
-            $fechamentoMovOpFin->appendChild($fechamentoMes);
+        $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'FechamentoMovOpFin', $indicador));
 
-            // anoMesCaixa (Obrigatório)
-            $fechamentoMes->appendChild($doc->createElementNS($ns, 'anoMesCaixa', $anoMes));
-            // quantArqTrans (Obrigatório)
-            $fechamentoMes->appendChild($doc->createElementNS($ns, 'quantArqTrans', $quantidade));
-        }
-
-        // 11. Exibir o XML
         return ['xml' => $doc, 'id' => $id_formatado];
     }
 
@@ -1516,8 +1983,6 @@ class GerarEFinanceira
         // 5. Retorna a string XML completa
         return $xmlString;
     }
-
-
 
     private function obterTagEventoAssinar(DOMElement $eventoElement)
     {
@@ -1578,6 +2043,18 @@ class GerarEFinanceira
         return null;
     }
 
+    private function is_xml($data)
+    {
+        if (empty($data)) return false;
+
+        // Desativa erros do libxml para não poluir o log e limpa depois
+        libxml_use_internal_errors(true);
+        $doc = simplexml_load_string($data);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+
+        return $doc !== false && empty($errors);
+    }
 
     public function assinarLoteEventos($xml)
     {
@@ -1591,10 +2068,17 @@ class GerarEFinanceira
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $resposta = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
         if ($resposta === false) {
             throw new Exception("Falha ao chamar serviço de assinatura");
+        }
+        if ($httpCode !== 200) {
+            throw new Exception("O serviço retornou um erro HTTP: $httpCode. Resposta: " . substr($resposta, 0, 100));
+        }
+        if (!$this->is_xml($resposta)) {
+            throw new Exception("A resposta do serviço não é um XML válido.");
         }
 
         return $resposta;
@@ -1612,7 +2096,7 @@ class GerarEFinanceira
         if ($prod) {
             $postFields = [
                 'xml' => $xmlConteudo,
-                'cert_path' => "/certs/efinanceira-producao-2025.cer"
+                'prod' => "true"
             ];
         } else {
             $postFields = [
@@ -1630,16 +2114,172 @@ class GerarEFinanceira
         if ($resposta === false || $httpCode !== 200) {
             throw new Exception("Falha ao chamar serviço de criptografia (HTTP $httpCode): " . $resposta);
         }
+        if (!$this->is_xml($resposta)) {
+            throw new Exception("A resposta do serviço não é um XML válido.");
+        }
 
         return $resposta;
     }
 
+    /**
+     * Atualiza o status de múltiplos eventos (Bulk Update)
+     * @param array $ids Lista de IDs (inteiros)
+     * @param string $protocolo Protocolo do lote
+     * @param string $nomeArquivo Nome do arquivo enviado
+     * @param string $status O status para gravar ('ENVIADO', 'ERRO', 'REJEITADO', etc)
+     */
+    public function atualizarLoteStatus(array $ids, $protocolo, $nomeArquivo, $status)
+    {
+        if (empty($ids)) return 0;
+
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $totalLinhas = 0;
+
+        // Divide em chunks de 1000 para segurança do PDO
+        $lotesDeIds = array_chunk($ids, 1000);
+
+        foreach ($lotesDeIds as $loteAtual) {
+            $placeholders = implode(',', array_fill(0, count($loteAtual), '?'));
+
+            // Adicionei a coluna status_envio = ? na query
+            $sql = "UPDATE envios_e_financeira 
+                SET status_envio = ?,
+                    nome_arquivo = ?,
+                    num_protocolo = ?,
+                    data_envio = NOW()
+                WHERE id IN ($placeholders)";
+
+            try {
+                $stmt = $pdo->prepare($sql);
+
+                // Parâmetros: Status, Nome, Protocolo
+                $params = [$status, $nomeArquivo, $protocolo];
+
+                // Merge com os IDs
+                $params = array_merge($params, $loteAtual);
+
+                $stmt->execute($params);
+                $totalLinhas += $stmt->rowCount();
+            } catch (PDOException $e) {
+                throw new Exception("Erro no update de status ($status): " . $e->getMessage());
+            }
+        }
+
+        return $totalLinhas;
+    }
+
+    public function atualizarLoteParaEnviado(array $ids, $protocolo, $nomeArquivo)
+    {
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $totalLinhasAfetadas = 0;
+
+        // Divide o array de IDs em pedaços de 1000
+        $lotesDeIds = array_chunk($ids, 1000);
+
+        foreach ($lotesDeIds as $loteAtual) {
+
+            $placeholders = implode(',', array_fill(0, count($loteAtual), '?'));
+
+            $sql = "UPDATE envios_e_financeira 
+                SET status_envio = 'ENVIADO',
+                    nome_arquivo = ?,
+                    num_protocolo = ?,
+                    data_envio = NOW()
+                WHERE id IN ($placeholders)";
+
+            try {
+                $stmt = $pdo->prepare($sql);
+
+                $params = [$nomeArquivo, $protocolo];
+
+                $params = array_merge($params, $loteAtual);
+
+                $stmt->execute($params);
+
+                $totalLinhasAfetadas += $stmt->rowCount();
+            } catch (PDOException $e) {
+                throw new Exception("Erro no Bulk Update: " . $e->getMessage());
+            }
+        }
+
+        return $totalLinhasAfetadas;
+    }
+
+    private function criarEnvioFinanceira(array $dados)
+    {
+        // 1. Definição da Query SQL
+        $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sql = "INSERT INTO envios_e_financeira (
+            tipo, 
+            status_envio, 
+            versao_efin, 
+            versao_epp, 
+            nome_arquivo, 
+            data_envio, 
+            semestre_ano, 
+            retificado, 
+            descricao,
+            cpfcnpj_declarado,
+            data_anomes,
+            id_retificacao,
+            num_protocolo
+        ) VALUES (
+            :tipo, 
+            :status_envio, 
+            :versao_efin, 
+            :versao_epp, 
+            :nome_arquivo, 
+            :data_envio, 
+            :semestre_ano, 
+            :retificado, 
+            :descricao,
+            :cpfcnpj_declarado,
+            :data_anomes,
+            :id_retificacao,
+            :num_protocolo
+        )";
+
+        try {
+            $stmt = $pdo->prepare($sql);
+
+            $params = [
+                // Campos Obrigatórios
+                ':tipo'         => $dados['tipo'],
+                ':status_envio' => $dados['status_envio'],
+                ':versao_efin'  => $dados['versao_efin'],
+                ':versao_epp'   => $dados['versao_epp'],
+                ':nome_arquivo' => $dados['nome_arquivo'],
+
+                // Campos Opcionais
+                ':data_envio'   => $dados['data_envio'] ?? null,
+                ':semestre_ano' => $dados['semestre_ano'] ?? null,
+                ':retificado'   => $dados['retificado'] ?? 'false',
+                ':descricao'    => $dados['descricao'] ?? null,
+                ':cpfcnpj_declarado' => $dados['cpfcnpj_declarado'] ?? null,
+                ':data_anomes'       => $dados['data_anomes'] ?? null,
+                ':id_retificacao'    => $dados['id_retificacao'] ?? null,
+                ':num_protocolo'     => $dados['num_protocolo'] ?? null,
+            ];
+
+            $stmt->execute($params);
+
+            // Retornar o ID gerado
+            return $pdo->lastInsertId();
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao inserir em envios_e_financeira: " . $e->getMessage());
+        }
+    }
 
     public function enviarLoteEFinanceira($xmlLoteCriptografado, $usarGzip = false, $producao = false)
     {
         // Definir endpoint
         if ($producao) {
-            $urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
+            //$urlBase = 'https://efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
         } else {
             $urlBase = 'https://pre-efinanceira.receita.fazenda.gov.br/recepcao/lotes/';
         }
@@ -1667,14 +2307,10 @@ class GerarEFinanceira
                 'Content-Length: ' . strlen($xmlString)
             ],
 
-            // --- CORREÇÃO AQUI ---
             // Autenticação mútua TLS com PFX
             CURLOPT_SSLCERT => $this->certificado, // O caminho para /certs/cert-eprepag.pfx
             CURLOPT_SSLCERTPASSWD => $this->senhaCertificado,
             CURLOPT_SSLCERTTYPE => 'P12',
-            // A linha CURLOPT_SSLKEY foi removida
-            // --- FIM DA CORREÇÃO ---
-
             // Segurança TLS
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -1781,6 +2417,257 @@ class GerarEFinanceira
         //return $this->processarRespostaConsulta($response, $httpCode);
         return $response;
     }
+
+    /**
+     * Consulta Informações Cadastrais
+     */
+    public function consultarInformacoesCadastrais($cnpj, $producao = false)
+    {
+        if (empty($cnpj)) {
+            throw new Exception("CNPJ é obrigatório.");
+        }
+
+        $endpoint = "/informacoes-cadastrais";
+
+        $params = [
+            'cnpj' => $cnpj
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Consulta Lista e-Financeira (Mov. Financeira e Previdência)
+     */
+    public function consultarListaEFinanceira($cnpj, $situacaoInformacao, $dataInicio, $dataFim, $producao = false)
+    {
+        // Validações básicas
+        if (empty($cnpj) || empty($dataInicio) || empty($dataFim)) {
+            throw new Exception("CNPJ, Data Início e Data Fim são obrigatórios.");
+        }
+
+        $endpoint = "/lista-efinanceira-movimento";
+
+        $params = [
+            'cnpj'               => $cnpj,
+            'situacaoInformacao' => $situacaoInformacao,
+            'dataInicio'         => $dataInicio, // Formato esperado geralmente é AAAA-MM-DD ou AAAA-MM-DDTHH:MM:SS
+            'dataFim'            => $dataFim
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Consulta Informações Movimento Operação Financeira
+     */
+    public function consultarMovimentoOpFin($cnpj, $situacaoInformacao, $anoMesInicio, $anoMesTermino, $tipoIdentificacao, $identificacao, $producao = false)
+    {
+        $endpoint = "/informacoes-mov-op-fin";
+
+        $params = [
+            'cnpj'                    => $cnpj,
+            'situacaoInformacao'      => $situacaoInformacao,
+            'anoMesInicioVigencia'    => $anoMesInicio,   // Ex: 202501
+            'anoMesTerminoVigencia'   => $anoMesTermino,  // Ex: 202506
+            'tipoIdentificacao'       => $tipoIdentificacao,
+            'identificacao'           => $identificacao
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Consulta Informações Movimento Operação Financeira Anual
+     */
+    public function consultarMovimentoOpFinAnual($cnpj, $situacaoInformacao, $anoMesInicio, $anoMesTermino, $tipoIdentificacao, $identificacao, $producao = false)
+    {
+        $endpoint = "/informacoes-mov-op-fin-anual";
+
+        $params = [
+            'cnpj'                    => $cnpj,
+            'situacaoInformacao'      => $situacaoInformacao,
+            'anoMesInicioVigencia'    => $anoMesInicio,
+            'anoMesTerminoVigencia'   => $anoMesTermino,
+            'tipoIdentificacao'       => $tipoIdentificacao,
+            'identificacao'           => $identificacao
+        ];
+
+        return $this->executarRequestPost($endpoint, $params, $producao);
+    }
+
+    /**
+     * Método auxiliar privado para realizar o POST com cURL
+     * Reutiliza a lógica de certificado do seu exemplo
+     */
+    private function executarRequestPost($endpointSuffix, $params, $producao)
+    {
+        // Define a URL Base
+        $baseUrl = $producao
+            ? "https://efinanceira.receita.fazenda.gov.br/consulta" // Ajustar se a base for diferente de /consulta
+            : "https://pre-efinanceira.receita.fazenda.gov.br/consulta";
+
+        $urlCompleta = $baseUrl . $endpointSuffix;
+
+        // Verificar certificado (igual ao seu código original)
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($urlCompleta);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+
+            // CONFIGURAÇÃO DE POST PARA FORM-URLENCODED
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($params), // Transforma o array em string query
+
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/x-www-form-urlencoded',
+                'Accept: application/xml', // Geralmente a resposta é XML
+                'Content-Length: ' . strlen(http_build_query($params))
+            ],
+
+            // Configurações de SSL (Mantidas do seu exemplo)
+            CURLOPT_SSLCERT        => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE    => 'PEM',
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeouts
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão cURL ({$endpointSuffix}): " . $curlError);
+        }
+
+        // Você pode tratar o HTTP Code aqui se quiser
+        if ($httpCode >= 400) {
+            // throw new Exception("Erro HTTP $httpCode: " . $response);
+        }
+
+        return $response;
+    }
+
+    public function consultarDetalhesPorProtocolo($tipo, $numeroProtocolo, $producao = false)
+    {
+        if (empty($numeroProtocolo)) {
+            throw new Exception("Número de protocolo inválido ou vazio.");
+        }
+
+        // 2. Mapeamento dos Endpoints (Conforme sua lista)
+        $mapaEndpoints = [
+            'cadastro'      => 'informacoes-cadastrais',
+            'lista'         => 'lista-efinanceira-movimento',
+            'mov_fin'       => 'informacoes-mov-op-fin',
+            'mov_fin_anual' => 'informacoes-mov-op-fin-anual',
+        ];
+
+        if (!array_key_exists($tipo, $mapaEndpoints)) {
+            throw new Exception("Tipo de consulta por protocolo desconhecido: " . $tipo);
+        }
+
+        $sufixoUrl = $mapaEndpoints[$tipo];
+
+        // 3. Definição da URL Base
+        $baseUrl = $producao
+            ? "https://efinanceira.receita.fazenda.gov.br/consulta"
+            : "https://pre-efinanceira.receita.fazenda.gov.br/consulta";
+
+        // Monta a URL final: {Base}/{Sufixo}/{Protocolo}
+        $urlCompleta = "{$baseUrl}/{$sufixoUrl}/{$numeroProtocolo}";
+
+        // 4. Executa a requisição GET
+        return $this->executarRequestGet($urlCompleta);
+    }
+
+    /**
+     * Método auxiliar privado para requisições GET (Reutiliza configurações de SSL)
+     */
+    private function executarRequestGet($url)
+    {
+        // Verificar certificado
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($url);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPGET        => true, // Força método GET
+            CURLOPT_HTTPHEADER     => [
+                'Accept: application/xml',
+            ],
+
+            // Autenticação mútua TLS (Mesma lógica do consultarLote)
+            CURLOPT_SSLCERT        => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE    => 'PEM',
+
+            // Segurança TLS
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeouts
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão cURL: " . $curlError);
+        }
+
+        // Opcional: Tratar erros 404/500 se quiser lançar exception
+        // if ($httpCode >= 400) { throw new Exception("Erro HTTP $httpCode"); }
+
+        return $response;
+    }
+
     public function validarLoteAssinado($xmlAssinado)
     {
         $senha = $this->senhaCertificado;
@@ -1800,5 +2687,70 @@ class GerarEFinanceira
         }
 
         return $resposta;
+    }
+
+    public function limparDadosTesteProducaoRestrita($cnpjDeclarante)
+    {
+        // URL fixa para o ambiente de testes (Produção Restrita) com o CNPJ na Query String
+        $urlCompleta = "https://pre-efinanceira.receita.fazenda.gov.br/recepcao/limpezaDadosTesteProducaoRestrita?cnpjDeclarante=" . urlencode($cnpjDeclarante);
+
+        // Verificar certificado
+        if (!file_exists($this->certificado_privado_epp)) {
+            throw new Exception("Certificado A1 não encontrado: " . $this->certificado_privado_epp);
+        }
+
+        $ch = curl_init($urlCompleta);
+
+        $curlOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+
+            // Define o método HTTP como DELETE
+            CURLOPT_CUSTOMREQUEST  => "DELETE",
+
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/xml'
+            ],
+
+            // Configurações de SSL
+            CURLOPT_SSLCERT        => $this->certificado_privado_epp,
+            CURLOPT_SSLCERTTYPE    => 'PEM',
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+
+            // Timeouts
+            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_CONNECTTIMEOUT => 30,
+        ];
+
+        // Se usar chave privada separada
+        if ($this->chave_privada_epp !== null) {
+            $curlOptions[CURLOPT_SSLKEY] = $this->chave_privada_epp;
+            $curlOptions[CURLOPT_SSLKEYTYPE] = 'PEM';
+        }
+
+        // Se tiver senha no certificado
+        if (!empty($this->senhaCertificado)) {
+            $curlOptions[CURLOPT_SSLCERTPASSWD] = $this->senhaCertificado;
+            $curlOptions[CURLOPT_SSLKEYPASSWD] = $this->senhaCertificado;
+        }
+
+        curl_setopt_array($ch, $curlOptions);
+
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro na conexão cURL (limpezaDadosTeste): " . $curlError);
+        }
+
+        // Retorna tanto o código HTTP quanto a resposta para facilitar o debug
+        return [
+            'httpCode' => $httpCode,
+            'response' => $response
+        ];
     }
 }

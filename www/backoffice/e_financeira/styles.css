@@ -1,0 +1,229 @@
+#data-help-icon {
+  left: 50px;
+}
+
+#data-help-icon::after {
+  left: 20px;
+}
+
+.help-icon {
+  position: relative;
+  margin-left: 5px;
+  cursor: pointer;
+  background: rgb(0, 0, 0, 0.1);
+  color: #606060;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  line-height: 18px;
+  font-size: 12px;
+  user-select: none;
+  display: inline-block;
+}
+
+.help-icon .tooltiptext {
+  visibility: hidden;
+  width: 135px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 11px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.help-icon .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 100%;
+  /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.help-icon:hover .tooltiptext,
+.tooltiptext.show {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.relatorio-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.tabela-clientes {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.tabela-clientes th,
+.tabela-clientes td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabela-clientes th {
+  background-color: #e0e0e0;
+}
+
+.tabela-clientes tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.total {
+  font-weight: bold;
+  background: #dfe6e9;
+}
+
+.align-right {
+  margin-left: auto;
+}
+
+.custom-justify {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.container-cancel-pins {
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  gap: 20px;
+  /* Adiciona uma margem entre as colunas */
+}
+
+/* Colunas (ajuste para uma largura proporcional) */
+.col-cancel-pins {
+  flex: 1;
+  min-width: 100px;
+  margin: 0;
+  max-width: 180px;
+  /* Remove margens laterais desnecessárias */
+}
+
+.data-input {
+  min-width: 200px;
+}
+
+.titulo-vencimento {
+  font-weight: bold;
+  color: #333333;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  text-align: left;
+  margin-left: 25px;
+  padding-bottom: 15px;
+  font-size: 21px;
+}
+
+.xml-box {
+  font-size: 14px;
+  max-height: 500px;
+  overflow: auto;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.xml-colapsado {
+  max-height: 120px !important;
+}
+
+.navbar-outline {
+  background-color: transparent;
+  border: 1px solid #268fbd;
+  border-radius: 25px;
+  /* margin: 15px; */
+  min-height: 35px;
+  padding: 2px 4px;
+}
+
+.navbar-outline .navbar-nav > li > a {
+  color: #268fbd;
+  font-weight: 600;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin: 2px 4px;
+  border-radius: 20px;
+  transition: all 0.15s;
+}
+
+.navbar-outline .navbar-nav > li > a:hover,
+.navbar-outline .navbar-nav > li > a:focus,
+.navbar-outline .navbar-nav > .active > a {
+  background-color: #268fbd;
+  color: #ffffff;
+}
+
+.navbar-outline .navbar-toggle {
+  border-color: #268fbd;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.navbar-outline .navbar-toggle .icon-bar {
+  background-color: #268fbd;
+}
+
+.navbar-outline .navbar-toggle:hover,
+.navbar-outline .navbar-toggle:focus {
+  background-color: #268fbd;
+}
+
+.navbar-outline .navbar-toggle:hover .icon-bar {
+  background-color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .navbar-outline {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .navbar-outline .navbar-collapse {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .navbar-outline .container-fluid {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+}
+@media (max-width: 480px) {
+  input,
+  label {
+    font-size: 11px;
+    /* Diminuir ainda mais o tamanho da fonte */
+  }
+
+  button {
+    font-size: 10px;
+    /* Diminuir o tamanho da fonte do botão */
+    padding: 6px 10px;
+    /* Diminuir o padding do botão */
+  }
+}
