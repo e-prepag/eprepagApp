@@ -246,7 +246,6 @@ class GerarEFinanceira
                 ORDER BY
                     f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
-        die($sql);
         try {
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
@@ -259,8 +258,7 @@ class GerarEFinanceira
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            echo "<div class='alert alert-danger'><strong>Erro:</strong> " . $e->getMessage() . "</div>";
-            die();
+            throw new Exception("Erro: " . $e->getMessage());
         }
     }
 
@@ -574,8 +572,7 @@ class GerarEFinanceira
 
             return array_merge($resultReprLegal, $resultPFTitular);
         } catch (Exception $e) {
-            echo "<div class='alert alert-danger'><strong>Erro:</strong> " . $e->getMessage() . "</div>";
-            die();
+            throw new Exception("Erro: " . $e->getMessage());
         }
     }
 
