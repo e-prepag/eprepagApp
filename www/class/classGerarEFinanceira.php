@@ -199,7 +199,7 @@ class GerarEFinanceira
                             (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
                             AND (
                                 (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
-                                OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                OR (SUBSTRING(cal.ano_mes_caixa, 5, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
                                 OR (d.mes_encerramento = cal.ano_mes_caixa)
                             )
                     )
@@ -367,7 +367,7 @@ class GerarEFinanceira
                                         (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
                                         AND (
                                             (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
-                                            OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                            OR (SUBSTRING(cal.ano_mes_caixa, 5, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
                                             OR (d.mes_encerramento = cal.ano_mes_caixa)
                                         )
                                 )
@@ -507,7 +507,7 @@ class GerarEFinanceira
                                     (d.mes_encerramento IS NULL OR cal.ano_mes_caixa <= d.mes_encerramento)
                                     AND (
                                         (g.mes_primeiro_estouro IS NOT NULL AND cal.ano_mes_caixa >= g.mes_primeiro_estouro)
-                                        OR (RIGHT(cal.ano_mes_caixa, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
+                                        OR (SUBSTRING(cal.ano_mes_caixa, 5, 2) = '12' AND (d.ug_ativo = 1 OR d.mes_encerramento = cal.ano_mes_caixa))
                                         OR (d.mes_encerramento = cal.ano_mes_caixa)
                                     )
                             )
