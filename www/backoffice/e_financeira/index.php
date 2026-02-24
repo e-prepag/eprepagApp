@@ -49,7 +49,7 @@ $data_atual = date('Y-m');
 			</div>
 		</div>
 	</nav>
-	<h2 class="titulo-vencimento">Gerar movimentações - E-Financeira</h2>
+	<h2 class="titulo-vencimento">Gerar lotes de movimentações - E-Financeira</h2>
 	<div class="alert alert-warning">
 		<strong>Importante:</strong> O mês de dezembro gera movimentações para todos os usuários, então é normal possuir muitos arquivos.
 	</div>
