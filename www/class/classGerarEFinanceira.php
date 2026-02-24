@@ -233,11 +233,8 @@ class GerarEFinanceira
                             WHERE sl.dugsl_ug_id = f.ug_id
                               AND sl.dugsl_data_inclusao < (
                                   CASE 
-                                      -- Se for o mês de encerramento, pega os logs antes da data de encerramento (isso pega até 23:59:59 do dia anterior)
                                       WHEN f.ano_mes_caixa = f.mes_encerramento 
                                       THEN f.ug_data_encerramento_conta::date
-                
-                                      -- Para Dezembro (ou qualquer outro mês normal), pega até o último segundo do último dia do mês corrente
                                       ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
                                   END
                               )
