@@ -311,14 +311,14 @@ class Garena
 					$this->destravaProcesso();
 					if ($resultado["error"] == 98 || $resultado["error"] == 99) {
 
-						array_push($this->error, ["Erro" => "Serviço temporariamente fora do ar, tente novamente mais tarde (EPP0044)."]);
+						array_push($this->error, ["Erro" => "Serviço temporariamente fora do ar, tente novamente mais tarde (EPP0047)."]);
 					} else {
 						array_push($this->error, ["Erro" => $this->catalogoErro($resultado["error"])]);
 					}
 				}
 			} elseif ($informacoesDisparo["http_code"] == 400) {
 				$this->destravaProcesso();
-				array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0045)."]); //O channel_name garena está invalido
+				array_push($this->error, ["Erro" => "Não foi possivel finalizar o resgate, tente novamente (EPP0048)."]); //O channel_name garena está invalido
 			} elseif ($informacoesDisparo["http_code"] == 403) {
 				$this->destravaProcesso();
 				array_push($this->error, ["Erro" => "A operação foi bloqueada por segurança. Tente novamente mais tarde. (EPP0046)."]); //O IP não está na whitelist
