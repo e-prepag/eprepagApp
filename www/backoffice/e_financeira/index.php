@@ -83,10 +83,10 @@ $data_atual = date('Y-m');
 				<a class="btn btn-success btn-info"
 					href="gerar_zip.php?data_inicial=<?= urlencode($data_inicial) ?>&data_final=<?= urlencode($data_final) ?>&acao=movimentacoes"
 					target="_blank">Baixar Todos os Lotes</a><span class="help-icon">?
-						<span class="tooltiptext">
-							Baixar um ZIP de todos os eventos no período separados em lotes XMLs com 50 eventos no máximo
-						</span>
+					<span class="tooltiptext">
+						Baixar um ZIP de todos os eventos no período separados em lotes XMLs com 50 eventos no máximo
 					</span>
+				</span>
 			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar Lotes</button>
 		</div>
@@ -107,37 +107,41 @@ $data_atual = date('Y-m');
 	$quantidade_registros_reais = 0; // Nova variável para guardar a contagem real
 	$tem_proxima_pagina = false;
 
-	if (!empty($data_inicial) && !empty($data_final)) {
-		if ($sel_tipo == 'xml') {
-			$resultado = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final, $limite_registros, $offset);
-			$dados = $resultado['xmls'];
-			$quantidade_registros_reais = $resultado['total_eventos'];
+	try {
+		if (!empty($data_inicial) && !empty($data_final)) {
+			if ($sel_tipo == 'xml') {
+				$resultado = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final, $limite_registros, $offset);
+				$dados = $resultado['xmls'];
+				$quantidade_registros_reais = $resultado['total_eventos'];
 
-			if (empty($dados)) {
-				echo '<div class="alert alert-info">Nenhum registro encontrado nesta página.</div>';
-			} else {
-				foreach ($dados as $dado) {
-					echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
+				if (empty($dados)) {
+					echo '<div class="alert alert-info">Nenhum registro encontrado nesta página.</div>';
+				} else {
+					foreach ($dados as $dado) {
+						echo xmlViewer($dado['xml'], "{$dado['ano_mes']}_{$dado['lote_numero']}");
+					}
+				}
+			} else if ($sel_tipo == 'pretty') {
+				$dados = $efinanceira->gerarMovimentacaoFinanceiraCompletaDados($data_inicial, $data_final, $limite_registros, $offset);
+
+				if (empty($dados)) {
+					echo '<div class="alert alert-info">Nenhum registro encontrado nesta página.</div>';
+				} else {
+					// Conta os eventos reais dentro do array agrupado do "pretty"
+					foreach ($dados as $mes => $eventos) {
+						$quantidade_registros_reais += count($eventos);
+					}
+					echo gerarRelatorioPorCompetencia($dados);
 				}
 			}
-		} else if ($sel_tipo == 'pretty') {
-			$dados = $efinanceira->gerarMovimentacaoFinanceiraCompletaDados($data_inicial, $data_final, $limite_registros, $offset);
 
-			if (empty($dados)) {
-				echo '<div class="alert alert-info">Nenhum registro encontrado nesta página.</div>';
-			} else {
-				// Conta os eventos reais dentro do array agrupado do "pretty"
-				foreach ($dados as $mes => $eventos) {
-					$quantidade_registros_reais += count($eventos);
-				}
-				echo gerarRelatorioPorCompetencia($dados);
+			// A métrica agora avalia a contagem REAL dos arrays internos
+			if ($quantidade_registros_reais >= 1) {
+				$tem_proxima_pagina = true;
 			}
 		}
-
-		// A métrica agora avalia a contagem REAL dos arrays internos
-		if ($quantidade_registros_reais >= 1) {
-			$tem_proxima_pagina = true;
-		}
+	} catch (Exception $e) {
+		echo "<div class='alert alert-danger'><strong>Erro:</strong> " . $e->getMessage() . "</div>";
 	}
 	?>
 
