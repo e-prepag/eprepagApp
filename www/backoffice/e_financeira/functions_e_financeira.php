@@ -193,7 +193,7 @@ function gerarRelatorioPorCompetencia(array $dados)
                 foreach ($registro['contas'] as $conta) {
                     $entradas = (float)$conta['entradas'];
                     $saidas   = (float)$conta['saidas'];
-                    
+
                     // LÓGICA DO SALDO (vlrUltDia)
                     $vlrUltDiaHtml = '-';
                     if (((int)$conta['ug_ativo'] !== 1 && date('Ym', strtotime($conta['ug_data_encerramento_conta'])) == $anoMes) || (int)$mes === 12) {
@@ -223,11 +223,11 @@ function gerarRelatorioPorCompetencia(array $dados)
 
                     $html .= '  <td class="col-money val-entrada">R$ ' . number_format($entradas, 2, ',', '.') . '</td>';
                     $html .= '  <td class="col-money val-saida">R$ ' . number_format($saidas, 2, ',', '.') . '</td>';
-                    
+
                     // Novas colunas adicionadas aqui
                     $html .= '  <td class="col-money val-saldo">' . $vlrUltDiaHtml . '</td>';
                     $html .= '  <td class="col-center">' . $dtEncerramentoHtml . '</td>';
-                    
+
                     $html .= '</tr>';
                 }
                 $html .= '</tbody></table>';
@@ -336,54 +336,54 @@ function extrairZip(string $caminhoZip, string $destino): array
     return $arquivosExtraidos;
 }
 
-function obterXmlFromZip($arquivo)
+function obterXmlFromZip($caminhoTemporarioZip)
 {
-    if (isset($_FILES[$arquivo])) {
-
-        $arquivoUpload = $_FILES[$arquivo];
-
-        if ($arquivoUpload['error'] !== UPLOAD_ERR_OK) {
-            die("Erro no upload do arquivo.");
-        }
-
-        // Cria uma pasta temporária única
-        $pastaDestino = '/tmp/temp_' . uniqid();
-        $caminhoTemporarioZip = $arquivoUpload['tmp_name'];
-
-        try {
-            $listaArquivos = extrairZip($caminhoTemporarioZip, $pastaDestino);
-
-            $xmls = [];
-            foreach ($listaArquivos as $nomeArquivo) {
-
-                $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
-
-                if ($extensao !== 'xml') {
-                    continue;
-                }
-
-                $caminhoCompletoXml = $pastaDestino . DIRECTORY_SEPARATOR . $nomeArquivo;
-                $conteudoXml = file_get_contents($caminhoCompletoXml);
-
-                if ($conteudoXml === false) {
-                    echo "Erro ao ler o arquivo: $nomeArquivo <br>";
-                    continue;
-                }
-
-                $xmls[] = [
-                    'nome' => $nomeArquivo,
-                    'conteudo' => $conteudoXml
-                ];
-
-                unlink($caminhoCompletoXml);
-            }
-            return $xmls;
-        } catch (Exception $e) {
-            echo "Erro Crítico: " . $e->getMessage();
-            return []; // Retorna array vazio em caso de erro para não quebrar o foreach seguinte
-        }
+    // Verifica se o arquivo temporário realmente chegou até aqui
+    if (!file_exists($caminhoTemporarioZip)) {
+        throw new Exception("Arquivo ZIP temporário não encontrado no servidor.");
     }
-    return [];
+
+    // Cria uma pasta temporária única
+    $pastaDestino = '/tmp/temp_' . uniqid();
+
+    try {
+        // Presumo que extrairZip já crie a $pastaDestino
+        $listaArquivos = extrairZip($caminhoTemporarioZip, $pastaDestino);
+
+        $xmls = [];
+        foreach ($listaArquivos as $nomeArquivo) {
+
+            $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+
+            if ($extensao !== 'xml') {
+                continue;
+            }
+
+            $caminhoCompletoXml = $pastaDestino . DIRECTORY_SEPARATOR . $nomeArquivo;
+            $conteudoXml = file_get_contents($caminhoCompletoXml);
+
+            if ($conteudoXml === false) {
+                throw new Exception("Falha ao ler o conteúdo do arquivo extraído: {$nomeArquivo}");
+            }
+
+            $xmls[] = [
+                'nome' => $nomeArquivo,
+                'conteudo' => $conteudoXml
+            ];
+
+            // Apaga o arquivo XML físico após jogar para a memória
+            unlink($caminhoCompletoXml);
+        }
+
+        // Limpeza: Remove a pasta temporária (que agora deve estar vazia)
+        if (is_dir($pastaDestino)) {
+            rmdir($pastaDestino);
+        }
+
+        return $xmls;
+    } catch (Exception $e) {
+        throw new Exception("Erro ao processar o ZIP: " . $e->getMessage());
+    }
 }
 
 // Função auxiliar para deletar a pasta temp depois (opcional)

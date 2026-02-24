@@ -4,6 +4,8 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
 $data_atual = date('Y-m');
 
+$producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? 'Homologação' : '';
+
 ?>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
@@ -36,7 +38,7 @@ $data_atual = date('Y-m');
 			</div>
 		</div>
 	</nav>
-	<h2 class="titulo-vencimento">Consulta - E-Financeira</h2>
+	<h2 class="titulo-vencimento">Consulta - E-Financeira <?= $producao ?></h2>
 
 	<form id="formConsulta" action="#" method="post" class="form-solicitacoes">
 

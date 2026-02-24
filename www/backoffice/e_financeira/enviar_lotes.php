@@ -2,6 +2,8 @@
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
+$producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? 'Homologação' : '';
+
 ?>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
@@ -34,7 +36,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 			</div>
 		</div>
 	</nav>
-	<h2 class="titulo-vencimento">Enviar Lotes - E-Financeira</h2>
+	<h2 class="titulo-vencimento">Enviar Lotes - E-Financeira <?= $producao ?></h2>
 	<div class="alert alert-info">
 		Você pode enviar um arquivo <strong>XML</strong> ou um arquivo <strong>ZIP contendo vários XMLs (lotes)</strong>.
 		Os arquivos enviados serão <strong>assinados digitalmente e criptografados automaticamente</strong>.
@@ -47,20 +49,14 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 	<form id="formEnvio" action="#" method="post" class="form-solicitacoes" enctype="multipart/form-data">
 		<div class="container-cancel-pins">
 			<div class="col-cancel-pins">
-				<label for="arquivo">Envie um XML ou um ZIP:
-				</label>
-				<input id="arquivo" name="arquivo"
-					type="file">
+				<label for="arquivo">Envie um ou mais arquivos (XML ou ZIP):</label>
+				<input id="arquivo" name="arquivo[]" type="file" multiple accept=".xml,.zip">
 			</div>
-
 		</div>
-
 		<div class="d-flex top10 custom-justify">
 			<button type="submit" class="btn btn-success btn-busca">Enviar</button>
 		</div>
-
 	</form>
-
 </div>
 <div style="overflow-x: auto; padding-top: 20px;">
 	<div class="relatorio-info">

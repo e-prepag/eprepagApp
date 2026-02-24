@@ -14,33 +14,63 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 ob_start();
 
 try {
-    // 1. Lógica de Upload (Mantida igual)
-    if (!isset($_FILES['arquivo']) || $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK) {
-        throw new Exception("Erro no upload. Código: " . ($_FILES['arquivo']['error'] ?? 'N/A'));
+    // Verifica se os arquivos foram enviados
+    if (!isset($_FILES['arquivo'])) {
+        throw new Exception("Nenhum arquivo enviado.");
     }
 
-    $caminho_temp = $_FILES['arquivo']['tmp_name'];
-    $nome_original = $_FILES['arquivo']['name'];
-    $mime_type = mime_content_type($caminho_temp);
+    $arquivos = $_FILES['arquivo'];
     $lotes_xml = [];
 
-    // Extrai arquivos do ZIP ou pega o XML único
-    if ($mime_type === 'application/zip' || $mime_type === 'application/x-zip-compressed' || pathinfo($nome_original, PATHINFO_EXTENSION) === 'zip') {
-        $lotes_xml = obterXmlFromZip('arquivo');
-    } elseif ($mime_type === 'text/xml' || $mime_type === 'application/xml' || pathinfo($nome_original, PATHINFO_EXTENSION) === 'xml') {
-        $xml_conteudo = file_get_contents($caminho_temp);
-        $lotes_xml[] = [
-            'nome' => basename($nome_original),
-            'conteudo' => $xml_conteudo
-        ];
-    } else {
-        throw new Exception("O arquivo deve ser ZIP ou XML.");
+    // Garante que a estrutura seja um array (mesmo se enviar apenas 1 arquivo)
+    $nomes_arquivos = is_array($arquivos['name']) ? $arquivos['name'] : [$arquivos['name']];
+    $erros = is_array($arquivos['error']) ? $arquivos['error'] : [$arquivos['error']];
+    $caminhos_temp = is_array($arquivos['tmp_name']) ? $arquivos['tmp_name'] : [$arquivos['tmp_name']];
+
+    $total_enviados = count($nomes_arquivos);
+
+    // Loop passando por cada arquivo anexado
+    for ($i = 0; $i < $total_enviados; $i++) {
+
+        if ($erros[$i] === UPLOAD_ERR_NO_FILE) {
+            continue; // Pula se o slot estiver vazio
+        }
+
+        if ($erros[$i] !== UPLOAD_ERR_OK) {
+            throw new Exception("Erro no upload do arquivo {$nomes_arquivos[$i]}. Código: " . $erros[$i]);
+        }
+
+        $caminho_temp = $caminhos_temp[$i];
+        $nome_original = $nomes_arquivos[$i];
+        $mime_type = mime_content_type($caminho_temp);
+        $extensao = strtolower(pathinfo($nome_original, PATHINFO_EXTENSION));
+
+        // Extrai arquivos do ZIP ou pega o XML único
+        if ($mime_type === 'application/zip' || $mime_type === 'application/x-zip-compressed' || $extensao === 'zip') {
+
+            // ATENÇÃO AQUI: Como agora processamos múltiplos arquivos, a sua função obterXmlFromZip 
+            // não pode mais buscar o $_FILES global pelo nome 'arquivo'. 
+            // Ela precisa receber o caminho temporário exato ($caminho_temp).
+            $xmls_extraidos = obterXmlFromZip($caminho_temp);
+
+            // Junta os XMLs extraídos no array principal
+            $lotes_xml = array_merge($lotes_xml, $xmls_extraidos);
+        } elseif ($mime_type === 'text/xml' || $mime_type === 'application/xml' || $extensao === 'xml') {
+
+            $xml_conteudo = file_get_contents($caminho_temp);
+            $lotes_xml[] = [
+                'nome' => basename($nome_original),
+                'conteudo' => $xml_conteudo
+            ];
+        } else {
+            throw new Exception("O arquivo '{$nome_original}' não é um ZIP ou XML válido.");
+        }
     }
 
-    // TRAVA DE SEGURANÇA: Verifica a quantidade de arquivos extraídos
+    // TRAVA DE SEGURANÇA MANTIDA: Verifica a quantidade total de arquivos extraídos
     $quantidade_arquivos = count($lotes_xml);
     if ($quantidade_arquivos > 15) {
-        throw new Exception("O arquivo contém {$quantidade_arquivos} XMLs. O limite máximo permitido é de 15 arquivos por envio.");
+        throw new Exception("Você tentou enviar {$quantidade_arquivos} XMLs (contando os que estavam dentro de ZIPs). O limite máximo permitido é de 15 arquivos por envio.");
     }
 
     if (empty($lotes_xml)) {
