@@ -84,7 +84,7 @@ if (!isset($_POST["dist"])) {
 
 		$respostaToken = Garena::verificaTokenRe($_POST["token"]);
 
-		if(getenv("AMBIENTE") == "HOMOLOGACAO") {
+		if (getenv("AMBIENTE") == "HOMOLOGACAO") {
 			$respostaToken["retorno"] = true;
 			$respostaToken["code"] = 1;
 		}
@@ -98,13 +98,19 @@ if (!isset($_POST["dist"])) {
 
 			$verificaPinIp = Garena::verificaQtdePin($_POST["codigo"], Garena::getClientIP(), $dataRequisicao);
 			$verificaPinIpLote = Garena::verificaLotePin(Garena::getClientIP(), $dataRequisicao);
-			if ($verificaPinIp != true || $verificaPinIpLote != true) {
-				$mensagemRetono = json_encode(["Erro" => "Seu resgate foi invalidado (EPP0044)."]);
+			if ($verificaPinIp != true) {
+				$mensagemRetono = json_encode(["Erro" => "Erro ao validar seu IP [".Garena::getClientIP()."] (EPP0049)."]);
 				Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 				echo $mensagemRetono;
 				exit;
 			}
 
+			if ($verificaPinIpLote != true) {
+				$mensagemRetono = json_encode(["Erro" => "Seu resgate foi invalidado (EPP0044)."]);
+				Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
+				echo $mensagemRetono;
+				exit;
+			}
 
 			$dadosPin = Garena::BuscaIdPin($_POST["codigo"]);
 			if ($dadosPin != false) {
@@ -137,7 +143,6 @@ if (!isset($_POST["dist"])) {
 			echo $mensagemRetono;
 			exit;
 		}
-
 	} else {
 		$pinCode = $_POST["codigo"];
 		$key = getenv('ENCRYPT_KEY');
@@ -152,7 +157,6 @@ if (!isset($_POST["dist"])) {
 
 	$dist = false;
 	$produto = false;
-
 } else {
 	$semCalculo = $idVenda;
 	if (isset($_POST["verifica"])) {
@@ -164,9 +168,7 @@ if (!isset($_POST["dist"])) {
 		$pinCode = [$_POST["codigo"]];
 		$dist = false;
 		$produto = false;
-
 	}
-
 }
 
 if (isset($_POST["valid"])) {
@@ -193,7 +195,6 @@ if (isset($_POST["valid"])) {
 		echo $mensagemRetono;
 		exit;
 	}
-
 } else {
 
 	if (gettype($_POST["codigo"]) == 'array') {
