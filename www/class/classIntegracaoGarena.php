@@ -339,6 +339,9 @@ class Garena
 			$currecy = "BRL";
 			$ip = self::getClientIP();
 
+			if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+				$ip = '127.0.0.1';
+			}
 
 			// Livrodjx has been here	
 			switch ($this->valorResgate) {
