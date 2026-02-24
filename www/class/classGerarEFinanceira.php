@@ -246,6 +246,7 @@ class GerarEFinanceira
                 ORDER BY
                     f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
+        die($sql);
         try {
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
