@@ -242,8 +242,7 @@ class GerarEFinanceira
                             LIMIT 1
                         ), 0
                     ) AS vlrUltDia
-                FROM 
-                    RelatorioFiltrado f
+                FROM RelatorioFiltrado f
                 ORDER BY
                     f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
