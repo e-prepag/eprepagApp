@@ -250,16 +250,21 @@ class GerarEFinanceira
                 ORDER BY
                     f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
-        $stmt->bindParam(':data_inicio', $inicio);
-        $stmt->bindParam(':data_fim', $fim);
-        if ($offset !== null && $limit !== null) {
-            $stmt->bindParam(':limit', $limit);
-            $stmt->bindParam(':offset', $offset);
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':data_inicio_semestre', $inicio_semestre);
+            $stmt->bindParam(':data_inicio', $inicio);
+            $stmt->bindParam(':data_fim', $fim);
+            if ($offset !== null && $limit !== null) {
+                $stmt->bindParam(':limit', $limit);
+                $stmt->bindParam(':offset', $offset);
+            }
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            echo "<div class='alert alert-danger'><strong>Erro:</strong> " . $e->getMessage() . "</div>";
+            die();
         }
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
@@ -546,30 +551,35 @@ class GerarEFinanceira
                             ) AS vlrUltDia
                         FROM RelatorioFiltrado f
                         ORDER BY f.ano_mes_caixa, ni_declarado, id_conta $sql_limit_offset;";
+        try {
 
-        $stmtReprLegal = $pdo->prepare($sqlReprLegal);
-        $stmtReprLegal->bindParam(':data_inicio_semestre', $inicio_semestre);
-        $stmtReprLegal->bindParam(':data_inicio', $inicio);
-        $stmtReprLegal->bindParam(':data_fim', $fim);
-        if ($offset !== null && $limit !== null) {
-            $stmtReprLegal->bindParam(':limit', $limit);
-            $stmtReprLegal->bindParam(':offset', $offset);
+            $stmtReprLegal = $pdo->prepare($sqlReprLegal);
+            $stmtReprLegal->bindParam(':data_inicio_semestre', $inicio_semestre);
+            $stmtReprLegal->bindParam(':data_inicio', $inicio);
+            $stmtReprLegal->bindParam(':data_fim', $fim);
+            if ($offset !== null && $limit !== null) {
+                $stmtReprLegal->bindParam(':limit', $limit);
+                $stmtReprLegal->bindParam(':offset', $offset);
+            }
+            $stmtReprLegal->execute();
+            $resultReprLegal = $stmtReprLegal->fetchAll(PDO::FETCH_ASSOC);
+
+            $stmtPFTitular = $pdo->prepare($sqlPFTitular);
+            $stmtPFTitular->bindParam(':data_inicio_semestre', $inicio_semestre);
+            $stmtPFTitular->bindParam(':data_inicio', $inicio);
+            $stmtPFTitular->bindParam(':data_fim', $fim);
+            if ($offset !== null && $limit !== null) {
+                $stmtPFTitular->bindParam(':limit', $limit);
+                $stmtPFTitular->bindParam(':offset', $offset);
+            }
+            $stmtPFTitular->execute();
+            $resultPFTitular = $stmtPFTitular->fetchAll(PDO::FETCH_ASSOC);
+
+            return array_merge($resultReprLegal, $resultPFTitular);
+        } catch (Exception $e) {
+            echo "<div class='alert alert-danger'><strong>Erro:</strong> " . $e->getMessage() . "</div>";
+            die();
         }
-        $stmtReprLegal->execute();
-        $resultReprLegal = $stmtReprLegal->fetchAll(PDO::FETCH_ASSOC);
-
-        $stmtPFTitular = $pdo->prepare($sqlPFTitular);
-        $stmtPFTitular->bindParam(':data_inicio_semestre', $inicio_semestre);
-        $stmtPFTitular->bindParam(':data_inicio', $inicio);
-        $stmtPFTitular->bindParam(':data_fim', $fim);
-        if ($offset !== null && $limit !== null) {
-            $stmtPFTitular->bindParam(':limit', $limit);
-            $stmtPFTitular->bindParam(':offset', $offset);
-        }
-        $stmtPFTitular->execute();
-        $resultPFTitular = $stmtPFTitular->fetchAll(PDO::FETCH_ASSOC);
-
-        return array_merge($resultReprLegal, $resultPFTitular);
     }
 
     private function buscarEnderecoPorCep($cep)
