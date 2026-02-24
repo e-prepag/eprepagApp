@@ -226,26 +226,27 @@ class GerarEFinanceira
                     f.total_movimentado_mes,
                     f.ug_ativo, 
                     f.ug_data_encerramento_conta,
-                    COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                    COALESCE(
+                        (
+                            SELECT sl.dugsl_ug_perfil_saldo
+                            FROM dist_usuarios_games_saldo_log sl
+                            WHERE sl.dugsl_ug_id = f.ug_id
+                              AND sl.dugsl_data_inclusao < (
+                                  CASE 
+                                      -- Se for o mês de encerramento, pega os logs antes da data de encerramento (isso pega até 23:59:59 do dia anterior)
+                                      WHEN f.ano_mes_caixa = f.mes_encerramento 
+                                      THEN f.ug_data_encerramento_conta::date
+                
+                                      -- Para Dezembro (ou qualquer outro mês normal), pega até o último segundo do último dia do mês corrente
+                                      ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                  END
+                              )
+                            ORDER BY sl.dugsl_data_inclusao DESC
+                            LIMIT 1
+                        ), 0
+                    ) AS vlrUltDia
                 FROM 
                     RelatorioFiltrado f
-                LEFT JOIN LATERAL (
-                    SELECT sl.dugsl_ug_perfil_saldo AS vlrUltDia
-                    FROM dist_usuarios_games_saldo_log sl
-                    WHERE sl.dugsl_ug_id = f.ug_id
-                      AND sl.dugsl_data_inclusao < (
-                          CASE 
-                              -- Se for o mês de encerramento, pega os logs antes da data de encerramento (isso pega até 23:59:59 do dia anterior)
-                              WHEN f.ano_mes_caixa = f.mes_encerramento 
-                              THEN f.ug_data_encerramento_conta::date
-
-                              -- Para Dezembro (ou qualquer outro mês normal), pega até o último segundo do último dia do mês corrente
-                              ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
-                          END
-                      )
-                    ORDER BY sl.dugsl_data_inclusao DESC
-                    LIMIT 1
-                ) saldo_calc ON true
                 ORDER BY
                     f.ano_mes_caixa, f.ni_declarado $sql_limit_offset;";
 
@@ -393,21 +394,22 @@ class GerarEFinanceira
                                 f.total_movimentado_mes,
                                 f.ug_ativo, 
                                 f.ug_data_encerramento_conta,
-                                COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                                COALESCE(
+                                    (
+                                        SELECT sl.dugsl_ug_perfil_saldo
+                                        FROM dist_usuarios_games_saldo_log sl
+                                        WHERE sl.dugsl_ug_id = f.ug_id
+                                          AND sl.dugsl_data_inclusao < (
+                                              CASE 
+                                                  WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
+                                                  ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                              END
+                                          )
+                                        ORDER BY sl.dugsl_data_inclusao DESC
+                                        LIMIT 1
+                                    ), 0
+                                ) AS vlrUltDia
                             FROM RelatorioFiltrado f
-                            LEFT JOIN LATERAL (
-                                SELECT sl.dugsl_ug_perfil_saldo AS vlrUltDia
-                                FROM dist_usuarios_games_saldo_log sl
-                                WHERE sl.dugsl_ug_id = f.ug_id
-                                  AND sl.dugsl_data_inclusao < (
-                                      CASE 
-                                          WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
-                                          ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
-                                      END
-                                  )
-                                ORDER BY sl.dugsl_data_inclusao DESC
-                                LIMIT 1
-                            ) saldo_calc ON true
                             ORDER BY f.ano_mes_caixa, ni_declarado $sql_limit_offset;";
 
         $sqlPFTitular = "WITH 
@@ -527,21 +529,22 @@ class GerarEFinanceira
                             f.total_movimentado_conta,
                             f.ug_ativo, 
                             f.ug_data_encerramento_conta,
-                            COALESCE(saldo_calc.vlrUltDia, 0) AS vlrUltDia
+                            COALESCE(
+                                (
+                                    SELECT sl.ugsl_ug_perfil_saldo
+                                    FROM usuarios_games_saldo_log sl
+                                    WHERE sl.ugsl_ug_id = f.ug_id
+                                      AND sl.ugsl_data_inclusao < (
+                                          CASE 
+                                              WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
+                                              ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
+                                          END
+                                      )
+                                    ORDER BY sl.ugsl_data_inclusao DESC
+                                    LIMIT 1
+                                ), 0
+                            ) AS vlrUltDia
                         FROM RelatorioFiltrado f
-                        LEFT JOIN LATERAL (
-                            SELECT sl.ugsl_ug_perfil_saldo AS vlrUltDia
-                            FROM usuarios_games_saldo_log sl
-                            WHERE sl.ugsl_ug_id = f.ug_id
-                              AND sl.ugsl_data_inclusao < (
-                                  CASE 
-                                      WHEN f.ano_mes_caixa = f.mes_encerramento THEN f.ug_data_encerramento_conta::date
-                                      ELSE (TO_DATE(f.ano_mes_caixa, 'YYYYMM') + INTERVAL '1 month')::date
-                                  END
-                              )
-                            ORDER BY sl.ugsl_data_inclusao DESC
-                            LIMIT 1
-                        ) saldo_calc ON true
                         ORDER BY f.ano_mes_caixa, ni_declarado, id_conta $sql_limit_offset;";
 
         $stmtReprLegal = $pdo->prepare($sqlReprLegal);
