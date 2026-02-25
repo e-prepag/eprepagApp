@@ -164,6 +164,12 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
         // 1. Assinar
         $lote_assinado = $efinanceira->assinarLoteEventos($conteudoXmlOriginal);
 
+        $pathEnviados = '/www/arquivos_gerados/efinanceira/lotes_enviados';
+        if (!is_dir($pathEnviados)) mkdir($pathEnviados, 0755, true);
+        
+        if (!file_exists($pathEnviados . '/' . $nomeArquivo)) {
+            file_put_contents($pathEnviados . '/' . $nomeArquivo, $lote_assinado);
+        }
         // 2. Criptografar
         $lote_criptografado = $efinanceira->criptografarLoteEF($lote_assinado, $producao);
 

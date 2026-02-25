@@ -1,10 +1,11 @@
 <?php
 // ajax_processar_consulta.php
 //header("Content-Type: text/html; charset=ISO-8859-1",true);
-// Define tempo limite infinito (ou alto) pois o loop pode demorar
 set_time_limit(0);
 
 require_once '/www/includes/constantes.php';
+require_once '/www/db/connect.php';
+require_once '/www/db/ConnectionPDO.php';
 require_once __DIR__ . "/functions_e_financeira.php";
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -127,7 +128,7 @@ try {
     // Processa o resultado final (seja sucesso, erro ou timeout com o último XML obtido)
     if ($xmlFinal) {
         // Função visual que cria os boxes coloridos
-        processarRetornoConsultaAssincrona($xmlFinal, $tipoConsultaTexto);
+        processarRetornoConsultaAssincrona($xmlFinal, $tipoConsultaTexto, $protocolo, $efinanceira);
 
         // Exibição do código XML
         echo xmlViewer($xmlFinal, $protocolo ?? "XML de Retorno", true, true);
@@ -168,10 +169,10 @@ function obterStatusConsultaRapido($xmlString)
     return 0; // Não conseguiu ler
 }
 
-function processarRetornoConsultaAssincrona($xmlString, $visualizadorConsulta)
+function processarRetornoConsultaAssincrona($xmlString, $visualizadorConsulta, $protocolo = null, $efinanceira = null)
 {
-    if($visualizadorConsulta == 'lote'){
-        processarRetornoConsultaLote($xmlString);
+    if ($visualizadorConsulta == 'lote') {
+        processarRetornoConsultaLote($xmlString, $protocolo, $efinanceira);
         return;
     }
     // 1. Carregar o XML removendo a "casca" do CDATA automaticamente (LIBXML_NOCDATA)
@@ -689,9 +690,17 @@ function processarRetornoMovOpFin($xmlString)
     return $dadosRetorno;
 }
 
-function processarRetornoConsultaLote($xmlProcessamento)
+function processarRetornoConsultaLote($xmlProcessamento, $protocolo = null, $efinanceira = null)
 {
-    // 2. Parser
+    // Extrai os dados, salva arquivos e atualiza o banco
+    $dadosProcessamento = extrairDadosEAtualizarLote($xmlProcessamento, $protocolo, $efinanceira);
+
+    // Gera o HTML com base nos dados e imprime na tela
+    echo gerarHtmlConsultaLote($dadosProcessamento);
+}
+
+function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efinanceira = null)
+{
     $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlProcessamento);
     $xmlObj = simplexml_load_string($xmlLimpo);
 
@@ -712,20 +721,12 @@ function processarRetornoConsultaLote($xmlProcessamento)
     $idsErro = [];
     $detalhesEventos = [];
 
-    // 3. Decisão baseada no Status do Lote
-
-    // Status 2 (Sucesso Total) ou 3 (Com Ocorrências) -> Vamos ler os eventos
     if ($statusGeralLote === 2 || $statusGeralLote === 3) {
-
         $eventosRetorno = $xmlObj->xpath("//retornoEventos/evento");
 
         if (!empty($eventosRetorno)) {
             foreach ($eventosRetorno as $evt) {
-                // ID do Wrapper (ID100...)
-                $idEventoWrapper = (string)$evt['id'];
-
-                // Busca o retornoEvento interno
-                $retornoEvento = $evt->xpath(".//retornoEvento"); // Simplificado pois removemos namespace
+                $retornoEvento = $evt->xpath(".//retornoEvento");
 
                 if (!empty($retornoEvento)) {
                     $nodeRetorno = $retornoEvento[0];
@@ -734,24 +735,18 @@ function processarRetornoConsultaLote($xmlProcessamento)
                     $idBanco = (int)substr($idEventoReal, 3);
 
                     $descRetornoEvt = (string)($nodeRetorno->xpath("status/descRetorno")[0] ?? '');
-
-                    // Verificação Definitiva de Sucesso: EXISTÊNCIA DE RECIBO
                     $recibo = (string)($nodeRetorno->xpath("dadosReciboEntrega/numeroRecibo")[0] ?? '');
 
-                    // Coleta Erros/Avisos do Evento
                     $errosMsg = [];
                     $ocorrencias = $nodeRetorno->xpath("status/dadosRegistroOcorrenciaEvento/ocorrencias");
                     if (!empty($ocorrencias)) {
                         foreach ($ocorrencias as $oc) {
-                            $tipo = (string)$oc->tipo; // 1=Erro, 2=Aviso
+                            $tipo = (string)$oc->tipo; 
                             $prefixo = ($tipo == '2') ? '[AVISO]' : '[ERRO]';
                             $errosMsg[] = "$prefixo " . $oc->descricao;
                         }
                     }
 
-                    // Lógica para Banco de Dados
-                    // Se tem Recibo = Sucesso (ENVIADO)
-                    // Se não tem Recibo = Erro (ERRO)
                     if (!empty($recibo)) {
                         if ($idBanco) $idsSucesso[] = $idBanco;
                         $statusDb = 'ENVIADO';
@@ -770,17 +765,13 @@ function processarRetornoConsultaLote($xmlProcessamento)
                 }
             }
         }
-    }
-    // Status 4, 5, 9 -> Erros Globais (Não há eventos para processar)
-    else {
-        // Pega as ocorrências globais do lote, se houver
+    } else {
         $ocorrenciasLote = $xmlObj->xpath("//status/ocorrencias/ocorrencia");
         $errosGlobais = [];
         foreach ($ocorrenciasLote as $oc) {
             $errosGlobais[] = "[LOTE] " . $oc->descricao;
         }
 
-        // Adiciona um item "falso" no detalhe para mostrar o erro global na tabela
         $detalhesEventos[] = [
             'id' => 'LOTE',
             'status_db' => 'ERRO',
@@ -790,26 +781,59 @@ function processarRetornoConsultaLote($xmlProcessamento)
         ];
     }
 
-    $dadosProcessamento = [
+    // LÓGICA DE CONTINGÊNCIA (SALVAR ARQUIVO FALTANTE E ATUALIZAR BD)
+    if (!empty($protocolo) && $efinanceira) {
+        $pdo = ConnectionPDO::getConnection()->getLink();
+        $sqlBusca = "SELECT nome_arquivo, status_envio FROM envios_e_financeira WHERE num_protocolo = :protocolo LIMIT 1";
+        $stmtBusca = $pdo->prepare($sqlBusca); 
+        $stmtBusca->execute([':protocolo' => $protocolo]);
+        
+        if ($row = $stmtBusca->fetch(PDO::FETCH_ASSOC)) {
+            $nomeArquivoOriginal = $row['nome_arquivo'];
+            $statusAtualDb = strtoupper($row['status_envio']);
+            
+            if (!empty($nomeArquivoOriginal)) {
+                $pathRespostas = '/www/arquivos_gerados/efinanceira/respostas_envio';
+                if (!is_dir($pathRespostas)) mkdir($pathRespostas, 0755, true);
+                
+                $info_arquivo = pathinfo($nomeArquivoOriginal);
+                $extensao = isset($info_arquivo['extension']) ? '.' . $info_arquivo['extension'] : '.xml';
+                $nomeResp = $info_arquivo['filename'] . "_retorno" . $extensao;
+                $caminhoCompletoResposta = $pathRespostas . '/' . $nomeResp;
+                
+                if (!file_exists($caminhoCompletoResposta)) {
+                    file_put_contents($caminhoCompletoResposta, $xmlProcessamento);
+                }
+                
+                if ($statusAtualDb === 'PENDENTE') {
+                    if (!empty($idsSucesso)) {
+                        $efinanceira->atualizarLoteStatus($idsSucesso, $protocolo, $nomeArquivoOriginal, 'ENVIADO');
+                    }
+                    if (!empty($idsErro)) {
+                        $efinanceira->atualizarLoteStatus($idsErro, $protocolo, $nomeArquivoOriginal, 'ERRO');
+                    }
+                }
+            }
+        }
+    }
+
+    return [
         'status_lote' => $statusGeralLote,
         'mensagem_lote' => $msgGeralLote,
         'detalhes' => $detalhesEventos,
         'qtd_sucesso' => count($idsSucesso),
         'qtd_erro' => count($idsErro)
     ];
+}
 
-     $html = "";
+function gerarHtmlConsultaLote($dadosProcessamento)
+{
+    $html = "";
     $statusLote = $dadosProcessamento['status_lote'];
 
     $html .= "<div class='card mb-3'>";
     $html .= "<div class='card-header'><strong>Resultado: </strong></div>";
     $html .= "<div class='card-body'>";
-
-    // Cores baseadas nos status novos
-    // 2 = Sucesso Total (Verde)
-    // 3 = Processado com Ocorrências (Amarelo/Laranja)
-    // 4, 5, 9 = Erro (Vermelho)
-    // 1 = Processando (Azul) - Teimou em ficar processando
 
     $alertClass = 'danger';
     if ($statusLote === 2) $alertClass = 'success';
@@ -820,7 +844,6 @@ function processarRetornoConsultaLote($xmlProcessamento)
     $html .= "<strong>Status do Lote ($statusLote):</strong> " . $dadosProcessamento['mensagem_lote'];
     $html .= "</div>";
 
-    // Resumo Quantitativo
     if ($statusLote === 2 || $statusLote === 3) {
         $html .= "<div class='row mb-2'>";
         $html .= "<div class='col-md-6'><span class='badge badge-success'>Sucesso: {$dadosProcessamento['qtd_sucesso']}</span></div>";
@@ -828,7 +851,6 @@ function processarRetornoConsultaLote($xmlProcessamento)
         $html .= "</div>";
     }
 
-    // Tabela de Detalhes
     if (!empty($dadosProcessamento['detalhes'])) {
         $html .= "<table class='table table-bordered table-sm'>";
         $html .= "<thead><tr class='active'><th>ID Evento</th><th>Status</th><th>Detalhes / Recibo</th></tr></thead>";
@@ -836,23 +858,19 @@ function processarRetornoConsultaLote($xmlProcessamento)
 
         foreach ($dadosProcessamento['detalhes'] as $det) {
             $label = ($det['status_db'] == 'ENVIADO') ? 'success' : 'danger';
-
-            // Se for um erro global de lote, destaca a linha
             $rowClass = ($det['id'] === 'LOTE') ? 'class="danger"' : '';
 
             $html .= "<tr $rowClass>";
             $html .= "<td>{$det['id']}</td>";
             $html .= "<td><span class='label label-$label'>{$det['status_db']}</span></td>";
-
             $html .= "<td>";
+            
             if (!empty($det['recibo'])) {
                 $html .= "<div><strong>Recibo:</strong> " . $det['recibo'] . "</div>";
             }
-            // Mensagem principal do evento
             if (!empty($det['mensagem']) && $det['mensagem'] !== 'SUCESSO') {
                 $html .= "<div><em>" . $det['mensagem'] . "</em></div>";
             }
-            // Lista de Ocorrências
             if (!empty($det['erros'])) {
                 $html .= "<div class='text-danger mt-1' style='font-size:0.9em; background:#fff0f0; padding:5px; border-radius:3px;'>";
                 foreach ($det['erros'] as $err) {
@@ -866,7 +884,7 @@ function processarRetornoConsultaLote($xmlProcessamento)
         $html .= "</tbody></table>";
     }
 
-    $html .= "</div></div>"; // Fim Card
+    $html .= "</div></div>";
 
-    echo $html;
+    return $html;
 }
