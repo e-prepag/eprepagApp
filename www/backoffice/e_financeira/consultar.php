@@ -58,7 +58,7 @@ $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? 'Homologação' : '';
 
 			<div class="col-cancel-pins group-dynamic" id="grp_lote">
 				<label for="numero_lote">Número do Protocolo</label>
-				<input type="text" id="numero_lote" name="numero_lote" class="form-control" placeholder="Apenas números">
+				<input type="text" id="numero_lote" name="numero_lote" class="form-control" placeholder="X.XXXXXX.XXXXXXXXX">
 			</div>
 
 			<div class="col-cancel-pins group-dynamic" id="grp_situacao" style="display:none;">
@@ -122,6 +122,7 @@ $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? 'Homologação' : '';
 	</div>
 	<div id="resultadoConsultaAjax"></div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 	function atualizarCampos() {
@@ -202,8 +203,7 @@ $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? 'Homologação' : '';
 		// 4. Lógica de Exibição dos Campos (Display)
 		if (tipo === 'lote') {
 			setDisplay('grp_lote', true);
-		} else if (tipo === 'cadastro') {
-		} else if (tipo === 'lista') {
+		} else if (tipo === 'cadastro') {} else if (tipo === 'lista') {
 			setDisplay('grp_situacao', true); // Mostra o select populado com Caso A
 			setDisplay('grp_data_ini', true);
 			setDisplay('grp_data_fim', true);
@@ -257,6 +257,10 @@ $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? 'Homologação' : '';
 		$('#' + id).toggleClass('xml-colapsado');
 	}
 	$(document).ready(function() {
+
+		$('#numero_lote').mask('0.000000.000000000', {
+			placeholder: "_.______._" // Opcional: Mostra o formato vazio pro usuário
+		});
 
 		$('#formConsulta').on('submit', function(e) {
 			e.preventDefault(); // Impede o reload da página
