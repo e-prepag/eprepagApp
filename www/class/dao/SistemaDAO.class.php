@@ -68,7 +68,9 @@ class SistemaDAO{
 //                $_SESSION["sistemas"] = array();
 //            }
 //            array_push($_SESSION["sistemas"], $sistema);
-                        				
+
+            $arrAbas = [];
+
             $where = "where aba_sistema = '$sistema'";
         
             if($strAba != ""){
