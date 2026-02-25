@@ -1,21 +1,13 @@
 <?php
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-$data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
-$data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
-$data_atual = date('Y-m');
-
 ?>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <link href="styles.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.5/datatables.min.js"></script>
+
 <div>
 	<div style="height: 15px;"></div>
 	<nav class="navbar navbar-outline">
@@ -41,93 +33,179 @@ $data_atual = date('Y-m');
 			</div>
 		</div>
 	</nav>
-	<h2 class="titulo-vencimento">Lotes Enviados - E-Financeira</h2>
-	<?php die("Trabalho em progresso...") ?>
-	<form id="form1" action="#" method="get" class="form-solicitacoes">
-		<div class="container-cancel-pins">
-			<div class="col-cancel-pins">
-				<label for="dt_inicial">Início período
-				</label>
-				<input id="dt_inicial" name="dt_inicial" max="<?php echo $data_atual; ?>" value="<?php echo $data_inicial; ?>" class="form-control"
-					type="month">
-			</div>
-			<div class="col-cancel-pins">
-				<label for="dt_final">Final período
-				</label>
-				<input id="dt_final" name="dt_final" max="<?php echo $data_atual; ?>" value="<?php echo $data_final; ?>" class="form-control"
-					type="month">
-			</div>
+	<h2 class="titulo-vencimento">Lotes Gerados - E-Financeira</h2>
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<form id="formFiltros" onsubmit="return false;">
+				<div class="filtros-grid">
+					<div class="campo-duplo">
+						<label>Período de Envio</label>
+						<div style="display: flex; gap: 5px;">
+							<input type="date" id="envio_inicio" class="form-control" style="flex: 1;">
+							<input type="date" id="envio_fim" class="form-control" style="flex: 1;">
+						</div>
+					</div>
+					<div>
+						<label>CPF/CNPJ (Apenas Mov)</label>
+						<input type="text" id="filtro_cpfcnpj" class="form-control" placeholder="Apenas números">
+					</div>
+					<div>
+						<label>Tipo de Evento</label>
+						<select id="filtro_tipo" class="form-control">
+							<option value="">TODOS</option>
+							<option value="MOVIMENTACAO">MOVIMENTAÇÃO</option>
+							<option value="ABERTURA">ABERTURA</option>
+							<option value="FECHAMENTO">FECHAMENTO</option>
+						</select>
+					</div>
+					<div>
+						<label>Status Envio</label>
+						<select id="filtro_status" class="form-control">
+							<option value="">TODOS</option>
+							<option value="ENVIADO">ENVIADO</option>
+							<option value="PENDENTE">PENDENTE</option>
+							<option value="ERRO">ERRO</option>
+						</select>
+					</div>
+					<div>
+						<label>Semestre / Ano</label>
+						<div style="display: flex; gap: 5px;">
+							<input type="number" id="filtro_ano" class="form-control" placeholder="Ano" min="2015" max="2099">
+							<select id="filtro_semestre" class="form-control">
+								<option value="">Sem.</option>
+								<option value="1">1º Sem</option>
+								<option value="2">2º Sem</option>
+							</select>
+						</div>
+					</div>
+					<div>
+						<label>Competência Informação</label>
+						<input type="text" id="filtro_competencia" class="form-control" placeholder="Ex: 2024-03 ou 2024-07...">
+					</div>
+				</div>
+				<div class="text-right">
+					<button type="button" id="btnBuscar" class="btn btn-success">Pesquisar Lotes</button>
+					<button type="reset" id="btnLimpar" class="btn btn-default">Limpar</button>
+				</div>
+			</form>
 		</div>
-
-		<div class="d-flex top10 custom-justify">
-			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=baixar"
-					target="_blank">Baixar Lotes</a>
-				<a class="btn btn-success btn-info"
-					href="gerar_zip.php?
-					data_inicial=<?= urlencode($data_inicial) ?>
-					&data_final=<?= urlencode($data_final) ?>
-					&acao=criptografar"
-					target="_blank">Baixar Cript. e Assin.</a>
-			<?php } ?>
-			<button type="submit" class="btn btn-success btn-busca">Buscar</button>
-		</div>
-
-	</form>
-
-</div>
-<div style="overflow-x: auto; padding-top: 20px;">
-	<div class="relatorio-info">
-		<div><strong>Data:</strong> <?php echo date('d/m/Y H:m:i'); ?></div>
 	</div>
 
-	<?php
-	require_once __DIR__ . "/functions_e_financeira.php";
-	$dados = gerarXmlMovimentacao($data_inicial, $data_final);
-	foreach ($dados as $dado) {
-		echo xmlViewer(utf8_decode(htmlspecialchars($dado['xml'])), "{$dado['ano_mes']}_{$dado['lote_numero']}");
-	}
-	//echo json_encode($dados);
-	?>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<div style="overflow-x: auto; padding-top: 20px;">
+	<div class="tabela">
+		<table id="tabelaEnviados" class="table table-striped table-bordered" style="width:100%">
+			<thead>
+				<tr>
+					<th>ID Formatado</th>
+					<th>Tipo</th>
+					<th>Status</th>
+					<th>Nome do Arquivo</th>
+					<th>Data do Envio</th>
+					<th>Competência</th>
+					<th>Retificado?</th>
+					<th>CPF/CNPJ</th>
+					<th>Protocolo</th>
+					<th class="text-center" style="min-width: 120px;">Ações (Baixar)</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+</div>
+
 <script>
-	function copiarXml(id) {
-		const text = document.getElementById(id).innerText;
-		navigator.clipboard.writeText(text).then(() => {
-			alert('XML copiado com sucesso!');
-		});
-	}
-
-	function toggleXml(id) {
-		$('#' + id).toggleClass('xml-colapsado');
-	}
 	$(document).ready(function() {
-		hljs.highlightAll();
-
-		document.querySelectorAll('.help-icon').forEach(icon => {
-			icon.addEventListener('click', () => {
-				const tooltip = icon.querySelector('.tooltiptext');
-
-				// Remove outros tooltips visíveis
-				document.querySelectorAll('.tooltiptext.show').forEach(other => {
-					if (other !== tooltip) other.classList.remove('show');
-				});
-
-				tooltip.classList.add('show');
-
-				// Remove após 3 segundos
-				setTimeout(() => {
-					tooltip.classList.remove('show');
-				}, 3000);
-			});
+		var tabela = $('#tabelaEnviados').DataTable({
+			"processing": true,
+			"serverSide": true,
+			"ajax": {
+				"url": "ajax_enviados.php",
+				"type": "POST",
+				"data": function(d) {
+					// Passa os valores dos filtros para o PHP
+					d.envio_inicio = $('#envio_inicio').val();
+					d.envio_fim = $('#envio_fim').val();
+					d.cpfcnpj = $('#filtro_cpfcnpj').val();
+					d.tipo = $('#filtro_tipo').val();
+					d.status = $('#filtro_status').val();
+					d.ano = $('#filtro_ano').val();
+					d.semestre = $('#filtro_semestre').val();
+					d.competencia = $('#filtro_competencia').val();
+				}
+			},
+			"columns": [{
+					"data": "id_formatado"
+				},
+				{
+					"data": "tipo"
+				},
+				{
+					"data": "status_badge",
+					"orderable": false
+				},
+				{
+					"data": "nome_arquivo"
+				},
+				{
+					"data": "data_envio"
+				},
+				{
+					"data": "data_anomes_formatado",
+					"orderable": false
+				},
+				{
+					"data": "retificado"
+				},
+				{
+					"data": "cpfcnpj_declarado"
+				},
+				{
+					"data": "num_protocolo",
+					"orderable": false
+				},
+				{
+					"data": "acoes",
+					"orderable": false,
+					"searchable": false,
+					"className": "text-center"
+				}
+			],
+			"order": [
+				[4, "desc"]
+			], // Ordena por data_envio por padrão
+			"language": {
+				"url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json"
+			}
 		});
-		
+
+		// Ação do botão buscar
+		$('#btnBuscar').click(function() {
+			tabela.draw();
+		});
+
+		// Limpa e recarrega
+		$('#btnLimpar').click(function() {
+			$('#formFiltros')[0].reset();
+			tabela.draw();
+		});
 	});
+
+	// FUNÇÃO REAL DE DOWNLOAD
+	function realizarDownload(tipoArquivo, nomeArquivo) {
+		// Codifica o nome do arquivo para garantir que espaços e caracteres especiais não quebrem a URL
+		const url = `download_efinanceira.php?tipo=${tipoArquivo}&arquivo=${encodeURIComponent(nomeArquivo)}`;
+
+		// Cria um link temporário e simula o clique para iniciar o download sem recarregar a página da tabela
+		const link = document.createElement('a');
+		link.href = url;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 </script>
 <?php
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
