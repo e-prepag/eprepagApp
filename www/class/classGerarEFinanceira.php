@@ -86,9 +86,15 @@ class GerarEFinanceira
         $this->versao_aplicacao = '00000000000000000001';
     }
 
-    public function obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
+    public function obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset = null, $limit = null, $cnpj = null)
     {
         $sql_limit_offset = ($offset !== null && $limit !== null) ? "LIMIT :limit OFFSET :offset" : "";
+
+        $filtro_cnpj_ug = "";
+        if ($cnpj !== null && $cnpj !== '') {
+            $cnpj = preg_replace('/[^0-9]/', '', $cnpj); // Garante que só tenha números
+            $filtro_cnpj_ug = " AND regexp_replace(ug.ug_cnpj, '[^0-9]', '', 'g') = :cnpj ";
+        }
 
         $pdo = ConnectionPDO::getConnection()->getLink();
         $sql = "WITH -- Busca todas as movimentações no período, sem filtrar status do usuário ainda
@@ -116,7 +122,7 @@ class GerarEFinanceira
                             dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                         WHERE 
                             -- Alterado conforme solicitado: Apenas filtro de data do log
-                            sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
+                            sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim $filtro_cnpj_ug
                         GROUP BY 
                             ug.ug_id,
                             TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
@@ -152,9 +158,10 @@ class GerarEFinanceira
                             dist_usuarios_games ug
                         WHERE
                             -- Otimização: Traz usuários que tem movimentação NO PERÍODO ou Estão Ativos (para regra de Dezembro)
-                            ug.ug_id IN (SELECT ug_id FROM MovimentacaoMensal)
+                            (ug.ug_id IN (SELECT ug_id FROM MovimentacaoMensal)
                             OR ug.ug_ativo = 1
-                            OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
+                            OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim)
+                            $filtro_cnpj_ug
                     ),
                     -- Gera a lista de meses do período selecionado
                     Calendario AS (
@@ -255,6 +262,9 @@ class GerarEFinanceira
                 $stmt->bindParam(':limit', $limit);
                 $stmt->bindParam(':offset', $offset);
             }
+            if ($cnpj !== null && $cnpj !== '') {
+                $stmt->bindParam(':cnpj', $cnpj);
+            }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
@@ -262,11 +272,24 @@ class GerarEFinanceira
         }
     }
 
-    public function obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset = null, $limit = null)
+    public function obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset = null, $limit = null, $cpf = null)
     {
         $pdo = ConnectionPDO::getConnection()->getLink();
 
         $sql_limit_offset = ($offset !== null && $limit !== null) ? "LIMIT :limit OFFSET :offset" : "";
+
+        $filtro_cpf_repr = "";
+        $filtro_cpf_titular = "";
+
+        if ($cpf !== null && $cpf !== '') {
+            $cpf = preg_replace('/[^0-9]/', '', $cpf); // Limpa a máscara
+
+            // Condição para a primeira query (Representante Legal - dist_usuarios_games)
+            $filtro_cpf_repr = " AND (regexp_replace(ug.ug_repr_legal_cpf, '[^0-9]', '', 'g') = :cpf OR regexp_replace(ug.ug_repr_venda_cpf, '[^0-9]', '', 'g') = :cpf) ";
+
+            // Condição para a segunda query (PF Titular - usuarios_games)
+            $filtro_cpf_titular = " AND regexp_replace(ug.ug_cpf, '[^0-9]', '', 'g') = :cpf ";
+        }
 
         $sqlReprLegal = "WITH 
                             -- Movimentação bruta (sem filtro de status)
@@ -293,7 +316,7 @@ class GerarEFinanceira
                                 JOIN 
                                     dist_usuarios_games_saldo_log sl ON ug.ug_id = sl.dugsl_ug_id
                                 WHERE 
-                                    sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
+                                    sl.dugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim $filtro_cpf_repr
                                 GROUP BY 
                                     ug.ug_id,
                                     TO_CHAR(sl.dugsl_data_inclusao::date, 'YYYYMM')
@@ -339,6 +362,7 @@ class GerarEFinanceira
                                         OR ug.ug_ativo = 1
                                         OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
                                     )
+                                    $filtro_cpf_repr
                             ),
                             -- Calendário
                             Calendario AS (
@@ -436,7 +460,7 @@ class GerarEFinanceira
                                 JOIN 
                                     usuarios_games_saldo_log sl ON ug.ug_id = sl.ugsl_ug_id
                                 WHERE 
-                                    sl.ugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim
+                                    sl.ugsl_data_inclusao::date BETWEEN :data_inicio_semestre AND :data_fim $filtro_cpf_titular
                                 GROUP BY 
                                     ug.ug_id, ug.ug_cpf,
                                     TO_CHAR(sl.ugsl_data_inclusao::date, 'YYYYMM')
@@ -479,6 +503,7 @@ class GerarEFinanceira
                                         OR ug.ug_ativo = 1
                                         OR ug.ug_data_encerramento_conta::date BETWEEN :data_inicio_semestre AND :data_fim
                                     )
+                                    $filtro_cpf_titular
                             ),
                             -- Calendário
                             Calendario AS (
@@ -552,6 +577,9 @@ class GerarEFinanceira
             $stmtReprLegal->bindParam(':data_inicio_semestre', $inicio_semestre);
             $stmtReprLegal->bindParam(':data_inicio', $inicio);
             $stmtReprLegal->bindParam(':data_fim', $fim);
+            if ($cpf !== null && $cpf !== '') {
+                $stmtReprLegal->bindParam(':cpf', $cpf);
+            }
             if ($offset !== null && $limit !== null) {
                 $stmtReprLegal->bindParam(':limit', $limit);
                 $stmtReprLegal->bindParam(':offset', $offset);
@@ -563,6 +591,9 @@ class GerarEFinanceira
             $stmtPFTitular->bindParam(':data_inicio_semestre', $inicio_semestre);
             $stmtPFTitular->bindParam(':data_inicio', $inicio);
             $stmtPFTitular->bindParam(':data_fim', $fim);
+            if ($cpf !== null && $cpf !== '') {
+                $stmtPFTitular->bindParam(':cpf', $cpf);
+            }
             if ($offset !== null && $limit !== null) {
                 $stmtPFTitular->bindParam(':limit', $limit);
                 $stmtPFTitular->bindParam(':offset', $offset);
@@ -960,7 +991,7 @@ class GerarEFinanceira
         }
     }
 
-    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim, $limit = null, $offset = null)
+    public function gerarMovimentacaoFinanceiraCompleta($inicio, $fim, $limit = null, $offset = null, $tipo_documento = null, $cpfcnpj = null)
     {
         $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
         $data_fim = DateTime::createFromFormat('Y-m', $fim);
@@ -974,13 +1005,22 @@ class GerarEFinanceira
         $inicio = $data_inicio->format('Y-m-01');
         $fim = $data_fim->format('Y-m-t');
 
-
-
-        // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
-        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
+        $dadosPJ = [];
+        $dadosPF = [];
+
+        if ($tipo_documento === 'cnpj') {
+            // Busca SOMENTE Pessoa Jurídica com o CNPJ específico
+            $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit, $cpfcnpj);
+        } elseif ($tipo_documento === 'cpf') {
+            // Busca SOMENTE Pessoa Física com o CPF específico
+            $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit, $cpfcnpj);
+        } else {
+            // Busca TUDO (comportamento padrão)
+            $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
+            $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
+        }
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         unset($dadosPJ);
@@ -990,83 +1030,82 @@ class GerarEFinanceira
         $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
         $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
 
-        // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
 
         // --- Processa PJs ---
-        foreach ($dadosPJAgrupados as $pessoa => $meses) {
-            foreach ($meses as $mes => $registro) {
+        if (!empty($dadosPJAgrupados)) {
+            foreach ($dadosPJAgrupados as $pessoa => $meses) {
+                foreach ($meses as $mes => $registro) {
 
-                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
-                    continue;
+                    if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                        continue;
+                    }
+                    // CRIA O XML (ou o objeto XML/Evento)
+                    $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
+                        $registro['dadosDeclarado']['tipo_declarado'],
+                        $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
+                        $this->garantirUtf8($registro['dadosDeclarado']['nome_declarado']),
+                        null,
+                        $this->formatarEnderecoCompleto(
+                            $registro['dadosDeclarado']['ug_endereco'],
+                            $registro['dadosDeclarado']['ug_numero'],
+                            $registro['dadosDeclarado']['ug_complemento'],
+                            $registro['dadosDeclarado']['ug_bairro'],
+                            $registro['dadosDeclarado']['ug_cidade'],
+                            $registro['dadosDeclarado']['ug_estado'],
+                            $registro['dadosDeclarado']['ug_cep']
+                        ),
+                        substr($mes, 0, 4), // Ano
+                        substr($mes, 4, 2), // Mês
+                        $registro['contas']
+                    );
+
+                    // ADICIONA O XML AO GRUPO DO MÊS CORRETO
+                    $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
                 }
-                // CRIA O XML (ou o objeto XML/Evento)
-
-                $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
-                    $registro['dadosDeclarado']['tipo_declarado'],
-                    $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
-                    $this->garantirUtf8($registro['dadosDeclarado']['nome_declarado']),
-                    null,
-                    $this->formatarEnderecoCompleto(
-                        $registro['dadosDeclarado']['ug_endereco'],
-                        $registro['dadosDeclarado']['ug_numero'],
-                        $registro['dadosDeclarado']['ug_complemento'],
-                        $registro['dadosDeclarado']['ug_bairro'],
-                        $registro['dadosDeclarado']['ug_cidade'],
-                        $registro['dadosDeclarado']['ug_estado'],
-                        $registro['dadosDeclarado']['ug_cep']
-                    ),
-                    substr($mes, 0, 4), // Ano
-                    substr($mes, 4, 2), // Mês
-                    $registro['contas']
-                );
-
-                // ADICIONA O XML AO GRUPO DO MÊS CORRETO
-                $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
-
         unset($dadosPJAgrupados);
 
         // --- Processa PFs ---
-        foreach ($dadosPFAgrupados as $pessoa => $meses) {
-            foreach ($meses as $mes => $registro) {
+        if (!empty($dadosPFAgrupados)) {
+            foreach ($dadosPFAgrupados as $pessoa => $meses) {
+                foreach ($meses as $mes => $registro) {
 
-                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
-                    continue;
+                    if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                        continue;
+                    }
+                    // CRIA O XML (ou o objeto XML/Evento)
+                    $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
+                        $registro['dadosDeclarado']['tipo_declarado'],
+                        $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
+                        $this->garantirUtf8($registro['dadosDeclarado']['nome_declarado']),
+                        substr($registro['dadosDeclarado']['data_nascimento'], 0, 10),
+                        $this->formatarEnderecoCompleto(
+                            $registro['dadosDeclarado']['ug_endereco'],
+                            $registro['dadosDeclarado']['ug_numero'],
+                            $registro['dadosDeclarado']['ug_complemento'],
+                            $registro['dadosDeclarado']['ug_bairro'],
+                            $registro['dadosDeclarado']['ug_cidade'],
+                            $registro['dadosDeclarado']['ug_estado'],
+                            $registro['dadosDeclarado']['ug_cep']
+                        ),
+                        substr($mes, 0, 4), // Ano
+                        substr($mes, 4, 2), // Mês
+                        $registro['contas']
+                    );
+
+                    // ADICIONA O XML AO GRUPO DO MÊS CORRETO
+                    $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
                 }
-                // CRIA O XML (ou o objeto XML/Evento)
-
-                $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
-                    $registro['dadosDeclarado']['tipo_declarado'],
-                    $this->apenasNumeros($registro['dadosDeclarado']['ni_declarado']),
-                    $this->garantirUtf8($registro['dadosDeclarado']['nome_declarado']),
-                    substr($registro['dadosDeclarado']['data_nascimento'], 0, 10),
-                    $this->formatarEnderecoCompleto(
-                        $registro['dadosDeclarado']['ug_endereco'],
-                        $registro['dadosDeclarado']['ug_numero'],
-                        $registro['dadosDeclarado']['ug_complemento'],
-                        $registro['dadosDeclarado']['ug_bairro'],
-                        $registro['dadosDeclarado']['ug_cidade'],
-                        $registro['dadosDeclarado']['ug_estado'],
-                        $registro['dadosDeclarado']['ug_cep']
-                    ),
-                    substr($mes, 0, 4), // Ano
-                    substr($mes, 4, 2), // Mês
-                    $registro['contas']
-                );
-
-                // ADICIONA O XML AO GRUPO DO MÊS CORRETO
-                $movimentacoesAgrupadasPorMes[$mes][] = $xmlOuEvento;
             }
         }
-
         unset($dadosPFAgrupados);
 
         return $movimentacoesAgrupadasPorMes;
     }
 
-    public function gerarMovimentacaoFinanceiraCompletaDados($inicio, $fim, $limit = null, $offset = null)
+    public function gerarMovimentacaoFinanceiraCompletaDados($inicio, $fim, $limit = null, $offset = null, $tipo_documento = null, $cpfcnpj = null)
     {
         $data_inicio = DateTime::createFromFormat('Y-m', $inicio);
         $data_fim = DateTime::createFromFormat('Y-m', $fim);
@@ -1080,11 +1119,22 @@ class GerarEFinanceira
         $inicio = $data_inicio->format('Y-m-01');
         $fim = $data_fim->format('Y-m-t');
 
-        // 1. Obtenção e Agrupamento dos Dados
         $inicio_semestre = $this->inicioDoSemestre($inicio);
 
-        $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
-        $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
+        $dadosPJ = [];
+        $dadosPF = [];
+
+        if ($tipo_documento === 'cnpj') {
+            // Busca SOMENTE Pessoa Jurídica
+            $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit, $cpfcnpj);
+        } elseif ($tipo_documento === 'cpf') {
+            // Busca SOMENTE Pessoa Física
+            $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit, $cpfcnpj);
+        } else {
+            // Busca TUDO
+            $dadosPJ = $this->obterDadosMovFinPJ($inicio_semestre, $inicio, $fim, $offset, $limit);
+            $dadosPF = $this->obterDadosMovFinPF($inicio_semestre, $inicio, $fim, $offset, $limit);
+        }
 
         $dadosPJAgrupados = $this->agruparDadosEFinanceira($dadosPJ);
         unset($dadosPJ);
@@ -1094,35 +1144,36 @@ class GerarEFinanceira
         $this->preCarregarIdsMovimentacoes($dadosPJAgrupados);
         $this->preCarregarIdsMovimentacoes($dadosPFAgrupados);
 
-        // 2. Array de Agrupamento Final: [ANO_MES] => [XMLs daquele mês]
         $movimentacoesAgrupadasPorMes = [];
 
         // --- Processa PJs ---
-        foreach ($dadosPJAgrupados as $pessoa => $meses) {
-            foreach ($meses as $mes => $registro) {
+        if (!empty($dadosPJAgrupados)) {
+            foreach ($dadosPJAgrupados as $pessoa => $meses) {
+                foreach ($meses as $mes => $registro) {
 
-                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
-                    continue;
+                    if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                        continue;
+                    }
+
+                    $movimentacoesAgrupadasPorMes[$mes][] = $registro;
                 }
-
-                $movimentacoesAgrupadasPorMes[$mes][] = $registro;
             }
         }
-
         unset($dadosPJAgrupados);
 
         // --- Processa PFs ---
-        foreach ($dadosPFAgrupados as $pessoa => $meses) {
-            foreach ($meses as $mes => $registro) {
+        if (!empty($dadosPFAgrupados)) {
+            foreach ($dadosPFAgrupados as $pessoa => $meses) {
+                foreach ($meses as $mes => $registro) {
 
-                if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
-                    continue;
+                    if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                        continue;
+                    }
+
+                    $movimentacoesAgrupadasPorMes[$mes][] = $registro;
                 }
-
-                $movimentacoesAgrupadasPorMes[$mes][] = $registro;
             }
         }
-
         unset($dadosPFAgrupados);
 
         return $movimentacoesAgrupadasPorMes;
@@ -1146,14 +1197,14 @@ class GerarEFinanceira
             return 0; // erro na data
         }
     }
-    public function gerarXmlMovimentacao($data_inicial, $data_final, $limit = null, $offset = null)
+    public function gerarXmlMovimentacao($data_inicial, $data_final, $limit = null, $offset = null, $tipo_doc = null, $cpfcnpj = null)
     {
         if ($this->compararDatas($data_inicial, $data_final) < 1) {
             return ['xmls' => [], 'total_eventos' => 0];
         }
 
         // Chama o método para pegar os dados brutos agrupados por mês
-        $movimentacoes = $this->gerarMovimentacaoFinanceiraCompleta($data_inicial, $data_final, $limit, $offset);
+        $movimentacoes = $this->gerarMovimentacaoFinanceiraCompleta($data_inicial, $data_final, $limit, $offset, $tipo_doc, $cpfcnpj);
 
         // CONTAGEM EXATA: Soma a quantidade de eventos dentro de cada mês
         $total_eventos = 0;
