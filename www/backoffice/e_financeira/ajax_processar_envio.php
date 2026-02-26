@@ -164,19 +164,6 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
         // 1. Assinar
         $lote_assinado = $efinanceira->assinarLoteEventos($conteudoXmlOriginal);
 
-        // Faz um pré carregamento dos dados no servidor antes de enviar
-        $idsExtraidos = $efinanceira->extrairIdsDoXml($conteudoXmlOriginal);
-
-        if (!empty($idsExtraidos)) {
-            $efinanceira->atualizarLoteStatus($idsExtraidos, "", $nomeArquivo, 'PENDENTE');
-        }
-
-        $pathEnviados = '/www/arquivos_gerados/efinanceira/lotes_enviados';
-        if (!is_dir($pathEnviados)) mkdir($pathEnviados, 0755, true);
-
-        if (!file_exists($pathEnviados . '/' . $nomeArquivo)) {
-            file_put_contents($pathEnviados . '/' . $nomeArquivo, $lote_assinado);
-        }
         // 2. Criptografar
         $lote_criptografado = $efinanceira->criptografarLoteEF($lote_assinado, $producao);
 
@@ -203,6 +190,20 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
         // Se já existe (Status 7 - Duplicidade), lançamos erro com o protocolo antigo se possível?
         // No envio, Status 7 é erro fatal de envio. O usuário deve consultar o protocolo antigo manualmente ou via outra rotina.
         throw new Exception("Lote rejeitado pela Receita. Cód: $cdResposta - Msg: $descResposta");
+    }
+
+    // Faz um pré carregamento dos dados no servidor antes de enviar
+    $idsExtraidos = $efinanceira->extrairIdsDoXml($conteudoXmlOriginal);
+
+    if (!empty($idsExtraidos)) {
+        $efinanceira->atualizarLoteStatus($idsExtraidos, $protocolo, $nomeArquivo, 'PENDENTE');
+    }
+
+    $pathEnviados = '/www/arquivos_gerados/efinanceira/lotes_enviados';
+    if (!is_dir($pathEnviados)) mkdir($pathEnviados, 0755, true);
+
+    if (!file_exists($pathEnviados . '/' . $nomeArquivo)) {
+        file_put_contents($pathEnviados . '/' . $nomeArquivo, $lote_assinado);
     }
 
     return [
