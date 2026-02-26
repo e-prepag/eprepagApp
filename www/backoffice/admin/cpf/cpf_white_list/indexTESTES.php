@@ -4,7 +4,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/gamer/functions.php";
 ?>
 
-<h1>TESTES</h1>
+<h2>Lista de CPF Whitelist</h2>
 
 <?php
 $ativacao = array(
