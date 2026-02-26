@@ -684,7 +684,7 @@ if (!empty($msg)) { ?>
 
                 labels: {
                     finish: '<span class="finish-img-wrapper">' +
-                        '<img src="./imagens/botao_continuar.png" ' +
+                        '<img src="./imagens/botao_continuar.jpeg" ' +
                         'alt="Finalizar Cadastro" class="finish-img">' +
                         '</span>',
                     next: "Próximo",
