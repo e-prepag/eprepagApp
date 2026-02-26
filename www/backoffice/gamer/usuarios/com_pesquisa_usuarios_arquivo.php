@@ -4,57 +4,57 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 include $raiz_do_projeto."includes/main.php";
 
-$BtnSearch                          = $_POST['BtnSearch'] ?? null;
+$BtnSearch                          = $_REQUEST['BtnSearch'] ?? null;
 
-$tf_u_codigo                        = $_POST['tf_u_codigo'] ?? null;
-$tf_u_codigo_include                = $_POST['tf_u_codigo_include'] ?? null;
-$tf_u_status                        = $_POST['tf_u_status'] ?? null;
+$tf_u_codigo                        = $_REQUEST['tf_u_codigo'] ?? null;
+$tf_u_codigo_include                = $_REQUEST['tf_u_codigo_include'] ?? null;
+$tf_u_status                        = $_REQUEST['tf_u_status'] ?? null;
 
-$tf_u_qtde_acessos_ini               = $_POST['tf_u_qtde_acessos_ini'] ?? null;
-$tf_u_qtde_acessos_fim               = $_POST['tf_u_qtde_acessos_fim'] ?? null;
+$tf_u_qtde_acessos_ini               = $_REQUEST['tf_u_qtde_acessos_ini'] ?? null;
+$tf_u_qtde_acessos_fim               = $_REQUEST['tf_u_qtde_acessos_fim'] ?? null;
 
-$tf_u_data_ultimo_acesso_ini         = $_POST['tf_u_data_ultimo_acesso_ini'] ?? null;
-$tf_u_data_ultimo_acesso_fim         = $_POST['tf_u_data_ultimo_acesso_fim'] ?? null;
+$tf_u_data_ultimo_acesso_ini         = $_REQUEST['tf_u_data_ultimo_acesso_ini'] ?? null;
+$tf_u_data_ultimo_acesso_fim         = $_REQUEST['tf_u_data_ultimo_acesso_fim'] ?? null;
 
-$tf_u_data_inclusao_ini              = $_POST['tf_u_data_inclusao_ini'] ?? null;
-$tf_u_data_inclusao_fim              = $_POST['tf_u_data_inclusao_fim'] ?? null;
+$tf_u_data_inclusao_ini              = $_REQUEST['tf_u_data_inclusao_ini'] ?? null;
+$tf_u_data_inclusao_fim              = $_REQUEST['tf_u_data_inclusao_fim'] ?? null;
 
-$tf_u_news                          = $_POST['tf_u_news'] ?? null;
-$ug_cadastro_completo                = $_POST['ug_cadastro_completo'] ?? null;
+$tf_u_news                          = $_REQUEST['tf_u_news'] ?? null;
+$ug_cadastro_completo                = $_REQUEST['ug_cadastro_completo'] ?? null;
 
-$tf_u_endereco_ip                    = $_POST['tf_u_endereco_ip'] ?? null;
-$tf_u_observacoes                    = $_POST['tf_u_observacoes'] ?? null;
+$tf_u_endereco_ip                    = $_REQUEST['tf_u_endereco_ip'] ?? null;
+$tf_u_observacoes                    = $_REQUEST['tf_u_observacoes'] ?? null;
 
-$tf_u_email                          = $_POST['tf_u_email'] ?? null;
-$tf_u_nome                           = $_POST['tf_u_nome'] ?? null;
-$tf_u_cpf                            = $_POST['tf_u_cpf'] ?? null;
-$ug_login                            = $_POST['ug_login'] ?? null;
+$tf_u_email                          = $_REQUEST['tf_u_email'] ?? null;
+$tf_u_nome                           = $_REQUEST['tf_u_nome'] ?? null;
+$tf_u_cpf                            = $_REQUEST['tf_u_cpf'] ?? null;
+$ug_login                            = $_REQUEST['ug_login'] ?? null;
 
-$tf_u_data_nascimento_ini            = $_POST['tf_u_data_nascimento_ini'] ?? null;
-$tf_u_data_nascimento_fim            = $_POST['tf_u_data_nascimento_fim'] ?? null;
+$tf_u_data_nascimento_ini            = $_REQUEST['tf_u_data_nascimento_ini'] ?? null;
+$tf_u_data_nascimento_fim            = $_REQUEST['tf_u_data_nascimento_fim'] ?? null;
 
-$tf_u_sexo                           = $_POST['tf_u_sexo'] ?? null;
+$tf_u_sexo                           = $_REQUEST['tf_u_sexo'] ?? null;
 
-$tf_u_tel_ddi                        = $_POST['tf_u_tel_ddi'] ?? null;
-$tf_u_tel_ddd                        = $_POST['tf_u_tel_ddd'] ?? null;
-$tf_u_tel                            = $_POST['tf_u_tel'] ?? null;
+$tf_u_tel_ddi                        = $_REQUEST['tf_u_tel_ddi'] ?? null;
+$tf_u_tel_ddd                        = $_REQUEST['tf_u_tel_ddd'] ?? null;
+$tf_u_tel                            = $_REQUEST['tf_u_tel'] ?? null;
 
-$tf_u_cel_ddi                        = $_POST['tf_u_cel_ddi'] ?? null;
-$tf_u_cel_ddd                        = $_POST['tf_u_cel_ddd'] ?? null;
-$tf_u_cel                            = $_POST['tf_u_cel'] ?? null;
+$tf_u_cel_ddi                        = $_REQUEST['tf_u_cel_ddi'] ?? null;
+$tf_u_cel_ddd                        = $_REQUEST['tf_u_cel_ddd'] ?? null;
+$tf_u_cel                            = $_REQUEST['tf_u_cel'] ?? null;
 
-$tf_u_endereco                       = $_POST['tf_u_endereco'] ?? null;
-$tf_u_bairro                         = $_POST['tf_u_bairro'] ?? null;
-$tf_u_cidade                         = $_POST['tf_u_cidade'] ?? null;
-$tf_u_cep                            = $_POST['tf_u_cep'] ?? null;
-$tf_u_estado                         = $_POST['tf_u_estado'] ?? null;
+$tf_u_endereco                       = $_REQUEST['tf_u_endereco'] ?? null;
+$tf_u_bairro                         = $_REQUEST['tf_u_bairro'] ?? null;
+$tf_u_cidade                         = $_REQUEST['tf_u_cidade'] ?? null;
+$tf_u_cep                            = $_REQUEST['tf_u_cep'] ?? null;
+$tf_u_estado                         = $_REQUEST['tf_u_estado'] ?? null;
 
-$tf_u_compet_aceito_regulamento      = $_POST['tf_u_compet_aceito_regulamento'] ?? null;
-$tf_u_integracao_origem              = $_POST['tf_u_integracao_origem'] ?? null;
+$tf_u_compet_aceito_regulamento      = $_REQUEST['tf_u_compet_aceito_regulamento'] ?? null;
+$tf_u_integracao_origem              = $_REQUEST['tf_u_integracao_origem'] ?? null;
 
-$tf_u_habilitado_cielo               = $_POST['tf_u_habilitado_cielo'] ?? null;
-$tf_u_usuario_vip                    = $_POST['tf_u_usuario_vip'] ?? null;
-$tf_u_com_totais_vendas            = $_POST['tf_u_com_totais_vendas'] ?? null;
+$tf_u_habilitado_cielo               = $_REQUEST['tf_u_habilitado_cielo'] ?? null;
+$tf_u_usuario_vip                    = $_REQUEST['tf_u_usuario_vip'] ?? null;
+$tf_u_com_totais_vendas            = $_REQUEST['tf_u_com_totais_vendas'] ?? null;
 
 // Decodifica cidade se necessário
 if (isset($tf_u_cidade)) {
@@ -64,13 +64,19 @@ if (isset($tf_u_cidade)) {
 // Gera a query SQL com base nos filtros
 include $raiz_do_projeto."includes/gamer/inc_pesquisa_usuarios_sql.php";
 
-$mensagem = "";
+ob_start();
+
+$tf_tipo = "u";
+$filename = $tf_tipo . "_" . date("Ymd_His") . ".txt";
+header("Content-Type: text/plain");
+header("Content-Disposition: attachment; filename=\"$filename\"");
+header("Content-Length: " . strlen($mensagem));
 
 // Cabeçalho da planilha
 if ($tf_u_com_totais_vendas) {
-    $mensagem .= "ID\tNome\tLogin\tEMail\tData de Cadastro\tCPF\tSexo\tEndereco\tBairro\tCidade\tEstado\tCEP\tVendas R$\tn Vendas\tTicket medio\tData ultima venda\tStatus\tData de Nascimento\tSaldo Atual\n\n";
+    echo "ID\tNome\tLogin\tEMail\tData de Cadastro\tCPF\tSexo\tEndereco\tBairro\tCidade\tEstado\tCEP\tVendas R$\tn Vendas\tTicket medio\tData ultima venda\tStatus\tData de Nascimento\tSaldo Atual\n\n";
 } else {
-    $mensagem .= "ID\tNome\tLogin\tEMail\tData de Cadastro\tCPF\tSexo\tEndereco\tBairro\tCidade\tEstado\tCEP\tData de Nascimento\tSaldo Atual\n\n";
+    echo "ID\tNome\tLogin\tEMail\tData de Cadastro\tCPF\tSexo\tEndereco\tBairro\tCidade\tEstado\tCEP\tData de Nascimento\tSaldo Atual\n\n";
 }
 
 // Monta o conteúdo
@@ -105,21 +111,13 @@ while ($rs_usuario_row = pg_fetch_array($rs_usuario)) {
             $status_label = "Atrasado";
         }
 
-        $mensagem .= "$ug_id\t$ug_nome\t$ug_login\t$ug_email\t$ug_data_inclusao\t$ug_cpf\t$ug_sexo\t$ug_endereco\t$ug_bairro\t$ug_cidade\t$ug_estado\t$ug_cep\t$vg_valor\t$vg_qtde_itens\t$ticket_medio\t$vg_data_ultima_venda\t$status_label\t$ug_data_nascimento\t$ug_perfil_saldo\n";
+        echo "$ug_id\t$ug_nome\t$ug_login\t$ug_email\t$ug_data_inclusao\t$ug_cpf\t$ug_sexo\t$ug_endereco\t$ug_bairro\t$ug_cidade\t$ug_estado\t$ug_cep\t$vg_valor\t$vg_qtde_itens\t$ticket_medio\t$vg_data_ultima_venda\t$status_label\t$ug_data_nascimento\t$ug_perfil_saldo\n";
     } else {
-        $mensagem .= "$ug_id\t$ug_nome\t$ug_login\t$ug_email\t$ug_data_inclusao\t$ug_cpf\t$ug_sexo\t$ug_endereco\t$ug_bairro\t$ug_cidade\t$ug_estado\t$ug_cep\t$ug_data_nascimento\t$ug_perfil_saldo\n";
+        echo "$ug_id\t$ug_nome\t$ug_login\t$ug_email\t$ug_data_inclusao\t$ug_cpf\t$ug_sexo\t$ug_endereco\t$ug_bairro\t$ug_cidade\t$ug_estado\t$ug_cep\t$ug_data_nascimento\t$ug_perfil_saldo\n";
     }
 }
 
-// Nome do arquivo
-$tf_tipo = "u";
-$filename = $tf_tipo . "_" . date("Ymd_His") . ".txt";
-
-// Força o download
-header("Content-Type: text/plain");
-header("Content-Disposition: attachment; filename=\"$filename\"");
-header("Content-Length: " . strlen($mensagem));
-echo $mensagem;
+ob_end_flush();
 exit;
 
 ?>
