@@ -741,7 +741,7 @@ function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efina
                     $ocorrencias = $nodeRetorno->xpath("status/dadosRegistroOcorrenciaEvento/ocorrencias");
                     if (!empty($ocorrencias)) {
                         foreach ($ocorrencias as $oc) {
-                            $tipo = (string)$oc->tipo; 
+                            $tipo = (string)$oc->tipo;
                             $prefixo = ($tipo == '2') ? '[AVISO]' : '[ERRO]';
                             $errosMsg[] = "$prefixo " . $oc->descricao;
                         }
@@ -782,29 +782,38 @@ function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efina
     }
 
     // LÓGICA DE CONTINGÊNCIA (SALVAR ARQUIVO FALTANTE E ATUALIZAR BD)
-    if (!empty($protocolo) && $efinanceira) {
+    $idReferenciaBusca = null;
+    if (!empty($idsSucesso)) {
+        $idReferenciaBusca = $idsSucesso[0];
+    } elseif (!empty($idsErro)) {
+        $idReferenciaBusca = $idsErro[0];
+    }
+
+    if (!empty($idReferenciaBusca) && $efinanceira) {
         $pdo = ConnectionPDO::getConnection()->getLink();
-        $sqlBusca = "SELECT nome_arquivo, status_envio FROM envios_e_financeira WHERE num_protocolo = :protocolo LIMIT 1";
-        $stmtBusca = $pdo->prepare($sqlBusca); 
-        $stmtBusca->execute([':protocolo' => $protocolo]);
-        
+
+        // Busca o arquivo usando o ID interno em vez do protocolo
+        $sqlBusca = "SELECT nome_arquivo, status_envio FROM envios_e_financeira WHERE id = :id LIMIT 1";
+        $stmtBusca = $pdo->prepare($sqlBusca);
+        $stmtBusca->execute([':id' => $idReferenciaBusca]);
+
         if ($row = $stmtBusca->fetch(PDO::FETCH_ASSOC)) {
             $nomeArquivoOriginal = $row['nome_arquivo'];
             $statusAtualDb = strtoupper($row['status_envio']);
-            
+
             if (!empty($nomeArquivoOriginal)) {
                 $pathRespostas = '/www/arquivos_gerados/efinanceira/respostas_envio';
                 if (!is_dir($pathRespostas)) mkdir($pathRespostas, 0755, true);
-                
+
                 $info_arquivo = pathinfo($nomeArquivoOriginal);
                 $extensao = isset($info_arquivo['extension']) ? '.' . $info_arquivo['extension'] : '.xml';
                 $nomeResp = $info_arquivo['filename'] . "_retorno" . $extensao;
                 $caminhoCompletoResposta = $pathRespostas . '/' . $nomeResp;
-                
+
                 if (!file_exists($caminhoCompletoResposta)) {
                     file_put_contents($caminhoCompletoResposta, $xmlProcessamento);
                 }
-                
+
                 if ($statusAtualDb === 'PENDENTE') {
                     if (!empty($idsSucesso)) {
                         $efinanceira->atualizarLoteStatus($idsSucesso, $protocolo, $nomeArquivoOriginal, 'ENVIADO');
@@ -864,7 +873,7 @@ function gerarHtmlConsultaLote($dadosProcessamento)
             $html .= "<td>{$det['id']}</td>";
             $html .= "<td><span class='label label-$label'>{$det['status_db']}</span></td>";
             $html .= "<td>";
-            
+
             if (!empty($det['recibo'])) {
                 $html .= "<div><strong>Recibo:</strong> " . $det['recibo'] . "</div>";
             }

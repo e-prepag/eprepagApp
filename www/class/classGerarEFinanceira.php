@@ -2694,6 +2694,35 @@ class GerarEFinanceira
         return $resposta;
     }
 
+    public function extrairIdsDoXml($xmlString)
+    {
+        $idsExtraidos = [];
+
+        $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlString);
+
+        $xml = simplexml_load_string($xmlLimpo);
+        if ($xml === false) {
+            return $idsExtraidos; // Retorna array vazio em caso de erro no XML
+        }
+
+        $eventos = $xml->xpath('//evento');
+
+        if (!empty($eventos)) {
+            foreach ($eventos as $evt) {
+                $idCompleto = (string) $evt['id'];
+
+                if (strpos($idCompleto, 'ID1') === 0) {
+
+                    $idNumerico = (int) substr($idCompleto, 3);
+
+                    $idsExtraidos[] = $idNumerico;
+                }
+            }
+        }
+
+        return $idsExtraidos;
+    }
+
     public function limparDadosTesteProducaoRestrita($cnpjDeclarante)
     {
         // URL fixa para o ambiente de testes (Produção Restrita) com o CNPJ na Query String

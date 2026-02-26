@@ -164,9 +164,16 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
         // 1. Assinar
         $lote_assinado = $efinanceira->assinarLoteEventos($conteudoXmlOriginal);
 
+        // Faz um pré carregamento dos dados no servidor antes de enviar
+        $idsExtraidos = $efinanceira->extrairIdsDoXml($conteudoXmlOriginal);
+
+        if (!empty($idsExtraidos)) {
+            $efinanceira->atualizarLoteStatus($idsExtraidos, "", $nomeArquivo, 'PENDENTE');
+        }
+
         $pathEnviados = '/www/arquivos_gerados/efinanceira/lotes_enviados';
         if (!is_dir($pathEnviados)) mkdir($pathEnviados, 0755, true);
-        
+
         if (!file_exists($pathEnviados . '/' . $nomeArquivo)) {
             file_put_contents($pathEnviados . '/' . $nomeArquivo, $lote_assinado);
         }
@@ -209,16 +216,16 @@ function etapa2_monitorarProcessamento($protocolo, $producao = false)
     $efinanceira = new GerarEFinanceira();
 
     $tentativa = 0;
-    $maxTentativas = 24; // 2 minutos (24 * 5s)
+    $maxTentativas = 1; // 2 minutos (24 * 5s)
     $xmlFinal = null;
     $statusLote = 1; // Começa assumindo '1 - Em Processamento'
 
     do {
         // Espera 5 segundos antes de consultar
-        sleep(5);
+        //sleep(5);
         $tentativa++;
 
-        $xmlFinal = $efinanceira->consultarLoteEFinanceira($protocolo, $producao);
+        //$xmlFinal = $efinanceira->consultarLoteEFinanceira($protocolo, $producao);
 
         // Remove namespaces para leitura rápida do status
         $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlFinal);
