@@ -119,7 +119,8 @@ class tabelaLista
             // Ícone de ordenação (opcional, dá um toque profissional)
             $icon = '';
             if ($this->sort == $campo) {
-                $icon = ($this->dir == 'ASC') ? ' <i class="fas fa-sort-up"></i>' : ' <i class="fas fa-sort-down"></i>';
+                // Usando os ícones nativos do Bootstrap 3
+                $icon = ($this->dir == 'ASC') ? ' <span class="glyphicon glyphicon-triangle-top"></span>' : ' <span class="glyphicon glyphicon-triangle-bottom"></span>';
             }
 
             $html[] = '        <th scope="col" class="text-nowrap">';
