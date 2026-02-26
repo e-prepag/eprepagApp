@@ -136,7 +136,9 @@ if ($msg == "") {
     $ug_obs = "";
     while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
       $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observação:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
-    }//end while
+
+      $ug_obs .= $rs_usuario_row['ug_observacao'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
+    } //end while
 
   }
 }
@@ -154,75 +156,76 @@ ob_end_flush();
     form1.action = 'com_usuario_detalhe_salva.php?acao=edt&usuario_id=' + cod;
     form1.submit();
   }
+
   function GP_popupAlertMsg(msg) { //v1.0
     document.MM_returnValue = alert(msg);
   }
+
   function GP_popupConfirmMsg(msg) { //v1.0
     document.MM_returnValue = confirm(msg);
   }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script language="javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("btn-remove-auth");
 
-document.addEventListener("DOMContentLoaded", function () {
-  const btn = document.getElementById("btn-remove-auth");
+    btn.addEventListener("click", function() {
+      Swal.fire({
+        title: "Tem certeza?",
+        text: "Esta ação removerá o autenticador do usuário!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sim, remover",
+        cancelButtonText: "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const id = document.getElementById("codigo-gamer").innerText;
 
-  btn.addEventListener("click", function () {
-    Swal.fire({
-      title: "Tem certeza?",
-      text: "Esta ação removerá o autenticador do usuário!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sim, remover",
-      cancelButtonText: "Cancelar"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const id = document.getElementById("codigo-gamer").innerText;
-
-        Swal.fire({
-          didOpen: () => {
-            Swal.showLoading();
-          }
-        });
-
-        fetch("/gamer/usuarios/ajaxRemoverAutenticador.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: `id=${encodeURIComponent(id)}&codigo=${encodeURIComponent('Gz8#kV2!mP$Xr9@tQw')}`,
-          credentials: "include"
-        })
-          .then(response => response.json())
-          .then(data => {
-            Swal.close();
-
-            if (data.situacao === "success") {
-              Swal.fire(
-                "Sucesso!",
-                data.msg,
-                "success"
-              ).then(() => {
-                document.getElementById("btn-remove-auth").style.display = "none";
-                document.getElementById("txt-auth").innerText = "Não";
-              });
-            } else {
-              Swal.fire(
-                "Erro!",
-                data.msg,
-                "error"
-              );
+          Swal.fire({
+            didOpen: () => {
+              Swal.showLoading();
             }
-          })
-          .catch(error => {
-            Swal.close();
-            Swal.fire("Erro!", "Erro na requisição.", "error");
-            console.error(error);
           });
-      }
+
+          fetch("/gamer/usuarios/ajaxRemoverAutenticador.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: `id=${encodeURIComponent(id)}&codigo=${encodeURIComponent('Gz8#kV2!mP$Xr9@tQw')}`,
+              credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+              Swal.close();
+
+              if (data.situacao === "success") {
+                Swal.fire(
+                  "Sucesso!",
+                  data.msg,
+                  "success"
+                ).then(() => {
+                  document.getElementById("btn-remove-auth").style.display = "none";
+                  document.getElementById("txt-auth").innerText = "Não";
+                });
+              } else {
+                Swal.fire(
+                  "Erro!",
+                  data.msg,
+                  "error"
+                );
+              }
+            })
+            .catch(error => {
+              Swal.close();
+              Swal.fire("Erro!", "Erro na requisição.", "error");
+              console.error(error);
+            });
+        }
+      });
     });
   });
-});
 
   function fcnAlterar(v_campo, v_valor_old, v_texto_adicional) {
 
@@ -260,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     return sString;
   }
-
 </script>
 <form name="form1" method="post" action="est_perfil_informa_estab.php">
   <input type="hidden" name="v_campo" value="">
@@ -300,20 +302,20 @@ document.addEventListener("DOMContentLoaded", function () {
           $rs = SQLexecuteQuery($sql);
           $rs_row = pg_fetch_array($rs);
           //echo "pg_num_rows(rs): ".pg_num_rows($rs).$rs_row['ugc_data_cancelamento'].$rs_row['ug_id']."<br>";
-          
+
           if (!$rs || pg_num_rows($rs) == 0 || empty($rs_row['ugc_data_cancelamento'])) {
-            ?>
+          ?>
             <td width="140"><a class="link_azul" href="#"
                 Onclick="if(confirm('Deseja alterar o Status deste usuário ?')) window.open('com_usuario_detalhe_selecao.php?v_campo=ativo&ativo=<?php echo $ug_ativo ?><?php echo $varsel ?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><b>Status</b></a>
             </td>
             <td width="307"><?php echo $GLOBALS['STATUS_USUARIO_LEGENDA'][$ug_ativo]; ?></td>
-            <?php
+          <?php
           } else {
             //$rs_row = pg_fetch_array($rs);
-            ?>
+          ?>
             <td width="140"><b>Usu&aacute;rio Suspendeu em:</b></td>
             <td width="307"><?php echo $rs_row['ugc_data_cancelamento']; ?></td>
-            <?php
+          <?php
           }
           ?>
         </tr>
@@ -334,43 +336,43 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr bgcolor="#F5F5FB" class="texto">
           <td><b>Usuário VIP?</b></td>
           <td><?php
-          $usuarioGames1 = new UsuarioGames($ug_id);
-          $meu_ip = '201.93.162.169';
+              $usuarioGames1 = new UsuarioGames($ug_id);
+              $meu_ip = '201.93.162.169';
 
-          if ($_SERVER['REMOTE_ADDR'] == $meu_ip) {
-            // teste
-            //echo $usuarioGames1->getStatusVipOuNao();
-            //$bret = $usuarioGames1->b_IsLogin_pagamento_vip();
-            //echo (($bret)?"<font color='blue'>SIM</font>":"não");
-            $bret = $usuarioGames1->b_IsLogin_pagamento_vip();
-            //echo (($bret)?"<font color='blue'>SIM</font>":"não");
-            echo (($bret) ? "<font color='blue'>SIM</font>" : "não");
-          } else {
-            $bret = $usuarioGames1->b_IsLogin_pagamento_vip();
-            echo (($bret) ? "<font color='blue'>SIM</font>" : "não");
-          }
+              if ($_SERVER['REMOTE_ADDR'] == $meu_ip) {
+                // teste
+                //echo $usuarioGames1->getStatusVipOuNao();
+                //$bret = $usuarioGames1->b_IsLogin_pagamento_vip();
+                //echo (($bret)?"<font color='blue'>SIM</font>":"não");
+                $bret = $usuarioGames1->b_IsLogin_pagamento_vip();
+                //echo (($bret)?"<font color='blue'>SIM</font>":"não");
+                echo (($bret) ? "<font color='blue'>SIM</font>" : "não");
+              } else {
+                $bret = $usuarioGames1->b_IsLogin_pagamento_vip();
+                echo (($bret) ? "<font color='blue'>SIM</font>" : "não");
+              }
 
 
-          ?></td>
+              ?></td>
           <td width="140"><b>Lista Extrato?</b></td>
           <td width="307"><?php
-          $bret = $usuarioGames1->b_IsLogin_extrato_UG();
-          echo (($bret) ? "<font color='blue'>SIM</font>" : "não");
-          ?></td>
+                          $bret = $usuarioGames1->b_IsLogin_extrato_UG();
+                          echo (($bret) ? "<font color='blue'>SIM</font>" : "não");
+                          ?></td>
         </tr>
         <tr bgcolor="#F5F5FB" class="texto">
           <td><b>Possui um autenticador</b></td>
           <td id="txt-auth"><?php
-          $sql = "SELECT ug_chave_autenticador FROM usuarios_games WHERE ug_id = " . $usuario_id;
-          $res_te = SQLexecuteQuery($sql);
-          if ($res_te_row = pg_fetch_array($res_te)) {
-            $autenticador = !empty($res_te_row['ug_chave_autenticador']);
-            echo $autenticador ? "Sim" : "Não";
-          } else {
-            echo "Não encontrado";
-          }
+                            $sql = "SELECT ug_chave_autenticador FROM usuarios_games WHERE ug_id = " . $usuario_id;
+                            $res_te = SQLexecuteQuery($sql);
+                            if ($res_te_row = pg_fetch_array($res_te)) {
+                              $autenticador = !empty($res_te_row['ug_chave_autenticador']);
+                              echo $autenticador ? "Sim" : "Não";
+                            } else {
+                              echo "Não encontrado";
+                            }
 
-          ?></td>
+                            ?></td>
           <td></td>
           <td><button type="button" class="btn btn-danger <?php echo $autenticador ? "" : "d-none" ?>"
               id="btn-remove-auth">Remover autenticador
@@ -430,13 +432,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 Onclick="if(confirm('Deseja alterar o Newsletter deste usuário ?')) fcnAlterar('news','<?php echo $ug_news ?>','');return false;"><b>Newsletter</b></a>
           </td>
           <td><?php
-          if ($ug_news == 'h')
-            echo "Sim - HTML";
-          elseif ($ug_news == 't')
-            echo "Sim - Texto";
-          else
-            echo "Não";
-          ?></td>
+              if ($ug_news == 'h')
+                echo "Sim - HTML";
+              elseif ($ug_news == 't')
+                echo "Sim - Texto";
+              else
+                echo "Não";
+              ?></td>
         </tr>
         <tr bgcolor="#FFFFFF" class="texto">
           <td colspan="4" bgcolor="#ECE9D8">Endereço</font>
@@ -541,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 $pagto_tipo = "Boleto";
               else
                 $pagto_tipo = $GLOBALS['FORMAS_PAGAMENTO_DESCRICAO_NUMERICO'][$pagto_tipo];
-              ?>
+            ?>
               <tr bgcolor="<?php echo $cor1 ?>">
                 <td class="texto" align="center"><a style="text-decoration:none"
                     href="/gamer/vendas/com_venda_detalhe.php?venda_id=<?php echo $rs_venda_row['vg_id'] ?>"><?php echo $rs_venda_row['vg_id'] ?></a>
@@ -569,7 +571,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <?php } ?>
               </tr>
             <?php } ?>
-            <?php	//paginacao_query($inicial_v, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial=$inicial", "inicial_v"); ?>
+            <?php  //paginacao_query($inicial_v, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial=$inicial", "inicial_v"); 
+            ?>
           <?php } ?>
         </table>
       </div>
@@ -635,7 +638,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td align="center"><?php echo $rs_usuario_log_row['ugl_obs'] ?></td>
               </tr>
             <?php } ?>
-            <?php	//paginacao_query($inicial, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial_v=".$inicial_v); ?>
+            <?php  //paginacao_query($inicial, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial_v=".$inicial_v); 
+            ?>
           <?php } ?>
         </table>
       </div>
@@ -700,15 +704,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 </td>
               </tr>
             <?php } ?>
-            <?php	//echo "$ordem_bloqueio, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp_bloqueio, $varsel_bloqueio.\"&ordem_bloqueio=\".$ordem_bloqueio";
-              //	paginacao_query($inicial_bloqueio, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp_bloqueio, $varsel_bloqueio."&ordem_bloqueio=".$ordem_bloqueio); ?>
+            <?php  //echo "$ordem_bloqueio, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp_bloqueio, $varsel_bloqueio.\"&ordem_bloqueio=\".$ordem_bloqueio";
+            //	paginacao_query($inicial_bloqueio, $total_table, $max, '4', $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp_bloqueio, $varsel_bloqueio."&ordem_bloqueio=".$ordem_bloqueio); 
+            ?>
           <?php } ?>
         </table>
       </div>
 
       <div class="col-md-12 bg-cinza-claro txt-preto">
         <p class="top20">Observações</p>
-        <textarea cols="40" rows="8" name="ug_obs" disabled class="texto"><?php echo $ug_obs ?></textarea>
+        <textarea cols="40" rows="8" name="ug_obs" disabled class="texto">
+<?php echo str_replace('<br>', "\n", $ug_obs); ?>
+</textarea>
       </div>
     </td>
   </tr>
