@@ -134,10 +134,12 @@ if ($msg == "") {
     $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM usuarios_games_obs WHERE ug_id = " . $rs_usuario_row['ug_id'] . ";";
     $rs_usuario_obs = SQLexecuteQuery($sql);
     $ug_obs = "";
+
+    if (!empty($rs_usuario_row['ug_observacao'])) {
+      $ug_obs .= $rs_usuario_row['ug_observacao'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
+    }
     while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
       $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observação:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
-
-      $ug_obs .= $rs_usuario_row['ug_observacao'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
     } //end while
 
   }
