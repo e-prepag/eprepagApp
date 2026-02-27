@@ -207,3 +207,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # * 0,3,6,9,12,15,18,21 * * * bash /www/background/limparBloqueioLogin.sh #Função que desbloqueia login de Usuario final bloqueados por atingirem limite maximo de tentativas
 # * 0,2,4,6,8,10,12,14,16,18,20,22 * * * bash /www/background/limparBloqueioPDV.sh #Cron para limpar PDVs bloqueados
 * * * * * bash /www/background/test_cron_franci.sh >> /www/arquivos_gerados/logs_cron/test_cron_franci.log  2>&1
+
+#Codigo para processar os workers
+* * * * * bash /www/background/processa_workers.sh
