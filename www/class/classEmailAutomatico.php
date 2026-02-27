@@ -106,7 +106,7 @@ class EnvioEmailAutomatico
         // Adicao de Saldo Gamer
         "AdicaoSaldoGamer" => "E-Prepag - Adição de Saldo",
         // Pedido negado lan
-        "PedidoNegadoLan" => "E-Prepag - Seu cadastro E-Prepag não foi aprovado",
+        "PedidoNegadoLan" => "Atualização sobre seu cadastro na E-Prepag",
         // Boleto para pagamento
         "BoletoParaPagamentoLanPos" => "E-Prepag - Boleto para pagamento",
         // Pedido Cancelado
