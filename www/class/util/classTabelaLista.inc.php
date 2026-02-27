@@ -116,16 +116,22 @@ class tabelaLista
         $html[] = '      <tr>';
 
         foreach ($this->camposTabela as $campo => $header) {
-            // Ícone de ordenação (opcional, dá um toque profissional)
-            $icon = '';
+
+            // 1. Define o ícone neutro (setas duplas) e a transparência padrão
+            $classe_icone = 'glyphicon-sort';
+            $opacidade = '0.4';
+
+            // 2. Se a coluna for a que está sendo ordenada no momento, troca a classe e dá destaque
             if ($this->sort == $campo) {
-                // Usando os ícones nativos do Bootstrap 3
-                $icon = ($this->dir == 'ASC') ? ' <span class="glyphicon glyphicon-triangle-top"></span>' : ' <span class="glyphicon glyphicon-triangle-bottom"></span>';
+                $opacidade = '1';
+                $classe_icone = ($this->dir == 'ASC') ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down';
             }
 
+            $icon = ' <span class="glyphicon ' . $classe_icone . '" style="top: 2px; left: 3px; opacity: ' . $opacidade . ';"></span>';
+
             $html[] = '        <th scope="col" class="text-nowrap">';
-            $html[] = '          <a href="javascript:void(0)" onclick="pagina(0,' . $this->limite . ',\'' . $campo . '\',\'' . $this->sortDir() . '\')" class="text-white text-decoration-none">';
-            $html[] = $header . $icon;
+            $html[] = '          <a href="javascript:void(0)" onclick="pagina(0,' . $this->limite . ',\'' . $campo . '\',\'' . $this->sortDir() . '\')" class="text-white text-decoration-none" style="display: flex; align-items: center; justify-content: space-between;">';
+            $html[] = '            <span>' . $header . '</span>' . $icon;
             $html[] = '          </a>';
             $html[] = '        </th>';
         }
