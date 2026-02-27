@@ -9,24 +9,20 @@ $data_inicial = isset($_GET['dt_inicial']) ? $_GET['dt_inicial'] : "";
 $data_final = isset($_GET['dt_final']) ? $_GET['dt_final'] : "";
 $sel_tipo = $_GET['sel_tipo'] ?? "pretty";
 
-// --- NOVAS VARIÁVEIS DE FILTRO DE DOCUMENTO ---
-$tipo_doc = $_GET['tipo_doc'] ?? ""; // Pode ser 'todos', 'cpf' ou 'cnpj'
+$tipo_doc = $_GET['tipo_doc'] ?? "";
 $cpfcnpj = $_GET['cpfcnpj'] ?? "";
 
-// --- VARIÁVEIS DE PAGINAÇÃO ---
 $limite_registros = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
 $pagina_atual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 $offset = ($pagina_atual - 1) * $limite_registros;
 
 $data_atual = date('Y-m');
-
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <link href="styles.css" rel="stylesheet" />
 
 <style>
-	/* Oculta a div do input por padrão */
 	#container_cpfcnpj {
 		display: none;
 	}
@@ -104,14 +100,16 @@ $data_atual = date('Y-m');
 
 		<div class="d-flex top10 custom-justify">
 			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
-                <a class="btn btn-success btn-info"
-                    href="gerar_zip.php?data_inicial=<?= urlencode($data_inicial) ?>&data_final=<?= urlencode($data_final) ?>&acao=movimentacoes&tipo_doc=<?= urlencode($tipo_doc) ?>&cpfcnpj=<?= urlencode($cpfcnpj) ?>"
-                    target="_blank">Baixar Todos os Lotes</a><span class="help-icon">?
-                    <span class="tooltiptext">
-                        Baixar um ZIP de todos os eventos no período separados em lotes XMLs com 50 eventos no máximo
-                    </span>
-                </span>
-            <?php } ?>
+				<button type="button" class="btn btn-success btn-info"
+					onclick="iniciarGeracaoBackground('<?= urlencode($data_inicial) ?>', '<?= urlencode($data_final) ?>', '<?= urlencode($tipo_doc) ?>', '<?= urlencode($cpfcnpj) ?>')">
+					Baixar Todos os Lotes
+				</button>
+				<span class="help-icon">?
+					<span class="tooltiptext">
+						Baixar um ZIP processado em segundo plano para evitar travamentos.
+					</span>
+				</span>
+			<?php } ?>
 			<button type="submit" class="btn btn-success btn-busca">Buscar Lotes</button>
 		</div>
 	</form>
@@ -130,7 +128,6 @@ $data_atual = date('Y-m');
 	$quantidade_registros_reais = 0;
 	$tem_proxima_pagina = false;
 
-	// Converte 'todos' para null, assim a função busca ambas as categorias sem restrições
 	$param_tipo_doc = ($tipo_doc === 'todos') ? null : $tipo_doc;
 	$param_cpfcnpj = empty($cpfcnpj) ? null : $cpfcnpj;
 
@@ -140,7 +137,6 @@ $data_atual = date('Y-m');
 			if ($sel_tipo == 'xml') {
 				$resultado = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final, $limite_registros, $offset, $param_tipo_doc, $param_cpfcnpj);
 
-				// Valida se houve retorno e atribui as variáveis
 				if ($resultado && isset($resultado['xmls'])) {
 					$dados = $resultado['xmls'];
 					$quantidade_registros_reais = $resultado['total_eventos'];
@@ -167,7 +163,6 @@ $data_atual = date('Y-m');
 			}
 
 			if ($quantidade_registros_reais > 0) {
-
 				$tem_proxima_pagina = true;
 			}
 		}
@@ -178,7 +173,6 @@ $data_atual = date('Y-m');
 
 	<?php if (!empty($data_inicial) && !empty($data_final)): ?>
 		<?php
-		// Constrói a URL base com todos os filtros mantidos para a paginação
 		$query_params = [
 			'dt_inicial' => $data_inicial,
 			'dt_final' => $data_final,
@@ -233,14 +227,12 @@ $data_atual = date('Y-m');
 		$('#' + id).toggleClass('xml-colapsado');
 	}
 
-	// --- LÓGICA DO FILTRO DE DOCUMENTO (jQuery) ---
 	function aplicarMascaraDocumento() {
 		var tipo = $('#tipo_doc').val();
 		var $inputCpfCnpj = $('#cpfcnpj');
 		var $container = $('#container_cpfcnpj');
 		var $label = $('#label_cpfcnpj');
 
-		// Remove máscaras antigas antes de aplicar a nova
 		$inputCpfCnpj.unmask();
 
 		if (tipo === 'cpf') {
@@ -254,21 +246,88 @@ $data_atual = date('Y-m');
 			$inputCpfCnpj.attr('placeholder', '00.000.000/0000-00');
 			$inputCpfCnpj.mask('00.000.000/0000-00');
 		} else {
-			// Se for "todos", esconde o campo e limpa o valor para não interferir na busca
 			$container.hide();
 			$inputCpfCnpj.val('');
 		}
 	}
 
+	// --- NOVA LÓGICA DO WORKER EM SEGUNDO PLANO ---
+	function iniciarGeracaoBackground(dataInicial, dataFinal, tipoDoc, cpfCnpj) {
+
+		// 1. Faz o pedido para inserir na fila
+		$.ajax({
+			url: 'gerar_zip.php',
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				acao: 'solicitar_download',
+				data_inicial: decodeURIComponent(dataInicial),
+				data_final: decodeURIComponent(dataFinal),
+				tipo_doc: decodeURIComponent(tipoDoc),
+				cpfcnpj: decodeURIComponent(cpfCnpj)
+			},
+			success: function(res) {
+				if (res.sucesso) {
+					let ticketId = res.ticket_id;
+
+					Swal.fire({
+						title: 'Processando na nuvem...',
+						html: 'Seu arquivo está sendo gerado em segundo plano para evitar travamentos.<br><br><b>Você não precisa atualizar a página.</b>',
+						icon: 'info',
+						allowOutsideClick: false,
+						showConfirmButton: false,
+						didOpen: () => {
+							Swal.showLoading();
+						}
+					});
+
+					// 2. Fica checando o status a cada 5 segundos
+					let interval = setInterval(function() {
+						$.ajax({
+							url: 'gerar_zip.php',
+							type: 'GET',
+							dataType: 'json',
+							data: {
+								acao: 'checar_status',
+								ticket_id: ticketId
+							},
+							success: function(statusRes) {
+								if (statusRes.status === 'CONCLUIDO') {
+									clearInterval(interval);
+
+									Swal.fire({
+										title: 'Download Pronto!',
+										text: 'Seus arquivos foram compactados com sucesso.',
+										icon: 'success',
+										confirmButtonText: 'Baixar Arquivo ZIP',
+									}).then((result) => {
+										if (result.isConfirmed) {
+											window.location.href = statusRes.url_download;
+										}
+									});
+								} else if (statusRes.status === 'ERRO') {
+									clearInterval(interval);
+									Swal.fire('Erro', 'Falha ao gerar o arquivo: ' + statusRes.mensagem, 'error');
+								}
+								// Se for PENDENTE ou PROCESSANDO, apenas aguarda o próximo ciclo
+							}
+						});
+					}, 5000);
+				} else {
+					Swal.fire('Erro', 'Não foi possível solicitar a geração do arquivo.', 'error');
+				}
+			},
+			error: function() {
+				Swal.fire('Erro', 'Ocorreu um problema de conexão com o servidor.', 'error');
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		hljs.highlightAll();
-
-		// Inicializa a lógica de exibição baseada na seleção atual (Útil após a página recarregar com GET)
 		aplicarMascaraDocumento();
 
-		// Escuta as mudanças no select para trocar a máscara e o placeholder em tempo real
 		$('#tipo_doc').change(function() {
-			// Se o usuário trocar o tipo, limpamos o campo para ele não tentar buscar um CPF com máscara de CNPJ
 			$('#cpfcnpj').val('');
 			aplicarMascaraDocumento();
 		});
@@ -276,19 +335,15 @@ $data_atual = date('Y-m');
 		document.querySelectorAll('.help-icon').forEach(icon => {
 			icon.addEventListener('click', () => {
 				const tooltip = icon.querySelector('.tooltiptext');
-
 				document.querySelectorAll('.tooltiptext.show').forEach(other => {
 					if (other !== tooltip) other.classList.remove('show');
 				});
-
 				tooltip.classList.add('show');
-
 				setTimeout(() => {
 					tooltip.classList.remove('show');
 				}, 3000);
 			});
 		});
-
 	});
 </script>
 <?php
