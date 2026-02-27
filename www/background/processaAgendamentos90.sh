@@ -1,1 +1,1 @@
-cd /www/background/; php -q "conciliacaoPDV.php" processaAgendamentos --log=conciliacaoPDV_90 --lista=9,0
+cd /www/background/; php -d max_execution_time=0 -q "conciliacaoPDV.php" processaAgendamentos --log=conciliacaoPDV_90 --lista=9,0

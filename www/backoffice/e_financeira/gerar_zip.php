@@ -74,7 +74,7 @@ if ($_REQUEST['acao'] == "abertura") {
                      WHERE tipo_tarefa = 'gerar_zip_efinanceira' 
                        AND parametros = :params 
                        AND status IN ('PENDENTE', 'PROCESSANDO', 'CONCLUIDO')
-                       AND data_solicitacao >= NOW() - INTERVAL '20 minutes'
+                       AND data_solicitacao >= NOW() - INTERVAL '1 hour'
                      ORDER BY id DESC LIMIT 1";
 
             $stmtBusca = $pdo->prepare($sqlBusca);

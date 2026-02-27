@@ -18,7 +18,7 @@ function workerGerarZipEfinanceira($parametros) {
     $temp_dir = "/www/arquivos_gerados/efinanceira/temp_zip_{$session_id}/";
     if (!is_dir($temp_dir)) mkdir($temp_dir, 0755, true);
 
-    $limit = 8000;
+    $limit = 5000;
     $offset = 0;
     $total_processado = 0;
     $arquivos_temporarios = [];
