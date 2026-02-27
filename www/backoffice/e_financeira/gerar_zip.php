@@ -2,38 +2,94 @@
 require __DIR__ . '/functions_e_financeira.php';
 
 if ($_REQUEST['acao'] == "movimentacoes") {
+    set_time_limit(0); // Impede que o script pare por tempo em processos longos
 
     $data_inicial = isset($_GET['data_inicial']) ? urldecode($_GET['data_inicial']) : date('Y-m', strtotime('-1 Month'));
     $data_final = isset($_GET['data_final']) ? urldecode($_GET['data_final']) : date('Y-m');
-
-    $tipo_doc = isset($_GET['tipo_doc']) ? urldecode($_GET['tipo_doc']) : '';
-    $cpfcnpj = isset($_GET['cpfcnpj']) ? urldecode($_GET['cpfcnpj']) : '';
+    $tipo_doc = $_GET['tipo_doc'] ?? '';
+    $cpfcnpj = $_GET['cpfcnpj'] ?? '';
 
     $param_tipo_doc = ($tipo_doc === 'todos' || empty($tipo_doc)) ? null : $tipo_doc;
     $param_cpfcnpj = empty($cpfcnpj) ? null : $cpfcnpj;
 
     $efinanceira = new GerarEFinanceira();
 
-    // Passa os dados. null, null são para o limit e offset (trazendo tudo)
-    $lotes = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final, null, null, $param_tipo_doc, $param_cpfcnpj);
+    // 1. Criar pasta temporária exclusiva para este processamento
+    $session_id = uniqid();
+    $temp_dir = "/www/arquivos_gerados/efinanceira/temp_zip_{$session_id}/";
+    if (!is_dir($temp_dir)) mkdir($temp_dir, 0755, true);
 
-    if ($lotes && !empty($lotes['xmls'])) {
-        $nome_arquivo = "lotes_{$data_final}_{$data_inicial}_" . date('Ymd_Hi') . "_{$lotes['total_eventos']}.zip";
-        $caminho = gerarZipLotes($lotes['xmls'], $nome_arquivo);
+    $limit = 8000;
+    $offset = 0;
+    $total_processado = 0;
+    $arquivos_temporarios = [];
 
-        if (!$caminho || !file_exists($caminho)) {
-            http_response_code(404);
-            exit('Arquivo não encontrado');
+    // 2. Loop de processamento em lotes (Batch Processing)
+    while (true) {
+        // Busca apenas 50 registros por vez
+        $lotes = $efinanceira->gerarXmlMovimentacao($data_inicial, $data_final, $limit, $offset, $param_tipo_doc, $param_cpfcnpj);
+
+        // Se não voltou nada, encerra o loop
+        if (!$lotes || empty($lotes['xmls'])) {
+            break;
         }
 
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="' . $nome_arquivo . '"');
-        header('Content-Length: ' . filesize($caminho));
-        header('Cache-Control: no-cache');
+        foreach ($lotes['xmls'] as $item) {
+            $nome_xml = "{$item['ano_mes']}_lote_{$item['lote_numero']}_" . uniqid() . ".xml";
+            $caminho_xml = $temp_dir . $nome_xml;
 
-        readfile($caminho);
-        unlink($caminho);
+            // Salva o XML direto no disco e remove da memória
+            file_put_contents($caminho_xml, $item['xml']);
+            $arquivos_temporarios[] = $caminho_xml;
+
+            unset($item['xml']); // Limpa a string pesada da memória
+        }
+
+        $total_processado += count($lotes['xmls']);
+        $offset += $limit;
+
+        // Limpa as variáveis do lote para a próxima rodada
+        unset($lotes);
+        error_log("Foi $total_processado \n");
+        // Se a quantidade retornada for menor que o limite, significa que acabou a base
+        // (Isso depende de como sua função gerarXmlMovimentacao responde, se ela não trouxer o total_eventos total)
+    }
+
+    // 3. Compactar os arquivos gerados
+    if ($total_processado > 0) {
+        $nome_zip = "lotes_{$data_final}_{$data_inicial}_" . date('Ymd_Hi') . "_{$total_processado}.zip";
+        $caminho_zip = "/www/arquivos_gerados/efinanceira/lotes_enviados/" . $nome_zip;
+
+        $zip = new ZipArchive();
+        if ($zip->open($caminho_zip, ZipArchive::CREATE) === TRUE) {
+            foreach ($arquivos_temporarios as $arquivo) {
+                // Adiciona ao zip usando apenas o nome do arquivo (sem o caminho da pasta temp)
+                $zip->addFile($arquivo, basename($arquivo));
+            }
+            $zip->close();
+
+            // 4. Limpar arquivos temporários XML (já estão no ZIP)
+            foreach ($arquivos_temporarios as $arquivo) {
+                unlink($arquivo);
+            }
+            rmdir($temp_dir);
+
+            // 5. Enviar para download
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . $nome_zip . '"');
+            header('Content-Length: ' . filesize($caminho_zip));
+            header('Cache-Control: no-cache');
+
+            readfile($caminho_zip);
+            unlink($caminho_zip); // Apaga o ZIP do servidor após o download
+            error_log("Uso maximo: " . round(memory_get_peak_usage(true) / 1024 / 1024, 2) . "mb");
+            exit;
+        } else {
+            echo "Erro ao criar o arquivo ZIP.";
+        }
     } else {
+        // Limpa a pasta caso não tenha gerado nada
+        if (is_dir($temp_dir)) rmdir($temp_dir);
         echo "Nenhum evento encontrado para este período ou filtro.";
     }
 } else if ($_REQUEST['acao'] == "abertura") {
