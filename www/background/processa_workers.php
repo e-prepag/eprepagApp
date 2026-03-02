@@ -64,4 +64,4 @@ try {
 }
 
 $fimTempo = microtime(true);
-echo "Tempo decorrido: " . ($fimTempo - $inicioTempo) . " segundos";
+echo "Tempo decorrido: " . ($fimTempo - $inicioTempo) . " segundos\n";
