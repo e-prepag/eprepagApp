@@ -1040,6 +1040,9 @@ class GerarEFinanceira
                     if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                         continue;
                     }
+                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
+                        continue;
+                    }
                     // CRIA O XML (ou o objeto XML/Evento)
                     $xmlOuEvento = $this->gerarMovimentacaoFinanceira(
                         $registro['dadosDeclarado']['tipo_declarado'],
@@ -1073,6 +1076,9 @@ class GerarEFinanceira
                 foreach ($meses as $mes => $registro) {
 
                     if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                        continue;
+                    }
+                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
                         continue;
                     }
                     // CRIA O XML (ou o objeto XML/Evento)
@@ -1155,6 +1161,10 @@ class GerarEFinanceira
                         continue;
                     }
 
+                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
+                        continue;
+                    }
+
                     $movimentacoesAgrupadasPorMes[$mes][] = $registro;
                 }
             }
@@ -1167,6 +1177,10 @@ class GerarEFinanceira
                 foreach ($meses as $mes => $registro) {
 
                     if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
+                        continue;
+                    }
+
+                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
                         continue;
                     }
 
