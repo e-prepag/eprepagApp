@@ -813,16 +813,14 @@ function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efina
                 if (!file_exists($caminhoCompletoResposta)) {
                     file_put_contents($caminhoCompletoResposta, $xmlProcessamento);
                 }
-
-                if ($statusAtualDb === 'PENDENTE') {
-                    if (!empty($idsSucesso)) {
-                        $efinanceira->atualizarLoteStatus($idsSucesso, $protocolo, $nomeArquivoOriginal, 'ENVIADO');
-                    }
-                    if (!empty($idsErro)) {
-                        $efinanceira->atualizarLoteStatus($idsErro, $protocolo, $nomeArquivoOriginal, 'ERRO');
-                    }
-                }
             }
+        }
+        
+        if (!empty($idsSucesso)) {
+            $efinanceira->atualizarLoteStatus($idsSucesso, $protocolo, $nomeArquivoOriginal, 'ENVIADO');
+        }
+        if (!empty($idsErro)) {
+            $efinanceira->atualizarLoteStatus($idsErro, $protocolo, $nomeArquivoOriginal, 'ERRO');
         }
     }
 
