@@ -22,7 +22,7 @@ $email = $_POST['email'] ?? null;
 $produtos = $_POST['produtos'] ?? null;
 
 
-if($_SESSION["token_csrf"] != $_POST["token_csrf"]){
+if ($_SESSION["token_csrf"] != $_POST["token_csrf"]) {
     header("location: /creditos/index.php");
 }
 
@@ -32,31 +32,31 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 if (!defined('PAGAMENTO_BRADESCO')) {
     //Definindo como ativado
     define('PAGAMENTO_BRADESCO', 1);
-}// end if
+} // end if
 if (!defined('PAGAMENTO_BANCO_BRASIL')) {
     //Definindo como ativado
     define('PAGAMENTO_BANCO_BRASIL', 1);
-}// end if
+} // end if
 if (!defined('PAGAMENTO_ITAU')) {
     //Definindo como ativado
     define('PAGAMENTO_ITAU', 1);
-}// end if
+} // end if
 if (!defined('PAGAMENTO_BOLETO')) {
     //Definindo como ativado
     define('PAGAMENTO_BOLETO', 1);
-}// end if
+} // end if
 if (!defined('PAGAMENTO_EPREPAG_CASH')) {
     //Definindo como ativado
     define('PAGAMENTO_EPREPAG_CASH', 1);
-}// end if
+} // end if
 if (!defined('PAGAMENTO_CIELO')) {
     //Definindo como ativado
     define('PAGAMENTO_CIELO', 1);
-}// end if
+} // end if
 if (!defined('PAGAMENTO_PIX')) {
     //Definindo como ativado
     define('PAGAMENTO_PIX', 1);
-}// end if
+} // end if
 
 if (isset($iforma)) {
     $pagto = $iforma;
@@ -104,8 +104,8 @@ $btSubmit = isset($_REQUEST['btSubmit']) ? $_REQUEST['btSubmit'] : false;
 if ($btSubmit || $iforma) {
 
     //        Variaveis do formulario
-//        $parcelas_REDECARD_MASTERCARD = $_REQUEST['parcelas_REDECARD_MASTERCARD'];
-//        $parcelas_REDECARD_DINERS = $_REQUEST['parcelas_REDECARD_DINERS'];
+    //        $parcelas_REDECARD_MASTERCARD = $_REQUEST['parcelas_REDECARD_MASTERCARD'];
+    //        $parcelas_REDECARD_DINERS = $_REQUEST['parcelas_REDECARD_DINERS'];
 
     //Validacao
     $msg = "";
@@ -139,9 +139,9 @@ if ($btSubmit || $iforma) {
         $_SESSION['dist_pagamento.total'] = $produtos_valor;
         $_SESSION['dist_pagamento.taxa'] = getTaxaPagtoOnline($iforma, $produtos_valor);
         //echo "<span style='background-color:black; color:white'>";
-//print_r($produtos_valor);
-//echo "</span>";
-//die;
+        //print_r($produtos_valor);
+        //echo "</span>";
+        //die;
         unset($_SESSION['pagamento.numorder']);
         unset($_SESSION['dist_pagamento.pagto_ja_fiz']);
         unset($_SESSION['dist_pagamento.parcelas.REDECARD_MASTERCARD']);
@@ -156,7 +156,6 @@ if ($btSubmit || $iforma) {
         echo "<hr>??? " . $msg . " ???<hr>";
         die;
     }
-
 }
 
 $b_nova_forma_pagamento = false;
@@ -182,18 +181,6 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
 
         // Calcula o total nas últimas 24 horas de valores de boletos gerados
         $total_diario_boletos = getVendasLHTotalDiarioBoletos($controller->usuarios->getId());
-
-
-        $file = fopen("/www/arquivos_gerados/logs/dados_saldo_pdv.txt", "a+");
-        fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
-        fwrite($file, "CONTEUDO " . json_encode($_POST) . "\n");
-        fwrite($file, "USUARIO " . $controller->usuarios->getId() . "\n");
-        fwrite($file, "CARRINHO " . $total_carrinho . "\n");
-        fwrite($file, "TOTAL DIARIO " . $total_diario . "\n");
-        fwrite($file, "TOTAL DIARIO RISCO " . $valor_total_diario . "\n");
-        fwrite($file, "TOTAL DIARIO BOLETOS " . $total_diario_boletos . "\n");
-        fwrite($file, str_repeat("*", 50) . "\n");
-        fclose($file);
 
         $platinum = $controller->usuarios->b_IsLogin_pagamento_platinum();
 
@@ -221,13 +208,13 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
             $b_LimiteDiarioOKBoleto = (($total_carrinho + $total_diario_boletos) <= $valor_total_diario);
 
             // Libera pagamento Online Banco do Brasil
-            $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK;// && $controller->usuarios->b_IsLogin_pagamento_bancodobrasil();
+            $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK; // && $controller->usuarios->b_IsLogin_pagamento_bancodobrasil();
 
             // Libera pagamento Online Banco Itaú
             $b_libera_BancoItau = $b_LimiteDiarioOK && $b_TentativasDiariasOK;
 
             // Libera Bradesco apenas se limite diario não ultrapassado //produtos (Habbo e GPotato) e tem até 5 compras nas últimas 24 horas
-            $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK;	//$b_IsProdutoOK && 
+            $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK;    //$b_IsProdutoOK && 
 
             // Libera Boleto apenas se o valor da venda não ultrapassa o limite por venda
             $b_libera_Boleto = $b_LimiteDiarioOKBoleto && $b_TentativasDiariasOK;
@@ -259,7 +246,6 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
                 $smsg_bloqueio .= "	NotSafe (>2*LIMITE_MAX)\n";
             }
             gravaLog_PagtoOnlineUsuariosBloqueadosParaVIP($smsg_bloqueio);
-
         } else {
             $msg_block = "Pagamento Online (LH Pré) PERMITIDO ++++++  ";
         }
@@ -291,13 +277,13 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
         $b_LimiteSemanalOKBoleto = (($total_carrinho + $total_semanal_boletos) <= $valor_total_semanal);
 
         // Libera pagamento Online Banco do Brasil
-        $b_libera_BancodoBrasil = $b_LimiteSemanalOK && $b_TentativasSemanaisOK;// && $controller->usuarios->b_IsLogin_pagamento_bancodobrasil();
+        $b_libera_BancodoBrasil = $b_LimiteSemanalOK && $b_TentativasSemanaisOK; // && $controller->usuarios->b_IsLogin_pagamento_bancodobrasil();
 
         // Libera pagamento Online Banco Itaú
         $b_libera_BancoItau = $b_LimiteSemanalOK && $b_TentativasSemanaisOK;
 
         // Libera Bradesco apenas se limite diario não ultrapassado //produtos (Habbo e GPotato) e tem até 5 compras nas últimas 24 horas
-        $b_libera_Bradesco = $b_LimiteSemanalOK && $b_TentativasSemanaisOK;	//$b_IsProdutoOK && 
+        $b_libera_Bradesco = $b_LimiteSemanalOK && $b_TentativasSemanaisOK;    //$b_IsProdutoOK && 
 
         // Libera Boleto apenas se o valor da venda não ultrapassa o limite por venda
         $b_libera_Boleto = $b_LimiteSemanalOKBoleto && $b_TentativasSemanaisOK;
@@ -326,7 +312,6 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
                 $smsg_bloqueio .= "	NotSafe (>2*LIMITE_MAX)\n";
             }
             gravaLog_PagtoOnlineUsuariosBloqueadosParaVIP($smsg_bloqueio);
-
         } else {
             $msg_block = "Pagamento Online (LH Pré) PERMITIDO ++++++  ";
         }
@@ -360,16 +345,16 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
 if ($b_nova_forma_pagamento) {
 
 
-    ?>
+?>
 
     <script type="text/javascript" src="/js/ajax.js"></script>
     <script language="Javascript">
-
         <?php
         if (is_object($controller->usuarios)) {
             if ($controller->usuarios->b_IsLogin_pagamento()) {
 
-                ?>
+        ?>
+
                 function save_shipping(iforma, id, sno) {
 
                     document.form1.iforma.value = iforma;
@@ -378,7 +363,7 @@ if ($b_nova_forma_pagamento) {
                     document.form1.btSubmit.value = "Continuar";
                     document.form1.submit();
                 }
-                <?php
+        <?php
             }
         }
         ?>
@@ -393,28 +378,29 @@ if ($b_nova_forma_pagamento) {
             var params = GetFormFields('form1');
             AJAXRequest('/ajax/pdv/finaliza_vendaExLH.php', params, 'FillHTML', 'tab_content', false);
         }
+
         function fcnJanelaBoleto(token) {
 
-            $(".btnPgto").each(function () {
+            $(".btnPgto").each(function() {
                 $(this).attr("onclick", "");
             });
 
 
             <?php
             if ($controller->usuarios->b_Is_Boleto_Itau()) {
-                ?>
+            ?>
                 window.open('/SICOB/BoletoWebItauCommerceLH.php?token=' + token, '', '');
             <?php
             } elseif ($controller->usuarios->b_Is_Boleto_Banespa()) {
-                ?>
+            ?>
                 window.open('/SICOB/BoletoWebBanespaCommerceLH.php?token=' + token, '', '');
             <?php
             } elseif (BANCO_BOLETO == "asaas" || $usuarioGames->getId() == 17371) {
-                ?>
+            ?>
                 window.open(token, '', '');
             <?php
             } elseif (BANCO_BOLETO == "bradesco") {
-                ?>
+            ?>
                 window.open('/boletos/pdv/boleto_bradesco.php?token=' + token, '', '');
             <?php
             }
@@ -454,7 +440,7 @@ if ($b_nova_forma_pagamento) {
 
                         if (PAGAMENTO_PIX || in_array($controller->usuarios->getId(), [17371, 19430, 17201, 12667, 13715])) {
                             if ($b_libera_Pix) {
-                                ?>
+                        ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -474,7 +460,7 @@ if ($b_nova_forma_pagamento) {
                                         <div class="row">
                                             <?php
                                             if ($cobraTaxa) {
-                                                ?>
+                                            ?>
                                                 <p class="txt-cinza fontsize-pp bottom0"><strong>Taxa de serviço:
                                                         R$<?php echo number_format($PAGAMENTO_PIX_TAXA, 2, ',', '.') ?></strong></p>
                                             <?php
@@ -483,13 +469,13 @@ if ($b_nova_forma_pagamento) {
                                             <p class="txt-verde fontsize-p">Entrega Imediata</p>
                                             <span style='visibility:hidden'><input type="radio" name="pagto"
                                                     value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_PIX'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_PIX'])
-                                                          echo " checked"; ?>></span>
+                                                                                                                    echo " checked"; ?>></span>
                                         </div>
                                     </div>
                                 </div>
                             <?php
                             } else {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -504,7 +490,7 @@ if ($b_nova_forma_pagamento) {
 
                         if ($controller->usuarios->b_IsLogin_pagamento_boleto() && PAGAMENTO_BOLETO) {
                             if ($b_libera_Boleto) {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -523,16 +509,16 @@ if ($b_nova_forma_pagamento) {
                                         <div class="row">
                                             <?php
                                             if ($cobraTaxa) {
-                                                ?>
+                                            ?>
                                                 <p class="txt-cinza fontsize-pp bottom0"><strong>Taxa de serviço: R$<?php
-                                                if ($controller->usuarios->b_Is_Boleto_Itau()) {
-                                                    echo number_format($GLOBALS['BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_NOVA'], 2, ',', '.');
-                                                } elseif ($controller->usuarios->b_Is_Boleto_Banespa()) {
-                                                    echo number_format($GLOBALS['BOLETO_BANESPA_TAXA_ADICIONAL'], 2, ',', '.');
-                                                } else {
-                                                    echo number_format($GLOBALS['BOLETO_TAXA_ADICIONAL_BRADESCO'], 2, ',', '.');
-                                                }
-                                                ?></strong></p>
+                                                                                                                    if ($controller->usuarios->b_Is_Boleto_Itau()) {
+                                                                                                                        echo number_format($GLOBALS['BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_NOVA'], 2, ',', '.');
+                                                                                                                    } elseif ($controller->usuarios->b_Is_Boleto_Banespa()) {
+                                                                                                                        echo number_format($GLOBALS['BOLETO_BANESPA_TAXA_ADICIONAL'], 2, ',', '.');
+                                                                                                                    } else {
+                                                                                                                        echo number_format($GLOBALS['BOLETO_TAXA_ADICIONAL_BRADESCO'], 2, ',', '.');
+                                                                                                                    }
+                                                                                                                    ?></strong></p>
                                             <?php
                                             }
                                             ?>
@@ -542,7 +528,7 @@ if ($b_nova_forma_pagamento) {
                                 </div>
                             <?php
                             } else {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -550,7 +536,7 @@ if ($b_nova_forma_pagamento) {
                                         </div>
                                     </div>
                                 </div>
-                                <?php
+                            <?php
                             }
                         }
                         /*
@@ -563,7 +549,7 @@ if ($b_nova_forma_pagamento) {
 
                         if ($controller->usuarios->b_IsLogin_pagamento_bancodobradesco() && PAGAMENTO_BRADESCO && false) {
                             if ($b_libera_Bradesco) {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -581,13 +567,13 @@ if ($b_nova_forma_pagamento) {
                                             <p class=" fontsize-p">Entrega em até 90 minutos</p>
                                             <span style='visibility:hidden'><input type="radio" name="pagto"
                                                     value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO'])
-                                                          echo " checked"; ?>></span>
+                                                                                                                                    echo " checked"; ?>></span>
                                         </div>
                                     </div>
                                 </div>
                             <?php
                             } else {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -595,13 +581,13 @@ if ($b_nova_forma_pagamento) {
                                         </div>
                                     </div>
                                 </div>
-                                <?php
+                            <?php
                             }
                         }
 
                         if ($controller->usuarios->b_IsLogin_pagamento_bancodobradesco() && PAGAMENTO_BRADESCO) {
                             if ($b_libera_Bradesco) {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -620,7 +606,7 @@ if ($b_nova_forma_pagamento) {
                                         <div class="row">
                                             <?php
                                             if ($cobraTaxa) {
-                                                ?>
+                                            ?>
                                                 <p class="txt-cinza fontsize-pp bottom0"><strong>Taxa de serviço:
                                                         R$<?php echo number_format($BRADESCO_TRANSFERENCIA_ENTRE_CONTAS_TAXA_ADICIONAL, 2, ',', '.') ?></strong>
                                                 </p>
@@ -637,7 +623,7 @@ if ($b_nova_forma_pagamento) {
                                 </div>
                             <?php
                             } else {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -645,7 +631,7 @@ if ($b_nova_forma_pagamento) {
                                         </div>
                                     </div>
                                 </div>
-                            <?php
+                        <?php
 
                             }
                         }
@@ -690,7 +676,7 @@ if ($b_nova_forma_pagamento) {
 
                         if ($controller->usuarios->b_IsLogin_pagamento_bancodobrasil() && PAGAMENTO_BANCO_BRASIL) {
                             if ($b_libera_BancodoBrasil) {
-                                ?>
+                        ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -709,7 +695,7 @@ if ($b_nova_forma_pagamento) {
                                         <div class="row">
                                             <?php
                                             if ($cobraTaxa) {
-                                                ?>
+                                            ?>
                                                 <p class="txt-cinza fontsize-pp bottom0"><strong>Taxa de serviço:
                                                         R$<?php echo number_format($BANCO_DO_BRASIL_TAXA_DE_SERVICO, 2, ',', '.') ?></strong>
                                                 </p>
@@ -719,13 +705,13 @@ if ($b_nova_forma_pagamento) {
                                             <p class="txt-verde fontsize-p">Entrega em até 90 minutos</p>
                                             <span style='visibility:hidden'><input type="radio" name="pagto"
                                                     value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA'])
-                                                          echo " checked"; ?>></span>
+                                                                                                                                    echo " checked"; ?>></span>
                                         </div>
                                     </div>
                                 </div>
                             <?php
                             } else {
-                                ?>
+                            ?>
                                 <div class="col-md-2 espacamento-colunas-formas-pagamento borda-colunas-formas-pagamento">
                                     <div class="col-md-12 text-center">
                                         <div class="row borda-linhas-formas-pagamento">
@@ -783,8 +769,8 @@ if ($b_nova_forma_pagamento) {
                         if (false) {
                             $b_libera_BancoItau = false;
                             $msg_bloqueia_BancoItau = "<br><b><p class='txt-vermelho fontsize-p'>Indisponível por Problemas no Itaú</p></b>";
-                        }//end if
-                    
+                        } //end if
+
                         if ($controller->usuarios->b_IsLogin_pagamento_bancoitau() && PAGAMENTO_ITAU) {
                             ?>
                             <div class="col-md-2 espacamento-colunas-formas-pagamento">
@@ -794,7 +780,7 @@ if ($b_nova_forma_pagamento) {
                                     </div>
                                     <?php
                                     if ($b_libera_BancoItau) {
-                                        ?>
+                                    ?>
                                         <div class="row top10">
                                             <img name="btn_10" src="/imagens/pag/pagto_forma_transferencia_1.gif"
                                                 class="c-pointer btnPgto"
@@ -806,7 +792,7 @@ if ($b_nova_forma_pagamento) {
                                         <div class="row">
                                             <?php
                                             if ($cobraTaxa) {
-                                                ?>
+                                            ?>
                                                 <p class="txt-cinza fontsize-pp bottom0"><strong>Taxa de serviço:
                                                         R$<?php echo number_format($BANCO_ITAU_TAXA_DE_SERVICO, 2, ',', '.') ?></strong>
                                                 </p>
@@ -816,11 +802,11 @@ if ($b_nova_forma_pagamento) {
                                             <p class="txt-verde fontsize-p">Entrega em até 90 minutos</p>
                                             <span style='visibility:hidden'><input type="radio" name="pagto"
                                                     value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'])
-                                                          echo " checked"; ?>></span>
+                                                                                                                                echo " checked"; ?>></span>
                                         </div>
                                     <?php
                                     } else {
-                                        ?>
+                                    ?>
                                         <div class="row borda-linhas-formas-pagamento">
                                             <?php echo $msg_bloqueia_BancoItau; ?>
                                         </div>
@@ -829,7 +815,7 @@ if ($b_nova_forma_pagamento) {
                                     ?>
                                 </div>
                             </div>
-                            <?php
+                        <?php
                         } else {
                             echo "&nbsp;";
                         }
@@ -841,13 +827,13 @@ if ($b_nova_forma_pagamento) {
                     <?php
                     if ($banner) {
                         foreach ($banner as $b) {
-                            ?>
+                    ?>
                             <div class="row pull-right">
                                 <a href="<?php echo $b->link; ?>" class="banner" id="<?php echo $b->id; ?>" target="_blank"><img
                                         src="<?php echo $controller->objBanner->urlLink . $b->imagem; ?>" width="186" class="p-3"
                                         title="<?php echo $b->titulo; ?>"></a>
                             </div>
-                        <?php
+                    <?php
                         }
                     }
                     ?>
@@ -857,7 +843,7 @@ if ($b_nova_forma_pagamento) {
 
         </div>
     </form>
-    <?php
+<?php
 }
 ?>
 
