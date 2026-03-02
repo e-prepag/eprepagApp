@@ -51,6 +51,8 @@ try {
         $stmtUpd->execute([':caminho' => $url_download_final, ':id' => $id_tarefa]);
 
         echo "Tarefa #{$id_tarefa} finalizada com sucesso.\n";
+        $fimTempo = microtime(true);
+        echo "Tempo decorrido: " . ($fimTempo - $inicioTempo) . " segundos\n";
     }
 } catch (Exception $e) {
     // 4. Captura qualquer erro de qualquer worker e atualiza o banco de dados
@@ -61,7 +63,7 @@ try {
         $stmtErr->execute([':msg' => $msgErro, ':id' => $id_tarefa]);
     }
     echo "ERRO CRÍTICO na Tarefa: " . $e->getMessage() . "\n";
+    $fimTempo = microtime(true);
+    echo "Tempo decorrido: " . ($fimTempo - $inicioTempo) . " segundos\n";
 }
 
-$fimTempo = microtime(true);
-echo "Tempo decorrido: " . ($fimTempo - $inicioTempo) . " segundos\n";
