@@ -712,7 +712,12 @@ ob_end_flush();
                   <td align="center"><b>PIN</b></td>
                 </tr>
                 <?php
-                $sql = "select pin_valor,pin_codinterno,pin_serial,CASE WHEN pin_caracter IS NULL THEN pin_codigo ELSE pin_caracter END as case_serial from pins where pin_codinterno IN ($vgm_pin_codinterno_tmp) order by pin_valor desc;";
+                $sql = "SELECT pin_valor,pin_codinterno,pin_serial,
+                          CASE 
+                               WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
+                               WHEN pin_codigo = '0000000000000000' THEN pin_caracter
+                               ELSE pin_codigo
+                          END AS case_serial from pins where pin_codinterno IN ($vgm_pin_codinterno_tmp) order by pin_valor desc;";
                 $rs_pins = SQLexecuteQuery($sql);
                 while ($rs_pins_row = pg_fetch_array($rs_pins)) {
                 ?>

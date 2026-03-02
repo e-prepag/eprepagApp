@@ -151,11 +151,13 @@ class PedidosController extends HeaderController
                 }
 
                 if ($msg == "") {
-                        $sql = "select p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
+                        $sql = "SELECT p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
 									vgm.vgm_nome_produto, vgm.vgm_nome_modelo, opr.opr_codigo, opr.opr_nome, opr.opr_ban_pos, ogp.ogp_nome_imagem,vgm.vgm_id,vg.vg_ug_id,  
-									CASE WHEN pin_codigo = '0000000000000000' THEN pin_caracter
-											ELSE pin_codigo
-									END as case_serial
+									CASE 
+                                                                             WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
+                                                                             WHEN pin_codigo = '0000000000000000' THEN pin_caracter
+                                                                             ELSE pin_codigo
+                                                                        END AS case_serial
 					  from pins_dist p
 							inner join tb_dist_venda_games_modelo_pins vgmp on p.pin_codinterno = vgmp.vgmp_pin_codinterno 
 							inner join tb_dist_venda_games_modelo vgm on vgm.vgm_id = vgmp.vgmp_vgm_id 

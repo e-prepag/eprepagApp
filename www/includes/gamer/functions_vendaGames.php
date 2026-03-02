@@ -1980,12 +1980,14 @@ function processaEmailVendaGames($venda_id, $parametros)
                                         // Obtem o PIN vendido
                                         if ($msg == "") {
                                                 // Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter	
-                                                $sql = "select *, 
-                                                                    CASE WHEN pin_codigo = '0000000000000000' THEN pin_caracter
+                                                $sql = "SELECT *, 
+                                                               CASE 
+                                                                    WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
+                                                                    WHEN pin_codigo = '0000000000000000' THEN pin_caracter
                                                                     ELSE pin_codigo
-                                                                    END as case_serial
-                                                    from pins
-                                                    where pin_codinterno = " . $vgm_pin_codinternoAr[$i] . "";
+                                                               END AS case_serial
+                                                        FROM pins
+                                                        WHERE pin_codinterno = " . $vgm_pin_codinternoAr[$i] . ";";
 
                                                 $rs_pin = SQLexecuteQuery($sql);
                                                 if (!$rs_pin || pg_num_rows($rs_pin) == 0) {
@@ -2170,14 +2172,14 @@ function processaEmailVendaGames($venda_id, $parametros)
                                 $qtde_total += $qtde;
                                 $total_geral += $valor * $qtde;
                                 $aux_lista .= "<tr bgcolor='#E6E6E6'>
-																			<td width='3'>&nbsp;</td>
-																			<td align='left'>" . $rs_venda_modelos_row['vgm_nome_produto'] . "</td>
-																			<td align='center'>" . $rs_venda_modelos_row['vgm_nome_modelo'] . "</td>
-																			<td align='center'>" . number_format($valor, 2, ',', '.') . "</td>
-																			<td align='center'>" . $qtde . "</td>
-																			<td align='right'><b>" . number_format($valor * $qtde, 2, ',', '.') . "</b></td>
-																			<td width='5'>&nbsp;</td>
-																	</tr>";
+			        		<td width='3'>&nbsp;</td>
+			        		<td align='left'>" . $rs_venda_modelos_row['vgm_nome_produto'] . "</td>
+			        		<td align='center'>" . $rs_venda_modelos_row['vgm_nome_modelo'] . "</td>
+			        		<td align='center'>" . number_format($valor, 2, ',', '.') . "</td>
+			        		<td align='center'>" . $qtde . "</td>
+			        		<td align='right'><b>" . number_format($valor * $qtde, 2, ',', '.') . "</b></td>
+			        		<td width='5'>&nbsp;</td>
+			        </tr>";
                                 if ($vgm_pin_request > 0) {
                                         //Para produtos BHN
                                         if ($vgm_pin_request == 1) {

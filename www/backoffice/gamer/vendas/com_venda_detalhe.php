@@ -682,10 +682,12 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						for($i=0; $i < count($vgm_pin_codinternoAr); $i++){
 						 
 							// Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter	
-							$sql = "select *, 
-										CASE WHEN pin_codigo = '0000000000000000' THEN pin_caracter
-										ELSE pin_codigo
-										END as case_serial
+							$sql = "SELECT *, 
+										CASE 
+                                	         WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
+                                	         WHEN pin_codigo = '0000000000000000' THEN pin_caracter
+                                	         ELSE pin_codigo
+                                	    END AS case_serial
 								from pins
 								where pin_codinterno = '" . ((strlen($vgm_pin_codinternoAr[$i])>0)?$vgm_pin_codinternoAr[$i]:0) . "'";
 							 
