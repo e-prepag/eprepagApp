@@ -208,5 +208,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # * 0,2,4,6,8,10,12,14,16,18,20,22 * * * bash /www/background/limparBloqueioPDV.sh #Cron para limpar PDVs bloqueados
 * * * * * bash /www/background/test_cron_franci.sh >> /www/arquivos_gerados/logs_cron/test_cron_franci.log  2>&1
 
-#Codigo para processar os workers
-* * * * * bash /www/background/processa_workers.sh
+#Codigo para processar os workers o sleep como flock é feito para poder rodar a cada 30 segundos, pois o cron tem limite de 1 minuto
+* * * * * flock -n /tmp/processa_workers.lock /www/background/processa_workers.sh
+* * * * * sleep 30; flock -n /tmp/processa_workers.lock /www/background/processa_workers.sh
