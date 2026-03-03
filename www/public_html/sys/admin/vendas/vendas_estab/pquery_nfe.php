@@ -267,10 +267,8 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
     // SQL para preencher
     $estat  = "select 
         trn_code, trn_data, opr_nome, valor, qtde_itens, qtde_produtos, canal, trn_nome, trn_cpf, trn_cpf_indicador, trn_vgm_id, trn_vgm_nfe_rps_id, 
-        endereco,
-    bairro, cidade, cep
+        endereco, bairro, cidade, cep
                 from (
-
                         select '1' as trn_code, vg.vg_data_inclusao as trn_data, t2.opr_nome, 
                         sum(vgm.vgm_valor * vgm.vgm_qtde) as valor, sum(vgm.vgm_qtde) as qtde_itens, count(*) as qtde_produtos, 
                         'Site LH' as canal, vgm.vgm_nome_cpf AS trn_nome, vgm.vgm_cpf AS trn_cpf, '3' as trn_cpf_indicador, vgm_id as trn_vgm_id, vgm_nfe_rps_id as trn_vgm_nfe_rps_id 
@@ -279,7 +277,8 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
                         where vgm.vgm_opr_codigo=t2.opr_codigo " . $where_opr_1 . " and vg.vg_data_inclusao>='" . $data_inicio_numeracao_nfe . "' and vg.vg_ultimo_status='5' " . $where_data_1a . " " . $where_canal_lh . " and vgm.vgm_nfe_rps_id<=0 
                         group by ug.ug_id, vgm.vgm_id, 
                                 vg.vg_data_inclusao, vg.vg_pagto_tipo, vg.vg_ultimo_status, vg.vg_concilia, 
-                                t2.opr_nome, vgm_nfe_rps_id 
+                                t2.opr_nome, vgm_nfe_rps_id, 
+                                vgm.vgm_nome_cpf, vgm.vgm_cpf, ug.ug_endereco, ug.ug_numero, ug.ug_bairro, ug.ug_cidade, ug.ug_cep
 
                         union all
 
@@ -293,13 +292,8 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
                         where vgm.vgm_opr_codigo=t2.opr_codigo " . $where_valor_1 . " " . $where_opr_1 . " and $where_mode_data>='" . $data_inicio_numeracao_nfe . "' and vg.vg_ultimo_status='5' " . $where_data_1b . " " . $where_canal_s . " and vgm.vgm_nfe_rps_id<=0 
                         group by vgm.vgm_id, vg.vg_data_concilia, vg.vg_pagto_tipo, vg.vg_ultimo_status, vg.vg_concilia, 
                                 t2.opr_nome, 
-                                vg.vg_ug_id, vgm_nfe_rps_id 
-
-                       
-
-                         
-                       
-
+                                vg.vg_ug_id, vgm_nfe_rps_id,
+                                ug.ug_nome, ug.ug_cpf, ug.ug_endereco, ug.ug_numero, ug.ug_bairro, ug.ug_cidade, ug.ug_cep
                 ) v ";
 
 
@@ -314,33 +308,79 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
     $dd_operadora_anterior = $dd_operadora;
     if ($dd_operadora == 125) $dd_operadora = 16;
 
+    // 1. Descobrir o nome da sequence ANTES do loop (baseado na função que criamos antes)
+    $sequences = [13 => 'nfe_013_seq', 16 => 'nfe_016_seq', 31 => 'nfe_031_seq'];
+    $seq_name = isset($sequences[$dd_operadora]) ? $sequences[$dd_operadora] : 0;
+
+    $lotes_por_tabela = [];
+    $dados_log = [];
+    $n_trans = 0;
+
+    $time_start_0 = getmicrotime(); // Início geral
+
     while ($pg_fill = pg_fetch_array($res_fill)) {
+        $trn_code = $pg_fill['trn_code'];
+        $id = $pg_fill['trn_vgm_id'];
 
-        $n_trans++;
+        if ($trn_code == '1') {
+            $tabela = 'tb_dist_venda_games_modelo';
+            $col_id = 'vgm_id';
+        } elseif ($trn_code == '2') {
+            $tabela = 'tb_venda_games_modelo';
+            $col_id = 'vgm_id';
+        } elseif ($trn_code == '3') {
+            $tabela = 'dist_vendas_pos';
+            $col_id = 've_id';
+        } elseif ($trn_code == '4') {
+            $tabela = 'dist_vendas_cartoes_tmp';
+            $col_id = 'vc_id';
+        } else {
+            continue;
+        } // Pula os '????'
 
-        $rps_id_max = 1;
-        $s_table = (($pg_fill['trn_code'] == '1') ? 'tb_dist_venda_games_modelo' : (($pg_fill['trn_code'] == '2') ? 'tb_venda_games_modelo' : (($pg_fill['trn_code'] == '3') ? 'dist_vendas_pos' : (($pg_fill['trn_code'] == '4') ? 'dist_vendas_cartoes_tmp' : '????'))));
-        $s_v_id = (($pg_fill['trn_code'] == '1') ? 'vgm_id' : (($pg_fill['trn_code'] == '2') ? 'vgm_id' : (($pg_fill['trn_code'] == '3') ? 've_id' : (($pg_fill['trn_code'] == '4') ? 'vc_id' : '????'))));
+        $lotes_por_tabela[$tabela]['col_id'] = $col_id;
+        $lotes_por_tabela[$tabela]['ids'][] = $id;
 
+        // Guarda os dados da linha para o log final
+        $dados_log[$id] = $pg_fill;
+    }
 
-        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = " . obtem_nfe_seq($dd_operadora) . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
-        echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $pg_fill['trn_vgm_id'] . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
+    foreach ($lotes_por_tabela as $tabela => $lote) {
+        $time_start_lote = getmicrotime();
 
-        $ret = SQLexecuteQuery($sql_update);
-        if (!$ret) {
-            $msg_error = "Erro ao atualizar registro ($sql_update).\n";
-            echo $msg_error . "<br>";
+        $col_id = $lote['col_id'];
+        $ids_virgula = implode(',', $lote['ids']);
+
+        $sql_bulk = "UPDATE {$tabela} 
+                 SET vgm_nfe_rps_id = nextval('{$seq_name}') 
+                 WHERE {$col_id} IN ({$ids_virgula}) 
+                 RETURNING {$col_id}, vgm_nfe_rps_id;";
+
+        $res_update = pg_query($sua_variavel_de_conexao, $sql_bulk);
+
+        if (!$res_update) {
+            error_log("Erro no bulk update da tabela {$tabela}");
+            echo "Erro ao atualizar lote da tabela {$tabela}.<br>";
+            continue;
         }
 
-        // Obtem o nfe_rps_id retornado por obtem_nfe_seq(opr_codigo)
-        $sql_tmp = "select vgm_nfe_rps_id from " . $s_table . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
-        $trn_vgm_nfe_rps_id = getValue($sql_tmp);
-        echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#000099'> [nfe_rps_id: " . $trn_vgm_nfe_rps_id . "] (" . $pg_fill['trn_data'] . ", " . $pg_fill['canal'] . ") " . $sql_tmp . "</font><br>";
+        while ($row = pg_fetch_assoc($res_update)) {
+            $n_trans++;
+            $id_venda = $row[$col_id];
+            $rps_id_gerado = $row['vgm_nfe_rps_id'];
 
-        $time_end = getmicrotime();
-        $time_each = $time_end - $time_start;
+            $pg_fill = $dados_log[$id_venda];
+
+            echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $id_venda . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . $rps_id_gerado . " <br>(Atualizado em lote)</font><br>";
+
+            echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#000099'> [nfe_rps_id: " . $rps_id_gerado . "] (" . $pg_fill['trn_data'] . ", " . $pg_fill['canal'] . ") </font><br>";
+        }
+
+        $time_end_lote = getmicrotime();
+        $time_lote_total = $time_end_lote - $time_start_lote;
+
         if ($_SESSION["tipo_acesso_pub"] == 'AT') {
-            echo  " <font face='Arial, Helvetica, sans-serif' size='1' color='#FF6600'>Delay: " . number_format($time_each, 2, '.', '.') . "s (total: " . number_format(($time_end - $time_start_0), 2, '.', '.') . "s) (média de cada: " . number_format(($time_end - $time_start_0) / (($n_trans == 0) ? 1 : $n_trans), 2, '.', '.') . "s)</font><br>";
+            echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#FF6600'>Delay do Lote {$tabela}: " . number_format($time_lote_total, 2, '.', '.') . "s (Itens atualizados: " . count($lote['ids']) . ")</font><br><hr>";
         }
     }
 
