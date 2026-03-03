@@ -308,7 +308,7 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
     $time_start_0 = getmicrotime();
     $n_trans = 0;
 
-    $res_fill = pg_query($estat);
+    $res_fill = SQLexecuteQuery($estat);
 
     //Gambiarra para resolver problema de sequencia de RPS para os dois publishers do Habboo Hotel
     $dd_operadora_anterior = $dd_operadora;
