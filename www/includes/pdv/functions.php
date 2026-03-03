@@ -556,7 +556,7 @@ function redirect($strRedirect)
                                                                 $body_plain = str_replace("\r\n", "", $msgEmail);
                                                                 $body_plain = str_replace("<br>", "\r\n", $msgEmail);
                                                                 $body_plain = str_replace("\t", "", theRealStripTags2($body_plain));
-                                                                $body_plain = html_entity_decode($body_plain, ENT_QUOTES, 'UTF-8');
+                                                                $body_plain = html_entity_decode($body_plain, ENT_QUOTES, 'ISO8859-1');
                                                                 $body_plain = str_replace("    ", "", $body_plain);
                                                                 $body_plain = str_replace("\r\n\r\n\r\n\r\n", "\r\n", $body_plain);
                                                                 $body_plain = str_replace(", \r\n", ", ", $body_plain);
