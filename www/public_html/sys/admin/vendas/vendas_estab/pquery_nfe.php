@@ -524,7 +524,7 @@ if ($FrmEnviar == 1) {
         echo str_replace("\n", "<br>\n", $estat) . "<br>";
     }
 
-    $res_count = pg_query($estat);
+    $res_count = SQLexecuteQuery($estat);
     if (!$res_count) {
         die("Erro ao executar query: " . pg_last_error());
     }
