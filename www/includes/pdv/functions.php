@@ -569,8 +569,6 @@ function redirect($strRedirect)
                                                         {
 
                                                                 $mail = new PHPMailer();
-                                                                $mail->CharSet = 'UTF-8';
-                                                                $mail->Encoding = 'base64';
 
 
                                                                 //-----Alteração exigida pela BaseNet(11/2017)-------------//
@@ -625,8 +623,6 @@ function redirect($strRedirect)
                                                         {
 
                                                                 $mail = new PHPMailer();
-                                                                $mail->CharSet = 'UTF-8';
-                                                                $mail->Encoding = 'base64';
 
 
                                                                 //-----Alteração exigida pela BaseNet(11/2017)-------------//

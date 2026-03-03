@@ -42,8 +42,6 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
 {
 
         $mail = new PHPMailer();
-        $mail->CharSet = 'UTF-8';
-        $mail->Encoding = 'base64';
 
 
 
@@ -834,8 +832,6 @@ function redirect($strRedirect)
                                                                 {
 
                                                                         $mail = new PHPMailer();
-                                                                        $mail->CharSet = 'UTF-8';
-                                                                        $mail->Encoding = 'base64';
 
 
                                                                         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
