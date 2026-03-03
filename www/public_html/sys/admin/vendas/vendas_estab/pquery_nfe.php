@@ -2,6 +2,35 @@
 // error_reporting(E_ALL); 
 // ini_set("display_errors", 1);
 
+function obtem_nfe_seq(int $opr_codigo): int
+{
+    $pdo = ConnectionPDO::getConnection()->getLink();
+
+    $sequences = [
+        13 => 'nfe_013_seq', // Ongame
+        16 => 'nfe_016_seq', // Habbo
+        31 => 'nfe_031_seq'  // GPotato
+    ];
+
+    $sequenceName = isset($sequences[$opr_codigo]) ? $sequences[$opr_codigo] : null;
+
+    if ($sequenceName === null) {
+        return -1;
+    }
+
+    try {
+        $stmt = $pdo->query("SELECT nextval('{$sequenceName}')");
+
+        if ($stmt) {
+            return (int) $stmt->fetchColumn();
+        }
+
+        return -1;
+    } catch (Exception $e) {
+        return -1;
+    }
+}
+
 $tf_data_inicial  = $_POST['tf_data_inicial'] ?? null;
 $tf_data_final    = $_POST['tf_data_final'] ?? null;
 $dd_canal         = $_POST['dd_canal'] ?? null;
@@ -294,7 +323,7 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
         $s_v_id = (($pg_fill['trn_code'] == '1') ? 'vgm_id' : (($pg_fill['trn_code'] == '2') ? 'vgm_id' : (($pg_fill['trn_code'] == '3') ? 've_id' : (($pg_fill['trn_code'] == '4') ? 'vc_id' : '????'))));
 
 
-        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = obtem_nfe_seq(" . $dd_operadora . ") where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
+        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = " . obtem_nfe_seq($dd_operadora) . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
         echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $pg_fill['trn_vgm_id'] . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
 
         $ret = SQLexecuteQuery($sql_update);
