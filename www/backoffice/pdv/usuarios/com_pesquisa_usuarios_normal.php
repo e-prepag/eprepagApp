@@ -22,76 +22,62 @@ $range_qtde   = isset($qtde_range_tela) ? $qtde_range_tela : 10;
 
 // Cria instância com LH teste
 $usuarioGames = new UsuarioGames(468);
-$bret = $usuarioGames->b_IsLogin_pagamento_normal(1, $usuarios_pagamento_online_vip_id);
-
-$total_table = count($usuarios_pagamento_online_vip_id);
-$reg_ate = $total_table;
-
-$s_ug_id_list = "";
-foreach ($usuarios_pagamento_online_vip_id as $key => $val) {
-	$s_ug_id_list .= (($s_ug_id_list) ? ", " : "") . $val;
-}
 
 $totalPages = 0;
 $currentPage = 1;
 
-if (!empty($s_ug_id_list)) {
-	$sql  = "select ug_id, ug_login, ug_email, vg_valor, vg_qtde_itens, vg_data_primeira_venda, vg_data_ultima_venda, " . PHP_EOL;
-	$sql .= "   (EXTRACT(epoch FROM (vg_data_ultima_venda - vg_data_primeira_venda ))/(24*3600))  as ndays,    " . PHP_EOL;
-	$sql .= "   (coalesce((EXTRACT(epoch FROM (vg_data_ultima_venda - vg_data_primeira_venda ))/(24*3600) ), 1) /vg_qtde_itens) as ndays_per_venda,    " . PHP_EOL;
-	$sql .= "   vg_valor_inc, vg_qtde_itens_inc, vg_data_primeira_venda_inc, vg_data_ultima_venda_inc   " . PHP_EOL;
-	$sql .= "from dist_usuarios_games ug " . PHP_EOL;
-	$sql .= "   left outer join ( " . PHP_EOL;
-	$sql .= "       select vg_ug_id, " . PHP_EOL;
-	$sql .= "           sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor, " . PHP_EOL;
-	$sql .= "           sum(vgm.vgm_qtde) as vg_qtde_itens, " . PHP_EOL;
-	$sql .= "           min(vg_data_inclusao) as vg_data_primeira_venda, " . PHP_EOL;
-	$sql .= "           max(vg_data_inclusao) as vg_data_ultima_venda " . PHP_EOL;
-	$sql .= "       from tb_dist_venda_games vg " . PHP_EOL;
-	$sql .= "       inner join tb_dist_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
-	$sql .= "       where vg_ultimo_status=5 " . PHP_EOL;
-	$sql .= "           and vg.vg_ug_id in ($s_ug_id_list) ";
-	$sql .= "       group by vg_ug_id " . PHP_EOL;
-	$sql .= "   ) v on v.vg_ug_id = ug.ug_id " . PHP_EOL;
-	$sql .= "   left outer join ( " . PHP_EOL;
-	$sql .= "       select vg_ug_id, " . PHP_EOL;
-	$sql .= "       sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor_inc, " . PHP_EOL;
-	$sql .= "       sum(vgm.vgm_qtde) as vg_qtde_itens_inc, " . PHP_EOL;
-	$sql .= "       min(vg_data_inclusao) as vg_data_primeira_venda_inc, " . PHP_EOL;
-	$sql .= "       max(vg_data_inclusao) as vg_data_ultima_venda_inc " . PHP_EOL;
-	$sql .= "       from tb_dist_venda_games vg " . PHP_EOL;
-	$sql .= "           inner join tb_dist_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
-	$sql .= "       where vg_ultimo_status=6 " . PHP_EOL;
-	$sql .= "           and vg.vg_ug_id in ($s_ug_id_list) ";
-	$sql .= "       group by vg_ug_id " . PHP_EOL;
-	$sql .= "   ) vi    on vi.vg_ug_id = ug.ug_id " . PHP_EOL;
-	$sql .= "where 1=1 " . PHP_EOL;
-	$sql .= "   and ug.ug_id in ($s_ug_id_list) ";
+$sql  = "select ug_id, ug_login, ug_email, vg_valor, vg_qtde_itens, vg_data_primeira_venda, vg_data_ultima_venda, " . PHP_EOL;
+$sql .= "   (EXTRACT(epoch FROM (vg_data_ultima_venda - vg_data_primeira_venda ))/(24*3600))  as ndays,    " . PHP_EOL;
+$sql .= "   (coalesce((EXTRACT(epoch FROM (vg_data_ultima_venda - vg_data_primeira_venda ))/(24*3600) ), 1) /vg_qtde_itens) as ndays_per_venda,    " . PHP_EOL;
+$sql .= "   vg_valor_inc, vg_qtde_itens_inc, vg_data_primeira_venda_inc, vg_data_ultima_venda_inc   " . PHP_EOL;
+$sql .= "from dist_usuarios_games ug " . PHP_EOL;
+$sql .= "   left outer join ( " . PHP_EOL;
+$sql .= "       select vg_ug_id, " . PHP_EOL;
+$sql .= "           sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor, " . PHP_EOL;
+$sql .= "           sum(vgm.vgm_qtde) as vg_qtde_itens, " . PHP_EOL;
+$sql .= "           min(vg_data_inclusao) as vg_data_primeira_venda, " . PHP_EOL;
+$sql .= "           max(vg_data_inclusao) as vg_data_ultima_venda " . PHP_EOL;
+$sql .= "       from tb_dist_venda_games vg " . PHP_EOL;
+$sql .= "       inner join tb_dist_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
+$sql .= "       where vg_ultimo_status=5 " . PHP_EOL;
+$sql .= "           and vg.vg_ug_id in (select ug_id from dist_usuarios_games where ug_vip = 0) ";
+$sql .= "       group by vg_ug_id " . PHP_EOL;
+$sql .= "   ) v on v.vg_ug_id = ug.ug_id " . PHP_EOL;
+$sql .= "   left outer join ( " . PHP_EOL;
+$sql .= "       select vg_ug_id, " . PHP_EOL;
+$sql .= "       sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor_inc, " . PHP_EOL;
+$sql .= "       sum(vgm.vgm_qtde) as vg_qtde_itens_inc, " . PHP_EOL;
+$sql .= "       min(vg_data_inclusao) as vg_data_primeira_venda_inc, " . PHP_EOL;
+$sql .= "       max(vg_data_inclusao) as vg_data_ultima_venda_inc " . PHP_EOL;
+$sql .= "       from tb_dist_venda_games vg " . PHP_EOL;
+$sql .= "           inner join tb_dist_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
+$sql .= "       where vg_ultimo_status=6 " . PHP_EOL;
+$sql .= "           and vg.vg_ug_id in (select ug_id from dist_usuarios_games where ug_vip = 0) ";
+$sql .= "       group by vg_ug_id " . PHP_EOL;
+$sql .= "   ) vi    on vi.vg_ug_id = ug.ug_id " . PHP_EOL;
+$sql .= "where ug.ug_vip = 0 " . PHP_EOL;
 
-	if ($ordem == 1) {
-		$sql .= " order by " . $ncamp . " desc; ";
-	} else {
-		$sql .= " order by " . $ncamp . " asc; ";
-	}
+if ($ordem == 1) {
+    $sql .= " order by " . $ncamp . " desc; ";
+} else {
+    $sql .= " order by " . $ncamp . " asc; ";
+}
 
-	$sql_limit = $sql;
-	$sql_limit = str_replace(";", "", $sql_limit);
-	$sql_limit .= " limit " . $max . " offset " . $inicial . ";";
+$sql_limit = str_replace(";", "", $sql);
+$sql_limit .= " limit " . $max . " offset " . $inicial . ";";
 
-	$rs_total = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($rs_total);
+$rs_total = SQLexecuteQuery($sql);
+$total_table = pg_num_rows($rs_total);
 
-	// Cálculos para paginação
-	$totalPages = ceil($total_table / $max);
-	$currentPage = floor($inicial / $max) + 1;
+// Cálculos para paginação
+$totalPages = ceil($total_table / $max);
+$currentPage = floor($inicial / $max) + 1;
 
-	if ($max + $inicial > $total_table)
-		$reg_ate = $total_table;
-	else
-		$reg_ate = $max + $inicial;
+// Forma mais limpa de calcular o "Exibindo resultados X a Y"
+$reg_ate = min($max + $inicial, $total_table);
 
-	$rs = SQLexecuteQuery($sql_limit);
-} //end if (!empty($s_ug_id_list))
+// Executa a query COM os limites da página atual
+$rs = SQLexecuteQuery($sql_limit);
 
 ob_end_flush();
 ?>
