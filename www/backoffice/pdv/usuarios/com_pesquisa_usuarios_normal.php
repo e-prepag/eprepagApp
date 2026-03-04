@@ -17,7 +17,7 @@ $BtnSearch = $_REQUEST['BtnSearch'] ?? null;
 $default_add  = nome_arquivo($PHP_SELF);
 $img_proxima  = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/proxima.gif";
 $img_anterior = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/anterior.gif";
-$max          = 100;
+$max          = 300;
 $range_qtde   = isset($qtde_range_tela) ? $qtde_range_tela : 10;
 
 // Cria instância com LH teste
@@ -26,48 +26,42 @@ $usuarioGames = new UsuarioGames(468);
 $totalPages = 0;
 $currentPage = 1;
 
-$sql  = "select ug_id, ug_login, ug_email, vg_valor, vg_qtde_itens, vg_data_primeira_venda, vg_data_ultima_venda, " . PHP_EOL;
-$sql .= "   (EXTRACT(epoch FROM (vg_data_ultima_venda - vg_data_primeira_venda ))/(24*3600))  as ndays,    " . PHP_EOL;
-$sql .= "   (coalesce((EXTRACT(epoch FROM (vg_data_ultima_venda - vg_data_primeira_venda ))/(24*3600) ), 1) /vg_qtde_itens) as ndays_per_venda,    " . PHP_EOL;
-$sql .= "   vg_valor_inc, vg_qtde_itens_inc, vg_data_primeira_venda_inc, vg_data_ultima_venda_inc   " . PHP_EOL;
-$sql .= "from dist_usuarios_games ug " . PHP_EOL;
-$sql .= "   left outer join ( " . PHP_EOL;
-$sql .= "       select vg_ug_id, " . PHP_EOL;
-$sql .= "           sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor, " . PHP_EOL;
-$sql .= "           sum(vgm.vgm_qtde) as vg_qtde_itens, " . PHP_EOL;
-$sql .= "           min(vg_data_inclusao) as vg_data_primeira_venda, " . PHP_EOL;
-$sql .= "           max(vg_data_inclusao) as vg_data_ultima_venda " . PHP_EOL;
-$sql .= "       from tb_dist_venda_games vg " . PHP_EOL;
-$sql .= "       inner join tb_dist_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
-$sql .= "       where vg_ultimo_status=5 " . PHP_EOL;
-$sql .= "           and vg.vg_ug_id in (select ug_id from dist_usuarios_games where ug_vip = 0) ";
-$sql .= "       group by vg_ug_id " . PHP_EOL;
-$sql .= "   ) v on v.vg_ug_id = ug.ug_id " . PHP_EOL;
-$sql .= "   left outer join ( " . PHP_EOL;
-$sql .= "       select vg_ug_id, " . PHP_EOL;
-$sql .= "       sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor_inc, " . PHP_EOL;
-$sql .= "       sum(vgm.vgm_qtde) as vg_qtde_itens_inc, " . PHP_EOL;
-$sql .= "       min(vg_data_inclusao) as vg_data_primeira_venda_inc, " . PHP_EOL;
-$sql .= "       max(vg_data_inclusao) as vg_data_ultima_venda_inc " . PHP_EOL;
-$sql .= "       from tb_dist_venda_games vg " . PHP_EOL;
-$sql .= "           inner join tb_dist_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
-$sql .= "       where vg_ultimo_status=6 " . PHP_EOL;
-$sql .= "           and vg.vg_ug_id in (select ug_id from dist_usuarios_games where ug_vip = 0) ";
-$sql .= "       group by vg_ug_id " . PHP_EOL;
-$sql .= "   ) vi    on vi.vg_ug_id = ug.ug_id " . PHP_EOL;
-$sql .= "where ug.ug_vip = 0 " . PHP_EOL;
+$sql  = "SELECT ug.ug_id, ug.ug_login, ug.ug_email, v.vg_valor, v.vg_qtde_itens, v.vg_data_primeira_venda, v.vg_data_ultima_venda, " . PHP_EOL;
+$sql .= "   (EXTRACT(epoch FROM (v.vg_data_ultima_venda - v.vg_data_primeira_venda))/(24*3600)) AS ndays, " . PHP_EOL;
+$sql .= "   (COALESCE((EXTRACT(epoch FROM (v.vg_data_ultima_venda - v.vg_data_primeira_venda))/(24*3600)), 1) / NULLIF(v.vg_qtde_itens, 0)) AS ndays_per_venda, " . PHP_EOL;
+$sql .= "   v.vg_valor_inc, v.vg_qtde_itens_inc, v.vg_data_primeira_venda_inc, v.vg_data_ultima_venda_inc " . PHP_EOL;
+$sql .= "FROM dist_usuarios_games ug " . PHP_EOL;
+$sql .= "LEFT JOIN ( " . PHP_EOL;
+$sql .= "   SELECT vg.vg_ug_id, " . PHP_EOL;
+$sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 5 THEN vgm.vgm_valor * vgm.vgm_qtde ELSE 0 END) AS vg_valor, " . PHP_EOL;
+$sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 5 THEN vgm.vgm_qtde ELSE 0 END) AS vg_qtde_itens, " . PHP_EOL;
+$sql .= "       MIN(CASE WHEN vg.vg_ultimo_status = 5 THEN vg.vg_data_inclusao END) AS vg_data_primeira_venda, " . PHP_EOL;
+$sql .= "       MAX(CASE WHEN vg.vg_ultimo_status = 5 THEN vg.vg_data_inclusao END) AS vg_data_ultima_venda, " . PHP_EOL;
+$sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 6 THEN vgm.vgm_valor * vgm.vgm_qtde ELSE 0 END) AS vg_valor_inc, " . PHP_EOL;
+$sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 6 THEN vgm.vgm_qtde ELSE 0 END) AS vg_qtde_itens_inc, " . PHP_EOL;
+$sql .= "       MIN(CASE WHEN vg.vg_ultimo_status = 6 THEN vg.vg_data_inclusao END) AS vg_data_primeira_venda_inc, " . PHP_EOL;
+$sql .= "       MAX(CASE WHEN vg.vg_ultimo_status = 6 THEN vg.vg_data_inclusao END) AS vg_data_ultima_venda_inc " . PHP_EOL;
+$sql .= "   FROM tb_dist_venda_games vg " . PHP_EOL;
+$sql .= "   INNER JOIN tb_dist_venda_games_modelo vgm ON vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
+$sql .= "   WHERE vg.vg_ultimo_status IN (5, 6) " . PHP_EOL;
+$sql .= "       AND vg.vg_ug_id IN (SELECT ug_id FROM dist_usuarios_games WHERE ug_vip = 0) " . PHP_EOL;
+$sql .= "   GROUP BY vg.vg_ug_id " . PHP_EOL;
+$sql .= ") v ON v.vg_ug_id = ug.ug_id " . PHP_EOL;
+$sql .= "WHERE ug.ug_vip = 0 " . PHP_EOL;
 
 if ($ordem == 1) {
-    $sql .= " order by " . $ncamp . " desc; ";
+	$sql .= " order by " . $ncamp . " desc; ";
 } else {
-    $sql .= " order by " . $ncamp . " asc; ";
+	$sql .= " order by " . $ncamp . " asc; ";
 }
 
 $sql_limit = str_replace(";", "", $sql);
 $sql_limit .= " limit " . $max . " offset " . $inicial . ";";
 
-$rs_total = SQLexecuteQuery($sql);
-$total_table = pg_num_rows($rs_total);
+$sql_count = "SELECT count(ug_id) as total FROM dist_usuarios_games WHERE ug_vip = 0;";
+$rs_count = SQLexecuteQuery($sql_count);
+$row_count = pg_fetch_array($rs_count);
+$total_table = $row_count['total'];
 
 // Cálculos para paginação
 $totalPages = ceil($total_table / $max);
