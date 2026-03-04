@@ -196,6 +196,11 @@ if ($file) {
   @fclose($file);
 }
 
+// remove o arquivo físico após o envio completo
+if (is_file($file_path)) {
+  @unlink($file_path);
+}
+
 // log downloads
 if (!LOG_DOWNLOADS) die();
 
