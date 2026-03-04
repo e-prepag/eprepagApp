@@ -955,7 +955,7 @@ require_once RAIZ_DO_PROJETO . "public_html/prepag2/commerce/includes/cabecalho_
                                                 $msg_block = "Pagamento Online BLOQUEADO ******  ";
 
                                                 $smsg_bloqueio =
-                                                    "	Usuário (INT, '$integracao_store_id', '$partner_name'): ID: " . $usuarioGames->getId() . ", Nome: " . $usuarioGames->getNome() . ", Email: " . $usuarioGames->getEmail() . ",\n" .
+                                                    "	Usuário (INT, '$integracao_store_id', '$partner_name'): ID: " . $usuarioGames->getId() . ",\n" .
                                                     "	Regras bloqueio: b_TentativasDiariasOK: " . (($b_TentativasDiariasOK) ? "SIM" : "não") . " (n: $qtde_last_dayOK), " .
                                                     "b_LimiteDiarioOK: " . (($b_LimiteDiarioOK) ? "SIM" : "não") . ", \n" .
                                                     "b_libera_Cielo: " . (($b_libera_Cielo) ? "SIM" : "não") . " \n" .
@@ -976,7 +976,7 @@ require_once RAIZ_DO_PROJETO . "public_html/prepag2/commerce/includes/cabecalho_
 
                                             $mensagem = "=====================================================================================\n" .
                                                 "$msg_block (" . date("Y-m-d H:i:s") . ")\n" .
-                                                "  Usuário: ID: " . $usuarioGames->getId() . ", Nome: " . $usuarioGames->getNome() . ", Email: " . $usuarioGames->getEmail() . ",\n" .
+                                                "  Usuário: ID: " . $usuarioGames->getId() . ",\n" .
                                                 "  qtde_last_dayOK: " . $qtde_last_dayOK . "\n" .
                                                 "  total_diario: " . number_format($total_diario, 2, ',', '.') . "\n" .
                                                 "  total_diario_const: " . number_format($total_diario_const, 2, ',', '.') . "\n" .

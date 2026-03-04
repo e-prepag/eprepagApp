@@ -238,7 +238,7 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
             $msg_block = "Pagamento Online BLOQUEADO (LH Pré) ******  ";
 
             $smsg_bloqueio =
-                "	Usuário: ID: " . $controller->usuarios->getId() . ", Nome: " . $controller->usuarios->getNome() . ", Email: " . $controller->usuarios->getEmail() . ",\n" .
+                "	Usuário: ID: " . $controller->usuarios->getId() . ",\n" .
                 "	solicitado: " . number_format(($total_carrinho + $total_diario), 2, ',', '.') . " de " . number_format($valor_maximo, 2, ',', '.') . "\n";
             if (($total_carrinho + $total_diario) <= (2 * $valor_maximo)) {
                 $smsg_bloqueio .= "	Safe (<=2*LIMITE_MAX)\n";
@@ -304,7 +304,7 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
             $msg_block = "Pagamento Online BLOQUEADO (LH Pré) ******  ";
 
             $smsg_bloqueio =
-                "	Usuário: ID: " . $controller->usuarios->getId() . ", Nome: " . $controller->usuarios->getNome() . ", Email: " . $controller->usuarios->getEmail() . ",\n" .
+                "	Usuário: ID: " . $controller->usuarios->getId() . ",\n" .
                 "	solicitado: " . number_format(($total_carrinho + $total_semanal), 2, ',', '.') . " de " . number_format($valor_maximo, 2, ',', '.') . "\n";
             if (($total_carrinho + $total_semanal) <= (2 * $valor_maximo)) {
                 $smsg_bloqueio .= "	Safe (<=2*LIMITE_MAX)\n";
@@ -318,7 +318,7 @@ if ($controller->usuarios->b_IsLogin_pagamento()) {
 
         $mensagem = "=====================================================================================\n" .
             "$msg_block (" . date("Y-m-d H:i:s") . ")\n" .
-            "  Usuário: ID: " . $controller->usuarios->getId() . ", Nome: " . $controller->usuarios->getNome() . ", Email: " . $controller->usuarios->getEmail() . ",\n" .
+            "  Usuário: ID: " . $controller->usuarios->getId() . ",\n" .
             "  qtde_last_weekOK: " . $qtde_last_weekOK . "\n" .
             "  total_semanal: " . number_format($total_semanal, 2, ',', '.') . "\n" .
             "  total_carrinho+total_semanal: " . number_format(($total_carrinho + $total_semanal), 2, ',', '.') . "\n" .

@@ -189,16 +189,4 @@ while (!feof($file)) {
 
 fclose($file);
 
-// 15. Log (se habilitado)
-if (LOG_DOWNLOADS) {
-  $log_entry = sprintf(
-    "[%s] IP: %s | File: %s\n",
-    date("Y-m-d H:i:s"),
-    $_SERVER['REMOTE_ADDR'] ?: 'unknown',
-    $fname
-  );
-
-  error_log($log_entry, 3, LOG_FILE);
-}
-
 exit;

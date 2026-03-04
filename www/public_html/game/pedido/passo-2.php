@@ -922,7 +922,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                             $msg_block = "Pagamento Online BLOQUEADO ******  ";
 
                             $smsg_bloqueio = 
-                                    "	Usuário: ID: ".$controller->usuario->getId().", Nome: ".$controller->usuario->getNome().", Email: ".$controller->usuario->getEmail().",\n".
+                                    "	Usuário: ID: ".$controller->usuario->getId().",\n".
                                     "	Regras bloqueio: b_TentativasDiariasOK: ".(($b_TentativasDiariasOK)?"SIM":"não")." (n: $qtde_last_dayOK), ".
                                             "b_LimiteDiarioOK: ".(($b_LimiteDiarioOK)?"SIM":"não").", ".
                                             "b_libera_Cielo: ".(($b_libera_Cielo)?"SIM":"não")." \n".
@@ -943,7 +943,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                     }
                     $mensagem = "=====================================================================================\n".
                             "$msg_block (".date("Y-m-d H:i:s").")\n".
-                            "  Usuário: ID: ".$controller->usuario->getId().", Nome: ".$controller->usuario->getNome().", Email: ".$controller->usuario->getEmail().",\n".
+                            "  Usuário: ID: ".$controller->usuario->getId().",\n".
                             "  qtde_last_dayOK: ".$qtde_last_dayOK."\n".
                             "  total_diario: ".number_format($total_diario, 2, ',', '.')."\n".
                             "  total_diario_const: ".number_format($total_diario_const, 2, ',', '.')."\n".

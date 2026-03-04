@@ -10,7 +10,7 @@ $sbanco = getBcoCodigo($iforma);
 	
 if ($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']) {
 	$valor_0 = $total_carrinho;
-gravaLog_EPPCASH_PINs("Vai para mostraCarrinho_pag(false, 0)\n  valor_0 = '$valor_0'; total_carrinho: '$total_carrinho'\n  integracao_is_parceiro: ".$GLOBALS['_SESSION']['integracao_is_parceiro']."\n  integracao_origem_id: ".$GLOBALS['_SESSION']['integracao_origem_id']."\n  carrinho: ".print_r($GLOBALS['_SESSION']['carrinho'], true)."\n".str_repeat("-", 80)."\n");
+gravaLog_EPPCASH_PINs("Vai para mostraCarrinho_pag(false, 0)\n  valor_0 = '$valor_0'; total_carrinho: '$total_carrinho'\n  integracao_is_parceiro: ".$GLOBALS['_SESSION']['integracao_is_parceiro']."\n  integracao_origem_id: ".$GLOBALS['_SESSION']['integracao_origem_id']."\n".str_repeat("-", 80)."\n");
 
 	$taxas = 0;
 	$amount = number_format($amount,2); // valor do pedido, que deve ter duas casas decimais no formato xx.xx.
@@ -20,7 +20,7 @@ gravaLog_EPPCASH_PINs("Vai para mostraCarrinho_pag(false, 0)\n  valor_0 = '$valo
 	$sql = "INSERT INTO tb_pag_compras (numcompra, cliente_nome, idcliente, tipo_cliente, frete, manuseio, taxas, subtotal, cesta, tipoPagto, prazo, numParcelas, valorParcela, total, dataInicio, status, iforma, banco) values ('".$orderId."', '".$cliente_nome_prev."', ".$id_usuario_prev.", '".$tipo_cliente."', 0, 0, ". $taxas .", 0, '', 0, 0, 0, 0, ".number_format((($valor_0+$taxas)*100), 0, ',', '').", '". date("Y-m-d H:i:s") ."', 0, '".$iforma."', '".$sbanco."')";
 	//echo $sql;
 	//die("STOP");
-	gravaLog_EPPCASH_PINs("Inserindo o registro na tabela tb_pag_compras através do programa pag\\epp\\inc_config.php\n total_carrinho: ".(($total_carrinho==0) ? "É ZERO === " : "NÃO É ZERO +++ ")."\n$sql");
+	gravaLog_EPPCASH_PINs("Inserindo o registro na tabela tb_pag_compras através do programa pag\\epp\\inc_config.php\n total_carrinho: ".(($total_carrinho==0) ? "É ZERO === " : "NÃO É ZERO +++ "));
 	$ret = SQLexecuteQuery($sql);
 	if(!$ret) {
 		echo "Erro ao inserir transação de pagamento.\n";

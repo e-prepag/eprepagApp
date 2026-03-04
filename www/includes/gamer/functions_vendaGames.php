@@ -1609,9 +1609,6 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 }
                                                         } //end if($msg == "")
 
-                                                        fwrite($fileLog, "PIN GERADO: " . $pin_codigo . " / " . $venda_id . " \n");
-
-
                                                         // Atualiza a tabela de pins		
                                                         if ($msg == "") {
                                                                 $ug_cel_ddd = (trim($ug_cel_ddd) == "") ? 0 : trim($ug_cel_ddd);
