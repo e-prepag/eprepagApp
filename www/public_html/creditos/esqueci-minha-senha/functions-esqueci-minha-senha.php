@@ -156,7 +156,7 @@
 	
 		$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha_pdv.log';
 					
-		$mensagemLog = "ID: {$idUsuario}\nIP: {$ipUsuario}\nLOGIN: {$loginUsuario}\nE-MAIL: {$emailUsuario}\nCÓDIGO: {$codigoValidacao}";
+		$mensagemLog = "ID: {$idUsuario}\nCÓDIGO: {$codigoValidacao}";
 
 		geraLogNovaSolicitacao($arquivoLog, $mensagemLog);
 		

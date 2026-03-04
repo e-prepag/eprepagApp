@@ -38,7 +38,7 @@
 				
 				$arquivoLog = '/www/arquivos_gerados/logs/logEsqueciMinhaSenha.log';
 				
-				$mensagemLog = "O usuário acessou a página de atualização de senha\nDATA / HORA: $dataHoraAtual\nID: {$resposta[0]['ug_id']}\nNOME: {$resposta[0]['ug_nome_completo']}\nCÓDIGO: {$codigoValidacao}";
+				$mensagemLog = "O usuário acessou a página de atualização de senha\nDATA / HORA: $dataHoraAtual\nID: {$resposta[0]['ug_id']}\nCÓDIGO: {$codigoValidacao}";
 		
 				geraLogAtualizaSolicitacao($arquivoLog, $mensagemLog);
 				
