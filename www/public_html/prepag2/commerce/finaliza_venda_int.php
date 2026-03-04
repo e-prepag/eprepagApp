@@ -451,7 +451,7 @@ if ($ret == "") {
 
                 if (!$ret1) {
                         echo "Erro ao atualizar transação de pagamento (3).\n";
-                        gravaLog_TMP("Erro ao atualizar transação de pagamento (3).\n" . $sql . "\n");
+                        gravaLog_TMP("Erro ao atualizar transação de pagamento (3).\n");
                 }
                 if (b_IsPagtoCielo($pagto_venda)) {
                         //Inicio do novo trecho para cadastramento do token no BD
@@ -513,7 +513,7 @@ if ($ret == "") {
 
                         if (!$ret1) {
                                 echo "Erro ao atualizar transação de integração (3).\n";
-                                gravaLog_TMP("Erro ao atualizar transação de integração (3).\n" . $sql . "\n");
+                                gravaLog_TMP("Erro ao atualizar transação de integração (3).\n");
                         }
                 } else {
                         gravaLog_TMP("Erro ao atualizar transação de integração (4): sem ip_order_id no SESSION.\n");

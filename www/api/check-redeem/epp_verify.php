@@ -218,7 +218,6 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											date('d-m-Y H:i:s') . PHP_EOL .
 											'IP ' . $_SERVER['REMOTE_ADDR'] . PHP_EOL .
 											'Corpo ' . $body . PHP_EOL .
-											'HEADERS' . print_r($headers, true) . PHP_EOL .
 											'CURL: ' . PHP_EOL . $dados_CURL . PHP_EOL .
 											'BUFFER ' . PHP_EOL . $dados_buffer . PHP_EOL .
 											'ERRORs: ' . PHP_EOL . $erros_curl . PHP_EOL .
