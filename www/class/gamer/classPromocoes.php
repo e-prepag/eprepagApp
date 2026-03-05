@@ -109,7 +109,7 @@ class Promocoes {
 	    $this	->	setVgId		($aux_promocao[3]);
 		//echo "<pre>".print_r($aux_promocao)."</pre>";
 
-gravaLog_DebugPromocao("Confere token em MontarPromocao()\n    Email: ".$this->getEmail().", ID: ".$this->getUgId().", PromoID: ".$this->getPromoId().", VG_ID: ".$this->getVgId()."\n");
+gravaLog_DebugPromocao("Confere token em MontarPromocao()\n ID: ".$this->getUgId().", PromoID: ".$this->getPromoId().", VG_ID: ".$this->getVgId()."\n");
 		
 		
 		$sql = "SELECT * 

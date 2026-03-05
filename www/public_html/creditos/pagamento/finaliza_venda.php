@@ -463,7 +463,7 @@ if($msg == ""){
 					$ret1 = SQLexecuteQuery($sql);
 					if(!$ret1) {
 						echo "Erro ao atualizar transação de pagamento (3).\n";
-						gravaLog_TMP("Erro ao atualizar transação de pagamento (3).\n".$sql."\n");
+						gravaLog_TMP("Erro ao atualizar transação de pagamento (3).\n");
 					}
 				}
 			} 

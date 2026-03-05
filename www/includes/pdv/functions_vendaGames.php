@@ -2676,14 +2676,13 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         ", status=3 where numcompra='" .
                         $rs_transacoes_row["numcompra"] .
                         "'";
-                    echo $cReturn . " NO SYNC => [" . $sql . "]" . $cReturn;
+                    echo $cReturn . " NO SYNC => " . $cReturn;
                     //gravaLog_TMP("Marca registro como processado.".$cReturn.$sql.$cReturn);
                     $rs_update2 = SQLexecuteQuery($sql);
                     if (!$rs_update2) {
                         $msg =
                             "Erro atualizando status de registro (62aa PDV)." .
                             $cReturn .
-                            "$sql" .
                             $cReturn;
                         echo $msg;
                     }
