@@ -808,7 +808,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                       
                                      <td class='label_pin_veja' colspan='2'>
 
-                                     O código deve ser utilizado em até 6 meses." . $conteudo_instrucoes . "
+                                     O código deve ser utilizado em até 2 meses." . $conteudo_instrucoes . "
 
                                      </td>
                                      <td>
