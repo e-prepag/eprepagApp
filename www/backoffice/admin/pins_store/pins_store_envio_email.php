@@ -187,6 +187,10 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					die("Erro ao criar ZIP em $varArquivoRAR");
 				}
 
+                if (file_exists($varArquivo)) {
+					unlink($varArquivo);
+				}
+
 				sleep(2);
 			} //end if (($DISTRIBUIDORA_EPP != intval($distributor_codigo))&&($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo)))
 			else {

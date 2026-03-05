@@ -41,7 +41,6 @@ $mensagemLog = '****#### INÍCIO ####****' . PHP_EOL .
 	'Data e Hora: ' . $dataAtual . PHP_EOL .
 	'Informações de REQUEST: ' . $informacoesReq . PHP_EOL .
 	'IP de Acesso: ' . $ipReq . PHP_EOL .
-	'Informações Adicionais do Servidor: ' . $infoAdicional . PHP_EOL .
 	'****#### FIM ####****' . PHP_EOL . PHP_EOL;
 
 $fileLog = "/www/arquivos_gerados/logs/logCheckRedeemALL.txt";

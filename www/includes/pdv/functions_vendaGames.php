@@ -1932,7 +1932,6 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             "Erro atualizando registro em processamento (41 PDV)." .
                                 $cReturn .
                                 $sout .
-                                $sql_update .
                                 $cReturn
                         );
                     } else {
@@ -2013,7 +2012,6 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $msg =
                                 "Erro atualizando status de registro (62aa PDV)." .
                                 $cReturn .
-                                "$sql" .
                                 $cReturn;
                             echo $msg;
                         }
@@ -2091,7 +2089,6 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                                     "Erro atualizando registro POR SONDA em processamento (41a PDV)." .
                                         $cReturn .
                                         $sout .
-                                        $sql_update .
                                         $cReturn
                                 );
                             } else {
@@ -2679,14 +2676,13 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         ", status=3 where numcompra='" .
                         $rs_transacoes_row["numcompra"] .
                         "'";
-                    echo $cReturn . " NO SYNC => [" . $sql . "]" . $cReturn;
+                    echo $cReturn . " NO SYNC => " . $cReturn;
                     //gravaLog_TMP("Marca registro como processado.".$cReturn.$sql.$cReturn);
                     $rs_update2 = SQLexecuteQuery($sql);
                     if (!$rs_update2) {
                         $msg =
                             "Erro atualizando status de registro (62aa PDV)." .
                             $cReturn .
-                            "$sql" .
                             $cReturn;
                         echo $msg;
                     }
@@ -2764,7 +2760,6 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                                 "Erro atualizando registro POR SONDA em processamento (41a PDV)." .
                                     $cReturn .
                                     $sout .
-                                    $sql_update .
                                     $cReturn
                             );
                         } else {

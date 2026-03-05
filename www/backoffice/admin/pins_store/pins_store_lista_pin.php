@@ -408,7 +408,7 @@ $time_start_stats = getmicrotime();
 									// Gera conteudo do Arquivo
 									if ($habil_download) {
 										if (in_array($rs_pins_row['pin_codinterno'], $ids_temp, true))
-											$sArq .= $rs_pins_row['pin_lote_codigo'] . ";" . $rs_pins_row['pin_valor'] . ";" . $ps->decrypt(base64_decode($rs_pins_row['pin_codigo'])) . "\n";
+											$sArq .= $rs_pins_row['pin_lote_codigo'] . ";" . $rs_pins_row['pin_valor'] . ";*******************\n";
 										//$sArq .= $rs_pins_row['pin_formato'].";".str_replace(' - Formato ('.$rs_pins_row['pin_formato'].')','',$operacao_array[$rs_pins_row['distributor_codigo']])." (".$rs_pins_row['distributor_codigo'].")".";".$rs_pins_row['pin_lote_codigo'].";".$rs_pins_row['pin_valor'].";".$rs_pins_row['pin_status'].";".$rs_pins_row['pin_serial'].";".$ps->decrypt(base64_decode($rs_pins_row['pin_codigo']))."\n";
 
 									}

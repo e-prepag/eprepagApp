@@ -467,10 +467,10 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         $vgm_pin_codinterno = null;
         // Levanta pins vendidos
         $npins = get_qtde_pins($venda_id, $vgm_qtde, $vgm_pin_codinterno);
-        gravaLog_TMP("Testing Conciliacao nPINs - em conciliacao() - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  venda_id: " . $venda_id . ", vgm_qtde: " . $vgm_qtde . ", vgm_pin_codinterno: '" . $vgm_pin_codinterno . "'" . PHP_EOL);
+        gravaLog_TMP("Testing Conciliacao nPINs - em conciliacao() - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  venda_id: " . $venda_id . ", vgm_qtde: " . $vgm_qtde . "'" . PHP_EOL);
         if ($vgm_pin_codinterno) {
-                $msg = "Erro na Conciliação PagOnline - PINs já foram vendidos - " . date("Y-m-d H:i:s") . PHP_EOL . "   Venda $venda_id já tem PINs: '$vgm_pin_codinterno'." . PHP_EOL;
-                gravaLog_TMP("ERROR - Conciliacao nPINs - em conciliacao() - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  venda_id: " . $venda_id . ", vgm_qtde: " . $vgm_qtde . ", vgm_pin_codinterno: " . $vgm_pin_codinterno . PHP_EOL . "  $msg" . PHP_EOL);
+                $msg = "Erro na Conciliação PagOnline - PINs já foram vendidos - " . date("Y-m-d H:i:s") . PHP_EOL . "   Venda $venda_id ." . PHP_EOL;
+                gravaLog_TMP("ERROR - Conciliacao nPINs - em conciliacao() - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  venda_id: " . $venda_id . ", vgm_qtde: " . $vgm_qtde  . PHP_EOL . "  $msg" . PHP_EOL);
         }
 
         // Valida valores
@@ -1609,9 +1609,6 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 }
                                                         } //end if($msg == "")
 
-                                                        fwrite($fileLog, "PIN GERADO: " . $pin_codigo . " / " . $venda_id . " \n");
-
-
                                                         // Atualiza a tabela de pins		
                                                         if ($msg == "") {
                                                                 $ug_cel_ddd = (trim($ug_cel_ddd) == "") ? 0 : trim($ug_cel_ddd);
@@ -1656,9 +1653,9 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                                                 // Alawar
                                                 if ($msg == "") {
-                                                        gravaLog_Debug(str_repeat("*", 80) . PHP_EOL . "OPR (opr_codigo = $vgm_opr_codigo) -> opr_codigo_Alawar = " . $GLOBALS['opr_codigo_Alawar'] . ", email: '$ug_email'" . PHP_EOL);
+                                                        gravaLog_Debug(str_repeat("*", 80) . PHP_EOL . "OPR (opr_codigo = $vgm_opr_codigo) -> opr_codigo_Alawar = " . $GLOBALS['opr_codigo_Alawar'] . "" . PHP_EOL);
                                                         if ($vgm_opr_codigo == $GLOBALS['opr_codigo_Alawar']) {
-                                                                gravaLog_Debug("IS ALAWAR - pin_codigo: '$pin_codigo'" . PHP_EOL);
+                                                                gravaLog_Debug("IS ALAWAR " . PHP_EOL);
 
                                                                 $certificateID = $pin_codigo;        //'1919823594123';
                                                                 $email = $ug_email;        //'fabioss@e-prepag.com.br';
@@ -1666,7 +1663,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 $activationKeyAlawar = '';
                                                                 $errorsAlawar = '';
 
-                                                                gravaLog_Debug("certificateID: '$certificateID', AFFILIATE_PID_ALAWAR: '" . AFFILIATE_PID_ALAWAR . "', email: '$email', AFFILIATE_SECRET_KEY: '" . AFFILIATE_SECRET_KEY . "', AFFILIATE_LOCALE_ALAWAR: '" . AFFILIATE_LOCALE_ALAWAR . "', gameID: $gameID" . PHP_EOL);
+                                                                gravaLog_Debug("certificateID: '$certificateID', AFFILIATE_PID_ALAWAR: '" . AFFILIATE_PID_ALAWAR . "', AFFILIATE_SECRET_KEY: '" . AFFILIATE_SECRET_KEY . "', AFFILIATE_LOCALE_ALAWAR: '" . AFFILIATE_LOCALE_ALAWAR . "', gameID: $gameID" . PHP_EOL);
                                                                 $objalawar = new AlawarAPI($certificateID, AFFILIATE_PID_ALAWAR, $email, AFFILIATE_SECRET_KEY, AFFILIATE_LOCALE_ALAWAR, $gameID);
                                                                 $objalawar->Execute();
                                                                 if ($objalawar->foundErrors()) {

@@ -19,7 +19,14 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
 
     $fileLog = fopen("/www/arquivos_gerados/logs/cadastro_games.txt", "a+");
     fwrite($fileLog, "Dta requisão: " . date("d-m-Y H:i:s") . "\n");
-    fwrite($fileLog, "Dados recebidos: " . json_encode($_POST) . "\n");
+    $postLog = $_POST;
+    $chavesSensiveis = ['senha', 'conf_senha', 'cpf', 'data_nascimento', 'telefone', 'celular', 'ipAdress', 'location', 'device', 'g-recaptcha-response'];
+    foreach ($chavesSensiveis as $key) {
+        if (isset($postLog[$key])) {
+            $postLog[$key] = '***REMOVIDO***';
+        }
+    }
+    fwrite($fileLog, "Dados recebidos: " . json_encode($postLog) . "\n");
     fwrite($fileLog, str_repeat("*", 50) . "\n\r");
     fclose($fileLog);
 

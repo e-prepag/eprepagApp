@@ -4,13 +4,9 @@
 session_start();
 if(empty($_SESSION["iduser_bko_pub"]))
 {
-        echo '<script>alert("Faça login novamente");</script>';
+        echo '<script>alert("FaÃ§a login novamente");</script>';
         exit;
 }
-$file = fopen("/www/arquivos_gerados/logs/dadosRecebidosGarena.txt", "a+");
-fwrite($file, "Data ".date("d-m-Y H:i:s")."\n");
-fwrite($file, json_encode($_POST)."\n");
-fclose($file);
 
 header('Content-Type: application/json; charset=utf-8');
 

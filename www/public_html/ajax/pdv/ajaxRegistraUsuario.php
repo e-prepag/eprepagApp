@@ -13,27 +13,27 @@ require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 
 if (!isset($_POST['termos']) || empty($_POST['termos'])) {
-    die("Erro: Vocï¿½ deve aceitar os termos de uso para prosseguir.");
+    die("Erro: Você deve aceitar os termos de uso para prosseguir.");
 }
 // Step 1
 $username = getInputRequest('username');
 if (preg_match('/[\[\]{}*;()"\']/', $username) || $username == "") {
 
-    die("Erro: O user $username nï¿½o pode ser vazio ou possuir caracteres nï¿½o permitidos. (, ), [, ], {, }, *, ;, \", ')");
+    die("Erro: O user $username não pode ser vazio ou possuir caracteres não permitidos. (, ), [, ], {, }, *, ;, \", ')");
 }
 $email = getInputRequest('email');
 if (!isValidEmail($email)) {
-    die("Erro: O e-mail fornecido ï¿½ invï¿½lido.");
+    die("Erro: O e-mail fornecido é inválido.");
 }
 $email_confirmacao = getInputRequest('email_confirmacao');
 if (!isValidEmail($email_confirmacao)) {
-    die("Erro: O e-mail de confirmaï¿½ï¿½o ï¿½ invï¿½lido.");
+    die("Erro: O e-mail de confirmação é inválido.");
 }
 $password = getInputRequest('password');
 $password_confirmacao = getInputRequest('password_confirmacao');
 
 if ($password !== $password_confirmacao) {
-    die("Erro: A senha e a confirmaï¿½ï¿½o de senha sï¿½o diferentes.");
+    die("Erro: A senha e a confirmação de senha são diferentes.");
 }
 
 require_once DIR_CLASS . "util/Validate.class.php";
@@ -44,7 +44,7 @@ $validate = new Validate;
 $clsLogin = new Login($password);
 
 if ($clsLogin->valida() > 0) {
-    $erros[] = "<p>Senha nï¿½o atinge os nï¿½veis de seguranï¿½a desejados.</p>";
+    $erros[] = "<p>Senha não atinge os níveis de segurança desejados.</p>";
 }
 
 // Step 2
@@ -88,7 +88,7 @@ $cpf_socios = "";
 $aux_data_nascimento_socios = "";
 $data_nascimento_socios = "";
 
-//Colocando dados do primeiro sÃ³cio como representante da empresa
+//Colocando dados do primeiro sócio como representante da empresa
 $cpf_representante = "00000000000";
 $nome_representante = sanitizeInput(getInputRequest('name'));
 $data_nascimento = "";
@@ -110,8 +110,8 @@ $numero_celular = "";
 $como_conheceu_eprepag = sanitizeInput(getInputRequest('como_conheceu_eprepag'));
 
 /*
-    Se o usuÃ¡rio escolheu a opÃ§Ã£o "outro" do select "Como conheceu a E-Prepag?"
-    SerÃ¡ incorporado a resposta do campo aberto em baixo
+    Se o usuário escolheu a opção "outro" do select "Como conheceu a E-Prepag?"
+    Será incorporado a resposta do campo aberto em baixo
 */
 if ($como_conheceu_eprepag == "outro") {
     $como_conheceu_eprepag = "OUTRO: " . sanitizeInput(getInputRequest('campo_outro_input'));
@@ -137,11 +137,11 @@ if (getenv('AMBIENTE') == "HOMOLOGACAO") {
         exit;
     }
 } else {
-    echo "Vocï¿½ deve realizar a verificaï¿½ï¿½o do RECAPTCHA para prosseguir.<br>";
+    echo "Você deve realizar a verificação do RECAPTCHA para prosseguir.<br>";
     exit;
 }
 
-$msgErroLocation = "Para seguir com o cadastro, precisamos da sua autorizaï¿½ï¿½o para acessar sua localizaï¿½ï¿½o. Essa informaï¿½ï¿½o nos ajuda a garantir mais seguranï¿½a no processo. Sua geolocalizaï¿½ï¿½o serï¿½ usada somente para esse fim e protegida conforme a Lei Geral de Proteï¿½ï¿½o de Dados (LGPD).";
+$msgErroLocation = "Para seguir com o cadastro, precisamos da sua autorização para acessar sua localização. Essa informação nos ajuda a garantir mais segurança no processo. Sua geolocalização será usada somente para esse fim e protegida conforme a Lei Geral de Proteção de Dados (LGPD).";
 
 $erro_location = false;
 if (isset($_POST["location"]) && !empty($_POST["location"])) {
@@ -182,7 +182,7 @@ $cad_usuarioGames = new UsuarioGames(
     $fantasia_empresa,
     $razao_social_empresa,
     $cnpj_empresa,
-    $nome_representante, // Responsavel legal Ã© o mesmo que o representante
+    $nome_representante, // Responsavel legal é o mesmo que o representante
     $email,
     $endereco_empresa,
     $tipo_endereco,
@@ -342,7 +342,7 @@ if ($msg == "") {
         curl_exec($ch);
         curl_close($ch);
     } else {
-        die("Nï¿½o foi possï¿½vel cadastrar o usuï¿½rio");
+        die("Não foi possível cadastrar o usuário");
     }
 }
 
@@ -388,13 +388,13 @@ function splitTelphoneNumber($number, $isMobile = false)
     return array('ddd' => $matches[1][0], 'number' => str_replace('-', '', $matches[2][0]));
 }
 
-// Funï¿½ï¿½o para remover caracteres especiais indesejados
+// Função para remover caracteres especiais indesejados
 function sanitizeInput($input)
 {
     return preg_replace('/[\[\]{}*;()"\']/', '', $input);
 }
 
-// Funï¿½ï¿½o para validar e-mail
+// Função para validar e-mail
 function isValidEmail($email)
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL);

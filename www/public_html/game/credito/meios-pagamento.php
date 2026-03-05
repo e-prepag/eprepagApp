@@ -216,7 +216,7 @@ if($controller->usuario->b_IsLogin_pagamento()) {
         }
         $mensagem= "=====================================================================================\n".
                 "$msg_block (".date("Y-m-d H:i:s").")\n".
-                "  Usuário: ID: ".$controller->usuario->getId().", Nome: ".$controller->usuario->getNome().", Email: ".$controller->usuario->getEmail().",\n".
+                "  Usuário: ID: ".$controller->usuario->getId().",\n".
                 "  qtde_last_dayOK: ".$qtde_last_dayOK."\n".
                 "  total_diario: ".number_format($total_diario, 2, ',', '.')."\n".
                 "  total_carrinho+total_diario: ".number_format(($total_carrinho+$total_diario), 2, ',', '.')."\n".

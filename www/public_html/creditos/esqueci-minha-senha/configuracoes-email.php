@@ -51,8 +51,6 @@
                 // Enviar e capturar o resultado
                 if(!$mail->Send()) {
                         $mensagemLog = "Erro: Ao enviar e-mail para: {$to} - Erro: " . $mail->ErrorInfo;
-                } else {
-                        $mensagemLog = "Sucesso: E-mail encaminhado para: {$to} CÓDIGO: {$codigoValidacao}";
                 }
 
 

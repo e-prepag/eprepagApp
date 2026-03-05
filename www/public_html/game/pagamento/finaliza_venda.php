@@ -497,7 +497,7 @@ if (empty($strRedirect)) {
                 ));
                 if (!$ret1) {
                         echo "Erro ao atualizar transa��o de pagamento (3).";
-                        gravaLog_TMP("Erro ao atualizar transa��o de pagamento (3).\n" . $sql . "");
+                        gravaLog_TMP("Erro ao atualizar transa��o de pagamento (3).\n");
                 }
                 if (b_IsPagtoCielo($pagto_venda)) {
                         //Inicio do novo trecho para cadastramento do token no BD

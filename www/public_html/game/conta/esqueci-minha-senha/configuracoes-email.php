@@ -52,8 +52,6 @@
                 $enviado = $mail->Send();
                 if(!$enviado) {
                         $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Erro: Ao enviar e-mail para: {$to} - Erro: " . $mail->ErrorInfo;
-                } else {
-                        $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Sucesso: E-mail encaminhado para: {$to} CÓDIGO: {$codigoValidacao}";
                 }
 
         //Mensagem
