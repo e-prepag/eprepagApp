@@ -73,17 +73,17 @@ $novo_ug_repr_legal_email           = $_POST['novo_ug_repr_legal_email'] ?? null
 $novo_ug_repr_legal_msn             = $_POST['novo_ug_repr_legal_msn'] ?? null;
 
 $num_registros_bd                   = $_POST['num_registros_bd'] ?? null;
-$novo_ug_repr_venda_igual_repr_legal= $_POST['novo_ug_repr_venda_igual_repr_legal'] ?? null;
+$novo_ug_repr_venda_igual_repr_legal = $_POST['novo_ug_repr_venda_igual_repr_legal'] ?? null;
 
 $novo_ug_dados_bancarios_01_banco   = $_POST['novo_ug_dados_bancarios_01_banco'] ?? null;
 $novo_ug_dados_bancarios_01_agencia = $_POST['novo_ug_dados_bancarios_01_agencia'] ?? null;
 $novo_ug_dados_bancarios_01_conta   = $_POST['novo_ug_dados_bancarios_01_conta'] ?? null;
-$novo_ug_dados_bancarios_01_abertura= $_POST['novo_ug_dados_bancarios_01_abertura'] ?? null;
+$novo_ug_dados_bancarios_01_abertura = $_POST['novo_ug_dados_bancarios_01_abertura'] ?? null;
 
 $novo_ug_dados_bancarios_02_banco   = $_POST['novo_ug_dados_bancarios_02_banco'] ?? null;
 $novo_ug_dados_bancarios_02_agencia = $_POST['novo_ug_dados_bancarios_02_agencia'] ?? null;
 $novo_ug_dados_bancarios_02_conta   = $_POST['novo_ug_dados_bancarios_02_conta'] ?? null;
-$novo_ug_dados_bancarios_02_abertura= $_POST['novo_ug_dados_bancarios_02_abertura'] ?? null;
+$novo_ug_dados_bancarios_02_abertura = $_POST['novo_ug_dados_bancarios_02_abertura'] ?? null;
 
 $novo_ug_contato01_nome             = $_POST['novo_ug_contato01_nome'] ?? null;
 $novo_ug_contato01_cargo            = $_POST['novo_ug_contato01_cargo'] ?? null;
@@ -166,7 +166,7 @@ if ($msg == "") {
 		if ($msgAcao == "") {
 			$cad_usuarioGames = new UsuarioGames($usuario_id);
 			//echo "cad_usuarioGames->getLogin(): '".$cad_usuarioGames->getLogin()."'<br>";
-//echo "cad_usuarioGames->getAbertura: ".$cad_usuarioGames->getAberturaMes()."/".$cad_usuarioGames->getAberturaAno()."<br>";
+			//echo "cad_usuarioGames->getAbertura: ".$cad_usuarioGames->getAberturaMes()."/".$cad_usuarioGames->getAberturaAno()."<br>";
 
 			if ($v_campo == 'email')
 				$cad_usuarioGames->setEmail($v_valor_new);
@@ -180,7 +180,7 @@ if ($msg == "") {
 			if ($v_campo == 'substatus') {
 				$cad_usuarioGames->setSubstatus($v_valor_new);
 				$cad_usuarioGames->setDataAprovacao(urldecode($novo_ug_data_aprovacao));
-			}//end if($v_campo == 'substatus')
+			} //end if($v_campo == 'substatus')
 
 			if ($v_campo == 'riscoclassif') {
 				if (array_key_exists(utf8_decode($v_valor_new), $RISCO_CLASSIFICACAO)) {
@@ -215,7 +215,6 @@ if ($msg == "") {
 					if (!$objUsuarioGames->getPerfilFormaPagto() || trim($objUsuarioGames->getPerfilFormaPagto()) == "") {
 						$msgAcao = "Não é possivel ativar este usuário, Forma de Pagamento ainda não definida.\n";
 					}
-
 				}
 			}
 
@@ -246,7 +245,6 @@ if ($msg == "") {
 			SQLexecuteQuery($sql);
 		}
 	}
-
 }
 
 //Recupera dados do usuario
@@ -277,7 +275,6 @@ if ($msg == "") {
 			$cad_RA = $pgatv['ra_desc'];
 		}
 	}
-
 }
 $msg .= $msgAcao; //.$msgRetValida;
 
@@ -294,13 +291,13 @@ ob_end_flush();
 	function GP_popupAlertMsg(msg) { //v1.0
 		document.MM_returnValue = alert(msg);
 	}
+
 	function GP_popupConfirmMsg(msg) { //v1.0
 		document.MM_returnValue = confirm(msg);
 	}
 </script>
 
 <script language="javascript">
-
 	function fcnEditarCadastro(cod) {
 		form1.action = 'com_usuario_detalhe_salva.php?acao=edt&usuario_id=' + cod;
 		form1.submit();
@@ -331,6 +328,7 @@ ob_end_flush();
 			form1.submit();
 		}
 	}
+
 	function trimAll(sString) {
 		while (sString.substring(0, 1) == ' ')
 			sString = sString.substring(1, sString.length);
@@ -339,7 +337,6 @@ ob_end_flush();
 
 		return sString;
 	}
-
 </script>
 <form name="form1" method="post" action="est_perfil_informa_estab.php">
 	<input type="hidden" name="v_campo" value="">
@@ -430,12 +427,32 @@ ob_end_flush();
 				<tr bgcolor="#F5F5FB" class="texto">
 					<td><b>Usuário VIP ou Master?</b></td>
 					<td><?php
-					$bret = $objUsuarioGames->b_IsLogin_pagamento_vip();
-					$bret2 = $objUsuarioGames->b_IsLogin_pagamento_master();
-					$bret3 = $objUsuarioGames->b_IsLogin_pagamento_black();
-					$bret4 = $objUsuarioGames->b_IsLogin_pagamento_gold();
-					echo (($bret) ? "<font color='blue'>VIP</font>" : (($bret2) ? "MASTER" : (($bret3) ? "BLACK" : (($bret4) ? "GOLD" : "não"))));
-					?></td>
+						$nivel = $objUsuarioGames->getNivelPagamento();
+
+						switch ($nivel) {
+							case 1:
+								$nivel_usuario = "<font color='blue'><b>VIP</b></font>";
+								break;
+							case 2:
+								$nivel_usuario = "<font color='green'><b>MASTER</b></font>";
+								break;
+							case 3:
+								$nivel_usuario = "<font color='black'><b>BLACK</b></font>";
+								break;
+							case 4:
+								$nivel_usuario = "<font color='#DAA520'><b>GOLD</b></font>";
+								break;
+							case 5:
+								$nivel_usuario = "<font color='#708090'><b>PLATINUM</b></font>";
+								break;
+							case 0:
+							default:
+								$nivel_usuario = "não";
+								break;
+						}
+
+						echo $nivel_usuario;
+						?></td>
 					<td width="140">Possui Restrição de Vendas de Produtos?</td>
 					<td width="307">
 						<?php echo (($objUsuarioGames->getPossuiRestricaoProdutos() == 1) ? "SIM" : "Não"); ?>
@@ -482,43 +499,43 @@ ob_end_flush();
 					<td><b>Data Último Acesso</b></td>
 					<td><?php
 
-					// Pega data e horário do último acesso registrado nas tabelas dist_usuarios_games_log				
-					
-					// Verifica a data de acesso mais recente do cliente na tabela de usuários ESTÁ NO FORMATO d-m-Y H:i
-					$data_tab_usuario = $objUsuarioGames->getDataUltimoAcesso();
+						// Pega data e horário do último acesso registrado nas tabelas dist_usuarios_games_log				
 
-					// Query para consultar a data mais recente de acesso registrada na tabela de hitórico do cliente
-					$sql_acesso_recente_historico = "SELECT * FROM dist_usuarios_games_log WHERE ugl_ug_id = {$usuario_id} and ugl_uglt_id = '2' ORDER BY ugl_data_inclusao DESC LIMIT 1";
+						// Verifica a data de acesso mais recente do cliente na tabela de usuários ESTÁ NO FORMATO d-m-Y H:i
+						$data_tab_usuario = $objUsuarioGames->getDataUltimoAcesso();
 
-					// Faz a pesquisa no histórico do cliente
-					$executa_pesquisa_no_historico = SQLexecuteQuery($sql_acesso_recente_historico);
+						// Query para consultar a data mais recente de acesso registrada na tabela de hitórico do cliente
+						$sql_acesso_recente_historico = "SELECT * FROM dist_usuarios_games_log WHERE ugl_ug_id = {$usuario_id} and ugl_uglt_id = '2' ORDER BY ugl_data_inclusao DESC LIMIT 1";
 
-					// Guarda a resposta da pesquisa no histórico do cliente
-					$resposta_pesquisa_no_historico = pg_fetch_array($executa_pesquisa_no_historico);
+						// Faz a pesquisa no histórico do cliente
+						$executa_pesquisa_no_historico = SQLexecuteQuery($sql_acesso_recente_historico);
 
-					// Guarda a data de acesso mais recente no histórico do cliente ESTÁ NO FORMATO Y-m-d H:i
-					$data_no_historico = $resposta_pesquisa_no_historico['ugl_data_inclusao'];
+						// Guarda a resposta da pesquisa no histórico do cliente
+						$resposta_pesquisa_no_historico = pg_fetch_array($executa_pesquisa_no_historico);
 
-					// Para fazer a comparação corretamente, transforma $data_recente_tab_usuario para o modelo ano/mês/dia hora:minuto
-					$data_tab_usuario_formato_comparacao = date('Y-m-d H:i', strtotime($data_tab_usuario));
+						// Guarda a data de acesso mais recente no histórico do cliente ESTÁ NO FORMATO Y-m-d H:i
+						$data_no_historico = $resposta_pesquisa_no_historico['ugl_data_inclusao'];
 
-					$data_no_historico_formatado = date('d-m-Y H:i', strtotime($data_no_historico));
+						// Para fazer a comparação corretamente, transforma $data_recente_tab_usuario para o modelo ano/mês/dia hora:minuto
+						$data_tab_usuario_formato_comparacao = date('Y-m-d H:i', strtotime($data_tab_usuario));
 
-					if (empty($data_tab_usuario_formato_comparacao) && empty($data_no_historico)) {
-						echo "Sem registro";
-					} else if (!strtotime($data_tab_usuario_formato_comparacao) && !strtotime($data_no_historico)) {
-						echo "Sem registro";
-					} else {
-						if ($data_tab_usuario_formato_comparacao >= $data_no_historico) {
-							echo $data_tab_usuario;
-						} else if ($data_tab_usuario_formato_comparacao < $data_no_historico) {
-							echo $data_no_historico_formatado;
-						} else {
+						$data_no_historico_formatado = date('d-m-Y H:i', strtotime($data_no_historico));
+
+						if (empty($data_tab_usuario_formato_comparacao) && empty($data_no_historico)) {
 							echo "Sem registro";
+						} else if (!strtotime($data_tab_usuario_formato_comparacao) && !strtotime($data_no_historico)) {
+							echo "Sem registro";
+						} else {
+							if ($data_tab_usuario_formato_comparacao >= $data_no_historico) {
+								echo $data_tab_usuario;
+							} else if ($data_tab_usuario_formato_comparacao < $data_no_historico) {
+								echo $data_no_historico_formatado;
+							} else {
+								echo "Sem registro";
+							}
 						}
-					}
 
-					?></td>
+						?></td>
 				</tr>
 				<tr bgcolor="#F5F5FB" class="texto">
 					<td><b>Data de expiração de senha</b></td>
@@ -531,16 +548,16 @@ ob_end_flush();
 				<tr bgcolor="#F5F5FB" class="texto">
 					<td><b>Possui um autenticador</b></td>
 					<td id="txt-auth"><?php
-					$sql = "SELECT ug_chave_autenticador FROM dist_usuarios_games WHERE ug_id = " . $objUsuarioGames->getId();
-					$res_te = SQLexecuteQuery($sql);
-					if ($res_te_row = pg_fetch_array($res_te)) {
-						$autenticador = !empty($res_te_row['ug_chave_autenticador']);
-						echo $autenticador ? "Sim" : "Não";
-					} else {
-						echo "Não encontrado";
-					}
+										$sql = "SELECT ug_chave_autenticador FROM dist_usuarios_games WHERE ug_id = " . $objUsuarioGames->getId();
+										$res_te = SQLexecuteQuery($sql);
+										if ($res_te_row = pg_fetch_array($res_te)) {
+											$autenticador = !empty($res_te_row['ug_chave_autenticador']);
+											echo $autenticador ? "Sim" : "Não";
+										} else {
+											echo "Não encontrado";
+										}
 
-					?></td>
+										?></td>
 					<td></td>
 					<td><button type="button" class="btn btn-danger <?php echo $autenticador ? "" : "d-none" ?>"
 							id="btn-remove-auth">Remover autenticador
@@ -549,19 +566,19 @@ ob_end_flush();
 				<tr bgcolor="#F5F5FB" class="texto">
 					<td><b>Usuário bloqueado por fraude</b></td>
 					<td id="txt-block"><?php
-					$usuario_bloqueio = obterUsuarioBloqueado(0+$objUsuarioGames->getId());
-					if ($usuario_bloqueio) {
-						echo "Sim. Motivo: " . utf8_decode($usuario_bloqueio['motivo']) . " - Data: " . $usuario_bloqueio['data_bloqueio'];
-					} else {
-						echo "Não possui bloqueio por fraude";
-					}
-					?></td>
+										$usuario_bloqueio = obterUsuarioBloqueado(0 + $objUsuarioGames->getId());
+										if ($usuario_bloqueio) {
+											echo "Sim. Motivo: " . utf8_decode($usuario_bloqueio['motivo']) . " - Data: " . $usuario_bloqueio['data_bloqueio'];
+										} else {
+											echo "Não possui bloqueio por fraude";
+										}
+										?></td>
 					<td></td>
 					<td><button type="button"
 							class="btn <?php echo $usuario_bloqueio ? "btn-success act-remove" : "btn-danger act-add" ?>"
 							style="font-weight: bold;" id="btn-bloqueio"><?php echo $usuario_bloqueio
-								? "Desbloquear usuário &#128275;"
-								: "Bloquear usuário &#9888;&#65039;" ?>
+																				? "Desbloquear usuário &#128275;"
+																				: "Bloquear usuário &#9888;&#65039;" ?>
 						</button></td>
 				</tr>
 
@@ -572,9 +589,9 @@ ob_end_flush();
 								<td align="left" class="texto">Habilitado para ONGAME (PB): </td>
 								<td align="left" class="texto">
 									&nbsp;&nbsp;&nbsp;&nbsp;<b><?php if (strtolower($objUsuarioGames->getUgOngame()) == 's')
-										echo "Sim";
-									else
-										echo "N&atilde;o"; ?></b>
+																	echo "Sim";
+																else
+																	echo "N&atilde;o"; ?></b>
 								</td>
 							</tr>
 						</table>
@@ -608,11 +625,11 @@ ob_end_flush();
 							$res_te = SQLexecuteQuery($sql);
 							if ($res_te_row = pg_fetch_array($res_te)) {
 								echo utf8_decode($res_te_row['te_descricao']);
-							}//end if($res_te_row = pg_fetch_array($res_te))
+							} //end if($res_te_row = pg_fetch_array($res_te))
 							else {
 								echo "ID n&atilde;o encontrado";
 							}
-						}// else if(is_null($objUsuarioGames->getTipoEstabelecimento()))
+						} // else if(is_null($objUsuarioGames->getTipoEstabelecimento()))
 						?>
 					</td>
 					<td><a class="link_azul" href="#"
@@ -656,7 +673,7 @@ ob_end_flush();
 							echo $objUsuarioGames->getSubstatusDescription();
 							if ($objUsuarioGames->getDataAprovacao() != "") {
 								echo "<br>Data de Aprovação do PDV em: <b>" . $objUsuarioGames->getDataAprovacao() . "</b>";
-							}//end if(!empty($objUsuarioGames->getDataAprovacao()))
+							} //end if(!empty($objUsuarioGames->getDataAprovacao()))
 							?>
 						</td>
 					</tr>
@@ -668,16 +685,16 @@ ob_end_flush();
 					<tr bgcolor="#F5F5FB" class="texto">
 						<td><b>Fat. Médio Mensal</b></td>
 						<td><?php if (isset($GLOBALS['CADASTRO_FATURAMENTO'][$objUsuarioGames->getFaturaMediaMensal()]))
-							echo $GLOBALS['CADASTRO_FATURAMENTO'][$objUsuarioGames->getFaturaMediaMensal()]; ?>
+								echo $GLOBALS['CADASTRO_FATURAMENTO'][$objUsuarioGames->getFaturaMediaMensal()]; ?>
 						</td>
 						<td><b>Qtde Computadores</b></td>
 						<td><?php if (isset($GLOBALS['CADASTRO_COMPUTADORES'][$objUsuarioGames->getComputadoresQtde()]))
-							echo $GLOBALS['CADASTRO_COMPUTADORES'][$objUsuarioGames->getComputadoresQtde()] ?>
-							</td>
-						</tr>
-						<tr bgcolor="#F5F5FB" class="texto">
-							<td><b>Cartões</b></td>
-							<td>
+								echo $GLOBALS['CADASTRO_COMPUTADORES'][$objUsuarioGames->getComputadoresQtde()] ?>
+						</td>
+					</tr>
+					<tr bgcolor="#F5F5FB" class="texto">
+						<td><b>Cartões</b></td>
+						<td>
 							<?php $cad_Cartoes = preg_split("/;/", $objUsuarioGames->getCartoes()); ?>
 							<?php if (isset($cad_Cartoes)) { ?>
 								<?php foreach ($cad_Cartoes as $CartaoId) { ?>
@@ -787,7 +804,7 @@ ob_end_flush();
 						</td>
 						<td><b>Cor secundária</b></td>
 						<td><?php
-						echo '<div style="
+							echo '<div style="
 									width: 90px;
 									height: 30px;
 									border-radius: 10px;
@@ -803,7 +820,7 @@ ob_end_flush();
 									">
 									' . htmlspecialchars($estilos['cor_secundaria']) . '
 									</div>';
-						?></td>
+							?></td>
 					</tr>
 					<tr bgcolor="#F5F5FB" class="texto">
 						<td><b>E-mail de suporte</b></td>
@@ -865,39 +882,39 @@ ob_end_flush();
 					<tr bgcolor="#F5F5FB" class="texto">
 						<td><b>Skype / Estilo resgate</b></td>
 						<td colspan="4" style="text-align: center; letter-spacing: 1.5px;"><?php
-						if ($objUsuarioGames->getReprLegalMSN() != "" && is_object(json_decode($objUsuarioGames->getReprLegalMSN()))) {
-							$dadosJson = json_decode($objUsuarioGames->getReprLegalMSN());
-							echo "<ul style='list-style: none;display: flex;justify-content: space-around;margin-bottom: 0;padding: 0;'>";
-							foreach ($dadosJson as $key => $value) {
-								if ($key != "EMAILMARK") {
-									echo "<li style='padding: 8px;'><span style='border: 1px solid #bbb;padding: 6px;'>" . ucfirst(strtolower($key)) . "</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $value . "</b></li>";
-								}
-								//echo "<li>E-MAIL MARKETING : </b>".$value."<b style='color: red;'> | </li>";
-							}
-							echo "</ul>";
-						} else {
-							echo $objUsuarioGames->getReprLegalMSN();
-						}
-						?></td>
+																							if ($objUsuarioGames->getReprLegalMSN() != "" && is_object(json_decode($objUsuarioGames->getReprLegalMSN()))) {
+																								$dadosJson = json_decode($objUsuarioGames->getReprLegalMSN());
+																								echo "<ul style='list-style: none;display: flex;justify-content: space-around;margin-bottom: 0;padding: 0;'>";
+																								foreach ($dadosJson as $key => $value) {
+																									if ($key != "EMAILMARK") {
+																										echo "<li style='padding: 8px;'><span style='border: 1px solid #bbb;padding: 6px;'>" . ucfirst(strtolower($key)) . "</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $value . "</b></li>";
+																									}
+																									//echo "<li>E-MAIL MARKETING : </b>".$value."<b style='color: red;'> | </li>";
+																								}
+																								echo "</ul>";
+																							} else {
+																								echo $objUsuarioGames->getReprLegalMSN();
+																							}
+																							?></td>
 					</tr>
 					<tr bgcolor="#F5F5FB" class="texto">
 						<td><b>Informe</b></td>
 						<td colspan="4" style="text-align: center; letter-spacing: 1.5px;"><?php
-						if ($objUsuarioGames->getReprLegalMSN() != "" && is_object(json_decode($objUsuarioGames->getReprLegalMSN()))) {
-							$dadosJson = json_decode($objUsuarioGames->getReprLegalMSN());
-							echo "<ul style='list-style: none;display: flex;justify-content: space-around;margin-bottom: 0;padding: 0;'>";
-							foreach ($dadosJson as $key => $value) {
-								if ($key == "EMAILMARK") {
-									echo "<li style='padding: 8px;display: flex;'><span style='border: 1px solid #bbb;padding: 6px;'>E-mail Marketing</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $value . "</b></li>";
-								}
-							}
-							echo "<li style='padding: 8px;display: flex;'><span style='border: 1px solid #bbb;padding: 6px;'>Representate Legal</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $objUsuarioGames->getReprLegalNome() . "</b></li>";
-							echo "<li style='padding: 8px;display: flex;'><span style='border: 1px solid #bbb;padding: 6px;'>Nome Fantasia</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $objUsuarioGames->getNomeFantasia() . "</b></li>";
-							echo "</ul>";
-						} else {
-							echo $objUsuarioGames->getReprLegalMSN();
-						}
-						?></td>
+																							if ($objUsuarioGames->getReprLegalMSN() != "" && is_object(json_decode($objUsuarioGames->getReprLegalMSN()))) {
+																								$dadosJson = json_decode($objUsuarioGames->getReprLegalMSN());
+																								echo "<ul style='list-style: none;display: flex;justify-content: space-around;margin-bottom: 0;padding: 0;'>";
+																								foreach ($dadosJson as $key => $value) {
+																									if ($key == "EMAILMARK") {
+																										echo "<li style='padding: 8px;display: flex;'><span style='border: 1px solid #bbb;padding: 6px;'>E-mail Marketing</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $value . "</b></li>";
+																									}
+																								}
+																								echo "<li style='padding: 8px;display: flex;'><span style='border: 1px solid #bbb;padding: 6px;'>Representate Legal</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $objUsuarioGames->getReprLegalNome() . "</b></li>";
+																								echo "<li style='padding: 8px;display: flex;'><span style='border: 1px solid #bbb;padding: 6px;'>Nome Fantasia</span><b style='padding: 6px;border: 1px solid #bbb;background-color: #dddddd;'>" . $objUsuarioGames->getNomeFantasia() . "</b></li>";
+																								echo "</ul>";
+																							} else {
+																								echo $objUsuarioGames->getReprLegalMSN();
+																							}
+																							?></td>
 					</tr>
 					<tr bgcolor="#FFFFFF" class="texto">
 						<td colspan="4" bgcolor="#ECE9D8">Principal Contato para assuntos relacionados à venda de crédito
@@ -949,7 +966,7 @@ ob_end_flush();
 					if ($res_socios && pg_num_rows($res_socios) > 0) {
 						$i = 0;
 						while ($res_row = pg_fetch_array($res_socios)) {
-							?>
+					?>
 							<tr bgcolor="#F5F5FB" class="texto">
 								<td colspan="4"><b>Sócio <?php echo ($i + 1); ?></b></td>
 							</tr>
@@ -966,7 +983,7 @@ ob_end_flush();
 								<td><?php echo formata_data($res_row['ugs_data_nascimento'], 0); ?></td>
 								<td colspan="2"></td>
 							</tr>
-							<?php
+						<?php
 							$i++;
 						}
 					} else {
@@ -975,7 +992,7 @@ ob_end_flush();
 							<td colspan="4"><b>*Sócios ainda não informados</b></font>
 							</td>
 						</tr>
-						<?php
+					<?php
 					}
 					?>
 					<tr bgcolor="#FFFFFF" class="texto">
@@ -1160,7 +1177,8 @@ ob_end_flush();
 					<td colspan="3"><?php echo $RISCO_CLASSIFICACAO_NOMES[$objUsuarioGames->getRiscoClassif()] ?>:
 						Descrição
 						'<b><?php echo $RISCO_CLASSIFICACAO_DESCRICAO[$objUsuarioGames->getRiscoClassif()] ?></b>'
-						<?php //&nbsp;&nbsp;&nbsp;[<_? if(bBloqueiaSePrepag($objUsuarioGames->getLogin())) { echo "<b><font color='#FF0000'>Esta LH pode ser habilitada para Pré-pago</font></b>"; } else { echo "Esta LH não pode ser habilitada para Pré-pago";  } ?_>] ?>
+						<?php //&nbsp;&nbsp;&nbsp;[<_? if(bBloqueiaSePrepag($objUsuarioGames->getLogin())) { echo "<b><font color='#FF0000'>Esta LH pode ser habilitada para Pré-pago</font></b>"; } else { echo "Esta LH não pode ser habilitada para Pré-pago";  } ?_>] 
+						?>
 					</td>
 				</tr>
 				<tr bgcolor="#F5F5FB" class="texto">
@@ -1184,13 +1202,13 @@ ob_end_flush();
 							$res_count = SQLexecuteQuery($sql);
 							$total_table = pg_num_rows($res_count);
 							//echo "sql: $sql<br>";
-//echo "total_table: $total_table<br>";
-							
+							//echo "total_table: $total_table<br>";
+
 							//		$sql .= " limit ".$max; 
-//		$sql .= " offset ".$inicial;
+							//		$sql .= " offset ".$inicial;
 							$rs_operadores = SQLexecuteQuery($sql);
 							//echo "sql: $sql<br>";
-							
+
 							?>
 							<table class="table">
 								<tr>
@@ -1204,8 +1222,8 @@ ob_end_flush();
 												Exibindo resultados <strong><?php echo $inicial + 1 ?></strong>
 												a <strong><?php echo $reg_ate ?></strong> de
 												<strong><?php echo $total_table ?></strong>
-											</font>
-										<?php } ?>
+										</font>
+									<?php } ?>
 									</td>
 									<td>
 										<div align="right"></div>
@@ -1249,7 +1267,7 @@ ob_end_flush();
 								$cor3 = "#E5E5Eb";
 
 								if ($rs_operadores) {
-									?>
+								?>
 									<?php
 									while ($rs_operadores_row = pg_fetch_array($rs_operadores)) {
 										if ($cor1 == $cor2) {
@@ -1257,7 +1275,7 @@ ob_end_flush();
 										} else {
 											$cor1 = $cor2;
 										}
-										?>
+									?>
 										<tr class="texto" bgcolor="<?php echo $cor1 ?>">
 											<td align="left"><?php echo $rs_operadores_row['ugo_id'] ?></td>
 											<td align="left"><?php echo $rs_operadores_row['ugo_nome'] ?> </td>
@@ -1276,24 +1294,24 @@ ob_end_flush();
 											</td>
 											<td align="center"><?php echo $rs_operadores_row['ugo_qtde_acessos'] ?> </td>
 
-							</td>
-							<td align="center">&nbsp;</td>
-						</tr>
-						<?php
+					</td>
+					<td align="center">&nbsp;</td>
+				</tr>
+			<?php
 									}
-									?>
-					</form>
-					<?php
+			?>
+			</form>
+		<?php
 								} else {
-									?>
-					<tr class="texto" bgcolor="<?php echo $cor1 ?>">
-						<td align="center" colspan="8">
-							<font color="#FF0000">Não foram encontrados funcionários</font>
-						</td>
-					</tr>
-					<?php
+		?>
+			<tr class="texto" bgcolor="<?php echo $cor1 ?>">
+				<td align="center" colspan="8">
+					<font color="#FF0000">Não foram encontrados funcionários</font>
+				</td>
+			</tr>
+		<?php
 								}
-								?>
+		?>
 			</table>
 
 			</div>
@@ -1317,10 +1335,10 @@ ob_end_flush();
 			if (!isset($inicial_v) || !$inicial_v)
 				$inicial_v = 0;
 			//if(b_IsUsuarioReinaldo()) { 
-//echo "<font color='#FF0000'>inicial_v: $inicial_v</font><br>";
-//echo "varsel: $varsel<br>";
-//}
-/*
+			//echo "<font color='#FF0000'>inicial_v: $inicial_v</font><br>";
+			//echo "varsel: $varsel<br>";
+			//}
+			/*
 			$sql  = "select vg.vg_id, vg.vg_data_inclusao, vg.vg_pagto_tipo, vg.vg_ultimo_status, vg.vg_concilia, 
 							sum(vgm.vgm_valor * vgm.vgm_qtde) as valor, sum(vgm.vgm_qtde) as qtde_itens, count(*) as qtde_produtos, 
 							sum(vgm.vgm_valor * vgm.vgm_qtde - vgm.vgm_valor * vgm.vgm_qtde * vgm_perc_desconto / 100) as repasse
@@ -1406,7 +1424,7 @@ ob_end_flush();
 								$pagto_tipo = "Boleto";
 							else
 								$pagto_tipo = $GLOBALS['FORMAS_PAGAMENTO_DESCRICAO'][$pagto_tipo];
-							?>
+						?>
 							<tr bgcolor="<?php echo $cor1 ?>">
 								<td class="texto" align="center"><a style="text-decoration:none"
 										href="/pdv/vendas/com_venda_detalhe.php?venda_id=<?php echo $rs_venda_row['vg_id'] ?>"><?php echo $rs_venda_row['vg_id'] ?></a>
@@ -1442,7 +1460,8 @@ ob_end_flush();
 								<?php } ?>
 							</tr>
 						<?php } ?>
-						<?php //paginacao_query($inicial_v, $total_table, $max, 9, $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial=$inicial", "inicial_v"); ?>
+						<?php //paginacao_query($inicial_v, $total_table, $max, 9, $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial=$inicial", "inicial_v"); 
+						?>
 					<?php } ?>
 				</table>
 			</div>
@@ -1466,9 +1485,9 @@ ob_end_flush();
 			if (!isset($inicial) || !$inicial)
 				$inicial = 0;
 			//if(b_IsUsuarioReinaldo()) { 
-//echo "<font color='#FF0000'>inicial: $inicial</font><br>";
-//echo "varsel: $varsel<br>";
-//}
+			//echo "<font color='#FF0000'>inicial: $inicial</font><br>";
+			//echo "varsel: $varsel<br>";
+			//}
 			$sql = "select * from dist_usuarios_games_log ugl " .
 				"where ugl.ugl_ug_id = " . $usuario_id;
 			//$rs_usuario_log = SQLexecuteQuery($sql);
@@ -1525,7 +1544,8 @@ ob_end_flush();
 								<td align="center"><?php echo $rs_usuario_log_row['ugl_obs'] ?></td>
 							</tr>
 						<?php } ?>
-						<?php //paginacao_query($inicial, $total_table, $max, 4, $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial_v=".$inicial_v); ?>
+						<?php //paginacao_query($inicial, $total_table, $max, 4, $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel."&inicial_v=".$inicial_v); 
+						?>
 					<?php } ?>
 				</table>
 			</div>
@@ -1564,10 +1584,10 @@ ob_end_flush();
 									 where opr.opr_status = '1'
 									 order by opr.opr_nome";
 									//echo $sql."<br>";
-//echo "formaId: ".$formaId." - formaId_num: ".$formaId_num."<br>";
-								
+									//echo "formaId: ".$formaId." - formaId_num: ".$formaId_num."<br>";
+
 									$rs_porFormaPagto = SQLexecuteQuery($sql);
-									?>
+								?>
 									<td valign="top">
 										<table class="table">
 											<tr bgcolor="#ECE9D8" class="texto">
@@ -1582,32 +1602,32 @@ ob_end_flush();
 											if ($rs_porFormaPagto)
 												while ($rs_porFormaPagto_row = pg_fetch_array($rs_porFormaPagto)) {
 													$des_perc_desconto = $rs_porFormaPagto_row['des_perc_desconto'];
-													?>
-													<tr class="texto" bgcolor="#F5F5FB">
-														<td>&nbsp;<nobr><?php echo $rs_porFormaPagto_row['opr_nome'] ?></nobr>
-														</td>
-														<td align="right">
-															<?php if (!is_null($des_perc_desconto)) { ?>
-																<a class="link_azul" href="#"
-																	Onclick="window.open('com_desconto_selecao.php?opr_nome=<?php echo urlencode($rs_porFormaPagto_row['opr_nome']) ?>&des_opr_codigo=<?php echo $rs_porFormaPagto_row['opr_codigo'] ?>&perc_desconto=<?php echo urlencode(number_format($des_perc_desconto, 2, ',', '.')) ?>&des_vg_pagto_tipo=<?php echo $formaId ?>&des_id=<?php echo $rs_porFormaPagto_row['des_id'] ?>&usuario_id=<?php echo $usuario_id ?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><?php echo number_format($des_perc_desconto, 2, ',', '.') ?>%</a>&nbsp;
-															<?php } else { ?>
-																<a class="link_azul" href="#"
-																	Onclick="window.open('com_desconto_selecao.php?opr_nome=<?php echo urlencode($rs_porFormaPagto_row['opr_nome']) ?>&des_opr_codigo=<?php echo $rs_porFormaPagto_row['opr_codigo'] ?>&perc_desconto=<?php echo urlencode("0,00") ?>&des_vg_pagto_tipo=<?php echo $formaId ?>&des_id=0&usuario_id=<?php echo $usuario_id ?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;">Inserir</a>&nbsp;
-															<?php } ?>
-														</td>
-														<td align="center">
-															<?php if (!is_null($des_perc_desconto)) { ?>
-																<a class="link_azul"
-																	Onclick="return confirm('Deseja excluir este desconto ?');"
-																	href="?acao=e&des_id=<?php echo $rs_porFormaPagto_row['des_id'] ?><?php echo $varsel ?>"
-																	title="Excluir desconto"><img src="../../images/deletar.gif"
-																		border="0"></a>
-															<?php } else { ?>
-																&nbsp;
-															<?php } ?>
-														</td>
-													</tr>
-												<?php } ?>
+											?>
+												<tr class="texto" bgcolor="#F5F5FB">
+													<td>&nbsp;<nobr><?php echo $rs_porFormaPagto_row['opr_nome'] ?></nobr>
+													</td>
+													<td align="right">
+														<?php if (!is_null($des_perc_desconto)) { ?>
+															<a class="link_azul" href="#"
+																Onclick="window.open('com_desconto_selecao.php?opr_nome=<?php echo urlencode($rs_porFormaPagto_row['opr_nome']) ?>&des_opr_codigo=<?php echo $rs_porFormaPagto_row['opr_codigo'] ?>&perc_desconto=<?php echo urlencode(number_format($des_perc_desconto, 2, ',', '.')) ?>&des_vg_pagto_tipo=<?php echo $formaId ?>&des_id=<?php echo $rs_porFormaPagto_row['des_id'] ?>&usuario_id=<?php echo $usuario_id ?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><?php echo number_format($des_perc_desconto, 2, ',', '.') ?>%</a>&nbsp;
+														<?php } else { ?>
+															<a class="link_azul" href="#"
+																Onclick="window.open('com_desconto_selecao.php?opr_nome=<?php echo urlencode($rs_porFormaPagto_row['opr_nome']) ?>&des_opr_codigo=<?php echo $rs_porFormaPagto_row['opr_codigo'] ?>&perc_desconto=<?php echo urlencode("0,00") ?>&des_vg_pagto_tipo=<?php echo $formaId ?>&des_id=0&usuario_id=<?php echo $usuario_id ?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;">Inserir</a>&nbsp;
+														<?php } ?>
+													</td>
+													<td align="center">
+														<?php if (!is_null($des_perc_desconto)) { ?>
+															<a class="link_azul"
+																Onclick="return confirm('Deseja excluir este desconto ?');"
+																href="?acao=e&des_id=<?php echo $rs_porFormaPagto_row['des_id'] ?><?php echo $varsel ?>"
+																title="Excluir desconto"><img src="../../images/deletar.gif"
+																	border="0"></a>
+														<?php } else { ?>
+															&nbsp;
+														<?php } ?>
+													</td>
+												</tr>
+											<?php } ?>
 										</table>
 									</td>
 								<?php } ?>
@@ -1625,20 +1645,22 @@ ob_end_flush();
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-	$("#btn-send-key").click(function () {
+	$("#btn-send-key").click(function() {
 		//alert("Em desenvolvimento");
 		$.ajax({
 			url: "/pdv/usuarios/ajaxReenvioChave.php",
 			method: "POST",
-			data: { id: $("#codigo-pdv").html() },
-			beforeSend: function () {
+			data: {
+				id: $("#codigo-pdv").html()
+			},
+			beforeSend: function() {
 				Swal.fire({
 					didOpen: () => {
 						Swal.showLoading()
 					}
 				})
 			},
-			complete: function (request, data) {
+			complete: function(request, data) {
 				Swal.close();
 				if (data == "success") {
 					let response = JSON.parse(request.responseText);
@@ -1658,7 +1680,7 @@ ob_end_flush();
 			}
 		});
 	});
-	$("#btn-remove-auth").click(function () {
+	$("#btn-remove-auth").click(function() {
 		Swal.fire({
 			title: "Tem certeza?",
 			text: "Esta ação removerá o autenticador do usuário!",
@@ -1671,15 +1693,18 @@ ob_end_flush();
 				$.ajax({
 					url: "/pdv/usuarios/ajaxRemoverAutenticador.php",
 					method: "POST",
-					data: { id: $("#codigo-pdv").html(), codigo: 'Gz8#kV2!mP$Xr9@tQw' },
-					beforeSend: function () {
+					data: {
+						id: $("#codigo-pdv").html(),
+						codigo: 'Gz8#kV2!mP$Xr9@tQw'
+					},
+					beforeSend: function() {
 						Swal.fire({
 							didOpen: () => {
 								Swal.showLoading()
 							}
 						});
 					},
-					complete: function (request, status) {
+					complete: function(request, status) {
 						Swal.close();
 						let response = JSON.parse(request.responseText);
 
@@ -1704,7 +1729,7 @@ ob_end_flush();
 			}
 		});
 	});
-	$("#btn-bloqueio").click(function () {
+	$("#btn-bloqueio").click(function() {
 		let acao = $("#btn-bloqueio").hasClass("act-add") ? "add" : "rm";
 
 		let msg = acao == "add" ? "Esta ação bloqueará o usuário!" : "Esta ação desbloqueará o usuário!";
@@ -1720,15 +1745,19 @@ ob_end_flush();
 				$.ajax({
 					url: "/pdv/usuarios/ajax_usuario_fraude.php",
 					method: "POST",
-					data: { ug_id: $("#codigo-pdv").html(), codigo: 'Gz8#kV2!mP$Xr9@tQw', acao: acao },
-					beforeSend: function () {
+					data: {
+						ug_id: $("#codigo-pdv").html(),
+						codigo: 'Gz8#kV2!mP$Xr9@tQw',
+						acao: acao
+					},
+					beforeSend: function() {
 						Swal.fire({
 							didOpen: () => {
 								Swal.showLoading()
 							}
 						});
 					},
-					complete: function (request, status) {
+					complete: function(request, status) {
 						Swal.close();
 						let response = JSON.parse(request.responseText);
 
@@ -1752,7 +1781,6 @@ ob_end_flush();
 			}
 		});
 	});
-
 </script>
 <?php
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
