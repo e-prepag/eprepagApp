@@ -139,6 +139,9 @@ while($rs_usuario_row = pg_fetch_array($rs_usuario)){
             case 4: 
                 $ug_vip = "Gold";
                 break;
+			case 5: 
+                $ug_vip = "Platinum";
+                break;
             default:
                 $ug_vip = "Categoria NÃO Registrada";
                 break;
