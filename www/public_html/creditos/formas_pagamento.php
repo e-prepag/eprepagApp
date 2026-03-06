@@ -65,20 +65,46 @@ if (isset($iforma)) {
     $iforma = false;
 }
 
-// Para fins de teste, algumas lans com minimo de R$1,00
-$valor_minimo = (($controller->usuarios->b_IsLogin_pagamento_minimo_1_real()) ? 1 : $GLOBALS['RISCO_LANS_PRE_VALOR_MIN']);
-$valor_maximo = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_VALOR_MAX'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_VALOR_MAX'] : $GLOBALS['RISCO_LANS_PRE_VALOR_MAX']))));
-
-if ($controller->usuarios->b_IsLogin_pagamento_platinum()) {
-    $valor_maximo = 150000;
+if (!isset($controller->usuarios) || !($controller->usuarios instanceof UsuarioGames)) {
+    die("Erro crítico: O objeto de usuário não foi instanciado corretamente no controller.");
 }
 
+$usr = $controller->usuarios;
+
+$valor_minimo = $usr->b_IsLogin_pagamento_minimo_1_real() ? 1 : $GLOBALS['RISCO_LANS_PRE_VALOR_MIN'];
+
+$nivel = $usr->getNivelPagamento();
+
+switch ($nivel) {
+    case 5:
+        $prefixo = 'RISCO_LANS_PRE_PLATINUM_';
+        break;
+    case 4:
+        $prefixo = 'RISCO_LANS_PRE_GOLD_';
+        break;
+    case 3:
+        $prefixo = 'RISCO_LANS_PRE_BLACK_';
+        break;
+    case 2:
+        $prefixo = 'RISCO_LANS_PRE_MASTER_';
+        break;
+    case 1:
+        $prefixo = 'RISCO_LANS_PRE_VIP_';
+        break;
+    case 0:
+    default:
+        $prefixo = 'RISCO_LANS_PRE_';
+        break; 
+}
+
+$valor_maximo = $GLOBALS[$prefixo . 'VALOR_MAX'];
+
 if ($GLOBALS['TIPO_LIMITE'] == 0) {
-    $valor_total_diario = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_TOTAL_DIARIO'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_TOTAL_DIARIO'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_TOTAL_DIARIO'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_TOTAL_DIARIO'] : $GLOBALS['RISCO_LANS_PRE_TOTAL_DIARIO']))));
-    $n_total_diario = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_PAGAMENTOS_DIARIO'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_PAGAMENTOS_DIARIO'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_PAGAMENTOS_DIARIO'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_PAGAMENTOS_DIARIO'] : $GLOBALS['RISCO_LANS_PRE_PAGAMENTOS_DIARIO']))));
+    $valor_total_diario = $GLOBALS[$prefixo . 'TOTAL_DIARIO'];
+    $n_total_diario     = $GLOBALS[$prefixo . 'PAGAMENTOS_DIARIO'];
 } else {
-    $valor_total_semanal = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_TOTAL_SEMANAL'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_TOTAL_SEMANAL'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_TOTAL_SEMANAL'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_TOTAL_SEMANAL'] : $GLOBALS['RISCO_LANS_PRE_TOTAL_SEMANAL']))));
-    $n_total_semanal = (($controller->usuarios->b_IsLogin_pagamento_vip()) ? $GLOBALS['RISCO_LANS_PRE_VIP_PAGAMENTOS_SEMANAL'] : (($controller->usuarios->b_IsLogin_pagamento_master()) ? $GLOBALS['RISCO_LANS_PRE_MASTER_PAGAMENTOS_SEMANAL'] : (($controller->usuarios->b_IsLogin_pagamento_black()) ? $GLOBALS['RISCO_LANS_PRE_BLACK_PAGAMENTOS_SEMANAL'] : (($controller->usuarios->b_IsLogin_pagamento_gold()) ? $GLOBALS['RISCO_LANS_PRE_GOLD_PAGAMENTOS_SEMANAL'] : $GLOBALS['RISCO_LANS_PRE_PAGAMENTOS_SEMANAL']))));
+    $valor_total_semanal = $GLOBALS[$prefixo . 'TOTAL_SEMANAL'];
+    $n_total_semanal     = $GLOBALS[$prefixo . 'PAGAMENTOS_SEMANAL'];
 }
 
 if (!isset($produtos_valor))
@@ -103,11 +129,6 @@ $btSubmit = isset($_REQUEST['btSubmit']) ? $_REQUEST['btSubmit'] : false;
 
 if ($btSubmit || $iforma) {
 
-    //        Variaveis do formulario
-    //        $parcelas_REDECARD_MASTERCARD = $_REQUEST['parcelas_REDECARD_MASTERCARD'];
-    //        $parcelas_REDECARD_DINERS = $_REQUEST['parcelas_REDECARD_DINERS'];
-
-    //Validacao
     $msg = "";
 
     //Valida opcao de pagamento
@@ -121,27 +142,13 @@ if ($btSubmit || $iforma) {
         if (!in_array($pagto, $FORMAS_PAGAMENTO))
             $msg = "Forma de pagamento inválida.";
     }
-    /*
-        if($msg == ""){
-                //Mastercard		
-                if($pagto == $FORMAS_PAGAMENTO['REDECARD_MASTERCARD']){
-                        if(!$parcelas_REDECARD_MASTERCARD || $parcelas_REDECARD_MASTERCARD == "" || !is_numeric($parcelas_REDECARD_MASTERCARD)) $msg = "Selecione qtde de parcelas.";
 
-                //Diners
-                } elseif($pagto == $FORMAS_PAGAMENTO['REDECARD_DINERS']){
-                        if(!$parcelas_REDECARD_DINERS || $parcelas_REDECARD_DINERS == "" || !is_numeric($parcelas_REDECARD_DINERS)) $msg = "Selecione qtde de parcelas.";
-                }
-        }
-    */
     //Adiciona dados no session
     if ($msg == "") {
         $_SESSION['dist_pagamento.pagto'] = $pagto;
         $_SESSION['dist_pagamento.total'] = $produtos_valor;
         $_SESSION['dist_pagamento.taxa'] = getTaxaPagtoOnline($iforma, $produtos_valor);
-        //echo "<span style='background-color:black; color:white'>";
-        //print_r($produtos_valor);
-        //echo "</span>";
-        //die;
+
         unset($_SESSION['pagamento.numorder']);
         unset($_SESSION['dist_pagamento.pagto_ja_fiz']);
         unset($_SESSION['dist_pagamento.parcelas.REDECARD_MASTERCARD']);
