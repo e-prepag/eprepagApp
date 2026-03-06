@@ -1341,35 +1341,38 @@ function redirect($strRedirect)
 
                                                         function getNVendasLH($idusuario)
                                                         {
-
                                                                 global $aIsLogin_pagamento_LH_testes;
                                                                 $qtde = 0;
 
-                                                                // Se for usuário de testes -> sem restrições
                                                                 if (in_array($idusuario, $aIsLogin_pagamento_LH_testes)) {
                                                                         return $qtde;
                                                                 }
 
-                                                                //SQL
-                                                                $sql = "select count(*) as qtde from tb_dist_venda_games ";
-                                                                $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
-                                                                $sql .= " and vg_data_inclusao>='" . date('Y-m-d H:i:s', strtotime("-1 days")) . "' and vg_ultimo_status=5 ";
-                                                                $sql .= " and (vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PIX_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'] . "); ";
+                                                                $formas_pagamento = array(
+                                                                        $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'],
+                                                                        $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'],
+                                                                        $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'],
+                                                                        $GLOBALS['PAGAMENTO_PIX_NUMERIC'],
+                                                                        $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']
+                                                                );
 
-                                                                //echo "<!-- sql: $sql\n -->";
+                                                                $lista_pagamentos = implode(',', $formas_pagamento);
+
+                                                                $sql  = "SELECT count(*) as qtde FROM tb_dist_venda_games ";
+                                                                $sql .= " WHERE vg_ug_id = " . SQLaddFields($idusuario, "");
+                                                                $sql .= " AND vg_data_inclusao >= NOW() - INTERVAL '24 hours' ";
+                                                                $sql .= " AND vg_ultimo_status = 5 ";
+                                                                $sql .= " AND vg_pagto_tipo IN (" . $lista_pagamentos . "); ";
+
                                                                 $rs = SQLexecuteQuery($sql);
+
                                                                 if ($rs && pg_num_rows($rs) > 0) {
                                                                         $rs_row = pg_fetch_array($rs);
-                                                                        $qtde = $rs_row['qtde'];
+                                                                        $qtde = (int)$rs_row['qtde'];
                                                                 }
-                                                                //echo "<!-- qtde: ".$rs_row['qtde']."\n-->";
-                                                                //echo $idusuario."-".$rs_row['qtde']."";
-
-                                                                // for Debug
                                                                 $mensagem = "In getNVendasLH(): " . PHP_EOL .
-                                                                        "qtde: " . $rs_row['qtde'] . PHP_EOL .
-                                                                        "idusuario: " . $idusuario . "";
-                                                                //					$sql.PHP_EOL.
+                                                                        "qtde: " . $qtde . PHP_EOL .
+                                                                        "idusuario: " . $idusuario;
 
                                                                 gravaLog_BloqueioPagtoOnline($mensagem);
 
@@ -1414,34 +1417,43 @@ function redirect($strRedirect)
 
                                                         function getVendasLHTotalDiarioOnline($idusuario)
                                                         {
-
                                                                 if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
-                                                                        //return 10000;
+                                                                        // return 10000;
                                                                 }
 
                                                                 global $aIsLogin_pagamento_LH_testes;
                                                                 $total = 0;
 
-                                                                // Se for usuário de testes -> sem restrições
                                                                 if (in_array($idusuario, $aIsLogin_pagamento_LH_testes)) {
                                                                         return $total;
                                                                 }
 
-                                                                //SQL
-                                                                $sql = "select sum(vg_pagto_valor_pago) as total from tb_dist_venda_games ";
-                                                                $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
-                                                                $sql .= " and vg_data_inclusao>='" . date('Y-m-d H:i:s', strtotime("-1 days")) . "' ";
-                                                                $sql .= " and (vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PIX_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'] . ") and vg_ultimo_status=5 ";
+                                                                $formas_pagamento = array(
+                                                                        $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'],
+                                                                        $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'],
+                                                                        $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'],
+                                                                        $GLOBALS['PAGAMENTO_PIX_NUMERIC'],
+                                                                        $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']
+                                                                );
+                                                                $lista_pagamentos = implode(',', $formas_pagamento);
+
+                                                                $sql  = "SELECT sum(vg_pagto_valor_pago) as total FROM tb_dist_venda_games ";
+                                                                $sql .= " WHERE vg_ug_id = " . SQLaddFields($idusuario, "");
+                                                                $sql .= " AND vg_data_inclusao >= NOW() - INTERVAL '24 hours' ";
+                                                                $sql .= " AND vg_ultimo_status = 5 ";
+                                                                $sql .= " AND vg_pagto_tipo IN (" . $lista_pagamentos . "); ";
+
                                                                 $rs = SQLexecuteQuery($sql);
+
                                                                 if ($rs && pg_num_rows($rs) > 0) {
                                                                         $rs_row = pg_fetch_array($rs);
-                                                                        $total = ($rs_row['total']) ? $rs_row['total'] : 0;
+                                                                        $total = !empty($rs_row['total']) ? (float)$rs_row['total'] : 0;
                                                                 }
 
-                                                                // for Debug
                                                                 $mensagem = "In getVendasLHTotalDiarioOnline(): " . PHP_EOL .
                                                                         "total: " . $total . PHP_EOL .
-                                                                        "idusuario: " . $idusuario . "";
+                                                                        "idusuario: " . $idusuario;
+
                                                                 gravaLog_BloqueioPagtoOnline($mensagem);
 
                                                                 return $total;
