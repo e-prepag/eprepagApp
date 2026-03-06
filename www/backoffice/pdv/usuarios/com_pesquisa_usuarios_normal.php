@@ -14,6 +14,12 @@ $ordem     = isset($_REQUEST['ordem']) ? (int)$_REQUEST['ordem'] : 1;
 $msg       = $_REQUEST['msg'] ?? '';
 $BtnSearch = $_REQUEST['BtnSearch'] ?? null;
 
+// Filtros de pesquisa
+$ug_id    = isset($_REQUEST['ug_id']) ? trim($_REQUEST['ug_id']) : '';
+$ug_id_int = ($ug_id !== '' ? (int)$ug_id : null);
+$ug_cnpj  = isset($_REQUEST['ug_cnpj']) ? trim($_REQUEST['ug_cnpj']) : '';
+$ug_cnpj_sql = ($ug_cnpj !== '' ? pg_escape_string($ug_cnpj) : '');
+
 $default_add  = nome_arquivo($PHP_SELF);
 $img_proxima  = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/proxima.gif";
 $img_anterior = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/anterior.gif";
@@ -26,28 +32,31 @@ $usuarioGames = new UsuarioGames(468);
 $totalPages = 0;
 $currentPage = 1;
 
-$sql  = "SELECT ug.ug_id, ug.ug_login, ug.ug_email, v.vg_valor, v.vg_qtde_itens, v.vg_data_primeira_venda, v.vg_data_ultima_venda, " . PHP_EOL;
-$sql .= "   (EXTRACT(epoch FROM (v.vg_data_ultima_venda - v.vg_data_primeira_venda))/(24*3600)) AS ndays, " . PHP_EOL;
-$sql .= "   (COALESCE((EXTRACT(epoch FROM (v.vg_data_ultima_venda - v.vg_data_primeira_venda))/(24*3600)), 1) / NULLIF(v.vg_qtde_itens, 0)) AS ndays_per_venda, " . PHP_EOL;
-$sql .= "   v.vg_valor_inc, v.vg_qtde_itens_inc, v.vg_data_primeira_venda_inc, v.vg_data_ultima_venda_inc " . PHP_EOL;
+$sql  = "SELECT ug.ug_id, ug.ug_login, ug.ug_email, v.vg_valor, v.vg_qtde_itens, v.vg_data_ultima_venda, " . PHP_EOL;
+$sql .= "   v.vg_valor_inc, v.vg_qtde_itens_inc, v.vg_data_ultima_venda_inc " . PHP_EOL;
 $sql .= "FROM dist_usuarios_games ug " . PHP_EOL;
 $sql .= "LEFT JOIN ( " . PHP_EOL;
 $sql .= "   SELECT vg.vg_ug_id, " . PHP_EOL;
 $sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 5 THEN vgm.vgm_valor * vgm.vgm_qtde ELSE 0 END) AS vg_valor, " . PHP_EOL;
 $sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 5 THEN vgm.vgm_qtde ELSE 0 END) AS vg_qtde_itens, " . PHP_EOL;
-$sql .= "       MIN(CASE WHEN vg.vg_ultimo_status = 5 THEN vg.vg_data_inclusao END) AS vg_data_primeira_venda, " . PHP_EOL;
-$sql .= "       MAX(CASE WHEN vg.vg_ultimo_status = 5 THEN vg.vg_data_inclusao END) AS vg_data_ultima_venda, " . PHP_EOL;
+$sql .= "       MAX(CASE WHEN vg.vg_ultimo_status = 5 THEN vg.vg_data_inclusao ELSE NULL END) AS vg_data_ultima_venda, " . PHP_EOL;
 $sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 6 THEN vgm.vgm_valor * vgm.vgm_qtde ELSE 0 END) AS vg_valor_inc, " . PHP_EOL;
 $sql .= "       SUM(CASE WHEN vg.vg_ultimo_status = 6 THEN vgm.vgm_qtde ELSE 0 END) AS vg_qtde_itens_inc, " . PHP_EOL;
-$sql .= "       MIN(CASE WHEN vg.vg_ultimo_status = 6 THEN vg.vg_data_inclusao END) AS vg_data_primeira_venda_inc, " . PHP_EOL;
-$sql .= "       MAX(CASE WHEN vg.vg_ultimo_status = 6 THEN vg.vg_data_inclusao END) AS vg_data_ultima_venda_inc " . PHP_EOL;
+$sql .= "       MAX(CASE WHEN vg.vg_ultimo_status = 6 THEN vg.vg_data_inclusao ELSE NULL END) AS vg_data_ultima_venda_inc " . PHP_EOL;
 $sql .= "   FROM tb_dist_venda_games vg " . PHP_EOL;
 $sql .= "   INNER JOIN tb_dist_venda_games_modelo vgm ON vg.vg_id = vgm.vgm_vg_id " . PHP_EOL;
 $sql .= "   WHERE vg.vg_ultimo_status IN (5, 6) " . PHP_EOL;
-$sql .= "       AND vg.vg_ug_id IN (SELECT ug_id FROM dist_usuarios_games WHERE ug_vip = 0) " . PHP_EOL;
 $sql .= "   GROUP BY vg.vg_ug_id " . PHP_EOL;
 $sql .= ") v ON v.vg_ug_id = ug.ug_id " . PHP_EOL;
 $sql .= "WHERE ug.ug_vip = 0 " . PHP_EOL;
+
+if ($ug_id_int !== null) {
+    $sql .= "   AND ug.ug_id = " . $ug_id_int . " " . PHP_EOL;
+}
+
+if ($ug_cnpj_sql !== '') {
+    $sql .= "   AND ug.ug_cnpj = '" . $ug_cnpj_sql . "' " . PHP_EOL;
+}
 
 if ($ordem == 1) {
 	$sql .= " order by " . $ncamp . " desc; ";
@@ -58,7 +67,17 @@ if ($ordem == 1) {
 $sql_limit = str_replace(";", "", $sql);
 $sql_limit .= " limit " . $max . " offset " . $inicial . ";";
 
-$sql_count = "SELECT count(ug_id) as total FROM dist_usuarios_games WHERE ug_vip = 0;";
+$sql_count = "SELECT count(ug_id) as total FROM dist_usuarios_games WHERE ug_vip = 0 ";
+
+if ($ug_id_int !== null) {
+    $sql_count .= "AND ug_id = " . $ug_id_int . " ";
+}
+
+if ($ug_cnpj_sql !== '') {
+    $sql_count .= "AND ug_cnpj = '" . $ug_cnpj_sql . "' ";
+}
+
+$sql_count .= ";";
 $rs_count = SQLexecuteQuery($sql_count);
 $row_count = pg_fetch_array($rs_count);
 $total_table = $row_count['total'];
@@ -92,23 +111,37 @@ ob_end_flush();
 	</ol>
 </div>
 
-<form name="form1" method="post" action="com_pesquisa_usuarios_vip.php">
-	<input type="hidden" name="ncamp" value="<?php echo htmlspecialchars($ncamp); ?>">
-	<input type="hidden" name="ordem" value="<?php echo htmlspecialchars($ordem); ?>">
-	<input type="hidden" name="range" value="<?php echo htmlspecialchars($range); ?>">
+<form name="form1" method="post" action="com_pesquisa_usuarios_normal.php">
+    <input type="hidden" name="ncamp" value="<?php echo htmlspecialchars($ncamp); ?>">
+    <input type="hidden" name="ordem" value="<?php echo htmlspecialchars($ordem); ?>">
+    <input type="hidden" name="range" value="<?php echo htmlspecialchars($range); ?>">
 
-	<table class="table">
-		<tr bgcolor="#F5F5FB">
-			<td align="right"><input type="submit" name="BtnSearch" value="Buscar" class="btn btn-info"></td>
-		</tr>
-		<?php if ($msg != "") { ?>
-			<tr class="texto">
-				<td align="center"><br><br>
-					<font color="#FF0000"><?php echo htmlspecialchars($msg); ?></font>
-				</td>
-			</tr>
-		<?php } ?>
-	</table>
+    <table class="table">
+        <tr bgcolor="#F5F5FB">
+            <td align="left">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="ug_id">Código:</label>
+                        <input type="text" name="ug_id" id="ug_id" value="<?php echo htmlspecialchars($ug_id); ?>" class="form-control" style="width: 100px;">
+                    </div>
+                    <div class="form-group" style="margin-left: 10px;">
+                        <label for="ug_cnpj">CNPJ:</label>
+                        <input type="text" name="ug_cnpj" id="ug_cnpj" value="<?php echo htmlspecialchars($ug_cnpj); ?>" class="form-control" style="width: 160px;">
+                    </div>
+                </div>
+            </td>
+            <td align="right" style="width: 1%; white-space: nowrap;">
+                <input type="submit" name="BtnSearch" value="Buscar" class="btn btn-info">
+            </td>
+        </tr>
+        <?php if ($msg != "") { ?>
+            <tr class="texto">
+                <td align="center" colspan="2"><br><br>
+                    <font color="#FF0000"><?php echo htmlspecialchars($msg); ?></font>
+                </td>
+            </tr>
+        <?php } ?>
+    </table>
 </form>
 
 <table class="fontsize-pp txt-preto" style="margin-left: -165px;">
@@ -200,113 +233,111 @@ ob_end_flush();
 								$cor2 = isset($query_cor1) ? $query_cor1 : '#FFFFFF';
 								$cor3 = isset($query_cor2) ? $query_cor2 : '#F5F5F5';
 
-								if ((pg_num_rows($rs) != 0) && ($rs)) {
-									while ($pgrs = pg_fetch_array($rs)) {
-										@$taxa_aproveitamento = 100. * $pgrs['vg_valor'] / ($pgrs['vg_valor'] + $pgrs['vg_valor_inc']);
-								?>
-										<tr bgcolor="<?php echo $cor1 ?>" class="texto" title="Taxa de aproveitamento: <?php echo number_format($taxa_aproveitamento, 2, ',', '.') ?>%">
-											<td align="center"><a href="com_usuario_detalhe.php?usuario_id=<?php echo $pgrs['ug_id']; ?>" target="_blank"><?php echo $pgrs['ug_id']; ?></a></td>
-											<td align="center" style="max-width: 350px;font-size: 10px;">
-												<nobr><?php echo trim((($pgrs['ug_login']) ? $pgrs['ug_login'] : "-")) ?></nobr>
-											</td>
-											<td align="center" style="max-width: 310px;font-size: 10px;"><?php echo trim($pgrs['ug_email']); ?></td>
-											<?php
-											$vg_qtde_itens = (($pgrs['vg_qtde_itens'] > 0) ? $pgrs['vg_qtde_itens'] : 1);
-											?>
-											<td align="right"><?php echo number_format($pgrs['vg_valor'], 2, ',', '.') ?></td>
-											<td align="right"><?php echo $vg_qtde_itens ?></td>
-											<td align="right"><?php echo number_format($pgrs['vg_valor'] / $vg_qtde_itens, 2, ',', '.') ?></td>
-											<td align="right" title="Primeira venda: '<?php echo substr($pgrs['vg_data_primeira_venda'], 0, 19) ?>'
-Dias entre 1a e última vendas: <?php echo number_format($pgrs['ndays'], 2, ',', '.') ?> 
-Média de dias por venda: <?php echo number_format($pgrs['ndays_per_venda'], 2, ',', '.') ?>">
-												<nobr><?php echo substr($pgrs['vg_data_ultima_venda'], 0, 19) ?></nobr>
-											</td>
-											<?php
-											$status = qtde_dias(substr($pgrs['vg_data_ultima_venda'], 8, 2) . "-" . substr($pgrs['vg_data_ultima_venda'], 5, 2) . "-" . substr($pgrs['vg_data_ultima_venda'], 0, 4), date('d-m-Y'));
-											if ($status <= $ATRASO_LANS_DIAS_LIM_1) {
-												$status_label   =   "<font color='#66CC00'>Frequente</font>";
-											} elseif ($status > $ATRASO_LANS_DIAS_LIM_1 && $status <= $ATRASO_LANS_DIAS_LIM_2) {
-												$status_label   =   "<font color='#FFCC00'>Atrasado</font>";
-											} elseif ($status > $ATRASO_LANS_DIAS_LIM_2) {
-												$status_label   =   "<font color='red'>Abandonou</font>";
-											}
-											?>
-											<td align="right" title="<?php echo $status . " dias sem comprar" ?>"><?php echo $status_label ?></td>
+                                if ((pg_num_rows($rs) != 0) && ($rs)) {
+                                    while ($pgrs = pg_fetch_array($rs)) {
+                                        @$taxa_aproveitamento = 100. * $pgrs['vg_valor'] / ($pgrs['vg_valor'] + $pgrs['vg_valor_inc']);
+                                ?>
+                                        <tr bgcolor="<?php echo $cor1 ?>" class="texto" title="Taxa de aproveitamento: <?php echo number_format($taxa_aproveitamento, 2, ',', '.') ?>%">
+                                            <td align="center"><a href="com_usuario_detalhe.php?usuario_id=<?php echo $pgrs['ug_id']; ?>" target="_blank"><?php echo $pgrs['ug_id']; ?></a></td>
+                                            <td align="center" style="max-width: 350px;font-size: 10px;">
+                                                <nobr><?php echo trim((($pgrs['ug_login']) ? $pgrs['ug_login'] : "-")) ?></nobr>
+                                            </td>
+                                            <td align="center" style="max-width: 310px;font-size: 10px;"><?php echo trim($pgrs['ug_email']); ?></td>
+                                            <?php
+                                            $vg_qtde_itens = (($pgrs['vg_qtde_itens'] > 0) ? $pgrs['vg_qtde_itens'] : 1);
+                                            ?>
+                                            <td align="right"><?php echo number_format($pgrs['vg_valor'], 2, ',', '.') ?></td>
+                                            <td align="right"><?php echo $vg_qtde_itens ?></td>
+                                            <td align="right"><?php echo number_format($pgrs['vg_valor'] / $vg_qtde_itens, 2, ',', '.') ?></td>
+                                            <td align="right">
+                                                <nobr><?php echo substr($pgrs['vg_data_ultima_venda'], 0, 19) ?></nobr>
+                                            </td>
+                                            <?php
+                                            $status = qtde_dias(substr($pgrs['vg_data_ultima_venda'], 8, 2) . "-" . substr($pgrs['vg_data_ultima_venda'], 5, 2) . "-" . substr($pgrs['vg_data_ultima_venda'], 0, 4), date('d-m-Y'));
+                                            if ($status <= $ATRASO_LANS_DIAS_LIM_1) {
+                                                $status_label   =   "<font color='#66CC00'>Frequente</font>";
+                                            } elseif ($status > $ATRASO_LANS_DIAS_LIM_1 && $status <= $ATRASO_LANS_DIAS_LIM_2) {
+                                                $status_label   =   "<font color='#FFCC00'>Atrasado</font>";
+                                            } elseif ($status > $ATRASO_LANS_DIAS_LIM_2) {
+                                                $status_label   =   "<font color='red'>Abandonou</font>";
+                                            }
+                                            ?>
+                                            <td align="right" title="<?php echo $status . " dias sem comprar" ?>"><?php echo $status_label ?></td>
 
 											<td align=""><strong>
 													<font class="texto">&nbsp;</font>
 												</strong></td>
 
-											<?php
-											$vg_qtde_itens_inc = (($pgrs['vg_qtde_itens_inc'] > 0) ? $pgrs['vg_qtde_itens_inc'] : 1);
-											?>
-											<td align="right"><?php echo number_format($pgrs['vg_valor_inc'], 2, ',', '.') ?></td>
-											<td align="right"><?php echo $vg_qtde_itens_inc ?></td>
-											<td align="right"><?php echo number_format($pgrs['vg_valor_inc'] / $vg_qtde_itens_inc, 2, ',', '.') ?></td>
-											<td align="right" title="Primeira venda: '<?php echo substr($pgrs['vg_data_primeira_venda_inc'], 0, 19) ?>'">
-												<nobr><?php echo substr($pgrs['vg_data_ultima_venda_inc'], 0, 19) ?></nobr>
-											</td>
-										</tr>
-								<?php
-									}
-								}
-								?>
-								<tr>
-									<td colspan="13" bgcolor="#FFFFFF" class="texto">
-										<?php echo (isset($search_msg) ? $search_msg : "") . number_format(getmicrotime() - $time_start, 2, ',', '.') . (isset($search_unit) ? $search_unit : "s"); ?>
-									</td>
-								</tr>
-							<?php
-						} else {
-							?>
-								<tr bgcolor="#ECE9D8" class="texto">
-									<td align="center" colspan="13"><b>Não foram encontrados registros</b></td>
-								</tr>
-							<?php
-						}
-							?>
-							</table>
-						</td>
-					</tr>
-				</table>
+                                            <?php
+                                            $vg_qtde_itens_inc = (($pgrs['vg_qtde_itens_inc'] > 0) ? $pgrs['vg_qtde_itens_inc'] : 1);
+                                            ?>
+                                            <td align="right"><?php echo number_format($pgrs['vg_valor_inc'], 2, ',', '.') ?></td>
+                                            <td align="right"><?php echo $vg_qtde_itens_inc ?></td>
+                                            <td align="right"><?php echo number_format($pgrs['vg_valor_inc'] / $vg_qtde_itens_inc, 2, ',', '.') ?></td>
+                                            <td align="right">
+                                                <nobr><?php echo substr($pgrs['vg_data_ultima_venda_inc'], 0, 19) ?></nobr>
+                                            </td>
+                                        </tr>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                <tr>
+                                    <td colspan="13" bgcolor="#FFFFFF" class="texto">
+                                        <?php echo (isset($search_msg) ? $search_msg : "") . number_format(getmicrotime() - $time_start, 2, ',', '.') . (isset($search_unit) ? $search_unit : "s"); ?>
+                                    </td>
+                                </tr>
+                            <?php
+                        } else {
+                            ?>
+                                <tr bgcolor="#ECE9D8" class="texto">
+                                    <td align="center" colspan="13"><b>Não foram encontrados registros</b></td>
+                                </tr>
+                            <?php
+                        }
+                            ?>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
 
-				<?php if ($totalPages > 1): ?>
-					<div style="margin-top: 20px; text-align: center;">
-						<ul class="pagination">
-							<li class="<?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
-								<?php $prevInicial = max(0, $inicial - $max); ?>
-								<a href="?inicial=<?php echo $prevInicial; ?>&ncamp=<?php echo htmlspecialchars($ncamp); ?>&ordem=<?php echo htmlspecialchars($ordem); ?>&range=<?php echo htmlspecialchars($range); ?>" aria-label="Anterior">
-									<span aria-hidden="true">&laquo; Anterior</span>
-								</a>
-							</li>
+                <?php if ($totalPages > 1): ?>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <ul class="pagination">
+                            <li class="<?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
+                                <?php $prevInicial = max(0, $inicial - $max); ?>
+                                <a href="?inicial=<?php echo $prevInicial; ?>&ncamp=<?php echo htmlspecialchars($ncamp); ?>&ordem=<?php echo htmlspecialchars($ordem); ?>&range=<?php echo htmlspecialchars($range); ?>&ug_id=<?php echo urlencode($ug_id); ?>&ug_cnpj=<?php echo urlencode($ug_cnpj); ?>" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo; Anterior</span>
+                                </a>
+                            </li>
 
 							<?php
 							// Opcional: limitar exibição para não quebrar layout caso haja muitas páginas (ex: exibir apenas +- 5 págs ao redor da atual)
 							$startPage = max(1, $currentPage - 5);
 							$endPage = min($totalPages, $currentPage + 5);
 
-							for ($i = $startPage; $i <= $endPage; $i++):
-								$calcInicial = ($i - 1) * $max;
-								$activeClass = ($currentPage == $i) ? 'active' : '';
-							?>
-								<li class="<?php echo $activeClass; ?>">
-									<a href="?inicial=<?php echo $calcInicial; ?>&ncamp=<?php echo htmlspecialchars($ncamp); ?>&ordem=<?php echo htmlspecialchars($ordem); ?>&range=<?php echo htmlspecialchars($range); ?>">
-										<?php echo $i; ?>
-									</a>
-								</li>
-							<?php endfor; ?>
+                            for ($i = $startPage; $i <= $endPage; $i++):
+                                $calcInicial = ($i - 1) * $max;
+                                $activeClass = ($currentPage == $i) ? 'active' : '';
+                            ?>
+                                <li class="<?php echo $activeClass; ?>">
+                                    <a href="?inicial=<?php echo $calcInicial; ?>&ncamp=<?php echo htmlspecialchars($ncamp); ?>&ordem=<?php echo htmlspecialchars($ordem); ?>&range=<?php echo htmlspecialchars($range); ?>&ug_id=<?php echo urlencode($ug_id); ?>&ug_cnpj=<?php echo urlencode($ug_cnpj); ?>">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
 
-							<li class="<?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
-								<?php $nextInicial = min(($totalPages - 1) * $max, $inicial + $max); ?>
-								<a href="?inicial=<?php echo $nextInicial; ?>&ncamp=<?php echo htmlspecialchars($ncamp); ?>&ordem=<?php echo htmlspecialchars($ordem); ?>&range=<?php echo htmlspecialchars($range); ?>" aria-label="Próxima">
-									<span aria-hidden="true">Próxima &raquo;</span>
-								</a>
-							</li>
-						</ul>
-					</div>
-				<?php endif; ?>
-		</td>
-	</tr>
+                            <li class="<?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
+                                <?php $nextInicial = min(($totalPages - 1) * $max, $inicial + $max); ?>
+                                <a href="?inicial=<?php echo $nextInicial; ?>&ncamp=<?php echo htmlspecialchars($ncamp); ?>&ordem=<?php echo htmlspecialchars($ordem); ?>&range=<?php echo htmlspecialchars($range); ?>&ug_id=<?php echo urlencode($ug_id); ?>&ug_cnpj=<?php echo urlencode($ug_cnpj); ?>" aria-label="Próxima">
+                                    <span aria-hidden="true">Próxima &raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+        </td>
+    </tr>
 </table>
 <?php
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
