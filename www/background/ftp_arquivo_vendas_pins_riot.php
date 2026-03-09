@@ -63,9 +63,9 @@ if(!$arquivoLog->haveFile()) {
            ";
     echo $sql.PHP_EOL;
     $rescommiss = pg_exec($connid,$sql);
-    $vetorComissao = "";
-    $vetorComissaoIOF = "";
-    $vetorAlicotaIOF = "";
+    $vetorComissao = [];
+    $vetorComissaoIOF = [];
+    $vetorAlicotaIOF = [];
     while ($rescommiss_row = pg_fetch_array($rescommiss)) {
         $rescommiss_row['co_canal'] = trim($rescommiss_row['co_canal']);
         $vetorAlicotaIOF[$rescommiss_row['co_opr_codigo']] = $rescommiss_row['opr_internacional_alicota'];
