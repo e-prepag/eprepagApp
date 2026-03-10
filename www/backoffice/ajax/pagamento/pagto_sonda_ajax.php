@@ -16,13 +16,14 @@ require_once $raiz_do_projeto . "includes/functionsPagamento.php";
 require_once $raiz_do_projeto . "includes/gamer/inc_functions_epp.php";
 require_once $raiz_do_projeto . "banco/bradesco/inc_urls_bradesco.php";
 require_once $raiz_do_projeto . "includes/gamer/functions_pagto.php";
+require_once $raiz_do_projeto . "includes/pix/RecebePix.php";
 
 $time_start = getmicrotime();
 
-// Dummy
-//if(!$iforma) {
-//	$iforma = 'I';
-//}
+$iforma            = $_REQUEST['iforma'] ?? null;
+$numcompra         = $_REQUEST['numcompra'] ?? null;
+$status            = $_REQUEST['status'] ?? null;
+$id_transacao_itau = $_REQUEST['id_transacao_itau'] ?? null;
 
 $date_now = date("H:i:s");
 
@@ -95,41 +96,32 @@ echo "<span style='font-size:10px; font-family: tahoma,arial,sans serif'>" . $da
 			} elseif ($tipo == "M") {
 				$tipoUsuario = $ARRAY_CONCATENA_ID_VENDA['gamer'];
 			} else {
-				echo "<font color='#FF0000'><b>Não consta Tipo de Pedido na Tabela de Pagamento (" . $numcompra . ").</b></font><br>";
+				echo "<font color='#FF0000'><b>NÃ£o consta Tipo de Pedido na Tabela de Pagamento (" . $numcompra . ").</b></font><br>";
 				exit;
 			}
 		}
 
-		$curl = curl_init();
+		// Define ambiente consumido pela classe RecebePix
+		$ambientePix = ($tipo == "LR") ? 'PDV' : 'USUARIO';
 
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => $server_url_bo.'/pix/confirmaPix.php',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'GET',
-			CURLOPT_POSTFIELDS => '{
-				  "response": {
-				    "message": {
-				      "status": "TRANSACAO_RECEBIDA",
-				      "id": "' . $tipoUsuario . $numcompra . '",
-				      "password": "$2y$10$9psPj6jdadcZQRH48VhXpuRaqCAnvmOWs2fMRcwHXAuCvv/o7fhZS" 
-				    }
-				  }
-				}',
-			CURLOPT_HTTPHEADER => array(
-				'Content-Type: application/json',
-			),
-		));
+		// Monta payload equivalente ao JSON enviado para confirmaPix.php
+		$payloadPix = (object)[
+			'response' => (object)[
+				'message' => (object)[
+					'status'   => 'TRANSACAO_RECEBIDA',
+					'id'       => $tipoUsuario . $numcompra,
+					'password' => '$2y$10$9psPj6jdadcZQRH48VhXpuRaqCAnvmOWs2fMRcwHXAuCvv/o7fhZS',
+				],
+			],
+		];
 
-		$response = curl_exec($curl);
-		$http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		curl_close($curl);
+		$pix = new RecebePix($ambientePix);
 
-		if ($http_code === 200 && strpos($response, "e-mail enviado com sucesso") !== false) {
+		ob_start();
+		$pix->conciliaPix($payloadPix);
+		$response = ob_get_clean();
+
+		if (strpos($response, "e-mail enviado com sucesso") !== false) {
 			$dataconfirma = date('d/m/Y H:i:s');
 			echo "[<font color='#009900'>Confirmado</font>]";
 			echo "<font color='#FF0000'>$dataconfirma<font>";

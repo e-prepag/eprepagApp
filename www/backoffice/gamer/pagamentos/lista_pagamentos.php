@@ -264,10 +264,10 @@ echo "$s_ids<hr>";
 					    $tipo = "Money_Express";
 					break;
 					case "LR":
-					    $tipo = "LH_Pré";
+					    $tipo = "LH_Pre";
 					break;
 					case "LO":
-                        $tipo = "LH_Pós";
+                        $tipo = "LH_Pos";
                     break;
                     default:
                         $tipo = "???";
