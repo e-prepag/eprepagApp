@@ -1115,6 +1115,9 @@ class EnvioEmailAutomatico
             $tmp_corpo_email = str_replace($key, $aux_value, $tmp_corpo_email);
         } //end foreach
 
+        $anoAtual = date('Y');
+        $tmp_corpo_email = str_replace('<<<ANO_ATUAL>>>', $anoAtual, $tmp_corpo_email);
+
         return $tmp_corpo_email;
     } //end function getCorpoEmail
 
