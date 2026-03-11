@@ -685,7 +685,6 @@ if ($msg == "") {
                 //echo "<pre>".print_r($cad_usuarioGames, true)."</pre>";
                 $instUsuarioGames = new UsuarioGames();
 
-                // Livrodjx dit it right
                 $is_ativo = $cad_usuarioGames->getAtivo();
                 $nome_fantasia = $cad_usuarioGames->getNomeFantasia();
                 $email = $cad_usuarioGames->getEmail();
@@ -696,7 +695,7 @@ if ($msg == "") {
 
                     if ($my_chave !== false) {
                         $envia_email = new EnvioEmailAutomatico('L', 'ChaveMestra');
-                        $envia_email->setUgNome(ucwords(strtolower($nome_fantasia)));
+                        $envia_email->setUgNome($nome_fantasia);
                         $envia_email->setChaveMestra($my_chave);
 
                         $to = $email;

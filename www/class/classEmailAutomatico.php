@@ -416,7 +416,7 @@ class EnvioEmailAutomatico
         "SenhaExMoney" => "SenhaExMoney.html",
 
         // Envio de Email com PINs através da LAN House para seus usuários
-        "CompraPontoVenda" => "CompraPontoVenda_jose.html",
+        "CompraPontoVenda" => "CompraPontoVenda.html",
 
         // Envio de Email com Compra de Serviços B2C
         "CompraB2C" => "CompraB2C.html",
@@ -1114,6 +1114,9 @@ class EnvioEmailAutomatico
             eval("\$aux_value = " . $value . ";");
             $tmp_corpo_email = str_replace($key, $aux_value, $tmp_corpo_email);
         } //end foreach
+
+        $anoAtual = date('Y');
+        $tmp_corpo_email = str_replace('<<<ANO_ATUAL>>>', $anoAtual, $tmp_corpo_email);
 
         return $tmp_corpo_email;
     } //end function getCorpoEmail
