@@ -211,3 +211,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 #Codigo para processar os workers o sleep como flock é feito para poder rodar a cada 30 segundos, pois o cron tem limite de 1 minuto
 * * * * * flock -n /tmp/processa_workers.lock /www/background/processa_workers.sh
 * * * * * sleep 30; flock -n /tmp/processa_workers.lock /www/background/processa_workers.sh
+
+#Rodar cron de inativar usuários automaticamente
+30 3 * * * /www/background/inativar_usuarios_falta_de_uso.sh
