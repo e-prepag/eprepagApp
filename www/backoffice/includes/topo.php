@@ -214,7 +214,7 @@ if ((strpos($urlVerifica, '/dashboard/pdv/index.php') !== false || strpos($urlVe
             </div>    
         </div>
         <div class="container-fluid borda-top-verde bg-info h-navbar">
-            <div class="container">
+            <div class="container container-large">
 	<nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">

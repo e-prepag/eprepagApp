@@ -1595,6 +1595,9 @@ pre code {
     .container {
         width: 1050px
     }
+    .container.container-large {
+        width: 1200px;
+    }
 }
 .container-fluid {
     padding-right: 15px;

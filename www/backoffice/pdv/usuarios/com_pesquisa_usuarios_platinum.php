@@ -111,13 +111,14 @@ ob_end_flush();
     </table>
 </form>
 
-<?php include "categorias_usuarios.php";?>
 
-<table class="fontsize-pp txt-preto" style="margin-left: -165px;">
+
+<table class="fontsize-pp txt-preto">
     <tr>
         <td valign="top">
             <table class="table">
                 <tr bgcolor="#ECE9D8" class="">
+                    <?php include "categorias_usuarios.php";?>
                 </tr>
             </table>
 
