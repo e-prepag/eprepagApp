@@ -416,7 +416,7 @@ class EnvioEmailAutomatico
         "SenhaExMoney" => "SenhaExMoney.html",
 
         // Envio de Email com PINs através da LAN House para seus usuários
-        "CompraPontoVenda" => "CompraPontoVenda_jose.html",
+        "CompraPontoVenda" => "CompraPontoVenda.html",
 
         // Envio de Email com Compra de Serviços B2C
         "CompraB2C" => "CompraB2C.html",
