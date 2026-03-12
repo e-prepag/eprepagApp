@@ -1,0 +1,1 @@
+cd /www/background/; php -q "notificar_usuarios_reativados.php" >/dev/null 2>&1
