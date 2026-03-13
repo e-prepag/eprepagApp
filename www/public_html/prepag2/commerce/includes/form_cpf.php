@@ -71,8 +71,8 @@ if (isset($_REQUEST['formsubmit'])) {
 
     //echo "<script>console.log('EPP')</script>";
 
-    if ($idade < 12) {
-        $errors[] = "A idade mínima para continuar o processo é de 12 anos.";
+    if ($idade < 16) {
+        $errors[] = "A idade mínima para continuar o processo é de 16 anos.";
     }
 
     //echo "<script>console.log('".$_REQUEST['data_nascimento']."')</script>";

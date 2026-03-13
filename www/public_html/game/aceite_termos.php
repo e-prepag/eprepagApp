@@ -276,7 +276,7 @@ $termosDeUso = strip_tags($termosDeUso);
                     <h5>Termo de Responsabilidade para pais e responsáveis:</h5>
                     <textarea class='contrato' rows='4' readonly
                         style='width: 100%; font-size: 13px; background-color: #00000005; text-align: justify; padding: 10px;'>
-Os usuários entre 12 e 18 anos devem certificar-se de ter lido o Termos e Condições de uso da Plataforma E-prepag, juntamente com seus pais ou responsáveis e que todo seu conteúdo tenha sido entendido e aprovado.
+Os usuários entre 16 e 18 anos devem certificar-se de ter lido o Termos e Condições de uso da Plataforma E-prepag, juntamente com seus pais ou responsáveis e que todo seu conteúdo tenha sido entendido e aprovado.
                     </textarea>
 
                 </div>
