@@ -14,6 +14,49 @@ require_once $raiz_do_projeto . "class/classIntegracaoPin.php";
 require_once $raiz_do_projeto . "class/classIntegracaoPinCash.php";
 require_once $raiz_do_projeto . "class/classControleIP.php";
 
+/**
+ * Validates the OAuth Token by calling the Go API
+ * This ensures token rotation and blacklist checks are performed.
+ */
+function validateOAuthToken($token) {
+    $apiUrl = 'https://auth-hml.eprepag.com.br/api/secure/profile';
+    
+    $ch = curl_init($apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $token",
+        "Content-Type: application/json"
+    ]);
+    
+    // In production, ensure SSL verification is appropriate for your environment
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // 200 means token is valid, active, and not blacklisted
+    return ($httpCode === 200);
+}
+
+// START OAUTH SECURE: Token validation check
+$headers = getallheaders();
+$authHeader = $headers['Authorization'] ?? '';
+
+if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    header('HTTP/1.1 401 Unauthorized');
+    exit('Unauthorized: Bearer token missing');
+}
+
+$token = $matches[1];
+
+// This is where you call your OAuth server or validate the JWT
+if (!validateOAuthToken($token)) {
+    header('HTTP/1.1 403 Forbidden');
+    exit('Unauthorized: Invalid or expired token');
+}
+// END OAUTH SECURE
+
 gravaLog_IntegracaoPIN("IP Tentativa: " . retorna_ip_acesso() . PHP_EOL . print_r($_POST, true));
 
 $dataAtual = date('Y-m-d H:i:s');
@@ -22,25 +65,26 @@ $ipReq = $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
 $infoAdicional = json_encode($_SERVER, JSON_UNESCAPED_UNICODE);
 
 if (!empty($_POST)) {
-	// Se $_POST existe e não está vazio
+	// Se $_POST existe e nï¿½o estï¿½ vazio
 	$informacoesReq = "Via POST: " . json_encode($_POST, JSON_UNESCAPED_UNICODE);
 } else {
-	// Se $_POST está vazio ou não está definido
+	// Se $_POST estï¿½ vazio ou nï¿½o estï¿½ definido
 
 	if (!empty($_GET)) {
 		$informacoesReq = "Via GET: " . json_encode($_GET, JSON_UNESCAPED_UNICODE);
 	} else if (!empty($_COOKIE))
 		$informacoesReq = "Via COOKIE: " . json_encode($_COOKIE, JSON_UNESCAPED_UNICODE);
 	else {
-		$informacoesReq = 'Sem informações de requisição POST, GET ou COOKIE';
+		$informacoesReq = 'Sem informaï¿½ï¿½es de requisiï¿½ï¿½o POST, GET ou COOKIE';
 	}
 }
 
 
-$mensagemLog = '****#### INÍCIO ####****' . PHP_EOL .
+$mensagemLog = '****#### INï¿½CIO ####****' . PHP_EOL .
 	'Data e Hora: ' . $dataAtual . PHP_EOL .
-	'Informações de REQUEST: ' . $informacoesReq . PHP_EOL .
+	'Informaï¿½ï¿½es de REQUEST: ' . $informacoesReq . PHP_EOL .
 	'IP de Acesso: ' . $ipReq . PHP_EOL .
+	'Informaï¿½ï¿½es Adicionais do Servidor: ' . $infoAdicional . PHP_EOL .
 	'****#### FIM ####****' . PHP_EOL . PHP_EOL;
 
 $fileLog = "/www/arquivos_gerados/logs/logCheckRedeemALL.txt";
@@ -53,7 +97,7 @@ if ($file) {
 }
 
 
-//Forçando todos os parametros em minusculo
+//Forï¿½ando todos os parametros em minusculo
 $_POST = array_change_key_case($_POST, CASE_LOWER);
 $id 		= isset($_POST["id"])			? $_POST["id"]			: null;
 
@@ -221,5 +265,5 @@ if ($action == '2' && (($id * 1) == 124 || ($id * 1) == 137)) {
 		echo ";PIN_VALUE=".$aux_pin_valueTOP."00";
 	} */
 
-//Fechando Conexão
+//Fechando Conexï¿½o
 pg_close($connid);
