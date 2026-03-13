@@ -9,6 +9,8 @@ require_once "/www/class/phpmailer/class.phpmailer.php";
 require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
 
+$logFile = '/www/arquivos_gerados/logs/notificar_usuarios_reativados.log';
+
 function logMessage($message)
 {
     global $logFile;
