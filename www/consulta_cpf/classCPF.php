@@ -50,7 +50,7 @@ class classCPF
                                                         'location' => CPF_SERVICE_URL,
                                                         'uri' => CPF_SERVICE_URL,
                                                         'cache_wsdl' => WSDL_CACHE_NONE,
-                                                        'soap_version' => SOAP_1_1,//SOAP_1_2,
+                                                        'soap_version' => SOAP_1_1, //SOAP_1_2,
                                                         //'encoding'	=> 'UTF-8',
                                                         'encoding' => 'ISO-8859-1',
                                                         'trace' => 1,
@@ -67,57 +67,57 @@ class classCPF
                                                 $this->set_service_status(true);
 
                                                 $this->logEvents("Service enable!\n", CPF_MSG_ERROR_LOG);
-                                        }//end if($testaConexao)
-                                }//end else do if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
+                                        } //end if($testaConexao)
+                                } //end else do if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
 
                         } catch (SoapFault $e) {
                                 $this->logEvents("Caught exception 1 (" . $e->faultcode . "): " . $e->getMessage() . PHP_EOL, CPF_MSG_ERROR_LOG);
                                 $this->set_error_system($e->getMessage());
                         }
-                }else{
+                } else {
                         $this->set_service_status(true);
                 }
-        }//end function __construct()
+        } //end function __construct()
 
         private function set_service_status($status)
         {
                 $this->service_online = $status;
-        }//end function set_service_status
+        } //end function set_service_status
 
         public function get_service_status()
         {
                 return $this->service_online;
-        }//end function get_service_status
+        } //end function get_service_status
 
         private function set_error_system($error)
         {
                 $this->error_system = $error;
-        }//end function set_error_system
+        } //end function set_error_system
 
         public function get_error_system()
         {
                 return $this->error_system;
-        }//end function get_error_system
+        } //end function get_error_system
 
         public function set_quantidade_limite($quantidade_limite)
         {
                 $this->quantidade_limite = $quantidade_limite;
-        }//end function set_quantidade_limite
+        } //end function set_quantidade_limite
 
         public function get_quantidade_limite()
         {
                 return $this->quantidade_limite;
-        }//end function get_quantidade_limite
+        } //end function get_quantidade_limite
 
         public function set_quantidade_contas($quantidade_contas)
         {
                 $this->quantidade_contas = $quantidade_contas;
-        }//end function set_quantidade_contas
+        } //end function set_quantidade_contas
 
         public function get_quantidade_contas()
         {
                 return $this->quantidade_contas;
-        }//end function get_quantidade_contas
+        } //end function get_quantidade_contas
 
         public function callService($typeOfService = '', $requestParams = array())
         {
@@ -131,7 +131,6 @@ class classCPF
                         } else {
                                 $this->soapClient = null;
                         }
-
                 } catch (SoapFault $e) {
                         $this->logEvents("Caught exception 2A (" . utf8_decode($e->faultcode) . "): " . utf8_decode($e->getMessage()) . PHP_EOL, CPF_MSG_ERROR_LOG, 0);
                         $this->set_error_system($e->getMessage());
@@ -184,13 +183,11 @@ class classCPF
 
                                         return $cpfResponseRecord;
                                 }
-
                         } catch (SoapFault $e) {
                                 $this->logEvents("<hr>ERRO" . PHP_EOL . "<pre>" . htmlentities(str_replace("><", ">\n<", $this->getTransactionMessages())) . "</pre>" . PHP_EOL . "<hr>", CPF_MSG_ERROR_LOG, 0);
                                 $this->logEvents("Caught exception 2B (" . utf8_decode($e->faultcode) . "): " . utf8_decode($e->getMessage()) . PHP_EOL . "MAX_EXECUTION_TIME : " . ini_get('max_execution_time') . PHP_EOL . "DEFAULT_SOCKET_TIMEOUT : " . ini_get('default_socket_timeout') . PHP_EOL, CPF_MSG_ERROR_LOG, 0);
                                 $this->set_error_system($e->getMessage());
                         }
-
                 } else {
                         $this->logEvents("Erro Interno 2C: soapClient não definido" . PHP_EOL, CPF_MSG_ERROR_LOG, 0);
                 }
@@ -220,7 +217,7 @@ class classCPF
                         $msg = "Erro Interno A: soapClient não definido";
                 }
                 return $msg;
-        }//end function getTransactionMessages
+        } //end function getTransactionMessages
 
 
         //Método para exibição da messagem de erro
@@ -271,9 +268,9 @@ class classCPF
                                 fclose($file);
                                 return $serialCheckResponseObj;
                         } //end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)
-                }//end if ($typeOfService == CPF_XML_REQUISICAO) 
+                } //end if ($typeOfService == CPF_XML_REQUISICAO) 
 
-        }//end 	function getRequestObject
+        } //end 	function getRequestObject
 
         // General method Response
         private function getResponseObject($typeOfService = '', $soapResponseData)
@@ -298,7 +295,7 @@ class classCPF
                         } //end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)
                 } //end if ($typeOfService == CPF_XML_REQUISICAO)
 
-        }//end function getResponseObject
+        } //end function getResponseObject
 
         public function Req_EfetuaConsulta($requestParams, &$lista_resposta)
         {
@@ -332,7 +329,6 @@ class classCPF
                                                 $this->logEvents("Resposta da consulta do CPF [" . $requestParams['cpfcnpj'] . "]:" . print_r($lista_resposta, true), CPF_MSG_ERROR_LOG, 0);
 
                                                 return $lista_resposta['retorno'];
-
                                         } else {
 
                                                 if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CAF) {
@@ -370,7 +366,6 @@ class classCPF
                                                                 }
                                                                 return 2;
                                                         }
-
                                                 } else {
 
                                                         require "/www/consulta_cpf/Onminidata.php";
@@ -411,13 +406,12 @@ class classCPF
                                                                 fwrite($file, str_repeat("*", 50) . "\n");
                                                                 fclose($file);
                                                         }
-
                                                 }
 
                                                 //retornando o código da consulta
                                                 if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY) {
                                                         return $responseCPF['resposta']['codigo'];
-                                                }//end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
+                                                } //end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
                                                 elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
 
                                                         $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
@@ -442,22 +436,20 @@ class classCPF
                                                         }
 
                                                         return $retorno; //$responseCPF['pesquisas']['status']
-                                                }//end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)
+                                                } //end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)
                                                 else {
                                                         return null;
                                                 }
+                                        } //end else do if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
 
-                                        }//end else do if (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
+                                } //end if($this->get_service_status())
 
-                                }//end if($this->get_service_status())
-
-                        }//end if(($this->consultaQuantidadeUtilizada($requestParams) < $this->get_quantidade_limite() && $this->consultaQuantidadeContas($requestParams) < $this->get_quantidade_contas()) || $this->estaWhiteList($requestParams))
+                        } //end if(($this->consultaQuantidadeUtilizada($requestParams) < $this->get_quantidade_limite() && $this->consultaQuantidadeContas($requestParams) < $this->get_quantidade_contas()) || $this->estaWhiteList($requestParams))
 
                         // Atingiu o limite máximo de utilização do CPF
                         else {
                                 return 171;
-
-                        }//end else do if($this->consultaQuantidadeUtilizada($requestParams) < $this->get_quantidade_limite() && $this->consultaQuantidadeContas($requestParams) < $this->get_quantidade_contas() || $this->estaWhiteList($requestParams))
+                        } //end else do if($this->consultaQuantidadeUtilizada($requestParams) < $this->get_quantidade_limite() && $this->consultaQuantidadeContas($requestParams) < $this->get_quantidade_contas() || $this->estaWhiteList($requestParams))
 
 
                 } //end if($this->naoEstaBlackList($requestParams))
@@ -467,12 +459,11 @@ class classCPF
 
                         return 299; //código penal para falsidade ideologica
 
-                }//end else do if($this->naoEstaBlackList($requestParams))
+                } //end else do if($this->naoEstaBlackList($requestParams))
 
                 //Sistema não respondendo
                 return $sret;
-
-        }//end function Req_EfetuaConsulta($requestParams,&$lista_resposta)
+        } //end function Req_EfetuaConsulta($requestParams,&$lista_resposta)
 
         private function logEvents($msg, $tipoLog = 'ERROR_LOG')
         {
@@ -491,7 +482,7 @@ class classCPF
                 $fp = fopen($fileLog, 'a+');
                 fwrite($fp, $log);
                 fclose($fp);
-        }//end function logEvents
+        } //end function logEvents
 
         public function array_to_xml(array $arr, SimpleXMLElement $xml)
         {
@@ -502,7 +493,7 @@ class classCPF
                                 $xml->addChild($k, $v);
                 }
                 return $xml;
-        }//end function array_to_xml
+        } //end function array_to_xml
 
         public function object_to_array($obj)
         {
@@ -543,7 +534,7 @@ class classCPF
                         } else {
                                 return false;
                         }
-                }//end else do if($cmdtuples===1)
+                } //end else do if($cmdtuples===1)
         } //end function counter()
 
         // consulta no parceiro Hub do desenvovedor
@@ -595,16 +586,13 @@ class classCPF
                         $cpfResponseRecord['pesquisas']['camposResposta']['nome'] = $busca_row['nome'];
                         $cpfResponseRecord['pesquisas']['camposResposta']['data_nascimento'] = $busca_row['data_nascimento'];
                         $cpfResponseRecord['retorno'] = 1;
-
                 } else {
 
                         //Retornando que não encontrou CPF no CACHE
                         $cpfResponseRecord['retorno'] = 2;
-
-                }//end else do if($cmdtuples===1)
+                } //end else do if($cmdtuples===1)
 
                 return $cpfResponseRecord;
-
         } //end function consultaCACHE()
 
         public function consultaQuantidadeUtilizada($requestParams)
@@ -621,13 +609,11 @@ class classCPF
 
                         $busca_row = pg_fetch_array($busca);
                         return $busca_row['qtde_utilizado'];
-
                 } else {
 
                         //Retornando que não encontrou CPF no CACHE
                         return 0;
-
-                }//end else do if($cmdtuples===1)
+                } //end else do if($cmdtuples===1)
 
         } //end function consultaQuantidadeUtilizada()
 
@@ -655,13 +641,11 @@ class classCPF
                                 $busca_row = pg_fetch_array($busca);
                                 return $busca_row['qtde_contas'];
                         }
-
                 } else {
 
                         //Retornando que não encontrou CPF no CACHE
                         return 0;
-
-                }//end else do if($cmdtuples===1)
+                } //end else do if($cmdtuples===1)
 
         } //end function consultaQuantidadeUtilizada()
 
@@ -690,7 +674,7 @@ class classCPF
                         } else {
                                 return false;
                         }
-                }//end else do if($cmdtuples===1)
+                } //end else do if($cmdtuples===1)
         } //end function adicionaQtdeContas
 
 
@@ -705,12 +689,10 @@ class classCPF
                 if ($busca && pg_num_rows($busca) === 1) {
                         //Retornando que Encontrou CPF na BlackList
                         return FALSE;
-
                 } else {
                         //Retornando que NÃO encontrou CPF na BlackList
                         return TRUE;
-
-                }//end else do if(pg_num_rows($busca)===1)
+                } //end else do if(pg_num_rows($busca)===1)
 
         } //end function naoEstaBlackList()
 
@@ -725,27 +707,36 @@ class classCPF
                 if ($busca && pg_num_rows($busca) === 1) {
                         //Retornando que Encontrou CPF na WhiteList
                         return TRUE;
-
                 } else {
                         //Retornando que NÃO encontrou CPF na WhiteList
                         return FALSE;
-
-                }//end else do if(pg_num_rows($busca)===1)
+                } //end else do if(pg_num_rows($busca)===1)
 
         } //end function estaWhiteList()
 
         public function verificaIdade($data_nascimento)
         {
-                $data_nascimento = explode("/", $data_nascimento);
-                $agora = explode("/", date("d/m/Y"));
+                // Detecta o formato
+                if (strpos($data_nascimento, '/') !== false) {
+                        $formato = 'd/m/Y';
+                } elseif (strpos($data_nascimento, '-') !== false) {
+                        $formato = 'Y-m-d';
+                } else {
+                        return 0; // formato inválido
+                }
+                
+                $data = DateTime::createFromFormat($formato, $data_nascimento);
 
-                if ($data_nascimento[0] > $agora[0]) {
-                        $agora[1] -= 1;
+                $erros = DateTime::getLastErrors();
+                if ($data === false || $erros['warning_count'] > 0 || $erros['error_count'] > 0) {
+                        return 0;
                 }
-                if ($data_nascimento[1] > $agora[1]) {
-                        $agora[2] -= 1;
-                }
-                return $agora[2] - $data_nascimento[2];
+
+                // Data atual
+                $hoje = new DateTime();
+
+                // Calcula idade
+                return $hoje->diff($data)->y;
         }
 
         public function __destruct()
@@ -762,8 +753,5 @@ class classCPF
                         $benchmark = new Benchmark($funcao, $sistema, $tempo, $erro_sistema);
                         $benchmark->save();
                 }
-
         }
-
 } //end class classCPF
-?>
