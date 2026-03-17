@@ -2699,6 +2699,30 @@ class UsuarioGames
             }
             $ret = SQLexecuteQuery($sql);
 
+            if (!is_null($objGamesUsuario->getAtivo())){
+                usleep(300000);
+
+                $sql_atualiza_obs = "UPDATE dist_usuarios_games_obs d
+                    SET ugo_user_insert = $1
+                    FROM (
+                        SELECT ug_id, ugo_data
+                        FROM dist_usuarios_games_obs
+                        WHERE ug_id = $2 AND ugo_status_user = $3 AND ugo_data >= NOW() - INTERVAL '5 seconds'
+                        ORDER BY ugo_data DESC
+                        LIMIT 1
+                    ) sub
+                    WHERE d.ug_id  = sub.ug_id
+                      AND d.ugo_data = sub.ugo_data;";
+
+                $params = [
+                    $GLOBALS['_SESSION']['userlogin_bko'],
+                    $objGamesUsuario->getId(),
+                    $objGamesUsuario->getAtivo()
+                ];
+                
+                SQLexecuteQueryParams($sql_atualiza_obs, $params);
+            }
+
             if (!$ret) $ret_all .= "Erro ao atualizar usuário." . PHP_EOL;
             else {
                 $ret = "";
