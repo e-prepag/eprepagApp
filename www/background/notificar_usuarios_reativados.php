@@ -62,7 +62,7 @@ try {
         $to = 'wesley.pereira@easygroupit.com, jose.carlos@easygroupit.com, rc@e-prepag.com.br, glaucia@e-prepag.com.br';
         $subject = 'Notificação de Reativação de Usuários';
 
-        $message = "<h1>(Teste José) Notificação de Reativação de Usuários</h1>";
+        $message = "<h1>Notificação de Reativação de Usuários</h1>";
         $message .= "<p>Os seguintes usuários foram reativados (status alterado para 1 - Ativo) recentemente:</p>";
         $message .= "<ul>";
 
