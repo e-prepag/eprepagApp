@@ -1556,7 +1556,7 @@ class UsuarioGames
 
         try {
             $sql = "SELECT ug_ativo FROM usuarios_games WHERE regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
-            if(!empty($usuarioId) && $usuarioId > 0){
+            if (!empty($usuarioId) && $usuarioId > 0) {
                 $sql .= " AND ug_id <> :ug_id";
             }
 
@@ -1566,7 +1566,7 @@ class UsuarioGames
 
             $rs = $pdo->prepare($sql);
             $rs->bindValue(':ug_cpf', $cpf, PDO::PARAM_STR);
-            if(!empty($usuarioId) && $usuarioId > 0){
+            if (!empty($usuarioId) && $usuarioId > 0) {
                 $usuarioId = (int) $usuarioId;
 
                 $rs->bindParam(":ug_id", $usuarioId, PDO::PARAM_INT);
@@ -1774,29 +1774,28 @@ class UsuarioGames
 
     public function existeCPFdoUsuario($usuario_id)
     {
-
         try {
-            // Inicializando a query base
             $sql = "select ug_cpf, ug_data_nascimento from usuarios_games where ug_id = :ug_id";
 
-            // Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
             $pdo = $con->getLink();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Passando a query de select
             $rs = $pdo->prepare($sql);
-
             $rs->bindParam(':ug_id', $usuario_id, PDO::PARAM_INT);
-
-            // Executando a query
             $rs->execute();
+
             $info = $rs->fetch(PDO::FETCH_ASSOC);
 
             if ($info != false) {
-                if (isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"]) && !empty($info["ug_data_nascimento"])) {
+                $cpfValido = isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"]);
+
+                $dataValida = !empty($info["ug_data_nascimento"]) && $this->validarDataReal($info["ug_data_nascimento"]);
+
+                if ($cpfValido && $dataValida) {
                     return "";
                 }
+
                 return "CPF INVALIDO";
             }
             return "ERRO CONSULTA";
@@ -1805,6 +1804,15 @@ class UsuarioGames
         } catch (Exception $e) {
             return "ERRO GERAL";
         }
+    }
+
+    private function validarDataReal($dataTimestamp)
+    {
+        $dataApenas = substr($dataTimestamp, 0, 10);
+
+        $d = DateTime::createFromFormat('Y-m-d', $dataApenas);
+
+        return $d && $d->format('Y-m-d') === $dataApenas;
     }
 
     function existeRG($rg, $usuario_id_excessao)
@@ -3066,7 +3074,7 @@ class UsuarioGames
                 $ret = "";
             }
 
-            if (!is_null($objGamesUsuario->getAtivo())){
+            if (!is_null($objGamesUsuario->getAtivo())) {
                 usleep(300000);
 
                 $sql_atualiza_obs = "UPDATE usuarios_games_obs d
@@ -3086,7 +3094,7 @@ class UsuarioGames
                     $objGamesUsuario->getId(),
                     $objGamesUsuario->getAtivo()
                 ];
-                
+
                 SQLexecuteQueryParams($sql_atualiza_obs, $params);
             }
         }
