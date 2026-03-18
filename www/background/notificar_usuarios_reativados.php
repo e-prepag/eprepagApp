@@ -28,7 +28,7 @@ $usuariosReativados = [];
 
 // Query para buscar os PDVs (dist_usuarios_games) reativados
 // Fazemos um JOIN da tabela _obs com a principal para capturar email e login
-$sqlDist = "SELECT u.ug_id, u.ug_login, u.ug_email, o.ugo_data AS data_reativacao, 'PDV' AS tipo_usuario
+$sqlDist = "SELECT u.ug_id, u.ug_login, u.ug_email, o.ugo_user_insert, o.ugo_data AS data_reativacao, 'PDV' AS tipo_usuario
                 FROM dist_usuarios_games u
                 INNER JOIN dist_usuarios_games_obs o ON u.ug_id = o.ug_id
                 WHERE o.ugo_status_user = 1 
@@ -36,7 +36,7 @@ $sqlDist = "SELECT u.ug_id, u.ug_login, u.ug_email, o.ugo_data AS data_reativaca
                 ORDER BY o.ugo_data DESC";
 
 // Query para buscar os Gamers (usuarios_games) reativados
-$sqlGamer = "SELECT u.ug_id, u.ug_login, u.ug_email, o.ugo_data AS data_reativacao, 'Gamer' AS tipo_usuario
+$sqlGamer = "SELECT u.ug_id, u.ug_login, u.ug_email, o.ugo_user_insert, o.ugo_data AS data_reativacao, 'Gamer' AS tipo_usuario
                  FROM usuarios_games u
                  INNER JOIN usuarios_games_obs o ON u.ug_id = o.ug_id
                  WHERE o.ugo_status_user = 1 
@@ -74,6 +74,7 @@ try {
             $message .= "<strong>Tipo:</strong> <span style='color: blue;'><b>" . $user['tipo_usuario'] . "</b></span><br>";
             $message .= "<strong>Login:</strong> " . $user['ug_login'] . "<br>";
             $message .= "<strong>Email:</strong> " . $user['ug_email'] . "<br>";
+            $message .= "<strong>Responsável:</strong> " . $user['ugo_user_insert'] . "<br>";
             $message .= "<strong>Data da Reativação:</strong> " . $dataFormatada . "</li><br>";
         }
 
