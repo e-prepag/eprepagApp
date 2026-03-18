@@ -467,7 +467,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
 	<?php				
 		 }else {
 ?>
-                    manipulaModal(1,"Usuários Bloqueados Momentaneamente para Compra","Erro"); 
+                    manipulaModal(1,"Seu cadastro está incompleto ou apresenta algum problema. Por favor, acesse ?Meu Cadastro? para revisar e corrigir seus dados. Caso o erro persista, entre em contato com o suporte.","Erro"); 
                     $('#modal-load').on('hidden.bs.modal', function () { location.href='/game/' });
                     </script>
 <?php

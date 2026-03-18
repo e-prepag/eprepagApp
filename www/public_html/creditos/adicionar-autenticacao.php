@@ -241,11 +241,7 @@ if ($authData) {
 
                     </ol>
                     <div style="width: 100%; display: flex; justify-content: center;">
-                        <iframe width="300" height="170px" src="https://www.youtube.com/embed/H_19Cv6jSDU"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
+                        <iframe width="300" height="170" src="https://www.youtube.com/embed/H_19Cv6jSDU" title="Tutorial autenticador" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>

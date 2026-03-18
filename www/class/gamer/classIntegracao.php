@@ -4574,7 +4574,7 @@ function endereco_page($preencher_endereco)
 function cpf_page($partner_list)
 {
 	if (isset($GLOBALS['_SESSION']['usuarioGames_ser']) && !is_null($GLOBALS['_SESSION']['usuarioGames_ser'])) {
-		
+
 		$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 		$usuarioId = $usuarioGames->getId();
 	}
@@ -4587,7 +4587,7 @@ function cpf_page($partner_list)
 
 	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf)  && validarDataReal($user->ug_dDataNascimento);
 
 	//Ajustando dados de CPF para usuários cadastrados no sistema antes de usar a integração
 	/*
@@ -4633,7 +4633,7 @@ function cpf_page($partner_list)
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
-			if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_dDataNascimento)) {
 				$_REQUEST['formsubmit'] = true;
 				$_REQUEST['cpf'] = $user->ug_cpf;
 				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4649,30 +4649,39 @@ function cpf_page($partner_list)
 
 function converterDataParaISO($data)
 {
-    // Se a variável estiver vazia ou não for string, retorna false
-    if (empty($data) || !is_string($data)) {
-        return false;
-    }
+	// Se a variável estiver vazia ou não for string, retorna false
+	if (empty($data) || !is_string($data)) {
+		return false;
+	}
 
-    // TENTATIVA 1: Verifica se é formato Brasileiro (dd/mm/yyyy)
-    $d = DateTime::createFromFormat('d/m/Y', $data);
-    
-    // O operador && verifica duas coisas:
-    // 1. Se o objeto DateTime foi criado com sucesso ($d)
-    // 2. Se a formatação de volta para string é idêntica à entrada (Isso evita datas como 30/02/2023 virarem 02/03/2023)
-    if ($d && $d->format('d/m/Y') === $data) {
-        return $d->format('Y-m-d');
-    }
+	// TENTATIVA 1: Verifica se é formato Brasileiro (dd/mm/yyyy)
+	$d = DateTime::createFromFormat('d/m/Y', $data);
 
-    // TENTATIVA 2: Verifica se já é formato ISO (yyyy-mm-dd)
-    $d = DateTime::createFromFormat('Y-m-d', $data);
-    
-    if ($d && $d->format('Y-m-d') === $data) {
-        return $data; // Já está no formato certo
-    }
+	// O operador && verifica duas coisas:
+	// 1. Se o objeto DateTime foi criado com sucesso ($d)
+	// 2. Se a formatação de volta para string é idêntica à entrada (Isso evita datas como 30/02/2023 virarem 02/03/2023)
+	if ($d && $d->format('d/m/Y') === $data) {
+		return $d->format('Y-m-d');
+	}
 
-    // Se não casou com nenhum dos dois formatos ou é data inválida
-    return false;
+	// TENTATIVA 2: Verifica se já é formato ISO (yyyy-mm-dd)
+	$d = DateTime::createFromFormat('Y-m-d', $data);
+
+	if ($d && $d->format('Y-m-d') === $data) {
+		return $data; // Já está no formato certo
+	}
+
+	// Se não casou com nenhum dos dois formatos ou é data inválida
+	return false;
+}
+
+function validarDataReal($dataTimestamp)
+{
+	$dataApenas = substr($dataTimestamp, 0, 10);
+
+	$d = DateTime::createFromFormat('Y-m-d', $dataApenas);
+
+	return $d && $d->format('Y-m-d') === $dataApenas;
 }
 
 function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
@@ -4683,7 +4692,7 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 
 	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_dDataNascimento);
 
 	if ($is_data_valid && $vg_integracao_parceiro_origem_id == 10422) {
 
@@ -4717,7 +4726,7 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
-			if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_dDataNascimento)) {
 				$_REQUEST['formsubmit'] = true;
 				$_REQUEST['cpf'] = $user->ug_cpf;
 				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4812,7 +4821,7 @@ function cpf_page_gamer()
 
 	$user = getUserFromId($usuarioGames->getId());
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_dDataNascimento);
 
 	$logFilePath = '/www/arquivos_gerados/txts/cpf_log.txt';
 
@@ -4855,7 +4864,7 @@ function cpf_page_gamer()
 		} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 		//Validando a data da consulta
-		if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+		if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_dDataNascimento)) {
 			$_POST['formsubmit'] = true;
 			$_POST['cpf'] = $user->ug_cpf;
 			$_POST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4913,40 +4922,39 @@ function verificaIdadeMinima($dataNascimento)
 	}
 }
 
-function buscarVinculoPorEmail(string $email) 
+function buscarVinculoPorEmail(string $email)
 {
 	$emailUpper = strtoupper($email);
 	$pdo = ConnectionPDO::getConnection()->getLink();
 
-    $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
+	$sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
 				JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
 				WHERE UPPER(ugv.email) = :email AND ug_ativo = 1 LIMIT 1";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
-    $stmt->execute();
 
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+	$stmt = $pdo->prepare($sql);
+	$stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+	$stmt->execute();
 
-    return $resultado ?? null;
+	$resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+	return $resultado ?? null;
 }
 
-function criarVinculoUsuario(int $ugId, string $email): void 
+function criarVinculoUsuario(int $ugId, string $email): void
 {
 	$pdo = ConnectionPDO::getConnection()->getLink();
-    try {
-        $emailUpper = strtoupper($email);
+	try {
+		$emailUpper = strtoupper($email);
 
-        $sql = "INSERT INTO usuarios_games_vinculo (ug_id, email) VALUES (:ug_id, :email)";
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':ug_id', $ugId, PDO::PARAM_INT);
-        $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
-        
-        $stmt->execute();
+		$sql = "INSERT INTO usuarios_games_vinculo (ug_id, email) VALUES (:ug_id, :email)";
 
-    } catch (PDOException $e) {
-        error_log("Erro ao inserir em usuarios_games_vinculo: " . $e->getMessage());
-    }
+		$stmt = $pdo->prepare($sql);
+		$stmt->bindValue(':ug_id', $ugId, PDO::PARAM_INT);
+		$stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+
+		$stmt->execute();
+	} catch (PDOException $e) {
+		error_log("Erro ao inserir em usuarios_games_vinculo: " . $e->getMessage());
+	}
 }
 ?>

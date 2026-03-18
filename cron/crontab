@@ -214,3 +214,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 #Rodar cron de inativar usuários automaticamente
 30 3 * * * /www/background/inativar_usuarios_falta_de_uso.sh
+
+#Notificar usuarios reativados
+0 7 * * * bash /www/background/notificar_usuarios_reativados.sh
