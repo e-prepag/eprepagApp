@@ -381,7 +381,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
         if (count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1') {
             echo "<script>$(function(){ showMessage('" . $msg . "'); });</script>";
             die();
-        } 
+        }
         ?>
         <div class="wrapper txt-preto int-box" style="width: 100% !important; max-width: 100% !important;">
             <div class="container-fluid">
@@ -396,7 +396,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                             style="position: relative; top: -2px; text-decoration: none;">
                         </a>
                         <p class="text-muted" style="margin-top: 5px;">
-                            <i>O CPF será solicitado apenas na sua primeira compra no jogo.</i>
+                            <i>O CPF será solicitado apenas na sua primeira compra no jogo. A idade mínima para realizar compras é de 16 anos.</i>
                         </p>
                     </div>
                 </div>

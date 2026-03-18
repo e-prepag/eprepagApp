@@ -29,93 +29,50 @@ try {
     exit(1);
 }
 
-function inativarUsuarios($pdo, $tabelaUsuario, $tabelaObs)
+function inativarUsuarios($pdo, $tabelaUsuario)
 {
     logMessage("Iniciando inativação para a tabela: $tabelaUsuario");
-    $usuariosInativados = [];
+    $countInativados = 0;
 
     try {
-        $pdo->beginTransaction();
-
-        // Busca usuários sem acesso há mais de 1 ano e que ainda não estão inativados
-        $sqlBusca = "SELECT ug_id, ug_login, ug_email, ug_data_ultimo_acesso FROM {$tabelaUsuario} 
-                     WHERE ug_data_ultimo_acesso <= NOW() - INTERVAL '1 year' 
-                     AND ug_ativo = 1
-                     LIMIT 500";
-
-        $stmtBusca = $pdo->prepare($sqlBusca);
-        $stmtBusca->execute();
-        $usuarios = $stmtBusca->fetchAll(PDO::FETCH_ASSOC);
-
-        $total = count($usuarios);
-        logMessage("Encontrados $total usuários inativos na tabela $tabelaUsuario.");
-
-        if ($total > 0) {
-            // Prepara a query de update
-            $sqlUpdate = "UPDATE {$tabelaUsuario} 
-                          SET ug_ativo = 6 
-                          WHERE ug_id = :ug_id";
-            $stmtUpdate = $pdo->prepare($sqlUpdate);
-
-            // Prepara a query de histórico/observação
-            $sqlInsertObs = "INSERT INTO {$tabelaObs} (ug_id, ug_obs, ugo_user_insert, ugo_data) 
-                             VALUES (:ug_id, :ug_obs, :ugo_user_insert, NOW())";
-            $stmtInsert = $pdo->prepare($sqlInsertObs);
-
-            $countInativados = 0;
-            foreach ($usuarios as $usuario) {
-                // Atualiza código do usuário
-                $stmtUpdate->execute([':ug_id' => $usuario['ug_id']]);
-
-                // Adiciona log na tabela de obs
-                $stmtInsert->execute([
-                    ':ug_id' => $usuario['ug_id'],
-                    ':ug_obs' => 'mensagem usuário inativado por falta de uso',
-                    ':ugo_user_insert' => 'Sistema'
-                ]);
-                $countInativados++;
-                $usuariosInativados[] = $usuario;
-            }
-
-            logMessage("Sucesso: $countInativados usuários inativados com sucesso.");
-        }
-
-        $pdo->commit();
-        logMessage("Processo finalizado com sucesso para $tabelaUsuario.");
+        // Update em bulk sem limite
+        $sqlUpdate = "UPDATE {$tabelaUsuario} 
+                      SET ug_ativo = 6 
+                      WHERE ug_data_ultimo_acesso <= NOW() - INTERVAL '1 year' 
+                      AND ug_ativo = 1";
+        
+        $stmtUpdate = $pdo->prepare($sqlUpdate);
+        $stmtUpdate->execute();
+        
+        $countInativados = $stmtUpdate->rowCount();
+        
+        logMessage("Sucesso: $countInativados usuários inativados na tabela $tabelaUsuario.");
     } catch (Exception $e) {
-        $pdo->rollBack();
         logMessage("Erro ao processar a tabela $tabelaUsuario: " . $e->getMessage());
     }
-    return $usuariosInativados;
+    
+    return $countInativados;
 }
 
-$todosInativados = [];
-
 // Executar para dist_usuarios_games
-$inativadosDist = inativarUsuarios($pdo, 'dist_usuarios_games', 'dist_usuarios_games_obs');
-$todosInativados = array_merge($todosInativados, $inativadosDist);
+$inativadosDist = inativarUsuarios($pdo, 'dist_usuarios_games');
 
 // Executar para usuarios_games
-$inativadosGames = inativarUsuarios($pdo, 'usuarios_games', 'usuarios_games_obs');
-$todosInativados = array_merge($todosInativados, $inativadosGames);
+$inativadosGames = inativarUsuarios($pdo, 'usuarios_games');
 
-if (count($todosInativados) > 0) {
-    logMessage("Montando e-mail de notificação para compliance. Total de inativados: " . count($todosInativados));
+$totalGeral = $inativadosDist + $inativadosGames;
+
+if ($totalGeral > 0) {
+    logMessage("Montando e-mail de notificação para compliance. Total de inativados: $totalGeral");
 
     $to = 'wesley.pereira@easygroupit.com, jose.carlos@easygroupit.com, rc@e-prepag.com.br, glaucia@e-prepag.com.br';
     $subject = 'Notificação de Inativação de Usuários por Falta de Uso';
 
     $message = "<h1>Notificação de Inativação de Usuários</h1>";
-    $message .= "<p>Os seguintes usuários foram inativados por estarem há mais de 1 ano sem acessar o sistema:</p>";
+    $message .= "<p>Foram inativados <strong>$totalGeral</strong> usuários por estarem há mais de 1 ano sem acessar o sistema.</p>";
     $message .= "<ul>";
-
-    foreach ($todosInativados as $user) {
-        $message .= "<li><strong>UG ID:</strong> " . $user['ug_id'] . "<br>";
-        $message .= "<strong>Login:</strong> " . $user['ug_login'] . "<br>";
-        $message .= "<strong>Email:</strong> " . $user['ug_email'] . "<br>";
-        $message .= "<strong>Último Acesso:</strong> " . $user['ug_data_ultimo_acesso'] . "</li><br>";
-    }
-
+    $message .= "<li><strong>PDVs:</strong> $inativadosDist usuários inativados</li>";
+    $message .= "<li><strong>Gamers:</strong> $inativadosGames usuários inativados</li>";
     $message .= "</ul>";
 
     if (function_exists('enviaEmail3')) {
