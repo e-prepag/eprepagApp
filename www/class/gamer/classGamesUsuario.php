@@ -1777,7 +1777,7 @@ class UsuarioGames
 
         try {
             // Inicializando a query base
-            $sql = "select ug_cpf from usuarios_games where ug_id = :ug_id";
+            $sql = "select ug_cpf, ug_data_nascimento from usuarios_games where ug_id = :ug_id";
 
             // Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
@@ -1794,7 +1794,7 @@ class UsuarioGames
             $info = $rs->fetch(PDO::FETCH_ASSOC);
 
             if ($info != false) {
-                if (isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"])) {
+                if (isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"]) && !empty($info["ug_data_nascimento"])) {
                     return "";
                 }
                 return "CPF INVALIDO";
