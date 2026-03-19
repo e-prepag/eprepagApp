@@ -2174,7 +2174,7 @@ if ($msg != "") {
 
                                 <td><?php echo $rs_usuario_row['ug_ficou_sabendo']; ?></td>
                                 <td><?php echo substr($rs_usuario_row['ug_data_inclusao'], 0, 10) ?></td>
-                                <td align="center"><?php echo ($rs_usuario_row['ug_ativo'] != 1 && !empty($rs_usuario_row['ug_data_encerramento_conta'])) ? substr($rs_usuario_row['ug_data_encerramento_conta'], 0, 10) : 'Ativo'; ?></td>
+                                <td align="center"><?php echo ($rs_usuario_row['ug_ativo'] != 1 && !empty($rs_usuario_row['ug_data_encerramento_conta'])) ? substr($rs_usuario_row['ug_data_encerramento_conta'], 0, 10) : 'Não possui'; ?></td>
                                 <td><?php echo $rs_usuario_row['ug_tipo_end'] ?> <?php echo $rs_usuario_row['ug_endereco'] ?>, <?php echo $rs_usuario_row['ug_numero'] ?> <?php echo $rs_usuario_row['ug_complemento'] ?> </td>
                                 <td><?php echo $rs_usuario_row['ug_bairro'] ?></td>
                                 <td><?php echo $rs_usuario_row['ug_cidade'] ?></td>
@@ -2318,6 +2318,7 @@ if ($msg != "") {
 
                                 <td><?php echo $rs_usuario_row['ug_ficou_sabendo']; ?></td>
                                 <td><?php echo substr($rs_usuario_row['ug_data_inclusao'], 0, 10) ?></td>
+                                <td align="center"><?php echo ($rs_usuario_row['ug_ativo'] != 1 && !empty($rs_usuario_row['ug_data_encerramento_conta'])) ? substr($rs_usuario_row['ug_data_encerramento_conta'], 0, 10) : 'Não possui'; ?></td>
                                 <td><?php echo $rs_usuario_row['ug_tipo_end'] ?> <?php echo $rs_usuario_row['ug_endereco'] ?>, <?php echo $rs_usuario_row['ug_numero'] ?> <?php echo $rs_usuario_row['ug_complemento'] ?> </td>
                                 <td><?php echo $rs_usuario_row['ug_bairro'] ?></td>
                                 <td><?php echo $rs_usuario_row['ug_cidade'] ?></td>

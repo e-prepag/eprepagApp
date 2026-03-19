@@ -1204,7 +1204,7 @@ require_once "/www/includes/bourls.php";
                                                                                 <td><a style="text-decoration:none" href="com_usuario_detalhe.php?usuario_id=<?php echo $rs_usuario_row['ug_id'] ?>"><?php echo $rs_usuario_row['ug_nome'] ?></a></td>
                                                                                 <td><?php echo $rs_usuario_row['ug_email'] ?></td>
                                                                                 <td align="center"><?php echo substr($rs_usuario_row['ug_data_inclusao'], 0, 10) ?></td>
-                                                                                <td align="center"><?php echo ($rs_usuario_row['ug_ativo'] != 1 && !empty($rs_usuario_row['ug_data_encerramento_conta'])) ? substr($rs_usuario_row['ug_data_encerramento_conta'], 0, 10) : 'Ativo'; ?></td>
+                                                                                <td align="center"><?php echo ($rs_usuario_row['ug_ativo'] != 1 && !empty($rs_usuario_row['ug_data_encerramento_conta'])) ? substr($rs_usuario_row['ug_data_encerramento_conta'], 0, 10) : 'Não possui'; ?></td>
                                                                                 <td nowrap><?php echo $rs_usuario_row['ug_cpf'] ?></td>
                                                                                 <td><?php echo $rs_usuario_row['ug_login'] ?></td>
                                                                                 <td><?php echo $rs_usuario_row['ug_endereco'] ?>, <?php echo $rs_usuario_row['ug_numero'] ?> <?php echo $rs_usuario_row['ug_complemento'] ?> </td>
