@@ -26,7 +26,8 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 					ip.active,
 				    ug.ug_nome_fantasia,
 				    ug.ug_id,
-					COALESCE(u.shn_nome, 'Desconhecido') as shn_nome
+					COALESCE(u.shn_nome, 'Desconhecido') as shn_nome,
+					ip.domain
 				FROM dist_usuarios_games ug
 				LEFT JOIN pdv_api_ip ip 
 				       ON ug.ug_id = ip.ug_id
@@ -85,15 +86,23 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	$data = ["data" => []];
 	if (count($resultRows) > 0) {
 		foreach ($resultRows as $key => $value) {
-			$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 576 512">
-    					<path d="M572.5 241.4c-1.5-2.3-38.4-57.3-107.2-102.5C407.3 94.1 337.2 80 288 80s-119.3 14.1-177.3 58.9C42.9 184.1 6.1 239.1 4.5 241.4a32.1 32.1 0 0 0 0 29.2c1.5 2.3 38.4 57.3 107.2 102.5C168.7 417.9 238.8 432 288 432s119.3-14.1 177.3-58.9c68.8-45.2 105.6-100.2 107.2-102.5a32.1 32.1 0 0 0 0-29.2zM288 384c-79.5 0-144-64.5-144-144s64.5-144 144-144 144 64.5 144 144-64.5 144-144 144zm0-240a96 96 0 1 0 0 192 96 96 0 0 0 0-192z"/>
-  					</svg>';
 
-			$acao = "<a class='btn btn-info' href='usuario.php?ug_id=" . $value["ug_id"] . "'
-							style='border-width: 0px;border-radius: 1px;box-shadow: 1px 1px 5px rgb(0,0,0,0.5); display: flex;width: 100%;justify-content: center;'
-						>
-							$svg
-						</a>";
+			$btnVisualizar = "<a class='btn btn-info' href='usuario.php?ug_id=" . $value["ug_id"] . "'
+                    style='border-width: 0px; border-radius: 1px; box-shadow: 1px 1px 5px rgb(0,0,0,0.5); display: flex; justify-content: center; align-items: center; padding: 5px 10px;' title='Visualizar'>
+                    Visualizar
+                </a>";
+
+			$btnPesquisar = "<form action='/pdv/keys/key.php' target='_blank' class='dados' method='POST' style='margin: 0; display: flex; gap: 5px;'>
+                        <input type='hidden' value='" . $value["ug_id"] . "' name='selecaoPdv' class='inpId form-control form-control-sm' placeholder='CÃ³digo PDV' style='width: 100px;'>
+                        <button type='submit' name='Pesquisar' class='btenvia btn btn-primary btn-sm' style='border-radius: 1px; box-shadow: 1px 1px 5px rgb(0,0,0,0.5);'>
+                            Ver chave
+                        </button>
+                    </form>";
+
+			$acao = "<div style='display: flex; gap: 10px; align-items: center; justify-content: center;'>
+                $btnVisualizar
+                $btnPesquisar
+             </div>";
 
 			if ($value["ip_range"] == true) {
 				$str_ip = "{$value["ip_range_ini"]} - {$value["ip_range_end"]}";
@@ -105,11 +114,13 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 				"ug_id" => $value["ug_id"],
 				"ug_nome" => (isset($value["ug_nome_fantasia"]) ? utf8_encode($value["ug_nome_fantasia"]) : "Não encontrado"),
 				"ip_pdv" => $str_ip,
+				"dominio_site" => $value["domain"] ?? "Sem site",
 				"shn_nome" => utf8_encode($value["shn_nome"]),
 				"criado_em" => isset($value["created_date"]) ? $value["created_date"] : "",
-				"ativo" => isset($value["active"]) ? ($value["active"] ? "Sim" : "Não") : "",
+				"ativo" => isset($value["active"]) ? ($value["active"] ? "Sim" : "NÃ£o") : "",
 				"acao" => $acao
 			];
+
 			array_push($data["data"], $dataLine);
 		}
 	}
@@ -121,6 +132,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	// 1) Recebe valores do POST / valida
 	$ug_id = isset($_POST['ug_id']) ? (int) $_POST['ug_id'] : 0;
 	$ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : "";
+	$domain = isset($_POST['domain']) ? $_POST['domain'] : "";
 
 	if ($ug_id <= 0) {
 		echo json_encode(["status" => "error", "msg" => "Usuário inválido."]);
@@ -140,13 +152,14 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	}
 
 	// 2) Insere a nova observação
-	$sql = "INSERT INTO pdv_api_ip (ug_id, ip_address, ip_range_ini, ip_range_end, ip_range, bko_user) VALUES (:ug_id, :ip_address, :ip_range_ini, :ip_range_end, :ip_range, :bko_user) RETURNING id";
+	$sql = "INSERT INTO pdv_api_ip (ug_id, ip_address, ip_range_ini, ip_range_end, ip_range, domain, bko_user) VALUES (:ug_id, :ip_address, :ip_range_ini, :ip_range_end, :ip_range, :domain, :bko_user) RETURNING id";
 	$stmt = $conexao->prepare($sql);
 	$stmt->bindParam(':ug_id', $ug_id);
 	$stmt->bindParam(':ip_address', $ip_address, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range_ini', $ip_range_ini, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range_end', $ip_range_end, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range', $ip_range, PDO::PARAM_BOOL);
+	$stmt->bindParam(':domain', $domain, PDO::PARAM_STR);
 	$stmt->bindParam(':bko_user', $_POST['bko_user'], PDO::PARAM_STR);
 
 	if ($stmt->execute()) {
@@ -157,7 +170,46 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		echo json_encode(["status" => "error", "msg" => "Erro ao registrar a nova observação."]);
 	}
 	die;
-} else if(isset($_POST["acao"]) && $_POST["acao"] == "remover"){
+} else if (isset($_POST["acao"]) && $_POST["acao"] == "editar") {
+
+	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+	if ($id <= 0) {
+		echo json_encode(["status" => "error", "msg" => "ID do IP inválido."]);
+		die;
+	}
+
+	$ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : "";
+	$domain = isset($_POST['domain']) ? $_POST['domain'] : "";
+
+	$ip_range_ini = "";
+	$ip_range_end = "";
+	$ip_range = empty($ip_address);
+	if ($ip_range) {
+		$ip_range_ini = isset($_POST['ip_range_ini']) ? $_POST['ip_range_ini'] : "";
+		$ip_range_end = isset($_POST['ip_range_end']) ? $_POST['ip_range_end'] : "";
+
+		if (empty($ip_range_ini) && empty($ip_range_end)) {
+			echo json_encode(["status" => "error", "msg" => "IPs inválidos."]);
+			die;
+		}
+	}
+
+	$sql = "UPDATE pdv_api_ip SET ip_address = :ip_address, ip_range_ini = :ip_range_ini, ip_range_end = :ip_range_end, ip_range = :ip_range, domain = :domain WHERE id = :id";
+	$stmt = $conexao->prepare($sql);
+	$stmt->bindParam(':id', $id, PDO::PARAM_INT);
+	$stmt->bindParam(':ip_address', $ip_address, PDO::PARAM_STR);
+	$stmt->bindParam(':ip_range_ini', $ip_range_ini, PDO::PARAM_STR);
+	$stmt->bindParam(':ip_range_end', $ip_range_end, PDO::PARAM_STR);
+	$stmt->bindParam(':ip_range', $ip_range, PDO::PARAM_BOOL);
+	$stmt->bindParam(':domain', $domain, PDO::PARAM_STR);
+
+	if ($stmt->execute()) {
+		echo json_encode(["status" => "success", "msg" => "IP atualizado com sucesso."]);
+	} else {
+		echo json_encode(["status" => "error", "msg" => "Erro ao atualizar IP."]);
+	}
+	die;
+} else if (isset($_POST["acao"]) && $_POST["acao"] == "remover") {
 	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
 	if ($id <= 0) {
@@ -175,8 +227,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		echo json_encode(["status" => "error", "msg" => "Erro ao remover o endereço IP."]);
 	}
 	die;
-
-} else if(isset($_POST["acao"]) && $_POST["acao"] == "alterar") {
+} else if (isset($_POST["acao"]) && $_POST["acao"] == "alterar") {
 
 	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
@@ -197,7 +248,6 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	} else {
 		echo json_encode(["status" => "error", "msg" => "Erro ao alterar o endereço IP."]);
 	}
-
 } else {
 	echo json_encode(["status" => "error", "msg" => "Não foi possivel efetuar sua escolha."]);
 }
