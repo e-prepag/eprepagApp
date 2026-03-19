@@ -403,7 +403,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                         class="btn-question glyphicon glyphicon-question-sign txt-vermelho c-pointer t0"
                         data-msg="<h2>O que é isso?</h2>Agora todas as transações financeiras de jogos online no Brasil são condicionadas ao fornecimento de um CPF. Esta informação será solicitada em algumas compras, mas não sempre. Agradecemos a sua compreensão."
                         style="position: relative;"></a></h4>
-                <p><i>O CPF será solicitado apenas na sua primeira compra no jogo.</i></p>
+                <p><i>O CPF será solicitado apenas na sua primeira compra no jogo. A idade mínima para realizar compras é de 16 anos.</i></p>
                 <div class="int-form1" style="position: relative;">
                     <form action="" id="cpfForm" method="POST">
                         <input type="hidden" name="formsubmit" value="OK" style="display: none;" />

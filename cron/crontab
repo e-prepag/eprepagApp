@@ -212,5 +212,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 * * * * * flock -n /tmp/processa_workers.lock /www/background/processa_workers.sh
 * * * * * sleep 30; flock -n /tmp/processa_workers.lock /www/background/processa_workers.sh
 
+#Rodar cron de inativar usuários automaticamente
+30 3 * * * /www/background/inativar_usuarios_falta_de_uso.sh
+
 #Notificar usuarios reativados
 0 7 * * * bash /www/background/notificar_usuarios_reativados.sh
