@@ -4675,13 +4675,21 @@ function converterDataParaISO($data)
 	return false;
 }
 
-function validarDataReal($dataTimestamp)
+function validarDataReal($dataInput)
 {
-	$dataApenas = substr($dataTimestamp, 0, 10);
+    $dataLimpa = substr(trim($dataInput), 0, 10);
 
-	$d = DateTime::createFromFormat('Y-m-d', $dataApenas);
+    if (strpos($dataLimpa, '/') !== false) {
+        $formato = 'd/m/Y';
+    } elseif (strpos($dataLimpa, '-') !== false) {
+        $formato = 'Y-m-d';
+    } else {
+        return false;
+    }
 
-	return $d && $d->format('Y-m-d') === $dataApenas;
+    $d = DateTime::createFromFormat($formato, $dataLimpa);
+
+    return $d && $d->format($formato) === $dataLimpa;
 }
 
 function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
@@ -4821,7 +4829,7 @@ function cpf_page_gamer()
 
 	$user = getUserFromId($usuarioGames->getId());
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_dDataNascimento);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
 
 	$logFilePath = '/www/arquivos_gerados/txts/cpf_log.txt';
 
@@ -4864,7 +4872,7 @@ function cpf_page_gamer()
 		} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 		//Validando a data da consulta
-		if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_dDataNascimento)) {
+		if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
 			$_POST['formsubmit'] = true;
 			$_POST['cpf'] = $user->ug_cpf;
 			$_POST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4918,7 +4926,7 @@ function verificaIdadeMinima($dataNascimento)
 	if ($_SESSION['integracao_origem_id'] == 10422) {
 		return ($interval->format('%Y') >= 18);
 	} else {
-		return ($interval->format('%Y') >= 12);
+		return ($interval->format('%Y') >= 16);
 	}
 }
 
