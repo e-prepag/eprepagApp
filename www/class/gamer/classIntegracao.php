@@ -4587,7 +4587,7 @@ function cpf_page($partner_list)
 
 	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf)  && validarDataReal($user->ug_dDataNascimento);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf)  && validarDataReal($user->ug_data_nascimento);
 
 	//Ajustando dados de CPF para usuários cadastrados no sistema antes de usar a integração
 	/*
@@ -4633,7 +4633,7 @@ function cpf_page($partner_list)
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
-			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_dDataNascimento)) {
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_data_nascimento)) {
 				$_REQUEST['formsubmit'] = true;
 				$_REQUEST['cpf'] = $user->ug_cpf;
 				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4700,7 +4700,7 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 
 	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_dDataNascimento);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_data_nascimento);
 
 	if ($is_data_valid && $vg_integracao_parceiro_origem_id == 10422) {
 
@@ -4734,7 +4734,7 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
-			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_dDataNascimento)) {
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_data_nascimento)) {
 				$_REQUEST['formsubmit'] = true;
 				$_REQUEST['cpf'] = $user->ug_cpf;
 				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4829,7 +4829,9 @@ function cpf_page_gamer()
 
 	$user = getUserFromId($usuarioGames->getId());
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_data_nascimento);
+
+	error_log("Data: {$user->ug_data_nascimento} True ou não: " . (validarDataReal($user->ug_data_nascimento) ? 'Sim' : 'Não') . "Valida tudo: " . ($is_data_valid ? 'Sim' : 'Não'));
 
 	$logFilePath = '/www/arquivos_gerados/txts/cpf_log.txt';
 
@@ -4872,7 +4874,7 @@ function cpf_page_gamer()
 		} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 		//Validando a data da consulta
-		if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+		if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_data_nascimento)) {
 			$_POST['formsubmit'] = true;
 			$_POST['cpf'] = $user->ug_cpf;
 			$_POST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
