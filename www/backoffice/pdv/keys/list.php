@@ -35,6 +35,32 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 
 //var_dump($resultadoSelecao);
 
+$conexao = ConnectionPDO::getConnection()->getLink();
+$idsEprepag = array_filter(array_column($resultadoSelecao, 'id_eprepag'));
+$vendasPorId = [];
+
+if (!empty($idsEprepag)) {
+	$inQuery = implode(',', array_fill(0, count($idsEprepag), '?'));
+	$sqlVendas = "SELECT vg.vg_ug_id, COUNT(vg.vg_id) as qtd
+				  FROM tb_dist_venda_games vg
+				  INNER JOIN pedidos_api_pdv p ON p.id_pedido_eprepag = vg.vg_id
+				  WHERE vg.vg_ug_id IN ($inQuery)
+				  AND vg.vg_data_inclusao >= NOW() - INTERVAL '1 month'
+				  GROUP BY vg.vg_ug_id";
+	$stmtVendas = $conexao->prepare($sqlVendas);
+	$stmtVendas->execute(array_values($idsEprepag));
+	$resultadosVendas = $stmtVendas->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($resultadosVendas as $v) {
+		$vendasPorId[$v['ug_id']] = $v['qtd'];
+	}
+}
+
+foreach ($resultadoSelecao as &$row) {
+	$row['qtd_vendas_mes'] = isset($vendasPorId[$row['id_eprepag']]) ? $vendasPorId[$row['id_eprepag']] : 0;
+}
+unset($row);
+
 ?>
 
 <link href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/datatables.min.css"
@@ -98,8 +124,9 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 			<tr>
 				<th>ID</th>
 				<th>PDV</th>
-				<th>Data Cria√ß√£o</th>
-				<th>Situa√ß√£o chave</th>
+				<th>Data CriaÁ„o</th>
+				<th>Vendas (30 dias)</th>
+				<th>SituaÁ„o chave</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -111,6 +138,7 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 						<td><?php echo $value["id_eprepag"]; ?></td>
 						<td><?php echo $value["preferredName"]; ?></td>
 						<td><?php echo !empty($value["createdAt"]) ? date("d/m/Y H:i:s", strtotime($value["createdAt"])) : '-'; ?></td>
+						<td><?php echo $value["qtd_vendas_mes"]; ?></td>
 						<td class="<?php echo ($value["cod_situacao"] == 1) ? 'active' : 'inactive'; ?>">
 							<?php echo ($value["cod_situacao"] == 1) ? 'Ativo' : 'Inativo'; ?></td>
 					</tr>
@@ -126,15 +154,15 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 	$(document).ready(function() {
 		let table = new DataTable('#table', {
 			language: {
-				lengthMenu: "Mostrar _MENU_ resultados por p√°gina",
-				zeroRecords: "N√£o foram encontrados PDVs Bloqueados",
-				info: "Mostrando a p√°gina _PAGE_ de _PAGES_",
+				lengthMenu: "Mostrar _MENU_ resultados por p·gina",
+				zeroRecords: "N„o foram encontrados PDVs Bloqueados",
+				info: "Mostrando a p·gina _PAGE_ de _PAGES_",
 				infoEmpty: "Dados inexistentes",
 				infoFiltered: "(filtro aplicado em _MAX_ registros)",
 				sSearch: "Pesquisar:",
 				paginate: {
 					previous: "Anterior",
-					next: "Pr√≥ximo",
+					next: "PrÛximo",
 				}
 			}
 		});
