@@ -171,7 +171,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 				</select>
 			</div>
 			<div class="col-cancel-pins">
-				<label for="ativos">Ativos</label>
+				<label for="ativos">IPs Ativos</label>
 				<select id="ativos" name="ativos" class="form-control">
 					<option selected value="">Todos</option>
 					<option value="1">Sim</option>
@@ -193,9 +193,10 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 				<th>Id PDV</th>
 				<th>Nome</th>
 				<th>Endereço IP</th>
+				<th>Site PDV</th>
 				<th>Responsável</th>
 				<th>Criado em</th>
-				<th>Ativo</th>
+				<th>IP Ativo</th>
 				<th>Ação</th>
 			</tr>
 		</thead>
@@ -223,11 +224,11 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
 	var tipo = "";
 	var vg_id = "";
-	$(document).ready(function () {
+	$(document).ready(function() {
 
 		$('#ip_pdv').mask('099.099.099.099');
 
-		$("#form1").on("submit", function (e) {
+		$("#form1").on("submit", function(e) {
 			e.preventDefault();
 			const formulario = $("#form1");
 
@@ -238,7 +239,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 				ajax: {
 					url: './ajax_ip_pdv.php',
 					type: 'POST',
-					data: function (d) {
+					data: function(d) {
 						// Convertemos os campos do form para objeto
 						const formData = $("#form1").serializeArray();
 						formData.forEach(item => {
@@ -249,7 +250,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 						d.acao = 'listar';
 						return d;
 					},
-					dataSrc: function (json) {
+					dataSrc: function(json) {
 						if (json.erro) {
 							Swal.fire({
 								icon: 'error',
@@ -260,7 +261,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 						}
 						return json.data || [];
 					},
-					error: function (xhr) {
+					error: function(xhr) {
 						let msg = "Erro inesperado.";
 						try {
 							const response = JSON.parse(xhr.responseText);
@@ -276,14 +277,30 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 					},
 					cache: false
 				},
-				columns: [
-					{ data: 'ug_id' },
-					{ data: 'ug_nome' },
-					{ data: 'ip_pdv' },
-					{ data: 'shn_nome', title: 'Usuário' },
-					{ data: 'criado_em', title: 'Criado em' },
-					{ data: 'ativo', title: 'Ativo' },
-					{ data: 'acao' },
+				columns: [{
+						data: 'ug_id'
+					},
+					{
+						data: 'ug_nome'
+					},
+					{
+						data: 'ip_pdv'
+					},
+					{
+						data: 'dominio_site'
+					},
+					{
+						data: 'shn_nome'
+					},
+					{
+						data: 'criado_em'
+					},
+					{
+						data: 'ativo'
+					},
+					{
+						data: 'acao'
+					},
 				],
 				destroy: true,
 				searching: false,
@@ -302,7 +319,6 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 		});
 
 	});
-
 </script>
 <?php
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
