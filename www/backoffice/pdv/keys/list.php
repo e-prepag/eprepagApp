@@ -10,11 +10,15 @@ $conexao_new_epp = function () {
 	try {
 		$username = 'eprepaga_pagorama';
 		$password = '3yARhv6HcJN';
-		$pdo = new PDO('mysql:host=10.204.168.21;port=3306;dbname=eprepaga_pag', $username, $password, 
-		[
-        PDO::ATTR_TIMEOUT => 5, // segundos
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    ]);
+		$pdo = new PDO(
+			'mysql:host=10.204.168.21;port=3306;dbname=eprepaga_pag',
+			$username,
+			$password,
+			[
+				PDO::ATTR_TIMEOUT => 5, // segundos
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+			]
+		);
 	} catch (PDOEXCEPTION $e) { //5433 
 		echo "Error: " . $e->getMessage();
 		return false;
@@ -23,7 +27,7 @@ $conexao_new_epp = function () {
 };
 
 
-$query = $conexao_new_epp()->prepare("select preferredName,cod_situacao,id_eprepag from user u 
+$query = $conexao_new_epp()->prepare("select preferredName,cod_situacao,id_eprepag,u.createdAt from user u 
 	 inner join oauth_clients c on c.user_id = u.id_new 
 	 inner join situacao_chave_api ch on ch.cod_usuario = u.id_new group by preferredName;");
 $query->execute();
@@ -94,21 +98,23 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 			<tr>
 				<th>ID</th>
 				<th>PDV</th>
-				<th>SituaÁ„o chave</th>
+				<th>Data Cria√ß√£o</th>
+				<th>Situa√ß√£o chave</th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
 			if (count($resultadoSelecao) > 0) {
 				foreach ($resultadoSelecao as $key => $value) {
-					?>
+			?>
 					<tr>
 						<td><?php echo $value["id_eprepag"]; ?></td>
 						<td><?php echo $value["preferredName"]; ?></td>
+						<td><?php echo !empty($value["createdAt"]) ? date("d/m/Y H:i:s", strtotime($value["createdAt"])) : '-'; ?></td>
 						<td class="<?php echo ($value["cod_situacao"] == 1) ? 'active' : 'inactive'; ?>">
 							<?php echo ($value["cod_situacao"] == 1) ? 'Ativo' : 'Inativo'; ?></td>
 					</tr>
-					<?php
+			<?php
 				}
 			}
 			?>
@@ -117,18 +123,18 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-	$(document).ready(function () {
+	$(document).ready(function() {
 		let table = new DataTable('#table', {
 			language: {
-				lengthMenu: "Mostrar _MENU_ resultados por p·gina",
-				zeroRecords: "N„o foram encontrados PDVs Bloqueados",
-				info: "Mostrando a p·gina _PAGE_ de _PAGES_",
+				lengthMenu: "Mostrar _MENU_ resultados por p√°gina",
+				zeroRecords: "N√£o foram encontrados PDVs Bloqueados",
+				info: "Mostrando a p√°gina _PAGE_ de _PAGES_",
 				infoEmpty: "Dados inexistentes",
 				infoFiltered: "(filtro aplicado em _MAX_ registros)",
 				sSearch: "Pesquisar:",
 				paginate: {
 					previous: "Anterior",
-					next: "PrÛximo",
+					next: "Pr√≥ximo",
 				}
 			}
 		});
