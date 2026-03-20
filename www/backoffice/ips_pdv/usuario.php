@@ -499,7 +499,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 			$.ajax({
 				url: "ajax_ip_pdv.php",
 				method: "POST",
-				data: $("#formNovo").serialize() + "&acao=novo&ug_id=<?= $user_id ?>&bko_user=<?= $_SESSION["iduser_bko"] ?>",
+				data: $("#formNovo").serialize() + "&ug_id=<?= $user_id ?>&bko_user=<?= $_SESSION["iduser_bko"] ?>",
 				beforeSend: function() {
 					Swal.fire({
 						title: 'Aguarde!',

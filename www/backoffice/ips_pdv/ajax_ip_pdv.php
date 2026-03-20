@@ -131,22 +131,31 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	// 1) Recebe valores do POST / valida
 	$ug_id = isset($_POST['ug_id']) ? (int) $_POST['ug_id'] : 0;
-	$ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : "";
 	$domain = isset($_POST['domain']) ? $_POST['domain'] : "";
+	$ipType = isset($_POST['ipType']) ? $_POST['ipType'] : "single";
 
 	if ($ug_id <= 0) {
 		echo json_encode(["status" => "error", "msg" => "Usuário inválido."]);
 		die;
 	}
-	$ip_range_ini = "";
-	$ip_range_end = "";
-	$ip_range = empty($ip_address);
+
+	$ip_address = null;
+	$ip_range_ini = null;
+	$ip_range_end = null;
+	$ip_range = ($ipType === 'range');
+
 	if ($ip_range) {
 		$ip_range_ini = isset($_POST['ip_range_ini']) ? $_POST['ip_range_ini'] : "";
 		$ip_range_end = isset($_POST['ip_range_end']) ? $_POST['ip_range_end'] : "";
 
-		if (empty($ip_range_ini) && empty($ip_range_end)) {
+		if (empty($ip_range_ini) || empty($ip_range_end)) {
 			echo json_encode(["status" => "error", "msg" => "IPs inválidos."]);
+			die;
+		}
+	} else {
+		$ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : "";
+		if (empty($ip_address)) {
+			echo json_encode(["status" => "error", "msg" => "Endereço IP inválido."]);
 			die;
 		}
 	}
@@ -178,18 +187,26 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		die;
 	}
 
-	$ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : "";
 	$domain = isset($_POST['domain']) ? $_POST['domain'] : "";
+	$ipType = isset($_POST['ipType']) ? $_POST['ipType'] : "single";
 
-	$ip_range_ini = "";
-	$ip_range_end = "";
-	$ip_range = empty($ip_address);
+	$ip_address = null;
+	$ip_range_ini = null;
+	$ip_range_end = null;
+	$ip_range = ($ipType === 'range');
+
 	if ($ip_range) {
 		$ip_range_ini = isset($_POST['ip_range_ini']) ? $_POST['ip_range_ini'] : "";
 		$ip_range_end = isset($_POST['ip_range_end']) ? $_POST['ip_range_end'] : "";
 
-		if (empty($ip_range_ini) && empty($ip_range_end)) {
+		if (empty($ip_range_ini) || empty($ip_range_end)) {
 			echo json_encode(["status" => "error", "msg" => "IPs inválidos."]);
+			die;
+		}
+	} else {
+		$ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : "";
+		if (empty($ip_address)) {
+			echo json_encode(["status" => "error", "msg" => "Endereço IP inválido."]);
 			die;
 		}
 	}
