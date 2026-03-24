@@ -1292,7 +1292,7 @@ if ($BtnSearch) {
                                         while ($pgrow = pg_fetch_array($resid)) {
                                             $valor = 1;
                                             $cpfcnpj = str_replace("-", "", str_replace(".", "", $pgrow['ug_cpf']));
-                                            $data_informado = empty($pgrow['ug_data_cpf_informado']) ? '' : substr($pgrow['ug_data_cpf_informado'], 0, 10);
+                                            $data_informado = empty($pgrow['ug_data_cpf_informado']) ? '' : date('d/m/Y H:i:s', strtotime($pgrow['ug_data_cpf_informado']));
                                         ?>
                                             <tr class="trListagem">
                                                 <td><?php echo $pgrow['ug_nome']; ?></td>
