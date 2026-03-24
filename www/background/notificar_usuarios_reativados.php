@@ -21,7 +21,7 @@ function logMessage($message)
 }
 
 $pdo = ConnectionPDO::getConnection()->getLink();
-$intervalo = '62 seconds';
+$intervalo = '120 seconds';
 
 logMessage("Buscando usuários reativados (status = 1) no último(a) $intervalo...");
 $usuariosReativados = [];
