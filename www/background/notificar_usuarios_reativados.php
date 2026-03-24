@@ -9,7 +9,27 @@ require_once "/www/class/phpmailer/class.phpmailer.php";
 require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
 
+
+
 $logFile = '/www/arquivos_gerados/logs/notificar_usuarios_reativados.log';
+
+// Teste
+$to = 'jose.carlos@easygroupit.com';
+$subject = 'TESTE CRON';
+
+$message = "<h1>TESTE CRON</h1>";
+$message .= "<p>TESTE CRON</p>";
+
+// Dispara o e-mail
+if (function_exists('enviaEmail3')) {
+    $emailResult = enviaEmail3($to, "", "", $subject, $message, "");
+    if ($emailResult) {
+        logMessage("TESTE CRON");
+    } else {
+        logMessage("TESTE CRON");
+    }
+}
+// Fim do Teste
 
 function logMessage($message)
 {
