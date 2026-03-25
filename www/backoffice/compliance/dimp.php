@@ -11,79 +11,79 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 function removerAcentos($string)
 {
     $map = array(
-        '·' => 'a',
-        '‡' => 'a',
-        '„' => 'a',
-        '‚' => 'a',
-        '‰' => 'a',
-        '¡' => 'A',
-        '¿' => 'A',
-        '√' => 'A',
-        '¬' => 'A',
-        'ƒ' => 'A',
-        'È' => 'e',
-        'Ë' => 'e',
-        'Í' => 'e',
-        'Î' => 'e',
-        '…' => 'E',
-        '»' => 'E',
-        ' ' => 'E',
-        'À' => 'E',
-        'Ì' => 'i',
-        'Ï' => 'i',
-        'Ó' => 'i',
-        'Ô' => 'i',
-        'Õ' => 'I',
-        'Ã' => 'I',
-        'Œ' => 'I',
-        'œ' => 'I',
-        'Û' => 'o',
-        'Ú' => 'o',
-        'ı' => 'o',
-        'Ù' => 'o',
-        'ˆ' => 'o',
-        '”' => 'O',
-        '“' => 'O',
-        '’' => 'O',
-        '‘' => 'O',
-        '÷' => 'O',
-        '˙' => 'u',
-        '˘' => 'u',
-        '˚' => 'u',
-        '¸' => 'u',
-        '⁄' => 'U',
-        'Ÿ' => 'U',
-        '€' => 'U',
-        '‹' => 'U',
-        'Á' => 'c',
-        '«' => 'C',
-        'Ò' => 'n',
-        '—' => 'N'
+        '√°' => 'a',
+        '√†' => 'a',
+        '√£' => 'a',
+        '√¢' => 'a',
+        '√§' => 'a',
+        '√Å' => 'A',
+        '√Ä' => 'A',
+        '√É' => 'A',
+        '√Ç' => 'A',
+        '√Ñ' => 'A',
+        '√©' => 'e',
+        '√®' => 'e',
+        '√™' => 'e',
+        '√´' => 'e',
+        '√â' => 'E',
+        '√à' => 'E',
+        '√ä' => 'E',
+        '√ã' => 'E',
+        '√≠' => 'i',
+        '√¨' => 'i',
+        '√Æ' => 'i',
+        '√Ø' => 'i',
+        '√ç' => 'I',
+        '√å' => 'I',
+        '√é' => 'I',
+        '√è' => 'I',
+        '√≥' => 'o',
+        '√≤' => 'o',
+        '√µ' => 'o',
+        '√¥' => 'o',
+        '√∂' => 'o',
+        '√ì' => 'O',
+        '√í' => 'O',
+        '√ï' => 'O',
+        '√î' => 'O',
+        '√ñ' => 'O',
+        '√∫' => 'u',
+        '√π' => 'u',
+        '√ª' => 'u',
+        '√º' => 'u',
+        '√ö' => 'U',
+        '√ô' => 'U',
+        '√õ' => 'U',
+        '√ú' => 'U',
+        '√ß' => 'c',
+        '√á' => 'C',
+        '√±' => 'n',
+        '√ë' => 'N'
     );
     return strtr($string, $map);
 }
 
 
 
-//Captura inÌcio da execuÁ„o
+//Captura in√≠cio da execu√ß√£o
 
 $time_start = getmicrotime();
 
 
 
-//Dados Necess·rios
+//Dados Necess√°rios
 
 $cnpjEPP = '19037276000172';                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$razaoEPP = 'E-prepag Administradora de Cartoes Ltda';  // Raz„o Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+$razaoEPP = 'E-prepag Administradora de Cartoes Ltda';  // Raz√£o Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';    // EndereÁo da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+$enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';    // Endere√ßo da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
 $cepEPP = '05418000';                                   // CEP da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
 $ufEPP = 'SP';                                          // UF da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$nomeRespEPP = 'Daniela Oliveira';                      // Nome do respons·vel da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+$nomeRespEPP = 'Daniela Oliveira';                      // Nome do respons√°vel da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
 $foneEPP = '01130309106';                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
@@ -91,19 +91,19 @@ $emailEPP = getenv('email_financeiro');               // Email para contato na e
 
 
 
-$opr_codigoEPPPAGTO = '1';                               // opr_codigo utilizado para identificaÁ„o da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$opr_codigoEPPPAGTO = '1';                               // opr_codigo utilizado para identifica√ß√£o da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $cnpjEPPPAGTO = '08221305000135';                        // CNPJ da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$razaoEPPPAGTO = 'E-PREPAG PAGAMENTOS ELETRONICOS LTDA';      // Raz„o Social da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$razaoEPPPAGTO = 'E-PREPAG PAGAMENTOS ELETRONICOS LTDA';      // Raz√£o Social da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$enderecoEPPPAGTO = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26, 27 e 28, Pinheiros';    // EndereÁo da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$enderecoEPPPAGTO = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26, 27 e 28, Pinheiros';    // Endere√ßo da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $cepEPPPAGTO = '05418000';                                   // CEP da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $ufEPPPAGTO = 'SP';                                          // UF da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$nomeRespEPPPAGTO = 'Glaucia da Costa Gregio';               // Nome do respons·vel da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$nomeRespEPPPAGTO = 'Glaucia da Costa Gregio';               // Nome do respons√°vel da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $foneEPPPAGTO = '01130309101';                               // Telefone para contato na empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA 
 
@@ -111,31 +111,31 @@ $emailEPPPAGTO = 'glaucia@e-prepag.com.br';                  // Email para conta
 
 $dataCredenciamentoEPPPAGTO = '20171101';                    // Data do credenciamento da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA junto a E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$IND_COMEX_EPPPAGTO = "0";                                   // Informar se a transaÁ„o se refere a pagamento ao exterior, em transaÁıes cross border. Valores V·lidos: [0,1]  Indicador de transaÁ„o de pagamento ao exterior 0 - N„o 1 - Sim 
+$IND_COMEX_EPPPAGTO = "0";                                   // Informar se a transa√ß√£o se refere a pagamento ao exterior, em transa√ß√µes cross border. Valores V√°lidos: [0,1]  Indicador de transa√ß√£o de pagamento ao exterior 0 - N√£o 1 - Sim 
 
 
 
-$COD_MCAPT = "4";                                            // Informar o cÛdigo de identificaÁ„o do Meio de Captura, ele È de livre atribuiÁ„o da InstituiÁ„o de Pagamento e ˙nico por arquivo. 
+$COD_MCAPT = "4";                                            // Informar o c√≥digo de identifica√ß√£o do Meio de Captura, ele √© de livre atribui√ß√£o da Institui√ß√£o de Pagamento e √∫nico por arquivo. 
 
-$NUM_LOG = "E-commerce";                                     // Informar o n˙mero lÛgico do Meio de Captura que identifica o terminal e corresponde ao informado nos comprovantes de pagamento. ValidaÁ„o: Para o Tipo de Tecnologia ?4 - E- commerce? do Campo 04, caso n„o seja possÌvel identificar o meio de captura, deve ser informado ?E-commerce?. 
+$NUM_LOG = "E-commerce";                                     // Informar o n√∫mero l√≥gico do Meio de Captura que identifica o terminal e corresponde ao informado nos comprovantes de pagamento. Valida√ß√£o: Para o Tipo de Tecnologia ?4 - E- commerce? do Campo 04, caso n√£o seja poss√≠vel identificar o meio de captura, deve ser informado ?E-commerce?. 
 
-$TIPO_TECN = "4";                                            // O tipo 6 refere-se a URA - Unidade de Resposta AudÌvel e MOTO (mail order / telephone order). Valores V·lidos: [1,2,3,4,5,6] 
+$TIPO_TECN = "4";                                            // O tipo 6 refere-se a URA - Unidade de Resposta Aud√≠vel e MOTO (mail order / telephone order). Valores V√°lidos: [1,2,3,4,5,6] 
 
-$TERM_PROP = "0";                                            // Informar sobre a propriedade do terminal, se È prÛprio ou de terceiros. Valores V·lidos: [0,1]. ValidaÁ„o: Para o Tipo de Tecnologia ?4 - E-commerce? do Campo 04 deve ser informado obrigatoriamente ?0 terminal prÛprio?. 
+$TERM_PROP = "0";                                            // Informar sobre a propriedade do terminal, se √© pr√≥prio ou de terceiros. Valores V√°lidos: [0,1]. Valida√ß√£o: Para o Tipo de Tecnologia ?4 - E-commerce? do Campo 04 deve ser informado obrigatoriamente ?0 terminal pr√≥prio?. 
 
-$MARCA = "E-PREPAG";                                         // Informar a marca que identifica a InstituiÁ„o de Pagamento no comprovante da transaÁ„o. ValidaÁ„o: Para TERM_PROP do Campo 05 igual a ?1 - terminal de terceiro? este campo deve ser informado obrigatoriamente. 
+$MARCA = "E-PREPAG";                                         // Informar a marca que identifica a Institui√ß√£o de Pagamento no comprovante da transa√ß√£o. Valida√ß√£o: Para TERM_PROP do Campo 05 igual a ?1 - terminal de terceiro? este campo deve ser informado obrigatoriamente. 
 
-$IND_EXTEMP = "0";                                           // Informar se a transaÁ„o se refere a operaÁ„o extempor‚nea. Para arquivos de retificaÁ„o, finalidade 02 do campo 03 no registro 0000, n„o ser„o aceitos registros extempor‚neos. Valores V·lidos: [0,1]. ValidaÁ„o: Para ?RetificaÁ„o do arquivo?, o IND_EXTEMP deve ser igual a zero. 
+$IND_EXTEMP = "0";                                           // Informar se a transa√ß√£o se refere a opera√ß√£o extempor√¢nea. Para arquivos de retifica√ß√£o, finalidade 02 do campo 03 no registro 0000, n√£o ser√£o aceitos registros extempor√¢neos. Valores V√°lidos: [0,1]. Valida√ß√£o: Para ?Retifica√ß√£o do arquivo?, o IND_EXTEMP deve ser igual a zero. 
 
-$IND_SPLIT = "0";                                            // Informar se a operaÁ„o faz parte de uma operaÁ„o ?splitada?. Valores V·lidos: [0,1]
+$IND_SPLIT = "0";                                            // Informar se a opera√ß√£o faz parte de uma opera√ß√£o ?splitada?. Valores V√°lidos: [0,1]
 
-$BANDEIRA = "99";                                            // A especificaÁ„o da bandeira deve estar contida na RelaÁ„o de Bandeiras constante no Manual de OrientaÁ„o ao Contribuinte do Projeto NF-e. Para boleto, informar 99 ? outros. 
+$BANDEIRA = "99";                                            // A especifica√ß√£o da bandeira deve estar contida na Rela√ß√£o de Bandeiras constante no Manual de Orienta√ß√£o ao Contribuinte do Projeto NF-e. Para boleto, informar 99 ? outros. 
 
-$NAT_OPER = "2";                                             // Informar a natureza da operaÁ„o realizada no comprovante de pagamento referenciado. Valores V·lidos: [1,2,3,4,9] NAT_OPER 1 ? CrÈdito 2 ? DÈbito 3 ? Boleto 4 ? Pagamentos instant‚neos /TransferÍncia de Recursos 9 - Outros. 
+$NAT_OPER = "2";                                             // Informar a natureza da opera√ß√£o realizada no comprovante de pagamento referenciado. Valores V√°lidos: [1,2,3,4,9] NAT_OPER 1 ? Cr√©dito 2 ? D√©bito 3 ? Boleto 4 ? Pagamentos instant√¢neos /Transfer√™ncia de Recursos 9 - Outros. 
 
 
 
-//Esse ID È concatenado no inicio de cada id da operaÁ„o('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
+//Esse ID √© concatenado no inicio de cada id da opera√ß√£o('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
 
 $ARRAY_CONCATENA_ID_VENDA = array(
 
@@ -151,7 +151,7 @@ $ARRAY_CONCATENA_ID_VENDA = array(
 
 
 
-//Buscando Publisher que possuem totalizaÁ„o por utilizaÁ„o
+//Buscando Publisher que possuem totaliza√ß√£o por utiliza√ß√£o
 
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
@@ -225,13 +225,13 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 <div class="col-md-12 txt-preto">
 
-    <h4 class="txt-azul-claro bottom50">Gerador de Arquivo DeclaraÁ„o de InformaÁıes de Meios de Pagamentos - DIMP</h4>
+    <h4 class="txt-azul-claro bottom50">Gerador de Arquivo Declara√ß√£o de Informa√ß√µes de Meios de Pagamentos - DIMP</h4>
 
     <form id="congelamento" name="congelamento" method="post" action="">
 
         <div class="col-md-12 col-sm-12 col-xs-12 text-right">
 
-            <div class="col-md-2 col-sm-2 col-xs-2 text-right">PerÌodo Apurado:</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 text-right">Per√≠odo Apurado:</div>
 
             <div class="col-md-2 col-sm-2 col-xs-2">
 
@@ -241,7 +241,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
             </div>
 
-            <div class="col-md-5 col-sm-5 col-xs-5 text-right">Unidade FederaÁ„o do Fisco da informaÁ„o prestada:</div>
+            <div class="col-md-5 col-sm-5 col-xs-5 text-right">Unidade Federa√ß√£o do Fisco da informa√ß√£o prestada:</div>
 
             <div class="col-md-3 col-sm-3 col-xs-3">
 
@@ -257,7 +257,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     </option>
 
                     <option value="AP" <?php if (isset($estado) && $estado == "AP")
-                                            echo 'selected="selected" '; ?>>Amap·
+                                            echo 'selected="selected" '; ?>>Amap√°
                     </option>
 
                     <option value="AM" <?php if (isset($estado) && $estado == "AM")
@@ -269,7 +269,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     </option>
 
                     <option value="CE" <?php if (isset($estado) && $estado == "CE")
-                                            echo 'selected="selected" '; ?>>Cear·
+                                            echo 'selected="selected" '; ?>>Cear√°
                     </option>
 
                     <option value="DF" <?php if (isset($estado) && $estado == "DF")
@@ -278,15 +278,15 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                     <option value="ES" <?php if (isset($estado) && $estado == "ES")
                                             echo 'selected="selected" '; ?>>
-                        EspÌrito Santo</option>
+                        Esp√≠rito Santo</option>
 
                     <option value="GO" <?php if (isset($estado) && $estado == "GO")
-                                            echo 'selected="selected" '; ?>>Goi·s
+                                            echo 'selected="selected" '; ?>>Goi√°s
                     </option>
 
                     <option value="MA" <?php if (isset($estado) && $estado == "MA")
                                             echo 'selected="selected" '; ?>>
-                        Maranh„o</option>
+                        Maranh√£o</option>
 
                     <option value="MT" <?php if (isset($estado) && $estado == "MT")
                                             echo 'selected="selected" '; ?>>Mato
@@ -301,16 +301,16 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         Gerais</option>
 
                     <option value="PA" <?php if (isset($estado) && $estado == "PA")
-                                            echo 'selected="selected" '; ?>>Par·
+                                            echo 'selected="selected" '; ?>>Par√°
                     </option>
 
                     <option value="PB" <?php if (isset($estado) && $estado == "PB")
                                             echo 'selected="selected" '; ?>>
-                        ParaÌba
+                        Para√≠ba
                     </option>
 
                     <option value="PR" <?php if (isset($estado) && $estado == "PR")
-                                            echo 'selected="selected" '; ?>>Paran·
+                                            echo 'selected="selected" '; ?>>Paran√°
                     </option>
 
                     <option value="PE" <?php if (isset($estado) && $estado == "PE")
@@ -318,7 +318,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         Pernambuco</option>
 
                     <option value="PI" <?php if (isset($estado) && $estado == "PI")
-                                            echo 'selected="selected" '; ?>>PiauÌ
+                                            echo 'selected="selected" '; ?>>Piau√≠
                     </option>
 
                     <option value="RJ" <?php if (isset($estado) && $estado == "RJ")
@@ -335,7 +335,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                     <option value="RO" <?php if (isset($estado) && $estado == "RO")
                                             echo 'selected="selected" '; ?>>
-                        RondÙnia</option>
+                        Rond√¥nia</option>
 
                     <option value="RR" <?php if (isset($estado) && $estado == "RR")
                                             echo 'selected="selected" '; ?>>
@@ -347,7 +347,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         Catarina</option>
 
                     <option value="SP" <?php if (empty($estado) || (isset($estado) && $estado == "SP"))
-                                            echo 'selected="selected" '; ?>>S„o Paulo</option>
+                                            echo 'selected="selected" '; ?>>S√£o Paulo</option>
 
                     <option value="SE" <?php if (isset($estado) && $estado == "SE")
                                             echo 'selected="selected" '; ?>>
@@ -370,7 +370,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
         <div class="col-md-12 col-sm-12 col-xs-12 text-right">
 
-            <div class="col-md-4 col-sm-4 col-xs-4 text-right">CÛdigo da Finalidade do Arquivo:</div>
+            <div class="col-md-4 col-sm-4 col-xs-4 text-right">C√≥digo da Finalidade do Arquivo:</div>
 
             <div class="col-md-6 col-sm-6 col-xs-6">
 
@@ -387,7 +387,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     <option value="3" <?php if (isset($cod_fin) && $cod_fin == "3")
                                             echo 'selected="selected" '; ?>>
                         Remessa
-                        de arquivo para atender notificaÁ„o</option>
+                        de arquivo para atender notifica√ß√£o</option>
 
                     <!-- option value="4" <?php if (isset($cod_fin) && $cod_fin == "4")
                                                 echo 'selected="selected" '; ?>>Remessa de arquivo zerado</option -->
@@ -421,7 +421,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
             <div class="col-md-6 col-sm-6 col-xs-6">
 
                 <input type="text" id="cpfcnpj" name="cpfcnpj" char="18" maxlength="18"
-                    class="form form-control data w320" placeholder="AINDA N√O IMPLEMENTADO - CPF ou CNPJ"
+                    class="form form-control data w320" placeholder="AINDA N√ÉO IMPLEMENTADO - CPF ou CNPJ"
                     value="<?php echo (!empty($_POST['cpfcnpj'])) ? $_POST['cpfcnpj'] : ""; ?>" readonly="readonly">
 
             </div>
@@ -438,7 +438,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 </div> <!--fecha a div de class="container"> -->
 
-<div id="resultado"></div> <!-- Elemento onde o HTML retornado ser· inserido -->
+<div id="resultado"></div> <!-- Elemento onde o HTML retornado ser√° inserido -->
 
 <?php
 
@@ -559,50 +559,83 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
         $("#modal-load").modal('hide');
 
         $(document).ready(function() {
+            const CACHE_MS = 15 * 60 * 1000; // 15 minutos
+            let lastRequestCache = {
+                paramsKey: null,
+                ticket_id: null,
+                ts: 0
+            };
+            let ajaxSolicitarInFlight = false;
+
             $('#congelamento').on('submit', function(e) {
                 e.preventDefault();
 
                 // Exibe mensagem de carregamento na div resultado
                 $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="40px" />Ainda processando, esse processo pode demorar 15 minutos ou mais, por favor aguarde...</div></div>');
 
-                // Cria um ID ˙nico para a requisiÁ„o
-                const requisicaoId = 'req_' + Date.now();
+                // De-dup (frontend) para a mesma solicita√ß√£o recente evitar re-disparar
+                const paramsKey = JSON.stringify({
+                    estado: $('#estado').val() || '',
+                    data_inicial: $('#data_inicial').val() || '',
+                    cod_fin: $('#cod_fin').val() || '',
+                    cpfcnpj: $('#cpfcnpj').val() || ''
+                });
 
-                // Serializa os dados do formul·rio + o requisicao_id
-                var formData = $(this).serialize() + '&requisicao_id=' + requisicaoId;
+                const agora = Date.now();
+                if (
+                    lastRequestCache.paramsKey === paramsKey &&
+                    (agora - lastRequestCache.ts) < CACHE_MS &&
+                    lastRequestCache.ticket_id
+                ) {
+                    iniciarVerificacao(lastRequestCache.ticket_id);
+                    return;
+                }
 
-                // Envia a requisiÁ„o inicial
+                if (ajaxSolicitarInFlight) {
+                    return;
+                }
+                ajaxSolicitarInFlight = true;
+
+                var formData = $(this).serialize() + '&acao=solicitar_download';
+
                 $.ajax({
                     url: './ajax_dimp.php',
                     method: 'POST',
                     data: formData,
+                    dataType: 'json',
                     success: function(response) {
-                        if (response.trim() === '') {
-                            iniciarVerificacao(formData);
+                        ajaxSolicitarInFlight = false;
+                        if (response.sucesso) {
+                            lastRequestCache = {
+                                paramsKey: paramsKey,
+                                ticket_id: response.ticket_id,
+                                ts: Date.now()
+                            };
+                            iniciarVerificacao(response.ticket_id);
                         } else {
-                            $('#resultado').html(response);
+                            $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisi√ß√£o: ' + response.mensagem + '</div></div>');
                         }
                     },
                     error: function() {
-                        $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisiÁ„o.</div></div>');
-
+                        ajaxSolicitarInFlight = false;
+                        $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisi√ß√£o.</div></div>');
                     }
                 });
             });
 
-            // FunÁ„o que verifica o status do processamento de tempos em tempos
+            // Fun√ß√£o que verifica o status do processamento de tempos em tempos
             let intervaloVerificacao = null;
             let requisicaoEmAndamento = false;
 
-            function iniciarVerificacao(formData) {
+            function iniciarVerificacao(ticket_id) {
 
-                // proteÁ„o: evita iniciar duas vezes
+                // prote√ß√£o: evita iniciar duas vezes
                 if (intervaloVerificacao !== null) {
-                    console.warn('VerificaÁ„o j· em andamento.');
+                    console.warn('Verifica√ß√£o j√° em andamento.');
                     return;
                 }
 
-                // HTML padr„o de "processando"
+                // HTML padr√£o de "processando"
                 const htmlProcessando = `
             <div class="row">
                 <div class="col-md-12 text-center top50"
@@ -620,12 +653,9 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                 $('#resultado').html(htmlProcessando);
 
-                // inicia o intervalo
-                formData = formData + '&verificar=true';
-
                 intervaloVerificacao = setInterval(function() {
 
-                    // evita chamadas paralelas se a anterior n„o terminou
+                    // evita chamadas paralelas se a anterior n√£o terminou
                     if (requisicaoEmAndamento) {
                         return;
                     }
@@ -635,18 +665,54 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     $.ajax({
                         url: './ajax_dimp.php',
                         type: 'POST',
-                        data: formData,
+                        data: {
+                            acao: 'checar_status',
+                            ticket_id: ticket_id
+                        },
+                        dataType: 'json',
                         timeout: 30000, // 30s de timeout
                         success: function(response) {
+                            if (!response || !response.status) {
+                                clearInterval(intervaloVerificacao);
+                                intervaloVerificacao = null;
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                            Resposta inv√°lida ao verificar processamento.
+                                        </div>
+                                    </div>
+                                `);
+                                return;
+                            }
 
-                            const status = response.trim();
-
-                            if (status !== 'aguardando') {
+                            if (response.status === 'CONCLUIDO') {
                                 // finalizou ? para o intervalo
                                 clearInterval(intervaloVerificacao);
                                 intervaloVerificacao = null;
-
-                                $('#resultado').html(response);
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                            Arquivo DIMP gerado com sucesso. Iniciando download...
+                                        </div>
+                                    </div>
+                                `);
+                                if (response.caminho_arquivo) {
+                                    window.open(response.caminho_arquivo, '_blank');
+                                }
+                            } else if (response.status === 'ERRO') {
+                                clearInterval(intervaloVerificacao);
+                                intervaloVerificacao = null;
+                                const msgErro = response.mensagem_erro ? response.mensagem_erro : 'Erro ao processar arquivo DIMP.';
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;white-space:pre-wrap;">
+                                            ${msgErro}
+                                        </div>
+                                    </div>
+                                `);
                             } else {
                                 // ainda processando
                                 $('#resultado').html(htmlProcessando);
@@ -674,7 +740,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     `);
                         },
                         complete: function() {
-                            // libera para prÛxima execuÁ„o
+                            // libera para pr√≥xima execu√ß√£o
                             requisicaoEmAndamento = false;
                         }
                     });

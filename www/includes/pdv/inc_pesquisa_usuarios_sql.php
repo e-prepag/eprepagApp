@@ -35,7 +35,7 @@ if ($tf_u_substatus) {	//|| $tf_u_substatus==0
 	else
 		$sql .= " and ug.ug_substatus = " . $tf_u_substatus . " ";
 }
-// Se tem operadora selecionada emtão quer dizer que tem valor e por isso vamos escolher só os que estão com valor >0
+// Se tem operadora selecionada emtÃ£o quer dizer que tem valor e por isso vamos escolher sÃ³ os que estÃ£o com valor >0
 if ($produtos_query) {
 	$sql .= " and coalesce(vg_valor, 0)>0 ";
 }
@@ -45,41 +45,41 @@ if ($tf_u_data_ultimo_acesso_ini && $tf_u_data_ultimo_acesso_fim) $sql .= " and 
 if ($tf_u_data_inclusao_ini && $tf_u_data_inclusao_fim) 			$sql .= " and ug.ug_data_inclusao >= '" . formata_data($tf_u_data_inclusao_ini, 1) . " 00:00:00' and ug.ug_data_inclusao <='" . formata_data($tf_u_data_inclusao_fim, 1) . " 23:59:59'";
 if ($ug_data_expiracao_senha_ini && $ug_data_expiracao_senha_fim) 			$sql .= " and ug.ug_data_expiracao_senha >= '" . formata_data($ug_data_expiracao_senha_ini, 1) . " 00:00:00' and ug.ug_data_expiracao_senha <='" . formata_data($ug_data_expiracao_senha_fim, 1) . " 23:59:59'";
 if ($ug_data_desativacao_ini && $ug_data_desativacao_fim) 			$sql .= " and ug.ug_data_encerramento_conta >= '" . formata_data($ug_data_desativacao_ini, 1) . " 00:00:00' and ug.ug_data_encerramento_conta <='" . formata_data($ug_data_desativacao_fim, 1) . " 23:59:59'";
-if ($tf_u_login) 		$sql .= " and upper(ug.ug_login) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_login))) . "%' ";
+if (trim($tf_u_login ?? '') != '') 		$sql .= " and upper(ug.ug_login) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_login))) . "%' ";
 
-if ($tf_u_nome_fantasia) $sql .= " and upper(ug.ug_nome_fantasia) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_nome_fantasia))) . "%' ";
-if ($tf_u_razao_social) 	$sql .= " and upper(ug.ug_razao_social) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_razao_social))) . "%' ";
-if ($tf_u_cnpj) 			$sql .= " and ug.ug_cnpj like '%" . trim($tf_u_cnpj) . "%' ";
+if (trim($tf_u_nome_fantasia ?? '') != '') $sql .= " and upper(ug.ug_nome_fantasia) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_nome_fantasia))) . "%' ";
+if (trim($tf_u_razao_social ?? '') != '') 	$sql .= " and upper(ug.ug_razao_social) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_razao_social))) . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cnpj ?? '')) != '') 			$sql .= " and ug.ug_cnpj like '%" . trim($tf_u_cnpj) . "%' ";
 //tipo estabelecimento
 if ($tf_ug_te_id)		$sql .= " and ug.ug_te_id = " . $tf_ug_te_id . " ";
 if ($tf_ug_te_id_ativo === '0' || $tf_ug_te_id_ativo === '1')	$sql .= " and te.te_ativo = " . $tf_ug_te_id_ativo . " ";
 
-if ($tf_u_responsavel) 	$sql .= " and upper(ug.ug_responsavel) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_responsavel))) . "%' ";
-if ($tf_u_email)			$sql .= " and upper(ug.ug_email) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_email))) . "%' ";
-if ($tf_u_site)			$sql .= " and upper(ug.ug_site) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_site))) . "%' ";
+if (trim($tf_u_responsavel ?? '') != '') 	$sql .= " and upper(ug.ug_responsavel) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_responsavel))) . "%' ";
+if (trim($tf_u_email ?? '') != '')			$sql .= " and upper(ug.ug_email) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_email))) . "%' ";
+if (trim($tf_u_site ?? '') != '')			$sql .= " and upper(ug.ug_site) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_site))) . "%' ";
 
 if ($tf_u_tipo_cadastro) $sql .= " and upper(ug.ug_tipo_cadastro) = '" . str_replace("'", "''", strtoupper($tf_u_tipo_cadastro)) . "' ";
-if ($tf_u_nome) 		$sql .= " and upper(ug.ug_nome) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_nome))) . "%' ";
-if ($tf_u_cpf) 		$sql .= " and (ug.ug_cpf like '%" . trim($tf_u_cpf) . "%' or  ug.ug_repr_legal_cpf like '%" . trim($tf_u_cpf) . "%' or  ug.ug_repr_venda_cpf like '%" . trim($tf_u_cpf) . "%')";
-if ($tf_u_rg) 		$sql .= " and ug.ug_rg like '%" . trim($tf_u_rg) . "%' ";
+if (trim($tf_u_nome ?? '') != '') 		$sql .= " and upper(ug.ug_nome) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_nome))) . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cpf ?? '')) != '') 		$sql .= " and (ug.ug_cpf like '%" . trim($tf_u_cpf) . "%' or  ug.ug_repr_legal_cpf like '%" . trim($tf_u_cpf) . "%' or  ug.ug_repr_venda_cpf like '%" . trim($tf_u_cpf) . "%')";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_rg ?? '')) != '') 		$sql .= " and ug.ug_rg like '%" . trim($tf_u_rg) . "%' ";
 if ($tf_u_sexo) 		$sql .= " and upper(ug.ug_sexo) = '" . strtoupper($tf_u_sexo) . "' ";
 if ($tf_u_data_nascimento_ini && $tf_u_data_nascimento_fim) 			$sql .= " and ug.ug_data_nascimento between '" . formata_data($tf_u_data_nascimento_ini, 1) . "' and '" . formata_data($tf_u_data_nascimento_fim, 1) . "'";
 
-if ($tf_u_endereco) 	$sql .= " and upper(ug.ug_endereco) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_endereco))) . "%' ";
-if ($tf_u_bairro)	$sql .= " and lower(ug.ug_bairro) like '%" . str_replace("'", "''", trim(strtolower($tf_u_bairro))) . "%' ";
-if ($tf_u_cidade)	$sql .= " and lower(ug.ug_cidade) like '%" . str_replace("'", "''", trim(strtolower($tf_u_cidade))) . "%' ";
-if ($tf_u_cep)		$sql .= " and ug.ug_cep like '%" . $tf_u_cep . "%' ";
+if (trim($tf_u_endereco ?? '') != '') 	$sql .= " and upper(ug.ug_endereco) like '%" . str_replace("'", "''", trim(strtoupper($tf_u_endereco))) . "%' ";
+if (trim($tf_u_bairro ?? '') != '')	$sql .= " and lower(ug.ug_bairro) like '%" . str_replace("'", "''", trim(strtolower($tf_u_bairro))) . "%' ";
+if (trim($tf_u_cidade ?? '') != '')	$sql .= " and lower(ug.ug_cidade) like '%" . str_replace("'", "''", trim(strtolower($tf_u_cidade))) . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cep ?? '')) != '')		$sql .= " and ug.ug_cep like '%" . $tf_u_cep . "%' ";
 if ($tf_u_estado)	$sql .= " and upper(ug.ug_estado) = '" . str_replace("'", "''", strtoupper($tf_u_estado)) . "' ";
 
 if ($tf_u_tel_ddi) 	$sql .= " and ug.ug_tel_ddi = '" . $tf_u_tel_ddi . "' ";
 if ($tf_u_tel_ddd) 	$sql .= " and ug.ug_tel_ddd = '" . $tf_u_tel_ddd . "' ";
-if ($tf_u_tel) 		$sql .= " and ug.ug_tel like '%" . $tf_u_tel . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_tel ?? '')) != '') 		$sql .= " and ug.ug_tel like '%" . $tf_u_tel . "%' ";
 if ($tf_u_cel_ddi) 	$sql .= " and ug.ug_cel_ddi = '" . $tf_u_cel_ddi . "' ";
 if ($tf_u_cel_ddd) 	$sql .= " and ug.ug_cel_ddd = '" . $tf_u_cel_ddd . "' ";
-if ($tf_u_cel) 		$sql .= " and ug.ug_cel like '%" . $tf_u_cel . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cel ?? '')) != '') 		$sql .= " and ug.ug_cel like '%" . $tf_u_cel . "%' ";
 if ($tf_u_fax_ddi) 	$sql .= " and ug.ug_fax_ddi = '" . $tf_u_fax_ddi . "' ";
 if ($tf_u_fax_ddd) 	$sql .= " and ug.ug_fax_ddd = '" . $tf_u_fax_ddd . "' ";
-if ($tf_u_fax) 		$sql .= " and ug.ug_fax like '%" . $tf_u_fax . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_fax ?? '')) != '') 		$sql .= " and ug.ug_fax like '%" . $tf_u_fax . "%' ";
 
 if ($tf_u_endereco_ip) {
 	$sql .= " and EXISTS (
@@ -90,7 +90,7 @@ if ($tf_u_endereco_ip) {
     ) ";
 }
 
-if ($tf_u_observacoes) {
+if (trim($tf_u_observacoes ?? '') != '') {
 	$sql .= " and EXISTS (
         SELECT 1 
         FROM dist_usuarios_games_obs obs
@@ -100,13 +100,13 @@ if ($tf_u_observacoes) {
 }
 
 if ($tf_u_ra_codigo)	$sql .= " and upper(ug.ug_ra_codigo) = '" . str_replace("'", "''", strtoupper($tf_u_ra_codigo)) . "' ";
-if ($tf_u_ra_outros)	$sql .= " and upper(ug.ug_ra_outros) like '%" . str_replace("'", "''", strtoupper($tf_u_ra_outros)) . "%' ";
+if (trim($tf_u_ra_outros ?? '') != '')	$sql .= " and upper(ug.ug_ra_outros) like '%" . str_replace("'", "''", strtoupper($tf_u_ra_outros)) . "%' ";
 
-if ($tf_u_contato01_nome) 	$sql .= " and upper(ug.ug_contato01_nome) like '%" . str_replace("'", "''", strtoupper($tf_u_contato01_nome)) . "%' ";
-if ($tf_u_contato01_cargo) 	$sql .= " and upper(ug.ug_contato01_cargo) like '%" . str_replace("'", "''", strtoupper($tf_u_contato01_cargo)) . "%' ";
+if (trim($tf_u_contato01_nome ?? '') != '') 	$sql .= " and upper(ug.ug_contato01_nome) like '%" . str_replace("'", "''", strtoupper($tf_u_contato01_nome)) . "%' ";
+if (trim($tf_u_contato01_cargo ?? '') != '') 	$sql .= " and upper(ug.ug_contato01_cargo) like '%" . str_replace("'", "''", strtoupper($tf_u_contato01_cargo)) . "%' ";
 if ($tf_u_contato01_tel_ddi) $sql .= " and ug.ug_contato01_tel_ddi = '" . $tf_u_contato01_tel_ddi . "' ";
 if ($tf_u_contato01_tel_ddd) $sql .= " and ug.ug_contato01_tel_ddd = '" . $tf_u_contato01_tel_ddd . "' ";
-if ($tf_u_contato01_tel) 	$sql .= " and ug.ug_contato01_tel like '%" . $tf_u_contato01_tel . "%' ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_contato01_tel ?? '')) != '') 	$sql .= " and ug.ug_contato01_tel like '%" . $tf_u_contato01_tel . "%' ";
 
 //if($tf_u_observacoes) 	$sql .= " and ug.ug_observacoes like '%" . $tf_u_observacoes . "%' ";
 
@@ -187,7 +187,7 @@ if ($tf_u_tipo_venda) {
 }
 
 // NexCafe
-if ($tf_u_login_nexcafe)	$sql .= " and upper(ug.ug_id_nexcafe) like '%" . str_replace("'", "''", strtoupper($tf_u_login_nexcafe)) . "%' ";
+if (trim($tf_u_login_nexcafe ?? '') != '')	$sql .= " and upper(ug.ug_id_nexcafe) like '%" . str_replace("'", "''", strtoupper($tf_u_login_nexcafe)) . "%' ";
 if ($tf_u_login_automatico_nexcafe) $sql .= " and ug.ug_login_nexcafe_auto=" . $tf_u_login_automatico_nexcafe . " ";
 if ($tf_u_data_adesao_nexcafe_ini && $tf_u_data_adesao_nexcafe_fim)
 	$sql .= " and ug.ug_data_inclusao_nexcafe between '" . formata_data($tf_u_data_adesao_nexcafe_ini, 1) . "' and '" . formata_data($tf_u_data_adesao_nexcafe_fim, 1) . "'";
