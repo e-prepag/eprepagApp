@@ -2551,7 +2551,7 @@ function workerGerarDIMP($parametros)
                                 } //end if ($transacoes)
                                 else {
 
-                                    $msg .= PHP_EOL . "ERRO 0011: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Administradora.";
+                                    $msg .= PHP_EOL . "ERRO 0011: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Administradora. $sql";
                                 } //end else do if ($transacoes)
 
 
