@@ -2449,6 +2449,8 @@ function workerGerarDIMP($parametros)
 
                                 $transacoes = SQLexecuteQuery($sql);
 
+                                $msg .= PHP_EOL . $sql;
+
                                 if ($transacoes) {
 
                                     while ($transacoes_row = pg_fetch_array($transacoes)) {
@@ -2551,7 +2553,7 @@ function workerGerarDIMP($parametros)
                                 } //end if ($transacoes)
                                 else {
 
-                                    $msg .= PHP_EOL . "ERRO 0011: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Administradora. $sql";
+                                    $msg .= PHP_EOL . "ERRO 0011: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Administradora! $sql";
                                 } //end else do if ($transacoes)
 
 
