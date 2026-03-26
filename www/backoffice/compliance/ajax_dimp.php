@@ -86,7 +86,7 @@ try {
                        FROM fila_tarefas_background
                       WHERE tipo_tarefa = 'gerar_dimp'
                         AND parametros = :params
-                        AND data_solicitacao >= NOW() - INTERVAL '15 minutes'
+                        AND data_solicitacao >= NOW() - INTERVAL '90 minutes'
                    ORDER BY id DESC
                       LIMIT 1";
 
