@@ -11,7 +11,7 @@ require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
 
-$arquivoControle = __DIR__ . '/www/arquivos_gerados/logs/ultimo_email_int_pedidos.txt';
+$arquivoControle = '/www/arquivos_gerados/logs/ultimo_email_int_pedidos.txt';
 $intervaloEmSegundos = 2 * 60 * 60;
 
 $arquivoLog = new ManipulacaoArquivosLog($argv);
