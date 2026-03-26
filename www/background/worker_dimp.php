@@ -55,7 +55,8 @@ function removerAcentos($string)
     return strtr($string, $map);
 }
 
-function workerGerarDIMP($parametros) {
+function workerGerarDIMP($parametros)
+{
     $estado = $parametros['estado'] ?? '';
     $data_inicial = $parametros['data_inicial'] ?? '';
     $cod_fin = $parametros['cod_fin'] ?? '';
@@ -64,115 +65,117 @@ function workerGerarDIMP($parametros) {
     $time_start = microtime(true);
 
     global $raiz_do_projeto;
-    if (empty($raiz_do_projeto)) { $raiz_do_projeto = '/www/'; }
+    if (empty($raiz_do_projeto)) {
+        $raiz_do_projeto = '/www/';
+    }
     require_once $raiz_do_projeto . 'class/util/classFilePipe.php';
     require_once $raiz_do_projeto . 'includes/constantes.php';
     require_once $raiz_do_projeto . 'includes/gamer/constantes.php';
     require_once $raiz_do_projeto . 'includes/main.php';
 
 
-//Dados Necessários
+    //Dados Necessários
 
-$cnpjEPP = '19037276000172';                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    $cnpjEPP = '19037276000172';                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$razaoEPP = 'E-prepag Administradora de Cartoes Ltda';  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    $razaoEPP = 'E-prepag Administradora de Cartoes Ltda';  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';    // Endereço da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    $enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';    // Endereço da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$cepEPP = '05418000';                                   // CEP da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    $cepEPP = '05418000';                                   // CEP da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$ufEPP = 'SP';                                          // UF da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    $ufEPP = 'SP';                                          // UF da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$nomeRespEPP = 'Daniela Oliveira';                      // Nome do responsável da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+    $nomeRespEPP = 'Daniela Oliveira';                      // Nome do responsável da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$foneEPP = '01130309106';                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
+    $foneEPP = '01130309106';                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
-$emailEPP = getenv('email_financeiro');               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
-
-
-
-$opr_codigoEPPPAGTO = '1';                               // opr_codigo utilizado para identificação da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$cnpjEPPPAGTO = '08221305000135';                        // CNPJ da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$razaoEPPPAGTO = 'E-PREPAG PAGAMENTOS ELETRONICOS LTDA';      // Razão Social da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$enderecoEPPPAGTO = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26, 27 e 28, Pinheiros';    // Endereço da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$cepEPPPAGTO = '05418000';                                   // CEP da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$ufEPPPAGTO = 'SP';                                          // UF da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$nomeRespEPPPAGTO = 'Glaucia da Costa Gregio';               // Nome do responsável da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
-
-$foneEPPPAGTO = '01130309101';                               // Telefone para contato na empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA 
-
-$emailEPPPAGTO = 'glaucia@e-prepag.com.br';                  // Email para contato na empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA 
-
-$dataCredenciamentoEPPPAGTO = '20171101';                    // Data do credenciamento da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA junto a E-PREPAG ADMINISTRADORA DE CARTOES LTDA
-
-$IND_COMEX_EPPPAGTO = "0";                                   // Informar se a transação se refere a pagamento ao exterior, em transações cross border. Valores Válidos: [0,1]  Indicador de transação de pagamento ao exterior 0 - Não 1 - Sim 
+    $emailEPP = getenv('email_financeiro');               // Email para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
 
 
-$COD_MCAPT = "4";                                            // Informar o código de identificação do Meio de Captura, ele é de livre atribuição da Instituição de Pagamento e único por arquivo. 
+    $opr_codigoEPPPAGTO = '1';                               // opr_codigo utilizado para identificação da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$NUM_LOG = "E-commerce";                                     // Informar o número lógico do Meio de Captura que identifica o terminal e corresponde ao informado nos comprovantes de pagamento. Validação: Para o Tipo de Tecnologia ?4 - E- commerce? do Campo 04, caso não seja possível identificar o meio de captura, deve ser informado ?E-commerce?. 
+    $cnpjEPPPAGTO = '08221305000135';                        // CNPJ da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$TIPO_TECN = "4";                                            // O tipo 6 refere-se a URA - Unidade de Resposta Audível e MOTO (mail order / telephone order). Valores Válidos: [1,2,3,4,5,6] 
+    $razaoEPPPAGTO = 'E-PREPAG PAGAMENTOS ELETRONICOS LTDA';      // Razão Social da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$TERM_PROP = "0";                                            // Informar sobre a propriedade do terminal, se é próprio ou de terceiros. Valores Válidos: [0,1]. Validação: Para o Tipo de Tecnologia ?4 - E-commerce? do Campo 04 deve ser informado obrigatoriamente ?0 terminal próprio?. 
+    $enderecoEPPPAGTO = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26, 27 e 28, Pinheiros';    // Endereço da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$MARCA = "E-PREPAG";                                         // Informar a marca que identifica a Instituição de Pagamento no comprovante da transação. Validação: Para TERM_PROP do Campo 05 igual a ?1 - terminal de terceiro? este campo deve ser informado obrigatoriamente. 
+    $cepEPPPAGTO = '05418000';                                   // CEP da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$IND_EXTEMP = "0";                                           // Informar se a transação se refere a operação extemporânea. Para arquivos de retificação, finalidade 02 do campo 03 no registro 0000, não serão aceitos registros extemporâneos. Valores Válidos: [0,1]. Validação: Para ?Retificação do arquivo?, o IND_EXTEMP deve ser igual a zero. 
+    $ufEPPPAGTO = 'SP';                                          // UF da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$IND_SPLIT = "0";                                            // Informar se a operação faz parte de uma operação ?splitada?. Valores Válidos: [0,1]
+    $nomeRespEPPPAGTO = 'Glaucia da Costa Gregio';               // Nome do responsável da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$BANDEIRA = "99";                                            // A especificação da bandeira deve estar contida na Relação de Bandeiras constante no Manual de Orientação ao Contribuinte do Projeto NF-e. Para boleto, informar 99 ? outros. 
+    $foneEPPPAGTO = '01130309101';                               // Telefone para contato na empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA 
 
-$NAT_OPER = "2";                                             // Informar a natureza da operação realizada no comprovante de pagamento referenciado. Valores Válidos: [1,2,3,4,9] NAT_OPER 1 ? Crédito 2 ? Débito 3 ? Boleto 4 ? Pagamentos instantâneos /Transferência de Recursos 9 - Outros. 
+    $emailEPPPAGTO = 'glaucia@e-prepag.com.br';                  // Email para contato na empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA 
 
+    $dataCredenciamentoEPPPAGTO = '20171101';                    // Data do credenciamento da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA junto a E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-
-//Esse ID é concatenado no inicio de cada id da operação('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
-
-$ARRAY_CONCATENA_ID_VENDA = array(
-
-    'gamer' => '10',
-
-    'pdv' => '20',
-
-    'cards' => '30',
-
-    'boleto_express' => '40'
-
-);
+    $IND_COMEX_EPPPAGTO = "0";                                   // Informar se a transação se refere a pagamento ao exterior, em transações cross border. Valores Válidos: [0,1]  Indicador de transação de pagamento ao exterior 0 - Não 1 - Sim 
 
 
 
-//Buscando Publisher que possuem totalização por utilização
+    $COD_MCAPT = "4";                                            // Informar o código de identificação do Meio de Captura, ele é de livre atribuição da Instituição de Pagamento e único por arquivo. 
 
-$vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
+    $NUM_LOG = "E-commerce";                                     // Informar o número lógico do Meio de Captura que identifica o terminal e corresponde ao informado nos comprovantes de pagamento. Validação: Para o Tipo de Tecnologia ?4 - E- commerce? do Campo 04, caso não seja possível identificar o meio de captura, deve ser informado ?E-commerce?. 
 
-try {
-    // Split ano/mes
+    $TIPO_TECN = "4";                                            // O tipo 6 refere-se a URA - Unidade de Resposta Audível e MOTO (mail order / telephone order). Valores Válidos: [1,2,3,4,5,6] 
 
-    list($mes, $ano) = explode("/", $data_inicial);
+    $TERM_PROP = "0";                                            // Informar sobre a propriedade do terminal, se é próprio ou de terceiros. Valores Válidos: [0,1]. Validação: Para o Tipo de Tecnologia ?4 - E-commerce? do Campo 04 deve ser informado obrigatoriamente ?0 terminal próprio?. 
+
+    $MARCA = "E-PREPAG";                                         // Informar a marca que identifica a Instituição de Pagamento no comprovante da transação. Validação: Para TERM_PROP do Campo 05 igual a ?1 - terminal de terceiro? este campo deve ser informado obrigatoriamente. 
+
+    $IND_EXTEMP = "0";                                           // Informar se a transação se refere a operação extemporânea. Para arquivos de retificação, finalidade 02 do campo 03 no registro 0000, não serão aceitos registros extemporâneos. Valores Válidos: [0,1]. Validação: Para ?Retificação do arquivo?, o IND_EXTEMP deve ser igual a zero. 
+
+    $IND_SPLIT = "0";                                            // Informar se a operação faz parte de uma operação ?splitada?. Valores Válidos: [0,1]
+
+    $BANDEIRA = "99";                                            // A especificação da bandeira deve estar contida na Relação de Bandeiras constante no Manual de Orientação ao Contribuinte do Projeto NF-e. Para boleto, informar 99 ? outros. 
+
+    $NAT_OPER = "2";                                             // Informar a natureza da operação realizada no comprovante de pagamento referenciado. Valores Válidos: [1,2,3,4,9] NAT_OPER 1 ? Crédito 2 ? Débito 3 ? Boleto 4 ? Pagamentos instantâneos /Transferência de Recursos 9 - Outros. 
 
 
 
-    // Capturando o ultimo dia do mês
+    //Esse ID é concatenado no inicio de cada id da operação('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
 
-    $currentmonth = mktime(0, 0, 0, $mes, 1, $ano);
+    $ARRAY_CONCATENA_ID_VENDA = array(
 
-    $ultimoDiaMes = date('t', $currentmonth);
+        'gamer' => '10',
+
+        'pdv' => '20',
+
+        'cards' => '30',
+
+        'boleto_express' => '40'
+
+    );
 
 
 
-    //Checando se existe algum período não congelado para a geração do mesmo
+    //Buscando Publisher que possuem totalização por utilização
 
-    $sql_check_freeze = "
+    $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
+
+    try {
+        // Split ano/mes
+
+        list($mes, $ano) = explode("/", $data_inicial);
+
+
+
+        // Capturando o ultimo dia do mês
+
+        $currentmonth = mktime(0, 0, 0, $mes, 1, $ano);
+
+        $ultimoDiaMes = date('t', $currentmonth);
+
+
+
+        //Checando se existe algum período não congelado para a geração do mesmo
+
+        $sql_check_freeze = "
 
                         select 
 
@@ -190,23 +193,23 @@ try {
 
                                and opr_status = '1';";
 
-    $freeze_total = SQLexecuteQuery($sql_check_freeze);
+        $freeze_total = SQLexecuteQuery($sql_check_freeze);
 
-    $msg = "";
+        $msg = "";
 
-    if ($freeze_total && $freeze_total_row = pg_fetch_array($freeze_total)) {
+        if ($freeze_total && $freeze_total_row = pg_fetch_array($freeze_total)) {
 
-        //verificando se existem registros sem congelamento
+            //verificando se existem registros sem congelamento
 
-        if ($freeze_total_row['total'] > 0) {
+            if ($freeze_total_row['total'] > 0) {
 
-            $msg = "ATENCAO 0002: Existem registros sem data congelada dentro do periodo apurado.";
+                $msg = "ATENCAO 0002: Existem registros sem data congelada dentro do periodo apurado.";
 
 
 
-            //Detalhando quais registros não estão congelados
+                //Detalhando quais registros não estão congelados
 
-            $sql_no_freeze = "  select 
+                $sql_no_freeze = "  select 
 
                                        count(*) as total,
 
@@ -238,275 +241,275 @@ try {
 
                                        fp_date;";
 
-            $freeze_detail = SQLexecuteQuery($sql_no_freeze);
+                $freeze_detail = SQLexecuteQuery($sql_no_freeze);
 
-            if ($freeze_detail) {
+                if ($freeze_detail) {
 
-                $msg .= PHP_EOL . "Relacao de Publishers que precisam ter seus periodos congelados:";
+                    $msg .= PHP_EOL . "Relacao de Publishers que precisam ter seus periodos congelados:";
 
-                $lastPublisher = NULL;
+                    $lastPublisher = NULL;
 
-                while ($freeze_detail_row = pg_fetch_array($freeze_detail)) {
+                    while ($freeze_detail_row = pg_fetch_array($freeze_detail)) {
 
-                    $publisherCodigo = (($freeze_detail_row['fp_publisher'] != $lastPublisher) ? $freeze_detail_row['fp_publisher'] : "");
-                    $publisherNome = (($freeze_detail_row['fp_publisher'] != $lastPublisher) ? $freeze_detail_row['opr_nome'] : "");
-                    $msg .= PHP_EOL . "- Cod: " . $publisherCodigo . " | Publisher: " . $publisherNome . " | Data: " . substr($freeze_detail_row['fp_date'], 0, 10);
+                        $publisherCodigo = (($freeze_detail_row['fp_publisher'] != $lastPublisher) ? $freeze_detail_row['fp_publisher'] : "");
+                        $publisherNome = (($freeze_detail_row['fp_publisher'] != $lastPublisher) ? $freeze_detail_row['opr_nome'] : "");
+                        $msg .= PHP_EOL . "- Cod: " . $publisherCodigo . " | Publisher: " . $publisherNome . " | Data: " . substr($freeze_detail_row['fp_date'], 0, 10);
 
-                    $lastPublisher = $freeze_detail_row['fp_publisher'];
-                } //end while
+                        $lastPublisher = $freeze_detail_row['fp_publisher'];
+                    } //end while
 
-            } //end if ($freeze_detail)
+                } //end if ($freeze_detail)
+                else {
+
+                    $msg .= PHP_EOL . "ERRO 0003: Erro ao executar o select dos DETALHES dos periodos nao congelados.";
+                } //end else do if ($freeze_detail)
+
+            } //end if($freeze_total_row['total'] > 0)
             else {
 
-                $msg .= PHP_EOL . "ERRO 0003: Erro ao executar o select dos DETALHES dos periodos nao congelados.";
-            } //end else do if ($freeze_detail)
 
-        } //end if($freeze_total_row['total'] > 0)
-        else {
 
+                //
 
+                // INÍCIO DO BLOCO DE GERAÇÃO DO ARQUIVO
 
-            //
+                //
+                $nomeArquivo = $estado . '_TEF-DIMP_' . $mes . $ano . date('-YmdHis') . '.txt';
 
-            // INÍCIO DO BLOCO DE GERAÇÃO DO ARQUIVO
+                $nomeArquivoDIMP[] = $nomeArquivo;
 
-            //
-            $nomeArquivo = $estado . '_TEF-DIMP_' . $mes . $ano . date('-YmdHis') . '.txt';
+                // Contador de registros do Bloco Zero
 
-            $nomeArquivoDIMP[] = $nomeArquivo;
+                $countBlocoZero = 0;
 
-            // Contador de registros do Bloco Zero
+                unset($file);
 
-            $countBlocoZero = 0;
+                $file = new FilePipe($nomeArquivo);
 
-            unset($file);
+                //=========================================================================================================================
 
-            $file = new FilePipe($nomeArquivo);
+                // REGISTRO TIPO 0000: ABERTURA DO ARQUIVO DIGITAL E IDENTIFICAÇÃO DA INSTITUIÇÃO DE PAGAMENTO 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 0000: ABERTURA DO ARQUIVO DIGITAL E IDENTIFICAÇÃO DA INSTITUIÇÃO DE PAGAMENTO 
+                unset($vetorLines);
 
-            //=========================================================================================================================
+                $vetorLines = array(
 
-            unset($vetorLines);
+                    0 => array(
+                        'name' => '0000',
 
-            $vetorLines = array(
+                        'size' => 4
 
-                0 => array(
-                    'name' => '0000',
+                    ),
 
-                    'size' => 4
+                    1 => array(
+                        'name' => '09', //'07', '03'
 
-                ),
+                        'size' => 2
 
-                1 => array(
-                    'name' => '09', //'07', '03'
+                    ),
 
-                    'size' => 2
+                    2 => array(
+                        'name' => $cod_fin,
 
-                ),
+                        'size' => 1
 
-                2 => array(
-                    'name' => $cod_fin,
+                    ),
 
-                    'size' => 1
+                    3 => array(
+                        'name' => $estado,
 
-                ),
+                        'size' => 2
 
-                3 => array(
-                    'name' => $estado,
+                    ),
 
-                    'size' => 2
+                    4 => array(
+                        'name' => $cnpjEPP,
 
-                ),
+                        'size' => 14
 
-                4 => array(
-                    'name' => $cnpjEPP,
+                    ),
 
-                    'size' => 14
+                    5 => array(
+                        'name' => $razaoEPP,
 
-                ),
+                        'size' => 40
 
-                5 => array(
-                    'name' => $razaoEPP,
+                    ),
 
-                    'size' => 40
+                    6 => array(
+                        'name' => $ano . $mes . '01',
 
-                ),
+                        'size' => 8
 
-                6 => array(
-                    'name' => $ano . $mes . '01',
+                    ),
 
-                    'size' => 8
+                    7 => array(
+                        'name' => $ano . $mes . $ultimoDiaMes,
 
-                ),
+                        'size' => 8
 
-                7 => array(
-                    'name' => $ano . $mes . $ultimoDiaMes,
+                    ),
 
-                    'size' => 8
+                    8 => array(
+                        'name' => (!checkIP() ? '1' : '2'),
 
-                ),
+                        'size' => 1
 
-                8 => array(
-                    'name' => (!checkIP() ? '1' : '2'),
+                    ),
 
-                    'size' => 1
+                    9 => array(
+                        'name' => date("Ym"),
 
-                ),
+                        'size' => 6
 
-                9 => array(
-                    'name' => date("Ym"),
+                    ),
 
-                    'size' => 6
+                );
 
-                ),
+                $file->setVetorLines($vetorLines);
 
-            );
+                $countBlocoZero++;
 
-            $file->setVetorLines($vetorLines);
+                $REG_BLC['0000'] = 1;
 
-            $countBlocoZero++;
+                //=========================================================================================================================
 
-            $REG_BLC['0000'] = 1;
+                // REGISTRO TIPO 0001: ABERTURA DO BLOCO 0 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 0001: ABERTURA DO BLOCO 0 
+                unset($vetorLines);
 
-            //=========================================================================================================================
+                $vetorLines = array(
 
-            unset($vetorLines);
+                    0 => array(
+                        'name' => '0001',
 
-            $vetorLines = array(
+                        'size' => 4
 
-                0 => array(
-                    'name' => '0001',
+                    ),
 
-                    'size' => 4
+                    1 => array(
+                        'name' => '1',
 
-                ),
+                        'size' => 1
 
-                1 => array(
-                    'name' => '1',
+                    ),
 
-                    'size' => 1
+                );
 
-                ),
+                $file->setVetorLines($vetorLines);
 
-            );
+                $countBlocoZero++;
 
-            $file->setVetorLines($vetorLines);
+                $REG_BLC['0001'] = 1;
 
-            $countBlocoZero++;
 
-            $REG_BLC['0001'] = 1;
 
+                //=========================================================================================================================
 
+                // REGISTRO TIPO 0005: DADOS COMPLEMENTARES DA INSTITUIÇÃO DE PAGAMENTO 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 0005: DADOS COMPLEMENTARES DA INSTITUIÇÃO DE PAGAMENTO 
+                unset($vetorLines);
 
-            //=========================================================================================================================
+                $vetorLines = array(
 
-            unset($vetorLines);
+                    0 => array(
+                        'name' => '0005',
 
-            $vetorLines = array(
+                        'size' => 4
 
-                0 => array(
-                    'name' => '0005',
+                    ),
 
-                    'size' => 4
+                    1 => array(
+                        'name' => $razaoEPP,
 
-                ),
+                        'size' => 40
 
-                1 => array(
-                    'name' => $razaoEPP,
+                    ),
 
-                    'size' => 40
+                    2 => array(
+                        'name' => $enderecoEPP,
 
-                ),
+                        'size' => 70
 
-                2 => array(
-                    'name' => $enderecoEPP,
+                    ),
 
-                    'size' => 70
+                    3 => array(
+                        'name' => $cepEPP,
 
-                ),
+                        'size' => 8
 
-                3 => array(
-                    'name' => $cepEPP,
+                    ),
 
-                    'size' => 8
+                    4 => array(
+                        'name' => '3550308',
 
-                ),
+                        'size' => 7
 
-                4 => array(
-                    'name' => '3550308',
+                    ),
 
-                    'size' => 7
+                    5 => array(
+                        'name' => $ufEPP,
 
-                ),
+                        'size' => 2
 
-                5 => array(
-                    'name' => $ufEPP,
+                    ),
 
-                    'size' => 2
+                    6 => array(
+                        'name' => $nomeRespEPP,
 
-                ),
+                        'size' => 30
 
-                6 => array(
-                    'name' => $nomeRespEPP,
+                    ),
 
-                    'size' => 30
+                    7 => array(
+                        'name' => $foneEPP,
 
-                ),
+                        'size' => 13
 
-                7 => array(
-                    'name' => $foneEPP,
+                    ),
 
-                    'size' => 13
+                    8 => array(
+                        'name' => $emailEPP,
 
-                ),
+                        'size' => 30,
 
-                8 => array(
-                    'name' => $emailEPP,
+                        'upper' => true
 
-                    'size' => 30,
+                    ),
 
-                    'upper' => true
+                );
 
-                ),
+                $file->setVetorLines($vetorLines);
 
-            );
+                $countBlocoZero++;
 
-            $file->setVetorLines($vetorLines);
+                $REG_BLC['0005'] = 1;
 
-            $countBlocoZero++;
 
-            $REG_BLC['0005'] = 1;
 
+                //=========================================================================================================================
 
+                // REGISTRO TIPO 0100: TABELA DE CADASTRO DO CLIENTE
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 0100: TABELA DE CADASTRO DO CLIENTE
+                $REG_BLC['0100'] = 0;
 
-            //=========================================================================================================================
 
-            $REG_BLC['0100'] = 0;
 
+                //Selecionando Publishers ligados a EPP Pagto
 
 
-            //Selecionando Publishers ligados a EPP Pagto
 
+                $publishers_epp_pagto = NULL;
 
-
-            $publishers_epp_pagto = NULL;
-
-            $sql_publishers_epp_pagto = "select opr_codigo 
+                $sql_publishers_epp_pagto = "select opr_codigo 
 
                                          from operadoras 
 
@@ -526,160 +529,160 @@ try {
 
                                          order by opr_codigo;";
 
-            //echo $sql_publishers_epp_pagto."<br>";
+                //echo $sql_publishers_epp_pagto."<br>";
 
-            $response_epp_pagto = SQLexecuteQuery($sql_publishers_epp_pagto);
+                $response_epp_pagto = SQLexecuteQuery($sql_publishers_epp_pagto);
 
-            if ($response_epp_pagto) {
+                if ($response_epp_pagto) {
 
-                while ($response_epp_pagto_row = pg_fetch_array($response_epp_pagto)) {
+                    while ($response_epp_pagto_row = pg_fetch_array($response_epp_pagto)) {
 
-                    if (!empty($publishers_epp_pagto)) {
+                        if (!empty($publishers_epp_pagto)) {
 
-                        $publishers_epp_pagto .= ", " . $response_epp_pagto_row['opr_codigo'];
-                    } //edn if(!empty($publishers_epp_pagto))
-                    else {
+                            $publishers_epp_pagto .= ", " . $response_epp_pagto_row['opr_codigo'];
+                        } //edn if(!empty($publishers_epp_pagto))
+                        else {
 
-                        $publishers_epp_pagto = $response_epp_pagto_row['opr_codigo'];
-                    } //end else do if(!empty($publishers_epp_pagto))
+                            $publishers_epp_pagto = $response_epp_pagto_row['opr_codigo'];
+                        } //end else do if(!empty($publishers_epp_pagto))
 
-                } //end while
+                    } //end while
 
-            } //end if ($response_epp_pagto) 
-            else {
+                } //end if ($response_epp_pagto) 
+                else {
 
-                $msg .= PHP_EOL . "ERRO 0004: Erro ao executar o select dos Publishers vinculados a E-Prepag Pagamentos.";
-            } //end esle do if ($response_epp_pagto) 
+                    $msg .= PHP_EOL . "ERRO 0004: Erro ao executar o select dos Publishers vinculados a E-Prepag Pagamentos.";
+                } //end esle do if ($response_epp_pagto) 
 
 
 
-            if (!empty($publishers_epp_pagto)) {
+                if (!empty($publishers_epp_pagto)) {
 
-                //Dados da EPP PAGTO
+                    //Dados da EPP PAGTO
 
-                unset($vetorLines);
+                    unset($vetorLines);
 
-                $vetorLines = array(
+                    $vetorLines = array(
 
-                    0 => array(
-                        'name' => '0100',
+                        0 => array(
+                            'name' => '0100',
 
-                        'size' => 4
+                            'size' => 4
 
-                    ),
+                        ),
 
-                    1 => array(
-                        'name' => str_pad($opr_codigoEPPPAGTO, 7, '0', STR_PAD_LEFT),
+                        1 => array(
+                            'name' => str_pad($opr_codigoEPPPAGTO, 7, '0', STR_PAD_LEFT),
 
-                        'size' => 7
+                            'size' => 7
 
-                    ),
+                        ),
 
-                    2 => array(
-                        'name' => $cnpjEPPPAGTO,
+                        2 => array(
+                            'name' => $cnpjEPPPAGTO,
 
-                        'size' => 14
+                            'size' => 14
 
-                    ),
+                        ),
 
-                    3 => array(
-                        'name' => '',
+                        3 => array(
+                            'name' => '',
 
-                        'size' => 11
+                            'size' => 11
 
-                    ),
+                        ),
 
-                    4 => array(
-                        'name' => $razaoEPPPAGTO,
+                        4 => array(
+                            'name' => $razaoEPPPAGTO,
 
-                        'size' => 40
+                            'size' => 40
 
-                    ),
+                        ),
 
-                    5 => array(
-                        'name' => removerAcentos($enderecoEPPPAGTO),
+                        5 => array(
+                            'name' => removerAcentos($enderecoEPPPAGTO),
 
-                        'size' => 70
+                            'size' => 70
 
-                    ),
+                        ),
 
-                    6 => array(
-                        'name' => $cepEPPPAGTO,
+                        6 => array(
+                            'name' => $cepEPPPAGTO,
 
-                        'size' => 8
+                            'size' => 8
 
-                    ),
+                        ),
 
-                    7 => array(
-                        'name' => '3550308',
+                        7 => array(
+                            'name' => '3550308',
 
-                        'size' => 7
+                            'size' => 7
 
-                    ),
+                        ),
 
-                    8 => array(
-                        'name' => $ufEPPPAGTO,
+                        8 => array(
+                            'name' => $ufEPPPAGTO,
 
-                        'size' => 2
+                            'size' => 2
 
-                    ),
+                        ),
 
-                    9 => array(
-                        'name' => $nomeRespEPPPAGTO,
+                        9 => array(
+                            'name' => $nomeRespEPPPAGTO,
 
-                        'size' => 30
+                            'size' => 30
 
-                    ),
+                        ),
 
-                    10 => array(
-                        'name' => $foneEPPPAGTO,
+                        10 => array(
+                            'name' => $foneEPPPAGTO,
 
-                        'size' => 13
+                            'size' => 13
 
-                    ),
+                        ),
 
-                    11 => array(
-                        'name' => $emailEPPPAGTO,
+                        11 => array(
+                            'name' => $emailEPPPAGTO,
 
-                        'size' => 30,
+                            'size' => 30,
 
-                        'upper' => true
+                            'upper' => true
 
-                    ),
+                        ),
 
-                    12 => array(
-                        'name' => $dataCredenciamentoEPPPAGTO,
+                        12 => array(
+                            'name' => $dataCredenciamentoEPPPAGTO,
 
-                        'size' => 8
+                            'size' => 8
 
-                    ),
-                    13 => array(
-                        'name' => '1',
+                        ),
+                        13 => array(
+                            'name' => '1',
 
-                        'size' => 1
+                            'size' => 1
 
-                    ),
+                        ),
 
-                );
+                    );
 
-                $file->setVetorLines($vetorLines);
+                    $file->setVetorLines($vetorLines);
 
-                $countBlocoZero++;
+                    $countBlocoZero++;
 
-                $REG_BLC['0100']++;
-            } //end if(!empty($publishers_epp_pagto))
+                    $REG_BLC['0100']++;
+                } //end if(!empty($publishers_epp_pagto))
 
-            //echo "<div> EPP PAGTO : [".$publishers_epp_pagto."]</div>";
+                //echo "<div> EPP PAGTO : [".$publishers_epp_pagto."]</div>";
 
 
 
-            //Selecionando Publishers ligados a EPP Adm
+                //Selecionando Publishers ligados a EPP Adm
 
 
 
-            $publishers_epp_adm = NULL;
+                $publishers_epp_adm = NULL;
 
-            $sql_publishers_epp_adm = "select opr_codigo,
+                $sql_publishers_epp_adm = "select opr_codigo,
 
                                               opr_nome_loja,
 
@@ -735,346 +738,346 @@ try {
 
                                        order by opr_codigo;";  // and opr_estado in ('".$estado."', '')
 
-            //echo $sql_publishers_epp_adm."<br>";
+                //echo $sql_publishers_epp_adm."<br>";
 
-            $response_epp_adm = SQLexecuteQuery($sql_publishers_epp_adm);
+                $response_epp_adm = SQLexecuteQuery($sql_publishers_epp_adm);
 
-            if ($response_epp_adm) {
+                if ($response_epp_adm) {
 
-                while ($response_epp_adm_row = pg_fetch_array($response_epp_adm)) {
+                    while ($response_epp_adm_row = pg_fetch_array($response_epp_adm)) {
 
-                    //Dados dos Publishers vinculados a EPP ADM
+                        //Dados dos Publishers vinculados a EPP ADM
 
-                    if ($response_epp_adm_row['opr_estado'] != 'SP') {
-                        continue;
-                    }
+                        if ($response_epp_adm_row['opr_estado'] != 'SP') {
+                            continue;
+                        }
 
-                    unset($vetorLines);
-                    $response_epp_adm_row['opr_cidade'] = removerAcentos($response_epp_adm_row['opr_cidade']);
-                    $response_epp_adm_row['opr_bairro'] = removerAcentos($response_epp_adm_row['opr_bairro']);
-                    $response_epp_adm_row['opr_complemento'] = removerAcentos($response_epp_adm_row['opr_complemento']);
+                        unset($vetorLines);
+                        $response_epp_adm_row['opr_cidade'] = removerAcentos($response_epp_adm_row['opr_cidade']);
+                        $response_epp_adm_row['opr_bairro'] = removerAcentos($response_epp_adm_row['opr_bairro']);
+                        $response_epp_adm_row['opr_complemento'] = removerAcentos($response_epp_adm_row['opr_complemento']);
 
-                    $enderecoPublisher = ($response_epp_adm_row['opr_estado'] == "RS") ? 'AVENIDA DAS NACOES UNIDAS, 12901 - SL 25 102 - BROOKLIN PAULISTA - SAO PAULO' : $response_epp_adm_row['opr_endereco'] . ', ' . $response_epp_adm_row['opr_numero'] . ((!empty($response_epp_adm_row['opr_complemento'])) ? ' - ' . $response_epp_adm_row['opr_complemento'] : "") . ((!empty($response_epp_adm_row['opr_bairro'])) ? ' - ' . $response_epp_adm_row['opr_bairro'] : "") . ' - ' . $response_epp_adm_row['opr_cidade'];
+                        $enderecoPublisher = ($response_epp_adm_row['opr_estado'] == "RS") ? 'AVENIDA DAS NACOES UNIDAS, 12901 - SL 25 102 - BROOKLIN PAULISTA - SAO PAULO' : $response_epp_adm_row['opr_endereco'] . ', ' . $response_epp_adm_row['opr_numero'] . ((!empty($response_epp_adm_row['opr_complemento'])) ? ' - ' . $response_epp_adm_row['opr_complemento'] : "") . ((!empty($response_epp_adm_row['opr_bairro'])) ? ' - ' . $response_epp_adm_row['opr_bairro'] : "") . ' - ' . $response_epp_adm_row['opr_cidade'];
 
-                    $vetorLines = array(
+                        $vetorLines = array(
 
-                        0 => array(
-                            'name' => '0100',
+                            0 => array(
+                                'name' => '0100',
 
-                            'size' => 4
+                                'size' => 4
 
-                        ),
+                            ),
 
-                        1 => array(
-                            'name' => str_pad($response_epp_adm_row['opr_codigo'], 7, '0', STR_PAD_LEFT),
+                            1 => array(
+                                'name' => str_pad($response_epp_adm_row['opr_codigo'], 7, '0', STR_PAD_LEFT),
 
-                            'size' => 7
+                                'size' => 7
 
-                        ),
+                            ),
 
-                        2 => array(
-                            'name' => ((!empty($response_epp_adm_row['opr_cnpj'])) ? $response_epp_adm_row['opr_cnpj'] : $cnpjEPP),
+                            2 => array(
+                                'name' => ((!empty($response_epp_adm_row['opr_cnpj'])) ? $response_epp_adm_row['opr_cnpj'] : $cnpjEPP),
 
-                            'size' => 14
+                                'size' => 14
 
-                        ),
+                            ),
 
-                        3 => array(
-                            'name' => '',
+                            3 => array(
+                                'name' => '',
 
-                            'size' => 11
+                                'size' => 11
 
-                        ),
+                            ),
 
-                        4 => array(
-                            'name' => $response_epp_adm_row['opr_nome_loja'],
+                            4 => array(
+                                'name' => $response_epp_adm_row['opr_nome_loja'],
 
-                            'size' => 40
+                                'size' => 40
 
-                        ),
+                            ),
 
-                        5 => array(
-                            'name' => removerAcentos($enderecoPublisher),
+                            5 => array(
+                                'name' => removerAcentos($enderecoPublisher),
 
-                            'size' => 200
+                                'size' => 200
 
-                        ),
+                            ),
 
-                        6 => array(
-                            'name' => ($response_epp_adm_row['opr_estado'] == "RS") ? '04578910' : str_pad(str_replace(" ", "", str_replace("-", "", str_replace(".", "", $response_epp_adm_row['opr_cep']))), 8, "0", STR_PAD_LEFT),
+                            6 => array(
+                                'name' => ($response_epp_adm_row['opr_estado'] == "RS") ? '04578910' : str_pad(str_replace(" ", "", str_replace("-", "", str_replace(".", "", $response_epp_adm_row['opr_cep']))), 8, "0", STR_PAD_LEFT),
 
-                            'size' => 8
+                                'size' => 8
 
-                        ),
+                            ),
 
-                        7 => array(
-                            'name' => '3550308',
+                            7 => array(
+                                'name' => '3550308',
 
-                            'size' => 7
+                                'size' => 7
 
-                        ),
+                            ),
 
-                        8 => array(
-                            'name' => ((!empty($response_epp_adm_row['opr_estado'])) ? (($response_epp_adm_row['opr_estado'] == "RS") ? $ufEPP : $response_epp_adm_row['opr_estado']) : $ufEPP),
+                            8 => array(
+                                'name' => ((!empty($response_epp_adm_row['opr_estado'])) ? (($response_epp_adm_row['opr_estado'] == "RS") ? $ufEPP : $response_epp_adm_row['opr_estado']) : $ufEPP),
 
-                            'size' => 2
+                                'size' => 2
 
-                        ),
+                            ),
 
-                        9 => array(
-                            'name' => $response_epp_adm_row['opr_contato'],
+                            9 => array(
+                                'name' => $response_epp_adm_row['opr_contato'],
 
-                            'size' => 100
+                                'size' => 100
 
-                        ),
+                            ),
 
-                        10 => array(
-                            'name' => str_replace(" ", "", str_replace("-", "", str_replace(".", "", $response_epp_adm_row['opr_cont_fone']))),
+                            10 => array(
+                                'name' => str_replace(" ", "", str_replace("-", "", str_replace(".", "", $response_epp_adm_row['opr_cont_fone']))),
 
-                            'size' => 13
+                                'size' => 13
 
-                        ),
+                            ),
 
-                        11 => array(
-                            'name' => substr($response_epp_adm_row['opr_email_dimp'], 0, strpos($response_epp_adm_row['opr_email_dimp'], ',')),
+                            11 => array(
+                                'name' => substr($response_epp_adm_row['opr_email_dimp'], 0, strpos($response_epp_adm_row['opr_email_dimp'], ',')),
 
-                            'size' => 30,
+                                'size' => 30,
 
-                            'upper' => true
+                                'upper' => true
 
-                        ),
+                            ),
 
-                        12 => array(
-                            'name' => $response_epp_adm_row['data'],
+                            12 => array(
+                                'name' => $response_epp_adm_row['data'],
 
-                            'size' => 8
+                                'size' => 8
 
-                        ),
-                        13 => array(
-                            'name' => '0',
+                            ),
+                            13 => array(
+                                'name' => '0',
 
-                            'size' => 1
+                                'size' => 1
 
-                        ),
+                            ),
 
 
-                    );
+                        );
 
-                    $file->setVetorLines($vetorLines);
+                        $file->setVetorLines($vetorLines);
 
-                    $countBlocoZero++;
+                        $countBlocoZero++;
 
-                    $REG_BLC['0100']++;
-                } //end while
+                        $REG_BLC['0100']++;
+                    } //end while
 
-            } //end if ($response_epp_adm) 
-            else {
+                } //end if ($response_epp_adm) 
+                else {
 
-                $msg .= PHP_EOL . "ERRO 0005: Erro ao executar o select dos Publishers vinculados a E-Prepag Administradora.";
-            } //end esle do if ($response_epp_adm) 
+                    $msg .= PHP_EOL . "ERRO 0005: Erro ao executar o select dos Publishers vinculados a E-Prepag Administradora.";
+                } //end esle do if ($response_epp_adm) 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            //        REGISTRO TIPO 0105: TABELA DE VAN DO CLIENTE ==> Não é nosso caso
+                //        REGISTRO TIPO 0105: TABELA DE VAN DO CLIENTE ==> Não é nosso caso
 
-            //Este registro tem por objetivo identificar as instituições cujas operações realizadas pelo
+                //Este registro tem por objetivo identificar as instituições cujas operações realizadas pelo
 
-            //beneficiário do pagamento não são liquidadas pela informante do arquivo. Obrigatório
+                //beneficiário do pagamento não são liquidadas pela informante do arquivo. Obrigatório
 
-            //apenas para as instituições que tenham contrato ativo ou realizaram operações de VAN
+                //apenas para as instituições que tenham contrato ativo ou realizaram operações de VAN
 
-            //no período para o beneficiário de pagamento informado no registro Pai 0100. É facultado
+                //no período para o beneficiário de pagamento informado no registro Pai 0100. É facultado
 
-            //às Instituições de Pagamentos escolher como irão reportar essa informação, por
+                //às Instituições de Pagamentos escolher como irão reportar essa informação, por
 
-            //contratos ativos ou se realizaram transações no período.     
+                //contratos ativos ou se realizaram transações no período.     
 
-            //========================================================================================================================
+                //========================================================================================================================
 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 0200: TABELA DE CADASTRO DO MEIO DE CAPTURA
+                // REGISTRO TIPO 0200: TABELA DE CADASTRO DO MEIO DE CAPTURA
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            unset($vetorLines);
+                unset($vetorLines);
 
-            $vetorLines = array(
+                $vetorLines = array(
 
-                0 => array(
-                    'name' => '0200',
+                    0 => array(
+                        'name' => '0200',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                1 => array(
-                    'name' => $COD_MCAPT,
+                    1 => array(
+                        'name' => $COD_MCAPT,
 
-                    'size' => 20
+                        'size' => 20
 
-                ),
+                    ),
 
-                2 => array(
-                    'name' => $NUM_LOG,
+                    2 => array(
+                        'name' => $NUM_LOG,
 
-                    'size' => 20
+                        'size' => 20
 
-                ),
+                    ),
 
-                3 => array(
-                    'name' => $TIPO_TECN,
+                    3 => array(
+                        'name' => $TIPO_TECN,
 
-                    'size' => 1
+                        'size' => 1
 
-                ),
+                    ),
 
-                4 => array(
-                    'name' => $TERM_PROP,
+                    4 => array(
+                        'name' => $TERM_PROP,
 
-                    'size' => 1
+                        'size' => 1
 
-                ),
+                    ),
 
-                5 => array(
-                    'name' => $MARCA,
+                    5 => array(
+                        'name' => $MARCA,
 
-                    'size' => 20
+                        'size' => 20
 
-                ),
+                    ),
 
-            );
+                );
 
-            $file->setVetorLines($vetorLines);
+                $file->setVetorLines($vetorLines);
 
-            $countBlocoZero++;
+                $countBlocoZero++;
 
-            $REG_BLC['0200'] = 1;
+                $REG_BLC['0200'] = 1;
 
 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 0300: DADOS DA INSTITUIÇÃO DE PAGAMENTO PARCEIRA ==> Não é nosso caso
+                // REGISTRO TIPO 0300: DADOS DA INSTITUIÇÃO DE PAGAMENTO PARCEIRA ==> Não é nosso caso
 
-            //Este registro tem por objetivo identificar as instituições de pagamento parceiras cujas
+                //Este registro tem por objetivo identificar as instituições de pagamento parceiras cujas
 
-            //transações estejam sendo reportadas no arquivo. Quando uma instituição é responsável
+                //transações estejam sendo reportadas no arquivo. Quando uma instituição é responsável
 
-            //pelo fornecimento das informações de outra IP é considerada ?Instituição Parceira?.
+                //pelo fornecimento das informações de outra IP é considerada ?Instituição Parceira?.
 
-            //Este registro também identifica as subadquirentes ou marketplace que exercem atividade
+                //Este registro também identifica as subadquirentes ou marketplace que exercem atividade
 
-            //de meio de pagamento, mas não compartilham as informações de seus clientes com a
+                //de meio de pagamento, mas não compartilham as informações de seus clientes com a
 
-            //IP remetente do arquivo. Nesses casos, o COD_IP_PAR deve ser igual ao
+                //IP remetente do arquivo. Nesses casos, o COD_IP_PAR deve ser igual ao
 
-            //COD_CLIENTE do registro 0100.
+                //COD_CLIENTE do registro 0100.
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
 
 
 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO 0990: ENCERRAMENTO DO BLOCO 0 
+                // REGISTRO 0990: ENCERRAMENTO DO BLOCO 0 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            unset($vetorLines);
+                unset($vetorLines);
 
-            $countBlocoZero++;
+                $countBlocoZero++;
 
-            $vetorLines = array(
+                $vetorLines = array(
 
-                0 => array(
-                    'name' => '0990',
+                    0 => array(
+                        'name' => '0990',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                1 => array(
-                    'name' => $countBlocoZero,
+                    1 => array(
+                        'name' => $countBlocoZero,
 
-                    'size' => 20
+                        'size' => 20
 
-                ),
+                    ),
 
-            );
+                );
 
-            $file->setVetorLines($vetorLines);
+                $file->setVetorLines($vetorLines);
 
-            $REG_BLC['0990'] = 1;
+                $REG_BLC['0990'] = 1;
 
 
 
 
 
-            // Contador de registros do Bloco Um
+                // Contador de registros do Bloco Um
 
-            $countBlocoUm = 0;
+                $countBlocoUm = 0;
 
 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 1001: ABERTURA DO BLOCO 1
+                // REGISTRO TIPO 1001: ABERTURA DO BLOCO 1
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            unset($vetorLines);
+                unset($vetorLines);
 
-            $vetorLines = array(
+                $vetorLines = array(
 
-                0 => array(
-                    'name' => '1001',
+                    0 => array(
+                        'name' => '1001',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                1 => array(
-                    'name' => '1',
+                    1 => array(
+                        'name' => '1',
 
-                    'size' => 1
+                        'size' => 1
 
-                ),
+                    ),
 
-            );
+                );
 
-            $file->setVetorLines($vetorLines);
+                $file->setVetorLines($vetorLines);
 
-            $countBlocoUm++;
+                $countBlocoUm++;
 
-            $REG_BLC['1001'] = 1;
+                $REG_BLC['1001'] = 1;
 
 
 
 
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            // REGISTRO TIPO 1100: RESUMO MENSAL DAS OPERAÇÕES DE PAGAMENTO
+                // REGISTRO TIPO 1100: RESUMO MENSAL DAS OPERAÇÕES DE PAGAMENTO
 
-            //=========================================================================================================================
+                //=========================================================================================================================
 
-            $REG_BLC['1100'] = 0;
+                $REG_BLC['1100'] = 0;
 
-            $REG_BLC['1110'] = 0;
+                $REG_BLC['1110'] = 0;
 
-            $REG_BLC['1115'] = 0;
+                $REG_BLC['1115'] = 0;
 
 
 
-            //Verificando se existe publishers vinculados a EPP Pagto
+                //Verificando se existe publishers vinculados a EPP Pagto
 
-            if (!empty($publishers_epp_pagto)) {
+                if (!empty($publishers_epp_pagto)) {
 
-                $sql_total_epp_pagto = "
+                    $sql_total_epp_pagto = "
 
                             select 
 
@@ -1096,102 +1099,102 @@ try {
 
                                     and fp_freeze=1; ";
 
-                //echo $sql_total_epp_pagto."<br>"; die();
+                    //echo $sql_total_epp_pagto."<br>"; die();
 
-                $total_epp_pagto = SQLexecuteQuery($sql_total_epp_pagto);
+                    $total_epp_pagto = SQLexecuteQuery($sql_total_epp_pagto);
 
-                if ($total_epp_pagto) {
+                    if ($total_epp_pagto) {
 
-                    if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto)) {
+                        if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto)) {
 
-                        unset($vetorLines);
+                            unset($vetorLines);
 
-                        $vetorLines = array(
+                            $vetorLines = array(
 
-                            0 => array(
-                                'name' => '1100',
+                                0 => array(
+                                    'name' => '1100',
 
-                                'size' => 4
+                                    'size' => 4
 
-                            ),
+                                ),
 
-                            1 => array(
-                                'name' => '',
+                                1 => array(
+                                    'name' => '',
 
-                                'size' => 20
+                                    'size' => 20
 
-                            ),
+                                ),
 
-                            2 => array(
-                                'name' => str_pad($opr_codigoEPPPAGTO, 7, '0', STR_PAD_LEFT),
+                                2 => array(
+                                    'name' => str_pad($opr_codigoEPPPAGTO, 7, '0', STR_PAD_LEFT),
 
-                                'size' => 7
+                                    'size' => 7
 
-                            ),
+                                ),
 
-                            3 => array(
-                                'name' => $IND_COMEX_EPPPAGTO,
+                                3 => array(
+                                    'name' => $IND_COMEX_EPPPAGTO,
 
-                                'size' => 1
+                                    'size' => 1
 
-                            ),
+                                ),
 
-                            4 => array(
-                                'name' => $IND_EXTEMP,
+                                4 => array(
+                                    'name' => $IND_EXTEMP,
 
-                                'size' => 1
+                                    'size' => 1
 
-                            ),
+                                ),
 
-                            5 => array(
-                                'name' => $ano . $mes . '01',
+                                5 => array(
+                                    'name' => $ano . $mes . '01',
 
-                                'size' => 8
+                                    'size' => 8
 
-                            ),
+                                ),
 
-                            6 => array(
-                                'name' => $ano . $mes . $ultimoDiaMes,
+                                6 => array(
+                                    'name' => $ano . $mes . $ultimoDiaMes,
 
-                                'size' => 8
+                                    'size' => 8
 
-                            ),
+                                ),
 
-                            7 => array(
-                                'name' => number_format($total_epp_pagto_row['total'], 2, ',', ''),
+                                7 => array(
+                                    'name' => number_format($total_epp_pagto_row['total'], 2, ',', ''),
 
-                                'size' => 21
+                                    'size' => 21
 
-                            ),
+                                ),
 
-                            8 => array(
-                                'name' => $total_epp_pagto_row['fp_total_order'],
+                                8 => array(
+                                    'name' => $total_epp_pagto_row['fp_total_order'],
 
-                                'size' => 10
+                                    'size' => 10
 
-                            ),
+                                ),
 
-                        );
+                            );
 
-                        $file->setVetorLines($vetorLines);
+                            $file->setVetorLines($vetorLines);
 
-                        $countBlocoUm++;
+                            $countBlocoUm++;
 
-                        $REG_BLC['1100']++;
-
-
-
-                        //=========================================================================================================================
-
-                        // REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP PAGTO
-
-                        //=========================================================================================================================
+                            $REG_BLC['1100']++;
 
 
 
-                        //Levantando totais por OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA
+                            //=========================================================================================================================
 
-                        $sql_total_operacoes_diarias = "
+                            // REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP PAGTO
+
+                            //=========================================================================================================================
+
+
+
+                            //Levantando totais por OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA
+
+                            $sql_total_operacoes_diarias = "
 
                                             select 
 
@@ -1219,119 +1222,119 @@ try {
 
 
 
-                        //echo "<br>1110 => ".$sql_total_operacoes_diarias."<br>"; //die();
+                            //echo "<br>1110 => ".$sql_total_operacoes_diarias."<br>"; //die();
 
-                        $total_operacoes_diarias = SQLexecuteQuery($sql_total_operacoes_diarias);
+                            $total_operacoes_diarias = SQLexecuteQuery($sql_total_operacoes_diarias);
 
-                        if ($total_operacoes_diarias) {
+                            if ($total_operacoes_diarias) {
 
-                            while ($total_operacoes_diarias_row = pg_fetch_array($total_operacoes_diarias)) {
-
-
-
-                                unset($vetorLines);
-
-                                $vetorLines = array(
-
-                                    0 => array(
-                                        'name' => '1110',
-
-                                        'size' => 4
-
-                                    ),
-
-                                    1 => array(
-                                        'name' => $COD_MCAPT,
-
-                                        'size' => 20
-
-                                    ),
-
-                                    2 => array(
-                                        'name' => $total_operacoes_diarias_row['fp_date'],
-
-                                        'size' => 8
-
-                                    ),
-
-                                    3 => array(
-                                        'name' => number_format($total_operacoes_diarias_row['total'], 2, ',', ''),
-
-                                        'size' => 13
-
-                                    ),
-
-                                    4 => array(
-                                        'name' => $total_operacoes_diarias_row['fp_total_order'],
-
-                                        'size' => 10
-
-                                    ),
-
-                                    5 => array(
-                                        'name' => $cnpjEPPPAGTO,
-
-                                        'size' => 14
-
-                                    ),
-
-                                );
-
-                                $file->setVetorLines($vetorLines);
-
-                                $countBlocoUm++;
-
-                                $REG_BLC['1110']++;
+                                while ($total_operacoes_diarias_row = pg_fetch_array($total_operacoes_diarias)) {
 
 
 
-                                //=========================================================================================================================
+                                    unset($vetorLines);
 
-                                // REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP PAGTO
+                                    $vetorLines = array(
 
-                                //=========================================================================================================================
+                                        0 => array(
+                                            'name' => '1110',
+
+                                            'size' => 4
+
+                                        ),
+
+                                        1 => array(
+                                            'name' => $COD_MCAPT,
+
+                                            'size' => 20
+
+                                        ),
+
+                                        2 => array(
+                                            'name' => $total_operacoes_diarias_row['fp_date'],
+
+                                            'size' => 8
+
+                                        ),
+
+                                        3 => array(
+                                            'name' => number_format($total_operacoes_diarias_row['total'], 2, ',', ''),
+
+                                            'size' => 13
+
+                                        ),
+
+                                        4 => array(
+                                            'name' => $total_operacoes_diarias_row['fp_total_order'],
+
+                                            'size' => 10
+
+                                        ),
+
+                                        5 => array(
+                                            'name' => $cnpjEPPPAGTO,
+
+                                            'size' => 14
+
+                                        ),
+
+                                    );
+
+                                    $file->setVetorLines($vetorLines);
+
+                                    $countBlocoUm++;
+
+                                    $REG_BLC['1110']++;
 
 
 
-                                if (count($vetorPublisherPorUtilizacao) > 0) {
+                                    //=========================================================================================================================
 
-                                    $where_opr_venda_lan = " AND ( CASE ";
+                                    // REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP PAGTO
 
-                                    $where_opr_venda_lan_negativa = " AND ( CASE ";
-
-                                    $where_opr_utilizacao_lan = " AND ( CASE ";
-
-                                    foreach ($vetorPublisherPorUtilizacao as $opr_codigo => $opr_data_inicio_contabilizacao_utilizacao) {
-
-                                        //echo "ID: ".$opr_codigo." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
-
-                                        $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-
-                                        $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-
-                                        $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-                                    } //end foreach
-
-                                    $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
-
-                                    $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
-
-                                    $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
-                                } //end if(count($vetorPublisherPorUtilizacao)>0)
-                                else {
-
-                                    $where_opr_venda_lan = "";
-
-                                    $where_opr_venda_lan_negativa = "";
-
-                                    $where_opr_utilizacao_lan = "";
-                                } //end else do if(count($vetorPublisherPorUtilizacao)>0)          
+                                    //=========================================================================================================================
 
 
 
-                                //Query de levantamento de transações
+                                    if (count($vetorPublisherPorUtilizacao) > 0) {
 
-                                $sql = "
+                                        $where_opr_venda_lan = " AND ( CASE ";
+
+                                        $where_opr_venda_lan_negativa = " AND ( CASE ";
+
+                                        $where_opr_utilizacao_lan = " AND ( CASE ";
+
+                                        foreach ($vetorPublisherPorUtilizacao as $opr_codigo => $opr_data_inicio_contabilizacao_utilizacao) {
+
+                                            //echo "ID: ".$opr_codigo." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
+
+                                            $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+
+                                            $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+
+                                            $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+                                        } //end foreach
+
+                                        $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
+
+                                        $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
+
+                                        $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
+                                    } //end if(count($vetorPublisherPorUtilizacao)>0)
+                                    else {
+
+                                        $where_opr_venda_lan = "";
+
+                                        $where_opr_venda_lan_negativa = "";
+
+                                        $where_opr_utilizacao_lan = "";
+                                    } //end else do if(count($vetorPublisherPorUtilizacao)>0)          
+
+
+
+                                    //Query de levantamento de transações
+
+                                    $sql = "
 
                                 select 
 
@@ -1537,11 +1540,11 @@ try {
 
                                                 ";
 
-                                //Contabilizando vendas por utilização de PINs Publisher
+                                    //Contabilizando vendas por utilização de PINs Publisher
 
-                                if (count($vetorPublisherPorUtilizacao) > 0) {
+                                    if (count($vetorPublisherPorUtilizacao) > 0) {
 
-                                    $sql .= "
+                                        $sql .= "
 
                                         
 
@@ -1595,9 +1598,9 @@ try {
                                                 publisher) 
 
                                             ";
-                                } //end if(count($vetorPublisherPorUtilizacao)>0)
+                                    } //end if(count($vetorPublisherPorUtilizacao)>0)
 
-                                $sql .= " 
+                                    $sql .= " 
 
                                 union all 
 
@@ -1757,7 +1760,690 @@ try {
 
                                 order by dia;";
 
-                                //echo "<br>1115 => ".$sql.PHP_EOL.PHP_EOL; die();
+                                    //echo "<br>1115 => ".$sql.PHP_EOL.PHP_EOL; die();
+
+                                    $transacoes = SQLexecuteQuery($sql);
+
+                                    if ($transacoes) {
+
+                                        while ($transacoes_row = pg_fetch_array($transacoes)) {
+
+                                            unset($vetorLines);
+
+                                            $vetorLines = array(
+
+                                                0 => array(
+                                                    'name' => '1115',
+
+                                                    'size' => 4
+
+                                                ),
+
+                                                1 => array(
+                                                    'name' => $transacoes_row['venda'] . str_pad($REG_BLC['1115'], 6, '0', STR_PAD_LEFT),
+
+                                                    'size' => 25
+
+                                                ),
+
+                                                2 => array(
+                                                    'name' => '',
+
+                                                    'size' => 8
+
+                                                ),
+
+                                                3 => array(
+                                                    'name' => '',
+
+                                                    'size' => 8
+
+                                                ),
+
+                                                4 => array(
+                                                    'name' => $IND_SPLIT,
+
+                                                    'size' => 1
+
+                                                ),
+
+                                                5 => array(
+                                                    'name' => $BANDEIRA,
+
+                                                    'size' => 2
+
+                                                ),
+
+                                                6 => array(
+                                                    'name' => $transacoes_row['dia'],
+
+                                                    'size' => 6
+
+                                                ),
+
+                                                7 => array(
+                                                    'name' => number_format($transacoes_row['total'], 2, ',', ''),
+
+                                                    'size' => 13
+
+                                                ),
+
+                                                8 => array(
+                                                    'name' => $NAT_OPER,
+
+                                                    'size' => 1
+
+                                                ),
+
+                                                9 => array(
+                                                    'name' => '',
+
+                                                    'size' => 14
+
+                                                ),
+                                                10 => array(
+                                                    'name' => '',
+
+                                                    'size' => 14
+
+                                                ),
+                                                11 => array(
+                                                    'name' => '',
+
+                                                    'size' => 14
+
+                                                )
+
+                                            );
+
+                                            $file->setVetorLines($vetorLines);
+
+                                            $countBlocoUm++;
+
+                                            $REG_BLC['1115']++;
+                                        } //endwhile
+
+                                    } //end if ($transacoes)
+                                    else {
+
+                                        $msg .= PHP_EOL . "ERRO 0010: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Pagamentos.";
+                                    } //end else do if ($transacoes)
+
+                                    //=========================================================================================================================
+
+                                    // FIM DO BLOCO - REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP PAGTO
+
+                                    //=========================================================================================================================
+
+
+
+
+
+                                } //endwhile
+
+                            } //end iif ($total_operacoes_diarias)
+                            else {
+
+                                $msg .= PHP_EOL . "ERRO 0009: Erro ao executar o select dos totais de operacoes diarias.";
+                            } //end esle do if ($total_operacoes_diarias)
+
+
+
+                            //=========================================================================================================================
+
+                            // FIM DO BLOCO - REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP PAGTO
+
+                            //=========================================================================================================================
+
+
+
+                        } //end if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
+                        else {
+
+                            $msg .= PHP_EOL . "ERRO 0007: Erro ao executar o fetch_array dos totais dos Publishers vinculados a E-Prepag Pagamentos.";
+                        } //end else do if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
+
+                    } //end if ($total_epp_pagto) 
+                    else {
+
+                        $msg .= PHP_EOL . "ERRO 0006: Erro ao executar o select dos totais dos Publishers vinculados a E-Prepag Pagamentos.";
+                    } //end esle do if ($total_epp_pagto) 
+
+                } //end if(!empty($publishers_epp_pagto))
+
+                //Levantando totais por Publishers vinculados a EPP ADM
+
+                $sql_total_epp_adm = "
+
+                                select 
+
+                                        opr_internacional_alicota,fp_publisher, sum(fp_total_order) as fp_total_order, sum(fp_total) as total
+
+                                from financial_processing 
+
+                                    inner join operadoras on opr_codigo =  fp_publisher
+
+                                where  fp_publisher NOT IN (" . $publishers_epp_pagto . ")
+
+                                    and fp_date >= '" . $ano . "-" . $mes . "-01 00:00:00' 
+
+                                    and fp_date <= '" . $ano . "-" . $mes . "-" . $ultimoDiaMes . " 23:59:59'
+
+                                    and opr_status = '1' 
+
+                                    and fp_freeze=1 
+									
+                                group by fp_publisher,opr_internacional_alicota; ";
+
+
+
+                //echo $sql_total_epp_adm;
+
+                $total_epp_adm = SQLexecuteQuery($sql_total_epp_adm);
+
+                if ($total_epp_adm) {
+
+                    while ($total_epp_adm_row = pg_fetch_array($total_epp_adm)) {
+
+                        unset($vetorLines);
+
+                        $vetorLines = array(
+
+                            0 => array(
+                                'name' => '1100',
+
+                                'size' => 4
+
+                            ),
+
+                            1 => array(
+                                'name' => '',
+
+                                'size' => 20
+
+                            ),
+
+                            2 => array(
+                                'name' => str_pad($total_epp_adm_row['fp_publisher'], 7, '0', STR_PAD_LEFT),
+
+                                'size' => 7
+
+                            ),
+
+                            3 => array(
+                                'name' => (($total_epp_adm_row['opr_internacional_alicota'] == 0) ? '0' : '1'),
+
+                                'size' => 1
+
+                            ),
+
+                            4 => array(
+                                'name' => $IND_EXTEMP,
+
+                                'size' => 1
+
+                            ),
+
+                            5 => array(
+                                'name' => $ano . $mes . '01',
+
+                                'size' => 8
+
+                            ),
+
+                            6 => array(
+                                'name' => $ano . $mes . $ultimoDiaMes,
+
+                                'size' => 8
+
+                            ),
+
+                            7 => array(
+                                'name' => number_format($total_epp_adm_row['total'], 2, ',', ''),
+
+                                'size' => 21
+
+                            ),
+
+                            8 => array(
+                                'name' => $total_epp_adm_row['fp_total_order'],
+
+                                'size' => 10
+
+                            ),
+
+                        );
+
+                        $file->setVetorLines($vetorLines);
+
+                        $countBlocoUm++;
+
+                        $REG_BLC['1100']++;
+
+
+
+                        //=========================================================================================================================
+
+                        // REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP ADM
+
+                        //=========================================================================================================================
+
+                        //Levantando totais por OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA
+
+                        $sql_total_operacoes_diarias = "
+
+                                        select 
+
+                                            to_char(fp_date,'YYYYMMDD') as fp_date,sum(fp_total_order) as fp_total_order, sum(fp_total) as total
+
+                                        from financial_processing 
+
+                                            inner join operadoras on opr_codigo =  fp_publisher
+
+                                        where fp_date >= '" . $ano . "-" . $mes . "-01 00:00:00' 
+
+                                            and fp_date <= '" . $ano . "-" . $mes . "-" . $ultimoDiaMes . " 23:59:59'
+
+                                            and fp_publisher = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                            and opr_status = '1' 
+
+                                            and fp_freeze=1 
+
+                                        group by fp_date
+
+                                        order by fp_date; ";
+
+
+
+                        //echo $sql_total_operacoes_diarias."<br>";
+
+                        $total_operacoes_diarias = SQLexecuteQuery($sql_total_operacoes_diarias);
+
+                        if ($total_operacoes_diarias) {
+
+                            while ($total_operacoes_diarias_row = pg_fetch_array($total_operacoes_diarias)) {
+
+
+
+                                unset($vetorLines);
+
+                                $vetorLines = array(
+
+                                    0 => array(
+                                        'name' => '1110',
+
+                                        'size' => 4
+
+                                    ),
+
+                                    1 => array(
+                                        'name' => $COD_MCAPT,
+
+                                        'size' => 20
+
+                                    ),
+
+                                    2 => array(
+                                        'name' => $total_operacoes_diarias_row['fp_date'],
+
+                                        'size' => 8
+
+                                    ),
+
+                                    3 => array(
+                                        'name' => number_format($total_operacoes_diarias_row['total'], 2, ',', ''),
+
+                                        'size' => 13
+
+                                    ),
+
+                                    4 => array(
+                                        'name' => $total_operacoes_diarias_row['fp_total_order'],
+
+                                        'size' => 10
+
+                                    ),
+
+                                    5 => array(
+                                        'name' => $cnpjEPPPAGTO,
+
+                                        'size' => 14
+
+                                    ),
+
+                                );
+
+                                $file->setVetorLines($vetorLines);
+
+                                $countBlocoUm++;
+
+                                $REG_BLC['1110']++;
+
+
+
+
+
+                                //=========================================================================================================================
+
+                                // REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP ADM
+
+                                //=========================================================================================================================
+
+
+
+                                if (count($vetorPublisherPorUtilizacao) > 0) {
+
+                                    $where_opr_venda_lan = " AND ( CASE ";
+
+                                    $where_opr_venda_lan_negativa = " AND ( CASE ";
+
+                                    $where_opr_utilizacao_lan = " AND ( CASE ";
+
+                                    foreach ($vetorPublisherPorUtilizacao as $opr_codigo => $opr_data_inicio_contabilizacao_utilizacao) {
+
+                                        //echo "ID: ".$opr_codigo." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
+
+                                        $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+
+                                        $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+
+                                        $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
+                                    } //end foreach
+
+                                    $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
+
+                                    $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
+
+                                    $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
+                                } //end if(count($vetorPublisherPorUtilizacao)>0)
+                                else {
+
+                                    $where_opr_venda_lan = "";
+
+                                    $where_opr_venda_lan_negativa = "";
+
+                                    $where_opr_utilizacao_lan = "";
+                                } //end else do if(count($vetorPublisherPorUtilizacao)>0)          
+
+
+
+                                //Query de levantamento de transações
+
+                                $sql = "
+
+                            select 
+
+                                    venda,
+
+                                    to_char(dia,'HH24MISS') as dia,
+
+                                    sum(n) as n, 
+
+                                    round(sum(total)::numeric,2) as total 
+
+                            from ( 
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(ve_data_inclusao,'YYMMDD') || lpad(CASE WHEN ve_jogo='HB' THEN 16 WHEN ve_jogo='OG' THEN 13 WHEN ve_jogo='MU' THEN 34 END::text , 3, '0') || lpad(ve_id::text , 8, '0') as venda,
+
+                                            ve_data_inclusao as dia,
+
+                                            CASE WHEN ve_jogo='HB' THEN 16 WHEN ve_jogo='OG' THEN 13 WHEN ve_jogo='MU' THEN 34 END as publisher,
+
+                                            count(*) as n, 
+
+                                            sum(ve_valor) as total 
+
+                                    from dist_vendas_pos 
+
+                                    where date_trunc('day', ve_data_inclusao)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                            and CASE WHEN ve_jogo='HB' THEN 16 WHEN ve_jogo='OG' THEN 13 WHEN ve_jogo='MU' THEN 34 END = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                    group by venda,
+
+                                            dia,
+
+                                            publisher) 
+
+                            union all
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(data_transacao,'YYMMDD') || lpad(opr_codigo::text , 3, '0') || lpad(id_transacao::text , 8, '0') as venda,
+
+                                            data_transacao as dia,
+
+                                            opr_codigo as publisher,
+
+                                            count(*) as n, 
+
+                                            sum(valor) as total 
+
+                                    from pos_transacoes_ponto_certo 
+
+                                    where opr_codigo is not NULL 
+
+                                            and opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                            and date_trunc('day', data_transacao)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                    group by venda,
+
+                                            dia,
+
+                                            publisher) 
+
+                            union all 
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['gamer'] . "'  || to_char(vg.vg_data_concilia,'YYMMDD') || lpad(vgm_opr_codigo::text , 3, '0') || lpad(vg.vg_id::text , 8, '0') as venda,
+
+                                            vg.vg_data_concilia as dia,
+
+                                            vgm_opr_codigo as publisher,
+
+                                            sum(vgm.vgm_qtde) as n,
+
+                                            sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
+
+                                    from tb_venda_games vg 
+
+                                            inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+
+                                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
+
+                                            and vgm_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                            and date_trunc('day', vg.vg_data_concilia)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                    group by venda,
+
+                                            dia, 
+
+                                            publisher) ";
+
+                                //verificando se o Publisher contabiliza vendas por utilização
+
+                                if (array_key_exists($total_epp_adm_row['fp_publisher'], $vetorPublisherPorUtilizacao)) {
+
+                                    $sql .= "
+
+
+
+                            -- Contabilizando PINs PDVs por UTILIZAÇÃO na Integração                
+
+                            union all
+
+
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(vg.vg_data_inclusao,'YYMMDD') || lpad(vgm_opr_codigo::text , 3, '0') || lpad(vg.vg_id::text , 8, '0') as venda,
+
+                                            vg.vg_data_inclusao as dia,
+
+                                            vgm_opr_codigo as publisher,
+
+                                            count(*) as n, 
+
+                                            sum(vgm.vgm_valor) as total
+
+                                    from tb_dist_venda_games vg 
+
+                                         inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+
+                                         inner join tb_dist_venda_games_modelo_pins vgmp on vgmp_vgm_id = vgm.vgm_id 
+
+                                         inner join pins_integracao_historico pih on pih_pin_id = vgmp_pin_codinterno
+
+                                    where vg.vg_data_inclusao>='2008-01-01 00:00:00' 
+
+                                         and vg.vg_ultimo_status='5'
+
+                                         and vgm_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                         and pin_status = '8'
+
+                                         and pih_codretepp='2'
+
+                                         " . $where_opr_venda_lan_negativa . "
+
+                                         and date_trunc('day', pih_data)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                         " . $where_opr_utilizacao_lan . "
+
+                                    group by venda,
+
+                                            dia,
+
+                                            publisher) 
+
+                                        ";
+                                } //end if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
+                                else {
+
+                                    $sql .= " 
+
+                                                
+
+                                -- Contabilizando PINs PDVs por VENDA na Integração                
+
+                                union all 
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(vg.vg_data_inclusao,'YYMMDD') || lpad(vgm_opr_codigo::text , 3, '0') || lpad(vg.vg_id::text , 8, '0') as venda,
+
+                                            vg.vg_data_inclusao as dia,
+
+                                            vgm_opr_codigo as publisher,
+
+                                            sum(vgm.vgm_qtde) as n, 
+
+                                            sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
+
+                                    from tb_dist_venda_games vg 
+
+                                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+
+                                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' " . $where_opr_venda_lan . "
+
+                                            and vgm_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                            and date_trunc('day', vg.vg_data_inclusao)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                    group by venda,
+
+                                            dia,
+
+                                            publisher) ";
+                                } //end else do if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
+
+                                $sql .= " 
+
+                            -- Contabilizando PINs GiftCards utilizados por Integração                
+
+                            union all 
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['cards'] . "'  || to_char(pih_data,'YYMMDD') || lpad(pih_id::text , 3, '0') || lpad(pih_pin_id::text , 8, '0') as venda,
+
+                                            pih_data as dia,
+
+                                            pih_id as publisher,
+
+                                            count(*) as n, 
+
+                                            sum(pih_pin_valor/100) as total 
+
+                                    from pins_integracao_card_historico
+
+                                    where pin_status = '" . intval($PINS_STORE_STATUS_VALUES['U']) . "' 
+
+                                            and pih_id = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                            and pih_codretepp = '2'
+
+                                            and date_trunc('day', pih_data)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                    group by venda,
+
+                                            dia,
+
+                                            publisher)
+
+                            -- Contabilizando PINs GoCASH utilizado por Integração de Utilização                
+
+                            union all 
+
+                                    (select 
+
+                                            '" . $ARRAY_CONCATENA_ID_VENDA['cards'] . "'  || to_char(pgc_pin_response_date,'YYMMDD') || lpad(pgc_opr_codigo::text , 3, '0') || lpad(pgc_id::text , 8, '0') as venda,
+
+                                            pgc_pin_response_date as dia,
+
+                                            pgc_opr_codigo as publisher,
+
+                                            count(*) as n, 
+
+                                            CASE WHEN (select opr_product_type from operadoras where opr_codigo = pgc_opr_codigo) = 5 THEN sum(pgc_real_amount) 
+
+                                                 WHEN ((select opr_product_type from operadoras where opr_codigo = pgc_opr_codigo) = 7 OR (select opr_product_type from operadoras where opr_codigo = pgc_opr_codigo) = 4 )  THEN sum (pgc_face_amount) 
+
+                                                 ELSE sum (pgc_face_amount) END as total 
+
+                                    from pins_gocash
+
+                                    where pgc_opr_codigo != 0 
+
+                                             and pgc_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
+
+                                             and date_trunc('day', pgc_pin_response_date)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
+
+                                    group by venda,
+
+                                            dia,
+
+                                            publisher) 
+
+                            ) t 
+
+                            inner join operadoras ON opr_codigo = publisher
+
+                            where publisher = " . $total_epp_adm_row['fp_publisher'] . "
+                                and total > 0
+                                and opr_status = '1' 
+
+                            group by venda, dia
+
+                            order by dia;";
+
+                                //echo $sql.PHP_EOL.PHP_EOL;     die();   
 
                                 $transacoes = SQLexecuteQuery($sql);
 
@@ -1863,12 +2549,14 @@ try {
                                 } //end if ($transacoes)
                                 else {
 
-                                    $msg .= PHP_EOL . "ERRO 0010: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Pagamentos.";
+                                    $msg .= PHP_EOL . "ERRO 0011: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Administradora.";
                                 } //end else do if ($transacoes)
+
+
 
                                 //=========================================================================================================================
 
-                                // FIM DO BLOCO - REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP PAGTO
+                                // FIM DO BLOCO - REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP ADM
 
                                 //=========================================================================================================================
 
@@ -1878,134 +2566,194 @@ try {
 
                             } //endwhile
 
-                        } //end iif ($total_operacoes_diarias)
+                        } //end if ($total_operacoes_diarias) 
                         else {
 
                             $msg .= PHP_EOL . "ERRO 0009: Erro ao executar o select dos totais de operacoes diarias.";
-                        } //end esle do if ($total_operacoes_diarias)
+                        } //end esle do if ($total_operacoes_diarias) 
+
+
 
 
 
                         //=========================================================================================================================
 
-                        // FIM DO BLOCO - REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP PAGTO
+                        // FIM DO BLOCO - REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP ADM
 
                         //=========================================================================================================================
 
 
 
-                    } //end if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
-                    else {
+                    } //endwhile
 
-                        $msg .= PHP_EOL . "ERRO 0007: Erro ao executar o fetch_array dos totais dos Publishers vinculados a E-Prepag Pagamentos.";
-                    } //end else do if ($total_epp_pagto_row = pg_fetch_array($total_epp_pagto))
-
-                } //end if ($total_epp_pagto) 
+                } //end if ($total_epp_adm) 
                 else {
 
-                    $msg .= PHP_EOL . "ERRO 0006: Erro ao executar o select dos totais dos Publishers vinculados a E-Prepag Pagamentos.";
-                } //end esle do if ($total_epp_pagto) 
+                    $msg .= PHP_EOL . "ERRO 0008: Erro ao executar o select dos totais dos Publishers vinculados a E-Prepag Administradora. $publishers_epp_pagto";
+                } //end esle do if ($total_epp_adm) 
 
-            } //end if(!empty($publishers_epp_pagto))
+                //=========================================================================================================================
 
-            //Levantando totais por Publishers vinculados a EPP ADM
+                // FIM DO BLOCO - REGISTRO TIPO 1100: RESUMO MENSAL DAS OPERAÇÕES DE PAGAMENTO
 
-            $sql_total_epp_adm = "
-
-                                select 
-
-                                        opr_internacional_alicota,fp_publisher, sum(fp_total_order) as fp_total_order, sum(fp_total) as total
-
-                                from financial_processing 
-
-                                    inner join operadoras on opr_codigo =  fp_publisher
-
-                                where  fp_publisher NOT IN (" . $publishers_epp_pagto . ")
-
-                                    and fp_date >= '" . $ano . "-" . $mes . "-01 00:00:00' 
-
-                                    and fp_date <= '" . $ano . "-" . $mes . "-" . $ultimoDiaMes . " 23:59:59'
-
-                                    and opr_status = '1' 
-
-                                    and fp_freeze=1 
-									
-                                group by fp_publisher,opr_internacional_alicota; ";
+                //=========================================================================================================================
 
 
 
-            //echo $sql_total_epp_adm;
 
-            $total_epp_adm = SQLexecuteQuery($sql_total_epp_adm);
 
-            if ($total_epp_adm) {
 
-                while ($total_epp_adm_row = pg_fetch_array($total_epp_adm)) {
 
-                    unset($vetorLines);
+
+
+                //=========================================================================================================================
+
+                // REGISTRO TIPO 1200: CANCELAMENTO EXTEMPORÂNEO ==> Não é nosso caso
+
+                //Este registro deve ser gerado para informar todas as operações canceladas em períodos
+
+                //anteriores a esta declaração. Os cancelamentos identificados no período desta
+
+                //declaração não devem ser informados. Não serão admitidos reportes de cancelamentos
+
+                //parciais, deve-se efetivar o cancelamento integral e, se for o caso, registrar um novo
+
+                //lançamento extemporâneo da efetiva operação no registro 1100 e demais registros
+
+                //hierarquicamente relacionados. Registros de cancelamento extemporâneo são aceitos
+
+                //apenas em arquivos com finalidade 01 ? Normal, campo 03 do registro 0000. 
+
+                //=========================================================================================================================
+
+
+
+
+
+
+
+
+
+                //=========================================================================================================================
+
+                // REGISTRO 1990: ENCERRAMENTO DO BLOCO 1 
+
+                //=========================================================================================================================
+
+                unset($vetorLines);
+
+                $countBlocoUm++;
+
+                $vetorLines = array(
+
+                    0 => array(
+                        'name' => '1990',
+
+                        'size' => 4
+
+                    ),
+
+                    1 => array(
+                        'name' => $countBlocoUm,
+
+                        'size' => 20
+
+                    ),
+
+                );
+
+                $file->setVetorLines($vetorLines);
+
+                $REG_BLC['1990'] = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // Contador de registros do Bloco Nove
+
+                $countBlocoNove = 0;
+
+
+
+                //=========================================================================================================================
+
+                // REGISTRO 9001: ABERTURA DO BLOCO 9  
+
+                //=========================================================================================================================
+
+                unset($vetorLines);
+
+                $vetorLines = array(
+
+                    0 => array(
+                        'name' => '9001',
+
+                        'size' => 4
+
+                    ),
+
+                    1 => array(
+                        'name' => '1',
+
+                        'size' => 1
+
+                    ),
+
+                );
+
+                $file->setVetorLines($vetorLines);
+
+                $countBlocoNove++;
+
+                $REG_BLC['9001'] = 1;
+
+
+
+
+
+
+
+                //=========================================================================================================================
+
+                // REGISTRO TIPO 9900: REGISTROS DO ARQUIVO
+
+                //=========================================================================================================================
+
+                unset($vetorLines);
+
+                foreach ($REG_BLC as $key => $value) {
 
                     $vetorLines = array(
 
                         0 => array(
-                            'name' => '1100',
+                            'name' => '9900',
 
                             'size' => 4
 
                         ),
 
                         1 => array(
-                            'name' => '',
+                            'name' => str_pad($key, 4, '0', STR_PAD_LEFT),
 
-                            'size' => 20
+                            'size' => 4
 
                         ),
 
                         2 => array(
-                            'name' => str_pad($total_epp_adm_row['fp_publisher'], 7, '0', STR_PAD_LEFT),
+                            'name' => $value,
 
-                            'size' => 7
-
-                        ),
-
-                        3 => array(
-                            'name' => (($total_epp_adm_row['opr_internacional_alicota'] == 0) ? '0' : '1'),
-
-                            'size' => 1
-
-                        ),
-
-                        4 => array(
-                            'name' => $IND_EXTEMP,
-
-                            'size' => 1
-
-                        ),
-
-                        5 => array(
-                            'name' => $ano . $mes . '01',
-
-                            'size' => 8
-
-                        ),
-
-                        6 => array(
-                            'name' => $ano . $mes . $ultimoDiaMes,
-
-                            'size' => 8
-
-                        ),
-
-                        7 => array(
-                            'name' => number_format($total_epp_adm_row['total'], 2, ',', ''),
-
-                            'size' => 21
-
-                        ),
-
-                        8 => array(
-                            'name' => $total_epp_adm_row['fp_total_order'],
-
-                            'size' => 10
+                            'size' => 20
 
                         ),
 
@@ -2013,723 +2761,8 @@ try {
 
                     $file->setVetorLines($vetorLines);
 
-                    $countBlocoUm++;
-
-                    $REG_BLC['1100']++;
-
-
-
-                    //=========================================================================================================================
-
-                    // REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP ADM
-
-                    //=========================================================================================================================
-
-                    //Levantando totais por OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA
-
-                    $sql_total_operacoes_diarias = "
-
-                                        select 
-
-                                            to_char(fp_date,'YYYYMMDD') as fp_date,sum(fp_total_order) as fp_total_order, sum(fp_total) as total
-
-                                        from financial_processing 
-
-                                            inner join operadoras on opr_codigo =  fp_publisher
-
-                                        where fp_date >= '" . $ano . "-" . $mes . "-01 00:00:00' 
-
-                                            and fp_date <= '" . $ano . "-" . $mes . "-" . $ultimoDiaMes . " 23:59:59'
-
-                                            and fp_publisher = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                            and opr_status = '1' 
-
-                                            and fp_freeze=1 
-
-                                        group by fp_date
-
-                                        order by fp_date; ";
-
-
-
-                    //echo $sql_total_operacoes_diarias."<br>";
-
-                    $total_operacoes_diarias = SQLexecuteQuery($sql_total_operacoes_diarias);
-
-                    if ($total_operacoes_diarias) {
-
-                        while ($total_operacoes_diarias_row = pg_fetch_array($total_operacoes_diarias)) {
-
-
-
-                            unset($vetorLines);
-
-                            $vetorLines = array(
-
-                                0 => array(
-                                    'name' => '1110',
-
-                                    'size' => 4
-
-                                ),
-
-                                1 => array(
-                                    'name' => $COD_MCAPT,
-
-                                    'size' => 20
-
-                                ),
-
-                                2 => array(
-                                    'name' => $total_operacoes_diarias_row['fp_date'],
-
-                                    'size' => 8
-
-                                ),
-
-                                3 => array(
-                                    'name' => number_format($total_operacoes_diarias_row['total'], 2, ',', ''),
-
-                                    'size' => 13
-
-                                ),
-
-                                4 => array(
-                                    'name' => $total_operacoes_diarias_row['fp_total_order'],
-
-                                    'size' => 10
-
-                                ),
-
-                                5 => array(
-                                    'name' => $cnpjEPPPAGTO,
-
-                                    'size' => 14
-
-                                ),
-
-                            );
-
-                            $file->setVetorLines($vetorLines);
-
-                            $countBlocoUm++;
-
-                            $REG_BLC['1110']++;
-
-
-
-
-
-                            //=========================================================================================================================
-
-                            // REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP ADM
-
-                            //=========================================================================================================================
-
-
-
-                            if (count($vetorPublisherPorUtilizacao) > 0) {
-
-                                $where_opr_venda_lan = " AND ( CASE ";
-
-                                $where_opr_venda_lan_negativa = " AND ( CASE ";
-
-                                $where_opr_utilizacao_lan = " AND ( CASE ";
-
-                                foreach ($vetorPublisherPorUtilizacao as $opr_codigo => $opr_data_inicio_contabilizacao_utilizacao) {
-
-                                    //echo "ID: ".$opr_codigo." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
-
-                                    $where_opr_venda_lan .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao < '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-
-                                    $where_opr_venda_lan_negativa .= " WHEN vgm.vgm_opr_codigo = $opr_codigo THEN vg.vg_data_inclusao >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-
-                                    $where_opr_utilizacao_lan .= "  WHEN pih_id = $opr_codigo THEN pih_data >= '" . substr($opr_data_inicio_contabilizacao_utilizacao, 0, 19) . "' ";
-                                } //end foreach
-
-                                $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
-
-                                $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
-
-                                $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
-                            } //end if(count($vetorPublisherPorUtilizacao)>0)
-                            else {
-
-                                $where_opr_venda_lan = "";
-
-                                $where_opr_venda_lan_negativa = "";
-
-                                $where_opr_utilizacao_lan = "";
-                            } //end else do if(count($vetorPublisherPorUtilizacao)>0)          
-
-
-
-                            //Query de levantamento de transações
-
-                            $sql = "
-
-                            select 
-
-                                    venda,
-
-                                    to_char(dia,'HH24MISS') as dia,
-
-                                    sum(n) as n, 
-
-                                    round(sum(total)::numeric,2) as total 
-
-                            from ( 
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(ve_data_inclusao,'YYMMDD') || lpad(CASE WHEN ve_jogo='HB' THEN 16 WHEN ve_jogo='OG' THEN 13 WHEN ve_jogo='MU' THEN 34 END::text , 3, '0') || lpad(ve_id::text , 8, '0') as venda,
-
-                                            ve_data_inclusao as dia,
-
-                                            CASE WHEN ve_jogo='HB' THEN 16 WHEN ve_jogo='OG' THEN 13 WHEN ve_jogo='MU' THEN 34 END as publisher,
-
-                                            count(*) as n, 
-
-                                            sum(ve_valor) as total 
-
-                                    from dist_vendas_pos 
-
-                                    where date_trunc('day', ve_data_inclusao)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                            and CASE WHEN ve_jogo='HB' THEN 16 WHEN ve_jogo='OG' THEN 13 WHEN ve_jogo='MU' THEN 34 END = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                    group by venda,
-
-                                            dia,
-
-                                            publisher) 
-
-                            union all
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(data_transacao,'YYMMDD') || lpad(opr_codigo::text , 3, '0') || lpad(id_transacao::text , 8, '0') as venda,
-
-                                            data_transacao as dia,
-
-                                            opr_codigo as publisher,
-
-                                            count(*) as n, 
-
-                                            sum(valor) as total 
-
-                                    from pos_transacoes_ponto_certo 
-
-                                    where opr_codigo is not NULL 
-
-                                            and opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                            and date_trunc('day', data_transacao)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                    group by venda,
-
-                                            dia,
-
-                                            publisher) 
-
-                            union all 
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['gamer'] . "'  || to_char(vg.vg_data_concilia,'YYMMDD') || lpad(vgm_opr_codigo::text , 3, '0') || lpad(vg.vg_id::text , 8, '0') as venda,
-
-                                            vg.vg_data_concilia as dia,
-
-                                            vgm_opr_codigo as publisher,
-
-                                            sum(vgm.vgm_qtde) as n,
-
-                                            sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
-
-                                    from tb_venda_games vg 
-
-                                            inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-
-                                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-
-                                            and vgm_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                            and date_trunc('day', vg.vg_data_concilia)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                    group by venda,
-
-                                            dia, 
-
-                                            publisher) ";
-
-                            //verificando se o Publisher contabiliza vendas por utilização
-
-                            if (array_key_exists($total_epp_adm_row['fp_publisher'], $vetorPublisherPorUtilizacao)) {
-
-                                $sql .= "
-
-
-
-                            -- Contabilizando PINs PDVs por UTILIZAÇÃO na Integração                
-
-                            union all
-
-
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(vg.vg_data_inclusao,'YYMMDD') || lpad(vgm_opr_codigo::text , 3, '0') || lpad(vg.vg_id::text , 8, '0') as venda,
-
-                                            vg.vg_data_inclusao as dia,
-
-                                            vgm_opr_codigo as publisher,
-
-                                            count(*) as n, 
-
-                                            sum(vgm.vgm_valor) as total
-
-                                    from tb_dist_venda_games vg 
-
-                                         inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-
-                                         inner join tb_dist_venda_games_modelo_pins vgmp on vgmp_vgm_id = vgm.vgm_id 
-
-                                         inner join pins_integracao_historico pih on pih_pin_id = vgmp_pin_codinterno
-
-                                    where vg.vg_data_inclusao>='2008-01-01 00:00:00' 
-
-                                         and vg.vg_ultimo_status='5'
-
-                                         and vgm_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                         and pin_status = '8'
-
-                                         and pih_codretepp='2'
-
-                                         " . $where_opr_venda_lan_negativa . "
-
-                                         and date_trunc('day', pih_data)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                         " . $where_opr_utilizacao_lan . "
-
-                                    group by venda,
-
-                                            dia,
-
-                                            publisher) 
-
-                                        ";
-                            } //end if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
-                            else {
-
-                                $sql .= " 
-
-                                                
-
-                                -- Contabilizando PINs PDVs por VENDA na Integração                
-
-                                union all 
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['pdv'] . "'  || to_char(vg.vg_data_inclusao,'YYMMDD') || lpad(vgm_opr_codigo::text , 3, '0') || lpad(vg.vg_id::text , 8, '0') as venda,
-
-                                            vg.vg_data_inclusao as dia,
-
-                                            vgm_opr_codigo as publisher,
-
-                                            sum(vgm.vgm_qtde) as n, 
-
-                                            sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
-
-                                    from tb_dist_venda_games vg 
-
-                                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-
-                                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' " . $where_opr_venda_lan . "
-
-                                            and vgm_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                            and date_trunc('day', vg.vg_data_inclusao)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                    group by venda,
-
-                                            dia,
-
-                                            publisher) ";
-                            } //end else do if(array_key_exists ($total_epp_adm_row['fp_publisher'],$vetorPublisherPorUtilizacao)) 
-
-                            $sql .= " 
-
-                            -- Contabilizando PINs GiftCards utilizados por Integração                
-
-                            union all 
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['cards'] . "'  || to_char(pih_data,'YYMMDD') || lpad(pih_id::text , 3, '0') || lpad(pih_pin_id::text , 8, '0') as venda,
-
-                                            pih_data as dia,
-
-                                            pih_id as publisher,
-
-                                            count(*) as n, 
-
-                                            sum(pih_pin_valor/100) as total 
-
-                                    from pins_integracao_card_historico
-
-                                    where pin_status = '" . intval($PINS_STORE_STATUS_VALUES['U']) . "' 
-
-                                            and pih_id = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                            and pih_codretepp = '2'
-
-                                            and date_trunc('day', pih_data)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                    group by venda,
-
-                                            dia,
-
-                                            publisher)
-
-                            -- Contabilizando PINs GoCASH utilizado por Integração de Utilização                
-
-                            union all 
-
-                                    (select 
-
-                                            '" . $ARRAY_CONCATENA_ID_VENDA['cards'] . "'  || to_char(pgc_pin_response_date,'YYMMDD') || lpad(pgc_opr_codigo::text , 3, '0') || lpad(pgc_id::text , 8, '0') as venda,
-
-                                            pgc_pin_response_date as dia,
-
-                                            pgc_opr_codigo as publisher,
-
-                                            count(*) as n, 
-
-                                            CASE WHEN (select opr_product_type from operadoras where opr_codigo = pgc_opr_codigo) = 5 THEN sum(pgc_real_amount) 
-
-                                                 WHEN ((select opr_product_type from operadoras where opr_codigo = pgc_opr_codigo) = 7 OR (select opr_product_type from operadoras where opr_codigo = pgc_opr_codigo) = 4 )  THEN sum (pgc_face_amount) 
-
-                                                 ELSE sum (pgc_face_amount) END as total 
-
-                                    from pins_gocash
-
-                                    where pgc_opr_codigo != 0 
-
-                                             and pgc_opr_codigo = " . $total_epp_adm_row['fp_publisher'] . "
-
-                                             and date_trunc('day', pgc_pin_response_date)  = '" . substr($total_operacoes_diarias_row['fp_date'], 0, 4) . "-" . substr($total_operacoes_diarias_row['fp_date'], 4, 2) . "-" . substr($total_operacoes_diarias_row['fp_date'], 6, 2) . "' 
-
-                                    group by venda,
-
-                                            dia,
-
-                                            publisher) 
-
-                            ) t 
-
-                            inner join operadoras ON opr_codigo = publisher
-
-                            where publisher = " . $total_epp_adm_row['fp_publisher'] . "
-                                and total > 0
-                                and opr_status = '1' 
-
-                            group by venda, dia
-
-                            order by dia;";
-
-                            //echo $sql.PHP_EOL.PHP_EOL;     die();   
-
-                            $transacoes = SQLexecuteQuery($sql);
-
-                            if ($transacoes) {
-
-                                while ($transacoes_row = pg_fetch_array($transacoes)) {
-
-                                    unset($vetorLines);
-
-                                    $vetorLines = array(
-
-                                        0 => array(
-                                            'name' => '1115',
-
-                                            'size' => 4
-
-                                        ),
-
-                                        1 => array(
-                                            'name' => $transacoes_row['venda'] . str_pad($REG_BLC['1115'], 6, '0', STR_PAD_LEFT),
-
-                                            'size' => 25
-
-                                        ),
-
-                                        2 => array(
-                                            'name' => '',
-
-                                            'size' => 8
-
-                                        ),
-
-                                        3 => array(
-                                            'name' => '',
-
-                                            'size' => 8
-
-                                        ),
-
-                                        4 => array(
-                                            'name' => $IND_SPLIT,
-
-                                            'size' => 1
-
-                                        ),
-
-                                        5 => array(
-                                            'name' => $BANDEIRA,
-
-                                            'size' => 2
-
-                                        ),
-
-                                        6 => array(
-                                            'name' => $transacoes_row['dia'],
-
-                                            'size' => 6
-
-                                        ),
-
-                                        7 => array(
-                                            'name' => number_format($transacoes_row['total'], 2, ',', ''),
-
-                                            'size' => 13
-
-                                        ),
-
-                                        8 => array(
-                                            'name' => $NAT_OPER,
-
-                                            'size' => 1
-
-                                        ),
-
-                                        9 => array(
-                                            'name' => '',
-
-                                            'size' => 14
-
-                                        ),
-                                        10 => array(
-                                            'name' => '',
-
-                                            'size' => 14
-
-                                        ),
-                                        11 => array(
-                                            'name' => '',
-
-                                            'size' => 14
-
-                                        )
-
-                                    );
-
-                                    $file->setVetorLines($vetorLines);
-
-                                    $countBlocoUm++;
-
-                                    $REG_BLC['1115']++;
-                                } //endwhile
-
-                            } //end if ($transacoes)
-                            else {
-
-                                $msg .= PHP_EOL . "ERRO 0011: Erro ao executar a query das transacoes dos Publishers vinculados a E-Prepag Administradora.";
-                            } //end else do if ($transacoes)
-
-
-
-                            //=========================================================================================================================
-
-                            // FIM DO BLOCO - REGISTRO TIPO 1115: OPERAÇÕES POR COMPROVANTE DE PAGAMENTO - Para Publisher vinculados a EPP ADM
-
-                            //=========================================================================================================================
-
-
-
-
-
-                        } //endwhile
-
-                    } //end if ($total_operacoes_diarias) 
-                    else {
-
-                        $msg .= PHP_EOL . "ERRO 0009: Erro ao executar o select dos totais de operacoes diarias.";
-                    } //end esle do if ($total_operacoes_diarias) 
-
-
-
-
-
-                    //=========================================================================================================================
-
-                    // FIM DO BLOCO - REGISTRO TIPO 1110: OPERAÇÕES DIÁRIAS DE PAGAMENTO POR MEIO DE CAPTURA - Para Publisher vinculados a EPP ADM
-
-                    //=========================================================================================================================
-
-
-
-                } //endwhile
-
-            } //end if ($total_epp_adm) 
-            else {
-
-                $msg .= PHP_EOL . "ERRO 0008: Erro ao executar o select dos totais dos Publishers vinculados a E-Prepag Administradora.";
-            } //end esle do if ($total_epp_adm) 
-
-            //=========================================================================================================================
-
-            // FIM DO BLOCO - REGISTRO TIPO 1100: RESUMO MENSAL DAS OPERAÇÕES DE PAGAMENTO
-
-            //=========================================================================================================================
-
-
-
-
-
-
-
-
-
-            //=========================================================================================================================
-
-            // REGISTRO TIPO 1200: CANCELAMENTO EXTEMPORÂNEO ==> Não é nosso caso
-
-            //Este registro deve ser gerado para informar todas as operações canceladas em períodos
-
-            //anteriores a esta declaração. Os cancelamentos identificados no período desta
-
-            //declaração não devem ser informados. Não serão admitidos reportes de cancelamentos
-
-            //parciais, deve-se efetivar o cancelamento integral e, se for o caso, registrar um novo
-
-            //lançamento extemporâneo da efetiva operação no registro 1100 e demais registros
-
-            //hierarquicamente relacionados. Registros de cancelamento extemporâneo são aceitos
-
-            //apenas em arquivos com finalidade 01 ? Normal, campo 03 do registro 0000. 
-
-            //=========================================================================================================================
-
-
-
-
-
-
-
-
-
-            //=========================================================================================================================
-
-            // REGISTRO 1990: ENCERRAMENTO DO BLOCO 1 
-
-            //=========================================================================================================================
-
-            unset($vetorLines);
-
-            $countBlocoUm++;
-
-            $vetorLines = array(
-
-                0 => array(
-                    'name' => '1990',
-
-                    'size' => 4
-
-                ),
-
-                1 => array(
-                    'name' => $countBlocoUm,
-
-                    'size' => 20
-
-                ),
-
-            );
-
-            $file->setVetorLines($vetorLines);
-
-            $REG_BLC['1990'] = 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // Contador de registros do Bloco Nove
-
-            $countBlocoNove = 0;
-
-
-
-            //=========================================================================================================================
-
-            // REGISTRO 9001: ABERTURA DO BLOCO 9  
-
-            //=========================================================================================================================
-
-            unset($vetorLines);
-
-            $vetorLines = array(
-
-                0 => array(
-                    'name' => '9001',
-
-                    'size' => 4
-
-                ),
-
-                1 => array(
-                    'name' => '1',
-
-                    'size' => 1
-
-                ),
-
-            );
-
-            $file->setVetorLines($vetorLines);
-
-            $countBlocoNove++;
-
-            $REG_BLC['9001'] = 1;
-
-
-
-
-
-
-
-            //=========================================================================================================================
-
-            // REGISTRO TIPO 9900: REGISTROS DO ARQUIVO
-
-            //=========================================================================================================================
-
-            unset($vetorLines);
-
-            foreach ($REG_BLC as $key => $value) {
+                    $countBlocoNove++;
+                } //end foreach
 
                 $vetorLines = array(
 
@@ -2741,14 +2774,14 @@ try {
                     ),
 
                     1 => array(
-                        'name' => str_pad($key, 4, '0', STR_PAD_LEFT),
+                        'name' => '9900',
 
                         'size' => 4
 
                     ),
 
                     2 => array(
-                        'name' => $value,
+                        'name' => count($REG_BLC) + 3,
 
                         'size' => 20
 
@@ -2759,209 +2792,179 @@ try {
                 $file->setVetorLines($vetorLines);
 
                 $countBlocoNove++;
-            } //end foreach
 
-            $vetorLines = array(
+                $vetorLines = array(
 
-                0 => array(
-                    'name' => '9900',
+                    0 => array(
+                        'name' => '9900',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                1 => array(
-                    'name' => '9900',
+                    1 => array(
+                        'name' => '9990',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                2 => array(
-                    'name' => count($REG_BLC) + 3,
+                    2 => array(
+                        'name' => '1',
 
-                    'size' => 20
+                        'size' => 20
 
-                ),
+                    ),
 
-            );
+                );
 
-            $file->setVetorLines($vetorLines);
+                $file->setVetorLines($vetorLines);
 
-            $countBlocoNove++;
+                $countBlocoNove++;
 
-            $vetorLines = array(
+                $vetorLines = array(
 
-                0 => array(
-                    'name' => '9900',
+                    0 => array(
+                        'name' => '9900',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                1 => array(
-                    'name' => '9990',
+                    1 => array(
+                        'name' => '9999',
 
-                    'size' => 4
+                        'size' => 4
 
-                ),
+                    ),
 
-                2 => array(
-                    'name' => '1',
+                    2 => array(
+                        'name' => '1',
 
-                    'size' => 20
+                        'size' => 20
 
-                ),
+                    ),
 
-            );
+                );
 
-            $file->setVetorLines($vetorLines);
+                $file->setVetorLines($vetorLines);
 
-            $countBlocoNove++;
+                $countBlocoNove++;
 
-            $vetorLines = array(
 
-                0 => array(
-                    'name' => '9900',
 
-                    'size' => 4
 
-                ),
 
-                1 => array(
-                    'name' => '9999',
 
-                    'size' => 4
 
-                ),
 
-                2 => array(
-                    'name' => '1',
 
-                    'size' => 20
 
-                ),
 
-            );
 
-            $file->setVetorLines($vetorLines);
 
-            $countBlocoNove++;
+                //=========================================================================================================================
 
+                // REGISTRO TIPO 9990: ENCERRAMENTO DO BLOCO 9  
 
+                //=========================================================================================================================
 
+                unset($vetorLines);
 
+                $countBlocoNove++;
 
+                $vetorLines = array(
 
+                    0 => array(
+                        'name' => '9990',
 
+                        'size' => 4
 
+                    ),
 
+                    1 => array(
+                        'name' => $countBlocoNove + 1,
 
+                        'size' => 20
 
+                    ),
 
+                );
 
-            //=========================================================================================================================
+                $file->setVetorLines($vetorLines);
 
-            // REGISTRO TIPO 9990: ENCERRAMENTO DO BLOCO 9  
 
-            //=========================================================================================================================
 
-            unset($vetorLines);
 
-            $countBlocoNove++;
 
-            $vetorLines = array(
 
-                0 => array(
-                    'name' => '9990',
 
-                    'size' => 4
 
-                ),
 
-                1 => array(
-                    'name' => $countBlocoNove + 1,
 
-                    'size' => 20
 
-                ),
+                //=========================================================================================================================
 
-            );
+                // REGISTRO TIPO 9999: ENCERRAMENTO DO ARQUIVO DIGITAL
 
-            $file->setVetorLines($vetorLines);
+                //=========================================================================================================================
 
+                unset($vetorLines);
 
+                $countBlocoNove++;
 
+                $vetorLines = array(
 
+                    0 => array(
+                        'name' => '9999',
 
+                        'size' => 4
 
+                    ),
 
+                    1 => array(
+                        'name' => $countBlocoZero + $countBlocoUm + $countBlocoNove,
 
+                        'size' => 20
 
+                    ),
 
+                );
 
-            //=========================================================================================================================
+                $file->setVetorLines($vetorLines);
 
-            // REGISTRO TIPO 9999: ENCERRAMENTO DO ARQUIVO DIGITAL
 
-            //=========================================================================================================================
+                if (!empty(trim($msg))) {
+                    throw new \Exception(trim($msg));
+                }
 
-            unset($vetorLines);
+                $file->saveFile(true, true);
 
-            $countBlocoNove++;
+                //echo "<pre>".print_r($_POST,true).print_r($file,true)."</pre>";
 
-            $vetorLines = array(
+                //
 
-                0 => array(
-                    'name' => '9999',
+                // FINAL DO BLOCO DE GERAÇÃO DO ARQUIVO
 
-                    'size' => 4
+                //
 
-                ),
 
-                1 => array(
-                    'name' => $countBlocoZero + $countBlocoUm + $countBlocoNove,
+            } //end else do if($freeze_total_row['total'] > 0)
 
-                    'size' => 20
 
-                ),
 
-            );
+        } //end if($freeze_total && $freeze_total_row = pg_fetch_array($freeze_total))
+        else {
 
-            $file->setVetorLines($vetorLines);
+            $msg .= PHP_EOL . "ERRO 0001: Erro ao executar o select dos periodos nao congelados.";
+        }
 
-
-            if (!empty(trim($msg))) {
-                throw new \Exception(trim($msg));
-            }
-
-            $file->saveFile(true, true);
-
-            //echo "<pre>".print_r($_POST,true).print_r($file,true)."</pre>";
-
-            //
-
-            // FINAL DO BLOCO DE GERAÇÃO DO ARQUIVO
-
-            //
-
-
-        } //end else do if($freeze_total_row['total'] > 0)
-
-
-
-    } //end if($freeze_total && $freeze_total_row = pg_fetch_array($freeze_total))
-    else {
-
-        $msg .= PHP_EOL . "ERRO 0001: Erro ao executar o select dos periodos nao congelados.";
+        if (!empty(trim($msg))) {
+            throw new \Exception(trim($msg));
+        }
+    } catch (\Throwable $e) {
+        throw new \Exception($e->getMessage());
     }
 
-    if (!empty(trim($msg))) {
-        throw new \Exception(trim($msg));
-    }
-} catch (\Throwable $e) {
-    throw new \Exception($e->getMessage());
-}
-
-return 'ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($nomeArquivo);
+    return 'ajax_dimp.php?directory=' . date('Ymd') . '&name=' . strtoupper($nomeArquivo);
 }
