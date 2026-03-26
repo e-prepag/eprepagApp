@@ -51,29 +51,73 @@ try {
 
     if ($acao === 'solicitar_download') {
         header('Content-Type: application/json');
-        
+
+        $estado = strtoupper(trim((string)($_POST['estado'] ?? '')));
+        $dataInicialRaw = trim((string)($_POST['data_inicial'] ?? ''));
+        $codFin = trim((string)($_POST['cod_fin'] ?? ''));
+        $cpfCnpj = preg_replace('/\D+/', '', (string)($_POST['cpfcnpj'] ?? ''));
+
+        // Normaliza "MM/YYYY" (aceita "M/YYYY", "MM/YY", "M/YY")
+        $dataInicial = $dataInicialRaw;
+        if ($dataInicialRaw !== '' && preg_match('/^\s*(\d{1,2})\s*\/\s*(\d{2,4})\s*$/', $dataInicialRaw, $m)) {
+            $mes = (int)$m[1];
+            $ano = (int)$m[2];
+            if ($ano < 100) {
+                $ano += 2000;
+            }
+            if ($mes >= 1 && $mes <= 12 && $ano >= 2000 && $ano <= 2100) {
+                $dataInicial = str_pad((string)$mes, 2, '0', STR_PAD_LEFT) . '/' . (string)$ano;
+            }
+        }
+
         $parametros = json_encode([
-            'estado'       => $_POST['estado'] ?? '',
-            'data_inicial' => $_POST['data_inicial'] ?? '',
-            'cod_fin'      => $_POST['cod_fin'] ?? '',
-            'cpfcnpj'      => $_POST['cpfcnpj'] ?? ''
+            'estado'       => $estado,
+            'data_inicial' => $dataInicial,
+            'cod_fin'      => $codFin,
+            'cpfcnpj'      => $cpfCnpj
         ]);
 
-        // VERIFICAÇÃO DE CACHE/FILA
-        $sqlBusca = "SELECT id FROM fila_tarefas_background 
-                 WHERE tipo_tarefa = 'gerar_dimp' 
-                   AND parametros = :params 
-                   AND status IN ('PENDENTE', 'PROCESSANDO', 'CONCLUIDO', 'ERRO')
-                   AND data_solicitacao >= NOW() - INTERVAL '15 minutes'
-                 ORDER BY id DESC LIMIT 1";
+        // VERIFICAÇÃO DE CACHE/FILA (últimos 15 minutos, mesmos parâmetros)
+        // Fluxo:
+        // - Se existir PENDENTE/PROCESSANDO: reaproveita (espera terminar)
+        // - Se existir CONCLUIDO sem erro: reaproveita (pode baixar)
+        // - Se existir ERRO (ou CONCLUIDO com erro): cria uma nova tarefa
+        $sqlBusca = "SELECT id, status, caminho_arquivo, mensagem_erro
+                       FROM fila_tarefas_background
+                      WHERE tipo_tarefa = 'gerar_dimp'
+                        AND parametros = :params
+                        AND data_solicitacao >= NOW() - INTERVAL '15 minutes'
+                   ORDER BY id DESC
+                      LIMIT 1";
 
         $stmtBusca = $pdo->prepare($sqlBusca);
         $stmtBusca->execute([':params' => $parametros]);
-        $ticket_existente = $stmtBusca->fetchColumn();
+        $existente = $stmtBusca->fetch(PDO::FETCH_ASSOC);
 
-        if ($ticket_existente) {
-            echo json_encode(['sucesso' => true, 'ticket_id' => $ticket_existente]);
-            exit;
+        if ($existente) {
+            $status = (string)($existente['status'] ?? '');
+            $msgErro = isset($existente['mensagem_erro']) ? trim((string)$existente['mensagem_erro']) : '';
+            $caminhoArquivo = isset($existente['caminho_arquivo']) ? trim((string)$existente['caminho_arquivo']) : '';
+
+            // Se já existe uma execução em andamento, reaproveita o ticket
+            if ($status === 'PENDENTE' || $status === 'PROCESSANDO') {
+                echo json_encode(['sucesso' => true, 'ticket_id' => (int)$existente['id']]);
+                exit;
+            }
+
+            // Se concluiu e não há erro e tem caminho de download, reaproveita e já devolve o link
+            if ($status === 'CONCLUIDO' && $msgErro === '' && $caminhoArquivo !== '') {
+                echo json_encode([
+                    'sucesso' => true,
+                    'ticket_id' => (int)$existente['id'],
+                    'status' => 'CONCLUIDO',
+                    'caminho_arquivo' => $caminhoArquivo
+                ]);
+                exit;
+            }
+
+            // Se houve erro, cria uma nova tarefa (não reaproveita)
+            // (inclui CONCLUIDO com mensagem_erro preenchida)
         }
 
         $sql = "INSERT INTO fila_tarefas_background (tipo_tarefa, parametros, status) 

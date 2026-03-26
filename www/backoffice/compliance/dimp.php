@@ -1,6 +1,5 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-header("Content-Type: text/html; charset=UTF-8");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 
 require_once "../../class/util/classFilePipe.php";
@@ -11,79 +10,79 @@ require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 function removerAcentos($string)
 {
     $map = array(
-        'Ã¡' => 'a',
-        'Ã ' => 'a',
-        'Ã£' => 'a',
-        'Ã¢' => 'a',
-        'Ã¤' => 'a',
-        'Ã' => 'A',
-        'Ã€' => 'A',
-        'Ãƒ' => 'A',
-        'Ã‚' => 'A',
-        'Ã„' => 'A',
-        'Ã©' => 'e',
-        'Ã¨' => 'e',
-        'Ãª' => 'e',
-        'Ã«' => 'e',
-        'Ã‰' => 'E',
-        'Ãˆ' => 'E',
-        'ÃŠ' => 'E',
-        'Ã‹' => 'E',
-        'Ã­' => 'i',
-        'Ã¬' => 'i',
-        'Ã®' => 'i',
-        'Ã¯' => 'i',
-        'Ã' => 'I',
-        'ÃŒ' => 'I',
-        'ÃŽ' => 'I',
-        'Ã' => 'I',
-        'Ã³' => 'o',
-        'Ã²' => 'o',
-        'Ãµ' => 'o',
-        'Ã´' => 'o',
-        'Ã¶' => 'o',
-        'Ã“' => 'O',
-        'Ã’' => 'O',
-        'Ã•' => 'O',
-        'Ã”' => 'O',
-        'Ã–' => 'O',
-        'Ãº' => 'u',
-        'Ã¹' => 'u',
-        'Ã»' => 'u',
-        'Ã¼' => 'u',
-        'Ãš' => 'U',
-        'Ã™' => 'U',
-        'Ã›' => 'U',
-        'Ãœ' => 'U',
-        'Ã§' => 'c',
-        'Ã‡' => 'C',
-        'Ã±' => 'n',
-        'Ã‘' => 'N'
+        'á' => 'a',
+        'à' => 'a',
+        'ã' => 'a',
+        'â' => 'a',
+        'ä' => 'a',
+        'Á' => 'A',
+        'À' => 'A',
+        'Ã' => 'A',
+        'Â' => 'A',
+        'Ä' => 'A',
+        'é' => 'e',
+        'è' => 'e',
+        'ê' => 'e',
+        'ë' => 'e',
+        'É' => 'E',
+        'È' => 'E',
+        'Ê' => 'E',
+        'Ë' => 'E',
+        'í' => 'i',
+        'ì' => 'i',
+        'î' => 'i',
+        'ï' => 'i',
+        'Í' => 'I',
+        'Ì' => 'I',
+        'Î' => 'I',
+        'Ï' => 'I',
+        'ó' => 'o',
+        'ò' => 'o',
+        'õ' => 'o',
+        'ô' => 'o',
+        'ö' => 'o',
+        'Ó' => 'O',
+        'Ò' => 'O',
+        'Õ' => 'O',
+        'Ô' => 'O',
+        'Ö' => 'O',
+        'ú' => 'u',
+        'ù' => 'u',
+        'û' => 'u',
+        'ü' => 'u',
+        'Ú' => 'U',
+        'Ù' => 'U',
+        'Û' => 'U',
+        'Ü' => 'U',
+        'ç' => 'c',
+        'Ç' => 'C',
+        'ñ' => 'n',
+        'Ñ' => 'N'
     );
     return strtr($string, $map);
 }
 
 
 
-//Captura inÃ­cio da execuÃ§Ã£o
+//Captura início da execução
 
 $time_start = getmicrotime();
 
 
 
-//Dados NecessÃ¡rios
+//Dados Necessários
 
 $cnpjEPP = '19037276000172';                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$razaoEPP = 'E-prepag Administradora de Cartoes Ltda';  // RazÃ£o Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+$razaoEPP = 'E-prepag Administradora de Cartoes Ltda';  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';    // EndereÃ§o da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+$enderecoEPP = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26-A, Pinheiros';    // Endereço da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
 $cepEPP = '05418000';                                   // CEP da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
 $ufEPP = 'SP';                                          // UF da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$nomeRespEPP = 'Daniela Oliveira';                      // Nome do responsÃ¡vel da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
+$nomeRespEPP = 'Daniela Oliveira';                      // Nome do responsável da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
 $foneEPP = '01130309106';                               // Telefone para contato na empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA 
 
@@ -91,19 +90,19 @@ $emailEPP = getenv('email_financeiro');               // Email para contato na e
 
 
 
-$opr_codigoEPPPAGTO = '1';                               // opr_codigo utilizado para identificaÃ§Ã£o da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$opr_codigoEPPPAGTO = '1';                               // opr_codigo utilizado para identificação da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $cnpjEPPPAGTO = '08221305000135';                        // CNPJ da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$razaoEPPPAGTO = 'E-PREPAG PAGAMENTOS ELETRONICOS LTDA';      // RazÃ£o Social da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$razaoEPPPAGTO = 'E-PREPAG PAGAMENTOS ELETRONICOS LTDA';      // Razão Social da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$enderecoEPPPAGTO = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26, 27 e 28, Pinheiros';    // EndereÃ§o da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$enderecoEPPPAGTO = 'Rua Deputado Lacerda Franco, 300 - conjuntos 26, 27 e 28, Pinheiros';    // Endereço da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $cepEPPPAGTO = '05418000';                                   // CEP da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $ufEPPPAGTO = 'SP';                                          // UF da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
-$nomeRespEPPPAGTO = 'Glaucia da Costa Gregio';               // Nome do responsÃ¡vel da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
+$nomeRespEPPPAGTO = 'Glaucia da Costa Gregio';               // Nome do responsável da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA
 
 $foneEPPPAGTO = '01130309101';                               // Telefone para contato na empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA 
 
@@ -111,31 +110,31 @@ $emailEPPPAGTO = 'glaucia@e-prepag.com.br';                  // Email para conta
 
 $dataCredenciamentoEPPPAGTO = '20171101';                    // Data do credenciamento da empresa E-PREPAG PAGAMENTOS ELETRONICOS LTDA junto a E-PREPAG ADMINISTRADORA DE CARTOES LTDA
 
-$IND_COMEX_EPPPAGTO = "0";                                   // Informar se a transaÃ§Ã£o se refere a pagamento ao exterior, em transaÃ§Ãµes cross border. Valores VÃ¡lidos: [0,1]  Indicador de transaÃ§Ã£o de pagamento ao exterior 0 - NÃ£o 1 - Sim 
+$IND_COMEX_EPPPAGTO = "0";                                   // Informar se a transação se refere a pagamento ao exterior, em transações cross border. Valores Válidos: [0,1]  Indicador de transação de pagamento ao exterior 0 - Não 1 - Sim 
 
 
 
-$COD_MCAPT = "4";                                            // Informar o cÃ³digo de identificaÃ§Ã£o do Meio de Captura, ele Ã© de livre atribuiÃ§Ã£o da InstituiÃ§Ã£o de Pagamento e Ãºnico por arquivo. 
+$COD_MCAPT = "4";                                            // Informar o código de identificação do Meio de Captura, ele é de livre atribuição da Instituição de Pagamento e único por arquivo. 
 
-$NUM_LOG = "E-commerce";                                     // Informar o nÃºmero lÃ³gico do Meio de Captura que identifica o terminal e corresponde ao informado nos comprovantes de pagamento. ValidaÃ§Ã£o: Para o Tipo de Tecnologia ?4 - E- commerce? do Campo 04, caso nÃ£o seja possÃ­vel identificar o meio de captura, deve ser informado ?E-commerce?. 
+$NUM_LOG = "E-commerce";                                     // Informar o número lógico do Meio de Captura que identifica o terminal e corresponde ao informado nos comprovantes de pagamento. Validação: Para o Tipo de Tecnologia ?4 - E- commerce? do Campo 04, caso não seja possível identificar o meio de captura, deve ser informado ?E-commerce?. 
 
-$TIPO_TECN = "4";                                            // O tipo 6 refere-se a URA - Unidade de Resposta AudÃ­vel e MOTO (mail order / telephone order). Valores VÃ¡lidos: [1,2,3,4,5,6] 
+$TIPO_TECN = "4";                                            // O tipo 6 refere-se a URA - Unidade de Resposta Audível e MOTO (mail order / telephone order). Valores Válidos: [1,2,3,4,5,6] 
 
-$TERM_PROP = "0";                                            // Informar sobre a propriedade do terminal, se Ã© prÃ³prio ou de terceiros. Valores VÃ¡lidos: [0,1]. ValidaÃ§Ã£o: Para o Tipo de Tecnologia ?4 - E-commerce? do Campo 04 deve ser informado obrigatoriamente ?0 terminal prÃ³prio?. 
+$TERM_PROP = "0";                                            // Informar sobre a propriedade do terminal, se é próprio ou de terceiros. Valores Válidos: [0,1]. Validação: Para o Tipo de Tecnologia ?4 - E-commerce? do Campo 04 deve ser informado obrigatoriamente ?0 terminal próprio?. 
 
-$MARCA = "E-PREPAG";                                         // Informar a marca que identifica a InstituiÃ§Ã£o de Pagamento no comprovante da transaÃ§Ã£o. ValidaÃ§Ã£o: Para TERM_PROP do Campo 05 igual a ?1 - terminal de terceiro? este campo deve ser informado obrigatoriamente. 
+$MARCA = "E-PREPAG";                                         // Informar a marca que identifica a Instituição de Pagamento no comprovante da transação. Validação: Para TERM_PROP do Campo 05 igual a ?1 - terminal de terceiro? este campo deve ser informado obrigatoriamente. 
 
-$IND_EXTEMP = "0";                                           // Informar se a transaÃ§Ã£o se refere a operaÃ§Ã£o extemporÃ¢nea. Para arquivos de retificaÃ§Ã£o, finalidade 02 do campo 03 no registro 0000, nÃ£o serÃ£o aceitos registros extemporÃ¢neos. Valores VÃ¡lidos: [0,1]. ValidaÃ§Ã£o: Para ?RetificaÃ§Ã£o do arquivo?, o IND_EXTEMP deve ser igual a zero. 
+$IND_EXTEMP = "0";                                           // Informar se a transação se refere a operação extemporânea. Para arquivos de retificação, finalidade 02 do campo 03 no registro 0000, não serão aceitos registros extemporâneos. Valores Válidos: [0,1]. Validação: Para ?Retificação do arquivo?, o IND_EXTEMP deve ser igual a zero. 
 
-$IND_SPLIT = "0";                                            // Informar se a operaÃ§Ã£o faz parte de uma operaÃ§Ã£o ?splitada?. Valores VÃ¡lidos: [0,1]
+$IND_SPLIT = "0";                                            // Informar se a operação faz parte de uma operação ?splitada?. Valores Válidos: [0,1]
 
-$BANDEIRA = "99";                                            // A especificaÃ§Ã£o da bandeira deve estar contida na RelaÃ§Ã£o de Bandeiras constante no Manual de OrientaÃ§Ã£o ao Contribuinte do Projeto NF-e. Para boleto, informar 99 ? outros. 
+$BANDEIRA = "99";                                            // A especificação da bandeira deve estar contida na Relação de Bandeiras constante no Manual de Orientação ao Contribuinte do Projeto NF-e. Para boleto, informar 99 ? outros. 
 
-$NAT_OPER = "2";                                             // Informar a natureza da operaÃ§Ã£o realizada no comprovante de pagamento referenciado. Valores VÃ¡lidos: [1,2,3,4,9] NAT_OPER 1 ? CrÃ©dito 2 ? DÃ©bito 3 ? Boleto 4 ? Pagamentos instantÃ¢neos /TransferÃªncia de Recursos 9 - Outros. 
+$NAT_OPER = "2";                                             // Informar a natureza da operação realizada no comprovante de pagamento referenciado. Valores Válidos: [1,2,3,4,9] NAT_OPER 1 ? Crédito 2 ? Débito 3 ? Boleto 4 ? Pagamentos instantâneos /Transferência de Recursos 9 - Outros. 
 
 
 
-//Esse ID Ã© concatenado no inicio de cada id da operaÃ§Ã£o('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
+//Esse ID é concatenado no inicio de cada id da operação('id_venda' => 'id_op') para diferenciar o tipo de venda que foi feito
 
 $ARRAY_CONCATENA_ID_VENDA = array(
 
@@ -151,7 +150,7 @@ $ARRAY_CONCATENA_ID_VENDA = array(
 
 
 
-//Buscando Publisher que possuem totalizaÃ§Ã£o por utilizaÃ§Ã£o
+//Buscando Publisher que possuem totalização por utilização
 
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
@@ -225,13 +224,13 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 <div class="col-md-12 txt-preto">
 
-    <h4 class="txt-azul-claro bottom50">Gerador de Arquivo DeclaraÃ§Ã£o de InformaÃ§Ãµes de Meios de Pagamentos - DIMP</h4>
+    <h4 class="txt-azul-claro bottom50">Gerador de Arquivo Declaração de Informações de Meios de Pagamentos - DIMP</h4>
 
     <form id="congelamento" name="congelamento" method="post" action="">
 
         <div class="col-md-12 col-sm-12 col-xs-12 text-right">
 
-            <div class="col-md-2 col-sm-2 col-xs-2 text-right">PerÃ­odo Apurado:</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 text-right">Período Apurado:</div>
 
             <div class="col-md-2 col-sm-2 col-xs-2">
 
@@ -241,7 +240,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
             </div>
 
-            <div class="col-md-5 col-sm-5 col-xs-5 text-right">Unidade FederaÃ§Ã£o do Fisco da informaÃ§Ã£o prestada:</div>
+            <div class="col-md-5 col-sm-5 col-xs-5 text-right">Unidade Federação do Fisco da informação prestada:</div>
 
             <div class="col-md-3 col-sm-3 col-xs-3">
 
@@ -257,7 +256,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     </option>
 
                     <option value="AP" <?php if (isset($estado) && $estado == "AP")
-                                            echo 'selected="selected" '; ?>>AmapÃ¡
+                                            echo 'selected="selected" '; ?>>Amapá
                     </option>
 
                     <option value="AM" <?php if (isset($estado) && $estado == "AM")
@@ -269,7 +268,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     </option>
 
                     <option value="CE" <?php if (isset($estado) && $estado == "CE")
-                                            echo 'selected="selected" '; ?>>CearÃ¡
+                                            echo 'selected="selected" '; ?>>Ceará
                     </option>
 
                     <option value="DF" <?php if (isset($estado) && $estado == "DF")
@@ -278,15 +277,15 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                     <option value="ES" <?php if (isset($estado) && $estado == "ES")
                                             echo 'selected="selected" '; ?>>
-                        EspÃ­rito Santo</option>
+                        Espírito Santo</option>
 
                     <option value="GO" <?php if (isset($estado) && $estado == "GO")
-                                            echo 'selected="selected" '; ?>>GoiÃ¡s
+                                            echo 'selected="selected" '; ?>>Goiás
                     </option>
 
                     <option value="MA" <?php if (isset($estado) && $estado == "MA")
                                             echo 'selected="selected" '; ?>>
-                        MaranhÃ£o</option>
+                        Maranhão</option>
 
                     <option value="MT" <?php if (isset($estado) && $estado == "MT")
                                             echo 'selected="selected" '; ?>>Mato
@@ -301,16 +300,16 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         Gerais</option>
 
                     <option value="PA" <?php if (isset($estado) && $estado == "PA")
-                                            echo 'selected="selected" '; ?>>ParÃ¡
+                                            echo 'selected="selected" '; ?>>Pará
                     </option>
 
                     <option value="PB" <?php if (isset($estado) && $estado == "PB")
                                             echo 'selected="selected" '; ?>>
-                        ParaÃ­ba
+                        Paraíba
                     </option>
 
                     <option value="PR" <?php if (isset($estado) && $estado == "PR")
-                                            echo 'selected="selected" '; ?>>ParanÃ¡
+                                            echo 'selected="selected" '; ?>>Paraná
                     </option>
 
                     <option value="PE" <?php if (isset($estado) && $estado == "PE")
@@ -318,7 +317,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         Pernambuco</option>
 
                     <option value="PI" <?php if (isset($estado) && $estado == "PI")
-                                            echo 'selected="selected" '; ?>>PiauÃ­
+                                            echo 'selected="selected" '; ?>>Piauí
                     </option>
 
                     <option value="RJ" <?php if (isset($estado) && $estado == "RJ")
@@ -335,7 +334,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                     <option value="RO" <?php if (isset($estado) && $estado == "RO")
                                             echo 'selected="selected" '; ?>>
-                        RondÃ´nia</option>
+                        Rondônia</option>
 
                     <option value="RR" <?php if (isset($estado) && $estado == "RR")
                                             echo 'selected="selected" '; ?>>
@@ -347,7 +346,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                         Catarina</option>
 
                     <option value="SP" <?php if (empty($estado) || (isset($estado) && $estado == "SP"))
-                                            echo 'selected="selected" '; ?>>SÃ£o Paulo</option>
+                                            echo 'selected="selected" '; ?>>São Paulo</option>
 
                     <option value="SE" <?php if (isset($estado) && $estado == "SE")
                                             echo 'selected="selected" '; ?>>
@@ -370,7 +369,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
         <div class="col-md-12 col-sm-12 col-xs-12 text-right">
 
-            <div class="col-md-4 col-sm-4 col-xs-4 text-right">CÃ³digo da Finalidade do Arquivo:</div>
+            <div class="col-md-4 col-sm-4 col-xs-4 text-right">Código da Finalidade do Arquivo:</div>
 
             <div class="col-md-6 col-sm-6 col-xs-6">
 
@@ -387,7 +386,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     <option value="3" <?php if (isset($cod_fin) && $cod_fin == "3")
                                             echo 'selected="selected" '; ?>>
                         Remessa
-                        de arquivo para atender notificaÃ§Ã£o</option>
+                        de arquivo para atender notificação</option>
 
                     <!-- option value="4" <?php if (isset($cod_fin) && $cod_fin == "4")
                                                 echo 'selected="selected" '; ?>>Remessa de arquivo zerado</option -->
@@ -421,7 +420,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
             <div class="col-md-6 col-sm-6 col-xs-6">
 
                 <input type="text" id="cpfcnpj" name="cpfcnpj" char="18" maxlength="18"
-                    class="form form-control data w320" placeholder="AINDA NÃƒO IMPLEMENTADO - CPF ou CNPJ"
+                    class="form form-control data w320" placeholder="AINDA NÃO IMPLEMENTADO - CPF ou CNPJ"
                     value="<?php echo (!empty($_POST['cpfcnpj'])) ? $_POST['cpfcnpj'] : ""; ?>" readonly="readonly">
 
             </div>
@@ -438,7 +437,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 </div> <!--fecha a div de class="container"> -->
 
-<div id="resultado"></div> <!-- Elemento onde o HTML retornado serÃ¡ inserido -->
+<div id="resultado"></div> <!-- Elemento onde o HTML retornado será inserido -->
 
 <?php
 
@@ -573,7 +572,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                 // Exibe mensagem de carregamento na div resultado
                 $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="40px" />Ainda processando, esse processo pode demorar 15 minutos ou mais, por favor aguarde...</div></div>');
 
-                // De-dup (frontend) para a mesma solicitaÃ§Ã£o recente evitar re-disparar
+                // De-dup (frontend) para a mesma solicitação recente evitar re-disparar
                 const paramsKey = JSON.stringify({
                     estado: $('#estado').val() || '',
                     data_inicial: $('#data_inicial').val() || '',
@@ -611,31 +610,52 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                                 ticket_id: response.ticket_id,
                                 ts: Date.now()
                             };
+                            // Se o backend já retornou concluído com link, não precisa ficar no polling
+                            if (response.status === 'CONCLUIDO' && response.caminho_arquivo) {
+                                const downloadUrl = String(response.caminho_arquivo);
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                            Arquivo DIMP gerado com sucesso.
+                                            <div class="top20">
+                                                <a class="btn btn-info" href="${downloadUrl}" target="_self" rel="noopener">
+                                                    Clique para baixar o arquivo
+                                                </a>
+                                            </div>
+                                            <div class="top10" style="font-weight:normal;font-size:0.95em;">
+                                                Se o seu navegador bloquear pop-ups, use o botão acima.
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                                return;
+                            }
                             iniciarVerificacao(response.ticket_id);
                         } else {
-                            $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisiÃ§Ã£o: ' + response.mensagem + '</div></div>');
+                            $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisição: ' + response.mensagem + '</div></div>');
                         }
                     },
                     error: function() {
                         ajaxSolicitarInFlight = false;
-                        $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisiÃ§Ã£o.</div></div>');
+                        $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisição.</div></div>');
                     }
                 });
             });
 
-            // FunÃ§Ã£o que verifica o status do processamento de tempos em tempos
+            // Função que verifica o status do processamento de tempos em tempos
             let intervaloVerificacao = null;
             let requisicaoEmAndamento = false;
 
             function iniciarVerificacao(ticket_id) {
 
-                // proteÃ§Ã£o: evita iniciar duas vezes
+                // proteção: evita iniciar duas vezes
                 if (intervaloVerificacao !== null) {
-                    console.warn('VerificaÃ§Ã£o jÃ¡ em andamento.');
+                    console.warn('Verificação já em andamento.');
                     return;
                 }
 
-                // HTML padrÃ£o de "processando"
+                // HTML padrão de "processando"
                 const htmlProcessando = `
             <div class="row">
                 <div class="col-md-12 text-center top50"
@@ -655,7 +675,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                 intervaloVerificacao = setInterval(function() {
 
-                    // evita chamadas paralelas se a anterior nÃ£o terminou
+                    // evita chamadas paralelas se a anterior não terminou
                     if (requisicaoEmAndamento) {
                         return;
                     }
@@ -679,7 +699,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                                     <div class="row">
                                         <div class="col-md-12 text-center top50"
                                              style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
-                                            Resposta invÃ¡lida ao verificar processamento.
+                                            Resposta inválida ao verificar processamento.
                                         </div>
                                     </div>
                                 `);
@@ -690,16 +710,33 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                                 // finalizou ? para o intervalo
                                 clearInterval(intervaloVerificacao);
                                 intervaloVerificacao = null;
-                                $('#resultado').html(`
-                                    <div class="row">
-                                        <div class="col-md-12 text-center top50"
-                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
-                                            Arquivo DIMP gerado com sucesso. Iniciando download...
+                                const downloadUrl = response.caminho_arquivo ? String(response.caminho_arquivo) : '';
+                                if (downloadUrl) {
+                                    $('#resultado').html(`
+                                        <div class="row">
+                                            <div class="col-md-12 text-center top50"
+                                                 style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                                Arquivo DIMP gerado com sucesso.
+                                                <div class="top20">
+                                                    <a class="btn btn-info" href="${downloadUrl}" target="_self" rel="noopener">
+                                                        Clique para baixar o arquivo
+                                                    </a>
+                                                </div>
+                                                <div class="top10" style="font-weight:normal;font-size:0.95em;">
+                                                    Se o seu navegador bloquear pop-ups, use o botão acima.
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                `);
-                                if (response.caminho_arquivo) {
-                                    window.open(response.caminho_arquivo, '_blank');
+                                    `);
+                                } else {
+                                    $('#resultado').html(`
+                                        <div class="row">
+                                            <div class="col-md-12 text-center top50"
+                                                 style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                                Arquivo DIMP gerado com sucesso, mas não foi possível obter o link de download.
+                                            </div>
+                                        </div>
+                                    `);
                                 }
                             } else if (response.status === 'ERRO') {
                                 clearInterval(intervaloVerificacao);
@@ -740,7 +777,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     `);
                         },
                         complete: function() {
-                            // libera para prÃ³xima execuÃ§Ã£o
+                            // libera para próxima execução
                             requisicaoEmAndamento = false;
                         }
                     });

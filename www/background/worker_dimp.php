@@ -556,7 +556,7 @@ function workerGerarDIMP($parametros)
 
 
 
-                if (!empty($publishers_epp_pagto)) {
+                if (!empty(trim($publishers_epp_pagto)) && trim($publishers_epp_pagto) != '') {
 
                     //Dados da EPP PAGTO
 
@@ -1075,7 +1075,7 @@ function workerGerarDIMP($parametros)
 
                 //Verificando se existe publishers vinculados a EPP Pagto
 
-                if (!empty($publishers_epp_pagto)) {
+                if (!empty(trim($publishers_epp_pagto)) && trim($publishers_epp_pagto) != '') {
 
                     $sql_total_epp_pagto = "
 
@@ -1913,19 +1913,21 @@ function workerGerarDIMP($parametros)
 
                 //Levantando totais por Publishers vinculados a EPP ADM
 
-                $sql_total_epp_adm = "
+                if (!empty(trim($publishers_epp_pagto)) && trim($publishers_epp_pagto) != '') {
+                    $sql_exclui = "fp_publisher NOT IN (" . $publishers_epp_pagto . ") and";
+                } else {
+                    $sql_exclui = "";
+                }
 
-                                select 
+                $sql_total_epp_adm = "SELECT 
 
                                         opr_internacional_alicota,fp_publisher, sum(fp_total_order) as fp_total_order, sum(fp_total) as total
 
                                 from financial_processing 
 
-                                    inner join operadoras on opr_codigo =  fp_publisher
+                                    inner join operadoras on opr_codigo = fp_publisher
 
-                                where  fp_publisher NOT IN (" . $publishers_epp_pagto . ")
-
-                                    and fp_date >= '" . $ano . "-" . $mes . "-01 00:00:00' 
+                                where $sql_exclui fp_date >= '" . $ano . "-" . $mes . "-01 00:00:00' 
 
                                     and fp_date <= '" . $ano . "-" . $mes . "-" . $ultimoDiaMes . " 23:59:59'
 
@@ -2589,7 +2591,7 @@ function workerGerarDIMP($parametros)
                 } //end if ($total_epp_adm) 
                 else {
 
-                    $msg .= PHP_EOL . "ERRO 0008: Erro ao executar o select dos totais dos Publishers vinculados a E-Prepag Administradora. $publishers_epp_pagto";
+                    $msg .= PHP_EOL . "ERRO 0008: Erro ao executar o select dos totais dos Publishers vinculados a E-Prepag Administradora.";
                 } //end esle do if ($total_epp_adm) 
 
                 //=========================================================================================================================
