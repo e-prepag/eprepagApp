@@ -2396,7 +2396,7 @@ class UsuarioGames
                     // Caso a lan não seja aprovada, enviar e-mail.
                     $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_LAN, 'PedidoNegadoLan');
                     $envioEmail->setUgID($objGamesUsuario->getId());
-                    $envioEmail->setUgNome($objGamesUsuario->getNome());
+                    $envioEmail->setUgNome($objGamesUsuario->getLogin());
                     $envioEmail->MontaEmailEspecifico();
                     break;
                 case 9:
@@ -2684,7 +2684,7 @@ class UsuarioGames
                     // Caso a lan não seja aprovada, enviar e-mail.
                     $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_LAN, 'PedidoNegadoLan');
                     $envioEmail->setUgID($objGamesUsuario->getId());
-                    $envioEmail->setUgNome($objGamesUsuario->getNome());
+                    $envioEmail->setUgNome($objGamesUsuario->getLogin());
                     $envioEmail->MontaEmailEspecifico();
                     break;
                 case 9:

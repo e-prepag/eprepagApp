@@ -12,7 +12,7 @@ define('EPREPAG_URL_HTTPS_COM', $tipo_http . getenv("EPREPAG_URL"));
 define('EPREPAG_URL_HTTP_COM', $tipo_http . getenv("EPREPAG_URL"));
 define('EPREPAG_URL_COM', getenv("EPREPAG_URL"));
 
-const NOVIDADES_URL = "https://solucoes.e-prepag.com/category/mercado/";
+const NOVIDADES_URL = "https://e-prepagpdv.com.br/category/blog-pdv/";
 const SOBRE_URL = "https://solucoes.e-prepag.com/a-e-prepag/";
 const QUEMSOMOS_URL = "https://solucoes.e-prepag.com/quem-somos/";
 const CARTAO_URL = "https://solucoes.e-prepag.com/cartao-e-prepag-2/";
