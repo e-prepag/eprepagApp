@@ -1,6 +1,5 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
-header("Content-Type: text/html; charset=UTF-8");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 
 require_once "../../class/util/classFilePipe.php";
@@ -559,33 +558,87 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
         $("#modal-load").modal('hide');
 
         $(document).ready(function() {
+            const CACHE_MS = 15 * 60 * 1000; // 15 minutos
+            let lastRequestCache = {
+                paramsKey: null,
+                ticket_id: null,
+                ts: 0
+            };
+            let ajaxSolicitarInFlight = false;
+
             $('#congelamento').on('submit', function(e) {
                 e.preventDefault();
 
                 // Exibe mensagem de carregamento na div resultado
                 $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;"><img src="<?= EPREPAG_URL_HTTPS ?>/imagens/engrenagem.gif" height="40px" />Ainda processando, esse processo pode demorar 15 minutos ou mais, por favor aguarde...</div></div>');
 
-                // Cria um ID único para a requisição
-                const requisicaoId = 'req_' + Date.now();
+                // De-dup (frontend) para a mesma solicitação recente evitar re-disparar
+                const paramsKey = JSON.stringify({
+                    estado: $('#estado').val() || '',
+                    data_inicial: $('#data_inicial').val() || '',
+                    cod_fin: $('#cod_fin').val() || '',
+                    cpfcnpj: $('#cpfcnpj').val() || ''
+                });
 
-                // Serializa os dados do formulário + o requisicao_id
-                var formData = $(this).serialize() + '&requisicao_id=' + requisicaoId;
+                const agora = Date.now();
+                if (
+                    lastRequestCache.paramsKey === paramsKey &&
+                    (agora - lastRequestCache.ts) < CACHE_MS &&
+                    lastRequestCache.ticket_id
+                ) {
+                    iniciarVerificacao(lastRequestCache.ticket_id);
+                    return;
+                }
 
-                // Envia a requisição inicial
+                if (ajaxSolicitarInFlight) {
+                    return;
+                }
+                ajaxSolicitarInFlight = true;
+
+                var formData = $(this).serialize() + '&acao=solicitar_download';
+
                 $.ajax({
                     url: './ajax_dimp.php',
                     method: 'POST',
                     data: formData,
+                    dataType: 'json',
                     success: function(response) {
-                        if (response.trim() === '') {
-                            iniciarVerificacao(formData);
+                        ajaxSolicitarInFlight = false;
+                        if (response.sucesso) {
+                            lastRequestCache = {
+                                paramsKey: paramsKey,
+                                ticket_id: response.ticket_id,
+                                ts: Date.now()
+                            };
+                            // Se o backend já retornou concluído com link, não precisa ficar no polling
+                            if (response.status === 'CONCLUIDO' && response.caminho_arquivo) {
+                                const downloadUrl = String(response.caminho_arquivo);
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                            Arquivo DIMP gerado com sucesso.
+                                            <div class="top20">
+                                                <a class="btn btn-info" href="${downloadUrl}" target="_self" rel="noopener">
+                                                    Clique para baixar o arquivo
+                                                </a>
+                                            </div>
+                                            <div class="top10" style="font-weight:normal;font-size:0.95em;">
+                                                Se o seu navegador bloquear pop-ups, use o botão acima.
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                                return;
+                            }
+                            iniciarVerificacao(response.ticket_id);
                         } else {
-                            $('#resultado').html(response);
+                            $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisição: ' + response.mensagem + '</div></div>');
                         }
                     },
                     error: function() {
+                        ajaxSolicitarInFlight = false;
                         $('#resultado').html('<div class="row"><div class="col-md-12 text-center top50" style="background-color: white; color: black; font-weight: bold; font-size: 1.2em; border-radius: 8px; padding: 15px;">Erro ao iniciar a requisição.</div></div>');
-
                     }
                 });
             });
@@ -594,7 +647,7 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
             let intervaloVerificacao = null;
             let requisicaoEmAndamento = false;
 
-            function iniciarVerificacao(formData) {
+            function iniciarVerificacao(ticket_id) {
 
                 // proteção: evita iniciar duas vezes
                 if (intervaloVerificacao !== null) {
@@ -620,9 +673,6 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
                 $('#resultado').html(htmlProcessando);
 
-                // inicia o intervalo
-                formData = formData + '&verificar=true';
-
                 intervaloVerificacao = setInterval(function() {
 
                     // evita chamadas paralelas se a anterior não terminou
@@ -635,18 +685,71 @@ $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
                     $.ajax({
                         url: './ajax_dimp.php',
                         type: 'POST',
-                        data: formData,
+                        data: {
+                            acao: 'checar_status',
+                            ticket_id: ticket_id
+                        },
+                        dataType: 'json',
                         timeout: 30000, // 30s de timeout
                         success: function(response) {
+                            if (!response || !response.status) {
+                                clearInterval(intervaloVerificacao);
+                                intervaloVerificacao = null;
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                            Resposta inválida ao verificar processamento.
+                                        </div>
+                                    </div>
+                                `);
+                                return;
+                            }
 
-                            const status = response.trim();
-
-                            if (status !== 'aguardando') {
+                            if (response.status === 'CONCLUIDO') {
                                 // finalizou ? para o intervalo
                                 clearInterval(intervaloVerificacao);
                                 intervaloVerificacao = null;
-
-                                $('#resultado').html(response);
+                                const downloadUrl = response.caminho_arquivo ? String(response.caminho_arquivo) : '';
+                                if (downloadUrl) {
+                                    $('#resultado').html(`
+                                        <div class="row">
+                                            <div class="col-md-12 text-center top50"
+                                                 style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                                Arquivo DIMP gerado com sucesso.
+                                                <div class="top20">
+                                                    <a class="btn btn-info" href="${downloadUrl}" target="_self" rel="noopener">
+                                                        Clique para baixar o arquivo
+                                                    </a>
+                                                </div>
+                                                <div class="top10" style="font-weight:normal;font-size:0.95em;">
+                                                    Se o seu navegador bloquear pop-ups, use o botão acima.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `);
+                                } else {
+                                    $('#resultado').html(`
+                                        <div class="row">
+                                            <div class="col-md-12 text-center top50"
+                                                 style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;">
+                                                Arquivo DIMP gerado com sucesso, mas não foi possível obter o link de download.
+                                            </div>
+                                        </div>
+                                    `);
+                                }
+                            } else if (response.status === 'ERRO') {
+                                clearInterval(intervaloVerificacao);
+                                intervaloVerificacao = null;
+                                const msgErro = response.mensagem_erro ? response.mensagem_erro : 'Erro ao processar arquivo DIMP.';
+                                $('#resultado').html(`
+                                    <div class="row">
+                                        <div class="col-md-12 text-center top50"
+                                             style="background-color:white;color:black;font-weight:bold;font-size:1.2em;border-radius:8px;padding:15px;white-space:pre-wrap;">
+                                            ${msgErro}
+                                        </div>
+                                    </div>
+                                `);
                             } else {
                                 // ainda processando
                                 $('#resultado').html(htmlProcessando);
