@@ -361,11 +361,7 @@ require_once "/www/includes/bourls.php";
                 setDateInterval('ug_data_desativacao_ini', 'ug_data_desativacao_fim', optDate);
                 setDateInterval('tf_u_data_ultimo_acesso_ini', 'tf_u_data_ultimo_acesso_fim', optDate);
                 setDateInterval('tf_u_data_nascimento_ini', 'tf_u_data_nascimento_fim', optDate);
-                <?php
-                if ($tf_u_com_totais_vendas) {
-                        print "setDateInterval('tf_v_data_inclusao_ini','tf_v_data_inclusao_fim',optDate);";
-                }
-                ?>
+                setDateInterval('tf_v_data_inclusao_ini', 'tf_v_data_inclusao_fim', optDate);
 
         });
 
@@ -966,7 +962,7 @@ require_once "/www/includes/bourls.php";
                                                 if ($tf_u_com_totais_vendas) $sbkg1 = " bgcolor='#FFCC66'";
                                                 ?>
                                                 <td class="texto" <?php echo $sbkg1; ?>>Com totais de vendas</td>
-                                                <td class="texto" <?php echo $sbkg1; ?>><input type="checkbox" name="tf_u_com_totais_vendas" <?php if ($tf_u_com_totais_vendas) echo " CHECKED"; ?>>
+                                                <td class="texto" <?php echo $sbkg1; ?>><input type="checkbox" name="tf_u_com_totais_vendas" id="tf_u_com_totais_vendas" <?php if ($tf_u_com_totais_vendas) echo " CHECKED"; ?>>
                                                         <?php if ($tf_u_com_totais_vendas) echo " (Com totais de vendas)"; ?>
                                                 </td>
                                                 <td class="texto">Usuários VIP</td>
@@ -980,10 +976,7 @@ require_once "/www/includes/bourls.php";
                                                 </td>
                                         </tr>
 
-                                        <?php
-                                        if ($tf_u_com_totais_vendas) {
-                                        ?>
-
+                                        <tbody id="vendas_options" style="display: <?php echo $tf_u_com_totais_vendas ? '' : 'none'; ?>;">
                                                 <tr bgcolor="#F5F5FB" class="texto">
                                                         <td>Data de Conciliação das Vendas</td>
                                                         <td>
@@ -1033,10 +1026,7 @@ require_once "/www/includes/bourls.php";
                                                                 <div id='mostraValores2'>*</div>
                                                         </td>
                                                 </tr>
-                                        <?php
-                                        }
-                                        ?>
-
+                                        </tbody>
                                 </table>
 
                                 <table border="0" cellpadding="0" cellspacing="2">
@@ -1261,16 +1251,20 @@ if ($_SERVER['REMOTE_ADDR'] == $meu_ip) echo $sql;
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
 ?>
 <script>
-        <?php
-        if ($tf_u_com_totais_vendas) {        //&& $dd_opr_codigo
-        ?>
-                $(document).ready(function() {
+        $(document).ready(function() {
+                if ($('#tf_u_com_totais_vendas').is(':checked')) {
                         load_caixas();
                         v_precos();
+                }
+
+                $('#tf_u_com_totais_vendas').change(function() {
+                        if ($(this).is(':checked')) {
+                                $('#vendas_options').show();
+                        } else {
+                                $('#vendas_options').hide();
+                        }
                 });
-        <?php
-        }
-        ?>
+        });
 
         $(document).ready(function() {
                 $('#dd_opr_codigo').change(function() {
