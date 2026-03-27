@@ -99,7 +99,7 @@ if (!$arquivoLog->haveFile()) {
             echo "$sret $post_parameters<br>";
 
             if ($buffer == false || $http_code != 200 || $rs_row['passou_30_min']) {
-                $msg .= " Pedido " . $rs_row['vg_id'] . " => Conciliado em [" . $rs_row['vg_data_concilia'] . "] => Tipo de pagamento [" . $rs_row['vg_pagto_tipo'] . "]; <br>" . PHP_EOL;
+                $msg .= " Pedido " . $rs_row['vg_id'] . " => Não foi possível conciliar. Data: [" . $rs_row['vg_data_concilia'] . "] => Tipo de pagamento [" . $rs_row['vg_pagto_tipo'] . "]; <br>" . PHP_EOL;
             }
         } //end while
 
