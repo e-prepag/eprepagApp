@@ -922,22 +922,24 @@ class EnvioEmailAutomatico
         if ($this->getTipoUsuario() == 'G') {
             $sql .= "ug_nome as ug_nome_full,* from usuarios_games ";
         } else {
-            $sql .= "(CASE WHEN (ug_tipo_cadastro='PJ') THEN ug_nome_fantasia WHEN (ug_tipo_cadastro='PF') THEN ug_nome END) as ug_nome_full,* from dist_usuarios_games ";
+            $sql .= "COALESCE(CASE WHEN (ug_tipo_cadastro='PJ') THEN ug_nome_fantasia WHEN (ug_tipo_cadastro='PF') THEN ug_nome END, ug_nome_fantasia, ug_razao_social, ug_nome, ug_login) as ug_nome_full,* from dist_usuarios_games ";
         }
         $sql .= "where ug_id = " . $this->getUgID();
         $result = SQLexecuteQuery($sql);
         if ($result_row = pg_fetch_array($result)) {
-            if (array_key_exists('ug_responsavel', $result_row)) {
+            if (array_key_exists('ug_responsavel', $result_row) && $this->getResponsavel() == "") {
                 $this->setResponsavel($result_row['ug_responsavel']);
             }
-            $this->setUgEmail($result_row['ug_email']);
-            $this->setUgLogin($result_row['ug_login']);
-            $this->setUgNome($result_row['ug_nome_full']);
-            $this->setUgPerfilSaldo($result_row['ug_perfil_saldo']);
+            if ($this->getUgEmail() == "") $this->setUgEmail($result_row['ug_email']);
+            if ($this->getUgLogin() == "") $this->setUgLogin($result_row['ug_login']);
+            if ($this->getUgNome() == "") {
+                $this->setUgNome($result_row['ug_nome_full'] ?: 'Parceiro');
+            }
+            if ($this->getUgPerfilSaldo() == "") $this->setUgPerfilSaldo($result_row['ug_perfil_saldo']);
 
             $senha = "";
 
-            $this->setUgSenha($senha);
+            if ($this->getUgSenha() == "") $this->setUgSenha($senha);
             return true;
         } else return false;
     } //end function getUserDados

@@ -173,7 +173,7 @@ class UsuarioGames
     var $ug_canais_venda;
 
     var $ug_blStatusBusca;
-    
+
     /*
       function UsuarioGames() {
       }
