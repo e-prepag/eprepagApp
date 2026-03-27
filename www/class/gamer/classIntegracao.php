@@ -4677,19 +4677,19 @@ function converterDataParaISO($data)
 
 function validarDataReal($dataInput)
 {
-    $dataLimpa = substr(trim($dataInput), 0, 10);
+	$dataLimpa = substr(trim($dataInput), 0, 10);
 
-    if (strpos($dataLimpa, '/') !== false) {
-        $formato = 'd/m/Y';
-    } elseif (strpos($dataLimpa, '-') !== false) {
-        $formato = 'Y-m-d';
-    } else {
-        return false;
-    }
+	if (strpos($dataLimpa, '/') !== false) {
+		$formato = 'd/m/Y';
+	} elseif (strpos($dataLimpa, '-') !== false) {
+		$formato = 'Y-m-d';
+	} else {
+		return false;
+	}
 
-    $d = DateTime::createFromFormat($formato, $dataLimpa);
+	$d = DateTime::createFromFormat($formato, $dataLimpa);
 
-    return $d && $d->format($formato) === $dataLimpa;
+	return $d && $d->format($formato) === $dataLimpa;
 }
 
 function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
@@ -4929,42 +4929,6 @@ function verificaIdadeMinima($dataNascimento)
 		return ($interval->format('%Y') >= 18);
 	} else {
 		return ($interval->format('%Y') >= 16);
-	}
-}
-
-function buscarVinculoPorEmail(string $email)
-{
-	$emailUpper = strtoupper($email);
-	$pdo = ConnectionPDO::getConnection()->getLink();
-
-	$sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
-				JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
-				WHERE UPPER(ugv.email) = :email AND ug_ativo = 1 LIMIT 1";
-
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
-	$stmt->execute();
-
-	$resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-
-	return $resultado ?? null;
-}
-
-function criarVinculoUsuario(int $ugId, string $email): void
-{
-	$pdo = ConnectionPDO::getConnection()->getLink();
-	try {
-		$emailUpper = strtoupper($email);
-
-		$sql = "INSERT INTO usuarios_games_vinculo (ug_id, email) VALUES (:ug_id, :email)";
-
-		$stmt = $pdo->prepare($sql);
-		$stmt->bindValue(':ug_id', $ugId, PDO::PARAM_INT);
-		$stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
-
-		$stmt->execute();
-	} catch (PDOException $e) {
-		error_log("Erro ao inserir em usuarios_games_vinculo: " . $e->getMessage());
 	}
 }
 ?>

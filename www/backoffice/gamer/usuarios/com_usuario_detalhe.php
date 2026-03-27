@@ -469,6 +469,41 @@ ob_end_flush();
           <td><?php echo $ug_estado ?></td>
         </tr>
       </table>
+
+      <div class="col-md-12 bg-cinza-claro txt-preto">
+        <p class="top20">Emails Vinculados</p>
+      </div>
+      <?php
+      $sql_vinculos = "SELECT email, game_origem FROM usuarios_games_vinculo WHERE ug_id = $1";
+      $params_vinculos = array($usuario_id);
+      $rs_vinculos = SQLexecuteQueryParams($sql_vinculos, $params_vinculos);
+      ?>
+      <div id="LayerVinculos" class="" style="position:static; width:100%; height:150px; z-index:1; overflow: auto;">
+        <table class="table txt-preto fontsize-pp table-bordered">
+          <tr bgcolor="#ECE9D8">
+            <td align="left" style="padding-left: 15px;"><b>Email</b></td>
+            <td align="left" style="padding-left: 15px;"><b>Game</b></td>
+          </tr>
+          <?php if (!$rs_vinculos || pg_num_rows($rs_vinculos) == 0) { ?>
+            <tr>
+              <td align="left" style="padding-left: 15px;" colspan="2">Nenhum email vinculado encontrado</td>
+            </tr>
+          <?php } else { ?>
+            <?php while ($rs_vinculos_row = pg_fetch_array($rs_vinculos)) {
+              if ($cor1 == $cor2) {
+                $cor1 = $cor3;
+              } else {
+                $cor1 = $cor2;
+              } ?>
+              <tr bgcolor="<?php echo $cor1 ?>">
+                <td class="texto" align="left" style="padding-left: 15px;"><?php echo $rs_vinculos_row['email'] ?></td>
+                <td class="texto" align="left" style="padding-left: 15px;"><?php echo getPartner_name_By_ID($rs_vinculos_row['game_origem']) . " ({$rs_vinculos_row['game_origem']})" ?></td>
+              </tr>
+            <?php } ?>
+          <?php } ?>
+        </table>
+      </div>
+
       <div class="col-md-12 bg-cinza-claro txt-preto">
         <p class="top20">Pedidos</p>
       </div>

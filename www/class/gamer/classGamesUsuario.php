@@ -3611,6 +3611,59 @@ class UsuarioGames
 
         return true;
     }
+
+    public function adicionar_vinculo($ug_id, $email, $game_origem)
+    {
+        $sql = "INSERT INTO usuarios_games_vinculo (ug_id, email, game_origem) VALUES ($1, $2, $3)";
+        $params = array($ug_id, $email, $game_origem);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        return $rs ? "" : "Erro ao adicionar vínculo.";
+    }
+
+    public function editar_vinculo($id, $email, $game_origem)
+    {
+        $sql = "UPDATE usuarios_games_vinculo SET email = $1, game_origem = $2 WHERE id = $3";
+        $params = array($email, $game_origem, $id);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        return $rs ? "" : "Erro ao editar vínculo.";
+    }
+
+    public function excluir_vinculo($id)
+    {
+        $sql = "DELETE FROM usuarios_games_vinculo WHERE id = $1";
+        $params = array($id);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        return $rs ? "" : "Erro ao excluir vínculo.";
+    }
+
+    public function get_vinculo_por_id($id)
+    {
+        $sql = "SELECT id, ug_id, email, game_origem FROM usuarios_games_vinculo WHERE id = $1";
+        $params = array($id);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        if ($rs && pg_num_rows($rs) > 0) {
+            return pg_fetch_array($rs);
+        }
+        return false;
+    }
+
+    public function buscarVinculoPorEmail($email)
+    {
+        $emailUpper = strtoupper($email);
+        $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
+                    JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
+                    WHERE UPPER(ugv.email) = :email AND ug_ativo = 1 LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado !== false ? $resultado : null;
+    }
 }
 
 // end of class

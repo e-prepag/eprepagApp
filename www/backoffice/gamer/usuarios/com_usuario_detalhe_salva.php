@@ -366,6 +366,37 @@ if ($msg == "") {
             } //end else do if(!empty($GLOBALS['_SESSION']['userlogin_bko']))
         } //end if($msgAcao == ""
     } //end if($op && $op == "sto")
+
+    if ($op && $op == "add_vinculo") {
+        $email_vinculo = $_POST['email_vinculo'] ?? '';
+        $game_origem_vinculo = $_POST['game_origem_vinculo'] ?? '';
+        if (filter_var($email_vinculo, FILTER_VALIDATE_EMAIL) && !empty($game_origem_vinculo)) {
+            $msgAcao = $usuariogames->adicionar_vinculo($usuario_id, $email_vinculo, $game_origem_vinculo);
+            if ($msgAcao == "") $msgAcao = "</span><font color='blue'>Vínculo adicionado com sucesso!</font><span>";
+        } else {
+            $msgAcao = "Dados inválidos para vincular email.";
+        }
+    }
+
+    if ($op && $op == "edt_vinculo") {
+        $id_vinculo = $_POST['id_vinculo'] ?? '';
+        $email_vinculo = $_POST['email_vinculo'] ?? '';
+        $game_origem_vinculo = $_POST['game_origem_vinculo'] ?? '';
+        if ($id_vinculo && filter_var($email_vinculo, FILTER_VALIDATE_EMAIL) && !empty($game_origem_vinculo)) {
+            $msgAcao = $usuariogames->editar_vinculo($id_vinculo, $email_vinculo, $game_origem_vinculo);
+            if ($msgAcao == "") $msgAcao = "</span><font color='blue'>Vínculo atualizado com sucesso!</font><span>";
+        } else {
+            $msgAcao = "Dados inválidos para atualizar vínculo.";
+        }
+    }
+
+    if ($op && $op == "del_vinculo") {
+        $id_vinculo = $_POST['id_vinculo'] ?? '';
+        if ($id_vinculo) {
+            $msgAcao = $usuariogames->excluir_vinculo($id_vinculo);
+            if ($msgAcao == "") $msgAcao = "</span><font color='blue'>Vínculo excluído com sucesso!</font><span>";
+        }
+    }
 } //end if($msg == "")
 
 //Recupera dados do usuario
@@ -402,6 +433,82 @@ ob_end_flush();
 
         return sString;
     }
+
+    function fcnAdicionarVinculo(cod) {
+        var email = document.getElementById('email_vinculo').value;
+        var game = document.getElementById('game_origem_vinculo').value;
+        if (!email || !game) {
+            alert('Preencha o email e selecione o game.');
+            return;
+        }
+
+        var re = /\S+@\S+\.\S+/;
+        if (!re.test(email)) {
+            alert('Formato de email inválido.');
+            return;
+        }
+
+        document.getElementById('op').value = 'add_vinculo';
+        form1.action = '?acao=sto&usuario_id=' + cod;
+        form1.submit();
+    }
+
+    function fcnPreparaEdicaoVinculo(id, email, game) {
+        document.getElementById('id_vinculo').value = id;
+        document.getElementById('email_vinculo').value = email;
+        document.getElementById('game_origem_vinculo').value = game;
+        document.getElementById('btn_salvar_vinculo').style.display = 'inline-block';
+        document.getElementById('btn_add_vinculo').style.display = 'none';
+        document.getElementById('btn_cancelar_vinculo').style.display = 'inline-block';
+        document.getElementById('email_vinculo').focus();
+    }
+
+    function fcnCancelarVinculo() {
+        document.getElementById('id_vinculo').value = '';
+        document.getElementById('email_vinculo').value = '';
+        document.getElementById('game_origem_vinculo').value = '';
+        document.getElementById('btn_salvar_vinculo').style.display = 'none';
+        document.getElementById('btn_add_vinculo').style.display = 'inline-block';
+        document.getElementById('btn_cancelar_vinculo').style.display = 'none';
+    }
+
+    function fcnSalvarVinculo(cod) {
+        var email = document.getElementById('email_vinculo').value;
+        var game = document.getElementById('game_origem_vinculo').value;
+        if (!email || !game) {
+            alert('Preencha o email e selecione o game.');
+            return;
+        }
+        var re = /\S+@\S+\.\S+/;
+        if (!re.test(email)) {
+            alert('Formato de email inválido.');
+            return;
+        }
+
+        document.getElementById('op').value = 'edt_vinculo';
+        form1.action = '?acao=sto&usuario_id=' + cod;
+        form1.submit();
+    }
+
+    function fcnExcluirVinculo(id, cod) {
+        if (confirm('Tem certeza que deseja excluir esse vínculo?')) {
+            document.getElementById('id_vinculo').value = id;
+            document.getElementById('op').value = 'del_vinculo';
+            form1.action = '?acao=sto&usuario_id=' + cod;
+            form1.submit();
+        }
+    }
+
+    function fcnValidarEmailBlur() {
+        var email = document.getElementById('email_vinculo').value;
+        if (email) {
+            var re = /\S+@\S+\.\S+/;
+            if (!re.test(email)) {
+                alert('Formato de email inválido.');
+                document.getElementById('email_vinculo').focus();
+            }
+        }
+    }
 </script>
 
 <div class="col-md-12">
@@ -416,7 +523,8 @@ ob_end_flush();
     <input type="hidden" name="v_campo" value="">
     <input type="hidden" name="v_valor_old" value="">
     <input type="hidden" name="v_valor_new" value="">
-    <input type="hidden" name="op" value="sto">
+    <input type="hidden" name="op" id="op" value="sto">
+    <input type="hidden" name="id_vinculo" id="id_vinculo" value="">
     <input type="hidden" name="consultou_rf" id="consultou_rf" value="0">
 
     <table class="table">
@@ -672,6 +780,69 @@ ob_end_flush();
             <td>(<input type="text" name="novo_ug_cel_ddi" value="<?php echo $objUsuarioGames->getCelDDI() ?>" maxlength="2" size="2" class="texto">) (<input type="text" name="novo_ug_cel_ddd" value="<?php echo $objUsuarioGames->getCelDDD() ?>" maxlength="2" size="2" class="texto">) <input type="text" name="novo_ug_cel" value="<?php echo $objUsuarioGames->getCel() ?>" maxlength="9" size="9" class="texto"></td>
         </tr>
 
+        <tr bgcolor="#FFFFFF" class="texto">
+            <td colspan="4" bgcolor="#ECE9D8">Emails Vinculados</font>
+            </td>
+        </tr>
+        <tr bgcolor="#F5F5FB" class="texto">
+            <td colspan="4">
+                <table class="table txt-preto fontsize-pp table-bordered">
+                    <tr bgcolor="#ECE9D8">
+                        <td align="left" style="padding-left: 15px; width: 40%;"><b>Email</b></td>
+                        <td align="left" style="padding-left: 15px; width: 40%;"><b>Game Origem</b></td>
+                        <td align="center" style="width: 20%;"><b>Ações</b></td>
+                    </tr>
+                    <?php
+                    global $partner_list;
+                    $sql_vinculos = "SELECT id, email, game_origem FROM usuarios_games_vinculo WHERE ug_id = $1";
+                    $params_vinculos = array($usuario_id);
+                    $rs_vinculos = SQLexecuteQueryParams($sql_vinculos, $params_vinculos);
+                    if (!$rs_vinculos || pg_num_rows($rs_vinculos) == 0) { ?>
+                        <tr>
+                            <td align="left" style="padding-left: 15px;" colspan="3">Nenhum email vinculado encontrado</td>
+                        </tr>
+                    <?php } else { ?>
+                        <?php while ($rs_vinculos_row = pg_fetch_array($rs_vinculos)) {
+                            if ($cor1 == $cor2) {
+                                $cor1 = $cor3;
+                            } else {
+                                $cor1 = $cor2;
+                            } ?>
+                            <tr bgcolor="<?php echo $cor1 ?>">
+                                <td class="texto" align="left" style="padding-left: 15px;"><?php echo htmlspecialchars($rs_vinculos_row['email']); ?></td>
+                                <td class="texto" align="left" style="padding-left: 15px;"><?php echo getPartner_name_By_ID($rs_vinculos_row['game_origem']) . " (" . $rs_vinculos_row['game_origem'] . ")"; ?></td>
+                                <td align="center">
+                                    <button type="button" class="btn btn-xs btn-warning" onclick="fcnPreparaEdicaoVinculo('<?php echo $rs_vinculos_row['id']; ?>', '<?php echo htmlspecialchars($rs_vinculos_row['email']); ?>', '<?php echo $rs_vinculos_row['game_origem']; ?>')">Editar</button>
+                                    <button type="button" class="btn btn-xs btn-danger" onclick="fcnExcluirVinculo('<?php echo $rs_vinculos_row['id']; ?>', <?php echo $usuario_id; ?>)">Excluir</button>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    <?php } ?>
+                </table>
+                <div style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; background: #fff;">
+                    <b>Adicionar / Editar Email Vinculado</b><br><br>
+                    <label style="margin-right: 10px;">Email:
+                        <input type="email" id="email_vinculo" name="email_vinculo" value="" maxlength="100" class="texto" onblur="fcnValidarEmailBlur()">
+                    </label>
+                    <label style="margin-right: 10px;">Game:
+                        <select id="game_origem_vinculo" name="game_origem_vinculo" class="texto">
+                            <option value="">Selecione o Game</option>
+                            <?php
+                            if (is_array($partner_list)) {
+                                foreach ($partner_list as $pl_key => $pl_val) { ?>
+                                    <option value="<?php echo $pl_val['partner_id']; ?>"><?php echo $pl_val['partner_name'] . " (" . $pl_val['partner_id'] . ")"; ?></option>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </label>
+                    <button type="button" id="btn_add_vinculo" class="btn btn-sm btn-success" onclick="fcnAdicionarVinculo(<?php echo $usuario_id; ?>)">Adicionar</button>
+                    <button type="button" id="btn_salvar_vinculo" class="btn btn-sm btn-info" style="display:none;" onclick="fcnSalvarVinculo(<?php echo $usuario_id; ?>)">Salvar Alteração</button>
+                    <button type="button" id="btn_cancelar_vinculo" class="btn btn-sm btn-default" style="display:none;" onclick="fcnCancelarVinculo()">Cancelar</button>
+                </div>
+            </td>
+        </tr>
         <tr bgcolor="#FFFFFF" class="texto">
             <td colspan="4" bgcolor="#ECE9D8">Gestão de Risco</font>
             </td>

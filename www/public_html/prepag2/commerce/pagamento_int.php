@@ -240,13 +240,12 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
                         }
                     } else {
 
-                        $usuario_vinculo = buscarVinculoPorEmail($integracao_client_email);
+                        $usuario_vinculo = $classUsuarioGames->buscarVinculoPorEmail($integracao_client_email);
 
                         if ($usuario_vinculo) {
 
                             $ug_id_cliente = $usuario_vinculo['ug_id'];
                             $cliente_email = $usuario_vinculo['ug_email'];
-
                         } else {
                             if (!(isset($CPF_cliente) && isset($data_nascimento_cliente))) {
                                 require_once DIR_CLASS . "pdv/classHelper.php";
@@ -261,7 +260,7 @@ if (! ($btSubmit_EPP_8593 || $iforma)) {
                             if ($retorno_cpf > 0) {
                                 $ug_id_cliente = $retorno_cpf['ug_id'];
                                 $cliente_email = $retorno_cpf['ug_email'];
-                                criarVinculoUsuario($retorno_cpf['ug_id'], $integracao_client_email);
+                                $classUsuarioGames->adicionar_vinculo($retorno_cpf['ug_id'], $integracao_client_email, $integracao_store_id);
                             } else {
                                 // cadastra novo usuário vindo de Integração, email e cpf
                                 $ug_id_cliente = $classUsuarioGames->inserir_simple($integracao_store_id, $integracao_client_email, $CPF_cliente, converterDataParaISO($data_nascimento_cliente), $nome_CPF_cliente);
