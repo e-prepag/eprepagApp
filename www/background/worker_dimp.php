@@ -758,6 +758,13 @@ function workerGerarDIMP($parametros)
                             continue;
                         }
 
+                        if (!empty($publishers_epp_adm)) {
+                            $publishers_epp_adm .= ", " . $response_epp_adm_row['opr_codigo'];
+                        } //end if(!empty($publishers_epp_adm))
+                        else {
+                            $publishers_epp_adm = $response_epp_adm_row['opr_codigo'];
+                        } //end else do if(!empty($publishers_epp_adm))
+
                         unset($vetorLines);
                         $response_epp_adm_row['opr_cidade'] = removerAcentos($response_epp_adm_row['opr_cidade']);
                         $response_epp_adm_row['opr_bairro'] = removerAcentos($response_epp_adm_row['opr_bairro']);
@@ -1925,6 +1932,12 @@ function workerGerarDIMP($parametros)
                     $sql_exclui = "";
                 }
 
+                if (!empty(trim($publishers_epp_adm)) && trim($publishers_epp_adm) != '') {
+                    $sql_filtra_adm = " and fp_publisher IN (" . $publishers_epp_adm . ")";
+                } else {
+                    $sql_filtra_adm = " and 1 = 0";
+                }
+
                 $sql_total_epp_adm = "SELECT 
 
                                         opr_internacional_alicota,fp_publisher, sum(fp_total_order) as fp_total_order, sum(fp_total) as total
@@ -1939,7 +1952,9 @@ function workerGerarDIMP($parametros)
 
                                     and opr_status = '1' 
 
-                                    and fp_freeze=1 
+                                    and fp_freeze=1
+
+                                    $sql_filtra_adm
 									
                                 group by fp_publisher,opr_internacional_alicota; ";
 
