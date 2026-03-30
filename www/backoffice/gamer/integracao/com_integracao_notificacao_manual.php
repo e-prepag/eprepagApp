@@ -201,7 +201,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
         <table width="400" border="0" cellpadding="0" cellspacing="2">
           <tr bgcolor="#F5F5FB"> 
 			<?php if(!$BtnNotify) { ?>
-            <td align="right"><button type="submit" name="BtnNotify" form="form1" value="Notificar" class="botao_search"></td>
+            <td align="right"><input type="submit" name="BtnNotify" form="form1" value="Notificar" class="botao_search"></td>
 			<?php } ?>
           </tr>
 		</table>
