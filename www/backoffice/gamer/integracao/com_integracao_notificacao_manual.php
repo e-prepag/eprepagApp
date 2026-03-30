@@ -171,7 +171,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 </head>
 <body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 <center>
-<form name="form1" method="post" action="com_integracao_notificacao_manual.php">
+<form id="form1" name="form1" method="post" action="com_integracao_notificacao_manual.php">
 <input type="hidden" name="store_id" value="<?php echo $store_id ?>">
 <input type="hidden" name="order_id" value="<?php echo $order_id ?>">
 
@@ -201,7 +201,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
         <table width="400" border="0" cellpadding="0" cellspacing="2">
           <tr bgcolor="#F5F5FB"> 
 			<?php if(!$BtnNotify) { ?>
-            <td align="right"><input type="submit" name="BtnNotify" value="Notificar" class="botao_search"></td>
+            <td align="right"><button type="submit" name="BtnNotify" form="form1" value="Notificar" class="botao_search"></td>
 			<?php } ?>
           </tr>
 		</table>
