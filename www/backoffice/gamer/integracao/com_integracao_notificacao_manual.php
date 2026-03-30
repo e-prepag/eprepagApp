@@ -44,6 +44,7 @@ $edb_conta = $_POST['edb_conta'] ?? null;
 $edb_tipo_conta = $_POST['edb_tipo_conta'] ?? null;
 $ec_id = $_POST['ec_id'] ?? null;
 $novoEstornoChargeback = $_POST['novoEstornoChargeback'] ?? null;
+$BtnNotify = $_REQUEST['BtnNotify'] ?? null;
 
 
 $msg = "";
