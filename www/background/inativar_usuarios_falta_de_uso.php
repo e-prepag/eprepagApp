@@ -8,7 +8,7 @@ require_once "/www/class/phpmailer/class.phpmailer.php";
 require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
 
-$logFile = __DIR__ . '../arquivos_gerados/logs/inativar_usuarios_falta_de_uso.log';
+$logFile = __DIR__ . '/../arquivos_gerados/logs/inativar_usuarios_falta_de_uso.log';
 
 function logMessage($message)
 {
