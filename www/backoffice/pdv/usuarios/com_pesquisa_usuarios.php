@@ -2023,7 +2023,7 @@ if ($msg != "") {
                             </strong>
                         </td>
                         <td align="center">
-                            <strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_data_encerramento_conta&inicial=" . $inicial . $varsel ?>">Encerramento</a>
+                            <strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_data_encerramento_conta&inicial=" . $inicial . $varsel ?>">Dt. Desativação</a>
                                 <?php if ($ncamp == 'ug_data_encerramento_conta') echo "<img src=" . $img_seta . " width='10' height='7' align='absmiddle'>"; ?>
                             </strong>
                         </td>
