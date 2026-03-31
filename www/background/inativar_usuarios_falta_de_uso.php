@@ -29,17 +29,23 @@ try {
     exit(1);
 }
 
-function inativarUsuarios($pdo, $tabelaUsuario)
+function inativarUsuarios($pdo, $tabelaUsuario, $tabelaObs)
 {
-    logMessage("Iniciando inativação para a tabela: $tabelaUsuario");
+    logMessage("Iniciando inativação para a tabela: $tabelaUsuario (observações: $tabelaObs)");
     $countInativados = 0;
 
     try {
-        // Update em bulk sem limite
-        $sqlUpdate = "UPDATE {$tabelaUsuario} 
+        $sqlUpdate = "UPDATE {$tabelaUsuario} u
                       SET ug_ativo = 6, ug_data_encerramento_conta = NOW()
-                      WHERE ug_data_ultimo_acesso <= NOW() - INTERVAL '1 year' 
-                      AND ug_ativo = 1";
+                      WHERE u.ug_data_ultimo_acesso <= NOW() - INTERVAL '1 year'
+                        AND u.ug_ativo = 1
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM {$tabelaObs} o
+                            WHERE o.ug_id = u.ug_id
+                              AND o.ugo_status_user = 1
+                              AND o.ugo_data >= NOW() - INTERVAL '1 month'
+                        )";
         
         $stmtUpdate = $pdo->prepare($sqlUpdate);
         $stmtUpdate->execute();
@@ -55,10 +61,10 @@ function inativarUsuarios($pdo, $tabelaUsuario)
 }
 
 // Executar para dist_usuarios_games
-$inativadosDist = inativarUsuarios($pdo, 'dist_usuarios_games');
+$inativadosDist = inativarUsuarios($pdo, 'dist_usuarios_games', 'dist_usuarios_games_obs');
 
 // Executar para usuarios_games
-$inativadosGames = inativarUsuarios($pdo, 'usuarios_games');
+$inativadosGames = inativarUsuarios($pdo, 'usuarios_games', 'usuarios_games_obs');
 
 $totalGeral = $inativadosDist + $inativadosGames;
 
