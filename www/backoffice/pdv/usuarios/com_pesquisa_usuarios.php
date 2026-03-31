@@ -2120,13 +2120,8 @@ if ($msg != "") {
 
                     while ($rs_usuario_row = pg_fetch_array($resultado_como_conheceu)):
 
-                        if ($rs_usuario_row['ug_ativo'] == 1) {
-                            $ativo = "Ativo";
-                        } elseif ($rs_usuario_row['ug_ativo'] == 2) {
-                            $ativo = "Inativo";
-                        } else {
-                            $ativo = "Indefinido";
-                        }
+                        $mapAtivo = [1 => 'Ativo', 2 => 'Inativo', 3 => 'Fraude', 4 => 'Suspeita de Fraude', 5 => 'Bloqueio Temporário e Preventivo de Fraude', 6 => 'Falta de Uso'];
+                        $ativo = isset($mapAtivo[$rs_usuario_row['ug_ativo']]) ? $mapAtivo[$rs_usuario_row['ug_ativo']] : 'Indefinido';
 
                         if ($rs_usuario_row['ug_status'] == 1) {
                             $status_busca = "Ativo";
@@ -2267,12 +2262,8 @@ if ($msg != "") {
 
 
                     while ($rs_usuario_row = pg_fetch_array($rs_usuario)) {
-                        if ($rs_usuario_row['ug_ativo'] == 1)
-                            $ativo = "Ativo";
-                        elseif ($rs_usuario_row['ug_ativo'] == 2)
-                            $ativo = "Inativo";
-                        else
-                            $ativo = "Indefinido";
+                        $mapAtivo = [1 => 'Ativo', 2 => 'Inativo', 3 => 'Fraude', 4 => 'Suspeita de Fraude', 5 => 'Bloqueio Temporário e Preventivo de Fraude', 6 => 'Falta de Uso'];
+                        $ativo = isset($mapAtivo[$rs_usuario_row['ug_ativo']]) ? $mapAtivo[$rs_usuario_row['ug_ativo']] : 'Indefinido';
 
                         if ($rs_usuario_row['ug_status'] == 1)
                             $status_busca = "Ativo";
