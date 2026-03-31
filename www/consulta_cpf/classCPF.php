@@ -301,17 +301,24 @@ class classCPF
         {
                 $sret = false;
                 $lista_resposta = null;
+                $idade = $this->verificaIdade($requestParams["data_nascimento"]);
+                $cpfNaWhiteList = $this->estaWhiteList($requestParams);
 
                 //Verifica a validade da idade (Menores que a idade mínima nem consulta o CPF)
-                if ($this->verificaIdade($requestParams["data_nascimento"]) < $GLOBALS["IDADE_MINIMA"]) {
+                if ($idade < $GLOBALS["IDADE_MINIMA"]) {
                         return 112;
+                }
+                
+                //Verifica idade máxima (maiores de 60 anos exigem validação prévia no RC)
+                elseif ($idade > $GLOBALS["IDADE_MAXIMA"] && !$cpfNaWhiteList) {
+                        return 160;
                 }
 
                 // Verificando se o CPF está na BlackList
                 elseif ($this->naoEstaBlackList($requestParams)) {
 
                         // Verificando se ultrapassou o limite máximo de utilização do CPF e se ultrapassou o limite máximo de contas com o mesmmo CPF ou consta na White List
-                        if (($this->consultaQuantidadeUtilizada($requestParams) < $this->get_quantidade_limite() && $this->consultaQuantidadeContas($requestParams) <= $this->get_quantidade_contas()) || $this->estaWhiteList($requestParams)) {
+                        if (($this->consultaQuantidadeUtilizada($requestParams) < $this->get_quantidade_limite() && $this->consultaQuantidadeContas($requestParams) <= $this->get_quantidade_contas()) || $cpfNaWhiteList) {
 
                                 if ($this->get_service_status()) {
 
@@ -737,6 +744,15 @@ class classCPF
 
                 // Calcula idade
                 return $hoje->diff($data)->y;
+        }
+
+        public function cpfEstaNaWhiteList($cpf)
+        {
+                $requestParams = array(
+                        'cpfcnpj' => preg_replace('/[^0-9]/', '', $cpf)
+                );
+
+                return $this->estaWhiteList($requestParams);
         }
 
         public function __destruct()

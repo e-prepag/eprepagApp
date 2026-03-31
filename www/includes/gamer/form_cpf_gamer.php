@@ -46,6 +46,8 @@ if (isset($_POST['formsubmit'])) {
         //Verificação de idade mínima 
         if ($testeCPF == 112) {
             $errors[] = "O produto " . $GLOBALS["produto_idade_minima"] . " é destinado para maiores de " . $GLOBALS["IDADE_MINIMA"] . " anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.";
+        } elseif ($testeCPF == 160) {
+            $errors[] = "Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para <a href='mailto:rc@e-prepag.com.br'>rc@e-prepag.com.br</a> solicitando a liberação do CPF.";
         }
 
         //Testando se o CPF consta na BlackList
