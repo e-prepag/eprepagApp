@@ -932,8 +932,8 @@ class EnvioEmailAutomatico
             }
             if ($this->getUgEmail() == "") $this->setUgEmail($result_row['ug_email']);
             if ($this->getUgLogin() == "") $this->setUgLogin($result_row['ug_login']);
-            if ($this->getUgNome() == "") {
-                $this->setUgNome($result_row['ug_nome_full'] ?: 'Parceiro');
+            if (empty($this->getUgNome())) {
+                $this->setUgNome($result_row['ug_nome_full'] ?: $result_row['ug_nome_fantasia'] ?: $result_row['ug_login'] ?: 'Parceiro');
             }
             if ($this->getUgPerfilSaldo() == "") $this->setUgPerfilSaldo($result_row['ug_perfil_saldo']);
 
