@@ -37,7 +37,7 @@ function inativarUsuarios($pdo, $tabelaUsuario)
     try {
         // Update em bulk sem limite
         $sqlUpdate = "UPDATE {$tabelaUsuario} 
-                      SET ug_ativo = 6 
+                      SET ug_ativo = 6, ug_data_encerramento_conta = NOW()
                       WHERE ug_data_ultimo_acesso <= NOW() - INTERVAL '1 year' 
                       AND ug_ativo = 1";
         
