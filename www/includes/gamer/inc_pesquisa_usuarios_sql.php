@@ -28,7 +28,7 @@ if ($tf_u_status)	$sql .= " and ug.ug_ativo = " . $tf_u_status . " ";
 if ($tf_u_qtde_acessos_ini && $tf_u_qtde_acessos_fim) 			$sql .= " and ug.ug_qtde_acessos between " . ($tf_u_qtde_acessos_ini == -1 ? 0 : $tf_u_qtde_acessos_ini) . " and " . ($tf_u_qtde_acessos_fim == -1 ? 0 : $tf_u_qtde_acessos_fim);
 if ($tf_u_data_ultimo_acesso_ini && $tf_u_data_ultimo_acesso_fim) $sql .= " and ug.ug_data_ultimo_acesso between '" . formata_data($tf_u_data_ultimo_acesso_ini, 1) . "' and '" . formata_data($tf_u_data_ultimo_acesso_fim, 1) . "'";
 if ($tf_u_data_inclusao_ini && $tf_u_data_inclusao_fim) 			$sql .= " and ug.ug_data_inclusao between '" . formata_data($tf_u_data_inclusao_ini, 1) . "' and '" . formata_data($tf_u_data_inclusao_fim, 1) . "'";
-if ($ug_data_desativacao_ini && $ug_data_desativacao_fim) 			$sql .= " and ug.ug_data_encerramento_conta between '" . formata_data($ug_data_desativacao_ini, 1) . "' and '" . formata_data($ug_data_desativacao_fim, 1) . "'";
+if ($ug_data_desativacao_ini && $ug_data_desativacao_fim) 			$sql .= " and ug.ug_data_encerramento_conta between '" . formata_data($ug_data_desativacao_ini, 1) . "' and '" . formata_data($ug_data_desativacao_fim, 1) . " 23:59:59'";
 if (trim($tf_u_nome ?? '') != '') 		$sql .= " and upper(ug.ug_nome) like '%" . strtoupper($tf_u_nome) . "%' ";
 if (trim($tf_u_email ?? '') != '')		$sql .= " and upper(ug.ug_email) like '%" . strtoupper($tf_u_email) . "%' ";
 if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cpf ?? '')) != '') 		$sql .= " and ug.ug_cpf like '%" . $tf_u_cpf . "%' ";
