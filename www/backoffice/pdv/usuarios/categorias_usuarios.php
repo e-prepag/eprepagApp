@@ -258,3 +258,39 @@
         </td>
     </tr>
 </table>
+
+<br>
+
+<table border="0" cellpadding="0" cellspacing="2" class="table">
+    <tr bgcolor="#ECE9D8" class="texto">
+        <td align="left" colspan="2" class="texto">Descricao de limites</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_TOTAL_DIARIO</td>
+        <td align="left" class="texto">Valor maximo permitido para adicao de saldo por dia.</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_PAGAMENTOS_DIARIO</td>
+        <td align="left" class="texto">Quantidade maxima de operacoes de adicao de saldo permitidas por dia.</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_VALOR_MIN_PARA_TAXA</td>
+        <td align="left" class="texto">Valor limite ate onde pode ser aplicada taxa; acima desse valor, nao ha cobranca de taxa.</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_VALOR_MIN</td>
+        <td align="left" class="texto">Valor minimo permitido para adicionar saldo.</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_VALOR_MAX</td>
+        <td align="left" class="texto">Valor maximo permitido para adicionar saldo por operacao.</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_VALOR_QTDE_PRODUTO</td>
+        <td align="left" class="texto">Quantidade maxima de produtos diferentes que podem ser incluidos no carrinho por compra.</td>
+    </tr>
+    <tr bgcolor="#F5F5FB">
+        <td align="left" class="texto">RISCO_LANS_PRE_QTDE_MODELO</td>
+        <td align="left" class="texto">Quantidade maxima permitida de um mesmo produto por compra.</td>
+    </tr>
+</table>

@@ -59,14 +59,16 @@ if (isset($_REQUEST['formsubmit'])) {
 
     //echo "<script>console.log('EPP')</script>";
 
-    if ($idade < 12) {
-        $errors[] = "A idade mínima para continuar o processo é de 12 anos.";
+    if ($idade < 16 || empty($idade)) {
+        $errors[] = "A idade mínima para continuar o processo é de 16 anos.";
     }
 
     //echo "<script>console.log('".$_REQUEST['data_nascimento']."')</script>";
 
     if ($testeCPF == 112) {
         $errors[] = "Venda não autorizada para menores de " . $GLOBALS["IDADE_MINIMA"] . " anos.";
+    } elseif ($testeCPF == 160) {
+        $errors[] = "Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberação do CPF.";
     }
 
     //Testando se o CPF consta na BlackList
@@ -381,7 +383,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
         if (count($errors) > 0 && $_REQUEST['consulta_automatica'] == '1') {
             echo "<script>$(function(){ showMessage('" . $msg . "'); });</script>";
             die();
-        } 
+        }
         ?>
         <div class="wrapper txt-preto int-box" style="width: 100% !important; max-width: 100% !important;">
             <div class="container-fluid">
@@ -396,7 +398,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                             style="position: relative; top: -2px; text-decoration: none;">
                         </a>
                         <p class="text-muted" style="margin-top: 5px;">
-                            <i>O CPF será solicitado apenas na sua primeira compra no jogo.</i>
+                            <i>O CPF será solicitado apenas na sua primeira compra no jogo. A idade mínima para realizar compras é de 16 anos.</i>
                         </p>
                     </div>
                 </div>

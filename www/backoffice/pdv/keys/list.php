@@ -10,11 +10,15 @@ $conexao_new_epp = function () {
 	try {
 		$username = 'eprepaga_pagorama';
 		$password = '3yARhv6HcJN';
-		$pdo = new PDO('mysql:host=10.204.168.21;port=3306;dbname=eprepaga_pag', $username, $password, 
-		[
-        PDO::ATTR_TIMEOUT => 5, // segundos
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    ]);
+		$pdo = new PDO(
+			'mysql:host=10.204.168.21;port=3306;dbname=eprepaga_pag',
+			$username,
+			$password,
+			[
+				PDO::ATTR_TIMEOUT => 5, // segundos
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+			]
+		);
 	} catch (PDOEXCEPTION $e) { //5433 
 		echo "Error: " . $e->getMessage();
 		return false;
@@ -23,13 +27,39 @@ $conexao_new_epp = function () {
 };
 
 
-$query = $conexao_new_epp()->prepare("select preferredName,cod_situacao,id_eprepag from user u 
+$query = $conexao_new_epp()->prepare("select preferredName,cod_situacao,id_eprepag,u.createdAt from user u 
 	 inner join oauth_clients c on c.user_id = u.id_new 
 	 inner join situacao_chave_api ch on ch.cod_usuario = u.id_new group by preferredName;");
 $query->execute();
 $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 
 //var_dump($resultadoSelecao);
+
+$conexao = ConnectionPDO::getConnection()->getLink();
+$idsEprepag = array_filter(array_column($resultadoSelecao, 'id_eprepag'));
+$vendasPorId = [];
+
+if (!empty($idsEprepag)) {
+	$inQuery = implode(',', array_fill(0, count($idsEprepag), '?'));
+	$sqlVendas = "SELECT vg.vg_ug_id, COUNT(vg.vg_id) as qtd
+				  FROM tb_dist_venda_games vg
+				  INNER JOIN pedidos_api_pdv p ON p.id_pedido_eprepag = vg.vg_id
+				  WHERE vg.vg_ug_id IN ($inQuery)
+				  AND vg.vg_data_inclusao >= NOW() - INTERVAL '1 month'
+				  GROUP BY vg.vg_ug_id";
+	$stmtVendas = $conexao->prepare($sqlVendas);
+	$stmtVendas->execute(array_values($idsEprepag));
+	$resultadosVendas = $stmtVendas->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($resultadosVendas as $v) {
+		$vendasPorId[$v['ug_id']] = $v['qtd'];
+	}
+}
+
+foreach ($resultadoSelecao as &$row) {
+	$row['qtd_vendas_mes'] = isset($vendasPorId[$row['id_eprepag']]) ? $vendasPorId[$row['id_eprepag']] : 0;
+}
+unset($row);
 
 ?>
 
@@ -94,6 +124,8 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 			<tr>
 				<th>ID</th>
 				<th>PDV</th>
+				<th>Data Criação</th>
+				<th>Vendas (30 dias)</th>
 				<th>Situação chave</th>
 			</tr>
 		</thead>
@@ -101,14 +133,16 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 			<?php
 			if (count($resultadoSelecao) > 0) {
 				foreach ($resultadoSelecao as $key => $value) {
-					?>
+			?>
 					<tr>
 						<td><?php echo $value["id_eprepag"]; ?></td>
 						<td><?php echo $value["preferredName"]; ?></td>
+						<td><?php echo !empty($value["createdAt"]) ? date("d/m/Y H:i:s", strtotime($value["createdAt"])) : '-'; ?></td>
+						<td><?php echo $value["qtd_vendas_mes"]; ?></td>
 						<td class="<?php echo ($value["cod_situacao"] == 1) ? 'active' : 'inactive'; ?>">
 							<?php echo ($value["cod_situacao"] == 1) ? 'Ativo' : 'Inativo'; ?></td>
 					</tr>
-					<?php
+			<?php
 				}
 			}
 			?>
@@ -117,7 +151,7 @@ $resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-	$(document).ready(function () {
+	$(document).ready(function() {
 		let table = new DataTable('#table', {
 			language: {
 				lengthMenu: "Mostrar _MENU_ resultados por página",

@@ -7,7 +7,7 @@ try {
     set_time_limit(0);
     $pdo = ConnectionPDO::getConnection()->getLink();
 
-    // 1. Busca e "trava" a próxima tarefa pendente em um único comando atômico
+    // 1. Busca e "trava" a prÃ³xima tarefa pendente em um Ãºnico comando atÃ´mico
     $sqlLock = "UPDATE fila_tarefas_background 
                 SET status = 'PROCESSANDO', data_inicio_processamento = NOW() 
                 WHERE id = (
@@ -37,6 +37,11 @@ try {
                 $url_download_final = workerGerarZipEfinanceira($parametros);
                 break;
 
+            case 'gerar_dimp':
+                require __DIR__ . "/worker_dimp.php";
+                $url_download_final = workerGerarDIMP($parametros);
+                break;
+
             // case 'outra_rotina_pdf':
             //     $url_download_final = workerGerarRelatorioPdf($parametros);
             //     break;
@@ -62,8 +67,7 @@ try {
         $stmtErr = $pdo->prepare($sqlErr);
         $stmtErr->execute([':msg' => $msgErro, ':id' => $id_tarefa]);
     }
-    echo "ERRO CRÍTICO na Tarefa: " . $e->getMessage() . "\n";
+    echo "ERRO CRÃTICO na Tarefa: " . $e->getMessage() . "\n";
     $fimTempo = microtime(true);
     echo "Tempo decorrido: " . ($fimTempo - $inicioTempo) . " segundos\n";
 }
-

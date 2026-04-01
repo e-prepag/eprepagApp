@@ -71,14 +71,16 @@ if (isset($_REQUEST['formsubmit'])) {
 
     //echo "<script>console.log('EPP')</script>";
 
-    if ($idade < 12) {
-        $errors[] = "A idade mínima para continuar o processo é de 12 anos.";
+    if ($idade < 16 || empty($idade)) {
+        $errors[] = "A idade mínima para continuar o processo é de 16 anos.";
     }
 
     //echo "<script>console.log('".$_REQUEST['data_nascimento']."')</script>";
 
     if ($testeCPF == 112) {
         $errors[] = "Venda não autorizada para menores de " . $GLOBALS["IDADE_MINIMA"] . " anos.";
+    } elseif ($testeCPF == 160) {
+        $errors[] = "Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberação do CPF.";
     }
 
     //Testando se o CPF consta na BlackList
@@ -403,7 +405,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                         class="btn-question glyphicon glyphicon-question-sign txt-vermelho c-pointer t0"
                         data-msg="<h2>O que é isso?</h2>Agora todas as transações financeiras de jogos online no Brasil são condicionadas ao fornecimento de um CPF. Esta informação será solicitada em algumas compras, mas não sempre. Agradecemos a sua compreensão."
                         style="position: relative;"></a></h4>
-                <p><i>O CPF será solicitado apenas na sua primeira compra no jogo.</i></p>
+                <p><i>O CPF será solicitado apenas na sua primeira compra no jogo. A idade mínima para realizar compras é de 16 anos.</i></p>
                 <div class="int-form1" style="position: relative;">
                     <form action="" id="cpfForm" method="POST">
                         <input type="hidden" name="formsubmit" value="OK" style="display: none;" />

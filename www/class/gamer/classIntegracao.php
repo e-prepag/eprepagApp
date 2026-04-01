@@ -4574,7 +4574,7 @@ function endereco_page($preencher_endereco)
 function cpf_page($partner_list)
 {
 	if (isset($GLOBALS['_SESSION']['usuarioGames_ser']) && !is_null($GLOBALS['_SESSION']['usuarioGames_ser'])) {
-		
+
 		$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 		$usuarioId = $usuarioGames->getId();
 	}
@@ -4587,7 +4587,7 @@ function cpf_page($partner_list)
 
 	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf)  && validarDataReal($user->ug_data_nascimento);
 
 	//Ajustando dados de CPF para usuários cadastrados no sistema antes de usar a integração
 	/*
@@ -4596,6 +4596,11 @@ function cpf_page($partner_list)
 		$rs = SQLexecuteQuery($sql_update);
 	}//end if(empty($user->ug_data_cpf_informado)|| empty($user->ug_data_cpf_informado))
 	*/
+
+	if ($is_data_valid && !verificaIdadeMaximaPermitida($user->ug_data_nascimento, $user->ug_cpf)) {
+		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberacao do CPF.</div></div</div>";
+		die();
+	}
 
 	if ($is_data_valid && $vg_integracao_parceiro_origem_id == 10422) {
 
@@ -4633,7 +4638,7 @@ function cpf_page($partner_list)
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
-			if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_data_nascimento)) {
 				$_REQUEST['formsubmit'] = true;
 				$_REQUEST['cpf'] = $user->ug_cpf;
 				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4649,30 +4654,47 @@ function cpf_page($partner_list)
 
 function converterDataParaISO($data)
 {
-    // Se a variável estiver vazia ou não for string, retorna false
-    if (empty($data) || !is_string($data)) {
-        return false;
-    }
+	// Se a variável estiver vazia ou não for string, retorna false
+	if (empty($data) || !is_string($data)) {
+		return false;
+	}
 
-    // TENTATIVA 1: Verifica se é formato Brasileiro (dd/mm/yyyy)
-    $d = DateTime::createFromFormat('d/m/Y', $data);
-    
-    // O operador && verifica duas coisas:
-    // 1. Se o objeto DateTime foi criado com sucesso ($d)
-    // 2. Se a formatação de volta para string é idêntica à entrada (Isso evita datas como 30/02/2023 virarem 02/03/2023)
-    if ($d && $d->format('d/m/Y') === $data) {
-        return $d->format('Y-m-d');
-    }
+	// TENTATIVA 1: Verifica se é formato Brasileiro (dd/mm/yyyy)
+	$d = DateTime::createFromFormat('d/m/Y', $data);
 
-    // TENTATIVA 2: Verifica se já é formato ISO (yyyy-mm-dd)
-    $d = DateTime::createFromFormat('Y-m-d', $data);
-    
-    if ($d && $d->format('Y-m-d') === $data) {
-        return $data; // Já está no formato certo
-    }
+	// O operador && verifica duas coisas:
+	// 1. Se o objeto DateTime foi criado com sucesso ($d)
+	// 2. Se a formatação de volta para string é idêntica à entrada (Isso evita datas como 30/02/2023 virarem 02/03/2023)
+	if ($d && $d->format('d/m/Y') === $data) {
+		return $d->format('Y-m-d');
+	}
 
-    // Se não casou com nenhum dos dois formatos ou é data inválida
-    return false;
+	// TENTATIVA 2: Verifica se já é formato ISO (yyyy-mm-dd)
+	$d = DateTime::createFromFormat('Y-m-d', $data);
+
+	if ($d && $d->format('Y-m-d') === $data) {
+		return $data; // Já está no formato certo
+	}
+
+	// Se não casou com nenhum dos dois formatos ou é data inválida
+	return false;
+}
+
+function validarDataReal($dataInput)
+{
+	$dataLimpa = substr(trim($dataInput), 0, 10);
+
+	if (strpos($dataLimpa, '/') !== false) {
+		$formato = 'd/m/Y';
+	} elseif (strpos($dataLimpa, '-') !== false) {
+		$formato = 'Y-m-d';
+	} else {
+		return false;
+	}
+
+	$d = DateTime::createFromFormat($formato, $dataLimpa);
+
+	return $d && $d->format($formato) === $dataLimpa;
 }
 
 function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
@@ -4683,7 +4705,12 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 
 	$partner = $partner_list[array_query("partner_id", $vg_integracao_parceiro_origem_id, $partner_list)];
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_data_nascimento);
+
+	if ($is_data_valid && !verificaIdadeMaximaPermitida($user->ug_data_nascimento, $user->ug_cpf)) {
+		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberacao do CPF.</div></div</div>";
+		die();
+	}
 
 	if ($is_data_valid && $vg_integracao_parceiro_origem_id == 10422) {
 
@@ -4717,7 +4744,7 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 			} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 			//Validando a data da consulta
-			if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+			if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_data_nascimento)) {
 				$_REQUEST['formsubmit'] = true;
 				$_REQUEST['cpf'] = $user->ug_cpf;
 				$_REQUEST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4812,7 +4839,9 @@ function cpf_page_gamer()
 
 	$user = getUserFromId($usuarioGames->getId());
 
-	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf);
+	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_data_nascimento);
+
+	error_log("Data: {$user->ug_data_nascimento} True ou não: " . (validarDataReal($user->ug_data_nascimento) ? 'Sim' : 'Não') . "Valida tudo: " . ($is_data_valid ? 'Sim' : 'Não'));
 
 	$logFilePath = '/www/arquivos_gerados/txts/cpf_log.txt';
 
@@ -4829,6 +4858,9 @@ function cpf_page_gamer()
 			echo "</div></div><div class='top20'></div>";
 			require_once DIR_WEB . "game/includes/footer.php";
 		} //end if(isset($controller->logado) && $controller->logado)
+		die();
+	} elseif (!verificaIdadeMaximaPermitida($user->ug_data_nascimento, $user->ug_cpf)) {
+		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberacao do CPF.</div></div</div>";
 		die();
 	} elseif (!verificaIdadeMinima($user->ug_data_nascimento)) {
 		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>O produto " . $GLOBALS["produto_idade_minima"] . " é destinado para maiores de " . $GLOBALS["IDADE_MINIMA"] . " anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.</div></div</div>";
@@ -4855,7 +4887,7 @@ function cpf_page_gamer()
 		} //end if($testeDadosAdicionais->consultaQuantidadeUtilizada($parametros) >= $testeDadosAdicionais->get_quantidade_limite())
 
 		//Validando a data da consulta
-		if (!verificaDataCPFInformado($user->ug_data_cpf_informado)) {
+		if (!verificaDataCPFInformado($user->ug_data_cpf_informado) || !validarDataReal($user->ug_data_nascimento)) {
 			$_POST['formsubmit'] = true;
 			$_POST['cpf'] = $user->ug_cpf;
 			$_POST['data_nascimento'] = formata_data($user->ug_data_nascimento, 0);
@@ -4909,44 +4941,22 @@ function verificaIdadeMinima($dataNascimento)
 	if ($_SESSION['integracao_origem_id'] == 10422) {
 		return ($interval->format('%Y') >= 18);
 	} else {
-		return ($interval->format('%Y') >= 12);
+		return ($interval->format('%Y') >= 16);
 	}
 }
 
-function buscarVinculoPorEmail(string $email) 
+function verificaIdadeMaximaPermitida($dataNascimento, $cpf)
 {
-	$emailUpper = strtoupper($email);
-	$pdo = ConnectionPDO::getConnection()->getLink();
+	$date = new DateTime($dataNascimento);
+	$interval = $date->diff(new DateTime(date('Y-m-d')));
+	$idade = (int)$interval->format('%Y');
 
-    $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
-				JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
-				WHERE UPPER(ugv.email) = :email AND ug_ativo = 1 LIMIT 1";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
-    $stmt->execute();
+	if ($idade <= $GLOBALS["IDADE_MAXIMA"]) {
+		return true;
+	}
 
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $resultado ?? null;
-}
-
-function criarVinculoUsuario(int $ugId, string $email): void 
-{
-	$pdo = ConnectionPDO::getConnection()->getLink();
-    try {
-        $emailUpper = strtoupper($email);
-
-        $sql = "INSERT INTO usuarios_games_vinculo (ug_id, email) VALUES (:ug_id, :email)";
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':ug_id', $ugId, PDO::PARAM_INT);
-        $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
-        
-        $stmt->execute();
-
-    } catch (PDOException $e) {
-        error_log("Erro ao inserir em usuarios_games_vinculo: " . $e->getMessage());
-    }
+	require_once RAIZ_DO_PROJETO . "consulta_cpf/config.inc.cpf.php";
+	$cpfService = new classCPF(false);
+	return $cpfService->cpfEstaNaWhiteList($cpf);
 }
 ?>

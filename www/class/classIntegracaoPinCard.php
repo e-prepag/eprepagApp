@@ -273,7 +273,7 @@ function verificaCPFnaReceitaFederal($cpf, $pin, $id, $data_nascimento = null) {
         $testeCPF = $rs_api->Req_EfetuaConsulta($parametros,$resposta);
 
         //Testando menor de idade minima
-        if($testeCPF == 112) {
+        if($testeCPF == 112 || $testeCPF == 160) {
             
             return $testeCPF;
             

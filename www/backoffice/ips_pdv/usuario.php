@@ -33,6 +33,7 @@ $sqlIp = "SELECT ip.id, ip.ip_address,
 				    ip.ip_range_end,
 					ip.created_date,
 					ip.active,
+					ip.domain,
 					COALESCE(u.shn_nome, 'Desconhecido') as shn_nome
 					FROM pdv_api_ip ip
 					LEFT JOIN usuarios u ON u.id = ip.bko_user
@@ -243,6 +244,38 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 			document.body.appendChild(modal);
 		}
 	});
+
+	function abrirEditarIp(id, ipAddress, rangeIni, rangeEnd, domain, isSingle) {
+		document.getElementById('ip_id').value = id;
+		document.getElementById('acaoForm').value = 'editar';
+		document.getElementById('domain').value = domain;
+		document.querySelector('.modal-title-alt').innerText = 'Editar endereço IP';
+
+		if (isSingle) {
+			selectIpType('single');
+			document.getElementById('singleIp').value = ipAddress;
+		} else {
+			selectIpType('range');
+			document.getElementById('startIp').value = rangeIni;
+			document.getElementById('endIp').value = rangeEnd;
+		}
+
+		$("#modal-novo").modal('show');
+	}
+
+	function abrirNovoIp() {
+		document.getElementById('ip_id').value = '';
+		document.getElementById('acaoForm').value = 'novo';
+		document.getElementById('domain').value = '';
+		document.querySelector('.modal-title-alt').innerText = 'Cadastrar endereços IPs';
+
+		selectIpType('single');
+		document.getElementById('singleIp').value = '';
+		document.getElementById('startIp').value = '';
+		document.getElementById('endIp').value = '';
+
+		$("#modal-novo").modal('show');
+	}
 
 	function validateIP(ip) {
 		const regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
@@ -466,7 +499,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 			$.ajax({
 				url: "ajax_ip_pdv.php",
 				method: "POST",
-				data: $("#formNovo").serialize() + "&acao=novo&ug_id=<?= $user_id ?>&bko_user=<?= $_SESSION["iduser_bko"] ?>",
+				data: $("#formNovo").serialize() + "&ug_id=<?= $user_id ?>&bko_user=<?= $_SESSION["iduser_bko"] ?>",
 				beforeSend: function() {
 					Swal.fire({
 						title: 'Aguarde!',
@@ -489,22 +522,8 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 					}
 					if (resposta.status === "success") {
 						icone = "success";
-						// Atualiza a tabela de histórico
-						const newRow = `
-						<tr>
-							<td style="font-size: 16px;font-weight: bold;color: #444;">${(ipType == 'single' ? 'Único' : 'Range')}</td>
-							<td style="font-size: 16px;font-weight: bold;color: #444;">${resposta.msg}</td>
-							<td style="font-size: 16px;font-weight: bold;color: #444;"><?= $usuarioNome ?></td>
-							<td style="font-size: 16px;font-weight: bold;color: #444;">${(new Date().toISOString().slice(0, 10))}</td>
-							<td style="font-size: 16px;font-weight: bold;color: #444;"><button onclick="alterarIp(this, ${resposta.id})" type="button" class="btn btn-info" style="font-weight: bold;" title="Desativar">Ativo</button></td>
-							<td><button type="button" class="btn btn-danger" id="remover${resposta.id}" style="font-weight: bold;" title="Remover">Remover</button></td>
-						</tr>`;
-						$("#col-Ip").prepend(newRow);
-						// Atualiza os campos de risco e data
-						document.getElementById('startIp').value = '';
-						document.getElementById('endIp').value = '';
-						// Limpa o formulário
-						//$("#modal-novo").modal('hide');
+						location.reload();
+						return;
 					} else {
 						msg = "Erro ao cadastrar endereço IP: " + resposta.msg;
 						icone = "error";
@@ -554,6 +573,12 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 			<div class="card">
 				<h2 class="modal-title-alt">Cadastrar endereços IPs</h2>
 				<form id="formNovo">
+					<input type="hidden" id="ip_id" name="id" value="">
+					<input type="hidden" id="acaoForm" name="acao" value="novo">
+					<div class="form-group">
+						<label id="domainLabel">Site PDV (Domínio)</label>
+						<input type="text" id="domain" name="domain" placeholder="ex: meudominio.com.br">
+					</div>
 					<div class="form-group">
 						<label>Tipo de IP</label>
 						<div class="ip-type-selector">
@@ -631,7 +656,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 							<div class="d-flex custom-justify bottom-10">
 								<h5 class="titulo-vencimento">Endereços IP cadastrados</h5>
 								<a href="#" style="font-weight: bold;" class="btn btn-success btn-todos align-right"
-									data-toggle="modal" data-target="#modal-novo">Novo</a>
+									onclick="abrirNovoIp()">Novo</a>
 							</div>
 							<div style="overflow-x: auto;">
 								<div class="table-responsive">
@@ -641,6 +666,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 											<tr>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Tipo</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Endereço IP</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">Site PDV</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">User Criação</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Dt Inclusão</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Ativo</th>
@@ -672,10 +698,12 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 												echo '<tr>
               									  		<td style="font-size: 16px;font-weight: bold;color: #444;">' . $msgRange . '</td>
               									  		<td style="font-size: 16px;font-weight: bold;color: #444;">' . $ipAdress . '</td>
+														<td style="font-size: 16px;font-weight: bold;color: #444;">' . ($row['domain'] ? $row['domain'] : 'Sem site') . '</td>
 														<td style="font-size: 16px;font-weight: bold;color: #444;">' . $row['shn_nome'] . '</td>
 														<td style="font-size: 16px;font-weight: bold;color: #444;">' . $row['created_date'] . '</td>
 														<td style="font-size: 16px;font-weight: bold;color: #444;">' . $btn_ativo . '</td>
               											<td>
+															<button onclick="abrirEditarIp(' . $row['id'] . ', \'' . $row['ip_address'] . '\', \'' . $row['ip_range_ini'] . '\', \'' . $row['ip_range_end'] . '\', \'' . ($row['domain'] ?? '') . '\', ' . ($range ? 'true' : 'false') . ')" type="button" class="btn btn-warning" style="font-weight: bold;" title="Editar">Editar</button>
 															<button id="remover' . $row['id'] . '" type="button" class="btn btn-danger" style="font-weight: bold;" title="Remover">Remover</button>
 														</td>
               										</tr>';

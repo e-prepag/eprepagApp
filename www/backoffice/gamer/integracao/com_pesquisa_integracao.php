@@ -253,7 +253,7 @@ require_once "/www/includes/bourls.php";
     });
 
 function open_notify_window(ip_id, store_id, order_id) { 
-	window.open('/gamer/integracao/com_integracao_notificacao_manual.php?ip_id='+ip_id+'&store_id='+store_id+'&order_id='+order_id,'mywindow', 'width=1000,height=500');
+	window.open('/gamer/integracao/com_integracao_notificacao_manual.php?ip_id='+ip_id+'&store_id='+store_id+'&order_id='+order_id, "_blank");
 }
 
 function GP_popupAlertMsg(msg) { //v1.0

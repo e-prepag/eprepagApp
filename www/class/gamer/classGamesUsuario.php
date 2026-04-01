@@ -1556,7 +1556,7 @@ class UsuarioGames
 
         try {
             $sql = "SELECT ug_ativo FROM usuarios_games WHERE regexp_replace(ug_cpf, '[^0-9]', '', 'g') = regexp_replace(:ug_cpf, '[^0-9]', '', 'g')";
-            if(!empty($usuarioId) && $usuarioId > 0){
+            if (!empty($usuarioId) && $usuarioId > 0) {
                 $sql .= " AND ug_id <> :ug_id";
             }
 
@@ -1566,7 +1566,7 @@ class UsuarioGames
 
             $rs = $pdo->prepare($sql);
             $rs->bindValue(':ug_cpf', $cpf, PDO::PARAM_STR);
-            if(!empty($usuarioId) && $usuarioId > 0){
+            if (!empty($usuarioId) && $usuarioId > 0) {
                 $usuarioId = (int) $usuarioId;
 
                 $rs->bindParam(":ug_id", $usuarioId, PDO::PARAM_INT);
@@ -1774,29 +1774,28 @@ class UsuarioGames
 
     public function existeCPFdoUsuario($usuario_id)
     {
-
         try {
-            // Inicializando a query base
-            $sql = "select ug_cpf from usuarios_games where ug_id = :ug_id";
+            $sql = "select ug_cpf, ug_data_nascimento from usuarios_games where ug_id = :ug_id";
 
-            // Inicializando conexao PDO
             $con = ConnectionPDO::getConnection();
             $pdo = $con->getLink();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Passando a query de select
             $rs = $pdo->prepare($sql);
-
             $rs->bindParam(':ug_id', $usuario_id, PDO::PARAM_INT);
-
-            // Executando a query
             $rs->execute();
+
             $info = $rs->fetch(PDO::FETCH_ASSOC);
 
             if ($info != false) {
-                if (isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"])) {
+                $cpfValido = isset($info["ug_cpf"]) && $this::Validar_CPF_Via_Calculo($info["ug_cpf"]);
+
+                $dataValida = !empty($info["ug_data_nascimento"]) && $this->validarDataReal($info["ug_data_nascimento"]);
+
+                if ($cpfValido && $dataValida) {
                     return "";
                 }
+
                 return "CPF INVALIDO";
             }
             return "ERRO CONSULTA";
@@ -1805,6 +1804,15 @@ class UsuarioGames
         } catch (Exception $e) {
             return "ERRO GERAL";
         }
+    }
+
+    private function validarDataReal($dataTimestamp)
+    {
+        $dataApenas = substr($dataTimestamp, 0, 10);
+
+        $d = DateTime::createFromFormat('Y-m-d', $dataApenas);
+
+        return $d && $d->format('Y-m-d') === $dataApenas;
     }
 
     function existeRG($rg, $usuario_id_excessao)
@@ -3065,6 +3073,30 @@ class UsuarioGames
             else {
                 $ret = "";
             }
+
+            if (!is_null($objGamesUsuario->getAtivo())) {
+                usleep(300000);
+
+                $sql_atualiza_obs = "UPDATE usuarios_games_obs d
+                    SET ugo_user_insert = $1
+                    FROM (
+                        SELECT ug_id, ugo_data
+                        FROM usuarios_games_obs
+                        WHERE ug_id = $2 AND ugo_status_user = $3 AND ugo_data >= NOW() - INTERVAL '5 seconds'
+                        ORDER BY ugo_data DESC
+                        LIMIT 1
+                    ) sub
+                    WHERE d.ug_id  = sub.ug_id
+                      AND d.ugo_data = sub.ugo_data;";
+
+                $params = [
+                    $GLOBALS['_SESSION']['userlogin_bko'],
+                    $objGamesUsuario->getId(),
+                    $objGamesUsuario->getAtivo()
+                ];
+
+                SQLexecuteQueryParams($sql_atualiza_obs, $params);
+            }
         }
 
         return $ret;
@@ -3578,6 +3610,59 @@ class UsuarioGames
         }
 
         return true;
+    }
+
+    public function adicionar_vinculo($ug_id, $email, $game_origem)
+    {
+        $sql = "INSERT INTO usuarios_games_vinculo (ug_id, email, game_origem) VALUES ($1, $2, $3)";
+        $params = array($ug_id, $email, $game_origem);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        return $rs ? "" : "Erro ao adicionar vínculo.";
+    }
+
+    public function editar_vinculo($id, $email, $game_origem)
+    {
+        $sql = "UPDATE usuarios_games_vinculo SET email = $1, game_origem = $2 WHERE id = $3";
+        $params = array($email, $game_origem, $id);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        return $rs ? "" : "Erro ao editar vínculo.";
+    }
+
+    public function excluir_vinculo($id)
+    {
+        $sql = "DELETE FROM usuarios_games_vinculo WHERE id = $1";
+        $params = array($id);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        return $rs ? "" : "Erro ao excluir vínculo.";
+    }
+
+    public function get_vinculo_por_id($id)
+    {
+        $sql = "SELECT id, ug_id, email, game_origem FROM usuarios_games_vinculo WHERE id = $1";
+        $params = array($id);
+        $rs = SQLexecuteQueryParams($sql, $params);
+        if ($rs && pg_num_rows($rs) > 0) {
+            return pg_fetch_array($rs);
+        }
+        return false;
+    }
+
+    public function buscarVinculoPorEmail($email)
+    {
+        $emailUpper = strtoupper($email);
+        $pdo = ConnectionPDO::getConnection()->getLink();
+
+        $sql = "SELECT ug.ug_id, ug.ug_email FROM usuarios_games_vinculo ugv
+                    JOIN usuarios_games ug ON ug.ug_id = ugv.ug_id
+                    WHERE UPPER(ugv.email) = :email AND ug_ativo = 1 LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':email', $emailUpper, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado !== false ? $resultado : null;
     }
 }
 

@@ -8,6 +8,10 @@ if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
 
 $https = "https";
 
+$formsubmit = $_POST['formsubmit'];
+$cpf = $_POST['cpf'];
+$data_nascimento = $_POST['data_nascimento'];
+
 // if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')) {
 //     $teste = substr($_SERVER['HTTP_USER_AGENT'], strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') + 4, 4) * 1;
 //     echo "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=" . htmlspecialchars($teste) . "\" />";

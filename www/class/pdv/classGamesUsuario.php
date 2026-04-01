@@ -171,11 +171,14 @@ class UsuarioGames
     var $ug_data_expiracao_senha;
 
     var $ug_canais_venda;
+
+    var $ug_blStatusBusca;
+
     /*
       function UsuarioGames() {
       }
      */
-    function UsuarioGames(
+    public function __construct(
         $ug_id                 = null,
         $ug_sLogin             = null,
         $ug_sSenha             = null,
@@ -1852,6 +1855,8 @@ class UsuarioGames
 
     function inserirPDO(&$objGamesUsuario, $dados = [])
     {
+        $rs_row = [];
+
         $objGamesUsuario->setPerfilSenhaReimpressao("E!!!Prepag");
         $objGamesUsuario->setPerfilLimite("0,00");
 
@@ -2171,6 +2176,8 @@ class UsuarioGames
     function atualizar($objGamesUsuario)
     {
 
+        $rs_row = [];
+
         $ret = UsuarioGames::validarCampos($objGamesUsuario, false);
 
         if ($ret == "") {
@@ -2389,7 +2396,7 @@ class UsuarioGames
                     // Caso a lan não seja aprovada, enviar e-mail.
                     $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_LAN, 'PedidoNegadoLan');
                     $envioEmail->setUgID($objGamesUsuario->getId());
-                    $envioEmail->setUgNome($objGamesUsuario->getNome());
+                    $envioEmail->setUgNome($objGamesUsuario->getLogin());
                     $envioEmail->MontaEmailEspecifico();
                     break;
                 case 9:
@@ -2677,7 +2684,7 @@ class UsuarioGames
                     // Caso a lan não seja aprovada, enviar e-mail.
                     $envioEmail = new EnvioEmailAutomatico(TIPO_USUARIO_LAN, 'PedidoNegadoLan');
                     $envioEmail->setUgID($objGamesUsuario->getId());
-                    $envioEmail->setUgNome($objGamesUsuario->getNome());
+                    $envioEmail->setUgNome($objGamesUsuario->getLogin());
                     $envioEmail->MontaEmailEspecifico();
                     break;
                 case 9:
@@ -2698,6 +2705,33 @@ class UsuarioGames
                     break;
             }
             $ret = SQLexecuteQuery($sql);
+
+            if (!is_null($objGamesUsuario->getAtivo())) {
+                usleep(300000);
+
+                $sql_atualiza_obs = "UPDATE dist_usuarios_games_obs d
+                    SET ugo_user_insert = $1, ug_obs = ug_obs || $4
+                    FROM (
+                        SELECT ug_id, ugo_data
+                        FROM dist_usuarios_games_obs
+                        WHERE ug_id = $2 AND ugo_status_user = $3 AND ugo_data >= NOW() - INTERVAL '5 seconds'
+                        ORDER BY ugo_data DESC
+                        LIMIT 1
+                    ) sub
+                    WHERE d.ug_id  = sub.ug_id
+                      AND d.ugo_data = sub.ugo_data;";
+
+                $texto_substatus = !is_null($objGamesUsuario->getSubstatus()) ? ("e substatus para " . $objGamesUsuario->getSubstatusDescription()) : "";
+
+                $params = [
+                    $GLOBALS['_SESSION']['userlogin_bko'],
+                    $objGamesUsuario->getId(),
+                    $objGamesUsuario->getAtivo(),
+                    $texto_substatus
+                ];
+
+                SQLexecuteQueryParams($sql_atualiza_obs, $params);
+            }
 
             if (!$ret) $ret_all .= "Erro ao atualizar usuário." . PHP_EOL;
             else {
@@ -5774,7 +5808,7 @@ class UsuarioGames
             $sql = "update dist_usuarios_games set ";
             $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
             $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
-            $sql .= " where ug_login = " . SQLaddFields($login, "s");
+            $sql .= " where ug_login = " . SQLaddFields($loginNXC, "s");
             $rs = SQLexecuteQuery($sql);
 
             usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CARREGA_SESSAO_NEXCAFE'], $usuarioGames->getId(), null);
@@ -6042,7 +6076,7 @@ function testaBloqueoPorNaoPagamento()
     $pagto = $_SESSION['dist_pagamento.pagto'];
 
     //recupera saldo atual
-    $usuarioGames = UsuarioGames::getUsuarioGamesById($usuarioId);
+    $usuarioGames = (new UsuarioGames)->getUsuarioGamesById($usuarioId);
 
     $today1 = strtotime('now');
     $today = date("d.m.Y", $today1);

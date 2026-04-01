@@ -187,20 +187,28 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                         //echo "<script>console.log(".$ano.")</script>";
                         if (UsuarioGames::Validar_CPF_Via_Calculo($cpf) == false) {
                             $erros[] = "<p>O CPF é inválido.</p>";
-                        } else if ($idade >= 18) {
+                        } else if ($idade >= 16) {
+                            if ($idade > $GLOBALS["IDADE_MAXIMA"]) {
+                                $cpfService = new classCPF(false);
+                                if (!$cpfService->cpfEstaNaWhiteList($cpf)) {
+                                    $erros[] = "<p>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberação do CPF.</p>";
+                                }
+                            }
 
-                            $nome = $retorno["nome"];
+                            if (empty($erros)) {
+                                $nome = $retorno["nome"];
 
-                            $usuarios = new UsuarioGames;
-                            $usuarios->setLogin(addslashes($_POST['login']));
-                            $usuarios->setNome(addslashes($nome));
-                            $usuarios->setNomeCPF(addslashes($nome));
-                            $usuarios->setCPF(addslashes($cpfComMascara));
-                            $usuarios->setDataNascimento(addslashes($_POST['dtNasc']));
-                            $usuarios->setEmail(addslashes($_POST['email']));
-                            $usuarios->setSenha($_POST['senha']);
+                                $usuarios = new UsuarioGames;
+                                $usuarios->setLogin(addslashes($_POST['login']));
+                                $usuarios->setNome(addslashes($nome));
+                                $usuarios->setNomeCPF(addslashes($nome));
+                                $usuarios->setCPF(addslashes($cpfComMascara));
+                                $usuarios->setDataNascimento(addslashes($_POST['dtNasc']));
+                                $usuarios->setEmail(addslashes($_POST['email']));
+                                $usuarios->setSenha($_POST['senha']);
+                            }
                         } else {
-                            $erros[] = "<p>A idade mínima para o cadastro é de 18 anos.</p>";
+                            $erros[] = "<p>A idade mínima para o cadastro é de 16 anos.</p>";
                         }
                     }
                 } else {
@@ -518,7 +526,7 @@ $termosDeUso = strip_tags($termosDeUso);
                 <div class="row top10">
                     <div class="cold-md-12 col-lg-12 col-sm-12 col-xs-12 text-left">
                         <ul>
-                            <li>Os usuários entre 12 e 18 anos devem certificar-se de ter lido o Termos e
+                            <li>Os usuários entre 16 e 18 anos devem certificar-se de ter lido o Termos e
                                 Condições de uso da Plataforma E-prepag, juntamente com seus pais ou
                                 responsáveis e que todo seu conteúdo tenha sido entendido e aprovado.</li>
                         </ul>

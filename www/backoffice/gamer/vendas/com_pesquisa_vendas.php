@@ -644,6 +644,11 @@ echo "***";
 		<script language="JavaScript" src="/js/anytime512.js"></script>
 		<script language="JavaScript" src="/js/anytimetz.js"></script>
 		<script language="JavaScript" src="/js/anytimeBR.js"></script>
+		<style>
+	.AnyTime-win {
+    z-index: 9999 !important;
+}
+</style>
 		<!--fim do trecho necessário para o calendario com data hora-->
         <link href="https://<?php echo $server_url_complete ;?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
         <script src="https://<?php echo $server_url_complete ;?>/js/jquery-ui-1.9.2.custom.min.js"></script>

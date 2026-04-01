@@ -11,7 +11,7 @@ require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
 
-$arquivoControle = __DIR__ . '/www/arquivos_gerados/logs/ultimo_email_int_pedidos.txt';
+$arquivoControle = '/www/arquivos_gerados/logs/ultimo_email_int_pedidos.txt';
 $intervaloEmSegundos = 2 * 60 * 60;
 
 $arquivoLog = new ManipulacaoArquivosLog($argv);
@@ -99,7 +99,7 @@ if (!$arquivoLog->haveFile()) {
             echo "$sret $post_parameters<br>";
 
             if ($buffer == false || $http_code != 200 || $rs_row['passou_30_min']) {
-                $msg .= " Pedido " . $rs_row['vg_id'] . " => Conciliado em [" . $rs_row['vg_data_concilia'] . "] => Tipo de pagamento [" . $rs_row['vg_pagto_tipo'] . "]; <br>" . PHP_EOL;
+                $msg .= " Pedido " . $rs_row['vg_id'] . " => Não foi possível conciliar. Data: [" . $rs_row['vg_data_concilia'] . "] => Tipo de pagamento [" . $rs_row['vg_pagto_tipo'] . "]; <br>" . PHP_EOL;
             }
         } //end while
 

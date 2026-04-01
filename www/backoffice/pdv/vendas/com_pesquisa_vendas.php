@@ -481,6 +481,11 @@ require_once "/www/includes/bourls.php";
 <link href="<?php echo $url; ?>:<?php echo $server_port ;?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
 <script src="<?php echo $url; ?>:<?php echo $server_port ;?>/js/jquery-ui-1.9.2.custom.min.js"></script>
 <script src="<?php echo $url;?>:<?php echo $server_port ;?>/js/global.js"></script>
+<style>
+	.AnyTime-win {
+    z-index: 9999 !important;
+}
+</style>
 <script language="javascript">
 	function GP_popupAlertMsg(msg) { //v1.0
 	  document.MM_returnValue = alert(msg);
