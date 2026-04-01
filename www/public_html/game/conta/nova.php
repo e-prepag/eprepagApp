@@ -191,7 +191,7 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                             if ($idade > $GLOBALS["IDADE_MAXIMA"]) {
                                 $cpfService = new classCPF(false);
                                 if (!$cpfService->cpfEstaNaWhiteList($cpf)) {
-                                    $erros[] = "<p>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para <a href='mailto:rc@e-prepag.com.br'>rc@e-prepag.com.br</a> solicitando a liberação do CPF.</p>";
+                                    $erros[] = "<p>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberação do CPF.</p>";
                                 }
                             }
 

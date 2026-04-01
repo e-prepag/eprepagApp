@@ -4598,7 +4598,7 @@ function cpf_page($partner_list)
 	*/
 
 	if ($is_data_valid && !verificaIdadeMaximaPermitida($user->ug_data_nascimento, $user->ug_cpf)) {
-		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para <a href='mailto:rc@e-prepag.com.br'>rc@e-prepag.com.br</a> solicitando a liberacao do CPF.</div></div</div>";
+		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberacao do CPF.</div></div</div>";
 		die();
 	}
 
@@ -4708,7 +4708,7 @@ function cpf_page_inicial($usuarioId, $vg_integracao_parceiro_origem_id)
 	$is_data_valid = verificaNome($user->ug_nome_cpf) && verificaCPF_int($user->ug_cpf) && validarDataReal($user->ug_data_nascimento);
 
 	if ($is_data_valid && !verificaIdadeMaximaPermitida($user->ug_data_nascimento, $user->ug_cpf)) {
-		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para <a href='mailto:rc@e-prepag.com.br'>rc@e-prepag.com.br</a> solicitando a liberacao do CPF.</div></div</div>";
+		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberacao do CPF.</div></div</div>";
 		die();
 	}
 
@@ -4860,7 +4860,7 @@ function cpf_page_gamer()
 		} //end if(isset($controller->logado) && $controller->logado)
 		die();
 	} elseif (!verificaIdadeMaximaPermitida($user->ug_data_nascimento, $user->ug_cpf)) {
-		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para <a href='mailto:rc@e-prepag.com.br'>rc@e-prepag.com.br</a> solicitando a liberacao do CPF.</div></div</div>";
+		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, e necessario validacao de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberacao do CPF.</div></div</div>";
 		die();
 	} elseif (!verificaIdadeMinima($user->ug_data_nascimento)) {
 		echo "<div class='row'> <div class='col-lg-12'><div class='alert alert-danger' role='alert'>O produto " . $GLOBALS["produto_idade_minima"] . " é destinado para maiores de " . $GLOBALS["IDADE_MINIMA"] . " anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.</div></div</div>";
