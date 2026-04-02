@@ -2099,8 +2099,13 @@ if ($msg != "") {
                     }
                     ?>
                     <!--<td align="center"><strong>Perfil&nbsp;Limite</strong></td>-->
-                    <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_perfil_saldo&inicial=" . $inicial . $varsel ?>">Perfil Saldo</a></strong></td>
-                    <td align="center"><strong>Data última compra/venda</a></strong></td>
+                    <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_vip&inicial=" . $inicial . $varsel ?>">VIP</a>
+                            <?php if ($ncamp == 'ug_vip') echo "<img src=" . $img_seta . " width='10' height='7' align='absmiddle'>"; ?></strong></td>
+                    <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=te_descricao&inicial=" . $inicial . $varsel ?>">Tipo Estabelecimento</a>
+                            <?php if ($ncamp == 'te_descricao') echo "<img src=" . $img_seta . " width='10' height='7' align='absmiddle'>"; ?></strong></td>
+                    <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_perfil_saldo&inicial=" . $inicial . $varsel ?>">Perfil Saldo</a>
+                            <?php if ($ncamp == 'ug_perfil_saldo') echo "<img src=" . $img_seta . " width='10' height='7' align='absmiddle'>"; ?></strong></td>
+                    <td align="center"><strong>Data última compra/venda</strong></td>
 
                     <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_coord_lng&inicial=" . $inicial . $varsel ?>">GMaps</a></strong></td>
                     <td align="center"><strong>VMaps</strong></td>
@@ -2207,6 +2212,12 @@ if ($msg != "") {
                             <?php
                             }
                             ?>
+                            <?php
+                            $vip_map_cc = [0 => 'Normal', 1 => 'VIP', 2 => 'Master', 3 => 'Black', 4 => 'Gold', 5 => 'Platinum'];
+                            $vip_label_cc = isset($vip_map_cc[$rs_usuario_row['ug_vip']]) ? $vip_map_cc[$rs_usuario_row['ug_vip']] : ($rs_usuario_row['ug_vip'] ?? '-');
+                            ?>
+                            <td align="center"><?php echo $vip_label_cc; ?></td>
+                            <td><?php echo $rs_usuario_row['te_descricao'] ?? ''; ?></td>
                             <td>
                                 <font color='<?php echo (($rs_usuario_row['ug_perfil_saldo'] < 0) ? "red" : (($rs_usuario_row['ug_perfil_saldo'] > 0) ? "blue" : "black")); ?>'>R$ <?php echo number_format($rs_usuario_row['ug_perfil_saldo'], 2, '.', '.') ?>
                             </td>
@@ -2354,6 +2365,12 @@ if ($msg != "") {
                             }
                             ?>
                             <!--<td>R$ <?php echo number_format($rs_usuario_row['ug_perfil_limite'], 2, '.', '.') ?></td>-->
+                            <?php
+                            $vip_map = [0 => 'Normal', 1 => 'VIP', 2 => 'Master', 3 => 'Black', 4 => 'Gold', 5 => 'Platinum'];
+                            $vip_label = isset($vip_map[$rs_usuario_row['ug_vip']]) ? $vip_map[$rs_usuario_row['ug_vip']] : ($rs_usuario_row['ug_vip'] ?? '-');
+                            ?>
+                            <td align="center"><?php echo $vip_label; ?></td>
+                            <td><?php echo $rs_usuario_row['te_descricao'] ?? ''; ?></td>
                             <td>
                                 <font color='<?php echo (($rs_usuario_row['ug_perfil_saldo'] < 0) ? "red" : (($rs_usuario_row['ug_perfil_saldo'] > 0) ? "blue" : "black")); ?>'>R$ <?php echo number_format($rs_usuario_row['ug_perfil_saldo'], 2, '.', '.') ?>
                             </td>

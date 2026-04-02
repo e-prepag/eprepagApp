@@ -2,13 +2,19 @@
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL);
-$sql  = "select *, (SELECT vg_data_inclusao
+$sql  = "select ug.*, te.te_descricao, (SELECT vg_data_inclusao
      FROM tb_dist_venda_games 
      WHERE vg_ug_id = ug.ug_id and vg_ultimo_status = 5
      ORDER BY vg_data_inclusao DESC 
      LIMIT 1) AS ultima_data_compra
 		 from dist_usuarios_games ug\n";
 if ($tf_u_com_totais_vendas) {	//&& $dd_opr_codigo
+	$sql  = "select ug.*, te.te_descricao, v.vg_valor, v.vg_qtde_itens, v.vg_data_primeira_venda, v.vg_data_ultima_venda, (SELECT vg_data_inclusao
+     FROM tb_dist_venda_games 
+     WHERE vg_ug_id = ug.ug_id and vg_ultimo_status = 5
+     ORDER BY vg_data_inclusao DESC 
+     LIMIT 1) AS ultima_data_compra
+		 from dist_usuarios_games ug\n";
 	$sql  .= "left outer join (
 				select vg_ug_id, sum(vgm.vgm_valor * vgm.vgm_qtde) as vg_valor, sum(vgm.vgm_qtde) as vg_qtde_itens, min(vg_data_inclusao) as vg_data_primeira_venda, max(vg_data_inclusao) as vg_data_ultima_venda 
 				from tb_dist_venda_games vg 
@@ -21,6 +27,7 @@ if ($tf_u_com_totais_vendas) {	//&& $dd_opr_codigo
 $sql .= " left outer join tb_tipo_estabelecimento te ON (te.te_id = ug.ug_te_id) \n";
 
 $sql  .= "where 1=1 ";
+
 if ($tf_u_codigo)		$sql .= " and ug.ug_id in (" . $tf_u_codigo . ") ";
 if ($tf_u_status)		$sql .= " and ug.ug_ativo = " . $tf_u_status . " ";
 // LIVRODJX if($tf_u_telefone)      $sql .= " and ug.ug_telefone = " . $tf_u_telefone . "" ;
