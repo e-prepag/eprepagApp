@@ -125,6 +125,9 @@ $ARRAY_INIBI_PRODUTOS_VENDA_TO_ID_HARDCODE = array(281);
 //Constante de idade mínima para cadastro
 $IDADE_MINIMA = 16;
 
+//Constante de idade máxima sem validação adicional de RC
+$IDADE_MAXIMA = 60;
+
 //Constante que define se haverá transferência SFTP dos arquivos para o Windows
 define("SFTP_TRANSFER", false);
 

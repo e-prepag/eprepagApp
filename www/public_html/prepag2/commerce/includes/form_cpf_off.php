@@ -67,6 +67,8 @@ if (isset($_REQUEST['formsubmit'])) {
 
     if ($testeCPF == 112) {
         $errors[] = "Venda não autorizada para menores de " . $GLOBALS["IDADE_MINIMA"] . " anos.";
+    } elseif ($testeCPF == 160) {
+        $errors[] = "Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberação do CPF.";
     }
 
     //Testando se o CPF consta na BlackList
