@@ -5,6 +5,7 @@ require_once "../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
+require_once $raiz_do_projeto . "includes/permissao_pin.php";
 
 set_time_limit(3000);
 
@@ -971,7 +972,7 @@ if (!isset($_POST['download'])) {
                                                 }
                                             ?>
                                                 <tr class="trListagem">
-                                                    <td class="text-center"><?php echo $pgrow['pin_codinterno'] ?></td>
+                                                    <td class="text-center"><?php echo mascarar_pin_id($pgrow['pin_codinterno']) ?></td>
                                                     <td class="text-center"><?php echo $pgrow['opr_nome'] ?></td>
                                                     <td class="text-center"><?php if ($pgrow['pin_datavenda']) { ?><?php echo monta_data($pgrow['pin_datavenda']); ?> - <?php echo $pgrow['pin_horavenda'];
                                                                                                                                                                     } else echo "--"; ?></td>
@@ -982,7 +983,7 @@ if (!isset($_POST['download'])) {
                                                         <td class="text-center">
                                                             <?php
                                                             if (b_is_Administrator()) {
-                                                                echo ((strlen(trim($case_codigo)) > 0) ? formata_string($case_codigo, '', 4) : "--vazio--");
+                                                                echo ((strlen(trim($case_codigo)) > 0) ? formata_string(mascarar_pin_codigo($case_codigo), '', 4) : "--vazio--");
                                                             } else {
                                                                 echo "----&nbsp;----";
                                                             }
@@ -995,7 +996,7 @@ if (!isset($_POST['download'])) {
                                                         <?php
                                                         // Mostra pin_serial para não-Publishers e para NDoors (opr_codigo=33) e PayByCash (opr_codigo=28)
                                                         if (b_is_Administrator() || b_is_PublisherMostraEstoquePINs()) {
-                                                            echo $pin_serial;
+                                                            echo mascarar_pin_codigo($pin_serial);
                                                         } else {
                                                             echo "-----&nbsp;-----";
                                                         }
@@ -1121,12 +1122,12 @@ if (isset($_POST['download'])) {
 
         $csv_row = array();
 
-        $csv_row[LANG_PINS_ID] = $pgrow['pin_codinterno'];
+        $csv_row[LANG_PINS_ID] = mascarar_pin_id($pgrow['pin_codinterno']);
         $csv_row[LANG_PINS_OPERATOR] = $pgrow['opr_nome'];
         $csv_row[LANG_PINS_SALES_DATE] = ($pgrow['pin_datavenda'] ? monta_data($pgrow['pin_datavenda']) . " - " . $pgrow['pin_horavenda'] : "--");
 
         if (b_is_Administrator() || b_is_PublisherMostraEstoquePINs()) {
-            $csv_row[LANG_PINS_PIN_NUMBER] = "'" . $pin_serial . "'";
+            $csv_row[LANG_PINS_PIN_NUMBER] = "'" . mascarar_pin_codigo($pin_serial) . "'";
         } else {
             $csv_row[LANG_PINS_PIN_NUMBER] = "---- ----";
         }
@@ -1135,7 +1136,7 @@ if (isset($_POST['download'])) {
             $csv[LANG_PINS_SERIAL_NUMBER] = "???";
         } else {
             if (b_is_Administrator())
-                $csv_row[LANG_PINS_SERIAL_NUMBER] = ((strlen(trim($case_codigo)) > 0) ? formata_string($case_codigo, '', 4) : "--vazio--");
+                $csv_row[LANG_PINS_SERIAL_NUMBER] = ((strlen(trim($case_codigo)) > 0) ? formata_string(mascarar_pin_codigo($case_codigo), '', 4) : "--vazio--");
             else
                 $csv_row[LANG_PINS_SERIAL_NUMBER] = "-----";
         }
