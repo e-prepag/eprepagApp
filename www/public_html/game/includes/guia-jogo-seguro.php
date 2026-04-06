@@ -5,7 +5,7 @@ $termosDeUso = '
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
 </style>
 
-<link href="/css/guia-jogo-seguro.css" rel="stylesheet">
+<link href="/css/guia-de-jogo-seguro.css" rel="stylesheet">
 
 <div id="guia-jogo-seguro">
 
