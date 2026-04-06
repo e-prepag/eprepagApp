@@ -223,6 +223,23 @@ if (!empty($_POST)) {
             <p>respostas para sua dúvida</p>
         </a>
     </div>
+    <div class="col-md-8 text-center"
+        style="
+        height:220px;
+        overflow:hidden;
+        border-radius:8px;
+     ">
+
+        <img
+            src="/css/images/banner-jogo-seguro.png"
+            style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        ">
+
+    </div>
     <div class="col-md-12 borda-top-azul top10">
     </div>
     <div class="col-md-4 txt-cinza text-center top20">

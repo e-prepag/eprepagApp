@@ -378,10 +378,10 @@ $termosDeUso = strip_tags($termosDeUso);
           <i class="fas fa-exclamation-triangle"></i>Devido à instabilidade na Receita Federal, seu cadastro na E-prepag não poderá ser finalizado neste momento, mas você pode se cadastrar no Atimopay e comprar créditos para seus games : <a href="https://linktr.ee/atimopay">https://linktr.ee/atimopay</a>
         </div> -->
 
-        <div class="alert alert-success" style="margin: 5px 10px;" role="alert">
+        <!-- <div class="alert alert-success" style="margin: 5px 10px;" role="alert">
             <i class="fas fa-gamepad"></i> Prefere comprar seus giftcards pelo celular ? Baixe agora mesmo o Atimopay <a
                 href="https://linktr.ee/atimopay">clicando aqui</a>.
-        </div>
+        </div> -->
         <div class="col-md-12 txt-verde top10">
             <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong
                 class="pull-left">
@@ -564,6 +564,16 @@ $termosDeUso = strip_tags($termosDeUso);
             </form>
         </div>
         <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+            <div class="banner">
+                <img
+                    src="/css/images/banner-jogo-seguro2.png"
+                    style="display: block;
+                        object-fit: cover;
+                        border-radius: 8px;
+                        width: 100%;
+                        margin: 0 auto;
+                    ">
+            </div>
             <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 txt-azul-claro">
                 <h2>Seja um ponto de venda</h2>
             </div>

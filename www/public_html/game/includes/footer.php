@@ -78,6 +78,8 @@
                         segura</a></p>
                 <p><a href="/game/politica-de-privacidade.php" class="txt-cinza-claro2 decoration-none"
                         target="_blank">Política de Privacidade</a></p>
+                <p><a href="/game/guia-jogo-seguro.php" class="txt-cinza-claro2 decoration-none"
+                        target="_blank">Guia de jogo seguro para pais e adolescentes</a></p>
             </div>
             <div class="col-md-3 col-sm-6">
                 <p><a href="<?= FORMASPAG_URL ?>" class="txt-cinza-claro2 decoration-none" target="_blank">Veja aqui
@@ -101,9 +103,10 @@
                 <script type="text/javascript">
                     var __dcid = __dcid || [];
                     __dcid.push(["DigiCertClickID_l47UPnR6", "13", "s", "black", "l47UPnR6"]);
-                    (function () {
+                    (function() {
                         var cid = document.createElement("script");
-                        cid.async = true; cid.src = "//seal.digicert.com/seals/cascade/seal.min.js";
+                        cid.async = true;
+                        cid.src = "//seal.digicert.com/seals/cascade/seal.min.js";
                         var s = document.getElementsByTagName("script");
                         var ls = s[(s.length - 1)];
                         ls.parentNode.insertBefore(cid, ls.nextSibling);
@@ -112,7 +115,26 @@
                 <script async="" src="//seal.digicert.com/seals/cascade/seal.min.js"></script>
                 <!-- End DigiCert/ClickID site seal HTML and JavaScript -->
                 <script type="text/javascript">
-                    (function (a, e, c, f, g, h, b, d) { var k = { ak: "1052651518", cl: "HjvTCPXqhnIQ_t_49QM", autoreplace: "3030 9101" }; a[c] = a[c] || function () { (a[c].q = a[c].q || []).push(arguments) }; a[g] || (a[g] = k.ak); b = e.createElement(h); b.async = 1; b.src = "//www.gstatic.com/wcm/loader.js"; d = e.getElementsByTagName(h)[0]; d.parentNode.insertBefore(b, d); a[f] = function (b, d, e) { a[c](2, b, k, d, null, new Date, e) }; a[f]() })(window, document, "_googWcmImpl", "_googWcmGet", "_googWcmAk", "script");
+                    (function(a, e, c, f, g, h, b, d) {
+                        var k = {
+                            ak: "1052651518",
+                            cl: "HjvTCPXqhnIQ_t_49QM",
+                            autoreplace: "3030 9101"
+                        };
+                        a[c] = a[c] || function() {
+                            (a[c].q = a[c].q || []).push(arguments)
+                        };
+                        a[g] || (a[g] = k.ak);
+                        b = e.createElement(h);
+                        b.async = 1;
+                        b.src = "//www.gstatic.com/wcm/loader.js";
+                        d = e.getElementsByTagName(h)[0];
+                        d.parentNode.insertBefore(b, d);
+                        a[f] = function(b, d, e) {
+                            a[c](2, b, k, d, null, new Date, e)
+                        };
+                        a[f]()
+                    })(window, document, "_googWcmImpl", "_googWcmGet", "_googWcmAk", "script");
                 </script>
                 </p>
             </div>
@@ -140,8 +162,8 @@
 <script type="text/javascript" async
     src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/a16eb379-4718-4567-8bfa-b86c5fd5ce3a-loader.js"></script>
 <script>
-    $(function () {
-        $(".redirecionamento").click(function () {
+    $(function() {
+        $(".redirecionamento").click(function() {
             window.open("http://" + $(this).attr("link"));
         })
     });
@@ -152,9 +174,11 @@
     _uacct = "UA-1903237-3";
     urchinTracker();
 
-    $(function () {
-        $(".banner").click(function () {
-            $.get("/creditos/ajax/clickBanner.php", { id: $(this).attr("id") });
+    $(function() {
+        $(".banner").click(function() {
+            $.get("/creditos/ajax/clickBanner.php", {
+                id: $(this).attr("id")
+            });
         });
     });
 </script>

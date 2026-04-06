@@ -1,0 +1,90 @@
+body {
+  background: #f2f2f2;
+  font-family: "Montserrat", sans-serif;
+}
+
+.pagina {
+  width: 900px;
+  margin: 40px auto;
+  background: #ffffff;
+
+  border: 6px dashed #00aeef;
+  border-radius: 12px;
+
+  padding: 30px;
+}
+
+.topo {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.logo {
+  max-height: 90px;
+}
+
+.banner {
+  text-align: center;
+  margin: 10px 0 20px 0;
+}
+
+.banner img {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.conteudo {
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #00aeef;
+  text-align: center;
+}
+
+h2 {
+  color: #268fbd;
+  margin: 18px 0 10px 0;
+}
+
+h3 {
+  color: #268fbd;
+  margin-top: 20px;
+}
+
+p {
+  line-height: 1.6;
+  color: #333;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+.checklist li {
+  font-weight: bold;
+}
+
+.conteudo a {
+  color: #1f1f1f;
+  text-decoration: none;
+}
+
+.conteudo a:hover {
+  text-decoration: underline;
+}
+
+.rodape {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 14px;
+  color: #777;
+}
