@@ -565,14 +565,16 @@ $termosDeUso = strip_tags($termosDeUso);
         </div>
         <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
             <div class="banner">
-                <img
-                    src="/css/images/banner-jogo-seguro2.png"
-                    style="display: block;
+                <a href="/game/guia-jogo-seguro.php.php">
+                    <img
+                        src="/css/images/banner-jogo-seguro2.png"
+                        style="display: block;
                         object-fit: cover;
                         border-radius: 8px;
                         width: 100%;
                         margin: 0 auto;
                     ">
+                </a>
             </div>
             <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 txt-azul-claro">
                 <h2>Seja um ponto de venda</h2>

@@ -230,14 +230,16 @@ if (!empty($_POST)) {
         border-radius:8px;
      ">
 
-        <img
-            src="/css/images/banner-jogo-seguro.png"
-            style="
+        <a href="/game/guia-jogo-seguro.php.php">
+            <img
+                src="/css/images/banner-jogo-seguro.png"
+                style="
             width:100%;
             height:100%;
             object-fit:cover;
             display:block;
         ">
+        </a>
 
     </div>
     <div class="col-md-12 borda-top-azul top10">
