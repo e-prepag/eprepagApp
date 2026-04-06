@@ -193,7 +193,7 @@ $termosDeUso = '
         <ul>
             <li>
                 <a href="https://ead.safernet.org.br/cidadaodigital/" target="_blank">
-                    Curso <strong><u>Cidadania Digital para Jovens</u></strong>
+                    Curso: <strong><u>Cidadania Digital para Jovens</u></strong>
                 </a>
             </li>
 
