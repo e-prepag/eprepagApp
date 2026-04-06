@@ -7,6 +7,8 @@ $termosDeUso = '
 
 <link href="/css/guia-jogo-seguro.css" rel="stylesheet">
 
+<div id="guia-jogo-seguro">
+
 <div class="pagina-guia-seguro">
 
     <!-- LOGO -->
@@ -216,4 +218,5 @@ $termosDeUso = '
 
     </div>
 
+</div>
 </div>';
