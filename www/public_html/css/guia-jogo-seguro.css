@@ -1,17 +1,13 @@
-body {
-  background: #f2f2f2;
-  font-family: "Montserrat", sans-serif;
-}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;700&family=Open+Sans:wght@400;600&display=swap");
 
-.pagina {
+.pagina-guia-seguro {
   width: 900px;
   margin: 40px auto;
-  background: #ffffff;
-
+  background: #f2f2f2;
   border: 6px dashed #00aeef;
   border-radius: 12px;
-
   padding: 30px;
+  font-family: "Open Sans", sans-serif;
 }
 
 .topo {
@@ -41,48 +37,73 @@ body {
   margin: 0 auto;
 }
 
-h1 {
+.pagina-guia-seguro h1 {
+  font-family: "Inter", sans-serif;
+  font-size: 34px;
+  font-weight: 700;
   color: #00aeef;
-  text-align: center;
+
+  margin: 30px 0 18px 0;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
 }
 
-h2 {
+.pagina-guia-seguro h2 {
+  font-family: "Inter", sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+
+  color: #00aeef;
+
+  margin: 28px 0 12px 0;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e6f2f8;
+}
+
+.pagina-guia-seguro h3 {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+
   color: #268fbd;
-  margin: 18px 0 10px 0;
+
+  margin: 20px 0 8px 0;
+  line-height: 1.4;
 }
 
-h3 {
-  color: #268fbd;
-  margin-top: 20px;
-}
-
-p {
+.pagina-guia-seguro p {
   line-height: 1.6;
+  font-size: 16px;
   color: #333;
 }
 
-ul {
+.pagina-guia-seguro ul {
+  color: #333;
   padding-left: 20px;
 }
 
-li {
+.pagina-guia-seguro li {
+  color: #333;
   margin-bottom: 8px;
 }
 
-.checklist li {
+.pagina-guia-seguro .checklist li {
   font-weight: bold;
 }
 
-.conteudo a {
+.pagina-guia-seguro .conteudo a {
   color: #1f1f1f;
   text-decoration: none;
 }
 
-.conteudo a:hover {
+.pagina-guia-seguro .conteudo a:hover {
   text-decoration: underline;
 }
 
-.rodape {
+.pagina-guia-seguro .rodape {
   text-align: center;
   margin-top: 40px;
   font-size: 14px;
