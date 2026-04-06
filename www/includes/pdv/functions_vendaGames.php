@@ -3332,6 +3332,13 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
 
     // Recupera as vendas pendentes de boleto ExpressMoney LH
     if ($msg == "") {
+        $params_venda = [];
+        $where_vg = "";
+        if ($vg_id && $vg_id > 0) {
+            $where_vg = " and vg.vg_id = $1 ";
+            $params_venda[] = $vg_id;
+        }
+
         $sql =
             "select * from tb_dist_venda_games vg 
                                 where ((vg.vg_ultimo_status = " .
@@ -3348,12 +3355,10 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
             "
                                                  and vg_concilia=0 and substr(vg_pagto_num_docto,1,1) = '4'
                                                  and vg_data_inclusao > (CURRENT_DATE - INTERVAL '15 days')
-                                ";
-        if ($vg_id && $vg_id > 0) {
-            $sql .= "and vg.vg_id = $vg_id	";
-        }
+                                " . $where_vg;
+
         echo "sqlA0: $sql" . PHP_EOL;
-        $rs_venda = SQLexecuteQuery($sql);
+        $rs_venda = SQLexecuteQueryParams($sql, $params_venda);
         if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         }
@@ -3373,11 +3378,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
             // obtem o valor total da venda
             $sql =
                 "select * from dist_boleto_bancario_games 
-                                        where bbg_ug_id=" .
-                $vg_ug_id .
-                " and bbg_pago=0 and  bbg_vg_id=" .
-                $vg_id .
-                "
+                                        where bbg_ug_id=$1 and bbg_pago=0 and  bbg_vg_id=$2
                                         order by bbg_data_inclusao desc";
 
             echo " (vg_id: $vg_id) elapsed total time (" .
@@ -3389,7 +3390,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                 "" .
                 PHP_EOL;
 
-            $rs_venda_dist = SQLexecuteQuery($sql);
+            $rs_venda_dist = SQLexecuteQueryParams($sql, [$vg_ug_id, $vg_id]);
             if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
                 //echo "  Encontrados (2) ".pg_num_rows($rs_venda_dist)." registros dist".PHP_EOL;
 
@@ -3398,12 +3399,11 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
 
                     //Procura boleto
+                    $params_bol = [$vg_pagto_banco];
                     $sql = "select bol_codigo ";
                     $sql .= "from boletos_pendentes, bancos_financeiros ";
                     $sql .=
-                        "where (bol_banco = bco_codigo) and (bco_rpp = 1) and bol_aprovado = 0 and bol_banco = '" .
-                        $vg_pagto_banco .
-                        "' ";
+                        "where (bol_banco = bco_codigo) and (bco_rpp = 1) and bol_aprovado = 0 and bol_banco = $1 ";
                     if (
                         $vg_pagto_banco == "237" ||
                         $vg_pagto_banco == "341" ||
@@ -3412,19 +3412,19 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                     ) {
                         if ($vg_pagto_banco == "341") {
                             $sql .=
-                                " and bol_documento = '4" .
-                                str_pad($vg_id, 8, "0", STR_PAD_LEFT) .
-                                "'";
+                                " and bol_documento = $2";
+                            $params_bol[] = "4" . str_pad($vg_id, 8, "0", STR_PAD_LEFT);
                             $sql .=
-                                " and bol_valor = " . ($valor - $custoBoleto); //($total_geral + $GLOBALS['BOLETO_MONEY_BRADESCO_TAXA_ADICIONAL']);
+                                " and bol_valor = $3"; //($total_geral + $GLOBALS['BOLETO_MONEY_BRADESCO_TAXA_ADICIONAL']);
+                            $params_bol[] = ($valor - $custoBoleto);
                         }
                         //end if($vg_pagto_banco == "341")
                         else {
                             $sql .=
-                                " and bol_documento like '4" .
-                                substr($vg_pagto_num_docto, 1) .
-                                "%'";
-                            $sql .= " and bol_valor = " . $valor; //($total_geral + $GLOBALS['BOLETO_MONEY_BRADESCO_TAXA_ADICIONAL']);
+                                " and bol_documento like $2";
+                            $params_bol[] = "4" . substr($vg_pagto_num_docto, 1) . "%";
+                            $sql .= " and bol_valor = $3"; //($total_geral + $GLOBALS['BOLETO_MONEY_BRADESCO_TAXA_ADICIONAL']);
+                            $params_bol[] = $valor;
                         } //end else if($vg_pagto_banco == "341")
                     } else {
                         $msg .=
@@ -3436,7 +3436,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                         continue;
                     }
 
-                    $rs_bol = SQLexecuteQuery($sql);
+                    $rs_bol = SQLexecuteQueryParams($sql, $params_bol);
                     if ($rs_bol && pg_num_rows($rs_bol) > 0) {
                         $rs_bol_row = pg_fetch_array($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];

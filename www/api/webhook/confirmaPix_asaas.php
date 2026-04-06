@@ -290,20 +290,16 @@ class RecebePix
 		$cpf = $data['cpfCnpj'] ? preg_replace('/\D/', '', $data['cpfCnpj']) : 'N ret CpfCnpj';
 		$name = $data['name'] ? $data['name'] : 'Nao retornou nome';
 
-		$sql = "SELECT * FROM tb_pag_pix WHERE numcompra = '" . substr($idpedido, 2, 17) . "'; ";
-		$rs_teste_existencia = SQLexecuteQuery($sql);
+		$sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1; ";
+		$rs_teste_existencia = SQLexecuteQueryParams($sql, [substr($idpedido, 2, 17)]);
 		if (pg_num_rows($rs_teste_existencia) == 0) {
 			$sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
                                                 cpf_cnpj_pagador, 
                                                 nome_pagador, 
                                                 json_resposta)
-                                    VALUES (
-                                            '" . substr($idpedido, 2, 17) . "', 
-                                            '" . $cpf . "',
-                                            '" . $name . "',
-                                            '" . $resposta_json . "');";
-			SQLexecuteQuery($sql);
+                                    VALUES ($1, $2, $3, $4);";
+			SQLexecuteQueryParams($sql, [substr($idpedido, 2, 17), $cpf, $name, $resposta_json]);
 		}
 	}
 
