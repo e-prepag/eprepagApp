@@ -22,7 +22,7 @@
 
         <!-- BANNER -->
         <div class="banner">
-            <a href="/game/guia-jogo-seguro.php.php">
+            <a href="/game/guia-jogo-seguro.php">
                 <img src="/css/images/banner-jogo-seguro.png">
             </a>
         </div>

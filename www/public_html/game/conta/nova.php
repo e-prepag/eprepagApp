@@ -565,7 +565,7 @@ $termosDeUso = strip_tags($termosDeUso);
         </div>
         <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
             <div class="banner">
-                <a href="/game/guia-jogo-seguro.php.php">
+                <a href="/game/guia-jogo-seguro.php">
                     <img
                         src="/css/images/banner-jogo-seguro2.png"
                         style="display: block;

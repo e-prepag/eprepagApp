@@ -230,7 +230,7 @@ if (!empty($_POST)) {
         border-radius:8px;
      ">
 
-        <a href="/game/guia-jogo-seguro.php.php">
+        <a href="/game/guia-jogo-seguro.php">
             <img
                 src="/css/images/banner-jogo-seguro.png"
                 style="
