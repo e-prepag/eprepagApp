@@ -99,7 +99,7 @@ if (!isset($_POST["dist"])) {
 			$verificaPinIp = Garena::verificaQtdePin($_POST["codigo"], Garena::getClientIP(), $dataRequisicao);
 			$verificaPinIpLote = Garena::verificaLotePin(Garena::getClientIP(), $dataRequisicao);
 			if ($verificaPinIp != true) {
-				$mensagemRetono = json_encode(["Erro" => "Erro ao validar seu IP [".Garena::getClientIP()."] (EPP0049)."]);
+				$mensagemRetono = json_encode(["Erro" => "Seu resgate foi invalidado (EPP0049)."]);
 				Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
 				echo $mensagemRetono;
 				exit;

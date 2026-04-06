@@ -7,6 +7,7 @@ ob_start();
 require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
+require_once $raiz_do_projeto . "includes/permissao_pin.php";
 
 $tf_data_inicial   = $_POST['tf_data_inicial'] ?? null;
 $tf_data_final     = $_POST['tf_data_final'] ?? null;
@@ -444,11 +445,11 @@ if ($BtnSearch) {
                                         $opr_codigo    = $pgrow['opr_codigo'];
                                     ?>
                                         <tr class="trListagem">
-                                            <td align="right"><?php echo $pgrow['pin_codinterno'] ?></td>
+                                            <td align="right"><?php echo mascarar_pin_id($pgrow['pin_codinterno']) ?></td>
                                             <td><?php echo $pgrow['opr_nome'] ?></td>
                                             <td align="center"><?php if ($pgrow['pin_datavenda']) { ?><?php echo monta_data($pgrow['pin_datavenda']); ?> - <?php echo $pgrow['pin_horavenda'];
                                                                                                                                                         } else echo "--"; ?></td>
-                                            <td><?php echo $pin_serial; ?></td>
+                                            <td><?php echo mascarar_pin_codigo($pin_serial); ?></td>
                                             <td align="right"><?php echo "R$ " . number_format($pgrow['pin_valor'], 2, ',', '.'); ?></td>
                                             <?php
                                             if (!b_is_Publisher()) {
