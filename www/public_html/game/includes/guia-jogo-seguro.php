@@ -1,9 +1,13 @@
 <?php
-echo '
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+$termosDeUso = '
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+</style>
+
 <link href="/css/guia-jogo-seguro.css" rel="stylesheet">
-';
-$termosDeUso = '<div class="pagina-guia-seguro">
+
+<div class="pagina-guia-seguro">
 
     <!-- LOGO -->
     <div class="topo">
