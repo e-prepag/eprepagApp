@@ -40,6 +40,16 @@ if ($resultado) {
 		$query->bindValue(":ID", $id);
 		$query->bindValue(":ATIVO", $ativo);
 		$query->execute();
+
+		$queryDeleteObs = $conexao->prepare("DELETE FROM dist_usuarios_games_obs
+			WHERE ug_id = :ID
+			  AND ugo_status_user IS NOT NULL
+			  AND ugo_data >= (NOW() - INTERVAL '2 second')
+			  AND ugo_data <= NOW();
+		");
+		$queryDeleteObs->bindValue(":ID", $id);
+		$queryDeleteObs->execute();
+
 		if ($query->rowCount() > 0) {
 			echo json_encode(["situacao" => "success", "msg" => "Autenticador removido com sucesso."]);
 			http_response_code(200);
