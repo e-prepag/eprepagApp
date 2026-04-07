@@ -1,5 +1,12 @@
 <?php
-$sql  = "select * 
+$sql  = "select ug.* ";
+if (is_array($a_lista_usuarios_VIP) && count($a_lista_usuarios_VIP) > 0) {
+	$s_list_vip_for_select = implode(",", $a_lista_usuarios_VIP);
+	$sql .= ", case when ug.ug_id in ($s_list_vip_for_select) then 1 else 0 end as ug_flag_vip ";
+} else {
+	$sql .= ", 0 as ug_flag_vip ";
+}
+	$sql .= "
 	";
 if ($somenteContar == 1) {
 	$sql  = "select count(*) as total
@@ -141,6 +148,29 @@ if ($tf_u_usuario_vip) {
 		}
 	}
 }
+
+// Campos permitidos para ordenação na busca de usuários.
+$a_order_by_fields = array(
+	'ug_id' => 'ug_id',
+	'ug_ativo' => 'ug_ativo',
+	'ug_nome' => 'ug_nome',
+	'ug_email' => 'ug_email',
+	'ug_data_inclusao' => 'ug_data_inclusao',
+	'ug_data_encerramento_conta' => 'ug_data_encerramento_conta',
+	'ug_cpf' => 'ug_cpf',
+	'ug_login' => 'ug_login',
+	'ug_endereco' => 'ug_endereco',
+	'ug_bairro' => 'ug_bairro',
+	'ug_cidade' => 'ug_cidade',
+	'ug_estado' => 'ug_estado',
+	'ug_cep' => 'ug_cep',
+	'ug_perfil_saldo' => 'ug_perfil_saldo',
+	'ug_flag_vip' => 'ug_flag_vip',
+	'vg_valor' => 'vg_valor',
+	'vg_qtde_itens' => 'vg_qtde_itens',
+	'vg_data_ultima_venda' => 'vg_data_ultima_venda'
+);
+$sql_order_field = $a_order_by_fields[$ncamp ?? ''] ?? 'ug_id';
 
 if (b_IsUsuarioWagner()) {
 	//echo str_replace("\n", "<br>\n", $sql)."<br>";

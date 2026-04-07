@@ -321,7 +321,7 @@ if (isset($BtnSearch)) {
                 include $raiz_do_projeto . "includes/gamer/inc_pesquisa_usuarios_sql.php";
 
                 //Ordem
-                $sql .= " order by " . $ncamp;
+                $sql .= " order by " . $sql_order_field;
                 if ($ordem == 1) {
                         $sql .= " desc ";
                         $img_seta = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/seta_down.gif";
@@ -1129,8 +1129,10 @@ require_once "/www/includes/bourls.php";
                                                                         <td align="center"><strong>
                                                                                         <font class="texto">Vendas</font></a>
                                                                                 </strong></td>
-                                                                        <td align="center"><strong>
-                                                                                        <font class="texto">Saldo</font></a>
+                                                                        <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_perfil_saldo&inicial=" . $inicial . $varsel ?>" class="link_branco">
+                                                                                                <font class="texto">Saldo</font>
+                                                                                        </a>
+                                                                                        <?php if ($ncamp == 'ug_perfil_saldo') echo "<img src=" . $img_seta . " width='10' height='7' align='absmiddle'>"; ?>
                                                                                 </strong></td>
                                                                         <?php if (strtolower($tf_u_compet_aceito_regulamento) != "") { ?>
                                                                                 <td align="center"><strong>
@@ -1173,10 +1175,13 @@ require_once "/www/includes/bourls.php";
                                                                         <?php
                                                                         }
                                                                         ?>
-                                                                        <td align="center"><strong>
-                                                                                        <font class="texto">
-                                                                                                <nobr>VIP?</nobr>
-                                                                        </td>
+                                                                        <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_flag_vip&inicial=" . $inicial . $varsel ?>" class="link_branco">
+                                                                                                <font class="texto">
+                                                                                                        <nobr>VIP?</nobr>
+                                                                                                </font>
+                                                                                        </a>
+                                                                                        <?php if ($ncamp == 'ug_flag_vip') echo "<img src=" . $img_seta . " width='10' height='7' align='absmiddle'>"; ?>
+                                                                                </strong></td>
                                                                         <td align="center"><strong>
                                                                                         <font class="texto">
                                                                                                 <nobr>Data de Nascimento</td>
