@@ -440,9 +440,11 @@ define("DESTINATARIO_EMAIL_DEV", "luis.gustavo@e-prepag.com.br");
             ?>
         </div>
         <div class="col-md-6 col-sm-12 col-xs-12 text-right canal-denuncia-banners" style="padding-top: 20px;">
-            <img src="/imagens/banner-canal-denuncia-1.png" alt="" class="img-responsive pull-right" style="margin-bottom: 5px; clear: both; width: 100%; aspect-ratio: 4 / 3; object-fit: fill;">
-            <img src="/imagens/banner-canal-denuncia-2.png" alt="" class="img-responsive pull-right" style="margin-bottom: 5px; clear: both; width: 100%; aspect-ratio: 4 / 3; object-fit: fill;">
-            <!-- <img src="/imagens/banner-canal-denuncia-3.png" alt="" class="img-responsive pull-right" style="clear: both; width: 100%; aspect-ratio: 4 / 3; object-fit: fill;"> -->
+            <img src="/imagens/banner-canal-denuncia-1.png" alt="" class="img-responsive pull-right" style="margin-bottom: 15px; clear: both; width: 85%; aspect-ratio: 3 / 2; object-fit: fill;">
+            <img src="/imagens/banner-canal-denuncia-2.png" alt="" class="img-responsive pull-right" style="margin-bottom: 15px; clear: both; width: 85%; aspect-ratio: 3 / 2; object-fit: fill;">
+            <a href="/game/guia-jogo-seguro.php" target="_blank" rel="noopener noreferrer">
+                <img src="/imagens/banner-canal-denuncia-3.png" alt="" class="img-responsive pull-right" style="clear: both; width: 85%; aspect-ratio: 3 / 2; object-fit: fill;">
+            </a>
         </div>
     </div>
 </div>
