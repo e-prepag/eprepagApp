@@ -21,21 +21,34 @@ $dd_opr_codigo = $_POST["dd_opr_codigo"];
 $fcanal = $_POST["fcanal"];
 $BtnSearch = $_POST["BtnSearch"];
 
-if (!$dd_opr_codigo) $dd_opr_codigo = '';
+$dd_opr_codigo = ($dd_opr_codigo !== null && $dd_opr_codigo !== '') ? (int)$dd_opr_codigo : 0;
+$fcanal = preg_replace('/[^A-Za-z]/', '', (string)$fcanal);
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+$tf_data_inicial = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_inicial);
+$tf_data_final = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_final);
+
+if (!$dd_opr_codigo) $dd_opr_codigo = 0;
 if (!$tf_data_final)    $tf_data_final   = date('d/m/Y');
 if (!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
 
 if (b_is_Publisher()) {
-    $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
+    $dd_opr_codigo = (int)$_SESSION["opr_codigo_pub"];
 }
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 if ($BtnSearch) {
 
     //Buscando PINs na banco de dados
+
+	$sql_params = array();
+	$param_dd_opr_codigo = '';
+	if ($dd_opr_codigo) {
+		$sql_params[] = (int)$dd_opr_codigo;
+		$param_dd_opr_codigo = "$" . count($sql_params);
+	}
     $sql = "
                 select 
 				    pin_guid_epp,
@@ -82,7 +95,7 @@ if ($BtnSearch) {
         }
         if ($dd_opr_codigo) {
             $sql .= " 
-                        AND (t0.opr_codigo=" . $dd_opr_codigo . ")  ";
+                        AND (t0.opr_codigo=" . $param_dd_opr_codigo . ")  ";
         }
         $sql .= " 
                      ) " . PHP_EOL;
@@ -117,7 +130,7 @@ if ($BtnSearch) {
             }
             if($dd_opr_codigo) {
                 $sql .= " 
-                        AND (t0.opr_codigo=".$dd_opr_codigo.")  ";
+                        AND (t0.opr_codigo=". $param_dd_opr_codigo .")  ";
             }
             $sql .= " 
                      ) ".PHP_EOL; */
@@ -152,7 +165,7 @@ if ($BtnSearch) {
         }
         if ($dd_opr_codigo) {
             $sql .= " 
-                        AND (t0.opr_codigo=" . $dd_opr_codigo . ")  ";
+                        AND (t0.opr_codigo=" . $param_dd_opr_codigo . ")  ";
         }
         $sql .= " 
                      ) " . PHP_EOL;
@@ -190,7 +203,7 @@ if ($BtnSearch) {
             }
             if($dd_opr_codigo) {
                 $sql .= " 
-                        AND (t0.opr_codigo=".$dd_opr_codigo.")  ";
+                        AND (t0.opr_codigo=". $param_dd_opr_codigo .")  ";
             }
             $sql .= " 
                      ) ".PHP_EOL;
@@ -297,7 +310,7 @@ if ($BtnSearch) {
         echo $sql;
     }
 
-    $resid = pg_exec($connid, $sql);
+    $resid = SQLexecuteQueryParams($sql, $sql_params);
     $total_table = pg_num_rows($resid);
 } //end if($BtnSearch)
 ?>

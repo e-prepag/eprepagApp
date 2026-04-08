@@ -14,6 +14,14 @@ $dd_mes             = $_POST["dd_mes"];
 $dd_ano             = $_POST["dd_ano"];
 $BtnSearch         = $_POST["BtnSearch"];
 
+$dd_canal = preg_replace('/[^A-Za-z]/', '', (string)$dd_canal);
+$dd_operadora = ($dd_operadora !== null && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+$dd_mode = ($dd_mode === 'V') ? 'V' : 'S';
+$dd_exclui_epp_cash = ((int)$dd_exclui_epp_cash === 1) ? 1 : 0;
+$dd_mes = ($dd_mes !== null && $dd_mes !== '') ? (int)$dd_mes : 0;
+$dd_ano = ($dd_ano !== null && $dd_ano !== '') ? (int)$dd_ano : 0;
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 $pos_pagina = $seg_auxilar;
@@ -32,7 +40,7 @@ if ($dd_exclui_epp_cash==1 && ($_SESSION["tipo_acesso_pub"]=='AT')) {
 }
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $dd_operadora = $_SESSION["opr_codigo_pub"];
+        $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
         $dd_mode = "S";
         $Submit = "Buscar";
 } else {
@@ -72,6 +80,23 @@ $where_opr_cartao = "";
 $where_opr_gocash = "";
 $where_operadora_rede_ponto_certo = "";
 
+$sql_main_params = array();
+$param_dd_operadora = '';
+$param_dd_ano = '';
+$param_dd_mes = '';
+if ($dd_operadora) {
+        $sql_main_params[] = (int)$dd_operadora;
+        $param_dd_operadora = "$" . count($sql_main_params);
+}
+if ($dd_ano) {
+        $sql_main_params[] = (int)$dd_ano;
+        $param_dd_ano = "$" . count($sql_main_params);
+}
+if ($dd_mes) {
+        $sql_main_params[] = (int)$dd_mes;
+        $param_dd_mes = "$" . count($sql_main_params);
+}
+
 if(count($vetorPublisherPorUtilizacao)>0) {
     $where_ano_3_utilizado = "";
     $where_mes_3_utilizado = "";
@@ -88,10 +113,10 @@ if(count($vetorPublisherPorUtilizacao)>0) {
     $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
     $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
     if($dd_ano) {
-        $where_ano_3_utilizado = " and (round(CAST (extract (year from pih_data::date) as int),0) =".$dd_ano.") ";
+        $where_ano_3_utilizado = " and (round(CAST (extract (year from pih_data::date) as int),0) =".$param_dd_ano.") ";
     }//end if($dd_ano)
     if($dd_mes) {
-        $where_mes_3_utilizado = " and (round(CAST (extract (month from pih_data::date) as int),0)=".((int)$dd_mes).") ";
+        $where_mes_3_utilizado = " and (round(CAST (extract (month from pih_data::date) as int),0)=".$param_dd_mes.") ";
     }//end if($dd_mes)
 } //end if(count($vetorPublisherPorUtilizacao)>0)
 else {
@@ -140,9 +165,9 @@ if($dd_canal) {
 }
 
 if($dd_operadora) {
-        $where_opr_cartao = " and (pih_id = ".$dd_operadora.")";
-        $where_opr_gocash = " and (pgc_opr_codigo = ".$dd_operadora.") ";
-        $where_opr_1 = " and (t0.opr_codigo = ".$dd_operadora.") ";
+        $where_opr_cartao = " and (pih_id = ".$param_dd_operadora.")";
+        $where_opr_gocash = " and (pgc_opr_codigo = ".$param_dd_operadora.") ";
+        $where_opr_1 = " and (t0.opr_codigo = ".$param_dd_operadora.") ";
 
         if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
                 $where_opr_2 = " and (ve_jogo = 'OG') ";
@@ -153,30 +178,30 @@ if($dd_operadora) {
         else
                 $where_opr_2 = " and (ve_jogo = 'xx') ";
 
-        $where_opr_3 = " and (vgm.vgm_opr_codigo= ".$dd_operadora.") ";
+        $where_opr_3 = " and (vgm.vgm_opr_codigo= ".$param_dd_operadora.") ";
         
-        $where_operadora_rede_ponto_certo = " and opr_codigo = ".$dd_operadora." ";
+        $where_operadora_rede_ponto_certo = " and opr_codigo = ".$param_dd_operadora." ";
 
 }
 
 if($dd_ano) {
-        $where_ano_1 = " and (extract (year from trn_data) = ".$dd_ano.") ";
-        $where_ano_2 = " and (extract (year from ve_data_inclusao) = ".$dd_ano.") ";
-        $where_ano_3a = " and (round(CAST (extract (year from vg.vg_data_inclusao::date) as int),0) =".$dd_ano.") ";
-        $where_ano_3b = " and (round(CAST (extract (year from vg.vg_data_concilia::date) as int),0) =".$dd_ano.") ";
-        $where_ano_3c = " and (round(CAST (extract (year from pih_data::date) as int),0) =".$dd_ano.") ";
-        $where_ano_3d = " and (round(CAST (extract (year from pgc_pin_response_date::date) as int),0) =".$dd_ano.") ";
-        $where_ano_ponto_certo = " and (round(CAST (extract (year from data_transacao::date) as int),0) =".$dd_ano.") ";
+        $where_ano_1 = " and (extract (year from trn_data) = ".$param_dd_ano.") ";
+        $where_ano_2 = " and (extract (year from ve_data_inclusao) = ".$param_dd_ano.") ";
+        $where_ano_3a = " and (round(CAST (extract (year from vg.vg_data_inclusao::date) as int),0) =".$param_dd_ano.") ";
+        $where_ano_3b = " and (round(CAST (extract (year from vg.vg_data_concilia::date) as int),0) =".$param_dd_ano.") ";
+        $where_ano_3c = " and (round(CAST (extract (year from pih_data::date) as int),0) =".$param_dd_ano.") ";
+        $where_ano_3d = " and (round(CAST (extract (year from pgc_pin_response_date::date) as int),0) =".$param_dd_ano.") ";
+        $where_ano_ponto_certo = " and (round(CAST (extract (year from data_transacao::date) as int),0) =".$param_dd_ano.") ";
 }
 
 if($dd_mes) {
-        $where_mes_1 = " and (extract (month from trn_data) = ".((int)$dd_mes).") ";
-        $where_mes_2 = " and (extract (month from ve_data_inclusao) = ".((int)$dd_mes).") ";
-        $where_mes_3a = " and (round(CAST (extract (month from vg.vg_data_inclusao::date) as int),0)=".((int)$dd_mes).") ";
-        $where_mes_3b = " and (round(CAST (extract (month from vg.vg_data_concilia::date) as int),0)=".((int)$dd_mes).") ";
-        $where_mes_3c = " and (round(CAST (extract (month from pih_data::date) as int),0)=".((int)$dd_mes).") ";
-        $where_mes_3d = " and (round(CAST (extract (month from pgc_pin_response_date::date) as int),0)=".((int)$dd_mes).") ";
-        $where_mes_ponto_certo = " and (round(CAST (extract (month from data_transacao::date) as int),0)=".((int)$dd_mes).") ";
+        $where_mes_1 = " and (extract (month from trn_data) = ".$param_dd_mes.") ";
+        $where_mes_2 = " and (extract (month from ve_data_inclusao) = ".$param_dd_mes.") ";
+        $where_mes_3a = " and (round(CAST (extract (month from vg.vg_data_inclusao::date) as int),0)=".$param_dd_mes.") ";
+        $where_mes_3b = " and (round(CAST (extract (month from vg.vg_data_concilia::date) as int),0)=".$param_dd_mes.") ";
+        $where_mes_3c = " and (round(CAST (extract (month from pih_data::date) as int),0)=".$param_dd_mes.") ";
+        $where_mes_3d = " and (round(CAST (extract (month from pgc_pin_response_date::date) as int),0)=".$param_dd_mes.") ";
+        $where_mes_ponto_certo = " and (round(CAST (extract (month from data_transacao::date) as int),0)=".$param_dd_mes.") ";
 }
 
 
@@ -304,20 +329,21 @@ $sql .= " order by dia, mes, ano ";
 
 //echo $sql;
 
-$res_count = pg_query($sql);
+$res_count = SQLexecuteQueryParams($sql, $sql_main_params);
 $total_table = pg_num_rows($res_count);
 
 $ordem = 0;
 $img_seta = "/sys/imagens/seta_down.gif";	
 
-$resdia = pg_exec($connid, $sql);
+$resdia = SQLexecuteQueryParams($sql, $sql_main_params);
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
+        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+        $resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 } else {
         $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_nome";
+        $resopr = SQLexecuteQuery($sqlopr);
 }
-$resopr = pg_exec($connid, $sqlopr);
 ?>
 <link rel="stylesheet" href="/sys/css/css.css" type="text/css">
 <title>E-Prepag</title>

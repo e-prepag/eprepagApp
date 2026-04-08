@@ -41,6 +41,16 @@ $BtnSearch    = $_POST['BtnSearch'] ?? null;
 $FrmPreencher = $_POST['FrmPreencher'] ?? null;
 $BtnGerarNFe = $_POST['BtnGerarNFe'] ?? null;
 
+$dd_operadora = ($dd_operadora !== null && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+$dd_canal = preg_replace('/[^A-Za-z]/', '', (string)$dd_canal);
+$tf_data_inicial = preg_replace('/[^0-9\\/-]/', '', (string)$tf_data_inicial);
+$tf_data_final = preg_replace('/[^0-9\\/-]/', '', (string)$tf_data_final);
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+$FrmPreencher = !empty($FrmPreencher) ? 1 : 0;
+$BtnGerarNFe = !empty($BtnGerarNFe) ? 1 : 0;
+$dd_valor = (isset($dd_valor) && $dd_valor !== '' && is_numeric($dd_valor)) ? (float)$dd_valor : 0;
+$dd_ids_integracao = preg_replace('/[^0-9]/', '', (string)($dd_ids_integracao ?? ''));
+
 session_start();
 if (isset($_POST['exportar_excel'])) {
     header('Content-Type: text/csv; charset=utf-8');
@@ -65,7 +75,7 @@ if (isset($_POST['exportar_excel'])) {
     }
 
     $sqlExport = $_SESSION['sqldata'];
-    $resExport = SQLexecuteQuery($sqlExport);
+    $resExport = SQLexecuteQueryParams($sqlExport, array());
 
     while ($row = pg_fetch_assoc($resExport)) {
         $valorVenda = $row['trn_valor'];
@@ -105,7 +115,7 @@ if ($bDebug) {
 }
 
 if ($_SESSION["tipo_acesso_pub"] == 'PU') {
-    $dd_operadora = $_SESSION["opr_codigo_pub"];
+    $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
     $dd_mode = "S";
     $Submit = "Buscar";
 }
@@ -154,9 +164,9 @@ if ($bDebug) {
 }
 
 if ($cb_opr_teste)
-    $resopr = SQLexecuteQuery("select opr_nome, opr_codigo from operadoras where (opr_status = '" . $operadora_ativada . "') order by opr_ordem");
+    $resopr = SQLexecuteQueryParams("select opr_nome, opr_codigo from operadoras where (opr_status = $1) order by opr_ordem", array(preg_replace('/[^0-9]/', '', (string)$operadora_ativada)));
 else
-    $resopr = SQLexecuteQuery("select opr_nome, opr_codigo from operadoras where (opr_status = '" . $operadora_ativada . "') and (opr_codigo <> " . $opr_teste . ") order by opr_ordem");
+    $resopr = SQLexecuteQueryParams("select opr_nome, opr_codigo from operadoras where (opr_status = $1) and (opr_codigo <> $2) order by opr_ordem", array(preg_replace('/[^0-9]/', '', (string)$operadora_ativada), (int)$opr_teste));
 
 if (!$dd_operadora) {
     $dd_operadora = 16;
@@ -167,8 +177,8 @@ if ($bDebug) {
 }
 
 if ($dd_operadora) {
-    $sqltmp = "select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=" . $dd_operadora . "";
-    $res_opr_info = SQLexecuteQuery($sqltmp);
+    $sqltmp = "select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=$1";
+    $res_opr_info = SQLexecuteQueryParams($sqltmp, array((int)$dd_operadora));
     $pg_opr_info = pg_fetch_array($res_opr_info);
 
     if ($bDebug) {
@@ -178,11 +188,11 @@ if ($dd_operadora) {
     $dd_operadora_nome = $pg_opr_info['opr_nome'];
 
     if ($pg_opr_info['opr_pin_online'] == 0) {
-        $sqltmp = "select pin_valor as valor from pins where opr_codigo='" . $pg_opr_info['opr_codigo'] . "' group by pin_valor order by pin_valor";
-        $resval = SQLexecuteQuery($sqltmp);
+        $sqltmp = "select pin_valor as valor from pins where opr_codigo=$1 group by pin_valor order by pin_valor";
+        $resval = SQLexecuteQueryParams($sqltmp, array((int)$pg_opr_info['opr_codigo']));
     } else {
-        $sqltmp = "select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = " . $pg_opr_info['opr_codigo'] . " group by valor_fixo order by valor_fixo";
-        $resval = SQLexecuteQuery($sqltmp);
+        $sqltmp = "select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = $1 group by valor_fixo order by valor_fixo";
+        $resval = SQLexecuteQueryParams($sqltmp, array((int)$pg_opr_info['opr_codigo']));
     }
 }
 
@@ -230,13 +240,25 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
     $where_canal_p = "";
     $where_canal_c = "";
 
+    $estat_params = array();
+    $estat_param_idx = 1;
+    $param_dd_operadora = '';
+    $param_dd_valor = '';
+
+    $estat_fill_params = array();
+    $estat_fill_param_idx = 1;
+    $param_fill_dd_operadora = '';
+
     $where_data_1a .= " and (vg_data_inclusao >= '2010-04-01 00:00:00') ";
     $where_data_1b .= " and ($where_mode_data >= '2010-04-01 00:00:00') ";
     $where_data_2 .= " and (ve_data_inclusao >= '2010-04-01 00:00:00') ";
     $where_data_3 .= " and (vc_data >= '2010-04-01 00:00:00') ";
 
     if ($dd_operadora) {
-        $where_opr_1 = " and (vgm.vgm_opr_codigo = " . $dd_operadora . ") ";
+        $param_fill_dd_operadora = "$" . $estat_fill_param_idx;
+        $estat_fill_params[] = (int)$dd_operadora;
+        $estat_fill_param_idx++;
+        $where_opr_1 = " and (vgm.vgm_opr_codigo = " . $param_fill_dd_operadora . ") ";
         if ($dd_operadora_nome == 'ONGAME') {
             $where_opr_2 = " and (ve_jogo = 'OG') ";
             $where_opr_3 = " and true ";    // Cartões - Só funciona para Ongame
@@ -302,7 +324,7 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
     $time_start_0 = getmicrotime();
     $n_trans = 0;
 
-    $res_fill = SQLexecuteQuery($estat);
+    $res_fill = SQLexecuteQueryParams($estat, $estat_fill_params);
     
     //Gambiarra para resolver problema de sequencia de RPS para os dois publishers do Habboo Hotel
     $dd_operadora_anterior = $dd_operadora;
@@ -320,7 +342,7 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
         $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = " . obtem_nfe_seq($dd_operadora) . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
         echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $pg_fill['trn_vgm_id'] . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
 
-        $ret = SQLexecuteQuery($sql_update);
+        $ret = SQLexecuteQueryParams($sql_update, array());
         if (!$ret) {
             $msg_error = "Erro ao atualizar registro ($sql_update).\n";
             echo $msg_error . "<br>";
@@ -375,7 +397,10 @@ if ($FrmEnviar == 1) {
     }
 
     if ($dd_operadora) {
-        $where_opr_1 = " and (vgm.vgm_opr_codigo = " . $dd_operadora . ") ";
+        $param_dd_operadora = "$" . $estat_param_idx;
+        $estat_params[] = (int)$dd_operadora;
+        $estat_param_idx++;
+        $where_opr_1 = " and (vgm.vgm_opr_codigo = " . $param_dd_operadora . ") ";
         if ($dd_operadora_nome == 'ONGAME') {
             $where_opr_2 = " and (ve_jogo = 'OG') ";
             $where_opr_3 = " and true ";
@@ -392,9 +417,12 @@ if ($FrmEnviar == 1) {
     $dd_valor = "";
 
     if ($dd_valor) {
-        $where_valor_1 = " and (vgm.vgm_valor = " . $dd_valor . ") ";
-        $where_valor_2 = " and (ve_valor = " . $dd_valor . ")";
-        $where_valor_3 = " and ((vc_total_5k*13 + vc_total_10k*25 + vc_total_15k*37 + vc_total_20k*49) = " . $dd_valor . ")";
+        $param_dd_valor = "$" . $estat_param_idx;
+        $estat_params[] = (float)$dd_valor;
+        $estat_param_idx++;
+        $where_valor_1 = " and (vgm.vgm_valor = " . $param_dd_valor . ") ";
+        $where_valor_2 = " and (ve_valor = " . $param_dd_valor . ")";
+        $where_valor_3 = " and ((vc_total_5k*13 + vc_total_10k*25 + vc_total_15k*37 + vc_total_20k*49) = " . $param_dd_valor . ")";
     }
 
     if ($dd_canal || $dd_canal == "") {
@@ -518,7 +546,7 @@ if ($FrmEnviar == 1) {
         echo str_replace("\n", "<br>\n", $estat) . "<br>";
     }
 
-    $res_count = SQLexecuteQuery($estat);
+    $res_count = SQLexecuteQueryParams($estat, $estat_params);
     if (!$res_count) {
         die("Erro ao executar query: " . pg_last_error());
     }
@@ -532,7 +560,7 @@ if ($FrmEnviar == 1) {
     // Calcula os totais
     $qtde_geral = 0;
     $valor_geral = 0;
-    $res_geral = SQLexecuteQuery($estat);
+    $res_geral = SQLexecuteQueryParams($estat, $estat_params);
     while ($pg_geral = pg_fetch_array($res_geral)) {
         // Apenas para Ongame: desconta comissão das lans do valor da venda
         if ($dd_operadora == 13) {
@@ -576,7 +604,7 @@ if ($FrmEnviar == 1) {
         // EPP "39324311"
         $sNFe .= gera_cabecalho($dd_operadora, $data_inicial, $data_final);
 
-        $res_nfe = SQLexecuteQuery($estat);
+        $res_nfe = SQLexecuteQueryParams($estat, $estat_params);
         while ($pg_nfe = pg_fetch_array($res_nfe)) {
             $n_linhas++;
 
@@ -661,7 +689,7 @@ $sql_transform = $estat;
 
 //echo $estat; //- atimo
 
-$resestat = SQLexecuteQuery($estat);
+$resestat = SQLexecuteQueryParams($estat, $estat_params);
 
 if ($bDebug) {
     $time_end_ = getmicrotime();

@@ -8,6 +8,13 @@ require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.p
 require_once $raiz_do_projeto . "class/gamer/classIntegracao.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 
+$tf_data_inicial = preg_replace('/[^0-9\\/]/', '', (string)($tf_data_inicial ?? ''));
+$tf_data_final = preg_replace('/[^0-9\\/]/', '', (string)($tf_data_final ?? ''));
+$dd_valor = (isset($dd_valor) && $dd_valor !== '' && is_numeric($dd_valor)) ? (float)$dd_valor : 0;
+$dd_product = preg_replace('/[^A-Za-z0-9_\\-]/', '', (string)($dd_product ?? ''));
+$dd_todos = preg_replace('/[^A-Z]/', '', (string)($dd_todos ?? ''));
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+
 set_time_limit (3000) ;
 $time_start = getmicrotime();
 
@@ -67,10 +74,12 @@ if($BtnSearch && $BtnSearch!=1 && $FrmEnviar==1 ) {
             FROM pedidos_bhn b
 			inner join tb_dist_operadora_games_produto_modelo mo on mo.ogpm_pin_resquest_id = b.bhn_product_id
             inner join tb_dist_operadora_games_produto pro on mo.ogpm_ogp_id = pro.ogp_id
-            WHERE bhn_data >= '".$data_inic."'
-                AND bhn_data < '".$data_fim."'
+            WHERE bhn_data >= $1
+                AND bhn_data < $2
                 and (select vgm_vg_id from tb_dist_venda_games_modelo where vgm_valor < 0 and vgm_vg_id = vg_id limit 1) is null ";
-        if(empty($dd_todos)) {
+		$sql_params = array($data_inic, $data_fim);
+		$sql_param_idx = 3;
+		if(empty($dd_todos)) {
                 $estat .=  "AND bhn_status = '00' 
                 AND bhn_pin != 'Reversal'
                 ";
@@ -85,10 +94,14 @@ if($BtnSearch && $BtnSearch!=1 && $FrmEnviar==1 ) {
                 ";
         }
         if($dd_valor) {
-                $estat .=  "AND bhn_valor = ".$dd_valor."";
+                $estat .=  "AND bhn_valor = $".$sql_param_idx."";
+				$sql_params[] = (float)$dd_valor;
+				$sql_param_idx++;
         }
         if($dd_product) {
-                $estat .=  "AND bhn_product_id = '".$dd_product."'";
+                $estat .=  "AND bhn_product_id = $".$sql_param_idx."";
+				$sql_params[] = $dd_product;
+				$sql_param_idx++;
         }
         $estat .= "
             ORDER BY bhn_data DESC, bhn_id DESC
@@ -96,18 +109,18 @@ if($BtnSearch && $BtnSearch!=1 && $FrmEnviar==1 ) {
 
 
         //echo $estat;
-        $rs = pg_query($estat);
+        $rs = SQLexecuteQueryParams($estat, $sql_params);
         $total_table = pg_num_rows($rs);
 
 }//end if($BtnSearch && $BtnSearch!=1 && $FrmEnviar==1 )
 
 $sql_valor  = "select opr_valor1, opr_valor2, opr_valor3, opr_valor4, opr_valor5, opr_valor6, opr_valor7, opr_valor8, opr_valor9, opr_valor10, opr_valor11, opr_valor12, opr_valor13, opr_valor14, opr_valor15 from operadoras where opr_codigo IN (101,113,114,126,127,128,129,130,131,132,133,134,135)";
 
-$resval = pg_exec($connid, $sql_valor);
+$resval = SQLexecuteQueryParams($sql_valor, array());
 
 $sql_produtos = "select ogpm_pin_resquest_id,ogpm_nome,ogpm_pin_valor from tb_dist_operadora_games_produto_modelo where ogpm_pin_resquest_id is not null and ogpm_ativo=1;";
 
-$resprods = pg_exec($connid, $sql_produtos);
+$resprods = SQLexecuteQueryParams($sql_produtos, array());
 
 ?>
 <html>

@@ -31,6 +31,15 @@ $cnpj_instituicao    = $_POST['cnpj_instituicao'] ?? null;
 // Bot?o
 $BtnSearch          = $_POST['BtnSearch'] ?? null;
 
+$dd_opr_codigo = ($dd_opr_codigo !== null && $dd_opr_codigo !== '') ? (int)$dd_opr_codigo : 0;
+$dd_canal = preg_replace('/[^A-Za-z]/', '', (string)$dd_canal);
+$dd_tipo = preg_replace('/[^A-Za-z]/', '', (string)$dd_tipo);
+$tf_data_inicial = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_inicial);
+$tf_data_final = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_final);
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+$reg_operacao = preg_replace('/[^A-Za-z0-9\\-]/', '', (string)$reg_operacao);
+$cnpj_instituicao = preg_replace('/[^0-9]/', '', (string)$cnpj_instituicao);
+
 //if(!b_is_AdminPlus()) die("<center><div align='left' style='margin-left:auto;margin-right:auto;width:850px;background-color:#CCCCCC;padding-left:20px;'><br><b>".$GLOBALS['_SESSION']['userlogin_bko'].",<br><br>Por favor, aguarde a finalização dos ajuste para tentarmos contornar o problema de estouro memória para tentar executar este relatório.<br><br>Conto com sua compreensão,<br>Wagner</b><br><br></div></center>");
 
 $vetor_SIGLA_PAIS = array(
@@ -322,17 +331,17 @@ if ($_SESSION["tipo_acesso_pub"] == 'AT') {
     } //end if(!$flist_vg_id)
 }
 
-if (!$dd_opr_codigo) $dd_opr_codigo = '';
+if (!$dd_opr_codigo) $dd_opr_codigo = 0;
 if (!$tf_data_final)    $tf_data_final   = date('d/m/Y');
 if (!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
 
 if (b_is_Publisher()) {
-    $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
+    $dd_opr_codigo = (int)$_SESSION["opr_codigo_pub"];
 }
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome, opr_pais, opr_razao, opr_internacional_alicota, opr_vinculo_empresa, opr_cotacao_dolar from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 if ($BtnSearch) {
 
@@ -371,6 +380,13 @@ if ($BtnSearch) {
     else $possui_totalizacao_utilizacao = FALSE;
 
     //Buscando PINs na banco de dados
+
+	$sql_params = array();
+	$param_dd_opr_codigo = '';
+	if ($dd_opr_codigo) {
+		$sql_params[] = (int)$dd_opr_codigo;
+		$param_dd_opr_codigo = "$" . count($sql_params);
+	}
     if ($dd_tipo == 'CPF') {
         $sql = "
                 SELECT DISTINCT ON (ug.ug_id) 
@@ -384,7 +400,7 @@ if ($BtnSearch) {
                 WHERE vg.vg_data_concilia >= '" . trim($data_inic) . " 00:00:00' 
                   AND vg.vg_data_concilia <= '" . trim($data_fim) . " 23:59:59' ";
         if ($dd_opr_codigo) {
-            $sql .= " AND vm.vgm_opr_codigo = " . $dd_opr_codigo . " ";
+            $sql .= " AND vm.vgm_opr_codigo = " . $param_dd_opr_codigo . " ";
         }
         $sql .= " ORDER BY ug.ug_id";
     } else {
@@ -431,7 +447,7 @@ if ($BtnSearch) {
                                 and vg.vg_data_concilia <= '" . trim($data_fim) . " 23:59:59' ";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
@@ -467,7 +483,7 @@ if ($BtnSearch) {
                                 and vg.vg_data_concilia <= '" . trim($data_fim) . " 23:59:59' ";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
@@ -503,7 +519,7 @@ if ($BtnSearch) {
                                 and vg.vg_data_concilia <= '" . trim($data_fim) . " 23:59:59' ";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
@@ -539,7 +555,7 @@ if ($BtnSearch) {
                                 and vg.vg_data_concilia <= '" . trim($data_fim) . " 23:59:59' ";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
@@ -575,7 +591,7 @@ if ($BtnSearch) {
                                 and vg.vg_data_concilia <= '" . trim($data_fim) . " 23:59:59' ";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg.vg_id,tipo,ug_cpf, ug_nome_cpf, vg_data_concilia, forma_pagamento )
@@ -634,7 +650,7 @@ if ($BtnSearch) {
             }
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg.vg_id,tipo,ug_cnpj, ug_razao_social, data, forma_pagamento )
@@ -669,7 +685,7 @@ if ($BtnSearch) {
                                 and pih_data <= '" . trim($data_fim) . " 23:59:59'";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (pih_id=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (pih_id=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by pih_id,tipo,picc_cpf, picc_nome, pih_data, forma_pagamento )
@@ -707,7 +723,7 @@ if ($BtnSearch) {
                                 and vg_data_concilia <= '" . trim($data_fim) . " 23:59:59'";
             if ($dd_opr_codigo) {
                 $sql .= " 
-                                and (vgm_opr_codigo=" . $dd_opr_codigo . ")  " . PHP_EOL;
+                                and (vgm_opr_codigo=" . $param_dd_opr_codigo . ")  " . PHP_EOL;
             }
             $sql .= "
                         group by vg_id,vg_canal,tipo,vgcbe_cpf, vgcbe_nome_cpf, vg_data_concilia, forma_pagamento )
@@ -724,7 +740,7 @@ if ($BtnSearch) {
     if ($_SERVER["REMOTE_ADDR"] == "177.37.138.113") {
         echo $sql;
     }
-    $resid = pg_exec($connid, $sql);
+    $resid = SQLexecuteQueryParams($sql, $sql_params);
     $total_table = pg_num_rows($resid);
 } //end if($BtnSearch)
 ?>

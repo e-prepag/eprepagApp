@@ -18,6 +18,12 @@ $fcanal          = $_POST['fcanal'] ?? null;
 // Botão
 $BtnSearch     = $_POST['BtnSearch'] ?? null;
 
+$dd_opr_codigo = ($dd_opr_codigo !== null && $dd_opr_codigo !== '') ? (int)$dd_opr_codigo : 0;
+$fcanal = preg_replace('/[^A-Za-z]/', '', (string)$fcanal);
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+$tf_data_inicial = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_inicial);
+$tf_data_final = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_final);
+
 
 //Disponibilizando acesso restrito
 set_time_limit(60000);
@@ -34,17 +40,17 @@ if ($_SESSION["tipo_acesso_pub"] == 'AT') {
     } //end if(!$flist_vg_id)
 }
 
-if (!$dd_opr_codigo) $dd_opr_codigo = '';
+if (!$dd_opr_codigo) $dd_opr_codigo = 0;
 if (!$tf_data_final)    $tf_data_final   = date('d/m/Y');
 if (!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
 
 if (b_is_Publisher()) {
-    $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
+    $dd_opr_codigo = (int)$_SESSION["opr_codigo_pub"];
 }
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 if ($BtnSearch) {
 
@@ -57,7 +63,7 @@ if ($BtnSearch) {
                 group by co_opr_codigo, co_canal, co_data_inclusao, co_volume_tipo, co_volume_min, co_comissao, opr_internacional_alicota 
                 order by co_opr_codigo, co_canal, co_data_inclusao desc, co_volume_tipo, co_volume_min  
                ";
-    $rescommiss = pg_exec($connid, $sql);
+    $rescommiss = SQLexecuteQueryParams($sql, array());
 
     $vetorComissao = array();
 
@@ -113,12 +119,19 @@ if ($BtnSearch) {
                         opr_contabiliza_utilizacao != 0 and opr_codigo = $1
                 ";
 
-        $rs_publisher = SQLexecuteQueryParams($sql, [$dd_opr_codigo]);
+	        $rs_publisher = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo));
 
         $por_utilizacao = pg_num_rows($rs_publisher) > 0;
     }
 
     //Buscando PINs na banco de dados
+
+	$sql_params = array();
+	$param_dd_opr_codigo = '';
+	if ($dd_opr_codigo) {
+		$sql_params[] = (int)$dd_opr_codigo;
+		$param_dd_opr_codigo = "$" . count($sql_params);
+	}
     $sql = "
                 select 
                     pin_codinterno, 
@@ -161,7 +174,7 @@ if ($BtnSearch) {
                 $sql .= " and (pih.pih_data between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "  23:59:59')  " . PHP_EOL;
             }
             if ($dd_opr_codigo) {
-                $sql .= " and t0.opr_codigo=" . $dd_opr_codigo . " and t0.pin_status <> '9'" . PHP_EOL;
+                $sql .= " and t0.opr_codigo=" . $param_dd_opr_codigo . " and t0.pin_status <> '9'" . PHP_EOL;
             }
 
             $sql .= "UNION ALL
@@ -211,7 +224,7 @@ if ($BtnSearch) {
             $sql .= " and (pin_datavenda between '" . trim($data_inic) . "' and  '" . trim($data_fim) . "')  " . PHP_EOL;
         }
         if ($dd_opr_codigo) {
-            $sql .= " and (t0.opr_codigo=" . $dd_opr_codigo . ") and t0.pin_status <> '9'" . PHP_EOL;
+            $sql .= " and (t0.opr_codigo=" . $param_dd_opr_codigo . ") and t0.pin_status <> '9'" . PHP_EOL;
         }
         $sql .= " ) " . PHP_EOL;
     } //end if($fcanal == 'L') 
@@ -248,7 +261,7 @@ if ($BtnSearch) {
                         ";
         if ($dd_opr_codigo) {
             $sql .= " 
-                        and pih_id = " . $dd_opr_codigo . PHP_EOL;
+                        and pih_id = " . $param_dd_opr_codigo . PHP_EOL;
         } //end if($dd_opr_codigo) 
         if ($tf_data_inicial && $tf_data_final) {
             $data_inic = formata_data(trim($tf_data_inicial), 1);
@@ -268,7 +281,7 @@ if ($BtnSearch) {
     if ($_SERVER["REMOTE_ADDR"] == "187.18.252.183") {
         echo $sql;
     }
-    $resid = pg_exec($connid, $sql);
+    $resid = SQLexecuteQueryParams($sql, $sql_params);
     $total_table = pg_num_rows($resid);
 } //end if($BtnSearch)
 ?>

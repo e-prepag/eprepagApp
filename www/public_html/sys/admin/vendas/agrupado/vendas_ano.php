@@ -6,6 +6,11 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 //require_once $raiz_do_projeto . "/incs/functions.php";
 
+$dd_canal = preg_replace('/[^A-Za-z]/', '', (string)($dd_canal ?? ''));
+$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+$dd_mode = (isset($dd_mode) && $dd_mode === 'V') ? 'V' : 'S';
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacao();
 
 $pos_pagina = $seg_auxilar;
@@ -13,7 +18,7 @@ $pos_pagina = $seg_auxilar;
 $time_start = getmicrotime();
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $dd_operadora = $_SESSION["opr_codigo_pub"];
+        $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
         $dd_mode = "S";
         $Submit = "Buscar";
 }
@@ -33,6 +38,13 @@ $where_opr_3 = "";
 $where_opr_cartao = "";
 $where_opr_gocash = "";
 $where_operadora_rede_ponto_certo = "";
+
+$sql_main_params = array();
+$param_dd_operadora = '';
+if ($dd_operadora) {
+        $sql_main_params[] = (int)$dd_operadora;
+        $param_dd_operadora = '$1';
+}
 
 if(count($vetorPublisherPorUtilizacao)>0) {
     $where_opr_venda_lan = " AND ( CASE ";
@@ -56,13 +68,15 @@ else {
 
 
 if($dd_canal) {
-        $where_canal = " and canal= '".$dd_canal."' ";
+        $sql_main_params[] = $dd_canal;
+        $param_dd_canal = "$" . count($sql_main_params);
+        $where_canal = " and canal= ".$param_dd_canal." ";
 }
 
 if($dd_operadora) {
-        $where_opr_cartao = " and (pih_id = ".$dd_operadora.")";
-        $where_opr_gocash = " and (pgc_opr_codigo = ".$dd_operadora.") ";
-        $where_opr_1 = " and (t0.opr_codigo = ".$dd_operadora.") ";
+        $where_opr_cartao = " and (pih_id = ".$param_dd_operadora.")";
+        $where_opr_gocash = " and (pgc_opr_codigo = ".$param_dd_operadora.") ";
+        $where_opr_1 = " and (t0.opr_codigo = ".$param_dd_operadora.") ";
         if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
                 $where_opr_2 = " and (ve_jogo = 'OG') ";
         elseif  ($dd_operadora==17)	//($dd_operadora_nome=='MU ONLINE') 
@@ -71,9 +85,9 @@ if($dd_operadora) {
                 $where_opr_2 = " and (ve_jogo = 'HB') ";
         else
                 $where_opr_2 = " and (ve_jogo = 'xx') ";
-        $where_opr_3 = " and (vgm.vgm_opr_codigo= ".$dd_operadora.") ";
+        $where_opr_3 = " and (vgm.vgm_opr_codigo= ".$param_dd_operadora.") ";
         
-        $where_operadora_rede_ponto_certo = " and opr_codigo = ".$dd_operadora." ";
+        $where_operadora_rede_ponto_certo = " and opr_codigo = ".$param_dd_operadora." ";
 
 }
 
@@ -212,7 +226,7 @@ $sql .= "
 $sql .= " where 1=1 ".($dd_canal == "ATIMO")?"":$where_canal." ";
 $sql .= "group by ano"; //", canal";
 
-$res_count = pg_query($sql);
+$res_count = SQLexecuteQueryParams($sql, $sql_main_params);
 $total_table = pg_num_rows($res_count);
 
 $sql .= " order by ".$ncamp;
@@ -230,14 +244,15 @@ else
 
 //echo "<!-- $sql<br> --->";
 
-$resano = pg_exec($connid, $sql);
+$resano = SQLexecuteQueryParams($sql, $sql_main_params);
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
+        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+        $resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 } else {
         $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_nome";
+        $resopr = SQLexecuteQuery($sqlopr);
 }
-$resopr = pg_exec($connid, $sqlopr);
 ?>
 <script language="JavaScript">
 <!--

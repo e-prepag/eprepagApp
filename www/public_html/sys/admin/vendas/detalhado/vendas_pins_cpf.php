@@ -8,6 +8,11 @@ require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.php";
 
+$dd_opr_codigo = (isset($dd_opr_codigo) && $dd_opr_codigo !== '') ? (int)$dd_opr_codigo : 0;
+$tf_data_inicial = preg_replace('/[^0-9\\/]/', '', (string)($tf_data_inicial ?? ''));
+$tf_data_final = preg_replace('/[^0-9\\/]/', '', (string)($tf_data_final ?? ''));
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+
 // Moeda considerada no relatório
 // https://pt.wikipedia.org/wiki/ISO_4217
 define("REMESSA_MOEDA", "BRL");
@@ -26,17 +31,17 @@ if ($_SESSION["tipo_acesso_pub"]=='AT') {
     }//end if(!$flist_vg_id)
 }
 
-if(!$dd_opr_codigo) $dd_opr_codigo = '';
+if(!$dd_opr_codigo) $dd_opr_codigo = 0;
 if(!$tf_data_final)    $tf_data_final   = date('d/m/Y');
 if(!$tf_data_inicial)  $tf_data_inicial = date('d/m/Y');
 
 if(b_is_Publisher()) {
-        $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
+        $dd_opr_codigo = (int)$_SESSION["opr_codigo_pub"];
 }
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome, opr_pais, opr_razao from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid,$sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 if($BtnSearch) {
     
@@ -69,6 +74,13 @@ if($BtnSearch) {
         else $possui_totalizacao_utilizacao = FALSE;
         
         //Buscando PINs na banco de dados
+
+	$sql_params = array();
+	$param_dd_opr_codigo = '';
+	if ($dd_opr_codigo) {
+		$sql_params[] = (int)$dd_opr_codigo;
+		$param_dd_opr_codigo = "$" . count($sql_params);
+	}
         $sql = "
                 select 
                     ug_cpf, 
@@ -90,7 +102,7 @@ if($BtnSearch) {
                                 and vg.vg_data_concilia <= '".trim($data_fim)." 23:59:59' ";               
         if($dd_opr_codigo) {
             $sql .= " 
-                                and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
+                                and (vgm_opr_codigo=". $param_dd_opr_codigo .")  ".PHP_EOL;
         }
         $sql .= "
                         group by ug_cpf, ug_nome_cpf, vg_data_concilia )
@@ -130,7 +142,7 @@ if($BtnSearch) {
         }
         if($dd_opr_codigo) {
             $sql .= " 
-                                and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
+                                and (vgm_opr_codigo=". $param_dd_opr_codigo .")  ".PHP_EOL;
         }
         $sql .= "
                         group by vgm_cpf, vgm_nome_cpf, vg_data_inclusao )  
@@ -151,7 +163,7 @@ if($BtnSearch) {
                                 and pih_data <= '".trim($data_fim)." 23:59:59'";               
         if($dd_opr_codigo) {
             $sql .= " 
-                                and (pih_id=".$dd_opr_codigo.")  ".PHP_EOL;
+                                and (pih_id=". $param_dd_opr_codigo .")  ".PHP_EOL;
         }
         $sql .= "
                         group by picc_cpf, picc_nome, pih_data )
@@ -172,7 +184,7 @@ if($BtnSearch) {
                                 and vg_data_concilia <= '".trim($data_fim)." 23:59:59'";               
         if($dd_opr_codigo) {
             $sql .= " 
-                                and (vgm_opr_codigo=".$dd_opr_codigo.")  ".PHP_EOL;
+                                and (vgm_opr_codigo=". $param_dd_opr_codigo .")  ".PHP_EOL;
         }
         $sql .= "
                         group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_data_inclusao )
@@ -182,7 +194,7 @@ if($BtnSearch) {
                 order by data;  
                 ";
         //echo $sql;
-	$resid = pg_exec($connid, $sql);
+	$resid = SQLexecuteQueryParams($sql, $sql_params);
 	$total_table = pg_num_rows($resid);
 
 } //end if($BtnSearch)

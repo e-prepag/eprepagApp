@@ -60,12 +60,12 @@ if ($tf_data_final) {
 }
 
 if (b_is_Publisher()) {
-    $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
+    $dd_opr_codigo = (int)$_SESSION["opr_codigo_pub"];
 }
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 if ($BtnSearch) {
 
@@ -91,7 +91,7 @@ if ($BtnSearch) {
     if (!empty($sql_params)) {
         $rescommiss = SQLexecuteQueryParams($sql, $sql_params);
     } else {
-        $rescommiss = SQLexecuteQuery($sql);
+        $rescommiss = SQLexecuteQueryParams($sql, array());
     }
     $vetorComissao = [];
     $vetorComissaoIOF = [];
@@ -243,7 +243,7 @@ if ($BtnSearch) {
     if (!empty($sql_params_pins)) {
         $resid = SQLexecuteQueryParams($sql, $sql_params_pins);
     } else {
-        $resid = SQLexecuteQuery($sql);
+        $resid = SQLexecuteQueryParams($sql, array());
     }
     $total_table = pg_num_rows($resid);
 } //end if($BtnSearch)

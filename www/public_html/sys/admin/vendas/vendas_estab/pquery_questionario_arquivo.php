@@ -44,7 +44,7 @@ if($estat_decrypted) {
 	// Recupera dados do pagamento
 	$sql = $estat_decrypted;
 	//echo "sql: $sql<br>"; 
-	$ret = SQLexecuteQuery($sql);
+	$ret = SQLexecuteQueryParams($sql, array());
 	if(!$ret) {
 		echo "Erro ao recuperar dados de questionario (ajax)\n";
 		die("Stop");

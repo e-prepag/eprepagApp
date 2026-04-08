@@ -3,6 +3,17 @@
         ob_start();
     require_once "../../../../../includes/constantes.php";
     require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
+    $dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+    $dd_valor = (isset($dd_valor) && $dd_valor !== '' && is_numeric($dd_valor)) ? (float)$dd_valor : 0;
+    $dd_mode = (isset($dd_mode) && $dd_mode === 'V') ? 'V' : 'S';
+    $inicial = isset($inicial) ? max(0, (int)$inicial) : 0;
+    $range = isset($range) ? max(1, (int)$range) : 1;
+    $ordem = isset($ordem) ? max(0, (int)$ordem) : 0;
+    $operadora_ativada = preg_replace('/[^0-9]/', '', (string)$operadora_ativada);
+    $opr_teste = (int)$opr_teste;
+    $cb_opr_teste = !empty($cb_opr_teste);
+    $dd_canal = preg_replace('/[^A-Za-z]/', '', (string)($dd_canal ?? ''));
+    $downloadCsv = !empty($downloadCsv) ? 1 : 0;
     set_time_limit ( 3000 ) ;
     $pos_pagina = $seg_auxilar;
     $time_start = getmicrotime();
@@ -12,11 +23,11 @@
 //echo "dd_operadora: ".$dd_operadora."<br>";
 //echo "dd_mode: ".$dd_mode."<br>";
 //echo "Submit: $Submit<br>";
-	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
-		$dd_mode = "S";
-//		$Submit = "Buscar";
-	}
+		if($_SESSION["tipo_acesso_pub"]=='PU') {
+			$dd_operadora = (int)$_SESSION["opr_codigo_pub"];
+			$dd_mode = "S";
+	//		$Submit = "Buscar";
+		}
 
 	if(!$dd_mode || ($dd_mode!='V')) {
 		$dd_mode = "S";
@@ -59,29 +70,29 @@
 	$max          = 6000; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
-//	$resuf = pg_exec($connid, "select uf from uf order by uf");
-//	$resuf_except = pg_exec($connid, "select uf from uf order by uf");
+//	$resuf = SQLexecuteQueryParams($connid, "select uf from uf order by uf");
+//	$resuf_except = SQLexecuteQueryParams($connid, "select uf from uf order by uf");
 
-	if($cb_opr_teste)
-		$resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = '".$operadora_ativada."') order by opr_nome");
-	else
-		$resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = '".$operadora_ativada."') and (opr_codigo <> ".$opr_teste.") order by opr_nome");
+		if($cb_opr_teste)
+			$resopr = SQLexecuteQueryParams("select opr_nome, opr_codigo from operadoras where (opr_status = $1) order by opr_nome", array($operadora_ativada));
+		else
+			$resopr = SQLexecuteQueryParams("select opr_nome, opr_codigo from operadoras where (opr_status = $1) and (opr_codigo <> $2) order by opr_nome", array($operadora_ativada, $opr_teste));
 
-	if($dd_operadora)
-	{			
-		$res_opr_info = pg_exec($connid, "select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=".$dd_operadora."");
-		$pg_opr_info = pg_fetch_array($res_opr_info);
+		if($dd_operadora)
+		{			
+			$res_opr_info = SQLexecuteQueryParams("select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=$1", array((int)$dd_operadora));
+			$pg_opr_info = pg_fetch_array($res_opr_info);
 
 		$dd_operadora_nome = $pg_opr_info['opr_nome'];
 	
-		if($pg_opr_info['opr_pin_online'] == 0)
-			$resval = pg_exec($connid, "select pin_valor as valor from pins where opr_codigo='".$pg_opr_info['opr_codigo']."' group by pin_valor order by pin_valor");
-		else
-		{
-			$resval = pg_exec($connid, "select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = ".$pg_opr_info['opr_codigo']." group by valor_fixo order by valor_fixo");
-			$res_opr_area = pg_exec($connid, "select oparea_codigo, area_nome from operadora_area where opr_codigo=".$pg_opr_info['opr_codigo']." order by oparea_codigo");
+			if($pg_opr_info['opr_pin_online'] == 0)
+				$resval = SQLexecuteQueryParams("select pin_valor as valor from pins where opr_codigo=$1 group by pin_valor order by pin_valor", array((int)$pg_opr_info['opr_codigo']));
+			else
+			{
+				$resval = SQLexecuteQueryParams("select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = $1 group by valor_fixo order by valor_fixo", array((int)$pg_opr_info['opr_codigo']));
+				$res_opr_area = SQLexecuteQueryParams("select oparea_codigo, area_nome from operadora_area where opr_codigo=$1 order by oparea_codigo", array((int)$pg_opr_info['opr_codigo']));
+			}
 		}
-	}
 
 	if(!verifica_data($tf_data_inicial))
 	{
@@ -100,8 +111,9 @@
 		$data_inicial_menor = true;
 		$FrmEnviar = 0;
 	}
+		$estat_params = array();
 
-	if($FrmEnviar == 1) {
+		if($FrmEnviar == 1) {
 
 		$where_data_1a = "";
 		$where_data_1b = "";
@@ -113,6 +125,10 @@
 		$where_canal_1a = "";
 		$where_canal_1b = "";
 		$where_canal_2 = "";
+
+		$estat_param_idx = 1;
+		$param_dd_operadora = '';
+		$param_dd_valor = '';
 
 		if($tf_data_inicial && $tf_data_final) 
 		{
@@ -134,8 +150,11 @@
 
 		
 		if($dd_operadora) {
+			$param_dd_operadora = "$" . $estat_param_idx;
+			$estat_params[] = (int)$dd_operadora;
+			$estat_param_idx++;
 //			$where_opr_1 = " and (t0.opr_codigo = ".$dd_operadora.") ";
-			$where_opr_1 = " and (vgm.vgm_opr_codigo = ".$dd_operadora.") ";
+			$where_opr_1 = " and (vgm.vgm_opr_codigo = ".$param_dd_operadora.") ";
 			if($dd_operadora_nome=='ONGAME') 
 				$where_opr_2 = " and (ve_jogo = 'OG') ";
 			elseif  ($dd_operadora_nome=='MU ONLINE') 
@@ -148,9 +167,12 @@
 		if($dd_operadora=="") $dd_valor = "";
 
 		if($dd_valor) {
+			$param_dd_valor = "$" . $estat_param_idx;
+			$estat_params[] = (float)$dd_valor;
+			$estat_param_idx++;
 //			$where_valor_1 = " and (t0.pin_valor = ".$dd_valor.") ";
-			$where_valor_1 = " and (vgm.vgm_valor = ".$dd_valor.") ";
-			$where_valor_2 = " and (ve_valor = ".$dd_valor.")";
+			$where_valor_1 = " and (vgm.vgm_valor = ".$param_dd_valor.") ";
+			$where_valor_2 = " and (ve_valor = ".$param_dd_valor.")";
 		}
 
 //echo "dd_vendas_pins: ".(($dd_vendas_pins)?"ON":"off")."<br>";
@@ -282,7 +304,7 @@ Antigo
 
 		$estat .= " order by trn_data "; 
 
-		$res_count = pg_query($estat);
+		$res_count = SQLexecuteQueryParams($estat, $estat_params);
 		$total_table = pg_num_rows($res_count);
 	
 
@@ -304,7 +326,7 @@ if(b_IsUsuarioWagner()) {
 
 		$vg_id_prev = -1;
 		$vgm_valor_venda_prev = -1;
-		$res_geral = pg_exec($connid, $estat);
+		$res_geral = SQLexecuteQueryParams($estat, $estat_params);
 		while($pg_geral = pg_fetch_array($res_geral))
 		{
 			if (($pg_geral['vg_id']!=$vg_id_prev) || ($pg_geral['vgm_valor']!=$vgm_valor_venda_prev)) {
@@ -331,7 +353,7 @@ if(b_IsUsuarioWagner()) {
 //	trace_sql($estat, "Arial", 2, "#666666", 'b');
 $sql_transform=$estat;
 	
-	$resestat = pg_exec($connid, $estat);
+	$resestat = SQLexecuteQueryParams($estat, $estat_params);
 
 	if($max + $inicial > $total_table)
 		$reg_ate = $total_table;

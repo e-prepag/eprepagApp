@@ -26,11 +26,18 @@ $tf_data_final     = $_POST['tf_data_final'] ?? null;
 // Botão
 $BtnSearch     = $_POST['BtnSearch'] ?? null;
 
+$dd_operadora = ($dd_operadora !== null && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+$dd_mode = ($dd_mode === 'V') ? 'V' : 'S';
+$dd_canal = preg_replace('/[^A-Za-z]/', '', (string)$dd_canal);
+$tf_data_inic = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_inic);
+$tf_data_final = preg_replace('/[^0-9\\/]/', '', (string)$tf_data_final);
+$BtnSearch = !empty($BtnSearch) ? 1 : 0;
+
 
 //echo "dd_operadora: ".$dd_operadora."<br>";
 //echo "Submit: $Submit<br>";
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
+		$dd_operadora = (int)$_SESSION["opr_codigo_pub"];
 		if(!$dd_mode) $dd_mode = "S";
 		$Submit = "Buscar";
 	} else {
@@ -54,11 +61,12 @@ $BtnSearch     = $_POST['BtnSearch'] ?? null;
 	$qtde_dias_vendas = qtde_dias($tf_data_inic, $tf_data_final) + 1;
 
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
+		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+		$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 	} else {
 		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_nome";
+		$resopr = SQLexecuteQueryParams($sqlopr, array());
 	}
-	$resopr = pg_exec($connid, $sqlopr);
 //echo "$sqlopr<br>";
 
 
@@ -187,12 +195,21 @@ function GP_popupConfirmMsg(msg) { //v1.0
 	$where_opr_3 = "";
 	$where_canal = "";
 
+$sql_main_params = array();
+$sql_param_idx = 1;
+$param_dd_operadora = '';
+
 	if($dd_canal) {
-		$where_canal = " and canal= '".$dd_canal."' ";
+		$where_canal = " and canal= $" . $sql_param_idx . " ";
+		$sql_main_params[] = $dd_canal;
+		$sql_param_idx++;
 	}
 
 	if($dd_operadora) {
-		$where_opr_1 = " and (t0.opr_codigo = ".$dd_operadora.") ";
+		$param_dd_operadora = "$" . $sql_param_idx;
+		$sql_main_params[] = (int)$dd_operadora;
+		$sql_param_idx++;
+		$where_opr_1 = " and (t0.opr_codigo = ".$param_dd_operadora.") ";
 
 		if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
 			$where_opr_2 = " and (ve_jogo = 'OG') ";
@@ -203,7 +220,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 		else
 			$where_opr_2 = " and (ve_jogo = 'xx') ";
 
-		$where_opr_3 = " and (vgm.vgm_opr_codigo= ".$dd_operadora.") ";
+		$where_opr_3 = " and (vgm.vgm_opr_codigo= ".$param_dd_operadora.") ";
 
 	}
 
@@ -283,7 +300,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                 $cabecalho = "'Range','Qtde','Média Qtde','Valor Total','Média Valor'";
 
                 //echo $sql;
-                $resven = SQLexecuteQuery($sql);
+                $resven = SQLexecuteQueryParams($sql, $sql_main_params);
                 if($resven && pg_num_rows($resven)>0) 
                 {
                     while($pgven = pg_fetch_array($resven))

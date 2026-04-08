@@ -17,7 +17,7 @@ fputcsv($output, [
 ]);
 
 $sql = base64_decode($_POST['sql']);
-$res = SQLexecuteQuery($sql);
+$res = SQLexecuteQueryParams($sql, array());
 
 while ($row = pg_fetch_assoc($res)) {
     fputcsv($output, [

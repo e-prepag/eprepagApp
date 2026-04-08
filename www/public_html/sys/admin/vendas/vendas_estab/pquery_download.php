@@ -9,6 +9,20 @@ require_once "/www/includes/bourls.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
+	$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+	$dd_valor = (isset($dd_valor) && $dd_valor !== '' && is_numeric($dd_valor)) ? (float)$dd_valor : 0;
+	$dd_mode = (isset($dd_mode) && $dd_mode === 'V') ? 'V' : 'S';
+	$allowedCanais = array('Site', 'POS', 'ATIMO', '');
+	$dd_canal = in_array((string)($dd_canal ?? ''), $allowedCanais, true) ? (string)$dd_canal : '';
+	$inicial = isset($inicial) ? max(0, (int)$inicial) : 0;
+	$range = isset($range) ? max(1, (int)$range) : 1;
+	$ordem = isset($ordem) ? max(1, (int)$ordem) : 1;
+	$operadora_ativada = preg_replace('/[^0-9]/', '', (string)$operadora_ativada);
+	$opr_teste = (int)$opr_teste;
+	$cb_opr_teste = !empty($cb_opr_teste);
+	$canal_pos = preg_replace('/[^A-Z0-9_]/', '', (string)($canal_pos ?? ''));
+	$dd_ids_integracao = preg_replace('/[^0-9]/', '', (string)($dd_ids_integracao ?? ''));
+
 	set_time_limit ( 3000 ) ;
 	$pos_pagina = $seg_auxilar;
 
@@ -57,30 +71,29 @@ require_once "/www/includes/bourls.php";
 	$max          = 100; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
-//	$resuf = pg_exec($connid, "select uf from uf order by uf");
-//	$resuf_except = pg_exec($connid, "select uf from uf order by uf");
+//	$resuf = SQLexecuteQueryParams($connid, "select uf from uf order by uf");
+//	$resuf_except = SQLexecuteQueryParams($connid, "select uf from uf order by uf");
 
 	if($cb_opr_teste) {
-		$resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = '".$operadora_ativada."') order by opr_nome");
+		$resopr = SQLexecuteQueryParams("select opr_nome, opr_codigo from operadoras where (opr_status = $1) order by opr_nome", array($operadora_ativada));
 	} else {
-		$resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = '".$operadora_ativada."') and (opr_codigo <> ".$opr_teste.") order by opr_nome");
+		$resopr = SQLexecuteQueryParams("select opr_nome, opr_codigo from operadoras where (opr_status = $1) and (opr_codigo <> $2) order by opr_nome", array($operadora_ativada, $opr_teste));
 	}
 
 	if($dd_operadora)
 	{			
-		$res_opr_info = pg_exec($connid, "select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=".$dd_operadora."");
+		$res_opr_info = SQLexecuteQueryParams("select opr_codigo, opr_nome, opr_pin_online from operadoras where opr_codigo=$1", array((int)$dd_operadora));
 		$pg_opr_info = pg_fetch_array($res_opr_info);
 
 		$dd_operadora_nome = $pg_opr_info['opr_nome'];
 	
 		if($pg_opr_info['opr_pin_online'] == 0) {
-			$sql_valor  = "select valor from operadoras_valores where opr_codigo = " . $dd_operadora . " ORDER BY valor";
-
-			$resval = pg_exec($connid, $sql_valor);
+			$sql_valor  = "select valor from operadoras_valores where opr_codigo = $1 ORDER BY valor";
+			$resval = SQLexecuteQueryParams($sql_valor, array((int)$dd_operadora));
 		} else {
-			$sql_valor = "select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = ".$pg_opr_info['opr_codigo']." group by valor_fixo order by valor_fixo";
-			$resval = pg_exec($connid, $sql_valor);
-			$res_opr_area = pg_exec($connid, "select oparea_codigo, area_nome from operadora_area where opr_codigo=".$pg_opr_info['opr_codigo']." order by oparea_codigo");
+			$sql_valor = "select valor_fixo as valor from pin_valor_lista t0, pin_valor_fixo t1 where t0.valor_lista_cod = t1.valor_lista_cod and opr_codigo = $1 group by valor_fixo order by valor_fixo";
+			$resval = SQLexecuteQueryParams($sql_valor, array((int)$pg_opr_info['opr_codigo']));
+			$res_opr_area = SQLexecuteQueryParams("select oparea_codigo, area_nome from operadora_area where opr_codigo=$1 order by oparea_codigo", array((int)$pg_opr_info['opr_codigo']));
 		}
 	}
 
@@ -101,8 +114,9 @@ require_once "/www/includes/bourls.php";
 		$data_inicial_menor = true;
 		$FrmEnviar = 0;
 	}
+		$estat_params = array();
 
-	if($FrmEnviar == 1)
+		if($FrmEnviar == 1)
 	{
 
 		$where_data_1a = "";
@@ -119,6 +133,13 @@ require_once "/www/includes/bourls.php";
                 //Where para ids de integração
                 $where_ids_integracao = "";
 
+		$estat_params = array();
+		$estat_param_idx = 1;
+		$param_dd_operadora = '';
+		$param_dd_valor = '';
+		$param_canal_pos = '';
+		$param_ids_integracao = '';
+
 		if($tf_data_inicial && $tf_data_final) 
 		{
 			$data_inic = formata_data(trim($tf_data_inicial), 1);
@@ -131,8 +152,11 @@ require_once "/www/includes/bourls.php";
 
 		
 		if($dd_operadora) {
+			$param_dd_operadora = "$" . $estat_param_idx;
+			$estat_params[] = (int)$dd_operadora;
+			$estat_param_idx++;
 //			$where_opr_1 = " and (t0.opr_codigo = ".$dd_operadora.") ";
-			$where_opr_1 = " and (vgm.vgm_opr_codigo = ".$dd_operadora.") ";
+			$where_opr_1 = " and (vgm.vgm_opr_codigo = ".$param_dd_operadora.") ";
 			if($dd_operadora_nome=='ONGAME') 
 				$where_opr_2 = " and (ve_jogo = 'OG') ";
 			elseif  ($dd_operadora_nome=='MU ONLINE') 
@@ -145,9 +169,12 @@ require_once "/www/includes/bourls.php";
 		if($dd_operadora=="") $dd_valor = "";
 
 		if($dd_valor) {
+			$param_dd_valor = "$" . $estat_param_idx;
+			$estat_params[] = (float)$dd_valor;
+			$estat_param_idx++;
 //			$where_valor_1 = " and (t0.pin_valor = ".$dd_valor.") ";
-			$where_valor_1 = " and (vgm.vgm_valor = ".$dd_valor.") ";
-			$where_valor_2 = " and (ve_valor = ".$dd_valor.")";
+			$where_valor_1 = " and (vgm.vgm_valor = ".$param_dd_valor.") ";
+			$where_valor_2 = " and (ve_valor = ".$param_dd_valor.")";
 		}
 
 		if($dd_canal) {
@@ -163,7 +190,10 @@ require_once "/www/includes/bourls.php";
 
 		if(!empty($canal_pos)) {
 			if(substr($canal_pos,0,1)=='P') {
-				$where_canal_pos = " and tvgpo.tvgpo_canal = '".$canal_pos."'";
+				$param_canal_pos = "$" . $estat_param_idx;
+				$estat_params[] = $canal_pos;
+				$estat_param_idx++;
+				$where_canal_pos = " and tvgpo.tvgpo_canal = ".$param_canal_pos;
 				$where_canal_pos_integradas = " and (FALSE) ";
 			}
 			if($canal_pos=="EPP") {
@@ -174,7 +204,10 @@ require_once "/www/includes/bourls.php";
                 
                 //IDS de integração
                 if($dd_ids_integracao) {
-			$where_ids_integracao = " and (vg.vg_integracao_parceiro_origem_id = '".$dd_ids_integracao."')";
+			$param_ids_integracao = "$" . $estat_param_idx;
+			$estat_params[] = $dd_ids_integracao;
+			$estat_param_idx++;
+			$where_ids_integracao = " and (vg.vg_integracao_parceiro_origem_id = ".$param_ids_integracao.")";
 		}
 
 /*
@@ -305,7 +338,7 @@ Antigo
 if(b_IsUsuarioWagner()) {
 //echo "(R) ".str_replace("\n", "\n<br>", $estat)."<br>";
 }
-		$res_count = pg_query($estat);
+		$res_count = SQLexecuteQueryParams($estat, $estat_params);
 		$total_table = pg_num_rows($res_count);
 	
 
@@ -337,7 +370,7 @@ if(b_IsUsuarioWagner()) {
 		$n_ids_lans = 0;
 		$n_ids_outros = 0;
 
-		$res_geral = pg_exec($connid, $estat);
+		$res_geral = SQLexecuteQueryParams($estat, $estat_params);
 		while($pg_geral = pg_fetch_array($res_geral))
 		{
 			$qtde_geral += $pg_geral['quantidade'];
@@ -379,7 +412,7 @@ if(b_IsUsuarioReinaldo()) {
         $estat = preg_replace('/limit [0-9]*/s', '', $estat);
         $estat = preg_replace('/offset [0-9]*/s', '', $estat);
 
-	$resestat = pg_exec($connid, $estat);
+	$resestat = SQLexecuteQueryParams($estat, $estat_params);
 
 	if($max + $inicial > $total_table)
 		$reg_ate = $total_table;
