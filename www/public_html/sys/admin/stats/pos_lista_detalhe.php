@@ -2,9 +2,29 @@
 require_once "../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 
-	$pos_pagina = $seg_auxilar;
-        
-	$time_start = getmicrotime();
+		$pos_pagina = $seg_auxilar;
+	        
+		$time_start = getmicrotime();
+
+		$dd_estabelecimento1 = $_REQUEST['dd_estabelecimento1'] ?? ($dd_estabelecimento1 ?? null);
+		$tf_data_inicial = $_REQUEST['tf_data_inicial'] ?? ($tf_data_inicial ?? null);
+		$tf_data_final = $_REQUEST['tf_data_final'] ?? ($tf_data_final ?? null);
+		$dd_valor = $_REQUEST['dd_valor'] ?? ($dd_valor ?? null);
+		$dd_operadora = $_REQUEST['dd_operadora'] ?? ($dd_operadora ?? null);
+		$ncamp1 = $_REQUEST['ncamp1'] ?? ($ncamp1 ?? null);
+		$inicial = $_REQUEST['inicial'] ?? ($inicial ?? null);
+		$range = $_REQUEST['range'] ?? ($range ?? null);
+		$ordem = $_REQUEST['ordem'] ?? ($ordem ?? null);
+		$BtnSearch = $_REQUEST['BtnSearch'] ?? ($BtnSearch ?? null);
+
+		$allowedSort = array('ve_data_inclusao','ve_valor');
+		$ncamp1 = in_array($ncamp1, $allowedSort, true) ? $ncamp1 : 've_data_inclusao';
+		$ordem = ((int)$ordem === 1) ? 1 : 0;
+		$inicial = (is_numeric($inicial) && (int)$inicial >= 0) ? (int)$inicial : 0;
+		$range = (is_numeric($range) && (int)$range > 0) ? (int)$range : 1;
+		$dd_operadora = in_array($dd_operadora, array('OG','HB','MU',''), true) ? $dd_operadora : '';
+		$dd_valor = ($dd_valor !== null && $dd_valor !== '' && preg_match('/^\d+(\.\d+)?$/', (string)$dd_valor)) ? $dd_valor : '';
+		$dd_estabelecimento1 = trim((string)$dd_estabelecimento1);
 
 //echo "dd_operadora: ".$dd_operadora."<br>";
 //echo "<pre>";
@@ -22,8 +42,8 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 	if(!$ncamp1) $ncamp1 = 've_data_inclusao';
 
 
-	if(!$tf_data_inicial)  {
-		$resdatainicio = pg_exec($connid, "select ve_data_inclusao from dist_vendas_pos where ve_estabelecimento='$dd_estabelecimento1' order by ve_data_inclusao limit 1");
+		if(!$tf_data_inicial)  {
+			$resdatainicio = SQLexecuteQueryParams("select ve_data_inclusao from dist_vendas_pos where ve_estabelecimento=$1 order by ve_data_inclusao limit 1", array($dd_estabelecimento1));
 		if($pgdatainicio = pg_fetch_array ($resdatainicio)) {
 			$tf_data_inicial = substr($pgdatainicio['ve_data_inclusao'],8,2)."/".substr($pgdatainicio['ve_data_inclusao'],5,2)."/".substr($pgdatainicio['ve_data_inclusao'],0,4);
 		} else {
@@ -62,9 +82,9 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 //	$resuf = pg_exec($connid, "select uf from uf order by uf");
 //	$resuf_except = pg_exec($connid, "select uf from uf order by uf");
 
-	$resusuario = pg_exec($connid, "select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado from dist_vendas_pos where ve_estabelecimento='$dd_estabelecimento1' order by ve_data_inclusao desc limit 1");  
+		$resusuario = SQLexecuteQueryParams("select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado from dist_vendas_pos where ve_estabelecimento=$1 order by ve_data_inclusao desc limit 1", array($dd_estabelecimento1));  
 
-	$resvalor = pg_exec($connid, "select ve_valor, count(*) as n from dist_vendas_pos where ve_estabelecimento='$dd_estabelecimento1' group by ve_valor order by ve_valor");  
+		$resvalor = SQLexecuteQueryParams("select ve_valor, count(*) as n from dist_vendas_pos where ve_estabelecimento=$1 group by ve_valor order by ve_valor", array($dd_estabelecimento1));  
 
 	if(!verifica_data($tf_data_inicial))
 	{
@@ -87,34 +107,49 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 
 	if($FrmEnviar == 1)
 	{
-		$where_data = "";
-		$where_valor = "";
-		$where_opr = "";
-		$where_estabelecimento = "";
+			$where_data = "";
+			$where_valor = "";
+			$where_opr = "";
+			$where_estabelecimento = "";
+			$estatParams = array();
+			$paramIndex = 0;
 
-		if($tf_data_inicial && $tf_data_final) {
-			$data_inic = formata_data(trim($tf_data_inicial), 1);
-			$data_fim = formata_data(trim($tf_data_final), 1); 
-			$where_data = " and ((ve_data_inclusao >= '".trim($data_inic)." 00:00:00') and (ve_data_inclusao <= '".trim($data_fim)." 23:59:59')) "; 
-		}
+			if($tf_data_inicial && $tf_data_final) {
+				$data_inic = formata_data(trim($tf_data_inicial), 1);
+				$data_fim = formata_data(trim($tf_data_final), 1); 
+				$paramIndex++;
+				$where_data .= " and ve_data_inclusao >= $".$paramIndex." ";
+				$estatParams[] = trim($data_inic)." 00:00:00";
+				$paramIndex++;
+				$where_data .= " and ve_data_inclusao <= $".$paramIndex." ";
+				$estatParams[] = trim($data_fim)." 23:59:59";
+			}
 
-		if($dd_valor) {
-			$where_valor= " and (ve_valor=$dd_valor) ";
-		}
+			if($dd_valor) {
+				$paramIndex++;
+				$where_valor= " and ve_valor = $".$paramIndex." ";
+				$estatParams[] = $dd_valor;
+			}
 
-		if($dd_operadora) {
-			if(($dd_operadora=="OG") || ($dd_operadora=="HB") || ($dd_operadora=="MU"))
-				$where_opr = " and (ve_jogo='$dd_operadora') ";
-		}
+			if($dd_operadora) {
+				if(($dd_operadora=="OG") || ($dd_operadora=="HB") || ($dd_operadora=="MU"))
+				{
+					$paramIndex++;
+					$where_opr = " and ve_jogo = $".$paramIndex." ";
+					$estatParams[] = $dd_operadora;
+				}
+			}
 		if($dd_operadora=="") $dd_valor = "";
 //echo "dd_valor: ".$dd_valor."<br>";
 
 
 		$estat  = "select ve_id, ve_data_inclusao, ve_valor, ve_jogo from dist_vendas_pos ";
-		$estat  .= " where 1=1 ".$where_data." ".$where_valor." ".$where_opr." and ve_estabelecimento='$dd_estabelecimento1' ";		
-	
+			$paramIndex++;
+			$estat  .= " where 1=1 ".$where_data." ".$where_valor." ".$where_opr." and ve_estabelecimento=$".$paramIndex." ";
+			$estatParams[] = $dd_estabelecimento1;
+		
 
-		$res_count = pg_query($estat);
+			$res_count = SQLexecuteQueryParams($estat, $estatParams);
 		$total_table = pg_num_rows($res_count);
 
 		$estat .= " order by ".$ncamp1; 
@@ -138,7 +173,7 @@ $sql_transform=$estat;
 
 //echo "Subtotal: $estat<br>";
 
-	$resestat = pg_exec($connid, $estat);
+		$resestat = SQLexecuteQueryParams($estat, $estatParams);
 
 	if($max + $inicial > $total_table)
 		$reg_ate = $total_table;
@@ -228,9 +263,9 @@ function envia_lista(id) {
                   <td width="62"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif">&nbsp;</font></td>
                 </tr>
 				<?php
-					$telefones = "select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel from dist_vendas_pos where ve_estabelecimento='".$ve_estabelecimento."' and ve_estabtipo='".$ve_estabtipo."' and ve_cidade='".$ve_cidade."' and ve_estado='".$ve_estado."' and not (ve_tel is null) group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel";
+						$telefones = "select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel from dist_vendas_pos where ve_estabelecimento=$1 and ve_estabtipo=$2 and ve_cidade=$3 and ve_estado=$4 and not (ve_tel is null) group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel";
 //echo $telefones."<br>";
-					$restelefones = pg_exec($connid, $telefones);
+						$restelefones = SQLexecuteQueryParams($telefones, array($ve_estabelecimento, $ve_estabtipo, $ve_cidade, $ve_estado));
 					
 				?>
                 <tr bgcolor="#F5F5FB"> 

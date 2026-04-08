@@ -8,10 +8,36 @@
     
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
-        require_once "../../../../includes/constantes.php";
-        require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
-	$pos_pagina = $seg_auxilar;
-	$time_start = getmicrotime();
+	        require_once "../../../../includes/constantes.php";
+	        require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
+		$pos_pagina = $seg_auxilar;
+		$time_start = getmicrotime();
+
+		$ncamp = $_REQUEST['ncamp'] ?? ($ncamp ?? null);
+		$tf_data_inicial = $_REQUEST['tf_data_inicial'] ?? ($tf_data_inicial ?? null);
+		$tf_data_final = $_REQUEST['tf_data_final'] ?? ($tf_data_final ?? null);
+		$inicial = $_REQUEST['inicial'] ?? ($inicial ?? null);
+		$range = $_REQUEST['range'] ?? ($range ?? null);
+		$ordem = $_REQUEST['ordem'] ?? ($ordem ?? null);
+		$BtnSearch = $_REQUEST['BtnSearch'] ?? ($BtnSearch ?? null);
+		$dd_estabelecimento = $_REQUEST['dd_estabelecimento'] ?? ($dd_estabelecimento ?? null);
+		$dd_valor = $_REQUEST['dd_valor'] ?? ($dd_valor ?? null);
+		$dd_cidade = $_REQUEST['dd_cidade'] ?? ($dd_cidade ?? null);
+		$dd_estado = $_REQUEST['dd_estado'] ?? ($dd_estado ?? null);
+		$dd_estabtipo = $_REQUEST['dd_estabtipo'] ?? ($dd_estabtipo ?? null);
+		$dd_operadora = $_REQUEST['dd_operadora'] ?? ($dd_operadora ?? null);
+
+		$allowedSort = array('ve_estabelecimento','ve_cidade','ve_estado','ve_n','ve_data_ultima','total');
+		$ncamp = in_array($ncamp, $allowedSort, true) ? $ncamp : 've_estabelecimento';
+		$ordem = ((int)$ordem === 1) ? 1 : 0;
+		$inicial = (is_numeric($inicial) && (int)$inicial >= 0) ? (int)$inicial : 0;
+		$range = (is_numeric($range) && (int)$range > 0) ? (int)$range : 1;
+		$dd_operadora = in_array($dd_operadora, array('OG','HB','MU',''), true) ? $dd_operadora : '';
+		$dd_valor = ($dd_valor !== null && $dd_valor !== '' && preg_match('/^\d+(\.\d+)?$/', (string)$dd_valor)) ? $dd_valor : '';
+		$dd_estabelecimento = trim((string)$dd_estabelecimento);
+		$dd_estabtipo = trim((string)$dd_estabtipo);
+		$dd_cidade = trim((string)$dd_cidade);
+		$dd_estado = trim((string)$dd_estado);
 
 //echo "dd_operadora: ".$dd_operadora."<br>";
 //echo "Submit: $Submit<br>";
@@ -23,8 +49,8 @@
 	if(!$ncamp) $ncamp = 've_estabelecimento';
 
 
-	if(!$tf_data_inicial)  {
-		$resdatainicio = pg_exec($connid, "select ve_data_inclusao from dist_vendas_pos order by ve_data_inclusao limit 1");
+		if(!$tf_data_inicial)  {
+			$resdatainicio = SQLexecuteQueryParams("select ve_data_inclusao from dist_vendas_pos order by ve_data_inclusao limit 1", array());
 		if($pgdatainicio = pg_fetch_array ($resdatainicio)) {
 			$tf_data_inicial = substr($pgdatainicio['ve_data_inclusao'],8,2)."/".substr($pgdatainicio['ve_data_inclusao'],5,2)."/".substr($pgdatainicio['ve_data_inclusao'],0,4);
 		} else {
@@ -85,45 +111,66 @@
 
 	if($FrmEnviar == 1)
 	{
-		$where_data = "";
-		$where_valor = "";
-		$where_opr = "";
-		$where_estabelecimento = "";
-		$where_estabtipo = "";
-		$where_cidade = "";
-		$where_estado = "";
+			$where_data = "";
+			$where_valor = "";
+			$where_opr = "";
+			$where_estabelecimento = "";
+			$where_estabtipo = "";
+			$where_cidade = "";
+			$where_estado = "";
+			$estatParams = array();
+			$paramIndex = 0;
 
-		if($tf_data_inicial && $tf_data_final) 
-		{
-			$data_inic = formata_data(trim($tf_data_inicial), 1);
-			$data_fim = formata_data(trim($tf_data_final), 1); 
-			$where_data = " and ((ve_data_inclusao >= '".trim($data_inic)." 00:00:00') and (ve_data_inclusao <= '".trim($data_fim)." 23:59:59')) "; 
-		}
+			if($tf_data_inicial && $tf_data_final) 
+			{
+				$data_inic = formata_data(trim($tf_data_inicial), 1);
+				$data_fim = formata_data(trim($tf_data_final), 1); 
+				$paramIndex++;
+				$where_data .= " and ve_data_inclusao >= $".$paramIndex." ";
+				$estatParams[] = trim($data_inic)." 00:00:00";
+				$paramIndex++;
+				$where_data .= " and ve_data_inclusao <= $".$paramIndex." ";
+				$estatParams[] = trim($data_fim)." 23:59:59";
+			}
 
-		if($dd_estabelecimento) {
-			$where_estabelecimento = " and (ve_estabelecimento like '".str_replace("'", "''", $dd_estabelecimento)."') ";
-		}
+			if($dd_estabelecimento) {
+				$paramIndex++;
+				$where_estabelecimento = " and ve_estabelecimento like $".$paramIndex." ";
+				$estatParams[] = $dd_estabelecimento;
+			}
 
-		if($dd_valor) {
-			$where_valor= " and (ve_valor=$dd_valor) ";
-		}
+			if($dd_valor) {
+				$paramIndex++;
+				$where_valor= " and ve_valor = $".$paramIndex." ";
+				$estatParams[] = $dd_valor;
+			}
 
-		if($dd_cidade) {
-			$where_cidade= " and (ve_cidade='$dd_cidade') ";
-		}
+			if($dd_cidade) {
+				$paramIndex++;
+				$where_cidade= " and ve_cidade = $".$paramIndex." ";
+				$estatParams[] = $dd_cidade;
+			}
 
-		if($dd_estado) {
-			$where_estado= " and (ve_estado='$dd_estado') ";
-		}
+			if($dd_estado) {
+				$paramIndex++;
+				$where_estado= " and ve_estado = $".$paramIndex." ";
+				$estatParams[] = $dd_estado;
+			}
 
-		if($dd_estabtipo) {
-			$where_estabtipo= " and (ve_estabtipo='$dd_estabtipo') ";
-		}
+			if($dd_estabtipo) {
+				$paramIndex++;
+				$where_estabtipo= " and ve_estabtipo = $".$paramIndex." ";
+				$estatParams[] = $dd_estabtipo;
+			}
 
-		if($dd_operadora) {
-			if(($dd_operadora=="OG") || ($dd_operadora=="HB") || ($dd_operadora=="MU"))
-				$where_opr = " and (ve_jogo='$dd_operadora') ";
-		}
+			if($dd_operadora) {
+				if(($dd_operadora=="OG") || ($dd_operadora=="HB") || ($dd_operadora=="MU"))
+				{
+					$paramIndex++;
+					$where_opr = " and ve_jogo = $".$paramIndex." ";
+					$estatParams[] = $dd_operadora;
+				}
+			}
 		if($dd_operadora=="") $dd_valor = "";
 //echo "dd_valor: ".$dd_valor."<br>";
 
@@ -133,7 +180,7 @@
 		$estat  .= " group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado ";
 	
 
-		$res_count = pg_query($estat);
+			$res_count = SQLexecuteQueryParams($estat, $estatParams);
 		$total_table = pg_num_rows($res_count);
 
 		$estat .= " order by ".$ncamp; 
@@ -162,7 +209,7 @@ $sql_transform=$estat;
 
 //echo "SQL: $estat<br>";
 
-	$resestat = pg_exec($connid, $estat);
+		$resestat = SQLexecuteQueryParams($estat, $estatParams);
 
 	if($max + $inicial > $total_table)
 		$reg_ate = $total_table;
@@ -246,7 +293,7 @@ function envia_lista(id) {
                             <select name="dd_estabelecimento" id="dd_estabelecimento" class="form-control" onChange="document.formlista.submit()">
                                 <option value=""><?php echo LANG_POS_ALL_ESTABLISHMENT; ?></option>
 <?php 
-                                    $resusuario = pg_exec($connid, "select ve_estabelecimento, count(*) as ve_n from dist_vendas_pos group by ve_estabelecimento order by ve_estabelecimento");  
+                                    $resusuario = SQLexecuteQueryParams("select ve_estabelecimento, count(*) as ve_n from dist_vendas_pos group by ve_estabelecimento order by ve_estabelecimento", array());  
                                     while ($pgusuario = pg_fetch_array ($resusuario)) 
                                     {
 ?>
@@ -263,7 +310,7 @@ function envia_lista(id) {
                             <select name="dd_estabtipo" id="dd_estabtipo" class="form-control" onChange="document.formlista.submit()">
                                 <option value=""><?php echo LANG_POS_ALL_TYPES; ?></option>
 <?php 
-                        $resestabtipo = pg_exec($connid, "select ve_estabtipo, count(*) as ve_n from dist_vendas_pos group by ve_estabtipo order by ve_estabtipo");  
+                        $resestabtipo = SQLexecuteQueryParams("select ve_estabtipo, count(*) as ve_n from dist_vendas_pos group by ve_estabtipo order by ve_estabtipo", array());  
                         while ($pgestabtipo = pg_fetch_array ($resestabtipo)) 
                         {
 ?>
@@ -282,7 +329,7 @@ function envia_lista(id) {
                             <select name="dd_cidade" id="dd_cidade" class="form-control" onChange="document.formlista.submit()">
                                 <option value=""><?php echo LANG_POS_ALL_CITIES; ?></option>
 <?php 
-                                $rescidade = pg_exec($connid, "select ve_cidade, count(*) as ve_n from dist_vendas_pos group by ve_cidade order by ve_cidade");  
+                                $rescidade = SQLexecuteQueryParams("select ve_cidade, count(*) as ve_n from dist_vendas_pos group by ve_cidade order by ve_cidade", array());  
                                 while ($pgcidade = pg_fetch_array ($rescidade)) 
                                 {
 ?>
@@ -299,7 +346,7 @@ function envia_lista(id) {
                             <select name="dd_estado" id="dd_estado" class="form-control" onChange="document.formlista.submit()">
                                 <option value=""><?php echo LANG_POS_ALL_CITIES; ?></option>
 <?php 
-                                $resestado = pg_exec($connid, "select ve_estado, count(*) as ve_n from dist_vendas_pos group by ve_estado order by ve_estado");
+                                $resestado = SQLexecuteQueryParams("select ve_estado, count(*) as ve_n from dist_vendas_pos group by ve_estado order by ve_estado", array());
                                 while ($pgestado = pg_fetch_array ($resestado)) 
                                 { 
 ?>
@@ -436,9 +483,9 @@ function envia_lista(id) {
                                 {	
                                     $valor = true;
 
-                                    $telefones = "select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel from dist_vendas_pos where ve_estabelecimento='".str_replace("'","\'",$pgrow['ve_estabelecimento'])."' and ve_estabtipo='".$pgrow['ve_estabtipo']."' and ve_cidade='".$pgrow['ve_cidade']."' and ve_estado='".$pgrow['ve_estado']."' and not (ve_tel is null) group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel";
+                                    $telefones = "select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel from dist_vendas_pos where ve_estabelecimento=$1 and ve_estabtipo=$2 and ve_cidade=$3 and ve_estado=$4 and not (ve_tel is null) group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, ve_ddd, ve_tel";
         //echo $telefones."<br>";
-                                    $restelefones = pg_exec($connid, $telefones);
+                                    $restelefones = SQLexecuteQueryParams($telefones, array($pgrow['ve_estabelecimento'], $pgrow['ve_estabtipo'], $pgrow['ve_cidade'], $pgrow['ve_estado']));
 
                                     $bvirgula = false;
                                     $t = "";

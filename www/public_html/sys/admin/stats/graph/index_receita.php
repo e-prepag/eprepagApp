@@ -251,7 +251,7 @@ else {
 
 
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
+		$dd_operadora = (int)$_SESSION["opr_codigo_pub"];
 		$dd_mode = "S";
 
 		if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
@@ -275,12 +275,13 @@ else {
 	if(!$dd_mode || ($dd_mode!='V')) {
 		$dd_mode = "S";
 	}
-	$smode = $dd_mode;
+		$smode = $dd_mode;
+		$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
 
-	$dd_operadora_nome = "";
-	if($dd_operadora) {
-		$sql 		 = "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
-		$resopr_nome = SQLexecuteQuery($sql);
+		$dd_operadora_nome = "";
+		if($dd_operadora) {
+			$sql 		 = "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem";
+			$resopr_nome = SQLexecuteQueryParams($sql, array((int)$dd_operadora));
 		//$resopr_nome = pg_exec($connid, "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome = $pgopr_nome['opr_nome'];
@@ -308,12 +309,13 @@ else {
 //		$extra_where = $where_operadora;
 	}
 
-	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
-	} else {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
-	}
-	$resopr = SQLexecuteQuery($sqlopr);
+		if($_SESSION["tipo_acesso_pub"]=='PU') {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem";
+			$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
+		} else {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+			$resopr = SQLexecuteQueryParams($sqlopr, array());
+		}
 	//$resopr = pg_exec($connid, $sqlopr);
 	//echo "$sqlopr<br>";
 ?>

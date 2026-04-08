@@ -12,9 +12,15 @@ $dd_operadora            = $_POST['dd_operadora'] ?? null;
 $dd_mode                 = $_POST['dd_mode'] ?? null;
 $dd_year                  = $_POST['dd_year'] ?? null;
 $dd_exclui_epp_cash      = $_POST['dd_exclui_epp_cash'] ?? null;
+$dd_ids_integracao       = $_POST['dd_ids_integracao'] ?? ($dd_ids_integracao ?? null);
 
 // Bot?o
 $btnSubmit            = $_POST['btnSubmit'] ?? null;
+
+$dd_operadora = ($dd_operadora !== null && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+$dd_year = ($dd_year !== null && $dd_year !== '' && is_numeric($dd_year)) ? (int)$dd_year : null;
+$dd_exclui_epp_cash = ((int)$dd_exclui_epp_cash === 1) ? 1 : 0;
+$dd_ids_integracao = ($dd_ids_integracao !== null && $dd_ids_integracao !== '') ? preg_replace('/[^0-9]/', '', (string)$dd_ids_integracao) : '';
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
         //redireciona
@@ -68,7 +74,7 @@ $where_operadora_rede_ponto_certo = "";
 $where_origem = "";
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $dd_operadora = $_SESSION["opr_codigo_pub"];
+        $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
         $dd_mode = "S";
 
         if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
@@ -141,26 +147,27 @@ if ($dd_exclui_epp_cash==1) {
         }
 }
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
+        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+        $resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 } else {
         $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_nome";
         if($dd_operadora==38) { 
                 $where_origem = ($dd_origem_stardoll)?" and vg_http_referer_origem='STARDOLL' ":"";
         }
+        $resopr = SQLexecuteQueryParams($sqlopr, array());
 }
 
 //IDS de integração
 if (!empty($dd_ids_integracao)) {
         if (empty($where_operadora)) {
-                $where_operadora .= " vg_integracao_parceiro_origem_id = '".$dd_ids_integracao."' ";
+                $where_operadora .= " vg_integracao_parceiro_origem_id = ".$dd_ids_integracao." ";
         }
         else {
-                $where_operadora .= " and vg_integracao_parceiro_origem_id = '".$dd_ids_integracao."' ";
+                $where_operadora .= " and vg_integracao_parceiro_origem_id = ".$dd_ids_integracao." ";
         }
 }
 
         
-$resopr = SQLexecuteQuery($sqlopr);
 //echo $sqlopr."<br>";
 
 ?>
@@ -360,9 +367,13 @@ if($_REQUEST['btnSubmit']) {
                 $where_opr_utilizacao_lan = "";
                 if($possui_totalizacao_utilizacao) {
                     //echo "ID: ".$dd_operadora." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
-                    $where_opr_venda_lan = " AND ( CASE  WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao < '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END ) ";
-                    $where_opr_venda_lan_negativa = " AND ( CASE WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao >= '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ELSE FALSE END ) ";
-                    $where_opr_utilizacao_lan = " AND ( CASE  WHEN pih_id = $dd_operadora THEN pih_data >= '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ELSE FALSE END ) ";
+                    $data_inicio_contabilizacao = substr((string)$opr_data_inicio_contabilizacao_utilizacao, 0, 19);
+                    if(!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $data_inicio_contabilizacao)) {
+                            $data_inicio_contabilizacao = '2008-01-01 00:00:00';
+                    }
+                    $where_opr_venda_lan = " AND ( CASE  WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao < '".$data_inicio_contabilizacao."' ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END ) ";
+                    $where_opr_venda_lan_negativa = " AND ( CASE WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao >= '".$data_inicio_contabilizacao."' ELSE FALSE END ) ";
+                    $where_opr_utilizacao_lan = " AND ( CASE  WHEN pih_id = $dd_operadora THEN pih_data >= '".$data_inicio_contabilizacao."' ELSE FALSE END ) ";
                 } //end if($possui_totalizacao_utilizacao)
                 if(empty($dd_operadora)){
                     //Buscando Publisher que possuem totalização por utilização
@@ -394,7 +405,7 @@ if($_REQUEST['btnSubmit']) {
 		$sql_total_mes = get_sql_total_mes($extra_where, false, $smode, null, false, $where_origem, $possui_totalizacao_utilizacao);
 
                 //echo $sql_total_mes."<br>";
-		$vendas_total_mes = SQLexecuteQuery($sql_total_mes);
+		$vendas_total_mes = SQLexecuteQueryParams($sql_total_mes, array());
 		if($vendas_total_mes) {
 			$aNVendas = array();
 			$aVendas = array();

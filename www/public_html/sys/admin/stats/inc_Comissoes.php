@@ -471,7 +471,7 @@ $COMISSOES_BRUTAS_PUBLISHER_M_E = Array(
 	$OPR_NOMES = Array();		// opr_nome => opr_codigo 
 	$sql  = "select * from operadoras ope order by opr_codigo "; //"where not opr_codigo=78;";
 //echo "$sql<br>";
-	$rs_operadoras = SQLexecuteQuery($sql);
+	$rs_operadoras = SQLexecuteQueryParams($sql, array());
 	if($rs_operadoras) {
 		while($rs_operadoras_row = pg_fetch_array($rs_operadoras)){ 
 			$OPR_CODIGOS[$rs_operadoras_row['opr_codigo']] = $rs_operadoras_row['opr_nome']; 
@@ -567,7 +567,10 @@ function get_sql_comissao($dd_operadora_nome, $smode) {
 
 	switch($smode) {
 		case "P":
-			$sql .= " (case when ve_jogo='HB' then (".$COMISSOES_BRUTAS['P']['HABBO HOTEL']."./100) when ve_jogo='MU' then (".$COMISSOES_BRUTAS['P']['MU ONLINE']."./100) when ve_jogo='OG' then (".$COMISSOES_BRUTAS['P']['ONGAME']."./100) end) \n";
+			$comHB = (float)$COMISSOES_BRUTAS['P']['HABBO HOTEL'];
+			$comMU = (float)$COMISSOES_BRUTAS['P']['MU ONLINE'];
+			$comOG = (float)$COMISSOES_BRUTAS['P']['ONGAME'];
+			$sql .= " (case when ve_jogo='HB' then (".$comHB."./100) when ve_jogo='MU' then (".$comMU."./100) when ve_jogo='OG' then (".$comOG."./100) end) \n";
 			break;
 		case "M":		
 		case "E":		
@@ -577,9 +580,11 @@ function get_sql_comissao($dd_operadora_nome, $smode) {
 //				$sql .= " when vgm_nome_produto='$NomeProduto' then (".$COMISSOES_BRUTAS['E'][$Publisher]."./100) ";
 //			}
 			foreach ($OPR_CODIGOS as $opr_codigo => $opr_nome){ 
+				$opr_codigo = (int)$opr_codigo;
 				$comiss = $COMISSOES_BRUTAS['M'][$opr_nome];			// "M" = "E" here (ok?)
 	//echo $opr_nome." -> ".$comiss."<br>";
 				if(!$comiss) $comiss = "0";
+				$comiss = (float)$comiss;
 				$sql .= " when vgm.vgm_opr_codigo=$opr_codigo then (".$comiss."./100) \n";
 			}
 			$sql .= " end) \n";
@@ -588,16 +593,19 @@ function get_sql_comissao($dd_operadora_nome, $smode) {
 			$sql .= " (\n";
 			$sql .= " case \n";
 			foreach ($OPR_CODIGOS as $opr_codigo => $opr_nome){ 
+				$opr_codigo = (int)$opr_codigo;
 				$comiss = $COMISSOES_BRUTAS['L'][$opr_nome];
 	//echo $opr_nome." -> ".$comiss."<br>";
 				if(!$comiss) $comiss = "0";
+				$comiss = (float)$comiss;
 				$sql .= " when vgm.vgm_opr_codigo=$opr_codigo then (".$comiss."./100) \n";
 			}
 			$sql .= " end) \n";
 			break;
 		case "C":		
 			if($dd_operadora_nome=="ONGAME") {
-				$sql .= " (".$COMISSOES_BRUTAS['C']['ONGAME']."./100.) \n";
+				$comOG = (float)$COMISSOES_BRUTAS['C']['ONGAME'];
+				$sql .= " (".$comOG."./100.) \n";
 			} else {
 				$sql .= " (0) \n";
 			}

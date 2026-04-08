@@ -1,17 +1,26 @@
 <?php
 session_start();
 
-//session_register("script");
-$_SESSION['script']	=	$_GET['script'];
+$allowed_scripts = array(
+	'POS_stats_abas.php',
+	'Money_stats_abas.php',
+	'MoneyEx_stats_abas.php',
+	'LHMoney_stats_abas.php',
+	'Cartoes_stats_abas.php',
+	'Site_stats_abas.php'
+);
+$script_get = isset($_GET['script']) ? (string)$_GET['script'] : '';
+if(!in_array($script_get, $allowed_scripts, true)) {
+	$script_get = 'POS_stats_abas.php';
+}
+$_SESSION['script']	=	$script_get;
 $script				=	$_SESSION['script'];
 //echo $script.": Script";
 
-//session_register('dd_operadora');
-$_SESSION['dd_operadora']	=	$_GET['dd_operadora'];
+$_SESSION['dd_operadora']	= isset($_GET['dd_operadora']) ? (int)$_GET['dd_operadora'] : 0;
 $dd_operadora				=	$_SESSION['dd_operadora'];
 
-//session_register('dd_mode');
-$_SESSION['dd_mode']	=	$_GET['dd_mode'];
+$_SESSION['dd_mode']	=	(isset($_GET['dd_mode']) && $_GET['dd_mode'] === 'V') ? 'V' : 'S';
 $dd_mode				=	$_SESSION['dd_mode'];
 
 if(!empty($_GET['button'])) {

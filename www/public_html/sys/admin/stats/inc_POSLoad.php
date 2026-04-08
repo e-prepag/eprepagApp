@@ -149,38 +149,56 @@ if(empty($_SESSION["iduser_bko_pub"]))
 	// 0		1	2					3						4		5	6		7			8		9
 	// 1721158, 10, BIG POSTO TUBARAO, POSTOS DE COMBUSTIVEL, LONDRINA, PR, 11,	66744123,	21/08/2008,	10:39
 	function add_item_in_DB($lote_game, $lote_opr_codigo, $lote_date, $afields, $print_output) {
+		$veId = isset($afields[0]) ? (int)$afields[0] : 0;
+		$veValor = isset($afields[1]) ? (float)str_replace(',', '.', (string)$afields[1]) : 0.0;
+		$veEstabelecimento = isset($afields[2]) ? trim((string)$afields[2]) : '';
+		$veEstabtipo = isset($afields[3]) ? trim((string)$afields[3]) : '';
+		$veCidade = isset($afields[4]) ? trim((string)$afields[4]) : '';
+		$veEstado = isset($afields[5]) ? trim((string)$afields[5]) : '';
+		$veDdd = isset($afields[6]) ? trim((string)$afields[6]) : '';
+		$veTel = isset($afields[7]) ? trim((string)$afields[7]) : '';
+		$veOprCodigo = (int)$lote_opr_codigo;
+		$veCodRede = '9999';
 
-		$sql = "select ve_id from dist_vendas_pos where ve_id = ".$afields[0].";";
-//echo "sql: $sql<br>\n";
-		$ret = SQLexecuteQuery($sql);
+		$sql = "select ve_id from dist_vendas_pos where ve_id = $1;";
+		$ret = SQLexecuteQueryParams($sql, array($veId));
 
 		if(!$ret || pg_num_rows($ret) == 0) {
-//			$sql = "insert into dist_vendas_pos (ve_id, ve_valor, ve_data, ve_jogo, ve_estado, ve_cidade, ve_estabtipo, ve_estabelecimento) values (".$afields[0].", ".$afields[1].", '".date("Y-m-d H:i:s", $lote_date)."', '".$lote_game."', '".$afields[5]."', '".$afields[4]."', '".$afields[3]."', '".$afields[2]."')";
+			$dataInclusao = date("Y-m-d H:i:s", (int)$lote_date);
 			if(count($afields)>7) {
-				// '29/08/2008'
-				$sRegDay = substr($afields[8], 0, 2);
-				$sRegMonth = substr($afields[8], 3, 2);
-				$sRegYear = substr($afields[8], 6, 4);
+				$rawDate = isset($afields[8]) ? trim((string)$afields[8]) : '';
+				$rawTime = isset($afields[9]) ? trim((string)$afields[9]) : '00:00:00';
+				if(preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $rawDate)) {
+					$sRegDay = substr($rawDate, 0, 2);
+					$sRegMonth = substr($rawDate, 3, 2);
+					$sRegYear = substr($rawDate, 6, 4);
+					if(preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $rawTime)) {
+						if(strlen($rawTime) === 5) {
+							$rawTime .= ":00";
+						}
+						$dataInclusao = $sRegYear."-".$sRegMonth."-".$sRegDay." ".$rawTime;
+					}
+				}
 
-				$sql = "insert into dist_vendas_pos (ve_id, ve_valor, ve_data_inclusao, ve_jogo, ve_estado, ve_cidade, ve_estabtipo, ve_estabelecimento, ve_ddd, ve_tel, ve_opr_codigo, ve_cod_rede) values (".$afields[0].", ".$afields[1].", '".($sRegYear."-".$sRegMonth."-".$sRegDay )." ".$afields[9]."', '".$lote_game."', '".$afields[5]."', '".str_replace("'", "''", $afields[4])."', '".str_replace("'", "''", $afields[3])."', '".str_replace("'", "''", $afields[2])."', '".$afields[6]."', '".$afields[7]."', ".$lote_opr_codigo.", '9999')";
+				$sql = "insert into dist_vendas_pos (ve_id, ve_valor, ve_data_inclusao, ve_jogo, ve_estado, ve_cidade, ve_estabtipo, ve_estabelecimento, ve_ddd, ve_tel, ve_opr_codigo, ve_cod_rede) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
+				$ret = SQLexecuteQueryParams($sql, array($veId, $veValor, $dataInclusao, $lote_game, $veEstado, $veCidade, $veEstabtipo, $veEstabelecimento, $veDdd, $veTel, $veOprCodigo, $veCodRede));
 			} else {
-				$sql = "insert into dist_vendas_pos (ve_id, ve_valor, ve_data_inclusao, ve_jogo, ve_estado, ve_cidade, ve_estabtipo, ve_estabelecimento, ve_opr_codigo, ve_cod_rede) values (".$afields[0].", ".$afields[1].", '".date("Y-m-d H:i:s", $lote_date)."', '".$lote_game."', '".$afields[5]."', '".$afields[4]."', '".str_replace("'", "''", $afields[3])."', '".str_replace("'", "''", $afields[2])."', ".$lote_opr_codigo.", '9999')";
+				$sql = "insert into dist_vendas_pos (ve_id, ve_valor, ve_data_inclusao, ve_jogo, ve_estado, ve_cidade, ve_estabtipo, ve_estabelecimento, ve_opr_codigo, ve_cod_rede) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
+				$ret = SQLexecuteQueryParams($sql, array($veId, $veValor, $dataInclusao, $lote_game, $veEstado, $veCidade, $veEstabtipo, $veEstabelecimento, $veOprCodigo, $veCodRede));
 			}
 
-//echo "sql: $sql<br>\n";
-			$ret = SQLexecuteQuery($sql);
 			if(!$ret) {
 				if($print_output) {
-					echo "<font color='#FF0000' style='background-color:#FFFF66'>ERRO ao cadastrar registro ".$afields[0]."</font><br>\n";
+					echo "<font color='#FF0000' style='background-color:#FFFF66'>ERRO ao cadastrar registro ".$veId."</font><br>\n";
 				}
 			} else {
 				if($print_output) {
-					echo "<font color='#66CC66'>Registro ".$afields[0]." cadastrado com sucesso</font>(".date("Y-m-d H:i:s").")<br>\n";
+					echo "<font color='#66CC66'>Registro ".$veId." cadastrado com sucesso</font>(".date("Y-m-d H:i:s").")<br>\n";
 				}
 			}
 		} else {
 //			if($print_output) {
-				echo "<font color='#FF0000'>Registro ".$afields[0]." já existe</font> (".date("Y-m-d H:i:s").")<br>\n";
+				echo "<font color='#FF0000'>Registro ".$veId." já existe</font> (".date("Y-m-d H:i:s").")<br>\n";
 //			}
 		}
 

@@ -23,21 +23,25 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 	$b_show_listings = true;
 
-	$time_start_stats = getmicrotime();
+		$time_start_stats = getmicrotime();
+		$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
 
 	$bg_col_01 = "#FFFFFF";
 	$bg_col_02 = "#EEEEEE";
 	$bg_col = $bg_col_01;
 
 	$where_operadora = "";
+	$queryParams = array();
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
 		$dd_operadora = (int)$_SESSION["opr_codigo_pub"]; // Sanitize as integer
 		$dd_mode = "S";
 
 		if($dd_operadora > 0) { 
-			$where_operadora = " and vgm_opr_codigo=".$dd_operadora;
+			$where_operadora = " and vgm_opr_codigo=$1";
+			$queryParams = array((int)$dd_operadora);
 		} else {
 			$where_operadora = "";
+			$queryParams = array();
 		}
 	}
 
@@ -49,20 +53,22 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	if($smode=='S') $where_mode_data = "vg.vg_data_concilia";
 
 	$dd_operadora_nome = "";
-	if($dd_operadora) {
-		$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array($dd_operadora));
+		if($dd_operadora) {
+			$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array((int)$dd_operadora));
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome = $pgopr_nome['opr_nome'];
 		} 
-		$where_operadora = " vgm_opr_codigo='".$dd_operadora."'";
-	}
+			$where_operadora = " vgm_opr_codigo=$1";
+			$queryParams = array((int)$dd_operadora);
+		}
 
-	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
-	} else {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
-	}
-	$resopr = pg_exec($connid, $sqlopr);
+		if($_SESSION["tipo_acesso_pub"]=='PU') {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem";
+			$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
+		} else {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+			$resopr = SQLexecuteQueryParams($sqlopr, array());
+		}
 //echo "$sqlopr<br>";
 
 //echo "dd_operadora: ".$dd_operadora."<br>";
@@ -191,7 +197,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	$sql = get_sql_query("M", "totais_de_vendas", addWhereClause($extra_where, $where_operadora), $smode);
 	$total_vendas = 0;
 	$n_vendas = 0;
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	if($vendas_estado) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 			$total_vendas = $vendas_estado_row['vendas'];
@@ -206,7 +212,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	$sql = get_sql_query("M", "datas_limites_no_bd", addWhereClause($extra_where, $where_operadora), $smode);
 	$data_min = date("Y-m-d");
 	$data_max = date("Y-m-d");
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	if($vendas_estado) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 			$data_min = $vendas_estado_row['data_min'];
@@ -223,7 +229,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	$sql = get_sql_query("M", "por_mes", addWhereClause($extra_where, $where_operadora), $smode);
 //echo "where_operadora: $where_operadora<br>";
 //echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 	echo "<a name='Totalpormes'><table border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' class='txt-cinza' style='border-collapse:collapse;'>";
@@ -243,7 +249,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	// ".LANG_STATISTICS_FOR_WEEK_DAY."
 	$sql = get_sql_query("M", "por_dia_da_semana", addWhereClause($extra_where, $where_operadora), $smode);
 //echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 	echo "<a name='Totalpordiadasemana'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
@@ -263,7 +269,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	// Por dia
 	$sql = get_sql_query("M", "por_dia", addWhereClause($extra_where, $where_operadora), $smode);
 //echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 	echo "<a name='Totalpordia'></a><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
@@ -295,7 +301,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 	// ".LANG_STATISTICS_FOR_GAME."
 	$sql = get_sql_query("M", "por_publisher", addWhereClause($extra_where, $where_operadora), $smode);
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 	echo "<a name='Totalporjogo'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
@@ -318,7 +324,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 	$extra_where = " ($where_mode_data>='".date("Y-m-d H:i:s", $thismonth)."') ";
 	$sql = get_sql_query("M", "por_publisher", addWhereClause($extra_where, $where_operadora), $smode);
 //echo $sql."<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$extra_where = "";
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado); 
@@ -344,7 +350,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 	// ".LANG_STATISTICS_FOR_STATE."
 	$sql = get_sql_query("M", "por_estado", addWhereClause($extra_where, $where_operadora), $smode);
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$previous_value = -1;
 	$bg_col = $bg_col_01;
 	echo "<a name='Totalporestado'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
@@ -363,7 +369,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 	// Por Cidade
 	$sql = get_sql_query("M", "por_cidade", addWhereClause($extra_where, $where_operadora), $smode);
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$previous_value = -1;
 	$bg_col = $bg_col_01;
 	echo "<a name='Totalporcidade'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
@@ -385,7 +391,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 		// ".LANG_STATISTICS_FOR_USER."
 		$sql = get_sql_query("M", "por_usuario", addWhereClause($extra_where, $where_operadora), $smode);
 //echo "sql: $sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
 		echo "<a name='Totalporusuario'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
@@ -412,7 +418,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 //echo "sql: $sql<br>";
 		$total_vendas = 0;
 		$n_vendas = 0;
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		if($vendas_estado && $b_show_listings) {
 			while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 				$total_vendas = $vendas_estado_row['vendas'];
@@ -425,7 +431,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 		// ".LANG_STATISTICS_FOR_USER." último mês
 		$sql = get_sql_query("M", "por_usuario", addWhereClause($extra_where, $where_operadora), $smode);
 //echo "sql: $sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
 		$total_vendas_mes = 0;
@@ -458,7 +464,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 		$sql = get_sql_query("M", "totais_de_vendas", addWhereClause($extra_where, $where_operadora), $smode);
 		$total_vendas = 0;
 		$n_vendas = 0;
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		if($vendas_estado) {
 			while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 				$total_vendas = $vendas_estado_row['vendas'];
@@ -471,7 +477,7 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 		// ".LANG_STATISTICS_FOR_USER." última semana
 		$sql = get_sql_query("M", "por_usuario", addWhereClause($extra_where, $where_operadora), $smode);
 	//echo "sql: $sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
 		$total_vendas_sem = 0;

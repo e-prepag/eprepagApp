@@ -25,6 +25,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.p
 require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 $time_start_stats = getmicrotime();
+$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
 ?>
 <!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -57,13 +58,15 @@ $time_start_stats = getmicrotime();
 	echo $descricao->MontaAreaDescricao();
 //}//end if (b_IsSysAdminFinancial())
 
-	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
-	} else {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') and (not ((opr_codigo in ($dd_operadora_EPP_Cash, $dd_operadora_EPP_Cash_LH)) )) order by opr_nome";
-	}
-//	$resopr = pg_exec($connid, $sqlopr);
-	$resopr = SQLexecuteQuery($sqlopr);
+		if($_SESSION["tipo_acesso_pub"]=='PU') {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+			$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
+		} else {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') and (not ((opr_codigo in ($1, $2)) )) order by opr_nome";
+			$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora_EPP_Cash, (int)$dd_operadora_EPP_Cash_LH));
+		}
+	//	$resopr = pg_exec($connid, $sqlopr);
+		
 //echo "$sqlopr<br>";
 
 
@@ -90,7 +93,7 @@ _SESSION[\"horalog_bko\"]: ".$_SESSION["horalog_bko"]."<br>";
 */
 
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
+		$dd_operadora = (int)$_SESSION["opr_codigo_pub"];
 		$dd_mode = "S";
 
 		if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
@@ -119,7 +122,7 @@ _SESSION[\"horalog_bko\"]: ".$_SESSION["horalog_bko"]."<br>";
 	$dd_operadora_nome = "";
 	if($dd_operadora) {
 //		$resopr_nome = pg_exec($connid, "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
-		$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array($dd_operadora));
+			$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array((int)$dd_operadora));
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome = $pgopr_nome['opr_nome'];
 		} 
@@ -198,14 +201,14 @@ _SESSION[\"horalog_bko\"]: ".$_SESSION["horalog_bko"]."<br>";
 
 	// Totais por mes ========================================================================================
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
+		$dd_operadora = (int)$_SESSION["opr_codigo_pub"];
 	}
 	if($dd_operadora==13) { 
 		$where_operadora_cartoes = " (ve_jogo='OG') ";
 	} else if($dd_operadora==17) { 
 		$where_operadora_cartoes = " (ve_jogo='MU') ";
 	} else { 
-		if(strlen($dd_operadora)>0) 
+		if($dd_operadora > 0) 
 			$where_operadora_cartoes = " (ve_jogo='??') ";
 	}
 
@@ -223,7 +226,7 @@ _SESSION[\"horalog_bko\"]: ".$_SESSION["horalog_bko"]."<br>";
 //	echo "<b>sql_total_mes</b>: ".str_replace("\n","<br>\n",$sql_total_mes)."<br><hr>";
 //}
 
-	$vendas_total_mes = SQLexecuteQuery($sql_total_mes);
+	$vendas_total_mes = SQLexecuteQueryParams($sql_total_mes, array());
 	if($vendas_total_mes) {
 		$aNVendas = array();
 		$aVendas = array();
@@ -560,7 +563,7 @@ _SESSION[\"horalog_bko\"]: ".$_SESSION["horalog_bko"]."<br>";
 		}
 //echo "sql_produtos: ".$sql_produtos."<br>";
 //echo "smsg_opr: ".$smsg_opr."<br>";
-		$res_produtos = SQLexecuteQuery($sql_produtos);
+		$res_produtos = SQLexecuteQueryParams($sql_produtos, array());
 		if($res_produtos) {
 			$sOutput = "";
 			while ($res_produtos_row = pg_fetch_array($res_produtos)){

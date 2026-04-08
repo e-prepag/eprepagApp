@@ -8,6 +8,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 $time_start_stats = getmicrotime();
+$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
 
 $bg_col_01 = "#FFFFFF";
 $bg_col_02 = "#EEEEEE";
@@ -22,7 +23,7 @@ $where_operadora_rede_ponto_certo = "";
 $dd_year = ""; //date("Y");
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $dd_operadora = $_SESSION["opr_codigo_pub"];
+        $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
         $dd_mode = "S";
 
         if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
@@ -51,7 +52,7 @@ $smode = $dd_mode;
 $dd_operadora_nome = "";
 $possui_totalizacao_utilizacao = false;
 if($dd_operadora) {
-        $resopr_nome = pg_exec($connid, "select opr_nome, opr_contabiliza_utilizacao, opr_data_inicio_contabilizacao_utilizacao from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
+        $resopr_nome = SQLexecuteQueryParams("select opr_nome, opr_contabiliza_utilizacao, opr_data_inicio_contabilizacao_utilizacao from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array((int)$dd_operadora));
         if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
                 $dd_operadora_nome = $pgopr_nome['opr_nome'];
                 $possui_totalizacao_utilizacao = $pgopr_nome['opr_contabiliza_utilizacao'];
@@ -86,11 +87,12 @@ if($dd_operadora) {
 }
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
+        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem";
+        $resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 } else {
         $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+        $resopr = SQLexecuteQueryParams($sqlopr, array());
 }
-$resopr = pg_exec($connid, $sqlopr);
 ?>
 <!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -198,9 +200,13 @@ $aCanais = array("C", "S", "L", "P");	//array("C", "E", "M", "L", "P");
 //Capturando informações de dados de totalização por utilização
 if($possui_totalizacao_utilizacao) {
     //echo "ID: ".$dd_operadora." => DATA: [".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."]<br>";
-    $where_opr_venda_lan = " AND ( CASE  WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao < '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END ) ";
-    $where_opr_venda_lan_negativa = " AND ( CASE WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao >= '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ELSE FALSE END ) ";
-    $where_opr_utilizacao_lan = " AND ( CASE  WHEN pih_id = $dd_operadora THEN pih_data >= '".substr($opr_data_inicio_contabilizacao_utilizacao,0,19)."' ELSE FALSE END ) ";
+    $data_inicio_contabilizacao = substr((string)$opr_data_inicio_contabilizacao_utilizacao, 0, 19);
+    if(!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $data_inicio_contabilizacao)) {
+        $data_inicio_contabilizacao = '2008-01-01 00:00:00';
+    }
+    $where_opr_venda_lan = " AND ( CASE  WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao < '".$data_inicio_contabilizacao."' ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END ) ";
+    $where_opr_venda_lan_negativa = " AND ( CASE WHEN vgm.vgm_opr_codigo = $dd_operadora THEN vg.vg_data_inclusao >= '".$data_inicio_contabilizacao."' ELSE FALSE END ) ";
+    $where_opr_utilizacao_lan = " AND ( CASE  WHEN pih_id = $dd_operadora THEN pih_data >= '".$data_inicio_contabilizacao."' ELSE FALSE END ) ";
 } //end if($possui_totalizacao_utilizacao)
 else {
     $where_opr_venda_lan = "";
@@ -211,7 +217,7 @@ else {
 // Totais por mes ========================================================================================
 $sql_total_mes = get_sql_total_mes($extra_where, false, $smode, $dd_year, false, $where_origem, $possui_totalizacao_utilizacao);
 
-$vendas_total_mes = SQLexecuteQuery($sql_total_mes);
+$vendas_total_mes = SQLexecuteQueryParams($sql_total_mes, array());
 if($vendas_total_mes) {
         $aNVendas = array();
         $aVendas = array();

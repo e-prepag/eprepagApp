@@ -25,6 +25,11 @@ require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
 $time_start = getmicrotime();
 
+$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
+$dd_year = (isset($dd_year) && $dd_year !== '' && is_numeric($dd_year)) ? (int)$dd_year : null;
+$dd_exclui_epp_cash = ((int)$dd_exclui_epp_cash === 1) ? 1 : 0;
+$dd_ids_integracao = (!empty($dd_ids_integracao)) ? preg_replace('/[^0-9]/', '', (string)$dd_ids_integracao) : '';
+
 if ($_SERVER['HTTP_REFERER'] != "" . EPREPAG_URL_HTTP . "/sys/admin/stats/TOTAL_MES_stats_maneira_antiga.php") {
         $dd_exclui_epp_cash = 1;
 }
@@ -61,7 +66,7 @@ $where_operadora_rede_ponto_certo = "";
 $where_origem = "";
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $dd_operadora = $_SESSION["opr_codigo_pub"];
+        $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
         $dd_mode = "S";
 
         if($dd_operadora==13)	//($dd_operadora_nome=='ONGAME') 
@@ -91,7 +96,7 @@ if(!$dd_year)   $dd_year      = date('Y');
 
 $dd_operadora_nome = "";
 if($dd_operadora) {
-        $resopr_nome = SQLexecuteQuery("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome");
+        $resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome", array((int)$dd_operadora));
         if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
                 $dd_operadora_nome = $pgopr_nome['opr_nome'];
         } 
@@ -131,26 +136,27 @@ if ($dd_exclui_epp_cash==1) {
         }
 }
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_nome";
+        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_nome";
+        $resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 } else {
         $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_nome";
         if($dd_operadora==38) { 
                 $where_origem = ($dd_origem_stardoll)?" and vg_http_referer_origem='STARDOLL' ":"";
         }
+        $resopr = SQLexecuteQueryParams($sqlopr, array());
 }
 
 //IDS de integração
 if (!empty($dd_ids_integracao)) {
         if (empty($where_operadora)) {
-                $where_operadora .= " vg_integracao_parceiro_origem_id = '".$dd_ids_integracao."' ";
+                $where_operadora .= " vg_integracao_parceiro_origem_id = ".$dd_ids_integracao." ";
         }
         else {
-                $where_operadora .= " and vg_integracao_parceiro_origem_id = '".$dd_ids_integracao."' ";
+                $where_operadora .= " and vg_integracao_parceiro_origem_id = ".$dd_ids_integracao." ";
         }
 }
 
         
-$resopr = SQLexecuteQuery($sqlopr);
 //echo "$sqlopr<br>";
 
 ?>
@@ -341,7 +347,7 @@ if($_REQUEST['btnSubmit']) {
 		$sql_total_mes = get_sql_total_mes($extra_where, false, $smode, null, false, $where_origem);
 
                 //echo $sql_total_mes."<br>";
-		$vendas_total_mes = SQLexecuteQuery($sql_total_mes);
+		$vendas_total_mes = SQLexecuteQueryParams($sql_total_mes, array());
 		if($vendas_total_mes) {
 			$aNVendas = array();
 			$aVendas = array();

@@ -56,7 +56,7 @@ $time_start_stats = getmicrotime();
                         $extra_where = "";
 
                         if($_SESSION["tipo_acesso_pub"]=='PU') {
-                                $dd_operadora = $_SESSION["opr_codigo_pub"];
+                                $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
                                 if(($dd_operadora==13) || ($dd_operadora==16) || ($dd_operadora==17) )
                                 { 
                                     $where_operadora_pos = " ve_jogo='".(($dd_operadora==13)?"OG":(($dd_operadora==16)?"HB":(($dd_operadora==17)?"MU":"??")))."'";
@@ -77,7 +77,7 @@ $time_start_stats = getmicrotime();
                         $sql_POS = get_sql_query("P", "totais_de_vendas", $extra_where, $smode);
                         $total_vendas_POS = 0;
                         $n_vendas_POS = 0;
-                        $vendas_estado_POS = SQLexecuteQuery($sql_POS);
+                        $vendas_estado_POS = SQLexecuteQueryParams($sql_POS, array());
                         if($vendas_estado_POS) 
                         {
                             while ($vendas_estado_POS_row = pg_fetch_array($vendas_estado_POS))
@@ -97,7 +97,7 @@ $time_start_stats = getmicrotime();
                         $extra_where = "";
                 //echo "sql: $sql<br>";
                         $total_vendas_mes_POS = 0;
-                        $vendas_estado = SQLexecuteQuery($sql);
+                        $vendas_estado = SQLexecuteQueryParams($sql, array());
                         if($vendas_estado) 
                         {
                             while ($vendas_estado_row = pg_fetch_array($vendas_estado))
@@ -113,7 +113,7 @@ $time_start_stats = getmicrotime();
                         $sql_POS = get_sql_query("P", "datas_limites_no_bd", $extra_where, $smode);
                         $data_min_POS = date("Y-m-d");
                         $data_max_POS = date("Y-m-d");
-                        $vendas_estado_POS = SQLexecuteQuery($sql_POS);
+                        $vendas_estado_POS = SQLexecuteQueryParams($sql_POS, array());
                         if($vendas_estado_POS) 
                         {
                             while ($vendas_estado_POS_row = pg_fetch_array($vendas_estado_POS))
@@ -129,7 +129,7 @@ $time_start_stats = getmicrotime();
                         // Por dia POS
                         $sql_POS = get_sql_query("P", "por_dia", $extra_where, $smode);
                 //echo "$sql_POS<br>";
-                        $vendas_estado_POS = SQLexecuteQuery($sql_POS);
+                        $vendas_estado_POS = SQLexecuteQueryParams($sql_POS, array());
                         $n_dias_POS = pg_num_rows($vendas_estado_POS);
 
                         // Media de Vendas POS
@@ -138,7 +138,7 @@ $time_start_stats = getmicrotime();
                         $sql_POS_media = get_sql_query("P", "por_dia", $extra_where_two_months_ago, $smode);
                 //echo "$sql_POS_media<br>";
                         $total_vendas_POS_media = 0;
-                        $vendas_estado_POS_media = SQLexecuteQuery($sql_POS_media);
+                        $vendas_estado_POS_media = SQLexecuteQueryParams($sql_POS_media, array());
                 //	$n_dias_POS_media = (pg_num_rows($vendas_estado_POS_media)>0)?pg_num_rows($vendas_estado_POS_media):1;(R$/dia)  
                         $n_dias_POS_media = 60; 
                 //echo "n_dias_POS_media: $n_dias_POS_media<br>";
@@ -156,10 +156,10 @@ $time_start_stats = getmicrotime();
                         // Money ========================================================================================
                         if($_SESSION["tipo_acesso_pub"]=='PU') 
                         {
-                            $dd_operadora = $_SESSION["opr_codigo_pub"];
-                            if(strlen($dd_operadora)>0) 
+                            $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
+                            if($dd_operadora > 0) 
                             { 
-                                    $where_operadora_Money = " and vgm_opr_codigo='".$dd_operadora."'";
+                                    $where_operadora_Money = " and vgm_opr_codigo=".$dd_operadora;
                             } else
                             {
                                     $where_operadora_Money = "";
@@ -170,7 +170,7 @@ $time_start_stats = getmicrotime();
                         $sql_Money = get_sql_query("M", "totais_de_vendas", $extra_where, $smode);
                         $total_vendas_Money = 0;
                         $n_vendas_Money = 0;
-                        $vendas_estado_Money = SQLexecuteQuery($sql_Money);
+                        $vendas_estado_Money = SQLexecuteQueryParams($sql_Money, array());
                         if($vendas_estado_Money) 
                         {
                             while ($vendas_estado_Money_row = pg_fetch_array($vendas_estado_Money))
@@ -190,7 +190,7 @@ $time_start_stats = getmicrotime();
                         $extra_where = "";
                 //echo "sql_Money: $sql_Money<br>";
                         $total_vendas_mes_Money = 0;
-                        $vendas_estado_Money = SQLexecuteQuery($sql_Money);
+                        $vendas_estado_Money = SQLexecuteQueryParams($sql_Money, array());
                         if($vendas_estado_Money)
                         {
                             while ($vendas_estado_Money_row = pg_fetch_array($vendas_estado_Money))
@@ -206,7 +206,7 @@ $time_start_stats = getmicrotime();
                         $sql_Money = get_sql_query("M", "datas_limites_no_bd", $extra_where, $smode);
                         $data_min_Money = date("Y-m-d");
                         $data_max_Money = date("Y-m-d");
-                        $vendas_estado_Money = SQLexecuteQuery($sql_Money);
+                        $vendas_estado_Money = SQLexecuteQueryParams($sql_Money, array());
                         if($vendas_estado_Money) 
                         {
                             while ($vendas_estado_Money_row = pg_fetch_array($vendas_estado_Money))
@@ -221,7 +221,7 @@ $time_start_stats = getmicrotime();
 
                         // Por dia Money
                         $sql_Money = get_sql_query("M", "por_dia", $extra_where, $smode);
-                        $vendas_estado_Money = SQLexecuteQuery($sql_Money);
+                        $vendas_estado_Money = SQLexecuteQueryParams($sql_Money, array());
                         $n_dias_Money = pg_num_rows($vendas_estado_Money);
 
 
@@ -230,7 +230,7 @@ $time_start_stats = getmicrotime();
                         $sql_Money_media = get_sql_query("M", "por_dia", $extra_where_two_months_ago, $smode);
                 //echo "$sql_Money_media<br>";
                         $total_vendas_Money_media = 0;
-                        $vendas_estado_Money_media = SQLexecuteQuery($sql_Money_media);
+                        $vendas_estado_Money_media = SQLexecuteQueryParams($sql_Money_media, array());
                 //	$n_dias_Money_media = (pg_num_rows($vendas_estado_Money_media)>0)?pg_num_rows($vendas_estado_Money_media):1;
                         $n_dias_Money_media = 60;
                 //echo "n_dias_Money_media: $n_dias_Money_media<br>";
@@ -248,10 +248,10 @@ $time_start_stats = getmicrotime();
                         // atimo ========================================================================================
                         if($_SESSION["tipo_acesso_pub"]=='PU') 
                         {
-                            $dd_operadora = $_SESSION["opr_codigo_pub"];
-                            if(strlen($dd_operadora)>0) 
+                            $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
+                            if($dd_operadora > 0) 
                             { 
-                                    $where_operadora_Money = " and vgm_opr_codigo='".$dd_operadora."'";
+                                    $where_operadora_Money = " and vgm_opr_codigo=".$dd_operadora;
                             } else
                             {
                                     $where_operadora_Money = "";
@@ -262,7 +262,7 @@ $time_start_stats = getmicrotime();
                         $sql_atimo = get_sql_query("A", "totais_de_vendas", $extra_where, $smode);
                         $total_vendas_atimo = 0;
                         $n_vendas_atimo = 0;
-                        $vendas_estado_atimo = SQLexecuteQuery($sql_atimo);
+                        $vendas_estado_atimo = SQLexecuteQueryParams($sql_atimo, array());
                         if($vendas_estado_atimo) 
                         {
                             while ($vendas_estado_atimo_row = pg_fetch_array($vendas_estado_atimo))
@@ -281,7 +281,7 @@ $time_start_stats = getmicrotime();
                         $sql_atimo = get_sql_query("A", "totais_de_vendas", $extra_where, $smode);
                         $extra_where = "";
                         $total_vendas_mes_atimo = 0;
-                        $vendas_estado_atimo = SQLexecuteQuery($sql_atimo);
+                        $vendas_estado_atimo = SQLexecuteQueryParams($sql_atimo, array());
                         if($vendas_estado_atimo)
                         {
                             while ($vendas_estado_atimo_row = pg_fetch_array($vendas_estado_atimo))
@@ -297,7 +297,7 @@ $time_start_stats = getmicrotime();
                         $sql_atimo = get_sql_query("A", "datas_limites_no_bd", $extra_where, $smode);
                         $data_min_atimo = date("Y-m-d");
                         $data_max_atimo = date("Y-m-d");
-                        $vendas_estado_atimo = SQLexecuteQuery($sql_atimo);
+                        $vendas_estado_atimo = SQLexecuteQueryParams($sql_atimo, array());
                         if($vendas_estado_atimo) 
                         {
                             while ($vendas_estado_atimo_row = pg_fetch_array($vendas_estado_atimo))
@@ -312,7 +312,7 @@ $time_start_stats = getmicrotime();
 
                         // Por dia atimo
                         $sql_atimo = get_sql_query("A", "por_dia", $extra_where, $smode);
-                        $vendas_estado_atimo = SQLexecuteQuery($sql_atimo);
+                        $vendas_estado_atimo = SQLexecuteQueryParams($sql_atimo, array());
                         $n_dias_atimo = pg_num_rows($vendas_estado_atimo);
 
 
@@ -320,7 +320,7 @@ $time_start_stats = getmicrotime();
                         $extra_where_two_months_ago = " vg.vg_data_inclusao>='".date("Y-m-d",$twomonthsago)."'";
                         $sql_atimo_media = get_sql_query("A", "por_dia", $extra_where_two_months_ago, $smode);
                         $total_vendas_atimo_media = 0;
-                        $vendas_estado_atimo_media = SQLexecuteQuery($sql_atimo_media);
+                        $vendas_estado_atimo_media = SQLexecuteQueryParams($sql_atimo_media, array());
                         $n_dias_atimo_media = 60;
                         if($vendas_estado_atimo_media) 
                         {
@@ -336,10 +336,10 @@ $time_start_stats = getmicrotime();
                         // Money Express ========================================================================================
                         if($_SESSION["tipo_acesso_pub"]=='PU') 
                         {
-                            $dd_operadora = $_SESSION["opr_codigo_pub"];
-                            if(strlen($dd_operadora)>0) 
+                            $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
+                            if($dd_operadora > 0) 
                             { 
-                                    $where_operadora_MoneyEx = " and vgm_opr_codigo='".$dd_operadora."'";
+                                    $where_operadora_MoneyEx = " and vgm_opr_codigo=".$dd_operadora;
                             } else
                             {
                                     $where_operadora_MoneyEx = "";
@@ -352,7 +352,7 @@ $time_start_stats = getmicrotime();
 
                         $total_vendas_MoneyEx = 0;
                         $n_vendas_MoneyEx = 0;
-                        $vendas_estado_MoneyEx = SQLexecuteQuery($sql_MoneyEx);
+                        $vendas_estado_MoneyEx = SQLexecuteQueryParams($sql_MoneyEx, array());
                         if($vendas_estado_MoneyEx) 
                         {
                             while ($vendas_estado_MoneyEx_row = pg_fetch_array($vendas_estado_MoneyEx))
@@ -372,7 +372,7 @@ $time_start_stats = getmicrotime();
                         $extra_where = "";
                 //echo "sql_MoneyEx: $sql_MoneyEx<br>";
                         $total_vendas_mes_MoneyEx = 0;
-                        $vendas_estado_MoneyEx = SQLexecuteQuery($sql_MoneyEx);
+                        $vendas_estado_MoneyEx = SQLexecuteQueryParams($sql_MoneyEx, array());
                         if($vendas_estado_MoneyEx) 
                         {
                             while ($vendas_estado_MoneyEx_row = pg_fetch_array($vendas_estado_MoneyEx))
@@ -389,7 +389,7 @@ $time_start_stats = getmicrotime();
                         $sql_MoneyEx = get_sql_query("E", "datas_limites_no_bd", $extra_where, $smode);
                         $data_min_MoneyEx = date("Y-m-d");
                         $data_max_MoneyEx = date("Y-m-d");
-                        $vendas_estado_MoneyEx = SQLexecuteQuery($sql_MoneyEx);
+                        $vendas_estado_MoneyEx = SQLexecuteQueryParams($sql_MoneyEx, array());
                         if($vendas_estado_MoneyEx) 
                         {
                             while ($vendas_estado_MoneyEx_row = pg_fetch_array($vendas_estado_MoneyEx))
@@ -404,7 +404,7 @@ $time_start_stats = getmicrotime();
 
                         // Por dia MoneyEx
                         $sql_MoneyEx = get_sql_query("E", "por_dia", $extra_where, $smode);
-                        $vendas_estado_MoneyEx = SQLexecuteQuery($sql_MoneyEx);
+                        $vendas_estado_MoneyEx = SQLexecuteQueryParams($sql_MoneyEx, array());
                         $n_dias_MoneyEx = pg_num_rows($vendas_estado_MoneyEx);
 
                         // Media de Vendas MoneyEx
@@ -412,7 +412,7 @@ $time_start_stats = getmicrotime();
                         $sql_MoneyEx_media = get_sql_query("E", "por_dia", $extra_where_two_months_ago, $smode);
                 //echo "sql_MoneyEx_media: $sql_MoneyEx_media<br>";
                         $total_vendas_MoneyEx_media = 0;
-                        $vendas_estado_MoneyEx_media = SQLexecuteQuery($sql_MoneyEx_media);
+                        $vendas_estado_MoneyEx_media = SQLexecuteQueryParams($sql_MoneyEx_media, array());
                         $n_dias_MoneyEx_media = (pg_num_rows($vendas_estado_MoneyEx_media)>0)?pg_num_rows($vendas_estado_MoneyEx_media):1;
                         $n_dias_MoneyEx_media = 60; 
                 //echo "n_dias_MoneyEx_media: $n_dias_MoneyEx_media<br>";
@@ -430,11 +430,11 @@ $time_start_stats = getmicrotime();
                         // LH Money ========================================================================================
                         if($_SESSION["tipo_acesso_pub"]=='PU') 
                         {
-                            $dd_operadora = $_SESSION["opr_codigo_pub"];
-                            if(strlen($dd_operadora)>0)
+                            $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
+                            if($dd_operadora > 0)
                             { 
-                                    $where_operadora_LHMoney = " and vgm_opr_codigo='".$dd_operadora."'";
-                            } else 
+                                    $where_operadora_LHMoney = " and vgm_opr_codigo=".$dd_operadora;
+                            } else
                             {
                                     $where_operadora_LHMoney = "";
                             }
@@ -446,7 +446,7 @@ $time_start_stats = getmicrotime();
 
                         $total_vendas_LHMoney = 0;
                         $n_vendas_LHMoney = 0;
-                        $vendas_estado_LHMoney = SQLexecuteQuery($sql_LHMoney);
+                        $vendas_estado_LHMoney = SQLexecuteQueryParams($sql_LHMoney, array());
                         if($vendas_estado_LHMoney) 
                         {
                             while ($vendas_estado_LHMoney_row = pg_fetch_array($vendas_estado_LHMoney))
@@ -466,7 +466,7 @@ $time_start_stats = getmicrotime();
                         $extra_where = "";
                 //echo "sql_LHMoney: $sql_LHMoney<br>";
                         $total_vendas_mes_LHMoney = 0;
-                        $vendas_estado_LHMoney = SQLexecuteQuery($sql_LHMoney);
+                        $vendas_estado_LHMoney = SQLexecuteQueryParams($sql_LHMoney, array());
                         if($vendas_estado_LHMoney) 
                         {
                             while ($vendas_estado_LHMoney_row = pg_fetch_array($vendas_estado_LHMoney))
@@ -483,7 +483,7 @@ $time_start_stats = getmicrotime();
                 //echo "sql_LHMoney: $sql_LHMoney<br>";
                         $data_min_LHMoney = date("Y-m-d");
                         $data_max_LHMoney = date("Y-m-d");
-                        $vendas_estado_LHMoney = SQLexecuteQuery($sql_LHMoney);
+                        $vendas_estado_LHMoney = SQLexecuteQueryParams($sql_LHMoney, array());
                         if($vendas_estado_LHMoney)
                         {
                             while ($vendas_estado_LHMoney_row = pg_fetch_array($vendas_estado_LHMoney))
@@ -497,7 +497,7 @@ $time_start_stats = getmicrotime();
 
                         // Por dia LHMoney
                         $sql_LHMoney = get_sql_query("L", "por_dia", $extra_where, $smode);
-                        $vendas_estado_LHMoney = SQLexecuteQuery($sql_LHMoney);
+                        $vendas_estado_LHMoney = SQLexecuteQueryParams($sql_LHMoney, array());
                         $n_dias_LHMoney = pg_num_rows($vendas_estado_LHMoney);
 
 
@@ -505,7 +505,7 @@ $time_start_stats = getmicrotime();
                         $extra_where_two_months_ago = " vg.vg_data_inclusao>='".date("Y-m-d",$twomonthsago)."'";
                         $sql_LHMoney_media = get_sql_query("L", "por_dia", $extra_where_two_months_ago, $smode);
                         $total_vendas_LHMoney_media = 0;
-                        $vendas_estado_LHMoney_media = SQLexecuteQuery($sql_LHMoney_media);
+                        $vendas_estado_LHMoney_media = SQLexecuteQueryParams($sql_LHMoney_media, array());
                         $n_dias_LHMoney_media = (pg_num_rows($vendas_estado_LHMoney_media)>0)?pg_num_rows($vendas_estado_LHMoney_media):1;
                         $n_dias_LHMoney_media = 60; 
                         if($vendas_estado_LHMoney_media) 
@@ -524,7 +524,7 @@ $time_start_stats = getmicrotime();
                 // 13;"";"ONGAME" - vc_valor_ongame>0
                         if($_SESSION["tipo_acesso_pub"]=='PU') 
                         {
-                            $dd_operadora = $_SESSION["opr_codigo_pub"];
+                            $dd_operadora = (int)$_SESSION["opr_codigo_pub"];
                             if($dd_operadora==13)
                             { 
                                     $where_operadora_cartoes = " (ve_jogo='OG') ";
@@ -541,7 +541,7 @@ $time_start_stats = getmicrotime();
                         $sql_Cartoes = get_sql_query("C", "totais_de_vendas", $extra_where, $smode);
                         $total_vendas_Cartoes = 0;
                         $n_vendas_Cartoes = 0;
-                        $vendas_estado_Cartoes = SQLexecuteQuery($sql_Cartoes);
+                        $vendas_estado_Cartoes = SQLexecuteQueryParams($sql_Cartoes, array());
                         if($vendas_estado_Cartoes)
                         {
                             while ($vendas_estado_Cartoes_row = pg_fetch_array($vendas_estado_Cartoes))
@@ -564,7 +564,7 @@ $time_start_stats = getmicrotime();
                         $extra_where = "";
                 //echo "sql_Cartoes: $sql_Cartoes<br>";
                         $total_vendas_mes_Cartoes = 0;
-                        $vendas_estado_Cartoes = SQLexecuteQuery($sql_Cartoes);
+                        $vendas_estado_Cartoes = SQLexecuteQueryParams($sql_Cartoes, array());
                         if($vendas_estado_Cartoes)
                         {
                             while ($vendas_estado_Cartoes_row = pg_fetch_array($vendas_estado_Cartoes))
@@ -579,7 +579,7 @@ $time_start_stats = getmicrotime();
                         $sql_Cartoes = get_sql_query("C", "datas_limites_no_bd", $extra_where, $smode);
                         $data_min_Cartoes = date("Y-m-d");
                         $data_max_Cartoes = date("Y-m-d");
-                        $vendas_estado_Cartoes = SQLexecuteQuery($sql_Cartoes);
+                        $vendas_estado_Cartoes = SQLexecuteQueryParams($sql_Cartoes, array());
                         if($vendas_estado_Cartoes)
                         {
                             while ($vendas_estado_Cartoes_row = pg_fetch_array($vendas_estado_Cartoes))
@@ -593,14 +593,14 @@ $time_start_stats = getmicrotime();
 
                         // Por dia Cartoes
                         $sql_Cartoes = get_sql_query("C", "por_dia", $extra_where, $smode);
-                        $vendas_estado_Cartoes = SQLexecuteQuery($sql_Cartoes);
+                        $vendas_estado_Cartoes = SQLexecuteQueryParams($sql_Cartoes, array());
                         $n_dias_Cartoes = pg_num_rows($vendas_estado_Cartoes);
 
                         // Media de Vendas Cartoes
                         $extra_where_two_months_ago = " vc_data>='".date("Y-m-d",$twomonthsago)."'";
                         $sql_Cartoes_media = get_sql_query("C", "por_dia", $extra_where_two_months_ago, $smode);
                         $total_vendas_Cartoes_media = 0;
-                        $vendas_estado_Cartoes_media = SQLexecuteQuery($sql_Cartoes_media);
+                        $vendas_estado_Cartoes_media = SQLexecuteQueryParams($sql_Cartoes_media, array());
                 //	$n_dias_Cartoes_media = (pg_num_rows($vendas_estado_Cartoes_media)>0)?pg_num_rows($vendas_estado_Cartoes_media):1;
                         $n_dias_Cartoes_media = 60;	// dois meses
                         if($vendas_estado_Cartoes_media) 

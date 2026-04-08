@@ -15,7 +15,8 @@
         require_once $raiz_do_projeto . "class/sys/classegrid.php";
         require_once $raiz_do_projeto . "includes/sys/inc_stats.php";
 
-	$time_start_stats = getmicrotime();
+		$time_start_stats = getmicrotime();
+		$dd_operadora = (isset($dd_operadora) && $dd_operadora !== '') ? (int)$dd_operadora : 0;
 
 	//echo $_GET['abanomeOld'].":_GET['abanomeOld']<br>";
 	//echo $_GET['abanome'].":_GET['abanome']<br>";
@@ -58,6 +59,16 @@
 	else {
 		$crescente_depois = 'ASC';
 	}
+	$inicial = (int)$inicial;
+	if($inicial < 0) $inicial = 0;
+	$range = (int)$range;
+	if($range < 1) $range = 1;
+	$ordem = (int)$ordem;
+	if($ordem < 1) $ordem = 1;
+	$max = (int)$max;
+	if($max < 1 || $max > 1000) $max = 100;
+	$crescente = (strtoupper((string)$crescente) === 'DESC') ? 'DESC' : 'ASC';
+	$crescente_depois = ($crescente === 'ASC') ? 'DESC' : 'ASC';
 
 
 	//echo"SCRIPT: ".$script.basename($_SERVER['PHP_SELF'])."<br>";
@@ -68,7 +79,7 @@
 	$varsel = "&script=".basename($_SERVER['PHP_SELF']);
 	$varsel .= "&abanomeAux=".urlencode($abanome)."&dd_operadora=".$dd_operadora."&dd_mode=".$dd_mode."&ordem=".$ordem."&button=".$_GET['button'];
 
-	$dd_operadora = $_SESSION['dd_operadora'];
+	$dd_operadora = (isset($_SESSION['dd_operadora']) && $_SESSION['dd_operadora'] !== '') ? (int)$_SESSION['dd_operadora'] : 0;
 	
 	$grid=new grid();
 
@@ -79,7 +90,7 @@
 
 	$where_operadora_cartoes = "";
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$dd_operadora = $_SESSION["opr_codigo_pub"];
+		$dd_operadora = (int)$_SESSION["opr_codigo_pub"];
 		if($dd_operadora==13) { 
 			$where_operadora_cartoes = " (ve_jogo='OG') ";
 		} else if($dd_operadora==17) { 
@@ -89,12 +100,12 @@
 		}
 	}
 
-	$dd_operadora_nome = "";
-	if($dd_operadora) {
-		$resopr_nome = pg_exec($connid, "select opr_nome from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
-		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
-			$dd_operadora_nome = $pgopr_nome['opr_nome'];
-		} 
+		$dd_operadora_nome = "";
+		if($dd_operadora) {
+			$resopr_nome = SQLexecuteQueryParams("select opr_nome from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array((int)$dd_operadora));
+			if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
+				$dd_operadora_nome = $pgopr_nome['opr_nome'];
+			} 
 		if($dd_operadora==13) { 
 			$where_operadora_cartoes = " (ve_jogo='OG') ";
 		} else if($dd_operadora==17) { 
@@ -104,12 +115,13 @@
 		}
 	}
 
-	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
-	} else {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
-	}
-	$resopr = pg_exec($connid, $sqlopr);
+		if($_SESSION["tipo_acesso_pub"]=='PU') {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem";
+			$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
+		} else {
+			$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+			$resopr = SQLexecuteQueryParams($sqlopr, array());
+		}
 	
 	if(!empty($_SESSION['script'])) {
 		$script  = $_SESSION['script'];
@@ -180,7 +192,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 //echo "<b>sql</b>: ".str_replace("\n","<br>\n",$sql)."<br>";
 	$total_vendas = 0;
 	$n_vendas = 0;
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	if($vendas_estado) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 			$total_vendas = $vendas_estado_row['vendas'];
@@ -207,7 +219,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 	$data_max = date("Y-m-d");
 //echo "[$data_max]".date("Y-m-d H:i:s", $data_max)."<br>";
 
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	if($vendas_estado) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 			$data_min = $vendas_estado_row['data_min'];
@@ -225,7 +237,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 if($abanome == LANG_STATISTICS_FOR_MONTH) {
 	$sql = get_sql_query("C", "por_mes", addWhereClause($extra_where, $where_operadora), $smode);
 	//echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 
@@ -237,7 +249,7 @@ if($abanome == LANG_STATISTICS_FOR_MONTH) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_MONTH;
 	$colunas[] = LANG_NUMBER_SALES;
@@ -264,7 +276,7 @@ if($abanome == LANG_STATISTICS_FOR_MONTH) {
 if($abanome == LANG_STATISTICS_FOR_WEEK_DAY) {
 	$sql = get_sql_query("C", "por_dia_da_semana", addWhereClause($extra_where, $where_operadora), $smode);
 	//echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 
@@ -276,7 +288,7 @@ if($abanome == LANG_STATISTICS_FOR_WEEK_DAY) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_WEEK;
 	$colunas[] = LANG_NUMBER_SALES;
@@ -302,7 +314,7 @@ if($abanome == LANG_STATISTICS_FOR_WEEK_DAY) {
 if($abanome == LANG_STATISTICS_FOR_DAY) {
 	$sql = get_sql_query("C", "por_dia", addWhereClause($extra_where, $where_operadora), $smode);
 	//echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 
@@ -314,7 +326,7 @@ if($abanome == LANG_STATISTICS_FOR_DAY) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_DAY;
 	$colunas[] = LANG_MONTH;
@@ -358,7 +370,7 @@ if($abanome == LANG_STATISTICS_FOR_DAY) {
 if($abanome == LANG_STATISTICS_FOR_GAME) {
 	$sql = get_sql_query("C", "por_publisher", addWhereClause($extra_where, $where_operadora), $smode);
 	//echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
 
@@ -370,7 +382,7 @@ if($abanome == LANG_STATISTICS_FOR_GAME) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_GAME;
 	$colunas[] = LANG_NUMBER_SALES;
@@ -400,7 +412,7 @@ if($abanome == LANG_STATISTICS_FOR_STATE) {
 	// ".LANG_STATISTICS_FOR_STATE."
 	$sql = get_sql_query("C", "por_estado", addWhereClause($extra_where, $where_operadora), $smode);
 	//echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$previous_value = -1;
 	$bg_col = $bg_col_01;
 	
@@ -412,7 +424,7 @@ if($abanome == LANG_STATISTICS_FOR_STATE) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_STATE;
 	$colunas[] = LANG_NUMBER_SALES;
@@ -440,7 +452,7 @@ if($abanome == LANG_STATISTICS_FOR_STATE) {
 if($abanome == LANG_STATISTICS_FOR_CITY) {
 	$sql = get_sql_query("C", "por_cidade", addWhereClause($extra_where, $where_operadora), $smode);
 //echo "sql: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$previous_value = -1;
 	$bg_col = $bg_col_01;
 	
@@ -452,7 +464,7 @@ if($abanome == LANG_STATISTICS_FOR_CITY) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_CITY;
 	$colunas[] = LANG_STATE;
@@ -485,7 +497,7 @@ if($abanome == 'Publisher') {
 	//echo "extra_where: $extra_where<br>";
 	//echo "where_opr_2: $where_opr_2<br>";
 	$sql = get_sql_query("C", "por_publisher", $extra_where, $smode);
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	//echo "<b>sql por Publisher</b>: $sql<br>";
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
@@ -498,7 +510,7 @@ if($abanome == 'Publisher') {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_GAME;
 	$colunas[] = LANG_NUMBER_SALES;
@@ -540,7 +552,7 @@ if($abanome == LANG_STATISTICS_FOR_PUBLISHER_THIS_MONTH_1) {
 	$sql = get_sql_query("C", "por_publisher", $extra_where, $smode);
 //echo "extra_where: $extra_where<br>";
 //echo "<b>sql por Publisher ".LANG_STATISTICS_THIS_MONTH."</b>: $sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	$extra_where = "";
 	$bg_col = $bg_col_01;
 	$n_dias = pg_num_rows($vendas_estado);
@@ -553,7 +565,7 @@ if($abanome == LANG_STATISTICS_FOR_PUBLISHER_THIS_MONTH_1) {
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
 	//echo "$sql<br>";
-	$vendas_estado = SQLexecuteQuery($sql);
+	$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 	$colunas[] = LANG_GAME;
 	$colunas[] = LANG_NUMBER_SALES;
@@ -587,7 +599,7 @@ if($abanome == LANG_STATISTICS_FOR_ESTABLISHMENT) {
 	if($_SESSION["tipo_acesso_pub"]!='PU') {
 		$sql = get_sql_query("C", "por_estabelecimento", $extra_where, $smode);
 		//echo "<b>sql</b>: ".str_replace("\n","<br>\n",$sql)."<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
 
@@ -599,7 +611,7 @@ if($abanome == LANG_STATISTICS_FOR_ESTABLISHMENT) {
 		$sql .= " limit ".$max; 
 		$sql .= " offset ".$inicial;
 		//echo "$sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 		$colunas[] = LANG_ESTABLISHMENT;
 		$colunas[] = LANG_START_DATE;
@@ -650,7 +662,7 @@ if($abanome == 'Totais-Vendas-Mes') {
 	//echo "<b>sql Totais de Vendas Mês</b>: $sql<br>";
 		$total_vendas = 0;
 		$n_vendas = 0;
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		if($vendas_estado) {
 			while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
 				$total_vendas = $vendas_estado_row['vendas'];
@@ -666,7 +678,7 @@ if($abanome == LANG_STATISTICS_FOR_LAST_MONTH) {
 	if($_SESSION["tipo_acesso_pub"]!='PU') {
 		$sql = get_sql_query("C", "por_estabelecimento", $extra_where, $smode);
 		//echo "<b>sql Por Estabelecimento último mês</b>: $sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 		//Adicionado por Wagner
 		$total_table = pg_num_rows($vendas_estado);
@@ -676,7 +688,7 @@ if($abanome == LANG_STATISTICS_FOR_LAST_MONTH) {
 		$sql .= " limit ".$max; 
 		$sql .= " offset ".$inicial;
 		//echo "$sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
@@ -725,7 +737,7 @@ if($abanome == 'Totais-Vendas-Semana') {
 		//echo "<b>sql Totais de Vendas Semana</b>: $sql<br>";
 		$total_vendas = 0;
 		$n_vendas = 0;
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		
 		if($vendas_estado) {
 			while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
@@ -742,7 +754,7 @@ if($abanome == LANG_STATISTICS_FOR_LAST_WEEK) {
 	if($_SESSION["tipo_acesso_pub"]!='PU') {
 		$sql = get_sql_query("C", "por_estabelecimento", $extra_where, $smode);
 	//echo "<b>sql por estabelecimento ultima semana</b>: $sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		
 		//Adicionado por Wagner
 		$total_table = pg_num_rows($vendas_estado);
@@ -752,7 +764,7 @@ if($abanome == LANG_STATISTICS_FOR_LAST_WEEK) {
 		$sql .= " limit ".$max; 
 		$sql .= " offset ".$inicial;
 		//echo "$sql<br>";
-		$vendas_estado = SQLexecuteQuery($sql);
+		$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
