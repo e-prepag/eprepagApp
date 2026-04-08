@@ -23,9 +23,10 @@ require_once DIR_INCS . "functions.php";
 //echo "dd_operadora com POST:".$_POST['dd_operadora']."<br>";
 $msg = "";
 if (!empty($_POST['dd_operadora'])) {
+        $dd_operadora = (int) $_POST['dd_operadora'];
         // monta a query apara bsucar dados da operadora
-        $sql = "SELECT * FROM operadoras WHERE opr_codigo = " . $_POST['dd_operadora'];
-        $rs_operadoras = SQLexecuteQuery($sql);
+        $sql = "SELECT * FROM operadoras WHERE opr_codigo = $1";
+        $rs_operadoras = SQLexecuteQueryParams($sql, array($dd_operadora));
         //verifica se retornou o registro 
         if (!($rs_operadoras_row = pg_fetch_array($rs_operadoras))) {
                 $msg .= "Erro ao consultar informa&ccedil;&otilde;es da Operadora. ($sql)<br>";
@@ -55,9 +56,8 @@ if (!empty($_POST['dd_operadora'])) {
                 $opr_numero_contrato = $rs_operadoras_row['opr_numero_contrato'];
                 $opr_banco_intermediario = $rs_operadoras_row['opr_banco_intermediario'];
                 if (!empty($opr_banco_intermediario)) {
-                        // monta a query apara bsucar dados da operadora
-                        $sql = "SELECT * FROM operadoras_banco_intermediario WHERE opr_codigo = " . $_POST['dd_operadora'];
-                        $rs_operadoras = SQLexecuteQuery($sql);
+                        $sql = "SELECT * FROM operadoras_banco_intermediario WHERE opr_codigo = $1";
+                        $rs_operadoras = SQLexecuteQueryParams($sql, array($dd_operadora));
                         //verifica se retornou o registro 
                         if ($rs_operadoras_row = pg_fetch_array($rs_operadoras)) {
                                 $obi_bic_code = $rs_operadoras_row['obi_bic_code'];

@@ -352,10 +352,10 @@ if ($BtnSearch) {
                     FROM operadoras
                     WHERE 
                             opr_contabiliza_utilizacao != 0
-                            AND opr_codigo = " . $dd_opr_codigo . ";";
+                            AND opr_codigo = $1;";
 
         //echo $sql.PHP_EOL; die();
-        $rs_publisher = SQLexecuteQuery($sql);
+        $rs_publisher = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo));
         //echo pg_num_rows($rs_publisher)."<br>";
         if (!$rs_publisher) {
             echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(" . $sql . ").<br>" . PHP_EOL;
@@ -1371,9 +1371,8 @@ function recupera_cotacao_dolar($dd_opr_codigo, $mes, $ano)
 {
 
     $currentmonthVerify = mktime(0, 0, 0, $mes, 1, $ano);
-    $sql = "select cd_cotacao from cotacao_dolar where opr_codigo = " . $dd_opr_codigo . " and cd_data = '" . date('Y-m-d', $currentmonthVerify) . " 00:00:00';";
-    //echo $sql."<br><br>";
-    $rs_dolar = SQLexecuteQuery($sql);
+    $sql = "select cd_cotacao from cotacao_dolar where opr_codigo = $1 and cd_data = $2;";
+    $rs_dolar = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo, date('Y-m-d', $currentmonthVerify) . " 00:00:00"));
 
     if ($rs_dolar && pg_num_rows($rs_dolar) > 0) {
         $valor_dolar_aux = pg_fetch_array($rs_dolar);
@@ -1387,8 +1386,8 @@ function recupera_cotacao_dolar_diario($dd_opr_codigo, $mes, $ano)
 {
 
     $currentmonthVerify = mktime(0, 0, 0, $mes, 1, $ano);
-    $sql = "select cd_cotacao,to_char(cd_data,'YYYY-MM-DD') as data from cotacao_dolar where opr_codigo = " . $dd_opr_codigo . " and to_char(cd_data,'YYYY-MM') = '" . date('Y-m', $currentmonthVerify) . "';";
-    $rs_dolar = SQLexecuteQuery($sql);
+    $sql = "select cd_cotacao,to_char(cd_data,'YYYY-MM-DD') as data from cotacao_dolar where opr_codigo = $1 and to_char(cd_data,'YYYY-MM') = $2;";
+    $rs_dolar = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo, date('Y-m', $currentmonthVerify)));
     $vetor_aux = NULL;
     if ($rs_dolar && pg_num_rows($rs_dolar) > 0) {
         while ($valor_dolar_aux = pg_fetch_array($rs_dolar)) {
@@ -1402,11 +1401,8 @@ function recupera_cotacao_dolar_diario($dd_opr_codigo, $mes, $ano)
 
 function recupera_comissao($dd_opr_codigo, $data, $canal)
 {
-
-    $sql = "select fp_aliquot from financial_processing where fp_publisher = " . $dd_opr_codigo . " and fp_date = '" . $data . " 00:00:00' and fp_channel = '" . $canal . "';";
-    //echo $sql."<br><br>";
-    $rs_cotacao = SQLexecuteQuery($sql);
-
+    $sql = "select fp_aliquot from financial_processing where fp_publisher = $1 and fp_date = $2 and fp_channel = $3;";
+    $rs_cotacao = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo, $data . " 00:00:00", $canal));
     if ($rs_cotacao && pg_num_rows($rs_cotacao) > 0) {
         $rs_cotacao_row = pg_fetch_array($rs_cotacao);
         return $rs_cotacao_row['fp_aliquot'];

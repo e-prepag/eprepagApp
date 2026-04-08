@@ -51,10 +51,10 @@ if($BtnSearch) {
                     FROM operadoras
                     WHERE 
                             opr_contabiliza_utilizacao != 0
-                            AND opr_codigo = ".$dd_opr_codigo.";";
+                            AND opr_codigo = $1;";
 
             //echo $sql.PHP_EOL; die();
-            $rs_publisher = SQLexecuteQuery($sql);
+            $rs_publisher = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo));
             //echo pg_num_rows($rs_publisher)."<br>";
             if(!$rs_publisher) {
                 echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(".$sql.").<br>".PHP_EOL;
