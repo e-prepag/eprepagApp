@@ -1,0 +1,14 @@
+=== CRON CLEANUP ===
+Time: Sun Apr  5 05:23:01 UTC 2026
+Host: 184c06dd185e
+UID: uid=1001(eprepagadm) gid=1001(eprepagadm) groups=1001(eprepagadm)
+
+--- /var/log/apache2 ---
+SYMLINK: access.log -> /dev/stdout
+SYMLINK: error.log -> /dev/stderr
+SYMLINK: other_vhosts_access.log -> /dev/stdout
+
+--- /www/arquivos_gerados/logs (sed 2nd pass) ---
+2nd pass total: 0 lines
+
+DONE
