@@ -15,6 +15,7 @@ $tf_opr_codigo     = $_POST['tf_opr_codigo'] ?? null;
 
 // Campo ARRAY (checkbox / multiselect)
 $tf_produto       = $_POST['tf_produto'] ?? [];
+$tf_pins          = $_POST['tf_pins'] ?? [];
 
 // Bot?o
 $btconsultar  = $_POST['btconsultar'] ?? null;
@@ -32,17 +33,8 @@ $canais_grade_legenda = array(
 								'A' => 'ATIMO'
 							);
 
-//Produtos
-if ($tf_produto && is_array($tf_produto)) {
-	if (count($tf_produto) == 1) $tf_produto_aux = $tf_produto[0];
-	else $tf_produto_aux = implode("','",$tf_produto);
-}
-
-//Valores
-if ($tf_pins && is_array($tf_pins)) {
-	if (count($tf_pins) == 1) $tf_pins_aux = $tf_pins[0];
-	else $tf_pins_aux = implode(",",$tf_pins);
-}
+$tf_produto_aux = null;
+$tf_pins_aux = null;
 
 //Inicializando as datas
 if(empty($tf_data_inicial)) {
@@ -58,6 +50,14 @@ function dataLegenda($this_date){
 	return $meses[($data_inicial_aux[1]*1)]."/".$data_inicial_aux[0];
 }
 
+function buildSqlPlaceholders($startIndex, $count) {
+	$placeholders = array();
+	for($i = 0; $i < $count; $i++) {
+		$placeholders[] = '$'.($startIndex + $i);
+	}
+	return implode(',', $placeholders);
+}
+
 
 
 //Operadoras / Produtos / Valores
@@ -65,28 +65,58 @@ if($_SESSION["tipo_acesso_pub"]=='PU') {
         $tf_opr_codigo = $_SESSION["opr_codigo_pub"];
 }
 
+if($tf_opr_codigo !== null && $tf_opr_codigo !== '') {
+	$tf_opr_codigo = (int)$tf_opr_codigo;
+}
+
+if(is_array($tf_produto)) {
+	$tf_produto = array_values(array_filter(array_map('trim', $tf_produto), function($item) {
+		return $item !== '';
+	}));
+} else {
+	$tf_produto = array();
+}
+
+if(is_array($tf_pins)) {
+	$tf_pins = array_values(array_filter(array_map('trim', $tf_pins), function($item) {
+		return preg_match('/^\d+(\.\d+)?$/', $item);
+	}));
+} else {
+	$tf_pins = array();
+}
+
+if ($tf_produto) {
+	if (count($tf_produto) == 1) $tf_produto_aux = $tf_produto[0];
+	else $tf_produto_aux = implode("','", $tf_produto);
+}
+
+if ($tf_pins) {
+	if (count($tf_pins) == 1) $tf_pins_aux = $tf_pins[0];
+	else $tf_pins_aux = implode(",", $tf_pins);
+}
+
 $sql = "select * from operadoras ope where opr_status = '1' order by opr_nome"; //".($tf_opr_codigo?" and opr_codigo = ".$tf_opr_codigo:"")."
-$rs_operadoras = SQLexecuteQuery($sql);
+$rs_operadoras = SQLexecuteQueryParams($sql, array());
 
 if($tf_opr_codigo) {
 
 	$sql = "
 	select ogp_nome as ogp_nome_aux
 	from (
-		(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = " . $tf_opr_codigo . " group by ogp_nome
+		(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 group by ogp_nome
 	)
 	union all (
-		select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = " . $tf_opr_codigo . " group by ogp_nome
+		select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 group by ogp_nome
 	)
 	union all (
-		select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = " . $tf_opr_codigo . " group by ogp_nome
+		select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = $1 group by ogp_nome
 	)
 	) as jogos
 	group by ogp_nome_aux
 	order by ogp_nome_aux";
-	$rs_oprProdutos = SQLexecuteQuery($sql);
-	$sql = "select pin_valor from pins where opr_codigo = " . $tf_opr_codigo . " group by pin_valor order by pin_valor;";
-	$rs_oprPins = SQLexecuteQuery($sql);
+	$rs_oprProdutos = SQLexecuteQueryParams($sql, array((int)$tf_opr_codigo));
+	$sql = "select pin_valor from pins where opr_codigo = $1 group by pin_valor order by pin_valor;";
+	$rs_oprPins = SQLexecuteQueryParams($sql, array((int)$tf_opr_codigo));
 }
 
 $descricao = new DescriptionReport('totais_jogos');
@@ -159,8 +189,13 @@ echo $descricao->MontaAreaDescricao();
     $bg_col_02 = "#EEEEEE";
     $bg_col = $bg_col_01;
 
-    $sqlopr = "select opr_nome as ogp_nome_aux, opr_codigo from operadoras where (opr_status = '1') ".($tf_opr_codigo?" and opr_codigo = ".$tf_opr_codigo:"")." order by opr_ordem";
-    $resopr = SQLexecuteQuery($sqlopr);
+    if($tf_opr_codigo) {
+	    $sqlopr = "select opr_nome as ogp_nome_aux, opr_codigo from operadoras where (opr_status = '1') and opr_codigo = $1 order by opr_ordem";
+	    $resopr = SQLexecuteQueryParams($sqlopr, array((int)$tf_opr_codigo));
+    } else {
+	    $sqlopr = "select opr_nome as ogp_nome_aux, opr_codigo from operadoras where (opr_status = '1') order by opr_ordem";
+	    $resopr = SQLexecuteQueryParams($sqlopr, array());
+    }
 ?>
 <br>
 <div class="container-fluid">
@@ -302,21 +337,21 @@ if($btconsultar)
 		while($currentmonth >=$firstmonth) {
 			if(empty($tf_opr_codigo)) {
 				foreach ($opr_codigo_matriz as $codigo => $valor) {
-					$sql = "
-					select ogp_nome as ogp_nome_aux
-					from (
-						(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = " . $valor . " group by ogp_nome
-					)
-					union all (
-						select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = " . $valor . " group by ogp_nome
-					)
-					union all (
-						select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = " . $valor . " group by ogp_nome
-					)
-					) as jogos
-					group by ogp_nome_aux
-					order by ogp_nome_aux";
-					$rs_Produtos = SQLexecuteQuery($sql);
+						$sql = "
+						select ogp_nome as ogp_nome_aux
+						from (
+							(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 group by ogp_nome
+						)
+						union all (
+							select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 group by ogp_nome
+						)
+						union all (
+							select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = $1 group by ogp_nome
+						)
+						) as jogos
+						group by ogp_nome_aux
+						order by ogp_nome_aux";
+						$rs_Produtos = SQLexecuteQueryParams($sql, array((int)$valor));
 					while($rs_Produtos_row = pg_fetch_array($rs_Produtos)) {
 						foreach ($canais_grade as $canal => $valor2) {
 							$Months[date("Y-m-d",$currentmonth)][$valor][$rs_Produtos_row['ogp_nome_aux']][$valor2]['Qtde']	= 0;
@@ -327,21 +362,21 @@ if($btconsultar)
 			}//end if(empty($tf_opr_codigo))
 			else {
 				if(empty($tf_produto_aux)) {
-					$sql = "
-					select ogp_nome as ogp_nome_aux
-					from (
-						(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = " . $tf_opr_codigo . " group by ogp_nome
-					)
-					union all (
-						select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = " . $tf_opr_codigo . " group by ogp_nome
-					)
-					union all (
-						select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = " . $tf_opr_codigo . " group by ogp_nome
-					)
-					) as jogos
-					group by ogp_nome_aux
-					order by ogp_nome_aux";
-					$rs_Produtos = SQLexecuteQuery($sql);
+						$sql = "
+						select ogp_nome as ogp_nome_aux
+						from (
+							(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 group by ogp_nome
+						)
+						union all (
+							select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 group by ogp_nome
+						)
+						union all (
+							select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = $1 group by ogp_nome
+						)
+						) as jogos
+						group by ogp_nome_aux
+						order by ogp_nome_aux";
+						$rs_Produtos = SQLexecuteQueryParams($sql, array((int)$tf_opr_codigo));
 					while($rs_Produtos_row = pg_fetch_array($rs_Produtos)) {
 						foreach ($canais_grade as $canal => $valor2) {
 							$Months[date("Y-m-d",$currentmonth)][$tf_opr_codigo][$rs_Produtos_row['ogp_nome_aux']][$valor2]['Qtde']	= 0;
@@ -350,21 +385,40 @@ if($btconsultar)
 					}//end while($rs_Produtos_row = pg_fetch_array($rs_Produtos))
 				}//end if(empty($tf_produto))
 				else {
-					$sql = "
-					select ogp_nome as ogp_nome_aux
-					from (
-						(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_nome IN ('" . $tf_produto_aux . "') group by ogp_nome
-					)
-					union all (
-						select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_nome IN ('" . $tf_produto_aux . "') group by ogp_nome
-					)
-					union all (
-						select ogp_nome from tb_pos_operadora_games_produto where ogp_nome IN ('" . $tf_produto_aux . "') group by ogp_nome
-					)
-					) as jogos
-					group by ogp_nome_aux
-					order by ogp_nome_aux";
-					$rs_Produtos = SQLexecuteQuery($sql);
+						$produtosSelecionados = is_array($tf_produto) ? $tf_produto : array();
+						$qtdProdutos = count($produtosSelecionados);
+						$inicioLista1 = 2;
+						$lista1 = buildSqlPlaceholders($inicioLista1, $qtdProdutos);
+						$paramOprLista2 = $inicioLista1 + $qtdProdutos;
+						$inicioLista2 = $paramOprLista2 + 1;
+						$lista2 = buildSqlPlaceholders($inicioLista2, $qtdProdutos);
+						$paramOprLista3 = $inicioLista2 + $qtdProdutos;
+						$inicioLista3 = $paramOprLista3 + 1;
+						$lista3 = buildSqlPlaceholders($inicioLista3, $qtdProdutos);
+
+						$sql = "
+						select ogp_nome as ogp_nome_aux
+						from (
+							(select ogp_nome from tb_dist_operadora_games_produto inner join tb_dist_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $1 and ogp_nome IN ($lista1) group by ogp_nome
+						)
+						union all (
+							select ogp_nome from tb_operadora_games_produto inner join tb_operadora_games_produto_modelo on (ogpm_ogp_id=ogp_id) where ogp_opr_codigo = $".$paramOprLista2." and ogp_nome IN ($lista2) group by ogp_nome
+						)
+						union all (
+							select ogp_nome from tb_pos_operadora_games_produto where ogp_opr_codigo = $".$paramOprLista3." and ogp_nome IN ($lista3) group by ogp_nome
+						)
+						) as jogos
+						group by ogp_nome_aux
+						order by ogp_nome_aux";
+
+						$paramsProdutos = array((int)$tf_opr_codigo);
+						$paramsProdutos = array_merge($paramsProdutos, $produtosSelecionados);
+						$paramsProdutos[] = (int)$tf_opr_codigo;
+						$paramsProdutos = array_merge($paramsProdutos, $produtosSelecionados);
+						$paramsProdutos[] = (int)$tf_opr_codigo;
+						$paramsProdutos = array_merge($paramsProdutos, $produtosSelecionados);
+
+						$rs_Produtos = SQLexecuteQueryParams($sql, $paramsProdutos);
 					while($rs_Produtos_row = pg_fetch_array($rs_Produtos)) {
 						foreach ($canais_grade as $canal => $valor2) {
 							$Months[date("Y-m-d",$currentmonth)][$tf_opr_codigo][$rs_Produtos_row['ogp_nome_aux']][$valor2]['Qtde']	= 0;
@@ -388,7 +442,7 @@ if($btconsultar)
         //echo $sql."<br>";
 //die("Stop");
 
-		$rs_totais = SQLexecuteQuery($sql);
+		$rs_totais = SQLexecuteQueryParams($sql, array());
 		
 		//DataInicial para exibição
 		$DataInicialExibicao	= '3000-12-31';

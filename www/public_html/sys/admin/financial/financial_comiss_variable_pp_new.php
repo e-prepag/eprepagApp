@@ -168,12 +168,13 @@ $time_start_stats = getmicrotime();
 <body>
 <?php
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
+		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem";
+		$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora));
 	} else {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (not (opr_codigo in ($dd_operadora_EPP_Cash, $dd_operadora_EPP_Cash_LH)))  order by opr_nome"; //opr_ordem
+		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (not (opr_codigo in ($1, $2)))  order by opr_nome"; //opr_ordem
+		$resopr = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora_EPP_Cash, (int)$dd_operadora_EPP_Cash_LH));
 	}
         //echo $sqlopr."<br>";
-	$resopr = SQLexecuteQuery($sqlopr);
 
 	$bg_col_01 = "#FFFFFF";
 	$bg_col_02 = "#EEEEEE";
@@ -187,7 +188,7 @@ $time_start_stats = getmicrotime();
 
 	$dd_operadora_nome = "";
 	if($dd_operadora) {
-		$resopr_nome = SQLexecuteQuery("select opr_nome,opr_cont_mail from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem");
+		$resopr_nome = SQLexecuteQueryParams("select opr_nome,opr_cont_mail from operadoras where (opr_status = '1') and (opr_codigo=$1) order by opr_ordem", array((int)$dd_operadora));
 		if($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
 			$dd_operadora_nome	= $pgopr_nome['opr_nome'];
 				$email_destino		= $pgopr_nome['opr_cont_mail'];
@@ -228,16 +229,19 @@ $time_start_stats = getmicrotime();
         if(($tf_data_inicial) && ($tf_data_final)&& ($dd_operadora)) {
                 $inicio = explode('/',$tf_data_inicial);
                 $fim = explode('/',$tf_data_final);
+                $startDateTime = $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00";
+                $endDateTime = $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59";
                 $sql_total_mes = "
                                 select 
                                         fp_channel,fp_publisher, sum(fp_number) as n, sum(fp_total) as total
                                 from financial_processing 
-                                where  fp_publisher = ".$dd_operadora."
-                                       and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                       and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
-                                       and fp_date >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ".$dd_operadora.")
+                                where  fp_publisher = $1
+                                       and fp_date >= $2 
+                                       and fp_date <= $3
+                                       and fp_date >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = $4)
                                       
                                 group by fp_channel,fp_publisher; ";
+                $sql_total_mes_params = array((int)$dd_operadora, $startDateTime, $endDateTime, (int)$dd_operadora);
                 $teste_mes = false;
                 $data_legenda = null;
 				// esse que puxou os valores TESTE VICTOR echo $sql_total_mes;
@@ -254,10 +258,10 @@ $time_start_stats = getmicrotime();
                 $sql_min_date = " 
                         select to_char(min(fp_date),'DD/MM/YYYY') as menor_data
                         from financial_processing 
-                        where  fp_publisher = ".$dd_operadora."
+                        where  fp_publisher = $1
                                and fp_freeze=0";
                 //echo $sql_min_date."<br>";
-                $min_date = SQLexecuteQuery($sql_min_date);
+                $min_date = SQLexecuteQueryParams($sql_min_date, array((int)$dd_operadora));
 				// echo $sql_min_date;
                 if($min_date) {
                     $min_date_row = pg_fetch_array($min_date);
@@ -265,11 +269,14 @@ $time_start_stats = getmicrotime();
                 }//end if($min_date)
 
         }// end if(($tf_data_inicial) && ($tf_data_final)&& ($dd_operadora)) 
-        else $sql_total_mes = "select 1;";
+        else {
+                $sql_total_mes = "select 1;";
+                $sql_total_mes_params = array();
+        }
         
         //echo $sql_total_mes."<br>";
 	
-        $vendas_total_mes = SQLexecuteQuery($sql_total_mes);
+        $vendas_total_mes = SQLexecuteQueryParams($sql_total_mes, $sql_total_mes_params);
 	if($vendas_total_mes) {
 		$aNVendas = array();
 		$aVendas = array();
@@ -294,11 +301,11 @@ $time_start_stats = getmicrotime();
                     $sql_comissao = "select * 
                                     from operadoras o 
                                             left outer join tb_comissoes c on o.opr_codigo=c.co_opr_codigo 
-                                    where to_char(co_data_inclusao,'YYYYDDMMHH24MISS') = (select to_char(max(co_data_inclusao),'YYYYDDMMHH24MISS') from tb_comissoes where co_opr_codigo=".$dd_operadora.") 
-                                                    and opr_codigo = ".$dd_operadora." 
+                                    where to_char(co_data_inclusao,'YYYYDDMMHH24MISS') = (select to_char(max(co_data_inclusao),'YYYYDDMMHH24MISS') from tb_comissoes where co_opr_codigo=$1) 
+                                                    and opr_codigo = $2
                                     order by co_opr_codigo, co_canal, co_data_inclusao desc, co_volume_tipo, co_volume_min ";
                     //echo  $sql_comissao."<br>";
-                    $dados_comissao = SQLexecuteQuery($sql_comissao);
+                    $dados_comissao = SQLexecuteQueryParams($sql_comissao, array((int)$dd_operadora, (int)$dd_operadora));
                     $teste_publihser_internacional = null;
                     $teste_bexs = null;
                     $opr_razao = null;
@@ -323,14 +330,14 @@ $time_start_stats = getmicrotime();
                                             $aVendas_aux[$canal] = $aVendas[$canal]*($dados_comissao_row['co_comissao']/100);
                                             $inicio = explode('/',$tf_data_inicial);
                                             $fim = explode('/',$tf_data_final);
-                                            $sql_aliquot = "update financial_processing set fp_aliquot=".$dados_comissao_row['co_comissao']." 
-                                                            where fp_channel='".$canal."' 
-                                                                and fp_publisher = ".$dd_operadora."
-                                                                and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                                and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                            $sql_aliquot = "update financial_processing set fp_aliquot=$1
+                                                            where fp_channel=$2
+                                                                and fp_publisher = $3
+                                                                and fp_date >= $4
+                                                                and fp_date <= $5
                                                                 and fp_freeze=0";
                                             //echo $sql_aliquot." :V sem Dir e Ind<br>";
-                                            $dados_update = SQLexecuteQuery($sql_aliquot);
+                                            $dados_update = SQLexecuteQueryParams($sql_aliquot, array($dados_comissao_row['co_comissao'], $canal, (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                                             $aTaxaComissao[$canal] = $dados_comissao_row['co_comissao'];
                                         }//if($aVendas_aux[$canal] >= $dados_comissao_row['co_volume_min'] && $aVendas_aux[$canal] <= $dados_comissao_row['co_volume_max'])
                                     
@@ -348,14 +355,14 @@ $time_start_stats = getmicrotime();
                                                 $aVendas_aux[$canal] = $aVendas[$canal]*($dados_comissao_row['co_comissao']/100);
                                                 $inicio = explode('/',$tf_data_inicial);
                                                 $fim = explode('/',$tf_data_final);
-                                                $sql_aliquot = "update financial_processing set fp_aliquot=".$dados_comissao_row['co_comissao']." 
-                                                                where fp_channel='".$canal."' 
-                                                                    and fp_publisher = ".$dd_operadora."
-                                                                    and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                                    and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                                $sql_aliquot = "update financial_processing set fp_aliquot=$1
+                                                                where fp_channel=$2
+                                                                    and fp_publisher = $3
+                                                                    and fp_date >= $4
+                                                                    and fp_date <= $5
                                                                     and fp_freeze=0";
                                                 //echo $sql_aliquot." :V Dir<br>";
-                                                $dados_update = SQLexecuteQuery($sql_aliquot);
+                                                $dados_update = SQLexecuteQueryParams($sql_aliquot, array($dados_comissao_row['co_comissao'], $canal, (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                                                 $aTaxaComissao[$canal] = $dados_comissao_row['co_comissao'];
                                             }//if($aVendas_aux[$canal] >= $dados_comissao_row['co_volume_min'] && $aVendas_aux[$canal] <= $dados_comissao_row['co_volume_max'])
                                         }//end if (in_array($canal, $aCanaisDiretos)) 
@@ -365,14 +372,14 @@ $time_start_stats = getmicrotime();
                                                 $aVendas_aux[$canal] = $aVendas[$canal]*($dados_comissao_row['co_comissao']/100);
                                                 $inicio = explode('/',$tf_data_inicial);
                                                 $fim = explode('/',$tf_data_final);
-                                                $sql_aliquot = "update financial_processing set fp_aliquot=".$dados_comissao_row['co_comissao']." 
-                                                                where fp_channel='".$canal."' 
-                                                                    and fp_publisher = ".$dd_operadora."
-                                                                    and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                                    and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                                $sql_aliquot = "update financial_processing set fp_aliquot=$1
+                                                                where fp_channel=$2
+                                                                    and fp_publisher = $3
+                                                                    and fp_date >= $4
+                                                                    and fp_date <= $5
                                                                     and fp_freeze=0";
                                                 //echo $sql_aliquot." :V Ind<br>";
-                                                $dados_update = SQLexecuteQuery($sql_aliquot);
+                                                $dados_update = SQLexecuteQueryParams($sql_aliquot, array($dados_comissao_row['co_comissao'], $canal, (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                                                 $aTaxaComissao[$canal] = $dados_comissao_row['co_comissao'];
                                         }//if($aVendas_aux[$canal] >= $dados_comissao_row['co_volume_min'] && $aVendas_aux[$canal] <= $dados_comissao_row['co_volume_max'])
                                         }//end elseif(in_array($canal, $aCanaisIndiretos))
@@ -387,14 +394,14 @@ $time_start_stats = getmicrotime();
                                         $aVendas_aux[$dados_comissao_row['co_canal']] = $aVendas[$dados_comissao_row['co_canal']]*($dados_comissao_row['co_comissao']/100);
                                         $inicio = explode('/',$tf_data_inicial);
                                         $fim = explode('/',$tf_data_final);
-                                        $sql_aliquot = "update financial_processing set fp_aliquot=".$dados_comissao_row['co_comissao']." 
-                                                        where fp_channel='".$canal."' 
-                                                            and fp_publisher = ".$dd_operadora."
-                                                            and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                            and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                        $sql_aliquot = "update financial_processing set fp_aliquot=$1
+                                                        where fp_channel=$2
+                                                            and fp_publisher = $3
+                                                            and fp_date >= $4
+                                                            and fp_date <= $5
                                                             and fp_freeze=0";
                                         //echo $sql_aliquot." :NAUN Var<br>";
-                                        $dados_update = SQLexecuteQuery($sql_aliquot);
+                                        $dados_update = SQLexecuteQueryParams($sql_aliquot, array($dados_comissao_row['co_comissao'], $canal, (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                                         $aTaxaComissao[$dados_comissao_row['co_canal']] = $dados_comissao_row['co_comissao'];
                                         //echo $aVendas_aux[$dados_comissao_row['co_canal']]."<br>";
                                     }
@@ -407,24 +414,24 @@ $time_start_stats = getmicrotime();
                     $sql_comissao = "select * 
                                     from operadoras o 
                                             left outer join tb_comissoes c on o.opr_codigo=c.co_opr_codigo 
-                                    where opr_codigo = ".$dd_operadora." 
+                                    where opr_codigo = $1
                                             and co_canal='C'
                                     order by co_opr_codigo, co_canal, co_data_inclusao desc, co_volume_tipo, co_volume_min ";
-                    $dados_comissao = SQLexecuteQuery($sql_comissao);
+                    $dados_comissao = SQLexecuteQueryParams($sql_comissao, array((int)$dd_operadora));
                     $dados_comissao_row = pg_fetch_array($dados_comissao);
                     foreach ($aVendas as $canal => $value) {
                             if($aVendas[$dados_comissao_row['co_canal']] != 0 && $dados_comissao_row['co_canal']==$canal) {
                                 $aVendas_aux[$dados_comissao_row['co_canal']] = $aVendas[$dados_comissao_row['co_canal']]*($dados_comissao_row['co_comissao']/100);
                                 $inicio = explode('/',$tf_data_inicial);
                                 $fim = explode('/',$tf_data_final);
-                                $sql_aliquot = "update financial_processing set fp_aliquot=".$dados_comissao_row['co_comissao']." 
-                                                where fp_channel='".$canal."' 
-                                                    and fp_publisher = ".$dd_operadora."
-                                                    and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                    and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                $sql_aliquot = "update financial_processing set fp_aliquot=$1
+                                                where fp_channel=$2
+                                                    and fp_publisher = $3
+                                                    and fp_date >= $4
+                                                    and fp_date <= $5
                                                     and fp_freeze=0";
                                 //echo $sql_aliquot." :C<br>";
-                                $dados_update = SQLexecuteQuery($sql_aliquot);
+                                $dados_update = SQLexecuteQueryParams($sql_aliquot, array($dados_comissao_row['co_comissao'], $canal, (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                                 $aTaxaComissao[$dados_comissao_row['co_canal']] = $dados_comissao_row['co_comissao'];
                                 //echo $aVendas_aux[$dados_comissao_row['co_canal']]."<br>";
                             }//end if($aVendas[$dados_comissao_row['co_canal']] != 0 && $dados_comissao_row['co_canal']==$canal)
@@ -983,15 +990,18 @@ echo $texto;
                                         sum(fp_total) as total 
                                 from financial_processing 
                                 where ";
+                $sql_graphic_params = array();
                 if(!empty($dd_operadora)) {
-                    $sql_graphic .= " fp_publisher = ".$dd_operadora." and 
+                    $sql_graphic .= " fp_publisher = $1 and 
                                     ";
+                    $sql_graphic_params[] = (int)$dd_operadora;
                 }//end if($dd_operadora)
-                $sql_graphic .= " fp_date >= '".(date("Y")-5)."-01-01 00:00:00'
+                $sql_graphic .= " fp_date >= $".(count($sql_graphic_params)+1)."
                                 group by mes; ";
+                $sql_graphic_params[] = (date("Y")-5)."-01-01 00:00:00";
                 
                 // Montando a SESSION com Valores mensais totais ================================================= 
-                $volume_total_mes = SQLexecuteQuery($sql_graphic);
+                $volume_total_mes = SQLexecuteQueryParams($sql_graphic, $sql_graphic_params);
 		while ($volume_total_mes_row = pg_fetch_array($volume_total_mes)){
                             $data_MK = explode('-',$volume_total_mes_row['mes']);
                             //echo "<pre>".print_r($data_MK)."</pre>";
@@ -1057,14 +1067,14 @@ $(document).ready(function () {
                     if(validacaoPublisherEppPagamentosFacilitadora($dd_operadora)) {
                             $sql_calculo = "update financial_processing 
                                             set fp_comission = (fp_total * fp_aliquot/100) , 
-                                                fp_start_date = '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00',
-                                                fp_end_date = '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
-                                            where fp_publisher = ".$dd_operadora."
-                                                and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                                fp_start_date = $1,
+                                                fp_end_date = $2
+                                            where fp_publisher = $3
+                                                and fp_date >= $4
+                                                and fp_date <= $5
                                                 and fp_freeze=0";
                             //echo $sql_calculo." <br>";
-                            $dados_calculo = SQLexecuteQuery($sql_calculo);
+                            $dados_calculo = SQLexecuteQueryParams($sql_calculo, array($inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59", (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                             if(!$dados_calculo) {
                                 echo "Problema em salvar o congelamento do c�lculo.<br>";
                             }//end if(!$dados_calculo)
@@ -1072,15 +1082,15 @@ $(document).ready(function () {
                     else {
                             $sql_calculo = "update financial_processing 
                                             set fp_comission = (fp_total * fp_aliquot/100) , 
-                                                fp_start_date = '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00',
-                                                fp_end_date = '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59',
+                                                fp_start_date = $1,
+                                                fp_end_date = $2,
                                                 fp_freeze = 1
-                                            where fp_publisher = ".$dd_operadora."
-                                                and fp_date >= '".$inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00' 
-                                                and fp_date <= '".$fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59'
+                                            where fp_publisher = $3
+                                                and fp_date >= $4
+                                                and fp_date <= $5
                                                 and fp_freeze=0";
                             //echo $sql_calculo." <br>";
-                            $dados_calculo = SQLexecuteQuery($sql_calculo);
+                            $dados_calculo = SQLexecuteQueryParams($sql_calculo, array($inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59", (int)$dd_operadora, $inicio[2]."-".$inicio[1]."-".$inicio[0]." 00:00:00", $fim[2]."-".$fim[1]."-".$fim[0]." 23:59:59"));
                             if(!$dados_calculo) {
                                 echo "Problema em salvar o congelamento do c�lculo.<br>";
                             }//end if(!$dados_calculo)
@@ -1364,8 +1374,8 @@ function converteChannelTotal($ch) {
 
 function getSplitCard($opr_codigo) {
         //	-- Function: Obtem parametro de separar vendas de cart�o no fechamento financeiro
-        $sql = "select opr_desmembra_cartao from operadoras where opr_codigo= ".$opr_codigo.";";
-        $res = SQLexecuteQuery($sql);
+        $sql = "select opr_desmembra_cartao from operadoras where opr_codigo = $1;";
+        $res = SQLexecuteQueryParams($sql, array((int)$opr_codigo));
         if($res) {
                 if($res_row = pg_fetch_array ($res)) { 
                         return $res_row['opr_desmembra_cartao'];
@@ -1386,15 +1396,15 @@ function validacaoPublisherEppPagamentosFacilitadora($opr_codigo) {
                         opr_codigo
                 from operadoras
                 where 
-                        opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS']." 
+                        opr_vinculo_empresa = $1
                         and opr_data_inicio_operacoes is not null
-                        and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
-                        and opr_codigo = ".$opr_codigo."
+                        and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = $2)
+                        and opr_codigo = $3
                         and opr_status != '0'
                 ";
 
         //echo $sql.PHP_EOL; die();
-        $rs_operadoras_operantes = SQLexecuteQuery($sql);
+        $rs_operadoras_operantes = SQLexecuteQueryParams($sql, array((int)$GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS'], IOF, (int)$opr_codigo));
         //echo pg_num_rows($rs_operadoras_operantes)."<br>";
         if(!$rs_operadoras_operantes) {
             echo "Erro na Query de valida��o de Publishers Epp Pagamentos Facilitadora(".$sql.").<br>".PHP_EOL;
