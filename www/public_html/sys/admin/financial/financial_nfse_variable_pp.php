@@ -30,16 +30,41 @@ $dd_mode		= "S";
 require_once $raiz_do_projeto . "includes/gamer/constantesPinEpp.php"; 
 
 
-if(!isset($dd_operadora_multi)){
+
+if(!isset($dd_operadora_multi) || !is_array($dd_operadora_multi)){
     $dd_operadora_multi = array();
 }
 
+$dd_operadora_multi_sanitized = array();
+foreach($dd_operadora_multi as $oprValor) {
+    $oprValor = trim((string)$oprValor);
+    if($oprValor === 'ALL') {
+        $dd_operadora_multi_sanitized[] = 'ALL';
+        continue;
+    }
+    if(ctype_digit($oprValor)) {
+        $dd_operadora_multi_sanitized[] = (int)$oprValor;
+    }
+}
+$dd_operadora_multi = array_values(array_unique($dd_operadora_multi_sanitized));
+
+if(!function_exists('nfseBuildInPlaceholders')) {
+    function nfseBuildInPlaceholders($values, &$params) {
+        $holders = array();
+        foreach($values as $value) {
+            $params[] = $value;
+            $holders[] = '$' . count($params);
+        }
+        return implode(',', $holders);
+    }
+}
+
 if(in_array("ALL", $dd_operadora_multi, true)) {
-	$sqlopr = "select opr_codigo from operadoras where (opr_status = '1') and opr_codigo!=".$dd_operadora_EPP_Cash." and  opr_codigo!=".$dd_operadora_EPP_Cash_LH ." order by opr_nome";
-	$resopraux = SQLexecuteQuery($sqlopr);
-	unset($dd_operadora_multi);
+	$sqlopr = "select opr_codigo from operadoras where (opr_status = '1') and opr_codigo!=$1 and opr_codigo!=$2 order by opr_nome";
+	$resopraux = SQLexecuteQueryParams($sqlopr, array((int)$dd_operadora_EPP_Cash, (int)$dd_operadora_EPP_Cash_LH));
+	$dd_operadora_multi = array();
 	while ($resoprauxrow = pg_fetch_array ($resopraux)) {
-		$dd_operadora_multi[] = $resoprauxrow['opr_codigo'];
+		$dd_operadora_multi[] = (int)$resoprauxrow['opr_codigo'];
 	}
 }
 
@@ -68,36 +93,53 @@ $time_start_stats = getmicrotime();
 $descricao = new DescriptionReport('nfse');
 echo $descricao->MontaAreaDescricao();
 
-//A variável empresa controla qual empresa estará selecionada no select de ínculo
-//Seu valor inicial é ALL, indicando que a opção Todos os Vínculos estará selecionada por padrão
+//A variï¿½vel empresa controla qual empresa estarï¿½ selecionada no select de ï¿½nculo
+//Seu valor inicial ï¿½ ALL, indicando que a opï¿½ï¿½o Todos os Vï¿½nculos estarï¿½ selecionada por padrï¿½o
 $empresa = 'ALL';
 
-//Caso exista um post do vínculo, seu valor é colocado em empresa
+//Caso exista um post do vï¿½nculo, seu valor ï¿½ colocado em empresa
 if(isset($_POST["empresa"])){
     $empresa = $_POST["empresa"];
 }
 
-//Caso mude o vínculos selecionado, as operadoras selecionadas serão esquecidas
+//Caso mude o vï¿½nculos selecionado, as operadoras selecionadas serï¿½o esquecidas
 if(isset($_POST["mudou"])){
     $dd_operadora_multi = array();
 }
 
-//Caso não esteja selecionado todos os vínculos, uma condição é adicionada ao select das operadoras
-if($empresa !== 'ALL'){
-    $condicao = "and (opr_vinculo_empresa = " . $_POST["empresa"] . ")";
-}else{
-    $condicao = "";
+$empresaFiltro = null;
+if($empresa !== 'ALL' && ctype_digit((string)$empresa)){
+    $empresaFiltro = (int)$empresa;
+}
+
+$sqloprParams = array();
+$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1')";
+if($empresaFiltro !== null) {
+    $sqloprParams[] = $empresaFiltro;
+    $sqlopr .= " and (opr_vinculo_empresa = $".count($sqloprParams).")";
 }
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') ".$condicao." and (opr_codigo IN '".implode(',',$dd_operadora_multi)."') and opr_codigo!=".$dd_operadora_EPP_Cash." and  opr_codigo!=".$dd_operadora_EPP_Cash_LH ." order by opr_ordem";
+    if(count($dd_operadora_multi) > 0) {
+        $inPlaceholders = nfseBuildInPlaceholders($dd_operadora_multi, $sqloprParams);
+        $sqlopr .= " and (opr_codigo IN (".$inPlaceholders."))";
+    } else {
+        $sqlopr .= " and 1=0";
+    }
+    $sqloprParams[] = (int)$dd_operadora_EPP_Cash;
+    $sqlopr .= " and opr_codigo!=$".count($sqloprParams);
+    $sqloprParams[] = (int)$dd_operadora_EPP_Cash_LH;
+    $sqlopr .= " and opr_codigo!=$".count($sqloprParams);
+    $sqlopr .= " order by opr_ordem";
 } else {
-        $sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') ".$condicao." and opr_codigo!=".$dd_operadora_EPP_Cash." and  opr_codigo!=".$dd_operadora_EPP_Cash_LH ." order by opr_nome"; //opr_ordem
+    $sqloprParams[] = (int)$dd_operadora_EPP_Cash;
+    $sqlopr .= " and opr_codigo!=$".count($sqloprParams);
+    $sqloprParams[] = (int)$dd_operadora_EPP_Cash_LH;
+    $sqlopr .= " and opr_codigo!=$".count($sqloprParams);
+    $sqlopr .= " order by opr_nome";
 }
 
-$resopr = SQLexecuteQuery($sqlopr);
-
-
+$resopr = SQLexecuteQueryParams($sqlopr, $sqloprParams);
 
 $bg_col_01 = "#FFFFFF";
 $bg_col_02 = "#EEEEEE";
@@ -106,11 +148,25 @@ $bg_col = $bg_col_01;
 $dd_operadora_nome = array();
 
 if(count($dd_operadora_multi)>0) {
-        $resopr_nome = SQLexecuteQuery("select opr_nome, opr_codigo,opr_vinculo_empresa from operadoras where (opr_status = '1') ".$condicao." and (opr_codigo IN ('".implode("','",$dd_operadora_multi)."')) and opr_codigo!=".$dd_operadora_EPP_Cash." and  opr_codigo!=".$dd_operadora_EPP_Cash_LH ." order by opr_ordem");
-        while($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
-                $dd_operadora_nome[$pgopr_nome['opr_codigo']] = $pgopr_nome['opr_nome'];
-                $dd_operadora_vinculo[$pgopr_nome['opr_codigo']] = $pgopr_nome['opr_vinculo_empresa'];
-        } 
+    $sqloprNomeParams = array();
+    $sqloprNome = "select opr_nome, opr_codigo,opr_vinculo_empresa from operadoras where (opr_status = '1')";
+    if($empresaFiltro !== null) {
+        $sqloprNomeParams[] = $empresaFiltro;
+        $sqloprNome .= " and (opr_vinculo_empresa = $".count($sqloprNomeParams).")";
+    }
+    $inPlaceholders = nfseBuildInPlaceholders($dd_operadora_multi, $sqloprNomeParams);
+    $sqloprNome .= " and (opr_codigo IN (".$inPlaceholders."))";
+    $sqloprNomeParams[] = (int)$dd_operadora_EPP_Cash;
+    $sqloprNome .= " and opr_codigo!=$".count($sqloprNomeParams);
+    $sqloprNomeParams[] = (int)$dd_operadora_EPP_Cash_LH;
+    $sqloprNome .= " and opr_codigo!=$".count($sqloprNomeParams);
+    $sqloprNome .= " order by opr_ordem";
+
+    $resopr_nome = SQLexecuteQueryParams($sqloprNome, $sqloprNomeParams);
+    while($pgopr_nome = pg_fetch_array ($resopr_nome)) { 
+        $dd_operadora_nome[$pgopr_nome['opr_codigo']] = $pgopr_nome['opr_nome'];
+        $dd_operadora_vinculo[$pgopr_nome['opr_codigo']] = $pgopr_nome['opr_vinculo_empresa'];
+    }
 }
 
 ?>
@@ -213,35 +269,43 @@ foreach($dd_operadora_multi as $line => $dd_operadora ) {
         $aCanaisDiretos = array("E", "M", "S");
         $aCanaisIndiretos = array("L", "P");
 
+
         $inicio = date('Y-m-01',mktime (0,0,0,date("m")-1,1,date("Y")));
         $fim = date('Y-m-d',mktime (0,0,0,date("m")-1,date("t",mktime (0,0,0,date("m")-1,1,date("Y"))),date("Y")));
+
+        $dd_operadora = (int)$dd_operadora;
         $sql_total_mes = "
                         select 
                                 fp_channel,fp_publisher, sum(fp_number) as n, sum(fp_total) as total, sum(fp_comission) as comissao
                         from financial_processing 
-                        where  fp_publisher = ".$dd_operadora."
-                               and fp_date >= '".$inicio." 00:00:00' 
-                               and fp_date <= '".$fim." 00:00:00'
-                               and fp_date >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ".$dd_operadora.")
+                        where  fp_publisher = $1
+                               and fp_date >= $2
+                               and fp_date <= $3
+                               and fp_date >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = $1)
                                and fp_freeze=1
                         group by fp_channel,fp_publisher; ";
-		
+        $sqlTotalMesParams = array(
+            $dd_operadora,
+            $inicio." 00:00:00",
+            $fim." 00:00:00"
+        );
+
         //echo $sql_total_mes."<br>";
         $sql_min_date = " 
                         select to_char(min(fp_date),'DD/MM/YYYY') as menor_data
                         from financial_processing 
-                        where  fp_publisher = ".$dd_operadora."
+                        where  fp_publisher = $1
                                and fp_freeze=0";
         //echo $sql_min_date."<br>";
-        $min_date = SQLexecuteQuery($sql_min_date);
+        $min_date = SQLexecuteQueryParams($sql_min_date, array($dd_operadora));
 	if($min_date) {
             $min_date_row = pg_fetch_array($min_date);
-            echo "<font color='#BD3C2D'>A menor data do Publisher <font color='#282B79'>".$dd_operadora_nome[$dd_operadora]."</font> que ainda não possui fechamento é  ".$min_date_row['menor_data'].".</font><br>";
+            echo "<font color='#BD3C2D'>A menor data do Publisher <font color='#282B79'>".$dd_operadora_nome[$dd_operadora]."</font> que ainda nï¿½o possui fechamento ï¿½  ".$min_date_row['menor_data'].".</font><br>";
         }//end if($min_date)
         
 //echo str_replace("\n","<br>",$sql_total_mes)."<br>";
 
-	$vendas_total_mes = SQLexecuteQuery($sql_total_mes);
+		$vendas_total_mes = SQLexecuteQueryParams($sql_total_mes, $sqlTotalMesParams);
 	if($vendas_total_mes) {
 		
 		$aNVendas = array();

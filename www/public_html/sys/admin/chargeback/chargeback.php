@@ -25,19 +25,24 @@ session_start();
 			$vetorFormaDevolucao = array('1' => 'Devolução em Saldo', '2' => 'Devolução através de Depósito');
 			$vetorPINsBloqueados = array('0' => 'NÃO foi Bloqueado', '1' => 'Foi Bloqueado');
 
-			// recuperando a lista de operadoras ativas
-			$sql = "select opr_codigo, opr_nome from operadoras where opr_status = '1' order by opr_nome";
-			$rs_operadoras_operantes = SQLexecuteQuery($sql);
-			while($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
-				$vetorPublisher[$rs_operadoras_operantes_row['opr_codigo']] = $rs_operadoras_operantes_row['opr_nome'];
-			}
 
-			$objEstornoChargeBack = new EstornoChargeBackBO();
-			if(!empty($_POST["dataDevolucaoInicio"]))     $filtros["ec_data_devolucao"] = "ec_data_devolucao >= '".Util::getData($_POST["dataDevolucaoInicio"], true)." 00:00:00'";
-			if(!empty($_POST["dataDevolucaoFinal"])) $filtros["ec_data_devolucao_fim"] = "ec_data_devolucao <= '".Util::getData($_POST["dataDevolucaoFinal"], true)." 23:59:59'";
-			if(!empty($_POST["formachargeback"]))    $filtros["ec_forma_devolucao"] = "ec_forma_devolucao = ".$_POST["formachargeback"]; 
-			if(!empty($_POST["numPedido"]))                 $filtros["vg_id"] = "vg_id = ".$_POST["numPedido"]; 
-			if(!empty($_SESSION["opr_vinculo"]) && $_SESSION["opr_vinculo"] != 0) $filtros["opr_codigo"] = "opr_codigo = ".$_SESSION["opr_vinculo"]; 
+				// recuperando a lista de operadoras ativas
+				$sql = "select opr_codigo, opr_nome from operadoras where opr_status = '1' order by opr_nome";
+				$rs_operadoras_operantes = SQLexecuteQueryParams($sql, array());
+				while($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
+					$vetorPublisher[$rs_operadoras_operantes_row['opr_codigo']] = $rs_operadoras_operantes_row['opr_nome'];
+				}
+
+				$formachargeback = (isset($_POST["formachargeback"]) && ctype_digit((string)$_POST["formachargeback"])) ? (int)$_POST["formachargeback"] : null;
+				$numPedido = (isset($_POST["numPedido"]) && ctype_digit((string)$_POST["numPedido"])) ? (int)$_POST["numPedido"] : null;
+				$oprVinculo = (isset($_SESSION["opr_vinculo"]) && ctype_digit((string)$_SESSION["opr_vinculo"])) ? (int)$_SESSION["opr_vinculo"] : 0;
+
+				$objEstornoChargeBack = new EstornoChargeBackBO();
+				if(!empty($_POST["dataDevolucaoInicio"])) $filtros["ec_data_devolucao"] = "ec_data_devolucao >= '".Util::getData($_POST["dataDevolucaoInicio"], true)." 00:00:00'";
+				if(!empty($_POST["dataDevolucaoFinal"]))  $filtros["ec_data_devolucao_fim"] = "ec_data_devolucao <= '".Util::getData($_POST["dataDevolucaoFinal"], true)." 23:59:59'";
+				if(!is_null($formachargeback))             $filtros["ec_forma_devolucao"] = "ec_forma_devolucao = ".$formachargeback;
+				if(!is_null($numPedido))                   $filtros["vg_id"] = "vg_id = ".$numPedido;
+				if($oprVinculo > 0)                        $filtros["opr_codigo"] = "opr_codigo = ".$oprVinculo;
 			$EstornoChargeBack = $objEstornoChargeBack->pegaEstornoChargeBack($filtros);
 			$_SESSION["excelBack"] = $EstornoChargeBack;
 			$_SESSION["oprs"] = $vetorPublisher;

@@ -175,12 +175,14 @@ echo "<div class='container'>(R) $tf_store_id<br></div>";
 				$filtro['vg_forma_pagto'] = $tf_d_forma_pagto;
 //echo "filtro['vg_forma_pagto']: '".$filtro['vg_forma_pagto']."'<br>";
 			}
-			if($tf_v_codigo) {
-				$filtro['vg_id'] = $tf_v_codigo;
-			}
-			if($tf_v_order) {
-				$filtro['order_id'] = $tf_v_order;
-			}
+				if($tf_v_codigo) {
+					$filtro['vg_id'] = $tf_v_codigo;
+					$filtro['tf_v_codigo_include'] = $tf_v_codigo_include;
+				}
+				if($tf_v_order) {
+					$filtro['order_id'] = $tf_v_order;
+					$filtro['tf_v_order_include'] = $tf_v_order_include;
+				}
 			if($tf_v_email) {
 				$filtro['client_email_txt'] = $tf_v_email;
 			}
@@ -233,18 +235,29 @@ if($b_lista) {
 //}
 }
 					//Ordem
-					$orderBy = $ncamp;
-					if($ordem == 1){
-						$orderBy .= " desc ";
-						$img_seta = "/sys/imagens/seta_down.gif";
-					} else {
-						$orderBy .= " asc ";
-						$img_seta = "/sys/imagens/seta_up.gif";
-					}
-			
+					$allowedOrderColumns = array(
+						'ip_id',
+						'ip_data_inclusao',
+						'ip_store_id',
+						'ip_client_email',
+						'ip_amount',
+						'ip_vg_id',
+						'ip_order_id',
+						'vg_ultimo_status',
+						'vg_pagto_tipo',
+						'ip_data_confirmed'
+					);
+					$orderColumn = in_array($ncamp, $allowedOrderColumns, true) ? $ncamp : 'ip_data_inclusao';
+					$orderDirection = ((int)$ordem === 1) ? 'DESC' : 'ASC';
+					$img_seta = ((int)$ordem === 1) ? "/sys/imagens/seta_down.gif" : "/sys/imagens/seta_up.gif";
+
+					$orderBy = array(
+						'column' => $orderColumn,
+						'direction' => $orderDirection
+					);
 					if(empty($flistall)) {
-						$orderBy .= " limit ".$max; 
-						$orderBy .= " offset ".$inicial;
+						$orderBy['limit'] = (int)$max;
+						$orderBy['offset'] = (int)$inicial;
 					}
 					else {
 						$max = $n_rows;
@@ -269,7 +282,7 @@ if($b_lista) {
 	//parceiros
 	$sql  = "select distinct ip_store_id as parceiro, count(*) as n, ".getPartner_Names_SQL()." from tb_integracao_pedido group by ip_store_id order by opr_nome, ip_store_id;";
 //echo "sql: $sql<br>";
-	$rs_parceiros = SQLexecuteQuery($sql);
+	$rs_parceiros = SQLexecuteQueryParams($sql, array());
 
 	//Clientes
 //	$sql  = "select distinct ip_client_email as cliente, count(*) as n from tb_integracao_pedido ip where 1=1 ".$sql_where." group by ip_client_email order by ip_client_email;";
@@ -701,169 +714,226 @@ require_once $raiz_do_projeto . "public_html/sys/includes/rodape_sys.php";
 <?php
 	function obter($filtro, $orderBy, &$rs){
 
-//echo "<pre>".print_r($filtro, true)."</pre><br>";
 		$ret = "";
-		$filtro = array_map("strtoupper", $filtro);
+		$params = array();
+		foreach($filtro as $filtroKey => $filtroVal) {
+			if(is_string($filtroVal)) {
+				$filtro[$filtroKey] = strtoupper($filtroVal);
+			}
+		}
+
+		$buildInPlaceholders = function($values) use (&$params) {
+			$holders = array();
+			foreach($values as $value) {
+				$params[] = $value;
+				$holders[] = '$' . count($params);
+			}
+			return implode(',', $holders);
+		};
+
+		$sanitizeCsvValues = function($csv, $numericOnly) {
+			$items = explode(',', (string)$csv);
+			$safeItems = array();
+			foreach($items as $item) {
+				$item = trim($item, " \t\n\r\0\x0B'\"");
+				if($item === '') {
+					continue;
+				}
+				if($numericOnly && !preg_match('/^[0-9]+$/', $item)) {
+					continue;
+				}
+				$safeItems[] = $item;
+			}
+			return $safeItems;
+		};
 
 		$sql  = "select ip.*";
 		$sql .= ", vg.vg_ultimo_status, vg.vg_pagto_tipo ";
 		$sql .= ", coalesce((select iph_ip_status_confirmed
-									from tb_integracao_pedido_historico iph 
-									where 1=1 
+										from tb_integracao_pedido_historico iph 
+										where 1=1 
+											and iph.iph_ip_id = ip.ip_id
+											and iph.iph_ip_store_id = ip.ip_store_id
+											and iph.iph_ip_order_id = ip.ip_order_id
+											and iph.iph_ip_vg_id = ip.ip_vg_id
+											and iph.iph_ip_vg_id >0
+											and iph.iph_ip_status_confirmed = 1
+										order by ip.ip_data_inclusao desc
+										limit 1
+											), 0) as confirmed ";
+		$sql .= ", coalesce(vg_id, 0) as vg_id ";
+		$sql .= ", coalesce(vg_ug_id, 0) as vg_ug_id ";
+		$sql .= "from tb_integracao_pedido ip ";
+		$sql .= "\tleft outer join tb_venda_games vg on ip.ip_vg_id = vg.vg_id ";
+
+		if(!is_null($filtro) && $filtro != ""){
+			$sql .= " where 1=1 ";
+
+			$dataMin = $filtro['dataMin'] ?? null;
+			$dataMax = $filtro['dataMax'] ?? null;
+			if($dataMin && $dataMax) {
+				$dataMin = formata_data_ts_integracao($dataMin);
+				$dataMax = formata_data_ts_integracao($dataMax);
+				$params[] = $dataMin . " 00:00:00";
+				$phDataMin = '$' . count($params);
+				$params[] = $dataMax . " 23:59:59";
+				$phDataMax = '$' . count($params);
+				$sql .= " and ip.ip_data_inclusao between ".$phDataMin." and ".$phDataMax." ";
+			}
+
+			$dataConfMin = $filtro['dataConfMin'] ?? null;
+			$dataConfMax = $filtro['dataConfMax'] ?? null;
+			if($dataConfMin && $dataConfMax) {
+				$dataConfMin = formata_data_ts_integracao($dataConfMin);
+				$dataConfMax = formata_data_ts_integracao($dataConfMax);
+				$params[] = $dataConfMin . " 00:00:00";
+				$phDataConfMin = '$' . count($params);
+				$params[] = $dataConfMax . " 23:59:59";
+				$phDataConfMax = '$' . count($params);
+				$sql .= " and ip.ip_data_confirmed between ".$phDataConfMin." and ".$phDataConfMax." ";
+			}
+
+			$dataConciliaMin = $filtro['dataConciliaMin'] ?? null;
+			$dataConciliaMax = $filtro['dataConciliaMax'] ?? null;
+			if($dataConciliaMin && $dataConciliaMax) {
+				$dataConciliaMin = formata_data_ts_integracao($dataConciliaMin);
+				$dataConciliaMax = formata_data_ts_integracao($dataConciliaMax);
+				$params[] = $dataConciliaMin;
+				$phDataConciliaMin = '$' . count($params);
+				$params[] = $dataConciliaMax;
+				$phDataConciliaMax = '$' . count($params);
+				$sql .= " and date(vg.vg_data_concilia) >= ".$phDataConciliaMin." and date(vg.vg_data_concilia) <= ".$phDataConciliaMax." ";
+			}
+
+			$storeIds = $sanitizeCsvValues($filtro['store_id'] ?? null, true);
+			if(count($storeIds) > 0) {
+				$storePlaceholders = $buildInPlaceholders($storeIds);
+				$sql .= " and ip.ip_store_id IN (".$storePlaceholders.") ";
+			}
+
+			$clienteEmail = $filtro['cliente_email'] ?? null;
+			if($clienteEmail) {
+				$params[] = strtoupper(trim($clienteEmail));
+				$phClienteEmail = '$' . count($params);
+				$sql .= " and upper(ip.ip_client_email) = ".$phClienteEmail." ";
+			}
+
+			$amount = $filtro['amount'] ?? null;
+			if($amount !== null && $amount !== '') {
+				$amountSanitized = str_replace(',', '.', preg_replace('/[^0-9,.-]/', '', (string)$amount));
+				if(is_numeric($amountSanitized)) {
+					$params[] = (int)round(((float)$amountSanitized) * 100);
+					$phAmount = '$' . count($params);
+					$sql .= " and ip.ip_amount = ".$phAmount." ";
+				}
+			}
+
+			$vgFormaPagto = $filtro['vg_forma_pagto'] ?? null;
+			if($vgFormaPagto) {
+				if($vgFormaPagto=="X") {
+					$sql .= " and vg_pagto_tipo in (" . getListaCodigoNumericoParaPagtoOnline() . ") ";
+				} elseif($vgFormaPagto=="Y") {
+					$sql .= " and vg_pagto_tipo in (".$GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF'].", ".$GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'].") ";
+				} else {
+					$params[] = (int)getCodigoNumericoParaPagto($vgFormaPagto);
+					$phVgFormaPagto = '$' . count($params);
+					$sql .= " and vg_pagto_tipo = ".$phVgFormaPagto." ";
+				}
+			}
+
+			$vgStatus = $filtro['vg_status'] ?? null;
+			if($vgStatus !== null && $vgStatus !== '') {
+				$params[] = (int)$vgStatus;
+				$phVgStatus = '$' . count($params);
+				$sql .= " and vg.vg_ultimo_status = ".$phVgStatus." ";
+			}
+
+			$vgIds = $sanitizeCsvValues($filtro['vg_id'] ?? null, true);
+			if(count($vgIds) > 0) {
+				$vgIdPlaceholders = $buildInPlaceholders($vgIds);
+				$notVgId = (($filtro['tf_v_codigo_include'] ?? null) == "-1") ? "not " : "";
+				$sql .= " and ip.ip_vg_id ".$notVgId."in (".$vgIdPlaceholders.") ";
+			}
+
+			$orderIds = $sanitizeCsvValues($filtro['order_id'] ?? null, false);
+			if(count($orderIds) > 0) {
+				$orderIdPlaceholders = $buildInPlaceholders($orderIds);
+				$notOrderId = (($filtro['tf_v_order_include'] ?? null) == "-1") ? "not " : "";
+				$sql .= " and upper(ip.ip_order_id) ".$notOrderId."in (".$orderIdPlaceholders.") ";
+			}
+
+			$clientEmailTxt = $filtro['client_email_txt'] ?? null;
+			if($clientEmailTxt) {
+				$params[] = "%" . strtoupper(trim($clientEmailTxt)) . "%";
+				$phClientEmailTxt = '$' . count($params);
+				$sql .= " and upper(ip.ip_client_email) like ".$phClientEmailTxt." ";
+			}
+
+			$confirmed = $filtro['confirmed'] ?? null;
+			if(!is_null($confirmed)) {
+				$sql_subquery = "\texists(
+										select iph_ip_status_confirmed
+										from tb_integracao_pedido_historico iph 
+										where 1=1 
 										and iph.iph_ip_id = ip.ip_id
 										and iph.iph_ip_store_id = ip.ip_store_id
 										and iph.iph_ip_order_id = ip.ip_order_id
 										and iph.iph_ip_vg_id = ip.ip_vg_id
-										and iph.iph_ip_vg_id >0
 										and iph.iph_ip_status_confirmed = 1
-									order by ip.ip_data_inclusao desc
-									limit 1
-										), 0) as confirmed ";
-		$sql .= ", coalesce(vg_id, 0) as vg_id ";
-		$sql .= ", coalesce(vg_ug_id, 0) as vg_ug_id ";
-//		$sql .= ", pc.status ";
-		$sql .= "from tb_integracao_pedido ip ";
-//		$sql .= "	left outer join tb_pag_compras pc on ip.ip_vg_id = pc.idvenda ";
-		$sql .= "	left outer join tb_venda_games vg on ip.ip_vg_id = vg.vg_id ";
-		if(!is_null($filtro) && $filtro != ""){
-		
-			if(!is_null($filtro['opr'])) {
-			}
+									)";
 
-			if(!is_null($filtro['dataMin']) && !is_null($filtro['dataMax'])){
-//echo "tf_data_ini: '".$filtro['dataMin']."' - tf_data_fim: '".$filtro['dataMax']."' <br>";
-				$filtro['dataMin'] = formata_data_ts_integracao($filtro['dataMin']);
-				$filtro['dataMax'] = formata_data_ts_integracao($filtro['dataMax']);
-//echo "tf_data_ini: '".$filtro['dataMin']."' - tf_data_fim: '".$filtro['dataMax']."' <br>";
-			}			
-			if(!is_null($filtro['dataConfMin']) && !is_null($filtro['dataConfMax'])){
-//echo "tf_data_conf_ini: '".$filtro['dataConfMin']."' - tf_data_fim: '".$filtro['dataConfMax']."' <br>";
-				$filtro['dataConfMin'] = formata_data_ts_integracao($filtro['dataConfMin']);
-				$filtro['dataConfMax'] = formata_data_ts_integracao($filtro['dataConfMax']);
-//echo "tf_data_conf_ini: '".$filtro['dataConfMin']."' - tf_data_fim: '".$filtro['dataConfMax']."' <br>";
-			}			
-
-			if(!is_null($filtro['dataConciliaMin']) && !is_null($filtro['dataConciliaMax'])){
-				$filtro['dataConciliaMin'] = formata_data_ts_integracao($filtro['dataConciliaMin']);
-				$filtro['dataConciliaMax'] = formata_data_ts_integracao($filtro['dataConciliaMax']);
-			}			
-
-			$sql .= " where 1=1 ";
-//			$sql .= " and (not idvenda = 0) ";
-			
-//			$sql .= " and (" . (is_null($filtro['dataMin']) || is_null($filtro['dataMax'])?1:0);
-//			$sql .= "=1 or ca.data between " . SQLaddFields($filtro['dataMin'], "") . " and " . SQLaddFields($filtro['dataMax'], "") . ")";
-
-			if($filtro['dataMin'] && $filtro['dataMax']) {
-				$sql .= " and (" . (is_null($filtro['dataMin']) || is_null($filtro['dataMax'])?1:0);
-				$sql .= "=1 or ip.ip_data_inclusao between '".$filtro['dataMin']." 00:00:00' and '".$filtro['dataMax']." 23:59:59') ";
-			}
-			if($filtro['dataConfMin'] && $filtro['dataConfMax']) {
-				$sql .= " and (" . (is_null($filtro['dataConfMin']) || is_null($filtro['dataConfMax'])?1:0);
-				$sql .= "=1 or ip.ip_data_confirmed between '".$filtro['dataConfMin']." 00:00:00' and '".$filtro['dataConfMax']." 23:59:59') ";
-			}
-			if($filtro['dataConciliaMin'] && $filtro['dataConciliaMax']) {
-				$sql .= " and (" . (is_null($filtro['dataConciliaMin']) || is_null($filtro['dataConciliaMax'])?1:0);
-				$sql .= "=1 or date(vg.vg_data_concilia) >= '".$filtro['dataConciliaMin']."' and date(vg.vg_data_concilia) <= '".$filtro['dataConciliaMax']."') ";
-				//$sql .= "=1 or vg.vg_data_concilia between '".$filtro['dataConciliaMin']." 00:00:00' and '".$filtro['dataConciliaMax']." 23:59:59') ";
-			}
-
-			$sql .= " and (" . (is_null($filtro['store_id'])?1:0);
-			$sql .= "=1 or ip.ip_store_id IN ('" . SQLaddFields($filtro['store_id'], "") . "') ) ";
-
-
-//$sql_where .= "and ip.ip_client_email = '".$filtro['cliente_email']."' ";
-
-			$sql .= " and (" . (is_null($filtro['cliente_email'])?1:0);
-			$sql .= "=1 or upper(ip.ip_client_email) = '" . SQLaddFields(($filtro['cliente_email']), "") . "') ";
-
-			$sql .= " and (" . (is_null($filtro['amount'])?1:0);
-			$sql .= "=1 or ip.ip_amount = '" . SQLaddFields(($filtro['amount']*100), "") . "') ";
-
-			if($filtro['vg_forma_pagto']) {
-				if($filtro['vg_forma_pagto']=="X") {
-//echo getListaCodigoNumericoParaPagtoOnline()."<br>";	// -> 5,6,7,9,10,13,11,12,999
-//echo getListaCharacterParaPagtoOnline()."<br>";	//	-> '5','6','7','9','A','E','B','P','Z'
-
-					$sql .= " and (" . (is_null($filtro['vg_forma_pagto'])?1:0);
-					$sql .= "=1 or vg_pagto_tipo in (" . getListaCodigoNumericoParaPagtoOnline() . ") ) ";
-				} elseif($filtro['vg_forma_pagto']=="Y") {
-
-					$sql .= " and (" . (is_null($filtro['vg_forma_pagto'])?1:0);
-					$sql .= "=1 or vg_pagto_tipo in (".$GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF'].", ".$GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'].") ) ";
-				} else {
-					$sql .= " and (" . (is_null($filtro['vg_forma_pagto'])?1:0);
-					$sql .= "=1 or vg_pagto_tipo = " . getCodigoNumericoParaPagto($filtro['vg_forma_pagto']) . ") ";
+				if($confirmed==-1) {
+					$sql .= "and coalesce(vg_id, 0)=0 ";
+					$sql .= "and not (".$sql_subquery.") ";
+				} elseif($confirmed==1) {
+					$sql .= "and coalesce(vg_id, 0)>0 ";
+					$sql .= "and not (".$sql_subquery.") ";
+				} elseif($confirmed==2) {
+					$sql .= "and coalesce(vg_id, 0)>0 ";
+					$sql .= "and (".$sql_subquery.") ";
 				}
 			}
 
-			$sql .= " and (" . (is_null($filtro['vg_status'])?1:0);
-			$sql .= "=1 or vg.vg_ultimo_status = " . SQLaddFields($filtro['vg_status'], "") . ") ";
-
-			if($filtro['vg_id']) {
-				$sql .= " and (" . (is_null($filtro['vg_id'])?1:0);
-				$sql .= "=1 or (ip.ip_vg_id ".(($filtro['tf_v_codigo_include']=="-1")?"not":"")." in (" . str_replace("'", "", $filtro['vg_id']) . ")) ) ";
+			$clientId = $filtro['client_id'] ?? null;
+			if($clientId !== null && $clientId !== '') {
+				$params[] = (int)$clientId;
+				$phClientId = '$' . count($params);
+				$sql .= " and ip.ip_client_id = ".$phClientId." ";
 			}
-			if($filtro['order_id']) {
-
-				$sql .= " and (" . (is_null($filtro['order_id'])?1:0);
-				$sql .= "=1 or (upper(ip.ip_order_id) ".(($filtro['tf_v_order_include']=="-1")?"not":"")." in ('" . str_replace(",", "','", str_replace(" ", "", $filtro['order_id'])) . "')) ) ";
-			}
-			if($filtro['client_email_txt']) {
-				$sql .= " and (" . (is_null($filtro['client_email_txt'])?1:0);
-				$sql .= "=1 or (upper(ip.ip_client_email) like '%" . strtoupper($filtro['client_email_txt']) . "%') ) ";
-			}
-			
-			if(!is_null($filtro['confirmed'])) {
-					$sql_subquery = "	exists(
-									select iph_ip_status_confirmed
-									from tb_integracao_pedido_historico iph 
-									where 1=1 
-									and iph.iph_ip_id = ip.ip_id
-									and iph.iph_ip_store_id = ip.ip_store_id
-									and iph.iph_ip_order_id = ip.ip_order_id
-									and iph.iph_ip_vg_id = ip.ip_vg_id
-									and iph.iph_ip_status_confirmed = 1
-								)";
-
-					if($filtro['confirmed']==-1) {
-						// -1 -> "0 - Não (sem venda)"
-						$sql .= "and coalesce(vg_id, 0)=0 ";
-						$sql .= "and not ($sql_subquery) ";
-					} elseif($filtro['confirmed']==1) {
-						// 1 -> "0 - Não (com venda)"
-						$sql .= "and coalesce(vg_id, 0)>0 ";
-						$sql .= "and not ($sql_subquery) ";
-					} elseif($filtro['confirmed']==2) {
-						// 2 -> "1 - Sim (Completo)"
-						$sql .= "and coalesce(vg_id, 0)>0 ";
-						$sql .= "and ($sql_subquery) ";
-					}
-			}
-
-			$sql .= " and (" . (is_null($filtro['client_id'])?1:0);
-			$sql .= "=1 or ip.ip_client_id = " . SQLaddFields($filtro['client_id'], "") . ")  ";
 		}
 
-		if(!is_null($orderBy)) $sql .= " order by " . $orderBy;
+		if(is_array($orderBy) && !empty($orderBy['column'])) {
+			$allowedOrderColumns = array(
+				'ip_id',
+				'ip_data_inclusao',
+				'ip_store_id',
+				'ip_client_email',
+				'ip_amount',
+				'ip_vg_id',
+				'ip_order_id',
+				'vg_ultimo_status',
+				'vg_pagto_tipo',
+				'ip_data_confirmed'
+			);
+			$orderColumn = in_array($orderBy['column'], $allowedOrderColumns, true) ? $orderBy['column'] : 'ip_data_inclusao';
+			$orderDirection = (isset($orderBy['direction']) && strtoupper($orderBy['direction']) === 'ASC') ? 'ASC' : 'DESC';
+			$sql .= " order by ".$orderColumn." ".$orderDirection;
+			if(isset($orderBy['limit'])) {
+				$sql .= " limit ".max(0, (int)$orderBy['limit']);
+			}
+			if(isset($orderBy['offset'])) {
+				$sql .= " offset ".max(0, (int)$orderBy['offset']);
+			}
+		}
 
-		//echo $sql;
-		//exit;
-
-if(b_IsUsuarioWagner()) { 
-//echo "<!-- ".str_replace("\n", "<br>\n", $sql)." --><br>";
-//echo "".str_replace("\n", "<br>\n", $sql)."<br>";
-//die("Stop");
-}               
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $params);
 		echo '<script>';
-    echo 'console.log(' . json_encode($sql) . ');';
-    echo '</script>';
-		//echo("felipe:" + $sql);
-		if(!$rs) $ret = "Erro ao obter pedidos de integração(s).\n";
+		echo 'console.log(' . json_encode($sql) . ');';
+		echo '</script>';
+		if(!$rs) $ret = "Erro ao obter pedidos de integra\347\343o(s).\n";
 
 		return $ret;
 
 	}
 	
-?>
+	?>

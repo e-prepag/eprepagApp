@@ -81,13 +81,14 @@ function gerarArquivo(varArquivo) {
 			$proc_novamente_adm = "";
 
 			foreach ($valorNota as $line => $valor) {
+				$line = (int)$line;
 				$valorAux = $valor * 1;
 				if (!empty($valorAux)) {
 
 					// Verificando se o Publisher é Nacional ou Internacional
-					$sql = "select opr_internacional_alicota from operadoras where opr_codigo = " . $line . "; ";
+					$sql = "select opr_internacional_alicota from operadoras where opr_codigo = $1;";
 					//echo $sql."<br>";
-					$resAlicota = SQLexecuteQuery($sql);
+					$resAlicota = SQLexecuteQueryParams($sql, array($line));
 					$insideIRRF = 0;
 					if ($resAlicotaRow = pg_fetch_array($resAlicota)) {
 						$insideIRRF = $resAlicotaRow['opr_internacional_alicota'];
@@ -102,9 +103,9 @@ function gerarArquivo(varArquivo) {
 					// Para EPP PAGAMENTOS
 					if (empty($vinculoEmpresa[$line])) {
 
-						$sql = "select * from nfse_epp where opr_codigo=$line and nfes_periodo='$nfes_periodo'";
-						//echo $sql."<br>";
-						$rs_periodo = SQLexecuteQuery($sql);
+						$sql = "select * from nfse_epp where opr_codigo=$1 and nfes_periodo=$2";
+							//echo $sql."<br>";
+							$rs_periodo = SQLexecuteQueryParams($sql, array($line, $nfes_periodo));
 						if (pg_num_rows($rs_periodo) > 0) {
 							echo "<tr><td><font color='#000000' class='texto' align='center'>Per&iacute;odo j&aacute; processado para o Publisher ($line)</font></td></tr>";
 							$proc_novamente = "_segunda_via";
@@ -114,8 +115,8 @@ function gerarArquivo(varArquivo) {
 							$varSerieRPS = "EPP";
 
 							$sql = "select MAX(nfes_seq) as nfes_seq from nfse_epp;";
-							//echo $sql."<br>";
-							$resRPS = SQLexecuteQuery($sql);
+								//echo $sql."<br>";
+								$resRPS = SQLexecuteQueryParams($sql, array());
 							if ($resRPSrow = pg_fetch_array($resRPS)) {
 								if (empty($resRPSrow['nfes_seq'])) {
 									$varNumeroRPSaux = 1;
@@ -140,8 +141,8 @@ function gerarArquivo(varArquivo) {
 							$varAliquotaRPS = "0200";	// 2% antes - agora é 5% passou para 2% novamente em 24/01/2018
 							$varISSRetido = "2";
 
-							$sql = "select * from operadoras where opr_codigo=" . $line;
-							$resOPR = SQLexecuteQuery($sql);
+							$sql = "select * from operadoras where opr_codigo=$1";
+								$resOPR = SQLexecuteQueryParams($sql, array($line));
 							$resOPRrow = pg_fetch_array($resOPR);
 
 							if (empty($resOPRrow['opr_cnpj'])) {
@@ -194,13 +195,13 @@ function gerarArquivo(varArquivo) {
 										nfes_periodo
 										) 
 								VALUES (
-										$varNumeroRPSaux,
+										$1,
 										NOW(),
-										$line, 
-										$valor,
-										'$nfes_periodo');";
-							//echo $sql."<br>";
-							$rs_operadoras = SQLexecuteQuery($sql);
+										$2, 
+										$3,
+										$4);";
+								//echo $sql."<br>";
+								$rs_operadoras = SQLexecuteQueryParams($sql, array((int)$varNumeroRPSaux, $line, $valor, $nfes_periodo));
 							if (!$rs_operadoras) {
 								$msg .= "Erro ao salvar informa&ccedil;&otilde;es da RPS. ($sql)<br>";
 							}
@@ -210,9 +211,9 @@ function gerarArquivo(varArquivo) {
 			
 					// Para EPP ADMINISTRADORA
 					else {
-						$sql = "select * from nfse_epp_adm where opr_codigo=$line and nfes_periodo='$nfes_periodo'";
+						$sql = "select * from nfse_epp_adm where opr_codigo=$1 and nfes_periodo=$2";
 						//echo $sql."<br>";
-						$rs_periodo = SQLexecuteQuery($sql);
+						$rs_periodo = SQLexecuteQueryParams($sql, array($line, $nfes_periodo));
 						if (pg_num_rows($rs_periodo) > 0) {
 							echo "<tr><td><font color='#000000' class='texto' align='center'>Per&iacute;odo j&aacute; processado para o Publisher ($line)</font></td></tr>";
 							$proc_novamente_adm = "_segunda_via";
@@ -229,8 +230,8 @@ function gerarArquivo(varArquivo) {
 
                                         select MAX(nfes_seq) as nfes_seq from tb_pag_taxa_anual
                                 ) as t;";
-							//echo $sql."<br>";
-							$resRPS = SQLexecuteQuery($sql);
+								//echo $sql."<br>";
+								$resRPS = SQLexecuteQueryParams($sql, array());
 							if ($resRPSrow = pg_fetch_array($resRPS)) {
 								if (empty($resRPSrow['nfes_seq'])) {
 									$varNumeroRPSaux = 1;
@@ -255,8 +256,8 @@ function gerarArquivo(varArquivo) {
 							$varAliquotaRPS = "0200";	// 2% antes - agora é 5%
 							$varISSRetido = "2";
 
-							$sql = "select * from operadoras where opr_codigo=" . $line;
-							$resOPR = SQLexecuteQuery($sql);
+								$sql = "select * from operadoras where opr_codigo=$1";
+								$resOPR = SQLexecuteQueryParams($sql, array($line));
 							$resOPRrow = pg_fetch_array($resOPR);
 
 							if (empty($resOPRrow['opr_cnpj'])) {
@@ -302,20 +303,20 @@ function gerarArquivo(varArquivo) {
 							$sNFeADM .= gera_lote($varTipoRPS, $varSerieRPS, $varNumeroRPS, $varNumLote, $varDataEmissaoRPS, $varSituacaoRPS, $varValorRPS, $varDeducaoRPS, $varCodigoServicoRPS, $varAliquotaRPS, $varISSRetido, $varIndicadorCPF, $varCPF, $varIM, $varIE, $varNome, $varTipoEndereco, $varEndereco, $varNumero, $varComplemento, $varBairro, $varCidade, $varUF, $varCEP, $varEmail, $varDiscriminacao, "", $varTributacaoServico, $varCodigoSubitemLista, $varRegimeTributacao, $varDataPagamentoServico, $varTipoNFTS) .
 								""; //"NFS"
 							$sql = "INSERT INTO nfse_epp_adm (
-                                                                                nfes_seq, 
-                                                                                nfes_data, 
-                                                                                opr_codigo, 
-                                                                                nfes_valor,
-                                                                                nfes_periodo
-                                                                                ) 
-                                                                VALUES (
-                                                                                $varNumeroRPSaux,
-                                                                                NOW(),
-                                                                                $line, 
-                                                                                $valor,
-                                                                                '$nfes_periodo');";
-							//echo $sql."<br>";
-							$rs_operadoras = SQLexecuteQuery($sql);
+														nfes_seq, 
+														nfes_data, 
+														opr_codigo, 
+														nfes_valor,
+														nfes_periodo
+														) 
+												VALUES (
+														$1,
+														NOW(),
+														$2, 
+														$3,
+														$4);";
+								//echo $sql."<br>";
+								$rs_operadoras = SQLexecuteQueryParams($sql, array((int)$varNumeroRPSaux, $line, $valor, $nfes_periodo));
 							if (!$rs_operadoras) {
 								$msg .= "Erro ao salvar informa&ccedil;&otilde;es da RPS. ($sql)<br>";
 							}
