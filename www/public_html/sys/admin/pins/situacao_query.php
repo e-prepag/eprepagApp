@@ -138,12 +138,12 @@ if ($flist_vg_id) {
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 
 // Levanta lista de status	
 $sql  = "select stat_codigo, stat_descricao from pins_status order by stat_codigo;";
-$resstatus = pg_exec($connid, $sql);
+$resstatus = SQLexecuteQueryParams($sql, array());
 $a_status = array();
 while ($pgstatus = pg_fetch_array($resstatus)) {
     $a_status[$pgstatus['stat_codigo']] = $pgstatus['stat_descricao'];
@@ -171,11 +171,7 @@ if ($debug) {
 }
 //echo "felipe " . $sql;
 
-if (!empty($sql_params)) {
-    $resvalue = SQLexecuteQueryParams($sql, $sql_params);
-} else {
-    $resvalue = SQLexecuteQuery($sql);
-}
+$resvalue = SQLexecuteQueryParams($sql, $sql_params);
 $a_valores = array();
 while ($pgvalue = pg_fetch_array($resvalue)) {
     $a_valores[$pgvalue['pin_valor']] = $pgvalue['n'];
@@ -387,11 +383,7 @@ if ($BtnSearch) {
                 order by pin_datavenda desc, pin_horavenda desc;";
     //echo "felipe: " . $sql;
 
-    if (!empty($sql_params_main)) {
-        $resid_count = SQLexecuteQueryParams($sql, $sql_params_main);
-    } else {
-        $resid_count = SQLexecuteQuery($sql);
-    }
+    $resid_count = SQLexecuteQueryParams($sql, $sql_params_main);
     $total_table = pg_num_rows($resid_count);
 
     $qtde_geral = 0;
@@ -528,11 +520,7 @@ if ($BtnSearch) {
     }
     //echo "felipe2: " . $sql;
 
-    if (!empty($sql_params_main)) {
-        $resid = SQLexecuteQueryParams($sql, $sql_params_main);
-    } else {
-        $resid = SQLexecuteQuery($sql);
-    }
+    $resid = SQLexecuteQueryParams($sql, $sql_params_main);
 
     if ($max + $inicial > $total_table) $reg_ate = $total_table;
     else $reg_ate = $max + $inicial;

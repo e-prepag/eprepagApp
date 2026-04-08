@@ -18,7 +18,7 @@ $operacao_array_tmp	= VetorDistribuidorasCard();
 if($_POST["BtnSearch"]){
     $BtnSearch = $_POST["BtnSearch"];
 }
-$fpin = $_POST["fpin"];
+$fpin = $_POST["fpin"] ?? "";
 
 ?>
 <link rel="stylesheet" href="/sys/css/css.css" type="text/css">
@@ -77,11 +77,12 @@ function validade() {
 <?php
 if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"]))) {  
         
-		if(isset($_GET["pin"]) && !empty($_GET["pin"]) && !$BtnSearch){
-			$fpin = $_GET["pin"];
-		}
-        //Variavel de verificação de PIN Cartão
-        $isPINCARD = RetonaTamanhoPINEPPCARD(trim($fpin));
+			if(isset($_GET["pin"]) && !empty($_GET["pin"]) && !$BtnSearch){
+				$fpin = $_GET["pin"];
+			}
+	        $fpin = trim($fpin);
+	        //Variavel de verificação de PIN Cartão
+	        $isPINCARD = RetonaTamanhoPINEPPCARD($fpin);
         if($isPINCARD) {
             if(empty($GLOBALS['_SESSION']['opr_codigo_pub'])) {
                 if($_SESSION["tipo_acesso_pub"]=='AT') {
@@ -98,15 +99,16 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                 $idGiftCard = retorna_id_pin_card(trim($fpin),$GLOBALS['_SESSION']['opr_codigo_pub']);
             }//end else do if(empty($GLOBALS['_SESSION']['opr_codigo_pub']))
             
-            $sql = "select 
-                    opr_codigo,
-                    ".trim($fpin)." as pin_codigo,
-                    pin_dataentrada,
-                    pin_valor,
-                    pin_status,
-                    'GIFT CARD -'||pin_formato as opr_pin_epp_formato
-                from pins_card 
-                where pin_codinterno = ".$idGiftCard.";";
+	            $sql = "select 
+	                    opr_codigo,
+	                    $1 as pin_codigo,
+	                    pin_dataentrada,
+	                    pin_valor,
+	                    pin_status,
+	                    'GIFT CARD -'||pin_formato as opr_pin_epp_formato
+	                from pins_card 
+	                where pin_codinterno = $2;";
+                $rs_pin = SQLexecuteQueryParams($sql, array($fpin, (int)$idGiftCard));
             
             //Carregando includes conforme Distribuidor
             //Variavel contendo o Código do Distribuidor
@@ -125,19 +127,20 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
             
         }//end if($isPINCARD)
         else {
-            $sql = "select *  
-                    from pins left join trava_qtde_pin on pin_codigo = pin 
-                    where pin_codigo = '".trim($fpin)."' ";
+	            $sql = "select *  
+	                    from pins left join trava_qtde_pin on pin_codigo = pin 
+	                    where pin_codigo = $1 ";
+                $sql_params = array($fpin);
 
-            if(!empty($GLOBALS['_SESSION']['opr_codigo_pub'])) {
-                $sql .= " and opr_codigo = ".$GLOBALS['_SESSION']['opr_codigo_pub']." ";
-            }//end if(!empty($GLOBALS['_SESSION']['opr_codigo_pub']))
-            $sql .= "order by data_inclusao asc limit 1";
-        } //end else do if
-        
-        //echo "(R) ".str_replace("\n","<br>\n",$sql)."<br>\n<hr>";
-        
-        $rs_pin = SQLexecuteQuery($sql);
+	            if(!empty($GLOBALS['_SESSION']['opr_codigo_pub'])) {
+	                $sql .= " and opr_codigo = $2 ";
+                    $sql_params[] = (int)$GLOBALS['_SESSION']['opr_codigo_pub'];
+	            }//end if(!empty($GLOBALS['_SESSION']['opr_codigo_pub']))
+	            $sql .= "order by data_inclusao asc limit 1";
+                $rs_pin = SQLexecuteQueryParams($sql, $sql_params);
+	        } //end else do if
+	        
+	        //echo "(R) ".str_replace("\n","<br>\n",$sql)."<br>\n<hr>";
         
         if($rs_pin && pg_num_rows($rs_pin) > 0) {
        ?>
@@ -161,8 +164,8 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
 					<th class="text-center"><strong>Tentativas de resgate</strong></th>
 					<th class="text-center"><strong>Último status integração</strong></th> 
 <?php
-                $sql_opr = "select opr_pin_epp_formato,opr_nome,opr_codigo from operadoras where opr_pin_epp_formato is not null order by opr_nome";
-                $rs_oper = SQLexecuteQuery($sql_opr);
+	                $sql_opr = "select opr_pin_epp_formato,opr_nome,opr_codigo from operadoras where opr_pin_epp_formato is not null order by opr_nome";
+	                $rs_oper = SQLexecuteQueryParams($sql_opr, array());
                 if($rs_oper) 
                 {
                     while ($rs_oper_row = pg_fetch_array($rs_oper)) 
@@ -188,9 +191,9 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                             if($isPINCARD) {
                                     if($rs_pin_row['pin_status'] == intval($PINS_STORE_STATUS_VALUES['U'])) {
                                         //Capturando a data da Utilização
-                                        $sql = "select MIN(pih_data) as pih_data from pins_integracao_card_historico where pin_status = '".intval($PINS_STORE_STATUS_VALUES['U'])."'  and pih_codretepp = '2' and pih_pin_id =".$idGiftCard." ;";
-                                        //echo "<!-- $sql -->";
-                                        $rs_pin_utilizado = SQLexecuteQuery($sql);
+	                                        $sql = "select MIN(pih_data) as pih_data from pins_integracao_card_historico where pin_status = $1 and pih_codretepp = '2' and pih_pin_id = $2 ;";
+	                                        //echo "<!-- $sql -->";
+	                                        $rs_pin_utilizado = SQLexecuteQueryParams($sql, array((int)$PINS_STORE_STATUS_VALUES['U'], (int)$idGiftCard));
                                         $rs_pin_utilizado_row = pg_fetch_array($rs_pin_utilizado);
                                         $data_utilizado_aux = substr($rs_pin_utilizado_row['pih_data'],0,19);
                                         
@@ -234,14 +237,14 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
 						        $chave256bits = new Chave();
 							    $aes = new AES($chave256bits->retornaChave());
 							    $pinEnc = base64_encode($aes->encrypt(trim($fpin)));
-						        $sqlPinStore = "select pin_status from pins_store where pin_codigo = '".$pinEnc."';";
-						        $rs_pin_utilizado_store = SQLexecuteQuery($sqlPinStore);
+							        $sqlPinStore = "select pin_status from pins_store where pin_codigo = $1;";
+							        $rs_pin_utilizado_store = SQLexecuteQueryParams($sqlPinStore, array($pinEnc));
                                 $rs_pin_utilizado_row_store = pg_fetch_array($rs_pin_utilizado_store);
 									
 								//echo $rs_pin_utilizado_row_store["pin_status"];	
                                 if($rs_pin_row['pin_status'] == '8') {
-                                    $sql = "select MIN(pih_data) as pih_data from pins_integracao_historico where pih_pin_id = ".$rs_pin_row['pin_codinterno']." and pin_status = 8 and pih_codretepp = '2';";
-                                    $rs_pin_utilizado = SQLexecuteQuery($sql);
+	                                    $sql = "select MIN(pih_data) as pih_data from pins_integracao_historico where pih_pin_id = $1 and pin_status = 8 and pih_codretepp = '2';";
+	                                    $rs_pin_utilizado = SQLexecuteQueryParams($sql, array((int)$rs_pin_row['pin_codinterno']));
                                     $rs_pin_utilizado_row = pg_fetch_array($rs_pin_utilizado);
                                     if(!empty($rs_pin_utilizado_row['pih_data'])){
                                         $data_utilizado_aux = substr($rs_pin_utilizado_row['pih_data'],0,19);

@@ -1,6 +1,6 @@
 <?php   
-require_once "../../../../includes/constantes.php";
-require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php"; 
+	require_once "../../../../includes/constantes.php";
+	require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php"; 
 
 set_time_limit ( 3000 ) ;
 
@@ -15,8 +15,22 @@ $days_for_mean = 7;
 $prazo_vermelho_vezes = 1;
 $prazo_amarelo_vezes = 2;
 
-$ChkTreinamento = "1";
-if(!$fcanal) $fcanal = 's';
+	$ChkTreinamento = "1";
+	if(!$fcanal) $fcanal = 's';
+	$Submit = $_REQUEST['Submit'] ?? ($Submit ?? null);
+	$fopr = $_REQUEST['fopr'] ?? ($fopr ?? null);
+	$fvalor = $_REQUEST['fvalor'] ?? ($fvalor ?? null);
+	$fuf = $_REQUEST['fuf'] ?? ($fuf ?? null);
+	$fcanal = $_REQUEST['fcanal'] ?? $fcanal;
+	$ncamp = $_REQUEST['ncamp'] ?? ($ncamp ?? null);
+	$nscamp = $_REQUEST['nscamp'] ?? ($nscamp ?? null);
+
+	$fopr = (is_numeric($fopr) ? (int)$fopr : null);
+	$fvalor = ($fvalor !== null && $fvalor !== '' ? preg_replace('/[^0-9\.]/', '', (string)$fvalor) : null);
+	$fuf = ($fuf !== null && $fuf !== '' ? preg_replace('/[^0-9]/', '', (string)$fuf) : null);
+	$fcanal = in_array($fcanal, array('s','p','r','t',''), true) ? $fcanal : 's';
+	$ncamp = in_array($ncamp, array('opr_nome','pin_valor','pin_status','opr_codigo'), true) ? $ncamp : 'opr_nome';
+	$nscamp = in_array($nscamp, array('ec_uf, pin_valor','pin_valor','ec_uf'), true) ? $nscamp : 'ec_uf, pin_valor';
 
 if($_SESSION["tipo_acesso_pub"]=='PU') {
         $fopr = $_SESSION["opr_codigo_pub"];
@@ -27,15 +41,15 @@ if(!$ncamp) $ncamp = 'opr_nome';
 if(!$nscamp) $nscamp = 'ec_uf, pin_valor';
 
 
-$sql = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_pin_online = 0 ";
-if(!$ChkTreinamento && $fopr <> 78) $sql .=" and (opr_codigo <> 78) "; 
-$sql .= " order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+	$sql = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_pin_online = 0 ";
+	if(!$ChkTreinamento && $fopr <> 78) $sql .=" and (opr_codigo <> 78) "; 
+	$sql .= " order by opr_nome";
+	$resopr = SQLexecuteQueryParams($sql, array());
 
 if($Submit){
 
 	if($fopr){			
-		$resopr_val = pg_exec($connid, "select opr_codigo from operadoras where opr_codigo='$fopr'");
+			$resopr_val = SQLexecuteQueryParams("select opr_codigo from operadoras where opr_codigo=$1", array((int)$fopr));
 
                 $pgopr_val = pg_fetch_array($resopr_val);
 		$canal_condition = "";
@@ -76,7 +90,7 @@ $resval = SQLexecuteQueryParams("select pin_valor from pins where opr_codigo=$1"
 
 	$sql .= "order by opr_nome, ".$ncamp.", pin_valor, pin_status"; 
 //			echo $sql;
-	$resestat = pg_exec($connid, $sql);
+	$resestat = SQLexecuteQueryParams($sql, array());
 
 	$sql = "select t1.opr_nome, t0.pin_valor, count(t0.pin_valor) as quantidade, (CASE WHEN t0.opr_codigo <> 78 THEN sum(t0.pin_valor) ELSE 0 END) as total_face, t0.opr_codigo, t1.opr_pedido_estoque_prazo as prazo_pedido ";
 	$sql .= "from pins t0, operadoras t1 ";
@@ -94,7 +108,7 @@ $resval = SQLexecuteQueryParams("select pin_valor from pins where opr_codigo=$1"
 
 	$sqlMedia = $sql;
 //echo "sqlMedia: " . $sqlMedia . "<br>";
-	$rs_Media = pg_exec($connid, $sqlMedia);
+	$rs_Media = SQLexecuteQueryParams($sqlMedia, array());
 
 	//Busca Brasil Telecom
 /*	$sql  = "select ec_uf, count(pin_valor) as qtde, pin_valor, sum(pin_valor) as total ";
@@ -109,13 +123,13 @@ echo $sql;
     $fp=fopen("../../debug.log","ab");
 	fwrite($fp,"\r\nIn Pins_Qtde Like as:\r\n".$sql."\r\n");
 	fclose($fp);
-	$resoprbrt = pg_exec($connid, $sql);
+		$resoprbrt = SQLexecuteQueryParams($sql, array());
 */	
 	$varsel = "&fopr=$fopr&fvalor=$fvalor";
 
 	if($fopr) {
 		$sql="select ec_uf,ec_codigo from estab_comissao where ec_opr_codigo = $fopr order by ec_uf asc";
-		$resec=pg_exec($connid,$sql);
+			$resec=SQLexecuteQueryParams($sql, array());
 	}
 /*	
 	$sql = "select t0.opr_codigo, pin_valor, count(pin_qtde) as total 
@@ -129,7 +143,7 @@ echo $sql;
 			and trn_data <='".date("Y-m-d",strtotime("now -1 days"))."')
 			group by t0.opr_codigo,pin_valor 
 			order by t0.opr_codigo,pin_valor "; 
-	$mediaopr=pg_exec($connid,$sql);
+		$mediaopr=SQLexecuteQueryParams($sql, array());
 */
 
 	//Esgotados
@@ -152,7 +166,7 @@ echo $sql;
         $sql .= " order by opr_nome, pin_valor; ";
 	
 //echo "sqlEsgotados: $sql<br>";
-    $rs_esgotados = pg_exec($connid, $sql);
+    $rs_esgotados = SQLexecuteQueryParams($sql, array());
 }
 
 ?>
@@ -525,19 +539,19 @@ function GP_popupConfirmMsg(msg) { //v1.0
                             $sql = "select count(*) as total_lan
                                     from tb_dist_operadora_games_produto dogp 
                                     inner join tb_dist_operadora_games_produto_modelo dogpm on dogp.ogp_id =dogpm.ogpm_ogp_id
-                                    where dogp.ogp_opr_codigo = ".$pgest['opr_codigo']."
-                                            and dogpm.ogpm_valor = ".$pgest['pin_valor']." 
+                                    where dogp.ogp_opr_codigo = $1
+                                            and dogpm.ogpm_valor = $2
                                             and dogpm.ogpm_ativo = 1
                                             and dogp.ogp_pin_request=0;";
-                            $rs_count_lan = pg_exec($connid, $sql);
+                            $rs_count_lan = SQLexecuteQueryParams($sql, array((int)$pgest['opr_codigo'], $pgest['pin_valor']));
                             $rs_count_lan_row = pg_fetch_array($rs_count_lan);
                             $sql = "select count(*) as total_gamer
                                     from tb_operadora_games_produto ogp
                                     inner join tb_operadora_games_produto_modelo ogpm on ogp.ogp_id =ogpm.ogpm_ogp_id
-                                    where ogp.ogp_opr_codigo = ".$pgest['opr_codigo']."
-                                            and ogpm.ogpm_valor = ".$pgest['pin_valor']."
+                                    where ogp.ogp_opr_codigo = $1
+                                            and ogpm.ogpm_valor = $2
                                             and ogpm.ogpm_ativo = 1;";
-                            $rs_count_gamer = pg_exec($connid, $sql);
+                            $rs_count_gamer = SQLexecuteQueryParams($sql, array((int)$pgest['opr_codigo'], $pgest['pin_valor']));
                             $rs_count_gamer_row = pg_fetch_array($rs_count_gamer);
                                                 
                                                 //echo "Publisher ".$pgest['opr_nome']."GAMER:".$rs_count_gamer_row['total_gamer']."  LAN:".$rs_count_lan_row['total_lan']."<br>";

@@ -1,6 +1,25 @@
 <?php
-    require_once "../../../../includes/constantes.php";
-    require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
+		require_once "../../../../includes/constantes.php";
+	    require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
+
+		$BtnSearch = $_REQUEST['BtnSearch'] ?? ($BtnSearch ?? null);
+		$ncamp = $_REQUEST['ncamp'] ?? ($ncamp ?? null);
+		$inicial = $_REQUEST['inicial'] ?? ($inicial ?? null);
+		$range = $_REQUEST['range'] ?? ($range ?? null);
+		$fpin = $_REQUEST['fpin'] ?? ($fpin ?? null);
+		$fserial = $_REQUEST['fserial'] ?? ($fserial ?? null);
+		$dd_opr_codigo = $_REQUEST['dd_opr_codigo'] ?? ($dd_opr_codigo ?? null);
+		$tf_data_final = $_REQUEST['tf_data_final'] ?? ($tf_data_final ?? null);
+		$tf_data_inicial = $_REQUEST['tf_data_inicial'] ?? ($tf_data_inicial ?? null);
+		$fcanal = $_REQUEST['fcanal'] ?? ($fcanal ?? null);
+		$dd_pin_status = $_REQUEST['dd_pin_status'] ?? ($dd_pin_status ?? null);
+		$tf_pins = $_REQUEST['tf_pins'] ?? ($tf_pins ?? null);
+
+		$dd_opr_codigo = (is_numeric($dd_opr_codigo) ? (int)$dd_opr_codigo : '');
+		$fpin = preg_replace('/[^a-zA-Z0-9]/', '', (string)$fpin);
+		$fserial = preg_replace('/[^a-zA-Z0-9]/', '', (string)$fserial);
+		$fcanal = in_array($fcanal, array('s','p','r','todos','t'), true) ? $fcanal : 's';
+		$dd_pin_status = preg_replace('/[^a-zA-Z0-9 \-]/', '', (string)$dd_pin_status);
 
 	set_time_limit ( 3000 ) ;
 
@@ -64,9 +83,9 @@
 //echo "varsel: $varsel<br>";
 //echo "BtnSearch: $BtnSearch<br>";
 
-	// Levanta lista de operadoras
-	$sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-    $resopr = pg_exec($connid,$sql);
+		// Levanta lista de operadoras
+		$sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
+	    $resopr = SQLexecuteQueryParams($sql, array());
 
 
 //	if(!$dd_pin_status) {
@@ -75,13 +94,13 @@
 //echo "dd_pin_status: ".$dd_pin_status."<br>";
 
 	// Levanta lista de status	
-	$sql  = "select stat_codigo, stat_descricao from pins_status order by stat_codigo;";
+		$sql  = "select stat_codigo, stat_descricao from pins_status order by stat_codigo;";
 if($debug) {
 //echo "sql : ".$sql ."<br>";
 //echo "Elapsed time A1: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.')."<br>";
 //die("Stop 3434");
 }
-	$resstatus = pg_exec($connid,$sql);
+		$resstatus = SQLexecuteQueryParams($sql, array());
 	$a_status = array();
 	while ($pgstatus = pg_fetch_array($resstatus)) { 
 		$a_status[$pgstatus['stat_codigo']] = $pgstatus['stat_descricao'];
@@ -92,11 +111,17 @@ if($debug) {
 
 	// Levanta lista de valores
 	$sql = "select pin_valor, count(*) as n from pins where 1=1 ";
+	$sqlParamsValores = array();
+	$paramValores = 0;
 	if($dd_opr_codigo) {
-		$sql .= " and opr_codigo=".$dd_opr_codigo." ";
+		$paramValores++;
+		$sql .= " and opr_codigo=$".$paramValores." ";
+		$sqlParamsValores[] = (int)$dd_opr_codigo;
 	}
 	if($fcanal) {
-		$sql .= " and pin_canal='".$fcanal."' ";
+		$paramValores++;
+		$sql .= " and pin_canal=$".$paramValores." ";
+		$sqlParamsValores[] = $fcanal;
 	}
 	$sql .= " group by pin_valor ";
 	$sql .= " order by pin_valor;";
@@ -106,7 +131,7 @@ echo "Elapsed time A1: ".number_format(getmicrotime() - $time_start_stats, 2, '.
 //die("Stop 3434");
 }
 
-	$resvalue = pg_exec($connid,$sql);
+		$resvalue = SQLexecuteQueryParams($sql, $sqlParamsValores);
 	$a_valores = array();
 	while ($pgvalue = pg_fetch_array($resvalue)) { 
 		$a_valores[$pgvalue['pin_valor']] = $pgvalue['n'];
@@ -216,14 +241,14 @@ $sql.="		( ";
 
 //echo "".str_replace("\n","<br>\n",$sql)."<br>\n<hr>";
 
-	$resid_count = pg_exec($connid, $sql);
+	$resid_count = SQLexecuteQueryParams($sql, array());
 	$total_table = pg_num_rows($resid_count);
 
 //echo "total_table: ".$total_table."<br>";
 	$qtde_geral = 0;
 	$valor_geral = 0;
 
-//	$res_geral = pg_exec($connid, $sql);
+//	$res_geral = SQLexecuteQueryParams($sql, array());
 	while($pg_geral = pg_fetch_array($resid_count))
 	{
 		$qtde_geral ++;
@@ -250,7 +275,7 @@ $sql.="		( ";
 //}
 
     //echo $sql;
-	$resid = pg_exec($connid, $sql);
+	$resid = SQLexecuteQueryParams($sql, array());
 
 
 	if($max + $inicial > $total_table) $reg_ate = $total_table;

@@ -7,8 +7,34 @@
     }
         
     
-        require_once "../../../../../includes/constantes.php";
-        require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
+		require_once "../../../../../includes/constantes.php";
+	        require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
+
+		$BtnSearch = $_REQUEST['BtnSearch'] ?? ($BtnSearch ?? null);
+		$acao = $_REQUEST['acao'] ?? ($acao ?? null);
+		$tipo = $_REQUEST['tipo'] ?? ($tipo ?? null);
+		$pin_codinterno = $_REQUEST['pin_codinterno'] ?? ($pin_codinterno ?? null);
+		$tf_data_inic = $_REQUEST['tf_data_inic'] ?? ($tf_data_inic ?? null);
+		$tf_data_final = $_REQUEST['tf_data_final'] ?? ($tf_data_final ?? null);
+		$dd_opr_codigo = $_REQUEST['dd_opr_codigo'] ?? ($dd_opr_codigo ?? null);
+		$dd_status = $_REQUEST['dd_status'] ?? ($dd_status ?? null);
+		$tf_valor_total = $_REQUEST['tf_valor_total'] ?? ($tf_valor_total ?? null);
+		$tf_valor_oper = $_REQUEST['tf_valor_oper'] ?? ($tf_valor_oper ?? null);
+		$tf_loteopr = $_REQUEST['tf_loteopr'] ?? ($tf_loteopr ?? null);
+		$tf_nro_pin = $_REQUEST['tf_nro_pin'] ?? ($tf_nro_pin ?? null);
+		$tf_nro_serie = $_REQUEST['tf_nro_serie'] ?? ($tf_nro_serie ?? null);
+		$inicial = $_REQUEST['inicial'] ?? ($inicial ?? null);
+		$range = $_REQUEST['range'] ?? ($range ?? null);
+		$ordem = $_REQUEST['ordem'] ?? ($ordem ?? null);
+		$ncamp = $_REQUEST['ncamp'] ?? ($ncamp ?? null);
+
+		$pin_codinterno = (is_numeric($pin_codinterno) ? (int)$pin_codinterno : null);
+		$dd_opr_codigo = (is_numeric($dd_opr_codigo) ? (int)$dd_opr_codigo : null);
+		$dd_status = ($dd_status !== null && $dd_status !== '' ? preg_replace('/[^0-9]/', '', (string)$dd_status) : null);
+		$tf_loteopr = ($tf_loteopr !== null && $tf_loteopr !== '' ? preg_replace('/[^0-9]/', '', (string)$tf_loteopr) : null);
+		$tf_nro_pin = ($tf_nro_pin !== null ? trim((string)$tf_nro_pin) : null);
+		$tf_nro_serie = ($tf_nro_serie !== null ? trim((string)$tf_nro_serie) : null);
+		$ncamp = in_array($ncamp, array('pin_codinterno','pin_dataentrada','pin_lote_codigo','pin_valor','opr_nome','pin_status')) ? $ncamp : 'pin_codinterno';
 
 	if(!$dd_situacao) $dd_situacao = "";
 	if(!$tf_data_inic) $tf_data_inic = date('d/m/Y');
@@ -52,28 +78,28 @@
 				
 				if($msgAcao == ""){
 					
-					//Excluir pin
-					if($tipo == "pin"){
-						$sql = "delete from pins where pin_codinterno = $pin_codinterno";
-						$ret = SQLexecuteQuery($sql);
-						if(!$ret) $msgAcao = "Erro ao excluir pin.\n";
-						else $msgAcao .= "Pin excluído.\n";
-						
-					//Excluir lote
-					}else if($tipo == "lote"){
-						$sql  = "select * from pins where pin_codinterno = $pin_codinterno";
-						$rs_pin = SQLexecuteQuery($sql);
-						if(!$rs_pin || pg_num_rows($rs_pin) == 0) $msg = "Lote não encontrado.\n";
-						else {
-							$rs_pin_row = pg_fetch_array($rs_pin);
-							$sql = "delete from pins where 
-										pin_lote_codigo	= " . $rs_pin_row['pin_lote_codigo'] . "
-										and opr_codigo 		= " . $rs_pin_row['opr_codigo'] . "
-										and pin_valor 		= " . $rs_pin_row['pin_valor'] . "
-										and pin_dataentrada = '" . $rs_pin_row['pin_dataentrada'] . "'";
-							$ret = SQLexecuteQuery($sql);
-							if(!$ret) $msgAcao = "Erro ao excluir lote.\n";
-							else $msgAcao .= "Lote excluído.\n";
+						//Excluir pin
+						if($tipo == "pin"){
+							$sql = "delete from pins where pin_codinterno = $1";
+							$ret = SQLexecuteQueryParams($sql, array((int)$pin_codinterno));
+							if(!$ret) $msgAcao = "Erro ao excluir pin.\n";
+							else $msgAcao .= "Pin excluído.\n";
+							
+						//Excluir lote
+						}else if($tipo == "lote"){
+							$sql  = "select * from pins where pin_codinterno = $1";
+							$rs_pin = SQLexecuteQueryParams($sql, array((int)$pin_codinterno));
+							if(!$rs_pin || pg_num_rows($rs_pin) == 0) $msg = "Lote não encontrado.\n";
+							else {
+								$rs_pin_row = pg_fetch_array($rs_pin);
+								$sql = "delete from pins where 
+											pin_lote_codigo	= $1
+											and opr_codigo 		= $2
+											and pin_valor 		= $3
+											and pin_dataentrada = $4";
+								$ret = SQLexecuteQueryParams($sql, array((int)$rs_pin_row['pin_lote_codigo'], (int)$rs_pin_row['opr_codigo'], $rs_pin_row['pin_valor'], $rs_pin_row['pin_dataentrada']));
+								if(!$ret) $msgAcao = "Erro ao excluir lote.\n";
+								else $msgAcao .= "Lote excluído.\n";
 							
 						}
 					}
@@ -108,27 +134,61 @@
 		//------------------------------------------------------------------------------------------------------------------
 		if($msg == ""){
 
-			$sql = "select p.pin_valor, p.pin_status, p.pin_codinterno, p.pin_dataentrada, p.pin_horaentrada, " .
-					"p.pin_lote_codigo, p.pin_codigo, p.pin_serial, p.pin_caracter, opr.opr_codigo, opr.opr_nome, ps.stat_descricao, p.pin_canal ";
-			$sql .= "from pins p ";
-			$sql .= "left join operadoras opr on opr.opr_codigo = p.opr_codigo ";
-			$sql .= "left join pins_status ps on ps.stat_codigo = p.pin_status ";
-			if($tf_data_inic && $tf_data_final) $sql .= "where (p.pin_dataentrada >= '".formata_data($tf_data_inic, 1)."' and p.pin_dataentrada <= '".formata_data($tf_data_final, 1)."') ";
-			if($dd_opr_codigo) $sql .= "and p.opr_codigo = ".($dd_opr_codigo)." ";
-			if(isset($dd_status) && $dd_status != '') $sql .= "and p.pin_status = '".($dd_status)."' ";
-			switch($tf_valor_oper) {
-				case "gt": $valor_oper=">"; break;
-				case "lt": $valor_oper="<"; break;
-				case "eq": $valor_oper="="; break;
-				default: $valor_oper=""; break;
-			}
-			if($tf_valor_total && $tf_valor_oper) $sql .= " and p.pin_valor " . $valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim($tf_valor_total))) . " ";
-			if($tf_loteopr) $sql .= "and p.pin_lote_codigo = ".$tf_loteopr." ";
-			if($tf_nro_pin) $sql .= "and (upper(p.pin_codigo) LIKE '%".strtoupper($tf_nro_pin)."%' or  upper(p.pin_caracter) LIKE '%".strtoupper($tf_nro_pin)."%')";
-			if($tf_nro_serie) $sql .= "and upper(p.pin_serial) LIKE '%".strtoupper($tf_nro_serie)."%' ";
-		
+				$sql = "select p.pin_valor, p.pin_status, p.pin_codinterno, p.pin_dataentrada, p.pin_horaentrada, " .
+						"p.pin_lote_codigo, p.pin_codigo, p.pin_serial, p.pin_caracter, opr.opr_codigo, opr.opr_nome, ps.stat_descricao, p.pin_canal ";
+				$sql .= "from pins p ";
+				$sql .= "left join operadoras opr on opr.opr_codigo = p.opr_codigo ";
+				$sql .= "left join pins_status ps on ps.stat_codigo = p.pin_status ";
+				$sql_params = array();
+				$param_index = 0;
+				$sql .= "where 1=1 ";
+				if($tf_data_inic && $tf_data_final) {
+					$param_index++;
+					$sql .= "and p.pin_dataentrada >= $".$param_index." ";
+					$sql_params[] = formata_data($tf_data_inic, 1);
+					$param_index++;
+					$sql .= "and p.pin_dataentrada <= $".$param_index." ";
+					$sql_params[] = formata_data($tf_data_final, 1);
+				}
+				if($dd_opr_codigo) {
+					$param_index++;
+					$sql .= "and p.opr_codigo = $".$param_index." ";
+					$sql_params[] = (int)$dd_opr_codigo;
+				}
+				if(isset($dd_status) && $dd_status != '') {
+					$param_index++;
+					$sql .= "and p.pin_status = $".$param_index." ";
+					$sql_params[] = (int)$dd_status;
+				}
+				switch($tf_valor_oper) {
+					case "gt": $valor_oper=">"; break;
+					case "lt": $valor_oper="<"; break;
+					case "eq": $valor_oper="="; break;
+					default: $valor_oper=""; break;
+				}
+				if($tf_valor_total && $tf_valor_oper) {
+					$param_index++;
+					$sql .= " and p.pin_valor " . $valor_oper . " $" . $param_index . " ";
+					$sql_params[] = str_replace(',', '.', str_replace('.', '', trim($tf_valor_total)));
+				}
+				if($tf_loteopr) {
+					$param_index++;
+					$sql .= "and p.pin_lote_codigo = $".$param_index." ";
+					$sql_params[] = (int)$tf_loteopr;
+				}
+				if($tf_nro_pin) {
+					$param_index++;
+					$sql .= "and (upper(p.pin_codigo) LIKE $".$param_index." or  upper(p.pin_caracter) LIKE $".$param_index.")";
+					$sql_params[] = '%'.strtoupper($tf_nro_pin).'%';
+				}
+				if($tf_nro_serie) {
+					$param_index++;
+					$sql .= "and upper(p.pin_serial) LIKE $".$param_index." ";
+					$sql_params[] = '%'.strtoupper($tf_nro_serie).'%';
+				}
+			
 //echo $sql."<br>";
-			$res_count = SQLexecuteQuery($sql);
+				$res_count = SQLexecuteQueryParams($sql, $sql_params);
 			$total_table = pg_num_rows($res_count);
 		
 			if($total_table == 0) $msg = LANG_PINS_NO_PINS_FOUND.".\n";		
@@ -153,7 +213,7 @@
 				
 			
 //trace_sql($sql, "Arial", 2, "#666666", 'b');			
-				$resest = SQLexecuteQuery($sql);
+					$resest = SQLexecuteQueryParams($sql, $sql_params);
 				
 				if($max + $inicial > $total_table) $reg_ate = $total_table;
 				else $reg_ate = $max + $inicial;
@@ -165,13 +225,13 @@
 	$varsel  = "&BtnSearch=1&tf_data_inic=$tf_data_inic&tf_data_final=$tf_data_final&dd_opr_codigo=$dd_opr_codigo&tf_loteopr=$tf_loteopr&dd_status=$dd_status&tf_valor_total=$tf_valor_total&tf_valor_oper=$tf_valor_oper";
 	$varsel .= "&tf_nro_pin=$tf_nro_pin&tf_nro_serie=$tf_nro_serie";
 
-	//Operadoras
-	$sql  = "select * from operadoras ope order by opr_nome";
-	$resbco = SQLexecuteQuery($sql);
+		//Operadoras
+		$sql  = "select * from operadoras ope order by opr_nome";
+		$resbco = SQLexecuteQueryParams($sql, array());
 
-	//Pins Status
-	$sql  = "select * from pins_status ps order by stat_codigo";
-	$rs_pins_status = SQLexecuteQuery($sql);
+		//Pins Status
+		$sql  = "select * from pins_status ps order by stat_codigo";
+		$rs_pins_status = SQLexecuteQueryParams($sql, array());
 
 ?>
 
@@ -438,7 +498,7 @@ function GP_popupAlertMsg(msg) {
                                 $lineCsv[] = "";
                                 $lineCsv[] = "";
                                 $lineCsv[] = "";
-                                $lineCsv[] = (($pgest['pin_canal']=="s")?"Site":(($pgest['pin_canal']=="p")?"POS":($pgest['pin_canal']=="a")?"AtimoPay":"???"));
+                                $lineCsv[] = (($pgest['pin_canal']=="s") ? "Site" : (($pgest['pin_canal']=="p") ? "POS" : (($pgest['pin_canal']=="a") ? "AtimoPay" : "???")));
                                 $lineCsv[] = $stat_descricao;
 
                                 if(is_array($lineCsv)) 
@@ -453,7 +513,7 @@ function GP_popupAlertMsg(msg) {
                                 <td class="text-center"><?php echo "-"; ?></td>
                                 <td class="text-center"><?php echo "-"; ?></td>
                                 <td class="text-center"><?php echo "-"; ?></td>
-                                <td class="text-center"><?php echo (($pgest['pin_canal']=="s")?"Site":(($pgest['pin_canal']=="p")?"POS":($pgest['pin_canal']=="a")?"AtimoPay":"???")) ?></td>
+                                <td class="text-center"><?php echo (($pgest['pin_canal']=="s") ? "Site" : (($pgest['pin_canal']=="p") ? "POS" : (($pgest['pin_canal']=="a") ? "AtimoPay" : "???"))) ?></td>
                                 <td class="text-center"><?php echo $stat_descricao; ?></td>
                             </tr>
 <?php	

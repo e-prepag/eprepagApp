@@ -30,6 +30,13 @@ $tf_valor_total = $_REQUEST['tf_valor_total'] ?? null;
 $dd_pin_status = $_REQUEST['dd_pin_status'] ?? null;
 $festab = $_REQUEST['festab'] ?? null;
 
+$dd_opr_codigo = (is_numeric($dd_opr_codigo) ? (int)$dd_opr_codigo : '');
+$fpin = preg_replace('/[^a-zA-Z0-9]/', '', (string)$fpin);
+$fserial = preg_replace('/[^a-zA-Z0-9]/', '', (string)$fserial);
+$festab = (is_numeric($festab) ? (int)$festab : '');
+$fcanal = in_array($fcanal ?? '', array('s','p','r','a','todos'), true) ? $fcanal : 's';
+$dd_pin_status = preg_replace('/[^a-zA-Z0-9 \-]/', '', (string)$dd_pin_status);
+
 if (!$ncamp) $ncamp = 'pin_codinterno';
 if (!$inicial)  $inicial     = 0;
 if (!$range)    $range       = 1;
@@ -114,7 +121,7 @@ if ($tf_pins && is_array($tf_pins)) {
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
-$resopr = pg_exec($connid, $sql);
+$resopr = SQLexecuteQueryParams($sql, array());
 
 // Lista de vendas encontradas para os parâmetros escolhidos
 // é o mesmo query de TOTAL_MES_stats.php e outros relatórios de vendas
@@ -122,25 +129,25 @@ if ($dd_pins_com_vendas) {
 	$data_inic = formata_data(trim($tf_data_inicial), 1);
 	$data_fim = formata_data(trim($tf_data_final), 1);
 
-	$sql  = "select vgm_pin_codinterno ";
-	$sql .= "from tb_venda_games vg ";
-	$sql .= "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id ";
-	$sql .= "where 1=1 ";
+		$sql  = "select vgm_pin_codinterno ";
+		$sql .= "from tb_venda_games vg ";
+		$sql .= "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id ";
+		$sql .= "where 1=1 ";
 	//	$sql .= "and vg.vg_data_concilia>'2008-01-01 00:00:00' ";
 	//	$sql .= "and COALESCE(vg.vg_data_concilia, (select datacompra from tb_pag_compras p where p.idvenda=vg.vg_id )>'2008-01-01 00:00:00' ";
 
 	$sql .= "and vg.vg_ultimo_status='5' ";
 
-	$sql .= "and vgm_opr_codigo=" . $dd_opr_codigo . " ";
+		$sql .= "and vgm_opr_codigo=$1 ";
 
 	//	$sql .= "and vg.vg_data_concilia between '".trim($data_inic)." 00:00:00' and '".trim($data_fim)." 23:59:59' ";
-	$sql .= "and COALESCE(vg.vg_data_concilia, (select datacompra from tb_pag_compras p where p.idvenda=vg.vg_id ) between '" . trim($data_inic) . " 00:00:00' and '" . trim($data_fim) . " 23:59:59' ";
+		$sql .= "and COALESCE(vg.vg_data_concilia, (select datacompra from tb_pag_compras p where p.idvenda=vg.vg_id )) between $2 and $3 ";
 	//	$sql .= "order by vg.vg_data_concilia desc";
-	$sql .= "order by COALESCE(vg.vg_data_concilia, (select datacompra from tb_pag_compras p where p.idvenda=vg.vg_id ) desc";
+		$sql .= "order by COALESCE(vg.vg_data_concilia, (select datacompra from tb_pag_compras p where p.idvenda=vg.vg_id )) desc";
 	//echo "<hr>".$sql."<hr>";
 
 	$s_lista_vgm_pin_codinterno = "";
-	$resvendas = pg_exec($connid, $sql);
+		$resvendas = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo, trim($data_inic) . " 00:00:00", trim($data_fim) . " 23:59:59"));
 	while ($pgvendas = pg_fetch_array($resvendas)) {
 		if ($s_lista_vgm_pin_codinterno != "") $s_lista_vgm_pin_codinterno .= " ";
 		$s_lista_vgm_pin_codinterno .= $pgvendas['vgm_pin_codinterno'];
@@ -163,7 +170,7 @@ if ($debug) {
 	//echo "Elapsed time A1: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.')."<br>";
 	//die("Stop 3434");
 }
-$resstatus = pg_exec($connid, $sql);
+$resstatus = SQLexecuteQueryParams($sql, array());
 $a_status = array();
 while ($pgstatus = pg_fetch_array($resstatus)) {
 	$a_status[$pgstatus['stat_codigo']] = $pgstatus['stat_descricao'];
@@ -174,11 +181,17 @@ ksort($a_status);
 
 // Levanta lista de valores
 $sql = "select pin_valor, count(*) as n from pins where 1=1 ";
+$sqlParamsValues = array();
+$paramValues = 0;
 if ($dd_opr_codigo) {
-	$sql .= " and opr_codigo=" . $dd_opr_codigo . " ";
+	$paramValues++;
+	$sql .= " and opr_codigo=$".$paramValues." ";
+	$sqlParamsValues[] = (int)$dd_opr_codigo;
 }
 if ($fcanal) {
-	$sql .= " and pin_canal='" . $fcanal . "' ";
+	$paramValues++;
+	$sql .= " and pin_canal=$".$paramValues." ";
+	$sqlParamsValues[] = $fcanal;
 }
 $sql .= " group by pin_valor ";
 $sql .= " order by pin_valor;";
@@ -188,7 +201,7 @@ if ($debug) {
 	//die("Stop 3434");
 }
 
-$resvalue = pg_exec($connid, $sql);
+$resvalue = SQLexecuteQueryParams($sql, $sqlParamsValues);
 $a_valores = array();
 while ($pgvalue = pg_fetch_array($resvalue)) {
 	$a_valores[$pgvalue['pin_valor']] = $pgvalue['n'];
@@ -295,14 +308,14 @@ if ($dd_pins_vendas) {
 //echo "".str_replace("\n","<br>\n",$sql)."<br>\n<hr>";
 //die("Stop");
 
-$resid_count = pg_exec($connid, $sql);
+$resid_count = SQLexecuteQueryParams($sql, array());
 $total_table = pg_num_rows($resid_count);
 
 //echo "total_table: ".$total_table."<br>";
 $qtde_geral = 0;
 $valor_geral = 0;
 
-//	$res_geral = pg_exec($connid, $sql);
+//	$res_geral = SQLexecuteQueryParams($sql, array());
 while ($pg_geral = pg_fetch_array($resid_count)) {
 	$qtde_geral++;
 	$valor_geral += $pg_geral['pin_valor'];
@@ -316,7 +329,7 @@ if (!isset($_GET["downloadCsv"])) {
 //if($_SESSION["tipo_acesso_pub"]!='PU') {
 //echo str_replace("\n", "<br>\n", $sql)."<br>";
 //}
-$resid = pg_exec($connid, $sql);
+$resid = SQLexecuteQueryParams($sql, array());
 
 if ($max + $inicial > $total_table) $reg_ate = $total_table;
 else $reg_ate = $max + $inicial;
