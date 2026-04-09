@@ -566,26 +566,30 @@ function getStatusTransacao($stipo, $sid, &$aline) {
 
 	// Obteve arquivo de retorno? -> salva no BD
 	if($bUpdate) {
-		$buffer_safe = str_replace("'", "''", $buffer);
+		$sql = "";
+		$params = array();
 		if($stipo=="Transf") {
 			$pc_sonda_brd_5 = $buffer;
                         $buffer_safe = json_encode($buffer);
-			$sql  = "update pag_config set pc_data_sonda_brd_5='".$time1."', pc_sonda_brd_5='".$buffer_safe."' where pc_id=1;"; 
+			$sql  = "update pag_config set pc_data_sonda_brd_5=$1, pc_sonda_brd_5=$2 where pc_id=1;";
+			$params = array((string)$time1, (string)$buffer_safe);
 		} else if($stipo=="PagtoFacil") {
 			$pc_sonda_brd_6 = $buffer;
-			$sql  = "update pag_config set pc_data_sonda_brd_6='".$time1."', pc_sonda_brd_6='".$buffer_safe."' where pc_id=1;"; 
+			$sql  = "update pag_config set pc_data_sonda_brd_6=$1, pc_sonda_brd_6=$2 where pc_id=1;";
+			$params = array((string)$time1, (string)$buffer);
 		} else if($stipo=="BancodoBrasil") {
 			$pc_sonda_bbr_9 = $buffer;
-			$sql  = "update pag_config set pc_data_sonda_bbr_9='".$time1."', pc_sonda_bbr_9='".$buffer_safe."' where pc_id=1;"; 
+			$sql  = "update pag_config set pc_data_sonda_bbr_9=$1, pc_sonda_bbr_9=$2 where pc_id=1;";
+			$params = array((string)$time1, (string)$buffer);
 		} else if($stipo=="BancoItau") {
-			// Não deve chegar aqui, Banco Itau não usa buffer de sonda
+			// Nï¿½o deve chegar aqui, Banco Itau nï¿½o usa buffer de sonda
 		} else if($stipo=="BancoEPP") {
 			$pc_sonda_bbr_Z = $buffer;
-			$sql  = "";	//"update pag_config set pc_data_sonda_bbr_9='".$time1."', pc_sonda_bbr_9='".$buffer_safe."' where pc_id=1;"; 
+			$sql  = "";	//"update pag_config set pc_data_sonda_bbr_9='".$time1."', pc_sonda_bbr_9='".$buffer_safe."' where pc_id=1;";
 		}
 
 		if($sql) {
-			$rs_config = SQLexecuteQuery($sql);
+			$rs_config = SQLexecuteQueryParams($sql, $params);
 		}
 
 	}

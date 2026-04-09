@@ -408,17 +408,33 @@ function retorna_status($pin)
 function log_pin($acao, $query, $pin)
 {
 	$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-	if (retorna_id_pin(addslashes($pin)) == '')
-		$aux_id_pin = '0';
-	else $aux_id_pin = retorna_id_pin(addslashes($pin));
-	$sql = "INSERT INTO pins_store_apl_historico VALUES (NOW()," . intval($usuarioGames->ug_id) . ",'" . retorna_ip_acesso_new() . "','" . addslashes($acao) . "','" . str_replace("'", '"', $query) . "'," . retorna_status(addslashes($pin)) . "," . intval($aux_id_pin) . ",'" . retorna_remote_addr() . "','" . retorna_http_client_ip() . "','" . retorna_http_x_forwarded_for() . "')";
+	$pin_safe = addslashes($pin);
+	$pin_id = retorna_id_pin($pin_safe);
+	if ($pin_id == '')
+		$aux_id_pin = 0;
+	else $aux_id_pin = (int)$pin_id;
+
+	$status_pin = retorna_status($pin_safe);
+	$status_pin = is_numeric($status_pin) ? (int)$status_pin : 0;
+
+	$sql = "INSERT INTO pins_store_apl_historico VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9)";
+	$params = array(
+		intval($usuarioGames->ug_id),
+		(string)retorna_ip_acesso_new(),
+		(string)addslashes($acao),
+		(string)str_replace("'", '"', $query),
+		$status_pin,
+		(int)$aux_id_pin,
+		(string)retorna_remote_addr(),
+		(string)retorna_http_client_ip(),
+		(string)retorna_http_x_forwarded_for()
+	);
 	//echo $sql." -- ".retorna_id_pin(addslashes($pin))." -- ".retorna_status(addslashes($pin))."<br>";
-	$rs_log = SQLexecuteQuery($sql);
+	$rs_log = SQLexecuteQueryParams($sql, $params);
 	if (!$rs_log) {
 		echo "<font color='#FF0000'><b>Erro na gera&ccedil;&atilde;o de LOG.\n</b></font><br>";
 	}
 }
-
 function permite_tentativas($quantidade, $tempo, &$msg_ajax)
 {
 	$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);

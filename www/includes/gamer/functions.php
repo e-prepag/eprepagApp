@@ -746,20 +746,23 @@ function redirect($strRedirect)
                                                                         if (!$usuario_games_id) return;
                                                                         $ip_long_unsigned = sprintf("%u\n", ip2long($_SERVER['REMOTE_ADDR']));
 
-                                                                        $sql = "insert into usuarios_games_log (" .
-                                                                                "	ugl_data_inclusao, ugl_ip, ugl_ip_long, ugl_uglt_id, ugl_ug_id, ugl_vg_id" . ($observacao == null ? "" : ", ugl_obs") .
-                                                                                ") values (";
-                                                                        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                                                                        $sql .= SQLaddFields(retorna_ip_acesso_gamer(), "s") . ",";
-                                                                        $sql .= SQLaddFields($ip_long_unsigned, "") . ",";
-                                                                        $sql .= SQLaddFields($tipo, "") . ",";
-                                                                        $sql .= SQLaddFields($usuario_games_id, "") . ",";
-                                                                        $sql .= SQLaddFields($venda_id, "");
+                                                                        $ipAcesso = (string)retorna_ip_acesso_gamer();
+                                                                        $tipo = (int)$tipo;
+                                                                        $usuario_games_id = (int)$usuario_games_id;
+                                                                        $venda_id = is_numeric($venda_id) ? (int)$venda_id : null;
+
+                                                                        $sql = "insert into usuarios_games_log (
+                                                                                ugl_data_inclusao, ugl_ip, ugl_ip_long, ugl_uglt_id, ugl_ug_id, ugl_vg_id" . ($observacao == null ? "" : ", ugl_obs") . "
+                                                                        ) values (
+                                                                                CURRENT_TIMESTAMP, $1, $2, $3, $4, $5" . ($observacao == null ? "" : ", $6") . "
+                                                                        )";
+
+                                                                        $params = array($ipAcesso, $ip_long_unsigned, $tipo, $usuario_games_id, $venda_id);
                                                                         if ($observacao != null) {
-                                                                                $sql .= ", " . SQLaddFields($observacao, "s");
+                                                                                $params[] = (string)$observacao;
                                                                         }
-                                                                        $sql .= ")";
-                                                                        $ret = SQLexecuteQuery($sql);
+
+                                                                        $ret = SQLexecuteQueryParams($sql, $params);
                                                                 }
 
                                                                 function theRealStripTags2($string)
