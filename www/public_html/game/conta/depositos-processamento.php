@@ -16,6 +16,11 @@ $processar = $_POST['processar'] ?? null;
 if(empty($data_inicio)) $data_inicio = date('d/m/Y');
 if(empty($data_fim)) $data_fim = date('d/m/Y');
 
+$data_inicio_sql = Util::getData($data_inicio, true) . " 00:00:00";
+$data_fim_sql = Util::getData($data_fim, true) . " 23:59:59";
+$status_venda_realizada = (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
+$usuario_id = (int)$controller->usuario->getId();
+
 $sql = "
 SELECT 
     vg_data_inclusao as data,
@@ -25,18 +30,23 @@ SELECT
     vg_deposito_em_saldo_valor as valor, 
     vg_valor_eppcash as eppcash
 FROM tb_venda_games
-WHERE vg_ultimo_status != ".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']." AND
+WHERE vg_ultimo_status != :status_venda_realizada AND
         vg_deposito_em_saldo = 1 AND 
-	vg_ug_id = ".$controller->usuario->getId()." AND
-  	vg_data_inclusao >= '".Util::getData($data_inicio, true)." 00:00:00' AND
-        vg_data_inclusao <= '".Util::getData($data_fim, true)." 23:59:59'      
+	vg_ug_id = :usuario_id AND
+  	vg_data_inclusao >= :data_inicio AND
+        vg_data_inclusao <= :data_fim
 ORDER BY vg_data_inclusao;
 ";
-//Conectando com PDO para execução da QUERY
+//Conectando com PDO para execuÃ§Ã£o da QUERY
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
 $stmt = $pdo->prepare($sql);
-$stmt->execute();
+$stmt->execute(array(
+    ':status_venda_realizada' => $status_venda_realizada,
+    ':usuario_id' => $usuario_id,
+    ':data_inicio' => $data_inicio_sql,
+    ':data_fim' => $data_fim_sql
+));
 $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //Verificando total de registros
@@ -57,7 +67,7 @@ $qtde_registros = count($fetch);
     <div class="row top20">
         <div class="row">
             <div class="col-md-3 txt-azul-claro">
-                <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left"><h4 class="top20">Cartão E-Prepag</h4></strong>
+                <span class="glyphicon glyphicon-triangle-right graphycon-big pull-left" aria-hidden="true"></span><strong class="pull-left"><h4 class="top20">CartÃ£o E-Prepag</h4></strong>
             </div>
         </div>
         <?php //include "../includes/menu-carteira.php"?>
@@ -66,14 +76,14 @@ $qtde_registros = count($fetch);
             <form id="form1" name="form1" method="post">
                 <div class="row txt-cinza">
                     <div class="col-md-12 top10">
-                        <h4 class="margin004"><strong>Depósitos em processamento</strong></h4>
-                        <p class="margin004"><strong>Selecione o Período</strong></p>
-                        <p class="margin004"><span class="fontsize-p">(Intervalo máximo de 6 meses)</span></p>
+                        <h4 class="margin004"><strong>DepÃ³sitos em processamento</strong></h4>
+                        <p class="margin004"><strong>Selecione o PerÃ­odo</strong></p>
+                        <p class="margin004"><span class="fontsize-p">(Intervalo mÃ¡ximo de 6 meses)</span></p>
                     </div>
                 </div>
                 <div class="row txt-cinza">
                      <div class="col-md-3 left10">
-                        Data de início
+                        Data de inÃ­cio
                         <input type="text" class="form-control" readonly="readonly" value="<?php echo $data_inicio; ?>" name="data_inicio" id="data_inicio">
                     </div>
                     <div class="col-md-3 left10">
@@ -110,7 +120,7 @@ if($qtde_registros > 0) {
                 <div class="hidden-lg hidden-md txt-preto espacamento">
                     <div class="row p-3 borda-fina">
                         <div class="col-sm-6 col-xs-6 borda-colunas-formas-pagamento">
-                            <p class="bottom0">Número:</p>
+                            <p class="bottom0">NÃºmero:</p>
                             <p class="txt-azul-claro text18">
                                 <strong><?php echo $value['numero']; ?></strong>
                             </p>
@@ -150,7 +160,7 @@ if($qtde_registros > 0) {
                     <thead>
                         <tr class="bg-cinza-claro">
                             <th class="text-center">Data</th>
-                            <th class="text-right">Número</th>
+                            <th class="text-right">NÃºmero</th>
                             <th class="text-center">Pagamento</th>
                             <th class="text-center">Status</th>
                             <th class="text-right">Valor</th>                            
@@ -226,7 +236,7 @@ if($qtde_registros > 0) {
 else {
 ?>
             <div class="text-center txt-vermelho top50">
-                Nenhuma transação no período informado.
+                Nenhuma transaÃ§Ã£o no perÃ­odo informado.
             </div>
 <?php                    
 }//end else do if($qtde_registros > 0) 
