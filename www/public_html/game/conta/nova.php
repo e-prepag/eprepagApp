@@ -197,15 +197,26 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
 
                             if (empty($erros)) {
                                 $nome = $retorno["nome"];
+                                $loginCadastro = preg_replace('/[^a-zA-Z0-9_.@-]/', '', (string)$_POST['login']);
+                                $nomeCadastro = preg_replace('/[\x00-\x1F\x7F]/u', '', (string)$nome);
+                                $cpfCadastro = substr($cpf, 0, 3) . "." . substr($cpf, 3, 3) . "." . substr($cpf, 6, 3) . "-" . substr($cpf, 9, 2);
+                                $dataNascimentoCadastro = preg_match('/^\d{2}\/\d{2}\/\d{4}$/', (string)$_POST['dtNasc']) ? (string)$_POST['dtNasc'] : '';
+                                $emailCadastro = filter_var((string)$_POST['email'], FILTER_SANITIZE_EMAIL);
 
-                                $usuarios = new UsuarioGames;
-                                $usuarios->setLogin(addslashes($_POST['login']));
-                                $usuarios->setNome(addslashes($nome));
-                                $usuarios->setNomeCPF(addslashes($nome));
-                                $usuarios->setCPF(addslashes($cpfComMascara));
-                                $usuarios->setDataNascimento(addslashes($_POST['dtNasc']));
-                                $usuarios->setEmail(addslashes($_POST['email']));
-                                $usuarios->setSenha($_POST['senha']);
+                                if ($loginCadastro === '' || $dataNascimentoCadastro === '' || !filter_var($emailCadastro, FILTER_VALIDATE_EMAIL)) {
+                                    $erros[] = "<p>Dados de cadastro inválidos.</p>";
+                                }
+
+                                if (empty($erros)) {
+                                    $usuarios = new UsuarioGames;
+                                    $usuarios->setLogin($loginCadastro);
+                                    $usuarios->setNome($nomeCadastro);
+                                    $usuarios->setNomeCPF($nomeCadastro);
+                                    $usuarios->setCPF($cpfCadastro);
+                                    $usuarios->setDataNascimento($dataNascimentoCadastro);
+                                    $usuarios->setEmail($emailCadastro);
+                                    $usuarios->setSenha($_POST['senha']);
+                                }
                             }
                         } else {
                             $erros[] = "<p>A idade mínima para o cadastro é de 16 anos.</p>";

@@ -36,8 +36,17 @@ $groupgeral = "";
 
 $itensespec = "";
 $groupespec = "";
+$itensespec2 = "";
 
 $where		= "";
+
+function isValidDateBr($date) {
+    if (!is_string($date) || !preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $date)) {
+        return false;
+    }
+    $parts = explode('/', $date);
+    return checkdate((int)$parts[1], (int)$parts[0], (int)$parts[2]);
+}
 
 function diasemana($data) {
 	$ano =  substr("$data", 0, 4);
@@ -81,15 +90,42 @@ function addDayIntoDate($date,$days) {
 	 return strftime("%Y-%m-%d", $nextdate);
 }
 
-// Recupera os dados passados por POST
-$act	 			= $_POST['act'];
-$statuspgto			= $_POST['statuspgto'];
-$fpgto 				= $_POST['fpgto'];
-$canais				= $_POST['canais'];
-$periodo 			= $_POST['periodo'];
-$tf_data_inicial	= $_POST['tf_data_inicial'];
-$tf_data_final 		= $_POST['tf_data_final'];
-$tipoconsulta		= $_POST['tipoconsulta'];
+// Recupera os dados passados por POST (sanitizados)
+$allowed_status = array('1', '2', '3', '4', '5', '6');
+$allowed_fpgto = array('0', '1', '2', '3', '5', '6', '9', '10', '11', '12', '15');
+$allowed_canais = array('0', 'C', 'S', 'L', 'P', 'A');
+$allowed_periodo = array('M', 'S', 'A', 'D', 'T');
+$allowed_tipo_consulta = array('O', 'J');
+
+$act = isset($_POST['act']) && ctype_digit((string)$_POST['act']) ? (int)$_POST['act'] : 0;
+
+$statuspgto = (string)($statuspgto ?? '');
+if (!in_array($statuspgto, $allowed_status, true)) {
+	$statuspgto = '5';
+}
+
+$fpgto = (string)($fpgto ?? '');
+if (!in_array($fpgto, $allowed_fpgto, true)) {
+	$fpgto = '0';
+}
+
+$canais = strtoupper((string)($canais ?? ''));
+if (!in_array($canais, $allowed_canais, true)) {
+	$canais = '0';
+}
+
+$periodo = strtoupper((string)($periodo ?? ''));
+if (!in_array($periodo, $allowed_periodo, true)) {
+	$periodo = 'M';
+}
+
+$tipoconsulta = strtoupper((string)($tipoconsulta ?? ''));
+if (!in_array($tipoconsulta, $allowed_tipo_consulta, true)) {
+	$tipoconsulta = 'O';
+}
+
+$tf_data_inicial = isValidDateBr((string)$tf_data_inicial) ? $tf_data_inicial : "";
+$tf_data_final = isValidDateBr((string)$tf_data_final) ? $tf_data_final : "";
 // Fim
 
 if(empty($fpgto)) {
