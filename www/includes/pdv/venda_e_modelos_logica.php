@@ -4,6 +4,7 @@
 		$usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 		$usuarioId = $usuarioGames->getId();
 	}
+	$usuarioId = isset($usuarioId) && is_numeric($usuarioId) ? (int)$usuarioId : 0;
 /*
 echo "<pre>";
 print_r($_SESSION);
@@ -11,11 +12,9 @@ echo "</pre>";
 */
 	//Recupera Id da venda
 	if(!$venda_id_request_nome) $venda_id_request_nome = 'venda';
-	$venda_id = $_REQUEST[$venda_id_request_nome];
-	if(!$venda_id) $venda_id = $_SESSION['venda'];
+	$venda_id = $_REQUEST[$venda_id_request_nome] ?? null;
+	if(!$venda_id && isset($_SESSION['venda'])) $venda_id = $_SESSION['venda'];
 
-	//Guarda id da venda no session
-	$_SESSION['venda'] = $venda_id;
 /*
 echo "usuarioId: $usuarioId<br>";
 echo "venda_id: $venda_id<br>";
@@ -27,15 +26,18 @@ die("Stop ascde");
 	//Valida id da venda
 	if($msg == ""){
 		if(!$venda_id || !is_numeric($venda_id)){		
-			$msg = "Id da venda inválido ou não fornecido ($venda_id).\n";
+			$msg = "Id da venda invalido ou nao fornecido ($venda_id).\n";
+		} else {
+			$venda_id = (int)$venda_id;
+			//Guarda id da venda no session
+			$_SESSION['venda'] = $venda_id;
 		}
 	}
 		
 	//Recupera a venda
 	if($msg == ""){
-		$sql  = "select * from tb_dist_venda_games vg " .
-				"where vg.vg_id = " . $venda_id . " and vg.vg_ug_id = " . $usuarioId;
-		$rs_venda = SQLexecuteQuery($sql);
+		$sql  = "select * from tb_dist_venda_games vg where vg.vg_id = $1 and vg.vg_ug_id = $2";
+		$rs_venda = SQLexecuteQueryParams($sql, array((int)$venda_id, (int)$usuarioId));
 		if(!$rs_venda || pg_num_rows($rs_venda) == 0) $msg = "Nenhuma venda encontrada (A1).\n";
 
 		$vg_pagto_tipo = -1;
@@ -58,12 +60,12 @@ die("Stop ascde");
 	if(b_IsPagtoOnline($vg_pagto_tipo)) {
 		//Recupera modelos
 		if($msg == ""){
-			$sql  = "select vg.*, 1 as vgm_qtde, bbg.bbg_valor as vgm_valor, 0 as vgm_perc_desconto, 'Crédito online LH Pré (R$' || to_char(bbg_valor-bbg_valor_taxa,'FM9999.00') || ')' as vgm_nome_produto, '' as vgm_nome_modelo from tb_dist_venda_games vg  ";
+			$sql  = "select vg.*, 1 as vgm_qtde, bbg.bbg_valor as vgm_valor, 0 as vgm_perc_desconto, 'Credito online LH Pre (R$' || to_char(bbg_valor-bbg_valor_taxa,'FM9999.00') || ')' as vgm_nome_produto, '' as vgm_nome_modelo from tb_dist_venda_games vg  ";
 			$sql .= "inner join dist_boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id ";
-			$sql .= "where vg.vg_id = " . $venda_id . " and vg.vg_ug_id=" . $usuarioId;
+			$sql .= "where vg.vg_id = $1 and vg.vg_ug_id = $2";
 //echo "sql: ".$sql."<br>";
 
-			$rs_venda_modelos = SQLexecuteQuery($sql);
+			$rs_venda_modelos = SQLexecuteQueryParams($sql, array((int)$venda_id, (int)$usuarioId));
 			if(!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado. (4335A)\n";
 		}
 	} else {
@@ -72,9 +74,9 @@ die("Stop ascde");
 		if($msg == ""){
 			$sql  = "select * from tb_dist_venda_games vg " .
 					"inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
-					"where vg.vg_id = " . $venda_id . " and vg.vg_ug_id=" . $usuarioId;
+					"where vg.vg_id = $1 and vg.vg_ug_id = $2";
 
-			$rs_venda_modelos = SQLexecuteQuery($sql);
+			$rs_venda_modelos = SQLexecuteQueryParams($sql, array((int)$venda_id, (int)$usuarioId));
 			if(!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado. (4335B)\n";
 		}
 	}

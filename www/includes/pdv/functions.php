@@ -464,19 +464,23 @@ function redirect($strRedirect)
                                                                 }
                                                                 if (!$usuario_games_id) return;
 
-                                                                $sql = "insert into dist_usuarios_games_log (" .
-                                                                        "	ugl_data_inclusao, ugl_ip, ugl_uglt_id, ugl_ug_id, ugl_vg_id" . ($observacao == null ? "" : ", ugl_obs") .
-                                                                        ") values (";
-                                                                $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                                                                $sql .= SQLaddFields(retorna_ip_acesso_pdv(), "s") . ",";
-                                                                $sql .= SQLaddFields($tipo, "") . ",";
-                                                                $sql .= SQLaddFields($usuario_games_id, "") . ",";
-                                                                $sql .= SQLaddFields($venda_id, "");
+                                                                $ipAcesso = (string)retorna_ip_acesso_pdv();
+                                                                $tipo = (int)$tipo;
+                                                                $usuario_games_id = (int)$usuario_games_id;
+                                                                $venda_id = is_numeric($venda_id) ? (int)$venda_id : null;
+
+                                                                $sql = "insert into dist_usuarios_games_log (
+                                                                        ugl_data_inclusao, ugl_ip, ugl_uglt_id, ugl_ug_id, ugl_vg_id" . ($observacao == null ? "" : ", ugl_obs") . "
+                                                                ) values (
+                                                                        CURRENT_TIMESTAMP, $1, $2, $3, $4" . ($observacao == null ? "" : ", $5") . "
+                                                                )";
+
+                                                                $params = array($ipAcesso, $tipo, $usuario_games_id, $venda_id);
                                                                 if ($observacao != null) {
-                                                                        $sql .= ", " . SQLaddFields($observacao, "s");
+                                                                        $params[] = (string)$observacao;
                                                                 }
-                                                                $sql .= ")";
-                                                                $ret = SQLexecuteQuery($sql);
+
+                                                                $ret = SQLexecuteQueryParams($sql, $params);
                                                         }
 
                                                         function usuarios_games_operador_log($tipo, $usuario_games_operador_id, $venda_id, $observacao = null)
