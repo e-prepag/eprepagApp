@@ -93,31 +93,21 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
     $msg = "";
 
 
+    $rs_modelos = false;
 
     //Captura os PINs selecionados
-
-    $listaPINs = "";
-
+    $lp_ids_array = array();
     foreach ($_POST as $key => $val) {
-
         if ($key != str_replace('emitir', '', $key)) {
-
-            if (empty($listaPINs)) {
-
-                $listaPINs = $val;
-
-            }//end if(empty($listaPINs))
-            else {
-
-                $listaPINs .= "," . $val;
-
-            }//end else do if(empty($listaPINs))
-
-        }//end if($key!=str_replace('emitir', '', $key))
-
-    }//end foreach($_POST as $key => $val)
-
-
+            $pinId = trim((string)$val);
+            if (!ctype_digit($pinId)) {
+                $msg = "PIN invÃ¡lido.\n";
+                break;
+            }
+            $lp_ids_array[] = (int)$pinId;
+        }
+    }
+    $lp_ids_array = array_values(array_unique($lp_ids_array));
 
     //CSS vindo do Drupal
 
@@ -127,7 +117,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
     //Testando se teve algum PIN selecionado
 
-    if (empty($listaPINs)) {
+    if (empty($lp_ids_array)) {
 
         die("<p class='text-red'>Nenhum PIN selecionado.</p>");
 
@@ -135,13 +125,16 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
 
 
-    //Capturando os IDs dos PINs
+    $venda_id = isset($_POST['tf_v_codigo_detalhe']) && ctype_digit((string)$_POST['tf_v_codigo_detalhe'])
+        ? (int)$_POST['tf_v_codigo_detalhe']
+        : 0;
+    if ($venda_id <= 0 && $msg == "") {
+        $msg = "Venda invÃ¡lida.\n";
+    }
 
-    $lp_ids = $listaPINs;
 
 
-
-    //capturando a variável server
+    //capturando a variï¿½vel server
 
     $server_url = "" . EPREPAG_URL . "";
 
@@ -154,6 +147,13 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
 
     if ($msg == "") {
+
+        $in_placeholders = array();
+        $sql_params = array((int)$usuarioId, (int)$venda_id);
+        foreach ($lp_ids_array as $pin_id) {
+            $sql_params[] = (int)$pin_id;
+            $in_placeholders[] = '$' . count($sql_params);
+        }
 
         $sql = "SELECT p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
                                     vgm.vgm_nome_produto, vgm.vgm_nome_modelo, opr.opr_codigo, opr.opr_nome, opr.opr_ban_pos, ogp.ogp_nome_imagem, 
@@ -175,21 +175,28 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
                             left join tb_dist_operadora_games_produto ogp on ogp.ogp_id = vgm.vgm_ogp_id
 
-                     where vg.vg_ug_id = $usuarioId 
+                     where vg.vg_ug_id = \$1 
 
-                           and vg.vg_id = " . $_POST['tf_v_codigo_detalhe'] . " 
+                           and vg.vg_id = \$2 
 
-                           and vgmp.vgmp_pin_codinterno in ($lp_ids)
+                           and vgmp.vgmp_pin_codinterno in (" . implode(',', $in_placeholders) . ")
 
                      order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde ";
 
         //echo "$sql<br>";
 
-        $rs_modelos = SQLexecuteQuery($sql);
+        $rs_modelos = SQLexecuteQueryParams($sql, $sql_params);
 
         if (!$rs_modelos || pg_num_rows($rs_modelos) == 0)
             $msg = "Nenhum cupom encontrado.\n";
         else {
+
+            $update_placeholders = array();
+            $update_params = array();
+            foreach ($lp_ids_array as $pin_id) {
+                $update_params[] = (int)$pin_id;
+                $update_placeholders[] = '$' . count($update_params);
+            }
 
             $sql = "update tb_dist_venda_games_modelo_pins set
 
@@ -197,12 +204,12 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
                                             vgmp_impressao_qtde = case when vgmp_impressao_qtde is NULL then 1 else vgmp_impressao_qtde + 1 end
 
-                                    where vgmp_pin_codinterno in ($lp_ids)";
+                                    where vgmp_pin_codinterno in (" . implode(',', $update_placeholders) . ")";
 
-            $ret = SQLexecuteQuery($sql);
+            $ret = SQLexecuteQueryParams($sql, $update_params);
 
             if (!$ret)
-                $msg = "Erro ao atualizar quantidade de impressões dos cupons.\n";
+                $msg = "Erro ao atualizar quantidade de impressï¿½es dos cupons.\n";
 
         } //end else do if(!$rs_modelos || pg_num_rows($rs_modelos) == 0)
 
@@ -503,9 +510,9 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
         
                         if ($rs_modelos_row['vgm_pin_request']) {
 
-                            $sql_instrucoes = "SELECT bhn_xml_retorno FROM pedidos_bhn WHERE bhn_pin = '" . $rs_modelos_row['pin_codigo'] . "';";
+                            $sql_instrucoes = "SELECT bhn_xml_retorno FROM pedidos_bhn WHERE bhn_pin = \$1";
 
-                            $rs_instrucoes = SQLexecuteQuery($sql_instrucoes);
+                            $rs_instrucoes = SQLexecuteQueryParams($sql_instrucoes, array($rs_modelos_row['pin_codigo']));
 
                             if ($rs_instrucoes) {
 
