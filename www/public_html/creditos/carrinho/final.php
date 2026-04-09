@@ -36,30 +36,57 @@ if($_POST['envia_email'] == 1) {
     session_start();
 
     //echo "<pre>".print_r($_POST,true)."</pre>";
-    
+
+    $msg = "";
+    $rs_modelos = false;
+
     //Capturando os IDs dos PINs
-    $lp_ids = $_POST['listaPINs'];
+    $lp_ids = $_POST['listaPINs'] ?? "";
+    $lp_ids_array = array();
+    if(trim((string)$lp_ids) != "") {
+        $lp_ids_exploded = explode(",", (string)$lp_ids);
+        foreach($lp_ids_exploded as $lp_id_item) {
+            $lp_id_item = trim($lp_id_item);
+            if($lp_id_item === "") continue;
+
+            if(!ctype_digit($lp_id_item)) {
+                $msg = "PIN inválido.\n";
+                break;
+            }
+
+            $lp_ids_array[] = (int)$lp_id_item;
+        }
+        $lp_ids_array = array_values(array_unique($lp_ids_array));
+    }
     
     //Capturando o E-Mail
     $email ="";
     //validando email
     $varRegExp = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i'; 
-    if(preg_match($varRegExp,$_POST['email'])) { 
+    if(preg_match($varRegExp,$_POST['email'])) {
         $email = $_POST['email'];
     }
-    else {
-        $msg .= "Email inválido"; 
+    else if($msg == "") {
+        $msg = "Email inválido";
     }
-
-    //Setando a variável
-    $msg = "";
     
     //Verifica reimpressao
     if($msg == ""){
-            if($lp_ids == "") $msg = "Nenhum PIN selecionado.\n";
+            if(empty($lp_ids_array)) $msg = "Nenhum PIN selecionado.\n";
     }
 
     if($msg == ""){
+            $in_placeholders = array();
+            $sql_params = array(
+                (int)$usuarioGames->getId(),
+                (int)$GLOBALS['_SESSION']['venda']
+            );
+
+            foreach($lp_ids_array as $pin_id) {
+                $sql_params[] = (int)$pin_id;
+                $in_placeholders[] = '$' . count($sql_params);
+            }
+
             $sql  = "SELECT p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
                                     vgm.vgm_nome_produto, vgm.vgm_nome_modelo, opr.opr_codigo, opr.opr_nome, opr.opr_ban_pos, ogp.ogp_nome_imagem,vgm.vgm_id,vg.vg_ug_id,  
                                     CASE 
@@ -73,18 +100,25 @@ if($_POST['envia_email'] == 1) {
                             inner join tb_dist_venda_games vg on vg.vg_id = vgm.vgm_vg_id
                             left join operadoras opr on opr.opr_codigo = vgm.vgm_opr_codigo
                             left join tb_dist_operadora_games_produto ogp on ogp.ogp_id = vgm.vgm_ogp_id
-                      where vg.vg_ug_id = ".$usuarioGames->getId()."
-                          and vg.vg_id = ".$GLOBALS['_SESSION']['venda']."
-                          and vgmp.vgmp_pin_codinterno in (".$lp_ids.")
+                      where vg.vg_ug_id = $1
+                          and vg.vg_id = $2
+                          and vgmp.vgmp_pin_codinterno in (".implode(",", $in_placeholders).")
                             order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde ";
-            $rs_modelos = SQLexecuteQuery($sql);
+            $rs_modelos = SQLexecuteQueryParams($sql, $sql_params);
             if(!$rs_modelos || pg_num_rows($rs_modelos) == 0) $msg = "Nenhum cupom encontrado.\n";
             else{
+                    $update_placeholders = array();
+                    $update_params = array();
+                    foreach($lp_ids_array as $pin_id) {
+                        $update_params[] = (int)$pin_id;
+                        $update_placeholders[] = '$' . count($update_params);
+                    }
+
                     $sql  = "update tb_dist_venda_games_modelo_pins set
                                             vgmp_impressao_ult_data = CURRENT_TIMESTAMP,
                                             vgmp_impressao_qtde = case when vgmp_impressao_qtde is NULL then 1 else vgmp_impressao_qtde + 1 end
-                                    where vgmp_pin_codinterno in ($lp_ids)";
-                    $ret = SQLexecuteQuery($sql);
+                                    where vgmp_pin_codinterno in (".implode(",", $update_placeholders).")";
+                    $ret = SQLexecuteQueryParams($sql, $update_params);
                     if(!$ret) $msg = "Erro ao atualizar quantidade de impressões dos cupons.\n";
             } //end else do if(!$rs_modelos || pg_num_rows($rs_modelos) == 0)
 
@@ -209,12 +243,16 @@ if($_POST['envia_email'] == 1) {
                                                                             vgpe_data
                                                                             ) 
                                                             VALUES (
-                                                                            ".$pin_codinterno.",
-                                                                            ".$rs_modelos_row['vg_ug_id'].",
-                                                                            '".$email."',
+                                                                            $1,
+                                                                            $2,
+                                                                            $3,
                                                                             NOW());";
                             //echo $sql."<br>";
-                            $rs_banner = SQLexecuteQuery($sql);
+                            $rs_banner = SQLexecuteQueryParams($sql, array(
+                                (int)$pin_codinterno,
+                                (int)$rs_modelos_row['vg_ug_id'],
+                                $email
+                            ));
                             if(!$rs_banner) {
                                     $mensagem = "Erro ao salvar informa&ccedil;&otilde;es denvio do e-mail. (ERRO: SIE-01)<br>";
                             }
