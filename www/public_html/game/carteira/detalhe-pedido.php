@@ -54,9 +54,9 @@ $sql = "
 SELECT total
 FROM tb_pag_compras
 WHERE tipo_cliente = 'M' AND 
-	idvenda_origem=".$venda_id.";";
+	idvenda_origem = ?;";
 $stmt = $pdo->prepare($sql);
-$stmt->execute();
+$stmt->execute([$venda_id]);
 $fetch_deposito = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if($qtde_registros > 0) {
