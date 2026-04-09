@@ -1113,7 +1113,7 @@ class EnvioEmailAutomatico
         $tmp_corpo_email = $this->getCorpoEmailTemplate($this->getIdentificadorEmail()); //UserProperty::
 
         foreach ($tmp_vetor as $key => $value) {
-            eval("\$aux_value = " . $value . ";");
+            $aux_value = $this->resolveTagExpression($value);
             $tmp_corpo_email = str_replace($key, $aux_value, $tmp_corpo_email);
         } //end foreach
 
@@ -1122,6 +1122,34 @@ class EnvioEmailAutomatico
 
         return $tmp_corpo_email;
     } //end function getCorpoEmail
+
+    private function resolveTagExpression($expression)
+    {
+        $expression = trim($expression);
+
+        if (preg_match('/^\$this->([A-Za-z_][A-Za-z0-9_]*)\(\)$/', $expression, $matches)) {
+            $method = $matches[1];
+
+            if (method_exists($this, $method) && strpos($method, 'get') === 0) {
+                return $this->$method();
+            }
+        }
+
+        if (preg_match("/^number_format\\(\\(\\$this->([A-Za-z_][A-Za-z0-9_]*)\\(\\)\\*([0-9]+(?:\\.[0-9]+)?)\\),([0-9]+),'([^']*)','([^']*)'\\)$/", $expression, $matches)) {
+            $method = $matches[1];
+            $multiplier = (float) $matches[2];
+            $decimals = (int) $matches[3];
+            $decimalSeparator = $matches[4];
+            $thousandsSeparator = $matches[5];
+
+            if (method_exists($this, $method) && strpos($method, 'get') === 0) {
+                $value = $this->$method();
+                return number_format(((float) $value) * $multiplier, $decimals, $decimalSeparator, $thousandsSeparator);
+            }
+        }
+
+        return '';
+    }
 
 
     public function getCorpoEmailTodos($tipo = null)
