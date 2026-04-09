@@ -203,9 +203,14 @@ if ($Enviar) {
             }
 
             try {
-                $sql = "insert into bko_access_log (log_data, log_hora, log_ip, log_user_id) values ('" . date('Y-m-d') . "', '" . date('H:i:s') . "', '" . retorna_ip_acesso_sys_admin() . "', '" . $pgrow['id'] . "') ";
+                $sql = "insert into bko_access_log (log_data, log_hora, log_ip, log_user_id) values (:log_data, :log_hora, :log_ip, :log_user_id)";
                 $stmt22 = $pdo->prepare($sql);
-                $stmt22->execute();
+                $stmt22->execute(array(
+                    ':log_data' => date('Y-m-d'),
+                    ':log_hora' => date('H:i:s'),
+                    ':log_ip' => retorna_ip_acesso_sys_admin(),
+                    ':log_user_id' => (int)$pgrow['id']
+                ));
             } catch (PDOException $e) {
                 $geraLog = new Log("LOGINSYSADMIN", array(
                     "ERROR: " . $e->getMessage(),

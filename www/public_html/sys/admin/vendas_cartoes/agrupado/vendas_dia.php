@@ -38,6 +38,11 @@
 //		$range       = 1;
 		$total_table = 0;
 	}
+	$dd_ano = (int)$dd_ano;
+	$dd_mes = (int)$dd_mes;
+	$dd_operadora = (int)$dd_operadora;
+	if($dd_ano <= 0) $dd_ano = (int)date('Y');
+	if($dd_mes < 1 || $dd_mes > 12) $dd_mes = (int)date('m');
 	
 //	$default_add  = nome_arquivo($PHP_SELF);
 //	$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
@@ -65,12 +70,13 @@
 	}
 
 	if($dd_ano) {
-		$where_ano = " and (extract (year from vc_data) = ".$dd_ano.") ";
+		$where_ano = " and (extract (year from vc_data) = $1::int) ";
 	}
 
 	if($dd_mes) {
-		$where_mes = " and (extract (month from vc_data) = ".$dd_mes.") ";
+		$where_mes = " and (extract (month from vc_data) = $2::int) ";
 	}
+	$query_params = array($dd_ano, $dd_mes);
 
 	$sql  = "select * from meses order by mes_codigo";
 	$resmes = pg_exec($connid, $sql);
@@ -105,7 +111,7 @@
 
 //echo str_replace("\n","<br>\n",$sql)."<br>";
 
-	$res_count = pg_query($sql);
+	$res_count = pg_query_params($connid, $sql, $query_params);
 	$total_table = pg_num_rows($res_count);
 
 	$ordem = 0;
@@ -126,7 +132,7 @@
 //	$sql .= " limit ".$max; 
 //	$sql .= " offset ".$inicial;
 
-	$resdia = pg_exec($connid, $sql);
+	$resdia = pg_query_params($connid, $sql, $query_params);
 
 //	if($max + $inicial > $total_table)
 //		$reg_ate = $total_table;
@@ -134,11 +140,12 @@
 //		$reg_ate = $max + $inicial;
 
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
+		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo = $1) order by opr_ordem";
+		$resopr = pg_query_params($connid, $sqlopr, array($dd_operadora));
 	} else {
 		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+		$resopr = pg_exec($connid, $sqlopr);
 	}
-	$resopr = pg_exec($connid, $sqlopr);
 //echo "$sqlopr<br>";
 
 //	$varsel = "&cb_opr_teste=$cb_opr_teste&dd_ano=$dd_ano&dd_mes=$dd_mes";

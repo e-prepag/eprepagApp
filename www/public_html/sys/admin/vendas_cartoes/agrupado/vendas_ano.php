@@ -34,6 +34,9 @@
 //		$range       = 1;
 		$total_table = 0;
 	}
+	$allowed_order_fields = array('ano', 'quantidade', 'total');
+	if (!in_array($ncamp, $allowed_order_fields, true)) $ncamp = 'ano';
+	$dd_operadora = (int)$dd_operadora;
 	
 //	$default_add  = nome_arquivo($PHP_SELF);
 //	$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
@@ -94,7 +97,7 @@
 		
 	$sql .= "group by ano"; //", canal";
 	
-	$res_count = pg_query($sql);
+	$res_count = pg_query($connid, $sql);
 	$total_table = pg_num_rows($res_count);
 
 	$sql .= " order by ".$ncamp." desc";
@@ -126,11 +129,12 @@
 //		$reg_ate = $max + $inicial;
 
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
+		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo = $1) order by opr_ordem";
+		$resopr = pg_query_params($connid, $sqlopr, array($dd_operadora));
 	} else {
 		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+		$resopr = pg_exec($connid, $sqlopr);
 	}
-	$resopr = pg_exec($connid, $sqlopr);
 //echo "$sqlopr<br>";
 
 //	$varsel = "&cb_opr_teste=$cb_opr_teste";

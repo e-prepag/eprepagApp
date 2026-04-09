@@ -27,6 +27,9 @@
 	if(!$ordem)    $ordem       = 0;
 	if($BtnSearch && $BtnSearch!=1 )
             $total_table = 0;
+	$dd_ano = (int)$dd_ano;
+	if($dd_ano <= 0) $dd_ano = (int)date('Y');
+	$dd_operadora = (int)$dd_operadora;
 	
 
 	$where_opr_1 = "";
@@ -49,9 +52,10 @@
 	}
 
 	if($dd_ano) {
-		$where_ano_1 = " and (extract (year from vc_data) = ".$dd_ano.") ";
-		$where_ano_2 = " and (extract (year from vc_data) = ".$dd_ano.") ";
+		$where_ano_1 = " and (extract (year from vc_data) = $1::int) ";
+		$where_ano_2 = " and (extract (year from vc_data) = $1::int) ";
 	}
+	$query_params = array($dd_ano);
 
 	$sql  = "select extract (month from vc_data) as mes, extract (year from vc_data) as ano, sum(n) as quantidade, sum (vendas1) as total 
 				from (
@@ -83,7 +87,7 @@
 //echo str_replace("\n","<br>\n",$sql)."<br>";
 
 	
-	$res_count = pg_query($sql);
+	$res_count = pg_query_params($connid, $sql, $query_params);
 	$total_table = pg_num_rows($res_count);
 
 //	$sql .= " order by ".$ncamp;
@@ -106,14 +110,15 @@
 
 //echo "$sql<br>";
 
-	$resmes = pg_exec($connid, $sql);
+	$resmes = pg_query_params($connid, $sql, $query_params);
 	
 	if($_SESSION["tipo_acesso_pub"]=='PU') {
-		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo='".$dd_operadora."') order by opr_ordem";
+		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status = '1') and (opr_codigo = $1) order by opr_ordem";
+		$resopr = pg_query_params($connid, $sqlopr, array($dd_operadora));
 	} else {
 		$sqlopr = "select opr_nome, opr_codigo from operadoras where (opr_status != '0') order by opr_ordem";
+		$resopr = pg_exec($connid, $sqlopr);
 	}
-	$resopr = pg_exec($connid, $sqlopr);
 ?>
 <html>
 <head>

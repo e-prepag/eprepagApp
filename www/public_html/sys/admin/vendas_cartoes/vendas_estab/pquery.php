@@ -26,6 +26,13 @@
 	if(!$inicial)          $inicial         = 0;
 	if(!$range)            $range           = 1;
 	if(!$ordem)            $ordem           = 0;
+	$allowed_order_fields = array('trn_data', 'opr_nome', 'pin_valor', 'quantidade', 'total_face');
+	if (!in_array($ncamp, $allowed_order_fields, true)) $ncamp = 'trn_data';
+	$inicial = (int)$inicial;
+	if($inicial < 0) $inicial = 0;
+	$range = (int)$range;
+	if($range < 1) $range = 1;
+	$ordem = ((int)$ordem === 1) ? 1 : 0;
 //	if($BtnSearch)         $inicial         = 0;
 //	if($BtnSearch)         $range           = 1;
 //	if($BtnSearch)         $total_table     = 0;
@@ -38,6 +45,7 @@
 	$data_inicial_limite = data_menos_n(date('d/m/Y'), 120);
 	$data_inicial_limite = '01/08/2004';
 	$FrmEnviar = 1;
+	$query_params = array();
 	
 	
 	$default_add  = nome_arquivo($PHP_SELF);
@@ -47,9 +55,9 @@
 	$range_qtde   = $qtde_range_tela;
 
 	if($cb_opr_teste)
-		$resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = '".$operadora_ativada."') order by opr_ordem");
+		$resopr = pg_query_params($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = $1) order by opr_ordem", array((string)$operadora_ativada));
 	else
-		$resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = '".$operadora_ativada."') and (opr_codigo <> ".$opr_teste.") order by opr_ordem");
+		$resopr = pg_query_params($connid, "select opr_nome, opr_codigo from operadoras where (opr_status = $1) and (opr_codigo <> $2) order by opr_ordem", array((string)$operadora_ativada, (int)$opr_teste));
 
 	if(!verifica_data($tf_data_inicial))
 	{
@@ -86,7 +94,9 @@
 		{
 			$data_inic = formata_data(trim($tf_data_inicial), 1);
 			$data_fim = formata_data(trim($tf_data_final), 1); 
-			$where_data_2 = " and ((vc_data >= '".trim($data_inic)." 00:00:00') and (vc_data <= '".trim($data_fim)." 23:59:59')) "; 
+			$where_data_2 = " and ((vc_data >= $1::timestamp) and (vc_data <= $2::timestamp)) "; 
+			$query_params[] = trim($data_inic)." 00:00:00";
+			$query_params[] = trim($data_fim)." 23:59:59";
 		}
 
 
@@ -168,7 +178,10 @@
 		$estat  .= " group by trn_data, opr_nome, pin_valor ";
 
 		
-		$res_count = pg_query($estat);
+		if(!empty($query_params))
+			$res_count = pg_query_params($connid, $estat, $query_params);
+		else
+			$res_count = pg_query($connid, $estat);
 		$total_table = pg_num_rows($res_count);
 	
 		$estat .= " order by ".$ncamp; 
@@ -188,7 +201,10 @@
 		$valor_geral = 0;
 
 //echo str_replace("\n","<br>\n",$estat)."<br>";
-		$res_geral = pg_exec($connid, $estat);
+		if(!empty($query_params))
+			$res_geral = pg_query_params($connid, $estat, $query_params);
+		else
+			$res_geral = pg_exec($connid, $estat);
 		while($pg_geral = pg_fetch_array($res_geral))
 		{
 			$qtde_geral += $pg_geral['quantidade'];
@@ -196,6 +212,8 @@
 		}
 
                 if(!isset($_GET["downloadCsv"])){
+                    $max = (int)$max;
+                    if($max < 1) $max = 100;
                     $estat .= " limit ".$max; 
                     $estat .= " offset ".$inicial;
                 }
@@ -207,7 +225,10 @@
 //	trace_sql($estat, "Arial", 2, "#666666", 'b');
 $sql_transform=$estat;
 	
-	$resestat = pg_exec($connid, $estat);
+	if(!empty($query_params))
+		$resestat = pg_query_params($connid, $estat, $query_params);
+	else
+		$resestat = pg_exec($connid, $estat);
 
 	if($max + $inicial > $total_table)
 		$reg_ate = $total_table;
@@ -272,10 +293,10 @@ function GP_popupConfirmMsg(msg) { //v1.0
                 <div class="row txt-cinza">
                     <form name="form1" method="post" action="">
                         <div class="col-md-2">
-                            <input  alt="Calendário" name="tf_data_inicial" type="text" class="form-control data" id="tf_data_inicial" value="<?php  echo $tf_data_inicial ?>" size="9" maxlength="10">
+                            <input  alt="Calendario" name="tf_data_inicial" type="text" class="form-control data" id="tf_data_inicial" value="<?php  echo $tf_data_inicial ?>" size="9" maxlength="10">
                         </div>
                         <div class="col-md-2">
-                            <input alt="Calendário" name="tf_data_final" type="text" class="form-control data" id="tf_data_final" value="<?php  echo $tf_data_final ?>" size="9" maxlength="10">
+                            <input alt="Calendario" name="tf_data_final" type="text" class="form-control data" id="tf_data_final" value="<?php  echo $tf_data_final ?>" size="9" maxlength="10">
                         </div>
                         <div class="col-md-3">
     <?php 
