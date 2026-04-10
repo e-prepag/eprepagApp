@@ -75,11 +75,11 @@ function valida_formatacao($tipo, $tamanho, $valor)
         $valor = trim($valor);
 
         if ($tipo == "N") {
-                if (eregi("^[0-9]{" . $tamanho . "}$", $valor)) return true;
+                if (preg_match('/^[0-9]{' . ((int)$tamanho) . '}$/i', $valor)) return true;
         } else if ($tipo == "Nle") {
-                if (eregi("^[0-9]{1," . $tamanho . "}$", $valor)) return true;
+                if (preg_match('/^[0-9]{1,' . ((int)$tamanho) . '}$/i', $valor)) return true;
         } else if ($tipo == "NleX") {
-                if (eregi("^[0-9]{1," . $tamanho . "}$", $valor) || eregi("^[0-9]{1," . ($tamanho - 1) . "}X$", $valor)) return true;
+                if (preg_match('/^[0-9]{1,' . ((int)$tamanho) . '}$/i', $valor) || preg_match('/^[0-9]{1,' . ((int)$tamanho - 1) . '}X$/i', $valor)) return true;
         }
 
         return false;
@@ -275,8 +275,14 @@ function redirect($strRedirect)
 
         ob_end_clean();
 
-        if (substr($strRedirect, 0, 4) != "http")
-                $strRedirect = "https://" . $_SERVER['HTTP_HOST'] . $strRedirect;
+        if (substr($strRedirect, 0, 4) != "http") {
+                $httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : "";
+                // Keep only safe host characters before composing absolute URL.
+                $httpHost = preg_replace('/[^A-Za-z0-9\\.\\-:]/', '', $httpHost);
+                $strRedirect = "https://" . $httpHost . $strRedirect;
+        }
+
+        $safeRedirectJs = json_encode($strRedirect, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
         //Reidrect interno
         //header("Location: " . $strRedirect);
@@ -284,7 +290,7 @@ function redirect($strRedirect)
         //redirect externo
 ?><html>
 
-        <body onload="window.location='<?= $strRedirect ?>'"><?php
+        <body onload="window.location=<?= $safeRedirectJs ?>"><?php
                                                                 exit;
                                                         }
 
@@ -527,15 +533,13 @@ function redirect($strRedirect)
    */
                                                                 for ($i = 0; $i < $tam; $i++) {
                                                                         // If I found one '<', $tag++ and continue whithout copy
-                                                                        if ($string{
-                                                                                $i} == '<') {
+                                                                        if ($string[$i] == '<') {
                                                                                 $tag++;
                                                                                 continue;
                                                                         }
 
                                                                         // if I found '>', decrease $tag and continue 
-                                                                        if ($string{
-                                                                                $i} == '>') {
+                                                                        if ($string[$i] == '>') {
                                                                                 if ($tag) {
                                                                                         $tag--;
                                                                                 }
@@ -547,8 +551,7 @@ function redirect($strRedirect)
 
                                                                         // if $tag is 0, can copy 
                                                                         if ($tag == 0) {
-                                                                                $newstring .= $string{
-                                                                                        $i}; // simple copy, only one car
+                                                                                $newstring .= $string[$i]; // simple copy, only one car
                                                                         }
                                                                 }
                                                                 return $newstring;
@@ -1149,6 +1152,7 @@ function redirect($strRedirect)
                                         </tr>
                                         <?php
                                                                         }
+                                                                        $instProdutoModelo = new ProdutoModelo;
                                                                         foreach ($carrinho as $modeloId => $qtde) {
 
                                                                                 $qtde = intval($qtde);
@@ -1156,7 +1160,7 @@ function redirect($strRedirect)
                                                                                 $filtro['ogpm_ativo'] = 1;
                                                                                 $filtro['ogpm_id'] = $modeloId;
                                                                                 $filtro['com_produto'] = true;
-                                                                                $ret = ProdutoModelo::obter($filtro, null, $rs);
+                                                                                $ret = $instProdutoModelo->obter($filtro, null, $rs);
                                                                                 if ($rs && pg_num_rows($rs) != 0) {
                                                                                         $rs_row = pg_fetch_array($rs);
                                                                                         $total_geral += $rs_row['ogpm_valor'] * $qtde;
@@ -1207,13 +1211,14 @@ function redirect($strRedirect)
                                                                 if (!$carrinho || count($carrinho) == 0) {
                                                                         $breturn = false;
                                                                 } else {
+                                                                        $instProdutoModelo = new ProdutoModelo;
                                                                         foreach ($carrinho as $modeloId => $qtde) {
                                                                                 $rs = null;
                                                                                 $filtro['ogpm_ativo'] = 1;
                                                                                 $filtro['ogpm_id'] = $modeloId;
                                                                                 $filtro['com_produto'] = true;
 
-                                                                                $ret = ProdutoModelo::obter($filtro, null, $rs);
+                                                                                $ret = $instProdutoModelo->obter($filtro, null, $rs);
                                                                                 if ($rs && pg_num_rows($rs) != 0) {
                                                                                         $rs_row = pg_fetch_array($rs);
                                                                                         if ($rs_row['ogp_opr_codigo'] != 16 && $rs_row['ogp_opr_codigo'] != 31) {
@@ -1285,6 +1290,28 @@ function redirect($strRedirect)
                                                         }
 
                                                         //  ================================================
+                                                        function get_time_difference($start, $end)
+                                                        {
+                                                                $startTs = is_numeric($start) ? (int) $start : strtotime($start);
+                                                                $endTs = is_numeric($end) ? (int) $end : strtotime($end);
+                                                                if ($startTs === false || $endTs === false) {
+                                                                        return false;
+                                                                }
+
+                                                                $nsecs = abs($endTs - $startTs);
+                                                                $days = floor($nsecs / 86400);
+                                                                $hours = floor(($nsecs / 3600) - ($days * 24));
+                                                                $minutes = floor(($nsecs / 60) - ($days * 1440) - ($hours * 60));
+                                                                $seconds = floor(($nsecs % 60));
+
+                                                                return array(
+                                                                        'days' => $days,
+                                                                        'hours' => $hours,
+                                                                        'minutes' => $minutes,
+                                                                        'seconds' => $seconds
+                                                                );
+                                                        }
+
                                                         function get_time_difference_formatted($start, $end)
                                                         {
                                                                 $aret = get_time_difference($start, $end);
