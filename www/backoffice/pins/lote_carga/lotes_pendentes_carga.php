@@ -131,15 +131,15 @@ if($opr_codigo==0 && isset($_POST['opr_codigo']))
 //echo "<hr>";
 
 if(isset($opr_codigo) && $opr_codigo && is_numeric($opr_codigo)) {
-	$sql = "SELECT valor AS pin_valor
-        FROM operadoras_valores
-        WHERE opr_codigo = $opr_codigo
-        AND (valor > 0 OR (valor = 0 AND opr_codigo = 78))
-        ORDER BY valor";
+		$sql = "SELECT valor AS pin_valor
+	        FROM operadoras_valores
+	        WHERE opr_codigo = $1
+	        AND (valor > 0 OR (valor = 0 AND opr_codigo = 78))
+	        ORDER BY valor";
 //echo str_replace("\n", "<br>\n", $sql)."<br>";
 
 //echo "sql: $sql<br>";
-	$rs_pins = SQLexecuteQuery($sql);
+		$rs_pins = SQLexecuteQueryParams($sql, [(int)$opr_codigo]);
 }
 
 	if(isset($Registrar) && $Registrar) {
@@ -318,7 +318,7 @@ if(isset($opr_codigo) && $opr_codigo && is_numeric($opr_codigo)) {
 
 	//Operadoras
 	$sql  = "select * from operadoras ope order by opr_nome";		// "opr_nome"
-	$rs_operadoras = SQLexecuteQuery($sql);
+		$rs_operadoras = SQLexecuteQueryParams($sql, []);
 
 	$opr_codigos_com_valores = array(16, 26, 35, 52, 55, 56);
 	$i = 1;

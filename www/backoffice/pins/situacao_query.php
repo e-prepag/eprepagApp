@@ -68,17 +68,22 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 	ksort($a_status);
 
 	// Levanta lista de valores
-	$sql = "select pin_valor, count(*) as n from pins where 1=1 ";
-	if($dd_opr_codigo) {
-		$sql .= " and opr_codigo=".$dd_opr_codigo." ";
-	}
-	if($fcanal) {
-		$sql .= " and pin_canal='".$fcanal."' ";
-	}
-	$sql .= " group by pin_valor ";
-	$sql .= " order by pin_valor;";
+		$sql = "select pin_valor, count(*) as n from pins where 1=1 ";
+		$paramsValores = [];
+		if($dd_opr_codigo) {
+			$idxOpr = count($paramsValores) + 1;
+			$paramsValores[] = (int)$dd_opr_codigo;
+			$sql .= " and opr_codigo=$".$idxOpr." ";
+		}
+		if($fcanal) {
+			$idxCanal = count($paramsValores) + 1;
+			$paramsValores[] = $fcanal;
+			$sql .= " and pin_canal=$".$idxCanal." ";
+		}
+		$sql .= " group by pin_valor ";
+		$sql .= " order by pin_valor;";
 
-	$resvalue = pg_exec($connid,$sql);
+		$resvalue = SQLexecuteQueryParams($sql, $paramsValores);
 	$a_valores = array();
 	while ($pgvalue = pg_fetch_array($resvalue)) { 
 		$a_valores[$pgvalue['pin_valor']] = $pgvalue['n'];
@@ -100,52 +105,104 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 	
 	    }
 	
-		$sql = "select t0.pin_codinterno, \n
-			CASE WHEN pin_codigo = '0000000000000000' THEN pin_caracter \n
-			ELSE pin_codigo \n
-			END as case_codigo, \n
-			t0.pin_serial, t0.pin_valor, t0.pin_status, t0.pin_canal,  \n";
-		$sql.= " t0.pin_datavenda, t0.pin_horavenda, t0.pin_est_codigo, t0.opr_codigo ";	//"--, t4.est_codigo, t4.nome_fantasia  \n";
-		$sql.= " from pins t0 ";	//	operadoras t1, pins_status t3 //"--, estabelecimentos t4  \n";
-		$sql.= " where 1=1 ";	//"--(t0.pin_est_codigo = t4.est_codigo) and \n";
-		$sql.= "   \n";
-		
+		$sql = "select t0.pin_codinterno, 
+
+			CASE WHEN pin_codigo = '0000000000000000' THEN pin_caracter 
+
+			ELSE pin_codigo 
+
+			END as case_codigo, 
+
+			t0.pin_serial, t0.pin_valor, t0.pin_status, t0.pin_canal,  
+";
+		$sql.= " t0.pin_datavenda, t0.pin_horavenda, t0.pin_est_codigo, t0.opr_codigo ";
+		$sql.= " from pins t0 ";
+		$sql.= " where 1=1 ";
+		$sql.= "   
+";
+		$paramsSearch = [];
+
 		if($tf_data_inicial) {
-				$data_inic = formata_data(trim($tf_data_inicial), 1);
-				$data_fim = formata_data(trim($tf_data_final), 1); 
-				$sql .= " and (pin_datavenda between '".trim($data_inic)."' and  '".trim($data_fim)."')  \n"; 
+			$data_inic = formata_data(trim($tf_data_inicial), 1);
+			$data_fim = formata_data(trim($tf_data_final), 1);
+			$idxDataIni = count($paramsSearch) + 1;
+			$paramsSearch[] = trim($data_inic);
+			$idxDataFim = count($paramsSearch) + 1;
+			$paramsSearch[] = trim($data_fim);
+			$sql .= " and (pin_datavenda between $".$idxDataIni." and $".$idxDataFim.")  
+";
 		}
 
-		//if(!trim($fpin) && !trim($fserial) && !($festab)) $sql.= "and (t0.pin_codigo='') and (t0.pin_serial='')  \n"; 
-		//else{
-			if(isset($fcodinterno) && $fcodinterno)	$sql .= " and (t0.pin_codinterno='".trim($fcodinterno)."')  \n";
-			if(isset($fcaracter) && $fcaracter)	$sql .= " and (t0.pin_caracter='".trim($fcaracter)."')  \n";
-			if(isset($fpin) && $fpin)	$sql .= " and (t0.pin_codigo='".trim($fpin)."')  \n";
-			if(isset($fserial) && $fserial)$sql .= " and (t0.pin_serial='".trim($fserial)."')  \n"; 
-			if(isset($festab) && $festab)	$sql .= " and (t0.pin_est_codigo = ".$festab.")  \n";
-			if(isset($fcanal) && $fcanal) $sql .= " and (t0.pin_canal='".$fcanal."') \n"; 
-		//}
+		if(isset($fcodinterno) && $fcodinterno){
+			$idxCodInterno = count($paramsSearch) + 1;
+			$paramsSearch[] = trim($fcodinterno);
+			$sql .= " and (t0.pin_codinterno=$".$idxCodInterno.")  
+";
+		}
+		if(isset($fcaracter) && $fcaracter){
+			$idxCaracter = count($paramsSearch) + 1;
+			$paramsSearch[] = trim($fcaracter);
+			$sql .= " and (t0.pin_caracter=$".$idxCaracter.")  
+";
+		}
+		if(isset($fpin) && $fpin){
+			$idxPin = count($paramsSearch) + 1;
+			$paramsSearch[] = trim($fpin);
+			$sql .= " and (t0.pin_codigo=$".$idxPin.")  
+";
+		}
+		if(isset($fserial) && $fserial){
+			$idxSerial = count($paramsSearch) + 1;
+			$paramsSearch[] = trim($fserial);
+			$sql .= " and (t0.pin_serial=$".$idxSerial.")  
+";
+		}
+		if(isset($festab) && $festab){
+			$idxEstab = count($paramsSearch) + 1;
+			$paramsSearch[] = (int)$festab;
+			$sql .= " and (t0.pin_est_codigo = $".$idxEstab.")  
+";
+		}
+		if(isset($fcanal) && $fcanal){
+			$idxCanalBusca = count($paramsSearch) + 1;
+			$paramsSearch[] = $fcanal;
+			$sql .= " and (t0.pin_canal=$".$idxCanalBusca.") 
+";
+		}
 
-		if($dd_opr_codigo) $sql .= " and (t0.opr_codigo=".$dd_opr_codigo.")  \n";
+		if($dd_opr_codigo) {
+			$idxOprBusca = count($paramsSearch) + 1;
+			$paramsSearch[] = (int)$dd_opr_codigo;
+			$sql .= " and (t0.opr_codigo=$".$idxOprBusca.")  
+";
+		}
 
 		if($dd_pin_status) {
-			if($dd_pin_status=="stVendido-TODOS") { 
-				$sql .= " and (t0.pin_status='3' or t0.pin_status='6' or t0.pin_status='7')  \n";
+			if($dd_pin_status=="stVendido-TODOS") {
+				$sql .= " and (t0.pin_status='3' or t0.pin_status='6' or t0.pin_status='7')  
+";
 			} else {
-				$sql .= " and (t0.pin_status='".substr($dd_pin_status,2,1)."')  \n";
-			}			
-		}
-                //die(var_dump($tf_pins));
-		if (!empty($tf_pins)) {
-			$sql .= " and (";
-			for($i=0;$i<count($tf_pins);$i++) {
-                $sql .= " (t0.pin_valor = ".$tf_pins[$i].")  ";
-				
-                if($i<count($tf_pins)-1) {
-					$sql .= " or  ";
-				}
+				$idxStatus = count($paramsSearch) + 1;
+				$paramsSearch[] = substr($dd_pin_status,2,1);
+				$sql .= " and (t0.pin_status=$".$idxStatus.")  
+";
 			}
-			$sql .= " ) ";
+		}
+
+		if (!empty($tf_pins)) {
+			$pinValores = array_values(array_filter($tf_pins, 'is_numeric'));
+			if (!empty($pinValores)) {
+				$sql .= " and (";
+				for($i=0;$i<count($pinValores);$i++) {
+					$idxPinValor = count($paramsSearch) + 1;
+					$paramsSearch[] = $pinValores[$i];
+					$sql .= " (t0.pin_valor = $".$idxPinValor.")  ";
+					if($i<count($pinValores)-1) {
+						$sql .= " or  ";
+					}
+				}
+				$sql .= " ) ";
+			}
 		}
         
 if($debug) {
@@ -155,12 +212,16 @@ echo "Elapsed time A2(*): ".number_format(getmicrotime() - $time_start_stats, 2,
 }
 
 //echo str_replace("\n","<br>\n",$sql)."<br>";
-		$resid_count = pg_exec($connid, $sql);
+			$resid_count = SQLexecuteQueryParams($sql, $paramsSearch);
 		$total_table = pg_num_rows($resid_count);
 
 		//$sql .= " order by pin_datavenda desc, pin_horavenda desc ";
-		$sql .= " limit ".$max." ";
-		$sql .= " offset ".$inicial;
+			$idxLimit = count($paramsSearch) + 1;
+			$paramsSearch[] = (int)$max;
+			$idxOffset = count($paramsSearch) + 1;
+			$paramsSearch[] = (int)$inicial;
+			$sql .= " limit $".$idxLimit." ";
+			$sql .= " offset $".$idxOffset;
 		
 
     //echo $sql;
@@ -170,7 +231,7 @@ echo str_replace("\n","<br>\n",$sql)."<br>";
 echo "Elapsed time A3: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.')."<br>";
 //die("Stop 3434ddd3");
 }
-		$resid = pg_exec($connid, $sql);
+			$resid = SQLexecuteQueryParams($sql, $paramsSearch);
 	
 if($debug) {
 echo "Elapsed time A4: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.')."<br>";

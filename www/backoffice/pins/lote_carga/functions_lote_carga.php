@@ -219,7 +219,7 @@ function Ongame_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -395,7 +395,7 @@ function BilaGames_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -570,7 +570,7 @@ function AeriaGames_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -750,7 +750,7 @@ function OGPlanet_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -924,7 +924,7 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".".PHP_EOL;
 					}
 			
@@ -1068,7 +1068,7 @@ function processaLote_BHN($fileSource, $nomeArq, $opr_codigo, $fcanal){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1225,7 +1225,7 @@ function GlobalGames_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1403,7 +1403,7 @@ function GlobalGames2_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1556,7 +1556,7 @@ function StarDoll_traduzKValor($k){
 				$sql = "select * from pins p inner join operadoras o on p.opr_codigo = o.opr_codigo where p.opr_codigo = $opr_codigo and p.pin_codigo = '$sPinCodigo' and pin_canal='".$fcanal."' ";
 
 //echo "sql: $sql<br>";
-				$ret = SQLexecuteQuery($sql);
+				$ret = SQLexecuteQueryParams("select * from pins p inner join operadoras o on p.opr_codigo = o.opr_codigo where p.opr_codigo = $1 and p.pin_codigo = $2 and pin_canal=$3", [(int)$opr_codigo, $sPinCodigo, $fcanal]);
 				if($ret && pg_num_rows($ret) > 0){
 					$ret_row = pg_fetch_array($ret);
 					$opr_nome = $ret_row['opr_nome'];
@@ -1615,7 +1615,7 @@ function StarDoll_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, '1', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret2 = SQLexecuteQuery($sql);
+							$ret2 = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret2) $msg = "Erro ao inserir registro: " . $linha . "<br>\n";
 if (strlen ($erro = pg_last_error($GLOBALS['connid']))) {
 	$message  = date("Y-m-d H:i:s") . " ";
@@ -1801,7 +1801,7 @@ function Softnyx_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1975,7 +1975,7 @@ function Jolt_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2143,7 +2143,7 @@ function Cosmopax_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, 0, '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, 0, $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2323,7 +2323,7 @@ function Hive_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2490,7 +2490,7 @@ function Escola24h_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2620,7 +2620,7 @@ function Escola24h_traduzKValor($k){
 				  AND pin_canal = '$fcanal'
 			";
 	
-			$rs = SQLexecuteQuery($sql);
+				$rs = SQLexecuteQueryParams("SELECT pin_caracter FROM pins WHERE opr_codigo = $1 AND pin_caracter = ANY(string_to_array($2, '|')) AND pin_canal = $3", [(int)$opr_codigo, implode('|', $cargaAr), $fcanal]);
 			if (!$rs) {
 				$msg = "Erro ao verificar duplicidade.\n";
 			} else {
@@ -2785,7 +2785,7 @@ function Escola24h_traduzKValor($k){
 				$linha 	= $cargaAr[$i];
 
 				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='".$fcanal."' ";
-				$rs = SQLexecuteQuery($sql);
+					$rs = SQLexecuteQueryParams("select count(*) as qtde from pins where opr_codigo = $1 and pin_caracter = $2 and pin_canal=$3", [(int)$opr_codigo, $linha, $fcanal]);
 				if(!$rs || pg_num_rows($rs) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
@@ -2842,7 +2842,7 @@ function Escola24h_traduzKValor($k){
 
 				$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_caracter, pin_canal) ";
 				$sql .= "values ($opr_codigo, 1, '" .$pin_serial++ ."', '$linha', $iPinLocal, $loteValor, $pin_lote_codigo, CURRENT_DATE, CURRENT_TIME, '$iPincaracter', '".$fcanal."')";
-				$ret = SQLexecuteQuery($sql);
+					$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_caracter, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7, $8)", [(int)$opr_codigo, $pin_serial++, $linha, $iPinLocal, $loteValor, $pin_lote_codigo, $iPincaracter, $fcanal]);
 				if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					
 				//Se houve erro, sai do loop
@@ -2932,7 +2932,7 @@ function Escola24h_traduzKValor($k){
 				$linha 	= $cargaAr[$i];
 
 				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='s' ";
-				$rs = SQLexecuteQuery($sql);
+					$rs = SQLexecuteQueryParams("select count(*) as qtde from pins where opr_codigo = $1 and pin_caracter = $2 and pin_canal='s'", [(int)$opr_codigo, $linha]);
 				if(!$rs || pg_num_rows($rs) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
@@ -2989,7 +2989,7 @@ function Escola24h_traduzKValor($k){
 
 				$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 				$sql .= "values ($opr_codigo, 1, '" .$pin_serial++ ."', '$linha', $iPinLocal, $loteValor, $pin_lote_codigo, CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-				$ret = SQLexecuteQuery($sql);
+					$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $pin_serial++, $linha, $iPinLocal, $loteValor, $pin_lote_codigo, $fcanal]);
 				if(!$ret) $msg = "Erro ao inserir registro: " . $linha . " ($sql).\n";
 					
 				//Se houve erro, sai do loop
@@ -3080,7 +3080,7 @@ function Escola24h_traduzKValor($k){
 				$linha 	= $cargaAr[$i];
 
 				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='s' ";
-				$rs = SQLexecuteQuery($sql);
+					$rs = SQLexecuteQueryParams("select count(*) as qtde from pins where opr_codigo = $1 and pin_caracter = $2 and pin_canal='s'", [(int)$opr_codigo, $linha]);
 				if(!$rs || pg_num_rows($rs) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
@@ -3137,7 +3137,7 @@ function Escola24h_traduzKValor($k){
 
 				$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_caracter, pin_canal) ";
 				$sql .= "values ($opr_codigo, 1, '" .$pin_serial++ ."', '$iPinCodigo', $iPinLocal, $loteValor, $pin_lote_codigo, CURRENT_DATE, CURRENT_TIME, '$linha', '".$fcanal."')";
-				$ret = SQLexecuteQuery($sql);
+					$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_caracter, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7, $8)", [(int)$opr_codigo, $pin_serial++, $iPinCodigo, $iPinLocal, $loteValor, $pin_lote_codigo, $linha, $fcanal]);
 				if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					
 				//Se houve erro, sai do loop
@@ -3278,7 +3278,7 @@ function MUOnline_traduzKValor($k){
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3457,7 +3457,7 @@ function GPotato_traduzKValor($k){
 					if($msg == ""){
 						$sql = "select count(*) as n from pins where opr_codigo=$opr_codigo and pin_serial='$sPinSerial' and pin_codigo='$sPinCodigo' and pin_valor='$sValorFace' and pin_canal='s' ";
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("select count(*) as n from pins where opr_codigo=$1 and pin_serial=$2 and pin_codigo=$3 and pin_valor=$4 and pin_canal='s'", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $sValorFace]);
 						if(!$ret) 
 							$msg = "Erro ao procurar pin (opr_codigo=$opr_codigo, pin_serial='$sPinSerial', pin_codigo='$sPinCodigo').\n";
 						else {
@@ -3475,7 +3475,7 @@ function GPotato_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3651,7 +3651,7 @@ function FHLGames_traduzKValor($k){
 					if($msg == ""){
 						$sql = "select count(*) as n from pins where opr_codigo=$opr_codigo and pin_serial='$sPinSerial' and pin_codigo='$sPinCodigo' and pin_valor='$sValorFace' and pin_canal='s' ";
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("select count(*) as n from pins where opr_codigo=$1 and pin_serial=$2 and pin_codigo=$3 and pin_valor=$4 and pin_canal='s'", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $sValorFace]);
 						if(!$ret) 
 							$msg = "Erro ao procurar pin (opr_codigo=$opr_codigo, pin_serial='$sPinSerial', pin_codigo='$sPinCodigo').\n";
 						else {
@@ -3669,7 +3669,7 @@ function FHLGames_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3841,7 +3841,7 @@ function YNKinteractive_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4017,7 +4017,7 @@ function PayByCash_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4199,7 +4199,7 @@ function Webzen_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4380,7 +4380,7 @@ function Coolnex_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4571,7 +4571,7 @@ function KOL_traduzKValor($k){
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4760,7 +4760,7 @@ function Acclaim_traduzKValor($k){
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4948,7 +4948,7 @@ function NDoors_traduzKValor($k){
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5136,7 +5136,7 @@ function Ignitedgames_traduzKValor($k){
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5322,7 +5322,7 @@ function Ticket_Surf_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', $sLote, CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5496,7 +5496,7 @@ function GameGol_traduzKValor($k){
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5666,7 +5666,7 @@ function GameIS_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5839,7 +5839,7 @@ function Kaizen_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6016,7 +6016,7 @@ function Onnet_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6190,7 +6190,7 @@ function fun_77PB_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6363,7 +6363,7 @@ function Alawar_traduzKValor($k){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
 						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal]);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6506,7 +6506,7 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
                         } else {
@@ -6629,7 +6629,7 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
                                         //echo $sql."<br>";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                         else $contador_PIN_importados++;
                                 }
@@ -6763,7 +6763,7 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -6919,7 +6919,7 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7071,7 +7071,7 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, '', $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7232,7 +7232,7 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7378,7 +7378,7 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7533,7 +7533,7 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7701,7 +7701,7 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7845,7 +7845,7 @@ function processaLote_SurfTelecom($fileSource, $nomeArq, $opr_codigo, $fcanal){
                         if($msg == ""){
                                 $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                 $sql .= "values ($opr_codigo, 1, '$sSerial', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                $ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)", [(int)$opr_codigo, $sSerial, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                 if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".".PHP_EOL;
                         }
 
@@ -7982,7 +7982,7 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 if($msg == ""){
 										$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -8154,7 +8154,7 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
                                         $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams("insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) values ($1, 1, '', $2, $3, $4, $5, CURRENT_DATE, CURRENT_TIME, $6)", [(int)$opr_codigo, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal]);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 

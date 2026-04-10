@@ -87,8 +87,8 @@ if (!function_exists('isVendaDeposito')) {
 
     $msg = "";
 
-    $sql = "select vg_deposito_em_saldo from tb_dist_venda_games vg where vg.vg_id = " . $venda_id;
-    $rs_venda = SQLexecuteQuery($sql);
+    $sql = "select vg_deposito_em_saldo from tb_dist_venda_games vg where vg.vg_id = $1";
+    $rs_venda = SQLexecuteQueryParams($sql, [(int)$venda_id]);
     if (!$rs_venda || pg_num_rows($rs_venda) == 0)
       $msg = "Nenhuma venda encontrada (em isvendaDeposito($venda_id)).\n";
 
@@ -135,13 +135,17 @@ if (!($isVendaDeposito == 1)) {
 if ($msg == "") {
 
   if (!empty($vgm_id)) {
-    $sql = "update tb_dist_venda_games_modelo set vgm_nome_cpf='" . trim($vgm_nome_cpf) . "',vgm_cpf='" . trim($vgm_cpf[$vgm_id]) . "',vgm_cpf_data_nascimento='" . formata_data(trim($vgm_cpf_data_nascimento[$vgm_id]), 1) . " 00:00:00' where ";
-    if ($todos == 1)
-      $sql .= "vgm_vg_id = " . $venda_id . " ;";
-    else
-      $sql .= "vgm_id = " . $vgm_id . " ;";
+    $sql = "update tb_dist_venda_games_modelo set vgm_nome_cpf=$1, vgm_cpf=$2, vgm_cpf_data_nascimento=$3 where ";
+    $paramsCpf = [trim($vgm_nome_cpf), trim($vgm_cpf[$vgm_id]), formata_data(trim($vgm_cpf_data_nascimento[$vgm_id]), 1) . " 00:00:00"];
+    if ($todos == 1) {
+      $sql .= "vgm_vg_id = $4 ;";
+      $paramsCpf[] = (int)$venda_id;
+    } else {
+      $sql .= "vgm_id = $4 ;";
+      $paramsCpf[] = (int)$vgm_id;
+    }
     //die($sql);
-    $rs_cpf = SQLexecuteQuery($sql);
+    $rs_cpf = SQLexecuteQueryParams($sql, $paramsCpf);
     if (pg_affected_rows($rs_cpf) < 1)
       $msg = "Erro ao atualizar os Dados de CPF!";
     unset($vgm_nome_cpf);
@@ -163,9 +167,9 @@ if ($msg == "") {
     if ($msgConcilia == "") {
 
       // se não tem modelo -> é depósito em conta
-      $sql = "select * from tb_dist_venda_games vg inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id where vg.vg_id = " . $venda_id . " ";
-      $sql = "select * from tb_dist_venda_games vg where vg.vg_id = " . $venda_id . " ";
-      $rs = SQLexecuteQuery($sql);
+      $sql = "select * from tb_dist_venda_games vg inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id where vg.vg_id = $1";
+      $sql = "select * from tb_dist_venda_games vg where vg.vg_id = $1";
+      $rs = SQLexecuteQueryParams($sql, [(int)$venda_id]);
       if (!$rs || pg_num_rows($rs) == 0) {
         echo "Venda '$venda_id' não foi encontrada<br>";
       } else {
@@ -320,8 +324,8 @@ if ($msg == "") {
 //Recupera a venda
 if ($msg == "") {
   $sql = "select * from tb_dist_venda_games vg " .
-    "where vg.vg_id = " . $venda_id;
-  $rs_venda = SQLexecuteQuery($sql);
+    "where vg.vg_id = $1";
+  $rs_venda = SQLexecuteQueryParams($sql, [(int)$venda_id]);
   if (!$rs_venda || pg_num_rows($rs_venda) == 0)
     $msg = "Nenhuma venda encontrada.\n";
   $rs_venda_row = pg_fetch_array($rs_venda);
@@ -352,9 +356,8 @@ if ($bDebug)
 if ($msg == "") {
   $sql = "select * from tb_dist_venda_games vg " .
     "left outer join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .  // inner join
-    "where vg.vg_id = " . $venda_id .
-    " order by vgm_id";
-  $rs_venda_modelos = SQLexecuteQuery($sql);
+    "where vg.vg_id = $1 order by vgm_id";
+  $rs_venda_modelos = SQLexecuteQueryParams($sql, [(int)$venda_id]);
   if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
     $msg = "Nenhum produto encontrado (ABCD).\n";
   else {
@@ -396,11 +399,11 @@ if ($bDebug)
 //Recupera historico da venda
 if ($msg == "") {
   $sql = "select * from tb_dist_venda_games_historico vgh 
-                         where vgh.vgh_vg_id = " . $venda_id . "
+                         where vgh.vgh_vg_id = $1
                          order by vgh_data_inclusao desc";
   if ($bDebug)
     echo "SQL historico: " . $sql . "<br>";
-  $rs_venda_hist = SQLexecuteQuery($sql);
+  $rs_venda_hist = SQLexecuteQueryParams($sql, [(int)$venda_id]);
 }
 if ($bDebug)
   echo "Elapsed time (A3): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "<br>";
@@ -408,8 +411,8 @@ if ($bDebug)
 //Recupera dados do usuario
 if ($msg == "") {
   $sql = "select * from dist_usuarios_games ug " .
-    "where ug.ug_id = " . $vg_ug_id;
-  $rs_usuario = SQLexecuteQuery($sql);
+    "where ug.ug_id = $1";
+  $rs_usuario = SQLexecuteQueryParams($sql, [(int)$vg_ug_id]);
   if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
     $msg = "Nenhum cliente encontrado.\n";
   else {
@@ -438,8 +441,8 @@ if ($msg == "") {
 if ($msg == "") {
   if ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO']) {
     $sql = "select * from dist_boleto_bancario_games bbg " .
-      "where bbg.bbg_vg_id = " . $venda_id;
-    $rs_boleto = SQLexecuteQuery($sql);
+      "where bbg.bbg_vg_id = $1";
+    $rs_boleto = SQLexecuteQueryParams($sql, [(int)$venda_id]);
     if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
       $msg = "Nenhum boleto encontrado.\n";
     else {
@@ -456,8 +459,8 @@ if ($msg == "") {
     }
   } elseif ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['REDECARD_MASTERCARD'] || $vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['REDECARD_DINERS']) {
     $sql = "select * from tb_venda_games_redecard vgrc " .
-      "where vgrc.vgrc_vg_id = " . $venda_id;
-    $rs_redecard = SQLexecuteQuery($sql);
+      "where vgrc.vgrc_vg_id = $1";
+    $rs_redecard = SQLexecuteQueryParams($sql, [(int)$venda_id]);
     if (!$rs_redecard || pg_num_rows($rs_redecard) == 0)
       $msg = "Nenhum redecard encontrado.\n";
     else {
@@ -511,8 +514,8 @@ if ($msg == "") {
       $shn_nome = "Anonymous";
     } else {
       $sql = "select * from usuarios urpp " .
-        "where urpp.id = '" . $vg_user_id_concilia . "'";
-      $rs_urpp = SQLexecuteQuery($sql);
+        "where urpp.id = $1";
+      $rs_urpp = SQLexecuteQueryParams($sql, [$vg_user_id_concilia]);
       if (!$rs_urpp || pg_num_rows($rs_urpp) == 0) {
         $shn_nome = "Anonymous";
       } else {
@@ -712,14 +715,22 @@ ob_end_flush();
                   <td align="center"><b>PIN</b></td>
                 </tr>
                 <?php
-                $sql = "SELECT pin_valor,pin_codinterno,pin_serial,
+                $pinIds = array_values(array_filter(array_map('intval', explode(',', $vgm_pin_codinterno_tmp))));
+                $rs_pins = false;
+                if (!empty($pinIds)) {
+                  $placeholders = [];
+                  foreach ($pinIds as $idx => $pinId) {
+                    $placeholders[] = '$' . ($idx + 1);
+                  }
+                  $sql = "SELECT pin_valor,pin_codinterno,pin_serial,
                           CASE 
                                WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
                                WHEN pin_codigo = '0000000000000000' THEN pin_caracter
                                ELSE pin_codigo
-                          END AS case_serial from pins where pin_codinterno IN ($vgm_pin_codinterno_tmp) order by pin_valor desc;";
-                $rs_pins = SQLexecuteQuery($sql);
-                while ($rs_pins_row = pg_fetch_array($rs_pins)) {
+                          END AS case_serial from pins where pin_codinterno IN (" . implode(', ', $placeholders) . ") order by pin_valor desc;";
+                  $rs_pins = SQLexecuteQueryParams($sql, $pinIds);
+                }
+                if ($rs_pins) while ($rs_pins_row = pg_fetch_array($rs_pins)) {
                 ?>
                   <tr bgcolor="F0F0F0" class="texto">
                     <td align="center">R$ <?php echo number_format($rs_pins_row['pin_valor'], 2, ',', '.'); ?></td>
@@ -1279,8 +1290,8 @@ ob_end_flush();
                   href="/financeiro/pedidos/depositos/altera.php?DepCod=<?php echo $vg_dep_codigo ?>"
                   target="_blank"><?php echo $vg_dep_codigo ?></a></td>
             </tr>
-            <?php $sql = "select * from depositos_pendentes dep where dep_codigo = " . $vg_dep_codigo;
-            $rs_dep = SQLexecuteQuery($sql);
+            <?php $sql = "select * from depositos_pendentes dep where dep_codigo = $1";
+            $rs_dep = SQLexecuteQueryParams($sql, [(int)$vg_dep_codigo]);
             if (!$rs_dep || pg_num_rows($rs_dep) == 0) { ?>
               <tr bgcolor="#F5F5FB">
                 <td><b>Dados do depósito</b></td>
@@ -1309,8 +1320,8 @@ ob_end_flush();
                   href="/financeiro/pedidos/boletos/altera.php?BolCod=<?php echo $vg_bol_codigo ?>"
                   target="_blank"><?php echo $vg_bol_codigo ?></a></td>
             </tr>
-            <?php $sql = "select * from boletos_pendentes bol where bol_codigo = " . $vg_bol_codigo;
-            $rs_bol = SQLexecuteQuery($sql);
+            <?php $sql = "select * from boletos_pendentes bol where bol_codigo = $1";
+            $rs_bol = SQLexecuteQueryParams($sql, [(int)$vg_bol_codigo]);
             if (!$rs_bol || pg_num_rows($rs_bol) == 0) { ?>
               <tr bgcolor="#F5F5FB">
                 <td><b>Dados do boleto</b></td>
@@ -1544,16 +1555,16 @@ function get_pins_vendidos($vg_id)
   $vgm_pin_codinterno = "";
   $msg = "";
 
-  $sql_mod = "select vgm_id from tb_dist_venda_games_modelo where vgm_vg_id = $vg_id;";
+  $sql_mod = "select vgm_id from tb_dist_venda_games_modelo where vgm_vg_id = $1;";
   //echo "$sql_mod<br>";
-  $rs_mod = SQLexecuteQuery($sql_mod);
+  $rs_mod = SQLexecuteQueryParams($sql_mod, [(int)$vg_id]);
   if (!$rs_mod || pg_num_rows($rs_mod) == 0) {
     $msg = "Nenhum modelo encontrado (vg_id = $vg_id).\n";
   } else {
     while ($rs_mod_row = pg_fetch_array($rs_mod)) {;
       $vgm_id = $rs_mod_row['vgm_id'] . "";
-      $sql_pin = "select vgmp_pin_codinterno from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = $vgm_id;";
-      $rs_pin = SQLexecuteQuery($sql_pin);
+      $sql_pin = "select vgmp_pin_codinterno from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = $1;";
+      $rs_pin = SQLexecuteQueryParams($sql_pin, [(int)$vgm_id]);
       if (!$rs_pin || pg_num_rows($rs_pin) == 0) {
         $msg = "Nenhum PIN encontrado.\n";
       } else {

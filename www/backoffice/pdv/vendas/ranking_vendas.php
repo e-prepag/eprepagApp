@@ -107,8 +107,19 @@ if(b_IsBKOUsuarioRankingLAN()) {
 			$sql .= " 
                             where vg.vg_ultimo_status='5' ";
 
-			if($tf_v_data_inclusao_ini && $tf_v_data_inclusao_fim)  $sql .= " and vg.vg_data_inclusao between '".formata_data($tf_v_data_inclusao_ini,1)." 00:00:00' and '".formata_data($tf_v_data_inclusao_fim,1)." 23:59:59' ";
-			if($tf_u_estado)                                        $sql .= " and  trim(both ' ' from ug.ug_estado) = '".strtoupper($tf_u_estado)."' ";
+			$params = [];
+			if($tf_v_data_inclusao_ini && $tf_v_data_inclusao_fim) {
+				$idxDataIni = count($params) + 1;
+				$params[] = formata_data($tf_v_data_inclusao_ini,1)." 00:00:00";
+				$idxDataFim = count($params) + 1;
+				$params[] = formata_data($tf_v_data_inclusao_fim,1)." 23:59:59";
+				$sql .= " and vg.vg_data_inclusao between $" . $idxDataIni . " and $" . $idxDataFim . " ";
+			}
+			if($tf_u_estado) {
+				$idxEstado = count($params) + 1;
+				$params[] = strtoupper($tf_u_estado);
+				$sql .= " and trim(both ' ' from ug.ug_estado) = $" . $idxEstado . " ";
+			}
                         if($tf_u_so_depositos=="1")     			$sql .= " and ( (not (bol_tipo is null)) or (not (pag_tipo is null)  ) ) ";
 			
 			$sql .= " 
@@ -123,7 +134,7 @@ if(b_IsBKOUsuarioRankingLAN()) {
                             order by  vendas DESC, ve_nome;";
 
                         //die($sql);
-			$rs_venda = SQLexecuteQuery($sql);
+			$rs_venda = SQLexecuteQueryParams($sql, $params);
 			$total_table = pg_num_rows($rs_venda);
 
 
