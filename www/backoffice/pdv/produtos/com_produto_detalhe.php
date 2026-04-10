@@ -105,9 +105,8 @@ if($msg == ""){
 
 		//excluir imagem
 		if($acao == "ei"){
-			$sql = "update tb_dist_operadora_games_produto set ogp_nome_imagem = NULL
-					where ogp_id = " . $produto_id;
-			$ret = SQLexecuteQuery($sql);
+                $sql = "update tb_dist_operadora_games_produto set ogp_nome_imagem = NULL where ogp_id = $1";
+                $ret = SQLexecuteQueryParams($sql, array((int) $produto_id));
 			if(!$ret) $msg = "Erro ao atualizar produto.\n";
             else $msgSuc = "Imagem do Produto excluida com sucesso.\n";
 		}

@@ -483,7 +483,19 @@ if (isset($BtnSearch)) {
         $total_table = pg_num_rows($rs_usuario);
 
         //Ordem
-        $sql .= " order by " . $ncamp;
+        $orderMapUsuarios = array(
+            'ug_id' => 'ug_id', 'ug_ativo' => 'ug_ativo', 'ug_status' => 'ug_status', 'ug_login' => 'ug_login', 'ug_nome_fantasia' => 'ug_nome_fantasia',
+            'ug_nome' => 'ug_nome', 'ug_responsavel' => 'ug_responsavel', 'ug_cnpj' => 'ug_cnpj', 'ug_email' => 'ug_email', 'ug_data_inclusao' => 'ug_data_inclusao',
+            'vg_valor' => 'vg_valor', 'vg_qtde_itens' => 'vg_qtde_itens', 'vg_data_ultima_venda' => 'vg_data_ultima_venda', 'ug_vip' => 'ug_vip', 'te_descricao' => 'te_descricao',
+            'ug_perfil_saldo' => 'ug_perfil_saldo', 'ug_coord_lng' => 'ug_coord_lng', 'ug_ficou_sabendo' => 'ug_ficou_sabendo', 'ug_endereco' => 'ug_endereco', 'ug_bairro' => 'ug_bairro',
+            'ug_cidade' => 'ug_cidade', 'ug_estado' => 'ug_estado', 'ug_cep' => 'ug_cep', 'ug_tel_ddd' => 'ug_tel_ddd', 'ug_tel' => 'ug_tel', 'ug_cel' => 'ug_cel',
+            'ug_cpf' => 'ug_cpf', 'ug_rg' => 'ug_rg', 'ug_data_encerramento_conta' => 'ug_data_encerramento_conta'
+        );
+        if (!isset($orderMapUsuarios[$ncamp])) {
+            $ncamp = 'ug_id';
+        }
+
+        $sql .= " order by " . $orderMapUsuarios[$ncamp];
         if ($ordem == 1) {
             $sql .= " desc ";
             $img_seta = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/seta_down.gif";
@@ -492,13 +504,12 @@ if (isset($BtnSearch)) {
             $img_seta = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/seta_up.gif";
         }
 
-        $sql .= " limit " . $max;
-        $sql .= " offset " . $inicial;
+        $sql .= " limit $1 offset $2";
 
         if ($total_table == 0) {
-            $msg = "Nenhum usuário encontrado.\n";
+            $msg = "Nenhum usuï¿½rio encontrado.\n";
         } else {
-            $rs_usuario = SQLexecuteQuery($sql);
+            $rs_usuario = SQLexecuteQueryParams($sql, array((int)$max, (int)$inicial));
 
             if ($max + $inicial > $total_table)
                 $reg_ate = $total_table;
@@ -2109,8 +2120,6 @@ if ($msg != "") {
 
                     <td align="center"><strong><a href="<?php echo $default_add . "?ordem=" . $ordem . "&ncamp=ug_coord_lng&inicial=" . $inicial . $varsel ?>">GMaps</a></strong></td>
                     <td align="center"><strong>VMaps</strong></td>
-                </tr>
-            </thead>
             <tbody>
                 <?php
                 $i = 0;
@@ -2120,8 +2129,8 @@ if ($msg != "") {
 
                 if (!empty($como_conheceu)) {
 
-                    $sql_como_conheceu = "select * from dist_usuarios_games where ug_ficou_sabendo LIKE '%{$como_conheceu}%';";
-                    $resultado_como_conheceu = SQLexecuteQuery($sql_como_conheceu);
+                    $sql_como_conheceu = "select * from dist_usuarios_games where ug_ficou_sabendo LIKE $1";
+                    $resultado_como_conheceu = SQLexecuteQueryParams($sql_como_conheceu, array("%{$como_conheceu}%"));
 
                     while ($rs_usuario_row = pg_fetch_array($resultado_como_conheceu)):
 

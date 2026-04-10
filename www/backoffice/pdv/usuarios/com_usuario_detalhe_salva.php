@@ -470,9 +470,11 @@ $msgAcao = "";
 //    $usuario_id = 468;    //    'REINALDOLH2'
 
 if (!$usuario_id)
-    $msg = "Código do usuário não fornecido.\n";
+    $msg = "Cï¿½digo do usuï¿½rio nï¿½o fornecido.\n";
 elseif (!is_numeric($usuario_id))
-    $msg = "Código do usuário inválido.\n";
+    $msg = "Cï¿½digo do usuï¿½rio invï¿½lido.\n";
+else
+    $usuario_id = (int)$usuario_id;
 
 //echo "op: '$op'<br>";
 
@@ -623,60 +625,62 @@ if ($msg == "") {
 
                 if ($not_empty_nome && $not_empty_cpf && $not_empty_data_nascimento && $not_empty_porcentagem) {
 
-                    //Validação para que não tenha sócios duplicados
+                    //Validaï¿½ï¿½o para que nï¿½o tenha sï¿½cios duplicados
                     $verifica_repetidos = array_unique($array_cpf_socios);
 
                     if (count($array_cpf_socios) != count($verifica_repetidos)) {
-                        $msgAcao = "Erro: Problema com sócios duplicados";
+                        $msgAcao = "Erro: Problema com sï¿½cios duplicados";
 
                     } else {
                         foreach ($array_porcentagem_socios as $valor) {
                             $total_porcentagem += str_replace(",", ".", $valor);
                         }
-                        //Cálculo para aceitar uma diferença máxima na soma das porcentagens, nesse caso com coeficiente igual a 0.1
+                        //Cï¿½lculo para aceitar uma diferenï¿½a mï¿½xima na soma das porcentagens, nesse caso com coeficiente igual a 0.1
                         $diferenca = abs(100 - $total_porcentagem);
 
                         if ($diferenca <= $coeficiente) {
                             if ($msgAcao == "") {
                                 if ($num_registros > 0) {
-                                    $sql_delete = "DELETE FROM dist_usuarios_games_socios WHERE ug_id = " . $usuario_id . " ;";
-                                    $ret_del = SQLexecuteQuery($sql_delete);
+                                    $sql_delete = "DELETE FROM dist_usuarios_games_socios WHERE ug_id = $1";
+                                    $ret_del = SQLexecuteQueryParams($sql_delete, array((int)$usuario_id));
                                     if (!$ret_del) {
-                                        $msgAcao = "Erro 1: ao atualizar/adicionar novos sócios";
+                                        $msgAcao = "Erro 1: ao atualizar/adicionar novos sï¿½cios";
                                     }
                                 }
                             }
 
                             if ($msgAcao == "") {
                                 for ($i = 0; $i < count($array_cpf_socios); $i++) {
-                                    $sql_insert = "INSERT INTO dist_usuarios_games_socios (ug_id, ugs_nome, ugs_cpf, ugs_data_nascimento, ugs_percentagem) VALUES 
-                                        (" . $usuario_id . " , '" . $array_nomes_socios[$i] . "' , '" . str_replace('.', '', str_replace('-', '', $array_cpf_socios[$i])) . "' , '" . formata_data($array_data_nascimento_socios[$i], 1) . " 00:00:00', " . str_replace(",", ".", $array_porcentagem_socios[$i]) . ");";
-                                    $ret_insert = SQLexecuteQuery($sql_insert);
+                                    $cpfSocio = str_replace('.', '', str_replace('-', '', $array_cpf_socios[$i]));
+                                    $dataNascimentoSocio = formata_data($array_data_nascimento_socios[$i], 1) . " 00:00:00";
+                                    $percentualSocio = (float) str_replace(",", ".", $array_porcentagem_socios[$i]);
+                                    $sql_insert = "INSERT INTO dist_usuarios_games_socios (ug_id, ugs_nome, ugs_cpf, ugs_data_nascimento, ugs_percentagem) VALUES ($1, $2, $3, $4, $5)";
+                                    $ret_insert = SQLexecuteQueryParams($sql_insert, array((int)$usuario_id, $array_nomes_socios[$i], $cpfSocio, $dataNascimentoSocio, $percentualSocio));
 
                                     if (!$ret_insert) {
-                                        $msgAcao = "Erro 2: ao atualizar/adicionar novos sócios";
+                                        $msgAcao = "Erro 2: ao atualizar/adicionar novos sï¿½cios";
                                     }
                                 }
                             }
                         } else {
-                            $msgAcao = "Erro: A soma das porcentagens dos Sócios devem totalizar 100%";
+                            $msgAcao = "Erro: A soma das porcentagens dos Sï¿½cios devem totalizar 100%";
                         }
                     }
 
                 } else {
-                    $msgAcao = "Erro: Todos os campos de Sócios devem ser preenchidos corretamente!";
+                    $msgAcao = "Erro: Todos os campos de Sï¿½cios devem ser preenchidos corretamente!";
                 }
             }
 
             //Pre atualizacao
 //                if($msgAcao == ""){
 //                    $objUsuarioGames = UsuarioGames::getUsuarioGamesById($usuario_id);
-//                    if($objUsuarioGames == null) $msgAcao = "Usuário não encontrado.\n";
+//                    if($objUsuarioGames == null) $msgAcao = "Usuï¿½rio nï¿½o encontrado.\n";
 //                }
             if ($msgAcao == "") {
                 if ($novo_ug_ativo == "1") {
                     if (!$cad_usuarioGames->getPerfilFormaPagto() || trim($cad_usuarioGames->getPerfilFormaPagto()) == "") {
-                        $msgAcao = "Não é possivel ativar este usuário, Forma de Pagamento ainda não definida.\n";
+                        $msgAcao = "Nï¿½o ï¿½ possivel ativar este usuï¿½rio, Forma de Pagamento ainda nï¿½o definida.\n";
                     }
                 }
             }
@@ -688,7 +692,7 @@ if ($msg == "") {
                 $is_ativo = $cad_usuarioGames->getAtivo();
                 $nome_fantasia = $cad_usuarioGames->getNomeFantasia();
                 $email = $cad_usuarioGames->getEmail();
-                // Está ativo
+                // Estï¿½ ativo
                 if ($is_ativo == 1) {
                     $chave_mestra = new ChaveMestra();
                     $my_chave = $chave_mestra->inserirChaveMestra($usuario_id);
@@ -735,10 +739,11 @@ if ($msg == "") {
 
 if ($msg == "") {
     if ($acao && $acao == 'exclui_socio') {
-        $sql = "DELETE FROM dist_usuarios_games_socios WHERE ug_id = " . $usuario_id . " AND ugs_cpf ='" . str_replace('.', '', str_replace('-', '', $novo_ug_cpf_socios)) . "';";
-        $ret = SQLexecuteQuery($sql);
+        $cpfSocioExclusao = str_replace('.', '', str_replace('-', '', $novo_ug_cpf_socios));
+        $sql = "DELETE FROM dist_usuarios_games_socios WHERE ug_id = $1 AND ugs_cpf = $2";
+        $ret = SQLexecuteQueryParams($sql, array((int)$usuario_id, $cpfSocioExclusao));
         if (!$ret)
-            $msgAcao = "Erro ao excluir sócio.\n";
+            $msgAcao = "Erro ao excluir sï¿½cio.\n";
     }
 }
 
@@ -749,14 +754,14 @@ if ($msg == "") {
     $objUsuarioGames = $instUsuarioGames->getUsuarioGamesById($usuario_id);
 
     if ($objUsuarioGames == null)
-        $msg = "Nenhum usuário encontrado.\n";
+        $msg = "Nenhum usuï¿½rio encontrado.\n";
     else {
 
         //RA
         if (is_null($objUsuarioGames->getRACodigo()) || trim($objUsuarioGames->getRACodigo()) == "") {
             $cad_RA = $objUsuarioGames->getRAOutros();
         } else {
-            $resatv = SQLexecuteQuery("select ra_codigo, ra_desc from ramo_atividade where ra_codigo = '" . $objUsuarioGames->getRACodigo() . "'");
+            $resatv = SQLexecuteQueryParams("select ra_codigo, ra_desc from ramo_atividade where ra_codigo = $1", array($objUsuarioGames->getRACodigo()));
             if ($resatv)
                 $pgatv = pg_fetch_array($resatv);
             $cad_RA = $pgatv['ra_desc'];
@@ -1302,14 +1307,9 @@ if (!$usuario_id || !is_numeric($usuario_id)) {
                                     value="<?php echo $objUsuarioGames->getReprLegalMSN() ?>" maxlength="100" size="50"
                                     class="texto"></td>
                         </tr>
-
-                        <tr bgcolor="#FFFFFF" class="texto">
-                            <td colspan="4" bgcolor="#ECE9D8">Sócios</font>
-                            </td>
-                        </tr>
                         <?php
-                        $sql_socios = "SELECT * FROM dist_usuarios_games_socios WHERE ug_id = " . $objUsuarioGames->getId() . " order by ugs_percentagem DESC;";
-                        $res_socios = SQLexecuteQuery($sql_socios);
+                        $sql_socios = "SELECT * FROM dist_usuarios_games_socios WHERE ug_id = $1 order by ugs_percentagem DESC";
+                        $res_socios = SQLexecuteQueryParams($sql_socios, array((int)$objUsuarioGames->getId()));
 
                         $i_socios = 0;
                         if ($res_socios && pg_num_rows($res_socios) > 0) {

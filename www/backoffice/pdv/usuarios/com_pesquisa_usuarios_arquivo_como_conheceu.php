@@ -12,8 +12,8 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 $resposta_como_conheceu = $_POST['resposta_como_conheceu'];
 
 
-$sql_como_conheceu = "select * from dist_usuarios_games where ug_ficou_sabendo LIKE '%{$resposta_como_conheceu}%';";
-$resultado_como_conheceu = SQLexecuteQuery($sql_como_conheceu);
+$sql_como_conheceu = "select * from dist_usuarios_games where ug_ficou_sabendo LIKE $1";
+$resultado_como_conheceu = SQLexecuteQueryParams($sql_como_conheceu, array("%" . $resposta_como_conheceu . "%"));
 
 
 $mensagem = "";

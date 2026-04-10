@@ -52,19 +52,20 @@ if ($BtnSearch) {
 	}
 
 	//atualiza desconto
-	if ($des_id) {
-		$sql  = "update tb_dist_descontos
-					 set des_perc_desconto = $novo_perc_desconto_aux
-					 where des_id = $des_id";
-		$ret = pg_exec($connid, $sql);
-		if (!$ret) $msg = "Erro ao atualizar desconto.\n";
+        if ($des_id) {
+            $sql  = "update tb_dist_descontos
+                         set des_perc_desconto = $1
+                         where des_id = $2";
+            $ret = SQLexecuteQueryParams($sql, array((float) $novo_perc_desconto_aux, (int) $des_id));
+            if (!$ret) $msg = "Erro ao atualizar desconto.\n";
 
-		//Insere desconto para a operadora		
-	} elseif ($msg == "") {
-		$sql  = "insert into tb_dist_descontos (des_opr_codigo, des_vg_pagto_tipo, des_ug_id, des_perc_desconto)
-				 	 values($des_opr_codigo, $des_vg_pagto_tipo, $usuario_id, $novo_perc_desconto_aux)";
-		$ret = pg_exec($connid, $sql);
-		if (!$ret) $msg = "Erro ao inserir desconto.\n";
+            //Insere desconto para a operadora
+        } elseif ($msg == "") {
+            $sql  = "insert into tb_dist_descontos (des_opr_codigo, des_vg_pagto_tipo, des_ug_id, des_perc_desconto)
+                         values($1, $2, $3, $4)";
+            $ret = SQLexecuteQueryParams($sql, array((int) $des_opr_codigo, (int) $des_vg_pagto_tipo, (int) $usuario_id, (float) $novo_perc_desconto_aux));
+            if (!$ret) $msg = "Erro ao inserir desconto.\n";
+        }
 	}
 
 ?>

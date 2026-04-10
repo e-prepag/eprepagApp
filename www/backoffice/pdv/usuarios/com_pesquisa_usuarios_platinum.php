@@ -26,6 +26,26 @@ $usuarioGames = new UsuarioGames(468);
 $totalPages = 0;
 $currentPage = 1;
 
+$orderMap = array(
+    'ug_id' => 'ug.ug_id',
+    'ug_login' => 'ug.ug_login',
+    'ug_email' => 'ug.ug_email',
+    'vg_valor' => 'v.vg_valor',
+    'vg_qtde_itens' => 'v.vg_qtde_itens',
+    'vg_data_primeira_venda' => 'v.vg_data_primeira_venda',
+    'vg_data_ultima_venda' => 'v.vg_data_ultima_venda',
+    'ndays' => 'ndays',
+    'ndays_per_venda' => 'ndays_per_venda',
+    'vg_valor_inc' => 'v.vg_valor_inc',
+    'vg_qtde_itens_inc' => 'v.vg_qtde_itens_inc',
+    'vg_data_primeira_venda_inc' => 'v.vg_data_primeira_venda_inc',
+    'vg_data_ultima_venda_inc' => 'v.vg_data_ultima_venda_inc'
+);
+if (!isset($orderMap[$ncamp])) {
+    $ncamp = 'vg_valor';
+}
+$orderBy = $orderMap[$ncamp];
+
 $sql  = "SELECT ug.ug_id, ug.ug_login, ug.ug_email, v.vg_valor, v.vg_qtde_itens, v.vg_data_primeira_venda, v.vg_data_ultima_venda, " . PHP_EOL;
 $sql .= "   (EXTRACT(epoch FROM (v.vg_data_ultima_venda - v.vg_data_primeira_venda))/(24*3600)) AS ndays, " . PHP_EOL;
 $sql .= "   (COALESCE((EXTRACT(epoch FROM (v.vg_data_ultima_venda - v.vg_data_primeira_venda))/(24*3600)), 1) / NULLIF(v.vg_qtde_itens, 0)) AS ndays_per_venda, " . PHP_EOL;
@@ -48,30 +68,29 @@ $sql .= "       AND vg.vg_ug_id IN (SELECT ug_id FROM dist_usuarios_games WHERE 
 $sql .= "   GROUP BY vg.vg_ug_id " . PHP_EOL;
 $sql .= ") v ON v.vg_ug_id = ug.ug_id " . PHP_EOL;
 $sql .= "WHERE ug.ug_vip = 5 " . PHP_EOL;
+$sql .= " order by " . $orderBy . (($ordem == 1) ? " desc " : " asc ");
 
-if ($ordem == 1) {
-    $sql .= " order by " . $ncamp . " desc; ";
-} else {
-    $sql .= " order by " . $ncamp . " asc; ";
-}
+$params = array();
+$limitIdx = count($params) + 1;
+$params[] = (int)$max;
+$offsetIdx = count($params) + 1;
+$params[] = (int)$inicial;
+$sql_limit = $sql . " limit $" . $limitIdx . " offset $" . $offsetIdx;
 
-$sql_limit = str_replace(";", "", $sql);
-$sql_limit .= " limit " . $max . " offset " . $inicial . ";";
-
-$sql_count = "SELECT count(ug_id) as total FROM dist_usuarios_games WHERE ug_vip = 5;";
-$rs_count = SQLexecuteQuery($sql_count);
+$sql_count = "SELECT count(ug_id) as total FROM dist_usuarios_games WHERE ug_vip = 5";
+$rs_count = SQLexecuteQueryParams($sql_count, array());
 $row_count = pg_fetch_array($rs_count);
 $total_table = $row_count['total'];
 
-// Cálculos para paginação
+// Cï¿½lculos para paginaï¿½ï¿½o
 $totalPages = ceil($total_table / $max);
 $currentPage = floor($inicial / $max) + 1;
 
 // Forma mais limpa de calcular o "Exibindo resultados X a Y"
 $reg_ate = min($max + $inicial, $total_table);
 
-// Executa a query COM os limites da página atual
-$rs = SQLexecuteQuery($sql_limit);
+// Executa a query COM os limites da pï¿½gina atual
+$rs = SQLexecuteQueryParams($sql_limit, $params);
 
 ob_end_flush();
 ?>

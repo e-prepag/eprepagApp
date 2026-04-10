@@ -30,36 +30,19 @@ if($acao == 'inserir')
 			$promolh_banner = $_FILES["promolh_banner"]["name"];
 		}
                 if(empty($msg)) {
-                        $sql = "INSERT INTO promocoes_lanhouses (
-                                                                        promolh_descricao,
-                                                                        promolh_data_inicio,
-                                                                        promolh_data_fim,
-                                                                        promolh_titulo_tabela,
-                                                                        opr_codigo,
-                                                                        promolh_banner,
-																		promolh_link_download,
-                                                                        promolh_regulamento";
+                        $titulo_tabela = str_replace("'", '"', $promolh_titulo_tabela);
+                        $columns = "promolh_descricao, promolh_data_inicio, promolh_data_fim, promolh_titulo_tabela, opr_codigo, promolh_banner, promolh_link_download, promolh_regulamento";
+                        $params = array($promolh_descricao, $promolh_data_inicio, $promolh_data_fim, $titulo_tabela, (int)$opr_codigo, $promolh_banner, $promolh_link_download, $promolh_regulamento);
+                        $values = "$1, to_date($2,'DD/MM/YYYY'), to_date($3,'DD/MM/YYYY'), $4, $5, $6, $7, $8";
+
                         if(!empty($ogp_id)){
-                                $sql .= ",
-                                                                        ogp_id";
+                                $columns .= ", ogp_id";
+                                $values .= ", $" . (count($params) + 1);
+                                $params[] = (int)$ogp_id;
                         }
-                        $sql .= "				) 
-                                                        VALUES (
-                                                                        '$promolh_descricao', 
-                                                                        to_date('$promolh_data_inicio','DD/MM/YYYY'), 
-                                                                        to_date('$promolh_data_fim','DD/MM/YYYY'), 
-                                                                        '".str_replace("'",'"',$promolh_titulo_tabela)."', 
-                                                                        $opr_codigo,
-                                                                        '$promolh_banner',
-                                                                        '$promolh_link_download',
-                                                                        '$promolh_regulamento'";
-                        if(!empty($ogp_id)){
-                                $sql .= ", 
-                                                                        $ogp_id";
-                        }
-                        $sql .= ");";
-                        //echo $sql."<br>";
-                        $rs_promocoes = SQLexecuteQuery($sql);
+
+                        $sql = "INSERT INTO promocoes_lanhouses (" . $columns . ") VALUES (" . $values . ")";
+                        $rs_promocoes = SQLexecuteQueryParams($sql, $params);
                         if(!$rs_promocoes) {
                                 $msg .= "Erro ao salvar informa&ccedil;&otilde;es da Promo&ccedil;&atilde;o de LANHouses. ($sql)<br>";
                         }
@@ -88,33 +71,49 @@ if($acao == 'atualizar')
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
 		}
 	}
-    $sql = "UPDATE promocoes_lanhouses SET
-						promolh_descricao		= '".$promolh_descricao."',
-						opr_codigo				= $opr_codigo,
-						promolh_data_inicio		= to_date('".$promolh_data_inicio."','DD/MM/YYYY'),           
-						promolh_data_fim		= to_date('".$promolh_data_fim."','DD/MM/YYYY'),
-						promolh_titulo_tabela	= '".str_replace("'",'"',$promolh_titulo_tabela)."',
-						promolh_link_download	= '".$promolh_link_download."',";
-	if (!empty($promolh_banner)) {
-		$sql .= "		promolh_banner          = '".$promolh_banner."',";
-	}
-	$sql .= "           promolh_regulamento     = '".$promolh_regulamento."'";
-	if(!empty($ogp_id)){
-		$sql .= ",
-							ogp_id		= ".$ogp_id."";
-	}
-	if(!empty($ug_id)){
-		$sql .= ",
-							ug_id		= ".$ug_id."";
-	}
-	$sql .= "	WHERE promolh_id = $promolh_id";
-	//echo $sql;
-	$rs_promocoes = SQLexecuteQuery($sql);
-	if(!$rs_promocoes) {
-		$msg .= "Erro ao atualizar informa&ccedil;&otilde;es da Promo&ccedil;&atilde;o de LANHouses. ($sql)<br>";
-	}
-	$promolh_descricao = "";
-	$acao = 'listar';
+    $titulo_tabela = str_replace("'", '"', $promolh_titulo_tabela);
+    $params = array(
+        $promolh_descricao,
+        (int)$opr_codigo,
+        $promolh_data_inicio,
+        $promolh_data_fim,
+        $titulo_tabela,
+        $promolh_link_download,
+        $promolh_regulamento
+    );
+
+    $setSql = "promolh_descricao = $1, " .
+              "opr_codigo = $2, " .
+              "promolh_data_inicio = to_date($3,'DD/MM/YYYY'), " .
+              "promolh_data_fim = to_date($4,'DD/MM/YYYY'), " .
+              "promolh_titulo_tabela = $5, " .
+              "promolh_link_download = $6, " .
+              "promolh_regulamento = $7";
+
+    if (!empty($promolh_banner)) {
+        $setSql .= ", promolh_banner = $" . (count($params) + 1);
+        $params[] = $promolh_banner;
+    }
+
+    if(!empty($ogp_id)){
+        $setSql .= ", ogp_id = $" . (count($params) + 1);
+        $params[] = (int)$ogp_id;
+    }
+
+    if(!empty($ug_id)){
+        $setSql .= ", ug_id = $" . (count($params) + 1);
+        $params[] = (int)$ug_id;
+    }
+
+    $whereIdx = count($params) + 1;
+    $params[] = (int)$promolh_id;
+    $sql = "UPDATE promocoes_lanhouses SET " . $setSql . " WHERE promolh_id = $" . $whereIdx;
+    $rs_promocoes = SQLexecuteQueryParams($sql, $params);
+    if(!$rs_promocoes) {
+        $msg .= "Erro ao atualizar informa&ccedil;&otilde;es da Promo&ccedil;&atilde;o de LANHouses. ($sql)<br>";
+    }
+    $promolh_descricao = "";
+    $acao = 'listar';
 }
 
 if($acao == 'editar')
@@ -131,8 +130,8 @@ if($acao == 'editar')
 					ogp_id,
 					ug_id
 			FROM promocoes_lanhouses 
-			WHERE promolh_id = $promolh_id"; 
-	$rs_promocoes = SQLexecuteQuery($sql);
+			WHERE promolh_id = $1"; 
+	$rs_promocoes = SQLexecuteQueryParams($sql, array((int)$promolh_id));
 	if(!($rs_promocoes_row = pg_fetch_array($rs_promocoes))) {
 		$msg .= "Erro ao consultar informa&ccedil;&otilde;es da Promo&ccedil;&atilde;o de LANHouses. ($sql)<br>";
 	}

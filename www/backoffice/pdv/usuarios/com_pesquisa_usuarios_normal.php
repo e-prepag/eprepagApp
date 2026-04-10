@@ -16,9 +16,11 @@ $BtnSearch = $_REQUEST['BtnSearch'] ?? null;
 
 // Filtros de pesquisa
 $ug_id    = isset($_REQUEST['ug_id']) ? trim($_REQUEST['ug_id']) : '';
-$ug_id_int = ($ug_id !== '' ? (int)$ug_id : null);
+$ug_id_int = null;
+if ($ug_id !== '' && ctype_digit($ug_id)) {
+    $ug_id_int = (int)$ug_id;
+}
 $ug_cnpj  = isset($_REQUEST['ug_cnpj']) ? trim($_REQUEST['ug_cnpj']) : '';
-$ug_cnpj_sql = ($ug_cnpj !== '' ? pg_escape_string($ug_cnpj) : '');
 
 $default_add  = nome_arquivo($PHP_SELF);
 $img_proxima  = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/proxima.gif";
@@ -30,7 +32,34 @@ $range_qtde   = isset($qtde_range_tela) ? $qtde_range_tela : 10;
 $usuarioGames = new UsuarioGames(468);
 
 $totalPages = 0;
-$currentPage = 1;
+$orderMap = array(
+    'ug_id' => 'ug.ug_id',
+    'ug_login' => 'ug.ug_login',
+    'ug_email' => 'ug.ug_email',
+    'vg_valor' => 'v.vg_valor',
+    'vg_qtde_itens' => 'v.vg_qtde_itens',
+    'vg_data_ultima_venda' => 'v.vg_data_ultima_venda',
+    'vg_valor_inc' => 'v.vg_valor_inc',
+    'vg_qtde_itens_inc' => 'v.vg_qtde_itens_inc',
+    'vg_data_ultima_venda_inc' => 'v.vg_data_ultima_venda_inc'
+);
+if (!isset($orderMap[$ncamp])) {
+    $ncamp = 'vg_valor';
+}
+$orderBy = $orderMap[$ncamp];
+
+$where = "WHERE ug.ug_vip = 0 ";
+$params = array();
+
+if ($ug_id_int !== null) {
+    $where .= " AND ug.ug_id = $" . (count($params) + 1) . " ";
+    $params[] = (int)$ug_id_int;
+}
+
+if ($ug_cnpj !== '') {
+    $where .= " AND ug.ug_cnpj = $" . (count($params) + 1) . " ";
+    $params[] = $ug_cnpj;
+}
 
 $sql  = "SELECT ug.ug_id, ug.ug_login, ug.ug_email, v.vg_valor, v.vg_qtde_itens, v.vg_data_ultima_venda, " . PHP_EOL;
 $sql .= "   v.vg_valor_inc, v.vg_qtde_itens_inc, v.vg_data_ultima_venda_inc " . PHP_EOL;
@@ -48,49 +77,29 @@ $sql .= "   INNER JOIN tb_dist_venda_games_modelo vgm ON vg.vg_id = vgm.vgm_vg_i
 $sql .= "   WHERE vg.vg_ultimo_status IN (5, 6) " . PHP_EOL;
 $sql .= "   GROUP BY vg.vg_ug_id " . PHP_EOL;
 $sql .= ") v ON v.vg_ug_id = ug.ug_id " . PHP_EOL;
-$sql .= "WHERE ug.ug_vip = 0 " . PHP_EOL;
+$sql .= $where . PHP_EOL;
+$sql .= " order by " . $orderBy . (($ordem == 1) ? " desc " : " asc ");
 
-if ($ug_id_int !== null) {
-    $sql .= "   AND ug.ug_id = " . $ug_id_int . " " . PHP_EOL;
-}
+$params_limit = $params;
+$limitIdx = count($params_limit) + 1;
+$params_limit[] = (int)$max;
+$offsetIdx = count($params_limit) + 1;
+$params_limit[] = (int)$inicial;
+$sql_limit = $sql . " limit $" . $limitIdx . " offset $" . $offsetIdx;
 
-if ($ug_cnpj_sql !== '') {
-    $sql .= "   AND ug.ug_cnpj = '" . $ug_cnpj_sql . "' " . PHP_EOL;
-}
-
-if ($ordem == 1) {
-	$sql .= " order by " . $ncamp . " desc; ";
-} else {
-	$sql .= " order by " . $ncamp . " asc; ";
-}
-
-$sql_limit = str_replace(";", "", $sql);
-$sql_limit .= " limit " . $max . " offset " . $inicial . ";";
-
-$sql_count = "SELECT count(ug_id) as total FROM dist_usuarios_games WHERE ug_vip = 0 ";
-
-if ($ug_id_int !== null) {
-    $sql_count .= "AND ug_id = " . $ug_id_int . " ";
-}
-
-if ($ug_cnpj_sql !== '') {
-    $sql_count .= "AND ug_cnpj = '" . $ug_cnpj_sql . "' ";
-}
-
-$sql_count .= ";";
-$rs_count = SQLexecuteQuery($sql_count);
+$sql_count = "SELECT count(ug.ug_id) as total FROM dist_usuarios_games ug " . $where;
+$rs_count = SQLexecuteQueryParams($sql_count, $params);
 $row_count = pg_fetch_array($rs_count);
 $total_table = $row_count['total'];
 
-// Cálculos para paginação
+// Cï¿½lculos para paginaï¿½ï¿½o
 $totalPages = ceil($total_table / $max);
 $currentPage = floor($inicial / $max) + 1;
 
 // Forma mais limpa de calcular o "Exibindo resultados X a Y"
 $reg_ate = min($max + $inicial, $total_table);
 
-// Executa a query COM os limites da página atual
-$rs = SQLexecuteQuery($sql_limit);
+$rs = SQLexecuteQueryParams($sql_limit, $params_limit);
 
 ob_end_flush();
 ?>

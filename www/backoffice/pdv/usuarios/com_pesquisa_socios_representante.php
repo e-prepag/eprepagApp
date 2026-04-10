@@ -26,36 +26,49 @@ $registros_total = 0;
 
 if(isset($_POST["btn_pesquisar"])){
     $where = " WHERE 1=1";
+    $params = array();
 
     if(!empty($data_inclusao_inicio)){
-        $where .= " AND ug.ug_data_inclusao >= '" . $data_inclusao_inicio . "'";
+        $where .= " AND ug.ug_data_inclusao >= $" . (count($params) + 1);
+        $params[] = $data_inclusao_inicio;
     }
 
     if(!empty($data_inclusao_fim)){
-        $where .= " AND ug.ug_data_inclusao <= '" . $data_inclusao_fim . "'";
+        $where .= " AND ug.ug_data_inclusao <= $" . (count($params) + 1);
+        $params[] = $data_inclusao_fim;
     }
 
     if(!empty($substatus)){
-        $where .= " AND ug.ug_substatus = " . $substatus;
+        $where .= " AND ug.ug_substatus = $" . (count($params) + 1);
+        $params[] = (int) $substatus;
     }
 
     if(!empty($status)){
-        $where .= " AND ug.ug_status = " . $status;
+        $where .= " AND ug.ug_status = $" . (count($params) + 1);
+        $params[] = (int) $status;
     }
 
     if(!empty($cpf)){
-        $where .= " AND (ug.ug_repr_legal_cpf = '" . $cpf . "' OR ugs.ugs_cpf = '" . $cpf . "')";
+        $cpfIdx1 = count($params) + 1;
+        $params[] = $cpf;
+        $cpfIdx2 = count($params) + 1;
+        $params[] = $cpf;
+        $where .= " AND (ug.ug_repr_legal_cpf = $" . $cpfIdx1 . " OR ugs.ugs_cpf = $" . $cpfIdx2 . ")";
     }
 
     $sql = "SELECT count(*) as total FROM dist_usuarios_games ug LEFT JOIN dist_usuarios_games_socios ugs ON ug.ug_id = ugs.ug_id " . $where;
-    $rs_total = SQLexecuteQuery($sql);
+    $rs_total = SQLexecuteQueryParams($sql, $params);
     $row = pg_fetch_assoc($rs_total);
     if($row) $registros_total = $row["total"];
 
     $sql = "SELECT ug.ug_id as id_pdv,ug.ug_cnpj, ug.ug_repr_legal_nome as nome_repr, ug_repr_legal_cpf as cpf_repr, ugs.ugs_nome as nome_socio, ugs.ugs_cpf as cpf_socio FROM dist_usuarios_games ug LEFT JOIN dist_usuarios_games_socios ugs ON ug.ug_id = ugs.ug_id " . $where;
-    $sql .= " ORDER BY ug.ug_id DESC";	
-    $sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
-    $rs_pdvs = SQLexecuteQuery($sql);
+    $paramsLista = $params;
+    $offsetIdx = count($paramsLista) + 1;
+    $paramsLista[] = max(0, ((int)$p - 1) * (int)$registros);
+    $limitIdx = count($paramsLista) + 1;
+    $paramsLista[] = (int)$registros;
+    $sql .= " ORDER BY ug.ug_id DESC offset $" . $offsetIdx . " limit $" . $limitIdx;
+    $rs_pdvs = SQLexecuteQueryParams($sql, $paramsLista);
 }
 ?>
 
