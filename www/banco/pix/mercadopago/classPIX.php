@@ -169,8 +169,9 @@ class classPIX
                 fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
                 fclose($ff);
 
-                $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = '" . substr($params['idpedido'], 2, 17) . "'; "; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
-                $rs_teste_existencia = SQLexecuteQuery($sql);
+                $numCompra = substr($params['idpedido'], 2, 17);
+                $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;"; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
+                $rs_teste_existencia = SQLexecuteQueryParams($sql, array($numCompra));
                 if (pg_num_rows($rs_teste_existencia) == 0) {
                     $sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
@@ -178,11 +179,11 @@ class classPIX
                                                 nome_pagador, 
                                                 json_resposta)
                                     VALUES (
-                                            '" . substr($params['idpedido'], 2, 17) . "', 
-                                            '" . $cpf . "',
-                                            '" . $name . "',
-                                            '" . json_encode($data) . "');";
-                    $rs = SQLexecuteQuery($sql);
+                                            $1, 
+                                            $2,
+                                            $3,
+                                            $4);";
+                    $rs = SQLexecuteQueryParams($sql, array($numCompra, $cpf, $name, json_encode($data)));
                     if ($rs)
                         $this->logEvents("Sucesso no INSERT: " . PHP_EOL . $sql . PHP_EOL);
                     else
@@ -259,8 +260,9 @@ class classPIX
                 fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
                 fclose($ff);
 
-                $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = '" . substr($numPedido, 2, 17) . "'; "; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
-                $rs_teste_existencia = SQLexecuteQuery($sql);
+                $numCompra = substr($numPedido, 2, 17);
+                $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;"; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
+                $rs_teste_existencia = SQLexecuteQueryParams($sql, array($numCompra));
                 if (pg_num_rows($rs_teste_existencia) == 0) {
                     $sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
@@ -268,11 +270,11 @@ class classPIX
                                                 nome_pagador, 
                                                 json_resposta)
                                     VALUES (
-                                            '" . substr($numPedido, 2, 17) . "', 
-                                            '" . $cpf . "',
-                                            '" . $name . "',
-                                            '" . json_encode($data) . "');";
-                    $rs = SQLexecuteQuery($sql);
+                                            $1, 
+                                            $2,
+                                            $3,
+                                            $4);";
+                    $rs = SQLexecuteQueryParams($sql, array($numCompra, $cpf, $name, json_encode($data)));
                     if ($rs)
                         $this->logEvents("Sucesso no INSERT: " . PHP_EOL . $sql . PHP_EOL);
                     else
