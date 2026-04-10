@@ -25,6 +25,55 @@ class ExtratoController extends HeaderController{
             $this->accessDenied();
         }
     }
+
+    private function addSqlParam(&$params, $value){
+        $params[] = $value;
+        return '$' . count($params);
+    }
+
+    private function addSqlCodigoFilter(&$sql, &$params, $column, $codigo){
+        if($codigo !== null){
+            $phCodigo = $this->addSqlParam($params, (int) $codigo);
+            $sql .= " and {$column} = {$phCodigo}";
+        }
+    }
+
+    private function addSqlDateRangeFilter(&$sql, &$params, $column, $dataIni, $dataFim){
+        if($dataIni !== null && $dataFim !== null){
+            $phDataIni = $this->addSqlParam($params, $dataIni);
+            $phDataFim = $this->addSqlParam($params, $dataFim);
+            $sql .= " and {$column} >= {$phDataIni} and {$column} <= {$phDataFim}";
+        }
+    }
+
+    private function getExtratoFiltros(){
+        $tf_v_codigo = null;
+        if (isset($_POST['tf_v_codigo']) && ctype_digit((string)$_POST['tf_v_codigo'])) {
+            $tf_v_codigo = (int) $_POST['tf_v_codigo'];
+        }
+
+        $data_inclusao_ini = null;
+        $data_inclusao_fim = null;
+        if (
+            !empty($_POST['tf_v_data_inclusao_ini']) &&
+            !empty($_POST['tf_v_data_inclusao_fim']) &&
+            verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 &&
+            verifica_data($_POST['tf_v_data_inclusao_fim']) != 0
+        ) {
+            $data_inclusao_ini = formata_data($_POST['tf_v_data_inclusao_ini'], 1) . " 00:00:00";
+            $data_inclusao_fim = formata_data($_POST['tf_v_data_inclusao_fim'], 1) . " 23:59:59";
+        }
+
+        $ugo_login = "";
+        if (!empty($_POST['ugo_login'])) {
+            $ugo_login_tmp = strtoupper(trim($_POST['ugo_login']));
+            if (preg_match('/^[A-Z0-9_.@-]{1,100}$/', $ugo_login_tmp)) {
+                $ugo_login = $ugo_login_tmp;
+            }
+        }
+
+        return array($tf_v_codigo, $data_inclusao_ini, $data_inclusao_fim, $ugo_login);
+    }
     
     public function init($registros = 20, $p = 0){
         //paginacao
@@ -54,17 +103,15 @@ class ExtratoController extends HeaderController{
             $data_limit = strtotime($data_limit);
 	}	
 
-        ////////////////////////////////////////////////////////////////////////////////////////
-	$msg = "";	
-
-	//Recupera as vendas
-	if($msg == "" && $sql){
-		$rs_vendas = SQLexecuteQuery($sql);
-	
-		if(!$rs_vendas || pg_num_rows($rs_vendas) == 0) $msg = "Nenhuma venda encontrada.\n";
-	}
+	        ////////////////////////////////////////////////////////////////////////////////////////
+	$msg = "";
+        list($tf_v_codigo, $data_inclusao_ini, $data_inclusao_fim, $ugo_login) = $this->getExtratoFiltros();
 
         ////// QUERY GERAL  //////////////////////////////////////////////////////////////////////////////////////
+        $sql_params = array();
+        $phUsuarioId = $this->addSqlParam($sql_params, (int) $usuarioId);
+        $phStatusVenda = $this->addSqlParam($sql_params, (string) $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']);
+
 	$sql = "select num_doc, pedido_parceiro, tipo_pagto, data, valor, sum(valor - repasse) as comissao, repasse, tipo, operador,resultado from (
                 (select (vg.vg_id::text) as num_doc,
 				 vpdv.id_pedido_parceiro as pedido_parceiro,
@@ -75,40 +122,39 @@ class ExtratoController extends HeaderController{
                  count(*) as qtde_produtos,
                  sum(vgm.vgm_valor * vgm.vgm_qtde - vgm.vgm_valor * vgm.vgm_qtde * vgm_perc_desconto / 100) as repasse ,
                  'Venda'::text as tipo,";
-         if(!empty($_POST['ugo_login'])){
+        if(!empty($ugo_login)){
             $sql .= " ugo_login as operador,";
-         }
-         else {
+        } else {
             $sql .= " '' as operador,";
-         }
-         $sql .= "
+        }
+        $sql .= "
                  NULL::smallint as resultado
 
                 from tb_dist_venda_games vg 
                         inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
 						 left join pedidos_api_pdv vpdv on vg.vg_id = vpdv.id_pedido_eprepag ";
-         if(!empty($_POST['ugo_login'])){
+        if(!empty($ugo_login)){
             $sql .= "
                         inner join dist_usuarios_games_operador_log ugol on ugol.ugol_vg_id = vg.vg_id
                         inner join dist_usuarios_games_operador ugo on ugol.ugol_ugo_id = ugo.ugo_id ";
-         }
-         $sql .=" 
-                where vg.vg_ug_id= ".$usuarioId." and vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' ";
-        if($_POST['tf_v_codigo'] && is_numeric($_POST['tf_v_codigo'])) $sql .= " and vg.vg_id=" . $_POST['tf_v_codigo'];
-	if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) 
-        {
-            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) 
-            {
-                $sql .=  " and vg.vg_data_inclusao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and vg.vg_data_inclusao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-	}
-        if(!empty($_POST['ugo_login'])){
-            $sql .= " and ugo.ugo_login = '".  strtoupper($_POST['ugo_login'])."' ";
         }
-        $sql.= " group by num_doc , pedido_parceiro, data , tipo_pagto , vg.vg_ultimo_status, vg.vg_usuario_obs , operador
+        $sql .= " 
+                where vg.vg_ug_id= {$phUsuarioId} and vg.vg_ultimo_status={$phStatusVenda} ";
+        $this->addSqlCodigoFilter($sql, $sql_params, "vg.vg_id", $tf_v_codigo);
+        $this->addSqlDateRangeFilter($sql, $sql_params, "vg.vg_data_inclusao", $data_inclusao_ini, $data_inclusao_fim);
+        if(!empty($ugo_login)){
+            $phUgoLogin = $this->addSqlParam($sql_params, $ugo_login);
+            $sql .= " and ugo.ugo_login = {$phUgoLogin} ";
+        }
+        $sql .= " group by num_doc , pedido_parceiro, data , tipo_pagto , vg.vg_ultimo_status, vg.vg_usuario_obs , operador
                  ) ";
-        if(empty($_POST['ugo_login'])){
-            $sql.= " 
+
+        if(empty($ugo_login)){
+            $phFormaPagamentoPix = $this->addSqlParam($sql_params, (string) $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']);
+            $phPagamentoPixNumeric = $this->addSqlParam($sql_params, (int) $GLOBALS['PAGAMENTO_PIX_NUMERIC']);
+            $phStatusAtivo = $this->addSqlParam($sql_params, '1');
+
+            $sql .= " 
                 union all
                 (select (vg_id::text) as num_doc,
 				0 as pedido_parceiro,
@@ -121,15 +167,12 @@ class ExtratoController extends HeaderController{
                 'Boleto' as tipo,
                 '' as operador,
                 NULL::smallint as resultado
-                from boletos_pendentes, bancos_financeiros, tb_dist_venda_games, dist_boleto_bancario_games where (bol_banco = bco_codigo) and (bol_venda_games_id=vg_id) and (bco_rpp = 1) and vg_ug_id = ".$usuarioId." and vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' and bol_documento LIKE '4%' and bbg_ug_id = ".$usuarioId." and bbg_vg_id = vg_id and bol_valor > 0 ";
-        if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) 
-        {
-            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) 
-            {
-                $sql .= " and bol_importacao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and bol_importacao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-        }
-        $sql .= "
+                from boletos_pendentes, bancos_financeiros, tb_dist_venda_games, dist_boleto_bancario_games
+                where (bol_banco = bco_codigo) and (bol_venda_games_id=vg_id) and (bco_rpp = 1) and vg_ug_id = {$phUsuarioId}
+                and vg_ultimo_status={$phStatusVenda} and bol_documento LIKE '4%' and bbg_ug_id = {$phUsuarioId}
+                and bbg_vg_id = vg_id and bol_valor > 0 ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "bol_importacao", $data_inclusao_ini, $data_inclusao_fim);
+            $sql .= "
                     group by vg_id,vg_data_inclusao,vg_pagto_tipo,bol_importacao 
                     order by bol_importacao  )
 
@@ -147,15 +190,10 @@ class ExtratoController extends HeaderController{
                     'Corte' as tipo,
                     '' as operador,
                     NULL::smallint as resultado
-                    from cortes c inner join boleto_bancario_cortes as bbc on cor_bbc_boleto_codigo = bbc_boleto_codigo where c.cor_ug_id = ".$usuarioId." and c.cor_venda_liquida > 0	and c.cor_status=3 ";
-	if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) 
-        {
-            if( verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) 
-            {
-                $sql .= " and bbc_data_inclusao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and bbc_data_inclusao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-	}
-	$sql .= "
+                    from cortes c inner join boleto_bancario_cortes as bbc on cor_bbc_boleto_codigo = bbc_boleto_codigo
+                    where c.cor_ug_id = {$phUsuarioId} and c.cor_venda_liquida > 0 and c.cor_status=3 ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "bbc_data_inclusao", $data_inclusao_ini, $data_inclusao_fim);
+            $sql .= "
                     )
 
                     union all 
@@ -163,7 +201,7 @@ class ExtratoController extends HeaderController{
                     (select idvenda::text as num_doc,
 					0 as pedido_parceiro,
                     datainicio as data,  
-                    (case when iforma='A' then 10 when iforma='".$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']."' then  ".$GLOBALS['PAGAMENTO_PIX_NUMERIC']." else iforma::int end ) as tipo_pagto,  
+                    (case when iforma='A' then 10 when iforma={$phFormaPagamentoPix} then {$phPagamentoPixNumeric} else iforma::int end ) as tipo_pagto,  
                     sum (total/100 - taxas) as valor, 
                     NULL as qtde_itens, 
                     NULL as qtde_produtos , 
@@ -173,14 +211,10 @@ class ExtratoController extends HeaderController{
                     NULL::smallint as resultado
 
                     from tb_pag_compras
-                    where substr(tipo_cliente,1,1)='L' and idcliente=".$usuarioId." and status=3 ";
-	if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-            if( verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                    $sql .= " and datainicio >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and datainicio <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-	}
+                    where substr(tipo_cliente,1,1)='L' and idcliente={$phUsuarioId} and status=3 ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "datainicio", $data_inclusao_ini, $data_inclusao_fim);
 
-	$sql .= "group by idvenda::text, datainicio, tipo_pagto, tipo_cliente 
+            $sql .= "group by idvenda::text, datainicio, tipo_pagto, tipo_cliente 
                 )
 
                      union all 
@@ -198,13 +232,9 @@ class ExtratoController extends HeaderController{
                     'Recarga Celular' as tipo,
                     '' as operador, 
                     NULL::smallint as resultado 
-                    from tb_recarga_pedidos where rp_ug_id = ".$usuarioId." and rp_status='1' ";
-        if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                        $sql .= " and rp_data_recarga >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and rp_data_recarga <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                }
-        }
-        $sql .= " )
+                    from tb_recarga_pedidos where rp_ug_id = {$phUsuarioId} and rp_status={$phStatusAtivo} ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "rp_data_recarga", $data_inclusao_ini, $data_inclusao_fim);
+            $sql .= " )
 
                     union all 
 
@@ -221,14 +251,10 @@ class ExtratoController extends HeaderController{
                     'Recarga Celular' as tipo,
                     '' as operador, 
                     NULL::smallint as resultado 
-                    from tb_recarga_pedidos_rede_sim where rprs_ug_id = ".$usuarioId." and rprs_status='1' ";
-        if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                $sql .= " and rprs_data_recarga >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and rprs_data_recarga <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-        }
+                    from tb_recarga_pedidos_rede_sim where rprs_ug_id = {$phUsuarioId} and rprs_status={$phStatusAtivo} ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "rprs_data_recarga", $data_inclusao_ini, $data_inclusao_fim);
 
-        $sql .= " and rprs_data_recarga is not null
+            $sql .= " and rprs_data_recarga is not null
             
             )
 
@@ -247,15 +273,10 @@ class ExtratoController extends HeaderController{
             'Seguro' as tipo,
             '' as operador, 
             NULL::smallint as resultado 
-            from tb_seguro_pedidos_rede_sim where sprs_ug_id = ".$usuarioId." and sprs_status='1' ";
+            from tb_seguro_pedidos_rede_sim where sprs_ug_id = {$phUsuarioId} and sprs_status={$phStatusAtivo} ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "sprs_data_seguro", $data_inclusao_ini, $data_inclusao_fim);
 
-        if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                    $sql .= " and sprs_data_seguro >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and sprs_data_seguro <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-        }
-
-        $sql .= " 
+            $sql .= " 
                     )
 
                     union all 
@@ -273,24 +294,27 @@ class ExtratoController extends HeaderController{
                     'B2C' as tipo,
                     '' as operador, 
                     NULL::smallint as resultado 
-                    from tb_vendas_b2c where vb2c_ug_id_lan = ".$usuarioId." and vb2c_status='1' ";
-        
-        if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                    $sql .= " and \"vb2c_dataVenda\" >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and \"vb2c_dataVenda\" <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-        }
+                    from tb_vendas_b2c where vb2c_ug_id_lan = {$phUsuarioId} and vb2c_status={$phStatusAtivo} ";
+            $this->addSqlDateRangeFilter($sql, $sql_params, "\"vb2c_dataVenda\"", $data_inclusao_ini, $data_inclusao_fim);
 
-        $sql .= "   ) ";
+            $sql .= "   ) ";
         } //end if(empty($_POST['ugo_login']))
         $sql .= "
                     ) as venda
 
                     group by venda.num_doc,pedido_parceiro, venda.tipo_pagto,venda.data,venda.valor,tipo,repasse,operador,resultado 
-                    order by data ".$ordem;
-        $sql .= " offset " . ($p - 1) * $registros . " limit " . $registros;
-	
-        $rs_extrato = SQLexecuteQuery($sql);
+                    order by data desc";
+
+        $offset = ((int)$p - 1) * (int)$registros;
+        if($offset < 0) $offset = 0;
+        $limit = (int)$registros;
+        if($limit <= 0) $limit = 20;
+
+        $phOffset = $this->addSqlParam($sql_params, $offset);
+        $phLimit = $this->addSqlParam($sql_params, $limit);
+        $sql .= " offset {$phOffset} limit {$phLimit}";
+
+        $rs_extrato = SQLexecuteQueryParams($sql, $sql_params);
 		
 		/*$ff= fopen("/www/arquivos_gerados/logs/teste_extrato.php","a+");
 		fwrite($ff, $sql."\r");
@@ -306,10 +330,10 @@ class ExtratoController extends HeaderController{
             //atribui os valores
             $extrato = array();
 
-            if(empty($_POST['ugo_login']) && $extrato_info['tipo'] == "Venda")
+            if(empty($ugo_login) && $extrato_info['tipo'] == "Venda")
             {
             
-                $sql_operador = 
+	                $sql_operador = 
                 "select 
                     ugo_id, ugo_login as operador
                 from 
@@ -317,9 +341,9 @@ class ExtratoController extends HeaderController{
                 inner join 
                     dist_usuarios_games_operador ugo on ugol.ugol_ugo_id = ugo.ugo_id 
                 where 
-                    ugol.ugol_vg_id = ".$extrato_info['num_doc'];
+                    ugol.ugol_vg_id = $1";
 //echo "$sql_operador<br>\n";
-                $rs_operador = SQLexecuteQuery($sql_operador);
+                $rs_operador = SQLexecuteQueryParams($sql_operador, array((int) $extrato_info['num_doc']));
 
                 //$extrato['operador'] = $ugo_login;
                 //$extrato['idOperador'] = $ugo_id;
@@ -506,7 +530,7 @@ class ExtratoController extends HeaderController{
                 $extrato['valor_view'] = ""; //credito
                 $extrato['valor_venda'] = ""; //debito
                 $extrato['comissao'] = "";
-                // O P é o numero de registros atual
+                // O P ? o numero de registros atual
             }// fim do if balanco				
             
             if($this->usuarios->getRiscoClassif()==2)
@@ -531,9 +555,15 @@ class ExtratoController extends HeaderController{
     }
     
     public function getTotalEntradaSaidaComissao(){
-        $usuarioId = $this->usuarios->getId();
+        $usuarioId = (int) $this->usuarios->getId();
+        list($tf_v_codigo, $data_inclusao_ini, $data_inclusao_fim, $ugo_login) = $this->getExtratoFiltros();
 
         /// 1- VENDAS /////////////////////////////////////////////////////////////////////
+        $sql_params = array();
+        $phUsuarioId = $this->addSqlParam($sql_params, $usuarioId);
+        $phStatusVenda = $this->addSqlParam($sql_params, (string) $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']);
+        $phStatusAtivo = $this->addSqlParam($sql_params, '1');
+
         $sql  = "select 
 			sum(qtde) as qtde_total,
                         sum(venda) as venda, 
@@ -549,7 +579,7 @@ class ExtratoController extends HeaderController{
                                 tb_dist_venda_games vg 
                         inner join 
                                 tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id ";
-        if(!empty($_POST['ugo_login'])){
+        if(!empty($ugo_login)){
                 $sql .= "
                         inner join dist_usuarios_games_operador_log ugol on ugol.ugol_vg_id = vg.vg_id
                         inner join dist_usuarios_games_operador ugo on ugol.ugol_ugo_id = ugo.ugo_id
@@ -557,16 +587,14 @@ class ExtratoController extends HeaderController{
         }
         $sql .= " 
                         where 
-                                vg_ug_id= '$usuarioId' and 
-                                vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' ";
-        if($_POST['tf_v_codigo'] && is_numeric($_POST['tf_v_codigo'])) $sql .= " and vg.vg_id=" . $_POST['tf_v_codigo'];
-        if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                $sql .= " and vg.vg_data_inclusao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and vg.vg_data_inclusao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-            }
-        }
-        if(!empty($_POST['ugo_login'])){
-                $sql .= " and ugo.ugo_login = '".  strtoupper($_POST['ugo_login'])."' ";
+                                vg_ug_id = {$phUsuarioId} and 
+                                vg.vg_ultimo_status = {$phStatusVenda} ";
+        $this->addSqlCodigoFilter($sql, $sql_params, "vg.vg_id", $tf_v_codigo);
+        $this->addSqlDateRangeFilter($sql, $sql_params, "vg.vg_data_inclusao", $data_inclusao_ini, $data_inclusao_fim);
+
+        if(!empty($ugo_login)){
+            $phUgoLogin = $this->addSqlParam($sql_params, $ugo_login);
+            $sql .= " and ugo.ugo_login = {$phUgoLogin} ";
         }
         else{
             $sql .= "   UNION ALL 
@@ -578,14 +606,10 @@ class ExtratoController extends HeaderController{
                             from 
                                 tb_vendas_b2c 
                             where 
-                                vb2c_ug_id_lan = ".$usuarioId." and 
-                                vb2c_status='1' ";
-            if($_POST['tf_v_codigo'] && is_numeric($_POST['tf_v_codigo'])) $sql .= " and vb2c_vg_id=" . $_POST['tf_v_codigo'];
-            if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                        $sql .= " and \"vb2c_dataVenda\" >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and \"vb2c_dataVenda\" <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                }
-            }
+                                vb2c_ug_id_lan = {$phUsuarioId} and 
+                                vb2c_status = {$phStatusAtivo} ";
+            $this->addSqlCodigoFilter($sql, $sql_params, "vb2c_vg_id", $tf_v_codigo);
+            $this->addSqlDateRangeFilter($sql, $sql_params, "\"vb2c_dataVenda\"", $data_inclusao_ini, $data_inclusao_fim);
             
             $sql .= "   union all 
                         select 
@@ -593,59 +617,46 @@ class ExtratoController extends HeaderController{
                             sum(sprs_valor) as valor ,
                             sum(sprs_valor) as repasse, 
                             sum(sprs_valor) as venda 
-                        from tb_seguro_pedidos_rede_sim where sprs_ug_id = ".$usuarioId." and sprs_status='1' ";
-
-            if($_POST['tf_v_codigo'] && is_numeric($_POST['tf_v_codigo'])) $sql .= " and sprs_vg_id=" . $_POST['tf_v_codigo'];
-            if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                        $sql .= " and sprs_data_seguro >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and sprs_data_seguro <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                }
-            }
+                        from tb_seguro_pedidos_rede_sim where sprs_ug_id = {$phUsuarioId} and sprs_status = {$phStatusAtivo} ";
+            $this->addSqlCodigoFilter($sql, $sql_params, "sprs_vg_id", $tf_v_codigo);
+            $this->addSqlDateRangeFilter($sql, $sql_params, "sprs_data_seguro", $data_inclusao_ini, $data_inclusao_fim);
             
             $sql .= "   union all 
-
-                        
                         select 
                             count(rprs_vg_id) as qtde,
                             sum(rprs_valor) as valor ,
                             sum(rprs_valor - (rprs_valor * rprs_comissao_para_repasse/100)) as repasse, 
                             sum(rprs_valor) as venda 
-                        from tb_recarga_pedidos_rede_sim where rprs_ug_id = ".$usuarioId." and rprs_status='1' ";
-            if($_POST['tf_v_codigo'] && is_numeric($_POST['tf_v_codigo'])) $sql .= " and rprs_vg_id=" . $_POST['tf_v_codigo'];
-            if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                    $sql .= " and rprs_data_recarga >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and rprs_data_recarga <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                }
-            }
+                        from tb_recarga_pedidos_rede_sim where rprs_ug_id = {$phUsuarioId} and rprs_status = {$phStatusAtivo} ";
+            $this->addSqlCodigoFilter($sql, $sql_params, "rprs_vg_id", $tf_v_codigo);
+            $this->addSqlDateRangeFilter($sql, $sql_params, "rprs_data_recarga", $data_inclusao_ini, $data_inclusao_fim);
             
             $sql .= "   union all 
-                    
                     select 
                         count(rp_vg_id) as qtde,
                         sum(rp_valor) as valor ,
                         sum(rp_valor) as repasse,
                         sum(rp_valor) as venda 
-                    from tb_recarga_pedidos where rp_ug_id = ".$usuarioId." and rp_status='1' ";
-            if($_POST['tf_v_codigo'] && is_numeric($_POST['tf_v_codigo'])) $sql .= " and rp_vg_id=" . $_POST['tf_v_codigo'];
-            if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                    if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                            $sql .= " and rp_data_recarga >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and rp_data_recarga <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                    }
-            }
+                    from tb_recarga_pedidos where rp_ug_id = {$phUsuarioId} and rp_status = {$phStatusAtivo} ";
+            $this->addSqlCodigoFilter($sql, $sql_params, "rp_vg_id", $tf_v_codigo);
+            $this->addSqlDateRangeFilter($sql, $sql_params, "rp_data_recarga", $data_inclusao_ini, $data_inclusao_fim);
         }
         
         $sql .= ") as total ";
-        $rs_vendas = SQLexecuteQuery($sql);
-	$rs_vendas_row = pg_fetch_array($rs_vendas);
+        $rs_vendas = SQLexecuteQueryParams($sql, $sql_params);
+        $rs_vendas_row = pg_fetch_array($rs_vendas);
         
-	$total_final_saida = $rs_vendas_row ['total_valor'];
-	$total_final_comissao = $rs_vendas_row['comissao'];
+        $total_final_saida = $rs_vendas_row['total_valor'];
+        $total_final_comissao = $rs_vendas_row['comissao'];
         $registros_total = $rs_vendas_row['qtde_total'];
         //////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////
         
-        if(empty($_POST['ugo_login'])){
+        if(empty($ugo_login)){
                 /// 2- BOLETOS PRE////////////////////////////////////////////////////////////////
+                $sql_params_boleto = array();
+                $phUsuarioIdBoleto = $this->addSqlParam($sql_params_boleto, $usuarioId);
+                $phStatusVendaBoleto = $this->addSqlParam($sql_params_boleto, (string) $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']);
                 $sql = "select 
                             sum(qtde) as qtde_total,
                             sum(bbg_valor)as valor ,
@@ -665,28 +676,26 @@ class ExtratoController extends HeaderController{
                                     (bol_banco = bco_codigo) and 
                                     (bol_venda_games_id=vg_id) and 
                                     (bco_rpp = 1) and 
-                                    vg_ug_id=".$usuarioId." and 
-                                    vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' and
+                                    vg_ug_id = {$phUsuarioIdBoleto} and 
+                                    vg_ultimo_status = {$phStatusVendaBoleto} and
                                     bol_documento LIKE '4%' and 
-                                    bbg_ug_id=".$usuarioId." and 
+                                    bbg_ug_id = {$phUsuarioIdBoleto} and 
                                     bbg_vg_id = vg_id";
-                if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                    if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                        $sql .= " and bol_importacao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and bol_importacao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                    }
-                }
+                $this->addSqlDateRangeFilter($sql, $sql_params_boleto, "bol_importacao", $data_inclusao_ini, $data_inclusao_fim);
                 $sql .= "
                                 group by bbg_valor, bbg_valor_taxa
                         ) as total";
-                $rs_boleto = SQLexecuteQuery($sql);
+                $rs_boleto = SQLexecuteQueryParams($sql, $sql_params_boleto);
                 $rs_vendas_row = pg_fetch_array($rs_boleto);
 
-                $total_final_entrada =  $rs_vendas_row['valor'] - $rs_vendas_row['taxa'] ;
+                $total_final_entrada =  $rs_vendas_row['valor'] - $rs_vendas_row['taxa'];
                 $registros_total += $rs_vendas_row['qtde_total'];
                 //////////////////////////////////////////////////////////////////////////////////
                 //////////////////////////////////////////////////////////////////////////////////
 
                 ////// 3- BOLETOS POS //////////////////////////////////////////////////////////////////
+                $sql_params_corte = array();
+                $phUsuarioIdCorte = $this->addSqlParam($sql_params_corte, $usuarioId);
                 $sql = "select 
                             sum (cor_venda_liquida) as venda 
                         from 
@@ -696,30 +705,24 @@ class ExtratoController extends HeaderController{
                                 from cortes c 
                                     inner join boleto_bancario_cortes as bbc on cor_bbc_boleto_codigo = bbc_boleto_codigo  
                                 where 
-                                    c.cor_ug_id = '$usuarioId' ";
-                if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                    if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                        $sql .= " and bbc_data_inclusao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and bbc_data_inclusao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                    }
-                }
+                                    c.cor_ug_id = {$phUsuarioIdCorte} ";
+                $this->addSqlDateRangeFilter($sql, $sql_params_corte, "bbc_data_inclusao", $data_inclusao_ini, $data_inclusao_fim);
                 $sql .= ") as corte_total";
-                $rs_corte = SQLexecuteQuery($sql);
+                $rs_corte = SQLexecuteQueryParams($sql, $sql_params_corte);
                 $rs_vendas_row = pg_fetch_array($rs_corte);
 
                 $total_final_entrada += $rs_vendas_row['venda'];
 
-                /// 3- PAGAMENTO ONLINE LAN PRÉ////////////////////////////////////////////////////////////////
+                /// 3- PAGAMENTO ONLINE LAN PRE////////////////////////////////////////////////////////////////
+                $sql_params_pag = array();
+                $phUsuarioIdPag = $this->addSqlParam($sql_params_pag, $usuarioId);
                 $sql = " select 
                             count(idvenda) as qtde_total,
                             sum (total/100 - taxas) as valor
                          from tb_pag_compras
-                         where substr(tipo_cliente,1,1)='L' and idcliente=".$usuarioId." and status=3 ";
-                if($_POST['tf_v_data_inclusao_ini'] && $_POST['tf_v_data_inclusao_fim']) {
-                    if( verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
-                            $sql .= " and datainicio >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and datainicio <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
-                    }
-                }
-                $rs_boleto = SQLexecuteQuery($sql);
+                         where substr(tipo_cliente,1,1)='L' and idcliente = {$phUsuarioIdPag} and status=3 ";
+                $this->addSqlDateRangeFilter($sql, $sql_params_pag, "datainicio", $data_inclusao_ini, $data_inclusao_fim);
+                $rs_boleto = SQLexecuteQueryParams($sql, $sql_params_pag);
                 $rs_vendas_row = pg_fetch_array($rs_boleto);
                 $total_final_entrada +=  $rs_vendas_row['valor'];
                 $registros_total += $rs_vendas_row['qtde_total'];
@@ -739,10 +742,11 @@ class ExtratoController extends HeaderController{
     }
     
     public function getOperadores(){
-        $sql = "select * from dist_usuarios_games_operador ugo where ugo.ugo_ug_id = ".$this->usuarios->getId() ."";
-        $res_count = SQLexecuteQuery($sql);
+        $sql = "select * from dist_usuarios_games_operador ugo where ugo.ugo_ug_id = $1";
+        $sqlParams = array((int) $this->usuarios->getId());
+        $res_count = SQLexecuteQueryParams($sql, $sqlParams);
         $total_table = pg_num_rows($res_count);
-        $rs_operadores = SQLexecuteQuery($sql);
+        $rs_operadores = SQLexecuteQueryParams($sql, $sqlParams);
         $arrOperadores = array();
         
         while($rs_operadores_row = pg_fetch_array($rs_operadores)){

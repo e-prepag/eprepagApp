@@ -125,7 +125,14 @@ class PedidosController extends HeaderController
                 }
 
                 //Capturando os IDs dos PINs
-                $lp_ids = $_POST['listaPINs'];
+                $lp_ids_raw = isset($_POST['listaPINs']) ? $_POST['listaPINs'] : "";
+                $lp_ids = array();
+                foreach (explode(',', $lp_ids_raw) as $pinId) {
+                        $pinId = trim($pinId);
+                        if ($pinId !== "" && ctype_digit($pinId)) {
+                                $lp_ids[] = (int) $pinId;
+                        }
+                }
 
                 $cor_sec_teste = htmlspecialchars($estilos['cor_secundaria']);
 
@@ -146,11 +153,20 @@ class PedidosController extends HeaderController
                 $mensagem = "";
                 //Verifica reimpressao
                 if ($msg == "") {
-                        if ($lp_ids == "")
+                        if (count($lp_ids) == 0)
                                 $msg = "Nenhum PIN selecionado.\n";
                 }
 
                 if ($msg == "") {
+                        $vendaId = isset($GLOBALS['_SESSION']['venda']) ? (int) $GLOBALS['_SESSION']['venda'] : 0;
+                        $idsPlaceholders = array();
+                        $paramsPins = array((int) $id_user, $vendaId);
+                        $paramIndex = 3;
+                        foreach ($lp_ids as $pinId) {
+                                $idsPlaceholders[] = "$" . $paramIndex;
+                                $paramsPins[] = $pinId;
+                                $paramIndex++;
+                        }
                         $sql = "SELECT p.pin_vencimento, p.pin_codigo, p.pin_valor, p.pin_lote_codigo, p.pin_serial, p.pin_codinterno,
 									vgm.vgm_nome_produto, vgm.vgm_nome_modelo, opr.opr_codigo, opr.opr_nome, opr.opr_ban_pos, ogp.ogp_nome_imagem,vgm.vgm_id,vg.vg_ug_id,  
 									CASE 
@@ -164,19 +180,27 @@ class PedidosController extends HeaderController
 							inner join tb_dist_venda_games vg on vg.vg_id = vgm.vgm_vg_id
 							left join operadoras opr on opr.opr_codigo = vgm.vgm_opr_codigo
 							left join tb_dist_operadora_games_produto ogp on ogp.ogp_id = vgm.vgm_ogp_id
-					  where vg.vg_ug_id = " . $id_user . "
-						  and vg.vg_id = " . $GLOBALS['_SESSION']['venda'] . "
-						  and vgmp.vgmp_pin_codinterno in (" . $lp_ids . ")
-							order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde ";
-                        $rs_modelos = SQLexecuteQuery($sql);
+					  where vg.vg_ug_id = $1
+						  and vg.vg_id = $2
+						  and vgmp.vgmp_pin_codinterno in (" . implode(',', $idsPlaceholders) . ")
+									order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde ";
+                        $rs_modelos = SQLexecuteQueryParams($sql, $paramsPins);
                         if (!$rs_modelos || pg_num_rows($rs_modelos) == 0)
                                 $msg = "Nenhum cupom encontrado.\n";
                         else {
+                                $idsPlaceholdersUpdate = array();
+                                $paramsPinsUpdate = array();
+                                $paramIndex = 1;
+                                foreach ($lp_ids as $pinId) {
+                                        $idsPlaceholdersUpdate[] = "$" . $paramIndex;
+                                        $paramsPinsUpdate[] = $pinId;
+                                        $paramIndex++;
+                                }
                                 $sql = "update tb_dist_venda_games_modelo_pins set
 											vgmp_impressao_ult_data = CURRENT_TIMESTAMP,
 											vgmp_impressao_qtde = case when vgmp_impressao_qtde is NULL then 1 else vgmp_impressao_qtde + 1 end
-									where vgmp_pin_codinterno in ($lp_ids)";
-                                $ret = SQLexecuteQuery($sql);
+									where vgmp_pin_codinterno in (" . implode(',', $idsPlaceholdersUpdate) . ")";
+                                $ret = SQLexecuteQueryParams($sql, $paramsPinsUpdate);
                                 if (!$ret)
                                         $msg = "Erro ao atualizar quantidade de impressões dos cupons.\n";
                         } //end else do if(!$rs_modelos || pg_num_rows($rs_modelos) == 0)
@@ -300,13 +324,13 @@ class PedidosController extends HeaderController
 																			vgpe_email,
 																			vgpe_data
 																			) 
-															VALUES (
-																			" . $pin_codinterno . ",
-																			" . $rs_modelos_row['vg_ug_id'] . ",
-																			'" . $email . "',
-																			NOW());";
+														VALUES (
+																	$1,
+																	$2,
+																	$3,
+																	NOW());";
                                         //echo $sql."<br>";
-                                        $rs_banner = SQLexecuteQuery($sql);
+                                        $rs_banner = SQLexecuteQueryParams($sql, array((int) $pin_codinterno, (int) $rs_modelos_row['vg_ug_id'], $email));
                                         if (!$rs_banner) {
                                                 $mensagem = "Erro ao salvar informa&ccedil;&otilde;es denvio do e-mail. (ERRO: SIE-01)<br>";
                                         }

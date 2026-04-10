@@ -7,14 +7,14 @@
  * @email diego.gomes@e-prepag.com.br
  * @date 16-07-2015
  */
-@require_once RAIZ_DO_PROJETO . "includes/main.php";
-@require_once RAIZ_DO_PROJETO . "includes/pdv/main.php";
-@require_once RAIZ_DO_PROJETO . "includes/pdv/corte_classPrincipal.php"; //corte_constantes
-@require_once RAIZ_DO_PROJETO . "includes/pdv/captura_inc.php";
+require_once RAIZ_DO_PROJETO . "includes/main.php";
+require_once RAIZ_DO_PROJETO . "includes/pdv/main.php";
+require_once RAIZ_DO_PROJETO . "includes/pdv/corte_classPrincipal.php"; //corte_constantes
+require_once RAIZ_DO_PROJETO . "includes/pdv/captura_inc.php";
 require_once RAIZ_DO_PROJETO . "class/util/Log.class.php";
-@require_once RAIZ_DO_PROJETO . "class/pdv/classOperadorGamesUsuario.php";
-@require_once RAIZ_DO_PROJETO . 'includes/functions.php';
-@require_once RAIZ_DO_PROJETO . "includes/configuracao.inc";
+require_once RAIZ_DO_PROJETO . "class/pdv/classOperadorGamesUsuario.php";
+require_once RAIZ_DO_PROJETO . 'includes/functions.php';
+require_once RAIZ_DO_PROJETO . "includes/configuracao.inc";
 require_once RAIZ_DO_PROJETO . "class/classBannerDrawShadow.php";
 require_once RAIZ_DO_PROJETO . 'class/business/BannerBO.class.php';
 require_once RAIZ_DO_PROJETO . 'includes/configIP.php';
