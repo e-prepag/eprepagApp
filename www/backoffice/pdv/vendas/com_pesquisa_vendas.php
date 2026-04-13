@@ -384,19 +384,32 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 			$sql .= "\n";
 
 			$sql .= " having 1=1 \n";
+			$paramsVendas = array();
 			if($tf_u_so_depositos=="1") {
 				// Do nothing
 			} else {
 
-				if($tf_v_valor) 		$sql .= " and sum(vgm.vgm_valor * vgm.vgm_qtde) = ".moeda2numeric($tf_v_valor)." \n";
-				if($tf_v_repasse) 		$sql .= " and sum(vgm.vgm_valor * vgm.vgm_qtde - vgm.vgm_valor * vgm.vgm_qtde * vgm_perc_desconto / 100) = ".moeda2numeric($tf_v_repasse)." \n";
-				if($tf_v_qtde_produtos) $sql .= " and count(*) = ".$tf_v_qtde_produtos." \n";
-				if($tf_v_qtde_itens) 	$sql .= " and sum(vgm.vgm_qtde) = ".$tf_v_qtde_itens." \n";
+				if($tf_v_valor) {
+					$sql .= " and sum(vgm.vgm_valor * vgm.vgm_qtde) = $" . (count($paramsVendas) + 1) . " \n";
+					$paramsVendas[] = (float) moeda2numeric($tf_v_valor);
+				}
+				if($tf_v_repasse) {
+					$sql .= " and sum(vgm.vgm_valor * vgm.vgm_qtde - vgm.vgm_valor * vgm.vgm_qtde * vgm_perc_desconto / 100) = $" . (count($paramsVendas) + 1) . " \n";
+					$paramsVendas[] = (float) moeda2numeric($tf_v_repasse);
+				}
+				if($tf_v_qtde_produtos) {
+					$sql .= " and count(*) = $" . (count($paramsVendas) + 1) . " \n";
+					$paramsVendas[] = (int) $tf_v_qtde_produtos;
+				}
+				if($tf_v_qtde_itens) {
+					$sql .= " and sum(vgm.vgm_qtde) = $" . (count($paramsVendas) + 1) . " \n";
+					$paramsVendas[] = (int) $tf_v_qtde_itens;
+				}
 			}
-		
-			$rs_venda = SQLexecuteQuery($sql);
+
+			$rs_venda = SQLexecuteQueryParams($sql, $paramsVendas);
 			$total_table = pg_num_rows($rs_venda);
-                        
+
 			//Total Geral
 			$totalGeral_valor = 0;
 			$totalGeral_repasse = 0;
@@ -414,6 +427,10 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 			}
 
 			//Ordem
+			$allowedOrderCampos = array("vg_id", "vg_data_inclusao", "valor", "repasse", "qtde_itens", "qtde_produtos", "ug_id", "ug_risco_classif", "vg_concilia");
+			if(!in_array($ncamp, $allowedOrderCampos, true)) {
+				$ncamp = "vg_data_inclusao";
+			}
 			$sql .= " order by ".$ncamp;
 			if($ordem == 1){
 				$sql .= " desc \n";
@@ -422,28 +439,33 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 				$sql .= " asc \n";
 				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_up.gif";
 			}
-                        
+
                         /*
                          * Inicio geracao csv
                          */
                         require_once $raiz_do_projeto.'class/business/VendasLanHouseBO.class.php';
                         $vendasBO = new VendasLanHouseBO;
-                        $csv = $vendasBO->geraCsv($sql);
+                        $sqlCsv = $sql;
+                        foreach ($paramsVendas as $paramIdx => $paramVal) {
+                                $sqlCsv = str_replace("$" . ($paramIdx + 1), (string)$paramVal, $sqlCsv);
+                        }
+                        $csv = $vendasBO->geraCsv($sqlCsv);
                         /*
                          * Fim geracao CSV
                         */
-			$sql .= " limit ".$max; 
-			$sql .= " offset ".$inicial;
-//if(b_IsUsuarioWagner()) { 
-//echo "(R) ".str_replace("\n", "<br>\n", $sql)."<br>";
-//die("Stop");
-//}
+
+			$paramsVendasPaginado = $paramsVendas;
+			$limitIdx = count($paramsVendasPaginado) + 1;
+			$paramsVendasPaginado[] = (int)$max;
+			$offsetIdx = count($paramsVendasPaginado) + 1;
+			$paramsVendasPaginado[] = (int)$inicial;
+			$sql .= " limit $" . $limitIdx;
+			$sql .= " offset $" . $offsetIdx;
 
 			if($total_table == 0) {
 				$msg = "Nenhuma venda encontrada.\n";
-			} else {		
-				$rs_venda = SQLexecuteQuery($sql);
-				
+			} else {
+				$rs_venda = SQLexecuteQueryParams($sql, $paramsVendasPaginado);
 				if($max + $inicial > $total_table)
 					$reg_ate = $total_table;
 				else
@@ -461,11 +483,11 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 	 $sql = "select * from operadoras ope where opr_status = '1' order by opr_nome";
 	 $rs_operadoras = SQLexecuteQuery($sql);
 	 if($tf_opr_codigo) {
-		 $sql = "select ogp_id,ogp_nome from tb_dist_operadora_games_produto where ogp_opr_codigo = " . $tf_opr_codigo . "";
-		 $rs_oprProdutos = SQLexecuteQuery($sql);
-		
-		 $sql = "select pin_valor from pins_dist where opr_codigo = " . $tf_opr_codigo . " group by pin_valor order by pin_valor;";
-		 $rs_oprPins = SQLexecuteQuery($sql);
+			 $sql = "select ogp_id,ogp_nome from tb_dist_operadora_games_produto where ogp_opr_codigo = $1";
+			 $rs_oprProdutos = SQLexecuteQueryParams($sql, array((int)$tf_opr_codigo));
+			
+			 $sql = "select pin_valor from pins_dist where opr_codigo = $1 group by pin_valor order by pin_valor";
+			 $rs_oprPins = SQLexecuteQueryParams($sql, array((int)$tf_opr_codigo));
 	 }
         
 ob_end_flush();
@@ -980,9 +1002,9 @@ require_once "/www/includes/bourls.php";
                     from tb_dist_venda_games vg 
                     inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
                     inner join operadoras opr on opr.opr_codigo = vgm.vgm_opr_codigo
-                    where vgm_vg_id = " . $rs_venda_row['vg_id'];
-			
-            $rs_produtos = SQLexecuteQuery($sql);
+	                    where vgm_vg_id = $1";
+
+	            $rs_produtos = SQLexecuteQueryParams($sql, array((int)$rs_venda_row['vg_id']));
 
             $statusMaps = $rs_venda_row['ug_google_maps_status'];
 

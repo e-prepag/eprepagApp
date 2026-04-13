@@ -11,9 +11,10 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
     if (isset($_POST['produtos']) && !empty($_POST['produtos'])) {
 
         foreach($_POST['produtos'] as $id => $odem){
-            $sql = "update tb_dist_operadora_games_produto set ogp_ordem = " . $odem . " where ogp_id = " . $id;
-                           
-            if(!$ret1 = SQLexecuteQuery($sql)){
+            $sql = "update tb_dist_operadora_games_produto set ogp_ordem = $1 where ogp_id = $2";
+            $params = array((int) $odem, (int) $id);
+
+            if(!$ret1 = SQLexecuteQueryParams($sql, $params)){
                 $idErrors[] = $id;
             }
         }
