@@ -134,6 +134,18 @@ docker compose -f docker-compose_dev.yml build
 docker compose -f docker-compose_dev.yml up -d
 ```
 
+### **Instalar libs do Composer no container app:**
+
+```bash
+docker compose -f docker-compose_dev.yml exec app composer install
+```
+
+### **Adicionar uma nova lib com Composer (exemplo):**
+
+```bash
+docker compose -f docker-compose_dev.yml exec app composer require symfony/dotenv
+```
+
 ### **Ver logs da aplicação:**
 
 ```bash
