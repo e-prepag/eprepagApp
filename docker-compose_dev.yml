@@ -18,9 +18,10 @@ services:
       - ./docker-config/certs_local:/etc/apache2/certs
       - ./www/arquivos_gerados:/www/arquivos_gerados
       - ./docker-config/apache_conf/security.conf:/etc/apache2/conf-enabled/security.conf:ro
+    env_file:
+      - ./www/.env
     environment:
-      TZ: "America/Sao_Paulo"
-      env_file: ./www/.env
+      TZ: "America/Fortaleza"
 
   assinador:
     build: ./assinador-dotnet
@@ -32,8 +33,8 @@ services:
     volumes:
       - ./certs:/certs:ro           # Acesso ao certificado (read-only)
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - TZ=America/Sao_Paulo
+      ASPNETCORE_ENVIRONMENT: Development
+      TZ: "America/Fortaleza"
     restart: unless-stopped
 
 networks:

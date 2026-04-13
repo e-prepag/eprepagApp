@@ -3,63 +3,58 @@
 
 class LoggingPDOStatement extends PDOStatement
 {
-    public $queryString;
-
     protected function __construct()
     {
         // O construtor é protegido para evitar instâncias diretas.
     }
 
-    public function execute($bound_input_params = null)
+    public function execute(?array $bound_input_params = null): bool
     {
-        // Verifica se estamos na pasta public_html
-        $backtrace = debug_backtrace();
-        $callerFile = $backtrace[0]['file'];  // Pega o caminho do arquivo que chamou
-        $callerDir = dirname($callerFile);   // Obtém o diretório do arquivo que chamou
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $callerFile = $backtrace[1]['file'] ?? __FILE__;
+        $callerDir = dirname($callerFile);
 
-        if (strpos($callerDir, 'public_html') === false 
-            && strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false 
-            && stripos($this->queryString, "usuarios") == false) {
-            // Se não está na pasta public_html, não faz log
+        if (
+            strpos($callerDir, 'public_html') === false
+            && strpos($_SERVER['HTTP_HOST'] ?? '', EPREPAG_URL) === false
+            && stripos($this->queryString, 'usuarios') === false
+        ) {
             return parent::execute($bound_input_params);
         }
-        // Verifica se a consulta é do tipo INSERT ou UPDATE
-        if (preg_match('/^\s*(INSERT|UPDATE|DELETE)/i', $this->queryString)) {
-            // Log da consulta SQL e parâmetros
-            $log = date('Y-m-d H:i:s') . " | Query: " . $this->queryString . PHP_EOL ;
 
-            if ($bound_input_params) {
+        if (preg_match('/^\s*(INSERT|UPDATE|DELETE)/i', $this->queryString)) {
+            $log = date('Y-m-d H:i:s') . " | Query: " . $this->queryString . PHP_EOL;
+
+            if ($bound_input_params !== null) {
                 $log .= " | Params: " . json_encode($bound_input_params) . PHP_EOL;
             }
 
             $log .= " | Called from: " . $callerFile . PHP_EOL;
 
-            if(isset($_SESSION['dist_usuarioGames_ser'])){
+            if (isset($_SESSION['dist_usuarioGames_ser'])) {
                 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
                 $log .= " | User Id Pdv: " . $usuarioGames->getId() . PHP_EOL;
-            }else if(isset($_SESSION['usuarioGames_ser'])){
+            } elseif (isset($_SESSION['usuarioGames_ser'])) {
                 $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
                 $log .= " | User Id Gamer: " . $usuarioGames->getId() . PHP_EOL;
-            }else{
+            } else {
                 $log .= " | No users in the session" . PHP_EOL;
             }
 
-            if($_SERVER['REMOTE_ADDR']){
+            if (!empty($_SERVER['REMOTE_ADDR'])) {
                 $log .= " | IP: " . $_SERVER['REMOTE_ADDR'] . PHP_EOL;
             }
 
-            // Linha de separação para melhorar a legibilidade
-            $separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
-
-            // Caminho do arquivo de log
+            $separator = str_repeat('*', 50);
             $logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
 
-            // Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
-            file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
-
+            file_put_contents(
+                $logFile,
+                PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL,
+                FILE_APPEND
+            );
         }
 
-        // Executa a consulta normalmente
         return parent::execute($bound_input_params);
     }
 }
