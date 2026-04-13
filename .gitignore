@@ -33,3 +33,6 @@ efinanceira-receita-fazenda-gov-br-2025.cer
 .github/instructions/snyk_rules.instructions.md
 *.sql
 .codex
+#/vendor/
+#.env
+#composer.phar
