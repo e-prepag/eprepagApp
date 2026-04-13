@@ -98,7 +98,7 @@ class Limite {
 		$this->setValorMinMax($this->getIForma());
 		$this->setTaxa($this->getIForma());
 		$this->setPeriodoConsiderado($periodo_considerado);
-		$this->setIPCliente($periodo_considerado);
+		$this->setIPCliente();
 
 	} 
     
@@ -574,6 +574,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$resposta = true;
 		$msg = "";
 		$usuarioGames = null;
+		$instanceClassUsuario = new UsuarioGames();
 
 		if($resposta && !$msg) {
 			// 0 - Testa se Cielo está habilitado
@@ -595,7 +596,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 			if(isset($_SESSION['usuarioGames_ser'])) {
 				$usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
 			} elseif($this->getIdUsuario()>0) {
-				$usuarioGames = UsuarioGames::getUsuarioGamesById($this->getIdUsuario());
+				$usuarioGames = $instanceClassUsuario->getUsuarioGamesById($this->getIdUsuario());
 			}
 //echo "<pre>".print_r($usuarioGames, true)."</pre>";
 			if(is_object($usuarioGames)) {

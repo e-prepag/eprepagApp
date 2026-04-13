@@ -879,6 +879,7 @@ gravaLog_RC_processing("SolicitacaoRecarga: \n".print_r(json_encode($aret), true
 	function salvaConsulta($tipo, $params) {
 
 		 $smsg = $params['smsg'];
+		 $sql = "";
 
 		// Sanitize 
 		if((strpos(strtoupper($smsg), "DROP")===false) && (strpos(strtoupper($smsg), "DELETE")===false) && (strpos(strtoupper($smsg), "INSERT")===false) && (strpos(strtoupper($smsg), "CREATE")===false) && (strpos(strtoupper($smsg), "ALTER")===false)) {
@@ -902,6 +903,7 @@ echo "Erro ao Salvar Consulta '$sql' (1) ".$GLOBALS['cReturn']."";
 	function salvaPedido($tipo, $params) {
 
 		 $smsg = $params['smsg'];
+		 $sql = "";
 //echo "VAI Salvar".$GLOBALS['cReturn']."";
 
 		// Sanitize 
