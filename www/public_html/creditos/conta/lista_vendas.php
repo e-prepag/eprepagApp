@@ -268,7 +268,7 @@ if(bRelatorioVendasComOperadores($usuarioGames->getLogin()) && ($rs_vendas_row['
    	          </td>
 
     	        </tr>
-		<?	} ?>
+		<?php } ?>
 			</table>
 
       </td>
@@ -324,4 +324,3 @@ if(bRelatorioVendasComOperadores($usuarioGames->getLogin()) && ($rs_vendas_row['
   _uacct = "UA-1903237-3";  
   urchinTracker();  
 </script>    
-                        <?php }?>
