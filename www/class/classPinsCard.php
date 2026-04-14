@@ -9,7 +9,8 @@ class Pins_Card {
 	var $sformato;
 	// variavel que recebera o objeto de cryptografia
 	var $aes;
-		
+	
+	public $bank;
 	
 	//O subvetor para o formato tem a seguinte caracteristicas para as posições
 	// 0 = Range de Caracteres

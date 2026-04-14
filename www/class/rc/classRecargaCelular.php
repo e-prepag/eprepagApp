@@ -994,66 +994,66 @@ echo "Em atualizaPedido() - NÃO Atualizou pedido por vg_id vazio: '$vg_id'".$GLO
 	}
 
 	// ================================================
-	function getExtraFields_SolicitacaoRecarga_Config($vg_id) {
-		$this->vg_id = $vg_id;
+// 	function getExtraFields_SolicitacaoRecarga_Config($vg_id) {
+// 		$this->vg_id = $vg_id;
 
-		// $codigoOperadora, $codigoRede, $codigoProduto, $numeroCelular, $numeroCelularConf, $valor, $versaoFilial, $versaoOperadora
-/*
-		if(!$codigoRede) $codigoRede = 2;
-		if(!$codigoProduto) $codigoProduto = 321;
-		if(!$numeroCelular) $numeroCelular = '98765432';
-		if(!$numeroCelularConf) $numeroCelularConf = $numeroCelular;
-		if(!$valor) $valor = 102;
-		if(!$versaoFilial) $versaoFilial = '1.0';
-		if(!$versaoOperadora) $versaoOperadora = '1.02';
-*/
-		$sret = "<hr>";
-		$sret .= "vg_id : ".$this->vg_id."&nbsp;<input type='hidden' id='vg_id' name='vg_id' value='".$this->vg_id."'>".$GLOBALS['cReturn']."\n";
-		$sret .= "codigoOperadora&nbsp;<select id='codigoOperadora' name='codigoOperadora' onChange='document.form1.submit();'>\n";
-		if($val['codigoOperadora']=="") {
-			$s_select = " selected";
-		}
-		$sret .= "<option value=''".$s_select.">Selecione uma operadora</option>\n";
-		foreach($GLOBALS['operadoras_current'] as $key => $val) {
-			$s_select = "";
-			if($val['codigoOperadora']==$this->codigoOperadora) {
-				$s_select = " selected";
-				$this->codigoRede = $val['codigoRede'];
-				$this->codigoProduto = $val['codigoProduto'];
-			}
-			$sret .= "<option value='".$val['codigoOperadora']."'".$s_select.">".$val['codigoOperadora']." - ".$val['nomeOperadora']."</option>\n";
-		}
-		$sret .= "</select>".$GLOBALS['cReturn']."\n";
-		$sret .= "codigoRede : ".$this->codigoRede."&nbsp;<input type='hidden' id='codigoRede' name='codigoRede' value='".$this->codigoRede."'>".$GLOBALS['cReturn']."\n";
+// 		// $codigoOperadora, $codigoRede, $codigoProduto, $numeroCelular, $numeroCelularConf, $valor, $versaoFilial, $versaoOperadora
+// /*
+// 		if(!$codigoRede) $codigoRede = 2;
+// 		if(!$codigoProduto) $codigoProduto = 321;
+// 		if(!$numeroCelular) $numeroCelular = '98765432';
+// 		if(!$numeroCelularConf) $numeroCelularConf = $numeroCelular;
+// 		if(!$valor) $valor = 102;
+// 		if(!$versaoFilial) $versaoFilial = '1.0';
+// 		if(!$versaoOperadora) $versaoOperadora = '1.02';
+// */
+// 		$sret = "<hr>";
+// 		$sret .= "vg_id : ".$this->vg_id."&nbsp;<input type='hidden' id='vg_id' name='vg_id' value='".$this->vg_id."'>".$GLOBALS['cReturn']."\n";
+// 		$sret .= "codigoOperadora&nbsp;<select id='codigoOperadora' name='codigoOperadora' onChange='document.form1.submit();'>\n";
+// 		if($val['codigoOperadora']=="") {
+// 			$s_select = " selected";
+// 		}
+// 		$sret .= "<option value=''".$s_select.">Selecione uma operadora</option>\n";
+// 		foreach($GLOBALS['operadoras_current'] as $key => $val) {
+// 			$s_select = "";
+// 			if($val['codigoOperadora']==$this->codigoOperadora) {
+// 				$s_select = " selected";
+// 				$this->codigoRede = $val['codigoRede'];
+// 				$this->codigoProduto = $val['codigoProduto'];
+// 			}
+// 			$sret .= "<option value='".$val['codigoOperadora']."'".$s_select.">".$val['codigoOperadora']." - ".$val['nomeOperadora']."</option>\n";
+// 		}
+// 		$sret .= "</select>".$GLOBALS['cReturn']."\n";
+// 		$sret .= "codigoRede : ".$this->codigoRede."&nbsp;<input type='hidden' id='codigoRede' name='codigoRede' value='".$this->codigoRede."'>".$GLOBALS['cReturn']."\n";
 
-		$sret .= "codigoProduto : ".$this->codigoProduto."&nbsp;<input type='hidden' id='codigoProduto' name='codigoProduto' value='".$this->codigoProduto."'>".$GLOBALS['cReturn']."\n";
-		$sret .= "numeroCelular&nbsp;<input type='text' name='numeroCelular' value='".$this->numeroCelular."'>".$GLOBALS['cReturn']."\n";
-		$sret .= "numeroCelularConf&nbsp;<input type='text' name='numeroCelularConf' value='".$this->numeroCelularConf."'>".$GLOBALS['cReturn']."\n";
-//		$sret .= "valor&nbsp;<input type='text' name='valor' value='".$this->valor."'>".$GLOBALS['cReturn']."\n";
-		foreach($GLOBALS['operadoras_current'] as $key => $val) {
-//			$sret .= "<option value='".$val['codigoOperadora']."'".(($val['codigoOperadora']==$this->codigoOperadora)?" selected":"").">".$val['codigoOperadora']." - ".$val['nomeOperadora']."</option>\n";
-//echo "".$GLOBALS['cReturn']."codigoOperadora: ".$val['codigoOperadora']."".$GLOBALS['cReturn']."";
-//echo "".$GLOBALS['cReturn']."this->codigoOperadora: ".$this->codigoOperadora."".$GLOBALS['cReturn']."";
-			if($val['codigoOperadora']==$this->codigoOperadora) {
-//echo "".$GLOBALS['cReturn']."codigoOperadora: ".$val['codigoOperadora']." (val: ".print_r($val, true)."".$GLOBALS['cReturn']."";
-				if(is_array($val['valoresFixos'])) {
-echo "COM valoresFixos: ";
-					$sret .= "valor&nbsp;<select name='valor' onChange='document.form1.submit();'>\n";
-					foreach($val['valoresFixos'] as $key1 => $val1) {
-						//echo $val1['valor']." (".$val1['valorBonus']."), ";
-						$sret .= "<option value='".$val1['valor']."'".(($this->valor==$val1['valor'])?" selected":"").">".$val1['valor']."</option>\n";
-					}
-					$sret .= "</select>\n";
-				} else {
-echo "SEM valoresFixos: ";
-				}
-			}
-		}
+// 		$sret .= "codigoProduto : ".$this->codigoProduto."&nbsp;<input type='hidden' id='codigoProduto' name='codigoProduto' value='".$this->codigoProduto."'>".$GLOBALS['cReturn']."\n";
+// 		$sret .= "numeroCelular&nbsp;<input type='text' name='numeroCelular' value='".$this->numeroCelular."'>".$GLOBALS['cReturn']."\n";
+// 		$sret .= "numeroCelularConf&nbsp;<input type='text' name='numeroCelularConf' value='".$this->numeroCelularConf."'>".$GLOBALS['cReturn']."\n";
+// //		$sret .= "valor&nbsp;<input type='text' name='valor' value='".$this->valor."'>".$GLOBALS['cReturn']."\n";
+// 		foreach($GLOBALS['operadoras_current'] as $key => $val) {
+// //			$sret .= "<option value='".$val['codigoOperadora']."'".(($val['codigoOperadora']==$this->codigoOperadora)?" selected":"").">".$val['codigoOperadora']." - ".$val['nomeOperadora']."</option>\n";
+// //echo "".$GLOBALS['cReturn']."codigoOperadora: ".$val['codigoOperadora']."".$GLOBALS['cReturn']."";
+// //echo "".$GLOBALS['cReturn']."this->codigoOperadora: ".$this->codigoOperadora."".$GLOBALS['cReturn']."";
+// 			if($val['codigoOperadora']==$this->codigoOperadora) {
+// //echo "".$GLOBALS['cReturn']."codigoOperadora: ".$val['codigoOperadora']." (val: ".print_r($val, true)."".$GLOBALS['cReturn']."";
+// 				if(is_array($val['valoresFixos'])) {
+// echo "COM valoresFixos: ";
+// 					$sret .= "valor&nbsp;<select name='valor' onChange='document.form1.submit();'>\n";
+// 					foreach($val['valoresFixos'] as $key1 => $val1) {
+// 						//echo $val1['valor']." (".$val1['valorBonus']."), ";
+// 						$sret .= "<option value='".$val1['valor']."'".(($this->valor==$val1['valor'])?" selected":"").">".$val1['valor']."</option>\n";
+// 					}
+// 					$sret .= "</select>\n";
+// 				} else {
+// echo "SEM valoresFixos: ";
+// 				}
+// 			}
+// 		}
 
-//		$sret .= "versaoFilial&nbsp;<input type='text' name='versaoFilial' value='".$this->versaoFilial."'>".$GLOBALS['cReturn']."\n";
-//		$sret .= "versaoOperadora&nbsp;<input type='text' name='versaoOperadora' value='".$this->versaoOperadora."'>".$GLOBALS['cReturn']."\n";
-		return $sret;
-	}
+// //		$sret .= "versaoFilial&nbsp;<input type='text' name='versaoFilial' value='".$this->versaoFilial."'>".$GLOBALS['cReturn']."\n";
+// //		$sret .= "versaoOperadora&nbsp;<input type='text' name='versaoOperadora' value='".$this->versaoOperadora."'>".$GLOBALS['cReturn']."\n";
+// 		return $sret;
+// 	}
 
 	function atualizaMonitor($msg) {
 		//Arquivo

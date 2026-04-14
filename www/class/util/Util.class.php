@@ -268,6 +268,7 @@ class Util {
         @var $showHour: se true, exibe a hora
      */
     public static function secToTime($val){
+        $horas = '';
         if(floor($val / 3600) > 0)
             $time[] = floor($val / 3600)." hora(s)";
         

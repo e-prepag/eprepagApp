@@ -3,7 +3,7 @@ require_once DIR_CLASS."view/SistemaVO.class.php";
 
 class SistemaDAO{
     
-    private $pdo = false;
+    private $pdo;
     
     public $qtdItens = 0;
     
@@ -16,7 +16,7 @@ class SistemaDAO{
     public $paginaInicial;
     
     public $arrAbasVO;
-    
+
     public function __construct(){
         
         $con = ConnectionPDO::getConnection();
@@ -197,7 +197,7 @@ class SistemaDAO{
     protected function getItensMenu($id){
         
         $where = " AND item_link_linux IS NOT NULL";
-        $itensUsuario = $this->getItensUsuario();
+        $itensUsuario = $this->getItensUsuario() ?? [];
         //echo "<script>console.log(".json_encode($itensUsuario).")</script>";
         if(!empty($itensUsuario)){
             
@@ -324,7 +324,7 @@ class SistemaDAO{
     
     protected function getArrItensByGrupos($idItem = null){
         
-        $arrIdGrupos = $this->getArrIdGrupos();
+        $arrIdGrupos = $this->getArrIdGrupos() ?? [];
         
         if(empty($arrIdGrupos))
             $this->setArrIdsGruposUsuario();

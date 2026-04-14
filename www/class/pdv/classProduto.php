@@ -203,13 +203,13 @@ class Produto {
 		{
 			//Ativos
 			$sql = "select ogp_id from tb_dist_operadora_games_produto where ogp_ativo = 1 order by ogp_nome ASC";
-			$sql_ordenar = pg_query($sql);
+			$sql_ordenar = SQLexecuteQuery($sql);
 			$cont = 0;
 		
 			if (pg_num_rows($sql_ordenar) != 0)
 				while($codigo = pg_fetch_array($sql_ordenar))
 				{
-					pg_query("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
+					SQLexecuteQuery("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
 					$cont++;
 				}
 		}
@@ -217,13 +217,13 @@ class Produto {
 		//Inativos
 		$sql = "select ogp_id from tb_dist_operadora_games_produto where ogp_ativo <> 1 order by ogp_nome ASC";
 //echo "sql: $sql<br>";
-		$sql_ordenar_inat = pg_query($sql);
+		$sql_ordenar_inat = SQLexecuteQuery($sql);
 		$cont = is_null($cont) ? pg_num_rows($sql_ordenar) : $cont;
 		
 		if (pg_num_rows($sql_ordenar_inat) != 0)
 			while($codigo = pg_fetch_array($sql_ordenar_inat))
 			{
-				pg_query("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
+				SQLexecuteQuery("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
 				$cont++;
 			}
 	}
@@ -249,9 +249,9 @@ class Produto {
 
 			// Adiciona numero total de registros na tabela (diferencia ativo/inativo)
 			if ($objProduto->getAtivo() != 1)
-				$sql_ordem = pg_query("select count(*) as total from tb_dist_operadora_games_produto");
+				$sql_ordem = SQLexecuteQuery("select count(*) as total from tb_dist_operadora_games_produto");
 			else
-				$sql_ordem = pg_query("select count(ogp_id) as total from tb_dist_operadora_games_produto where ogp_ativo = 1");
+				$sql_ordem = SQLexecuteQuery("select count(ogp_id) as total from tb_dist_operadora_games_produto where ogp_ativo = 1");
 			$total_ordem = pg_fetch_result($sql_ordem,0,0);
 			$sql .= SQLaddFields($total_ordem, "") . ",";
 			$sql .= SQLaddFields($objProduto->getIOF(), "") . ",";

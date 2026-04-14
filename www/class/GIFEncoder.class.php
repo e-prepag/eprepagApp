@@ -2,7 +2,7 @@
 /*
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::
-::	GIFEncoder Version 2.0 by László Zsidi, http://gifs.hu
+::	GIFEncoder Version 2.0 by Lï¿½szlï¿½ Zsidi, http://gifs.hu
 ::
 ::	This class is a rewritten 'GifMerge.class.php' version.
 ::
@@ -46,12 +46,11 @@ Class GIFEncoder {
 	::	GIFEncoder...
 	::
 	*/
-	function GIFEncoder	(
+	function __construct	(
 							$GIF_src, $GIF_dly, $GIF_lop, $GIF_dis,
 							$GIF_red, $GIF_grn, $GIF_blu, $GIF_mod
 						) {
-							$GIF_tim = "";
-		if ( ! is_array ( $GIF_src ) && ! is_array ( $GIF_tim ) ) {
+		if ( ! is_array ( $GIF_src ) ) {
 			printf	( "%s: %s", $this->VER, $this->ERR [ 'ERR00' ] );
 			exit	( 0 );
 		}
@@ -107,7 +106,8 @@ Class GIFEncoder {
 	*/
 	function GIFAddFrames ( $i, $d ) {
 
-		$Locals_str = 13 + 3 * ( 2 << ( ord ( $this->BUF [ $i ] [ 10 ] ) & 0x07 ) );
+		$Locals_img = "";
+		$Locals_str = 13 + 3 * ( 2 << ( ord ( $this->BUF [ $i ] [ 10 ] ) & 0x80 ) );
 
 		$Locals_end = strlen ( $this->BUF [ $i ] ) - $Locals_str - 1;
 		$Locals_tmp = substr ( $this->BUF [ $i ], $Locals_str, $Locals_end );
