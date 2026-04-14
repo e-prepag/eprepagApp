@@ -16,6 +16,7 @@ if(Util::isAjaxRequest())
     //Conectando com PDO para execução da QUERY
     $con = ConnectionPDO::getConnection();
     $pdo = $con->getLink();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     $retorno = new stdClass();
     

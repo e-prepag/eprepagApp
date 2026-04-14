@@ -96,6 +96,7 @@ $params		= array('numpin'	=> array ('0' => $numpin,
 					);
 $params		= sanitize_input_data_array($params,$err_cod);
 extract($params, EXTR_OVERWRITE);
+$palavraCodigoSession = strtolower((string)($_SESSION['palavraCodigo'] ?? ""));
 
 //Limpa os PINs da SESSION
 limpa_session_pin($pagto);
@@ -107,7 +108,7 @@ $msg_ajax = "";
 //variavel de teste se deve ser contruido a interface
 $verifica_interface = false;
 
-if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodigo']!="") {
+if ($palavraCodigoSession == $vercod && $palavraCodigoSession !== "") {
 		
 	//Comentado a linha abaixo por conta do GoCASH
 	//$numpin = substr($numpin,0,$PIN_STORE_TAMANHO);
@@ -124,7 +125,7 @@ if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodig
 			$tamanho_pin = strlen($numpin);
 
 			//Testando a quantidade de PINs Utilizado
-			if (($numpin != "")&&(count($_SESSION['PINEPP'])<5)) {
+				if (($numpin != "")&&(count($_SESSION['PINEPP'] ?? [])<5)) {
 
 				if(RetonaTamanhoPINEPPCASH($numpin)) {
 					//Confirmando existencia e valor do PIN EPP CASH
@@ -164,7 +165,7 @@ if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodig
 				//Caso não esteja no formato EPP CASH e nem GoCASH
 				elseif($numpin != "") $msg_ajax .= "Este PIN n&atilde;o foi identificado (Erro: 3).<br>Por favor, verifique se o c&oacute;digo digitado est&aacute; correto ou entre em contato com o <a href=\'mailto:suporte@e-prepag.com.br\'>suporte@e-prepag.com.br</a>";
 
-			}//end if (($numpin != "")&&(count($_SESSION['PINEPP'])<5))
+				}//end if (($numpin != "")&&(count($_SESSION['PINEPP'] ?? [])<5))
 			elseif ($numpin != "") {
 				$msg_ajax .= "A quantidade m&aacute;xima de PINs a serem utilizados s&atilde;o 5 (cinco).";
 			}
@@ -210,7 +211,7 @@ if ($trava->b_IsLogin_Wagner() || $trava->b_IsLogin_reinaldopshotmail()) {
 		else $msg_ajax .= "Problemas ao utilizar o PIN.<br>Tente valida-lo novamente.<br>";
 	}//end else do if (strtolower($op) != 'uti') 
 
-}//end if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodigo']!="")
+}//end if ($palavraCodigoSession == $vercod && $palavraCodigoSession !== "")
 else {
 	//habilitando a interface
 	$verifica_interface = true;
