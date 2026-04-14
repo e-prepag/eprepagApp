@@ -2371,7 +2371,7 @@ class UsuarioGames
 
             if (!is_null($objGamesUsuario->getTipoVenda())) $sql .= " ug_tipo_venda = " . SQLaddFields($objGamesUsuario->getTipoVenda(), "s") . ",";
 
-            if (!is_null($objGamesUsuario->getCanaisVenda())) $sql .= " ug_canais_venda = " . SQLaddFields($objGamesUsuario->getCanaisVenda());
+            if (!is_null($objGamesUsuario->getCanaisVenda())) $sql .= " ug_canais_venda = " . SQLaddFields($objGamesUsuario->getCanaisVenda(), 'n');
 
             if ($objGamesUsuario->getDataAprovacao() == "" && $objGamesUsuario->getSubstatus() == 11) $sql .= " ug_data_aprovacao = NOW(),";
 

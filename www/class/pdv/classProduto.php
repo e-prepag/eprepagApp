@@ -18,6 +18,7 @@ class Produto {
     var $ogp_comunicacao_cupom;
     var $ogp_valor_minimo;
     var $ogp_valor_maximo;
+	public $ogp_idade_minima;
 
     function Produto(	$p_id 				= null,
                         $p_sNome 			= null,
