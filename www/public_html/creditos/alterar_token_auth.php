@@ -3,7 +3,7 @@
 //ini_set("display_errors", 1);
 require_once "../../includes/constantes.php";
 require_once DIR_CLASS . "pdv/controller/MeuCadastroController.class.php";
-require_once "../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once "../class/GoogleAutenticator.php";
 
 $controller = new MeuCadastroController;
 
