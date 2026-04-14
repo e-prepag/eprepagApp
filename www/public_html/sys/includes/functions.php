@@ -1999,15 +1999,13 @@ function theRealStripTags2($string)
 
 	for ($i = 0; $i < $tam; $i++) {
 		// If I found one '<', $tag++ and continue whithout copy
-		if ($string{
-			$i} == '<') {
+			if ($string[$i] == '<') {
 			$tag++;
 			continue;
 		}
 
 		// if I found '>', decrease $tag and continue 
-		if ($string{
-			$i} == '>') {
+			if ($string[$i] == '>') {
 			if ($tag) {
 				$tag--;
 			}
@@ -2019,8 +2017,7 @@ function theRealStripTags2($string)
 
 		// if $tag is 0, can copy 
 		if ($tag == 0) {
-			$newstring .= $string{
-				$i}; // simple copy, only one car
+				$newstring .= $string[$i]; // simple copy, only one car
 		}
 	}
 	return $newstring;

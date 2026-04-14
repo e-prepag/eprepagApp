@@ -1900,18 +1900,18 @@ function imprimeComboSeuBanco($mensagem)
 	</script>
 	<form name="formSeuBanco" method="post" action="">
 		<table border="0" cellspacing="0" cellpadding="0" align="center">
-			<? if ($mensagem != "") { ?><tr align="center">
+			<?php if ($mensagem != "") { ?><tr align="center">
 					<td>
-						<font size='2' face='Arial, Helvetica, sans-serif' color='#000099'><? echo $mensagem ?></font>
+						<font size='2' face='Arial, Helvetica, sans-serif' color='#000099'><?php echo $mensagem ?></font>
 					</td>
-				</tr><? } ?>
+				</tr><?php } ?>
 			<tr align="center">
 				<td>
 					<select name="seuBanco">
 						<option value="">Selecione seu Banco</option>
-						<? for ($i = 0; $i < count($URL_BANCOS); $i++) { ?>
-							<option value="<? echo $URL_BANCOS[$i][1] ?>"><? echo $URL_BANCOS[$i][0] ?></option>
-						<? } ?>
+						<?php for ($i = 0; $i < count($URL_BANCOS); $i++) { ?>
+							<option value="<?php echo $URL_BANCOS[$i][1] ?>"><?php echo $URL_BANCOS[$i][0] ?></option>
+						<?php } ?>
 					</select>
 					<input name="btnSeuBanco" type="button" class="botao_amex" value="Ir para seu Banco" onClick="fcnSeuBanco(document.formSeuBanco);">
 				</td>
