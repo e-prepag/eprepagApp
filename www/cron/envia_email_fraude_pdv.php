@@ -3,15 +3,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once "/www/includes/constantes.php";
-require_once "/www/includes/gamer/functions.php";
-require_once "/www/db/connect.php";
-require_once "/www/db/ConnectionPDO.php";
-require_once "/www/class/classEmailAutomatico.php";
-require_once "/www/class/phpmailer/class.phpmailer.php";
-require_once "/www/includes/configIP.php";
-require_once "/www/class/phpmailer/class.smtp.php";
-require_once "/www/class/pdv/classChaveMestra.php"; 
+require_once __DIR__ . "/../includes/constantes.php";
+require_once __DIR__ . "/../includes/gamer/functions.php";
+require_once __DIR__ . "/../db/connect.php";
+require_once __DIR__ . "/../db/ConnectionPDO.php";
+require_once __DIR__ . "/../class/classEmailAutomatico.php";
+require_once __DIR__ . "/../class/phpmailer/class.phpmailer.php";
+require_once __DIR__ . "/../includes/configIP.php";
+require_once __DIR__ . "/../class/phpmailer/class.smtp.php";
+require_once __DIR__ . "/../class/pdv/classChaveMestra.php"; 
 $pdo = ConnectionPDO::getConnection()->getLink(); 
 try {
     // Conexão com o banco de dados usando PDO

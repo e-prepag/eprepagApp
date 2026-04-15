@@ -190,7 +190,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
                                 gravaLogDepuradorCard("Arquivo txt excluido com sucesso!".PHP_EOL."$varArquivo".PHP_EOL);
                         }
                         
-                        $email = new PHPMailer;
+                        $email = new \PHPMailer\PHPMailer\PHPMailer();
 
 //			$email->Host     = "smtp.e-prepag.com.br";	//"localhost";
             //-----Alteração exigida pela BaseNet(11/2017)-------------//
@@ -204,7 +204,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
 			$email->FromName = "E-Prepag";	// " (EPP)"
             
             //-----Alteração exigida pela BaseNet(11/2017)-------------//
-            $email->IsSMTP();
+            $email->isSMTP();
             //$email->SMTPSecure = "ssl";
             $email->Port     = getenv("smtp_port");
             //---------------------------------------------------------//
@@ -222,7 +222,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
                         }
 
 			// Reply-to
-			$email->AddReplyTo(getenv("email_suporte"));
+			$email->addReplyTo(getenv("email_suporte"));
 
 
 			$email -> AddAddress($sEmailTo,$sEmailToNome);

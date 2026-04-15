@@ -8,6 +8,7 @@ class classPIX
 
     private $access_token;
     private $url;
+    private $itens = array();
 
     public function __construct()
     {
@@ -50,8 +51,9 @@ class classPIX
         $email = $params['email'];
         $id_pedido = $params['idpedido'];
         $itens = $params['itens'];
+        $this->itens = is_array($itens) ? $itens : array();
 
-        $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email, $itens);
+        $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
         $logFilePath = "/www/arquivos_gerados/logs/mercadopago_PIX.txt";
         $ff = fopen($logFilePath, "a+");
@@ -366,8 +368,9 @@ class classPIX
         return $data;
     }
 
-    private function sendJSON($nome, $cpf, $valor, $vendaId, $email = "", $itens = [])
+    private function sendJSON($nome, $cpf, $valor, $vendaId, $email = "")
     {
+        $itens = is_array($this->itens) ? $this->itens : array();
 
         $type = $this->identifyDocumentType($cpf);
 
