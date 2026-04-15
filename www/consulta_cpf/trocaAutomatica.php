@@ -37,10 +37,10 @@ function qtdeTrocaAutomatica(){
 
 function trocaOrigemAutomatica($environment){
 	
-	    if(isset($vetorReverso) && isset($vetorLegenda)){
-			 global $vetorReverso;
-		     global $vetorLegenda;
-		}else{
+		global $vetorReverso;
+		global $vetorLegenda;
+
+		if(!isset($vetorReverso) || !isset($vetorLegenda)){
 			$vetorLegenda = array(
 				CPF_PARTNER_CREDIFY => 'CREDIFY',
 				CPF_PARTNER_OMNIDATA => 'OMNIDATA',
