@@ -34,7 +34,7 @@ function is_DateTime($dateTime)
 	$dateTime = trim($dateTime);
 
 	if (preg_match("'^(\d{2})[\-//](\d{2})[\-//](\d{4})\s(\d{2}):(\d{2})$'", $dateTime,  $matches)) {
-		return checkdate($matches[2], $matches[1], $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
+			return checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
@@ -59,8 +59,8 @@ function is_DateTimeEx($dateTime, $tipo)
 	$dateTime = trim($dateTime);
 
 	if (preg_match($pattern, $dateTime,  $matches)) {
-		if ($tipo == 1) return checkdate($matches[2], $matches[1], $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
-		else if ($tipo == 2) return checkdate($matches[2], $matches[3], $matches[1]) && is_hora($matches[4] . ":" . $matches[5]);
+			if ($tipo == 1) return checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
+			else if ($tipo == 2) return checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1]) && is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
@@ -291,14 +291,14 @@ function qtde_dias($data1, $data2)
     echo "<br><br>";
 */
 	// manipula data1
-	$dia1 = substr($data1, 0, -8); // extraimos somete o dia inicial
-	$mes1 = substr($data1, 3, -5); // extraimos somete o mes inicial
-	$ano1 = substr($data1, 6);    // extraimos somete o ano inicial
+	$dia1 = (int) substr($data1, 0, -8); // extraimos somete o dia inicial
+	$mes1 = (int) substr($data1, 3, -5); // extraimos somete o mes inicial
+	$ano1 = (int) substr($data1, 6);    // extraimos somete o ano inicial
 
 	// manipula data2
-	$dia2 = substr($data2, 0, -8); // extraimos somete o dia final
-	$mes2 = substr($data2, 3, -5); // extraimos somete o mes final
-	$ano2 = substr($data2, 6);    // extraimos somete o ano final
+	$dia2 = (int) substr($data2, 0, -8); // extraimos somete o dia final
+	$mes2 = (int) substr($data2, 3, -5); // extraimos somete o mes final
+	$ano2 = (int) substr($data2, 6);    // extraimos somete o ano final
 
 
 	$data_inicial = mktime(0, 0, 0, $mes1, $dia1, $ano1); // obtem tempo unix para data1 no formato timestamp
@@ -765,9 +765,10 @@ function verifica_email($email)
 
 function data_mais_um($data)
 {
-	$dia = substr($data, 0, 2);
-	$mes = substr($data, 3, 2);
-	$ano = substr($data, 6, 4);
+	$dia = (int) substr($data, 0, 2);
+	$mes = (int) substr($data, 3, 2);
+	$ano = (int) substr($data, 6, 4);
+	$mes_num = 0;
 
 	if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
 		$bissexto = 1;
@@ -862,9 +863,9 @@ function data_mais_n($data, $qtde_dias)
 
 function data_menos_um($data)
 {
-	$dia = substr($data, 0, 2);
-	$mes = substr($data, 3, 2);
-	$ano = substr($data, 6, 4);
+	$dia = (int) substr($data, 0, 2);
+	$mes = (int) substr($data, 3, 2);
+	$ano = (int) substr($data, 6, 4);
 
 	if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
 		$bissexto = 1;
@@ -1144,6 +1145,9 @@ function verifica_data($data)
 					if ($alerta == 1) {
 						return  0;
 					} else {
+							$dia = (int) $dia;
+							$mes = (int) $mes;
+							$ano = (int) $ano;
 						if ($mes > 12 || $dia > 31) {
 							return 0;
 						} else {
