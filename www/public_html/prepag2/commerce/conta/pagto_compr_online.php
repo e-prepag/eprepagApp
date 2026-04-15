@@ -1,4 +1,6 @@
-<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; ?>
+<?php require_once __DIR__ . '/../../../../includes/constantes_url.php'; 
+header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'", true);
+?>
 <?php
 
 $https = "https";
@@ -53,7 +55,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']) {
 	$rs_pagto = SQLexecuteQueryParams($sql, $params);
 
 	if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
-		$msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
+		$msg = "Nï¿½o foi encontrado o pagamento para a venda " . $venda_id . ".\n";
 	} else {
 		$rs_pagto_row = pg_fetch_array($rs_pagto);
 		$banco = $rs_pagto_row['banco'];
@@ -80,7 +82,7 @@ if ($total_carrinho == 0) {
 	$rs_pagto = SQLexecuteQueryParams($sql, $params);
 
 	if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
-		$msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
+		$msg = "Nï¿½o foi encontrado o pagamento para a venda " . $venda_id . ".\n";
 	} else {
 		$rs_pagto_row = pg_fetch_array($rs_pagto);
 		if ($total_carrinho == 0) {
@@ -96,7 +98,7 @@ if (!(b_IsPagtoBoletoDeposito($pagto_tipo) || b_IsPagtoOnline($pagto_tipo))) {
 	//		die("Stop3223");
 	$strRedirect = "/prepag2/commerce/conta/lista_vendas.php";
 
-	//Fechando Conexão
+	//Fechando Conexï¿½o
 	pg_close($connid);
 
 	redirect($strRedirect);
@@ -133,7 +135,7 @@ if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) ||
 	$rs_pagto_id = SQLexecuteQueryParams($sql, $params);
 
 	if (!$rs_pagto_id || pg_num_rows($rs_pagto_id) == 0) {
-		$msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
+		$msg = "Nï¿½o foi encontrado o pagamento para a venda " . $venda_id . ".\n";
 	} else {
 		$rs_pagto_id_row = pg_fetch_array($rs_pagto_id);
 		$id_transacao_itau = $rs_pagto_id_row['id_transacao_itau'];
@@ -158,7 +160,7 @@ if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) ||
 
 $numOrder = $OrderId;
 
-// Redireciona para a página final no site do Banco
+// Redireciona para a pï¿½gina final no site do Banco
 if ($iforma == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
 	$img_bank_logo = $GLOBALS['_SESSION']['is_integration'] == true ? "bradesco_logo_dr.gif" : "bradesco_horiz_peq.jpg";
 	$simg_bank = "<img src='/imagens/pag/$img_bank_logo' border='0' title='Bradesco'>";
@@ -172,11 +174,11 @@ if ($iforma == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
 	$simg_bank = "<img src='/imagens/pag/$img_bank_logo' border='0' title='Banco do Brasil'>";
 } else if ($iforma == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC) { //$FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']
 	$location = $link_BItauShopline;
-	//		$simg_bank = "<img src='/imagens/pag/botao_conta_itau_.jpg' width='136' height='48' border='0' title='Banco Itaú Shopline'>";
+	//		$simg_bank = "<img src='/imagens/pag/botao_conta_itau_.jpg' width='136' height='48' border='0' title='Banco Itaï¿½ Shopline'>";
 
 	$img_bank_logo = $GLOBALS['_SESSION']['is_integration'] == true ? "itau_logo_dr.gif" : "Itau_logo_loja.jpg";
 	$img_bank_logo_size = $GLOBALS['_SESSION']['is_integration'] == true ? array('84', '68') : array('116', '43');
-	$simg_bank = "<img src='/imagens/pag/$img_bank_logo' width='$img_bank_logo_size[0]' height='$img_bank_logo_size[1]' border='0' title='Banco Itaú Shopline'>";
+	$simg_bank = "<img src='/imagens/pag/$img_bank_logo' width='$img_bank_logo_size[0]' height='$img_bank_logo_size[1]' border='0' title='Banco Itaï¿½ Shopline'>";
 	//echo "location: ".$location."<br>";
 } else if ($iforma == $PAGAMENTO_HIPAY_ONLINE_NUMERIC) {
 	//			// width='284' height='98'
@@ -296,7 +298,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 				cpf_page($partner_list);
 			} else {
 
-				//Testando a necessidade de solicitação de CPF para Gamer
+				//Testando a necessidade de solicitaï¿½ï¿½o de CPF para Gamer
 				if ($test_opr_need_cpf || $pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
 
 					cpf_page_gamer();
@@ -317,9 +319,9 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 				<br>
 				Obrigado por comprar conosco!<br><br>
 				<?php if ($vg_integracao_parceiro_origem_id) { ?>
-					Após o pagamento o crédito será automaticamente ativado na conta do seu jogo.
+					Apï¿½s o pagamento o crï¿½dito serï¿½ automaticamente ativado na conta do seu jogo.
 				<?php } else { ?>
-					Após o pagamento a senha será automaticamente enviada para o seu email.
+					Apï¿½s o pagamento a senha serï¿½ automaticamente enviada para o seu email.
 				<?php } ?>
 			</td>
 		</tr>
@@ -332,7 +334,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 			</tr>
 			<tr>
 				<td align="center" class="texto">
-					<input type="button" name="btOK" value="Clique aqui para emitir o Boleto Bancário"
+					<input type="button" name="btOK" value="Clique aqui para emitir o Boleto Bancï¿½rio"
 						OnClick="fcnJanelaBoleto();" class="botao_simples">
 				</td>
 			</tr>
@@ -354,7 +356,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 				<br>
 				Obrigado por comprar conosco!<br><br>
 				<?php if ($vg_integracao_parceiro_origem_id) { ?>
-					Sua compra foi processada e o crédito será ativado diretamente na sua conta no jogo.
+					Sua compra foi processada e o crï¿½dito serï¿½ ativado diretamente na sua conta no jogo.
 				<?php } else { ?>
 					Sua compra foi processada e os pins enviados para seu email cadastrado conosco.
 				<?php } ?>
@@ -365,7 +367,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 		<center>
 			<table border="0" cellspacing="0" align="center">
 				<tr bgcolor="F0F0F0">
-					<td class="texto" align="center" height="25"><b>Autenticação</b></td>
+					<td class="texto" align="center" height="25"><b>Autenticaï¿½ï¿½o</b></td>
 				</tr>
 				<tr bgcolor="F0F0F0">
 					<td class="texto" align="center"><?php formataAssinatura($assinatura) ?></td>
@@ -449,17 +451,17 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 																			while ($venda_modelo = pg_fetch_assoc($rs_venda_modelos)) {
 																				$itens[] = [
 																					"title" => $venda_modelo['vgm_nome_produto'] ? $venda_modelo['vgm_nome_produto'] : 'Produto sem nome',
-																					"description" => $venda_modelo['vgm_nome_modelo'] ? $venda_modelo['vgm_nome_modelo'] : 'Sem descrição',
+																					"description" => $venda_modelo['vgm_nome_modelo'] ? $venda_modelo['vgm_nome_modelo'] : 'Sem descriï¿½ï¿½o',
 																					"category_id" => "integracao_gamer",
 																					"unit_price" => isset($venda_modelo['vgm_valor']) ? $venda_modelo['vgm_valor'] : 0.0,
 																					"quantity" => isset($venda_modelo['vgm_qtde']) ? $venda_modelo['vgm_qtde'] : 1,
 																				];
 																			}
-																			// Garante pelo menos 1 item, mesmo se $arr_venda_modelos estiver vazio ou inválido
+																			// Garante pelo menos 1 item, mesmo se $arr_venda_modelos estiver vazio ou invï¿½lido
 																			if (empty($itens)) {
 																				$itens[] = [
 																					"title" => "Produto sem nome",
-																					"description" => "Não foi possível recuperar o produto",
+																					"description" => "Nï¿½o foi possï¿½vel recuperar o produto",
 																					"category_id" => "pins_gamer",
 																					"unit_price" => 0.0,
 																					"quantity" => 1,
@@ -478,7 +480,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 																			);
 																			echo $pix->callService($params);
 																		} else {
-																			echo "Pix não disponível no momento.";
+																			echo "Pix nï¿½o disponï¿½vel no momento.";
 																		}
 																	} else {
 																		require_once RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php';
@@ -503,17 +505,17 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 																			while ($venda_modelo = pg_fetch_assoc($rs_venda_modelos)) {
 																				$itens[] = [
 																					"title" => $venda_modelo['vgm_nome_produto'] ? $venda_modelo['vgm_nome_produto'] : 'Produto sem nome',
-																					"description" => $venda_modelo['vgm_nome_modelo'] ? $venda_modelo['vgm_nome_modelo'] : 'Sem descrição',
+																					"description" => $venda_modelo['vgm_nome_modelo'] ? $venda_modelo['vgm_nome_modelo'] : 'Sem descriï¿½ï¿½o',
 																					"category_id" => "integracao_gamer",
 																					"unit_price" => isset($venda_modelo['vgm_valor']) ? $venda_modelo['vgm_valor'] : 0.0,
 																					"quantity" => isset($venda_modelo['vgm_qtde']) ? $venda_modelo['vgm_qtde'] : 1,
 																				];
 																			}
-																			// Garante pelo menos 1 item, mesmo se $arr_venda_modelos estiver vazio ou inválido
+																			// Garante pelo menos 1 item, mesmo se $arr_venda_modelos estiver vazio ou invï¿½lido
 																			if (empty($itens)) {
 																				$itens[] = [
 																					"title" => "Produto sem nome",
-																					"description" => "Não foi possível recuperar o produto",
+																					"description" => "Nï¿½o foi possï¿½vel recuperar o produto",
 																					"category_id" => "pins_gamer",
 																					"unit_price" => 0.0,
 																					"quantity" => 1,
@@ -569,7 +571,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 																	<td valign='middle'>
 																		<font color='#FF0000' size='1'
 																			class="int-pagamento-compr-online-message1">Clique
-																			abaixo para efetuar o pagamento.<br>Após o pagamento o
+																			abaixo para efetuar o pagamento.<br>Apï¿½s o pagamento o
 																			processamento leva alguns instantes.</font>
 																	</td>
 																</tr>
@@ -583,7 +585,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 										if ($pagto_tipo == $PAGAMENTO_PIX_NUMERIC) {
 										?>
 											<div id="info_pagamento" pix="1">
-												<b>ATENÇÃO: Não efetue o Pix fora do nosso site. Para cada pagamento será necessário
+												<b>ATENï¿½ï¿½O: Nï¿½o efetue o Pix fora do nosso site. Para cada pagamento serï¿½ necessï¿½rio
 													gerar um novo pedido.</b>
 											</div>
 										<?php
@@ -599,14 +601,14 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 									?>
 
 									<?php
-										//ELSE para exibição do pagamento PINs E-PREPG
+										//ELSE para exibiï¿½ï¿½o do pagamento PINs E-PREPG
 									} else {
 										unset($_SESSION['PINEPP']);
 										unset($_SESSION['PIN_NOMINAL']);
 										echo "</tr><tr><td>
 						<div id='box-principal' name='box-principal'>
 						";
-										// Deserializa os dados da sessão
+										// Deserializa os dados da sessï¿½o
 										$aux_saldo = unserialize($_SESSION['usuarioGames_ser']);
 
 										// Converte os dados para JSON
@@ -654,9 +656,9 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 
 											include_once DIR_CLASS . "classAtivacaoPinTemplate.class.php";
 											/*
-											Na confecção do vetor abaixo onde está sendo mencionado:
+											Na confecï¿½ï¿½o do vetor abaixo onde estï¿½ sendo mencionado:
 											[ $total_geral_epp_cash/100 ]
-											não se trata de conversão e sim uma divisão simples para que o ajax receba o valor dividido por 100 com a finalidade
+											nï¿½o se trata de conversï¿½o e sim uma divisï¿½o simples para que o ajax receba o valor dividido por 100 com a finalidade
 											de facilitar os calculos
 											*/
 											if (b_isIntegracao() && b_isIntegracao_with_nonvalidated_email() && (!b_isIntegracao_logged_in())) {
@@ -711,16 +713,16 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 								.divToken { font: 11px bolder arial, sans-serif; color: #000000; margin: 20px 20px 0px 20px; text-align: left; }
 								.titulo {font: 13px bolder arial, sans-serif; font-weight: bold;}
 							</style>
-							<div class='divToken'><span class='titulo'>Validação do cartão</span><br><br>
-								Para a segurança desta transação, pedimos que digite abaixo o código de 6 dígitos que aparece na fatura do seu cartão. ( Este código aparece após o *, na descrição de sua Última compra pela E-prepag realizada em <nobr>" . htmlspecialchars($data_exibicao, ENT_QUOTES, 'UTF-8') . "</nobr><br><br>
-								Esta operação será solicitada somente uma vez para este cartão.<br><br>
+							<div class='divToken'><span class='titulo'>Validaï¿½ï¿½o do cartï¿½o</span><br><br>
+								Para a seguranï¿½a desta transaï¿½ï¿½o, pedimos que digite abaixo o cï¿½digo de 6 dï¿½gitos que aparece na fatura do seu cartï¿½o. ( Este cï¿½digo aparece apï¿½s o *, na descriï¿½ï¿½o de sua ï¿½ltima compra pela E-prepag realizada em <nobr>" . htmlspecialchars($data_exibicao, ENT_QUOTES, 'UTF-8') . "</nobr><br><br>
+								Esta operaï¿½ï¿½o serï¿½ solicitada somente uma vez para este cartï¿½o.<br><br>
 								<form action='" . htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8') . "' method='POST'>
 									<input type='hidden' name='cielo_pan' id='cielo_pan' value='" . htmlspecialchars($cielo_pan, ENT_QUOTES, 'UTF-8') . "'/>
 									<input type='text' name='token' id='token' maxlength='6' size='5'/>
 									<input type='submit' name='btnToken' id='btnToken' value='Enviar'>
 								</form>
 							</div>";
-											//$cielo_pan contem o hash do cartão
+											//$cielo_pan contem o hash do cartï¿½o
 										} //end if($limite->getPrimeiraVendaGamers())
 										else {
 
@@ -812,7 +814,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 													$rs_pagto = SQLexecuteQueryParams($sql, $params);
 
 													if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
-														$msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
+														$msg = "Nï¿½o foi encontrado o pagamento para a venda " . $venda_id . ".\n";
 													} else {
 														$rs_pagto_row = pg_fetch_array($rs_pagto);
 														$numcompra = $rs_pagto_row['numcompra'];
@@ -883,18 +885,18 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 														//echo "<pre>".print_r($array_infos_ws,true);die();
 
 														if (is_null($array_infos_ws)) {
-															$msg_problem = "Sua sessão expirou!";
-															$titulo = "Sessão expirada";
+															$msg_problem = "Sua sessï¿½o expirou!";
+															$titulo = "Sessï¿½o expirada";
 														} else {
 															$comunica = $obj_pagamento->Req_EfetuaConsultaURL($array_infos_ws, $lista_resposta);
 
 															if (is_null($comunica)) {
-																$titulo = "ERRO - Problema na validação de seus dados";
+																$titulo = "ERRO - Problema na validaï¿½ï¿½o de seus dados";
 																$msg_problem = "Problema ao validar seus dados cadastrados! Por favor, relate o problema ao Suporte";
 															} else {
 																if (is_array($comunica)) {
-																	$titulo = "ERRO - Problema de comunicação com o Bradesco";
-																	$msg_problem = "Houve um problema de comunicação com o Bradesco! Tente novamente mais tarde. Obrigado!";
+																	$titulo = "ERRO - Problema de comunicaï¿½ï¿½o com o Bradesco";
+																	$msg_problem = "Houve um problema de comunicaï¿½ï¿½o com o Bradesco! Tente novamente mais tarde. Obrigado!";
 																} else {
 																	$location = $comunica;
 																}
@@ -953,7 +955,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 											<?php
 														}
 														//Dummy
-														//$smsg = "LOG Integração pagamentos - ".date("Y-m-d H:i:s")."\n orderId1: $orderId, OrderId1: $OrderId, numOrder1: $numOrder\n  taxa: $taxa\n location: $location\n";
+														//$smsg = "LOG Integraï¿½ï¿½o pagamentos - ".date("Y-m-d H:i:s")."\n orderId1: $orderId, OrderId1: $OrderId, numOrder1: $numOrder\n  taxa: $taxa\n location: $location\n";
 														//gravaLog_TMP($smsg);
 
 											?>
@@ -1102,7 +1104,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 					<td align="center" class="texto" colspan="2">&nbsp;</td>
 				</tr>
 				<tr>
-					<td align="center" class="texto" colspan="2">Os seus dados serão fornecidos com toda segurança apenas ao seu
+					<td align="center" class="texto" colspan="2">Os seus dados serï¿½o fornecidos com toda seguranï¿½a apenas ao seu
 						banco.</td>
 				</tr>
 			<?php
@@ -1136,12 +1138,12 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 				Pagamento realizado com sucesso.<br>
 				<?php if ($vg_integracao_parceiro_origem_id) {
 				?>
-					Em alguns minutos o crédito será ativado no jogo.<br>
-					<?php //" e uma mensagem será enviada para seu email cadastrado" 
+					Em alguns minutos o crï¿½dito serï¿½ ativado no jogo.<br>
+					<?php //" e uma mensagem serï¿½ enviada para seu email cadastrado" 
 					?>
 					Para retornar ao site do jogo <a href="javascript:send_to_trans()">clique aqui</a><br>
 				<?php } else { ?>
-					O crédito foi enviado para seu Email cadastrado.<br>
+					O crï¿½dito foi enviado para seu Email cadastrado.<br>
 				<?php } ?>
 				<br>
 
@@ -1250,7 +1252,7 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) { ?>
 	</noscript>
 	<?php
 
-	//Fechando Conexão
+	//Fechando Conexï¿½o
 	//pg_close($connid);
 
 	?>

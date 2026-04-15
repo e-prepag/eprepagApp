@@ -2,8 +2,8 @@
 <?php
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
-require_once $raiz_do_projeto . 'sftp/connect.php';
-require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/connect.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
 if (b_IsBKOUsuarioAdminMeiosPagamentos()) {
     /* 
     CONTROLLER

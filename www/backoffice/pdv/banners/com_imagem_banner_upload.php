@@ -56,9 +56,9 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
                                     if(SFTP_TRANSFER && file_exists($arquivo)){
                                         $arq = trim(str_replace('/', '\\', $arquivo));
                                         //enviar para os servidores via sFTP
-                                        $sftp = new SFTPConnection($server, $port);
-                                        $sftp->login($user, $pass);
-                                        $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/dist_commerce/images/banners/".$nome_arquivo);
+                                        // [SFTP DESATIVADO] $sftp = new SFTPConnection($server, $port);
+                                        // [SFTP DESATIVADO] $sftp->login($user, $pass);
+                                        // [SFTP DESATIVADO] $sftp->uploadFile($arquivo, "E-Prepag/www/web/prepag2/dist_commerce/images/banners/".$nome_arquivo);
 
                                         //$msg .= "<br><br>Imagem de produto enviada ao servidor Windows 2003";
 

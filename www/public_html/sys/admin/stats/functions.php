@@ -362,8 +362,8 @@ function regra3($total_conhecido, $parte_conhecida, $totalx)
 
 function time2min($horario)
 {
-	$hora = substr($horario, 0, 2);
-	$min = substr($horario, 2, 2);
+	$hora = (int) substr($horario, 0, 2);
+	$min = (int) substr($horario, 2, 2);
 
 	$minutos = (60 * $hora) + $min;
 	return $minutos;
@@ -375,8 +375,8 @@ function min2time($min)
 
 	$time = $min;
 
-	$hora = substr($horario, 0, 2);
-	$min = substr($horario, 2, 2);
+	$hora = (int) substr($horario, 0, 2);
+	$min = (int) substr($horario, 2, 2);
 
 	$minutos = (60 * $hora) + $min;
 	return $minutos;
@@ -738,9 +738,10 @@ function verifica_email($email)
 
 function data_mais_um($data)
 {
-	$dia = substr($data, 0, 2);
-	$mes = substr($data, 3, 2);
-	$ano = substr($data, 6, 4);
+	$dia = (int) substr($data, 0, 2);
+	$mes = (int) substr($data, 3, 2);
+	$ano = (int) substr($data, 6, 4);
+	$mes_num = 0;
 
 	if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
 		$bissexto = 1;
@@ -835,9 +836,9 @@ function data_mais_n($data, $qtde_dias)
 
 function data_menos_um($data)
 {
-	$dia = substr($data, 0, 2);
-	$mes = substr($data, 3, 2);
-	$ano = substr($data, 6, 4);
+	$dia = (int) substr($data, 0, 2);
+	$mes = (int) substr($data, 3, 2);
+	$ano = (int) substr($data, 6, 4);
 
 	if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
 		$bissexto = 1;
@@ -907,9 +908,9 @@ function verifica_telEx($tel, $blComTraco = true)
 {
 
 	if ($blComTraco) {
-		return eregi("^[0-9]{4}-[0-9]{4}$", $tel);
+		return preg_match('/^[0-9]{4}-[0-9]{4}$/i', $tel);
 	} else {
-		return eregi("^[0-9]{8}$", $tel);
+		return preg_match('/^[0-9]{8}$/i', $tel);
 	}
 }
 
@@ -1135,6 +1136,9 @@ function verifica_data($data)
 					if ($alerta == 1) {
 						return  0;
 					} else {
+							$dia = (int) $dia;
+							$mes = (int) $mes;
+							$ano = (int) $ano;
 						if ($mes > 12 || $dia > 31) {
 							return 0;
 						} else {
@@ -1496,9 +1500,9 @@ function verifica_cepEx($cep, $blComTraco = true)
 {
 
 	if ($blComTraco) {
-		return eregi("^[0-9]{5}-[0-9]{3}$", $cep);
+		return preg_match('/^[0-9]{5}-[0-9]{3}$/i', $cep);
 	} else {
-		return eregi("^[0-9]{8}$", $cep);
+		return preg_match('/^[0-9]{8}$/i', $cep);
 	}
 }
 
@@ -1594,7 +1598,7 @@ function moeda_char($string)
 			$anterior = substr($dep_virg, 1, 1);
 			$significativo = substr($dep_virg, 0, 1);
 			if ($duvidoso > 5) {
-				$anterior += 1;
+					$anterior = (int) $anterior + 1;
 				$depois_format = $significativo . $anterior;
 			}
 			if ($duvidoso < 5) {
@@ -1602,7 +1606,7 @@ function moeda_char($string)
 			}
 			if ($duvidoso == 5) {
 				if ($anterior % 2 != 0) {
-					$anterior += 1;
+						$anterior = (int) $anterior + 1;
 				}
 				$depois_format = $significativo . $anterior;
 			}
@@ -1900,18 +1904,18 @@ function imprimeComboSeuBanco($mensagem)
 	</script>
 	<form name="formSeuBanco" method="post" action="">
 		<table border="0" cellspacing="0" cellpadding="0" align="center">
-			<? if ($mensagem != "") { ?><tr align="center">
+			<?php if ($mensagem != "") { ?><tr align="center">
 					<td>
-						<font size='2' face='Arial, Helvetica, sans-serif' color='#000099'><? echo $mensagem ?></font>
+						<font size='2' face='Arial, Helvetica, sans-serif' color='#000099'><?php echo $mensagem ?></font>
 					</td>
-				</tr><? } ?>
+				</tr><?php } ?>
 			<tr align="center">
 				<td>
 					<select name="seuBanco">
 						<option value="">Selecione seu Banco</option>
-						<? for ($i = 0; $i < count($URL_BANCOS); $i++) { ?>
-							<option value="<? echo $URL_BANCOS[$i][1] ?>"><? echo $URL_BANCOS[$i][0] ?></option>
-						<? } ?>
+						<?php for ($i = 0; $i < count($URL_BANCOS); $i++) { ?>
+							<option value="<?php echo $URL_BANCOS[$i][1] ?>"><?php echo $URL_BANCOS[$i][0] ?></option>
+						<?php } ?>
 					</select>
 					<input name="btnSeuBanco" type="button" class="botao_amex" value="Ir para seu Banco" onClick="fcnSeuBanco(document.formSeuBanco);">
 				</td>

@@ -13,6 +13,7 @@ if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
         exit;
 }
 $pdo = ConnectionPDO::getConnection()->getLink();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $tf_pins = isset($tf_pins) ? $tf_pins : null;
 
