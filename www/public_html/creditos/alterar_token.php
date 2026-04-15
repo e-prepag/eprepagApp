@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 require_once "../../includes/constantes.php";
-require_once "../class/GoogleAutenticator.php";
+require_once "../libs/PHPGangsta/GoogleAuthenticator.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
 
 $controller = new OfflineController;

@@ -2,12 +2,12 @@
 <?php
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-require_once __DIR__ . '/../includes/configIP.php';
+require_once RAIZ_DO_PROJETO . 'includes/configIP.php';
 if(checkIP()) {
     $server_url = $_SERVER['SERVER_NAME'];
 }
 else {
-    $server_url = defined('EPREPAG_URL') ? EPREPAG_URL : ($_SERVER['SERVER_NAME'] ?? '');
+    $server_url = "" . EPREPAG_URL . "";
 }
 
 // Constante a quantidade limite para aceitação do mesmo CPF
@@ -48,7 +48,7 @@ $vetorReverso = array(
 						CPF_PARTNER_CAF => 'CPF_PARTNER_CAF'
 );
 
-require_once __DIR__ . "/environment.cpf.php";
+require_once RAIZ_DO_PROJETO . "consulta_cpf/environment.cpf.php";
 
 //Definindo valor Default no caso do include estar corrompido
 if(!defined('CPF_PARTNER_ENVIRONMET')) {

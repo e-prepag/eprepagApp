@@ -1,31 +1,30 @@
 <?php
-require_once __DIR__ . "/../includes/constantes.php";
-require_once __DIR__ . "/../includes/functions.php";
-require_once __DIR__ . "/../includes/gamer/functions.php";
-require_once __DIR__ . "/../db/connect.php"; 
-require_once __DIR__ . "/../db/ConnectionPDO.php";
-require_once __DIR__ . "/classEmailAutomatico.php";
-require_once __DIR__ . "/phpmailer/class.phpmailer.php";
-require_once __DIR__ . "/../includes/configIP.php";
-require_once __DIR__ . "/phpmailer/class.smtp.php";
-require_once __DIR__ . "/../includes/load_dotenv.php";
+require_once "/www/includes/constantes.php";
+require_once "/www/includes/functions.php";
+require_once "/www/includes/gamer/functions.php";
+require_once "/www/db/connect.php"; 
+require_once "/www/db/ConnectionPDO.php";
+require_once "/www/class/classEmailAutomatico.php";
+require_once "/www/class/phpmailer/class.phpmailer.php";
+require_once "/www/includes/configIP.php";
+require_once "/www/class/phpmailer/class.smtp.php";
+require_once "/www/includes/load_dotenv.php";
 
 class TwoFactorAuthenticator {
 	
+	private $random_code;
 	private $development;
 	private $connection;
 	private $ug_id;
 	private $ug_login;
 	private $ug_email;
 	
-	private $project_root;
 	public function __construct(
 		$ambient = null,
 		$ug_id = null,
 		$ug_login = null,
 		$ug_email = null
 	) {
-		$this->project_root = dirname(__DIR__) . "/";
 		$this->development = $ambient;
 		$this->connection = ConnectionPDO::getConnection()->getLink();
 		$this->ug_id = $ug_id;
@@ -36,14 +35,14 @@ class TwoFactorAuthenticator {
 	public function generate_random_code(){
 		$code = mt_rand(100000,999999);
 		
-		$token = hash_hmac('sha256', (string) $code, (string) getenv('HMAC_SECRET'));
+		$token = hash_hmac('sha256',$code, getenv('HMAC_SECRET'));
 		
 		return $token;
 	}
 	
 	public function grava_2fa_log($email) {
 		try {
-			$file = fopen($this->project_root . "arquivos_gerados/logs/2fa_tokens.txt", "a+");
+			$file = fopen("/www/arquivos_gerados/logs/2fa_tokens.txt", "a+");
 			fwrite($file, str_repeat("*", 50)."\n");
 			fwrite($file, "DATA: ".date("d-m-Y H:i:s")."\n");
 			fwrite($file, "Teste Livrodjx". "\n");

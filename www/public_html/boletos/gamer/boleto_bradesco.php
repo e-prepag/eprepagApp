@@ -11,9 +11,7 @@ $https = "https";
 //Como o backoffice eh um site diferente do site de venda, eh passado um token para validar.
 //----------------------------------------------------------------------------------------------------------------
 //Recupera token
-$token = isset($token) ? $token : ($_REQUEST['token'] ?? null);
-$venda_id = $venda_id ?? null;
-$usuario_id = $usuario_id ?? null;
+if (!$token) $token = $_REQUEST['token'];
 if ($token && $token != "") {
     $objEncryption = new Encryption();
     $token_decript = $objEncryption->decrypt($token);
@@ -22,8 +20,7 @@ if ($token && $token != "") {
         $data_gerado = $tokenAr[0];
         $venda_id = $tokenAr[1];
         $usuario_id = $tokenAr[2];
-        $dataGeradoInt = ctype_digit((string) $data_gerado) ? (int) $data_gerado : 0;
-        if ($dataGeradoInt === 0 || ((int) date('YmdHis') - $dataGeradoInt > 5 * 60)) { // segundos
+        if (date('YmdHis') - $data_gerado > 5 * 60) { //segundos
             $msg = "Token expirado.";
             $strRedirect = "/game/mensagem.php?msg=" . urlencode($msg) . "&pt=" . urlencode("Boleto Bancário");
             redirect($strRedirect);
@@ -32,12 +29,12 @@ if ($token && $token != "") {
 
     //Recupera o usuario do session
 } else {
-    $usuarioGames = unserialize($_SESSION['usuarioGames_ser'] ?? '');
+    $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
     if ($usuarioGames) {
         //Codigo do usuario
         $usuario_id = $usuarioGames->getId();
         //Codigo da Venda
-        if (!$venda_id) $venda_id = ($_REQUEST['venda'] ?? null);
+        if (!$venda_id) $venda_id = $_REQUEST['venda'];
     }
 }
 
@@ -167,7 +164,7 @@ if ($msg == "") {
     // DADOS DO BOLETO PARA O SEU CLIENTE
     $data_venc         = formata_data($data_venc, 0);
     $taxa_boleto     = $valor_taxa;
-    $valor_boleto     = number_format((float)$valor, 2, ',', '');
+    $valor_boleto     = number_format($valor, 2, ',', '');
     $num_doc         = $num_doc;
     $venda_id        = $venda_id;
 

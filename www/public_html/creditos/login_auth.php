@@ -5,7 +5,7 @@
 // error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
-require '../class/GoogleAutenticator.php';
+require '../libs/PHPGangsta/GoogleAuthenticator.php';
 require_once "/www/includes/load_dotenv.php";
 require_once __DIR__ . '/includes/funcoes_login.php';
 

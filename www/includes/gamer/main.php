@@ -4,7 +4,7 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 ob_start();
-session_start();
+@session_start();
 
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";

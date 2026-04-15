@@ -71,7 +71,7 @@ class classBradescoTransferencia{
     public function montaVetorInformacoes($objUser, $valor_total, $venda_id, $descricao, $is_PDV = FALSE){
         
         //Recupera objeto usuario
-        if(isset($objUser)){
+        if(isset($objUser) && !is_null($objUser)){
             $usuarioId = $objUser->getId();
             
             if($is_PDV){
@@ -151,9 +151,8 @@ class classBradescoTransferencia{
         }
 	}
     
-    private function logEvents($msg, $tipoLog = 'ERROR_LOG', $unused = 0) {
+    private function logEvents($msg, $tipoLog = 'ERROR_LOG') {
 			
-		$fileLog = LOG_FILE_BRADESCO_WS_ERRORS;
 		if($tipoLog == BRADESCO_MSG_ERROR_LOG) 
 			$fileLog = LOG_FILE_BRADESCO_WS_ERRORS;		
 		else if($tipoLog == BRADESCO_MSG_TRANSACTION_LOG) 
@@ -213,7 +212,7 @@ class classBradescoTransferencia{
 		}		
 	}//end 	function getRequestObject
     
-    private function getResponseObject($typeOfService, $soapResponseData) {			
+    private function getResponseObject($typeOfService = '', $soapResponseData) {			
 
         if ($typeOfService == BRADESCO_XML_REQUISICAO) {
             $serialCheck = new XMLEstruturaBradescoTransf();

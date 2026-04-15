@@ -1,8 +1,8 @@
 <?php
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
-// [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/connect.php';
-// [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
+require_once $raiz_do_projeto.'sftp/connect.php';
+require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
 require_once $raiz_do_projeto."class/util/EmailEnvironment.class.php";
 if(b_IsBKOUsuarioAdminServidorEmails()) {
 /* 
@@ -32,9 +32,9 @@ define("EMAIL_SERVER",'.$environment.');
                     $arq = trim(str_replace('/', '\\', $arquivo));
 
                     //enviar para os servidores via sFTP
-                    // [SFTP DESATIVADO] $sftp = new SFTPConnection($server, $port);
-                    // [SFTP DESATIVADO] $sftp->login($user, $pass);
-                    // [SFTP DESATIVADO] $sftp->uploadFile($arquivo, "E-Prepag/incs/".$nome_arquivo);
+                    $sftp = new SFTPConnection($server, $port);
+                    $sftp->login($user, $pass);
+                    $sftp->uploadFile($arquivo, "E-Prepag/incs/".$nome_arquivo);
 
                     $msg .= "<br><br>Arquivo de configuração enviado ao servidor Windows 2003";
 

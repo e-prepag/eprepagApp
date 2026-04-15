@@ -133,12 +133,9 @@ if($msg_erro_ids == ""){
         $resultado .= $bexs->req_Web_service();
     }
 
-    //Enviar arquivo SFTP [DESATIVADO]
-    // if($bexs->getStatus() && $bexs->need_envio_sFTP()) {
-    //     $resultado .= $bexs->envio_sFTP($need_req_Web_Service);
-    // }
-    if($bexs->getStatus()) {
-        $resultado .= "<br>[SFTP desativado] Envio SFTP nao executado.";
+    //Enviar arquivo SFTP
+    if($bexs->getStatus() && $bexs->need_envio_sFTP()) {
+        $resultado .= $bexs->envio_sFTP($need_req_Web_Service);
     }
 
     echo $resultado;

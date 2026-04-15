@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../includes/load_dotenv.php";
+require_once "/www/includes/load_dotenv.php";
 
 // Verifica se as variáveis de ambiente já estão definidas, caso contrário as carrega do .env
 $db_host = getenv('DB_HOST_EPREPAG') ?: "null";

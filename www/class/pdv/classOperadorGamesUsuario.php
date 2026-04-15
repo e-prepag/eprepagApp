@@ -16,8 +16,6 @@ class UsuarioGamesOperador {
     var $ugo_sNome;
     var $ugo_sEmail;
 
-	public $ugo_tipo;
-
 
 /*
     function UsuarioGamesOperador() {
@@ -327,9 +325,7 @@ class UsuarioGamesOperador {
 	}
 	
 	function validarCampos($objOperadorGamesUsuario, $blCompleto){
-	
-		$tipoCadastro = '';
-
+		
 		$ret = "";
 		
 		//Dados do login
@@ -595,9 +591,7 @@ class UsuarioGamesOperador {
 			$ugo_ug_id = $rs_id_row['ugo_ug_id'];
 		}			
 
-		$instanceClassUsuario = new UsuarioGames();
-
-		$objGamesUsuario = $instanceClassUsuario->getUsuarioGamesById($ugo_ug_id);
+		$objGamesUsuario = UsuarioGames::getUsuarioGamesById($ugo_ug_id);
 		if($objGamesUsuario != null) {
 			$ug_ativo = $objGamesUsuario->getAtivo();
                         $ug_substatus = $objGamesUsuario->getSubstatus();
@@ -857,10 +851,10 @@ class UsuarioGamesOperador {
 		//Envia email
 		//--------------------------------------------------------------------------------
 		$parametros['prepag_dominio'] = "http://" . $server_url;
-		$parametros['nome_fantasia'] = "";
-		$parametros['tipo_cadastro'] = "";
-		$parametros['nome'] = "";
-		$parametros['sexo'] = "";
+		$parametros['nome_fantasia'] = $objOperadorGamesUsuario->getNomefantasia();
+		$parametros['tipo_cadastro'] = $objOperadorGamesUsuario->getTipoCadastro();
+		$parametros['nome'] = $objOperadorGamesUsuario->getNome();
+		$parametros['sexo'] = $objOperadorGamesUsuario->getSexo();
 		
 		$msgEmail  = email_cabecalho($parametros);
 		$msgEmail .= "  <br><br>

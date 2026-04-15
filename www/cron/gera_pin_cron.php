@@ -7,8 +7,8 @@
 //error_reporting(E_ALL);
 
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . "/../db/connect.php"; 
-require_once __DIR__ . "/../db/ConnectionPDO.php"; 
+require_once "/www/db/connect.php"; 
+require_once "/www/db/ConnectionPDO.php"; 
 $connection = ConnectionPDO::getConnection()->getLink(); 
 
 

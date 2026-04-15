@@ -153,7 +153,7 @@ class tabelaLista
             while ($rs_query_row = pg_fetch_array($rs_query)) {
                 // Lógica de Estilo da Linha/Célula
                 $classeLinha = '';
-                if ($this->estilos instanceof estilosLista) {
+                if ($this->estilos != '') {
                     // Mantive a lógica original de pegar o estilo pelo objeto
                     $classeLinha = $this->estilos->retornaEstilo($rs_query);
                 }

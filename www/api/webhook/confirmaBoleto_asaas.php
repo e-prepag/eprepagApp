@@ -1,24 +1,21 @@
 <?php
 
-$paymentData = (isset($webhookData) && is_array($webhookData)) ? ($webhookData['payment'] ?? array()) : array();
-$originalValue = (isset($paymentData['originalValue']) && is_numeric($paymentData['originalValue'])) ? (string) $paymentData['originalValue'] : null;
-$value = (isset($paymentData['value']) && is_numeric($paymentData['value'])) ? (string) $paymentData['value'] : null;
-$interestValue = (isset($paymentData['interestValue']) && is_numeric($paymentData['interestValue'])) ? (string) $paymentData['interestValue'] : '0';
-$paymentReference = isset($paymentReference) ? $paymentReference : ($paymentData['externalReference'] ?? null);
-$paymentStatus = isset($paymentStatus) ? $paymentStatus : ($paymentData['status'] ?? null);
+$originalValue = $webhookData['payment']['originalValue'] ? $webhookData['payment']['originalValue'] : null;
+$value = $webhookData['payment']['value'] ? $webhookData['payment']['value'] : null;
+$interestValue = $webhookData['payment']['interestValue'] ? $webhookData['payment']['interestValue'] : 0;
 
 // Se originalValue nao for nulo, faz a verificacao
-if ($originalValue !== null) {
+if (!is_null($originalValue)) {
 	// Soma interestValue ao originalValue caso interestValue nao seja nulo
-	$calculatedValue = bcadd($originalValue, $interestValue, 2);
+	$calculatedValue = $originalValue + $interestValue;
 
 	// Comparacao
-	if ($value === null || bccomp($calculatedValue, $value, 2) !== 0) {
+	if (bccomp($calculatedValue, $value, 2) !== 0) {
 		echo "Valores não batem";
 		exit;
 	}
 }
-if ($value === null) {
+if (!$value) {
 	echo "Não foi possivel obter o valor do boleto";
 	exit;
 }
@@ -68,13 +65,11 @@ class RecebeBoleto
 			$tableName = ($this->ambiente === "PDV") ? "tb_dist_venda_games" : "tb_venda_games";
 			$tableNameBol = ($this->ambiente === "PDV") ? "dist_boleto_bancario_games" : "boleto_bancario_games";
 
-				$sql = "SELECT bbg_pago,
-	                       vg_id AS idvenda,
-	                       vg_data_inclusao,
-	                       vg_ultimo_status AS status,
-	                       vg_ultimo_status,
-	                       vg_pagto_num_docto
-	                FROM {$tableNameBol}
+			$sql = "SELECT bbg_pago,
+                       vg_data_inclusao,
+                       vg_ultimo_status,
+                       vg_pagto_num_docto
+                FROM {$tableNameBol}
                 INNER JOIN {$tableName} ON bbg_vg_id = vg_id
                 WHERE vg_id = :idVenda";
 
@@ -192,11 +187,11 @@ class RecebeBoleto
 				conciliacaoAutomaticaBoletoExpressMoneyLH($this->idVendaConcilia);
 				$novoRetorno = $this->verificaPagamento($this->idVendaConcilia);
 				$conciliado = ($novoRetorno["vg_ultimo_status"] == '5') ? true : false;
-				} else {
-					$novoRetorno["status"] = $venda["status"];
-					$novoRetorno["vg_ultimo_status"] = $venda["vg_ultimo_status"];
-					$conciliado = false;
-				}
+			} else {
+				$novoRetorno["vg_ultimo_status"] = $venda["vg_ultimo_status"];
+				$novoRetorno["vg_ultimo_status"] = $venda["vg_ultimo_status"];
+				$conciliado = false;
+			}
 			$this->gravaLog($venda["idvenda"], $novoRetorno["status"], $venda["status"], $novoRetorno["vg_ultimo_status"]);
 		} else {
 			$venda = $this->verificaPagamento($this->idVendaConcilia);
@@ -222,11 +217,11 @@ class RecebeBoleto
 
 				$novoRetorno = $this->verificaPagamento($this->idVendaConcilia);
 				$conciliado = ($novoRetorno["vg_ultimo_status"] == '5') ? true : false;
-				} else {
-					$novoRetorno["status"] = $venda["status"];
-					$novoRetorno["vg_ultimo_status"] = $venda["vg_ultimo_status"];
-					$conciliado = false;
-				}
+			} else {
+				$novoRetorno["vg_ultimo_status"] = $venda["vg_ultimo_status"];
+				$novoRetorno["vg_ultimo_status"] = $venda["vg_ultimo_status"];
+				$conciliado = false;
+			}
 			$this->gravaLog($venda["idvenda"], $novoRetorno["vg_ultimo_status"], $venda["vg_ultimo_status"], $novoRetorno["vg_ultimo_status"]);
 		}
 
@@ -268,11 +263,6 @@ class RecebeBoleto
 
 
 # 20000000020221109121112256 | 10000000020221109120309450
-if (!empty($tipoUsuario) && !empty($paymentReference) && !empty($paymentStatus)) {
-	$Boleto = new RecebeBoleto($tipoUsuario);
-	$Boleto->conciliaBoleto($paymentReference, $paymentStatus);
-	http_response_code(200);
-} else {
-	http_response_code(400);
-	echo "Dados de webhook inválidos";
-}
+$Boleto = new RecebeBoleto($tipoUsuario);
+$Boleto->conciliaBoleto($paymentReference, $paymentStatus);
+http_response_code(200);

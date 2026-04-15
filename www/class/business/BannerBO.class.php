@@ -1,7 +1,4 @@
 <?php
-if(!isset($raiz_do_projeto)) {
-    $raiz_do_projeto = defined('RAIZ_DO_PROJETO') ? rtrim(RAIZ_DO_PROJETO, '/')."/" : "/www/";
-}
 require_once $raiz_do_projeto . "class/dao/BannerDAO.class.php";
 require_once $raiz_do_projeto . "class/view/BannerVO.class.php";
 require_once $raiz_do_projeto . "class/business/PosicaoBannerBO.class.php";
@@ -24,6 +21,7 @@ class BannerBO extends BannerDAO
 
     public function __construct()
     {
+        $fullPath = RAIZ_DO_PROJETO . "json/";
         $this->_json = new Json;
     }
 
@@ -85,7 +83,7 @@ class BannerBO extends BannerDAO
 
         try {
             if (!$this->validaBanner($post)) {
-                $this->erros[] = "Dados invï¿½lidos";
+                $this->erros[] = "Dados inválidos";
                 throw new Exception;
             }
 
@@ -132,7 +130,7 @@ class BannerBO extends BannerDAO
                 $post["idb"] == "" ||
                 !$this->validaBanner($post)
             ) {
-                $this->erros[] = "Dados invï¿½lidos";
+                $this->erros[] = "Dados inválidos";
                 throw new Exception;
             }
 
@@ -194,33 +192,32 @@ class BannerBO extends BannerDAO
 
     private function removeImagemAntiga($file)
     {
-        global $raiz_do_projeto;
-        if (file_exists($raiz_do_projeto . $this->pasta . $file))
-            unlink($raiz_do_projeto . $this->pasta . $file);
+        if (file_exists(RAIZ_DO_PROJETO . $this->pasta . $file))
+            unlink(RAIZ_DO_PROJETO . $this->pasta . $file);
     }
 
     private function moveImagem($file)
     {
         global $raiz_do_projeto;
-        // Garante que o nome nï¿½o contenha caminhos (../)
+        // Garante que o nome não contenha caminhos (../)
         $safe_filename = basename($file["name"]);
 
         $image_info = @getimagesize($file["tmp_name"]);
 
         if ($image_info === false) {
-            $this->erros[] = "Arquivo invï¿½lido. O arquivo nï¿½o ï¿½ uma imagem suportada.";
+            $this->erros[] = "Arquivo inválido. O arquivo não é uma imagem suportada.";
             return false;
         }
 
-        // Usamos a informaï¿½ï¿½o de MIME que o getimagesize() nos deu.
+        // Usamos a informação de MIME que o getimagesize() nos deu.
         $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-        if (!in_array($image_info['mime'], $allowed_mimes)) {
-            $this->erros[] = "Tipo de imagem no permitido. Apenas JPG, PNG e GIF so aceitos.";
+        if (!isset($image_info['mime']) || !in_array($image_info['mime'], $allowed_mimes)) {
+            $this->erros[] = "Tipo de imagem não permitido. Apenas JPG, PNG e GIF são aceitos.";
             return false;
         }
 
-        $destino_local = $raiz_do_projeto . $this->pasta . $safe_filename;
+        $destino_local = RAIZ_DO_PROJETO . $this->pasta . $safe_filename;
         // 6. Mover o arquivo
         if (!move_uploaded_file($file["tmp_name"], $destino_local)) {
             $this->erros[] = "Erro ao gravar imagem localmente. $destino_local";
@@ -231,29 +228,32 @@ class BannerBO extends BannerDAO
 
     private function validaBanner($post)
     {
+        $urlErro = false;
+
         return (strlen($post["bs_titulo"]) < 4 ||
             strlen($post["bs_link"]) < 8 ||
             strlen($post["bs_data_inicio"]) < 10 ||
             strlen($post["bs_data_fim"]) < 10 ||
             $post["bsc_id"] <= 0 ||
             $post["bsp_id"] <= 0 ||
-            ($post["bs_status"] != 0 && $post["bs_status"] != 1))
+            ($post["bs_status"] != 0 && $post["bs_status"] != 1) ||
+            $urlErro)
             ? false : true;
     }
+
     private function validaImagem($file)
     {
         $ext = explode('/', $file['type']);
-        global $raiz_do_projeto;
         $ext = array_reverse($ext);
 
         if (empty($file["name"]))
             $this->erros[] = "A imagem precisa ter um nome.";
 
         if (!in_array($ext[0], $this->formatos))
-            $this->erros[] = "Formato de imagem invï¿½lido.";
+            $this->erros[] = "Formato de imagem inválido.";
 
-        if (file_exists($raiz_do_projeto . $this->pasta . $file["name"]))
-            $this->erros[] = "Jï¿½ existe uma imagem com esse nome, por favor, renomeie-a e tente novamente.";
+        if (file_exists(RAIZ_DO_PROJETO . $this->pasta . $file["name"]))
+            $this->erros[] = "Já existe uma imagem com esse nome, por favor, renomeie-a e tente novamente.";
 
         return (!empty($this->erros)) ? false : true;
     }
@@ -304,7 +304,7 @@ class BannerBO extends BannerDAO
 
                     if (!isset($arrBanners)) {
                         $arrBanners = array("Vazio");
-                        echo "Nï¿½o estï¿½ setado arrBanners" . PHP_EOL;
+                        echo "Não está setado arrBanners" . PHP_EOL;
                     }
 
                     try {
@@ -369,13 +369,13 @@ class BannerBO extends BannerDAO
 
             // 3. Verificar o resultado
             if ($json) {
-                // getJsonRecursive() jï¿½ retorna o objeto/array decodificado
+                // getJsonRecursive() já retorna o objeto/array decodificado
                 $posicao = html_entity_decode($posicao);
                 return isset($json->$posicao) ? $json->$posicao : false;
             } else {
-                // Se $json for false, o DB nï¿½o encontrou.
-                // Lanï¿½amos uma exceï¿½ï¿½o para acionar a lï¿½gica de fallback (tentar -2.json, -3.json)
-                throw new Exception("JSON '$nomeJson' nï¿½o encontrado no banco.");
+                // Se $json for false, o DB não encontrou.
+                // Lançamos uma exceção para acionar a lógica de fallback (tentar -2.json, -3.json)
+                throw new Exception("JSON '$nomeJson' não encontrado no banco.");
             }
         } catch (Exception $ex) {
             $this->erros[] = $ex->getMessage();
@@ -385,10 +385,10 @@ class BannerBO extends BannerDAO
                 "LINE " . $ex->getLine()
             ));
 
-            // setando qual arquivo json serï¿½ usado em caso de erro
+            // setando qual arquivo json será usado em caso de erro
             $currJsonFile++;
 
-            // A lï¿½gica de fallback ï¿½ mantida
+            // A lógica de fallback é mantida
             if ($currJsonFile <= 3) {
                 return $this->getBannersFromJson($posicao, $categoria, $currJsonFile);
             } else {

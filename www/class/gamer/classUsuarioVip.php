@@ -42,6 +42,10 @@
 			
 			if (!empty($ug_id)) {
 				
+				$ug_id = $ug_id;
+				$op_id = $op_id;
+				$op_nome = $op_nome;
+				
 				$sqlPesquisa = "select * from usuarios_games where ug_id = {$ug_id}";
 				$rsPesquisa = SQLexecuteQuery($sqlPesquisa);
 				$dadosPesquisa = pg_fetch_array($rsPesquisa);
@@ -61,7 +65,7 @@
 					$ug_data_inclusao = date('Y-m-d H:i:s');
 					
 					$sqlAdicao = "insert into tb_gamers_vip (ug_id, ug_vip_status, ug_data_inclusao, op_id, op_nome) values ($1, $2, $3, $4, $5)";
-					$rsAdicao = SQLexecuteQueryParams($sqlAdicao, [$ug_id, $ug_vip_status, $ug_data_inclusao, $op_id, $op_nome]);
+					$rsAdicao = pg_query_params($sqlAdicao, [$ug_id, $ug_vip_status, $ug_data_inclusao, $op_id, $op_nome]);
 					$dadosAdicao = SQLexecuteQuery($rsAdicao);
 					/*
 					$sqlConsultaBloqueio = "select * from usuarios_games_pagamento_bloqueio_log where ugpbl_ug_id = {$ug_id};";
@@ -73,7 +77,7 @@
 						$deletaBloqueio = SQLexecuteQuery($sqlDeletaBloqueio);
 					}
 					*/
-					if ($dadosAdicao != false) {
+					if ($dadosAdicao != false && $dadosAdicao->rowCount() > 0) {
 						return 'Usuário VIP adicionado com sucesso';
 					} else {
 						return 'Erro ao adicionar o usuário à categoria VIP - #888';

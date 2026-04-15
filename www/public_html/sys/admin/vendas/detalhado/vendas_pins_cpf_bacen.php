@@ -810,7 +810,7 @@ if ($BtnSearch) {
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12 ">
-	                        <strong>Relatório BACEN por Publisher (ACAM220) <?php echo $vetor_SIGLA_PAIS['Brazil']; ?></strong>
+                        <strong>Relatório BACEN por Publisher (ACAM220) <? echo $vetor_SIGLA_PAIS['Brazil']; ?></strong>
                     </div>
                 </div>
                 <div class="row txt-cinza">

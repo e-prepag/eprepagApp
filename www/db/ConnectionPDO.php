@@ -1,61 +1,65 @@
 <?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
-require_once __DIR__ . "/connect.php";
 
 class LoggingPDOStatement extends PDOStatement
 {
+    public $queryString;
+
     protected function __construct()
     {
         // O construtor é protegido para evitar instâncias diretas.
     }
 
-    public function execute(?array $bound_input_params = null): bool
+    public function execute($bound_input_params = null)
     {
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        $callerFile = $backtrace[1]['file'] ?? __FILE__;
-        $callerDir = dirname($callerFile);
+        // Verifica se estamos na pasta public_html
+        $backtrace = debug_backtrace();
+        $callerFile = $backtrace[0]['file'];  // Pega o caminho do arquivo que chamou
+        $callerDir = dirname($callerFile);   // Obtém o diretório do arquivo que chamou
 
-        if (
-            strpos($callerDir, 'public_html') === false
-            && (!defined('EPREPAG_URL') || strpos($_SERVER['HTTP_HOST'] ?? '', EPREPAG_URL) === false)
-            && stripos($this->queryString, 'usuarios') === false
-        ) {
+        if (strpos($callerDir, 'public_html') === false 
+            && strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false 
+            && stripos($this->queryString, "usuarios") == false) {
+            // Se não está na pasta public_html, não faz log
             return parent::execute($bound_input_params);
         }
-
+        // Verifica se a consulta é do tipo INSERT ou UPDATE
         if (preg_match('/^\s*(INSERT|UPDATE|DELETE)/i', $this->queryString)) {
-            $log = date('Y-m-d H:i:s') . " | Query: " . $this->queryString . PHP_EOL;
+            // Log da consulta SQL e parâmetros
+            $log = date('Y-m-d H:i:s') . " | Query: " . $this->queryString . PHP_EOL ;
 
-            if ($bound_input_params !== null) {
+            if ($bound_input_params) {
                 $log .= " | Params: " . json_encode($bound_input_params) . PHP_EOL;
             }
 
             $log .= " | Called from: " . $callerFile . PHP_EOL;
 
-            if (isset($_SESSION['dist_usuarioGames_ser'])) {
+            if(isset($_SESSION['dist_usuarioGames_ser'])){
                 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
                 $log .= " | User Id Pdv: " . $usuarioGames->getId() . PHP_EOL;
-            } elseif (isset($_SESSION['usuarioGames_ser'])) {
+            }else if(isset($_SESSION['usuarioGames_ser'])){
                 $usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
                 $log .= " | User Id Gamer: " . $usuarioGames->getId() . PHP_EOL;
-            } else {
+            }else{
                 $log .= " | No users in the session" . PHP_EOL;
             }
 
-            if (!empty($_SERVER['REMOTE_ADDR'])) {
+            if($_SERVER['REMOTE_ADDR']){
                 $log .= " | IP: " . $_SERVER['REMOTE_ADDR'] . PHP_EOL;
             }
 
-            $separator = str_repeat('*', 50);
+            // Linha de separação para melhorar a legibilidade
+            $separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
+
+            // Caminho do arquivo de log
             $logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
 
-            file_put_contents(
-                $logFile,
-                PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL,
-                FILE_APPEND
-            );
+            // Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
+            file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
+
         }
 
+        // Executa a consulta normalmente
         return parent::execute($bound_input_params);
     }
 }
@@ -91,16 +95,10 @@ class ConnectionPDO
     public function connect()
     {
         try {
-            $dbHost = defined("DB_HOST") ? DB_HOST : (getenv("DB_HOST_EPREPAG") ?: "null");
-            $dbPort = defined("DB_PORT") ? DB_PORT : (getenv("DB_PORT_EPREPAG") ?: "null");
-            $dbBanco = defined("DB_BANCO") ? DB_BANCO : (getenv("DB_BANCO_EPREPAG") ?: "null");
-            $dbUser = defined("DB_USER") ? DB_USER : (getenv("DB_USER_EPREPAG") ?: "null");
-            $dbPass = defined("DB_PASS") ? DB_PASS : (getenv("DB_PASS_EPREPAG") ?: "null");
-
             $this->link = new PDO(
-                "pgsql:dbname=" . $dbBanco . ";host=" . $dbHost . ";port=" . $dbPort,
-                $dbUser,
-                $dbPass,
+                'pgsql:dbname=' . DB_BANCO . ';host=' . DB_HOST . ';port=' . DB_PORT,
+                DB_USER,
+                DB_PASS,
                 [
                     PDO::ATTR_PERSISTENT => false,
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -178,6 +176,7 @@ class ConnectionPDO
      */
     public function __clone()
     {
+        return false;
     }
 
 }

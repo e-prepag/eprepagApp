@@ -179,7 +179,7 @@ class classCPF
                                         }
 
                                         //Capturando a resposta da consulta em vetor
-                                        $cpfResponseRecord = $this->getResponseObject($resultWS, $typeOfService);
+                                        $cpfResponseRecord = $this->getResponseObject($typeOfService, $resultWS);
 
                                         return $cpfResponseRecord;
                                 }
@@ -223,7 +223,6 @@ class classCPF
         //Método para exibição da messagem de erro
         public function getErrorMessages($resultWS, $isSoapFault = true)
         {
-                $msg = "";
 
                 if ($isSoapFault) {
                         $msg .= "Message : " . $resultWS->getMessage() . PHP_EOL;
@@ -274,7 +273,7 @@ class classCPF
         } //end 	function getRequestObject
 
         // General method Response
-        private function getResponseObject($soapResponseData, $typeOfService = '')
+        private function getResponseObject($typeOfService = '', $soapResponseData)
         {
 
                 if ($typeOfService == CPF_XML_REQUISICAO) {
@@ -340,9 +339,9 @@ class classCPF
                                         } else {
 
                                                 if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CAF) {
-                                                        require_once __DIR__ . "/Caf.php";
+                                                        require "/www/consulta_cpf/Caf.php";
 
-                                                        $caf = new ClassCaf();
+                                                        $caf = new ClassCAF();
                                                         $lista_resposta = $caf->consultaCPF($requestParams['cpfcnpj'], $requestParams['data_nascimento']);
 
                                                         $file = fopen("/www/arquivos_gerados/logs/logCaf.txt", "a+");
@@ -376,7 +375,7 @@ class classCPF
                                                         }
                                                 } else {
 
-                                                        require_once __DIR__ . "/Onminidata.php";
+                                                        require "/www/consulta_cpf/Onminidata.php";
 
                                                         $onminidata = new Onminidata();
                                                         $onminidata->query($requestParams['cpfcnpj'], $requestParams['data_nascimento']);
@@ -473,9 +472,8 @@ class classCPF
                 return $sret;
         } //end function Req_EfetuaConsulta($requestParams,&$lista_resposta)
 
-        private function logEvents($msg, $tipoLog = 'ERROR_LOG', $extra = null)
+        private function logEvents($msg, $tipoLog = 'ERROR_LOG')
         {
-                $fileLog = LOG_FILE_CPF_WS_ERRORS;
 
                 if ($tipoLog == CPF_MSG_ERROR_LOG)
                         $fileLog = LOG_FILE_CPF_WS_ERRORS;

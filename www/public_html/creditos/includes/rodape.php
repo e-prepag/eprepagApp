@@ -6,7 +6,7 @@
 
   
 	<!-- inicio :: rodape //-->  
-		<?php include $_SERVER["DOCUMENT_ROOT"] . "/eprepag/incs/rodape.php"; ?>
+	<? include $_SERVER['DOCUMENT_ROOT']. "/eprepag/incs/rodape.php" ?>
 	<!-- fim :: rodape //-->
 
 </center>

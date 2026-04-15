@@ -336,7 +336,7 @@ class ProdutoModelo {
 
 			// Debug reinaldops
 			if($filtro['show_treinamento']==1 && $filtro['ogpm_ogp_id']==63) {
-				$sql .= "or (ogpm.ogpm_ogp_id = ".SQLaddFields($filtro['ogpm_ogp_id'], 'n').") \n";
+				$sql .= "or (ogpm.ogpm_ogp_id = ".SQLaddFields($filtro['ogpm_ogp_id']).") \n";
 			}
 		}		
 		if(!is_null($orderBy)) $sql .= " order by " . $orderBy . " \n";

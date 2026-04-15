@@ -8,8 +8,8 @@ require_once "/www/db/ConnectionPDO.php";
 //ini_set('display_startup_errors', '1');
 //error_reporting(E_ALL);
 
-if (($_SERVER["REMOTE_ADDR"] ?? "") == "201.93.162.169") {
-	$url = (string) ($_SERVER["REQUEST_URI"] ?? "");
+if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
+	$url = $_SERVER["REQUEST_URI"];
 	$dadosFiltrados = array_unique(explode("/", $url));
 	$urlQuebrada = array_splice($dadosFiltrados, 1);
 
@@ -19,7 +19,6 @@ if (($_SERVER["REMOTE_ADDR"] ?? "") == "201.93.162.169") {
 		//if(in_array($nomeProduto, $chaves)){
 			//$nomeProduto =  "free";
 			$conexao = ConnectionPDO::getConnection();
-				$conexao->getLink()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			$buscaProduto = "select * from link_produto_amigavel where palavras_chaves like :CHAVE;";
 			$query = $conexao->getLink()->prepare($buscaProduto);
 			$query->bindValue(":CHAVE", "%".$nomeProduto."%");

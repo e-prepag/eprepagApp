@@ -13,7 +13,6 @@ if(empty($_SESSION["iduser_bko_pub"]) && empty($_SESSION["iduser_bko"]))
 date_default_timezone_set('America/Fortaleza');
 
 $pdo = ConnectionPDO::getConnection()->getLink();
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
 $tf_pins = isset($tf_pins) ? $tf_pins : null;

@@ -3,11 +3,11 @@
 // Livrodjx did it right
 
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . "/../db/connect.php";
-require_once __DIR__ . "/../db/ConnectionPDO.php";
-require_once __DIR__ . '/../includes/gamer/inc_sanitize.php';
-// require_once __DIR__ . '/../includes/gamer/chave.php';
-// require_once __DIR__ . '/../includes/gamer/AES.class.php';
+require_once "/www/db/connect.php";
+require_once "/www/db/ConnectionPDO.php";
+require_once '/www/includes/gamer/inc_sanitize.php';
+require_once '/www/includes/gamer/chave.php';
+require_once '/www/includes/gamer/AES.class.php';
 $connection = ConnectionPDO::getConnection()->getLink();
 
 $sql = "SELECT ogp_id, ogp_nome, ogpm_nome, ogpm_descricao, opr_nome, ogp_opr_codigo AS opr_codigo, 
@@ -37,7 +37,7 @@ $separador = 4;
 $serial_length = 10;
 $chars = '0123456789';
 
-function saveLogPinsEstoque($pins, $lote, $operadora, $valor)
+function saveLog($pins, $lote, $operadora, $valor)
 {
     try {
         $file = fopen("/www/arquivos_gerados/logs/cron_estoque_pins.txt", "a+");
@@ -141,7 +141,7 @@ if (count($ret) > 0) {
                 }
             }
 
-            saveLogPinsEstoque($pins_final, $rs_lote["max_pin_lote_codigo"], $value["opr_codigo"], $value["ogpm_valor"]);
+            saveLog($pins_final, $rs_lote["max_pin_lote_codigo"], $value["opr_codigo"], $value["ogpm_valor"]);
         }
     }
 }

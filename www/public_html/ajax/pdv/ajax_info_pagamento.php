@@ -23,7 +23,6 @@ echo date("H:i:s")."<br>";
 
 // recupera cesta
 $pdo = ConnectionPDO::getConnection()->getLink();
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Sanitiza o número da compra, mantendo apenas dígitos
 $numcompra = preg_replace("/\D/", "", $numcompra);

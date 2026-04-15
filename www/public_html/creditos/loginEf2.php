@@ -7,7 +7,7 @@ require_once "../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
-require '../class/GoogleAutenticator.php';
+require '../libs/PHPGangsta/GoogleAuthenticator.php';
 
 // include do arquivo contendo IPs DEV
 require_once DIR_INCS . "configIP.php";

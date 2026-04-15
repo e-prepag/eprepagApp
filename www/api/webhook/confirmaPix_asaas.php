@@ -30,23 +30,17 @@ if ($receivedToken !== ASAAS_SECRET_TOKEN) {
 $webhook = file_get_contents('php://input');
 $webhookData = json_decode($webhook, true);
 
-if (!is_array($webhookData)) {
-	http_response_code(400);
-	exit("Payload inválido");
-}
-
 // Extrai o ID do pagamento do webhook
-$eventType = $webhookData['event'] ?? null;
+$eventType = $webhookData['event'];
 
 if (!($eventType && $eventType == "PAYMENT_RECEIVED")) {
 	http_response_code(200);
 	exit;
 }
 
-$paymentData = $webhookData['payment'] ?? array();
-$paymentStatus = $paymentData['status'] ?? null;
-$paymentReference = $paymentData['externalReference'] ?? null;
-$confirmDate = $paymentData['confirmedDate'] ?? null;
+$paymentStatus = $webhookData['payment']['status'];
+$paymentReference = $webhookData['payment']['externalReference'];
+$confirmDate = $webhookData['payment']['confirmedDate'];
 
 # VERIFICAÇÃO DE QUAL AMBIENTE VAI SER TRABALHADO
 # 20 = PDV

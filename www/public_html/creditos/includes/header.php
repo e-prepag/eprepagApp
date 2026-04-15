@@ -7,12 +7,12 @@ and open the template in the editor.
 <?php
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 
-$strNome = ($controller->usuariosOperador)
-    ? $controller->usuariosOperador->getLogin()
-    : (($controller->usuarios->getTipoCadastro() == 'PF') ? fix_name($controller->usuarios->getNome()) : fix_name($controller->usuarios->getNomeFantasia()));
+$strNome = ($controller->usuariosOperador) ?
+    $controller->usuariosOperador->getLogin()
+    : ($controller->usuarios->getTipoCadastro() == 'PF') ? fix_name($controller->usuarios->getNome()) : fix_name($controller->usuarios->getNomeFantasia());
 
 
-$usuarioGames = unserialize($GLOBALS['_SESSION']['dist_usuarioGames_ser'] ?? '');
+$usuarioGames = unserialize($GLOBALS['_SESSION']['dist_usuarioGames_ser']);
 
 // Verifica se a desserialização foi bem-sucedida e acessa a propriedade
 $showModal = false;

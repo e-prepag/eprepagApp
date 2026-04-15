@@ -147,7 +147,7 @@ class EstornoChargeBackDAO {
 	
     } //end function get
     
-    public function insert (EstornoChargeBackVO $EstornoChargeBack, ?EstornoDadosBancariosVO $EstornoDadosBancarios = null){
+    public function insert (EstornoChargeBackVO $EstornoChargeBack, EstornoDadosBancariosVO $EstornoDadosBancarios = NULL){
         
         try {
             
@@ -157,7 +157,7 @@ class EstornoChargeBackDAO {
             foreach ($arrayTemp as $key => $value) {
                     if($value != "" && $EstornoChargeBack->isCampoTabela($key)) {
                             $arrayCampos[$key] = $value;
-                            if(is_string($value) && substr_count($value, '/') ==  2) {
+                            if(substr_count($value, '/') ==  2) {
                                     $arrayFormatoValores[] = "to_date('%s','DD/MM/YYYY')";
                             }//end if(substr_count($value, '/') ==  2)
                             else {
@@ -172,16 +172,13 @@ class EstornoChargeBackDAO {
                     $sql = vsprintf($query, $arrayCampos);
                     $retorno = SQLexecuteQuery($sql);
                     if($retorno) {
-								if(!($EstornoDadosBancarios instanceof EstornoDadosBancariosVO)) {
-									throw new Exception("FALHA AO INSERIR NOVO ESTORNO / CHARGEBACK. Não é uma classe estorno");
-								}
                             $arrayTemp = $EstornoDadosBancarios->dados;
                             $arrayCampos = array();
                             $arrayFormatoValores = array();
                             foreach ($arrayTemp as $key => $value) {
                                     if($value != "" && $EstornoDadosBancarios->isCampoTabela($key)) {
                                             $arrayCampos[$key] = $value;
-                                            if(is_string($value) && substr_count($value, '/') ==  2) {
+                                            if(substr_count($value, '/') ==  2) {
                                                     $arrayFormatoValores[] = "to_date('%s','DD/MM/YYYY')";
                                             }//end if(substr_count($value, '/') ==  2)
                                             else {
@@ -219,7 +216,7 @@ class EstornoChargeBackDAO {
         
     } //end function insert
     
-    public function update (EstornoChargeBackVO $EstornoChargeBack, $ec_id, ?EstornoDadosBancariosVO $EstornoDadosBancarios = null){
+    public function update (EstornoChargeBackVO $EstornoChargeBack, $ec_id, EstornoDadosBancariosVO $EstornoDadosBancarios = NULL){
         try {
             if(!is_null($ec_id)) {
                     
@@ -230,7 +227,7 @@ class EstornoChargeBackDAO {
                             if($EstornoChargeBack->isCampoTabela($key))  {
                                     if($key  != 'ec_id') {
                                             $arrayCampos[$key] = $value;
-                                            if(is_string($value) && substr_count($value, '/') ==  2) {
+                                            if(substr_count($value, '/') ==  2) {
                                                     $arrayFormatoValores[$key] = "to_date('%s','DD/MM/YYYY')";
                                             }//end if(substr_count($value, '/') ==  2)
                                             elseif($value == ""){
@@ -257,9 +254,6 @@ class EstornoChargeBackDAO {
                             $sql = vsprintf($query, $arrayCampos);
                             $retorno = SQLexecuteQuery($sql);
                             if($retorno) {
-								if(!($EstornoDadosBancarios instanceof EstornoDadosBancariosVO)) {
-									return true;
-								}
                                 //Tratando e atualizando dados bancários
                                 $arrayTemp = $EstornoDadosBancarios->dados;
                                 $arrayCampos = array();
@@ -269,7 +263,7 @@ class EstornoChargeBackDAO {
                                         if($EstornoDadosBancarios->isCampoTabela($key)) {
                                                 if($key  != 'edb_id') {
                                                         $arrayCampos[$key] = $value;
-                                                        if(is_string($value) && substr_count($value, '/') ==  2) {
+                                                        if(substr_count($value, '/') ==  2) {
                                                                 $arrayFormatoValores[$key] = "to_date('%s','DD/MM/YYYY')";
                                                         }//end if(substr_count($value, '/') ==  2)
                                                         elseif($value == ""){
