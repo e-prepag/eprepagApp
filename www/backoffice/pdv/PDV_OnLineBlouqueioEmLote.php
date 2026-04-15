@@ -101,8 +101,8 @@ if(!empty($executar)) {
             <div class="form-group col-md-3">
                 <label for="exampleInputName3">Ação:</label>
                 <select class="form-control" name="acao" id="acao" required="required">
-                    <option value="Bloquear"<?php (empty($acao)||$acao == "Bloquear")?" selected='selected'":""?>>Bloquear</option>
-                    <option value="Desbloquear"<?php (isset($acao) && $acao == "Desbloquear")?" selected='selected'":""?>>Desbloquear</option>
+                    <option value="Bloquear"<?php echo (empty($acao)||$acao == "Bloquear") ? " selected='selected'" : ""; ?>>Bloquear</option>
+                    <option value="Desbloquear"<?php echo (isset($acao) && $acao == "Desbloquear") ? " selected='selected'" : ""; ?>>Desbloquear</option>
                 </select>
             </div>
             <div class="form-group col-md-1">

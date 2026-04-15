@@ -1017,11 +1017,11 @@ ob_end_flush();
                   ?>
                     <tr class="texto" bgcolor="#F5F5FB">
                       <td align="left"><?php echo $vgm_descricao_modelo[$key]; ?></td>
-                      <td align="left"><input type="text" name="vgm_cpf[<? echo $key; ?>]" id="vgm_cpf[<? echo $key; ?>]"
+                      <td align="left"><input type="text" name="vgm_cpf[<?php  echo $key; ?>]" id="vgm_cpf[<?php  echo $key; ?>]"
                           value="<?php echo $value; ?>" maxlength="14" size="14" class="texto cpf" /></td>
                       <td align="left"><?php echo $vgm_nome_cpf[$key]; ?></td>
-                      <td align="left"><input type="text" name="vgm_cpf_data_nascimento[<? echo $key; ?>]"
-                          id="vgm_cpf_data_nascimento[<? echo $key; ?>]"
+                      <td align="left"><input type="text" name="vgm_cpf_data_nascimento[<?php  echo $key; ?>]"
+                          id="vgm_cpf_data_nascimento[<?php  echo $key; ?>]"
                           value="<?php echo formata_data_ts($vgm_cpf_data_nascimento[$key], 0, false, false); ?>"
                           maxlength="10" size="10" class="texto data_nasci" /></td>
                       <td align="right"><span class="glyphicon glyphicon-save-file graphycon-big" aria-hidden="true"
