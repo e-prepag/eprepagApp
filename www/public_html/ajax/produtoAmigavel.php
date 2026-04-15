@@ -11,6 +11,7 @@
 
     $con = ConnectionPDO::getConnection();
     $pdo = $con->getLink();
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $sql = "select * from link_produto_amigavel where id_produto = :PRODUTO;";  
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(":PRODUTO", $prod);

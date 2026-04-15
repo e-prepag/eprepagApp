@@ -171,7 +171,7 @@ $RS_DDD = array (
                  21 => 'RJ',
                  22 => 'RJ',
                  24 => 'RJ',
-                 83 => 'RN',
+                 830 => 'RN',
                  51 => 'RS',
                  53 => 'RS',
                  54 => 'RS',
@@ -283,7 +283,7 @@ if($this->bdebug) echo "IN callService: <pre>".print_r($redeSimRequestRecord, tr
 				echo RS_MSG_USER_PARSING_WSDL;
 
 				$this->logEvents($this->getErrorMessages($resultWS), RS_MSG_ERROR_LOG, 0);	
-				$this->logEventsBD($this->getErrorMessages($resultWS), RS_MSG_ERROR_LOG, 0);		
+				//$this->logEventsBD($this->getErrorMessages($resultWS), RS_MSG_ERROR_LOG, 0);		
 			} else {
 
 if($this->bdebug) $this->logEvents(" callService RESPONSE :\n".$this->getTransactionMessages());
@@ -369,9 +369,9 @@ if($this->bdebug) echo "Em Req_RecargaAction(): <pre>".print_r($rc, true)."</pre
 if($this->bdebug) echo "  == SUCCESS (2): <pre>".print_r($soapResponseData, true)."</pre><br> ";	
 			$Req_Seguros = new Req_Seguros();
 			$Req_SegurosResponseObj = $Req_Seguros->getResponseData($soapResponseData);
-if($this->bdebug) echo "  == SUCCESS (3): <pre>".print_r($Req_SegurosRecord, true)."</pre><br> ";	
-			return $Req_SegurosResponseObj;
-		}
+// if($this->bdebug) echo "  == SUCCESS (3): <pre>".print_r($Req_SegurosRecord, true)."</pre><br> ";	
+// 			return $Req_SegurosResponseObj;
+ 		}
 	}
 	
 	
@@ -408,7 +408,7 @@ if($this->bdebug) echo "  == SUCCESS (3): <pre>".print_r($Req_SegurosRecord, tru
 	public function getErrorMessages($resultWS, $isSoapFault = true) {
 		
 		if ($isSoapFault) {
-			$msg .= "Message : ".$resultWS->getMessage()."\n";
+			$msg = "Message : ".$resultWS->getMessage()."\n";
 			$msg .= "--------------------------\n";
 			$msg .= "TraceString: ".$resultWS->getTraceAsString()."\n";
 			$msg .= "--------------------------\n";
@@ -423,7 +423,7 @@ if($this->bdebug) echo "  == SUCCESS (3): <pre>".print_r($Req_SegurosRecord, tru
 			$msg .= "Detail: ".$resultWS->detail."\n\n\n";
 			$msg .= $this->getTransactionMessages();
 		} else {
-			$msg .= $this->getTransactionMessages();				
+			$msg = $this->getTransactionMessages();				
 		}
 		
 		return $msg;
@@ -991,7 +991,7 @@ echo "$key => $val (R$ ".$resultReq_SegurosAction['ItemValor']->string[$key].", 
                         $params_rc = array();
                         $params_rc["Usuario"]		= RS_USUARIO_EPP;
                         $params_rc["Senha"]		= RS_SENHA_EPP;
-                        $params_rc["PontodeVenda"]	= "Lan_".$pontodevenda;
+                        $params_rc["PontodeVenda"]	= "Lan_";
                         $params_rc["Operadora"]         = $id;//"'".str_pad($id, 4, "0", STR_PAD_LEFT)."'";  // produces "-=-=-Alien" //"'".$id."'";
                         if(isset($GLOBALS['_SESSION']['RS_NIR']) && $GLOBALS['_SESSION']['RS_NIR']) {
                                 $params_rc["NIR"]	= $GLOBALS['_SESSION']['RS_NIR'];

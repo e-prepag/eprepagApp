@@ -12,6 +12,7 @@ class Pins_Store {
 	// variavel que recebera o objeto de cryptografia
 	var $aes;
 		
+	public $bank;
 	
     //O subvetor para o formato tem a seguinte caracteristicas para as posições
 	// 0 = Range de Caracteres
@@ -284,8 +285,8 @@ class Pins_Store {
 			}	
 		}
 		if (!$error) {
-			$user = new User($_POST['user']);
-			$user->passwd($_POST['newPass1']);
+			//$user = new User($_POST['user']);
+			//$user->passwd($_POST['newPass1']);
 		}
 	}
 

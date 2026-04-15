@@ -3,7 +3,7 @@ require_once DIR_CLASS."view/SistemaVO.class.php";
 
 class SistemaDAO{
     
-    private $pdo = false;
+    private $pdo;
     
     public $qtdItens = 0;
     
@@ -16,7 +16,7 @@ class SistemaDAO{
     public $paginaInicial;
     
     public $arrAbasVO;
-    
+
     public function __construct(){
         
         $con = ConnectionPDO::getConnection();
@@ -27,6 +27,14 @@ class SistemaDAO{
             $this->pdo = $con->getLink();
         }
     }
+    private function prepareStatement($sql) {
+        $stmt = $this->pdo->prepare($sql);
+        if ($stmt === false) {
+            throw new Exception("Falha ao preparar SQL.");
+        }
+        return $stmt;
+    }
+
     
     public function getArrIdGrupos() {
         return $this->arrIdGrupos;
@@ -78,7 +86,7 @@ class SistemaDAO{
             }
 
             $sql = "SELECT * FROM bo_aba $where order by aba_order asc";
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->prepareStatement($sql);
             $stmt->execute();
 
             $fetchAbas = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -148,7 +156,7 @@ class SistemaDAO{
         if(!isset($auxSession["menus"])){
             $auxSession["qtdItens"] = 0;
             $sql = "SELECT * FROM bo_menu where aba_id = ? order by menu_order asc";
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->prepareStatement($sql);
             $stmt->execute(
                     array(
                         $idAba
@@ -189,7 +197,7 @@ class SistemaDAO{
     protected function getItensMenu($id){
         
         $where = " AND item_link_linux IS NOT NULL";
-        $itensUsuario = $this->getItensUsuario();
+        $itensUsuario = $this->getItensUsuario() ?? [];
         //echo "<script>console.log(".json_encode($itensUsuario).")</script>";
         if(!empty($itensUsuario)){
             
@@ -203,7 +211,7 @@ class SistemaDAO{
         
         $sql = "SELECT * FROM bo_item WHERE menu_id = ? $where ORDER BY item_order asc";
                 
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->prepareStatement($sql);
         $stmt->execute(
                 array(
                     $id
@@ -241,7 +249,7 @@ class SistemaDAO{
         
         $sql = "select * from bo_item WHERE item_link_linux = '$link' AND item_link_linux IS NOT NULL";
         
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->prepareStatement($sql);
         $stmt->execute();
 
         $fetchItensMenu = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -271,7 +279,7 @@ class SistemaDAO{
     public function setArrIdsGruposUsuario(){
         
         $sql = "SELECT * FROM grupos_acesso_usuarios where id = ?";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->prepareStatement($sql);
         $stmt->execute(
                 array(
                     $this->idUsuario
@@ -316,7 +324,7 @@ class SistemaDAO{
     
     protected function getArrItensByGrupos($idItem = null){
         
-        $arrIdGrupos = $this->getArrIdGrupos();
+        $arrIdGrupos = $this->getArrIdGrupos() ?? [];
         
         if(empty($arrIdGrupos))
             $this->setArrIdsGruposUsuario();
@@ -333,7 +341,7 @@ class SistemaDAO{
         if($stridsGrupos != ''){
             $sql = "SELECT item_id FROM nivel_acesso_item_grupo where grupos_id in($stridsGrupos) $where group by item_id";
 
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->prepareStatement($sql);
             $stmt->execute();
 
             $fetchitensAcessoGrupos = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -356,7 +364,7 @@ class SistemaDAO{
         
         $sql = "SELECT * FROM bo_menu where menu_id = ?";
         
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->prepareStatement($sql);
         $stmt->execute(
                 array(
                     $id

@@ -14,7 +14,7 @@ if (empty($user) || empty($passw)) {
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
-require_once __DIR__ . "/../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once __DIR__ . "/../class/GoogleAutenticator.php";
 require_once "/www/class/classSecureEncryption.php";
 
 $ipReq = $_SERVER['HTTP_CF_CONNECTING_IP'] ?: $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];

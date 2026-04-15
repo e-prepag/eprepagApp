@@ -1065,7 +1065,7 @@ class EnvioEmailAutomatico
 
         $msgEmail = $this->getCorpoEmail();
 
-        $ug_email = $this->getUgEmail();
+        $ug_email = $this->getUgEmail() ?? "";
 
         $bcc = "";
         //envio de email para monitoramento
@@ -1151,6 +1151,9 @@ class EnvioEmailAutomatico
         return '';
     }
 
+    public function __toString(): string {
+        return "classe envia email";
+    }
 
     public function getCorpoEmailTodos($tipo = null)
     {

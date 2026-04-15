@@ -9,8 +9,8 @@
 
 if(!isset($raiz_do_projeto)) 
     $raiz_do_projeto = "/www/";
-if(!defined(RAIZ_DO_PROJETO))
-    define(RAIZ_DO_PROJETO,"/www/");
+if(!defined('RAIZ_DO_PROJETO'))
+    define('RAIZ_DO_PROJETO',"/www/");
 
 require_once $raiz_do_projeto."/class/dao/EstornoChargebackDAO.class.php";
 require_once $raiz_do_projeto."/class/util/Log.class.php";
@@ -19,7 +19,7 @@ require_once $raiz_do_projeto."/class/view/EstornoChargebackVO.class.php";
 require_once $raiz_do_projeto."/class/view/EstornoDadosBancariosVO.class.php";
 require_once $raiz_do_projeto."/class/view/CategoriaEstornoChargebackVO.class.php";
 
-class EstornoChargeBackBO extends EstornoChargebackDAO {
+class EstornoChargeBackBO extends EstornoChargeBackDAO {
     
     public function pegaEstornoChargeBack($filtro = null, $limit = null){
         $this->erros = array();

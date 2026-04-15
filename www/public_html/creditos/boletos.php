@@ -206,8 +206,8 @@ if($rs_cortes){
 
             $Tot_QtdeVendas = 0.0;
             $Tot_VendaBruta = 0.0;
-            $Tot_Comiss?o = 0.0;
-            $Tot_VendaL?quida = 0.0;
+            $Tot_Comissao = 0.0;
+            $Tot_VendaLiquida = 0.0;
 
             if($arr_rs_cortes)
             {
@@ -219,8 +219,8 @@ if($rs_cortes){
 
                     $Tot_QtdeVendas += $rs_cortes_row['cor_venda_qtde'];
                     $Tot_VendaBruta += $rs_cortes_row['cor_venda_bruta'];
-                    $Tot_Comiss?o += $rs_cortes_row['cor_venda_comissao'];
-                    $Tot_VendaL?quida += $rs_cortes_row['cor_venda_liquida'];
+                    $Tot_Comissao += $rs_cortes_row['cor_venda_comissao'];
+                    $Tot_VendaLiquida += $rs_cortes_row['cor_venda_liquida'];
 ?>
                 <div class="hidden-lg hidden-md txt-preto espacamento">
                     <div class="row p-3 borda-fina">
@@ -298,8 +298,8 @@ if($rs_cortes){
 <?php
 $Tot_QtdeVendas = 0.0;
 $Tot_VendaBruta = 0.0;
-$Tot_Comiss?o = 0.0;
-$Tot_VendaL?quida = 0.0;
+$Tot_Comissao = 0.0;
+$Tot_VendaLiquida = 0.0;
 
 if($arr_rs_cortes)
 {
@@ -312,8 +312,8 @@ if($arr_rs_cortes)
 
         $Tot_QtdeVendas += $rs_cortes_row['cor_venda_qtde'];
         $Tot_VendaBruta += $rs_cortes_row['cor_venda_bruta'];
-        $Tot_Comiss?o += $rs_cortes_row['cor_venda_comissao'];
-        $Tot_VendaL?quida += $rs_cortes_row['cor_venda_liquida'];
+        $Tot_Comissao += $rs_cortes_row['cor_venda_comissao'];
+        $Tot_VendaLiquida += $rs_cortes_row['cor_venda_liquida'];
 
 ?>
                     <tr class="trListagem"> 

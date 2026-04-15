@@ -1,4 +1,7 @@
 <?php
+if(!isset($raiz_do_projeto)) {
+    $raiz_do_projeto = defined('RAIZ_DO_PROJETO') ? rtrim(RAIZ_DO_PROJETO, '/')."/" : "/www/";
+}
 require_once $raiz_do_projeto."class/dao/CategoriaBannerDAO.class.php";
 require_once $raiz_do_projeto."class/view/CategoriaBannerVO.class.php";
 

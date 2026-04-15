@@ -327,7 +327,7 @@ class Json
         return $this->_html;
     }
 
-    private function jsonBeautifierMain($json)
+    private function jsonBeautifierMain($json, $id = null)
     {
         foreach ($json as $ind => $arr) {
             if (empty($arr))

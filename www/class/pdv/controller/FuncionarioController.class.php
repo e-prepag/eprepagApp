@@ -16,6 +16,8 @@ $pagina_titulo = "Funcionários";
 class FuncionarioController extends HeaderController{
     public $raiz_do_projeto;
     public $msg;
+
+     public UsuarioGames $usuarios;
         
     public function __construct(){
         $this->objBanner = new BannerBO;
@@ -92,7 +94,7 @@ class FuncionarioController extends HeaderController{
             
             $msg = "<p class='txt-verde'>$msg</p>";
             //Log na base
-            usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CADASTRA_OPERADOR'], $ug_id, null);
+            usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CADASTRA_OPERADOR'], $ug_id ?? "", null);
 //            $strRedirect = "/prepag2/dist_commerce/conta/operador_consulta.php?msg=" . urlencode($msg);
 //            redirect($strRedirect);
             $this->msg = $msg;
@@ -228,6 +230,8 @@ class FuncionarioController extends HeaderController{
     
     public function pega($sel_id)
     {
+        global $ENTRE_CONTATO_CENTRAL;
+
         $operadorCadastrado = $this->usuarios->operadorCadastrado($this->usuarios->getId(), $sel_id);
         
         if(!$operadorCadastrado){
@@ -240,7 +244,7 @@ class FuncionarioController extends HeaderController{
             $ret = $instUsuarioGamesOperador->obter($filtro, null, $rs);
             if(!$rs || pg_num_rows($rs) == 0)
             {
-                $this->msg .= "Login não encontrado." . "\n<br>" . $ENTRE_CONTATO_CENTRAL;	
+                $this->msg .= "Login não encontrado." . "\n<br>" . ($ENTRE_CONTATO_CENTRAL ?? "");	
                 return false;
             } else 
             {

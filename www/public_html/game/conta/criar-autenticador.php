@@ -11,7 +11,7 @@ if ($request_uri !== $script_name) {
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once RAIZ_DO_PROJETO . 'consulta_cpf/config.inc.cpf.php';
-require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once "../../class/GoogleAutenticator.php";
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 

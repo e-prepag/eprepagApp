@@ -5,8 +5,8 @@ require_once $raiz_do_projeto . "backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto . "includes/main.php";
 require_once $raiz_do_projeto . "includes/pdv/main.php";
 require_once $raiz_do_projeto . "class/util/Imagem.class.php";
-require_once $raiz_do_projeto . 'sftp/connect.php';
-require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/connect.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
 $msg = "";
 
 if ($produto_id) {

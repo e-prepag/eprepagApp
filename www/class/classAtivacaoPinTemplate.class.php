@@ -21,16 +21,16 @@ class AtivacaoPinTemplate {
 	/**
 	 * Construtor
 	 * 	 
-	 * @param Array $paramList => URL dos recursos da página, como Imagens, scripts JS, etc..
-	 * @param Boolean usuarioLogado => Diz ao método se existe um usuário Logado 
-	 * @param Boolean exibe_botao_pagar => Diz ao método se exibe ou não o botão pagar 
-	 * @param Decimal saldo => Contem o valor do Saldo do usuário 
-	 * @param Decimal valor_pedido => Contem o valor do Pedido do usuário 
-	 * @param Decimal saldo_final => Contem o valor do Saldo Final do usuário 
-	 * @param String email => Contem o email do usuário 
-	 * @param String captcha_valor => Contem o valor digitado referente ao captcha 
-	 * @param Array $lista_pins => Contem a lista de PINs 
-	 * @param Boolean box_carga_saldo => Diz ao método se é um box de carga no saldo ou de pagamento, onde: true = box de carga no saldo e false = box de pagamento 
+	 * @param array $paramList => URL dos recursos da página, como Imagens, scripts JS, etc..
+	 * @param bool usuarioLogado => Diz ao método se existe um usuário Logado 
+	 * @param bool exibe_botao_pagar => Diz ao método se exibe ou não o botão pagar 
+	 * @param float saldo => Contem o valor do Saldo do usuário 
+	 * @param float valor_pedido => Contem o valor do Pedido do usuário 
+	 * @param float saldo_final => Contem o valor do Saldo Final do usuário 
+	 * @param string email => Contem o email do usuário 
+	 * @param string captcha_valor => Contem o valor digitado referente ao captcha 
+	 * @param array $lista_pins => Contem a lista de PINs 
+	 * @param bool box_carga_saldo => Diz ao método se é um box de carga no saldo ou de pagamento, onde: true = box de carga no saldo e false = box de pagamento 
 	*/
 	public function __construct($paramList,$lista_pins=null) { 		
 		$this->jquery_core_include = $paramList['jquery_core_include'] ? $paramList['jquery_core_include'] : false;
@@ -75,7 +75,7 @@ class AtivacaoPinTemplate {
     	return $this->lista_pins;
     }
     function setListaPINs($lista_pins){
-    	$this->lista_pins = $lista_pins;
+    	$this->lista_pins = is_array($lista_pins) ? $lista_pins : array();
     }
 
     function getSaldo(){
@@ -140,7 +140,7 @@ class AtivacaoPinTemplate {
 	/**
 	 * Gera a URL que será usada na página de Ativação de PINs EPP Cash
 	 * 
-	 * @param String $urlParam
+	 * @param string $urlParam
 	*/
 	public function generateUrl($urlParam) {
 		$server_url = EPREPAG_URL;
@@ -176,7 +176,8 @@ class AtivacaoPinTemplate {
                     $server_url = $_SERVER['SERVER_NAME'];
                     }
 				
-		@$paginaAtivacaoPin .= $this->cssInclude();
+		$paginaAtivacaoPin = '';
+		$paginaAtivacaoPin .= $this->cssInclude();
 		$paginaAtivacaoPin .= $this->jsInclude();						
 //		$paginaAtivacaoPin .= "<div id='box-principal' name='box-principal'>";
         $disblock = (!b_isIntegracao() || $this->getUsuarioLogado()) ? "style='display:block;'" : "";

@@ -61,7 +61,6 @@ class classB2C {
 $this->logEvents("<hr>SUCESSO\n<pre>".htmlentities(str_replace("><", ">\n<", $this->getTransactionMessages()))."</pre>\n<hr>", B2C_MSG_ERROR_LOG, 0);
 				if ($resultWS instanceof SoapFault) {								
 					$this->logEvents($this->getErrorMessages($resultWS), B2C_MSG_ERROR_LOG, 0);	
-					$this->logEventsBD($this->getErrorMessages($resultWS), B2C_MSG_ERROR_LOG, 0);		
 				} else {
 										
 					$b2cResponseRecord = $this->getResponseObject($typeOfService, $resultWS);			
@@ -99,14 +98,11 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		$sql .= SQLaddFields($vb2c_comissao_para_repasse, ""). "";
 		$sql .= ");";
 
-		gravaLog_B2C("Em saveSoapTransaction(): \n".$sql."\n");
-
 		$rs   = SQLexecuteQuery($sql);
 		if($rs) {
 			$ret = true;
 		}
 		else {
-			gravaLog_B2C("Em saveSoapTransaction(): ERROR ao executar o SQL\n");
 			$ret = false;
 		}
 		
@@ -142,7 +138,7 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 	public function getErrorMessages($resultWS, $isSoapFault = true) {
 		
 		if ($isSoapFault) {
-			$msg .= "Message : ".$resultWS->getMessage()."\n";
+			$msg = "Message : ".$resultWS->getMessage()."\n";
 			$msg .= "--------------------------\n";
 			$msg .= "TraceString: ".$resultWS->getTraceAsString()."\n";
 			$msg .= "--------------------------\n";
@@ -157,7 +153,7 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 			$msg .= "Detail: ".$resultWS->detail."\n\n\n";
 			$msg .= $this->getTransactionMessages();
 		} else {
-			$msg .= $this->getTransactionMessages();				
+			$msg = $this->getTransactionMessages();				
 		}
 		
 		return $msg;
@@ -799,7 +795,7 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 
 	}//end function envia_email_produto($params)
 
-	private function logEvents($msg, $tipoLog = 'ERROR_LOG') {
+	private function logEvents($msg, $tipoLog = 'ERROR_LOG', $num) {
 			
 		if($tipoLog == B2C_MSG_ERROR_LOG) 
 			$fileLog = LOG_FILE_B2C_WS_ERRORS;		

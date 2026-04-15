@@ -137,11 +137,15 @@ if (in_array($ipVisitante, $ipsBloqueados)) {
 ob_start();
 @session_start();
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once '/www/vendor/autoload.php';
+
 require_once 'constantes.php';
 require_once $raiz_do_projeto.'db/connect.php';
 require_once $raiz_do_projeto.'db/ConnectionPDO.php';
 require_once $raiz_do_projeto.'includes/functions.php';
-require_once $raiz_do_projeto.'class/phpmailer/PHPMailerAutoload.php';
 require_once $raiz_do_projeto.'class/util/EmailEnvironment.class.php';
 require_once $raiz_do_projeto.'class/classEmailAutomatico.php';
 require_once $raiz_do_projeto.'class/classEncryption.php';

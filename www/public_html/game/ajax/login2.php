@@ -7,7 +7,7 @@ require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once DIR_CLASS . "util/Validate.class.php";
 require_once "/www/class/class2FA.php";
-require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once "../../class/GoogleAutenticator.php";
 /*
  * Programa em AJAX para efetuar o login de gamer
  * 

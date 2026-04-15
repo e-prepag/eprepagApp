@@ -91,7 +91,7 @@ function rnd_string ( $len = CHARSLEN ) {
 	$val = '';
 
 	for ( $i = 0; $i < $len; $i++ ) {
-		$val .= $str { rand ( 0, strlen ( $str ) - 1 ) };
+		$val .= $str[ rand ( 0, strlen ( $str ) - 1 ) ];
 	}
     return $val;
 }

@@ -1,5 +1,11 @@
 <?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once '/www/vendor/autoload.php';
+
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_pagto.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_economy.php";
 require_once RAIZ_DO_PROJETO . "includes/load_dotenv.php";
@@ -41,7 +47,7 @@ if (!function_exists('checkIP')) {
 function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $name = '', $replyTo = '')
 {
 
-        $mail = new PHPMailer();
+        $mail = new \PHPMailer\PHPMailer\PHPMailer();
 
 
 
@@ -57,36 +63,36 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         $mail->isHTML(true);
 
         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
-        $mail->IsSMTP();
+        $mail->isSMTP();
         //$mail->SMTPSecure = "ssl";
         $mail->Port     = getenv("smtp_port");
         //---------------------------------------------------------//  
 
         // Reply-to
-        $mail->AddReplyTo(($replyTo != '' ? $replyTo : getenv("email_suporte")));
+        $mail->addReplyTo(($replyTo != '' ? $replyTo : getenv("email_suporte")));
 
         //To
         if ($to && trim($to) != "") {
                 $toAr = explode(",", $to);
-                for ($i = 0; $i < count($toAr); $i++) $mail->AddAddress($toAr[$i]);
+                for ($i = 0; $i < count($toAr); $i++) $mail->addAddress($toAr[$i]);
         }
 
         //Cc
         if ($cc && trim($cc) != "") {
                 $ccAr = explode(",", $cc);
-                for ($i = 0; $i < count($ccAr); $i++) $mail->AddCC($ccAr[$i]);
+                for ($i = 0; $i < count($ccAr); $i++) $mail->addCC($ccAr[$i]);
         }
 
         //Bcc
         if ($bcc && trim($bcc) != "") {
                 $bccAr = explode(",", $bcc);
-                for ($i = 0; $i < count($bccAr); $i++) $mail->AddBCC($bccAr[$i]);
+                for ($i = 0; $i < count($bccAr); $i++) $mail->addBCC($bccAr[$i]);
         }
 
         if (!empty($attach)) {
                 if ($stringAttach) {
 
-                        $mail->AddStringAttachment($attach, $name);
+                        $mail->addStringAttachment($attach, $name);
                 } else {
 
                         $mail->addAttachment($attach);
@@ -96,7 +102,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        return $mail->Send();
+        return $mail->send();
 } //end function enviaEmail4
 
 function declare_valida_formatacao()
@@ -784,15 +790,15 @@ function redirect($strRedirect)
    */
                                                                         for ($i = 0; $i < $tam; $i++) {
                                                                                 // If I found one '<', $tag++ and continue whithout copy
-                                                                                if ($string{
-                                                                                        $i} == '<') {
+                                                                                if ($string[
+                                                                                        $i] == '<') {
                                                                                         $tag++;
                                                                                         continue;
                                                                                 }
 
                                                                                 // if I found '>', decrease $tag and continue 
-                                                                                if ($string{
-                                                                                        $i} == '>') {
+                                                                                if ($string[
+                                                                                        $i] == '>') {
                                                                                         if ($tag) {
                                                                                                 $tag--;
                                                                                         }
@@ -804,8 +810,8 @@ function redirect($strRedirect)
 
                                                                                 // if $tag is 0, can copy 
                                                                                 if ($tag == 0) {
-                                                                                        $newstring .= $string{
-                                                                                                $i}; // simple copy, only one car
+                                                                                        $newstring .= $string[
+                                                                                                $i]; // simple copy, only one car
                                                                                 }
                                                                         }
                                                                         return $newstring;
@@ -834,7 +840,7 @@ function redirect($strRedirect)
                                                                 function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain)
                                                                 {
 
-                                                                        $mail = new PHPMailer();
+                                                                        $mail = new \PHPMailer\PHPMailer\PHPMailer();
 
 
                                                                         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
@@ -848,29 +854,29 @@ function redirect($strRedirect)
                                                                         $mail->FromName = "E-Prepag";        // " (EPP)"
 
                                                                         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
-                                                                        $mail->IsSMTP();
+                                                                        $mail->isSMTP();
                                                                         ////$mail->SMTPSecure = "ssl";
                                                                         $mail->Port     = getenv("smtp_port");
 
                                                                         // Reply-to
-                                                                        $mail->AddReplyTo(getenv("email_suporte"));
+                                                                        $mail->addReplyTo(getenv("email_suporte"));
 
                                                                         //To
                                                                         if ($to && trim($to) != "") {
                                                                                 $toAr = explode(",", $to);
-                                                                                for ($i = 0; $i < count($toAr); $i++) $mail->AddAddress($toAr[$i]);
+                                                                                for ($i = 0; $i < count($toAr); $i++) $mail->addAddress($toAr[$i]);
                                                                         }
 
                                                                         //Cc
                                                                         if ($cc && trim($cc) != "") {
                                                                                 $ccAr = explode(",", $cc);
-                                                                                for ($i = 0; $i < count($ccAr); $i++) $mail->AddCC($ccAr[$i]);
+                                                                                for ($i = 0; $i < count($ccAr); $i++) $mail->addCC($ccAr[$i]);
                                                                         }
 
                                                                         //Bcc
                                                                         if ($bcc && trim($bcc) != "") {
                                                                                 $bccAr = explode(",", $bcc);
-                                                                                for ($i = 0; $i < count($bccAr); $i++) $mail->AddBCC($bccAr[$i]);
+                                                                                for ($i = 0; $i < count($bccAr); $i++) $mail->addBCC($bccAr[$i]);
                                                                         }
 
 
@@ -879,7 +885,7 @@ function redirect($strRedirect)
                                                                         $mail->Body    = $body_html;
                                                                         $mail->AltBody = $body_plain;
 
-                                                                        $sret = $mail->Send();
+                                                                        $sret = $mail->send();
 
                                                                         gravaLog_EnviaEmail("M", $to, $subject);
 
@@ -1680,7 +1686,7 @@ pin
                                                                                         $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format($rs_row['vgm_valor'], 2, ',', '.') . ")\n";
                                                                                 }
                                                                         }
-                                                                        if (!$cesta_nome || count($cesta_nome) == 0) {
+                                                                        if (!$cesta_nome || strlen($cesta_nome) == 0) {
                                                                                 $sout = "Produto EPP padrao\n";
                                                                         } else {
                                                                                 $sout = $cesta_nome;

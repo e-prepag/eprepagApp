@@ -80,7 +80,7 @@ include $cabecalho_file;
                         <td class="texto"><?php echo $pagto_data_data_full?></td>
                     </tr>
                     <?php
-                    $pagto_nome_docto_Ar = split(";", $PAGTO_NOME_DOCTO[$pagto_banco][$pagto_local]);
+                    $pagto_nome_docto_Ar = explode(";", $PAGTO_NOME_DOCTO[$pagto_banco][$pagto_local]);
                     for($i=0; $i<count($pagto_nome_docto_Ar); $i++){
                     ?>
                     <tr bgcolor="#F0F0F0">

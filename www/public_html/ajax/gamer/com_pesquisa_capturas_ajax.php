@@ -68,8 +68,8 @@ if($tf_version=="undefined") $tf_version = "";
 						<select id="tf_platform" name="tf_platform" class="form2">
 							<option value="" <?php if($tf_platform == "") echo "selected" ?>>Selecione</option>
 							<?php if($rs_platforms) while($rs_platforms_row = pg_fetch_array($rs_platforms)){ ?>					
-							<option value="<? echo $rs_platforms_row['browser_platform']; ?>" <?php if ($tf_platform == $rs_platforms_row['browser_platform']) echo "selected";?>><? echo (($rs_platforms_row["browser_platform"])?$rs_platforms_row["browser_platform"]:"Vazio")." (".$rs_platforms_row["n"]." reg".(($rs_platforms_row["n"]>1)?"s":"").".)"; ?></option>
-							<? } ?>
+							<option value="<?= $rs_platforms_row['browser_platform']; ?>" <?php if ($tf_platform == $rs_platforms_row['browser_platform']) echo "selected";?>><?= (($rs_platforms_row["browser_platform"])?$rs_platforms_row["browser_platform"]:"Vazio")." (".$rs_platforms_row["n"]." reg".(($rs_platforms_row["n"]>1)?"s":"").".)"; ?></option>
+							<?php } ?>
 						</select>&nbsp;
 					</td>
 				    <td width="17%" class="texto" align="right">&nbsp;Navegador&nbsp;</td>
@@ -77,8 +77,8 @@ if($tf_version=="undefined") $tf_version = "";
 						<select id="tf_browser" name="tf_browser" class="form2"> 	<?php //  onChange="change_select()" ?>
 							<option value="" <?php if($tf_browser == "") echo "selected" ?>>Selecione</option>
 							<?php if($rs_browsers) while($rs_browsers_row = pg_fetch_array($rs_browsers)){ ?>					
-							<option value="<? echo $rs_browsers_row['browser_browser']; ?>" <?php if ($tf_browser == $rs_browsers_row['browser_browser']) echo "selected";?>><? echo (($rs_browsers_row["browser_browser"])?$rs_browsers_row["browser_browser"]:"Vazio")." (".$rs_browsers_row["n"]." reg".(($rs_browsers_row["n"]>1)?"s":"").".)"; ?></option>
-							<? } ?>
+							<option value="<?= $rs_browsers_row['browser_browser']; ?>" <?php if ($tf_browser == $rs_browsers_row['browser_browser']) echo "selected";?>><?= (($rs_browsers_row["browser_browser"])?$rs_browsers_row["browser_browser"]:"Vazio")." (".$rs_browsers_row["n"]." reg".(($rs_browsers_row["n"]>1)?"s":"").".)"; ?></option>
+							<?php } ?>
 						</select>&nbsp;
 					</td>
 				    <td width="17%" class="texto" align="right">&nbsp;Versão&nbsp;</td>
@@ -87,8 +87,8 @@ if($tf_version=="undefined") $tf_version = "";
 							<select id="tf_version" name="tf_version" class="form2"> 	<?php //  onChange="change_select()" ?>
 								<option value="" <?php if($tf_version == "") echo "selected" ?>>Selecione</option>
 								<?php if($rs_versions) while($rs_versions_row = pg_fetch_array($rs_versions)){ ?>					
-								<option value="<? echo $rs_versions_row['browser_version']; ?>" <?php if ($tf_version == $rs_versions_row['browser_version']) echo "selected";?>><? echo (($rs_versions_row["browser_version"])?$rs_versions_row["browser_version"]:"Vazio")." (".$rs_versions_row["n"]." reg".(($rs_versions_row["n"]>1)?"s":"").".)"; ?></option>
-								<? } ?>
+								<option value="<?= $rs_versions_row['browser_version']; ?>" <?php if ($tf_version == $rs_versions_row['browser_version']) echo "selected";?>><?= (($rs_versions_row["browser_version"])?$rs_versions_row["browser_version"]:"Vazio")." (".$rs_versions_row["n"]." reg".(($rs_versions_row["n"]>1)?"s":"").".)"; ?></option>
+								<?php } ?>
 							</select>
 						<?php } ?>
 						&nbsp;

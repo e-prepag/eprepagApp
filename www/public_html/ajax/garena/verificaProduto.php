@@ -17,7 +17,7 @@ if (in_array(Garena::getClientIP(), $ipsBloqueados)) {
 	   //error_reporting(E_ALL);
    }*/
 
-$idVenda = $_POST["vde"];
+$idVenda = $_POST["vde"] ?? null;
 
 //$validJson = is_string($_POST) && is_array(json_decode($_POST, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
 
@@ -25,15 +25,15 @@ $logEntry = sprintf(
 	"DATA: %s\rIP REQUISICAO: %s\rORIGEM: %s\r%s\r%s\r",
 	date("d-m-Y H:i:s"),
 	Garena::getClientIP(),
-	$_SERVER["HTTP_REFERER"],
+	($_SERVER["HTTP_REFERER"] ?? ""),
 	json_encode($_POST),
 	str_repeat("*", 50)
 );
 
 file_put_contents('/www/arquivos_gerados/logs/parametros_GARENA.txt', $logEntry, FILE_APPEND);
 
-$_POST["codigo"] = preg_replace("/['\"\s]/", "", $_POST["codigo"]);
-
+$_POST["codigo"] = preg_replace("/[\x27\x22\s]/", "", (string) ($_POST["codigo"] ?? ""));
+$codigo = (string) ($_POST["codigo"] ?? "");
 // utilizado para verificar userName EPP
 if (isset($_POST["user"])) {
 
@@ -75,9 +75,9 @@ if (!isset($_POST["dist"])) {
 
 	if (isset($_POST["verifica"])) {
 
-		if (strlen($_POST["codigo"]) != 20) {
+			if (strlen($codigo) != 20) {
 			$mensagemRetono = json_encode(["Erro" => "Não é possivel fazer o resgate do pin enviado."]);
-			Garena::salvaRetorno($_POST["codigo"], Garena::getClientIP(), $mensagemRetono);
+				Garena::salvaRetorno($codigo, Garena::getClientIP(), $mensagemRetono);
 			echo $mensagemRetono;
 			exit;
 		}

@@ -42,6 +42,8 @@ class bank_sonda {
 	// how long to wait for the Sonda to complete (in seconds)
 	private $CONST_delay_max;
 
+	public $time_stats;
+
     function __construct() {
 
 		$this->CONST_delay_max = 9;
@@ -69,7 +71,6 @@ class bank_sonda {
 				*/
 		);
 	}
-
 
 	public function key_is_Cielo($iforma) {
 		$ret = false;

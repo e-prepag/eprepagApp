@@ -22,8 +22,8 @@ class Utils {
 	/**
 	 * Registra Logs de Eventos em Arquivos Texto
 	 *
-	 * @param String $arquivo
-	 * @param String $mensagem
+	 * @param string $arquivo
+	 * @param string $mensagem
 	*/	
 	static public function logEvent($arquivo, $mensagem) {
 
@@ -40,7 +40,7 @@ class Utils {
 	/**
 	 * Tranforma um Array em JSON
 	 * 
-	 * @param Array $array
+	 * @param array $array
 	*/
 	static public function ArrayToJSON($array) {
 	

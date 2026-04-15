@@ -2473,7 +2473,7 @@ class UsuarioGames
 
     public function getDadosVip()
     {
-        $ug_id = $this->getId();
+        $ug_id = $this->getId() ?? 0;
 
         $sql = "select * from tb_gamers_vip where ug_id = $1;";
         $rs = SQLexecuteQueryParams($sql, [$ug_id]);

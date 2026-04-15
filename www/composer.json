@@ -1,0 +1,7 @@
+{
+    "require": {
+        "phpmailer/phpmailer": "^7.0",
+        "symfony/dotenv": "^8.0",
+        "pragmarx/google2fa": "^9.0"
+    }
+}

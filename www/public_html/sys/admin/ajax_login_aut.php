@@ -9,7 +9,7 @@ require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/chave.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/AES.class.php";
-require_once __DIR__ . "/../../../libs/PHPGangsta/GoogleAuthenticator.php";
+require_once __DIR__ . "/../../../class/GoogleAutenticator.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/configuracao.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/languages.php";
 require_once "../../../includes/load_dotenv.php";

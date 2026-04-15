@@ -56,7 +56,7 @@ class InibeAtaque {
 			}//end while($rs_row = pg_fetch_assoc($rs))
 
 		else {			 
-			$this->logErrors("ERRORS -> (".pg_errormessage().")");
+			$this->logErrors("ERRORS -> (".pg_last_error().")");
 		}
 				
 		return $ret;

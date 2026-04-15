@@ -30,6 +30,7 @@ class AlawarGames {
 			/* Cria Mensagem para Registrar o Tempo de Execucao do Script */
 			$msgImportTask  = "";
 			$msgImportTask .= "Inicio -> ".date("d/m/Y - H:i:s")."\n";
+			$orderBy = "pag_name";
 				
 			$dom = new DOMDocument;
 					
@@ -57,8 +58,8 @@ gravaLog_AlawarXML($gameIdByXML);
 				$jogoCasualProperties = array();
 				
 				/* Pega o ID do Jogo do node @attributes */
-				$gameID = each($itAl);
-				$jogoCasualProperties['game_id'] = $gameID['value']['ID'];
+				$attributes = $itAl->attributes();
+				$jogoCasualProperties['game_id'] = (string)$attributes['ID'];
 				
 				/* O dados recebidos chegam em UTF-8, e precisamos grava-los em ISO-8859-1 (PgSQL) */
 				$jogoCasualProperties['game_name'] = iconv("UTF-8", "ISO-8859-1", trim($itAl->Name));	
@@ -111,15 +112,16 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 				$jogoOnlineProperties = array();
 								
 				/* Pega o ID do Jogo do node @attributes */
-				$gameOnlineID = each($jogosOnline);
-				$jogoOnlineProperties['game_id_online'] = $gameOnlineID['value']['ID'];  
+				$attributesOnline = $jogosOnline->attributes();
+				$jogoOnlineProperties['game_id_online'] = (string)$attributesOnline['ID'];  
 				
 				/* Pega do node Properties as propriedades especificas dos jogos Online */
 				$gidGameRelated = $jogosOnline->xpath("RelatedItems//RelatedItemCatalog[@Code='casualpcgames']//RelatedItem");
 
 				/* Pega o ID do Jogo Offline Relacionado ao Jogo Online */
-				$gameOnlineID = each($gidGameRelated);
-				$jogoOnlineProperties['game_id_related'] = (string)$gameOnlineID['value']['ID'];				
+				$relatedItem = isset($gidGameRelated[0]) ? $gidGameRelated[0] : null;
+				$relatedAttributes = $relatedItem ? $relatedItem->attributes() : null;
+				$jogoOnlineProperties['game_id_related'] = (string)($relatedAttributes ? $relatedAttributes['ID'] : '');				
 				$jogoOnlineProperties['game_name'] = iconv("UTF-8", "ISO-8859-1", trim($jogosOnline->Name));				
 				
 				foreach ($jogosOnline->Properties as $prop) {									
@@ -313,7 +315,7 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 				$this->logEvents("OK", "", "", "Registro Inserido com Sucesso : (ID=".$gameID.",NAME='".$gameName."',STATUS=".$gameStatus.")", $sql);				
 			}
 			else {
-				throw new Exception("Erro ao tentar inserir um jogo alawar na base de dados: (".pg_errormessage().")");
+				throw new Exception("Erro ao tentar inserir um jogo alawar na base de dados: (".pg_last_error().")");
 			}	
 						
 		} catch (Exception $e) {			
@@ -372,7 +374,7 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 				$this->logEvents("OK", "", "", "Registro Atualizado com Sucesso! ", $sql);
 			}
 			else {
-				throw new Exception("Erro ao tentar atualizar um jogo alawar na base de dados: (".pg_errormessage().")");
+				throw new Exception("Erro ao tentar atualizar um jogo alawar na base de dados: (".pg_last_error().")");
 			}
 		} catch (Exception $e) {							
 			$this->logEvents("ERROR", $e->getFile(), $e->getLine(), $e->getMessage(), $sql);
@@ -395,7 +397,7 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 				$ret = true;
 			}
 			else {
-				throw new Exception("Erro ao tentar Desativar um jogo alawar na base de dados: (".pg_errormessage().")");
+				throw new Exception("Erro ao tentar Desativar um jogo alawar na base de dados: (".pg_last_error().")");
 			}
 		} catch (Exception $e) {
 			$this->logEvents("ERROR", $e->getFile(), $e->getLine(), $e->getMessage(), $sql);
@@ -462,8 +464,8 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 				$jogoCasualProperties = array();
 	
 				/* Pega o ID do Jogo do node @attributes */
-				$gameID = each($itAl);
-				$jogoCasualProperties['game_id'] = $gameID['value']['ID'];
+				$attributes = $itAl->attributes();
+				$jogoCasualProperties['game_id'] = (string)$attributes['ID'];
 	
 				/* O dados recebidos chegam em UTF-8, e precisamos grava-los em ISO-8859-1 (PgSQL) */
 				$jogoCasualProperties['game_name'] = iconv("UTF-8", "ISO-8859-1", trim($itAl->Name));

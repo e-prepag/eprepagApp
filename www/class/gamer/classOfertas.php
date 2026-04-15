@@ -56,7 +56,7 @@ class Ofertas {
 				
 		$urlPainelOferta = str_replace("[APP_ID]", $result["ugoc_app_id"], $result["ugoc_canal_url"]);
 		$urlPainelOferta = str_replace("[USER_ID]", $emailUser, $urlPainelOferta);
-		$urlPainelOferta = str_replace("[TRANSACTION_ID]", md5(microtime().uniqid(rand(), true)), $urlPainelOferta);
+		$urlPainelOferta = str_replace("[TRANSACTION_ID]", md5(microtime().uniqid((string)rand(), true)), $urlPainelOferta);
 		
 		$painelOfertas = '	<!-- <Painel Ofertas - '.$result["ugoc_descricao"].'> -->
 							<div class="painelOfertas">
