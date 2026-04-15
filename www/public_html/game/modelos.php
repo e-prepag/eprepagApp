@@ -192,7 +192,7 @@ include DIR_WEB . "game/icludes/cabecalho.php";
     <tr valign="top" align="center">
       <td>Aguarde em Breve os Planos de Acesso</td>
     </tr>
-	<?php
+	<?
 		}
 	?>
 	</table>
@@ -451,4 +451,5 @@ urchinTracker();
         
 <?php
 }
+                }
 ?>

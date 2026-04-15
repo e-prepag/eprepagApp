@@ -1,7 +1,7 @@
 <?php
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
-require_once "../../class/GoogleAutenticator.php";
+require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
 require_once "../../../includes/constantes_url.php";
 
 $posicao = "Inferior Internas";

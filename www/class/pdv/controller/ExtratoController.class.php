@@ -14,9 +14,7 @@ $pagina_titulo = "Saldo";
 
 class ExtratoController extends HeaderController{
     public $raiz_do_projeto;
-    
-    public UsuarioGames $usuarios;
-
+        
     public function __construct(){
         $this->objBanner = new BannerBO;
         
@@ -372,7 +370,6 @@ class ExtratoController extends HeaderController{
             $comissao = $extrato_info['comissao'];
             $status =  $extrato_info['status'];
             $resultado = $extrato_info['resultado'];
-            $rows = "";
 
              //////////////////////////// BOLETO //////////////////////////////////////////////////
              //// s&oacute; desenha a linha se a data do boleto for maior que a data dos pedidos 
@@ -519,6 +516,8 @@ class ExtratoController extends HeaderController{
                         $balanco_img = '/imagens/pdv/balanco_PRE.png';
                         $balanco_title = 'Lan Pré';
                 }
+
+                $last_balanco = $rs_balanco_row['db_valor_balanco'];
 
                 /////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
                 $extrato['tipo'] = "B2C";

@@ -49,7 +49,6 @@ $params		= array('numpin'	=> array ('0' => $numpin,
 					);
 $params		= sanitize_input_data_array($params,$err_cod);
 extract($params, EXTR_OVERWRITE);
-$palavraCodigoSession = strtolower((string)($_SESSION['palavraCodigo'] ?? ""));
 ?>
 <link href="/css/styles.css" rel="stylesheet" type="text/css" />
 <center class="texto">
@@ -71,7 +70,7 @@ if (strtolower($op) != 'uti') {
 	//habilitando a interface
 	$verifica_interface = true;
 
-	if ($palavraCodigoSession == $vercod && $palavraCodigoSession !== "") {
+	if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodigo']!="") {
 		//verificando o numero maximo de tentativas sem sucesso em um determinado intervalo de tempo
 		if(permite_tentativas($PIN_STORE_TENTATIVAS,$PIN_STORE_PERIODO,$msg_ajax)) {
 
@@ -80,7 +79,7 @@ if (strtolower($op) != 'uti') {
 				//Confirmando existencia e valor do PIN EPP CASH
 				$aux_valida_pin = valida_pin($numpin);
 				if ($aux_valida_pin >= 0 || ($numpin == "")) {
-					if (($numpin != "")&&(count($_SESSION['PINEPP'] ?? []) < $PAGTO_RESTR_NUM_MAX_PINS_DEFAULT_DEP)) {
+					if (($numpin != "")&&(count($_SESSION['PINEPP']) < $PAGTO_RESTR_NUM_MAX_PINS_DEFAULT_DEP)) {
 						if(valida_vencimento_pin($numpin)){
 							session_start();
 							addContadorVezCarrinho($numpin);
@@ -102,7 +101,7 @@ if (strtolower($op) != 'uti') {
 				$aux_pin_valor = StatusInquiryPIN_Value($numpin); // Wagner
 //echo "A: '$numpin' -> $aux_pin_valor<br>";
 				if ($aux_pin_valor > 0 || ($numpin == "")) {
-					if (($numpin != "")&&(count($_SESSION['PINEPP'] ?? []) < $PAGTO_RESTR_NUM_MAX_PINS_DEFAULT_DEP)) {
+					if (($numpin != "")&&(count($_SESSION['PINEPP']) < $PAGTO_RESTR_NUM_MAX_PINS_DEFAULT_DEP)) {
 						session_start(); 
 
 						$aux_pin_valor_converted = ConversionPINs::get_ValorReal('G', $aux_pin_valor);
@@ -121,11 +120,11 @@ if (strtolower($op) != 'uti') {
 			//Caso não esteja no formato EPP CASH e nem GoCASH
 			elseif($numpin != "") $msg_ajax .= 'Este PIN n&atilde;o foi identificado (Erro: 3).<br>Por favor, verifique se o c&oacute;digo digitado est&aacute; correto ou entre em contato com o <a href="mailto:suporte@e-prepag.com.br">suporte@e-prepag.com.br</a>\n';
 		}//end if(permite_tentativas($quantidade,$tempo))
-	}//end if ($palavraCodigoSession == $vercod && $palavraCodigoSession !== "")
+	}//end if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodigo']!="")
 	else {
 		$msg_ajax .= "O código da imagem (captcha) está incorreto.<br>Por favor, tente novamente.";
 		sleep(1);
-	}//end else do if ($palavraCodigoSession == $vercod && $palavraCodigoSession !== "")
+	}//end else do if (strtolower($_SESSION['palavraCodigo']) == $vercod && $_SESSION['palavraCodigo']!="")
 }
 else {
 	//Utilizar o PIN

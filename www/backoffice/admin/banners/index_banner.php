@@ -4,8 +4,8 @@
 // error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
-// [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/connect.php';
-// [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
+require_once $raiz_do_projeto.'sftp/connect.php';
+require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
 
 $bds_banner = $_FILES["bds_banner"]["name"] ?: null;
 

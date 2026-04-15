@@ -24,7 +24,6 @@ require_once __DIR__ . "/../../../db/connect.php";
 require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 
 $pdo = ConnectionPDO::getConnection()->getLink();
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
 $valorSelecionado = isset($_REQUEST['valor']) ? intval($_REQUEST['valor']) : null;

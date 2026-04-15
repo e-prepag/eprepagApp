@@ -16,9 +16,7 @@ class LinkAcesso {
 	
 	public function __construct($login){
 		$this->provedor = new Provedor();
-		if(class_exists("SMS")){
-			$this->serviceSMS = new SMS();
-		}
+		$this->serviceSMS = new SMS();
 		$this->login = $login;
 	}
 	

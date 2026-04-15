@@ -2,7 +2,7 @@
 
   //require "/www/db/connect.php";
   //require "/www/db/ConnectionPDO.php";
-  require_once __DIR__ . "/../includes/load_dotenv.php";
+  require_once "/www/includes/load_dotenv.php";
 class Onminidata {
 	
 	/* configuração dodos cliente */

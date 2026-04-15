@@ -139,8 +139,7 @@ class AlawarAPI {
 	
 	private function registerTransaction() {
 				 
-		$usuarioGames = new UsuarioGames();
-		$usuarioGamer = $usuarioGames->getIdUsuarioGamerByEmail($this->getEmail());
+		$usuarioGamer = UsuarioGames::getIdUsuarioGamerByEmail($this->getEmail());
 		
 		$sql  = "INSERT INTO pins_alawar (pa_id, pa_certificate_id, pa_data_transacao, pa_activation_key, pa_ug_id, pa_pag_id) VALUES (";
 		$sql .= SQLaddFields("DEFAULT", ""). ",";
@@ -156,7 +155,7 @@ class AlawarAPI {
 		if($rs) 
 			$ret = true;
 		else {			 
-			$this->logErrors("localhost","ERRORS -> (".pg_last_error().")");
+			$this->logErrors("localhost","ERRORS -> (".pg_errormessage().")");
 		}
 				
 		return $ret;
@@ -176,8 +175,7 @@ class AlawarAPI {
 	
 	private function logErrors($url, $errorMessage) {
 
-		$usuarioGames = new UsuarioGames();
-		$usuarioGamer = $usuarioGames->getIdUsuarioGamerByEmail($this->getEmail());
+		$usuarioGamer = UsuarioGames::getIdUsuarioGamerByEmail($this->getEmail());
 		
 		$sql  = "INSERT INTO pins_alawar_log (pal_id, pal_pa_certificate_id, pal_ug_id, pal_data_log, pal_mensagem_log, pal_pag_id) VALUES (";
 		$sql .= SQLaddFields("DEFAULT", ""). ",";

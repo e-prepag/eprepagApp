@@ -2,7 +2,6 @@
 class PosicaoBannerDAO {
     
     public $posicoes;
-    protected $erros = array();
     
     public function get($filtro){
         $this->posicoes = array();

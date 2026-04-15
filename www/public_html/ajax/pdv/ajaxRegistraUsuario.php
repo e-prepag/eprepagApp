@@ -324,7 +324,6 @@ $msg = $instUsuarioGames->inserirPDO($cad_usuarioGames, $_POST);
 
 if ($msg == "") {
     $pdo = ConnectionPDO::getConnection()->getLink();
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $stmt = $pdo->prepare('SELECT * FROM dist_usuarios_games WHERE ug_email ILIKE ?');
     $stmt->execute(array($email));
     $row = $stmt->fetch(PDO::FETCH_ASSOC);

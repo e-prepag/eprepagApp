@@ -331,10 +331,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 		return $retorno;
 	}//end function VerificarRespondeu()
 
-	function InsereVisualizacao($idBanner = null){
-		if(!is_null($idBanner)) {
-			$this->setIdBanner($idBanner);
-		}
+	function InsereVisualizacao(){
 		$retorno = false;
 		$sql ="INSERT INTO tb_banner_drop_shadow_clicks (bds_id_banner, ug_id, bdsc_data_inclusao, bdsc_tipo_usuario) VALUES (".$this->getIdBanner().",".$this->getUgId().",NOW(),'".$this -> getTipoUsuario()."'); ";
 		$rs_banner_repostas = SQLexecuteQuery($sql);
@@ -362,7 +359,6 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 	}//end InsereClick()
 
 	function CapturaBannerEspecifico($bds_id_banner){
-		$retorno = false;
 		$sql = "SELECT * 
 				FROM tb_banner_drop_shadow 
 				WHERE bds_id_banner=$bds_id_banner;";
@@ -371,7 +367,6 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 			return null;
 		} else {
 			if($rs_banners_row = pg_fetch_array($rs_banners)) {
-							$retorno = true;
 						$this->setIdBanner		($rs_banners_row['bds_id_banner']);
 						$this->setTipoBanner	($rs_banners_row['bds_tipo']);
 						$this->setBannerBanner	($rs_banners_row['bds_imagem_banner']);

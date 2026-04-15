@@ -122,7 +122,7 @@ class Norton{
         return $new;       
     } //end function object_to_array($obj)
 
-    public function logEvents($msg, $tipoLog = 'ERROR_LOG', $pinStatusCode = 0) {
+    public function logEvents($msg, $tipoLog = 'ERROR_LOG') {
 			
         if($tipoLog == NORTON_ERROR_LOG) 
                 $fileLog = NORTON_ERROR_LOG_FILE;		
@@ -140,29 +140,6 @@ class Norton{
         fclose($fp);		
     }//end function logEvents($msg, $tipoLog = 'ERROR_LOG')
     
-    public function getErrorMessages($resultWS, $isSoapFault = true) {
-
-        if ($isSoapFault) {
-            $msg = "Message : ".$resultWS->getMessage().PHP_EOL;
-            $msg .= "--------------------------".PHP_EOL;
-            $msg .= "TraceString: ".$resultWS->getTraceAsString().PHP_EOL;
-            $msg .= "--------------------------".PHP_EOL;
-            $msg .= "Code: ".$resultWS->getCode().PHP_EOL;
-            $msg .= "--------------------------".PHP_EOL;
-            $msg .= "File: ".$resultWS->getFile().PHP_EOL;
-            $msg .= "--------------------------".PHP_EOL;
-            $msg .= "Line: ".$resultWS->getLine().PHP_EOL;
-            $msg .= "--------------------------".PHP_EOL;
-            $msg .= "FaultCode: ".$resultWS->faultcode.PHP_EOL;
-            $msg .= "--------------------------".PHP_EOL;
-            $msg .= "Detail: ".$resultWS->detail.PHP_EOL.PHP_EOL.PHP_EOL;
-            $msg .= $this->getTransactionMessages();
-        } else {
-            $msg = $this->getTransactionMessages();
-        }
-
-        return $msg;
-    }
     public function getTransactionMessages() {
 
         if($this->soapClient) {

@@ -2,8 +2,8 @@
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
-// [SFTP DESATIVADO] require_once '../sftp/connect.php';
-// [SFTP DESATIVADO] require_once '../sftp/classSFTPconnection.php';
+require_once '../sftp/connect.php';
+require_once '../sftp/classSFTPconnection.php';
 
 $json = file_get_contents("../json/file_info.json");
 $arrFiles = json_decode($json);
@@ -17,9 +17,9 @@ foreach($arrFiles->files as $file){
     try
     {
         if(file_exists($file->origem)) {
-            // [SFTP DESATIVADO] $sftp = new SFTPConnection($server, $port);
-            // [SFTP DESATIVADO] $sftp->login($user, $pass);
-            // [SFTP DESATIVADO] $sftp->uploadFile($file->origem, $file->destino);
+            $sftp = new SFTPConnection($server, $port);
+            $sftp->login($user, $pass);
+            $sftp->uploadFile($file->origem, $file->destino);
             echo PHP_EOL;
         }
         else echo "Arquivo de origem não existe!".PHP_EOL.PHP_EOL;

@@ -5,7 +5,7 @@ session_start();
 //ini_set("display_errors", 1); 
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "util/Util.class.php";
-require_once "../../class/GoogleAutenticator.php";
+require_once "../../libs/PHPGangsta/GoogleAuthenticator.php";
 
 /*
  * Programa em AJAX validar os dados de seguranca

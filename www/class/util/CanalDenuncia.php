@@ -14,7 +14,7 @@ class CanalDenuncia
     private $mensagem_denuncia = "";
     private $denuncia_anonima = "";
     private $ug_id = "";
-    private $pdo;
+    private $pdo = "";
     private $errors = array();
 
     public static $ARRAY_MOTIVOS = array(

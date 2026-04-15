@@ -27,7 +27,7 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
         global $raiz_do_projeto;
         $vendas = $this->getVendas($sql);
         
-        if($vendas instanceof VendasLanHouseVO){
+        if($vendas){
             $objCsv = new CSV($cabecalho, md5(uniqid()), $raiz_do_projeto . "arquivos_gerados/csv/", $cabecalhoProdutos, $espacamentoProdutos);
             $objCsv->setCabecalho();
             $objCsv->addSubCabecalho();

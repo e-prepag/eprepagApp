@@ -272,7 +272,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 
 			try {
 
-				$email = new \PHPMailer\PHPMailer\PHPMailer();
+				$email = new PHPMailer;
 
 
 				//$email->Host     = "smtp.e-prepag.com.br";	//"localhost";
@@ -287,7 +287,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				$email->FromName = "E-Prepag";	// " (EPP)"
 
 				//-----Alteração exigida pela BaseNet(11/2017)-------------//
-				$email->isSMTP();
+				$email->IsSMTP();
 				//$email->SMTPSecure = "ssl";
 				$email->Port = getenv("smtp_port");
 				//---------------------------------------------------------//
@@ -305,14 +305,14 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 										  }
 								  */
 				// Reply-to
-				$email->addReplyTo(getenv("email_suporte"));
+				$email->AddReplyTo(getenv("email_suporte"));
 
 				$msg_temp = [];
 				if ($sEmailTo && trim($sEmailTo) != "") {
 					$toAr = explode(",", $sEmailTo);
 					for ($i = 0; $i < sizeof($toAr); $i++) {
 
-						$email->addAddress($toAr[$i]);
+						$email->AddAddress($toAr[$i]);
 						$msg_temp[] = $toAr[$i];
 					}
 				}
@@ -322,7 +322,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				//$email -> AddCC($sEmailCc,$sEmailCcNome);
 				//$email -> AddBCC("wagner@e-prepag.com.br");
 				if (($DISTRIBUIDORA_EPP != intval($distributor_codigo)) && ($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo))) {
-					$email->addAttachment($varArquivoRAR);
+					$email->AddAttachment($varArquivoRAR);
 					$email->Body = $msg_temp[0] . " e " . $msg_temp[1] . ",
 					Segue anexo o arquivo com a relação de PINs Ativos.";
 					$email->Subject = "Arquivo de PINs Ativos";
@@ -340,7 +340,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				}
 				//	echo "[".$email -> Body."]";
 				//	$email -> AltBody = $body_plain;
-				if ($email->send()) {
+				if ($email->Send()) {
 					gravaLog_Depurador("Email enviado com sucesso!" . PHP_EOL);
 
 					if (($DISTRIBUIDORA_EPP != intval($distributor_codigo)) && ($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo))) {

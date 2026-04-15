@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../includes/load_dotenv.php";
+require_once "/www/includes/load_dotenv.php";
 class ClassCaf
 {
 

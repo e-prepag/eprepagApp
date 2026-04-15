@@ -3,7 +3,7 @@
 
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
-require '../class/GoogleAutenticator.php';
+require '../libs/PHPGangsta/GoogleAuthenticator.php';
 
 
 $controller = new OfflineController;

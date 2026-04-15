@@ -15,7 +15,6 @@ class Pins_Publishers
 	// variavel que recebera o objeto de cryptografia Publisher
 	var $aesPub;
 
-	public $bank;
 
 	//O subvetor para o formato tem a seguinte caracteristicas para as posições
 	// 0 = Range de Caracteres
@@ -373,8 +372,8 @@ pin_status          stat_descricao                                 n
 			}
 		}
 		if (!$error) {
-			//$user = new User($_POST['user']);
-			//$user->passwd($_POST['newPass1']);
+			$user = new User($_POST['user']);
+			$user->passwd($_POST['newPass1']);
 		}
 	}
 }

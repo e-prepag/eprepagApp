@@ -30,7 +30,7 @@ class Limite {
 	private $aIsLogin_pagamento= array();
 	private $ip_cliente;
 
-	// Limites pagamentos com cartï¿½o atravï¿½s da Cielo
+	// Limites pagamentos com cartão através da Cielo
 	private $risco_cielo_total_day = 700;
 	private $risco_cielo_npags_day = 20;
 
@@ -55,7 +55,7 @@ class Limite {
 	private	$usuarioGames;
 
 
-	// Fim Limites pagamentos com cartï¿½o atravï¿½s da Cielo
+	// Fim Limites pagamentos com cartão através da Cielo
 
 	// Black List de IPs
 	private $ips_black_list = array(
@@ -69,12 +69,12 @@ class Limite {
 	
 	function __construct($iforma = null,$idusuario = null,$valor = null, $carrinho = null, $periodo_considerado = null) {
 		/*
-		================ Instruï¿½ï¿½es dos parï¿½metros do construtor:
+		================ Instruções dos parâmetros do construtor:
 		$iforma :...............Indica a forma de pagamento escolhida indicado por caracter
-		$idusuario:.............Trata-se do id do usuï¿½rio que esta executando a compra
-		$valor:.................ï¿½ o valor total da compra
-		$carrinho:..............ï¿½ um vetor contendo os opr_codigo dos produtos presentes na venda. 
-		$periodo_considerado:...ï¿½ o periodo utilizado na totalizaï¿½ï¿½o para se chegar no volume a ser comprado com constantes de risco cadastrado no inï¿½cio da classe.
+		$idusuario:.............Trata-se do id do usuário que esta executando a compra
+		$valor:.................É o valor total da compra
+		$carrinho:..............É um vetor contendo os opr_codigo dos produtos presentes na venda. 
+		$periodo_considerado:...É o periodo utilizado na totalização para se chegar no volume a ser comprado com constantes de risco cadastrado no início da classe.
 				valores:	'day', 'week', 'month', 'quarter', 'year'
 		============================================================================================== 
 		*/
@@ -98,11 +98,11 @@ class Limite {
 		$this->setValorMinMax($this->getIForma());
 		$this->setTaxa($this->getIForma());
 		$this->setPeriodoConsiderado($periodo_considerado);
-		$this->setIPCliente();
+		$this->setIPCliente($periodo_considerado);
 
 	} 
     
-	// Metodo que carrega as operadoras para os meios de pagamentos - Primeira versï¿½o
+	// Metodo que carrega as operadoras para os meios de pagamentos - Primeira versão
 	//	 [Bilagames, Stardoll, Webzen, Softnyx, Axeso5]	38, 37, 34, 42, 44
 	function cargaPublishersWhiteList_primeiraversao() {
 
@@ -428,15 +428,15 @@ class Limite {
     	$this->periodo_considerado = $periodo_considerado;
 		
 		// Dados de hoje	
-		$id = (int)date("d");
-		$im = (int)date("m");
-		$iy = (int)date("Y");
-		$ih = (int)date("H");
-		$ii = (int)date("i");
-		$is = (int)date("s");
+		$id = date("d");
+		$im = date("m");
+		$iy = date("Y");
+		$ih = date("H");
+		$ii = date("i");
+		$is = date("s");
 //		echo "Ontem: ".date("Y-m-d H:i:s", mktime($ih, $ii, $is, $im, $id-1, $iy))."<br>";
 //		echo "Semana passada: ".date("Y-m-d H:i:s", mktime($ih, $ii, $is, $im, $id-7, $iy))."<br>";
-//		echo "Mï¿½s passado: ".date("Y-m-d H:i:s", mktime($ih, $ii, $is, $im-1, $id, $iy))."<br>";
+//		echo "Mês passado: ".date("Y-m-d H:i:s", mktime($ih, $ii, $is, $im-1, $id, $iy))."<br>";
 //		echo "trimestre passado: ".date("Y-m-d H:i:s", mktime($ih, $ii, $is, $im-3, $id, $iy))."<br>";
 
 		$d_yesterday = date("Y-m-d H:i:s", mktime($ih, $ii, $is, $im, $id-1, $iy));
@@ -474,7 +474,7 @@ class Limite {
 		$this->ip_cliente = retorna_ip_acesso_new();
 	}
 
-	//Conforme esta habilitado abaixo se um unico item do carrinho for de uma operadora que nï¿½o esta habilitada para a forma de pagamento a compra inteira serï¿½ abortada. 
+	//Conforme esta habilitado abaixo se um unico item do carrinho for de uma operadora que não esta habilitada para a forma de pagamento a compra inteira será abortada. 
 	function verificaPublisherHabilitado(&$msg) {
 		$resposta = false;
 //echo "publishers_white_list: <pre>".print_r($this->publishers_white_list, true)."</pre>";
@@ -492,17 +492,17 @@ class Limite {
 						$msg .= "Valor [".$this->getValor()."] Permitido para este Publisher nesta Forma de Pagamento\n";
 						$resposta = true;
 					} else {
-						$msg .= "Valor [".$this->getValor()."] Nï¿½o Permitido para este Publisher nesta Forma de Pagamento\n";
+						$msg .= "Valor [".$this->getValor()."] Não Permitido para este Publisher nesta Forma de Pagamento\n";
 						$resposta = false;
 						break;
 					}
 				} else {
-					$msg .= "Tipo de Pagamento [".$this->getIForma()."] Nï¿½o Permitido\n";
+					$msg .= "Tipo de Pagamento [".$this->getIForma()."] Não Permitido\n";
 					$resposta = false;
 					break;
 				}
 			} else {
-				$msg .= "Operadora [".$opr_codigo."] Nï¿½o Permitida\n";
+				$msg .= "Operadora [".$opr_codigo."] Não Permitida\n";
 				$resposta = false;
 				break;
 			}
@@ -515,9 +515,9 @@ class Limite {
 		$msg = "";
 
 		if($resposta && !$msg) {
-			// 0 - Testa se Cielo estï¿½ habilitado
+			// 0 - Testa se Cielo está habilitado
 			if(!($this->getCieloHabilitado()==1)) {
-				$msg = "Pagamentos Cielo nï¿½o estï¿½o habilitados\n";
+				$msg = "Pagamentos Cielo não estão habilitados\n";
 				$resposta = false;
 			}
 		}
@@ -530,7 +530,7 @@ class Limite {
 			}
 		}		
 		if($resposta && !$msg) {
-			// 2 - Testa se usuï¿½rio estï¿½ habilitado para Cielo
+			// 2 - Testa se usuário está habilitado para Cielo
 			$usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
 //echo "<pre>".print_r($usuarioGames, true)."</pre>";
 			if(is_object($usuarioGames)) {
@@ -538,11 +538,11 @@ class Limite {
 //gravaLog_DebugTMP("==== ug_use_cielo: \n    usuarioGames->getUseCielo(): ".$usuarioGames->getUseCielo()."\n   ".print_r($usuarioGames, true)." \n");
 
 				if($usuarioGames->getUseCielo()!=1) {
-					$msg = "Usuï¿½rio nï¿½o estï¿½ habilitado para usar pagamentos Cielo (1) \n	Usuï¿½rio: ID: ".$usuarioGames->getId().", Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."\n";
+					$msg = "Usuário não está habilitado para usar pagamentos Cielo (1) \n	Usuário: ID: ".$usuarioGames->getId().", Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."\n";
 					$resposta = false;
 				}
 			} else {
-				$msg = "Usuï¿½rio nï¿½o estï¿½ logado\n	Usuï¿½rio: ID: ".$usuarioGames->getId().", Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."\n";
+				$msg = "Usuário não está logado\n	Usuário: ID: ".$usuarioGames->getId().", Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."\n";
 				$resposta = false;
 			}
 		}
@@ -556,7 +556,7 @@ class Limite {
 //		gravaLog_LimitePagtoOnline($msg_debug);
                 
 /*
- * ************************* TEMPORï¿½RIO PARA NOSSOS USUARIOS
+ * ************************* TEMPORÁRIO PARA NOSSOS USUARIOS
  */
 if(isset($_SESSION['usuarioGames_ser'])) {
     $users_para_excecao = array(53916,2745,46198);    
@@ -565,7 +565,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
         $resposta = true;
     }
 }//end if(isset($_SESSION['usuarioGames_ser'])) 
-//FIM do TEMPORï¿½RIO PARA NOSSOS USUARIOS
+//FIM do TEMPORÁRIO PARA NOSSOS USUARIOS
 
 		return $resposta;
 	}
@@ -574,12 +574,11 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$resposta = true;
 		$msg = "";
 		$usuarioGames = null;
-		$instanceClassUsuario = new UsuarioGames();
 
 		if($resposta && !$msg) {
-			// 0 - Testa se Cielo estï¿½ habilitado
+			// 0 - Testa se Cielo está habilitado
 			if(!($this->getCieloHabilitado()==1)) {
-				$msg = "Pagamentos Cielo nï¿½o estï¿½o habilitados\n";
+				$msg = "Pagamentos Cielo não estão habilitados\n";
 				$resposta = false;
 			}
 		}
@@ -592,11 +591,11 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 			}
 		}		
 		if($resposta && !$msg) {
-			// 2 - Testa se usuï¿½rio estï¿½ habilitado para Cielo
+			// 2 - Testa se usuário está habilitado para Cielo
 			if(isset($_SESSION['usuarioGames_ser'])) {
 				$usuarioGames = unserialize($_SESSION['usuarioGames_ser']);
 			} elseif($this->getIdUsuario()>0) {
-				$usuarioGames = $instanceClassUsuario->getUsuarioGamesById($this->getIdUsuario());
+				$usuarioGames = UsuarioGames::getUsuarioGamesById($this->getIdUsuario());
 			}
 //echo "<pre>".print_r($usuarioGames, true)."</pre>";
 			if(is_object($usuarioGames)) {
@@ -604,11 +603,11 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 //gravaLog_DebugTMP("==== ug_use_cielo: \n    usuarioGames->getUseCielo(): ".$usuarioGames->getUseCielo()."\n   ".print_r($usuarioGames, true)." \n");
 
 				if($usuarioGames->getUseCielo()!=1) {
-					$msg = "Usuï¿½rio nï¿½o estï¿½ habilitado para usar pagamentos Cielo (2)\n	Usuï¿½rio: ID: ".$usuarioGames->getId().", Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."\n";
+					$msg = "Usuário não está habilitado para usar pagamentos Cielo (2)\n	Usuário: ID: ".$usuarioGames->getId().", Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."\n";
 					$resposta = false;
 				}
 			} else {
-				$msg = "Usuï¿½rio nï¿½o estï¿½ logado\n";
+				$msg = "Usuário não está logado\n";
 				$resposta = false;
 			}
 		}
@@ -673,7 +672,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 */
 
 		/*
-		// Se for usuï¿½rio de testes -> sem restriï¿½ï¿½es
+		// Se for usuário de testes -> sem restrições
 		if(in_array($this->getIdUsuario(), $this->aIsLogin_pagamento)) {
 	 		$msg .= "Super Usuario";
 			return true;   	
@@ -684,7 +683,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 //		$this->setValor(300);
 
 		if (!($this->getValor() >= $this->valor_min && $this->getValor() <= $this->valor_max)) {
-			$msg .= "Valor da compra fora do valor Mï¿½nimo e Mï¿½ximo permitido";
+			$msg .= "Valor da compra fora do valor Mínimo e Máximo permitido";
 			return false;
 		}
 
@@ -695,7 +694,6 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$sql .= $this->getCondicoes()." and vg_ultimo_status=5 ";
 
 		$rs = SQLexecuteQuery($sql);
-		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
 			$total = ($rs_row['total'])?$rs_row['total']:0;
@@ -710,7 +708,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 			{
 				// for Debug
 				$msg_debug = "In getVendasTotalDiario(): \n".
-							"total nï¿½o incluido valor da compra abaixo: ".$total." (periodo: ".$this->periodo_considerado.")\n".
+							"total não incluido valor da compra abaixo: ".$total." (periodo: ".$this->periodo_considerado.")\n".
 							"idusuario: ".$this->getIdUsuario()."\n".	// , Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."
 							"valor da compra: ".$this->getValor()."\n".
 							"valor taxa: ".$this->getTaxa()."\n".
@@ -726,11 +724,11 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 				$resposta = true;
 			}
 			else {
-				$msg .= "Ultrapassou a quantidade diï¿½ria de compras.\n";
+				$msg .= "Ultrapassou a quantidade diária de compras.\n";
 			}
 		}
 		else {
-			$msg .= "Ultrapassou o limite diï¿½rio de compras.\n";
+			$msg .= "Ultrapassou o limite diário de compras.\n";
 		}
 
 		if($resposta){
@@ -746,7 +744,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$resposta = false;
 		
 		/*
-		// Se for usuï¿½rio de testes -> sem restriï¿½ï¿½es
+		// Se for usuário de testes -> sem restrições
 		if(in_array($this->getIdUsuario(), $this->aIsLogin_pagamento)) {
 	 		return true;   ??   	
 		}
@@ -760,7 +758,6 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$sql .= $this->getCondicoes()." ; ";	// escolhe pagamentos Cielo
 
 		$rs = SQLexecuteQuery($sql);
-		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
 			$qtde = $rs_row['qtde'];
@@ -779,7 +776,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 				// for Debug
 				$msg_debug = "In getNVendas() 3: \n".
 					"	qtde: $qtde; \n	risco_cielo_90mins_npags: $risco_cielo_90mins_npags; \n	periodo_considerado: '90mins'\n".
-					"	qtde nï¿½o incluindo esta compra: ".$rs_row['qtde']."\n".
+					"	qtde não incluindo esta compra: ".$rs_row['qtde']."\n".
 					"	idusuario: ".$this->getIdUsuario()."\n".		// , Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."
 					"	sql: ".$sql."\n";
 				gravaLog_LimitePagtoOnline($msg_debug);
@@ -787,10 +784,10 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		}
 
 		if($qtde<$risco_cielo_90mins_npags) {
-			$msg .= "N Tentativas nos ï¿½ltimos ".$this->intervalo_para_vendas_em_aberto." minutos [$qtde <= $risco_cielo_90mins_npags] => Permitido\n";
+			$msg .= "N Tentativas nos últimos ".$this->intervalo_para_vendas_em_aberto." minutos [$qtde <= $risco_cielo_90mins_npags] => Permitido\n";
 			$resposta = true;
 		} else {
-			$msg .= "N Tentativas nos ï¿½ltimos ".$this->intervalo_para_vendas_em_aberto." minutos [$qtde > $risco_cielo_90mins_npags] => nï¿½o Permitido\n";
+			$msg .= "N Tentativas nos últimos ".$this->intervalo_para_vendas_em_aberto." minutos [$qtde > $risco_cielo_90mins_npags] => não Permitido\n";
 			$resposta = false;
 		}
 		
@@ -804,7 +801,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$resposta = false;
 		
 		/*
-		// Se for usuï¿½rio de testes -> sem restriï¿½ï¿½es
+		// Se for usuário de testes -> sem restrições
 		if(in_array($this->getIdUsuario(), $this->aIsLogin_pagamento)) {
 	 		return true;   ??   	
 		}
@@ -818,7 +815,6 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$sql .= $this->getCondicoes()." ; ";	// escolhe pagamentos Cielo
 
 		$rs = SQLexecuteQuery($sql);
-		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
 			$qtde = $rs_row['qtde'];
@@ -859,7 +855,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 				// for Debug
 				$msg_debug = "In getNVendas() 2: \n".
 					"	qtde: $qtde; \n	risco_cielo_npags: $risco_cielo_npags; \n	periodo_considerado: '".$this->periodo_considerado."'\n".
-					"	qtde nï¿½o incluindo esta compra: ".$rs_row['qtde']."\n".
+					"	qtde não incluindo esta compra: ".$rs_row['qtde']."\n".
 					"	idusuario: ".$this->getIdUsuario()."\n".		// , Nome: ".$usuarioGames->getNome().", Email: ".$usuarioGames->getEmail()."
 					"	riscopagamentodiario: ".$this->riscopagamentodiario."\n".
 					"	sql: ".$sql."\n";
@@ -896,7 +892,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 
 	function get_debug_table() {
 		echo "<table border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>\n";
-		echo "<tr><td align='left'>CieloHabilitado</td> <td align='left'>".(($this->getCieloHabilitado()==1)?"<font color='blue'>SIM</font>":"<font color='red'>nï¿½o</font>")."</td></tr>\n";
+		echo "<tr><td align='left'>CieloHabilitado</td> <td align='left'>".(($this->getCieloHabilitado()==1)?"<font color='blue'>SIM</font>":"<font color='red'>não</font>")."</td></tr>\n";
 		echo "<tr><td align='left'>iforma</td> <td align='left'>".$this->iforma."</td></tr>\n";
 		echo "<tr><td align='left'>idusuario</td> <td align='left'>".$this->idusuario."</td></tr>\n";
 		echo "<tr><td align='left'>valor</td> <td align='left'>".$this->valor."</td></tr>\n";
@@ -916,7 +912,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 
 	function get_debug_table_str() {
 		$str  = "";
-		$str .= "	CieloHabilitado :".(($this->getCieloHabilitado()==1)?"SIM":"nï¿½o")."\n";
+		$str .= "	CieloHabilitado :".(($this->getCieloHabilitado()==1)?"SIM":"não")."\n";
 		$str .= "	iforma:	".(($this->iforma)?$this->iforma:"  --- EMPTY ---  ")."\n";
 		$str .= "	idusuario:	".$this->idusuario."\n";
 		$str .= "	valor:	".$this->valor."\n";
@@ -937,7 +933,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 
 
 /*
-	Primeira versï¿½o alterada em funï¿½ï¿½o da reuniï¿½o com o Reynaldo
+	Primeira versão alterada em função da reunião com o Reynaldo
 
 	function getPrimeiraVendaGamers(&$cielo_pan) {
 		$sql = "select count(*) as total,cielo_pan from tb_venda_games vg ";
@@ -950,7 +946,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		//echo $sql."<br>";
 		$rs = SQLexecuteQuery($sql);
 		if($rs && pg_num_rows($rs)== 1){
-			//Teste se jï¿½ foi digitado com sucesso o Token para a primeira venda
+			//Teste se já foi digitado com sucesso o Token para a primeira venda
 			//$sql = "select * from codigo_confirmacao where cc_tipo_usuario='M' and cc_ug_id=".SQLaddFields($this->getIdUsuario(), "")." and cc_tipo_pagamento='".$this->getIForma()."' and cc_status='0';";
 			//$rs_token_verify = SQLexecuteQuery($sql);
 			//echo $sql;
@@ -977,7 +973,6 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$sql .= " group by cielo_pan ";
 		//echo $sql."<br>";
 		$rs = SQLexecuteQuery($sql);
-		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			while ($rs_row = pg_fetch_array($rs)) {
 				$cielo_pan = $rs_row['cielo_pan'];
@@ -1050,7 +1045,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 }//end class Limite
 
 //	converte o carrinho de produtos para um carrinho de operadoras
-//		estrutura: Array ( [opr_codigo1] => n1; [opr_codigo] => n2; ... ) onde os n1, n2... sï¿½o o total de pins de cada operadora presente na venda
+//		estrutura: Array ( [opr_codigo1] => n1; [opr_codigo] => n2; ... ) onde os n1, n2... são o total de pins de cada operadora presente na venda
 function converte_carrinho_em_operadoras($carrinho) {
 	
 	$s_carrinho = "";
@@ -1098,9 +1093,9 @@ function converte_carrinho_em_operadoras($carrinho) {
 }
 
 /*
-//exemplo de implementaï¿½ï¿½o
-//para funcionar este exemplo deve-se fazer uma compra na loja em outra aba atï¿½ o momento de seleï¿½ï¿½o do meio de pagamento.
-//entaun somente apï¿½s deverï¿½ executar este.
+//exemplo de implementação
+//para funcionar este exemplo deve-se fazer uma compra na loja em outra aba até o momento de seleção do meio de pagamento.
+//entaun somente após deverá executar este.
 
 $valor_compra = 0;
 $opr_codigo   = array();
@@ -1135,10 +1130,10 @@ echo "Valor: ".$teste->getValor();
 //echo "<br>getCondicoes(): ".$teste->getCondicoes();
 $mensagem = "";
 if ($teste->getVendasTotalDiario($mensagem,$val)) {
-	echo "<br>Transaï¿½ï¿½o OK\nMensagem: \n".$mensagem;
+	echo "<br>Transação OK\nMensagem: \n".$mensagem;
 }
 else {
-	echo "<br>Transaï¿½ï¿½o NAUN OK\nMensagem: \n".$mensagem;
+	echo "<br>Transação NAUN OK\nMensagem: \n".$mensagem;
 }
 echo "<pre>".print_r($val,true)."</pre>";
 //echo "<pre>".print_r($GLOBALS['_SESSION'],true)."</pre>";

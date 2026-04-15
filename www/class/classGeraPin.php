@@ -130,7 +130,7 @@ class GeraPinVariavel
 		if ($aux_spin_codigo == $spin_codigo) {
 
 			$rs_serial++;
-			$spin_serial = str_pad(number_format($rs_serial, 0, '', ''), 10, "0", STR_PAD_LEFT);
+			$spin_serial = str_pad(number_format($rs_serial["max_serial"], 0, '', ''), 10, "0", STR_PAD_LEFT);
 
 			$sql = "SELECT * FROM pins where pin_codigo = '" . $spin_codigo . "' and opr_codigo = " . $this->opr_codigo . ";";
 			$query = $this->connection->prepare($sql);

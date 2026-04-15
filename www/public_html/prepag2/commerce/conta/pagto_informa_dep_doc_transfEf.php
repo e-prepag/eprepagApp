@@ -191,7 +191,7 @@ if (!$ret) {
 			            </tr>";
 	//			                <td class='texto' nowrap>" . $pagto_data_Dia . "/" . $pagto_data_Mes . "/" . $pagto_data_Ano . "</td>
 
-	$pagto_nome_docto_Ar = explode(";", $PAGTO_NOME_DOCTO[$pagto_banco][$pagto_local]);
+	$pagto_nome_docto_Ar = split(";", $PAGTO_NOME_DOCTO[$pagto_banco][$pagto_local]);
 	for ($i = 0; $i < count($pagto_nome_docto_Ar); $i++) {
 		$msgEmail .= "  <tr>
 			            	<td class='texto' nowrap>&nbsp;&nbsp;<b>" . $pagto_nome_docto_Ar[$i] . ":</b></td>

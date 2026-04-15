@@ -8,7 +8,7 @@ class Benchmark{
     private $sistema = "";
     private $tempo = "";
     private $data = "";
-    private $pdo;
+    private $pdo = "";
     private $erro_sistema = "";
     private $errors = array();
     

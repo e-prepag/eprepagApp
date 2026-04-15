@@ -13,10 +13,10 @@ $id = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
 
 if ($id > 0) {
     // Determina a tabela com base no referer
-    $httpReferer = (string)($_SERVER['HTTP_REFERER'] ?? '');
-    $tb = (strpos($httpReferer, 'dist_commerce') > 0)
+    $tb = (strpos($_SERVER['HTTP_REFERER'], 'dist_commerce') > 0)
         ? "tb_dist_operadora_games_produto"
         : "tb_operadora_games_produto";
+
     // Valida se a tabela é permitida (evita SQL Injection via nome de tabela)
     $tabelasPermitidas = ['tb_dist_operadora_games_produto', 'tb_operadora_games_produto'];
     if (!in_array($tb, $tabelasPermitidas)) {

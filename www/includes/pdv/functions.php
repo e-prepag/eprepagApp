@@ -574,7 +574,7 @@ function enviaEmail($to, $cc, $bcc, $subject, $msgEmail, $nome = '')
 function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = '')
 {
 
-        $mail = new \PHPMailer\PHPMailer\PHPMailer();
+        $mail = new PHPMailer();
 
 
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
@@ -588,29 +588,29 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
         $mail->FromName = $nome != '' ? $nome : "E-Prepag";          // "(EPP LH)"
 
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
-        $mail->isSMTP();
+        $mail->IsSMTP();
         //$mail->SMTPSecure = "ssl";
         $mail->Port     = getenv("smtp_port");
 
         // Reply-to
-        $mail->addReplyTo(getenv("email_suporte"));
+        $mail->AddReplyTo(getenv("email_suporte"));
 
         //To
         if ($to && trim($to) != "") {
                 $toAr = explode(",", $to);
-                for ($i = 0; $i < count($toAr); $i++) $mail->addAddress($toAr[$i]);
+                for ($i = 0; $i < count($toAr); $i++) $mail->AddAddress($toAr[$i]);
         }
 
         //Cc
         if ($cc && trim($cc) != "") {
                 $ccAr = explode(",", $cc);
-                for ($i = 0; $i < count($ccAr); $i++) $mail->addCC($ccAr[$i]);
+                for ($i = 0; $i < count($ccAr); $i++) $mail->AddCC($ccAr[$i]);
         }
 
         //Bcc
         if ($bcc && trim($bcc) != "") {
                 $bccAr = explode(",", $bcc);
-                for ($i = 0; $i < count($bccAr); $i++) $mail->addBCC($bccAr[$i]);
+                for ($i = 0; $i < count($bccAr); $i++) $mail->AddBCC($bccAr[$i]);
         }
 
 
@@ -618,7 +618,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        $sret = $mail->send();
+        $sret = $mail->Send();
 
         gravaLog_EnviaEmail("L", $to, $subject);
 
@@ -628,7 +628,7 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
 function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $nome = '')
 {
 
-        $mail = new \PHPMailer\PHPMailer\PHPMailer();
+        $mail = new PHPMailer();
 
 
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
@@ -642,32 +642,32 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         $mail->FromName = "E-Prepag";        // " (EPP)"
         $mail->isHTML(true);
         //-----Alteração exigida pela BaseNet(11/2017)-------------//
-        $mail->isSMTP();
+        $mail->IsSMTP();
         //$mail->SMTPSecure = "ssl";
         $mail->Port     = getenv("smtp_port");
 
         // Reply-to
-        $mail->addReplyTo(getenv("email_suporte"));
+        $mail->AddReplyTo(getenv("email_suporte"));
 
         //To
         if ($to && trim($to) != "") {
                 $toAr = explode(",", $to);
                 for ($i = 0; $i < count($toAr); $i++)
-                        $mail->addAddress($toAr[$i]);
+                        $mail->AddAddress($toAr[$i]);
         }
 
         //Cc
         if ($cc && trim($cc) != "") {
                 $ccAr = explode(",", $cc);
                 for ($i = 0; $i < count($ccAr); $i++)
-                        $mail->addCC($ccAr[$i]);
+                        $mail->AddCC($ccAr[$i]);
         }
 
         //Bcc
         if ($bcc && trim($bcc) != "") {
                 $bccAr = explode(",", $bcc);
                 for ($i = 0; $i < count($bccAr); $i++)
-                        $mail->addBCC($bccAr[$i]);
+                        $mail->AddBCC($bccAr[$i]);
         }
 
         $mail->Subject = $subject;
@@ -682,7 +682,7 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
                 }
         }
 
-        $sret = $mail->send();
+        $sret = $mail->Send();
 
         gravaLog_EnviaEmail("L", $to, $subject);
 

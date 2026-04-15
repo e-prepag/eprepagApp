@@ -292,7 +292,7 @@ ob_end_flush();
 					  <td width="200">
 						&nbsp;&nbsp;
 						<?php echo $rs_venda_modelos_row['vgm_nome_produto']?> 
-							<?php if($rs_venda_modelos_row["vgm_nome_modelo"]!=""){?> - <?php echo $rs_venda_modelos_row["vgm_nome_modelo"]?><?php } ?>
+						<?php if($rs_venda_modelos_row['vgm_nome_modelo']!=""){?> - <?php echo $rs_venda_modelos_row['vgm_nome_modelo']?><?}?>
 					  </td>
 					  <td align="center"><?php echo $qtde?></td>
 					  <td align="right"><?php echo number_format($valor, 2, ',', '.')?></td>
