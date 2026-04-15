@@ -1,5 +1,6 @@
 <?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
+require_once __DIR__ . "/connect.php";
 
 class LoggingPDOStatement extends PDOStatement
 {
@@ -16,7 +17,7 @@ class LoggingPDOStatement extends PDOStatement
 
         if (
             strpos($callerDir, 'public_html') === false
-            && strpos($_SERVER['HTTP_HOST'] ?? '', EPREPAG_URL) === false
+            && (!defined('EPREPAG_URL') || strpos($_SERVER['HTTP_HOST'] ?? '', EPREPAG_URL) === false)
             && stripos($this->queryString, 'usuarios') === false
         ) {
             return parent::execute($bound_input_params);
@@ -90,10 +91,16 @@ class ConnectionPDO
     public function connect()
     {
         try {
+            $dbHost = defined("DB_HOST") ? DB_HOST : (getenv("DB_HOST_EPREPAG") ?: "null");
+            $dbPort = defined("DB_PORT") ? DB_PORT : (getenv("DB_PORT_EPREPAG") ?: "null");
+            $dbBanco = defined("DB_BANCO") ? DB_BANCO : (getenv("DB_BANCO_EPREPAG") ?: "null");
+            $dbUser = defined("DB_USER") ? DB_USER : (getenv("DB_USER_EPREPAG") ?: "null");
+            $dbPass = defined("DB_PASS") ? DB_PASS : (getenv("DB_PASS_EPREPAG") ?: "null");
+
             $this->link = new PDO(
-                'pgsql:dbname=' . DB_BANCO . ';host=' . DB_HOST . ';port=' . DB_PORT,
-                DB_USER,
-                DB_PASS,
+                "pgsql:dbname=" . $dbBanco . ";host=" . $dbHost . ";port=" . $dbPort,
+                $dbUser,
+                $dbPass,
                 [
                     PDO::ATTR_PERSISTENT => false,
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -171,7 +178,6 @@ class ConnectionPDO
      */
     public function __clone()
     {
-        return false;
     }
 
 }
