@@ -1,11 +1,13 @@
-<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
 <?php
 session_start();
 session_destroy();
+header("Content-Type: text/html; charset=ISO-8859-1",true);
+?>
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<?php
 die('');
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 // include do arquivo contendo IPs DEV
 require_once '../includes/main.php';
@@ -25,7 +27,7 @@ $checkout_id	= isset($_POST["checkout_id"])		? $_POST["checkout_id"]			: null;
 //ini_set("display_errors", 1); 
 ?>
 <html>
-<title> Teste integração de PINs </title>
+<title> Teste integraï¿½ï¿½o de PINs </title>
 <script language="javascript">
 function verifica()
 {
@@ -66,7 +68,7 @@ function verifica()
             </font></td>
           </tr>
           <tr bgcolor="#F5F5FB">
-            <td width="30%" bgcolor="#00008C"><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><b> Ação: </b></font></td>
+            <td width="30%" bgcolor="#00008C"><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><b> Aï¿½ï¿½o: </b></font></td>
             <td width="70%" colspan="2" bgcolor="#f5f5fb"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif">
                     <input name="ACTION" id="ACTION" type="text" value="<?php echo $action; ?>" size="1" maxlength="1" onKeypress="return verifica();">
             </font></td>

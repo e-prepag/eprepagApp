@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+if (empty($_SESSION["iduser_bko_pub"])) {
+    header("Location: /sys/admin/index.php");
+    exit;
+}
+if (($_SESSION["tipo_acesso_pub"] != 'AD') && ($_SESSION["tipo_acesso_pub"] != 'DT') && ($_SESSION["tipo_acesso_pub"] != 'SV') && ($_SESSION["tipo_acesso_pub"] != 'AT') && ($_SESSION["tipo_acesso_pub"] != 'PU')) {
+    header("Location: /sys/admin/index.php");
+    exit;
+}
+?>
 <!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <header>
@@ -7,19 +19,6 @@
     <?php
     //error_reporting(E_ALL & ~E_NOTICE);
 
-    session_start();
-
-    if (empty($_SESSION["iduser_bko_pub"])) {
-
-        header("Location: /sys/admin/index.php");
-
-        exit;
-    }
-    if (($_SESSION["tipo_acesso_pub"] != 'AD') && ($_SESSION["tipo_acesso_pub"] != 'DT') && ($_SESSION["tipo_acesso_pub"] != 'SV') && ($_SESSION["tipo_acesso_pub"] != 'AT') && ($_SESSION["tipo_acesso_pub"] != 'PU')) {
-        header("Location: /sys/admin/index.php");
-        exit;
-    }
-    ?>
     <script language="JavaScript">
         <!--
         function changeLang(langName) {
@@ -89,7 +88,7 @@
             $dia_semana = "Segunda-Feira";
             break;
         case "Tuesday":
-            $dia_semana = "Terça-Feira";
+            $dia_semana = "Terï¿½a-Feira";
             break;
         case "Wednesday":
             $dia_semana = "Quarta-Feira";
@@ -101,7 +100,7 @@
             $dia_semana = "Sexta-Feira";
             break;
         case "Saturday":
-            $dia_semana = "Sábado";
+            $dia_semana = "Sï¿½bado";
             break;
         case "Sunday":
             $dia_semana = "Domingo";
@@ -119,7 +118,7 @@
             break;
         case "SV":
             $tipo_acesso_var = $pgusr['tipo_acesso'];
-            $tipo_acesso = "SUPERVISÃO";
+            $tipo_acesso = "SUPERVISï¿½O";
             break;
         case "AT":
             $tipo_acesso_var = $pgusr['tipo_acesso'];
@@ -165,7 +164,7 @@
                         <form method="post" name="form_lang">
                             <input type="hidden" name="nome" value="<?php echo $_SESSION['langNome']; ?>" />
                         </form>
-                        <img src="<?php echo $webstring ?>/sys/imagens/flg/flag_brasil.gif" width="29" height="18" border="0" title="Português - Brasil" onClick="changeLang('pt');">&nbsp;
+                        <img src="<?php echo $webstring ?>/sys/imagens/flg/flag_brasil.gif" width="29" height="18" border="0" title="Portuguï¿½s - Brasil" onClick="changeLang('pt');">&nbsp;
                         <img src="<?php echo $webstring ?>/sys/imagens/flg/flag_uk.gif" width="29" height="18" border="0" title="English" onClick="changeLang('en');">&nbsp;
                         <img src="<?php echo $webstring ?>/sys/imagens/flg/flag_corea.gif" width="29" height="18" border="0" title="Korean" onClick="changeLang('ko');"></nobr>
                     </div>
@@ -186,7 +185,7 @@
     <center>
         <?php
 
-        // mudança devido novo relatorio de chargeback
+        // mudanï¿½a devido novo relatorio de chargeback
         if ($_SERVER["PHP_SELF"] != '/sys/admin/chargeback/chargeback.php') {
             session_write_close();
         }
@@ -304,13 +303,13 @@
                     }
                     return $obj;
                 } elseif (is_string($mixed)) {
-                    // remove caracteres inválidos e converte para UTF-8
+                    // remove caracteres invï¿½lidos e converte para UTF-8
                     return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
                 } else {
                     return $mixed;
                 }
             }
-            // --- Função auxiliar para mascarar valores recursivamente ---
+            // --- Funï¿½ï¿½o auxiliar para mascarar valores recursivamente ---
             function mask_value_recursive($key, $value, $blacklist_lower, $mask = '[FILTERED]', $maxValueLength = 200)
             {
                 if (in_array(strtolower($key), $blacklist_lower, true)) {
@@ -341,7 +340,7 @@
             // --- Preparar blacklist lower ---
             $blacklist_lower = array_map('strtolower', $blacklist);
 
-            // --- Capturar informações ---
+            // --- Capturar informaï¿½ï¿½es ---
             $rota = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
             $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'CLI';
             $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';

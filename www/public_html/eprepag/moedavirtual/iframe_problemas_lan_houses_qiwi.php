@@ -1,7 +1,9 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; 
+header("Content-Type: text/html; charset=ISO-8859-1",true);
+session_start();
+?>
 <script type="text/javascript" src="/prepag2/dist_commerce/includes/jquery.js"></script>
 <?php
-header("Content-Type: text/html; charset=ISO-8859-1",true);
 require_once "../../../includes/constantes.php";
 require_once  DIR_INCS . "main.php";
 require_once  DIR_INCS . "pdv/main.php";
@@ -9,7 +11,7 @@ $https = "https";
 require_once DIR_INCS . "configIP.php";
 
 $server_url = $https . '://' . (checkIP() ? $_SERVER['SERVER_NAME'] : '' . EPREPAG_URL . '');
-session_start();
+
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -17,7 +19,7 @@ session_start();
 if(isset($_POST["email"]) && $_POST["email"] != ""){
 
     $to = getenv("email_suporte");
-    $subject = "PDV Não Encontrado no Mapa";
+    $subject = "PDV Nï¿½o Encontrado no Mapa";
     $body_html = "<b>Data</b>: ".date("d/m/Y H:i:s").". <br> ";
     foreach($_POST as $ind => $val){
         if($val != ""){
@@ -27,7 +29,7 @@ if(isset($_POST["email"]) && $_POST["email"] != ""){
 
     echo (enviaEmail($to, null, null, $subject, $body_html, null)) ? 
               "<span  style='color: #0F64CF;font-family: \"Verdana\", Arial, Serif;'>"
-            . " <p>Vamos verificar a ocorrência.</p>"
+            . " <p>Vamos verificar a ocorrï¿½ncia.</p>"
             . " <p>Muito obrigado por seu aviso!</p>"
             . "</span>" : 
                   "<span  style='color: #0F64CF;font-family: \"Verdana\", Arial, Serif;'>"  
@@ -63,10 +65,10 @@ if(isset($_POST["email"]) && $_POST["email"] != ""){
         
         }
         else if (document.form_lanHouses_filtros.nome_do_Ponto_de_Venda.value == ""){
-            $("#msg_validacao").append('<br><font color="#FF1F00"><b>O nome do ponto de venda não foi preenchido corretamente.</b></font>');
+            $("#msg_validacao").append('<br><font color="#FF1F00"><b>O nome do ponto de venda nï¿½o foi preenchido corretamente.</b></font>');
         
         }else if (document.form_lanHouses_filtros.email.value == "" || !validaEmail(document.form_lanHouses_filtros.email.value)){
-            $("#msg_validacao").append('<br><font color="#FF1F00"><b>O e-mail não foi preenchido corretamente.</b></font>');
+            $("#msg_validacao").append('<br><font color="#FF1F00"><b>O e-mail nï¿½o foi preenchido corretamente.</b></font>');
         
         }else if ( document.form_lanHouses_filtros.bairro.value == "" ){
             $("#msg_validacao").append('<br><font color="#FF1F00"><b>Selecione um bairro.</b></font>');
@@ -180,10 +182,10 @@ $(function(){
     <p class="textocentral ">O que aconteceu?</p>
     <p> 
         <select name="motivo" id="motivo">
-            <option value="O Ponto de venda não existe">O Ponto de venda não existe</option>
-            <option value="O endereço está errado">O endereço está errado</option>
-            <option value="O Ponto de venda não tem saldo">O Ponto de venda não tem saldo</option>
-            <option value="Não souberam como vender o crédito">Não souberam como vender o crédito</option>
+            <option value="O Ponto de venda nï¿½o existe">O Ponto de venda nï¿½o existe</option>
+            <option value="O endereï¿½o estï¿½ errado">O endereï¿½o estï¿½ errado</option>
+            <option value="O Ponto de venda nï¿½o tem saldo">O Ponto de venda nï¿½o tem saldo</option>
+            <option value="Nï¿½o souberam como vender o crï¿½dito">Nï¿½o souberam como vender o crï¿½dito</option>
             <option value="outro">Outro</option>
         </select>
         <textarea rows="3" id="outro_motivo" name="Outro_Motivo" style="display:none; margin-top: 5px;" placeholder="Qual?"  cols="24"></textarea>
