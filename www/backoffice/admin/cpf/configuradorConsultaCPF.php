@@ -5,8 +5,8 @@
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . 'backoffice/includes/topo.php';
 require_once $raiz_do_projeto . 'consulta_cpf/config.inc.cpf.php';
-require_once $raiz_do_projeto . 'sftp/connect.php';
-require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/connect.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
 require_once "/www/includes/bourls.php";
 if (!function_exists("enviaEmail3")) {
     require_once $raiz_do_projeto . "includes/main.php";
@@ -67,9 +67,9 @@ define("CPF_PARTNER_ENVIRONMET",' . $vetorReverso[$environment] . ');
             $arq = trim(str_replace('/', '\\', $arquivo));
 
             //enviar para os servidores via sFTP
-            $sftp = new SFTPConnection($server, $port);
-            $sftp->login($user, $pass);
-            $sftp->uploadFile($raiz_do_projeto . "consulta_cpf/" . $nome_arquivo, "E-Prepag/www/web/prepag2/consulta_cpf/" . $nome_arquivo);
+            // [SFTP DESATIVADO] $sftp = new SFTPConnection($server, $port);
+            // [SFTP DESATIVADO] $sftp->login($user, $pass);
+            // [SFTP DESATIVADO] $sftp->uploadFile($raiz_do_projeto . "consulta_cpf/" . $nome_arquivo, "E-Prepag/www/web/prepag2/consulta_cpf/" . $nome_arquivo);
 
             $msg .= "<br><br>Arquivo de configuração enviado ao servidor Windows 2003";
 

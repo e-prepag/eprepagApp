@@ -5,8 +5,8 @@
 
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
-require_once $raiz_do_projeto.'sftp/connect.php';
-require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/connect.php';
+// [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
 require $raiz_do_projeto.'includes/configCEP.php';
 
 /* 
@@ -56,9 +56,9 @@ if(isset($BtnSearch) && $BtnSearch) {
                         $arq = trim(str_replace('/', '\\', $arquivo));
 
                         //enviar para os servidores via sFTP
-                        $sftp = new SFTPConnection($server, $port);
-                        $sftp->login($user, $pass);
-                        $sftp->uploadFile($arquivo, "E-Prepag/incs/".$nome_arquivo);
+                        // [SFTP DESATIVADO] $sftp = new SFTPConnection($server, $port);
+                        // [SFTP DESATIVADO] $sftp->login($user, $pass);
+                        // [SFTP DESATIVADO] $sftp->uploadFile($arquivo, "E-Prepag/incs/".$nome_arquivo);
 
                         $msg .= "<br><br>Arquivo de configuração enviado ao servidor Windows 2003";
 

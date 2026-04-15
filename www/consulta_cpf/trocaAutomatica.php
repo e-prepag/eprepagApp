@@ -5,8 +5,8 @@
 //require "/www/db/connect.php";
 //require "/www/db/ConnectionPDO.php";	
 //require "/www/consulta_cpf/config.inc.cpf.php";
-require "/www/sftp/connect.php";
-require "/www/sftp/classSFTPconnection.php";
+// [SFTP DESATIVADO] require "/www/sftp/connect.php";
+// [SFTP DESATIVADO] require "/www/sftp/classSFTPconnection.php";
 
 function verificaContagem(){
 	$conexao = ConnectionPDO::getConnection()->getLink();

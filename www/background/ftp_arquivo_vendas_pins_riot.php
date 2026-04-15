@@ -227,35 +227,38 @@ if(!$arquivoLog->haveFile()) {
         ob_flush();
         //ob_end_flush();
         
-        //Transferindo arquivo por SFTP
-        $connection = ssh2_connect($host, $port);
-        if($connection === FALSE) {
-            echo 'Failed to connect'.PHP_EOL;
-        }
-        else {
-            if(ssh2_auth_password($connection, $username, $password) === FALSE) {
-                echo 'Failed to authenticate'.PHP_EOL;
+    //Transferindo arquivo por SFTP [DESATIVADO]
+    /*
+            $connection = ssh2_connect($host, $port);
+            if($connection === FALSE) {
+                echo 'Failed to connect'.PHP_EOL;
             }
             else {
-                //Linha abaixo não deu certo
-                //ssh2_scp_send($connection, '/local/file with space.txt', '"/remote/file with space.txt"', 0777);
-                //var_dump( $nome_do_arquivo, $localDir.$arq_csv);
-                
-                $resSFTP = ssh2_sftp($connection);
-                $resFile = fopen("ssh2.sftp://$username:$password@$host:$port".$localDir.$arq_csv, 'w');
-                $srcFile = fopen($nome_do_arquivo, 'r');
-                $writtenBytes = stream_copy_to_stream($srcFile, $resFile);
-                if($writtenBytes > 0) {
-                    echo "Total de ".$writtenBytes." Bytes Transferidos!".PHP_EOL;
-                    if($writtenBytes == filesize($nome_do_arquivo))
-                        echo "Arquivo transferido com Sucesso!".PHP_EOL;
-                    else echo "Arquivo não foi completamente transferido!".PHP_EOL;
-                }//end if($writtenBytes > 0) 
-                else echo "Falha na transferencia do arquivo".PHP_EOL;
-                fclose($resFile);
-                fclose($srcFile);
-            }//end else do if(ssh2_auth_password($connection, 'eprepag', 'htLGUcYI4mwCVsRjeti1') === FALSE)
-        }//end else do if($connection === FALSE)
+                if(ssh2_auth_password($connection, $username, $password) === FALSE) {
+                    echo 'Failed to authenticate'.PHP_EOL;
+                }
+                else {
+                    //Linha abaixo não deu certo
+                    //ssh2_scp_send($connection, '/local/file with space.txt', '"/remote/file with space.txt"', 0777);
+                    //var_dump( $nome_do_arquivo, $localDir.$arq_csv);
+                    
+                    $resSFTP = ssh2_sftp($connection);
+                    $resFile = fopen("ssh2.sftp://$username:$password@$host:$port".$localDir.$arq_csv, 'w');
+                    $srcFile = fopen($nome_do_arquivo, 'r');
+                    $writtenBytes = stream_copy_to_stream($srcFile, $resFile);
+                    if($writtenBytes > 0) {
+                        echo "Total de ".$writtenBytes." Bytes Transferidos!".PHP_EOL;
+                        if($writtenBytes == filesize($nome_do_arquivo))
+                            echo "Arquivo transferido com Sucesso!".PHP_EOL;
+                        else echo "Arquivo não foi completamente transferido!".PHP_EOL;
+                    }//end if($writtenBytes > 0) 
+                    else echo "Falha na transferencia do arquivo".PHP_EOL;
+                    fclose($resFile);
+                    fclose($srcFile);
+                }//end else do if(ssh2_auth_password($connection, 'eprepag', 'htLGUcYI4mwCVsRjeti1') === FALSE)
+            }//end else do if($connection === FALSE)
+    */
+    echo "Transferencia SFTP desativada.".PHP_EOL;
 
     } //end if($total_table > 0)
 
