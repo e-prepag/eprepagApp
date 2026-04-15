@@ -41,7 +41,7 @@ function dataJuliano($data)
 	$dataf = strtotime("$ano/$mes/$dia");
 	$datai = strtotime(($ano-1).'/12/31');
 	$dias  = (int)(($dataf - $datai)/(60*60*24));
-  return str_pad($dias,3,'0',STR_PAD_LEFT).substr($data,9,4);
+  return str_pad((string) $dias,3,'0',STR_PAD_LEFT).substr($data,9,4);
 }
 /*
 function digitoVerificador_nossonumero($numero) {
@@ -170,7 +170,7 @@ function direita($entra,$comp){
 }
 
 function fator_vencimento($data) {
-	$data = split("/",$data);
+	$data = explode("/",$data);
 	$ano = $data[2];
 	$mes = $data[1];
 	$dia = $data[0];
@@ -278,8 +278,8 @@ function modulo_11($num)  {
 	$fator=2;
 	
 	for ($i = strlen($num); $i > 0; $i--){
-		$soma += substr($num,$i-1,1) * $fator;
-		$tmp = substr($num,$i-1,1) * $fator;;
+		$soma += (int) substr($num,$i-1,1) * $fator;
+		$tmp = (int) substr($num,$i-1,1) * $fator;;
 		$fator++;
 		if($fator==8){
 			$fator=2;
@@ -324,7 +324,7 @@ function modulo_11_autoconferencia($num)  // Calculo de Modulo 11 (dígito de aut
 	
     for ($i = strlen($num); $i > 0; $i--) 
     {
-      $soma += substr($num,$i-1,1) * $fator;
+      $soma += (int) substr($num,$i-1,1) * $fator;
 	  if($fator >= 9){
 	     $fator = 2;
 	  } else {
@@ -383,7 +383,7 @@ function monta_codigo_de_barras($codigo)
 	
     for ($i = strlen($codigo); $i > 0; $i--) 
     {
-      $soma += substr($codigo,$i-1,1) * $fator;
+      $soma += (int) substr($codigo,$i-1,1) * $fator;
 	  if($fator >= 9){
 	     $fator = 2;
 	  } else {
@@ -398,7 +398,7 @@ function monta_codigo_de_barras($codigo)
 		$campo3 = 11 - $resto;
 	}
 	
-	return $campo1.$campo2.$campo3.$campo4.$campo5.$campo6.$campo7.$campo8.$campo9.$campo10; 
+	return $campo1.$campo2.$campo3.$campo4.$campo5.$campo6.$campo7.$campo8.$campo9; 
 }
 */
 function monta_codigo_de_barras_wagner($codigo) 
@@ -438,7 +438,7 @@ function monta_codigo_de_barras_wagner($codigo)
 	
     for ($i = strlen($codigo); $i > 0; $i--) 
     {
-      $soma += substr($codigo,$i-1,1) * $fator;
+      $soma += (int) substr($codigo,$i-1,1) * $fator;
 	  if($fator >= 9){
 	     $fator = 2;
 	  } else {
@@ -453,7 +453,7 @@ function monta_codigo_de_barras_wagner($codigo)
 		$campo3 = 11 - $resto;
 	}
 	
-	return $campo1.$campo2.$campo3.$campo4.$campo5.$campo6.$campo7.$campo8.$campo9.$campo10; 
+	return $campo1.$campo2.$campo3.$campo4.$campo5.$campo6.$campo7.$campo8.$campo9; 
 }//end function monta_codigo_de_barras_wagner($codigo) 
 /*
 function monta_linha_digitavel($linha){
@@ -518,9 +518,9 @@ function calcula_verificador_nosso_numero($agencia, $nossonumero){
 	
 	// Calcula dígito verificador
 	for($a=0; $a<10; $a++){
-		$numero = substr($num, $a, 1)*$fatores[$a];
+		$numero = (int) substr($num, $a, 1)*$fatores[$a];
 		if($numero>=10){
-			$soma += substr($numero, 1);
+			$soma += (int) substr((string) $numero, 1);
 		} else {
 			$soma += $numero;
 		}
@@ -528,7 +528,7 @@ function calcula_verificador_nosso_numero($agencia, $nossonumero){
 	
 	// Monta dígito
 	if($soma>10){
-		$digito = 10-(substr($soma, strlen($soma)-1,1));
+		$digito = 10-((int) substr((string) $soma, strlen((string) $soma)-1,1));
 	} else {
 		$digito = 10-$soma;
 	}

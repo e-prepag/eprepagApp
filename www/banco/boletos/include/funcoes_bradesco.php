@@ -41,8 +41,8 @@ function digitoVerificador_nossonumero($numero) {
 }
 
 
-function digitoVerificador_barra($numero) {
-	$resto2 = modulo_11($numero, 9, 1);
+function digitoVerificador_barra($numero, $base = 9, $r = 1) {
+	$resto2 = modulo_11($numero, $base, $r);
      if ($resto2 == 0 || $resto2 == 1 || $resto2 == 10) {
         $dv = 1;
      } else {
@@ -73,7 +73,7 @@ function formata_numero($numero,$loop,$insert,$tipo = "geral") {
 			$numero = $insert . $numero;
 		}
 	}
-	if ($tipo = "convenio") {
+	if ($tipo == "convenio") {
 		while(strlen($numero)<$loop){
 			$numero = $numero . $insert;
 		}
@@ -128,7 +128,7 @@ if((strlen($texto) % 2) <> 0){
 
 // Draw dos dados
 while (strlen($texto) > 0) {
-  $i = round(esquerda($texto,2));
+  $i = (int) round(esquerda($texto,2));
   $texto = direita($texto,strlen($texto)-2);
   $f = $barcodes[$i];
   for($i=1;$i<11;$i+=2){
@@ -176,8 +176,8 @@ function fator_vencimento($data) {
 }
 
 function _dateToDays($year,$month,$day) {
-    $century = substr($year, 0, 2);
-    $year = substr($year, 2, 2);
+    $century = (int) substr($year, 0, 2);
+    $year = (int) substr($year, 2, 2);
     if ($month > 2) {
         $month -= 3;
     } else {
@@ -202,12 +202,12 @@ function modulo_10($num) {
         // Separacao dos numeros
         for ($i = strlen($num); $i > 0; $i--) {
             // pega cada numero isoladamente
-            $numeros[$i] = substr($num,$i-1,1);
+            $numeros[$i] = (int) substr($num,$i-1,1);
             // Efetua multiplicacao do numero pelo (falor 10)
             // 2002-07-07 01:33:34 Macete para adequar ao Mod10 do Itaú
             $temp = $numeros[$i] * $fator; 
             $temp0=0;
-            foreach (preg_split('//',$temp,-1,PREG_SPLIT_NO_EMPTY) as $k=>$v){ $temp0+=$v; }
+            foreach (preg_split('//',(string)$temp,-1,PREG_SPLIT_NO_EMPTY) as $k=>$v){ $temp0+=$v; }
             $parcial10[$i] = $temp0; //$numeros[$i] * $fator;
             // monta sequencia para soma dos digitos no (modulo 10)
             $numtotal10 += $parcial10[$i];
@@ -259,7 +259,7 @@ function modulo_11($num, $base=9, $r=0)  {
     /* Separacao dos numeros */
     for ($i = strlen($num); $i > 0; $i--) {
         // pega cada numero isoladamente
-        $numeros[$i] = substr($num,$i-1,1);
+        $numeros[$i] = (int) substr($num,$i-1,1);
         // Efetua multiplicacao do numero pelo falor
         $parcial[$i] = $numeros[$i] * $fator;
         // Soma dos digitos

@@ -376,7 +376,7 @@
         global $imagem1;
         ob_clean();
         ob_start();
-        imagegif($imagem1, NULL,9);// criar
+        imagegif($imagem1);// criar
         $gif = ob_get_clean();
 
         $envioEmail->MontaEmailEspecifico($gif, true, 'boleto.gif');
@@ -417,7 +417,7 @@
                     geraBoletoEnviaEmail($envioEmail);
                     unset($GLOBALS['_SESSION']['aux_lista_oferta']);
                 } else {
-                    imagegif($imagem1, NULL,9);// criar
+                    imagegif($imagem1);// criar
                     imagedestroy($imagem1);
                 }
                 break;
@@ -431,7 +431,7 @@
                     geraBoletoEnviaEmail($envioEmail);
                     unset($GLOBALS['_SESSION']['aux_lista_oferta']);
                 } else {
-                    imagegif($imagem1, NULL,9);// criar
+                    imagegif($imagem1);// criar
                     imagedestroy($imagem1);
                 }
                 break;
@@ -447,13 +447,13 @@
                 unset($GLOBALS['_SESSION']['EmailOfertas']);
                 break;
             default:
-                imagegif($imagem1, NULL,9);// criar
+                imagegif($imagem1);// criar
                 imagedestroy($imagem1);
                 break;
         }
         unset($GLOBALS['_SESSION']['boleto_imagem']);
     } else {
-        imagegif($imagem1, NULL,9);// criar
+        imagegif($imagem1);// criar
         imagedestroy($imagem1);
     }
 ?>
