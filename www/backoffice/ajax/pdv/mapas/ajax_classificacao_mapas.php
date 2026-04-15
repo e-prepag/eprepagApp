@@ -36,7 +36,7 @@ try{
 
     $arrLojas = array();
 
-    $delete = "delete from classificacao_mapas_pdv where cm_id in (".implode($publishers,",").")";
+    $delete = "delete from classificacao_mapas_pdv where cm_id in (".implode(",", $publishers).")";
 
     $limpa_tabela = SQLexecuteQuery($delete);
 
@@ -54,14 +54,12 @@ try{
     foreach($arrLojas as $ind => $cMapas){
         $tmpcMapas = explode("|",$cMapas); 
 
-        if(!empty($tmpcMapas)){
             foreach($tmpcMapas as $cMapa){
-                if(isset($cMapa) && trim($cMapa) != ""){
+                if(trim($cMapa) != ""){
                     $tmp .=  vsprintf($insert, array($ind,$cMapa))."; \n";
                 }
             }
         }
-    }
 
     if($ret = SQLexecuteQuery($tmp) || $tmp == ""){
         echo true;

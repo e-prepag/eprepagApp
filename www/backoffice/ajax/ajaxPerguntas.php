@@ -20,7 +20,7 @@ function block_direct_calling() {
 block_direct_calling();
 
 //desenvolvimento	
-if(false) $raiz_do_projeto = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao";
+//if(false) $raiz_do_projeto = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao";
 //
 //error_reporting(E_ALL);
 ini_set("display_errors", 1);

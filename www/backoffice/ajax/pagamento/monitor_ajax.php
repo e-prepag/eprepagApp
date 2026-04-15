@@ -133,13 +133,13 @@ echo "".$date_now."<br>\n";		// " (".number_format($bin_size, 2, '.', '.')."s/co
 //					$stitle = (($rs_venda_row["vg_pagto_tipo"]==5 || $rs_venda_row["vg_pagto_tipo"]==6 || $rs_venda_row["vg_pagto_tipo"]==9 || $rs_venda_row["vg_pagto_tipo"]==10 )?"Pagto Online":"");
 					$total_valor_this = $rs_venda_row["valor"]*(($tipo=="M")?$rs_venda_row["qtde_itens"]:1);
 					$total_valor_cum += $total_valor_this;
-					$delay = $rs_venda_row["delay"];
-					$total_por_min = (($rs_venda_row["delay"])?(60*$total_valor_cum / $delay):0);
+					$delay = (float)($rs_venda_row["delay"] ?? 0);
+					$total_por_min = ($delay > 0) ? (60 * $total_valor_cum / $delay) : 0;
 
-					$scolor_iforma = ( ($rs_venda_row["vg_pagto_tipo"]==$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']) ? "color:red" : 
-						((b_IsPagtoCielo($rs_venda_row["vg_pagto_tipo"])) ? "color:cyan" : 
-							($rs_venda_row["vg_pagto_tipo"]==$GLOBALS['PAGAMENTO_MCOIN_NUMERIC']) ? "color:yellow" : "" 
-						) );
+					$scolor_iforma = (($rs_venda_row["vg_pagto_tipo"] == $GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']) ? "color:red" :
+						((b_IsPagtoCielo($rs_venda_row["vg_pagto_tipo"])) ? "color:cyan" :
+							(($rs_venda_row["vg_pagto_tipo"] == $GLOBALS['PAGAMENTO_MCOIN_NUMERIC']) ? "color:yellow" : "")
+						));
 
 					$sret .= "<tr bgcolor='#".$GradientsTri[$icolor]."' onclick='abre_venda('".$tipo."', ".$rs_venda_row["vg_id"].")' title='vg_id: ".$rs_venda_row["vg_id"]."".((isset($rs_venda_row["vg_integracao_parceiro_origem_id"]) && $rs_venda_row["vg_integracao_parceiro_origem_id"])?" (Venda Integração - store_id: ".$rs_venda_row["vg_integracao_parceiro_origem_id"].")":""). (($vg_drupal_order_id>0)?"\ndrupal _order_id: $vg_drupal_order_id":"") ."'>\n";
 						$sret .= "<td align='center'><span title='".$stitle."'><font color='#00008C' size='1' face='Arial, Helvetica, sans-serif'> ".$rs_venda_row["vg_canal"].(($rs_venda_row["vg_canal"]=="M")?( ($b_is_vg_pagto_tipo_online) ? "&nbsp;(<span style='".$scolor_iforma."'>".$rs_venda_row["vg_pagto_tipo"]."</span>)":""):"") .(($vg_drupal_order_id>0)?"&nbsp;[<span style='color:red'>D</span>]":"") . "</font></span></td>\n";
@@ -313,17 +313,20 @@ function get_sql_monitor($tipo, $date_threshold, $limit) {
 		$nmins = 0;
 		$nsecs = 0;
 
-		$ndays = intval($n/(60*60*24));
-		$nhours = str_pad(intval(($n-$ndays*60*60*24)/(60*60)), 2, "0", STR_PAD_LEFT);
-		$nmins = str_pad(intval(($n-$ndays*60*60*24-$nhours*60*60)/(60)), 2, "0", STR_PAD_LEFT);
-		$nsecs = str_pad(intval(($n-$ndays*60*60*24-$nhours*60*60-$nmins*60)), 2, "0", STR_PAD_LEFT);
+			$ndays = intval($n / (60 * 60 * 24));
+			$nhours = intval(($n - $ndays * 60 * 60 * 24) / (60 * 60));
+			$nmins = intval(($n - $ndays * 60 * 60 * 24 - $nhours * 60 * 60) / 60);
+			$nsecs = intval($n - $ndays * 60 * 60 * 24 - $nhours * 60 * 60 - $nmins * 60);
+			$nhours_fmt = str_pad((string)$nhours, 2, "0", STR_PAD_LEFT);
+			$nmins_fmt = str_pad((string)$nmins, 2, "0", STR_PAD_LEFT);
+			$nsecs_fmt = str_pad((string)$nsecs, 2, "0", STR_PAD_LEFT);
 		
 		
 		$sout .= "<font size='1'>";
 		$sout .= (($ndays>0)?$ndays."<font color='#FF0000'>d</font>":"");
-		$sout .= (($ndays>0 || $nhours>0)?$nhours."<font color='#FF0000'>h</font>":"");
-		$sout .= (($ndays>0 || $nhours>0 || $nmins>0)?$nmins."<font color='#FF0000'>m</font>":"");
-		$sout .= (($ndays>0 || $nhours>0 || $nmins>0 || $nsecs>0)?$nsecs."<font color='#FF0000'>s</font>":"");
+			$sout .= (($ndays>0 || $nhours>0)?$nhours_fmt."<font color='#FF0000'>h</font>":"");
+			$sout .= (($ndays>0 || $nhours>0 || $nmins>0)?$nmins_fmt."<font color='#FF0000'>m</font>":"");
+			$sout .= (($ndays>0 || $nhours>0 || $nmins>0 || $nsecs>0)?$nsecs_fmt."<font color='#FF0000'>s</font>":"");
 		$sout .= "</font>";
 
 		return $sout;
@@ -358,7 +361,7 @@ function get_sql_monitor($tipo, $date_threshold, $limit) {
 			$HexRGB['b'] = sprintf('%02x', ($RGB['b']));
 
 			if(!($bSkipFirst && $i==0)) { 
-				$GradientColors[] = strtoupper(implode(NULL, $HexRGB));
+					$GradientColors[] = strtoupper(implode("", $HexRGB));
 			}
 		}
 		return $GradientColors;

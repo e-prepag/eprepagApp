@@ -44,13 +44,14 @@ $expiration = 600;	// time in seconds to delete image form server
 	list($usec, $sec) = explode(" ", microtime());
 	$now = ((float)$usec + (float)$sec);			
 	$current_dir = @opendir($raiz_do_projeto . "arquivos_gerados".$img_path);	
-        if(is_dir($current_dir)) {
-            while($filename = @readdir($raiz_do_projeto . "arquivos_gerados".$img_path)) {
+	        if($current_dir && is_dir($raiz_do_projeto . "arquivos_gerados".$img_path)) {
+	            while(($filename = @readdir($current_dir)) !== false) {
                     if ($filename != "." and $filename != ".." and $filename != "index.html") {
-                            $name = str_replace(".png", "", $filename);		
+							$name = str_replace(".png", "", $filename);
+							$createdAt = is_numeric($name) ? (float)$name : 0;
     //echo "$i: ".$img_path.$filename." - ";
-                            if ((($name + $expiration) < $now) && (strpos($filename, ".png")!==false)) {
-                                    @unlink($raiz_do_projeto . "arquivos_gerados".$img_path.$filename);
+							if (($createdAt > 0) && (($createdAt + $expiration) < $now) && (strpos($filename, ".png")!==false)) {
+									@unlink($raiz_do_projeto . "arquivos_gerados".$img_path.$filename);
     //echo " delete it";
                             }
                             $i++;
