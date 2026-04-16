@@ -7,6 +7,7 @@ require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
 require_once "/www/includes/constantes.php";
 require_once "/www/includes/gamer/functions.php";
+require_once "/www/includes/pdv_encoding.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -18,16 +19,8 @@ function converterParaUtf8($data) {
     if (is_array($data)) {
         return array_map('converterParaUtf8', $data);
     }
-    
-    if (is_string($data)) {
-        // Detecta e converte automaticamente
-        $encoding = mb_detect_encoding($data, ['ISO-8859-1', 'UTF-8', 'ASCII'], true);
-        if ($encoding && $encoding !== 'UTF-8') {
-            return mb_convert_encoding($data, 'UTF-8', $encoding);
-        }
-    }
-    
-    return $data;
+
+    return pdv_iso_to_utf8($data);
 }
 function processarListaTextarea($texto)
 {
@@ -36,7 +29,7 @@ function processarListaTextarea($texto)
 	}
 
 	// Remove espacos em branco extras no incio e fim
-	$texto = trim($texto);
+	$texto = trim((string)($texto ?? ""));
 
 	// Substitui quebras de linha por vrgulas
 	$texto = preg_replace('/\r\n|\r|\n/', ',', $texto);
@@ -56,6 +49,7 @@ function processarListaTextarea($texto)
 if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	$data = ["data" => []];
+	$resultRows = [];
 
 
 	if (isset($_POST["pin_cod"]) && $_POST["pin_cod"] != "") {
@@ -66,7 +60,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 			echo "Nenhum valor fornecido";
 			exit;
 		}
-		$placeholders = implode(',', array_fill(0, count($valores), '?'));
+		$placeholders = implode(',', array_fill(0, (is_countable($valores) ? count($valores) : 0), '?'));
 
 		$sql = "WITH pins_filtrados AS (
 					    SELECT 
@@ -151,7 +145,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		$selectRows->execute($valores);
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
 	}
-	if (count($resultRows) > 0) {
+	if ((is_countable($resultRows) ? count($resultRows) : 0) > 0) {
 		$data["data"] = converterParaUtf8($resultRows);
 	}
 	echo json_encode($data);

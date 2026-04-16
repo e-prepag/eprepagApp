@@ -18,6 +18,15 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 	$bCommit = true;
 	$bPrint = false;
 
+$fopr = $fopr ?? ($_REQUEST["fopr"] ?? null);
+$Submit = $Submit ?? ($_REQUEST["Submit"] ?? null);
+$Move = $Move ?? ($_REQUEST["Move"] ?? null);
+$pin_valor = $pin_valor ?? ($_REQUEST["pin_valor"] ?? null);
+$pin_qtde = $pin_qtde ?? ($_REQUEST["pin_qtde"] ?? null);
+$pin_canal_from = $pin_canal_from ?? ($_REQUEST["pin_canal_from"] ?? null);
+$pin_canal_to = $pin_canal_to ?? ($_REQUEST["pin_canal_to"] ?? null);
+$PHP_SELF = $PHP_SELF ?? ($_SERVER["PHP_SELF"] ?? "");
+
 
 	$channel_from = array (
 							's' => 'Site',
@@ -32,7 +41,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 							);
 	
 	if(isset($_SESSION["tipo_acesso_pub"]) && $_SESSION["tipo_acesso_pub"]=='PU') {
-		$fopr = $_SESSION["opr_codigo_pub"];
+		$fopr = ($_SESSION["opr_codigo_pub"] ?? null);
 		$Submit = "Buscar";
 	}
 
@@ -141,7 +150,7 @@ $(document).ready(function () {
 /*
 				$aux = "";
 				foreach($channel_from as $key => $value) {
-					if (strlen($aux)>0)
+					if (strlen((string)($aux ?? ""))>0)
 					{
 						echo "\t else ";
 					}
@@ -204,7 +213,7 @@ $(document).ready(function () {
 				  </td>
                   <td> 
 					  <div id='mostraValores'>
-						<?php if(isset($fopr) && strlen($fopr)>0) { ?>
+						<?php if(isset($fopr) && strlen((string)($fopr ?? ""))>0) { ?>
 						<script language="javascript">
 						carga_valor();
 						</script>
@@ -225,7 +234,7 @@ $(document).ready(function () {
 					<?php
 						foreach($channel_from as $key => $value) {
 							echo "<option value='$key' ";
-							if(isset($pin_canal_from) && trim($pin_canal_from) == $key )
+							if(isset($pin_canal_from) && trim((string)($pin_canal_from ?? "")) == $key )
 								echo "selected";
 							echo ">$value</option>";
 						}
@@ -238,7 +247,7 @@ $(document).ready(function () {
                     <?php
 						foreach($channel_from as $key => $value) {
 							echo "<option value='$key' ";
-							if(isset($pin_canal_to) && trim($pin_canal_to) == $key )
+							if(isset($pin_canal_to) && trim((string)($pin_canal_to ?? "")) == $key )
 								echo "selected";
 							echo ">$value</option>";
 						}
@@ -290,7 +299,7 @@ if($bPrint) echo str_replace("\n", "<br>\n",$sql)."<br>";
                             }
                             echo "<tr><td><font size='2' face='Arial, Helvetica, sans-serif'>".$ret_row['opr_nome']."</font></td>";
                             echo "<td align='right'><font size='2' face='Arial, Helvetica, sans-serif'>".$ret_row['pin_valor']."</font></td>";
-                            echo "<td align='center'><font size='2' face='Arial, Helvetica, sans-serif'>".$channel_from[$ret_row['pin_canal']]."</font></td>";
+                            echo "<td align='center'><font size='2' face='Arial, Helvetica, sans-serif'>".($channel_from[$ret_row['pin_canal']] ?? $ret_row['pin_canal'])."</font></td>";
                             echo "<td align='right'><font size='2' face='Arial, Helvetica, sans-serif'>".$ret_row['quantidade']."</font></td></tr>";
                         }
                     }
@@ -353,11 +362,11 @@ if($bPrint) echo "$sql<br>";
 				}
 
 				if($msg == ""){
-					if (pg_num_rows($rs_transacao) >= $pin_qtde) {
+					if ((($rs_transacao) ? pg_num_rows($rs_transacao) : 0) >= $pin_qtde) {
 						$i = 1;
 						while($rs_transacao_row = pg_fetch_array($rs_transacao)){
 							// Atualiza nova ordem
-							$iorder = $key + 1;
+							$iorder = $i;
 							$sql = "update pins set pin_canal = '".$pin_canal_to."' where pin_codinterno = ".$rs_transacao_row['pin_codinterno']." and opr_codigo=$fopr and pin_valor=$pin_valor and pin_status='1' and pin_canal='$pin_canal_from' ;";
 if($bPrint) echo "$sql<br>";
 							if($bCommit) {
@@ -374,7 +383,7 @@ if($bPrint) echo "$sql<br>";
 							}
 						}
 					} else {
-						$msg .="Quantidade de PIN em estoque de canal $pin_canal_from &eacute; de :".pg_num_rows($rs_transacao)." e a quantidade solicitada para alteração &eacute; de: ".$pin_qtde;
+						$msg .="Quantidade de PIN em estoque de canal $pin_canal_from &eacute; de :".(($rs_transacao) ? pg_num_rows($rs_transacao) : 0)." e a quantidade solicitada para alteração &eacute; de: ".$pin_qtde;
 					}
 				}
 
@@ -424,7 +433,7 @@ if($bPrint) echo "$sql<br>";
 		$file = $raiz_do_projeto . "arquivos_gerados/logs/log_PINsTransferChannel.txt";
 	
 		//Mensagem
-		$mensagem = date('Y-m-d H:i:s') . " " . $GLOBALS['_SERVER']["SCRIPT_FILENAME"] . ", userlogin_bko: '".$_SESSION['userlogin_bko']."'\n     " . $mensagem . "\n";
+		$mensagem = date('Y-m-d H:i:s') . " " . ($GLOBALS['_SERVER']["SCRIPT_FILENAME"] ?? "") . ", userlogin_bko: '".($_SESSION['userlogin_bko'] ?? "")."'\n     " . $mensagem . "\n";
 	
 		//Grava mensagem no arquivo
 		if ($handle = fopen($file, 'a+')) {

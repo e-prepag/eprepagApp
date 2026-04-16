@@ -11,7 +11,17 @@ $cor3 = "#FFFFFF";
 
 $time_start = getmicrotime();
 
-if(!isset($nscamp) || !$ncamp) $ncamp = 'opr_nome';
+$fopr    = $fopr ?? ($_REQUEST["fopr"] ?? null);
+$fvalor  = $fvalor ?? ($_REQUEST["fvalor"] ?? null);
+$fcanal  = $fcanal ?? ($_REQUEST["fcanal"] ?? null);
+$fuf     = $fuf ?? ($_REQUEST["fuf"] ?? null);
+$Submit  = $Submit ?? ($_REQUEST["Submit"] ?? null);
+$del_estoque = $del_estoque ?? ($_REQUEST["del_estoque"] ?? null);
+$del_opr_codigo = $del_opr_codigo ?? ($_REQUEST["del_opr_codigo"] ?? null);
+$del_pin_valor = $del_pin_valor ?? ($_REQUEST["del_pin_valor"] ?? null);
+$PHP_SELF = $PHP_SELF ?? ($_SERVER["PHP_SELF"] ?? "");
+
+if(!isset($ncamp) || !$ncamp) $ncamp = 'opr_nome';
 if(!isset($nscamp) || !$nscamp) $nscamp = 'ec_uf, pin_valor';
 
 $resopr = pg_exec($connid, "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_pin_online = 0 order by opr_nome");
@@ -190,9 +200,9 @@ function GP_popupConfirmMsg(msg) { //v1.0
                   <td> 
                     <select name="fcanal" id="fcanal" class="combo_normal">
                       <option value="">Todos os canais</option>
-                      <option value="s" <?php if(isset($fcanal) && trim($fcanal) == 's') echo "selected"?>>Site</option>
-                      <option value="p" <?php if(isset($fcanal) && trim($fcanal) == 'p') echo "selected"?>>POS</option>
-                      <option value="r" <?php if(isset($fcanal) && trim($fcanal) == 'r') echo "selected"?>>Rede</option>
+                      <option value="s" <?php if(isset($fcanal) && trim((string)($fcanal ?? "")) == 's') echo "selected"?>>Site</option>
+                      <option value="p" <?php if(isset($fcanal) && trim((string)($fcanal ?? "")) == 'p') echo "selected"?>>POS</option>
+                      <option value="r" <?php if(isset($fcanal) && trim((string)($fcanal ?? "")) == 'r') echo "selected"?>>Rede</option>
                     </select>
                   </td>
 				  <?php if(isset($fopr) && $fopr == 32) {?>
@@ -202,7 +212,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                     <select name="fuf" id="fuf" class="combo_normal">
                       <option value="">Todos os Estados</option>
                       <?php while($pgec=pg_fetch_array($resec)) { ?>
-                      <option value="<?php echo $pgec['ec_codigo'] ?>" <?php if(trim($fuf) == trim($pgec['ec_codigo'])) echo "selected"?>><?php echo $pgec['ec_uf'] ?></option>
+                      <option value="<?php echo $pgec['ec_codigo'] ?>" <?php if(trim((string)($fuf ?? "")) == trim((string)($pgec['ec_codigo'] ?? ""))) echo "selected"?>><?php echo $pgec['ec_uf'] ?></option>
                       <?php } ?>
                     </select>
                   </td>
@@ -223,7 +233,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                   <td><div align="right"></div></td>
 				</tr>
 <?php
-			if(!isset($resestat) || !$resestat || pg_num_rows($resestat) == 0){ ?>
+			if(!isset($resestat) || !$resestat || (($resestat) ? pg_num_rows($resestat) : 0) == 0){ ?>
 				  <tr bgcolor="#f5f5fb"> 
 					<td colspan="6" bgcolor="<?php echo $cor1 ?>" align="center">
 						<font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>
@@ -233,6 +243,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 			<?php } else {?>
 <?php				
                 $pin_total_valor = $total_reg = $pin_total_qtde = 0;
+				$valor = 0;
                 
                 while ($pgestat = pg_fetch_array($resestat)){
 					$opr_nome_aux = (isset($opr_nome)) ? $opr_nome : "";
@@ -290,7 +301,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 
 					   $nrows = 0;
 
-						if($rs_Media && pg_num_rows($rs_Media) > 0) pg_fetch_array($rs_Media,0);
+						if($rs_Media && (($rs_Media) ? pg_num_rows($rs_Media) : 0) > 0) pg_fetch_array($rs_Media,0);
 				  		while($pgmediaopr=pg_fetch_array($rs_Media)) {
 //echo "pgmediaopr O V Q (S): ".$pgmediaopr['opr_nome']."= ".$pgmediaopr['quantidade']."  ".$pgmediaopr['pin_valor']." (".$pgmediaopr['pin_status'].")<br>\n";
 							if($pgmediaopr['opr_nome']==$pgestat['opr_nome'] && $pgmediaopr['pin_valor']==$pgestat['pin_valor']) {
@@ -358,7 +369,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
               <table class="table table-bordered">
                   <td colspan="3" class="alert alert-danger text-center"><strong>Pins Esgotados</font></strong></td>
               </tr>
-		    <?php if (!isset($rs_esgotados) || !$rs_esgotados || pg_num_rows($rs_esgotados) == 0){  ?>
+		    <?php if (!isset($rs_esgotados) || !$rs_esgotados || (($rs_esgotados) ? pg_num_rows($rs_esgotados) : 0) == 0){  ?>
               <tr class="alert alert-danger"> 
                 <td colspan="3" bgcolor="<?php echo $cor1 ?>" align="center">
                     N&atilde;o h&aacute; registros
@@ -406,7 +417,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                                 } //end if($rs_count_gamer_row['total_gamer'] == 0 && $rs_count_lan_row['total_lan'] == 0)
                                                 
                                     } //end while ($pgest = pg_fetch_array($rs_esgotados))
-                            } //end else  do if (!$rs_esgotados || pg_num_rows($rs_esgotados) == 0)
+                            } //end else  do if (!$rs_esgotados || (($rs_esgotados) ? pg_num_rows($rs_esgotados) : 0) == 0)
               ?>
 					 
             </table>

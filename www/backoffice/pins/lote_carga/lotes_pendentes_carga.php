@@ -16,6 +16,11 @@ $Registrar      = $_POST['Registrar'] ?? null;
 $loteValor      = $_POST['loteValor'] ?? null;
 $MAX_FILE_SIZE  = $_POST['MAX_FILE_SIZE'] ?? null;
 
+if (!isset($_FILES['arquivo']) || !is_array($_FILES['arquivo'])) {
+	$_FILES['arquivo'] = array('tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'name' => '');
+}
+$fileSource = '';
+
 //Constantes
 //----------------------------------------------------------------------------------------
 $logFile = 'lote_carga.log';
@@ -122,7 +127,7 @@ if(!isset($opr_codigo))
     $opr_codigo = "";
 
 if($opr_codigo==0 && isset($_POST['opr_codigo'])) 
-	$opr_codigo = $_POST['opr_codigo'];
+	$opr_codigo = $_POST['opr_codigo'] ?? "";
 //echo "opr_codigo: ".$opr_codigo."<br>";
 //echo "<pre>";
 //print_r($_POST);
@@ -185,7 +190,7 @@ if(isset($opr_codigo) && $opr_codigo && is_numeric($opr_codigo)) {
 	
 		//Operadora
 		if($msg == ""){
-			if(trim($opr_codigo) == "")
+			if(trim((string)($opr_codigo ?? "")) == "")
 				$msg = "A Operadora deve ser selecionada.\n";
 			else if(!is_numeric($opr_codigo))
 				$msg = "Operadora inválida.\n";
@@ -325,7 +330,7 @@ if(isset($opr_codigo) && $opr_codigo && is_numeric($opr_codigo)) {
     if(!isset($s_js))
         $s_js = "";
 	foreach($opr_codigos_com_valores as $key => $val) {
-		$s_OR_post_condition = ((($i++)<count($opr_codigos_com_valores))?" || ":"");
+		$s_OR_post_condition = ((($i++)<(is_countable($opr_codigos_com_valores) ? count($opr_codigos_com_valores) : 0))?" || ":"");
 		$s_js .= "document.form1.opr_codigo[document.form1.opr_codigo.selectedIndex].value == $val ".$s_OR_post_condition;
 	}
 //	echo "<hr>$s_js<hr>";
@@ -408,8 +413,8 @@ function fcnSubmit(){
             <td width="21" height="28" bgcolor="#F5F5FB" align="right" align="center"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif">Canal:<br></font></td>
             <td height="28" bgcolor="#F5F5FB"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"> 
                 <select name="fcanal" id="fcanal" class="combo_normal">
-                  <option value="s" <?php if(isset($fcanal) && trim($fcanal) == 's') echo "selected"?>>Site</option>
-                  <option value="p" <?php if(isset($fcanal) && trim($fcanal) == 'p') echo "selected"?>>POS</option>
+                  <option value="s" <?php if(isset($fcanal) && trim((string)($fcanal ?? "")) == 's') echo "selected"?>>Site</option>
+                  <option value="p" <?php if(isset($fcanal) && trim((string)($fcanal ?? "")) == 'p') echo "selected"?>>POS</option>
                 </select>
                 </font></td>
 

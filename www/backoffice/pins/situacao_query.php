@@ -7,6 +7,21 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
     $teste = false;
 	
 	$time_start_stats = getmicrotime();
+
+$BtnSearch = $BtnSearch ?? ($_REQUEST["BtnSearch"] ?? null);
+$tf_data_inicial = $tf_data_inicial ?? ($_REQUEST["tf_data_inicial"] ?? null);
+$tf_data_final = $tf_data_final ?? ($_REQUEST["tf_data_final"] ?? null);
+$dd_opr_codigo = $dd_opr_codigo ?? ($_REQUEST["dd_opr_codigo"] ?? null);
+$dd_pin_status = $dd_pin_status ?? ($_REQUEST["dd_pin_status"] ?? null);
+$tf_pins = $tf_pins ?? ($_REQUEST["tf_pins"] ?? null);
+$fcodinterno = $fcodinterno ?? ($_REQUEST["fcodinterno"] ?? null);
+$fcaracter = $fcaracter ?? ($_REQUEST["fcaracter"] ?? null);
+$fpin = $fpin ?? ($_REQUEST["fpin"] ?? null);
+$fserial = $fserial ?? ($_REQUEST["fserial"] ?? null);
+$festab = $festab ?? ($_REQUEST["festab"] ?? null);
+$fcanal = $fcanal ?? ($_REQUEST["fcanal"] ?? null);
+$total_table = $total_table ?? 0;
+$PHP_SELF = $PHP_SELF ?? ($_SERVER["PHP_SELF"] ?? "");
 	
 //echo "inicial: $inicial<br>";
 	if(!isset($ncamp) || !$ncamp) $ncamp = 'pin_codinterno';
@@ -24,8 +39,8 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 	}
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 100; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -37,15 +52,15 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 
 	if(!isset($fcanal) || !$fcanal) $fcanal = 's';
         
-	if (!empty($tf_pins)) {
-		if (count($tf_pins) == 1) {
-			$tf_pins = $tf_pins[0];                       
-		} else {                   
-			$tf_pins = implode("|",$tf_pins);                        
+	if (!empty($tf_pins) && is_array($tf_pins)) {
+		if ((is_countable($tf_pins) ? count($tf_pins) : 0) == 1) {
+			$tf_pins = $tf_pins[0];
+		} else {
+			$tf_pins = implode("|",$tf_pins);
 		}
 	}
 	if (isset($tf_pins) && $tf_pins != "") {              
-		$tf_pins = explode("|",$tf_pins);	
+		$tf_pins = explode("|", (string)($tf_pins ?? ""));	
 	}
 
 	// levanta operadoras
@@ -69,7 +84,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 
 	// Levanta lista de valores
 	$sql = "select pin_valor, count(*) as n from pins where 1=1 ";
-	if($dd_opr_codigo) {
+	if(isset($dd_opr_codigo) && $dd_opr_codigo) {
 		$sql .= " and opr_codigo=".$dd_opr_codigo." ";
 	}
 	if($fcanal) {
@@ -110,25 +125,25 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 		$sql.= " where 1=1 ";	//"--(t0.pin_est_codigo = t4.est_codigo) and \n";
 		$sql.= "   \n";
 		
-		if($tf_data_inicial) {
-				$data_inic = formata_data(trim($tf_data_inicial), 1);
-				$data_fim = formata_data(trim($tf_data_final), 1); 
-				$sql .= " and (pin_datavenda between '".trim($data_inic)."' and  '".trim($data_fim)."')  \n"; 
+		if(isset($tf_data_inicial) && $tf_data_inicial) {
+				$data_inic = formata_data(trim((string)($tf_data_inicial ?? "")), 1);
+				$data_fim = formata_data(trim((string)($tf_data_final ?? "")), 1); 
+				$sql .= " and (pin_datavenda between '".trim((string)($data_inic ?? ""))."' and  '".trim((string)($data_fim ?? ""))."')  \n"; 
 		}
 
-		//if(!trim($fpin) && !trim($fserial) && !($festab)) $sql.= "and (t0.pin_codigo='') and (t0.pin_serial='')  \n"; 
+		//if(!trim((string)($fpin ?? "")) && !trim((string)($fserial ?? "")) && !($festab)) $sql.= "and (t0.pin_codigo='') and (t0.pin_serial='')  \n"; 
 		//else{
-			if(isset($fcodinterno) && $fcodinterno)	$sql .= " and (t0.pin_codinterno='".trim($fcodinterno)."')  \n";
-			if(isset($fcaracter) && $fcaracter)	$sql .= " and (t0.pin_caracter='".trim($fcaracter)."')  \n";
-			if(isset($fpin) && $fpin)	$sql .= " and (t0.pin_codigo='".trim($fpin)."')  \n";
-			if(isset($fserial) && $fserial)$sql .= " and (t0.pin_serial='".trim($fserial)."')  \n"; 
+			if(isset($fcodinterno) && $fcodinterno)	$sql .= " and (t0.pin_codinterno='".trim((string)($fcodinterno ?? ""))."')  \n";
+			if(isset($fcaracter) && $fcaracter)	$sql .= " and (t0.pin_caracter='".trim((string)($fcaracter ?? ""))."')  \n";
+			if(isset($fpin) && $fpin)	$sql .= " and (t0.pin_codigo='".trim((string)($fpin ?? ""))."')  \n";
+			if(isset($fserial) && $fserial)$sql .= " and (t0.pin_serial='".trim((string)($fserial ?? ""))."')  \n"; 
 			if(isset($festab) && $festab)	$sql .= " and (t0.pin_est_codigo = ".$festab.")  \n";
 			if(isset($fcanal) && $fcanal) $sql .= " and (t0.pin_canal='".$fcanal."') \n"; 
 		//}
 
-		if($dd_opr_codigo) $sql .= " and (t0.opr_codigo=".$dd_opr_codigo.")  \n";
+		if(isset($dd_opr_codigo) && $dd_opr_codigo) $sql .= " and (t0.opr_codigo=".$dd_opr_codigo.")  \n";
 
-		if($dd_pin_status) {
+		if(isset($dd_pin_status) && $dd_pin_status) {
 			if($dd_pin_status=="stVendido-TODOS") { 
 				$sql .= " and (t0.pin_status='3' or t0.pin_status='6' or t0.pin_status='7')  \n";
 			} else {
@@ -138,10 +153,10 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
                 //die(var_dump($tf_pins));
 		if (!empty($tf_pins)) {
 			$sql .= " and (";
-			for($i=0;$i<count($tf_pins);$i++) {
+			for($i=0;$i<(is_countable($tf_pins) ? count($tf_pins) : 0);$i++) {
                 $sql .= " (t0.pin_valor = ".$tf_pins[$i].")  ";
 				
-                if($i<count($tf_pins)-1) {
+                if($i<(is_countable($tf_pins) ? count($tf_pins) : 0)-1) {
 					$sql .= " or  ";
 				}
 			}
@@ -156,7 +171,7 @@ echo "Elapsed time A2(*): ".number_format(getmicrotime() - $time_start_stats, 2,
 
 //echo str_replace("\n","<br>\n",$sql)."<br>";
 		$resid_count = pg_exec($connid, $sql);
-		$total_table = pg_num_rows($resid_count);
+		$total_table = (($resid_count) ? pg_num_rows($resid_count) : 0);
 
 		//$sql .= " order by pin_datavenda desc, pin_horavenda desc ";
 		$sql .= " limit ".$max." ";
@@ -458,15 +473,15 @@ function ResetCheckedValue() {
             <td>
 				<select name="fcanal" id="fcanal" class="combo_normal">
 				  <option value="">Todos os canais</option>
-				  <option value="s" <?php  if(trim($fcanal) == 's') echo "selected"?>>Site</option>
-				  <option value="p" <?php  if(trim($fcanal) == 'p') echo "selected"?>>POS</option>
-				  <option value="r" <?php  if(trim($fcanal) == 'r') echo "selected"?>>Rede POS</option>
-				  <option value="a" <?php  if(trim($fcanal) == 'a') echo "selected"?>>AtimoPay</option>
+				  <option value="s" <?php  if(trim((string)($fcanal ?? "")) == 's') echo "selected"?>>Site</option>
+				  <option value="p" <?php  if(trim((string)($fcanal ?? "")) == 'p') echo "selected"?>>POS</option>
+				  <option value="r" <?php  if(trim((string)($fcanal ?? "")) == 'r') echo "selected"?>>Rede POS</option>
+				  <option value="a" <?php  if(trim((string)($fcanal ?? "")) == 'a') echo "selected"?>>AtimoPay</option>
 				</select>
 			</td>
           </tr>
         </table>
-		<input name="tfph" type="hidden" class="form" id="tfph" value="<?php if(isset($tf_pins))echo $tf_pins[0] ?>">
+		<input name="tfph" type="hidden" class="form" id="tfph" value="<?php if(isset($tf_pins[0])) echo $tf_pins[0] ?>">
       </form>
 	
 	
@@ -518,7 +533,7 @@ function ResetCheckedValue() {
         <?php 		} ?>
         <tr> 
           <td colspan="8">
-                <?php  if($total_table > 0) { ?>
+                <?php  if(isset($total_table) && $total_table > 0) { ?>
                     <?php echo 'Exibindo resultados'.' '; ?> <strong><?php  echo $inicial + 1 ?></strong> a <strong><?php  echo $reg_ate ?></strong> de <strong><?php  echo $total_table ?></strong>
                 <?php  } else { ?>
                     &nbsp;
