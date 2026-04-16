@@ -288,7 +288,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                     $rs_pins_opr_row = pg_fetch_array($rs_pins_opr, $i);
             ?>
                     <option value="<?php echo $rs_pins_opr_row["valor"]; ?>" <?php if ($ogpm_pin_valor == $rs_pins_opr_row["valor"]) echo "selected"; ?>>
-                        <?php echo number_format($rs_pins_opr_row["valor"], 2, ',', '.'); ?>
+                        <?php echo number_format((float)($rs_pins_opr_row["valor"] ?? 0), 2, ',', '.'); ?>
                     </option>
             <?php
                 }

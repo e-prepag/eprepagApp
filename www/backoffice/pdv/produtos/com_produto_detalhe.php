@@ -471,8 +471,8 @@ function abreUpload(produto_id){
 					  <td align="center"><a style="text-decoration:none" href="com_modelo_detalhe.php?modelo_id=<?php echo $rs_produto_modelos_row['ogpm_id'] ?>"><?php echo $rs_produto_modelos_row['ogpm_id'] ?></a></td>
 					  <td align="center"><a style="text-decoration:none" href="com_modelo_detalhe.php?modelo_id=<?php echo $rs_produto_modelos_row['ogpm_id'] ?>"><?php echo $rs_produto_modelos_row['ogpm_nome'] ?></a></td>
 					  <td align="center"><?php echo ($rs_produto_modelos_row['ogpm_ativo'] == 1)?("Ativo"):("Inativo") ?></td>
-					  <td align="center"><?php echo number_format($rs_produto_modelos_row['ogpm_valor'], 2, ',', '.') ?></td>
-					  <td align="center"><?php echo number_format($rs_produto_modelos_row['ogpm_pin_valor'], 2, ',', '.') ?></td>
+					  <td align="center"><?php echo number_format((float)($rs_produto_modelos_row['ogpm_valor'] ?? 0), 2, ',', '.') ?></td>
+					  <td align="center"><?php echo number_format((float)($rs_produto_modelos_row['ogpm_pin_valor'] ?? 0), 2, ',', '.') ?></td>
                       <td align="center" width="70"><a href="#" class="btn btn-sm btn-danger" onClick="if(confirm('Deseja excluir este modelo?')) window.location='com_produto_detalhe.php?acao=e&produto_id=<?php echo $produto_id ?>&modelo_id=<?php echo $rs_produto_modelos_row['ogpm_id'] ?>';return false;">Excluir</a></td>
 					</tr>
 			<?php	} ?>

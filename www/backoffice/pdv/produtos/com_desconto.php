@@ -122,7 +122,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 							  <td>&nbsp;<?=$rs_porOperadora_row['opr_nome']?></td>
 							  <td align="right">
 							  <?php if(!is_null($des_perc_desconto)){ ?>
-								<a class="link_azul" href="#" Onclick="window.open('com_desconto_selecao.php?opr_nome=<?=urlencode($rs_porOperadora_row['opr_nome'])?>&des_opr_codigo=<?=$rs_porOperadora_row['opr_codigo']?>&perc_desconto=<?=urlencode(number_format($des_perc_desconto, 2, ',', '.')) ?>&des_vg_pagto_tipo=0&des_id=<?=$rs_porOperadora_row['des_id']?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><?=number_format($des_perc_desconto, 2, ',', '.')?>%</a>&nbsp;
+								<a class="link_azul" href="#" Onclick="window.open('com_desconto_selecao.php?opr_nome=<?=urlencode($rs_porOperadora_row['opr_nome'])?>&des_opr_codigo=<?=$rs_porOperadora_row['opr_codigo']?>&perc_desconto=<?=urlencode(number_format((float)$des_perc_desconto, 2, ',', '.')) ?>&des_vg_pagto_tipo=0&des_id=<?=$rs_porOperadora_row['des_id']?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><?=number_format((float)$des_perc_desconto, 2, ',', '.')?>%</a>&nbsp;
 							  <?php } else {?>
 								<a class="link_azul" href="#" Onclick="window.open('com_desconto_selecao.php?opr_nome=<?=urlencode($rs_porOperadora_row['opr_nome'])?>&des_opr_codigo=<?=$rs_porOperadora_row['opr_codigo']?>&perc_desconto=<?=urlencode("0,00") ?>&des_vg_pagto_tipo=0&des_id=0','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;">Inserir</a>&nbsp;
 							  <?php } ?>
@@ -179,7 +179,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 									  <td>&nbsp;<?=$rs_porFormaPagto_row['opr_nome']?></td>
 									  <td align="right">
 									  <?php if(!is_null($des_perc_desconto)){ ?>
-										<a class="link_azul" href="#" Onclick="window.open('com_desconto_selecao.php?opr_nome=<?=urlencode($rs_porFormaPagto_row['opr_nome'])?>&des_opr_codigo=<?=$rs_porFormaPagto_row['opr_codigo']?>&perc_desconto=<?=urlencode(number_format($des_perc_desconto, 2, ',', '.')) ?>&des_vg_pagto_tipo=<?=$formaId?>&des_id=<?=$rs_porFormaPagto_row['des_id']?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><?=number_format($des_perc_desconto, 2, ',', '.')?>%</a>&nbsp;
+										<a class="link_azul" href="#" Onclick="window.open('com_desconto_selecao.php?opr_nome=<?=urlencode($rs_porFormaPagto_row['opr_nome'])?>&des_opr_codigo=<?=$rs_porFormaPagto_row['opr_codigo']?>&perc_desconto=<?=urlencode(number_format((float)$des_perc_desconto, 2, ',', '.')) ?>&des_vg_pagto_tipo=<?=$formaId?>&des_id=<?=$rs_porFormaPagto_row['des_id']?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><?=number_format((float)$des_perc_desconto, 2, ',', '.')?>%</a>&nbsp;
 									  <?php } else {?>
 										<a class="link_azul" href="#" Onclick="window.open('com_desconto_selecao.php?opr_nome=<?=urlencode($rs_porFormaPagto_row['opr_nome'])?>&des_opr_codigo=<?=$rs_porFormaPagto_row['opr_codigo']?>&perc_desconto=<?=urlencode("0,00") ?>&des_vg_pagto_tipo=<?=$formaId?>&des_id=0','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;">Inserir</a>&nbsp;
 									  <?php } ?>
