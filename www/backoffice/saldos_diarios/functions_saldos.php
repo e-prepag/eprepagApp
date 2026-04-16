@@ -607,13 +607,13 @@ function gerarTabelaClientes(array $dados, $tipo_cliente)
         	<tr class="total">
         	    <td>Média</td>
 				<td>' . $tipo_cliente_texto . '</td>
-        	    <td>' . formatarReais($soma_saldo_inicial / count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_entradas_str / count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_saidas_str / count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_saldo_final_str / count($dados)) . '</td>
-				<td>' . formatarReais($soma_entradas_dia / count($dados)) . '</td>
-				<td>' . formatarReais($soma_saidas_dia / count($dados)) . '</td>
-        	    <td>' . formatarReais($soma_saldo_final / count($dados)) . '</td>
+        	    <td>' . formatarReais($soma_saldo_inicial / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
+        	    <td>' . formatarReais($soma_entradas_str / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
+        	    <td>' . formatarReais($soma_saidas_str / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
+        	    <td>' . formatarReais($soma_saldo_final_str / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
+				<td>' . formatarReais($soma_entradas_dia / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
+				<td>' . formatarReais($soma_saidas_dia / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
+        	    <td>' . formatarReais($soma_saldo_final / ((is_array($dados) && count($dados) > 0) ? count($dados) : 1)) . '</td>
         	</tr>
 		</tfoot>
     ';

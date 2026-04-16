@@ -3,6 +3,7 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 require_once '/www/includes/constantes.php';
+require_once "/www/includes/pdv_encoding.php";
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
 $conexao = ConnectionPDO::getConnection()->getLink();
@@ -15,7 +16,7 @@ $sql = "SELECT ug_nome_fantasia, ug_id
 $user_id = isset($_REQUEST['ug_id']) ? $_REQUEST['ug_id'] : 0;
 
 if ($user_id <= 0) {
-	die("Id do usuário inválido.");
+	die("Id do usuï¿½rio invï¿½lido.");
 }
 
 $stmt = $conexao->prepare($sql);
@@ -24,7 +25,7 @@ $stmt->execute();
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$usuario) {
-	die("Usuário não encontrado.");
+	die("Usuï¿½rio nï¿½o encontrado.");
 }
 
 $sqlIp = "SELECT ip.id, ip.ip_address,
@@ -249,7 +250,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 		document.getElementById('ip_id').value = id;
 		document.getElementById('acaoForm').value = 'editar';
 		document.getElementById('domain').value = domain;
-		document.querySelector('.modal-title-alt').innerText = 'Editar endereço IP';
+		document.querySelector('.modal-title-alt').innerText = 'Editar endereï¿½o IP';
 
 		if (isSingle) {
 			selectIpType('single');
@@ -267,7 +268,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 		document.getElementById('ip_id').value = '';
 		document.getElementById('acaoForm').value = 'novo';
 		document.getElementById('domain').value = '';
-		document.querySelector('.modal-title-alt').innerText = 'Cadastrar endereços IPs';
+		document.querySelector('.modal-title-alt').innerText = 'Cadastrar endereï¿½os IPs';
 
 		selectIpType('single');
 		document.getElementById('singleIp').value = '';
@@ -298,7 +299,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 			radioGroups[0].classList.add('active');
 			rangeInputs.classList.remove('active');
 			singleIp.style.display = 'block';
-			ipLabel.textContent = 'Endereço IP';
+			ipLabel.textContent = 'Endereï¿½o IP';
 			document.querySelector('input[name="ipType"][value="single"]').checked = true;
 		} else {
 			radioGroups[1].classList.add('active');
@@ -315,11 +316,11 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 		if (ipType === 'single') {
 			const ip = document.getElementById('singleIp').value.trim();
 			if (!ip) {
-				document.getElementById('ipError').textContent = 'Digite um endereço IP válido.';
+				document.getElementById('ipError').textContent = 'Digite um endereï¿½o IP vï¿½lido.';
 				return false;
 			}
 			if (!validateIP(ip)) {
-				document.getElementById('ipError').textContent = 'Formato de IP inválido.';
+				document.getElementById('ipError').textContent = 'Formato de IP invï¿½lido.';
 				return false;
 			}
 
@@ -332,7 +333,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 				return false;
 			}
 			if (!validateIP(startIp) || !validateIP(endIp)) {
-				document.getElementById('ipError').textContent = 'Formato de IP inválido.';
+				document.getElementById('ipError').textContent = 'Formato de IP invï¿½lido.';
 				return false;
 			}
 
@@ -343,7 +344,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 	function removerIp(id) {
 		Swal.fire({
 			title: 'Tem certeza?',
-			text: "Deseja realmente remover este endereço IP?",
+			text: "Deseja realmente remover este endereï¿½o IP?",
 			icon: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#d33',
@@ -386,7 +387,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 							Swal.fire({
 								icon: "error",
 								title: "Erro",
-								text: resposta.msg || "Erro ao remover o endereço IP."
+								text: resposta.msg || "Erro ao remover o endereï¿½o IP."
 							});
 						}
 					},
@@ -394,7 +395,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 						Swal.fire({
 							icon: "error",
 							title: "Erro",
-							text: "Erro ao remover o endereço IP."
+							text: "Erro ao remover o endereï¿½o IP."
 						});
 					}
 				});
@@ -412,7 +413,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 
 		Swal.fire({
 			title: 'Tem certeza?',
-			text: "Deseja realmente alterar este endereço IP?",
+			text: "Deseja realmente alterar este endereï¿½o IP?",
 			icon: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#d33',
@@ -459,7 +460,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 							Swal.fire({
 								icon: "error",
 								title: "Erro",
-								text: resposta.msg || "Erro ao alterar o endereço IP."
+								text: resposta.msg || "Erro ao alterar o endereï¿½o IP."
 							});
 						}
 					},
@@ -467,7 +468,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 						Swal.fire({
 							icon: "error",
 							title: "Erro",
-							text: "Erro ao alterar o endereço IP."
+							text: "Erro ao alterar o endereï¿½o IP."
 						});
 					}
 				});
@@ -475,7 +476,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 		});
 	}
 
-	// Delegação de evento para os botões de remover (caso sejam adicionados dinamicamente)
+	// Delegaï¿½ï¿½o de evento para os botï¿½es de remover (caso sejam adicionados dinamicamente)
 	$(document).on('click', 'button[id^="remover"]', function() {
 		const id = $(this).attr('id').replace('remover', '');
 		removerIp(id);
@@ -503,7 +504,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 				beforeSend: function() {
 					Swal.fire({
 						title: 'Aguarde!',
-						html: 'Processando a solicitação',
+						html: 'Processando a solicitaï¿½ï¿½o',
 						timerProgressBar: true,
 						didOpen: () => {
 							Swal.showLoading()
@@ -525,7 +526,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 						location.reload();
 						return;
 					} else {
-						msg = "Erro ao cadastrar endereço IP: " + resposta.msg;
+						msg = "Erro ao cadastrar endereï¿½o IP: " + resposta.msg;
 						icone = "error";
 					}
 
@@ -541,7 +542,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 				},
 				error: function(xhr, status, error) {
 					Swal.close();
-					let msg = "Erro inesperado ao cadastrar o endereço IP.";
+					let msg = "Erro inesperado ao cadastrar o endereï¿½o IP.";
 					if (xhr && xhr.responseText) {
 						try {
 							const resposta = JSON.parse(xhr.responseText);
@@ -571,12 +572,12 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 		<!-- Modal content-->
 		<div class="modal-content" style="z-index: 1001;">
 			<div class="card">
-				<h2 class="modal-title-alt">Cadastrar endereços IPs</h2>
+				<h2 class="modal-title-alt">Cadastrar endereï¿½os IPs</h2>
 				<form id="formNovo">
 					<input type="hidden" id="ip_id" name="id" value="">
 					<input type="hidden" id="acaoForm" name="acao" value="novo">
 					<div class="form-group">
-						<label id="domainLabel">Site PDV (Domínio)</label>
+						<label id="domainLabel">Site PDV (Domï¿½nio)</label>
 						<input type="text" id="domain" name="domain" placeholder="ex: meudominio.com.br">
 					</div>
 					<div class="form-group">
@@ -594,12 +595,12 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 					</div>
 
 					<div class="form-group">
-						<label id="ipLabel">Endereço IP</label>
+						<label id="ipLabel">Endereï¿½o IP</label>
 						<div class="ip-input-group">
 							<input type="text" id="singleIp" name="ip_address" placeholder="ex: 192.168.1.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
 							<div class="range-inputs" id="rangeInputs">
 								<input type="text" id="startIp" name="ip_range_ini" placeholder="IP inicial" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-								<div class="range-separator">até</div>
+								<div class="range-separator">atï¿½</div>
 								<input type="text" id="endIp" name="ip_range_end" placeholder="IP final" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
 							</div>
 						</div>
@@ -627,34 +628,35 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 				href="<?php echo $sistema->item->getLink();
 						?>"><?php echo $sistema->item->getDescricao();
 							?> -
-				<?= utf8_decode(htmlspecialchars(utf8_encode($usuario['ug_id']))) ?></a>
+				<?= htmlspecialchars((string)($usuario['ug_id'] ?? "")) ?></a>
 		</li>
-	</ol>
-</div>
-<div class="col-md-12">
-	<div>
+		</ol>
+		</div>
+		<div class="col-md-12">
+		<div>
 		<fieldset>
 			<h4 class="titulo-vencimento">PDV</h4>
 			<table class="table txt-preto">
 				<tr>
 					<td>Id:</td>
 					<td id="ug_id">
-						<?= $usuario['ug_id'] ?>
+						<?= htmlspecialchars((string)($usuario['ug_id'] ?? "")) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>
 				<tr>
 					<td>Nome:</td>
 					<td>
-						<?= utf8_decode(htmlspecialchars(utf8_encode(($usuario["ug_nome_fantasia"] ? $usuario["ug_nome_fantasia"] : "Não encontrado")))) ?>
+						<?= pdv_iso_to_utf8(htmlspecialchars((string)($usuario["ug_nome_fantasia"] ?? "NÃ£o encontrado"))) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>
+
 				<tr>
 					<td colspan="2">
 						<fieldset>
 							<div class="d-flex custom-justify bottom-10">
-								<h5 class="titulo-vencimento">Endereços IP cadastrados</h5>
+								<h5 class="titulo-vencimento">Endereï¿½os IP cadastrados</h5>
 								<a href="#" style="font-weight: bold;" class="btn btn-success btn-todos align-right"
 									onclick="abrirNovoIp()">Novo</a>
 							</div>
@@ -665,12 +667,12 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 										<thead class="thead-dark">
 											<tr>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Tipo</th>
-												<th style="font-size: 14px;font-weight: bold;color: #444;">Endereço IP</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">Endereï¿½o IP</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Site PDV</th>
-												<th style="font-size: 14px;font-weight: bold;color: #444;">User Criação</th>
-												<th style="font-size: 14px;font-weight: bold;color: #444;">Dt Inclusão</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">User Criaï¿½ï¿½o</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">Dt Inclusï¿½o</th>
 												<th style="font-size: 14px;font-weight: bold;color: #444;">Ativo</th>
-												<th style="font-size: 14px;font-weight: bold;color: #444;">Ação</th>
+												<th style="font-size: 14px;font-weight: bold;color: #444;">Aï¿½ï¿½o</th>
 											</tr>
 										</thead>
 										<tbody id="col-Ip">
@@ -683,7 +685,7 @@ $usuarioNome = $usuarioNome['shn_nome'] ?: "Desconhecido";
 												$range = $row['ip_range'] == false;
 
 												if ($range) {
-													$msgRange = "Único";
+													$msgRange = "ï¿½nico";
 													$ipAdress = $row['ip_address'];
 												} else {
 													$msgRange = "Range";

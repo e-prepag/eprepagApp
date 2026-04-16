@@ -4,6 +4,7 @@
 // error_reporting(E_ALL);
 require_once "/www/includes/configIP.php";
 require_once "/www/includes/constantes.php";
+require_once "/www/includes/pdv_encoding.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -13,8 +14,8 @@ $conexao = ConnectionPDO::getConnection()->getLink();
 
 if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
-	$usuario_id = $_POST['usuario_id'];
-	$ip_pdv = $_POST['ip_pdv'];
+	$usuario_id = $_POST['usuario_id'] ?? null;
+	$ip_pdv = $_POST['ip_pdv'] ?? null;
 
 	// 2) Monta a parte fixa do SELECT
 	$sql = "SELECT 
