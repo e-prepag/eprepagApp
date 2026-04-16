@@ -28,7 +28,7 @@ if (isset($BtnSearch) && $BtnSearch) {
     //echo $sql."<br>";
     $rs = SQLexecuteQuery($sql);
     if ($rs) {
-        if (pg_num_rows($rs) > 0) {
+        if ($rs && pg_num_rows($rs) > 0) {
             $total_geral = 0;
             $total_registros = 0;
             $msg .= "<table class='table txt-preto fontsize-pp'>
@@ -41,7 +41,7 @@ if (isset($BtnSearch) && $BtnSearch) {
                                         <td>Qtde Dep</td>
                                         <td>Valor da Taxa</td>
                                     </tr>";
-            while ($rsRow = pg_fetch_array($rs)) {
+            while ($rs && ($rsRow = pg_fetch_array($rs))) {
 
                 $total_geral += $rsRow['pta_valor'];
                 $total_registros++;

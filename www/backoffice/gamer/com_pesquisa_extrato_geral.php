@@ -71,7 +71,7 @@ if ($codigo_user>0){
 		$sql  = "select ug_perfil_saldo from usuarios_games where ug_id=$codigo_user";
 //echo $sql . "<br>";
 		$rs_UG = SQLexecuteQuery($sql);
-		if(!$rs_UG || pg_num_rows($rs_UG) == 0) $msg = "Usu&aacute;rio $codigo_user n�o encontrado.\n";
+		if(!$rs_UG || !$rs_UG || pg_num_rows($rs_UG) == 0) $msg = "Usu&aacute;rio $codigo_user n�o encontrado.\n";
 		else {				
 			$rs_UG_row = pg_fetch_array($rs_UG);
 			$ug_perfil_saldo		= $rs_UG_row['ug_perfil_saldo'];
@@ -98,7 +98,7 @@ if ($codigo_user>0){
 						)";
 //echo $sql . "<br>";
 		$rs_Pendentes = SQLexecuteQuery($sql);
-		if(!$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute; $codigo_user n�o encontrada.\n";
+		if(!$rs_Pendentes || !$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute; $codigo_user n�o encontrada.\n";
 		else {				
 			$rs_Pendentes_row = pg_fetch_array($rs_Pendentes);
 			$ug_n			= $rs_Pendentes_row['n'];
@@ -125,7 +125,7 @@ if ($codigo_user>0){
 						)";
 //echo $sql . "<br>";
 		$rs_Pendentes = SQLexecuteQuery($sql);
-		if(!$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute;rio $codigo_user n&atilde;o encontrada.\n";
+		if(!$rs_Pendentes || !$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute;rio $codigo_user n&atilde;o encontrada.\n";
 		else {				
 			$rs_Pendentes_row = pg_fetch_array($rs_Pendentes);
 			$ug_n1			= $rs_Pendentes_row['n1'];

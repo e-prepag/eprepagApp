@@ -125,7 +125,7 @@ require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 	
 	//Produtos
 	if ($tf_produto && is_array($tf_produto))
-		if (count($tf_produto) == 1)
+		if (is_countable($tf_produto) ? count($tf_produto) : 0 == 1)
 			$tf_produto = $tf_produto[0];
 		else
 			$tf_produto = implode("|",$tf_produto);
@@ -135,7 +135,7 @@ require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 	
 	//Valores
 	if ($tf_pins && is_array($tf_pins))
-		if (count($tf_pins) == 1)
+		if (is_countable($tf_pins) ? count($tf_pins) : 0 == 1)
 			$tf_pins = $tf_pins[0];
 		else
 			$tf_pins = implode("|",$tf_pins);
@@ -465,13 +465,13 @@ require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 
 			//Produtos
 			if ($tf_produto && is_array($tf_produto))
-				if (count($tf_produto) == 1)
+				if (is_countable($tf_produto) ? count($tf_produto) : 0 == 1)
 						$sql .= " and upper(vgm.vgm_nome_produto) like '%" . str_replace("'", "''",strtoupper($tf_produto[0])) . "%' ";	
 				else
 				{
 					$sql .= " and (";
 					foreach($tf_produto as $tf_produto_id => $tf_produto_row)	
-						if ($tf_produto_id == count($tf_produto) - 1)
+						if ($tf_produto_id == is_countable($tf_produto) ? count($tf_produto) : 0 - 1)
 							$sql .= "upper(vgm.vgm_nome_produto) like '%" . str_replace("'", "''",strtoupper($tf_produto_row)) . "%')";
 						else
 							$sql .= "upper(vgm.vgm_nome_produto) like '%" . str_replace("'", "''",strtoupper($tf_produto_row)) . "%' or ";
@@ -479,13 +479,13 @@ require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 
 			//Valores
 			if ($tf_pins && is_array($tf_pins))
-				if (count($tf_pins) == 1)
+				if (is_countable($tf_pins) ? count($tf_pins) : 0 == 1)
 						$sql .= " and vgm.vgm_valor = " . moeda2numeric($tf_pins[0]) . " ";	
 				else
 				{
 					$sql .= " and (";
 					foreach($tf_pins as $tf_pins_id => $tf_pins_row)	
-						if ($tf_pins_id == count($tf_pins) - 1)
+						if ($tf_pins_id == is_countable($tf_pins) ? count($tf_pins) : 0 - 1)
 							$sql .= "vgm.vgm_valor = " . moeda2numeric($tf_pins_row) . ")";
 						else
 							$sql .= "vgm.vgm_valor = " . moeda2numeric($tf_pins_row) . " or ";

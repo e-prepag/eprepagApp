@@ -11,7 +11,7 @@ echo $descricao->MontaAreaDescricao();
 if (isset($btn_estorno) && $btn_estorno=="Estornar") {
 	//echo "<pre>".print_r($scf_id,true)."</pre>";
 	$mensagem_final = "";
-	$scf_id_lista = implode(",",$scf_id);
+	$scf_id_lista = !empty($scf_id) ? implode(",",(array)$scf_id) : "0";
 
 	$msg = "";
 	//Inicia transacao
@@ -23,7 +23,7 @@ if (isset($btn_estorno) && $btn_estorno=="Estornar") {
 	$sql = "SELECT scf_id from saldo_composicao_fifo WHERE scf_id IN ($scf_id_lista) AND scf_valor=scf_valor_disponivel AND scf_status=1;";
 	$rs_dados_confirmados = SQLexecuteQuery($sql);
 //	echo $sql."<br>";
-	while($rs_dados_confirmados_row = pg_fetch_array($rs_dados_confirmados)) {
+	while($rs_dados_confirmados && ($rs_dados_confirmados_row = pg_fetch_array($rs_dados_confirmados))) {
 		//transacao por transacao
 //		echo $rs_dados_confirmados_row['scf_id'].str_repeat("=",30)."<br>";
 		if($msg == ""){
@@ -73,7 +73,7 @@ if (isset($btn_estorno) && $btn_estorno=="Estornar") {
 				$msg .= "<font color='#FF0000'><b>Erro ao atualizar saldo_composicao_fifo.\n</b></font><br>";
 			}//end else if($rs_saldo_composicao_fifo)
 		} // end if($msg == "")
-	}//end while($rs_dados_confirmados_row = pg_fetch_array($rs_dados_confirmados))
+	}//end while($rs_dados_confirmados && ($rs_dados_confirmados_row = pg_fetch_array($rs_dados_confirmados)))
 	
 	//Finaliza transacao
 	if($msg == ""){

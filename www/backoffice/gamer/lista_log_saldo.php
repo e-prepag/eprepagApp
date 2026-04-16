@@ -30,6 +30,10 @@ require_once "/www/includes/bourls.php";
 $n = 0;
 $file = (isset($GLOBALS['ARQUIVO_RC_MONITOR'])) ? $GLOBALS['ARQUIVO_RC_MONITOR'] : "";
 
+$tf_v_data_inclusao_ini = isset($tf_v_data_inclusao_ini) ? $tf_v_data_inclusao_ini : (isset($_POST['tf_v_data_inclusao_ini']) ? $_POST['tf_v_data_inclusao_ini'] : null);
+$tf_v_data_inclusao_fim = isset($tf_v_data_inclusao_fim) ? $tf_v_data_inclusao_fim : (isset($_POST['tf_v_data_inclusao_fim']) ? $_POST['tf_v_data_inclusao_fim'] : null);
+$ug_id = isset($ug_id) ? $ug_id : (isset($_POST['ug_id']) ? $_POST['ug_id'] : null);
+
 if(!isset($btnSubmit) || !$btnSubmit) {
 	$tf_v_data_inclusao_ini = date("d/m/Y");
 	$tf_v_data_inclusao_fim = date("d/m/Y");
@@ -51,16 +55,17 @@ $sql_n .= "from usuarios_games_saldo_log " . PHP_EOL;
 $sql_n .= "where 1=1 " . PHP_EOL;
 
 if(!empty($ug_id)) {
-	$sql .= "and ugsl_ug_id = $ug_id ";
-	$sql_n .= "and ugsl_ug_id = $ug_id " . PHP_EOL;
+    $ug_id_sql = (int)$ug_id;
+	$sql .= "and ugsl_ug_id = $ug_id_sql ";
+	$sql_n .= "and ugsl_ug_id = $ug_id_sql " . PHP_EOL;
 }
-if($tf_v_data_inclusao_ini) {
+if(!empty($tf_v_data_inclusao_ini)) {
 	if(verifica_data_rc($tf_v_data_inclusao_ini) != 0 ) {
 		$sql .= "and ugsl_data_inclusao >= '".formata_data_rc($tf_v_data_inclusao_ini,1)." 00:00:00' ";
 		$sql_n .= "and ugsl_data_inclusao >= '".formata_data_rc($tf_v_data_inclusao_ini,1)." 00:00:00' " . PHP_EOL;
 	}
 }
-if($tf_v_data_inclusao_fim) {
+if(!empty($tf_v_data_inclusao_fim)) {
 	if(verifica_data_rc($tf_v_data_inclusao_fim) != 0 ) {
 		$sql .= "and ugsl_data_inclusao <= '".formata_data_rc($tf_v_data_inclusao_fim,1)." 23:59:59' ";
 		$sql_n .= "and ugsl_data_inclusao <= '".formata_data_rc($tf_v_data_inclusao_fim,1)." 23:59:59' " . PHP_EOL;
@@ -98,7 +103,7 @@ if(b_IsUsuarioReinaldo()) {
 <form method="post" action="" name="form1">
 <table class="table txt-preto ">
 <tr>
-    <td>Data início:</td>
+    <td>Data inï¿½cio:</td>
     <td> 	
         <input name="tf_v_data_inclusao_ini" type="text" id="tf_v_data_inclusao_ini" value="<?php echo $tf_v_data_inclusao_ini ?>" size="9" maxlength="10">
 	</td>
@@ -131,7 +136,7 @@ if(b_IsUsuarioReinaldo()) {
 		
 		echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>" . PHP_EOL;
 		echo "<td colspan='2'>&nbsp;</td>" . PHP_EOL;
-		echo "<td colspan='3'>usuário</td>" . PHP_EOL;
+		echo "<td colspan='3'>usuï¿½rio</td>" . PHP_EOL;
 		echo "<td colspan='2'>valor</td>" . PHP_EOL;
 		echo "<td colspan='2'>Diff</td>" . PHP_EOL;
 		echo "</tr>" . PHP_EOL;
@@ -141,7 +146,7 @@ if(b_IsUsuarioReinaldo()) {
 		echo "<td>id</td>" . PHP_EOL;
 		echo "<td>data_inclusao</td>" . PHP_EOL;
 
-		echo "<td>usuário</td>" . PHP_EOL;
+		echo "<td>usuï¿½rio</td>" . PHP_EOL;
 		echo "<td>n_regs</td>" . PHP_EOL;
 		echo "<td>e-mail</td>" . PHP_EOL;
 

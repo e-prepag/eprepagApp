@@ -52,7 +52,7 @@ require_once $raiz_do_projeto."public_html/sys/admin/stats/inc_Comissoes.php";
 	if(!$rs_operadoras) {
 		echo "Erro ao listar Operadoras. ($sql)<br>";
 	} else {
-		if($rs_operadoras && pg_num_rows($rs_operadoras)>0) {
+		if($rs_operadoras && $rs_operadoras && pg_num_rows($rs_operadoras)>0) {
 			while($rs_operadoras_row = pg_fetch_array($rs_operadoras)) {
 				$COMISSOES_BRUTAS_matrix_operadoras_ids[$rs_operadoras_row['opr_nome']] = $rs_operadoras_row['opr_codigo'];
 			}
@@ -65,7 +65,7 @@ require_once $raiz_do_projeto."public_html/sys/admin/stats/inc_Comissoes.php";
 
 	// Lista as comissões
 	echo "<table border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>\n";
-	echo "<tr class='texto' style='background-color:#ccffcc;font-weight:bold'><td colspan='2'>&nbsp;</td><td align='center' colspan='".(count($COMISSOES_BRUTAS_matrix_canal)+1)."'>Canais</td></tr>\n";
+	echo "<tr class='texto' style='background-color:#ccffcc;font-weight:bold'><td colspan='2'>&nbsp;</td><td align='center' colspan='".(is_countable($COMISSOES_BRUTAS_matrix_canal) ? count($COMISSOES_BRUTAS_matrix_canal) : 0+1)."'>Canais</td></tr>\n";
 	echo "<tr class='texto' style='background-color:#ccffcc;font-weight:bold'><td align='center' width='80px'>Operadoras</td><td align='center' width='30px'>ID</td>\n";
 	foreach ($COMISSOES_BRUTAS_matrix_canal as $key_canal => $val_canal) {
 		echo "<td align='center' width='30px'>$key_canal</td>\n";
