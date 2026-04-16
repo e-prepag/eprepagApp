@@ -21,7 +21,7 @@ $res0 = SQLexecuteQuery($ps_query);
 
 
 
-$total_de_cidades = pg_num_rows($res0);
+$total_de_cidades = (($res0) ? pg_num_rows($res0) : 0);
 
 // seleção de cidades ordenada em ordem decrescente para acelerar 
 $ps_query = "SELECT distinct ug_cidade, ug_estado FROM dist_usuarios_games order by ug_cidade desc";
@@ -33,7 +33,7 @@ $ps_query = "SELECT distinct ug_cidade, ug_estado FROM dist_usuarios_games order
 //$res1 = pg_get_result($conex);
 $res1 = SQLexecuteQuery($ps_query);
 
-$total_de_cidades_com_estado = pg_num_rows($res1);
+$total_de_cidades_com_estado = (($res1) ? pg_num_rows($res1) : 0);
 
 
 // conferencia 
@@ -51,8 +51,8 @@ while ($info = pg_fetch_array($res1)) {
 		//$res2 = pg_get_result($conex);
 		$res2 = SQLexecuteQuery($queryB);
 
-			echo "&nbsp;&nbsp;&nbsp;Total duplos encontrados: ".pg_num_rows($res2)."<br>";
-			if(pg_num_rows($res2)>0) {
+			echo "&nbsp;&nbsp;&nbsp;Total duplos encontrados: ".(($res2) ? pg_num_rows($res2) : 0)."<br>";
+			if((($res2) ? pg_num_rows($res2) : 0)>0) {
 				echo "queryB: ".$queryB."<br>";
 			}
 

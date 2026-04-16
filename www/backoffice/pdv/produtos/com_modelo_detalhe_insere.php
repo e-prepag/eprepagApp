@@ -59,7 +59,7 @@ if ($msg == "") {
       $instProduto = new Produto();
       $ret = $instProduto->obterMelhorado($filtro, null, $rs);
 
-      if ($rs && pg_num_rows($rs) > 0) {
+      if ($rs && (($rs) ? pg_num_rows($rs) : 0) > 0) {
         for ($i = 0; $rs_row = pg_fetch_array($rs); $i++) {
           if (!empty($rs_row['ogp_nome'])) {
             $produto                                    = new stdClass();
@@ -112,7 +112,7 @@ if ($msg == "") {
                                                                 $instProduto = new Produto();
                                                                 $ret = $instProduto->obtermelhorado($filtro, null, $rs_produto);
                                                                 if ($ret != "") $msg = $ret;
-                                                                else if (!$rs_produto || pg_num_rows($rs_produto) == 0) $msg = "Nenhum produto encontrado.\n";
+                                                                else if (!$rs_produto || (($rs_produto) ? pg_num_rows($rs_produto) : 0) == 0) $msg = "Nenhum produto encontrado.\n";
                                                                 else {
                                                                   $rs_produto_row = pg_fetch_array($rs_produto);
                                                                   $ogp_id       = $rs_produto_row['ogp_id'];

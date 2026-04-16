@@ -74,7 +74,7 @@ if($msg == ""){
                     $instProduto = new Produto();
                     $ret = $instProduto->obterMelhorado($filtro, null, $rs);
 
-                    if($rs && pg_num_rows($rs) > 0)
+                    if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0)
                     {
                         for($i=0; $rs_row = pg_fetch_array($rs); $i++)
                         {

@@ -17,7 +17,7 @@ if (isset($_POST["btn-envia"])) {
 		$html .= "</tr>";
 		$html .= "</thead>";
 		$html .= "<tbody>";
-		for ($num = 0; $num < count($info); $num++) {
+		for ($num = 0; $num < (is_countable($info) ? count($info) : 0); $num++) {
 			$html .= "<tr>
 					 <td style='text-align:center;' colspan='4'>" . $info[$num][1] . "</td>
 					 <td style='text-align:center;' colspan='4'>" . $info[$num][3] . "</td>
@@ -32,8 +32,8 @@ if (isset($_POST["btn-envia"])) {
 	if (isset($_POST["dtMin"]) && isset($_POST["dtMax"])) {
 
 		// As datas vêm do POST no formato YYYY-MM-DD
-		$dtMin = $_POST["dtMin"]; // Ex: "2025-01-15"
-		$dtMax = $_POST["dtMax"]; // Ex: "2025-01-31"
+		$dtMin = $_POST["dtMin"] ?? ''; // Ex: "2025-01-15"
+		$dtMax = $_POST["dtMax"] ?? ''; // Ex: "2025-01-31"
 
 		$sql = "SELECT DISTINCT 
         		    ug_id,
@@ -66,7 +66,7 @@ if (isset($_POST["btn-envia"])) {
 		}
 
 		// Se encontrou dados, gera o Excel
-		if (count($dados) > 0) {
+		if ((is_countable($dados) ? count($dados) : 0) > 0) {
 			$emails = array_column($dados, 2); // Coluna do email (índice 2)
 			// echo '<script>console.log('.json_encode($emails).')</script>';
 			estruturaExcel($dados);
@@ -153,8 +153,8 @@ if (isset($_POST["btn-envia"])) {
 		</thead>
 		<tbody>
 			<?php
-			if (isset($dados) && count($dados) > 0) {
-				for ($num = 0; $num < count($dados); $num++) {
+			if (isset($dados) && (is_countable($dados) ? count($dados) : 0) > 0) {
+				for ($num = 0; $num < (is_countable($dados) ? count($dados) : 0); $num++) {
 			?>
 					<tr>
 						<td><?php echo $dados[$num][1]; ?></td>

@@ -77,7 +77,7 @@ if($acao == 'editar')
 		$dv_data_fim		= $rs_tipo_estabalecimento_row['dv_data_fim'];
 		$dv_url				= $rs_tipo_estabalecimento_row['dv_url'];
 													
-		if (pg_num_rows($rs_tipo_estabalecimento) > 0)
+		if ((($rs_tipo_estabalecimento) ? pg_num_rows($rs_tipo_estabalecimento) : 0) > 0)
 			include 'videos_edt.php';
 		else
 			$acao = 'listar';

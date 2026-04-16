@@ -6,8 +6,8 @@ require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 require_once "/www/includes/configIP.php";
 
-$id = $_POST["id"];
-$codigo = $_POST["codigo"];
+$id = $_POST["id"] ?? '';
+$codigo = $_POST["codigo"] ?? '';
 
 if ($codigo != 'Gz8#kV2!mP$Xr9@tQw') {
 	http_response_code(400);

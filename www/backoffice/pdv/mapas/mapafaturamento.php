@@ -4,18 +4,18 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
-$ug_ativo	= $_POST['ug_ativo'];
-$dataini	= $_POST['dataini'];
-$datafim	= $_POST['datafim'];
-$tipo		= $_POST['tipo'];
-$centro	 	= $_POST['centro'];
-$zoom	 	= $_POST['zoom'];
-$chk_ug_id	= $_POST['chk_ug_id'];
+$ug_ativo	= $_POST['ug_ativo'] ?? '';
+$dataini	= $_POST['dataini'] ?? '';
+$datafim	= $_POST['datafim'] ?? '';
+$tipo		= $_POST['tipo'] ?? '';
+$centro	 	= $_POST['centro'] ?? '';
+$zoom	 	= $_POST['zoom'] ?? '';
+$chk_ug_id	= $_POST['chk_ug_id'] ?? '';
 
 $https = "https";
 $need_key_maps = (checkIP())?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve00r8hb4";
 
-if(count($chk_ug_id)>0) {
+if((is_countable($chk_ug_id) ? count($chk_ug_id) : 0)>0) {
 	$lista_ug_id = implode(",", $chk_ug_id);
 	$sqlUpdate = "update dist_usuarios_games set ug_coord_lat=0, ug_coord_lng=0 where ug_id IN ($lista_ug_id)";
 	//echo $sqlUpdate."<br>";
@@ -44,7 +44,7 @@ if(empty($ug_ativo)) {
 }
 
 // Deixa o drop down nos valores que estavam selecionados antes do reload.
-$valorRequestCidade = $_POST['cidade'];
+$valorRequestCidade = $_POST['cidade'] ?? '';
 if ((isset($_REQUEST['cidade'])) and (isset($_REQUEST['bairro']))){
 	$SQLBairro = "SELECT distinct(ug_bairro) as ug_bairro
 				FROM dist_usuarios_games
@@ -54,7 +54,7 @@ if ((isset($_REQUEST['cidade'])) and (isset($_REQUEST['bairro']))){
 }
 
 // Deixa o drop down nos valores que estavam selecionados antes do reload.
-$valorRequestEstado = $_POST['estado'];
+$valorRequestEstado = $_POST['estado'] ?? '';
 if ((isset($_REQUEST['estado'])) and (isset($_REQUEST['cidade']))){
 	$SQLCidade = "SELECT ug_cidade, ug_estado
 						FROM dist_usuarios_games

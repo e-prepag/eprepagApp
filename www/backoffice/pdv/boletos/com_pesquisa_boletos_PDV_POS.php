@@ -96,7 +96,7 @@ if(isset($BtnSearch)){
 
             include $raiz_do_projeto . "includes/pdv/inc_pesquisa_boletos_PDV_POS_sql.php";
 
-            $total_table = pg_num_rows($rs_boleto_pos);
+            $total_table = (($rs_boleto_pos) ? pg_num_rows($rs_boleto_pos) : 0);
 
             //Ordem
             $sql .= " order by ".$ncamp;

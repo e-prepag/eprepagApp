@@ -3,7 +3,7 @@ require_once '../../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
-$cidade = $_GET['cidade'];
+$cidade = $_GET['cidade'] ?? '';
 $ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games where ug_cidade = '$cidade';";
 //echo $ps_query;
 /// todas as lan que estiverem nesse bairro

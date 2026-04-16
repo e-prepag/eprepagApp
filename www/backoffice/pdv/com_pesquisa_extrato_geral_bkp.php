@@ -21,10 +21,10 @@ $max          = 2000; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
 $registros	  = $max;
 
-$dd_balancos = $_REQUEST['dd_balancos'];
-$dd_boletos = $_REQUEST['dd_boletos'];
-$dd_compras = $_REQUEST['dd_compras'];
-$lan_tipo = $_REQUEST['lan_tipo'];
+$dd_balancos = $_REQUEST['dd_balancos'] ?? '';
+$dd_boletos = $_REQUEST['dd_boletos'] ?? '';
+$dd_compras = $_REQUEST['dd_compras'] ?? '';
+$lan_tipo = $_REQUEST['lan_tipo'] ?? '';
 if(!isset($tf_v_data_inclusao_ini) || !$tf_v_data_inclusao_ini) {
 	$hoje = date("d/m/Y");
 	//$hoje = "20/03/2008";
@@ -32,9 +32,9 @@ if(!isset($tf_v_data_inclusao_ini) || !$tf_v_data_inclusao_ini) {
 	
 }	
 if(!isset($tf_v_data_inclusao_fim) || !$tf_v_data_inclusao_fim) $tf_v_data_inclusao_fim = $hoje;
-$tf_v_codigo = $_REQUEST['tf_v_codigo'];
+$tf_v_codigo = $_REQUEST['tf_v_codigo'] ?? '';
 $nome_fantasia = strtoupper($_REQUEST['nome_fantasia']);
-$codigo_lan = $_REQUEST['codigo_lan'];
+$codigo_lan = $_REQUEST['codigo_lan'] ?? '';
 
 if (isset($tf_v_codigo)){
 	$varse1 .= "&tf_v_codigo=$tf_v_codigo";
@@ -67,7 +67,7 @@ if ($codigo_lan>0){
 		$sql  = "select ug_perfil_saldo, ug_perfil_limite, ug_credito_pendente, ug_risco_classif from dist_usuarios_games where ug_id=$codigo_lan";
 //echo $sql . "<br>";
 		$rs_LH = SQLexecuteQuery($sql);
-		if(!$rs_LH || pg_num_rows($rs_LH) == 0) $msg = "PDV $codigo_lan não encontrado.\n";
+		if(!$rs_LH || (($rs_LH) ? pg_num_rows($rs_LH) : 0) == 0) $msg = "PDV $codigo_lan não encontrado.\n";
 		else {				
 			$rs_LH_row = pg_fetch_array($rs_LH);
 			$lh_ug_perfil_saldo		= $rs_LH_row['ug_perfil_saldo'];
@@ -97,7 +97,7 @@ if ($codigo_lan>0){
 						)";
 //echo $sql . "<br>";
 		$rs_Pendentes = SQLexecuteQuery($sql);
-		if(!$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas de PDV $codigo_lan não encontrada.\n";
+		if(!$rs_Pendentes || (($rs_Pendentes) ? pg_num_rows($rs_Pendentes) : 0) == 0) $msg = "Vendas de PDV $codigo_lan não encontrada.\n";
 		else {				
 			$rs_Pendentes_row = pg_fetch_array($rs_Pendentes);
 			$lh_n			= $rs_Pendentes_row['n'];
@@ -125,7 +125,7 @@ if ($codigo_lan>0){
 						)";
 //echo $sql . "<br>";
 		$rs_Pendentes = SQLexecuteQuery($sql);
-		if(!$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas de PDV $codigo_lan não encontrada.\n";
+		if(!$rs_Pendentes || (($rs_Pendentes) ? pg_num_rows($rs_Pendentes) : 0) == 0) $msg = "Vendas de PDV $codigo_lan não encontrada.\n";
 		else {				
 			$rs_Pendentes_row = pg_fetch_array($rs_Pendentes);
 			$lh_n1			= $rs_Pendentes_row['n1'];
@@ -136,7 +136,7 @@ if ($codigo_lan>0){
 		$sql  = "select cor_codigo, cor_venda_bruta, cor_venda_liquida from cortes where cor_ug_id = $codigo_lan and cor_status=1 order by cor_periodo_ini desc limit 1";
 //echo $sql . "<br>";
 		$rs_cor_aberto = SQLexecuteQuery($sql);
-		if(!$rs_cor_aberto || pg_num_rows($rs_cor_aberto) == 0) $msg = "Corte aberto para PDV $codigo_lan não encontrado.\n";
+		if(!$rs_cor_aberto || (($rs_cor_aberto) ? pg_num_rows($rs_cor_aberto) : 0) == 0) $msg = "Corte aberto para PDV $codigo_lan não encontrado.\n";
 		else {				
 			$rs_cor_aberto_row = pg_fetch_array($rs_cor_aberto);
 			$lh_cor_codigo			= $rs_cor_aberto_row['cor_codigo'];
@@ -786,7 +786,7 @@ if(isset($btPesquisar) && $btPesquisar) {
 
 	$res_tmp = SQLexecuteQuery($sql);
 	
-	$totalres = pg_num_rows($res_tmp);
+	$totalres = (($res_tmp) ? pg_num_rows($res_tmp) : 0);
 	
 	if(!isset($_GET["inicial"]) || empty($_GET["inicial"])){
 		$_SESSION["inicial"] = 0;
@@ -803,7 +803,7 @@ if(isset($btPesquisar) && $btPesquisar) {
 				}
 			}else{
 			   
-			    $resto = ($_SESSION["inicial"]== "0")? null : $_SESSION["inicial"] -= $_GET["inicial"];
+			    $resto = ($_SESSION["inicial"]== "0")? null : $_SESSION["inicial"] -= ($_GET["inicial"] ?? 0);
 				if($resto == null){
 				    $resto = "Inicial";
 				}else{
@@ -821,7 +821,7 @@ if(isset($btPesquisar) && $btPesquisar) {
 	
 	$dados = [];
 	if ($res_tmp) {
-		$total_table = pg_num_rows($res_tmp);
+		$total_table = (($res_tmp) ? pg_num_rows($res_tmp) : 0);
 
 		while( $info = pg_fetch_array($res_tmp) ){
 		
@@ -1458,7 +1458,7 @@ if ($total_table > 0) {
     <tbody>
 	<?php 
 	
-	if(count($dados) > 0 && !empty($dados)){
+	if((is_countable($dados) ? count($dados) : 0) > 0 && !empty($dados)){
 	    foreach($dados as $key => $value){?>
          <tr>
 	        <td>
@@ -1692,7 +1692,7 @@ echo $search_msg . number_format(getmicrotime() - $time_start, 2, '.', '.') . $s
 	?>
 	<tr><td align="center" valign="middle" width="36"></td><td width="200" class='texto'>&nbsp;</td><tr>
 </table>
-<?php //echo count($dados);?>
+<?php //echo (is_countable($dados) ? count($dados) : 0);?>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>

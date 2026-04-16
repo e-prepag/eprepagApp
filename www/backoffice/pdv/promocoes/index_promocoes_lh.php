@@ -17,9 +17,9 @@ $formatos[] = 'png';
 		
 if($acao == 'inserir')
 {
-	$ext	= explode('/',$_FILES['promolh_banner']['type']);
+	$ext	= explode('/', isset($_FILES['promolh_banner']['type']) ? $_FILES['promolh_banner']['type'] : '');
 
-	if(in_array($ext[1],$formatos)) {
+	if(isset($ext[1]) && in_array($ext[1],$formatos)) {
 		$pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/promocoes/";
 		if(file_exists("$pasta".$_FILES["promolh_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor, renomear antes.<br>";
@@ -72,7 +72,7 @@ if($acao == 'inserir')
 if($acao == 'atualizar')
 {
 	if(!empty($_FILES["promolh_banner"]["name"])) {
-		$ext	= explode('/',$_FILES['promolh_banner']['type']);
+		$ext	= explode('/', isset($_FILES['promolh_banner']['type']) ? $_FILES['promolh_banner']['type'] : '');
 		$pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/promocoes/";
 		if(file_exists("$pasta".$_FILES["promolh_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor renomear antes.<br>";
@@ -84,7 +84,7 @@ if($acao == 'atualizar')
 			}
 			$promolh_banner = $_FILES["promolh_banner"]["name"];
 		}
-		if(!in_array($ext[1],$formatos)) {
+		if(!isset($ext[1]) || !in_array($ext[1],$formatos)) {
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
 		}
 	}
@@ -147,7 +147,7 @@ if($acao == 'editar')
 		$opr_codigo 			= $rs_promocoes_row['opr_codigo'];
 		$ogp_id					= $rs_promocoes_row['ogp_id'];
 		$ug_id					= $rs_promocoes_row['ug_id'];
-		if (pg_num_rows($rs_promocoes) > 0)
+		if ((($rs_promocoes) ? pg_num_rows($rs_promocoes) : 0) > 0)
 			include 'promocoes_lh_edt.php';
 		else
 			$acao = 'listar';

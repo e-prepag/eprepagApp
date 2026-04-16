@@ -89,7 +89,7 @@
 
 //echo $sql;
 	$rs_concilia = SQLexecuteQuery($sql);
-	if($rs_concilia && pg_num_rows($rs_concilia) > 0){
+	if($rs_concilia && (($rs_concilia) ? pg_num_rows($rs_concilia) : 0) > 0){
 		$rs_concilia_row = pg_fetch_array($rs_concilia);
 		$vg_id_prox = $rs_concilia_row['vg_id'];
 	}

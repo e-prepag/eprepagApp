@@ -16,7 +16,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
-$us_id = $_POST['us_id'];
+$us_id = $_POST['us_id'] ?? '';
 ?>
 <div id='popup_questionario' name='popup_questionario' align='left' title='Edição de Dados'>
 	<form method='post' action='lista_stores_cartoes.php' name='frmPreCadastro' id='frmPreCadastro' onsubmit='return true;'>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "includes/pdv/corte_constantes.php";
 require_once $raiz_do_projeto."includes/main.php";
@@ -147,7 +148,7 @@ if($v_campo){
 		if($novo_ug_tipo_cadastro){
 ?>
 			<script>
-				window.opener.location.href='com_usuario_detalhe.php?acao=a&v_campo=<?php  echo $v_campo ?>&v_valor_new=<?php  echo utf8_encode($novo_ug_tipo_cadastro) ?><?php  echo $varsel ?>';
+				window.opener.location.href='com_usuario_detalhe.php?acao=a&v_campo=<?php  echo $v_campo ?>&v_valor_new=<?php  echo pdv_iso_to_utf8($novo_ug_tipo_cadastro) ?><?php  echo $varsel ?>';
 				window.close();
 			</script>
 <?php 			exit;
@@ -245,7 +246,7 @@ function fcnValidaPerfilCorteDiaSemana() {
         <table width="100%" border="0" cellpadding="0" cellspacing="2">
           <tr> 
             <td colspan="5" height="21" bgcolor="00008C">
-				<font face="Arial, Helvetica, sans-serif" size="1" color="#FFFFFF"><b><?php echo utf8_encode("Money Distribuidor - Usuário"); ?></b></font></td>
+				<font face="Arial, Helvetica, sans-serif" size="1" color="#FFFFFF"><b><?php echo pdv_iso_to_utf8("Money Distribuidor - Usuário"); ?></b></font></td>
 			</td>
           </tr>
 		</table>
@@ -255,15 +256,15 @@ function fcnValidaPerfilCorteDiaSemana() {
 
         <table width="100%" border="0" cellpadding="0" cellspacing="2">
           <tr bgcolor="#FFFFFF"> 
-            <td colspan="5" bgcolor="#ECE9D8"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo utf8_encode("Classificação de Risco"); ?></font></td>
+            <td colspan="5" bgcolor="#ECE9D8"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo pdv_iso_to_utf8("Classificação de Risco"); ?></font></td>
           </tr>
           <tr bgcolor="#F5F5FB"> 
-            <td width="100"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo utf8_encode("Classificação"); ?></font></td>
+            <td width="100"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo pdv_iso_to_utf8("Classificação"); ?></font></td>
             <td>
 				<select name="novo_limitereferencia">
 					<option value="" <?php  if((strcmp($novo_limitereferencia,"")==0)||(is_null($novo_limitereferencia))||($novo_limitereferencia==0)) echo "selected" ?>>Selecione</option>
-				<?php  for($i=1; $i < count($RISCO_CLASSIFICACAO_NOMES)+1; $i++){ ?>
-					<option value="<?php  echo utf8_encode($RISCO_CLASSIFICACAO_NOMES[$i]) ?>"<?php  if(strcmp($RISCO_CLASSIFICACAO_NOMES[$novo_limitereferencia], $RISCO_CLASSIFICACAO_NOMES[$i])==0) echo " selected"; ?>><?php  echo utf8_encode($RISCO_CLASSIFICACAO_NOMES[$i]) ?></option>
+				<?php  for($i=1; $i < (is_countable($RISCO_CLASSIFICACAO_NOMES) ? count($RISCO_CLASSIFICACAO_NOMES) : 0)+1; $i++){ ?>
+					<option value="<?php  echo pdv_iso_to_utf8($RISCO_CLASSIFICACAO_NOMES[$i]) ?>"<?php  if(strcmp($RISCO_CLASSIFICACAO_NOMES[$novo_limitereferencia], $RISCO_CLASSIFICACAO_NOMES[$i])==0) echo " selected"; ?>><?php  echo pdv_iso_to_utf8($RISCO_CLASSIFICACAO_NOMES[$i]) ?></option>
 				<?php  } ?>
 				</select>
 			</td>
@@ -286,15 +287,15 @@ function fcnValidaPerfilCorteDiaSemana() {
 
         <table width="100%" border="0" cellpadding="0" cellspacing="2">
           <tr bgcolor="#FFFFFF"> 
-            <td colspan="5" bgcolor="#ECE9D8"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo utf8_encode("Classificação de Risco"); ?></font></td>
+            <td colspan="5" bgcolor="#ECE9D8"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo pdv_iso_to_utf8("Classificação de Risco"); ?></font></td>
           </tr>
           <tr bgcolor="#F5F5FB"> 
-            <td width="100"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo utf8_encode("Classificação"); ?></font></td>
+            <td width="100"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo pdv_iso_to_utf8("Classificação"); ?></font></td>
             <td>
 				<select name="novo_riscoclassif">
 					<option value="" <?php  if((strcmp($novo_riscoclassif,"")==0)||(is_null($novo_riscoclassif))||($novo_riscoclassif==0)) echo "selected" ?>>Selecione</option>
-				<?php  for($i=1; $i < count($RISCO_CLASSIFICACAO_NOMES)+1; $i++){ ?>
-					<option value="<?php  echo utf8_encode($RISCO_CLASSIFICACAO_NOMES[$i]) ?>"<?php  if(strcmp($RISCO_CLASSIFICACAO_NOMES[$novo_riscoclassif], $RISCO_CLASSIFICACAO_NOMES[$i])==0) echo " selected"; ?>><?php  echo utf8_encode($RISCO_CLASSIFICACAO_NOMES[$i]) ?></option>
+				<?php  for($i=1; $i < (is_countable($RISCO_CLASSIFICACAO_NOMES) ? count($RISCO_CLASSIFICACAO_NOMES) : 0)+1; $i++){ ?>
+					<option value="<?php  echo pdv_iso_to_utf8($RISCO_CLASSIFICACAO_NOMES[$i]) ?>"<?php  if(strcmp($RISCO_CLASSIFICACAO_NOMES[$novo_riscoclassif], $RISCO_CLASSIFICACAO_NOMES[$i])==0) echo " selected"; ?>><?php  echo pdv_iso_to_utf8($RISCO_CLASSIFICACAO_NOMES[$i]) ?></option>
 				<?php  } ?>
 				</select>
 			</td>
@@ -386,7 +387,7 @@ function fcnValidaPerfilCorteDiaSemana() {
                 	<option value="" <?php  if($substatus == "") echo "selected" ?>>Selecione</option>
                 	<?php
 						foreach($SUBSTATUS_LH as $indice=>$dado) {
-							echo "<option value=\"".$indice."\""; if($substatus == $indice) echo "selected"; echo " >".utf8_encode($dado)." (".$indice.")</option>\n";
+							echo "<option value=\"".$indice."\""; if($substatus == $indice) echo "selected"; echo " >".pdv_iso_to_utf8($dado)." (".$indice.")</option>\n";
 						}
 					?>
 
@@ -420,7 +421,7 @@ function fcnValidaPerfilCorteDiaSemana() {
                                 <select name="novo_ug_perfil_forma_pagto" readonly disabled="disabled">
 					<option value="">Selecione a Forma de Pagamento</option>
 					<?php  foreach ($FORMAS_PAGAMENTO_DESCRICAO as $formaPagtoId => $formaPagtoDesc){ ?>
-					<option value="<?php  echo $formaPagtoId; ?>" <?php  if ($novo_ug_perfil_forma_pagto == $formaPagtoId) echo "selected";?>><?php  echo utf8_encode($formaPagtoDesc); ?></option>
+					<option value="<?php  echo $formaPagtoId; ?>" <?php  if ($novo_ug_perfil_forma_pagto == $formaPagtoId) echo "selected";?>><?php  echo pdv_iso_to_utf8($formaPagtoDesc); ?></option>
 					<?php  } ?>
 				</select>
 			</td>
@@ -451,7 +452,7 @@ function fcnValidaPerfilCorteDiaSemana() {
 				<select name="novo_ug_perfil_corte_dia_semana">
 					<option value="">Selecione o Dia de Corte</option>
 					<?php  foreach ($GLOBALS['CORTE_DIAS_DA_SEMANA_DESCRICAO'] as $formaPagtoId => $formaPagtoDesc){ ?>
-					<option value="<?php  echo $formaPagtoId; ?>" <?php  if ($novo_ug_perfil_corte_dia_semana == $formaPagtoId) echo "selected";?>><?php  echo utf8_encode($formaPagtoDesc); ?></option>
+					<option value="<?php  echo $formaPagtoId; ?>" <?php  if ($novo_ug_perfil_corte_dia_semana == $formaPagtoId) echo "selected";?>><?php  echo pdv_iso_to_utf8($formaPagtoDesc); ?></option>
 					<?php  } ?>
 				</select>
 			</td>
@@ -463,7 +464,7 @@ function fcnValidaPerfilCorteDiaSemana() {
 
 		<?php  if($msg != ""){?>
 		  	<tr><td colspan="2">&nbsp;</td></tr>
-		  	<tr><td colspan="2" align="center"><font color="#FF0000" size="1" face="Arial, Helvetica, sans-serif"><?php  echo utf8_encode($msg)?></font></td></tr>
+		  	<tr><td colspan="2" align="center"><font color="#FF0000" size="1" face="Arial, Helvetica, sans-serif"><?php  echo pdv_iso_to_utf8($msg)?></font></td></tr>
 		<?php  }?>
 		</table>
 </form>
@@ -479,11 +480,11 @@ if($v_campo == 'ug_tipo_cadastro'){
             <td colspan="5" bgcolor="#ECE9D8"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif">Tipo de Cadastro</font></td>
           </tr>
           <tr bgcolor="#F5F5FB"> 
-            <td width="100"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo utf8_encode("Classificação"); ?></font></td>
+            <td width="100"><font color="#666666" size="1" face="Arial, Helvetica, sans-serif"><?php echo pdv_iso_to_utf8("Classificação"); ?></font></td>
             <td>
                 <select name="novo_ug_tipo_cadastro">
-                        <option value="PJ" <?php  if($novo_ug_tipo_cadastro == 'PJ') echo "selected" ?>><?php echo utf8_encode("Pessoa Jurídica (CNPJ)") ?></option>
-                        <option value="PF" <?php  if($novo_ug_tipo_cadastro == 'PF') echo "selected" ?>><?php echo utf8_encode("Pessoa Física (CPF)") ?></option>
+                        <option value="PJ" <?php  if($novo_ug_tipo_cadastro == 'PJ') echo "selected" ?>><?php echo pdv_iso_to_utf8("Pessoa Jurídica (CNPJ)") ?></option>
+                        <option value="PF" <?php  if($novo_ug_tipo_cadastro == 'PF') echo "selected" ?>><?php echo pdv_iso_to_utf8("Pessoa Física (CPF)") ?></option>
                 </select>
             </td>
           </tr>
@@ -496,7 +497,7 @@ if($v_campo == 'ug_tipo_cadastro'){
                 if($msg != ""){
                 ?>
 		  	<tr><td colspan="2">&nbsp;</td></tr>
-		  	<tr><td colspan="2" align="center"><font color="#FF0000" size="1" face="Arial, Helvetica, sans-serif"><?php echo utf8_encode($msg); ?></font></td></tr>
+		  	<tr><td colspan="2" align="center"><font color="#FF0000" size="1" face="Arial, Helvetica, sans-serif"><?php echo pdv_iso_to_utf8($msg); ?></font></td></tr>
 		<?php
                 }
                 ?>

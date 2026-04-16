@@ -45,7 +45,7 @@ while($rs_usuario_row = pg_fetch_array($rs_usuario)){
 
     if($rs_usuario_row['ug_numero'])
     {
-        $num = strlen($rs_usuario_row['ug_numero']) < 6 ? $rs_usuario_row['ug_numero']." " : $rs_usuario_row['ug_numero'];
+        $num = strlen((string)($rs_usuario_row['ug_numero'] ?? "")) < 6 ? $rs_usuario_row['ug_numero']." " : $rs_usuario_row['ug_numero'];
     }else
         $num = "0 ";
     
@@ -129,7 +129,7 @@ if($file->checkFile()){
         
     }
 ?>
-<a class="txt-branco" href="/includes/download/dld.php?f=<?php echo $file->getFileName(); ?>&fc=<?php echo $file->getFileName(); ?>">Download (<?php echo $cont?> de <?php echo pg_num_rows($rs_usuario); ?> registros exportados)</a>    
+<a class="txt-branco" href="/includes/download/dld.php?f=<?php echo $file->getFileName(); ?>&fc=<?php echo $file->getFileName(); ?>">Download (<?php echo $cont?> de <?php echo (($rs_usuario) ? pg_num_rows($rs_usuario) : 0); ?> registros exportados)</a>    
 <?php    
     //echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
 }

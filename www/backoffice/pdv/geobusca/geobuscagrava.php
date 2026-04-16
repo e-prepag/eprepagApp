@@ -5,7 +5,11 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
 //echo "<pre>".$_GET."</pre>";
-$sql = "UPDATE dist_usuarios_games SET ug_coord_lat = $_GET[ug_coord_lat], ug_coord_lng = $_GET[ug_coord_lng], ug_google_maps_string = '".str_replace("'", "''", $_GET[ug_google_maps_string])."', ug_google_maps_status = Null WHERE ug_id = $_GET[ug_id]";
+$ug_coord_lat = isset($_GET['ug_coord_lat']) ? $_GET['ug_coord_lat'] : 0;
+$ug_coord_lng = isset($_GET['ug_coord_lng']) ? $_GET['ug_coord_lng'] : 0;
+$ug_google_maps_string = isset($_GET['ug_google_maps_string']) ? $_GET['ug_google_maps_string'] : '';
+$ug_id = isset($_GET['ug_id']) ? $_GET['ug_id'] : 0;
+$sql = "UPDATE dist_usuarios_games SET ug_coord_lat = $ug_coord_lat, ug_coord_lng = $ug_coord_lng, ug_google_maps_string = '".str_replace("'", "''", $ug_google_maps_string)."', ug_google_maps_status = Null WHERE ug_id = $ug_id";
 //echo $sql."<br>";
 
 $ret = SQLexecuteQuery($sql);

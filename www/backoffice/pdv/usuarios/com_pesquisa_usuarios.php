@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header("Content-Type: text/html; charset=ISO-8859-1", true);
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
@@ -199,7 +199,7 @@ if ($msg == "") {
         if ($msgAcao == "") {
             $sql = "select count(*) as qtde from tb_dist_venda_games where vg_ug_id = $usuario_id";
             $rs = SQLexecuteQuery($sql);
-            if (!$rs || pg_num_rows($rs) == 0) $msgAcao = "Erro ao pesquisar pedidos do usuário.\n";
+            if (!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msgAcao = "Erro ao pesquisar pedidos do usuário.\n";
             else {
                 $rs_row = pg_fetch_array($rs);
                 $qtde = $rs_row['qtde'];
@@ -210,7 +210,7 @@ if ($msg == "") {
         if ($msgAcao == "") {
             $sql = "select count(*) as qtde from cortes where cor_ug_id = $usuario_id";
             $rs = SQLexecuteQuery($sql);
-            if (!$rs || pg_num_rows($rs) == 0) $msgAcao = "Erro ao pesquisar cortes do usuário.\n";
+            if (!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msgAcao = "Erro ao pesquisar cortes do usuário.\n";
             else {
                 $rs_row = pg_fetch_array($rs);
                 $qtdecortes = $rs_row['qtde'];
@@ -405,7 +405,7 @@ if (isset($BtnSearch)) {
 
         // Processa a seleção de produtos no POST
         if ($tf_produto && is_array($tf_produto)) {
-            if (count($tf_produto) == 1) {
+            if ((is_countable($tf_produto) ? count($tf_produto) : 0) == 1) {
                 $tf_produto = $tf_produto[0];
             } else {
                 $tf_produto = implode("|", $tf_produto);
@@ -416,8 +416,8 @@ if (isset($BtnSearch)) {
         }
 
         $i = 0;
-        $num_col = count($tf_produto);
-        while ($i <= $num_col) {
+        $num_col = (is_countable($tf_produto) ? count($tf_produto) : 0);
+        while ($i < $num_col) {
             $filtro['produto' . $i] = $tf_produto[$i];
             $palavra = urlencode($filtro['produto' . $i]);
             $varsel .= "&tf_produto[]=" . $palavra;
@@ -426,7 +426,7 @@ if (isset($BtnSearch)) {
 
         // Processa a seleção de valores no POST
         if ($tf_pins && is_array($tf_pins)) {
-            if (count($tf_pins) == 1) {
+            if ((is_countable($tf_pins) ? count($tf_pins) : 0) == 1) {
                 $tf_pins = $tf_pins[0];
             } else {
                 $tf_pins = implode("|", $tf_pins);
@@ -437,8 +437,8 @@ if (isset($BtnSearch)) {
         }
 
         $i = 0;
-        $num_col_pin = count($tf_pins);
-        while ($i <= $num_col_pin) {
+        $num_col_pin = (is_countable($tf_pins) ? count($tf_pins) : 0);
+        while ($i < $num_col_pin) {
             $filtro['pin' . $i] = $tf_pins[$i];
             $palavra = urlencode($filtro['pin' . $i]);
             $varsel .= "&tf_pins[]=" . $palavra;
@@ -480,7 +480,7 @@ if (isset($BtnSearch)) {
         $tf_decode = false;
         require_once $raiz_do_projeto . "includes/pdv/inc_pesquisa_usuarios_sql.php";
 
-        $total_table = pg_num_rows($rs_usuario);
+        $total_table = (($rs_usuario) ? pg_num_rows($rs_usuario) : 0);
 
         //Ordem
         $sql .= " order by " . $ncamp;
@@ -607,13 +607,13 @@ require_once "/www/includes/bourls.php";
 
         $parametros = ",'tf_produto[]': [";
 
-        while ($i <= $num_col) {
+        while ($i < $num_col) {
         ?>
             var tf_produto<?php echo $i ?> = "<?php echo $tf_produto[$i] ?>";
         <?php
             $parametros .= "\"$tf_produto[$i]\"";
             $i++;
-            if ($i <= $num_col) {
+            if ($i < $num_col) {
                 $parametros .= ",";
             }
         }
@@ -1269,7 +1269,7 @@ if ($msg != "") {
                         <label for="tf_u_codigo">Código</label>
                         <?php //echo $_SESSION["visualiza_dados"];
                         ?>
-                        <input type="text" class="input-sm form-control" id="tf_u_codigo" name="tf_u_codigo" placeholder="Código" value="<?php echo trim($tf_u_codigo) ?>">
+                        <input type="text" class="input-sm form-control" id="tf_u_codigo" name="tf_u_codigo" placeholder="Código" value="<?php echo trim((string)($tf_u_codigo ?? "")) ?>">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_qtde_acessos_ini" class="w100">Qtde de Acessos</label>
@@ -1287,7 +1287,7 @@ if ($msg != "") {
                     </div>
                     <div class="form-group">
                         <label for="tf_u_login" class="w100">Login</label>
-                        <input name="tf_u_login" id="tf_u_login" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_login) ?>" size="25" maxlength="100">
+                        <input name="tf_u_login" id="tf_u_login" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_login ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_tipo_cadastro" class="w100">Tipo de Cadastro</label>
@@ -1381,7 +1381,7 @@ if ($msg != "") {
                         <label for="tf_u_risco_classif" class="w100">Classificação</label>
                         <select name="tf_u_risco_classif" id="tf_u_risco_classif" class="input-sm form-control w-auto">
                             <option value="" <?php if ($tf_u_risco_classif == "") echo "selected" ?>>Selecione</option>
-                            <?php for ($i = 1; $i < count($RISCO_CLASSIFICACAO_NOMES) + 1; $i++) { ?>
+                            <?php for ($i = 1; $i < (is_countable($RISCO_CLASSIFICACAO_NOMES) ? count($RISCO_CLASSIFICACAO_NOMES) : 0) + 1; $i++) { ?>
                                 <option value="<?php echo $RISCO_CLASSIFICACAO_NOMES[$i] ?>" <?php if ($tf_u_risco_classif == $RISCO_CLASSIFICACAO_NOMES[$i]) echo "selected"; ?>><?php echo $RISCO_CLASSIFICACAO_NOMES[$i] ?></option>
                             <?php } ?>
                         </select>
@@ -1397,19 +1397,19 @@ if ($msg != "") {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="tf_u_nome_fantasia" class="w100">Nome Fantasia</label>
-                        <input name="tf_u_nome_fantasia" id="tf_u_nome_fantasia" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_nome_fantasia) ?>" size="25" maxlength="100">
+                        <input name="tf_u_nome_fantasia" id="tf_u_nome_fantasia" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_nome_fantasia ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_cnpj" class="w100">CNPJ</label>
-                        <input name="tf_u_cnpj" id="" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_cnpj) ?>" size="25" maxlength="14">
+                        <input name="tf_u_cnpj" id="" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_cnpj ?? "")) ?>" size="25" maxlength="14">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_responsavel" class="w100">Responsável</label>
-                        <input name="tf_u_responsavel" id="tf_u_responsavel" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_responsavel) ?>" size="25" maxlength="100">
+                        <input name="tf_u_responsavel" id="tf_u_responsavel" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_responsavel ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_site" class="w100">Site Web</label>
-                        <input name="tf_u_site" id="tf_u_site" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_site) ?>" size="50" maxlength="100">
+                        <input name="tf_u_site" id="tf_u_site" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_site ?? "")) ?>" size="50" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_fatura_media_mensal" class="w100">Fat. médio mensal:</label>
@@ -1424,7 +1424,7 @@ if ($msg != "") {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="tf_u_razao_social" class="w100">Razão Social</label>
-                        <input name="tf_u_razao_social" id="tf_u_razao_social" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_razao_social) ?>" size="25" maxlength="100">
+                        <input name="tf_u_razao_social" id="tf_u_razao_social" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_razao_social ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_ug_te_id" class="w100">Tipo Estabelecimento</label>
@@ -1442,7 +1442,7 @@ if ($msg != "") {
                                     $select    = '';
                                 }
                             ?>
-                                <option value='<?php echo $te_codigo ?>' <?php echo $select ?>><?php echo utf8_decode($res_te_row['te_descricao']); ?> (<?php if ($res_te_row['te_ativo']) echo "Ativo";
+                                <option value='<?php echo $te_codigo ?>' <?php echo $select ?>><?php echo pdv_utf8_to_iso($res_te_row['te_descricao']); ?> (<?php if ($res_te_row['te_ativo']) echo "Ativo";
                                                                                                                                                         else echo "Inativo"; ?>)</option>
                             <?php
                             } //end while
@@ -1487,11 +1487,11 @@ if ($msg != "") {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="tf_u_nome" class="w100">Nome</label>
-                        <input name="tf_u_nome" id="tf_u_nome" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_nome) ?>" size="25" maxlength="100">
+                        <input name="tf_u_nome" id="tf_u_nome" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_nome ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_cpf" class="w100">CPF</label>
-                        <input name="tf_u_cpf" id="tf_u_cpf" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_cpf) ?>" size="25" maxlength="14">
+                        <input name="tf_u_cpf" id="tf_u_cpf" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_cpf ?? "")) ?>" size="25" maxlength="14">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_data_nascimento_ini" class="w100">Data de Nascimento</label>
@@ -1525,15 +1525,15 @@ if ($msg != "") {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="tf_u_endereco" class="w100">Endereço</label>
-                        <input name="tf_u_endereco" id="tf_u_endereco" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_endereco) ?>" size="50" maxlength="100">
+                        <input name="tf_u_endereco" id="tf_u_endereco" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_endereco ?? "")) ?>" size="50" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_bairro" class="w100">Bairro</label>
-                        <input name="tf_u_bairro" id="tf_u_bairro" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_bairro) ?>" size="25" maxlength="100">
+                        <input name="tf_u_bairro" id="tf_u_bairro" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_bairro ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_cep" class="w100">CEP</label>
-                        <input name="tf_u_cep" id="tf_u_cep" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_cep) ?>" size="7" maxlength="8">
+                        <input name="tf_u_cep" id="tf_u_cep" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_cep ?? "")) ?>" size="7" maxlength="8">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_tel_ddi" class="w100">Telefone</label>
@@ -1560,13 +1560,13 @@ if ($msg != "") {
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="tf_u_cidade" class="w100 top74">Cidade</label>
-                        <input name="tf_u_cidade" id="tf_u_cidade" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_cidade) ?>" size="25" maxlength="100">
+                        <input name="tf_u_cidade" id="tf_u_cidade" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_cidade ?? "")) ?>" size="25" maxlength="100">
                     </div>
                     <div class="form-group">
                         <label for="tf_u_estado" class="w100">Estado</label>
                         <select name="tf_u_estado" id="tf_u_estado" class="input-sm form-control">
                             <option value="" <?php if ($tf_u_estado == "") echo "selected" ?>>Selecione</option>
-                            <?php for ($i = 0; $i < count($SIGLA_ESTADOS); $i++) { ?>
+                            <?php for ($i = 0; $i < (is_countable($SIGLA_ESTADOS) ? count($SIGLA_ESTADOS) : 0); $i++) { ?>
                                 <option value="<?php echo $SIGLA_ESTADOS[$i] ?>" <?php if ($tf_u_estado == $SIGLA_ESTADOS[$i]) echo "selected"; ?>><?php echo $SIGLA_ESTADOS[$i] ?></option>
                             <?php } ?>
                         </select>
@@ -1715,7 +1715,7 @@ if ($msg != "") {
                     </div>
                     <div class="form-group">
                         <label for="tf_u_endereco_ip" class="w100">Endereço IP</label>
-                        <input name="tf_u_endereco_ip" id="tf_u_endereco_ip" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_endereco_ip) ?>" size="50" maxlength="100">
+                        <input name="tf_u_endereco_ip" id="tf_u_endereco_ip" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_endereco_ip ?? "")) ?>" size="50" maxlength="100">
                     </div>
                     <?php
                     //                if($tf_u_com_totais_vendas) 
@@ -1788,7 +1788,7 @@ if ($msg != "") {
                     </div>
                     <div class="form-group">
                         <label for="tf_u_observacoes" class="w100">Observações</label>
-                        <input name="tf_u_observacoes" id="tf_u_observacoes" type="text" class="input-sm form-control" value="<?php echo trim($tf_u_observacoes) ?>" size="50" maxlength="100">
+                        <input name="tf_u_observacoes" id="tf_u_observacoes" type="text" class="input-sm form-control" value="<?php echo trim((string)($tf_u_observacoes ?? "")) ?>" size="50" maxlength="100">
                     </div>
                     <?php
                     if ($tf_u_com_totais_vendas) {
@@ -2239,7 +2239,7 @@ if ($msg != "") {
                                     break;
                                 default:
                                     $statusMaps_descr = "Tipo Desconhecido";
-                                    if (strlen(trim($statusMaps)) == 0) $statusMaps_descr .= " (Empty)";
+                                    if (strlen(trim((string)($statusMaps ?? ""))) == 0) $statusMaps_descr .= " (Empty)";
                                     else $statusMaps_descr .= " ('$statusMaps')";
                                     break;
                             }
@@ -2250,7 +2250,7 @@ if ($msg != "") {
                             } else {
                                 $statusMaps_descr .= "\n[" . number_format($rs_usuario_row['ug_coord_lat'], 2, '.', '.') . ", " . number_format($rs_usuario_row['ug_coord_lng'], 2, '.', '.') . "]";
                             }
-                            if (trim($statusMaps) == "") {
+                            if (trim((string)($statusMaps ?? "")) == "") {
                                 if ($rs_usuario_row['ug_coord_lat'] == 0 && $rs_usuario_row['ug_coord_lng'] == 0) {
                                     $statusMaps = "<font color='red'>Coords=0";
                                 } else {
@@ -2293,7 +2293,7 @@ if ($msg != "") {
                             <?php if ($_SESSION["visualiza_dados"] == "S") { ?>
                                 <td><?php echo $rs_usuario_row['ug_login'] ?></td>
                             <?php } ?>
-                            <td><a style="text-decoration:none" href="com_usuario_detalhe.php?usuario_id=<?php echo $rs_usuario_row['ug_id'] ?>"><?php echo $rs_usuario_row['ug_nome_fantasia'];/*strlen($rs_usuario_row['ug_nome_fantasia']) > 40 ? substr($rs_usuario_row['ug_nome_fantasia'],0,37)."..." :*/ ?></a></td>
+                            <td><a style="text-decoration:none" href="com_usuario_detalhe.php?usuario_id=<?php echo $rs_usuario_row['ug_id'] ?>"><?php echo $rs_usuario_row['ug_nome_fantasia'];/*strlen((string)($rs_usuario_row['ug_nome_fantasia'] ?? "")) > 40 ? substr($rs_usuario_row['ug_nome_fantasia'],0,37)."..." :*/ ?></a></td>
                             <!--<td><a style="text-decoration:none" href="com_usuario_detalhe.php?usuario_id=<?php echo $rs_usuario_row['ug_id'] ?>"><?php echo $rs_usuario_row['ug_nome'] ?></a></td>-->
                             <?php if ($_SESSION["visualiza_dados"] == "S") { ?>
                                 <td><?php echo $rs_usuario_row['ug_cnpj']; ?></td>
@@ -2391,7 +2391,7 @@ if ($msg != "") {
                                     break;
                                 default:
                                     $statusMaps_descr = "Tipo Desconhecido";
-                                    if (strlen(trim($statusMaps)) == 0) $statusMaps_descr .= " (Empty)";
+                                    if (strlen(trim((string)($statusMaps ?? ""))) == 0) $statusMaps_descr .= " (Empty)";
                                     else $statusMaps_descr .= " ('$statusMaps')";
                                     break;
                             }
@@ -2401,7 +2401,7 @@ if ($msg != "") {
                             } else {
                                 $statusMaps_descr .= "\n[" . number_format($rs_usuario_row['ug_coord_lat'], 2, '.', '.') . ", " . number_format($rs_usuario_row['ug_coord_lng'], 2, '.', '.') . "]";
                             }
-                            if (trim($statusMaps) == "") {
+                            if (trim((string)($statusMaps ?? "")) == "") {
                                 if ($rs_usuario_row['ug_coord_lat'] == 0 && $rs_usuario_row['ug_coord_lng'] == 0) {
                                     $statusMaps = "<font color='red'>Coords=0";
                                 } else {

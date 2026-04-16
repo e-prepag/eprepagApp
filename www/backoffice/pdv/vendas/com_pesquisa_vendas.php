@@ -106,7 +106,7 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 
 	 //Produtos
 	 if ($tf_produto && is_array($tf_produto)) {
-		 if (count($tf_produto) == 1) {
+		 if ((is_countable($tf_produto) ? count($tf_produto) : 0) == 1) {
 			 $tf_produto = $tf_produto[0];
 		 } else {
 			 $tf_produto = implode("|",$tf_produto);
@@ -119,7 +119,7 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 	 
 	 //Valores
 	 if ($tf_pins && is_array($tf_pins)){
-		 if (count($tf_pins) == 1) {
+		 if ((is_countable($tf_pins) ? count($tf_pins) : 0) == 1) {
 			 $tf_pins = $tf_pins[0];
 		 } else {
 			 $tf_pins = implode("|",$tf_pins);
@@ -326,12 +326,12 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 
 				//Produtos
 				if ($tf_produto && is_array($tf_produto)) {
-					if (count($tf_produto) == 1) {
+					if ((is_countable($tf_produto) ? count($tf_produto) : 0) == 1) {
 					  $sql .= " and upper(vgm.vgm_nome_produto) like '%" . str_replace("'", "''",strtoupper($tf_produto[0])) . "%' "; 
 					} else {
 						$sql .= " and (";
 						foreach($tf_produto as $tf_produto_id => $tf_produto_row) {
-							if ($tf_produto_id == count($tf_produto) - 1) {
+							if ($tf_produto_id == (is_countable($tf_produto) ? count($tf_produto) : 0) - 1) {
 								$sql .= "vgm.vgm_nome_produto like '%" . str_replace("'", "''",$tf_produto_row) . "%')";
 							} else {
 								$sql .= "vgm.vgm_nome_produto like '%" . str_replace("'", "''",$tf_produto_row) . "%' or ";
@@ -342,12 +342,12 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 				
 				//Valores
 				if ($tf_pins && is_array($tf_pins)) {
-					if (count($tf_pins) == 1) {
+					if ((is_countable($tf_pins) ? count($tf_pins) : 0) == 1) {
 						$sql .= " and vgm.vgm_valor = " . moeda2numeric($tf_pins[0]) . " "; 
 					} else {
 						$sql .= " and (";
 						foreach($tf_pins as $tf_pins_id => $tf_pins_row) {
-							if ($tf_pins_id == count($tf_pins) - 1) {
+							if ($tf_pins_id == (is_countable($tf_pins) ? count($tf_pins) : 0) - 1) {
 								$sql .= "vgm.vgm_valor = " . moeda2numeric($tf_pins_row) . ")";
 							} else {
 								$sql .= "vgm.vgm_valor = " . moeda2numeric($tf_pins_row) . " or ";
@@ -395,7 +395,7 @@ $tf_u_risco_classif             = $_POST['tf_u_risco_classif'] ?? null;
 			}
 		
 			$rs_venda = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_venda);
+			$total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
                         
 			//Total Geral
 			$totalGeral_valor = 0;
@@ -742,7 +742,7 @@ require_once "/www/includes/bourls.php";
             <td>
 				<select name="tf_u_estado" id="tf_u_estado" class="form2" class="field_dados">
 					<option value="" <?php if($tf_u_estado == "") echo "selected" ?>>Selecione</option>
-				<?php for($i=0; $i < count($SIGLA_ESTADOS); $i++){ ?>
+				<?php for($i=0; $i < (is_countable($SIGLA_ESTADOS) ? count($SIGLA_ESTADOS) : 0); $i++){ ?>
 					<option value="<?php echo $SIGLA_ESTADOS[$i] ?>" <?php if($tf_u_estado == $SIGLA_ESTADOS[$i]) echo "selected"; ?>><?php echo $SIGLA_ESTADOS[$i] ?></option>
 				<?php } ?>
 				</select>
@@ -844,7 +844,7 @@ require_once "/www/includes/bourls.php";
 			<td colspan="3" class="texto">
 				<select name="tf_u_risco_classif" class="field_dados" class="form2">
 					<option value="" <?php  if($tf_u_risco_classif == "") echo "selected" ?>>Selecione</option>
-				<?php  for($i=1; $i < count($RISCO_CLASSIFICACAO_NOMES)+1; $i++){ ?>
+				<?php  for($i=1; $i < (is_countable($RISCO_CLASSIFICACAO_NOMES) ? count($RISCO_CLASSIFICACAO_NOMES) : 0)+1; $i++){ ?>
 					<option value="<?php  echo $RISCO_CLASSIFICACAO_NOMES[$i] ?>" <?php  if($tf_u_risco_classif == $RISCO_CLASSIFICACAO_NOMES[$i]) echo "selected"; ?>><?php  echo $RISCO_CLASSIFICACAO_NOMES[$i] ?></option>
 				<?php  } ?>
 				</select>
@@ -997,7 +997,7 @@ require_once "/www/includes/bourls.php";
                     break;
                 default: 
                     $statusMaps_descr = "Tipo Desconhecido";
-                    if(strlen(trim($statusMaps))==0) $statusMaps_descr .= " (Empty)";
+                    if(strlen(trim((string)($statusMaps ?? "")))==0) $statusMaps_descr .= " (Empty)";
                     else $statusMaps_descr .= " ('$statusMaps')";
                     break;
             }
@@ -1009,7 +1009,7 @@ require_once "/www/includes/bourls.php";
                 $statusMaps_descr .= "\n[".number_format($rs_venda_row['ug_coord_lat'], 2, '.', '.').", ".number_format($rs_venda_row['ug_coord_lng'], 2, '.', '.')."]";
             }
 
-            if(trim($statusMaps)=="") {
+            if(trim((string)($statusMaps ?? ""))=="") {
                 if($rs_venda_row['ug_coord_lat']==0 && $rs_venda_row['ug_coord_lng']==0) {
                     $statusMaps = "<font color='red'>Coords=0</font>";
                     $statusMaps_title = "Coords=0";
@@ -1102,7 +1102,7 @@ require_once "/www/includes/bourls.php";
 			
             <?php } ?>
             <td nowrap valign="top" class="texto" nowrap valign="top">
-                <?php if($rs_produtos && pg_num_rows($rs_produtos) > 0){ ?>
+                <?php if($rs_produtos && (($rs_produtos) ? pg_num_rows($rs_produtos) : 0) > 0){ ?>
                         <table class="texto table" border="0" width="400" cellpadding="0" cellspacing="0">
                             <tr bgcolor="#ECE9D8">
                                 <td nowrap width="30%">Operadora</td>
@@ -1152,7 +1152,7 @@ require_once "/www/includes/bourls.php";
             ?>
             <td class="texto" align="right"><?php echo number_format($totalGeral_qtde_itens, 0, '','.') ?></td>
             <td class="texto" align="right"><?php echo number_format($totalGeral_qtde_produtos, 0, '','.') ?></td>
-            <td class="texto" colspan="7"><?php echo " Número de LANs: ".count($users); ?></td>
+            <td class="texto" colspan="7"><?php echo " Número de LANs: ".(is_countable($users) ? count($users) : 0); ?></td>
         </tr>
         <tr> 
             <td colspan="20" bgcolor="#FFFFFF" class="texto"><?php echo $search_msg . number_format(getmicrotime() - $time_start, 2, '.', '.') . $search_unit ?></font></td>

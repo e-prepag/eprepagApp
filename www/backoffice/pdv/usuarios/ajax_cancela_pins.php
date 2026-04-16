@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
@@ -29,7 +30,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		}
 
 		// BIGINT máximo = 19 dígitos
-		if (strlen($idPedido) > 19) {
+		if (strlen((string)($idPedido ?? "")) > 19) {
 			echo json_encode([]);
 			die;
 		}
@@ -104,7 +105,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		}
 
 		// BIGINT máximo = 19 dígitos
-		if (strlen($id_pdv) > 19) {
+		if (strlen((string)($id_pdv ?? "")) > 19) {
 			echo json_encode([]);
 			die;
 		}
@@ -117,7 +118,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	}
 	//echo $sql;
 
-	if (count($resultRows) > 0) {
+	if ((is_countable($resultRows) ? count($resultRows) : 0) > 0) {
 		foreach ($resultRows as $key => $value) {
 			$dataKeys = array_keys($value);
 			$acao = '';
@@ -131,7 +132,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 				$dataKeys[2] => $value["pin_codigo"],
 				$dataKeys[3] => $value["opr_nome"],
 				$dataKeys[4] => DateTime::createFromFormat('Y-m-d H:i:s.u', $value["vg_data_inclusao"])->format('Y-m-d H:i'),
-				$dataKeys[5] => utf8_encode($value["stat_descricao"]),
+				$dataKeys[5] => pdv_iso_to_utf8($value["stat_descricao"]),
 				$dataKeys[6] => $value["ug_login"],
 				"acoes" => $acao
 			];
@@ -144,7 +145,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	$conexao->beginTransaction();
 
-	$dt_final = $_POST["dt_final"];
+	$dt_final = $_POST["dt_final"] ?? '';
 	$queryRow = "UPDATE pins p
 				SET pin_status = '9'
 				FROM tb_dist_venda_games_modelo_pins vp
@@ -231,7 +232,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		$to = strtolower($resultRow["shn_mail"]);
 		$cc = "";
 		$bcc = "";
-		$subject = utf8_decode("E-prepag - Solicitação de cancelamento de pins");
+		$subject = pdv_utf8_to_iso("E-prepag - Solicitação de cancelamento de pins");
 		$legendaAcao = "Aprovada";
 		$html = file_get_contents("./template.html");
 		$html = str_replace(["{data-atual}", "{tipo}", "{nome}", "{data}", "{operador}", "{resposta}"], [date("d-m-Y H:i:s"), $tipoAcao, $data["ug_login"], date("d-m-Y H:i:s"), $_POST["nome"], $legendaAcao], $html);
@@ -309,7 +310,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		$to = strtolower($resultRow["shn_mail"]);
 		$cc = "";
 		$bcc = "";
-		$subject = utf8_decode("E-prepag - Solicitação de cancelamento de pin");
+		$subject = pdv_utf8_to_iso("E-prepag - Solicitação de cancelamento de pin");
 		$legendaAcao = "Aprovada";
 		$html = file_get_contents("./template.html");
 		$html = str_replace(["{data-atual}", "{tipo}", "{nome}", "{data}", "{operador}", "{resposta}"], [date("d-m-Y H:i:s"), $tipoAcao, $data["ug_login"], date("d-m-Y H:i:s"), $_POST["nome"], $legendaAcao], $html);

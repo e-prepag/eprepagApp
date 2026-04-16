@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header('Content-Type: application/json; charset=utf-8');
 require_once "/www/db/connect.php"; 
 require_once "/www/db/ConnectionPDO.php"; 
@@ -7,7 +8,7 @@ $connection = ConnectionPDO::getConnection()->getLink();
 function isAjax() {return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));}
 function block_direct_calling() {
     if(!isAjax()) {
-           echo "Chamada n".utf8_encode('ã')."o permitida";
+           echo "Chamada n".pdv_iso_to_utf8('ã')."o permitida";
            die();
     }
 }
@@ -39,7 +40,7 @@ foreach($result as $key => $value) {
 		$query->execute();
 		$result = $query->fetch(PDO::FETCH_ASSOC);
 		
-		$value["ug_id"] = $result["ug_id"];
+		$value["ug_id"] = isset($result["ug_id"]) ? $result["ug_id"] : "";
 	}
 	
 	if($value['tentativas'] == 0){
@@ -48,7 +49,7 @@ foreach($result as $key => $value) {
 		$mensagem = '<button type="button" class="btn btn-aprovar" style="background-color: green; color: white">Desbloquear</button>';			
 	}
 	
-	$value["login"] = utf8_encode($value["login"]);
+	$value["login"] = pdv_iso_to_utf8($value["login"]);
 	$value["msg"] = $mensagem;
 	
 	array_push($allResults, $value);

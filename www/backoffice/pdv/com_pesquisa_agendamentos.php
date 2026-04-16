@@ -99,7 +99,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 			if($tf_v_codigo) 			$sql .= " and ae.ae_vg_id = ".$tf_v_codigo." ";
 
 			$rs_agendamentos = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_agendamentos);
+			$total_table = (($rs_agendamentos) ? pg_num_rows($rs_agendamentos) : 0);
 
 			//Ordem
 			$sql .= " order by ".$ncamp;

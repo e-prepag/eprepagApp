@@ -34,7 +34,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 		$sql  = "select * from tb_dist_descontos des 
 				 where des.des_opr_codigo = 0 and des.des_vg_pagto_tipo = 0 and des.des_ug_id = 0"; 
 		$rs_global = SQLexecuteQuery($sql);
-		if(!$rs_global || pg_num_rows($rs_global) != 1){
+		if(!$rs_global || (($rs_global) ? pg_num_rows($rs_global) : 0) != 1){
 			$des_id_global = 0;
 			$des_perc_desconto_global = 0;
 		} else {

@@ -15,8 +15,8 @@ $usuario_id = $_GET['usuario_id'] ?? null;
 function moeda2numeric($val)
 {
 
-	if ((strlen($val) >= 4)
-		&& (strrpos($val, ",") == strlen($val) - 3)
+	if ((strlen((string)($val ?? "")) >= 4)
+		&& (strrpos($val, ",") == strlen((string)($val ?? "")) - 3)
 		&& is_numeric(substr($val, 0, 1))
 		//&& (substr($val, 0, 1) != "0")
 	) {
@@ -45,7 +45,7 @@ if ($BtnSearch) {
 
 	$msg = "";
 
-	if (!$novo_perc_desconto || trim($novo_perc_desconto) == "") $msg = "Desconto deve ser preenchido.\n";
+	if (!$novo_perc_desconto || trim((string)($novo_perc_desconto ?? "")) == "") $msg = "Desconto deve ser preenchido.\n";
 	else {
 		$novo_perc_desconto_aux = moeda2numeric($novo_perc_desconto);
 		if (!is_numeric($novo_perc_desconto_aux)) $msg = "Desconto inválido. Utilize o formato x,xx\n";
@@ -133,7 +133,7 @@ if ($BtnSearch) {
 					<font color="#666666" size="1" face="Arial, Helvetica, sans-serif">&nbsp;<b>Desconto</b></font>
 				</td>
 			</tr>
-			<?php if ($opr_nome && trim($opr_nome) != "") { ?>
+			<?php if ($opr_nome && trim((string)($opr_nome ?? "")) != "") { ?>
 				<tr bgcolor="#F5F5FB" height="25">
 					<td width="100">
 						<font color="#666666" size="1" face="Arial, Helvetica, sans-serif">&nbsp;<b>Operadora</b></font>

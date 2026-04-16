@@ -87,7 +87,7 @@ require_once "/www/includes/bourls.php";
 				$msg = $ret;
 			else 
 			{
-				$total_table = pg_num_rows($rs_banners);
+				$total_table = (($rs_banners) ? pg_num_rows($rs_banners) : 0);
 
 				if($total_table == 0)
 					$msg = "Nenhum banner encontrado.\n"; 
@@ -322,7 +322,7 @@ require_once "/www/includes/bourls.php";
 												$conteudo = ($rs_banners_row['b_conteudo'] == 0)?"Texto":(($rs_banners_row['b_conteudo'] == 1)?"Imagem":"URL");
 												
 												$sql_ativo = pg_query("select b_id from tb_promocoes where b_data_inicio <= current_date and b_data_expira >= current_date and b_id = " . $rs_banners_row["b_id"] . " and b_ativo = 1");
-												$ativo_site = (pg_num_rows($sql_ativo) != 0) ? "Promoção atualmente <font color=\"blue\"><b>ativa</b></font> no site" : "Promoção atualmente <font color=\"red\"><b>inativa</b></font> no site";
+												$ativo_site = ((($sql_ativo) ? pg_num_rows($sql_ativo) : 0) != 0) ? "Promoção atualmente <font color=\"blue\"><b>ativa</b></font> no site" : "Promoção atualmente <font color=\"red\"><b>inativa</b></font> no site";
 										?>
                       					<tr bgcolor="<?php echo $cor1 ?>"> 
                         					<td class="texto" align="center"><a style="text-decoration:none" href="com_banner_detalhe.php?banner_id=<?php echo $rs_banners_row['b_id'] ?>"><?php echo $rs_banners_row['b_id'] ?></a></td>

@@ -28,7 +28,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	// 1) Recebe valores do POST / valida
 	$dataInicio = validarData($_POST['dt_inicial']) ? $_POST['dt_inicial'] : null;
 	$dataFim = validarData($_POST['dt_final']) ? $_POST['dt_final'] . " 23:59:59" : null;
-	$usuario = isset($_POST['usuario_id']) ? trim($_POST['usuario_id']) : null;
+	$usuario = isset($_POST['usuario_id']) ? trim((string)($_POST['usuario_id'] ?? "")) : null;
 
 	// 2) Monta a parte fixa do SELECT
 	$sql = "SELECT uat.versao_termo, uat.aceitou, uat.data_aceite, uat.ip, uat.dispositivo, uat.localizacao, ug.ug_nome_fantasia, ug.ug_id from dist_usuarios_games ug
@@ -74,7 +74,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	$data = ["data" => []];
 
-	if (count($resultRows) > 0) {
+	if ((is_countable($resultRows) ? count($resultRows) : 0) > 0) {
 		foreach ($resultRows as $key => $value) {
 			$dataKeys = array_keys($value);
 

@@ -68,7 +68,7 @@ if (isset($_POST["cadastrar"])) {
 					for ($max = 0; $max < 5; $max++) {
 						for ($num = 0; $num < 12; $num++) {
 							$possibilidades = "abcdefghijklmniopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$%&!";
-							$pass .= $possibilidades[rand(0, strlen($possibilidades) - 1)];
+							$pass .= $possibilidades[rand(0, strlen((string)($possibilidades ?? "")) - 1)];
 						}
 
 						$verificaSenha = $con->prepare("select count(*) as total from oauth_clients where client_secret = :VPASS;");
@@ -105,7 +105,7 @@ if (isset($_POST["cadastrar"])) {
 								$con->commit();
 								$msg = ["mensagem" => "A chave foi gerada com sucesso", "tipo" => "exito"];
 								$_POST["Pesquisar"] = true;
-								$_POST["selecaoPdv"] = $_POST["idPdv"];
+								$_POST["selecaoPdv"] = $_POST["idPdv"] ?? "";
 
 							} else {
 								$msg = ["mensagem" => "N&#227;o foi possivel cadastrar a chave para o PDV", "tipo" => "erro"];
@@ -132,7 +132,8 @@ if (isset($_POST["cadastrar"])) {
 	}
 }
 if (isset($_GET["cod"]) && !empty($_GET["cod"])) {
-	if ($_GET["action"] == 1) {
+	$action = isset($_GET["action"]) ? $_GET["action"] : null;
+	if ($action == 1) {
 
 		$con = $conexao_new_epp();
 		$con->beginTransaction();
@@ -207,7 +208,7 @@ if (isset($_POST["Pesquisar"]) || isset($_GET["ini"])) {
 	}
 	$query->execute();
 	$resultadoSelecao = $query->fetchAll(PDO::FETCH_ASSOC);
-	if (count($resultadoSelecao) == 0) {
+	if ((is_countable($resultadoSelecao) ? count($resultadoSelecao) : 0) == 0) {
 		$resultadoTotal["numtotal"] = 0;
 	}
 
@@ -407,7 +408,7 @@ if (isset($_POST["Pesquisar"]) || isset($_GET["ini"])) {
 				<tbody>
 					<?php
 					if ($resultadoSelecao != false) {
-						$qdte = count($resultadoSelecao);
+						$qdte = (is_countable($resultadoSelecao) ? count($resultadoSelecao) : 0);
 						foreach ($resultadoSelecao as $key => $value) {
 							$situacao = isset($value["cod_situacao"]) ? $value["cod_situacao"] : "N&atilde;o encotrado";
 							?>

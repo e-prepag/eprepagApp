@@ -52,7 +52,7 @@ require_once "/www/includes/bourls.php";
 		$ret = $instBanner->obter($filtro, null, $rs_banner);
 		if($ret != "") 
 			$msg = $ret;
-		else if(!$rs_banner || pg_num_rows($rs_banner) == 0) 
+		else if(!$rs_banner || (($rs_banner) ? pg_num_rows($rs_banner) : 0) == 0) 
 			$msg = "Nenhum banner encontrado.\n";
 		else 
 		{

@@ -10,7 +10,7 @@ $ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games ";
 //pg_send_query($conex,$ps_query);
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 // seleciona todos os bairros que tenha palavras sem acentos e se pareçam o bairro subselecionado  
 $ps_query = "SELECT distinct ug_bairro, ug_cidade, ug_estado FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike in (sem_acentos( SELECT distinct ug_bairro from dist_usuarios_games  )order by ug_bairro";
@@ -22,7 +22,7 @@ $res1 = SQLexecuteQuery($ps_query);
 
 
 //recebe o total de bairros que estão ruins ou seja semelhante e desacentuados
-$bad = pg_num_rows($res1);
+$bad = (($res1) ? pg_num_rows($res1) : 0);
 echo "Total: $bad - $total <br>";
 
 // regata o valor e faz a lista

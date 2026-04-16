@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
@@ -54,7 +55,7 @@ $BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
             $instProduto = new Produto();
             $ret = $instProduto->obterMelhorado($filtro, null, $rs);
 
-            if($rs && pg_num_rows($rs) > 0)
+            if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0)
             {
                 for($i=0; $rs_row = pg_fetch_array($rs); $i++)
                 {
@@ -66,7 +67,7 @@ $BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
                         $produto->nome                              = htmlentities($rs_row['ogp_nome']);
                         $produto->busca                             = htmlentities(strip_tags(Util::cleanStr2($rs_row['ogp_nome']." | ".$rs_row['opr_nome_loja']))); //corrigir traducao dew caracter q nao ta funfando
                         $produto->imagem                            = $rs_row['ogp_nome_imagem'];
-                        $produto->operadora                         = utf8_decode($rs_row['opr_nome_loja']);
+                        $produto->operadora                         = pdv_utf8_to_iso($rs_row['opr_nome_loja']);
                         $produto->filtro['ogp_inibi_lojas_online']  = $rs_row['ogp_inibi_lojas_online'];
 
                         $arrTemp['games'][] = $produto;
@@ -113,7 +114,7 @@ $BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
                 $instProdutoModelo = new ProdutoModelo();
 		$ret = $instProdutoModelo->obter($filtro, null, $rs_modelo);
 		if($ret != "") $msg = $ret;
-		else if(!$rs_modelo || pg_num_rows($rs_modelo) == 0) $msg = "Nenhum modelo encontrado.\n";
+		else if(!$rs_modelo || (($rs_modelo) ? pg_num_rows($rs_modelo) : 0) == 0) $msg = "Nenhum modelo encontrado.\n";
 		else {
 			$rs_modelo_row = pg_fetch_array($rs_modelo);
 			$ogpm_id 			= $rs_modelo_row['ogpm_id'];
@@ -141,7 +142,7 @@ $BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
                         $instProduto = new Produto();
 			$ret = $instProduto->obterMelhorado($filtro, null, $rs_produto);
 			if($ret != "") $msg = $ret;
-			else if(!$rs_produto || pg_num_rows($rs_produto) == 0) $msg = "Nenhum produto encontrado.\n";
+			else if(!$rs_produto || (($rs_produto) ? pg_num_rows($rs_produto) : 0) == 0) $msg = "Nenhum produto encontrado.\n";
 			else {
 				$rs_produto_row = pg_fetch_array($rs_produto);
 				$ogp_id 			= $rs_produto_row['ogp_id'];
@@ -283,7 +284,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 					<option value="">Selecione</option>
 					<?php
             if ($rs_pins_opr) {
-                $num_rows = pg_num_rows($rs_pins_opr);
+                $num_rows = (($rs_pins_opr) ? pg_num_rows($rs_pins_opr) : 0);
                 for ($i = 0; $i < $num_rows; $i++) {
                     $rs_pins_opr_row = pg_fetch_array($rs_pins_opr, $i);
             ?>

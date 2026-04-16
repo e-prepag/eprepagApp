@@ -1,13 +1,19 @@
 <?php
-$_GET['endereco'] = utf8_decode($_GET['endereco']);
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
+$_GET['endereco'] = isset($_GET['endereco']) ? pdv_utf8_to_iso($_GET['endereco']) : '';
+$_GET['us_id'] = isset($_GET['us_id']) ? $_GET['us_id'] : '';
+$_GET['us_endereco'] = isset($_GET['us_endereco']) ? $_GET['us_endereco'] : '';
+$_GET['us_cep'] = isset($_GET['us_cep']) ? $_GET['us_cep'] : '';
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
-$us_id = $_GET['us_id']; 
-$us_endereco = $_GET['us_endereco']; 
-$us_cep = $_GET['us_cep'];
+$us_id = $_GET['us_id'] ?? ''; 
+$us_endereco = $_GET['us_endereco'] ?? ''; 
+$us_cep = $_GET['us_cep'] ?? '';
+$us_coord_lat = '';
+$us_coord_lng = '';
 
 if(!empty($us_endereco)) {
 	
@@ -112,12 +118,12 @@ $_GET['us_cep'] = $us_cep1.'-'.$us_cep2;
   <input type="button" class='btn btn-sm btn-info' name="buscar" value="Atualizar geolocalização com estes valores" id="buscar" onClick="atualizaGeo(document.getElementById('us_coord_lat').innerHTML, document.getElementById('us_coord_lng').innerHTML);"/>
   <!--<input type="button" name="buscar" value="Localizar Endere&ccedil;o" id="buscar" onClick="localizaEndereco();"/>-->
   <hr />
-  <?php echo utf8_decode($_GET['endereco']); ?>,<?php echo $_GET['us_cep']; ?>, Brasil
+  <?php echo pdv_utf8_to_iso($_GET['endereco']); ?>,<?php echo $_GET['us_cep']; ?>, Brasil
   &nbsp;&nbsp;<input type="button" class='btn btn-sm btn-info' name="resetar" value="Renovar Endereço" id="buscar" onClick="document.getElementById('consulta').value = document.getElementById('consultaoculta').value ;"/>
   <br />
   ENDERE&Ccedil;O:&nbsp;
-<input type="text" name="consulta" id="consulta" size = "100"  value="<?php echo utf8_decode($_GET['endereco']); ?>,<?php echo $_GET['us_cep']; ?>, Brasil"/> 
-<input type="hidden" name="consultaoculta" id="consultaoculta" size = "100"  value="<?php echo utf8_decode($_GET['endereco']); ?>,<?php echo $_GET['us_cep']; ?>, Brasil"/> 
+<input type="text" name="consulta" id="consulta" size = "100"  value="<?php echo pdv_utf8_to_iso($_GET['endereco']); ?>,<?php echo $_GET['us_cep']; ?>, Brasil"/> 
+<input type="hidden" name="consultaoculta" id="consultaoculta" size = "100"  value="<?php echo pdv_utf8_to_iso($_GET['endereco']); ?>,<?php echo $_GET['us_cep']; ?>, Brasil"/> 
   <input type="submit" name="Ok" class='btn btn-sm btn-info' value="Consultar" />
 </p>
 </form>

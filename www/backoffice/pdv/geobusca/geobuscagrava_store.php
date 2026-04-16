@@ -5,7 +5,11 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
 //echo "<pre>".print_r($_GET,true)."</pre>";
-$sql = "UPDATE dist_usuarios_stores_cartoes SET us_coord_lat = ".$_GET[us_coord_lat].", us_coord_lng = ".$_GET[us_coord_lng].", us_google_maps_string = '".str_replace("'", "''", $_GET[us_google_maps_string])."', us_google_maps_status = Null WHERE us_id = $_GET[us_id]";
+$us_coord_lat = isset($_GET['us_coord_lat']) ? $_GET['us_coord_lat'] : 0;
+$us_coord_lng = isset($_GET['us_coord_lng']) ? $_GET['us_coord_lng'] : 0;
+$us_google_maps_string = isset($_GET['us_google_maps_string']) ? $_GET['us_google_maps_string'] : '';
+$us_id = isset($_GET['us_id']) ? $_GET['us_id'] : 0;
+$sql = "UPDATE dist_usuarios_stores_cartoes SET us_coord_lat = ".$us_coord_lat.", us_coord_lng = ".$us_coord_lng.", us_google_maps_string = '".str_replace("'", "''", $us_google_maps_string)."', us_google_maps_status = Null WHERE us_id = $us_id";
 //echo $sql."<br>";
 
 $ret = SQLexecuteQuery($sql);

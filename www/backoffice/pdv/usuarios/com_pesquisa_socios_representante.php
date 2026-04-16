@@ -16,7 +16,7 @@ $cpf                    = isset($_REQUEST['cpf'])? htmlentities($_REQUEST['cpf']
 
 //paginacao
 if(isset($_POST['p'])){
-    $p = $_POST['p'];
+    $p = $_POST['p'] ?? '';
 }else{
     $p = 1;
 }
@@ -166,7 +166,7 @@ if(isset($_POST["btn_pesquisar"])){
     </div>
     <div class="panel-body">
 <?php
-        if(isset($rs_pdvs) && pg_num_rows($rs_pdvs) > 0){
+        if(isset($rs_pdvs) && (($rs_pdvs) ? pg_num_rows($rs_pdvs) : 0) > 0){
 ?>
             <table class="table">
                 <thead>

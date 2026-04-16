@@ -4,8 +4,8 @@ require_once "/www/includes/bourls.php";
 	require_once "/www/db/connect.php";
 	require_once "/www/db/ConnectionPDO.php";
 		
-	$dados_operador = $_POST["dados_operador"];
-	$venda_id = $_POST["venda_id"];
+	$dados_operador = $_POST["dados_operador"] ?? '';
+	$venda_id = $_POST["venda_id"] ?? '';
 
 	$dataHoraAtual = new dateTime();
 
@@ -35,7 +35,7 @@ require_once "/www/includes/bourls.php";
 	
 	
 	
-	if (trim($resultado) == 'Pagamento já conciliado') {
+	if (trim((string)($resultado ?? "")) == 'Pagamento já conciliado') {
 		echo 'Conciliação manual não foi realizada!';
 	} elseif (strpos($resultado, 'e-mail enviado com sucesso') !== false) {
 		
@@ -52,7 +52,7 @@ require_once "/www/includes/bourls.php";
 			$stmt->execute();
 			$resultado_consulta = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-			if (count($resultado_consulta) > 0) {
+			if ((is_countable($resultado_consulta) ? count($resultado_consulta) : 0) > 0) {
 				
 				$query_atualiza = "update tb_dist_venda_games set vg_usuario_obs = vg_usuario_obs || ' - {$dataHoraFormatada} Conciliado manualmente por ' || :dados_operador WHERE vg_id = :venda_id;";
 

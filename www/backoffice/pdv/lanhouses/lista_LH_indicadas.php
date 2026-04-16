@@ -11,7 +11,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 
 	$sql  = "select * from lanhouses_indicadas order by li_data_inclusao desc";
 	$rs_logins = SQLexecuteQuery($sql);
-	$n_lans = pg_num_rows($rs_logins);
+	$n_lans = (($rs_logins) ? pg_num_rows($rs_logins) : 0);
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">
@@ -38,7 +38,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
       <td width="100%" valign="top"> <div align="left">
 	<?php
 	
-	if($rs_logins && pg_num_rows($rs_logins) > 0){
+	if($rs_logins && (($rs_logins) ? pg_num_rows($rs_logins) : 0) > 0){
 		echo "<p>Lista de PDVs indicados pelos jogadores para participar no Campeonato (este cadastro é independente do cadastro de Lanhouses da E-Prepag)</p>";
 		echo "<p>Total de PDVs encontrados: $n_lans</p>\n";
 		echo "<table class='table'>\n";

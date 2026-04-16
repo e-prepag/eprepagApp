@@ -12,7 +12,7 @@ $default_add  = nome_arquivo($PHP_SELF);
 // Cria instância com LH teste
 $usuarioGames = new UsuarioGames(468);
 $bret = $usuarioGames->b_IsLogin_pagamento_master(1, $usuarios_pagamento_online_master_id);
-$total_table = count($usuarios_pagamento_online_master_id);
+$total_table = (is_countable($usuarios_pagamento_online_master_id) ? count($usuarios_pagamento_online_master_id) : 0);
 $reg_ate = $total_table;
 
 $s_ug_id_list = "";
@@ -133,7 +133,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						$cor2 = $query_cor1;
 						$cor3 = $query_cor2;
 
-						if((pg_num_rows($rs) != 0) && ($rs)) {
+						if(((($rs) ? pg_num_rows($rs) : 0) != 0) && ($rs)) {
 							while ($pgrs = pg_fetch_array ($rs)) {
 								{
 									$taxa_aproveitamento = 100.*$pgrs['vg_valor']/($pgrs['vg_valor'] + $pgrs['vg_valor_inc']);

@@ -6,8 +6,8 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 require_once $raiz_do_projeto."includes/pdv/corte_constantes.php";
 require_once $raiz_do_projeto."banco/boletos/include/funcoes_bradesco.php";
 
-$tf_u_codigo = $_GET['ug_id'];
-$bbc_boleto_cod = $_GET['bbc_boleto_codigo'];
+$tf_u_codigo = $_GET['ug_id'] ?? '';
+$bbc_boleto_cod = $_GET['bbc_boleto_codigo'] ?? '';
 
 //Validacao
 //------------------------------------------------------------------------------------------------------------------
@@ -17,11 +17,11 @@ $str_redirect = "";
 
 //Valida estabelecimento
 if($msg == "" && $msgFatal == "")
-    if(!$tf_u_codigo || !is_numeric($tf_u_codigo) || trim($tf_u_codigo) == "") $msgFatal = "Código do usuário inválido.\n";
+    if(!$tf_u_codigo || !is_numeric($tf_u_codigo) || trim((string)($tf_u_codigo ?? "")) == "") $msgFatal = "Código do usuário inválido.\n";
 
 //Valida codigo do boleto
 if($msg == ""){
-    if(!$bbc_boleto_cod || trim($bbc_boleto_cod) == "" || !is_numeric($bbc_boleto_cod)) $msg = "Código do boleto inválido.\n";
+    if(!$bbc_boleto_cod || trim((string)($bbc_boleto_cod ?? "")) == "" || !is_numeric($bbc_boleto_cod)) $msg = "Código do boleto inválido.\n";
 }
 
 //Busca dados do boleto
@@ -31,7 +31,7 @@ if($msg == ""){
                 where bbc.bbc_boleto_codigo = $bbc_boleto_cod
                 and bbc.bbc_ug_id = $tf_u_codigo";
     $rs_boleto = SQLexecuteQuery($sql);
-    if(!$rs_boleto || pg_num_rows($rs_boleto) == 0) $msg = "Erro ao buscar boleto.\n";
+    if(!$rs_boleto || (($rs_boleto) ? pg_num_rows($rs_boleto) : 0) == 0) $msg = "Erro ao buscar boleto.\n";
     else {
         $rs_boleto_row = pg_fetch_array($rs_boleto);
         $bbc_bco_codigo = $rs_boleto_row['bbc_bco_codigo'];
@@ -52,7 +52,7 @@ if($msg == ""){
         //Banco
         if($bbc_bco_codigo != $GLOBALS['BOLETO_COD_BANCO_BRADESCO']) $msg = "Boleto não é do Bradesco.\n";
             //usuario
-        if(!$bbc_ug_id || trim($bbc_ug_id) == "" || !is_numeric($bbc_ug_id)) $msg = "Código do usuário inválido.\n";
+        if(!$bbc_ug_id || trim((string)($bbc_ug_id ?? "")) == "" || !is_numeric($bbc_ug_id)) $msg = "Código do usuário inválido.\n";
         }
 }
 
@@ -60,7 +60,7 @@ if($msg == ""){
 if($msg == ""){
         $sql  = "select * from dist_usuarios_games ug where ug.ug_id = " . $bbc_ug_id;
         $rs_estab = SQLexecuteQuery($sql);
-        if(!$rs_estab || pg_num_rows($rs_estab) == 0) $msg = "Nenhum usuário encontrado.\n";
+        if(!$rs_estab || (($rs_estab) ? pg_num_rows($rs_estab) : 0) == 0) $msg = "Nenhum usuário encontrado.\n";
         else {
                 $rs_estab_row = pg_fetch_array($rs_estab);
 
@@ -74,15 +74,15 @@ if($msg == ""){
                 $ug_endereco_logradouro = $ug_endereco;
                 $numero 		= $rs_estab_row['ug_numero'];
                 $ug_numero 		= $numero;
-                if(trim($numero) != "") $ug_endereco .= ", " . trim($numero);
+                if(trim((string)($numero ?? "")) != "") $ug_endereco .= ", " . trim((string)($numero ?? ""));
                 $complemento	= $rs_estab_row['ug_complemento'];
                 $ug_complemento		= $complemento;
-                if(trim($complemento) != "") $ug_endereco .= " - " . trim($complemento);
+                if(trim((string)($complemento ?? "")) != "") $ug_endereco .= " - " . trim((string)($complemento ?? ""));
                 $bairro 		= $rs_estab_row['ug_bairro'];
                 $ug_bairro 		= $bairro;
                 $municipio 		= $rs_estab_row['ug_cidade'];
                 $ug_cidade 		= $municipio;
-                if(trim($bairro) != "") $bairro .= " - " . trim($municipio);
+                if(trim((string)($bairro ?? "")) != "") $bairro .= " - " . trim((string)($municipio ?? ""));
                 $uf 			= $rs_estab_row['ug_estado'];
                 $ug_estado		= $uf;
                 $cep 			= str_replace("-","",$rs_estab_row['ug_cep']);

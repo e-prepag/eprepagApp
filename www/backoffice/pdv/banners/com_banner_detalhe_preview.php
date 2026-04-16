@@ -4,7 +4,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";	
 
-	$b_id = $_REQUEST['b_id'];
+	$b_id = $_REQUEST['b_id'] ?? '';
 //	echo $b_id."<br>";
 //echo $PREPAG_DOMINIO." - ".$URL_DIR_IMAGES_BANNER."<br>"; 
 	if($b_id) {
@@ -31,7 +31,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 		echo "<font color='red'>Erro: Forneça um ID Banner</font><br>";
 	}
 
-		if ($rs_banners && pg_num_rows($rs_banners) > 0) {
+		if ($rs_banners && (($rs_banners) ? pg_num_rows($rs_banners) : 0) > 0) {
 			$rs_banners_row = pg_fetch_array($rs_banners);
 //echo "<pre>".print_r($rs_banners_row, true)."</pre>";
 ?>

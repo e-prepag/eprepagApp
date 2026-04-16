@@ -18,7 +18,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 //echo "<pre>".print_r($usuarios_com_extrato_id, true)."</pre>";
 	$reg_ate = $total_table;
 
-	$total_table = count($usuarios_com_extrato_id);
+	$total_table = (is_countable($usuarios_com_extrato_id) ? count($usuarios_com_extrato_id) : 0);
 ob_end_flush();
 ?>
 <script language="javascript">
@@ -75,7 +75,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						$sql .= "order by ug_login;";
 //echo "$sql<br>";
 						$rs_usuarios = SQLexecuteQuery($sql);
-						if(!$rs_usuarios || pg_num_rows($rs_usuarios) == 0) $msg = "Nenhum usuário encontrado (1ag).\n";
+						if(!$rs_usuarios || (($rs_usuarios) ? pg_num_rows($rs_usuarios) : 0) == 0) $msg = "Nenhum usuário encontrado (1ag).\n";
 
 						if($msg == ""){
 							//Verifica cada item de cada produto

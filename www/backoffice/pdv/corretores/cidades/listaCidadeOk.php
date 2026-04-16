@@ -8,7 +8,7 @@ $ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games group by ug_cida
 //pg_send_query($conex,$ps_query);
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
-$total_de_cidades = pg_num_rows($res0);
+$total_de_cidades = (($res0) ? pg_num_rows($res0) : 0);
 
 
 $ps_query = "SELECT distinct count (ug_cidade) as total, ug_cidade FROM dist_usuarios_games where ug_cidade ~ '^[A-Z][a-z]+ [A-Z][a-z] |[A-Z][a-z]' group by ug_cidade order by ug_cidade";
@@ -21,7 +21,7 @@ $ps_query = "SELECT distinct count (ug_cidade) as total, ug_cidade FROM dist_usu
 //$res1 = pg_get_result($conex);
 $res1 = SQLexecuteQuery($ps_query);
 
-$total_de_cidades_sem_erro = pg_num_rows($res1);
+$total_de_cidades_sem_erro = (($res1) ? pg_num_rows($res1) : 0);
 echo "total_de_cidades_sem_erro: $total_de_cidades_sem_erro - total_de_cidades: $total_de_cidades (".number_format((100*$total_de_cidades_sem_erro/ $total_de_cidades), 2, '.', '.').") <br>";
 
 while ($info = pg_fetch_array($res1)) {

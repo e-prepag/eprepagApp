@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
@@ -165,8 +166,8 @@ function salva_estilos($idUsuario, $pdo)
     // Coleta os dados do formulário
     $corPrimaria = htmlspecialchars($_POST['cor_primaria']);
     $corSecundaria = htmlspecialchars($_POST['cor_secundaria']);
-    $emailSuporte = $_POST['email_suporte'];
-    $linkCanal = $_POST['link_canal'];
+    $emailSuporte = $_POST['email_suporte'] ?? '';
+    $linkCanal = $_POST['link_canal'] ?? '';
     $mensagem = htmlspecialchars($_POST['mensagem']);
 
     $logoData = null;
@@ -612,7 +613,7 @@ if ($msg == "") {
                 usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], $usuario_id, null, "Mod. por usuario bko id: " . $_SESSION['iduser_bko']);
             }
 
-            if (count($array_nomes_socios) > 0) {
+            if ((is_countable($array_nomes_socios) ? count($array_nomes_socios) : 0) > 0) {
                 $not_empty_nome = verificaValorVazioArray($array_nomes_socios);
                 $not_empty_cpf = verificaValorVazioArray($array_cpf_socios);
                 $not_empty_data_nascimento = verificaValorVazioArray($array_data_nascimento_socios);
@@ -626,7 +627,7 @@ if ($msg == "") {
                     //Validação para que não tenha sócios duplicados
                     $verifica_repetidos = array_unique($array_cpf_socios);
 
-                    if (count($array_cpf_socios) != count($verifica_repetidos)) {
+                    if ((is_countable($array_cpf_socios) ? count($array_cpf_socios) : 0) != (is_countable($verifica_repetidos) ? count($verifica_repetidos) : 0)) {
                         $msgAcao = "Erro: Problema com sócios duplicados";
 
                     } else {
@@ -648,7 +649,7 @@ if ($msg == "") {
                             }
 
                             if ($msgAcao == "") {
-                                for ($i = 0; $i < count($array_cpf_socios); $i++) {
+                                for ($i = 0; $i < (is_countable($array_cpf_socios) ? count($array_cpf_socios) : 0); $i++) {
                                     $sql_insert = "INSERT INTO dist_usuarios_games_socios (ug_id, ugs_nome, ugs_cpf, ugs_data_nascimento, ugs_percentagem) VALUES 
                                         (" . $usuario_id . " , '" . $array_nomes_socios[$i] . "' , '" . str_replace('.', '', str_replace('-', '', $array_cpf_socios[$i])) . "' , '" . formata_data($array_data_nascimento_socios[$i], 1) . " 00:00:00', " . str_replace(",", ".", $array_porcentagem_socios[$i]) . ");";
                                     $ret_insert = SQLexecuteQuery($sql_insert);
@@ -675,7 +676,7 @@ if ($msg == "") {
 //                }
             if ($msgAcao == "") {
                 if ($novo_ug_ativo == "1") {
-                    if (!$cad_usuarioGames->getPerfilFormaPagto() || trim($cad_usuarioGames->getPerfilFormaPagto()) == "") {
+                    if (!$cad_usuarioGames->getPerfilFormaPagto() || trim((string)$cad_usuarioGames->getPerfilFormaPagto()) == "") {
                         $msgAcao = "Não é possivel ativar este usuário, Forma de Pagamento ainda não definida.\n";
                     }
                 }
@@ -753,7 +754,7 @@ if ($msg == "") {
     else {
 
         //RA
-        if (is_null($objUsuarioGames->getRACodigo()) || trim($objUsuarioGames->getRACodigo()) == "") {
+        if (is_null($objUsuarioGames->getRACodigo()) || trim((string)$objUsuarioGames->getRACodigo()) == "") {
             $cad_RA = $objUsuarioGames->getRAOutros();
         } else {
             $resatv = SQLexecuteQuery("select ra_codigo, ra_desc from ramo_atividade where ra_codigo = '" . $objUsuarioGames->getRACodigo() . "'");
@@ -1067,7 +1068,7 @@ if (!$usuario_id || !is_numeric($usuario_id)) {
                                     }
                                     ?>
                                     <option value='<?php echo $te_codigo ?>' <?php echo $select ?>>
-                                        <?php echo utf8_decode($res_te_row['te_descricao']); ?>
+                                        <?php echo pdv_utf8_to_iso($res_te_row['te_descricao']); ?>
                                         (<?php if ($res_te_row['te_ativo'])
                                             echo "Ativo";
                                         else
@@ -1312,7 +1313,7 @@ if (!$usuario_id || !is_numeric($usuario_id)) {
                         $res_socios = SQLexecuteQuery($sql_socios);
 
                         $i_socios = 0;
-                        if ($res_socios && pg_num_rows($res_socios) > 0) {
+                        if ($res_socios && (($res_socios) ? pg_num_rows($res_socios) : 0) > 0) {
 
                             while ($res_row = pg_fetch_array($res_socios)) {
                                 $novo_ug_nome_socios = $res_row['ugs_nome'];

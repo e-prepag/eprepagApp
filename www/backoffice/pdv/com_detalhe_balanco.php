@@ -14,8 +14,8 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 
 
 header("Content-Type: text/html; charset=ISO-8859-1",true); 
-$id_lan = $_GET['id_lan'];
-$bal_id = $_GET['bal_id'];
+$id_lan = $_GET['id_lan'] ?? '';
+$bal_id = $_GET['bal_id'] ?? '';
 $query = "select * from dist_balancos where db_id = '$bal_id' and db_ug_id = '$id_lan' ";
 $res = SQLexecuteQuery($query);
 	if ( $info_balanco = pg_fetch_array($res)) {

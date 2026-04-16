@@ -112,7 +112,7 @@ if(isset($BtnSearch)){
 		$ret = $instProduto->obterMelhorado($filtro, null, $rs_produtos);
 		if($ret != "") $msg = $ret;
 		else {
-			$total_table = pg_num_rows($rs_produtos);
+			$total_table = (($rs_produtos) ? pg_num_rows($rs_produtos) : 0);
 
 			if($total_table == 0) {
 				$msg = "Nenhum produto encontrado.\n";

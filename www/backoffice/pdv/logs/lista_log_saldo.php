@@ -115,11 +115,11 @@ if (b_IsUsuarioReinaldo()) {
 
 
 $rs = SQLexecuteQuery($sql);
-//echo "pg_num_rows(rs): ".pg_num_rows($rs)."<br>";
+//echo "pg_num_rows(rs): ".(($rs) ? pg_num_rows($rs) : 0)."<br>";
 
 $rs_n = SQLexecuteQuery($sql_n);
 $a_n_regs = array();
-if (!$rs_n || pg_num_rows($rs_n) == 0) {
+if (!$rs_n || (($rs_n) ? pg_num_rows($rs_n) : 0) == 0) {
 	echo "Nenhum produto encontrado (duplicado).<br>\n";
 } else {
 	while ($rs_n_row = pg_fetch_array($rs_n)) {
@@ -176,13 +176,13 @@ if (b_IsUsuarioReinaldo()) {
 	<?php
 
 
-					if (!$rs || pg_num_rows($rs) == 0) {
+					if (!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
 						echo "Nenhum produto encontrado.<br>\n";
 					} else {
 
-						$s_several = ((pg_num_rows($rs) > 1) ? "s" : "");
+						$s_several = (((($rs) ? pg_num_rows($rs) : 0) > 1) ? "s" : "");
 
-						echo "<p>Encontrado$s_several " . pg_num_rows($rs) . " registro$s_several</p>";
+						echo "<p>Encontrado$s_several " . (($rs) ? pg_num_rows($rs) : 0) . " registro$s_several</p>";
 						echo "<table class='table table-bordered'>\n";
 
 						echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>\n";

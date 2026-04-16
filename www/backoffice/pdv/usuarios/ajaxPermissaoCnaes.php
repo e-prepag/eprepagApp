@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header('Content-Type: application/json; charset=utf-8');
 require_once "/www/db/connect.php"; 
 require_once "/www/db/ConnectionPDO.php"; 
@@ -23,7 +24,7 @@ $result = $query->fetchAll(PDO::FETCH_ASSOC);
 $cnaes = [];
 
 foreach($result as $key => $cnae) {
-	$cnae["atividade_cnae"] = utf8_encode($cnae["atividade_cnae"]);
+	$cnae["atividade_cnae"] = pdv_iso_to_utf8($cnae["atividade_cnae"]);
 	
 	array_push($cnaes, $cnae);
 }

@@ -40,10 +40,10 @@ function exibe_ranking() {
             echo '<div class="alert alert-warning text-center" role="alert">Nenhuma promoção vigente no momento.</div>';
         }
 
-	//echo "count(a_promolh_id): ".count($a_promolh_id)." Promoções cadastradas vigentes"."\n";
+	//echo "count(a_promolh_id): ".(is_countable($a_promolh_id) ? count($a_promolh_id) : 0)." Promoções cadastradas vigentes"."\n";
 	//echo "<pre>".print_r($a_promolh_id,true)."</pre>";
 
-	for($i=0;$i<count($a_promolh_id);$i++) {
+	for($i=0;$i<(is_countable($a_promolh_id) ? count($a_promolh_id) : 0);$i++) {
 
 		$query = "SELECT 
 						promolh_id,

@@ -48,16 +48,16 @@ require_once $raiz_do_projeto."includes/pdv/inc_ufs.php";
 		} elseif($btSalvar=="Salvar") {
 			$msg_save = "<font color='blue'>Salvando</font>";
 
-			$lh_db_lanhouse		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_lanhouse)),0,50)); 
-			$lh_db_logradouro	= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_logradouro)),0,50)); 
-			$lh_db_numero		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_numero)),0,50)); 
-			$lh_db_complemento	= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_complemento)),0,50)); 
-			$lh_db_bairro		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_bairro)),0,50)); 
-			$lh_db_cidade		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_cidade)),0,50)); 
-			$lh_db_cep			= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_cep)),0,10)); 
-			$lh_db_estado		= substr(str_replace("'", "''", trim($lh_estado)),0,2); 
+			$lh_db_lanhouse		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_lanhouse ?? ""))),0,50)); 
+			$lh_db_logradouro	= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_logradouro ?? ""))),0,50)); 
+			$lh_db_numero		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_numero ?? ""))),0,50)); 
+			$lh_db_complemento	= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_complemento ?? ""))),0,50)); 
+			$lh_db_bairro		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_bairro ?? ""))),0,50)); 
+			$lh_db_cidade		= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_cidade ?? ""))),0,50)); 
+			$lh_db_cep			= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_cep ?? ""))),0,10)); 
+			$lh_db_estado		= substr(str_replace("'", "''", trim((string)($lh_estado ?? ""))),0,2); 
 			$lh_db_data_inclusao = $lh_data_inclusao;
-			$lh_db_comentario	= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($lh_comentario)),0,50)); 
+			$lh_db_comentario	= translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($lh_comentario ?? ""))),0,50)); 
 			$lh_db_promocao		= $lh_promocao;
 
 			if($bNew) {
@@ -68,7 +68,7 @@ require_once $raiz_do_projeto."includes/pdv/inc_ufs.php";
 				else {
 					// Obtem last id
 					$rs_id = SQLexecuteQuery("select currval('sq_lans') as last_id");
-					if($rs_id && pg_num_rows($rs_id) > 0){
+					if($rs_id && (($rs_id) ? pg_num_rows($rs_id) : 0) > 0){
 						$rs_id_row = pg_fetch_array($rs_id);
 						$lh_lanhouses_id = $rs_id_row['last_id'];
 						$bNew = 0;
@@ -110,7 +110,7 @@ if($msg) echo "<font color='red'>$msg</font><br>";
 			$sql  = "SELECT * FROM tb_lanhouses " .
 					"where lanhouses_id = " . $lanhouses_id;
 			$rs_LH = SQLexecuteQuery($sql);
-			if(!$rs_LH || pg_num_rows($rs_LH) == 0) {
+			if(!$rs_LH || (($rs_LH) ? pg_num_rows($rs_LH) : 0) == 0) {
 				$msg = "Nenhum PDV encontrado.\n";
 			} else {
 				$rs_LH_row = pg_fetch_array($rs_LH);

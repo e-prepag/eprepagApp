@@ -120,7 +120,7 @@ $ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games ";
 //pg_send_query($conex,$ps_query);
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 //* comentado para o update
 /*$ps_query = "SELECT distinct ug_bairro,ug_cidade, count (ug_bairro) as total FROM dist_usuarios_games where sem_acentos(ug_bairro) ~ sem_acentos('[A-z] +') group by ug_bairro,ug_cidade order by ug_bairro"; */
@@ -134,7 +134,7 @@ echo $ps_query."<br>";
 //$res1 = pg_get_result($conex);
 $res1 = SQLexecuteQuery($ps_query);
 
-$ok = pg_num_rows($res1);
+$ok = (($res1) ? pg_num_rows($res1) : 0);
 
 echo "Total: $ok - $total <br>";
 $iloop = 1;

@@ -1,4 +1,5 @@
-<?php 
+<?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 require_once '../../../includes/constantes.php';
@@ -120,7 +121,7 @@ while($rs_usuario_row = pg_fetch_array($rs_usuario)){
         $ug_cel			=	$rs_usuario_row['ug_cel'];
 		$ug_ficou_sabendo	= $rs_usuario_row['ug_ficou_sabendo'];
         $ug_tipo_end		=	$rs_usuario_row['ug_tipo_end'];
-        $te_descricao   	=	utf8_decode($rs_usuario_row['te_descricao']);
+        $te_descricao   	=	pdv_utf8_to_iso($rs_usuario_row['te_descricao']);
         //$ug_perfil_saldo	=	number_format($rs_usuario_row['ug_perfil_saldo'], 2, ',', '.'); Pontuação quebrou em nova coluna
         $ug_perfil_saldo	=	$rs_usuario_row['ug_perfil_saldo'];
         switch($rs_usuario_row['ug_vip']){

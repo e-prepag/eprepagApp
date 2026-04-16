@@ -65,7 +65,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 	}
 //echo str_replace("\n", "<br>\n", $sql);	
 	$rs_logins = SQLexecuteQuery($sql);
-	$n_lans = pg_num_rows($rs_logins);
+	$n_lans = (($rs_logins) ? pg_num_rows($rs_logins) : 0);
 ?>
 <script type="text/javascript" src="/js/jquery.tablesorter/jquery-latest.js"></script> 
 <script type="text/javascript" src="/js/jquery.tablesorter/jquery.tablesorter.js"></script> 
@@ -260,7 +260,7 @@ $(document).ready(function() {
   <td width="100%" valign="top"> <div align="left"> <font color="#666666" size="2" face="Arial, Helvetica, sans-serif">  
 	<?php
 	
-	if($rs_logins && pg_num_rows($rs_logins) > 0){
+	if($rs_logins && (($rs_logins) ? pg_num_rows($rs_logins) : 0) > 0){
 		echo "<p>Total de PDVs encontrados: $n_lans (vendas depois de $data_inicio_pagto_online)</p>\n";
 		echo "<p>Dicas: 
                     <ul>
@@ -342,28 +342,28 @@ Estado               = ".$rs_logins_row['ug_estado'] ."
 CEP                  = ".$rs_logins_row['ug_cep'] ."
 Tipo Cadastro        = ".$rs_logins_row['ug_tipo_cadastro'] ."
 ";
-			if(trim($rs_logins_row['ug_tel'])!="") {
+			if(trim((string)($rs_logins_row['ug_tel'] ?? ""))!="") {
 				$sout .= "Tel                  = (".$rs_logins_row['ug_tel_ddi'] .") (".$rs_logins_row['ug_tel_ddd'] .") ".$rs_logins_row['ug_tel'] ."
 ";
 			}
-			if(trim($rs_logins_row['ug_cel'])!="") {
+			if(trim((string)($rs_logins_row['ug_cel'] ?? ""))!="") {
 				$sout .= "Cel                  = (".$rs_logins_row['ug_cel_ddi'] .") (".$rs_logins_row['ug_cel_ddd'] .") ".$rs_logins_row['ug_cel'] ."
 ";
 			}
-			if(trim($rs_logins_row['ug_fax'])!="") {
+			if(trim((string)($rs_logins_row['ug_fax'] ?? ""))!="") {
 				$sout .= "Fax                  = (".$rs_logins_row['ug_fax_ddi'] .") (".$rs_logins_row['ug_fax_ddd'] .") ".$rs_logins_row['ug_fax'] ."
 ";
 			}
-			if(trim($rs_logins_row['ug_contato01_nome'])!="") {
+			if(trim((string)($rs_logins_row['ug_contato01_nome'] ?? ""))!="") {
 				$sout .= "Contato01 Nome       = ".$rs_logins_row['ug_contato01_nome'] ."
 Contato01 Cargo      = ".$rs_logins_row['ug_contato01_cargo'] ."
 ";
-				if(trim($rs_logins_row['ug_contato01_tel'])!="") {
+				if(trim((string)($rs_logins_row['ug_contato01_tel'] ?? ""))!="") {
 				$sout .= "Contato01 Tel        = (".$rs_logins_row['ug_contato01_tel_ddi'] .") (".$rs_logins_row['ug_contato01_tel_ddd'] .") ".$rs_logins_row['ug_contato01_tel'] ."
 ";
 				}
 			}
-			if(trim($rs_logins_row['ug_observacoes'])!="") {
+			if(trim((string)($rs_logins_row['ug_observacoes'] ?? ""))!="") {
 				$sout .= "Observações          = ".$rs_logins_row['ug_observacoes'] ."
 ";
 			}
@@ -442,7 +442,7 @@ Contato01 Cargo      = ".$rs_logins_row['ug_contato01_cargo'] ."
 					break;
 				default: 
 					$statusMaps_descr = "Tipo Desconhecido";
-					if(strlen(trim($statusMaps))==0) $statusMaps_descr .= " (Empty)";
+					if(strlen(trim((string)($statusMaps ?? "")))==0) $statusMaps_descr .= " (Empty)";
 					else $statusMaps_descr .= " ('$statusMaps')";
 					break;
 			}
@@ -452,7 +452,7 @@ Contato01 Cargo      = ".$rs_logins_row['ug_contato01_cargo'] ."
 			} else {
 				$statusMaps_descr .= "\n[".number_format($rs_logins_row['ug_coord_lat'], 2, '.', '.').", ".number_format($rs_logins_row['ug_coord_lng'], 2, '.', '.')."]";
 			}
-			if(trim($statusMaps)=="") {
+			if(trim((string)($statusMaps ?? ""))=="") {
 				if($rs_logins_row['ug_coord_lat']==0 && $rs_logins_row['ug_coord_lng']==0) {
 					$statusMaps = "<font color='red'>Coords=0</font>";
 				} else {

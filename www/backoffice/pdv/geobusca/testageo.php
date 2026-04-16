@@ -39,7 +39,7 @@ require_once $raiz_do_projeto."includes/pdv/point_in_polygon.php"; ?>
 	$sql = "SELECT * FROM dist_usuarios_games WHERE ug_coord_lat != 0 AND ug_coord_lng != 0";
 //echo $sql."<br>";
 	$rss = SQLexecuteQuery($sql);
-	$tot = pg_num_rows($rss);
+	$tot = (($rss) ? pg_num_rows($rss) : 0);
 	
 	if($tot > 0) {
 		$conta = 0;

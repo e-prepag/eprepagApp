@@ -47,7 +47,7 @@ if(isset($Submit) && $Submit=="RESPONDER") {
 
 $sql = "SELECT * FROM dist_usuarios_stores_qiwi";
 $result_aux = SQLexecuteQuery($sql);
-$total_table = pg_num_rows($result_aux);
+$total_table = (($result_aux) ? pg_num_rows($result_aux) : 0);
 //Ordem
 $sql .= " order by ".$ncamp;
 if($ordem == 1){
@@ -66,7 +66,7 @@ if($max + $inicial > $total_table)
     $reg_ate = $total_table;
 else
     $reg_ate = $max + $inicial;
-$tot = pg_num_rows($rss);
+$tot = (($rss) ? pg_num_rows($rss) : 0);
 
 $a_fields = array(
 	'us_id', 
@@ -184,7 +184,7 @@ if(isset($msg))
 								break;
 							default: 
 								$statusMaps_descr = "Tipo Desconhecido";
-								if(strlen(trim($statusMaps))==0) $statusMaps_descr .= " (Empty)";
+								if(strlen(trim((string)($statusMaps ?? "")))==0) $statusMaps_descr .= " (Empty)";
 								else $statusMaps_descr .= " ('$statusMaps')";
 								break;
 						}
@@ -194,7 +194,7 @@ if(isset($msg))
 						} else {
 							$statusMaps_descr .= "\n[".number_format($valores['us_coord_lat'], 2, '.', '.').", ".number_format($valores['us_coord_lng'], 2, '.', '.')."]";
 						}
-						if(trim($statusMaps)=="") {
+						if(trim((string)($statusMaps ?? ""))=="") {
 							if($valores['us_coord_lat']==0 && $valores['us_coord_lng']==0) {
 								$statusMaps = "<font color='red'>Coords=0</font>";
 							} else {

@@ -22,8 +22,8 @@ if(!empty($executar)) {
         $lista_ids_pdvs = str_replace(',,', ',', $lista_ids_pdvs);
         $lista_ids_pdvs = str_replace(',,', ',', $lista_ids_pdvs);
         $lista_ids_pdvs = str_replace(',,', ',', $lista_ids_pdvs);
-        if(substr($lista_ids_pdvs,-1) == ',') $lista_ids_pdvs = substr($lista_ids_pdvs,0,strlen($lista_ids_pdvs)-1);
-        if(substr($lista_ids_pdvs,0,1) == ',') $lista_ids_pdvs = substr($lista_ids_pdvs,1,strlen($lista_ids_pdvs));
+        if(substr($lista_ids_pdvs,-1) == ',') $lista_ids_pdvs = substr($lista_ids_pdvs,0,strlen((string)($lista_ids_pdvs ?? ""))-1);
+        if(substr($lista_ids_pdvs,0,1) == ',') $lista_ids_pdvs = substr($lista_ids_pdvs,1,strlen((string)($lista_ids_pdvs ?? "")));
         //Fim da proteção contra usuário displicente
         $sql = "UPDATE dist_usuarios_games SET ug_possui_restricao_produtos = ".(($acao == "Bloquear")?"1":"0")." WHERE ug_id IN (".$lista_ids_pdvs.");";
         $rs_bloqueios = SQLexecuteQuery($sql);
@@ -123,7 +123,7 @@ if(!empty($executar)) {
     <?php
         $sql = "SELECT ug_id, ug_login FROM dist_usuarios_games WHERE ug_possui_restricao_produtos = 1 ORDER BY ug_login;";
         $rs = SQLexecuteQuery($sql); 
-        if($rs && pg_num_rows($rs) > 0 ) {
+        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0 ) {
             echo '<div class="row borda-baixo-basica p-8"><div class="col-md-2"><b>ID do PDV</b></div><div class="col-md-10"><b>Login do PDV</b></div></div><br>';
             while($rs_row = pg_fetch_array($rs)) {
                 echo '<div class="row"><div class="col-md-2">'.$rs_row['ug_id'].'</div><div class="col-md-10">'.$rs_row['ug_login'].'</div></div>';

@@ -13,7 +13,7 @@ $errado = array("Km 18"," De "," Da "," Do "," Dos "," Das ","são ", "Sao " ,"St
 
 $certo = array("Quilômetro Dezoito"," de "," da "," do "," dos "," das ", "São ","São ","Santo ","São"," V "," VI "," III "," II "," XV "," XI "," XI "," XII "," XII ", " VI"," I ", "Jardim ","Treze","Quatorze","Trinta e Um","Jardim ", "Jardim ","Jardim ","Jardim ","Jardim ","Jardim ","Centro","Centro", "Centro","Centro","Alto","Alto","Alto","Vila","Vila","Vila", "Parque","Parque","Balneário","Ó","Don "," II","I"," Dez ","Dezoito"," Jardim Paulo VI", "Olho D'Água", "Vila Erna","Dix-Sept Rosado","Grajaú"," IV ", " Petrópolis","Jundiaí","Júnior","Nossa Senhora ","Senhora","Senhor", "Senhora","Betânia", "Betânia", "Petrópolis","Paciência", "Padre Miguel","Parque"," Dez","Pau Miúdo","Residêncial Aquário","Aquario", "Samanaú","Eulália", "Efigênia", "Eulália", "Vila","João", "José", "Salvador","Vila São Cristóvão","Vila Brasília","Carrão","Vila Iorio","Vila Iara","Jacuí", "Operária", "Pompéia","Quitaúna","Luíz","Vila Sônia","Virgínia", "Araújo","Osório","Paraíso","Paranaguá","Petrópolis","Pelótas","Caiuá","Á");
 */
-//for($i=0;$i<count($errado);$i++) {
+//for($i=0;$i<(is_countable($errado) ? count($errado) : 0);$i++) {
 //	echo "'".$errado[$i]."' => '".$certo[$i]."',<br>";
 //}
 
@@ -135,7 +135,7 @@ $ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games ";
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
 
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 //* comentado para o update
 /*$ps_query = "SELECT distinct ug_bairro,ug_cidade, count (ug_bairro) as total FROM dist_usuarios_games where sem_acentos(ug_bairro) ~ sem_acentos('[A-z] +') group by ug_bairro,ug_cidade order by ug_bairro"; */
@@ -149,7 +149,7 @@ $ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games ";
 //$res1 = pg_get_result($conex);
 $res1 = SQLexecuteQuery($ps_query);
 
-$ok = pg_num_rows($res1);
+$ok = (($res1) ? pg_num_rows($res1) : 0);
 
 echo "Total: $ok - $total <br>";
 $iloop = 1;

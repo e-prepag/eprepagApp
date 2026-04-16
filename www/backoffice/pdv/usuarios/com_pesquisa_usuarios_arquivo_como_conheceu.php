@@ -1,4 +1,5 @@
-<?php 
+<?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 header('Content-Type: text/csv');
@@ -9,7 +10,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
-$resposta_como_conheceu = $_POST['resposta_como_conheceu'];
+$resposta_como_conheceu = $_POST['resposta_como_conheceu'] ?? '';
 
 
 $sql_como_conheceu = "select * from dist_usuarios_games where ug_ficou_sabendo LIKE '%{$resposta_como_conheceu}%';";
@@ -45,7 +46,7 @@ $cor1 = ($cor1 == $cor2)?$cor3:$cor2;
         $ug_cel			=	$rs_usuario_row['ug_cel'];
 		$ug_ficou_sabendo	= $rs_usuario_row['ug_ficou_sabendo'];
         $ug_tipo_end		=	$rs_usuario_row['ug_tipo_end'];
-        $te_descricao   	=	utf8_decode($rs_usuario_row['te_descricao']);
+        $te_descricao   	=	pdv_utf8_to_iso($rs_usuario_row['te_descricao']);
         //$ug_perfil_saldo	=	number_format($rs_usuario_row['ug_perfil_saldo'], 2, ',', '.'); Pontuação quebrou em nova coluna
         $ug_perfil_saldo	=	$rs_usuario_row['ug_perfil_saldo'];
         switch($rs_usuario_row['ug_vip']){
