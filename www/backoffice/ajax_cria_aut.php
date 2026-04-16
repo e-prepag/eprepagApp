@@ -21,7 +21,7 @@ try {
 
     if (Util::isAjaxRequest()) {
 
-        $login = strtoupper(trim($_POST['user']));
+        $login = strtoupper(trim((string)($_POST['user'] ?? "")));
 
         $sql = "SELECT id, chave_autenticador, shn_password FROM usuarios WHERE shn_login = ?
         AND ((tipo_acesso='AD') OR (tipo_acesso='DT') OR (tipo_acesso='SV') OR (tipo_acesso='AT') OR (tipo_acesso='US'))";
@@ -33,21 +33,21 @@ try {
         $stmt->execute(array($login));
         $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($stmt->rowCount() > 0) {
+        if ($stmt && $stmt->rowCount() > 0) {
 
             $bcrypt = new SecureEncryption();
 
-            if (!$bcrypt->verifyPassword($_POST['passw'], $fetch['shn_password'])) {
+            if (!$bcrypt->verifyPassword((string)($_POST['passw'] ?? ""), (string)($fetch['shn_password'] ?? ""))) {
                 $msg = 'Senha incorreta!';
             } else if (empty($fetch['chave_autenticador'])) {
-                if (!$_SESSION['secret']) {
+                if (!isset($_SESSION['secret']) || !$_SESSION['secret']) {
                     $secret = $ga->createSecret();
                     $_SESSION['secret'] = $secret;
                 } else {
                     $secret = $_SESSION['secret'];
 
-                    if ($_SESSION['id_do_usuario'] == $fetch['id']) {
-                        if ($ga->verifyCode($secret, $_POST['token'], 2)) {
+                    if (isset($_SESSION['id_do_usuario']) && $_SESSION['id_do_usuario'] == $fetch['id']) {
+                        if ($ga->verifyCode($secret, (string)($_POST['token'] ?? ""), 2)) {
                             $sql = "UPDATE usuarios SET chave_autenticador = ? WHERE id = ?";
                             $stmt = $pdo->prepare($sql);
                             $stmt->execute([$secret, $fetch['id']]);
@@ -57,9 +57,9 @@ try {
                                 $_SESSION['secret'] = "";
 ?>
                                 <form id="redir" method="POST" action="/index2.php">
-                                    <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                    <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                    <input type="hidden" name="token" value="<?= htmlspecialchars($_POST['token'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="user" value="<?= htmlspecialchars((string)($_POST['user'] ?? ""), ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="passw" value="<?= htmlspecialchars((string)($_POST['passw'] ?? ""), ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
+                                    <input type="hidden" name="token" value="<?= htmlspecialchars((string)($_POST['token'] ?? ""), ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                                 </form>
 
                                 <script>
@@ -73,7 +73,7 @@ try {
                         } else if (!$_POST['token']) {
                             $msg = 'Preencha o campo com um token!';
                         } else {
-                            $msg = "Token inválido!";
+                            $msg = "Token invï¿½lido!";
                         }
                     }
                 }
@@ -176,7 +176,7 @@ try {
                                     </div>
 
                                     <div class="text-left" style="margin: 15px;">
-                                        <label class="">Chave de segurança:</label>
+                                        <label class="">Chave de seguranï¿½a:</label>
                                         <div id="div-copiar" onclick="copyAuthCode()" style="cursor: pointer;">
                                             <p id="authCode" style="font-size: 15px; letter-spacing: 0.5px; margin-bottom: 0px;">
                                                 <?= $secret ?>
@@ -202,19 +202,19 @@ try {
                                 </button>
                                 <div class="instrucoes">
 
-                                    <h3>Instruções:</h3>
+                                    <h3>Instruï¿½ï¿½es:</h3>
                                     <ol class="lista-instrucoes">
-                                        <li>Abra o aplicativo autenticador instalado no seu celular. Caso não tenha um autenticador,
-                                            você deve instalar um. O Microsoft Authenticator e o Google Authenticator são os mais
+                                        <li>Abra o aplicativo autenticador instalado no seu celular. Caso nï¿½o tenha um autenticador,
+                                            vocï¿½ deve instalar um. O Microsoft Authenticator e o Google Authenticator sï¿½o os mais
                                             populares.</li>
 
                                         <li>Com o aplicativo aberto, leia o QR code gerado pelo nosso site.
-                                            Se estiver usando celular, copie a chave de segurança gerada e cole no
+                                            Se estiver usando celular, copie a chave de seguranï¿½a gerada e cole no
                                             aplicativo autenticador.</li>
 
-                                        <li>Aparecerá um código de 6 dígitos no seu aplicativo.</li>
+                                        <li>Aparecerï¿½ um cï¿½digo de 6 dï¿½gitos no seu aplicativo.</li>
 
-                                        <li>Digite esse código no site da E-prepag para confirmar e pronto! O autenticador está
+                                        <li>Digite esse cï¿½digo no site da E-prepag para confirmar e pronto! O autenticador estï¿½
                                             associado a seu PDV.</li>
 
                                     </ol>

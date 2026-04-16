@@ -43,7 +43,7 @@ if ($Enviar) {
 
     $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (count($fetch) == 1) {
+    if (is_array($fetch) && count($fetch) == 1) {
         $pgrow = $fetch[0];
         if (!$_SESSION["id_do_usuario"]) {
             $bcrypt = new SecureEncryption();
