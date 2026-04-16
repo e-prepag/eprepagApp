@@ -24,8 +24,8 @@ if(isset($Registrar) && $Registrar) {
 
         //arquivo
         if($msg == ""){
-                $fileSource = $_FILES['arquivo']['tmp_name']; 
-                $fileTemp = $folder . $_FILES['arquivo']['name']; 
+                $fileSource = $_FILES['arquivo']['tmp_name'] ?? ""; 
+                $fileTemp = $folder . ($_FILES['arquivo']['name'] ?? ""); 
 
                 if (($fileSource == 'none') || ($fileSource == '' )) $msg = 'Nenhum arquivo fornecido.\n';
                 elseif (!move_uploaded_file($fileSource, $fileTemp)) $msg = 'Não foi possivel copiar para o diretório destino.\n'; 
@@ -41,19 +41,19 @@ if(isset($Registrar) && $Registrar) {
 
                 //le header
                 $arquivoRetornoAr = preg_split("/\n/", $arquivoRetorno);
-                if(!$arquivoRetornoAr || count($arquivoRetornoAr) == 0) $msg = "Arquivo sem conteúdo.\n";
+                if(!$arquivoRetornoAr || (is_countable($arquivoRetornoAr) ? count($arquivoRetornoAr) : 0) == 0) $msg = "Arquivo sem conteúdo.\n";
                 else $header = $arquivoRetornoAr[0];
         }
 
         if($msg == ""){
                 if(strpos($header, "237BRADESCO") > 0) $msg = processaBoleto_Banco("237", $arquivoRetornoAr, $fileTemp);
                 elseif(strpos($header, "341BANCO ITAU S.A.") > 0) $msg = processaBoleto_Banco("341", $arquivoRetornoAr, $fileTemp); 
-                elseif((str_replace("033","",$header) != $header && strpos($header, "SANTANDER") > 0) && (strlen($header)==241)) $msg = processaBoleto_Banco("033", $arquivoRetornoAr, $fileTemp);
+                elseif((str_replace("033","",$header) != $header && strpos($header, "SANTANDER") > 0) && (strlen((string)($header ?? ""))==241)) $msg = processaBoleto_Banco("033", $arquivoRetornoAr, $fileTemp);
                 else $msg = "No foi identificado no arquivo a que banco pertence este boleto.\n";
         }
 
         if($msg == "") $msg = "Boletos inseridos com sucesso.";
-        $msg .= gravaLogBoleto($_FILES['arquivo']['name'], $msg);
+        $msg .= gravaLogBoleto($_FILES['arquivo']['name'] ?? "", $msg);
 
 } // end if($Registrar)
 ?>
@@ -321,14 +321,14 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 		$filename = substr(strrchr($fileTemp, "/"), 1);
 
 		if($bol_banco_defined=="237") {
-			$detalhe_IdentCedAg = substr($arquivoRetornoAr[1], 24, 5);
-			$detalhe_IdentCedCC	= substr($arquivoRetornoAr[1], 29, 7);
+			$detalhe_IdentCedAg = substr((string)($arquivoRetornoAr[1] ?? ""), 24, 5);
+			$detalhe_IdentCedCC	= substr((string)($arquivoRetornoAr[1] ?? ""), 29, 7);
 		} elseif($bol_banco_defined=="341") {
-			$detalhe_IdentCedAg = substr($arquivoRetornoAr[1], 17, 4);
-			$detalhe_IdentCedCC	= substr($arquivoRetornoAr[1], 23, 5);	// discard two leading zeros "00"
+			$detalhe_IdentCedAg = substr((string)($arquivoRetornoAr[1] ?? ""), 17, 4);
+			$detalhe_IdentCedCC	= substr((string)($arquivoRetornoAr[1] ?? ""), 23, 5);	// discard two leading zeros "00"
 		} elseif($bol_banco_defined=="033") {
-			$detalhe_IdentCedAg = substr($arquivoRetornoAr[1], 53, 4);
-			$detalhe_IdentCedCC	= substr($arquivoRetornoAr[1], 59, 9);	
+			$detalhe_IdentCedAg = substr((string)($arquivoRetornoAr[1] ?? ""), 53, 4);
+			$detalhe_IdentCedCC	= substr((string)($arquivoRetornoAr[1] ?? ""), 59, 9);	
                 } else {
 			$detalhe_IdentCedAg = "";
 			$detalhe_IdentCedCC	= "";
@@ -366,15 +366,15 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 		if($bol_banco_defined=="237") {
 			$bol_banco_defined_nome		= "Bradesco";
 
-			$header_IdentReg			= substr($arquivoRetornoAr[0], 0, 1);
-			$header_IdentArqRetorno		= substr($arquivoRetornoAr[0], 1, 1);
-			$header_LiteralRetorno		= strtoupper(trim(substr($arquivoRetornoAr[0], 2, 7)));
-			$header_CodServico			= substr($arquivoRetornoAr[0], 9, 2);
-			$header_LiteralServico		= strtoupper(trim(substr($arquivoRetornoAr[0], 11, 15)));
-			$header_CodEmpresa			= substr($arquivoRetornoAr[0], 26, 20);
-			$header_NomeEmpresa			= strtoupper(trim(substr($arquivoRetornoAr[0], 46, 30)));
-			$header_NumeroBradesco		= substr($arquivoRetornoAr[0], 76, 3);
-			$header_NomeBanco			= strtoupper(trim(substr($arquivoRetornoAr[0], 79, 15)));
+			$header_IdentReg			= substr((string)($arquivoRetornoAr[0] ?? ""), 0, 1);
+			$header_IdentArqRetorno		= substr((string)($arquivoRetornoAr[0] ?? ""), 1, 1);
+			$header_LiteralRetorno		= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 2, 7)));
+			$header_CodServico			= substr((string)($arquivoRetornoAr[0] ?? ""), 9, 2);
+			$header_LiteralServico		= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 11, 15)));
+			$header_CodEmpresa			= substr((string)($arquivoRetornoAr[0] ?? ""), 26, 20);
+			$header_NomeEmpresa			= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 46, 30)));
+			$header_NumeroBradesco		= substr((string)($arquivoRetornoAr[0] ?? ""), 76, 3);
+			$header_NomeBanco			= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 79, 15)));
 
 			//Validacao
 			if($header_IdentReg != "0") 			$msg .= "Identificação do Registro inválida ($header_IdentReg).\n";
@@ -388,15 +388,15 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 		} elseif($bol_banco_defined=="341") { 
 			$bol_banco_defined_nome		= "Banco Itaú";
 
-			$header_IdentReg			= substr($arquivoRetornoAr[0], 0, 1);
-			$header_IdentArqRetorno		= substr($arquivoRetornoAr[0], 1, 1);
-			$header_LiteralRetorno		= strtoupper(trim(substr($arquivoRetornoAr[0], 2, 7)));
-			$header_CodServico			= substr($arquivoRetornoAr[0], 9, 2);
-			$header_LiteralServico		= strtoupper(trim(substr($arquivoRetornoAr[0], 11, 15)));
-			$header_CodEmpresa			= substr($arquivoRetornoAr[0], 26, 20);
-			$header_NomeEmpresa			= strtoupper(trim(substr($arquivoRetornoAr[0], 46, 30)));
-			$header_NumeroItau			= substr($arquivoRetornoAr[0], 76, 3);
-			$header_NomeBanco			= strtoupper(trim(substr($arquivoRetornoAr[0], 79, 15)));
+			$header_IdentReg			= substr((string)($arquivoRetornoAr[0] ?? ""), 0, 1);
+			$header_IdentArqRetorno		= substr((string)($arquivoRetornoAr[0] ?? ""), 1, 1);
+			$header_LiteralRetorno		= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 2, 7)));
+			$header_CodServico			= substr((string)($arquivoRetornoAr[0] ?? ""), 9, 2);
+			$header_LiteralServico		= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 11, 15)));
+			$header_CodEmpresa			= substr((string)($arquivoRetornoAr[0] ?? ""), 26, 20);
+			$header_NomeEmpresa			= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 46, 30)));
+			$header_NumeroItau			= substr((string)($arquivoRetornoAr[0] ?? ""), 76, 3);
+			$header_NomeBanco			= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 79, 15)));
 
 			//Validacao
 			if($header_IdentReg != "0") 			$msg .= "Identificação do Registro inválida ('$header_IdentReg').\n";
@@ -410,12 +410,12 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 		} elseif($bol_banco_defined=="033") { 
 			$bol_banco_defined_nome		= "Santander";
 
-			$header_IdentReg			= substr($arquivoRetornoAr[0], 7, 1);
-			$header_IdentArqRetorno		= substr($arquivoRetornoAr[0], 142, 1);
-			$header_CodServico			= substr($arquivoRetornoAr[1], 9, 2);
-			$header_NomeEmpresa			= strtoupper(trim(substr($arquivoRetornoAr[0], 72, 30)));
-			$header_NumeroSantander			= substr($arquivoRetornoAr[0], 0, 3);
-			$header_NomeBanco			= strtoupper(trim(substr($arquivoRetornoAr[0], 102, 30)));
+			$header_IdentReg			= substr((string)($arquivoRetornoAr[0] ?? ""), 7, 1);
+			$header_IdentArqRetorno		= substr((string)($arquivoRetornoAr[0] ?? ""), 142, 1);
+			$header_CodServico			= substr((string)($arquivoRetornoAr[1] ?? ""), 9, 2);
+			$header_NomeEmpresa			= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 72, 30)));
+			$header_NumeroSantander			= substr((string)($arquivoRetornoAr[0] ?? ""), 0, 3);
+			$header_NomeBanco			= strtoupper(trim(substr((string)($arquivoRetornoAr[0] ?? ""), 102, 30)));
 
 			//Validacao
 			if($header_IdentReg != "0") 			$msg .= "Identificação do Registro inválida ('$header_IdentReg').\n";
@@ -437,7 +437,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 	if($msg == ""){
 		$sql = "BEGIN TRANSACTION ";
 		$ret = SQLexecuteQuery($sql);
-		if(!$ret) $msg = "Erro ao iniciar transação.\n";
+		if(!isset($ret) || !$ret) $msg = "Erro ao iniciar transação.\n";
 	}
 	
 	//detail
@@ -452,87 +452,87 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                 //Criando contador diferenciado para Santander pois trabalha com 2 Linhas por boleto
                 if($bol_banco_defined=="033") {
                     $Incrementador = 2;
-                    $terminador = count($arquivoRetornoAr)-3;
+                    $terminador = (is_countable($arquivoRetornoAr) ? count($arquivoRetornoAr) : 0)-3;
                 }//end if($bol_banco_defined=="033")
                 else {
                     $Incrementador = 1;
-                    $terminador = count($arquivoRetornoAr);
+                    $terminador = (is_countable($arquivoRetornoAr) ? count($arquivoRetornoAr) : 0);
                 }//end else do if($bol_banco_defined=="033")
                 
 		for($i = $Incrementador; $i < $terminador; $i+=$Incrementador) {
 			if($bol_banco_defined=="237") {
 
-				$detalhe_IdentReg			= substr($arquivoRetornoAr[$i], 0, 1);
-				$detalhe_IdentCedCart		= substr($arquivoRetornoAr[$i], 20, 4);
-				$detalhe_IdentCedAg			= substr($arquivoRetornoAr[$i], 24, 5);
-				$detalhe_IdentCedCC			= substr($arquivoRetornoAr[$i], 29, 7);
-				$detalhe_IdentCedCCDV		= substr($arquivoRetornoAr[$i], 36, 1);
-				$detalhe_ContrPart			= substr($arquivoRetornoAr[$i], 37, 25);
-				$detalhe_IdentTitulo		= substr($arquivoRetornoAr[$i], 70, 12);
-				$detalhe_IdentOcorr			= substr($arquivoRetornoAr[$i], 108, 2);
-				$detalhe_DataOcorr			= substr($arquivoRetornoAr[$i], 110, 6);
-				$detalhe_NroDocumento		= substr($arquivoRetornoAr[$i], 116, 10);
-				$detalhe_IdentTituloBanco	= substr($arquivoRetornoAr[$i], 126, 20);
-				$detalhe_DataVencTitulo		= substr($arquivoRetornoAr[$i], 146, 6);
-				$detalhe_ValorTitulo		= substr($arquivoRetornoAr[$i], 152, 13);
-				$detalhe_ValorPago			= substr($arquivoRetornoAr[$i], 253, 13);
-				$detalhe_DataCredito		= substr($arquivoRetornoAr[$i], 295, 6);	// "DDMMYY", Ex:  "100108"
-				$detalhe_MotivosRejeicoes	= substr($arquivoRetornoAr[$i], 318, 10);
-				$detalhe_RegSequencial		= substr($arquivoRetornoAr[$i], 394, 6);
+				$detalhe_IdentReg			= substr((string)($arquivoRetornoAr[$i] ?? ""), 0, 1);
+				$detalhe_IdentCedCart		= substr((string)($arquivoRetornoAr[$i] ?? ""), 20, 4);
+				$detalhe_IdentCedAg			= substr((string)($arquivoRetornoAr[$i] ?? ""), 24, 5);
+				$detalhe_IdentCedCC			= substr((string)($arquivoRetornoAr[$i] ?? ""), 29, 7);
+				$detalhe_IdentCedCCDV		= substr((string)($arquivoRetornoAr[$i] ?? ""), 36, 1);
+				$detalhe_ContrPart			= substr((string)($arquivoRetornoAr[$i] ?? ""), 37, 25);
+				$detalhe_IdentTitulo		= substr((string)($arquivoRetornoAr[$i] ?? ""), 70, 12);
+				$detalhe_IdentOcorr			= substr((string)($arquivoRetornoAr[$i] ?? ""), 108, 2);
+				$detalhe_DataOcorr			= substr((string)($arquivoRetornoAr[$i] ?? ""), 110, 6);
+				$detalhe_NroDocumento		= substr((string)($arquivoRetornoAr[$i] ?? ""), 116, 10);
+				$detalhe_IdentTituloBanco	= substr((string)($arquivoRetornoAr[$i] ?? ""), 126, 20);
+				$detalhe_DataVencTitulo		= substr((string)($arquivoRetornoAr[$i] ?? ""), 146, 6);
+				$detalhe_ValorTitulo		= substr((string)($arquivoRetornoAr[$i] ?? ""), 152, 13);
+				$detalhe_ValorPago			= substr((string)($arquivoRetornoAr[$i] ?? ""), 253, 13);
+				$detalhe_DataCredito		= substr((string)($arquivoRetornoAr[$i] ?? ""), 295, 6);	// "DDMMYY", Ex:  "100108"
+				$detalhe_MotivosRejeicoes	= substr((string)($arquivoRetornoAr[$i] ?? ""), 318, 10);
+				$detalhe_RegSequencial		= substr((string)($arquivoRetornoAr[$i] ?? ""), 394, 6);
 
 			} elseif($bol_banco_defined=="341") {
 
-				$detalhe_Itau_tipo_de_registro		= substr($arquivoRetornoAr[$i],  0,  1);
-				$detalhe_Itau_codigo_de_inscricao	= substr($arquivoRetornoAr[$i],  1,  2);
-				$detalhe_Itau_numero_de_inscricao	= substr($arquivoRetornoAr[$i],  3, 14);
-				$detalhe_Itau_agencia				= substr($arquivoRetornoAr[$i], 17,  4);
-				$detalhe_Itau_zeros					= substr($arquivoRetornoAr[$i], 21,  2);
-				$detalhe_Itau_conta					= substr($arquivoRetornoAr[$i], 23,  5);
-				$detalhe_Itau_dac					= substr($arquivoRetornoAr[$i], 28,  1);
-				$detalhe_Itau_brancos1				= substr($arquivoRetornoAr[$i], 29,  8);
-				$detalhe_Itau_uso_da_empresa		= substr($arquivoRetornoAr[$i], 37, 25);
-				$detalhe_Itau_nosso_numero1			= substr($arquivoRetornoAr[$i], 62,  8);
-				$detalhe_Itau_brancos2				= substr($arquivoRetornoAr[$i], 70, 12);
-				$detalhe_Itau_carteira				= substr($arquivoRetornoAr[$i], 82,  3);
-				$detalhe_Itau_nosso_numero2			= substr($arquivoRetornoAr[$i], 85,  8);
-				$detalhe_Itau_dac_nosso_numero		= substr($arquivoRetornoAr[$i], 93,  1);
-				$detalhe_Itau_brancos3				= substr($arquivoRetornoAr[$i], 94, 13);
-				$detalhe_Itau_carteira				= substr($arquivoRetornoAr[$i],107,  1);
-				$detalhe_Itau_cod_de_ocorrencia		= substr($arquivoRetornoAr[$i],108,  2);
-				$detalhe_Itau_data_de_ocorrencia	= substr($arquivoRetornoAr[$i],110,  6);
-				$detalhe_Itau_no_do_documento		= substr($arquivoRetornoAr[$i],116, 10);
-				$detalhe_Itau_nosso_numero3			= substr($arquivoRetornoAr[$i],126,  8);
-				$detalhe_Itau_brancos4				= substr($arquivoRetornoAr[$i],134, 12);
-				$detalhe_Itau_vencimento			= substr($arquivoRetornoAr[$i],146,  6);
-				$detalhe_Itau_valor_do_titulo		= substr($arquivoRetornoAr[$i],152, 13);
-				$detalhe_Itau_codigo_do_banco		= substr($arquivoRetornoAr[$i],165,  3);
-				$detalhe_Itau_agencia_cobradora		= substr($arquivoRetornoAr[$i],168,  4);
-				$detalhe_Itau_dac_ag_cobradora		= substr($arquivoRetornoAr[$i],172,  1);
-				$detalhe_Itau_especie				= substr($arquivoRetornoAr[$i],173,  2);
-				$detalhe_Itau_tarifa_de_cobranca	= substr($arquivoRetornoAr[$i],175, 13);
-				$detalhe_Itau_brancos5				= substr($arquivoRetornoAr[$i],188, 26);
-				$detalhe_Itau_valor_do_iof			= substr($arquivoRetornoAr[$i],214, 13);
-				$detalhe_Itau_valor_abatimento		= substr($arquivoRetornoAr[$i],227, 13);
-				$detalhe_Itau_descontos				= substr($arquivoRetornoAr[$i],240, 13);
-				$detalhe_Itau_valor_principal		= substr($arquivoRetornoAr[$i],253, 13);	// é o valor (detalhe_Itau_valor_do_titulo - detalhe_Itau_descontos - BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO)
-				$detalhe_Itau_juros_de_mora_multa	= substr($arquivoRetornoAr[$i],266, 13);
-				$detalhe_Itau_outros_creditos		= substr($arquivoRetornoAr[$i],279, 13);
-				$detalhe_Itau_brancos6				= substr($arquivoRetornoAr[$i],292,  3);
-				$detalhe_Itau_data_credito			= substr($arquivoRetornoAr[$i],295,  6);
-				$detalhe_Itau_instrcancelada		= substr($arquivoRetornoAr[$i],301,  4);
-				$detalhe_Itau_brancos7				= substr($arquivoRetornoAr[$i],305,  6);
-				$detalhe_Itau_zeros					= substr($arquivoRetornoAr[$i],311, 13);
-				$detalhe_Itau_nome_do_sacado		= substr($arquivoRetornoAr[$i],324, 30);
-				$detalhe_Itau_brancos8				= substr($arquivoRetornoAr[$i],354, 23);
-				$detalhe_Itau_erros					= substr($arquivoRetornoAr[$i],377,  8);
-				$detalhe_Itau_brancos9				= substr($arquivoRetornoAr[$i],385,  7);
-				$detalhe_Itau_cod_de_liquidacao		= substr($arquivoRetornoAr[$i],392,  2);
-				$detalhe_Itau_numero_sequencial		= substr($arquivoRetornoAr[$i],394,  6);
+				$detalhe_Itau_tipo_de_registro		= substr((string)($arquivoRetornoAr[$i] ?? ""),  0,  1);
+				$detalhe_Itau_codigo_de_inscricao	= substr((string)($arquivoRetornoAr[$i] ?? ""),  1,  2);
+				$detalhe_Itau_numero_de_inscricao	= substr((string)($arquivoRetornoAr[$i] ?? ""),  3, 14);
+				$detalhe_Itau_agencia				= substr((string)($arquivoRetornoAr[$i] ?? ""), 17,  4);
+				$detalhe_Itau_zeros					= substr((string)($arquivoRetornoAr[$i] ?? ""), 21,  2);
+				$detalhe_Itau_conta					= substr((string)($arquivoRetornoAr[$i] ?? ""), 23,  5);
+				$detalhe_Itau_dac					= substr((string)($arquivoRetornoAr[$i] ?? ""), 28,  1);
+				$detalhe_Itau_brancos1				= substr((string)($arquivoRetornoAr[$i] ?? ""), 29,  8);
+				$detalhe_Itau_uso_da_empresa		= substr((string)($arquivoRetornoAr[$i] ?? ""), 37, 25);
+				$detalhe_Itau_nosso_numero1			= substr((string)($arquivoRetornoAr[$i] ?? ""), 62,  8);
+				$detalhe_Itau_brancos2				= substr((string)($arquivoRetornoAr[$i] ?? ""), 70, 12);
+				$detalhe_Itau_carteira				= substr((string)($arquivoRetornoAr[$i] ?? ""), 82,  3);
+				$detalhe_Itau_nosso_numero2			= substr((string)($arquivoRetornoAr[$i] ?? ""), 85,  8);
+				$detalhe_Itau_dac_nosso_numero		= substr((string)($arquivoRetornoAr[$i] ?? ""), 93,  1);
+				$detalhe_Itau_brancos3				= substr((string)($arquivoRetornoAr[$i] ?? ""), 94, 13);
+				$detalhe_Itau_carteira				= substr((string)($arquivoRetornoAr[$i] ?? ""),107,  1);
+				$detalhe_Itau_cod_de_ocorrencia		= substr((string)($arquivoRetornoAr[$i] ?? ""),108,  2);
+				$detalhe_Itau_data_de_ocorrencia	= substr((string)($arquivoRetornoAr[$i] ?? ""),110,  6);
+				$detalhe_Itau_no_do_documento		= substr((string)($arquivoRetornoAr[$i] ?? ""),116, 10);
+				$detalhe_Itau_nosso_numero3			= substr((string)($arquivoRetornoAr[$i] ?? ""),126,  8);
+				$detalhe_Itau_brancos4				= substr((string)($arquivoRetornoAr[$i] ?? ""),134, 12);
+				$detalhe_Itau_vencimento			= substr((string)($arquivoRetornoAr[$i] ?? ""),146,  6);
+				$detalhe_Itau_valor_do_titulo		= substr((string)($arquivoRetornoAr[$i] ?? ""),152, 13);
+				$detalhe_Itau_codigo_do_banco		= substr((string)($arquivoRetornoAr[$i] ?? ""),165,  3);
+				$detalhe_Itau_agencia_cobradora		= substr((string)($arquivoRetornoAr[$i] ?? ""),168,  4);
+				$detalhe_Itau_dac_ag_cobradora		= substr((string)($arquivoRetornoAr[$i] ?? ""),172,  1);
+				$detalhe_Itau_especie				= substr((string)($arquivoRetornoAr[$i] ?? ""),173,  2);
+				$detalhe_Itau_tarifa_de_cobranca	= substr((string)($arquivoRetornoAr[$i] ?? ""),175, 13);
+				$detalhe_Itau_brancos5				= substr((string)($arquivoRetornoAr[$i] ?? ""),188, 26);
+				$detalhe_Itau_valor_do_iof			= substr((string)($arquivoRetornoAr[$i] ?? ""),214, 13);
+				$detalhe_Itau_valor_abatimento		= substr((string)($arquivoRetornoAr[$i] ?? ""),227, 13);
+				$detalhe_Itau_descontos				= substr((string)($arquivoRetornoAr[$i] ?? ""),240, 13);
+				$detalhe_Itau_valor_principal		= substr((string)($arquivoRetornoAr[$i] ?? ""),253, 13);	// é o valor (detalhe_Itau_valor_do_titulo - detalhe_Itau_descontos - BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO)
+				$detalhe_Itau_juros_de_mora_multa	= substr((string)($arquivoRetornoAr[$i] ?? ""),266, 13);
+				$detalhe_Itau_outros_creditos		= substr((string)($arquivoRetornoAr[$i] ?? ""),279, 13);
+				$detalhe_Itau_brancos6				= substr((string)($arquivoRetornoAr[$i] ?? ""),292,  3);
+				$detalhe_Itau_data_credito			= substr((string)($arquivoRetornoAr[$i] ?? ""),295,  6);
+				$detalhe_Itau_instrcancelada		= substr((string)($arquivoRetornoAr[$i] ?? ""),301,  4);
+				$detalhe_Itau_brancos7				= substr((string)($arquivoRetornoAr[$i] ?? ""),305,  6);
+				$detalhe_Itau_zeros					= substr((string)($arquivoRetornoAr[$i] ?? ""),311, 13);
+				$detalhe_Itau_nome_do_sacado		= substr((string)($arquivoRetornoAr[$i] ?? ""),324, 30);
+				$detalhe_Itau_brancos8				= substr((string)($arquivoRetornoAr[$i] ?? ""),354, 23);
+				$detalhe_Itau_erros					= substr((string)($arquivoRetornoAr[$i] ?? ""),377,  8);
+				$detalhe_Itau_brancos9				= substr((string)($arquivoRetornoAr[$i] ?? ""),385,  7);
+				$detalhe_Itau_cod_de_liquidacao		= substr((string)($arquivoRetornoAr[$i] ?? ""),392,  2);
+				$detalhe_Itau_numero_sequencial		= substr((string)($arquivoRetornoAr[$i] ?? ""),394,  6);
 
 				// Pagamentos online tem o campo detalhe_Itau_nosso_numero1 começando com "0"
 				// boletos começam com "1", "2", "3", "4", etc
-				if(substr($detalhe_Itau_nosso_numero1,0,1)=="0") {
-//					echo "Desconsidera linha $detalhe_Itau_nosso_numero1 (".substr($detalhe_Itau_nosso_numero1,0,1).")<br>";
+				if(substr((string)($detalhe_Itau_nosso_numero1 ?? ""),0,1)=="0") {
+//					echo "Desconsidera linha $detalhe_Itau_nosso_numero1 (".substr((string)($detalhe_Itau_nosso_numero1 ?? ""),0,1).")<br>";
 					continue;
 				}
 
@@ -557,28 +557,28 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                 
 			} elseif($bol_banco_defined=="033") {
 
-				$detalhe_IdentReg		= substr($arquivoRetornoAr[$i], 13, 1);
+				$detalhe_IdentReg		= substr((string)($arquivoRetornoAr[$i] ?? ""), 13, 1);
 				if($detalhe_IdentReg == "T") {
                                     $detalhe_IdentCedCart	= "";
-                                    $detalhe_IdentCedAg		= substr($arquivoRetornoAr[$i], 17, 4);
-                                    $detalhe_IdentCedCC		= substr($arquivoRetornoAr[$i], 23, 9);
-                                    $detalhe_IdentCedCCDV	= substr($arquivoRetornoAr[$i], 31, 1);
+                                    $detalhe_IdentCedAg		= substr((string)($arquivoRetornoAr[$i] ?? ""), 17, 4);
+                                    $detalhe_IdentCedCC		= substr((string)($arquivoRetornoAr[$i] ?? ""), 23, 9);
+                                    $detalhe_IdentCedCCDV	= substr((string)($arquivoRetornoAr[$i] ?? ""), 31, 1);
                                     $detalhe_ContrPart		= "";
-                                    $detalhe_IdentTitulo	= substr($arquivoRetornoAr[$i], 40, 13);
+                                    $detalhe_IdentTitulo	= substr((string)($arquivoRetornoAr[$i] ?? ""), 40, 13);
                                     
-                                    $detalhe_IdentOcorr		= substr($arquivoRetornoAr[$i+1], 15, 2);
-                                    $detalhe_DataOcorr		= substr($arquivoRetornoAr[$i+1], 137, 8);
+                                    $detalhe_IdentOcorr		= substr((string)($arquivoRetornoAr[$i+1] ?? ""), 15, 2);
+                                    $detalhe_DataOcorr		= substr((string)($arquivoRetornoAr[$i+1] ?? ""), 137, 8);
                                     
-                                    $detalhe_NroDocumento	= substr($arquivoRetornoAr[$i], 54, 15);
+                                    $detalhe_NroDocumento	= substr((string)($arquivoRetornoAr[$i] ?? ""), 54, 15);
                                     $detalhe_IdentTituloBanco	= "";
-                                    $detalhe_DataVencTitulo	= substr($arquivoRetornoAr[$i], 69, 8);
+                                    $detalhe_DataVencTitulo	= substr((string)($arquivoRetornoAr[$i] ?? ""), 69, 8);
                                     
-                                    $detalhe_ValorTitulo	= substr($arquivoRetornoAr[$i], 77, 15)*1;
-                                    $detalhe_ValorPago		= substr($arquivoRetornoAr[$i+1], 77, 15)*1;
+                                    $detalhe_ValorTitulo	= substr((string)($arquivoRetornoAr[$i] ?? ""), 77, 15)*1;
+                                    $detalhe_ValorPago		= substr((string)($arquivoRetornoAr[$i+1] ?? ""), 77, 15)*1;
                                     
-                                    $detalhe_DataCredito	= substr($arquivoRetornoAr[$i+1], 145, 8);
+                                    $detalhe_DataCredito	= substr((string)($arquivoRetornoAr[$i+1] ?? ""), 145, 8);
                                     $detalhe_MotivosRejeicoes	= "";
-                                    $detalhe_RegSequencial	= substr($arquivoRetornoAr[$i+1], 8, 5)*1;
+                                    $detalhe_RegSequencial	= substr((string)($arquivoRetornoAr[$i+1] ?? ""), 8, 5)*1;
                                     $detalhe_IdentReg   = "1"; //para efeito de continue
                                 }//end if($detalhe_IdentReg == "T")
                                 else {
@@ -621,15 +621,15 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 			unset($detalhe_DataCredito_aux); 		
                         //Se for Santander outro formato de data no arquivo 
 		        if($bol_banco_defined=="033") {
-                            if($detalhe_DataOcorr != "000000" && trim($detalhe_DataOcorr) != "") $detalhe_DataOcorr_aux = substr($detalhe_DataOcorr, 4, 4) . "-" . substr($detalhe_DataOcorr, 2, 2) . "-" . substr($detalhe_DataOcorr, 0, 2);
-                            if($detalhe_DataVencTitulo != "000000" && trim($detalhe_DataVencTitulo) != "") $detalhe_DataVencTitulo_aux = substr($detalhe_DataVencTitulo, 4, 4) . "-" . substr($detalhe_DataVencTitulo, 2, 2) . "-" . substr($detalhe_DataVencTitulo, 0, 2);
-                            if($detalhe_DataCredito != "000000" && trim($detalhe_DataCredito) != "") $detalhe_DataCredito_aux = substr($detalhe_DataCredito, 4, 4) . "-" . substr($detalhe_DataCredito, 2, 2) . "-" . substr($detalhe_DataCredito, 0, 2);
+                            if($detalhe_DataOcorr != "000000" && trim((string)($detalhe_DataOcorr ?? "")) != "") $detalhe_DataOcorr_aux = substr((string)($detalhe_DataOcorr ?? ""), 4, 4) . "-" . substr((string)($detalhe_DataOcorr ?? ""), 2, 2) . "-" . substr((string)($detalhe_DataOcorr ?? ""), 0, 2);
+                            if($detalhe_DataVencTitulo != "000000" && trim((string)($detalhe_DataVencTitulo ?? "")) != "") $detalhe_DataVencTitulo_aux = substr((string)($detalhe_DataVencTitulo ?? ""), 4, 4) . "-" . substr((string)($detalhe_DataVencTitulo ?? ""), 2, 2) . "-" . substr((string)($detalhe_DataVencTitulo ?? ""), 0, 2);
+                            if($detalhe_DataCredito != "000000" && trim((string)($detalhe_DataCredito ?? "")) != "") $detalhe_DataCredito_aux = substr((string)($detalhe_DataCredito ?? ""), 4, 4) . "-" . substr((string)($detalhe_DataCredito ?? ""), 2, 2) . "-" . substr((string)($detalhe_DataCredito ?? ""), 0, 2);
                         }//end if($bol_banco_defined=="033")
                         else {
                             // detalhe_DataOcorr_aux = "20" . "YY" . "MM" . "DD" // "DDMMYY", Ex:  "100108"
-                            if($detalhe_DataOcorr != "000000" && trim($detalhe_DataOcorr) != "") $detalhe_DataOcorr_aux = "20" . substr($detalhe_DataOcorr, 4, 2) . "-" . substr($detalhe_DataOcorr, 2, 2) . "-" . substr($detalhe_DataOcorr, 0, 2);
-                            if($detalhe_DataVencTitulo != "000000" && trim($detalhe_DataVencTitulo) != "") $detalhe_DataVencTitulo_aux = "20" . substr($detalhe_DataVencTitulo, 4, 2) . "-" . substr($detalhe_DataVencTitulo, 2, 2) . "-" . substr($detalhe_DataVencTitulo, 0, 2);
-                            if($detalhe_DataCredito != "000000" && trim($detalhe_DataCredito) != "") $detalhe_DataCredito_aux = "20" . substr($detalhe_DataCredito, 4, 2) . "-" . substr($detalhe_DataCredito, 2, 2) . "-" . substr($detalhe_DataCredito, 0, 2);
+                            if($detalhe_DataOcorr != "000000" && trim((string)($detalhe_DataOcorr ?? "")) != "") $detalhe_DataOcorr_aux = "20" . substr((string)($detalhe_DataOcorr ?? ""), 4, 2) . "-" . substr((string)($detalhe_DataOcorr ?? ""), 2, 2) . "-" . substr((string)($detalhe_DataOcorr ?? ""), 0, 2);
+                            if($detalhe_DataVencTitulo != "000000" && trim((string)($detalhe_DataVencTitulo ?? "")) != "") $detalhe_DataVencTitulo_aux = "20" . substr((string)($detalhe_DataVencTitulo ?? ""), 4, 2) . "-" . substr((string)($detalhe_DataVencTitulo ?? ""), 2, 2) . "-" . substr((string)($detalhe_DataVencTitulo ?? ""), 0, 2);
+                            if($detalhe_DataCredito != "000000" && trim((string)($detalhe_DataCredito ?? "")) != "") $detalhe_DataCredito_aux = "20" . substr((string)($detalhe_DataCredito ?? ""), 4, 2) . "-" . substr((string)($detalhe_DataCredito ?? ""), 2, 2) . "-" . substr((string)($detalhe_DataCredito ?? ""), 0, 2);
 			}//end else do if($bol_banco_defined=="033") 
 
 			$detalhe_ValorTitulo_aux = number_format(intval($detalhe_ValorTitulo)/100, 2, ".","");
@@ -646,8 +646,8 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                     bpb_bol_banco = '$bol_banco_defined';";
 //echo $sql . "<br>";
                             $ret = SQLexecuteQuery($sql);
-                            if(!$ret) $msgFatal = "Erro ao pesquisar boleto pendente ".$bol_banco_defined_nome.": Sequêncial ($detalhe_RegSequencial).\n";
-                            elseif(pg_num_rows($ret) > 0){
+                            if(!isset($ret) || !$ret) $msgFatal = "Erro ao pesquisar boleto pendente ".$bol_banco_defined_nome.": Sequêncial ($detalhe_RegSequencial).\n";
+                            elseif((($ret) ? pg_num_rows($ret) : 0) > 0){
                                     $ret_row = pg_fetch_array($ret);
                                     $bpb_codigo = $ret_row['bpb_codigo'];
                                     $msgNaoFatal_aux = "Registro já inserido anteriormente: Banco('$bol_banco_defined', '$bol_banco_defined_nome'), Carteira($detalhe_IdentCedCart), Agência($detalhe_IdentCedAg), Conta($detalhe_IdentCedCC), Identificação do Título ($detalhe_IdentTitulo), Identificação da Ocorrência ($detalhe_IdentOcorr), Data da Ocorrência ($detalhe_DataOcorr).\n";
@@ -666,10 +666,10 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                             " . SQLaddFields($detalhe_DataCredito_aux, "s") . ",'$detalhe_MotivosRejeicoes', '$bol_banco_defined');";
 //echo $sql . "<br>";
                                     $ret = SQLexecuteQuery($sql);
-                                    if(!$ret) $msgFatal = "Erro ao inserir registro: Sequêncial ($detalhe_RegSequencial).\n";
+                                    if(!isset($ret) || !$ret) $msgFatal = "Erro ao inserir registro: Sequêncial ($detalhe_RegSequencial).\n";
                                     else{
                                             $rs_id = SQLexecuteQuery("select currval('boletos_pendentes_bradesco_bpb_codigo_seq') as last_id");
-                                            if(!$rs_id || pg_num_rows($rs_id) == 0) $msgFatal = "Erro ao obter id do registro: Sequêncial ($detalhe_RegSequencial).\n";
+                                            if(!$rs_id || (($rs_id) ? pg_num_rows($rs_id) : 0) == 0) $msgFatal = "Erro ao obter id do registro: Sequêncial ($detalhe_RegSequencial).\n";
                                             else {
                                                     $rs_id_row = pg_fetch_array($rs_id);
                                                     $bpb_codigo = $rs_id_row['last_id'];
@@ -680,7 +680,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                             if($msgFatal == "" && $msgNaoFatal_aux == ""){
 
                                     //Nosso Numero - Origem
-                                    $origem		= intval(substr($detalhe_IdentTitulo, 0, 1));
+                                    $origem		= intval(substr((string)($detalhe_IdentTitulo ?? ""), 0, 1));
     //echo "<!-- detalhe_IdentTitulo: '".$detalhe_IdentTitulo."' - [".$origem."] -->\n";
     //echo "detalhe_IdentTitulo: '".$detalhe_IdentTitulo."' - [".$origem."] <br>\n";
 
@@ -693,45 +693,45 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                             // detalhe_IdentTitulo:
                                             //		ver geraBoleto(): $cor_ug_id + $cor_codigo
                                             // exemplo: 10005079831P	
-    //					$est_codigo	= intval(substr($detalhe_IdentTitulo, 1, 5));
-                                            $est_codigo	= "";	//intval(substr($detalhe_IdentTitulo, 1, 5));
+    //					$est_codigo	= intval(substr((string)($detalhe_IdentTitulo ?? ""), 1, 5));
+                                            $est_codigo	= "";	//intval(substr((string)($detalhe_IdentTitulo ?? ""), 1, 5));
                                             //	"1000CCCCCCC"
-    //					$cor_codigo	= intval(substr($detalhe_IdentTitulo, 4, 7));
+    //					$cor_codigo	= intval(substr((string)($detalhe_IdentTitulo ?? ""), 4, 7));
 
                                             // para ajustar os boletos de corte com cor_codigo de +5 digitos em 2010-08-22/2010-08-25
-                                            $detalhe_DataOcorr_a = substr($detalhe_DataOcorr,0,2)."-".substr($detalhe_DataOcorr,2,2)."-20".substr($detalhe_DataOcorr,4,2);
+                                            $detalhe_DataOcorr_a = substr((string)($detalhe_DataOcorr ?? ""),0,2)."-".substr((string)($detalhe_DataOcorr ?? ""),2,2)."-20".substr((string)($detalhe_DataOcorr ?? ""),4,2);
                                             $detalhe_DataOcorr_date_a = strtotime($detalhe_DataOcorr_a);
     /*
                                             // processamento temporário para corrigir erro no nosso número: ficou >99999
                                             if(($detalhe_DataOcorr_date_a-strtotime("2010-08-22"))>=0 && ($detalhe_DataOcorr_date_a-strtotime("2010-08-31"))<=0) {
-                                                    if(substr($detalhe_IdentTitulo, 6, 1)=="0") {	
+                                                    if(substr((string)($detalhe_IdentTitulo ?? ""), 6, 1)=="0") {	
                                                             // formato antigo com erro: cor_codigo>99999
                                                             //   01234567890
                                                             //	"1uuuuuCCCCC"
                                                             // passa "01466" -> "101466"
-                                                            $cor_codigo	= intval("1".substr($detalhe_IdentTitulo, 6, 5));
+                                                            $cor_codigo	= intval("1".substr((string)($detalhe_IdentTitulo ?? ""), 6, 5));
                                                     } else {
                                                             // Formato antigo	
                                                             //	"1uuuuuCCCCC"
                                                             // deixa "99899" -> "99899"
-                                                            $cor_codigo	= intval(substr($detalhe_IdentTitulo, 6, 5));
+                                                            $cor_codigo	= intval(substr((string)($detalhe_IdentTitulo ?? ""), 6, 5));
                                                     }
                                             } else {
                                                     // Novo formato de "Nosso numero" no boleto
                                                     //	"1000CCCCCCC"
-                                                    $cor_codigo	= intval(substr($detalhe_IdentTitulo, 3, 8));
+                                                    $cor_codigo	= intval(substr((string)($detalhe_IdentTitulo ?? ""), 3, 8));
                                             }
     */
                                             // Novo formato de "Nosso numero" no boleto
                                             //	"1000CCCCCCC"
-                                            $cor_codigo	= intval(substr($detalhe_IdentTitulo, 3, 8));
+                                            $cor_codigo	= intval(substr((string)($detalhe_IdentTitulo ?? ""), 3, 8));
 
 
                                             $sql = "select cor_bbc_boleto_codigo from cortes where cor_codigo = $cor_codigo";
     //echo $sql . "<br>";
                                             $ret = SQLexecuteQuery($sql);
-                                            if(!$ret) $msgFatal = "Erro ao pesquisar codigo do boleto no corte: Corte ($cor_codigo).\n";
-                                            elseif(pg_num_rows($ret) == 0) $msgFatal = "Nenhum boleto encontrado para o corte ($cor_codigo) data lida: $detalhe_DataOcorr.\n";
+                                            if(!isset($ret) || !$ret) $msgFatal = "Erro ao pesquisar codigo do boleto no corte: Corte ($cor_codigo).\n";
+                                            elseif((($ret) ? pg_num_rows($ret) : 0) == 0) $msgFatal = "Nenhum boleto encontrado para o corte ($cor_codigo) data lida: $detalhe_DataOcorr.\n";
                                             else {
                                                     $ret_row = pg_fetch_array($ret);
                                                     $cor_bbc_boleto_codigo = $ret_row['cor_bbc_boleto_codigo'];
@@ -748,7 +748,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                                             where bbc_boleto_codigo = $cor_bbc_boleto_codigo";
     //echo $sql . "<br>";
                                                             $ret = SQLexecuteQuery($sql);
-                                                            if(!$ret) $msgFatal = "Erro ao atualizar status REJEITADO do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
+                                                            if(!isset($ret) || !$ret) $msgFatal = "Erro ao atualizar status REJEITADO do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
                                                             else $msgNaoFatal_aux = "Boleto REJEITADO: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
 
                                                     //Entrada Confirmada
@@ -759,7 +759,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                                             where bbc_boleto_codigo = $cor_bbc_boleto_codigo";
     //echo $sql . "<br>";
                                                             $ret = SQLexecuteQuery($sql);
-                                                            if(!$ret) $msgFatal = "Erro ao atualizar status ACEITO do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
+                                                            if(!isset($ret) || !$ret) $msgFatal = "Erro ao atualizar status ACEITO do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
                                                             else $msgNaoFatal_aux = "Boleto com ENTRADA CONFIRMADA: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
 
                                                     //Título Liquidado
@@ -772,7 +772,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                                             where bbc_boleto_codigo = $cor_bbc_boleto_codigo";
     //echo $sql . "<br>";
                                                             $ret = SQLexecuteQuery($sql);
-                                                            if(!$ret) $msgFatal = "Erro ao atualizar status CONCILIADO do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
+                                                            if(!isset($ret) || !$ret) $msgFatal = "Erro ao atualizar status CONCILIADO do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
                                                             else {
                                                                     $msgNaoFatal_aux = "Boleto LIQUIDADO: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo).\n";
                                                                     if($detalhe_ValorTitulo_aux != $detalhe_ValorPago_aux) $msgNaoFatal_aux .= "Valor Pago difere do valor do boleto: Código ($cor_bbc_boleto_codigo), Corte ($cor_codigo), Valor (" . number_format($detalhe_ValorTitulo_aux, 2, ",", ".") . "), Valor Pago (" . number_format($detalhe_ValorPago_aux, 2, ",", ".") . ").\n";
@@ -802,7 +802,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                     $sql .= " values (" . $bol_valor . ",'" . $data . "','" . $bol_banco . "','" . $bol_documento . "','" . date('Y-m-d H:i:s') . "');";
                                                     //echo $sql . "<br>";	
                                                     $ret = SQLexecuteQuery($sql);
-                                                    if(!$ret) $msgFatal = "Erro ao inserir boleto Money: Sequêncial ($detalhe_RegSequencial).\n";
+                                                    if(!isset($ret) || !$ret) $msgFatal = "Erro ao inserir boleto Money: Sequêncial ($detalhe_RegSequencial).\n";
                                                     else $msgNaoFatal_aux = "Boleto Money inserido: $detalhe_IdentTitulo.\n";
                                             }
                                     }				
@@ -821,7 +821,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                     $sql .= " values (" . $bol_valor . ",'" . $data . "','" . $bol_banco . "','" . $bol_documento . "','" . date('Y-m-d H:i:s') . "')";
                                                     //echo $sql . "<br>";
                                                     $ret = SQLexecuteQuery($sql);
-                                                    if(!$ret) $msgFatal = "Erro ao inserir boleto Express Money: Sequêncial ($detalhe_RegSequencial).\n";
+                                                    if(!isset($ret) || !$ret) $msgFatal = "Erro ao inserir boleto Express Money: Sequêncial ($detalhe_RegSequencial).\n";
                                                     else $msgNaoFatal_aux = "Boleto Express Money inserido: $detalhe_IdentTitulo.\n";
                                             }
                                     }				
@@ -840,7 +840,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                     $sql .= " values (" . $bol_valor . ",'" . $data . "','" . $bol_banco . "','" . $bol_documento . "','" . date('Y-m-d H:i:s') . "')";
                                                     //echo $sql . "<br>";
                                                     $ret = SQLexecuteQuery($sql);
-                                                    if(!$ret) $msgFatal = "Erro ao inserir boleto PDV Pré: Sequêncial ($detalhe_RegSequencial).\n";
+                                                    if(!isset($ret) || !$ret) $msgFatal = "Erro ao inserir boleto PDV Pré: Sequêncial ($detalhe_RegSequencial).\n";
                                                     else $msgNaoFatal_aux = "Boleto PDV Pré inserido: $detalhe_IdentTitulo.\n";
                                             }
                                     }				
@@ -859,7 +859,7 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
                                                     $sql .= " values (" . $bol_valor . ",'" . $data . "','" . $bol_banco . "','" . $bol_documento . "','" . date('Y-m-d H:i:s') . "')";
                                             //echo $sql . "<br>";
                                                     $ret = SQLexecuteQuery($sql);
-                                                    if(!$ret) $msgFatal = "Erro ao inserir boleto Money Deposito em Saldo: Sequêncial ($detalhe_RegSequencial).\n";
+                                                    if(!isset($ret) || !$ret) $msgFatal = "Erro ao inserir boleto Money Deposito em Saldo: Sequêncial ($detalhe_RegSequencial).\n";
                                                     else $msgNaoFatal_aux = "Boleto Money Deposito em Saldo inserido: $detalhe_IdentTitulo.\n";
                                             }
                                     }				
@@ -880,11 +880,11 @@ function processaBoleto_Banco($bol_banco_defined, $arquivoRetornoAr, $fileTemp){
 	if($msg == ""){
 		$sql = "COMMIT TRANSACTION ";
 		$ret = SQLexecuteQuery($sql);
-		if(!$ret) $msg .= "Erro ao comitar transação.\n";
+		if(!isset($ret) || !$ret) $msg .= "Erro ao comitar transação.\n";
 	} else {
 		$sql = "ROLLBACK TRANSACTION ";
 		$ret = SQLexecuteQuery($sql);
-		if(!$ret) $msg .= "Erro ao dar rollback na transação.\n";
+		if(!isset($ret) || !$ret) $msg .= "Erro ao dar rollback na transação.\n";
 	}
 	
 	if($msgFatal != "")	return $msg . $msgFatal . "Arquivo não foi inserido.\n";
@@ -898,19 +898,19 @@ function criaDiretorio($folder){
 
 	$folderAr = preg_split("/\//", $folder);
 	
-	if(trim($folder) == "") $msg = "Caminho vázio.\n";
-	if(count($folderAr) == 0) $msg = "Caminho inválido.\n";
+	if(trim((string)($folder ?? "")) == "") $msg = "Caminho vázio.\n";
+	if((is_countable($folderAr) ? count($folderAr) : 0) == 0) $msg = "Caminho inválido.\n";
 	
 	
 	if($msg == ""){
 		$fullPath = "";
-		for($i=0; $i < count($folderAr); $i++){
+		for($i=0; $i < (is_countable($folderAr) ? count($folderAr) : 0); $i++){
 			$level = $folderAr[$i];
 //echo "level: ".$level."<br>";
 			// Não faz o teste para as primeiras pastas 
 			if(($level!="backoffice") && ($level!="offweb") && ($level!="corte") && ($level!="retornos") ) {
-				if(trim($level) == "" && $i==0) $fullPath .= "/";
-				elseif(trim($level) != ""){
+				if(trim((string)($level ?? "")) == "" && $i==0) $fullPath .= "/";
+				elseif(trim((string)($level ?? "")) != ""){
 					$fullPath .= "$level/";
 //echo "&nbsp;&nbsp;fullPath: ".$fullPath."<br>";
 					if(!is_dir($fullPath)){ 
@@ -932,10 +932,12 @@ function criaDiretorio($folder){
 }
 
 function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro = '') {
+	$arquivoAr = array();
+	$filtro = (string)($filtro ?? "");
 
 	if($filtro != ''){
-		if(strpos($filtro, ';') != strlen($filtro)) $filtro .= ';';
-		$filtro = explode(';', $filtro);
+		if(strpos($filtro, ';') != strlen((string)($filtro ?? ""))) $filtro .= ';';
+		$filtro = explode(';', (string)($filtro ?? ""));
 	}
 	if(is_dir($folder)){
 		if ($handle = opendir($folder)) {
@@ -944,7 +946,7 @@ function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro = '')
 			   if ($file != '.' && $file != '..') {
 				    $sdate = " (".date("d/m/Y H:i:s", filemtime($folder.$file)).")";
 					if($filtro != ''){
-						for($j = 0; $j < count($filtro) -1; $j++){
+						for($j = 0; $j < (is_countable($filtro) ? count($filtro) : 0) -1; $j++){
 							if(strpos(strtolower($file), strtolower($filtro[$j])) !== false){
 								if($ordem == 'nome') $arquivoAr[strtolower($file)] = $file.$sdate;
 								if($ordem == 'data') $arquivoAr[date("YmdHis", filemtime($folder.$file))] = $file.$sdate;
@@ -959,7 +961,7 @@ function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro = '')
 			closedir($handle);
 
 			//Ordena os arquivos
-			if (count($arquivoAr) != 0) {
+			if ((is_countable($arquivoAr) ? count($arquivoAr) : 0) != 0) {
 				if($direcao == 'asc') ksort($arquivoAr);
 				if($direcao == 'desc') krsort($arquivoAr);
 			}
@@ -967,6 +969,8 @@ function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro = '')
 			return $arquivoAr;
 		}
 	}
+
+	return $arquivoAr;
 }
 
 function gravaLog($file, $mensagem){
@@ -1031,7 +1035,7 @@ function leLog($leLogCompleto){
 				if($leLogCompleto){
 					$buffer .= $buffer_aux;
 				} else {
-					if(trim($buffer_aux) == trim($logDelimitador)){
+					if(trim((string)($buffer_aux ?? "")) == trim((string)($logDelimitador ?? ""))){
 						break;
 					} else {
 						$buffer .= $buffer_aux;

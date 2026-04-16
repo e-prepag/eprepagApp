@@ -6,11 +6,16 @@ require_once $raiz_do_projeto."includes/gamer/constantesPinEpp.php";
 
 $acao	= isset($_REQUEST['acao']) ? $_REQUEST['acao'] : 'listar';
 $msg	= "";
+$opr_codigo = $_REQUEST['opr_codigo'] ?? null;
+$pcd_id_distribuidor = $_REQUEST['pcd_id_distribuidor'] ?? null;
+$pcd_formato = $_REQUEST['pcd_formato'] ?? null;
+$pcd_comissao = $_REQUEST['pcd_comissao'] ?? null;
+$quantidade_itens = $_REQUEST['quantidade_itens'] ?? 0;
 
 if($acao == 'inserir') {
 	$sql = "select * from pins_card_distribuidoras where opr_codigo = ".$opr_codigo." and pcd_id_distribuidor = ".$pcd_id_distribuidor.";";
         $rs_distribuidoras = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_distribuidoras) < 1) {
+        if((($rs_distribuidoras) ? pg_num_rows($rs_distribuidoras) : 0) < 1) {
                 
                 $sql = "INSERT INTO pins_card_distribuidoras (
                                                                 opr_codigo,
@@ -24,12 +29,12 @@ if($acao == 'inserir') {
                                                                 ".$pcd_comissao.");";
                 //echo $sql."<br>";//die();
                 $rs_distribuidoras = SQLexecuteQuery($sql);
-                if(!$rs_distribuidoras) {
+                if(!isset($rs_distribuidoras) || !$rs_distribuidoras) {
                         $msg .= "Erro ao salvar informações da Distribuidora. ($sql)<br>";
                 }
                 else {
                         for ( $x = 1; $x <= $quantidade_itens ; $x++ ){
-                            $valor = $_POST["valor$x"];
+                            $valor = $_POST["valor$x"] ?? "";
                             if(!empty($valor)) {
                                 $sql = "insert into pins_card_distribuidoras_valores (
                                                        opr_codigo, 
@@ -42,14 +47,14 @@ if($acao == 'inserir') {
                                                        $valor);";
                                 //echo $sql."<br>";
                                 $rs_distribuidoras_valor = SQLexecuteQuery($sql);
-                                if(!$rs_distribuidoras_valor) {
+                                if(!isset($rs_distribuidoras_valor) || !$rs_distribuidoras_valor) {
                                        $msg .= "Erro ao salvar as informacoes de Valores de Cartões para a Distribuidora. ($sql)<br>";
                                 }
 
                             }//end if(!empty($valor))
                         }//end for
-                }//end else do if(!$rs_distribuidoras)
-        }//end if(pg_num_rows($rs_distribuidoras) < 1)
+                }//end else do if(!isset($rs_distribuidoras) || !$rs_distribuidoras)
+        }//end if((($rs_distribuidoras) ? pg_num_rows($rs_distribuidoras) : 0) < 1)
         else $msg .= "Já existe um cadastro para este Publisher [".$opr_codigo."] e este Distribuidor [".$pcd_id_distribuidor."].<br>";
 
 	$acao = 'listar';
@@ -64,7 +69,7 @@ if($acao == 'atualizar') {
 
         //echo $sql."<br>";die();
 	$rs_distribuidoras = SQLexecuteQuery($sql);
-	if(!$rs_distribuidoras) {
+	if(!isset($rs_distribuidoras) || !$rs_distribuidoras) {
 		$msg .= "Erro ao atualizar informações da Distribuidora. ($sql)<br>";
 	}
 	else {
@@ -74,7 +79,7 @@ if($acao == 'atualizar') {
                 //echo $sql."<br>";
                 $rs_distribuidoras_valor = SQLexecuteQuery($sql);
                 for ( $x = 1; $x <= $quantidade_itens ; $x++ ){
-                    $valor = $_POST["valor$x"];
+                    $valor = $_POST["valor$x"] ?? "";
                     if(!empty($valor)) {
                         $sql = "insert into pins_card_distribuidoras_valores (
                                                opr_codigo, 
@@ -87,13 +92,13 @@ if($acao == 'atualizar') {
                                                $valor);";
                         //echo $sql."<br>";
                         $rs_distribuidoras_valor = SQLexecuteQuery($sql);
-                        if(!$rs_distribuidoras_valor) {
+                        if(!isset($rs_distribuidoras_valor) || !$rs_distribuidoras_valor) {
                                $msg .= "Erro ao atualizar os valores de Cartões para a Distribuidora. ($sql)<br>";
                         }
 
                     }//end if(!empty($valor))
                 }//end for
-	}//end else do if(!$rs_distribuidoras)
+	}//end else do if(!isset($rs_distribuidoras) || !$rs_distribuidoras)
         $acao = 'listar';
 }
 
@@ -109,7 +114,7 @@ if($acao == 'editar') {
 		$pcd_id_distribuidor 	= $rs_distribuidoras_row['pcd_id_distribuidor'];
 		$pcd_formato		= $rs_distribuidoras_row['pcd_formato'];
 		$pcd_comissao		= $rs_distribuidoras_row['pcd_comissao'];
-		if (pg_num_rows($rs_distribuidoras) > 0) {
+		if ((($rs_distribuidoras) ? pg_num_rows($rs_distribuidoras) : 0) > 0) {
                         $sql = "select * from pins_card_distribuidoras_valores where opr_codigo = ".$opr_codigo." and pcd_id_distribuidor = ".$pcd_id_distribuidor." ORDER BY pcdv_valor;";
                         //echo $sql."<br>";die();
                         $rs_distribuidoras = SQLexecuteQuery($sql);
@@ -119,7 +124,7 @@ if($acao == 'editar') {
                             $counter++;
                         }//end while
 			include 'operadoras_cartao_edt.php';
-                }//end if (pg_num_rows($rs_distribuidoras) > 0)
+                }//end if ((($rs_distribuidoras) ? pg_num_rows($rs_distribuidoras) : 0) > 0)
 		else {
 			$acao = 'listar';
                 }//end else

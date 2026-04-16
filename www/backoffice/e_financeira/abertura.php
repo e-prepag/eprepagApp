@@ -9,7 +9,7 @@ $tipo = $_POST['tipo'] ?? '';
 
 $hoje = new DateTime('today');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
     if ($tipo === 'semestre') {
 

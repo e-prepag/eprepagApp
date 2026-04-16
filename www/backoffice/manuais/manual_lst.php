@@ -93,7 +93,7 @@ $rs = SQLexecuteQuery($sql);
 </div>
 <div class="row">
     <div class="col-md-12 top10 txt-preto">
-        <form id="form1" name="form1" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <form id="form1" name="form1" method="post" action="<?php echo ($_SERVER['PHP_SELF'] ?? ""); ?>">
             <div class="row">
                 <div class="col-md-5 text-center">
                     <label for="">Código do Manual: </label>

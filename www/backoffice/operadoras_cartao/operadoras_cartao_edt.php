@@ -91,7 +91,7 @@ function alltrim(sStr){
     </ol>
 </div>
 <div class="col-md-12">
-    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" name="frmPreCadastro" id="frmPreCadastro" onsubmit="return validaUsuario();">
+    <form method="post" action="<?php echo ($_SERVER['PHP_SELF'] ?? ""); ?>" name="frmPreCadastro" id="frmPreCadastro" onsubmit="return validaUsuario();">
     <input type="hidden" name="acao" id="acao" value="<?php echo $acao; ?>" />
         <fieldset>
             <legend>Distribuidora de Cartões</legend>
@@ -120,13 +120,13 @@ function alltrim(sStr){
                         else {
                             $sql = "select opr_codigo, opr_nome from operadoras where opr_emite_cartao_conosco=1 and opr_codigo = ".$opr_codigo." ;";
                             $rs_operadoras = SQLexecuteQuery($sql);
-                            if(pg_num_rows($rs_operadoras) == 1) {
+                            if((($rs_operadoras) ? pg_num_rows($rs_operadoras) : 0) == 1) {
                                 $rs_operadoras_row = pg_fetch_array($rs_operadoras);
                                 echo $rs_operadoras_row['opr_nome'];
-                            }//end if(pg_num_rows($rs_operadoras) == 1)
+                            }//end if((($rs_operadoras) ? pg_num_rows($rs_operadoras) : 0) == 1)
                             else {
                                 echo "ATENÇÃO: Nenhum Publisher possui estes ID, ou mais de um Publisher póssui o mesmo ID.";
-                            }//end else do if(pg_num_rows($rs_operadoras) == 1)
+                            }//end else do if((($rs_operadoras) ? pg_num_rows($rs_operadoras) : 0) == 1)
                         ?>
                             <input name="opr_codigo" type="hidden" id="opr_codigo" value="<?php echo $opr_codigo; ?>"/>
                         <?php

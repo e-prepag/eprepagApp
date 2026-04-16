@@ -11,7 +11,7 @@ $tem_movimentacoes = $_POST['tem_movimentacoes'] ?? 1;
 
 $hoje = new DateTime('today');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
     if ($tipo === 'semestre') {
 

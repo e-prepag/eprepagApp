@@ -9,7 +9,7 @@
 
 	//Valida codigo do boleto
 	if($msg == ""){
-		if(!$bbc_boleto_codigo || trim($bbc_boleto_codigo) == "" || !is_numeric($bbc_boleto_codigo)) $msg = "Código do boleto inválido.\n";
+		if(!$bbc_boleto_codigo || trim((string)($bbc_boleto_codigo ?? "")) == "" || !is_numeric($bbc_boleto_codigo)) $msg = "Código do boleto inválido.\n";
 	}
 
 	//Busca dados do boleto
@@ -17,8 +17,8 @@
 		$sql = "select * from boleto_bancario_cortes bbc
 				where bbc.bbc_boleto_codigo = $bbc_boleto_codigo";
 		$rs_boleto = SQLexecuteQuery($sql);
-		if(!$rs_boleto) $msg = "Erro ao buscar boleto.\n";
-		elseif(pg_num_rows($rs_boleto) == 0) $msg = "Nenhum boleto encontrado.\n";
+		if(!isset($rs_boleto) || !$rs_boleto) $msg = "Erro ao buscar boleto.\n";
+		elseif((($rs_boleto) ? pg_num_rows($rs_boleto) : 0) == 0) $msg = "Nenhum boleto encontrado.\n";
 		else {
 			$rs_boleto_row = pg_fetch_array($rs_boleto);
   			$bbc_bco_codigo = $rs_boleto_row['bbc_bco_codigo'];
@@ -26,7 +26,7 @@
 			//Validacoes
 			//-----------------------------------------------------------------------------------------------------
 			//Banco
-			if(!$bbc_bco_codigo || trim($bbc_bco_codigo) == "" || !is_numeric($bbc_bco_codigo)) $msg = "Código do banco inválido.\n";
+			if(!$bbc_bco_codigo || trim((string)($bbc_bco_codigo ?? "")) == "" || !is_numeric($bbc_bco_codigo)) $msg = "Código do banco inválido.\n";
 		}
 	}
 

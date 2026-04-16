@@ -66,7 +66,7 @@ function leLog($leLogCompleto){
 				if($leLogCompleto){
 					$buffer .= $buffer_aux;
 				} else {
-					if(trim($buffer_aux) == trim($logDelimitador)){
+					if(trim((string)($buffer_aux ?? "")) == trim((string)($logDelimitador ?? ""))){
 						break;
 					} else {
 						$buffer .= $buffer_aux;
@@ -84,28 +84,28 @@ function leLog($leLogCompleto){
 	
 		$msg = "";
 		$bol_banco = "104";
-		$cargaAr = explode("\n", $carga);
+		$cargaAr = explode("\n", (string)($carga ?? ""));
 
-		if(count($cargaAr) > 0){
+		if((is_countable($cargaAr) ? count($cargaAr) : 0) > 0){
 
 			//Inicia transacao
 			if($msg == ""){
 				$sql = "BEGIN TRANSACTION ";
 				$ret = pg_exec($GLOBALS['connid'], $sql);
-				if(!$ret) $msg = "Erro ao iniciar transação.\n";
+				if(!isset($ret) || !$ret) $msg = "Erro ao iniciar transação.\n";
 			}
 
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
 				//verifica se eh uma linha valida
-				if(!is_numeric(substr($cargaAr[$i], 0, 4))) continue;
+				if(!is_numeric(substr((string)($cargaAr[$i] ?? ""), 0, 4))) continue;
 				
 				//valida documento
-  				$bol_documento = substr($cargaAr[$i], 0, 16);
-				if(trim($bol_documento) == "") $msg = "Documento vázio: " . $cargaAr[$i] . ".\n";
+  				$bol_documento = substr((string)($cargaAr[$i] ?? ""), 0, 16);
+				if(trim((string)($bol_documento ?? "")) == "") $msg = "Documento vázio: " . $cargaAr[$i] . ".\n";
 				
 				//valida valor
-  				$bol_valor = substr($cargaAr[$i], 20, 12) . "." . substr($cargaAr[$i], 33, 2);
+  				$bol_valor = substr((string)($cargaAr[$i] ?? ""), 20, 12) . "." . substr((string)($cargaAr[$i] ?? ""), 33, 2);
 				if(!is_numeric($bol_valor)) $msg = "Valor inválido: " . $cargaAr[$i] . ".\n";
 				else $bol_valor = 0 + $bol_valor;
 				
@@ -116,7 +116,7 @@ function leLog($leLogCompleto){
 				$sql .= "values(" . $bol_valor . ",'" . $data . "'," . $bol_banco . ",'" . $bol_documento . "','" . date('Y-m-d H:i:s') . "')";
 				//echo $sql . "<br>";
 				$ret = pg_exec($GLOBALS['connid'], $sql);
-				if(!$ret){
+				if(!isset($ret) || !$ret){
 					$msg = "Erro ao inserir registro: " . $cargaAr[$i] . ".\n";
 					break;
 				}
@@ -127,11 +127,11 @@ function leLog($leLogCompleto){
 			if($msg == ""){
 				$sql = "COMMIT TRANSACTION ";
 				$ret = pg_exec($GLOBALS['connid'], $sql);
-				if(!$ret) $msg = "Erro ao comitar transação.\n";
+				if(!isset($ret) || !$ret) $msg = "Erro ao comitar transação.\n";
 			} else {
 				$sql = "ROLLBACK TRANSACTION ";
 				$ret = pg_exec($GLOBALS['connid'], $sql);
-				if(!$ret) $msg = "Erro ao dar rollback na transação.\n";
+				if(!isset($ret) || !$ret) $msg = "Erro ao dar rollback na transação.\n";
 			}
 			
 		}
@@ -166,8 +166,8 @@ if(false) $folder = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao\\backoffice
 	
 		//arquivo
 		if($msg == ""){
-			$fileSource = $_FILES['arquivo']['tmp_name']; 
-			$fileDest = $folder . $_FILES['arquivo']['name']; 
+			$fileSource = $_FILES['arquivo']['tmp_name'] ?? ""; 
+			$fileDest = $folder . ($_FILES['arquivo']['name'] ?? ""); 
 		
 			if (($fileSource == 'none') || ($fileSource == '' )) { 
 				$msg = 'Nenhum arquivo fornecido.\n';
@@ -184,7 +184,7 @@ if(false) $folder = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao\\backoffice
 	
 		//Banco
 		if($msg == ""){
-			if(trim($bco_id) == "")
+			if(trim((string)($bco_id ?? "")) == "")
 				$msg = "O banco deve ser selecionado.\n";
 			else if(!is_numeric($bco_id))
 				$msg = "Banco inválido.\n";
@@ -214,7 +214,7 @@ if(false) $folder = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao\\backoffice
 			}
 			
 			if($msg == "") $msg = "Boletos inseridos com sucesso.";
-			$msg .= gravaLogBoleto($_FILES['arquivo']['name'], "Banco: '" . $bco_id. "' - Data: '" . $tf_data_dia . "/" . $tf_data_mes . "/" . $tf_data_ano . "'\n" . $msg);
+			$msg .= gravaLogBoleto($_FILES['arquivo']['name'] ?? "", "Banco: '" . $bco_id. "' - Data: '" . $tf_data_dia . "/" . $tf_data_mes . "/" . $tf_data_ano . "'\n" . $msg);
 			
 		}
 	}

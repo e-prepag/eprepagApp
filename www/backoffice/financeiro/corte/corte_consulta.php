@@ -47,7 +47,7 @@ if($msg == ""){
 	if($msg == ""){
 		$sql = "select * from dist_usuarios_games ug where ug.ug_id = " . $usuario_id . " ";
 		$rs_usuario = SQLexecuteQuery($sql);
-		if(!$rs_usuario) $msg = "Erro ao buscar usuário.\n";
+		if(!isset($rs_usuario) || !$rs_usuario) $msg = "Erro ao buscar usuário.\n";
 	}
 	
 	//Busca dados de corte
@@ -60,7 +60,7 @@ if($msg == ""){
                 //echo $sql . "<br>"; die();
 
 		$rs_cortes = SQLexecuteQuery($sql);
-		if(!$rs_cortes) $msg = "Erro ao buscar cortes.\n";
+		if(!isset($rs_cortes) || !$rs_cortes) $msg = "Erro ao buscar cortes.\n";
 	}
 }
 $msg = $msgUsuario . $msg;
@@ -105,7 +105,7 @@ $msg = $msgUsuario . $msg;
     <td align="center" valign="top" bgcolor="#FFFFFF" width="100%">
           <?php if($msg != ""){?><tr><td colspan="5" align="center"><font color="#FF0000" size="1" face="Arial, Helvetica, sans-serif"><?php echo $msg?></font></td></tr><?php }?>
 		<br>
-<?php if($rs_usuario && pg_num_rows($rs_usuario) > 0){
+<?php if($rs_usuario && (($rs_usuario) ? pg_num_rows($rs_usuario) : 0) > 0){
 		$rs_usuario_row = pg_fetch_array($rs_usuario);
 ?>
 
@@ -184,9 +184,9 @@ $cor3 = "#E5E5Eb";
 				<?php if($cor_status == $GLOBALS['CORTE_STATUS']['ABERTO']){?>
 				<!--a onclick="return confirm('Confirma a conciliação manual deste corte ?\nO boleto associado a este corte será cancelado.');" href="corte_consulta.php?acao=conciliar_manual&corte_id=<?php echo $rs_cortes_row['cor_codigo']?><?=$varsel?>"-->
 				<a href="#" onclick="return canciliaManual(<?php echo $rs_cortes_row['cor_codigo']?>);">
-				<font class="texto"><?php echo substr($cor_status_descricao, 0, strpos($cor_status_descricao, ".")) ?></font>
+				<font class="texto"><?php echo substr((string)($cor_status_descricao ?? ""), 0, strpos($cor_status_descricao, ".")) ?></font>
 				</a>
-				<?php }else{ ?><?php echo substr($cor_status_descricao, 0, strpos($cor_status_descricao, ".")) ?><?php } ?>
+				<?php }else{ ?><?php echo substr((string)($cor_status_descricao ?? ""), 0, strpos($cor_status_descricao, ".")) ?><?php } ?>
 				
 			</td>
 			<td align="center">

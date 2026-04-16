@@ -14,19 +14,19 @@
 	$varsel .= "&tf_v_data_inclusao_ini=$tf_v_data_inclusao_ini&tf_v_data_inclusao_fim=$tf_v_data_inclusao_fim";
 
 	//paginacao
-	$p = $_REQUEST['p'];
-	if(!$p) $p = 1;
+	$p = $_REQUEST['p'] ?? 1;
+	if(!isset($p) || !$p) $p = 1;
 	$registros = 50;
 	$registros_total = 0;
 
-	if(!$ncamp)    $ncamp       = 'vb_data_venda';
-	if(!$inicial)  $inicial     = 0;
-	if(!$range)    $range       = 1;
-	if(!$ordem)    $ordem       = 0;
+	if(!isset($ncamp) || !$ncamp)    $ncamp       = 'vb_data_venda';
+	if(!isset($inicial) || !$inicial)  $inicial     = 0;
+	if(!isset($range) || !$range)    $range       = 1;
+	if(!isset($ordem) || !$ordem)    $ordem       = 0;
 //	if($BtnSearch) $inicial     = 0;
 //	if($BtnSearch) $range       = 1;
 //	if($BtnSearch) $total_table = 0;
-	if($BtnSearch=="Buscar") {
+	if(isset($BtnSearch) && $BtnSearch=="Buscar") {
 		$inicial     = 0;
 		$range       = 1;
 		$total_table = 0;
@@ -34,8 +34,8 @@
 
 	
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 100;	//$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -66,7 +66,7 @@
 //echo $sql;
 
 	$res_count = pg_query($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 	$sql .= " order by ".$ncamp;
 	
@@ -203,8 +203,8 @@ function GP_popupConfirmMsg(msg) { //v1.0
 				{
 					$valor = 1;
 					$id_prot = $pgrow['vb_tr_id'];
-					if(strlen($id_prot)<5) {
-						$id_prot = str_pad($id_prot, (5-strlen($id_prot)),"0",STR_PAD_RIGHT);
+					if(strlen((string)($id_prot ?? ""))<5) {
+						$id_prot = str_pad($id_prot, (5-strlen((string)($id_prot ?? ""))),"0",STR_PAD_RIGHT);
 					}
 					$venda_color = (($pgrow['vb_comissao_lan']>0)?"#FF0000":"#666666");
 			?>
@@ -225,7 +225,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
         <?php
 					if ($cor1 == $cor2) {$cor1 = $cor3;} else {$cor1 = $cor2;} 
 				}
-				if (!$valor)
+				if(!isset($valor) || !$valor)
 				{
 			?>
         <tr bgcolor="#f5f5fb"> 

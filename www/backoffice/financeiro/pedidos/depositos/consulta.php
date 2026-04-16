@@ -6,12 +6,12 @@
 <?php
 	$time_start = getmicrotime();
 
-	if(!$tf_data_inic) $tf_data_inic = date('d/m/Y');
-	if(!$tf_data_final) $tf_data_final = date('d/m/Y');
-	if(!$ncamp) $ncamp = 'dep_data';
-	if(!$inicial)  $inicial     = 0;
-	if(!$range)    $range       = 1;
-	if(!$ordem)    $ordem       = 0;
+	if(!isset($tf_data_inic) || !$tf_data_inic) $tf_data_inic = date('d/m/Y');
+	if(!isset($tf_data_final) || !$tf_data_final) $tf_data_final = date('d/m/Y');
+	if(!isset($ncamp) || !$ncamp) $ncamp = 'dep_data';
+	if(!isset($inicial) || !$inicial)  $inicial     = 0;
+	if(!isset($range) || !$range)    $range       = 1;
+	if(!isset($ordem) || !$ordem)    $ordem       = 0;
 //	if($BtnSearch) $inicial     = 0;
 //	if($BtnSearch) $range       = 1;
 //	if($BtnSearch) $total_table = 0;
@@ -23,8 +23,8 @@
 
 	
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = $qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -37,7 +37,7 @@
 	$sql .= "and dep_aprovado = 0 ";
 		
 	$res_count = pg_query($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	
 	$sql .= "order by ".$ncamp." ";
 
@@ -146,7 +146,7 @@ function GP_popupAlertMsg(msg) {
            $cor1 = $cor2;
            
         } }
-	   if (!$valor)
+	   if(!isset($valor) || !$valor)
 	   {  ?>
         <tr bgcolor="#f5f5fb"> 
           <td colspan="5" bgcolor="<?php echo $cor1 ?>"><div align="center"><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>

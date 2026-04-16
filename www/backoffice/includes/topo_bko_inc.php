@@ -8,9 +8,9 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 
 $url = "https://";
-$url .= $_SERVER['SERVER_NAME'];
+$url .= ($_SERVER['SERVER_NAME'] ?? "");
 
-$webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "https://".($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "");
 require_once $raiz_do_projeto."includes/access_functions.php";
 require_once $raiz_do_projeto.'includes/configIP.php';
 require_once $raiz_do_projeto.'includes/configuracaoBO.php';

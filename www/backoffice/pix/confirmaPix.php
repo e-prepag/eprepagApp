@@ -10,6 +10,7 @@ require_once "/www/includes/gamer/constantes.php";
 require_once "/www/includes/main.php";
 require_once "/www/includes/inc_Pagamentos.php";
 require_once "/www/includes/functions.php";
+require_once __DIR__ . "/../includes/encoding.php";
 
 $teste = '{
 		"http_status_code": 200,
@@ -108,7 +109,7 @@ class RecebePix
 	{
 		try {
 			if ($tipo === "PDV") {
-				$data_venda = substr($data_venda, 0, 19);
+				$data_venda = substr((string)($data_venda ?? ""), 0, 19);
 
 				$sql = "UPDATE tb_pag_compras 
                     SET status_processed = 1,
@@ -188,8 +189,8 @@ class RecebePix
 
 			if ($stmtSelecao->rowCount() > 0) {
 				$venda = $stmtSelecao->fetch(PDO::FETCH_ASSOC);
-				$data_venda = substr($venda["vg_data_inclusao"], 0, 19);
-				$valor = substr($venda["total"], 0, -2) . "." . substr($venda["total"], -2);
+				$data_venda = substr((string)($venda["vg_data_inclusao"] ?? ""), 0, 19);
+				$valor = substr((string)($venda["total"] ?? ""), 0, -2) . "." . substr((string)($venda["total"] ?? ""), -2);
 
 				// Atualiza a venda
 				$sqlAtualiza = "UPDATE {$tableName} 
@@ -264,14 +265,22 @@ class RecebePix
 
 		$this->status = $informacoes->response->message->status;
 		$this->idConciliador = $informacoes->response->message->id;
+		$idVendaConciliador = substr((string)($this->idConciliador ?? ""), 2);
 
 		if ($this->ambiente == "PDV") {
-			$venda = $this->verificaPagamento(substr($this->idConciliador, 2));
+			$venda = $this->verificaPagamento($idVendaConciliador);
+			if (!is_array($venda)) {
+				$this->gravaLog($idVendaConciliador, "", "", "");
+				return false;
+			}
 			if (($venda["status"] == "1" || $venda["status"] == "-1")) {
-				$this->atulizaPagamento(substr($this->idConciliador, 2), $venda["vg_data_inclusao"]);
+				$this->atulizaPagamento($idVendaConciliador, $venda["vg_data_inclusao"]);
 				$this->atualizaVenda($venda["idvenda"]);
 				///conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($venda["idvenda"]);
-				$novoRetorno = $this->verificaPagamento(substr($this->idConciliador, 2));
+				$novoRetorno = $this->verificaPagamento($idVendaConciliador);
+				if (!is_array($novoRetorno)) {
+					$novoRetorno = array("status" => $venda["status"], "vg_ultimo_status" => $venda["vg_ultimo_status"]);
+				}
 				$conciliado = ($novoRetorno["status"] == '3') ? true : false;
 			} else {
 				$novoRetorno["status"] = $venda["status"];
@@ -280,17 +289,24 @@ class RecebePix
 			}
 			$this->gravaLog($venda["idvenda"], $novoRetorno["status"], $venda["status"], $novoRetorno["vg_ultimo_status"]);
 		} else {
-			$venda = $this->verificaPagamento(substr($this->idConciliador, 2));
+			$venda = $this->verificaPagamento($idVendaConciliador);
+			if (!is_array($venda)) {
+				$this->gravaLog($idVendaConciliador, "", "", "");
+				return false;
+			}
 			if (($venda["status"] == "1" || $venda["status"] == "-1")) {
-				$this->atulizaPagamento(substr($this->idConciliador, 2), $venda["vg_data_inclusao"], "USUARIO");
+				$this->atulizaPagamento($idVendaConciliador, $venda["vg_data_inclusao"], "USUARIO");
 				//$this->atualizaVenda($venda["idvenda"]);
 				if ($venda["tipo_deposito"] == 0) {
-					$idvenda = htmlspecialchars($venda["idvenda"], ENT_QUOTES, 'UTF-8');
+					$idvenda = htmlspecialchars((string)($venda["idvenda"] ?? ""), ENT_QUOTES, 'UTF-8');
 					conciliacaoAutomaticaPagtoPIXemGAMER(true, $idvenda);
 				} else if ($venda["tipo_deposito"] == 2) {
 					conciliaAutomaticaMoneyDepositoSaldocomPIX(true, $venda["idvenda"]);
 				}
-				$novoRetorno = $this->verificaPagamento(substr($this->idConciliador, 2));
+				$novoRetorno = $this->verificaPagamento($idVendaConciliador);
+				if (!is_array($novoRetorno)) {
+					$novoRetorno = array("status" => $venda["status"], "vg_ultimo_status" => $venda["vg_ultimo_status"]);
+				}
 				$conciliado = ($novoRetorno["status"] == '3') ? true : false;
 			} else {
 				$novoRetorno["status"] = $venda["status"];
@@ -301,9 +317,9 @@ class RecebePix
 		}
 
 		if ($conciliado) {
-			$mensagem = utf8_decode('<b>O pagamento foi conciliado com sucesso!</b><br> 
+			$mensagem = backoffice_utf8_to_iso('<b>O pagamento foi conciliado com sucesso!</b><br> 
 			    Data da conciliação: ' . date("d-m-Y H:i:s") . '<br>
-				ID pagamento E-Prepag: ' . substr($this->idConciliador, 2) . '<br>
+				ID pagamento E-Prepag: ' . $idVendaConciliador . '<br>
 				Status final venda: ' . $novoRetorno["vg_ultimo_status"] . '<br>
 				Ambiente Venda: ' . $this->ambiente . '<br>
 				ID de venda E-Prepag: ' . $venda["idvenda"]);

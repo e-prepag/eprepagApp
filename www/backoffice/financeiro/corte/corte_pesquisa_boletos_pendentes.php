@@ -25,8 +25,8 @@ require_once "/www/includes/bourls.php";
 
 //echo "qtde_reg_tela: $qtde_reg_tela<br>";
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 100; //$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
     
@@ -152,7 +152,7 @@ require_once "/www/includes/bourls.php";
 			if($tf_b_bol_banco) 		$sql .= " and bpb.bpb_bol_banco = '$tf_b_bol_banco' ";
 			
 			$rs_boletos = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_boletos);
+			$total_table = (($rs_boletos) ? pg_num_rows($rs_boletos) : 0);
 //echo $sql . "<br>";
 
 			$bol_valor_total_i=0;
@@ -163,10 +163,10 @@ require_once "/www/includes/bourls.php";
 			$sql .= " order by ".$ncamp;
 			if($ordem == 1){
 				$sql .= " desc ";
-				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_down.gif";
+				$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_down.gif";
 			} else {
 				$sql .= " asc ";
-				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_up.gif";
+				$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_up.gif";
 			}
 			$sql .= " limit ".$max; 
 			$sql .= " offset ".$inicial;
@@ -257,7 +257,7 @@ $(function(){
 				<select name="tf_b_status" class="form2">
 					<option value="" <?php if($tf_b_status == "") echo "selected" ?>>Selecione</option>
 					<?php foreach ($CORTE_BOLETO_STATUS_DESCRICAO as $statusId => $statusNome){ ?>
-					<option value="<?php echo $statusId; ?>" <?php if ($tf_b_status == $statusId) echo "selected";?>><?php echo $statusId . " - " . substr($statusNome, 0, strpos($statusNome, '.')); ?></option>
+					<option value="<?php echo $statusId; ?>" <?php if ($tf_b_status == $statusId) echo "selected";?>><?php echo $statusId . " - " . substr((string)($statusNome ?? ""), 0, strpos($statusNome, '.')); ?></option>
 					<?php } ?>
 				</select>
 			</td>
@@ -366,7 +366,7 @@ $(function(){
 							$cor1 = ($cor1 == $cor2)?$cor3:$cor2;
 							$status = $rs_boletos_row['bbc_status'];
 							$statusNome = $GLOBALS['CORTE_BOLETO_STATUS_DESCRICAO'][$status];
-							$statusNome = substr($statusNome, 0, strpos($statusNome, '.'));
+							$statusNome = substr((string)($statusNome ?? ""), 0, strpos($statusNome, '.'));
 							if($rs_boletos_row['ug_tipo_cadastro'] == 'PF') $nome = $rs_boletos_row['ug_nome'];
 							else $nome = $rs_boletos_row['ug_nome_fantasia'];
 

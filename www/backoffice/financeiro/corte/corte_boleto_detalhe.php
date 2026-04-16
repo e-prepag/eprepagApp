@@ -8,7 +8,7 @@ require_once $raiz_do_projeto . "includes/pdv/corte_classPrincipal.php";
 
 	$msg = "";
 
-	if(!$bbc_id) $msg = "Código do boleto não fornecido.\n";
+	if(!isset($bbc_id) || !$bbc_id) $msg = "Código do boleto não fornecido.\n";
 	elseif(!is_numeric($bbc_id)) $msg = "Código do boleto inválido.\n";
 
 	//Recupera boleto
@@ -17,7 +17,7 @@ require_once $raiz_do_projeto . "includes/pdv/corte_classPrincipal.php";
 				 inner join cortes c on c.cor_codigo = bbc.bbc_cor_codigo
 				 where bbc.bbc_boleto_codigo = " . $bbc_id;
 		$rs_boleto = SQLexecuteQuery($sql);
-		if(!$rs_boleto || pg_num_rows($rs_boleto) == 0) $msg = "Nenhum boleto encontrado.\n";
+		if(!$rs_boleto || (($rs_boleto) ? pg_num_rows($rs_boleto) : 0) == 0) $msg = "Nenhum boleto encontrado.\n";
 		else {
 			$rs_boleto_row = pg_fetch_array($rs_boleto);
 			$bbc_boleto_codigo 	= $rs_boleto_row['bbc_boleto_codigo'];
@@ -197,7 +197,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 			<td align="center" nowrap><strong><font color="#666666" size="1" face="Arial, Helvetica, sans-serif">&nbsp;Data Crédito&nbsp;</font></strong></td>
 			<td align="center" nowrap><strong><font color="#666666" size="1" face="Arial, Helvetica, sans-serif">&nbsp;Motivos Rejeições&nbsp;</font></strong></td>
 		</tr>
-	<?php if($rs_retornos && pg_num_rows($rs_retornos) > 0){
+	<?php if($rs_retornos && (($rs_retornos) ? pg_num_rows($rs_retornos) : 0) > 0){
 			$cor1 = $cor3;
 			while($rs_retornos_row = pg_fetch_array($rs_retornos)){
 				if ($cor1 == $cor2) {$cor1 = $cor3;} else {$cor1 = $cor2;}
@@ -237,7 +237,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 			<td align="center" nowrap><strong><font color="#666666" size="1" face="Arial, Helvetica, sans-serif">&nbsp;IP&nbsp;</font></strong></td>
 			<td align="center" nowrap><strong><font color="#666666" size="1" face="Arial, Helvetica, sans-serif">&nbsp;Usuário&nbsp;</font></strong></td>
 		</tr>
-<?php if($rs_acessos && pg_num_rows($rs_acessos) > 0){
+<?php if($rs_acessos && (($rs_acessos) ? pg_num_rows($rs_acessos) : 0) > 0){
 		$cor1 = $cor3;
 		while($rs_acessos_row = pg_fetch_array($rs_acessos)){
 			if ($cor1 == $cor2) {$cor1 = $cor3;} else {$cor1 = $cor2;}

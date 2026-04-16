@@ -6,7 +6,7 @@ require_once '/www/includes/constantes.php';
 require_once __DIR__ . "/functions_e_financeira.php";
 require_once __DIR__ . "/../../includes/load_dotenv.php";
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     http_response_code(405);
     exit("Método não permitido");
 }
@@ -19,7 +19,7 @@ try {
         throw new Exception("Nenhum arquivo enviado.");
     }
 
-    $arquivos = $_FILES['arquivo'];
+    $arquivos = $_FILES['arquivo'] ?? array();
     $lotes_xml = [];
 
     // Garante que a estrutura seja um array (mesmo se enviar apenas 1 arquivo)
@@ -27,7 +27,7 @@ try {
     $erros = is_array($arquivos['error']) ? $arquivos['error'] : [$arquivos['error']];
     $caminhos_temp = is_array($arquivos['tmp_name']) ? $arquivos['tmp_name'] : [$arquivos['tmp_name']];
 
-    $total_enviados = count($nomes_arquivos);
+    $total_enviados = (is_countable($nomes_arquivos) ? count($nomes_arquivos) : 0);
 
     // Loop passando por cada arquivo anexado
     for ($i = 0; $i < $total_enviados; $i++) {
@@ -68,7 +68,7 @@ try {
     }
 
     // TRAVA DE SEGURANÇA MANTIDA: Verifica a quantidade total de arquivos extraídos
-    $quantidade_arquivos = count($lotes_xml);
+    $quantidade_arquivos = (is_countable($lotes_xml) ? count($lotes_xml) : 0);
     if ($quantidade_arquivos > 15) {
         throw new Exception("Você tentou enviar {$quantidade_arquivos} XMLs (contando os que estavam dentro de ZIPs). O limite máximo permitido é de 15 arquivos por envio.");
     }
@@ -174,7 +174,7 @@ function etapa1_enviarLote($conteudoXmlOriginal, $nomeArquivo, $producao = false
     }
 
     // 4. Extrair Protocolo
-    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlResposta);
+    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', (string)($xmlResposta ?? ''));
     $xmlObj = simplexml_load_string($xmlLimpo);
 
     if ($xmlObj === false) {
@@ -229,7 +229,7 @@ function etapa2_monitorarProcessamento($protocolo, $producao = false)
         //$xmlFinal = $efinanceira->consultarLoteEFinanceira($protocolo, $producao);
 
         // Remove namespaces para leitura rápida do status
-        $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlFinal);
+        $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', (string)($xmlFinal ?? ''));
         $obj = simplexml_load_string($xmlLimpo);
 
         if ($obj === false) {
@@ -271,10 +271,10 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
     file_put_contents($pathRespostas . '/' . $nomeResp, $xmlProcessamento);
 
     // 2. Parser
-    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlProcessamento);
+    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', (string)($xmlProcessamento ?? ''));
     $xmlObj = simplexml_load_string($xmlLimpo);
 
-    if (!$xmlObj) {
+    if(!isset($xmlObj) || !$xmlObj) {
         return [
             'status_lote' => 9,
             'mensagem_lote' => 'XML de retorno inválido ou corrompido.',
@@ -310,7 +310,7 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
                     $nodeRetorno = $retornoEvento[0];
 
                     $idEventoReal = (string)$nodeRetorno->attributes()->id;
-                    $idBanco = (int)substr($idEventoReal, 3);
+                    $idBanco = (int)substr((string)($idEventoReal ?? ""), 3);
 
                     $descRetornoEvt = (string)($nodeRetorno->xpath("status/descRetorno")[0] ?? '');
 
@@ -383,8 +383,8 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
         'mensagem_lote' => $msgGeralLote,
         'detalhes' => $detalhesEventos,
         'caminho_resposta' => $nomeResp,
-        'qtd_sucesso' => count($idsSucesso),
-        'qtd_erro' => count($idsErro)
+        'qtd_sucesso' => (is_countable($idsSucesso) ? count($idsSucesso) : 0),
+        'qtd_erro' => (is_countable($idsErro) ? count($idsErro) : 0)
     ];
 }
 

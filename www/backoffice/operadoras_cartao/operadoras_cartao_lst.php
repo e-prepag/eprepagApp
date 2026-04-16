@@ -32,7 +32,7 @@ if(!isset($pcd_id_distribuidor)){
             <table class="table txt-preto fontsize-pp">
                 <tr>
                     <td valign="top">
-                        <form id="form1" name="form1" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                        <form id="form1" name="form1" method="post" action="<?php echo ($_SERVER['PHP_SELF'] ?? ""); ?>">
                             <table class="table txt-preto fontsize-pp">
                                 <tr>
                                     <td colspan="4" bgcolor="#DDDDDD">&nbsp;&nbsp;Filtro de Pesquisa</td>
@@ -107,7 +107,7 @@ if (isset($sql_aux)) {
 }
 //echo "$sql<br>"; //die();
 // instancia classe para listagem
-$lista = new tabelaLista($sql, $_SERVER['PHP_SELF'], isset($paginacao) ? $paginacao : null, $inicio, $limite, $sort, $dir, $objBotoes);
+$lista = new tabelaLista($sql, ($_SERVER['PHP_SELF'] ?? ""), isset($paginacao) ? $paginacao : null, $inicio, $limite, $sort, $dir, $objBotoes);
 
 // campos a serem listados => headers
 $camposTabela = array(

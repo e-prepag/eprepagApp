@@ -8,12 +8,12 @@
 <?php
 	$time_start = getmicrotime();
 
-	if(!$tf_data_inic) $tf_data_inic = date('d/m/Y');
-	if(!$tf_data_final) $tf_data_final = date('d/m/Y');
-	if(!$ncamp) $ncamp = 'ped_est_codigo';
-	if(!$inicial)  $inicial     = 0;
-	if(!$range)    $range       = 1;
-	if(!$ordem)    $ordem       = 0;
+	if(!isset($tf_data_inic) || !$tf_data_inic) $tf_data_inic = date('d/m/Y');
+	if(!isset($tf_data_final) || !$tf_data_final) $tf_data_final = date('d/m/Y');
+	if(!isset($ncamp) || !$ncamp) $ncamp = 'ped_est_codigo';
+	if(!isset($inicial) || !$inicial)  $inicial     = 0;
+	if(!isset($range) || !$range)    $range       = 1;
+	if(!isset($ordem) || !$ordem)    $ordem       = 0;
 //	if($BtnSearch) $inicial     = 0;
 //	if($BtnSearch) $range       = 1;
 //	if($BtnSearch) $total_table = 0;
@@ -24,8 +24,8 @@
 	}
 	
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = $qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
     $sql ="select ped_codigo, ped_est_codigo, nome_fantasia, ped_cod_documento,ped_valor,ped_cod_doc_equiv 
@@ -35,7 +35,7 @@
 		   and est_teste =0 and ped_valor = $DepValor and ped_banco = $DepBanco";
 		
 	$res_count = pg_query($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	$dep_valor_total = $total_table*$DepValor;
 	$sql .= "order by ".$ncamp." ";
 
@@ -139,7 +139,7 @@ function GP_popupAlertMsg(msg) {
         <?php
 
        if ($cor1 == $cor2) {$cor1 = $cor3;} else {$cor1 = $cor2;} }
-	   if (!$valor)
+	   if(!isset($valor) || !$valor)
 	   {  ?>
         <tr bgcolor="#f5f5fb"> 
           <td colspan="4" bgcolor="<?php echo $cor1 ?>"><div align="center"><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>

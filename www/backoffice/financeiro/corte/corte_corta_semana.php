@@ -6,11 +6,11 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 require_once $raiz_do_projeto . "includes/pdv/corte_classPrincipal.php"; 
 require_once "/www/includes/bourls.php";
 
-	if(!$ncamp) $ncamp = 'ug_id';
-	if(!$inicial)  $inicial     = 0;
-	if(!$range)    $range       = 1;
-	if(!$ordem)    $ordem       = 0;
-//	if(!$BtnSearch) $inicial     = 0;
+	if(!isset($ncamp) || !$ncamp) $ncamp = 'ug_id';
+	if(!isset($inicial) || !$inicial)  $inicial     = 0;
+	if(!isset($range) || !$range)    $range       = 1;
+	if(!isset($ordem) || !$ordem)    $ordem       = 0;
+//	if(!isset($BtnSearch) || !$BtnSearch) $inicial     = 0;
 //	if($BtnSearch) $range       = 1;
 //	if($BtnSearch) $total_table = 0;
 	if($BtnSearch=="Buscar") {
@@ -47,17 +47,17 @@ require_once "/www/includes/bourls.php";
 
 	$last_sunday = date("Y-m-d 00:00:00", strtotime("last Sunday"));
 	$last_monday = date("Y-m-d 23:59:59", strtotime("last Monday", strtotime($last_sunday)));
-	if(!$data_final) $data_final = date("d/m/Y", strtotime($last_sunday));
-	if(!$data_inicial) $data_inicial = date("d/m/Y", strtotime($last_monday));
-//	if(!$data_inicial) $data_inicial=date("d/m/Y",strtotime("now last monday"));
-//	if(!$data_final) $data_final=date("d/m/Y",strtotime("now last sunday"));
+	if(!isset($data_final) || !$data_final) $data_final = date("d/m/Y", strtotime($last_sunday));
+	if(!isset($data_inicial) || !$data_inicial) $data_inicial = date("d/m/Y", strtotime($last_monday));
+//	if(!isset($data_inicial) || !$data_inicial) $data_inicial=date("d/m/Y",strtotime("now last monday"));
+//	if(!isset($data_final) || !$data_final) $data_final=date("d/m/Y",strtotime("now last sunday"));
 
-	$data_inicial_dia_semana = date('w', strtotime(substr($data_inicial, 6, 4) . "-" . substr($data_inicial, 3, 2) . "-" . substr($data_inicial, 0, 2)));
+	$data_inicial_dia_semana = date('w', strtotime(substr((string)($data_inicial ?? ""), 6, 4) . "-" . substr((string)($data_inicial ?? ""), 3, 2) . "-" . substr((string)($data_inicial ?? ""), 0, 2)));
 
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 200;	//$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 if($BtnSearch){
@@ -87,16 +87,16 @@ if($BtnSearch){
 			left join cortes cor on cor.cor_ug_id = vendas.ug_id and cor.cor_periodo_ini = '".formata_data($data_inicial,1)." 00:00:00' and cor.cor_periodo_fim = '".formata_data($data_final,1)." 23:59:59'
 			group by ug.ug_id, ug.ug_tipo_cadastro, ug.ug_nome_fantasia, ug.ug_nome, ug.ug_perfil_corte_dia_semana, cor.cor_codigo";
 	$resest = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($resest);
+	$total_table = (($resest) ? pg_num_rows($resest) : 0);
 
 	//Ordem
 	$sql .= " order by ".$ncamp;
 	if($ordem == 1){
 		$sql .= " desc ";
-		$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_down.gif";
+		$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_down.gif";
 	} else {
 		$sql .= " asc ";
-		$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_up.gif";
+		$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_up.gif";
 	}
 	$sql .= " limit ".$max; 
 	$sql .= " offset ".$inicial;
@@ -237,7 +237,7 @@ $(function(){
           <td align="right"><?php echo number_format($total_comissao, 2, ',', '.') ?></td>
           <td align="right"><?php echo number_format($total_pagar, 2, ',', '.') ?></td>
           <td align="center"><?php if($pgest['ug_perfil_corte_dia_semana'] != $data_inicial_dia_semana){ ?><font color="red"><?}?><?php echo $GLOBALS['CORTE_DIAS_DA_SEMANA_DESCRICAO'][$pgest['ug_perfil_corte_dia_semana']] ?></td>
-		<?php if(trim($pgest['cor_codigo']) == ""){ ?>
+		<?php if(trim((string)($pgest['cor_codigo'] ?? "")) == ""){ ?>
           <td align="center"><a onclick="return confirm('Confirma o corte para o período <?=$data_inicial?> a <?=$data_final?> do estabelecimento \'<?=$pgest['nome_fantasia'] ?>\'');" href="corte_corta_semana.php?acao=cortar&usuario_id=<?php echo $pgest['ug_id']?><?=$varsel?>"><img src="/images/inserir2.gif" alt="Gera corte" width="14" height="14" border="0"></a></td>
         <?php } else { ?>
           <td align="center"><a class="link_br" href="corte_consulta.php?usuario_id=<?php echo $pgest['ug_id']?>&BtnSearch=1"><font class="texto">Já existe corte</font></a></td>
@@ -245,7 +245,7 @@ $(function(){
         </tr>
         <?php
        if ($cor1 == $cor2) {$cor1 = $cor3;} else {$cor1 = $cor2;} }
-	   if (!$valor)
+	   if(!isset($valor) || !$valor)
 	   {  ?>
         <tr bgcolor="#f5f5fb"> 
           <td colspan="9" bgcolor="<?php echo $cor1 ?>"><div align="center"><font size="2" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>

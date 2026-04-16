@@ -8,7 +8,7 @@ require_once '/www/db/connect.php';
 require_once '/www/db/ConnectionPDO.php';
 require_once __DIR__ . "/functions_e_financeira.php";
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     http_response_code(405);
     exit("Método inválido");
 }
@@ -19,7 +19,8 @@ try {
     $efinanceira = new GerarEFinanceira();
 
     $producao = getenv('AMBIENTE') == "HOMOLOGACAO" ? false : true;
-    $tipoConsulta = $_POST['sel_consulta'];
+    $tipoConsulta = $_POST['sel_consulta'] ?? '';
+    if ($tipoConsulta === '') throw new Exception("Tipo de consulta obrigatorio.");
 
     // Variáveis de controle
     $xmlSolicitacao = null;    // O XML retornado no pedido (Status 1)
@@ -33,7 +34,7 @@ try {
 
     if ($tipoConsulta === 'lote') {
         // Lote é síncrono/diferente, tratamos separado
-        $lote = $_POST['numero_lote'];
+        $lote = $_POST['numero_lote'] ?? '';
         if (empty($lote)) throw new Exception("Número do lote obrigatório.");
 
         $xmlFinal = $efinanceira->consultarLoteEFinanceira($lote, $producao);
@@ -42,7 +43,7 @@ try {
     } else {
         // Consultas Assíncronas (Cadastro, Lista, Movimento)
 
-        $cnpj = preg_replace('/[^0-9]/', '', $efinanceira->cnpjEPP);
+        $cnpj = preg_replace('/[^0-9]/', '', (string)($efinanceira->cnpjEPP ?? ''));
         if (empty($cnpj)) throw new Exception("CNPJ do Declarante é obrigatório.");
 
         switch ($tipoConsulta) {
@@ -52,9 +53,9 @@ try {
                 break;
 
             case 'lista':
-                $sit = $_POST['situacao_informacao'];
-                $dtIni = implode('/', array_reverse(explode('-', $_POST['dt_inicial'])));
-                $dtFim = implode('/', array_reverse(explode('-', $_POST['dt_final'])));
+                $sit = $_POST['situacao_informacao'] ?? '';
+                $dtIni = implode('/', array_reverse(explode('-', (string)($_POST['dt_inicial'] ?? ""))));
+                $dtFim = implode('/', array_reverse(explode('-', (string)($_POST['dt_final'] ?? ""))));
 
                 $xmlSolicitacao = $efinanceira->consultarListaEFinanceira($cnpj, $sit, $dtIni, $dtFim, $producao);
                 $tipoConsultaTexto = 'lista';
@@ -62,11 +63,11 @@ try {
 
             case 'mov_fin':
             case 'mov_fin_anual':
-                $sit = $_POST['situacao_informacao'];
-                $mesIni = str_replace('-', '', $_POST['anomes_inicio']);
-                $mesFim = str_replace('-', '', $_POST['anomes_termino']);
-                $tipoId = $_POST['tipo_identificacao'];
-                $ident = preg_replace('/[^0-9]/', '', $_POST['identificacao']);
+                $sit = $_POST['situacao_informacao'] ?? '';
+                $mesIni = str_replace('-', '', (string)($_POST['anomes_inicio'] ?? ''));
+                $mesFim = str_replace('-', '', (string)($_POST['anomes_termino'] ?? ''));
+                $tipoId = $_POST['tipo_identificacao'] ?? '';
+                $ident = preg_replace('/[^0-9]/', '', (string)($_POST['identificacao'] ?? ''));
 
                 // Adicione lógica para 'mov_fin_anual' se tiver o método na classe
                 $xmlSolicitacao = $efinanceira->consultarMovimentoOpFin($cnpj, $sit, $mesIni, $mesFim, $tipoId, $ident, $producao);
@@ -81,7 +82,7 @@ try {
         // Tenta extrair o protocolo do XML de solicitação
         $protocolo = extrairProtocoloEFinanceira($xmlSolicitacao);
 
-        if (!$protocolo) {
+        if(!isset($protocolo) || !$protocolo) {
             echo "<h4 style='color:red'>Falha na Solicitação Inicial</h4>";
             echo "<p>Não foi possível obter um número de protocolo.</p>";
             // Mostra o XML de erro imediatamente e para
@@ -149,7 +150,7 @@ echo $html;
 // -------------------------------------------------------------------------
 function obterStatusConsultaRapido($xmlString)
 {
-    if (!$xmlString) return 0;
+    if(!isset($xmlString) || !$xmlString) return 0;
 
     // Load simples apenas para pegar o cdResposta
     $xml = simplexml_load_string($xmlString, "SimpleXMLElement", LIBXML_NOCDATA);
@@ -217,7 +218,7 @@ function processarRetornoConsultaAssincrona($xmlString, $visualizadorConsulta, $
     ];
 
     echo "<div style='font-family: sans-serif; border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; background: #f9f9f9;'>";
-    echo "<strong>Tipo de Consulta:</strong> " . htmlspecialchars($tipoConsulta) . "<br>";
+    echo "<strong>Tipo de Consulta:</strong> " . htmlspecialchars((string)($tipoConsulta ?? "")) . "<br>";
     echo "<strong>Protocolo:</strong> " . ($protocolo ? $protocolo : '<em>Não gerado</em>') . "<br>";
     echo "<strong>Data/Hora:</strong> " . $dataHora . "<br>";
     echo "<hr>";
@@ -313,7 +314,7 @@ function processarRetornoInformacoesCadastrais($xmlString)
     $nsUrl = reset($namespaces);
 
     // Se por acaso vier sem namespace (improvável), usa um fallback ou string vazia
-    if (!$nsUrl) {
+    if(!isset($nsUrl) || !$nsUrl) {
         $nsUrl = ""; // XPath funcionará sem prefixo
         $xml->registerXPathNamespace('ns', '');
     } else {
@@ -568,7 +569,7 @@ function processarRetornoMovOpFin($xmlString)
     $namespaces = $xml->getNamespaces(true);
     $nsUrl = reset($namespaces);
 
-    if (!$nsUrl) {
+    if(!isset($nsUrl) || !$nsUrl) {
         $nsUrl = "http://www.eFinanceira.gov.br/schemas/retornoConsultaInformacoesMovOpFin/v1_0_0"; // Fallback para o schema padrão
         $xml->registerXPathNamespace('ns', $nsUrl);
     } else {
@@ -666,8 +667,8 @@ function processarRetornoMovOpFin($xmlString)
         foreach ($listaMovimentos as $mov) {
             // Formata Ano/Mês (202501 -> 01/2025)
             $anoMes = $mov['anoMesCaixa'];
-            if (strlen($anoMes) == 6) {
-                $anoMes = substr($anoMes, 4, 2) . '/' . substr($anoMes, 0, 4);
+            if (strlen((string)($anoMes ?? "")) == 6) {
+                $anoMes = substr((string)($anoMes ?? ""), 4, 2) . '/' . substr((string)($anoMes ?? ""), 0, 4);
             }
 
             echo "<tr>";
@@ -679,7 +680,7 @@ function processarRetornoMovOpFin($xmlString)
             echo "</tr>";
         }
         echo "</tbody></table></div>";
-        echo "<p class='text-right'>Total de registros encontrados: <strong>" . count($listaMovimentos) . "</strong></p>";
+        echo "<p class='text-right'>Total de registros encontrados: <strong>" . (is_countable($listaMovimentos) ? count($listaMovimentos) : 0) . "</strong></p>";
     } else if ($cdRetorno == '0') {
         echo "<p><em>Nenhum movimento financeiro encontrado para os critérios informados.</em></p>";
     }
@@ -701,10 +702,10 @@ function processarRetornoConsultaLote($xmlProcessamento, $protocolo = null, $efi
 
 function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efinanceira = null)
 {
-    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', $xmlProcessamento);
+    $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', (string)($xmlProcessamento ?? ''));
     $xmlObj = simplexml_load_string($xmlLimpo);
 
-    if (!$xmlObj) {
+    if(!isset($xmlObj) || !$xmlObj) {
         return [
             'status_lote' => 9,
             'mensagem_lote' => 'XML de retorno inválido ou corrompido.',
@@ -732,7 +733,7 @@ function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efina
                     $nodeRetorno = $retornoEvento[0];
 
                     $idEventoReal = (string)$nodeRetorno->attributes()->id;
-                    $idBanco = (int)substr($idEventoReal, 3);
+                    $idBanco = (int)substr((string)($idEventoReal ?? ""), 3);
 
                     $descRetornoEvt = (string)($nodeRetorno->xpath("status/descRetorno")[0] ?? '');
                     $recibo = (string)($nodeRetorno->xpath("dadosReciboEntrega/numeroRecibo")[0] ?? '');
@@ -828,8 +829,8 @@ function extrairDadosEAtualizarLote($xmlProcessamento, $protocolo = null, $efina
         'status_lote' => $statusGeralLote,
         'mensagem_lote' => $msgGeralLote,
         'detalhes' => $detalhesEventos,
-        'qtd_sucesso' => count($idsSucesso),
-        'qtd_erro' => count($idsErro)
+        'qtd_sucesso' => (is_countable($idsSucesso) ? count($idsSucesso) : 0),
+        'qtd_erro' => (is_countable($idsErro) ? count($idsErro) : 0)
     ];
 }
 

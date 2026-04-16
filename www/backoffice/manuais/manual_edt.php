@@ -69,7 +69,7 @@ $rs_menus = SQLexecuteQuery($sql);
 <!--DIV COM FORMULÁRIO DE CADASTRO-->
 <div class='row txt-preto'>
     <div class='col-md-offset-1 col-md-10'>
-        <form class="form-horizontal" method="POST" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']; ?>" name="frmPreCadastro" id="frmPreCadastro">
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data" action="<?php echo ($_SERVER['PHP_SELF'] ?? ""); ?>" name="frmPreCadastro" id="frmPreCadastro">
             <!--CAMPOS VERIFICANDO SE VAI SER UMA INSERÇÃO OU UM UPDATE-->
             <input type="hidden" name="acao" id="acao" value="<?php if(isset($acao)) echo $acao; ?>" />
             <input type="hidden" name="manual_id_update" id="manual_id_update" value="<?php if(isset($manual_id)) echo $manual_id; ?>" />

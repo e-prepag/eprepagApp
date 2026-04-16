@@ -7,6 +7,7 @@ require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
 require_once "/www/includes/constantes.php";
 require_once "/www/includes/gamer/functions.php";
+require_once __DIR__ . "/../includes/encoding.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -99,7 +100,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 		2 => "Médio",
 		3 => "Alto"
 	];
-	if (count($resultRows) > 0) {
+	if ((is_countable($resultRows) ? count($resultRows) : 0) > 0) {
 		foreach ($resultRows as $key => $value) {
 			$dataKeys = array_keys($value);
 
@@ -116,13 +117,13 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 			$dataLine = [
 				$dataKeys[0] => $value["opr_codigo"],
-				$dataKeys[1] => utf8_encode($value["opr_nome"]),
+				$dataKeys[1] => backoffice_iso_to_utf8($value["opr_nome"]),
 				$dataKeys[2] => ($value["opr_cnpj"] != "" ? $value["opr_cnpj"] : "Não possui"),
 				$dataKeys[3] => ($value["opr_internacional"] == 1 ? "Sim" : "Não"),
 				$dataKeys[4] => ($value["opr_status"] == 1 ? "Ativo" : "Inativo"),
 				"tipo_risco" => (isset($value["tipo_risco"]) ? $riscos[$value["tipo_risco"]] : "Não encontrado"),
 				"ultima_data" => (isset($value["data_observacao"]) ? $value["data_observacao"] : "Não encontrado"),
-				"observacao" => (isset($value["observacao"]) ? utf8_encode($value["observacao"]) : "Não encontrado"),
+				"observacao" => (isset($value["observacao"]) ? backoffice_iso_to_utf8($value["observacao"]) : "Não encontrado"),
 				"acao" => $acao
 			];
 			array_push($data["data"], $dataLine);
@@ -136,7 +137,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	$oprCodigo = isset($_POST['opr_codigo']) ? (int) $_POST['opr_codigo'] : 0;
 	$tipoRisco = isset($_POST['tipo_risco']) ? (int) $_POST['tipo_risco'] : 0;
 	$dataObservacao = date("Y-m-d H:i:s");
-	$observacao = isset($_POST['observacao']) ? utf8_decode($_POST['observacao']) : '';
+	$observacao = isset($_POST['observacao']) ? backoffice_utf8_to_iso($_POST['observacao']) : '';
 	$usuario = isset($_POST['user_id']) ? (int) $_POST['user_id'] : 0;
 
 	if ($oprCodigo <= 0 ) {

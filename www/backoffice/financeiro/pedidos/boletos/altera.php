@@ -5,7 +5,7 @@
 	include_once $raiz_do_projeto."includes/gamer/constantes.php";
 
 	$pos_pagina = isset($seg_auxilar) ? $seg_auxilar : null;
-	if(!$BolCod)
+	if(!isset($BolCod) || !$BolCod)
         $varsel = "&tf_data_inic=$tf_data_inic&tf_data_final=$tf_data_final&dd_banco=$dd_banco&tf_cod_documento=$tf_cod_documento&tf_documento=$tf_documento&dd_situacao=$dd_situacao&tf_valor=$tf_valor";
     else
         $varsel = "&bol_codigo=$BolCod";
@@ -19,10 +19,10 @@
 	// Obtem o ID Venda a aprtir do numeor do documento
 	if($pgbol['bol_banco']==$GLOBALS['BOLETO_MONEY_BRADESCO_COD_BANCO']) {
 		// Formato "3000vvvvvvvP"
-		$vg_id_boleto = substr($pgbol['bol_documento'],3,8);
+		$vg_id_boleto = substr((string)($pgbol['bol_documento'] ?? ""),3,8);
 	} elseif($pgbol['bol_banco']==$GLOBALS['BOLETO_MONEY_ITAU_COD_BANCO']) {
 		// Formato "3vvvvvvv"
-		$vg_id_boleto = substr($pgbol['bol_documento'],1,8);
+		$vg_id_boleto = substr((string)($pgbol['bol_documento'] ?? ""),1,8);
 	}elseif($GLOBALS['BOLETO_MONEY_ASAAS_COD_BANCO'] == $pgbol['bol_banco']) {
     $vg_id_boleto = $pgbol['bol_venda_games_id'];
   } else {
@@ -31,7 +31,7 @@
 	
 	// usa o indicador no numero do documento para mostrar a venda
 	$pesquisa_venda = "";
-	$s_indicador = substr($pgbol['bol_documento'],0,1);
+	$s_indicador = substr((string)($pgbol['bol_documento'] ?? ""),0,1);
 	if($vg_id_boleto>0) {
 		if($s_indicador=="1" || $s_indicador=="4") {
 			$pesquisa_venda = "/pdv/vendas/com_venda_detalhe.php?venda_id=$vg_id_boleto";

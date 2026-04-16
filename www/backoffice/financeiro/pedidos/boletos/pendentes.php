@@ -35,10 +35,10 @@ if (isset($BtnSearch) && $BtnSearch == "Buscar") {
   $range       = 1;
   $total_table = 0;
 }
-$tf_data_inic = trim($tf_data_inic);
+$tf_data_inic = trim((string)($tf_data_inic ?? ""));
 $default_add  = nome_arquivo($PHP_SELF);
-$img_proxima  = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/proxima.gif";
-$img_anterior = "https://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'] . "/images/anterior.gif";
+$img_proxima  = "https://" . ($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "") . "/images/proxima.gif";
+$img_anterior = "https://" . ($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "") . "/images/anterior.gif";
 $max          = 100; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
 
@@ -64,16 +64,16 @@ if (isset($dd_situacao) && $dd_situacao != '') $sql .= "and bol_aprovado = " . (
 //	if($tf_valor) $sql .= "and bol_valor = '" . str_replace(",",".",str_replace(".","",$tf_valor)) ."' ";
 if (isset($dd_banco) && $dd_banco) $sql .= "and bol_banco = '" . $dd_banco . "' ";
 if (isset($dd_usuario) && $dd_usuario) $sql .= "and ug.ug_id = " . $dd_usuario . " ";
-if (isset($tf_cod_documento) && trim($tf_cod_documento) != "") $sql .= "and bol_cod_documento LIKE '%" . strtoupper($tf_cod_documento) . "%' ";
-if (isset($tf_documento) && trim($tf_documento) != "") $sql .= "and bol_documento LIKE '%" . strtoupper($tf_documento) . "%' ";
-if (isset($tf_valor) && trim($tf_valor) != "")     $sql .= " and bol_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim($tf_valor))) . " ";
-if (isset($dd_tipodoc) && trim($dd_tipodoc) != "") $sql .= "and bol_documento LIKE '" . strtoupper($dd_tipodoc) . "%' ";
+if (isset($tf_cod_documento) && trim((string)($tf_cod_documento ?? "")) != "") $sql .= "and bol_cod_documento LIKE '%" . strtoupper($tf_cod_documento) . "%' ";
+if (isset($tf_documento) && trim((string)($tf_documento ?? "")) != "") $sql .= "and bol_documento LIKE '%" . strtoupper($tf_documento) . "%' ";
+if (isset($tf_valor) && trim((string)($tf_valor ?? "")) != "")     $sql .= " and bol_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim((string)($tf_valor ?? "")))) . " ";
+if (isset($dd_tipodoc) && trim((string)($dd_tipodoc ?? "")) != "") $sql .= "and bol_documento LIKE '" . strtoupper($dd_tipodoc) . "%' ";
 
 if (b_IsUsuarioWagner()) {
   //echo "<br><br>".str_replace("\n", "<br>\n", $sql)."<br><br>";
 }
 $res_count = pg_exec($sql);
-$total_table = pg_num_rows($res_count);
+$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 $bol_valor_total_i = 0;
 
 while ($u = pg_fetch_array($res_count))
@@ -159,10 +159,10 @@ if (isset($_POST['BtnExport'])) {
   if (isset($dd_situacao) && $dd_situacao != '') $sql_export .= "and bol_aprovado = " . ($dd_situacao - 1) . " ";
   if (isset($dd_banco) && $dd_banco) $sql_export .= "and bol_banco = '" . $dd_banco . "' ";
   if (isset($dd_usuario) && $dd_usuario) $sql_export .= "and ug.ug_id = " . $dd_usuario . " ";
-  if (isset($tf_cod_documento) && trim($tf_cod_documento) != "") $sql_export .= "and bol_cod_documento LIKE '%" . strtoupper($tf_cod_documento) . "%' ";
-  if (isset($tf_documento) && trim($tf_documento) != "") $sql_export .= "and bol_documento LIKE '%" . strtoupper($tf_documento) . "%' ";
-  if (isset($tf_valor) && trim($tf_valor) != "")     $sql_export .= " and bol_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim($tf_valor))) . " ";
-  if (isset($dd_tipodoc) && trim($dd_tipodoc) != "") $sql_export .= "and bol_documento LIKE '" . strtoupper($dd_tipodoc) . "%' ";
+  if (isset($tf_cod_documento) && trim((string)($tf_cod_documento ?? "")) != "") $sql_export .= "and bol_cod_documento LIKE '%" . strtoupper($tf_cod_documento) . "%' ";
+  if (isset($tf_documento) && trim((string)($tf_documento ?? "")) != "") $sql_export .= "and bol_documento LIKE '%" . strtoupper($tf_documento) . "%' ";
+  if (isset($tf_valor) && trim((string)($tf_valor ?? "")) != "")     $sql_export .= " and bol_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim((string)($tf_valor ?? "")))) . " ";
+  if (isset($dd_tipodoc) && trim((string)($dd_tipodoc ?? "")) != "") $sql_export .= "and bol_documento LIKE '" . strtoupper($dd_tipodoc) . "%' ";
 
   $sql_export .= " order by " . $ncamp . " ";
   $sql_export .= ($ordem == 1) ? " asc " : " desc ";
@@ -368,7 +368,7 @@ if (isset($_POST['BtnExport'])) {
                   <?php
 
                   while ($pgusuario = pg_fetch_array($rs_usuario)) { ?>
-                    <option value="<?php echo $pgusuario['ug_id'] ?>" <?php if (isset($dd_usuario) && $pgusuario['ug_id'] == $dd_usuario) echo "selected" ?>><?php echo substr($pgusuario['ug_nome_fantasia'], 0, 25) ?> (ID: <?php echo $pgusuario['ug_id'] ?>)</option>
+                    <option value="<?php echo $pgusuario['ug_id'] ?>" <?php if (isset($dd_usuario) && $pgusuario['ug_id'] == $dd_usuario) echo "selected" ?>><?php echo substr((string)($pgusuario['ug_nome_fantasia'] ?? ""), 0, 25) ?> (ID: <?php echo $pgusuario['ug_id'] ?>)</option>
                   <?php
                   }
 
@@ -480,7 +480,7 @@ if (isset($_POST['BtnExport'])) {
       $cor1 = "#F5F5FB";
       $cor2 = "#F5F5FB";
       $cor3 = "#FFFFFF";
-      //echo "rows: ".pg_num_rows($resest)."<br>";
+      //echo "rows: ".(($resest) ? pg_num_rows($resest) : 0)."<br>";
       //echo "B: ".date("Y-m-d H:i:s")."<br>";
       //die("Stop");
       if (!isset($bol_valor_total))
