@@ -14,7 +14,7 @@ $sql = "SELECT * FROM bo_aba order by aba_descricao asc";
 $rs = SQLexecuteQuery($sql);
 
 if($rs) {
-    $totalRegistros = pg_num_rows($rs);
+    $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
 }
 else $totalRegistros = 0;
 

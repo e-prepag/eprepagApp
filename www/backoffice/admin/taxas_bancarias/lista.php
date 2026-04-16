@@ -46,7 +46,7 @@ if ($con->isConnected()){
         $stmt->execute();
 
         $taxas = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $totalRegistros = count($taxas);
+        $totalRegistros = (is_countable($taxas) ? count($taxas) : 0);
     }
 }
 

@@ -44,7 +44,7 @@
 //echo "$sql<br>";
 
 	$rs = SQLexecuteQuery($sql);
-	//echo "pg_num_rows(rs): ".pg_num_rows($rs)."<br>";
+	//echo "pg_num_rows(rs): ".(($rs) ? pg_num_rows($rs) : 0)."<br>";
 
 ?>
 <link href="<?php echo $url; ?>:<?php echo $server_port; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -107,13 +107,13 @@
 <?php
 
 
-	if(!$rs || pg_num_rows($rs) == 0) {
+	if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
 		echo "Nenhum produto encontrado.<br>\n";
 	} else {
 
-		$s_several = ((pg_num_rows($rs)>1)?"s":"");
+		$s_several = (((($rs) ? pg_num_rows($rs) : 0)>1)?"s":"");
 
-		echo "<p>Encontrado$s_several ".pg_num_rows($rs)." registro$s_several</p>";
+		echo "<p>Encontrado$s_several ".(($rs) ? pg_num_rows($rs) : 0)." registro$s_several</p>";
 		echo "<table class=\"table txt-preto bg-branco fontsize-pp\">\n";
 		echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>\n";
 		echo "<td>id</td>\n";
@@ -136,7 +136,7 @@
 //			$recibo_formatted = wordwrap(print_r(json_decode($rs_row['rc_retorno'],true),true), 41, "\n", true);
 			// se limite é válido -> Procesa solicitação
 
-			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen($recibo_formatted)>0)?" title=\"".$recibo_formatted."\"":"").">\n";
+			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen((string)($recibo_formatted ?? ""))>0)?" title=\"".$recibo_formatted."\"":"").">\n";
 			echo "<td align='center'>".$rs_row['rc_id']."</td>\n";
 			echo "<td><nobr>".substr($rs_row['rc_data_inclusao'], 0, 19)."</nobr></td>\n";
 			echo "<td align='center'>".strtoupper($rs_row['rc_tipo'])."</td>\n";

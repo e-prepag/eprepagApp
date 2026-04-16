@@ -18,7 +18,7 @@ if(!empty($_POST['reordenar'])){
         
         $sql = "select * from bo_menu where menu_id = ".$id;
         $rs_reordena = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_reordena) > 0) {
+        if((($rs_reordena) ? pg_num_rows($rs_reordena) : 0) > 0) {
             $sqlAtualizaAba = "update bo_menu set menu_order = $ordem where menu_id = $id";
             
             if(!$rsAtualiza = SQLexecuteQuery($sqlAtualizaAba)){
@@ -40,7 +40,7 @@ if(isset($_POST['aba'])){
     $rs = SQLexecuteQuery($sql);
 
     if($rs) {
-        $totalRegistros = pg_num_rows($rs);
+        $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
     }
 }
 
@@ -48,7 +48,7 @@ if(isset($_POST['aba'])){
 $totalAbas = 0;
 $sql = "select * from bo_aba";
 if($rs_abas = SQLexecuteQuery($sql)){
-    $totalAbas = pg_num_rows($rs_abas);
+    $totalAbas = (($rs_abas) ? pg_num_rows($rs_abas) : 0);
 }
 
 ?>

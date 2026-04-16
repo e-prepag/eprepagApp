@@ -39,7 +39,7 @@ if($tf_v_data_inclusao_fim) {
 $sql .= "order by \"vb2c_dataVenda\" desc";
 //echo "$sql<br>";
 $rs = SQLexecuteQuery($sql);
-//echo "pg_num_rows(rs): ".pg_num_rows($rs)."<br>";
+//echo "pg_num_rows(rs): ".(($rs) ? pg_num_rows($rs) : 0)."<br>";
 
 ?>
 <link href="<?php echo $url; ?>:<?php echo $server_port; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -98,13 +98,13 @@ $(function(){
 <?php
 
 
-	if(!$rs || pg_num_rows($rs) == 0) {
+	if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
 		echo "Nenhum produto encontrado.<br>\n";
 	} else {
 
-		$s_several = ((pg_num_rows($rs)>1)?"s":"");
+		$s_several = (((($rs) ? pg_num_rows($rs) : 0)>1)?"s":"");
 
-		echo "<p>Encontrado$s_several ".pg_num_rows($rs)." registro$s_several</p>";
+		echo "<p>Encontrado$s_several ".(($rs) ? pg_num_rows($rs) : 0)." registro$s_several</p>";
 		echo "<table class='table txt-preto fontsize-pp table-bordered'>\n";
 		echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>\n";
 		echo "<td>idProduto</td>\n";
@@ -133,7 +133,7 @@ $(function(){
 			$recibo_formatted = $rs_row['vb2c_pin'];	//wordwrap($rs_row['rprs_recibo'], 41, "\n", true);
 			$b2cNomeServico = (isset($GLOBALS['B2C_PRODUCT'][$rs_row['vb2c_coServico']]['name'])) ? $GLOBALS['B2C_PRODUCT'][$rs_row['vb2c_coServico']]['name'] : "";
 			// se limite é válido -> Procesa solicitação
-			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen($recibo_formatted)>0)?" title=\"".$recibo_formatted."\"":"").">\n";
+			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen((string)($recibo_formatted ?? ""))>0)?" title=\"".$recibo_formatted."\"":"").">\n";
 			echo "<td align='center'>".$rs_row['vb2c_coServico']."</td>\n";
 			echo "<td><nobr>".substr($rs_row['vb2c_dataVenda'], 0, 19)."</nobr></td>\n";
 			echo "<td align='center'><nobr>".$b2cNomeServico."</nobr></td>\n";

@@ -2,7 +2,7 @@
 <?php
 require_once $raiz_do_projeto . "includes/access_functions.php";
 
-$sNomePagina = substr($_SERVER['PHP_SELF'],strrpos($_SERVER['PHP_SELF'],'/')+1,(strlen($_SERVER['PHP_SELF'])-strrpos($_SERVER['PHP_SELF'],'/')));
+$sNomePagina = substr($_SERVER['PHP_SELF'],strrpos($_SERVER['PHP_SELF'],'/')+1,(strlen((string)($_SERVER['PHP_SELF'] ?? ""))-strrpos($_SERVER['PHP_SELF'],'/')));
 
 $MENU = array (
 				'Hist&oacute;rico de PINs'		=> 'pins_card_historico.php',

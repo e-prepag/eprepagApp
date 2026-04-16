@@ -39,7 +39,7 @@ function geraSenha() {
 	// add random characters to $return until $tamanhoSenha is reached
 	for ($i=0; $i < $tamanhoSenha; $i++) {
 		// pick a random character from the possible ones
-		$char = substr($sPossib, mt_rand(0, strlen($sPossib) - 1), 1);
+		$char = substr($sPossib, mt_rand(0, strlen((string)($sPossib ?? "")) - 1), 1);
 		// we don't want this character if it's already in the password
 		// but repeat character  if length > range 
 		$return .= $char;
@@ -85,9 +85,9 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
                 
 		// Armazena o range de lote
 		$sCodLote = "";
-		for ($i=0; $i<count($ids_temp);$i++) {
+		for ($i=0; $i<(is_countable($ids_temp) ? count($ids_temp) : 0);$i++) {
 			list($codlote,$codopr) = explode("|",$ids_temp[$i]);
-			if (strlen($sCodLote)==0) {
+			if (strlen((string)($sCodLote ?? ""))==0) {
 				$sCodLote .= $codlote;
 			}
 			else $sCodLote .= ",".$codlote;
@@ -112,7 +112,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
 		//echo $sql."<br>"; 
                 
 		$rs_pins_email = SQLexecuteQuery($sql);
-		if(!$rs_pins_email|| pg_num_rows($rs_pins_email) == 0) {
+		if(!$rs_pins_email|| (($rs_pins_email) ? pg_num_rows($rs_pins_email) : 0) == 0) {
 			$msg_pin .= "Todos os PINs Ativos da seleção já foram utilizados em arquivos anteriores.<br>";
 			$msg .= "<font color='#FF0000'><b>Todos os PINs Ativos da seleção já foram utilizados em arquivos anteriores.".PHP_EOL."</b></font><br>";
 		}
@@ -239,7 +239,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
                         if ($email -> Send()) {
 				gravaLogDepuradorCard("Email enviado com sucesso!".PHP_EOL);
 				
-				$nomeArquivoProBD = substr($varArquivoRAR,(strrpos($varArquivoRAR,'/')+1),(strlen($varArquivoRAR)-strrpos($varArquivoRAR,'/')));
+				$nomeArquivoProBD = substr($varArquivoRAR,(strrpos($varArquivoRAR,'/')+1),(strlen((string)($varArquivoRAR ?? ""))-strrpos($varArquivoRAR,'/')));
 				
 				//teste se não houve problemas na inserção no estoque
 				if($msg == "") {
@@ -256,7 +256,7 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
 						$sqlArquivo = "select pcra_codinterno from pins_card_rel_arquivos where pcra_nome='".$nomeArquivoProBD."' and pcra_senha='".$senha."';";
 						//echo $sqlArquivo."<br>";
                                                 $rs_arquivoRet = SQLexecuteQuery($sqlArquivo);
-						if(!$rs_arquivoRet|| pg_num_rows($rs_arquivoRet) == 0) {
+						if(!$rs_arquivoRet|| (($rs_arquivoRet) ? pg_num_rows($rs_arquivoRet) : 0) == 0) {
 							$msg_pin .= "Erro localizar informações do arquivo no banco de dados. ($sqlArquivo)<br>";
 							$msg .= "<font color='#FF0000'><b>Erro localizar informações do arquivo no banco de dados. ($sqlArquivo).".PHP_EOL."<br></b></font><br>";
 						}

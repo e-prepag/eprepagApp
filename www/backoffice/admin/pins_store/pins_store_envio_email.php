@@ -53,7 +53,7 @@ function geraSenha()
 	// add random characters to $return until $tamanhoSenha is reached
 	for ($i = 0; $i < $tamanhoSenha; $i++) {
 		// pick a random character from the possible ones
-		$char = substr($sPossib, mt_rand(0, strlen($sPossib) - 1), 1);
+		$char = substr($sPossib, mt_rand(0, strlen((string)($sPossib ?? "")) - 1), 1);
 		// we don't want this character if it's already in the password
 		// but repeat character  if length > range 
 		$return .= $char;
@@ -94,9 +94,9 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 		}
 		$sCodLote = "";
 		// Armazena o range de lote
-		for ($i = 0; $i < count($ids_temp); $i++) {
+		for ($i = 0; $i < (is_countable($ids_temp) ? count($ids_temp) : 0); $i++) {
 			list($codlote, $codopr) = explode("|", $ids_temp[$i]);
-			if (strlen($sCodLote) == 0) {
+			if (strlen((string)($sCodLote ?? "")) == 0) {
 				$sCodLote .= $codlote;
 			} else
 				$sCodLote .= "," . $codlote;
@@ -114,7 +114,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 		$sql = "select pin_codinterno,distributor_codigo, pin_lote_codigo, to_char(pin_dataentrada,'DD/MM/YYYY') as data, pin_formato, pin_valor, pin_codigo, pin_serial from pins_store ps where pin_status='" . intval($PINS_STORE_STATUS_VALUES['A']) . "' and distributor_codigo=" . intval($distributor_codigo) . " and pin_arq_gerado IS NULL and pin_lote_codigo IN (" . $sCodLote . ") order by pin_valor";
 		//echo $sql;
 		$rs_pins_email = SQLexecuteQuery($sql);
-		if (!$rs_pins_email || pg_num_rows($rs_pins_email) == 0) {
+		if (!$rs_pins_email || (($rs_pins_email) ? pg_num_rows($rs_pins_email) : 0) == 0) {
 			$msg_pin .= "Todos os PINs Ativos da seleção j&aacute; foram utilizados em arquivos anteriores.<br>";
 			$msg .= "<font color='#FF0000'><b>Todos os PINs Ativos da seleção j&aacute; foram utilizados em arquivos anteriores." . PHP_EOL . "</b></font><br>";
 		} else {
@@ -205,7 +205,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					// Cria LoteID
 					$sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins where opr_codigo = " . $opr_codigo_aux;
 					$rs_lote = SQLexecuteQuery($sql);
-					if (!$rs_lote || pg_num_rows($rs_lote) == 0) {
+					if (!$rs_lote || (($rs_lote) ? pg_num_rows($rs_lote) : 0) == 0) {
 						$ilote = 1;
 					} else {
 						$rs_lote_row = pg_fetch_array($rs_lote);
@@ -216,7 +216,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					$sql_serial = "select CAST(pin_serial AS BIGINT) as max_serial from pins where opr_codigo = " . $opr_codigo_aux . " order by CAST(pin_serial AS BIGINT) desc limit 1;";
 					$rs_serial = SQLexecuteQuery($sql_serial);
 					if ($rs_serial) {
-						if (pg_num_rows($rs_serial) > 0) {
+						if ((($rs_serial) ? pg_num_rows($rs_serial) : 0) > 0) {
 							$rs_serial_row = pg_fetch_array($rs_serial);
 							$pin_serial = $rs_serial_row['max_serial'];
 						} else {
@@ -240,7 +240,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 						//Teste existencia no estoque do publisher
 						$sql = "select * from pins where pin_codigo = '" . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . "' and opr_codigo = $opr_codigo_aux";
 						$rs_pins_pub = SQLexecuteQuery($sql);
-						if (!$rs_pins_pub || pg_num_rows($rs_pins_pub) == 0) {
+						if (!$rs_pins_pub || (($rs_pins_pub) ? pg_num_rows($rs_pins_pub) : 0) == 0) {
 							$sql = "insert into pins (pin_serial, pin_codigo, opr_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_canal, pin_horaentrada,pin_status,pin_validade) values ('" . $spin_serial . "', '" . $ps->decrypt(base64_decode($rs_pins_email_row['pin_codigo'])) . "', " . $opr_codigo_aux . ", " . $rs_pins_email_row['pin_valor'] . ", " . $ilote . ", CURRENT_TIMESTAMP, 's', NOW(),'1',(NOW() + interval '2 month'));";
 							$rs_pins_save = SQLexecuteQuery($sql);
 							if (!$rs_pins_save) {
@@ -344,7 +344,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					gravaLog_Depurador("Email enviado com sucesso!" . PHP_EOL);
 
 					if (($DISTRIBUIDORA_EPP != intval($distributor_codigo)) && ($DISTRIBUIDORA_EPP_LH != intval($distributor_codigo))) {
-						$nomeArquivoProBD = substr($varArquivoRAR, (strrpos($varArquivoRAR, '/') + 1), (strlen($varArquivoRAR) - strrpos($varArquivoRAR, '/')));
+						$nomeArquivoProBD = substr($varArquivoRAR, (strrpos($varArquivoRAR, '/') + 1), (strlen((string)($varArquivoRAR ?? "")) - strrpos($varArquivoRAR, '/')));
 					} else {
 						$nomeArquivoProBD = "Carga no Estoque " . date('Y-m-d H:i:s');
 						$senha = "";
@@ -361,7 +361,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 						} else {
 							$sqlArquivo = "select psra_codinterno from pins_store_rel_arquivos where psra_nome='" . $nomeArquivoProBD . "' and psra_senha='" . $senha . "';";
 							$rs_arquivoRet = SQLexecuteQuery($sqlArquivo);
-							if (!$rs_arquivoRet || pg_num_rows($rs_arquivoRet) == 0) {
+							if (!$rs_arquivoRet || (($rs_arquivoRet) ? pg_num_rows($rs_arquivoRet) : 0) == 0) {
 								$msg_pin .= "Erro localizar informa&ccedil;&otilde;es do arquivo no banco de dados. ($sqlArquivo)<br>";
 								$msg .= "<font color='#FF0000'><b>Erro localizar informa&ccedil;&otilde;es do arquivo no banco de dados. ($sqlArquivo)." . PHP_EOL . "<br></b></font><br>";
 							} else {

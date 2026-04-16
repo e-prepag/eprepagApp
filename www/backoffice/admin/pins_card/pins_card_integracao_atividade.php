@@ -26,9 +26,9 @@ $msg = "";
 if($msg == "" && $btPesquisar){
 	$sql_filters = array();
 	$sql  = "SELECT *,to_char(pih_data,'DD/MM/YYYY HH24:MI:SS') as pih_data_aux from pins_integracao_card_historico "; 
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql_filters[] = "pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql_filters[] = "pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	if(!empty($opr_codigo))
 				$sql_filters[] = "pih_id = ".addslashes($opr_codigo);
@@ -37,18 +37,18 @@ if($msg == "" && $btPesquisar){
         elseif(!empty($pin_codigo)) die("É obrigatório a seleção do Publisher para a Pesquisa de PIN!");
 	if(!empty($pin_valor))
 				$sql_filters[] = "pih_pin_valor = ".addslashes($pin_valor);
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= "WHERE ".$sql_aux;
 	}
 	//echo $sql."<br>";
 	$rs_total = SQLexecuteQuery($sql);
-	if($rs_total) $registros_total = pg_num_rows($rs_total);
+	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY pih_data DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
         //echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 
 //funcoes
@@ -59,7 +59,7 @@ function implode_with_key($assoc, $inglue = '>', $outglue = ',') {
         $return .= $outglue . $tk . $inglue . $tv;
     }
  
-    return substr($return, strlen($outglue));
+    return substr($return, strlen((string)($outglue ?? "")));
 }//end function implode_with_key
 
 function gera_epp_card_integracao() {

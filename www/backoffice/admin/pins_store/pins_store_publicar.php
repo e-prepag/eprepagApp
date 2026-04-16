@@ -114,7 +114,7 @@ $msg_pin = "";
 			//echo "<pre>";
 			//print_r($ids_temp);
 			//echo "</pre>";
-			for ($i=0;$i<count($ids_temp);$i++) {
+			for ($i=0;$i<(is_countable($ids_temp) ? count($ids_temp) : 0);$i++) {
                 if($msg == ""){
 					list($codlote,$codopr) = explode("|",$ids_temp[$i]);
 					//echo "lote: ".$codlote."<br>";
@@ -130,7 +130,7 @@ $msg_pin = "";
 					}
 				}
 			} 
-			if (count($ids_temp) == 0) {
+			if ((is_countable($ids_temp) ? count($ids_temp) : 0) == 0) {
 				$msg_pin .= "<font color='#FF0000'><b>N&atilde;o foi selecionado nenhum LOTE para publica&ccedil;&atilde;o!</b></font><br>";
 			}
 			//Finaliza transacao
@@ -148,33 +148,33 @@ $msg_pin = "";
 	if($msg == ""){
 		$sql  = "select distributor_codigo, pin_lote_codigo, to_char(pin_dataentrada,'DD/MM/YYYY') as data, count(ps.pin_codinterno) as total, pin_formato, pin_valor, pin_canal from pins_store ps where pin_status='".intval($PINS_STORE_STATUS_VALUES['D'])."' ";
 
-		if(strlen($tf_v_formato)) {
+		if(strlen((string)($tf_v_formato ?? ""))) {
 			if(!($tf_v_formato==0 || $tf_v_formato==1 || $tf_v_formato==2 || $tf_v_formato==3 || $tf_v_formato==4)) {
 				$tf_v_formato = "";
 			}
 
-			if(strlen($tf_v_formato)) {
+			if(strlen((string)($tf_v_formato ?? ""))) {
 				$sql .= " and pin_formato='".intval($tf_v_formato)."' ";	
 			}
 		}
-        if(strlen($distributor_codigo))
+        if(strlen((string)($distributor_codigo ?? "")))
                     $sql .= " and distributor_codigo=".intval($distributor_codigo);
-		if(strlen($lote))
+		if(strlen((string)($lote ?? "")))
                     $sql .= " and pin_lote_codigo=".intval($lote);
-		if(strlen($valor))
+		if(strlen((string)($valor ?? "")))
                     $sql .= " and pin_valor=".intval($valor);
-		if(strlen($tf_v_data_inclusao_ini))
+		if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and pin_dataentrada >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-		if(strlen($tf_v_data_inclusao_fim))
+		if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and pin_dataentrada <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 		$sql .= " group by distributor_codigo, pin_lote_codigo, data, pin_formato, pin_valor, pin_canal ";
 		$rs_total = SQLexecuteQuery($sql);
-		if($rs_total) $registros_total = pg_num_rows($rs_total);
+		if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 		$sql .= " order by total DESC,pin_valor ";	
 		$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
 		$rs_pins = SQLexecuteQuery($sql);
-		if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+		if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 	}
 ?>
 <div class="col-md-12">
@@ -280,7 +280,7 @@ include "pins_store_menu.php";
 				  <td class="texto" align="center"><nobr>&nbsp;<?php 
 					$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = ".$rs_pins_row['distributor_codigo']."and to_char(pin_dataentrada,'DD/MM/YYYY') = '".$rs_pins_row['data']."' and pin_lote_codigo = ".$rs_pins_row['pin_lote_codigo'];
 					$rs_total = SQLexecuteQuery($sql_total);
-					if($rs_total && pg_num_rows($rs_total) > 0) {
+					if($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 						$rs_total_row = pg_fetch_array($rs_total);
 						echo $rs_total_row['total'];
 					}

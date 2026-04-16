@@ -69,7 +69,7 @@ try {
 		$selectRows->execute();
 
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
-		if (count($resultRows) > 0) {
+		if ((is_countable($resultRows) ? count($resultRows) : 0) > 0) {
 			foreach ($resultRows as $key => $value) {
 				$dataKeys = array_keys($value);
 

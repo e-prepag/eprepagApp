@@ -93,7 +93,7 @@ $(document).ready(function () {
             <td width="30%" class="bg-azul-claro txt-branco"><b> Valor do PIN: </b></td>
             <td width="40%" bgcolor="#f5f5fb">
 				<div id='mostraValores'>
-				<?php if(strlen($opr_codigo)>0) { ?>
+				<?php if(strlen((string)($opr_codigo ?? ""))>0) { ?>
 				<script language="javascript">
 				carga_valor();
 				</script>

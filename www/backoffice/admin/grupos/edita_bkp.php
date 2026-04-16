@@ -129,19 +129,19 @@ if(!empty($msg))
             $continue = false;
             $abas = $sistemaMenus->getAbas();
 
-            if(count($abas) > 0){
+            if((is_countable($abas) ? count($abas) : 0) > 0){
                 
                 foreach($abas as $indAba => $aba){
                     
                     $menus = $aba->getMenus();
                     
-                    if(count($menus) <= 0)
+                    if((is_countable($menus) ? count($menus) : 0) <= 0)
                         continue;
                     
                     foreach ($menus as $indMenu => $menu){
                         $itensMenus = $menu->getItens();
 
-                        if(count($itensMenus) > 0)
+                        if((is_countable($itensMenus) ? count($itensMenus) : 0) > 0)
                         {
                             $abasAux[$sis][$indAba] = $aba;
                         }
@@ -154,7 +154,7 @@ if(!empty($msg))
             $continue = false;
             $abas = $sistemaMenus;
 
-            if(count($abas) > 0){
+            if((is_countable($abas) ? count($abas) : 0) > 0){
 ?>
                 <div class="top10 lista bg-primary txt-branco">
                     <a href="#<?=$sis;?>" class="txt-branco" data-toggle="collapse"><strong>Sistema: <?=$sis;?></strong></a>
@@ -164,7 +164,7 @@ if(!empty($msg))
                 foreach($abas as $aba){
                     $menus = $aba->getMenus();
                     
-                    if(count($menus) <= 0)
+                    if((is_countable($menus) ? count($menus) : 0) <= 0)
                         continue;
 ?>
                     <div class="top10 lista bg-verde-claro txt-branco">
@@ -178,7 +178,7 @@ if(!empty($msg))
                     foreach ($menus as $menu){
                         $itensMenus = $menu->getItens();
 
-                        if(count($itensMenus) <= 0)
+                        if((is_countable($itensMenus) ? count($itensMenus) : 0) <= 0)
                             continue;
 ?>
                         <div class="lista bg-info txt-branco">

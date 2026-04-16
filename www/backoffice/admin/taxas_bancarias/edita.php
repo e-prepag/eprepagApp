@@ -27,15 +27,15 @@ if(isset($_POST['taxa']) && isset($_POST['id'])) { //novo e edita
             $sqlValida = "select count(id) from taxas_transacoes_cobradas_da_epp where data = ? and id_forma = ? and banco = ?";
             
             $params = array(
-                            filter_var(str_replace(",",".",$_POST['taxa']),FILTER_SANITIZE_STRING),
-                            filter_var(Util::getData($_POST['data'], true),FILTER_SANITIZE_STRING),
-                            filter_var($_POST['formaPagamento'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)str_replace(",",".",$_POST['taxa'])),
+                            strip_tags((string)Util::getData($_POST['data'], true)),
+                            strip_tags((string)$_POST['formaPagamento']),
                             filter_var($_POST['banco'],FILTER_SANITIZE_NUMBER_INT)
                         );
             
             $paramsValidate = array(
-                           filter_var(Util::getData($_POST['data'], true),FILTER_SANITIZE_STRING),
-                           filter_var($_POST['formaPagamento'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)Util::getData($_POST['data'], true)),
+                            strip_tags((string)$_POST['formaPagamento']),
                            filter_var($_POST['banco'],FILTER_SANITIZE_NUMBER_INT)
                        );
             
@@ -45,16 +45,16 @@ if(isset($_POST['taxa']) && isset($_POST['id'])) { //novo e edita
             $sql = "UPDATE taxas_transacoes_cobradas_da_epp set taxa = ?, data  = ?, id_forma = ?, banco = ? where id = ?;";
             $sqlValida = "select count(id) from taxas_transacoes_cobradas_da_epp where data = ? and id_forma = ? and banco = ? and id != ?";
             $params = array(
-                            filter_var(str_replace(",",".",$_POST['taxa']),FILTER_SANITIZE_STRING),
-                            filter_var(Util::getData($_POST['data'], true),FILTER_SANITIZE_STRING),
-                            filter_var($_POST['formaPagamento'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)str_replace(",",".",$_POST['taxa'])),
+                            strip_tags((string)Util::getData($_POST['data'], true)),
+                            strip_tags((string)$_POST['formaPagamento']),
                             filter_var($_POST['banco'],FILTER_SANITIZE_NUMBER_INT),
                             filter_var($_POST['id'],FILTER_SANITIZE_NUMBER_INT)
                         );
             
             $paramsValidate = array(
-                            filter_var(Util::getData($_POST['data'], true),FILTER_SANITIZE_STRING),
-                            filter_var($_POST['formaPagamento'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)Util::getData($_POST['data'], true)),
+                            strip_tags((string)$_POST['formaPagamento']),
                             filter_var($_POST['banco'],FILTER_SANITIZE_NUMBER_INT),
                             filter_var($_POST['id'],FILTER_SANITIZE_NUMBER_INT)
                         );
@@ -95,7 +95,7 @@ else if(isset($_POST['id']) && is_numeric($_POST['id']) && empty($_POST['nome'])
         $stmt->execute(array($_POST['id']));
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if(count($fetch) > 0){
+        if((is_countable($fetch) ? count($fetch) : 0) > 0){
             $id = $fetch[0]['id'];
             $taxa = $fetch[0]['taxa'];
             $data = Util::getData($fetch[0]['data']);

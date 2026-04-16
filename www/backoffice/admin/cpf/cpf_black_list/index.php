@@ -27,13 +27,13 @@ if($acao == 'inserir')
 	if(empty($msg)) {
                 $sql = "select * from cpf_black_list where cpf = $cpf;";
                 $rs_log = SQLexecuteQuery($sql);
-                if($rs_log && pg_num_rows($rs_log)>0) {
+                if($rs_log && (($rs_log) ? pg_num_rows($rs_log) : 0)>0) {
                     $msg = "<b class='txt-vermelho'>Este CPF já consta na Black List!</b><p class='top20'></p>";
                 }
                 else {
                     $sql = "select * from cpf_white_list where cpf = $cpf;";
                     $rs_log = SQLexecuteQuery($sql);
-                    if($rs_log && pg_num_rows($rs_log)>0) {
+                    if($rs_log && (($rs_log) ? pg_num_rows($rs_log) : 0)>0) {
                         $msg = "<b class='txt-vermelho'>Este CPF AINDA CONSTA na WHITE List!</b><p class='top20'></p>";
                     }
                     else {

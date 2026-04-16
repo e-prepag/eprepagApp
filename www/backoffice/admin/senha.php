@@ -54,7 +54,7 @@ if(isset($_POST['pass_old']) && $_SESSION["token_csrf"] == $_POST["token_csrf"])
 
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($fetch) == 1) {
+        if ((is_countable($fetch) ? count($fetch) : 0) == 1) {
 
 
             $passw = $cripto->hashPassword(addslashes($_POST['nova_senha']));

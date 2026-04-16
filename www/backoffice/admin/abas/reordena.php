@@ -17,7 +17,7 @@ if(!empty($_POST['reordenar'])){
         
         $sql = "select * from bo_aba where aba_id = ".$id;
         $rs_reordena = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_reordena) > 0) {
+        if((($rs_reordena) ? pg_num_rows($rs_reordena) : 0) > 0) {
             $sqlAtualizaAba = "update bo_aba set aba_order = $ordem where aba_id = $id";
             
             if(!$rsAtualiza = SQLexecuteQuery($sqlAtualizaAba)){
@@ -39,7 +39,7 @@ if(isset($_POST['sistema'])){
     $rs = SQLexecuteQuery($sql);
 
     if($rs) {
-        $totalRegistros = pg_num_rows($rs);
+        $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
     }
 }
 ?>

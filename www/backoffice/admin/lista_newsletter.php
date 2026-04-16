@@ -80,19 +80,19 @@ if(!empty($btPesquisar))
 					un_email,
 					to_char(un_data_cadastro,'DD/MM/YYYY HH24:MI:SS') as un_data_cadastro_aux
 			FROM usuarios_newsletter";
-	if(strlen($un_email))
+	if(strlen((string)($un_email ?? "")))
 				$sql_filters[] = "un_email like '%".addslashes($un_email)."%'";
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql_filters[] = "un_data_cadastro >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql_filters[] = "un_data_cadastro <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= " WHERE ".$sql_aux;
 	}
 
 	$rs_newsletter_total = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($rs_newsletter_total);
+	$total_table = (($rs_newsletter_total) ? pg_num_rows($rs_newsletter_total) : 0);
 	if($total_table == 0) {
 		echo "Nenhum e-mail encontrado.<br>".PHP_EOL;
 	} else {		
@@ -118,7 +118,7 @@ if(!empty($btPesquisar))
 	//echo($sql);
 
 	$rs_newsletter = SQLexecuteQuery($sql);
-	if(!isset($rs_newsletter) || !($rs_newsletter) || (pg_num_rows($rs_newsletter)==0)) {
+	if(!isset($rs_newsletter) || !($rs_newsletter) || ((($rs_newsletter) ? pg_num_rows($rs_newsletter) : 0)==0)) {
 		echo "Erro ao consultar informa&ccedil;&otilde;es de emails de newsletter.<br>";
 	}
 	else {

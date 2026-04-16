@@ -24,7 +24,7 @@ if(!empty($_POST['reordenar'])){
         
         $sql = "select * from bo_item where item_id = ".$id;
         $rs_reordena = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_reordena) > 0) {
+        if((($rs_reordena) ? pg_num_rows($rs_reordena) : 0) > 0) {
             $sqlAtualizaAba = "update bo_item set item_order = $ordem where item_id = $id";
             
             if(!$rsAtualiza = SQLexecuteQuery($sqlAtualizaAba)){
@@ -46,7 +46,7 @@ $stmt->execute();
 
 $abas = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-if(count($abas) > 0 && isset($_POST['aba']) && $_POST['aba']){
+if((is_countable($abas) ? count($abas) : 0) > 0 && isset($_POST['aba']) && $_POST['aba']){
 
     $where = " where aba_id = ".$_POST['aba'];
 
@@ -65,7 +65,7 @@ if(count($abas) > 0 && isset($_POST['aba']) && $_POST['aba']){
         $rs = SQLexecuteQuery($sql);
 
         if($rs) {
-            $totalRegistros = pg_num_rows($rs);
+            $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
         }
     }
 }

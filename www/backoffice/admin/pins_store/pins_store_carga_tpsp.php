@@ -14,7 +14,7 @@ echo "Gamers<br>";
 	//echo $sql;
 	//die();
 	$rs_pins_email = SQLexecuteQuery($sql);
-	if(!$rs_pins_email|| pg_num_rows($rs_pins_email) == 0) {
+	if(!$rs_pins_email|| (($rs_pins_email) ? pg_num_rows($rs_pins_email) : 0) == 0) {
 		$msg_pin .= "Não existe nenhum PIN no estoque para a operadora 49.<br>";
 	}
 	else {
@@ -73,7 +73,7 @@ echo "<br>======================================================================
 	//echo $sql;
 	//die();
 	$rs_pins_email = SQLexecuteQuery($sql);
-	if(!$rs_pins_email|| pg_num_rows($rs_pins_email) == 0) {
+	if(!$rs_pins_email|| (($rs_pins_email) ? pg_num_rows($rs_pins_email) : 0) == 0) {
 		$msg_pin .= "Não existe nenhum PIN no estoque para a operadora 49.<br>";
 	}
 	else {

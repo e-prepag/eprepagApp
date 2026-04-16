@@ -63,23 +63,23 @@ if($msg == "" && $btPesquisar=='Pesquisar'){
                         from pins_card pc, 
                                 pins_card_rel_arquivos pcra
                         where pc.pin_arq_gerado = pcra.pcra_codinterno";
-        if(strlen($tf_v_data_inclusao_ini_env))
+        if(strlen((string)($tf_v_data_inclusao_ini_env ?? "")))
                         $sql .= " and pcra.pcra_dataentrada >= to_timestamp('".addslashes($tf_v_data_inclusao_ini_env)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-        if(strlen($tf_v_data_inclusao_fim_env))
+        if(strlen((string)($tf_v_data_inclusao_fim_env ?? "")))
                         $sql .= " and pcra.pcra_dataentrada <= to_timestamp('".addslashes($tf_v_data_inclusao_fim_env)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($opr_codigo))
+	if(strlen((string)($opr_codigo ?? "")))
 			$sql .= " and pc.opr_codigo=".intval($opr_codigo);
-        if(strlen($distributor_codigo))
+        if(strlen((string)($distributor_codigo ?? "")))
                         $sql .= " and pc.distributor_codigo=".intval($distributor_codigo);
-        if(strlen($lote))
+        if(strlen((string)($lote ?? "")))
                         $sql .= " and pc.pin_lote_codigo=".intval($lote);
-        if(strlen($valor))
+        if(strlen((string)($valor ?? "")))
                         $sql .= " and pc.pin_valor=".intval($valor);
         $sql .= " group by distributor_codigo, pin_lote_codigo, pc.opr_codigo, pin_valor, pcra.pcra_nome, pcra.pcra_dataentrada, pcra.pcra_codinterno";
         //echo "<br><br>".str_replace("\n", "<br>\n", $sql)."<br><br>";
         $rs_total = SQLexecuteQuery($sql);
         if($rs_total) {
-                $registros_total = pg_num_rows($rs_total);
+                $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 
         }
         //inicio totalizador geral
@@ -90,7 +90,7 @@ if($msg == "" && $btPesquisar=='Pesquisar'){
         $total_geral_pins_utilizados_full = 0;
         $total_geral_valor_pins_utilizados_full = 0;
         while($rs_pins_row = pg_fetch_array($rs_total)){ 
-                if(strlen($rs_pins_row['pcra_codinterno'])) {
+                if(strlen((string)($rs_pins_row['pcra_codinterno'] ?? ""))) {
                         $sql_total = "
                                 select 
                                         count(pc.pin_codinterno) as total,
@@ -102,7 +102,7 @@ if($msg == "" && $btPesquisar=='Pesquisar'){
                                           pc.distributor_codigo = ".$rs_pins_row['distributor_codigo']." and
                                           pc.pin_arq_gerado = ".$rs_pins_row['pcra_codinterno'];
                         $rs_total_aux = SQLexecuteQuery($sql_total);
-                        if($rs_total_aux && pg_num_rows($rs_total_aux) > 0) {
+                        if($rs_total_aux && (($rs_total_aux) ? pg_num_rows($rs_total_aux) : 0) > 0) {
                                 $rs_total_row = pg_fetch_array($rs_total_aux);
                                 $total_geral_pins_lote_full += $rs_total_row['total'];
                                 $total_geral_valor_pins_lote_full += $rs_pins_row['pin_valor'] * $rs_total_row['total'];
@@ -120,12 +120,12 @@ if($msg == "" && $btPesquisar=='Pesquisar'){
                                           pc.distributor_codigo = ".$rs_pins_row['distributor_codigo']." and
                                           pc.pin_arq_gerado = ".$rs_pins_row['pcra_codinterno'];
 
-                        if(strlen($tf_v_data_inclusao_ini))
+                        if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
                                         $sql_total .= " and pich.pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-                        if(strlen($tf_v_data_inclusao_fim))
+                        if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
                                         $sql_total .= " and pich.pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
                         $rs_total_uti = SQLexecuteQuery($sql_total);
-                        if($rs_total_uti && pg_num_rows($rs_total_uti) > 0) {
+                        if($rs_total_uti && (($rs_total_uti) ? pg_num_rows($rs_total_uti) : 0) > 0) {
                                 $rs_total_uti_row = pg_fetch_array($rs_total_uti);
                                 $total_geral_pins_utilizados_full += $rs_total_uti_row['utilizados'];
                                 $total_geral_valor_pins_utilizados_full += $rs_pins_row['pin_valor'] * $rs_total_uti_row['utilizados'];
@@ -137,7 +137,7 @@ if($msg == "" && $btPesquisar=='Pesquisar'){
         $sql .= " order by distributor_codigo,pcra.pcra_dataentrada DESC, pin_valor ";	
         $sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
         $rs_pins = SQLexecuteQuery($sql);
-        if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+        if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <div class="col-md-12">
@@ -245,7 +245,7 @@ include "pins_card_menu.php";
     	          <td class="texto" align="center"><nobr>&nbsp;<?php echo $rs_pins_row['data_envio']?>&nbsp;</nobr></td>
     	          <td class="texto" align="center">&nbsp;<?php echo $rs_pins_row['pin_lote_codigo']?>&nbsp;</td>
     	          <td class="texto" align="right">&nbsp;<?php
-					if(strlen($rs_pins_row['pcra_codinterno'])) {
+					if(strlen((string)($rs_pins_row['pcra_codinterno'] ?? ""))) {
 						$sql_total = "
 							select 
 								count(pc.pin_codinterno) as total,
@@ -256,7 +256,7 @@ include "pins_card_menu.php";
                                                         	  pc.distributor_codigo = ".$rs_pins_row['distributor_codigo']." and
 								  pc.pin_arq_gerado = ".$rs_pins_row['pcra_codinterno'];
 					 	$rs_total = SQLexecuteQuery($sql_total);
-						if($rs_total && pg_num_rows($rs_total) > 0) {
+						if($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 							$rs_total_row = pg_fetch_array($rs_total);
 							echo $rs_total_row['total'];
 							$total_geral_pins_lote += $rs_total_row['total'];
@@ -270,7 +270,7 @@ include "pins_card_menu.php";
 					  $total_geral_valor_pins_lote += $valor_aux;
 				  ?>&nbsp;</nobr></td>
 				  <td class="texto" align="right"><nobr>&nbsp;<?php 
-					if(strlen($rs_pins_row['pcra_codinterno'])&&$rs_total && pg_num_rows($rs_total) > 0) {
+					if(strlen((string)($rs_pins_row['pcra_codinterno'] ?? ""))&&$rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 						echo $rs_total_row['circulante'];
 						$total_geral_pins_circulante += $rs_total_row['circulante'];	
 					}
@@ -281,7 +281,7 @@ include "pins_card_menu.php";
 					  $total_geral_valor_pins_circulante += $valor_aux;
 				  ?>&nbsp;</td>
     	          <td class="texto" align="right">&nbsp;<?php
-					if(strlen($rs_pins_row['pcra_codinterno'])) {
+					if(strlen((string)($rs_pins_row['pcra_codinterno'] ?? ""))) {
                                                 // TO DO ==> Alterar a query quando for gerar PINs CARDs para EPP CASH
 						$sql_total = "
 							select 
@@ -292,12 +292,12 @@ include "pins_card_menu.php";
                                                                   pc.opr_codigo = ".$rs_pins_row['opr_codigo']." and
                                                         	  pc.distributor_codigo = ".$rs_pins_row['distributor_codigo']." and
 								  pc.pin_arq_gerado = ".$rs_pins_row['pcra_codinterno'];
-						if(strlen($tf_v_data_inclusao_ini))
+						if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 								$sql_total .= " and pich.pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-						if(strlen($tf_v_data_inclusao_fim))
+						if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 								$sql_total .= " and pich.pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 						$rs_total_uti = SQLexecuteQuery($sql_total);
-						if($rs_total_uti && pg_num_rows($rs_total_uti) > 0) {
+						if($rs_total_uti && (($rs_total_uti) ? pg_num_rows($rs_total_uti) : 0) > 0) {
 							$rs_total_uti_row = pg_fetch_array($rs_total_uti);
 							echo $rs_total_uti_row['utilizados'];
 							$total_geral_pins_utilizados += $rs_total_uti_row['utilizados'];	

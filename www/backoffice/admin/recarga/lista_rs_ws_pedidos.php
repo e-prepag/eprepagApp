@@ -49,7 +49,7 @@ if($tf_v_data_inclusao_fim) {
 $sql .= "order by rprs_data_inclusao desc";
 //echo "$sql<br>";
 $rs = SQLexecuteQuery($sql);
-//echo "pg_num_rows(rs): ".pg_num_rows($rs)."<br>";
+//echo "pg_num_rows(rs): ".(($rs) ? pg_num_rows($rs) : 0)."<br>";
 
 ?>
 <link href="<?php echo $url; ?>:<?php echo $server_port; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -120,13 +120,13 @@ $rs = SQLexecuteQuery($sql);
 <?php
 
 
-	if(!$rs || pg_num_rows($rs) == 0) {
+	if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
 		echo "Nenhum produto encontrado.<br>";
 	} else {
 
-		$s_several = ((pg_num_rows($rs)>1)?"s":"");
+		$s_several = (((($rs) ? pg_num_rows($rs) : 0)>1)?"s":"");
 
-		echo "<p>Encontrado$s_several ".pg_num_rows($rs)." registro$s_several</p>
+		echo "<p>Encontrado$s_several ".(($rs) ? pg_num_rows($rs) : 0)." registro$s_several</p>
                 <table class=\"table txt-preto\">
                 <tr align='center' style='font-weight:bold; background-color:#ffffcc'>
                 <td>id</td>
@@ -155,7 +155,7 @@ $rs = SQLexecuteQuery($sql);
 
 			// se limite é válido -> Procesa solicitação
 
-			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen($recibo_formatted)>0)?" title=\"".$recibo_formatted."\"":"").">";
+			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen((string)($recibo_formatted ?? ""))>0)?" title=\"".$recibo_formatted."\"":"").">";
 			echo "<td align='center'>".$rs_row['rprs_id']."</td>";
 			echo "<td><nobr>".substr($rs_row['rprs_data_inclusao'], 0, 19)."</nobr></td>";
 			echo "<td align='center'>".$rs_row['rprs_codigooperadora']."</td>";
@@ -171,7 +171,7 @@ $rs = SQLexecuteQuery($sql);
 			echo "<td align='center'>".$rs_row['rprs_status']."</td>";
 			echo "<td align='center'>".$rs_row['rprs_statustransacao']."</td>";
 			echo "<td align='center'><nobr>".substr($rs_row['rprs_data_recarga'], 0, 19)."</nobr></td>";
-			echo "<td align='center'>".((strlen($rs_row['rprs_recibo'])>0)?"<font color='red'>SIM</font>":"")."</td>";
+			echo "<td align='center'>".((strlen((string)($rs_row['rprs_recibo'] ?? ""))>0)?"<font color='red'>SIM</font>":"")."</td>";
 			echo "<td align='center'><nobr>".$rs_row['rprs_nir']."</nobr></td>";
 			echo "<td align='center'><nobr>".$rs_row['rprs_email']."</nobr></td>";
 			echo "</tr>";

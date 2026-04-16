@@ -34,15 +34,15 @@ if(!empty($btPesquisar)){
                     "; 
 	if(!empty($opr_codigo))
 				$sql .= " and pih_id = ".addslashes($opr_codigo);
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	$sql .= " ORDER BY pih_data DESC";	
 	//echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-        $registros_total = pg_num_rows($rs_pins);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+        $registros_total = (($rs_pins) ? pg_num_rows($rs_pins) : 0);
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

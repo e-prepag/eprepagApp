@@ -43,10 +43,10 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
             $sql = "INSERT INTO bo_item (item_descricao, item_link, item_link_linux, item_monitor, menu_id, item_aparece_menu) VALUES (?, ?, ?, ?, ?, ?);";
             
             $params = array(
-                            filter_var($_POST['nome'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['nome']),
                             filter_var($_POST['link_windows'],FILTER_SANITIZE_URL),
                             $_POST["link_linux"],
-                            filter_var($_POST['item_monitor'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['item_monitor']),
                             filter_var($_POST['idMenu'],FILTER_SANITIZE_NUMBER_INT),
                             filter_var($_POST['item_aparece_menu'],FILTER_SANITIZE_NUMBER_INT)
                         );
@@ -56,10 +56,10 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
             $texto = "atualizados";
             $sql = "UPDATE bo_item set item_descricao = ?, item_link  = ?, item_link_linux = ?, item_monitor = ?, menu_id = ?, item_aparece_menu = ? where item_id = ?;";
             $params = array(
-                            filter_var($_POST['nome'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['nome']),
                             filter_var($_POST['link_windows'],FILTER_SANITIZE_URL),
                             $_POST["link_linux"],
-                            filter_var($_POST['item_monitor'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['item_monitor']),
                             filter_var($_POST['idMenu'],FILTER_SANITIZE_NUMBER_INT),
                             filter_var($_POST['item_aparece_menu'],FILTER_SANITIZE_NUMBER_INT),
                             filter_var($_POST['id'],FILTER_SANITIZE_NUMBER_INT)
@@ -119,7 +119,7 @@ else if(isset($_POST['id']) && is_numeric($_POST['id']) && empty($_POST['nome'])
         $stmt->execute(array($_POST['id']));
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if(count($fetch) > 0){
+        if((is_countable($fetch) ? count($fetch) : 0) > 0){
 
             $id = $fetch[0]['item_id'];
             $nome = $fetch[0]['item_descricao'];

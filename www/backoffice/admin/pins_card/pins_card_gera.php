@@ -139,7 +139,7 @@ include "pins_card_menu.php";
             <td width="70%" colspan="2" bgcolor="#f5f5fb"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif">
                     <div id='mostraDistribuidoras'>
 <?php 
-                    if(strlen($opr_codigo)>0) { 
+                    if(strlen((string)($opr_codigo ?? ""))>0) { 
                         if(isset($distributor_codigo)){
 ?>
                         <input type="hidden" id="pin_operacao" value="<?php echo $distributor_codigo;?>">
@@ -163,7 +163,7 @@ include "pins_card_menu.php";
             <td width="30%" class=" bg-azul-claro"><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><b> Valor do PIN: </b></font></td>
             <td width="70%" colspan="2" bgcolor="#f5f5fb"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif">
 				<div id='mostraValores'>
-				<?php if(strlen($distributor_codigo)>0) { ?>
+				<?php if(strlen((string)($distributor_codigo ?? ""))>0) { ?>
 				<script language="javascript">
 				carga_valor();
 				</script>

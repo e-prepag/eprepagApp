@@ -26,7 +26,7 @@ if ($rs_oprPins) {
     echo '<select name="pin_valor" id="pin_valor" class="combo_normal">'.PHP_EOL;
     echo '<option value="">Selecione o Valor</option>';
 
-    $num_rows = pg_num_rows($rs_oprPins);
+    $num_rows = (($rs_oprPins) ? pg_num_rows($rs_oprPins) : 0);
     for ($i = 0; $i < $num_rows; $i++) {
         $row = pg_fetch_array($rs_oprPins, $i);
         $valor = $row['valor'];

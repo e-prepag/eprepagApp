@@ -10,7 +10,7 @@ $sql = "select (select count(*) from sendpin_email_list where mailing_number = $
 //echo $sql."<br>";
 //echo "DOCUMENT_ROOT: ".$_SERVER['DOCUMENT_ROOT']."<br>";
 $rss = SQLexecuteQuery($sql);
-if($rss && pg_num_rows($rss)>0) {
+if($rss && (($rss) ? pg_num_rows($rss) : 0)>0) {
     $vlr = pg_fetch_array($rss);
     $ncadastrados = $vlr['ncadastrados'];
     $ndisparados = $vlr['ndisparados'];
@@ -34,7 +34,7 @@ $sql = "SELECT
        ";
 //echo $sql."<br>";
 $rss = SQLexecuteQuery($sql);
-$nlidos = pg_num_rows($rss);	
+$nlidos = (($rss) ? pg_num_rows($rss) : 0);	
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">

@@ -155,19 +155,19 @@ if(!empty($btPesquisar))
 	}
 	$sql_filters[] = "bdsc.bdsc_click=1"; 
 	$sql_filters[] = "bdsc.bdsc_tipo_usuario = '".addslashes($bds_tipo)."'";
-	if(strlen($bds_id_banner))
+	if(strlen((string)($bds_id_banner ?? "")))
 				$sql_filters[] = "bdsc.bds_id_banner = ".intval($bds_id_banner);
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql_filters[] = "bdsc.bdsc_data_inclusao >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql_filters[] = "bdsc.bdsc_data_inclusao <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= " WHERE ".$sql_aux;
 	}
 	//echo $sql;
 	$rs_respostas_total = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($rs_respostas_total);
+	$total_table = (($rs_respostas_total) ? pg_num_rows($rs_respostas_total) : 0);
 	
 	//Ordem
 	if(!isset($ncamp) || !$ncamp) $sql .= " order by ug_nome_aux";
@@ -187,7 +187,7 @@ if(!empty($btPesquisar))
 	//echo($sql);
 
 	$rs_respostas = SQLexecuteQuery($sql);
-	$total_table_pag = pg_num_rows($rs_respostas_total);
+	$total_table_pag = (($rs_respostas_total) ? pg_num_rows($rs_respostas_total) : 0);
 	if($total_table_pag == 0) {
 		echo "Nenhuma resposta encontrada.<br>\n";
 	} else {		
@@ -197,7 +197,7 @@ if(!empty($btPesquisar))
 			$reg_ate = $max + $inicial;
 	}
 	
-	if(!($rs_respostas) || (pg_num_rows($rs_respostas)==0)) {
+	if(!($rs_respostas) || ((($rs_respostas) ? pg_num_rows($rs_respostas) : 0)==0)) {
 		//echo "Erro ao consultar informa&ccedil;&otilde;es de respostas.<br>";
 	}
 	else {

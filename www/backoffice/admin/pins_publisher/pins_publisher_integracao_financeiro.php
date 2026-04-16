@@ -29,12 +29,12 @@ $msg = "";
 if(!empty($btPesquisar)){ 
         $sql  = "SELECT *,
                         to_char(pih_data,'DD/MM/YYYY HH24:MI:SS') as pih_data_aux ";
-        if(strlen($data_venda_exclusao))
+        if(strlen((string)($data_venda_exclusao ?? "")))
                             $sql .= ", to_char(vg_data_inclusao,'DD/MM/YYYY HH24:MI:SS') as vg_data_inclusao_aux";
         $sql .= "
                 FROM pins_integracao_historico pih
                         inner join pins p ON pin_codinterno=pih_pin_id ";
-        if(strlen($data_venda_exclusao))
+        if(strlen((string)($data_venda_exclusao ?? "")))
                             $sql .= " 
                         inner join tb_dist_venda_games_modelo_pins on vgmp_pin_codinterno  = pih_pin_id
                         inner join tb_dist_venda_games_modelo on vgm_id = vgmp_vgm_id
@@ -46,17 +46,17 @@ if(!empty($btPesquisar)){
                     "; 
 	if(!empty($opr_codigo))
 				$sql .= " and pih_id = ".addslashes($opr_codigo);
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($data_venda_exclusao))
+	if(strlen((string)($data_venda_exclusao ?? "")))
                             $sql .= " and vg_ultimo_status='5' and vg_data_inclusao >= to_timestamp('".addslashes($data_venda_exclusao)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
         $sql .= " ORDER BY pih_data DESC";	
 	//echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-        $registros_total = pg_num_rows($rs_pins);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+        $registros_total = (($rs_pins) ? pg_num_rows($rs_pins) : 0);
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -133,7 +133,7 @@ $(function(){
 			  <td class="texto" align="center"><b>ID do PIN</b>&nbsp;</td>
 			  <td class="texto" align="center"><b>Integrador</b>&nbsp;</td>
 			  <td class="texto" align="center"><b>Dia e Hora Utilização</b>&nbsp;</td>
-			  <td class="texto" align="center"><b><?php echo (strlen($data_venda_exclusao)?"Data de Venda":"VAZIO"); ?></b>&nbsp;</td>
+			  <td class="texto" align="center"><b><?php echo (strlen((string)($data_venda_exclusao ?? ""))?"Data de Venda":"VAZIO"); ?></b>&nbsp;</td>
 			  <td class="texto" align="center"><b>PIN</b>&nbsp;</td>
 			  <td class="texto" align="center"><b>Valor do PIN</b>&nbsp;</td>
 			</tr>
@@ -152,7 +152,7 @@ $(function(){
 		  <td class="texto" align="right">&nbsp;<?php echo $rs_pins_row['pih_pin_id']; ?></td>
     	          <td class="texto" align="center">&nbsp;<?php echo " (".$rs_pins_row['pih_id'].") ".$publisher_array[$rs_pins_row['pih_id']]; ?></td>
     	          <td class="texto" align="center">&nbsp;<?php echo $rs_pins_row['pih_data_aux'];?>&nbsp;</td>
-    	          <td class="texto" align="center">&nbsp;<?php echo (strlen($data_venda_exclusao)?$rs_pins_row['vg_data_inclusao_aux']:"&nbsp;");?></td>
+    	          <td class="texto" align="center">&nbsp;<?php echo (strlen((string)($data_venda_exclusao ?? ""))?$rs_pins_row['vg_data_inclusao_aux']:"&nbsp;");?></td>
                   <td class="texto" align="center">&nbsp;<?php echo $rs_pins_row['pin_codigo']; ?>&nbsp;</td>
     	          <td class="texto" align="right">&nbsp;<?php echo number_format($rs_pins_row['pin_valor'],2,',','.'); ?>&nbsp;</td>
     	        		</tr>

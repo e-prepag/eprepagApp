@@ -118,7 +118,7 @@ include "pins_store_menu.php";
             <td width="30%"><b> Valor do PIN: </b></td>
             <td width="70%" colspan="2">
 				<div id='mostraValores'>
-				<?php if(strlen($distributor_codigo)>0) { ?>
+				<?php if(strlen((string)($distributor_codigo ?? ""))>0) { ?>
 				<script language="javascript">
 				carga_valor();
 				</script>

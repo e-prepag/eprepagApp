@@ -156,7 +156,7 @@ function isTipo(pVal)
                     <td> <?php if(!empty($bds_banner)) { echo "Alterar o Banner"; } else { echo "Upload do Banner"; } ?>:</td>
                     <td>
 						<input type="file" name="bds_banner" id="bds_banner" size="50" />&nbsp; Formatos Permitidos (<?php
-						for($i=0;$i<count($formatos);$i++){
+						for($i=0;$i<(is_countable($formatos) ? count($formatos) : 0);$i++){
 							if ($i==0)
 								echo $formatos[$i];
 							else echo ", ".$formatos[$i];

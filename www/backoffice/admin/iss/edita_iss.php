@@ -31,9 +31,9 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
             $sql = "INSERT INTO iss_cidade (iss_cidade, iss_estado, iss_aliquota) VALUES (?, ?, ?);";
             
             $params = array(
-                            filter_var($_POST['nome'],FILTER_SANITIZE_STRING),
-                            filter_var($_POST['ug_estado'],FILTER_SANITIZE_STRING),
-                            filter_var($_POST['item_aliquota'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['nome']),
+                            strip_tags((string)$_POST['ug_estado']),
+                            strip_tags((string)$_POST['item_aliquota']),
                         );
             
         }
@@ -41,7 +41,7 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
             $texto = "atualizados";
             $sql = "UPDATE iss_cidade set iss_aliquota = ? where iss_id = ?;";
             $params = array(
-                            filter_var($_POST['item_aliquota'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['item_aliquota']),
                             filter_var($_POST['id'],FILTER_SANITIZE_NUMBER_INT),
                         );
         }
@@ -66,8 +66,8 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
 $sql = "SELECT * FROM iss_cidade WHERE iss_cidade = ? and iss_estado = ?;";
 $stmt = $pdo->prepare($sql);
 $params = array(
-                filter_var($_POST['nome'],FILTER_SANITIZE_STRING),
-                filter_var($_POST['ug_estado'],FILTER_SANITIZE_STRING),
+                            strip_tags((string)$_POST['nome']),
+                            strip_tags((string)$_POST['ug_estado']),
             );
 $stmt->execute($params);
 $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
