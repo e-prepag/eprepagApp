@@ -23,7 +23,7 @@ require_once $raiz_do_projeto . "class/util/classFilePosition.php";
 $server_url = "backoffice.e-prepag.com.br";
 
 //=========  Mês/Ano considerado no Elaboração dos Arquivos
-$currentmonth = mktime(0, 0, 0, date('n') - 1, 1, date('Y'));
+$currentmonth = mktime(0, 0, 0, (int)date('n') - 1, 1, (int)date('Y'));
 $mesAno = date('m/Y', $currentmonth);
 
 //forçando mês 06 de 2019
@@ -53,12 +53,12 @@ $codigoSegmento = '001';
 $versaoLayout = '03';
 $codigoCidadeSP_IBGE = '3550308';
 $funcao = 'D';          // Função Débito Fixa
-$qtdeEstabelecimentos = count($vetorPublisher); //Quantidade de estabelecimentos 
-$qtdeEstabelecimentosAtivo = count($vetorPublisher); //Quantidade de estabelecimentos operando
+$qtdeEstabelecimentos = count((array)$vetorPublisher); //Quantidade de estabelecimentos 
+$qtdeEstabelecimentosAtivo = count((array)$vetorPublisher); //Quantidade de estabelecimentos operando
 //Adicionando os publishers novos no total de estabelecimentos
 if (!empty($verificadorPublishersNovos)) {
-    $qtdeEstabelecimentos += count($vetorPublisherNovos);
-    $qtdeEstabelecimentosAtivo += count($vetorPublisherNovos);
+    $qtdeEstabelecimentos += count((array)$vetorPublisherNovos);
+    $qtdeEstabelecimentosAtivo += count((array)$vetorPublisherNovos);
 } //end if(!empty($verificadorPublishersNovos))
 $identificacaoRegisto10 = '10';  // Identificação do tipo de registro
 $identificacaoRegisto11 = '11';  // Identificação do tipo de registro
@@ -95,7 +95,7 @@ $iof = 6.38; //Aliquota de IOF - usar PONTO (.) como casa decimal
 //Buscando Publisher que possuem totalização por utilização
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacaoMunicipal();
 
-if (count($vetorPublisherPorUtilizacao) > 0) {
+if (count((array)$vetorPublisherPorUtilizacao) > 0) {
     $where_opr_venda_lan = " AND ( CASE ";
     $where_opr_venda_lan_negativa = " AND ( CASE ";
     $where_opr_utilizacao_lan = " AND ( CASE ";
@@ -108,12 +108,12 @@ if (count($vetorPublisherPorUtilizacao) > 0) {
     $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
     $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
     $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
-} //end if(count($vetorPublisherPorUtilizacao)>0)
+} //end if(count((array)$vetorPublisherPorUtilizacao)>0)
 else {
     $where_opr_venda_lan = "";
     $where_opr_venda_lan_negativa = "";
     $where_opr_utilizacao_lan = "";
-} //end else do if(count($vetorPublisherPorUtilizacao)>0)
+} //end else do if(count((array)$vetorPublisherPorUtilizacao)>0)
 
 
 // Exibindo o Período de Apuração
@@ -293,7 +293,7 @@ if (!empty($verificadorPublishers)) {
             group by opr_cnpj,opr_ie,opr_codigo,opr_estado,opr_cidade,opr_cep,num_docto,data) ";
 
     //Contabilizando vendas por utilização de PINs Publisher
-    if (count($vetorPublisherPorUtilizacao) > 0) {
+    if (count((array)$vetorPublisherPorUtilizacao) > 0) {
         $sql .= "
         
         union all
@@ -323,7 +323,7 @@ if (!empty($verificadorPublishers)) {
                  " . $where_opr_utilizacao_lan . "
             group by opr_cnpj,opr_ie,opr_codigo,opr_estado,opr_cidade,opr_cep,num_docto,data) 
             ";
-    } //end if(count($vetorPublisherPorUtilizacao)>0)
+    } //end if(count((array)$vetorPublisherPorUtilizacao)>0)
 
     $sql .= " 
             

@@ -5,39 +5,40 @@ set_time_limit(3600);
 
 // Incluindo a Classe geradora do Arquivo
 require_once '../../../includes/constantes.php';
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . "includes/complice/functions.php";
 require_once $raiz_do_projeto . "class/util/classFilePosition.php";
 
-//=========  Mês/Ano considerado no Elaboração dos Arquivos
+//=========  Mï¿½s/Ano considerado no Elaboraï¿½ï¿½o dos Arquivos
 $currentmonth = mktime(0, 0, 0, date('n')-1, 1, date('Y'));
 $mesAno = date('m/Y',$currentmonth);
 
-//=========  Data de doze meses anteriores a data Mês Ano considerado => 13 em função de mes anterior (-1) e 12 meses antes
+//=========  Data de doze meses anteriores a data Mï¿½s Ano considerado => 13 em funï¿½ï¿½o de mes anterior (-1) e 12 meses antes
 $dozeMesesAnteriores = mktime(0, 0, 0, date('n')-13, 1, date('Y'));
 
-//========= Variável contendo o Ano Mês inicio das operações para efeitos de 
-//========= exclusão nos teste Trimenetrais e Semestrais por não estarem completos
+//========= Variï¿½vel contendo o Ano Mï¿½s inicio das operaï¿½ï¿½es para efeitos de 
+//========= exclusï¿½o nos teste Trimenetrais e Semestrais por nï¿½o estarem completos
 $dataInicioOperacao = 201407;
 
 // Split ano/mes
 list($mes, $ano) = explode("/", $mesAno);
 
-// Exibindo o Período de Apuração
-echo "<br><b>Mês/Ano do período de apuração: [<span style='color: red'>".$mesAno."</span>]</b><br><br><br>\n";
+// Exibindo o Perï¿½odo de Apuraï¿½ï¿½o
+echo "<br><b>Mï¿½s/Ano do perï¿½odo de apuraï¿½ï¿½o: [<span style='color: red'>".$mesAno."</span>]</b><br><br><br>\n";
 
-//Publishers Já em Operação constantes em arquivos BACEN anteriores INTERNacionais
+//Publishers Jï¿½ em Operaï¿½ï¿½o constantes em arquivos BACEN anteriores INTERNacionais
 $vetorPublisher = levantamentoPublisherOperantes($ano,$mes);
 
 //Publishers novos nunca antes contou nos arquivos BACEN INTERNacionais
 $vetorPublisherNovos = levantamentoPublisherNovosOperantes($ano,$mes);
 
-// Instanciando a variavel para verificação de novos Publishers
+// Instanciando a variavel para verificaï¿½ï¿½o de novos Publishers
 $verificadorPublishersNovos = implode(",", $vetorPublisherNovos);
 
-//Buscando dados de cotação no Banco de Dados
+//Buscando dados de cotaï¿½ï¿½o no Banco de Dados
 $sql = "select cd_cotacao,opr_codigo,cd_freeze from cotacao_dolar where cd_data = '".date('Y-m-d',$currentmonth)." 00:00:00' and opr_codigo IN (".implode(",", $vetorPublisher).(!empty($verificadorPublishersNovos)?",".$verificadorPublishersNovos:"").");";
 //echo $sql."<br>";
 $rs = SQLexecuteQuery($sql);
@@ -50,16 +51,16 @@ if($rs) {
         }//end if($rs_row['cd_cotacao'] == 0)
     } //end while 
     if($testeCotacaoZerada) {
-        die("Obrigatório o cadastramento de cotação diferente de Zero para os Publishers relacionados acima.");
+        die("Obrigatï¿½rio o cadastramento de cotaï¿½ï¿½o diferente de Zero para os Publishers relacionados acima.");
     }//end if($testeCotacaoZerada)
 }//end if($rs)
 
-//Verificando se existe o cadastro de cotação do dolar para geração dos arquivos BACEN
-if(isset($vetorCotacaoUSS) && count($vetorCotacaoUSS) == 0){
-    die("Antes de gerar os arquivos deve ser cadastrados as cotações de dólar no sistema!");
-}//end if(count($vetorCotacaoUSS))
+//Verificando se existe o cadastro de cotaï¿½ï¿½o do dolar para geraï¿½ï¿½o dos arquivos BACEN
+if(isset($vetorCotacaoUSS) && count((array)$vetorCotacaoUSS) == 0){
+    die("Antes de gerar os arquivos deve ser cadastrados as cotaï¿½ï¿½es de dï¿½lar no sistema!");
+}//end if(count((array)$vetorCotacaoUSS))
 
-//Totalizando publisher internacionais e verificando se bate os totais de publisher com o cadastro de cotações.
+//Totalizando publisher internacionais e verificando se bate os totais de publisher com o cadastro de cotaï¿½ï¿½es.
 $totalPublisherInternacionais = 0;
 foreach ($vetorPublisher as $key => $value) {
     if(!empty($value)) {
@@ -71,23 +72,23 @@ foreach ($vetorPublisherNovos as $key => $value) {
         $totalPublisherInternacionais++;
     }
 }
-if($totalPublisherInternacionais != count($vetorCotacaoUSS)) {
-    die("Existe divergencias entre o total de publisher com movimento no mês de referencia e o total de publisher cadastrado com cotações!");
-}//end if($totalPublisherInternacionais != count($vetorCotacaoUSS)) 
+if($totalPublisherInternacionais != count((array)$vetorCotacaoUSS)) {
+    die("Existe divergencias entre o total de publisher com movimento no mï¿½s de referencia e o total de publisher cadastrado com cotaï¿½ï¿½es!");
+}//end if($totalPublisherInternacionais != count((array)$vetorCotacaoUSS)) 
 
-//Dados Necessários
-$identificacaoRegisto5816_I = '#A1';    // Identificação do registro => 1- REGISTRO DE IDENTIFICAÇÃO DA ADMINISTRADORA/PROCESSADORA
-$identificacaoRegisto5816_F = '@1';     // Identificação do registro => 4- REGISTRO DE CONTROLE FINAL 
-$tipoCartao = 'db';                     // Tipo do cartão para o documento 5816
-$codigoMoeda = '220';                   // Código da Moeda fico 220 = Dolar Americano
+//Dados Necessï¿½rios
+$identificacaoRegisto5816_I = '#A1';    // Identificaï¿½ï¿½o do registro => 1- REGISTRO DE IDENTIFICAï¿½ï¿½O DA ADMINISTRADORA/PROCESSADORA
+$identificacaoRegisto5816_F = '@1';     // Identificaï¿½ï¿½o do registro => 4- REGISTRO DE CONTROLE FINAL 
+$tipoCartao = 'db';                     // Tipo do cartï¿½o para o documento 5816
+$codigoMoeda = '220';                   // Cï¿½digo da Moeda fico 220 = Dolar Americano
 $cnpjEPP = '19037276000172';            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
-$codigoNossaBandeira = '4';             // Código de Nossa Bandeira de 1 (uma) posição para o documento 5816
+$codigoNossaBandeira = '4';             // Cï¿½digo de Nossa Bandeira de 1 (uma) posiï¿½ï¿½o para o documento 5816
 
 
 
 //Verificando se faltam Dados
 if (verificaFaltaCPFNome($vetorPublisher, date("t",mktime(0, 0, 0, ($mes*1), 1, $ano)), $rs_dados_incompletos, $vetorPublisherNovos)) {
-    echo "<hr><b>Faltam Dados de CPF e Nome: (TOTAL [".pg_num_rows($rs_dados_incompletos)."] Usuários)</b><br><br>\n";
+    echo "<hr><b>Faltam Dados de CPF e Nome: (TOTAL [".pg_num_rows($rs_dados_incompletos)."] Usuï¿½rios)</b><br><br>\n";
     while($rs_dados_incompletos_row = pg_fetch_array($rs_dados_incompletos)) {
             echo " ".$rs_dados_incompletos_row['tipo']." => ID: ".$rs_dados_incompletos_row['ug_id']." DATA: ".$rs_dados_incompletos_row['data_transacao']." Email: ".$rs_dados_incompletos_row['ug_email']."<br>\n";
     } //end while
@@ -101,7 +102,7 @@ if (verificaCPFValido($vetorPublisher, date("t",mktime(0, 0, 0, ($mes*1), 1, $an
     $i = 0;
     while($rs_dados_row = pg_fetch_array($rs_dados)) {
         if(!verificaCPF_BACEN($rs_dados_row['ug_cpf'])) {
-            $exibicaoDadosProblemas .= " ".$rs_dados_row['tipo']." => ID: ".$rs_dados_row['ug_id']." CPF Inválido: ".$rs_dados_row['ug_cpf']."<br>\n";
+            $exibicaoDadosProblemas .= " ".$rs_dados_row['tipo']." => ID: ".$rs_dados_row['ug_id']." CPF Invï¿½lido: ".$rs_dados_row['ug_cpf']."<br>\n";
             $i++;
         }// end if(!verificaCPF_BACEN($rs_dados_row['ug_cpf']))
     } //end while
@@ -116,22 +117,22 @@ if (verificaCPFValido($vetorPublisher, date("t",mktime(0, 0, 0, ($mes*1), 1, $an
 // Teste de Abortagem
 $testeData = $ano.$mes;
 if($testeData < $dataInicioOperacao) {
-    die("O mês ano deve ser obrigatóriamente superior a ".$dataInicioOperacao." (AAAAMM).<br>\n");
+    die("O mï¿½s ano deve ser obrigatï¿½riamente superior a ".$dataInicioOperacao." (AAAAMM).<br>\n");
 }// end if($testeData < 201403)
 
 
 
 
 
-//================================== Inicio da Geração do Arquivo Layout 5816
+//================================== Inicio da Geraï¿½ï¿½o do Arquivo Layout 5816
 echo "<b>Gerando Arquivo Mensal</b><br><br>\n";
 
 $contFatura = 0;        // Quantidade de regitro de faturas
 $contDetalhamento = 0;  // Quantidade de regitro de detalhamento
-$listaUG_CPF = "";   // Lista contendo os IDs de usuários que gastram mais de 10.000 dolares
+$listaUG_CPF = "";   // Lista contendo os IDs de usuï¿½rios que gastram mais de 10.000 dolares
 $vetorTotaisAcimaLimite = array();
 if (verificaLimiteDetalhamento(10000,$rsTeste)) {
-    echo "<b>[<span style='color: red'>ATENÇÃO: Existe CPF que ultrapassou os US$ 10.000 no mês</span>]</b><br><br><br>\n";
+    echo "<b>[<span style='color: red'>ATENï¿½ï¿½O: Existe CPF que ultrapassou os US$ 10.000 no mï¿½s</span>]</b><br><br><br>\n";
     while($rsTeste_row = pg_fetch_array($rsTeste)) {
         if(strlen($listaUG_CPF) == 0) {
             $listaUG_CPF = "'".$rsTeste_row['ug_cpf'];
@@ -146,7 +147,7 @@ if (verificaLimiteDetalhamento(10000,$rsTeste)) {
 
 $listaCPFsCOAF = "";
 if (verificaLimiteCOAF(5000,$rsCOAF)) {
-    echo "<b>[<span style='color: red'>ATENÇÃO: Existe CPF que ultrapassou os R$ 5.000,00 no mês e devem ser completados os dados de cadastro e analisados em relação ao COAF.</span>]</b><br><br><br>\n";
+    echo "<b>[<span style='color: red'>ATENï¿½ï¿½O: Existe CPF que ultrapassou os R$ 5.000,00 no mï¿½s e devem ser completados os dados de cadastro e analisados em relaï¿½ï¿½o ao COAF.</span>]</b><br><br><br>\n";
     while($rsCOAF_row = pg_fetch_array($rsCOAF)) {
         if(strlen($listaCPFsCOAF) == 0) {
             $listaCPFsCOAF = "LISTA: <BR>".$rsCOAF_row['ug_cpf']."<BR>";
@@ -165,10 +166,10 @@ unset($file);
 $file = new FilePosition($nomeArquivo);
 
 
-//Buscando Publisher que possuem totalização por utilização
+//Buscando Publisher que possuem totalizaï¿½ï¿½o por utilizaï¿½ï¿½o
 $vetorPublisherPorUtilizacao = levantamentoPublisherComFechamentoUtilizacaoInternacional();
 
-if(count($vetorPublisherPorUtilizacao)>0) {
+if(count((array)$vetorPublisherPorUtilizacao)>0) {
     $where_opr_venda_lan = " AND ( CASE ";
     $where_opr_venda_lan_negativa = " AND ( CASE ";
     $where_opr_utilizacao_lan = " AND ( CASE ";
@@ -181,19 +182,19 @@ if(count($vetorPublisherPorUtilizacao)>0) {
     $where_opr_venda_lan .= " ELSE vg.vg_data_inclusao > '2008-01-01 00:00:00' END )";
     $where_opr_venda_lan_negativa .= " ELSE FALSE END )";
     $where_opr_utilizacao_lan .= "  ELSE FALSE END ) ";
-} //end if(count($vetorPublisherPorUtilizacao)>0)
+} //end if(count((array)$vetorPublisherPorUtilizacao)>0)
 else {
     $where_opr_venda_lan = "";
     $where_opr_venda_lan_negativa = "";
     $where_opr_utilizacao_lan = "";
-}//end else do if(count($vetorPublisherPorUtilizacao)>0)
+}//end else do if(count((array)$vetorPublisherPorUtilizacao)>0)
 
 
 
 //=========================================================================================================================
-//1- REGISTRO DE IDENTIFICAÇÃO DA ADMINISTRADORA/PROCESSADORA
+//1- REGISTRO DE IDENTIFICAï¿½ï¿½O DA ADMINISTRADORA/PROCESSADORA
 //=========================================================================================================================
-// Cabeçalho
+// Cabeï¿½alho
 unset($vetorHeader);
 $vetorHeader = array (
                      0 => array('name' => $identificacaoRegisto5816_I,
@@ -221,7 +222,7 @@ $file->setVetorHeader($vetorHeader);
 //=========================================================================================================================
 //2- REGISTRO DE DADOS (FATURA)
 //=========================================================================================================================
-// Buscando informações 
+// Buscando informaï¿½ï¿½es 
 $sql = "select ug_cpf, ug_nome, sum(total_em_dolar) as total_em_dolar from ( 
             (select 
                     ug_cpf, 
@@ -271,8 +272,8 @@ if(!empty($listaUG_CPF)) {
 $sql .= "
             group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo) ";
     
-//Contabilizando vendas por utilização de PINs Publisher
-if(count($vetorPublisherPorUtilizacao)>0) {
+//Contabilizando vendas por utilizaï¿½ï¿½o de PINs Publisher
+if(count((array)$vetorPublisherPorUtilizacao)>0) {
     $sql .= "
         
         union all
@@ -305,7 +306,7 @@ if(count($vetorPublisherPorUtilizacao)>0) {
     $sql .= "
             group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo) 
             ";
-}//end if(count($vetorPublisherPorUtilizacao)>0)
+}//end if(count((array)$vetorPublisherPorUtilizacao)>0)
  
 $sql .=" 
             
@@ -411,7 +412,7 @@ if(!empty($verificadorPublishersNovos)) {
         $sql .= "
             group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo) ";
     
-        //Contabilizando vendas por utilização de PINs Publisher
+        //Contabilizando vendas por utilizaï¿½ï¿½o de PINs Publisher
         if (array_key_exists($value, $vetorPublisherPorUtilizacao)) { 
             $sql .= "
         
@@ -498,9 +499,9 @@ $sql .= "
             
 //echo $sql."\n"; die();
 
-// Inicializando variavel com Total do Relatório Mensal
+// Inicializando variavel com Total do Relatï¿½rio Mensal
 $total_5816_dolares = 0;
-// Inicializando variavel com Total de CPFs no Relatório Mensal
+// Inicializando variavel com Total de CPFs no Relatï¿½rio Mensal
 $total_5816_cpfs = 0;
 
 $rs = SQLexecuteQuery($sql);
@@ -511,7 +512,7 @@ else {
     while($rs_row = pg_fetch_array($rs)) {
         
         if($cpf_anterior == str_replace("-","",str_replace(".", "", $rs_row['ug_cpf']))) {
-            die("<br>O CPF anterior [".$cpf_anterior."] e o próximo CPF [".$rs_row['ug_cpf']."] está sendo utilizado com NOMES DIFERENTES!<br>Corrigir antes de gerar o arquivo para o BACEN!<pre>".print_r($rs_row,true)."</pre>");
+            die("<br>O CPF anterior [".$cpf_anterior."] e o prï¿½ximo CPF [".$rs_row['ug_cpf']."] estï¿½ sendo utilizado com NOMES DIFERENTES!<br>Corrigir antes de gerar o arquivo para o BACEN!<pre>".print_r($rs_row,true)."</pre>");
         }//end if($cpf_anterior == $rs_row['ug_cpf']) 
             
         // Acumulando os valores
@@ -558,7 +559,7 @@ else {
 }//end else do if(!$rs)
 
 //=========================================================================================================================
-//3- REGISTRO DE DADOS ( DETALHAMENTO DAS DESPESAS DA FATURA - OBRIGATÓRIO PARA FATURAS NO VALOR ACIMA DE U$ 10.000,00)
+//3- REGISTRO DE DADOS ( DETALHAMENTO DAS DESPESAS DA FATURA - OBRIGATï¿½RIO PARA FATURAS NO VALOR ACIMA DE U$ 10.000,00)
 //=========================================================================================================================
 if(!empty($listaUG_CPF)) { 
     echo "Possui detalhamento no 5816 por possuir CPF com mais de U$ 10.000 Dolares em Gastos<br>".PHP_EOL;
@@ -607,8 +608,8 @@ if(!empty($listaUG_CPF)) {
                     and vgm_cpf IN (".$listaUG_CPF.")
             group by vgm_opr_codigo,vg_id,vgm_cpf, vgm_nome_cpf ) ";
     
-    //Contabilizando vendas por utilização de PINs Publisher
-    if(count($vetorPublisherPorUtilizacao)>0) {
+    //Contabilizando vendas por utilizaï¿½ï¿½o de PINs Publisher
+    if(count((array)$vetorPublisherPorUtilizacao)>0) {
         $sql .= "
         
         union all
@@ -638,7 +639,7 @@ if(!empty($listaUG_CPF)) {
                  ".$where_opr_utilizacao_lan."
             group by vgm_opr_codigo,vg_id,vgm_cpf, vgm_nome_cpf ) 
             ";
-    }//end if(count($vetorPublisherPorUtilizacao)>0)
+    }//end if(count((array)$vetorPublisherPorUtilizacao)>0)
 
     $sql .=" 
             
@@ -733,7 +734,7 @@ if(!empty($listaUG_CPF)) {
                         and vgm_cpf IN (".$listaUG_CPF.")
                 group by vgm_opr_codigo,vg_id,vgm_cpf, vgm_nome_cpf)  ";
     
-            //Contabilizando vendas por utilização de PINs Publisher
+            //Contabilizando vendas por utilizaï¿½ï¿½o de PINs Publisher
             if (array_key_exists($value, $vetorPublisherPorUtilizacao)) {
                 $sql .= "
         
@@ -818,7 +819,7 @@ if(!empty($listaUG_CPF)) {
         $cpfAnterior = "";
         while($rs_row = pg_fetch_array($rs)) {
             
-            // Busca informações do estabelecimento onde foi efetuada a despesa no exterior
+            // Busca informaï¿½ï¿½es do estabelecimento onde foi efetuada a despesa no exterior
             $sql = "select opr_razao from operadoras where opr_codigo = ".$rs_row['vgm_opr_codigo'];
             $rsRazao = SQLexecuteQuery($sql);
             $rsRazao_row = pg_fetch_array($rsRazao);
@@ -923,7 +924,7 @@ $vetorLines = array (
                      0 => array('name' => $identificacaoRegisto5816_F,
                                 'size' => 2
                                 ),
-                     1 => array('name' => ($contFatura+$contDetalhamento+2), //Os dois são referentes aos registros de Identificação e Controle Final
+                     1 => array('name' => ($contFatura+$contDetalhamento+2), //Os dois sï¿½o referentes aos registros de Identificaï¿½ï¿½o e Controle Final
                                 'size' => 8
                                 ),
                      2 => array('name' => ' ',
@@ -939,16 +940,16 @@ if($file->checkFile()){
     echo "<hr>Arquivo ".$file->getFileName()." gerado com sucesso.<br>".PHP_EOL;
 }
 else {
-   echo "<hr>Arquivo ".$file->getFileName()." não gerado.<br>".PHP_EOL; 
+   echo "<hr>Arquivo ".$file->getFileName()." nï¿½o gerado.<br>".PHP_EOL; 
 }
 
-//================================== Fim da Geração do Arquivo Layout 5816
+//================================== Fim da Geraï¿½ï¿½o do Arquivo Layout 5816
 
 
 
 
 
-//==================================  Início do trecho compactando arquivos Semestrais para serem enviados ao BACEN
+//==================================  Inï¿½cio do trecho compactando arquivos Semestrais para serem enviados ao BACEN
 $nomeArquivo5816Zipado = 'amtf101_5816_'.$mes.$ano.".zip"; //Exemplo: amtf101_5816_122014.zip
 $file = new FilePosition($nomeArquivo5816Zipado); 
 $file->createZip($nomeArquivo5816,true);
@@ -969,7 +970,7 @@ echo "Total CPFs no arquivo: <b>".number_format($total_5816_cpfs,0,",",".")."</b
  ***** Capturando os Publishers Nacionais vinculados a E-Prepag Administradora  
  */
 
-//Publishers Já em Operação constantes em arquivos BACEN anteriores CONCATENANDO com Nacionais
+//Publishers Jï¿½ em Operaï¿½ï¿½o constantes em arquivos BACEN anteriores CONCATENANDO com Nacionais
 $vetorPublisherNacionais = levantamentoPublisherOperantesNacionais($ano,$mes);
 $vetorPublisher = array_merge($vetorPublisher, $vetorPublisherNacionais);
 
@@ -979,7 +980,7 @@ if(!empty($verificadorPublishersNovos))
     $vetorPublisherNovos = array_merge($vetorPublisherNovos,$vetorPublisherNovosNacionais);
 else $vetorPublisherNovos = $vetorPublisherNovosNacionais;
 
-// Atualizando a variavel para verificação de novos Publishers Nacionais (CONCATENADO com os Internacionais).
+// Atualizando a variavel para verificaï¿½ï¿½o de novos Publishers Nacionais (CONCATENADO com os Internacionais).
 $verificadorPublishersNovos = implode(",", $vetorPublisherNovos);
 
 // Array para testes Nacionais
@@ -991,47 +992,47 @@ else $vetorPublisherNacionaisTestes = $vetorPublisherNacionais;
 //echo "Vetor Publisher:<pre>".print_r($vetorPublisher,true)."</pre>";
 //echo "Vetor Publisher NOVOS NACIONAIS:<pre>".print_r($vetorPublisherNovosNacionais,true)."</pre>";
 //echo "Vetor Publisher NOVOS:<pre>".print_r($vetorPublisherNovos,true)."</pre>";
-//echo "String contendo novos PUblisher após concatenados: [".$verificadorPublishersNovos."]<br>";
+//echo "String contendo novos PUblisher apï¿½s concatenados: [".$verificadorPublishersNovos."]<br>";
 
-//Dados necessários para os arquivos TRIMESTRAIS e MENSAIS
+//Dados necessï¿½rios para os arquivos TRIMESTRAIS e MENSAIS
 $codigoSegmento = '001';
 $ano = $ano;
 $trimestre = $mes;
 $oitoPrimeiros = '19037276';     // 8 primeiros digitos do CNPJ E-PREPAG ADMINISTRADORA DE CARTOES
-$funcao = 'E';          // Função Débito Fixa -- Alterado para E (pré-pago) em 15/01/2018
-$bandeira = 6;          // Bandeira Fixo 6 - Bandeira própria
-$formaCaptura = 4;      // Forma de Captura Fixa 4 - Não presencial
-$numeroParcelas = 1;    // Numero de Parcelas Fixo 1 - Somente pagamento à vista
+$funcao = 'E';          // Funï¿½ï¿½o Dï¿½bito Fixa -- Alterado para E (prï¿½-pago) em 15/01/2018
+$bandeira = 6;          // Bandeira Fixo 6 - Bandeira prï¿½pria
+$formaCaptura = 4;      // Forma de Captura Fixa 4 - Nï¿½o presencial
+$numeroParcelas = 1;    // Numero de Parcelas Fixo 1 - Somente pagamento ï¿½ vista
 $produto = 20;          // Produto fixo 20 - Outros
-$modalidade = 'P';      // Modalidade fixo P - Cartão emitido com bandeira de crédito sem associação com outra marca comercial, industrial ou sem fins lucrativos e cartões com função débito.
+$modalidade = 'P';      // Modalidade fixo P - Cartï¿½o emitido com bandeira de crï¿½dito sem associaï¿½ï¿½o com outra marca comercial, industrial ou sem fins lucrativos e cartï¿½es com funï¿½ï¿½o dï¿½bito.
 $tarifaIntercam = 0;    // Tarifa Intercambio % inicialmente como (0) Zero.
-$qtdeEstabelecimentos       = count($vetorPublisher); //Quantidade de estabelecimentos 
-$qtdeEstabelecimentosAtivo  = count($vetorPublisher); //Quantidade de estabelecimentos operando
+$qtdeEstabelecimentos       = count((array)$vetorPublisher); //Quantidade de estabelecimentos 
+$qtdeEstabelecimentosAtivo  = count((array)$vetorPublisher); //Quantidade de estabelecimentos operando
 //Adicionando os publishers novos no total de estabelecimentos
 if(!empty($verificadorPublishersNovos)) {
-    $qtdeEstabelecimentos       += count($vetorPublisherNovos);
-    $qtdeEstabelecimentosAtivo  += count($vetorPublisherNovos);
+    $qtdeEstabelecimentos       += count((array)$vetorPublisherNovos);
+    $qtdeEstabelecimentosAtivo  += count((array)$vetorPublisherNovos);
 } //end if(!empty($verificadorPublishersNovos))
 $receitaAluguelEquipamentos = 0; // Receita de aluguel de equipamentos e de conectividade
-$custoTarifaIntercambio     = 0; // Custo da tarifa de intercâmbio
-$custoTaxaAcessoBandeira    = 0; // Custo das taxas de acesso às bandeiras
-$ISPB = '19037276';              // Código ISPB cadastrado
-$nomeEmissor = 'E-PREPAG ADMINISTRADORA DE CARTOES LTDA'; // Nome da instituição emissora de cartões de pagamento pertencente ao conglomerado financeiro.
-$receitaEmissaoeFaturamento = 0;// Receitas obtidas junto aos credenciadores, provenientes de incentivos à emissão de cartões de pagamento
-$receitaFinanceira = 0;         // Receitas originadas pelo crédito rotativo bem como aquelas geradas por ganhos financeiros decorrentes de inadimplência (multas, juros, etc.)
-$custoProgramaRecompensa = 0;   // Custos advindos das vantagens que o emissor oferece ao portador do cartão, tais como descontos na tarifa de anuidade, programas de recompensa, seguros, etc.
-$nomeArquivosTrimestrais = array(); //Lista de Arquivos a serem considerados na compactação de arquivos Trimestrais
-$nomeArquivosSemestrais = array();  //Lista de Arquivos a serem considerados na compactação de arquivos Semestrais
+$custoTarifaIntercambio     = 0; // Custo da tarifa de intercï¿½mbio
+$custoTaxaAcessoBandeira    = 0; // Custo das taxas de acesso ï¿½s bandeiras
+$ISPB = '19037276';              // Cï¿½digo ISPB cadastrado
+$nomeEmissor = 'E-PREPAG ADMINISTRADORA DE CARTOES LTDA'; // Nome da instituiï¿½ï¿½o emissora de cartï¿½es de pagamento pertencente ao conglomerado financeiro.
+$receitaEmissaoeFaturamento = 0;// Receitas obtidas junto aos credenciadores, provenientes de incentivos ï¿½ emissï¿½o de cartï¿½es de pagamento
+$receitaFinanceira = 0;         // Receitas originadas pelo crï¿½dito rotativo bem como aquelas geradas por ganhos financeiros decorrentes de inadimplï¿½ncia (multas, juros, etc.)
+$custoProgramaRecompensa = 0;   // Custos advindos das vantagens que o emissor oferece ao portador do cartï¿½o, tais como descontos na tarifa de anuidade, programas de recompensa, seguros, etc.
+$nomeArquivosTrimestrais = array(); //Lista de Arquivos a serem considerados na compactaï¿½ï¿½o de arquivos Trimestrais
+$nomeArquivosSemestrais = array();  //Lista de Arquivos a serem considerados na compactaï¿½ï¿½o de arquivos Semestrais
 
 // IOF
 $iof = 6.38; //Aliquota de IOF - usar PONTO (.) como casa decimal
 
 
 
-// Teste de verificação se é mês para geração dos arquivos Trimestrais
+// Teste de verificaï¿½ï¿½o se ï¿½ mï¿½s para geraï¿½ï¿½o dos arquivos Trimestrais
 if(isTrimestral($mes)) {
 
-    //================================== Início Verificando se os Dados Financeiros estão devidamente apurados (Congelados na Geração de Notas)
+    //================================== Inï¿½cio Verificando se os Dados Financeiros estï¿½o devidamente apurados (Congelados na Geraï¿½ï¿½o de Notas)
     $sql = "
         select 
                 fp_publisher, 
@@ -1105,13 +1106,13 @@ if(isTrimestral($mes)) {
         while($rs_nao_emitidos_row = pg_fetch_array($rs_nao_emitidos)) {
                 echo " * Publisher ID [".$rs_nao_emitidos_row['fp_publisher']."] => Data [".$rs_nao_emitidos_row['data_sem_notas']."] <br>\n";
         } //end while
-        die("------- Emitir Notas para os Publisher e Períodos acima antes de gerar os Arquivos -------------<br><hr>\n");
+        die("------- Emitir Notas para os Publisher e Perï¿½odos acima antes de gerar os Arquivos -------------<br><hr>\n");
     }//end if(pg_num_rows($rs_nao_emitidos) != 0)
-    //================================== Fim Verificando se os Dados Financeiros estão devidamente apurados (Congelados na Geração de Notas)
+    //================================== Fim Verificando se os Dados Financeiros estï¿½o devidamente apurados (Congelados na Geraï¿½ï¿½o de Notas)
     
     
     
-    //================================== Verificando se os Dados Complementares estão devidamente cadastrados
+    //================================== Verificando se os Dados Complementares estï¿½o devidamente cadastrados
     $sql = "SELECT  *
             FROM complice 
             WHERE c_ano_mes =  '".$ano."-".$mes."-01';"; 
@@ -1121,7 +1122,7 @@ if(isTrimestral($mes)) {
     
         
         
-        //================================== Verificando se os Dados Complementares de TODO o TRIMESTRE estão devidamente cadastrados
+        //================================== Verificando se os Dados Complementares de TODO o TRIMESTRE estï¿½o devidamente cadastrados
         $sql = "SELECT  *
                 FROM complice 
                 WHERE c_ano_mes >= '".getStartDateTrimestral($mes,$ano)." 00:00:00' 
@@ -1133,7 +1134,7 @@ if(isTrimestral($mes)) {
             echo "<b>Gerando Arquivos Trimestrais</b><br><br>\n";
             
             
-            //==================================  Inicio do trecho a geração do arquivo SEGMENTO.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo SEGMENTO.TXT
             $nomeArquivo = 'segmento.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
@@ -1145,7 +1146,7 @@ if(isTrimestral($mes)) {
                                 0 => array('name' => 'games',
                                            'size' => 50
                                             ),
-                                1 => array('name' => 'Estabelecimentos publicadores de games que comercializam créditos pré-pagos',
+                                1 => array('name' => 'Estabelecimentos publicadores de games que comercializam crï¿½ditos prï¿½-pagos',
                                            'size' => 250
                                             ),
                                 2 => array('name' => $codigoSegmento,
@@ -1154,7 +1155,7 @@ if(isTrimestral($mes)) {
                                 );
             $quantidadeLinhas = 1;
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'segmento',
@@ -1179,28 +1180,28 @@ if(isTrimestral($mes)) {
                 echo "<hr>Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "<hr>Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "<hr>Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo SEGMENTO.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo SEGMENTO.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo RANKING.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo RANKING.TXT
             $nomeArquivo = 'ranking.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
 
-            //Adicionando os publishers já contabilizados em períodos anteriores ao total de linhas
-            $quantidadeLinhas = count($vetorPublisher);
+            //Adicionando os publishers jï¿½ contabilizados em perï¿½odos anteriores ao total de linhas
+            $quantidadeLinhas = count((array)$vetorPublisher);
             
             //Adicionando os publishers novos no total de linhas
             if(!empty($verificadorPublishersNovos)) {
-                $quantidadeLinhas += count($vetorPublisherNovos);
+                $quantidadeLinhas += count((array)$vetorPublisherNovos);
             } //end if(!empty($verificadorPublishersNovos))
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'ranking',
@@ -1219,7 +1220,7 @@ if(isTrimestral($mes)) {
 
             $file->setVetorHeader($vetorHeader);
 
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 select 
                         fp_publisher, 
@@ -1354,14 +1355,14 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo RANKING.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo RANKING.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo DESCONTO.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo DESCONTO.TXT
             $nomeArquivo = 'desconto.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
@@ -1369,7 +1370,7 @@ if(isTrimestral($mes)) {
 
             $quantidadeLinhas = 1; //Devido a ser fixo somente uma linha com totais de estabelecimentos
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'desconto',
@@ -1388,7 +1389,7 @@ if(isTrimestral($mes)) {
 
             $file->setVetorHeader($vetorHeader);
 
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 select 
                         sum(quantidade) as quantidade,
@@ -1489,7 +1490,7 @@ if(isTrimestral($mes)) {
 
                 //echo $value."<pre>".print_r($rs_row,true)."</pre>".$sql."<br>";
 
-                // Cálculo do DESVIO PADRÃO
+                // Cï¿½lculo do DESVIO PADRï¿½O
                 $desvio_padrao = 0;
                 $sql = " 
                 select 
@@ -1556,7 +1557,7 @@ if(isTrimestral($mes)) {
                 //echo $sql."\n"; die();
 
                 $rsDesvio = SQLexecuteQuery($sql);
-                if(!$rsDesvio) echo "Erro ao selecionar o Publisher Desvio Padrão (".implode(",", $vetorPublisher).").<br>\n";
+                if(!$rsDesvio) echo "Erro ao selecionar o Publisher Desvio Padrï¿½o (".implode(",", $vetorPublisher).").<br>\n";
                 else { 
 
                     while($rsDesvio_row = pg_fetch_array($rsDesvio)) {
@@ -1619,14 +1620,14 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo DESCONTO.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo DESCONTO.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo INTERCAM.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo INTERCAM.TXT
             $nomeArquivo = 'intercam.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
@@ -1634,7 +1635,7 @@ if(isTrimestral($mes)) {
 
             $quantidadeLinhas = 1; //Devido a ser fixo somente uma linha com totais de estabelecimentos
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'intercam',
@@ -1653,7 +1654,7 @@ if(isTrimestral($mes)) {
 
             $file->setVetorHeader($vetorHeader);
 
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 select 
                         sum(quantidade) as quantidade, 
@@ -1792,14 +1793,14 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo INTERCAM.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo INTERCAM.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo LUCRCRED.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo LUCRCRED.TXT
             $nomeArquivo = 'lucrcred.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
@@ -1807,7 +1808,7 @@ if(isTrimestral($mes)) {
 
             $quantidadeLinhas = 1; //Devido a ser fixo somente uma linha com totais de estabelecimentos
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'lucrcred',
@@ -1826,7 +1827,7 @@ if(isTrimestral($mes)) {
 
             $file->setVetorHeader($vetorHeader);
 
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 select 
                    sum(c_receita_credenciador) as c_receita_credenciador,
@@ -1901,14 +1902,14 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo LUCRCRED.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo LUCRCRED.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo CONCCRED.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo CONCCRED.TXT
             $nomeArquivo = 'conccred.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
@@ -1916,7 +1917,7 @@ if(isTrimestral($mes)) {
 
             $quantidadeLinhas = 1; //Devido a ser fixo somente uma linha com totais de estabelecimentos
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'conccred',
@@ -1935,7 +1936,7 @@ if(isTrimestral($mes)) {
 
             $file->setVetorHeader($vetorHeader);
 
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 select 
                         sum(quantidade) as quantidade, 
@@ -2062,26 +2063,26 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo CONCCRED.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo CONCCRED.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo INFRESTA.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo INFRESTA.TXT
             $nomeArquivo = 'infresta.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
 
-            //Criando vetor Auxiliar para elaboração da query
+            //Criando vetor Auxiliar para elaboraï¿½ï¿½o da query
             if(!empty($verificadorPublishersNovos)) {
                 $auxVetor = array_merge($vetorPublisherNacionais,$vetorPublisherNovosNacionais);
             }//end if(!empty($verificadorPublishersNovos)) 
             else $auxVetor = $vetorPublisherNacionais;
         
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 SELECT 
                         opr_estado as uf,
@@ -2099,7 +2100,7 @@ if(isTrimestral($mes)) {
                 // Verificando a quantidade
                 $quantidadeLinhas = pg_num_rows($rs); //capturando a quantidade de linhas
 
-                // Cabeçalho
+                // Cabeï¿½alho
                 unset($vetorHeader);
                 $vetorHeader = array (
                                      0 => array('name' => 'infresta',
@@ -2157,28 +2158,28 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo INFRESTA.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo INFRESTA.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo INFRTERM.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo INFRTERM.TXT
             $nomeArquivo = 'infrterm.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
 
 
-            //Criando vetor Auxiliar para elaboração da query
+            //Criando vetor Auxiliar para elaboraï¿½ï¿½o da query
             if(!empty($verificadorPublishersNovos)) {
                 $auxVetor = array_merge($vetorPublisherNacionais,$vetorPublisherNovosNacionais);
             }//end if(!empty($verificadorPublishersNovos)) 
             else $auxVetor = $vetorPublisherNacionais;
             
             
-            // Buscando informações congeladas
+            // Buscando informaï¿½ï¿½es congeladas
             $sql = "
                 SELECT 
                         opr_estado as uf,
@@ -2196,7 +2197,7 @@ if(isTrimestral($mes)) {
                 // Verificando a quantidade
                 $quantidadeLinhas = pg_num_rows($rs); //capturando a quantidade de linhas
 
-                // Cabeçalho
+                // Cabeï¿½alho
                 unset($vetorHeader);
                 $vetorHeader = array (
                                      0 => array('name' => 'infrterm',
@@ -2254,22 +2255,22 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo INFRTERM.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo INFRTERM.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo CONTATOS.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo CONTATOS.TXT
             $nomeArquivo = 'contatos.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
 
-            $quantidadeLinhas = 4; //Devido a ser fixo somente 4 Contatos diretor responsável pela prestação das informações, de dois técnicos designados como responsáveis e um contato institucional
+            $quantidadeLinhas = 4; //Devido a ser fixo somente 4 Contatos diretor responsï¿½vel pela prestaï¿½ï¿½o das informaï¿½ï¿½es, de dois tï¿½cnicos designados como responsï¿½veis e um contato institucional
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'contatos',
@@ -2315,7 +2316,7 @@ if(isTrimestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // Dados Técnico 01
+            // Dados Tï¿½cnico 01
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ano,
@@ -2342,7 +2343,7 @@ if(isTrimestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // Dados Técnico 02
+            // Dados Tï¿½cnico 02
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ano,
@@ -2384,7 +2385,7 @@ if(isTrimestral($mes)) {
                                 3 => array('name' => 'Katia Godoy de Medeiros',
                                            'size' => 50
                                            ),
-                                4 => array('name' => 'ANALISTA CONTÁBIL FINANCEIRO',
+                                4 => array('name' => 'ANALISTA CONTï¿½BIL FINANCEIRO',
                                            'size' => 50
                                            ),
                                 5 => array('name' => '11 3030-9105',
@@ -2402,20 +2403,20 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo CONTATOS.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo CONTATOS.TXT
 
             
             
             
-            //==================================  Inicio do trecho a geração do arquivo DATABASE.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo DATABASE.TXT
             $nomeArquivo = 'database.txt';
             $nomeArquivosTrimestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'database',
@@ -2427,7 +2428,7 @@ if(isTrimestral($mes)) {
                                  2 => array('name' => $oitoPrimeiros, // 8 primeiros digitos do CNPJ E-PREPAG ADMINISTRADORA DE CARTOES 
                                             'size' => 8
                                             ),
-                                 3 => array('name' => $ano.$mes, //Data-base dos arquivos enviados (AAAAMM), correspondendo ao último mês do trimestre de referência. Por exemplo, a data-base do quarto trimestre de 2018 é 201812. 
+                                 3 => array('name' => $ano.$mes, //Data-base dos arquivos enviados (AAAAMM), correspondendo ao ï¿½ltimo mï¿½s do trimestre de referï¿½ncia. Por exemplo, a data-base do quarto trimestre de 2018 ï¿½ 201812. 
                                             'size' => 6
                                             ),
                             );
@@ -2440,14 +2441,14 @@ if(isTrimestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo DATABASE.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo DATABASE.TXT
 
             
             
             
-            //==================================  Início do trecho compactando arquivos Trimestrais para serem enviados ao BACEN
+            //==================================  Inï¿½cio do trecho compactando arquivos Trimestrais para serem enviados ao BACEN
             $nomeArquivoTrimestralZipado = "aspb034_6334_".trimestre($trimestre)."T".$ano.".zip"; //Exemplo: aspb008_6308_3T2014.zip
             $file = new FilePosition($nomeArquivoTrimestralZipado); 
             $file->createZip($nomeArquivosTrimestrais,true);
@@ -2459,12 +2460,12 @@ if(isTrimestral($mes)) {
             
        }//end do if(pg_num_rows($rs_complice) == 3 || $testeData == $dataInicioOperacao)
         else {
-            die("O trimestre não possui Todos os mêses Necessários Cadastrados para os Dados Complementares de Complice no BackOffice.<br>Por favor, verificar no BackOffice.");
+            die("O trimestre nï¿½o possui Todos os mï¿½ses Necessï¿½rios Cadastrados para os Dados Complementares de Complice no BackOffice.<br>Por favor, verificar no BackOffice.");
         }//end else do if(pg_num_rows($rs_complice) == 3 || $testeData == $dataInicioOperacao)
 
     }//end if(pg_num_rows($rs_complice_verify) == 1)
     else {
-        die("Necessários Cadastrar os Dados Complementares de Complice no BackOffice antes de continuar.");
+        die("Necessï¿½rios Cadastrar os Dados Complementares de Complice no BackOffice antes de continuar.");
     }//end else do if(pg_num_rows($rs_complice_verify) == 1)
     
 } //end if(isTrimestral($mes))
@@ -2472,12 +2473,12 @@ if(isTrimestral($mes)) {
 
 
 
-// Teste de verificação se é mês para geração dos arquivos Semestrais
+// Teste de verificaï¿½ï¿½o se ï¿½ mï¿½s para geraï¿½ï¿½o dos arquivos Semestrais
 if(isSemestral($mes)) {
     
     
     
-    //================================== Início Verificando se os Dados Financeiros estão devidamente apurados (Congelados na Geração de Notas)
+    //================================== Inï¿½cio Verificando se os Dados Financeiros estï¿½o devidamente apurados (Congelados na Geraï¿½ï¿½o de Notas)
     $sql = "
         select 
                 fp_publisher, 
@@ -2551,14 +2552,14 @@ if(isSemestral($mes)) {
         while($rs_nao_emitidos_row = pg_fetch_array($rs_nao_emitidos)) {
                 echo " * Publisher ID [".$rs_nao_emitidos_row['fp_publisher']."] => Data [".$rs_nao_emitidos_row['data_sem_notas']."] <br>\n";
         } //end while
-        die("------- Emitir Notas para os Publisher e Períodos acima antes de gerar os Arquivos -------------<br><hr>\n");
+        die("------- Emitir Notas para os Publisher e Perï¿½odos acima antes de gerar os Arquivos -------------<br><hr>\n");
     }//end if(pg_num_rows($rs_nao_emitidos) != 0)
-    //================================== Fim Verificando se os Dados Financeiros estão devidamente apurados (Congelados na Geração de Notas)
+    //================================== Fim Verificando se os Dados Financeiros estï¿½o devidamente apurados (Congelados na Geraï¿½ï¿½o de Notas)
   
 
 
 
-    //================================== Verificando se os Dados Complementares estão devidamente cadastrados
+    //================================== Verificando se os Dados Complementares estï¿½o devidamente cadastrados
     $sql = "SELECT  *
             FROM complice 
             WHERE c_ano_mes =  '".$ano."-".$mes."-01';"; 
@@ -2569,7 +2570,7 @@ if(isSemestral($mes)) {
         
         
         
-        //================================== Verificando se os Dados Complementares de TODO o TRIMESTRE estão devidamente cadastrados
+        //================================== Verificando se os Dados Complementares de TODO o TRIMESTRE estï¿½o devidamente cadastrados
         $sql = "SELECT  *
                 FROM complice 
                 WHERE c_ano_mes >= '".getStartDateSemestral($mes,$ano)." 00:00:00' 
@@ -2582,7 +2583,7 @@ if(isSemestral($mes)) {
             echo "<b>Gerando Arquivos Semestrais</b><br><br>\n";
             
             
-            //==================================  Inicio do trecho a geração do arquivo EMISSOR.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo EMISSOR.TXT
             $nomeArquivo = 'emissor.txt';
             $nomeArquivosSemestrais[] = $nomeArquivo;
             unset($file);
@@ -2591,7 +2592,7 @@ if(isSemestral($mes)) {
             //Total de linhas de emissor (2 trimestre)
             $quantidadeLinhas = 2;
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'emissor',
@@ -2611,7 +2612,7 @@ if(isSemestral($mes)) {
             $file->setVetorHeader($vetorHeader);
             
             // Dados 
-            // 1º Trimestre
+            // 1ï¿½ Trimestre
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ISPB,
@@ -2630,7 +2631,7 @@ if(isSemestral($mes)) {
 
             $file->setVetorLines($vetorLines);
 
-            // 2º Trimestre
+            // 2ï¿½ Trimestre
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ISPB,
@@ -2655,14 +2656,14 @@ if(isSemestral($mes)) {
                 echo "<hr>Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "<hr>Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "<hr>Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo EMISSOR.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo EMISSOR.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo PORTADOR.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo PORTADOR.TXT
             $nomeArquivo = 'portador.txt';
             $nomeArquivosSemestrais[] = $nomeArquivo;
             unset($file);
@@ -2671,7 +2672,7 @@ if(isSemestral($mes)) {
             //Total de linhas de emissor (2 trimestre)
             $quantidadeLinhas = 2;
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'portador',
@@ -2691,8 +2692,8 @@ if(isSemestral($mes)) {
             $file->setVetorHeader($vetorHeader);
             
             // Dados 
-            // 1º Trimestre
-            //Dados sobre Taxas de Manutenção Anual
+            // 1ï¿½ Trimestre
+            //Dados sobre Taxas de Manutenï¿½ï¿½o Anual
             $sql = "
                 SELECT 
 			MIN(pta_valor) as minimo,
@@ -2705,13 +2706,13 @@ if(isSemestral($mes)) {
                 ";
             //echo $sql."\n"; die();
             $rsDadosManutecaoAnual = SQLexecuteQuery($sql);
-            if(!$rsDadosManutecaoAnual) echo "Erro ao selecionar os Dados sobre Taxas de Manutenção Anual (".implode(",", $vetorPublisher).").<br>\n";
+            if(!$rsDadosManutecaoAnual) echo "Erro ao selecionar os Dados sobre Taxas de Manutenï¿½ï¿½o Anual (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                //Capturando Dados sobre Taxas de Manutenção Anual
+                //Capturando Dados sobre Taxas de Manutenï¿½ï¿½o Anual
                 $rsDadosManutecaoAnual_row = pg_fetch_array($rsDadosManutecaoAnual);
             }//end else do if(!$rsDadosManutecaoAnual)
 
-            //Relação de alicotas para o cálculo de desvio padrão
+            //Relaï¿½ï¿½o de alicotas para o cï¿½lculo de desvio padrï¿½o
             $sql = "
                 SELECT 
 			DISTINCT(pta_valor) as aliquota
@@ -2722,9 +2723,9 @@ if(isSemestral($mes)) {
                 ";
             //echo $sql."\n"; die();
             $rsRelacaoAlicota = SQLexecuteQuery($sql);
-            if(!$rsRelacaoAlicota) echo "Erro ao selecionar a Relação de Alicotas dos Dados sobre Taxas de Manutenção Anual (".implode(",", $vetorPublisher).").<br>\n";
+            if(!$rsRelacaoAlicota) echo "Erro ao selecionar a Relaï¿½ï¿½o de Alicotas dos Dados sobre Taxas de Manutenï¿½ï¿½o Anual (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                    // Cálculo do DESVIO PADRÃO
+                    // Cï¿½lculo do DESVIO PADRï¿½O
                     $desvio_padrao = 0;
 
                     while($rsRelacaoAlicota_row = pg_fetch_array($rsRelacaoAlicota)) {
@@ -2734,7 +2735,7 @@ if(isSemestral($mes)) {
                     $desvio_padrao = sqrt($desvio_padrao/$rsDadosManutecaoAnual_row['numero_aliquota']);
                     
             }//end else do if(!$rsRelacaoAlicota)
-            //echo "Desvio Padrão:".$desvio_padrao." Desvio padrão Formatado: ".number_format(($desvio_padrao), 2, ',', '.'); die();
+            //echo "Desvio Padrï¿½o:".$desvio_padrao." Desvio padrï¿½o Formatado: ".number_format(($desvio_padrao), 2, ',', '.'); die();
 
             unset($vetorLines);
             $vetorLines = array (
@@ -2756,22 +2757,22 @@ if(isSemestral($mes)) {
                                 5 => array('name' => $funcao,
                                            'size' => 1
                                            ),
-                                6 => array('name' => number_format(($rsDadosManutecaoAnual_row['minimo']*100), 0, '', ''),     //Tarifa de anuidade mínima
+                                6 => array('name' => number_format(($rsDadosManutecaoAnual_row['minimo']*100), 0, '', ''),     //Tarifa de anuidade mï¿½nima
                                            'size' => 6
                                            ),
-                                7 => array('name' => number_format(($rsDadosManutecaoAnual_row['media_simples']*100), 0, '', ''),     //Tarifa de anuidade média
+                                7 => array('name' => number_format(($rsDadosManutecaoAnual_row['media_simples']*100), 0, '', ''),     //Tarifa de anuidade mï¿½dia
                                            'size' => 6
                                            ),
-                                8 => array('name' => number_format(($rsDadosManutecaoAnual_row['maximo']*100), 0, '', ''),     //Tarifa de anuidade máxima
+                                8 => array('name' => number_format(($rsDadosManutecaoAnual_row['maximo']*100), 0, '', ''),     //Tarifa de anuidade mï¿½xima
                                            'size' => 6
                                            ),
-                                9 => array('name' => number_format(($desvio_padrao*100), 0, '', ''),     //Desvio padrão da tarifa de anuidade
+                                9 => array('name' => number_format(($desvio_padrao*100), 0, '', ''),     //Desvio padrï¿½o da tarifa de anuidade
                                            'size' => 6
                                            ),
                                 10 => array('name' => 0,    //Estoque de pontos acumulados nas contas dos portadores
                                            'size' => 12
                                            ),
-                                11 => array('name' => 0,    //Quantidade de pontos adquiridos no âmbito dos programas de recompensa do emissor
+                                11 => array('name' => 0,    //Quantidade de pontos adquiridos no ï¿½mbito dos programas de recompensa do emissor
                                            'size' => 12
                                            ),
                                 12 => array('name' => 0,    //Quantidade de pontos convertidos (transferidos)
@@ -2787,8 +2788,8 @@ if(isSemestral($mes)) {
 
             $file->setVetorLines($vetorLines);
 
-            // 2º Trimestre
-            //Dados sobre Taxas de Manutenção Anual
+            // 2ï¿½ Trimestre
+            //Dados sobre Taxas de Manutenï¿½ï¿½o Anual
             $sql = "
                 SELECT 
 			MIN(pta_valor) as minimo,
@@ -2801,13 +2802,13 @@ if(isSemestral($mes)) {
                 ";
             //echo $sql."\n"; die();
             $rsDadosManutecaoAnual = SQLexecuteQuery($sql);
-            if(!$rsDadosManutecaoAnual) echo "Erro ao selecionar os Dados sobre Taxas de Manutenção Anual (".implode(",", $vetorPublisher).").<br>\n";
+            if(!$rsDadosManutecaoAnual) echo "Erro ao selecionar os Dados sobre Taxas de Manutenï¿½ï¿½o Anual (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                //Capturando Dados sobre Taxas de Manutenção Anual
+                //Capturando Dados sobre Taxas de Manutenï¿½ï¿½o Anual
                 $rsDadosManutecaoAnual_row = pg_fetch_array($rsDadosManutecaoAnual);
             }//end else do if(!$rsDadosManutecaoAnual)
 
-            //Relação de alicotas para o cálculo de desvio padrão
+            //Relaï¿½ï¿½o de alicotas para o cï¿½lculo de desvio padrï¿½o
             $sql = "
                 SELECT 
 			DISTINCT(pta_valor) as aliquota
@@ -2818,9 +2819,9 @@ if(isSemestral($mes)) {
                 ";
             //echo $sql."\n"; die();
             $rsRelacaoAlicota = SQLexecuteQuery($sql);
-            if(!$rsRelacaoAlicota) echo "Erro ao selecionar a Relação de Alicotas dos Dados sobre Taxas de Manutenção Anual (".implode(",", $vetorPublisher).").<br>\n";
+            if(!$rsRelacaoAlicota) echo "Erro ao selecionar a Relaï¿½ï¿½o de Alicotas dos Dados sobre Taxas de Manutenï¿½ï¿½o Anual (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                    // Cálculo do DESVIO PADRÃO
+                    // Cï¿½lculo do DESVIO PADRï¿½O
                     $desvio_padrao = 0;
 
                     while($rsRelacaoAlicota_row = pg_fetch_array($rsRelacaoAlicota)) {
@@ -2830,7 +2831,7 @@ if(isSemestral($mes)) {
                     $desvio_padrao = sqrt($desvio_padrao/$rsDadosManutecaoAnual_row['numero_aliquota']);
                     
             }//end else do if(!$rsRelacaoAlicota)
-            //echo "Desvio Padrão:".$desvio_padrao." Desvio padrão Formatado: ".number_format(($desvio_padrao), 2, ',', '.'); die();
+            //echo "Desvio Padrï¿½o:".$desvio_padrao." Desvio padrï¿½o Formatado: ".number_format(($desvio_padrao), 2, ',', '.'); die();
 
             unset($vetorLines);
             $vetorLines = array (
@@ -2852,22 +2853,22 @@ if(isSemestral($mes)) {
                                 5 => array('name' => $funcao,
                                            'size' => 1
                                            ),
-                                6 => array('name' => number_format(($rsDadosManutecaoAnual_row['minimo']*100), 0, '', ''),     //Tarifa de anuidade mínima
+                                6 => array('name' => number_format(($rsDadosManutecaoAnual_row['minimo']*100), 0, '', ''),     //Tarifa de anuidade mï¿½nima
                                            'size' => 6
                                            ),
-                                7 => array('name' => number_format(($rsDadosManutecaoAnual_row['media_simples']*100), 0, '', ''),     //Tarifa de anuidade média
+                                7 => array('name' => number_format(($rsDadosManutecaoAnual_row['media_simples']*100), 0, '', ''),     //Tarifa de anuidade mï¿½dia
                                            'size' => 6
                                            ),
-                                8 => array('name' => number_format(($rsDadosManutecaoAnual_row['maximo']*100), 0, '', ''),     //Tarifa de anuidade máxima
+                                8 => array('name' => number_format(($rsDadosManutecaoAnual_row['maximo']*100), 0, '', ''),     //Tarifa de anuidade mï¿½xima
                                            'size' => 6
                                            ),
-                                9 => array('name' => number_format(($desvio_padrao*100), 0, '', ''),     //Desvio padrão da tarifa de anuidade
+                                9 => array('name' => number_format(($desvio_padrao*100), 0, '', ''),     //Desvio padrï¿½o da tarifa de anuidade
                                            'size' => 6
                                            ),
                                 10 => array('name' => 0,    //Estoque de pontos acumulados nas contas dos portadores
                                            'size' => 12
                                            ),
-                                11 => array('name' => 0,    //Quantidade de pontos adquiridos no âmbito dos programas de recompensa do emissor
+                                11 => array('name' => 0,    //Quantidade de pontos adquiridos no ï¿½mbito dos programas de recompensa do emissor
                                            'size' => 12
                                            ),
                                 12 => array('name' => 0,    //Quantidade de pontos convertidos (transferidos)
@@ -2889,14 +2890,14 @@ if(isSemestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo PORTADOR.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo PORTADOR.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo LUCREMIS.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo LUCREMIS.TXT
             $nomeArquivo = 'lucremis.txt';
             $nomeArquivosSemestrais[] = $nomeArquivo;
             unset($file);
@@ -2905,7 +2906,7 @@ if(isSemestral($mes)) {
             //Total de linhas de emissor (2 trimestre)
             $quantidadeLinhas = 2;
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'lucremis',
@@ -2925,7 +2926,7 @@ if(isSemestral($mes)) {
             $file->setVetorHeader($vetorHeader);
             
             // Dados 
-            // 1º Trimestre
+            // 1ï¿½ Trimestre
             $sql = "
                 select 
                    sum(c_custo_mkt_credenciado) as c_custo_mkt_credenciado, 
@@ -2953,7 +2954,7 @@ if(isSemestral($mes)) {
                 $rsInfoComplementar_row = pg_fetch_array($rsInfoComplementar);
             }//end else do if(!$rsInfoComplementar)
 
-            //Total de taxas de manutenção anual no trimestre
+            //Total de taxas de manutenï¿½ï¿½o anual no trimestre
             $sql = "
                 SELECT SUM(pta_valor) as total
                 FROM tb_pag_taxa_anual	
@@ -2962,9 +2963,9 @@ if(isSemestral($mes)) {
                 ";
             //echo $sql."\n"; die();
             $rsTotalManutecaoAnual = SQLexecuteQuery($sql);
-            if(!$rsTotalManutecaoAnual) echo "Erro ao selecionar o Total de Taxas de Manutenção Anual (".implode(",", $vetorPublisher).").<br>\n";
+            if(!$rsTotalManutecaoAnual) echo "Erro ao selecionar o Total de Taxas de Manutenï¿½ï¿½o Anual (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                //Capturando Total de taxas de manutenção anual no trimestre
+                //Capturando Total de taxas de manutenï¿½ï¿½o anual no trimestre
                 $rsTotalManutecaoAnual_row = pg_fetch_array($rsTotalManutecaoAnual);
             }//end else do if(!$rsTotalManutecaoAnual)
             
@@ -3022,7 +3023,7 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // 2º Trimestre
+            // 2ï¿½ Trimestre
             $sql = "
                 select 
                    sum(c_custo_mkt_credenciado) as c_custo_mkt_credenciado, 
@@ -3050,7 +3051,7 @@ if(isSemestral($mes)) {
                 $rsInfoComplementar_row = pg_fetch_array($rsInfoComplementar);
             }//end else do if(!$rsInfoComplementar)
 
-            //Total de taxas de manutenção anual no trimestre
+            //Total de taxas de manutenï¿½ï¿½o anual no trimestre
             $sql = "
                 SELECT SUM(pta_valor) as total
                 FROM tb_pag_taxa_anual	
@@ -3059,9 +3060,9 @@ if(isSemestral($mes)) {
                 ";
             //echo $sql."\n"; die();
             $rsTotalManutecaoAnual = SQLexecuteQuery($sql);
-            if(!$rsTotalManutecaoAnual) echo "Erro ao selecionar o Total de Taxas de Manutenção Anual (".implode(",", $vetorPublisher).").<br>\n";
+            if(!$rsTotalManutecaoAnual) echo "Erro ao selecionar o Total de Taxas de Manutenï¿½ï¿½o Anual (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                //Capturando Total de taxas de manutenção anual no trimestre
+                //Capturando Total de taxas de manutenï¿½ï¿½o anual no trimestre
                 $rsTotalManutecaoAnual_row = pg_fetch_array($rsTotalManutecaoAnual);
             }//end else do if(!$rsTotalManutecaoAnual)
             
@@ -3125,13 +3126,13 @@ if(isSemestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo LUCREMIS.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo LUCREMIS.TXT
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo CONCEMIS.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo CONCEMIS.TXT
             $nomeArquivo = 'concemis.txt';
             $nomeArquivosSemestrais[] = $nomeArquivo;
             unset($file);
@@ -3140,7 +3141,7 @@ if(isSemestral($mes)) {
             //Total de linhas de emissor (2 trimestre)
             $quantidadeLinhas = 2;
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'concemis',
@@ -3160,8 +3161,8 @@ if(isSemestral($mes)) {
             $file->setVetorHeader($vetorHeader);
             
             // Dados 
-            // 1º Trimestre
-            // Capturando a quantidade total de cartões emitidos
+            // 1ï¿½ Trimestre
+            // Capturando a quantidade total de cartï¿½es emitidos
             $sql = "
                    select 
                        count(distinct(ug_cpf)) as cartoes_emitidos 
@@ -3270,13 +3271,13 @@ if(isSemestral($mes)) {
             //die($sql);
 
             $rsInfoEmitidos = SQLexecuteQuery($sql);
-            if(!$rsInfoEmitidos) echo "Erro ao selecionar o Cartões Emitidos.<br>\n";
+            if(!$rsInfoEmitidos) echo "Erro ao selecionar o Cartï¿½es Emitidos.<br>\n";
             else { 
-                //Capturando Dados Cartões Emitidos
+                //Capturando Dados Cartï¿½es Emitidos
                 $rsInfoEmitidos_row = pg_fetch_array($rsInfoEmitidos);
             }//end else do if(!$rsDesvio)
             
-            // Capturando a quantidade total de cartões ativos
+            // Capturando a quantidade total de cartï¿½es ativos
             $sql = "
             select   
                 count(distinct(ug_cpf_tmp)) as cartoes_ativos
@@ -3384,18 +3385,18 @@ if(isSemestral($mes)) {
                 foreach ($vetorPublisherNovos as $key => $value) {
                     //echo "Key: $key -- value: $value <br>";
                     
-                    //Levantando data para verificação se deve ser incluido a parte da querie no select principal
+                    //Levantando data para verificaï¿½ï¿½o se deve ser incluido a parte da querie no select principal
                     $sql_data_inicio = "select to_char(opr_data_inicio_operacoes, 'YYYY-MM-DD') as data_inicio from operadoras where opr_codigo = ".$value.";";
                     $rsDataIncioOperacao = SQLexecuteQuery($sql_data_inicio);
-                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniício da Operação para o Publisher (".$value.").<br>\n");
+                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniï¿½cio da Operaï¿½ï¿½o para o Publisher (".$value.").<br>\n");
                     else { 
-                        //Capturando Dados da Início da Operação
+                        //Capturando Dados da Inï¿½cio da Operaï¿½ï¿½o
                         $rsDataIncioOperacao_row = pg_fetch_array($rsDataIncioOperacao);
                     }//end else do if(!$rsDataIncioOperacao)
 
                     //die("------[".$rsDataIncioOperacao_row['data_inicio']."]<br>[".getEndDateTrimestral(($mes-3),$ano)."]\n");
                     if($rsDataIncioOperacao_row['data_inicio'] <= getEndDateTrimestral(($mes-3),$ano)) {
-                        //Parte que irá unir a query principal
+                        //Parte que irï¿½ unir a query principal
                         $sql .= "
 
                     union all
@@ -3465,9 +3466,9 @@ if(isSemestral($mes)) {
             //echo $sql."\n"; die();
 
             $rsInfoAtivos = SQLexecuteQuery($sql);
-            if(!$rsInfoAtivos) echo "Erro ao selecionar o Cartões Ativos.<br>\n";
+            if(!$rsInfoAtivos) echo "Erro ao selecionar o Cartï¿½es Ativos.<br>\n";
             else { 
-                //Capturando Dados Cartões Emitidos
+                //Capturando Dados Cartï¿½es Emitidos
                 $rsInfoAtivos_row = pg_fetch_array($rsInfoAtivos);
             }//end else do if(!$rsDesvio)
             
@@ -3524,18 +3525,18 @@ if(isSemestral($mes)) {
                 foreach ($vetorPublisherNovos as $key => $value) {
                     //echo "Key: $key -- value: $value <br>";
                     
-                    //Levantando data para verificação se deve ser incluido a parte da querie no select principal
+                    //Levantando data para verificaï¿½ï¿½o se deve ser incluido a parte da querie no select principal
                     $sql_data_inicio = "select to_char(opr_data_inicio_operacoes, 'YYYY-MM-DD') as data_inicio from operadoras where opr_codigo = ".$value.";";
                     $rsDataIncioOperacao = SQLexecuteQuery($sql_data_inicio);
-                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniício da Operação para o Publisher (".$value.").<br>\n");
+                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniï¿½cio da Operaï¿½ï¿½o para o Publisher (".$value.").<br>\n");
                     else { 
-                        //Capturando Dados da Início da Operação
+                        //Capturando Dados da Inï¿½cio da Operaï¿½ï¿½o
                         $rsDataIncioOperacao_row = pg_fetch_array($rsDataIncioOperacao);
                     }//end else do if(!$rsDataIncioOperacao)
 
                     //die("------[".$rsDataIncioOperacao_row['data_inicio']."]<br>[".getEndDateTrimestral(($mes-3),$ano)."]\n");
                     if($rsDataIncioOperacao_row['data_inicio'] <= getEndDateTrimestral(($mes-3),$ano)) {
-                        //Parte que irá unir a query principal
+                        //Parte que irï¿½ unir a query principal
                         $sql .= "
 
                       union all
@@ -3617,8 +3618,8 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // 2º Trimestre
-            // Capturando a quantidade total de cartões emitidos
+            // 2ï¿½ Trimestre
+            // Capturando a quantidade total de cartï¿½es emitidos
             $sql = "
                    select 
                        count(distinct(ug_cpf)) as cartoes_emitidos 
@@ -3729,11 +3730,11 @@ if(isSemestral($mes)) {
             $rsInfoEmitidos = SQLexecuteQuery($sql);
             if(!$rsInfoEmitidos) echo "Erro ao selecionar o Publisher Dados Complementares (".implode(",", $vetorPublisher).").<br>\n";
             else { 
-                //Capturando Dados Cartões Emitidos
+                //Capturando Dados Cartï¿½es Emitidos
                 $rsInfoEmitidos_row = pg_fetch_array($rsInfoEmitidos);
             }//end else do if(!$rsDesvio)
             
-            // Capturando a quantidade total de cartões ativos
+            // Capturando a quantidade total de cartï¿½es ativos
             $sql = "
             select   
                 count(distinct(ug_cpf_tmp)) as cartoes_ativos
@@ -3843,18 +3844,18 @@ if(isSemestral($mes)) {
                 foreach ($vetorPublisherNovos as $key => $value) {
                     //echo "Key: $key -- value: $value <br>";
                     
-                    //Levantando data para verificação se deve ser incluido a parte da querie no select principal
+                    //Levantando data para verificaï¿½ï¿½o se deve ser incluido a parte da querie no select principal
                     $sql_data_inicio = "select to_char(opr_data_inicio_operacoes, 'YYYY-MM-DD') as data_inicio from operadoras where opr_codigo = ".$value.";";
                     $rsDataIncioOperacao = SQLexecuteQuery($sql_data_inicio);
-                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniício da Operação para o Publisher (".$value.").<br>\n");
+                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniï¿½cio da Operaï¿½ï¿½o para o Publisher (".$value.").<br>\n");
                     else { 
-                        //Capturando Dados da Início da Operação
+                        //Capturando Dados da Inï¿½cio da Operaï¿½ï¿½o
                         $rsDataIncioOperacao_row = pg_fetch_array($rsDataIncioOperacao);
                     }//end else do if(!$rsDataIncioOperacao)
 
                     //die("------[".$rsDataIncioOperacao_row['data_inicio']."]<br>[".getEndDateTrimestral(($mes),$ano)."]\n");
                     if($rsDataIncioOperacao_row['data_inicio'] <= getEndDateTrimestral(($mes),$ano)) {
-                        //Parte que irá unir a query principal
+                        //Parte que irï¿½ unir a query principal
                         $sql .= "
 
                     union all
@@ -3928,9 +3929,9 @@ if(isSemestral($mes)) {
             //echo $sql."\n"; die();
 
             $rsInfoAtivos = SQLexecuteQuery($sql);
-            if(!$rsInfoAtivos) echo "Erro ao selecionar o Cartões Ativos.<br>\n";
+            if(!$rsInfoAtivos) echo "Erro ao selecionar o Cartï¿½es Ativos.<br>\n";
             else { 
-                //Capturando Dados Cartões Emitidos
+                //Capturando Dados Cartï¿½es Emitidos
                 $rsInfoAtivos_row = pg_fetch_array($rsInfoAtivos);
             }//end else do if(!$rsDesvio)
             
@@ -3988,18 +3989,18 @@ if(isSemestral($mes)) {
                 foreach ($vetorPublisherNovos as $key => $value) {
                     //echo "Key: $key -- value: $value <br>";
                     
-                    //Levantando data para verificação se deve ser incluido a parte da querie no select principal
+                    //Levantando data para verificaï¿½ï¿½o se deve ser incluido a parte da querie no select principal
                     $sql_data_inicio = "select to_char(opr_data_inicio_operacoes, 'YYYY-MM-DD') as data_inicio from operadoras where opr_codigo = ".$value.";";
                     $rsDataIncioOperacao = SQLexecuteQuery($sql_data_inicio);
-                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniício da Operação para o Publisher (".$value.").<br>\n");
+                    if(!$rsDataIncioOperacao) die("Erro ao selecionar a Data Iniï¿½cio da Operaï¿½ï¿½o para o Publisher (".$value.").<br>\n");
                     else { 
-                        //Capturando Dados da Início da Operação
+                        //Capturando Dados da Inï¿½cio da Operaï¿½ï¿½o
                         $rsDataIncioOperacao_row = pg_fetch_array($rsDataIncioOperacao);
                     }//end else do if(!$rsDataIncioOperacao)
 
                     //die("------[".$rsDataIncioOperacao_row['data_inicio']."]<br>[".getEndDateTrimestral(($mes),$ano)."]\n");
                     if($rsDataIncioOperacao_row['data_inicio'] <= getEndDateTrimestral(($mes),$ano)) {
-                        //Parte que irá unir a query principal
+                        //Parte que irï¿½ unir a query principal
                         $sql .= "
 
                       union all
@@ -4089,22 +4090,22 @@ if(isSemestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo CONCEMIS.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo CONCEMIS.TXT
 
 
 
 
-            //==================================  Inicio do trecho a geração do arquivo CONTATOS.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo CONTATOS.TXT
             $nomeArquivo = 'contatos.txt';
             $nomeArquivosSemestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
 
-            $quantidadeLinhas = 8; //Devido a ser fixo somente 3 Contatos diretor responsável pela prestação das informações, de dois técnicos designados como responsáveis
+            $quantidadeLinhas = 8; //Devido a ser fixo somente 3 Contatos diretor responsï¿½vel pela prestaï¿½ï¿½o das informaï¿½ï¿½es, de dois tï¿½cnicos designados como responsï¿½veis
 
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'contatos',
@@ -4123,7 +4124,7 @@ if(isSemestral($mes)) {
 
             $file->setVetorHeader($vetorHeader);
 
-            // 1º Trimestre
+            // 1ï¿½ Trimestre
             // Dados Diretor
             unset($vetorLines);
             $vetorLines = array (
@@ -4151,7 +4152,7 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // Dados Técnico 01
+            // Dados Tï¿½cnico 01
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ano,
@@ -4178,7 +4179,7 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // Dados Técnico 02
+            // Dados Tï¿½cnico 02
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ano,
@@ -4220,7 +4221,7 @@ if(isSemestral($mes)) {
                                 3 => array('name' => 'Katia Godoy de Medeiros',
                                            'size' => 50
                                            ),
-                                4 => array('name' => 'ANALISTA CONTÁBIL FINANCEIRO',
+                                4 => array('name' => 'ANALISTA CONTï¿½BIL FINANCEIRO',
                                            'size' => 50
                                            ),
                                 5 => array('name' => '11 3030-9105',
@@ -4232,7 +4233,7 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // 2º Trimestre
+            // 2ï¿½ Trimestre
             // Dados Diretor
             unset($vetorLines);
             $vetorLines = array (
@@ -4260,7 +4261,7 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // Dados Técnico 01
+            // Dados Tï¿½cnico 01
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ano,
@@ -4287,7 +4288,7 @@ if(isSemestral($mes)) {
                                 );
             $file->setVetorLines($vetorLines);
 
-            // Dados Técnico 02
+            // Dados Tï¿½cnico 02
             unset($vetorLines);
             $vetorLines = array (
                                 0 => array('name' => $ano,
@@ -4329,7 +4330,7 @@ if(isSemestral($mes)) {
                                 3 => array('name' => 'Katia Godoy de Medeiros',
                                            'size' => 50
                                            ),
-                                4 => array('name' => 'ANALISTA CONTÁBIL FINANCEIRO',
+                                4 => array('name' => 'ANALISTA CONTï¿½BIL FINANCEIRO',
                                            'size' => 50
                                            ),
                                 5 => array('name' => '11 3030-9105',
@@ -4347,19 +4348,19 @@ if(isSemestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo CONTATOS.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo CONTATOS.TXT
 
             
             
             
-            //==================================  Inicio do trecho a geração do arquivo DATABASE.TXT
+            //==================================  Inicio do trecho a geraï¿½ï¿½o do arquivo DATABASE.TXT
             $nomeArquivo = 'database.txt';
             $nomeArquivosSemestrais[] = $nomeArquivo;
             unset($file);
             $file = new FilePosition($nomeArquivo);
-            // Cabeçalho
+            // Cabeï¿½alho
             unset($vetorHeader);
             $vetorHeader = array (
                                  0 => array('name' => 'database',
@@ -4371,7 +4372,7 @@ if(isSemestral($mes)) {
                                  2 => array('name' => $oitoPrimeiros, // 8 primeiros digitos do CNPJ E-PREPAG ADMINISTRADORA DE CARTOES 
                                             'size' => 8
                                             ),
-                                 3 => array('name' => $ano.$mes, //Data-base dos arquivos enviados (AAAAMM), correspondendo ao último mês do trimestre de referência. Por exemplo, a data-base do quarto trimestre de 2018 é 201812. 
+                                 3 => array('name' => $ano.$mes, //Data-base dos arquivos enviados (AAAAMM), correspondendo ao ï¿½ltimo mï¿½s do trimestre de referï¿½ncia. Por exemplo, a data-base do quarto trimestre de 2018 ï¿½ 201812. 
                                             'size' => 6
                                             ),
                             );
@@ -4384,16 +4385,16 @@ if(isSemestral($mes)) {
                 echo "Arquivo ".$file->getFileName()." gerado com sucesso.<br>\n";
             }
             else {
-               echo "Arquivo ".$file->getFileName()." não gerado.<br>\n"; 
+               echo "Arquivo ".$file->getFileName()." nï¿½o gerado.<br>\n"; 
             }
-            //==================================  Fim do trecho a geração do arquivo DATABASE.TXT
+            //==================================  Fim do trecho a geraï¿½ï¿½o do arquivo DATABASE.TXT
 
 
 
             
             
             
-            //==================================  Início do trecho compactando arquivos Semestrais para serem enviados ao BACEN
+            //==================================  Inï¿½cio do trecho compactando arquivos Semestrais para serem enviados ao BACEN
             $nomeArquivoSemestralZipado = "aspb008_6308_".semestre($trimestre)."S".$ano.".zip"; //Exemplo: aspb008_6308_2S2014.zip
             $file = new FilePosition($nomeArquivoSemestralZipado); 
             $file->createZip($nomeArquivosSemestrais,true);
@@ -4407,12 +4408,12 @@ if(isSemestral($mes)) {
     
         }//end do if(pg_num_rows($rs_complice) == 6 || $testeData == $dataInicioOperacao)
         else {
-            die("O semestre não possui Todos os mêses Necessários Cadastrados para os Dados Complementares de Complice no BackOffice.<br>Por favor, verificar no BackOffice.");
+            die("O semestre nï¿½o possui Todos os mï¿½ses Necessï¿½rios Cadastrados para os Dados Complementares de Complice no BackOffice.<br>Por favor, verificar no BackOffice.");
         }//end else do if(pg_num_rows($rs_complice) == 6 || $testeData == $dataInicioOperacao)
 
     }//end if(pg_num_rows($rs_complice) == 1)
     else {
-        die("Necessários Cadastrar os Dados Complementares de Complice no BackOffice antes de continuar.");
+        die("Necessï¿½rios Cadastrar os Dados Complementares de Complice no BackOffice antes de continuar.");
     }//end else do if(pg_num_rows($rs_complice) == 1)
     
 }//end if(isSemestral($mes))
@@ -4420,11 +4421,11 @@ if(isSemestral($mes)) {
 
 
 
-//==================================  Início do trecho da alteração para já em arquivo do BACEN 
+//==================================  Inï¿½cio do trecho da alteraï¿½ï¿½o para jï¿½ em arquivo do BACEN 
 if(!empty($verificadorPublishersNovos)) {
     alteracaoPublisherNovosJaArquivoBACEN($vetorPublisherNovos);
 }//end if(!empty($verificadorPublishersNovos))
-//==================================  Fim do trecho da alteração para já em arquivo do BACEN 
+//==================================  Fim do trecho da alteraï¿½ï¿½o para jï¿½ em arquivo do BACEN 
 
 
 require_once $raiz_do_projeto."backoffice/includes/rodape_bko.php";

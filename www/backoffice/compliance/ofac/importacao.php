@@ -1,6 +1,6 @@
 <?php
 
-//Variavel de verificação de sucesso
+//Variavel de verificaï¿½ï¿½o de sucesso
 $success = false;
 
 require_once '../../../includes/constantes.php';
@@ -15,9 +15,9 @@ $BtnConcluir = $_POST['BtnConcluir'] ?? null;
 $OFAC_EXTENSOES = array("zip");
 //Nome do arquivo OFAC zipado
 $OFAC_FILE_NAME = "SDN_XML.ZIP";
-//Diretório destino do arquivo do OFAC
+//Diretï¿½rio destino do arquivo do OFAC
 $DIR_OFAC_ARQ_RETORNO = $raiz_do_projeto . "/arquivos_gerados/compliance/ofac/";
-//Número de arquivos contidos no ZIP
+//Nï¿½mero de arquivos contidos no ZIP
 $QTDE_ARQUIVOS = 1;
 //Lista de arquivos a serem importados
 //$LISTA_ARQUIVOS_IMPORTAR = array('cons_prim.del','cons_alt.del');
@@ -59,14 +59,15 @@ if(isset($BtnConcluir) && $BtnConcluir) {
 
         //Valida extensao
         if($msg == ""){
-                $fileExtensao = strtolower(substr($_FILES['arquivo']['name'], -3)); 
-                if (!in_array($fileExtensao, $GLOBALS['OFAC_EXTENSOES'])) $msg = "Extensão de arquivo inválida.".PHP_EOL;
+                $fileExtensao = strtolower(substr((string)($_FILES['arquivo']['name'] ?? ""), -3)); 
+                if (!in_array($fileExtensao, (array)($GLOBALS['OFAC_EXTENSOES'] ?? []))) $msg = "Extenso de arquivo invlida.".PHP_EOL;
         }
 
         //Valida extensao
         if($msg == ""){
-                if (strtoupper($_FILES['arquivo']['name']) != $OFAC_FILE_NAME) $msg = "O nome do Arquivo deveria ser $OFAC_FILE_NAME.".PHP_EOL;
+                if (strtoupper((string)($_FILES['arquivo']['name'] ?? "")) != $OFAC_FILE_NAME) $msg = "O nome do Arquivo deveria ser $OFAC_FILE_NAME.".PHP_EOL;
         }
+
 
         //Salva arquivo
         if($msg == ""){
@@ -77,14 +78,14 @@ if(isset($BtnConcluir) && $BtnConcluir) {
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
                 $erroSistema = error_get_last();
-                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino: {$erroSistema['message']}".PHP_EOL; 
-                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Nï¿½o foi possivel copiar para o diretï¿½rio destino: {$erroSistema['message']}".PHP_EOL; 
+                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou invï¿½lido.".PHP_EOL;
                 if(file_exists($fileSource)) unlink($fileSource);
         }
         
         //Descompactando o arquivo e verificando a data
         if($msg == ""){
-                //Diretório Destino
+                //Diretï¿½rio Destino
                 $dirDest = $GLOBALS['DIR_OFAC_ARQ_RETORNO'] ."tmp/";
                 
                 $zip = new ZipArchive; 
@@ -111,33 +112,34 @@ if(isset($BtnConcluir) && $BtnConcluir) {
         }
 
         
-        //Verificando se o arquivo já foi importado
+        //Verificando se o arquivo jï¿½ foi importado
         if($msg == ""){
             
             //capturando a data (YYYYMMDD) do arquivo gerado pelo OFAC
             $data_arquivo_ofac = date("Ymd", $nome_arquivos[0]['mtime']);
             
-            //testando se diretório para gravação do arquivo existe
+            //testando se diretï¿½rio para gravaï¿½ï¿½o do arquivo existe
             if(!file_exists($GLOBALS['DIR_OFAC_ARQ_RETORNO']."/".$data_arquivo_ofac)) {
                 mkdir($GLOBALS['DIR_OFAC_ARQ_RETORNO']."/".$data_arquivo_ofac, 0700);
             }//end if
             else {
-                $msg = "Arquivo já importado anteriormente".PHP_EOL;
+                $msg = "Arquivo jï¿½ importado anteriormente".PHP_EOL;
                 $success = true;
             }//end else 
         }//end 
             
-        //Validações de arquivo por período, estrutura e conteudo
+        //Validaï¿½ï¿½es de arquivo por perï¿½odo, estrutura e conteudo
         if($msg == ""){
             //Buscando todos os arquivos 
             for($i = 0; $i < $numeroArquivos; $i++) {
-                if(in_array(strtoupper($nome_arquivos[$i]['name']), $LISTA_ARQUIVOS_IMPORTAR)) {
+                if(in_array(strtoupper((string)($nome_arquivos[$i]['name'] ?? "")), $LISTA_ARQUIVOS_IMPORTAR)) {
                     //echo $dirDest.$nome_arquivos[$i]['name']."<br>";
                     //Abrindo arquivo do OFAC
                     $xml=simplexml_load_file($dirDest.$nome_arquivos[$i]['name']);
-                    $data_dados_considerados = substr($xml->publshInformation->Publish_Date,6,4)."-".substr($xml->publshInformation->Publish_Date,0,2)."-".substr($xml->publshInformation->Publish_Date,3,2)." 00:00:00";
-                    $total_de_registros = $xml->publshInformation->Record_Count;
-		    $msg_aux = "Data da geração dos Dados Considerados: ".$data_dados_considerados."<br> Total de Registros: ".$total_de_registros."<br>"; //."<pre>".print_r($xml,true)."</pre>";
+                    $publishDate = (string)($xml->publshInformation->Publish_Date ?? "");
+                    $data_dados_considerados = substr($publishDate,6,4)."-".substr($publishDate,0,2)."-".substr($publishDate,3,2)." 00:00:00";
+                    $total_de_registros = (int)($xml->publshInformation->Record_Count ?? 0);
+		    $msg_aux = "Data da geraï¿½ï¿½o dos Dados Considerados: ".$data_dados_considerados."<br> Total de Registros: ".$total_de_registros."<br>"; //."<pre>".print_r($xml,true)."</pre>";
                     $i = 1;
                     foreach($xml->sdnEntry as $indice => $registro) {
                         if(in_array(strtoupper($registro->sdnType), $tipos_com_firstName)) {
@@ -156,7 +158,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
 
                     //Verificando a quantidade de registros no arquivo
                     if($total_de_registros != ($i-1)) {
-                        $msg = "Quantidade de registros diferente do total informado no cabeçalho do arquivo".PHP_EOL;
+                        $msg = "Quantidade de registros diferente do total informado no cabeï¿½alho do arquivo".PHP_EOL;
                     }
                     
                 }//end if(in_array($nome_arquivos[$i]['name'], $LISTA_ARQUIVOS_IMPORTAR))
@@ -184,8 +186,8 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                 $fileDest = $GLOBALS['DIR_OFAC_ARQ_RETORNO']."/".$data_arquivo_ofac."/".$fileDest_nome;
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
-                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                if (!rename($fileSource, $fileDest)) $msg = "Nï¿½o foi possivel copiar para o diretï¿½rio destino.".PHP_EOL; 
+                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou invï¿½lido.".PHP_EOL;
                 if(file_exists($fileSource)) unlink($fileSource);
                 
                 //verificando se ocorreu algum erro, se sim deleta arquivos
@@ -198,8 +200,8 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                     $fileSource = $dirDest.$nome_arquivos[$i]['name'];
                 
                     //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                    if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
-                    else if(!file_exists($fileDest)) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                    if (!rename($fileSource, $fileDest)) $msg = "Nï¿½o foi possivel copiar para o diretï¿½rio destino.".PHP_EOL; 
+                    else if(!file_exists($fileDest)) $msg = "Arquivo no destino esta vazio ou invï¿½lido.".PHP_EOL;
                     if(file_exists($fileSource)) unlink($fileSource);
                 }//end for
                 
@@ -221,7 +223,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
         //fecha janela
         if($msg == ""){
                 $success = true;
-                $msg = "Operação efetuada com sucesso!".PHP_EOL."Arquivos validados e registros salvos no Banco de Dados.".PHP_EOL; 
+                $msg = "Operaï¿½ï¿½o efetuada com sucesso!".PHP_EOL."Arquivos validados e registros salvos no Banco de Dados.".PHP_EOL; 
         }
 
 //die($msg." -$i-  ".$_FILES['arquivo']['name']."--".$numeroArquivos);
@@ -231,11 +233,11 @@ if(isset($BtnConcluir) && $BtnConcluir) {
     <script>
         function fcnOnSubmit(){
             if(form1.arquivo.value==''){
-                alert('Arquivo não especificado');
+                alert('Arquivo nï¿½o especificado');
                 return false;
             }
             else {
-                return confirm('O arquivo demorará a ser processado.\nPor favor, NÃO FECHE a tela acreditando que o programa travou!');
+                return confirm('O arquivo demorarï¿½ a ser processado.\nPor favor, Nï¿½O FECHE a tela acreditando que o programa travou!');
             }
         }
     </script>

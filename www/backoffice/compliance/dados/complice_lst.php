@@ -44,20 +44,18 @@ $mes            = isset($_REQUEST['mes'])               ? htmlentities($_REQUEST
                                         <?php  } ?>
                                         </select>
                                     </td>
-                                    <td><div align="right">Mês dos Dados de Complice: </div></td>
+                                    <td><div align="right">Mï¿½s dos Dados de Complice: </div></td>
                                     <td><select name="mes" id="mes" class="combo_normal">
-                                                <option value="" >Todos os Mêses</option>
+                                                <option value="" >Todos os Mï¿½ses</option>
                                         <?php
                                             for ($codigoMes=1; $codigoMes<=12; $codigoMes++){
-                                                   if (strlen($codigoMes) == 1){
-                                                           $codigoMes = '0'.$codigoMes;
-                                                   }
+                                                   $codigoMesStr = str_pad((string)$codigoMes, 2, '0', STR_PAD_LEFT);
 
-                                                   echo '<option value="'.$codigoMes.'"';
-                                                   if ($mes == $codigoMes){
+                                                   echo '<option value="'.$codigoMesStr.'"';
+                                                   if ($mes == $codigoMesStr){
                                                            echo ' SELECTED';
                                                    }
-                                                   echo '>'.mesNome($codigoMes).'</option>';
+                                                   echo '>'.mesNome($codigoMesStr).'</option>';
                                             }
                                             ?>
                                     </select></td>
@@ -115,7 +113,7 @@ $sql = "SELECT
                                         AND c_custo_inadimplencia_emissor > 0 AND c_custos_outros_emissor > 0
                                         AND c_custo_impostos_emissor > 0 AND c_receita_credenciador > 0
                                         AND c_receita_outras_credenciador > 0 AND c_custo_processamento_front_end_back_end > 0) 
-                            then 'Todos os Dados Preenchidos' else 'Faltam Dados à Preencher' end)||'</nobr>' as dados
+                            then 'Todos os Dados Preenchidos' else 'Faltam Dados ï¿½ Preencher' end)||'</nobr>' as dados
 	FROM complice ";
 if(!isset($sql_aux))
     $sql_aux = null;

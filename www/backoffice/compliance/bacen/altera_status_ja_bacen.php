@@ -6,18 +6,18 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
 require_once $raiz_do_projeto . "includes/complice/functions.php";
 
-//Variavel de verificação de sucesso
+//Variavel de verificaï¿½ï¿½o de sucesso
 $success = false;
 
 //Extensoes de arquivos do BACEN permitidos 
 $BACEN_EXTENSOES = array("zip");
-//Diretório destino do arquivo do BACEN
+//Diretï¿½rio destino do arquivo do BACEN
 $DIR_BACEN_ARQ_RETORNO = $raiz_do_projeto . "arquivos_gerados/bacen/";
-//Número de arquivos contidos no ZIP
+//Nï¿½mero de arquivos contidos no ZIP
 $QTDE_ARQUIVOS = 1;
-//Posição no arquivo dentro do ZIP File
+//Posiï¿½ï¿½o no arquivo dentro do ZIP File
 $POSICAO_ARQUIVO = 0;
-//Código do movimento gravado
+//Cï¿½digo do movimento gravado
 $COD_MOV_SAVED = "PMTF110C";
 //Identificador de Qtde de Faturas Gravadas
 $TOTAL_FATURAS = "TOTAL DE FATURAS GRAVADAS";
@@ -46,26 +46,27 @@ if(isset($BtnConcluir) && $BtnConcluir) {
 
         //Valida extensao
         if($msg == ""){
-                $fileExtensao = strtolower(substr($_FILES['arquivo']['name'], -3)); 
-                if (!in_array($fileExtensao, $GLOBALS['BACEN_EXTENSOES'])) $msg = "Extensão de arquivo inválida.".PHP_EOL;
+                $fileExtensao = strtolower(substr((string)($_FILES['arquivo']['name'] ?? ""), -3)); 
+                if (!in_array($fileExtensao, (array)($GLOBALS['BACEN_EXTENSOES'] ?? []))) $msg = "Extenso de arquivo invlida.".PHP_EOL;
         }
 
         //Salva arquivo
         if($msg == ""){
 
-                $fileDest_nome = $_FILES['arquivo']['name']; 
+                $fileDest_nome = (string)($_FILES['arquivo']['name'] ?? ""); 
+
 
                 $fileDest = $GLOBALS['DIR_BACEN_ARQ_RETORNO'] ."tmp/". $fileDest_nome; 
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
-                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Nï¿½o foi possivel copiar para o diretï¿½rio destino.".PHP_EOL; 
+                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou invï¿½lido.".PHP_EOL;
                 else @unlink($fileSource);
         }
 
         //Descompactando o arquivo e verificando a data
         if($msg == ""){
-                //Diretório Destino
+                //Diretï¿½rio Destino
                 $dirDest = $GLOBALS['DIR_BACEN_ARQ_RETORNO'] ."tmp/";
                 
                 $zip = new ZipArchive; 
@@ -90,20 +91,20 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                 } 
         }
         
-        //Validações de arquivo por período, estrutura e conteudo
+        //Validaï¿½ï¿½es de arquivo por perï¿½odo, estrutura e conteudo
         if($msg == ""){
             
             //capturando a data (YYYYMMDD) do arquivo gerado pelo BACEN
             $data_arquivo_bacen = date("Ymd", $nome_arquivos[$POSICAO_ARQUIVO]['mtime']);
             
-            //testando se diretório para gravação do arquivo existe
+            //testando se diretï¿½rio para gravaï¿½ï¿½o do arquivo existe
             if(!file_exists($GLOBALS['DIR_BACEN_ARQ_RETORNO']."/".$data_arquivo_bacen)) {
                 mkdir($GLOBALS['DIR_BACEN_ARQ_RETORNO']."/".$data_arquivo_bacen, 0700);
             }//end if(!file_exists($GLOBALS['DIR_BACEN_ARQ_RETORNO']."/".$data_arquivo_bacen))
                 
-            //teste se o arquivo percente ao mês vigente
+            //teste se o arquivo percente ao mï¿½s vigente
             if(date("Ym") == date("Ym", $nome_arquivos[$POSICAO_ARQUIVO]['mtime'])) {
-                //echo "O arquivo corresponde ao Mês vigente<br>";
+                //echo "O arquivo corresponde ao Mï¿½s vigente<br>";
 
                 //Abrindo arquivo do BACEN
                 $fileBACEN = fopen($dirDest.$nome_arquivos[$POSICAO_ARQUIVO]['name'], 'r');
@@ -118,27 +119,28 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                     $i = 1;
                     $linhaCOD_MOV_SAVED = false;
                     $linhaTOTAL_FATURAS = false;
-                    foreach ($members as $line){
-                        if(strstr(strtoupper($line), $COD_MOV_SAVED)) {
+                    foreach ((array)($members ?? []) as $line){
+                        if(strstr(strtoupper((string)($line ?? "")), $COD_MOV_SAVED)) {
                             $linhaCOD_MOV_SAVED = $i;
                         }
 
-                        if(strstr(strtoupper($line), $TOTAL_FATURAS)) {
+                        if(strstr(strtoupper((string)($line ?? "")), $TOTAL_FATURAS)) {
                             $linhaTOTAL_FATURAS = $i;
-                            $auxNumero = preg_replace('/[^0-9]/','',$line);
+                            $auxNumero = preg_replace('/[^0-9]/','',(string)($line ?? ""));
                             //echo "[$auxNumero]<br>";
-                            if(!($auxNumero > 0)) $msg = "O Total de Faturas Gravadas no Arquivo do BACEN é 0(ZERO)".PHP_EOL;
+                            if(!($auxNumero > 0)) $msg = "O Total de Faturas Gravadas no Arquivo do BACEN  0(ZERO)".PHP_EOL;
                         } //end if(strstr(strtoupper($line), $TOTAL_FATURAS))
 
                         //echo $line.'<br/>'; // do something with each line from text file here
                         $i++;
                     }//end foreach
 
-                    if(!$linhaCOD_MOV_SAVED) $msg = "Não encontrou o Código de Movimento Gravado no Arquivo do BACEN".PHP_EOL;
 
-                    if(!$linhaTOTAL_FATURAS) $msg = "Não encontrou o Total de Faturas Gravadas no Arquivo do BACEN".PHP_EOL;
+                    if(!$linhaCOD_MOV_SAVED) $msg = "Nï¿½o encontrou o Cï¿½digo de Movimento Gravado no Arquivo do BACEN".PHP_EOL;
 
-                    if($linhaTOTAL_FATURAS <= $linhaCOD_MOV_SAVED) $msg = "Informações de Código de Movimento Gravados e Total de Faturas Gravadas Incoerentes".PHP_EOL;
+                    if(!$linhaTOTAL_FATURAS) $msg = "Nï¿½o encontrou o Total de Faturas Gravadas no Arquivo do BACEN".PHP_EOL;
+
+                    if($linhaTOTAL_FATURAS <= $linhaCOD_MOV_SAVED) $msg = "Informaï¿½ï¿½es de Cï¿½digo de Movimento Gravados e Total de Faturas Gravadas Incoerentes".PHP_EOL;
 
                     //echo $msg;
                 }//end if($fileBACEN) 
@@ -147,7 +149,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
 
             }//end if(date("Ym") == date("Ym", $nome_arquivos[$POSICAO_ARQUIVO]['mtime']))
 
-            else $msg = "O arquivo pertence a um período anterior ao atual".PHP_EOL;
+            else $msg = "O arquivo pertence a um perï¿½odo anterior ao atual".PHP_EOL;
 
             //verificando se ocorreu algum erro, se sim deleta arquivos
             if($msg != ""){
@@ -172,8 +174,8 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                 $fileDest = $GLOBALS['DIR_BACEN_ARQ_RETORNO']."/".$data_arquivo_bacen."/".$fileDest_nome;
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
-                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                if (!rename($fileSource, $fileDest)) $msg = "Nï¿½o foi possivel copiar para o diretï¿½rio destino.".PHP_EOL; 
+                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou invï¿½lido.".PHP_EOL;
                 else @unlink($fileSource);
                 
                 //verificando se ocorreu algum erro, se sim deleta arquivos
@@ -185,8 +187,8 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                 $fileSource = $dirDest.$nome_arquivos[$POSICAO_ARQUIVO]['name'];
                 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
-                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                if (!rename($fileSource, $fileDest)) $msg = "Nï¿½o foi possivel copiar para o diretï¿½rio destino.".PHP_EOL; 
+                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou invï¿½lido.".PHP_EOL;
                 else @unlink($fileSource);
                 
                 //verificando se ocorreu algum erro, se sim deleta arquivos
@@ -199,32 +201,33 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                 //Capturando a data do arquivo
                 $mesAno = date('m/Y', $nome_arquivos[$POSICAO_ARQUIVO]['mtime']);
                 list($mes, $ano) = explode("/", $mesAno);   
-                //Trazendo o mês anterior que foi o mês que o BACEN processou
+                //Trazendo o mï¿½s anterior que foi o mï¿½s que o BACEN processou
                 $currentmonth = mktime(0, 0, 0, $mes-1, 1, $ano);
                 $mesAno = date('m/Y',$currentmonth);
                 list($mes, $ano) = explode("/", $mesAno);
 
-                //Publishers Já em Operação constantes em arquivos BACEN anteriores INTERNacionais
-                $vetorPublisher = levantamentoPublisherOperantes($ano,$mes);
+                //Publishers J em Operao constantes em arquivos BACEN anteriores INTERNacionais
+                $vetorPublisher = (array)levantamentoPublisherOperantes($ano,$mes);
 
                 //Publishers novos nunca antes contou nos arquivos BACEN INTERNacionais
-                $vetorPublisherNovos = levantamentoPublisherNovosOperantes($ano,$mes);
+                $vetorPublisherNovos = (array)levantamentoPublisherNovosOperantes($ano,$mes);
 
-                // Instanciando a variavel para verificação de novos Publishers
+                // Instanciando a variavel para verificao de novos Publishers
                 $verificadorPublishersNovos = implode(",", $vetorPublisherNovos);
 
-                //atualiza publisher de já em arquivos para 
+                //atualiza publisher de j em arquivos para 
                 $sql = "update operadoras set opr_ja_contabilizou = ".$GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU']." where opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN']. " and opr_vinculo_empresa = 1 and opr_codigo IN (".implode(",", $vetorPublisher).(!empty($verificadorPublishersNovos)?",".$verificadorPublishersNovos:"").");";
+
                 //echo $sql;
                 $ret = SQLexecuteQuery($sql);
                 if(!$ret) $msg = "Erro ao atualizar Publisher.".PHP_EOL;
                 else {
-                    //Capturando o período    
+                    //Capturando o perï¿½odo    
                     $currentmonth = mktime(0, 0, 0, date('n')-1, 1, date('Y'));
                     $sql = "update cotacao_dolar set cd_freeze = 1 where cd_data = '".date('Y-m-d',$currentmonth)." 00:00:00' and opr_codigo IN (".implode(",", $vetorPublisher).(!empty($verificadorPublishersNovos)?",".$verificadorPublishersNovos:"").");";
                     //echo $sql;
                     $retCotacao = SQLexecuteQuery($sql);
-                    if(!$retCotacao) $msg = "Erro ao atualizar congelamento de cotação do dólar.".PHP_EOL;
+                    if(!$retCotacao) $msg = "Erro ao atualizar congelamento de cotaï¿½ï¿½o do dï¿½lar.".PHP_EOL;
                 }//end else if(!$ret)
 
         }
@@ -232,7 +235,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
         //fecha janela
         if($msg == ""){
                 $success = true;
-                $msg = "Operação efetuada com sucesso!\nArquivos validados e salvos nos respectivos diretórios".PHP_EOL; 
+                $msg = "Operaï¿½ï¿½o efetuada com sucesso!\nArquivos validados e salvos nos respectivos diretï¿½rios".PHP_EOL; 
         }
 
 }
@@ -241,14 +244,14 @@ if(isset($BtnConcluir) && $BtnConcluir) {
         function fcnOnSubmit(){
 
             if(form1.arquivo.value==''){
-                alert('Arquivo não especificado');
+                alert('Arquivo nï¿½o especificado');
                 return false;
             }
 
         }
     </script>
     <div class="col-md-8 txt-preto">
-        <p>Selecionar o arquivo de retorno do BACEN (compactado) para ser processado e alterar o status dos Publishers para já considerados anteriormente em arquivo para o BACEN. </p>
+        <p>Selecionar o arquivo de retorno do BACEN (compactado) para ser processado e alterar o status dos Publishers para jï¿½ considerados anteriormente em arquivo para o BACEN. </p>
         <form action="" enctype="multipart/form-data" method="post">
             <p>
                 <input type="file" name="arquivo" size="30" class="btn btn-sm btn-info pull-left"> 
