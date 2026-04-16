@@ -3,6 +3,7 @@
 //ini_set("display_startup_errors", 1);
 //error_reporting(E_ALL);
 
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header('Content-Type: application/json; charset=utf-8');
 require_once "/www/db/connect.php"; 
 require_once "/www/db/ConnectionPDO.php"; 
@@ -38,16 +39,18 @@ else if(isset($_POST["datainicial"]) && isset($_POST["datafinal"])) {
 	$mediaUsuarios = array_column($ticket_medio_usuarios, "avg", "ug_id");
 	$nomeUsuarios = array_column($ticket_medio_usuarios, "ug_nome");
 	 try{
-		 $sql2 = "select count(*) as qtde, vg_ug_id from tb_venda_games inner join tb_venda_games_modelo on vgm_vg_id = vg_id where vg_ultimo_status = 5 and vg_ug_id in(".implode(",", $codigosUsuarios).") and date(vg_data_inclusao) BETWEEN :DTINI2 and :DTFIN2 group by vg_ug_id order by vg_ug_id;";
-		 $queries = $connection->prepare($sql2);
-		 //$queries->bindValue(":ID2", ); //$_POST["id"]
-		 $queries->bindValue(":DTINI2", $_POST["datainicial"]);
-		 $queries->bindValue(":DTFIN2", $_POST["datafinal"]);	 
-		 $queries->execute();
-		 $qtdeAnual = $queries->fetchAll(PDO::FETCH_ASSOC);
-		 $mediaQuantidadeUsuarios = array_column($qtdeAnual, "qtde", "vg_ug_id");
-		 
-		 $sql3 = "SELECT date(min(vg_data_inclusao)) as data, vg_ug_id from tb_venda_games inner join tb_venda_games_modelo on vgm_vg_id = vg_id where vg_ultimo_status = 5 and vg_ug_id in(".implode(",", $codigosUsuarios).") group by vg_ug_id order by vg_ug_id;";
+	         $listaCodigos = !empty($codigosUsuarios) ? implode(",", array_map('intval', $codigosUsuarios)) : "0";
+	         $sql2 = "select count(*) as qtde, vg_ug_id from tb_venda_games inner join tb_venda_games_modelo on vgm_vg_id = vg_id where vg_ultimo_status = 5 and vg_ug_id in(".$listaCodigos.") and date(vg_data_inclusao) BETWEEN :DTINI2 and :DTFIN2 group by vg_ug_id order by vg_ug_id;";
+	         $queries = $connection->prepare($sql2);
+	         //$queries->bindValue(":ID2", ); //$_POST["id"]
+	         $queries->bindValue(":DTINI2", $_POST["datainicial"]);
+	         $queries->bindValue(":DTFIN2", $_POST["datafinal"]);    
+	         $queries->execute();
+	         $qtdeAnual = $queries->fetchAll(PDO::FETCH_ASSOC);
+	         $mediaQuantidadeUsuarios = array_column($qtdeAnual, "qtde", "vg_ug_id");
+
+	         $sql3 = "SELECT date(min(vg_data_inclusao)) as data, vg_ug_id from tb_venda_games inner join tb_venda_games_modelo on vgm_vg_id = vg_id where vg_ultimo_status = 5 and vg_ug_id in(".$listaCodigos.") group by vg_ug_id order by vg_ug_id;";
+
 		 $queries3 = $connection->prepare($sql3);
 		 $queries3->execute();
 		 $tempoDeUniao = $queries3->fetchAll(PDO::FETCH_ASSOC);
@@ -55,20 +58,20 @@ else if(isset($_POST["datainicial"]) && isset($_POST["datafinal"])) {
 		 
 		 function calculaLtv($ticket, $qtde, $uniao, $nome){
 			$data_atual = new DateTime('now');
-			$diferenca = $data_atual->diff(new DateTime($uniao));
+			$diferenca = $data_atual->diff(new DateTime((string)($uniao ?? "now")));
 			//var_dump($ticket." - ".$qtde." - ".$uniao." - ".$nome);
-			$ltv = number_format(($ticket * $qtde) * $diferenca->y, 2, ",", ".");
-			return ["usuario" => utf8_encode($nome), "ltv" => $ltv]; 
+			$ltv = number_format(((float)$ticket * (float)$qtde) * $diferenca->y, 2, ",", ".");
+			return ["usuario" => pdv_iso_to_utf8((string)($nome ?? "")), "ltv" => $ltv]; 
 		 }
 		 $resultadoLTV = array_map("calculaLtv", $mediaUsuarios, $mediaQuantidadeUsuarios, $mediaUniaoUsuarios, $nomeUsuarios);  //$codigosPdvs
 		 function limpaResultado($array){
-			 if($array["ltv"] !="0,00"){
+			 if(isset($array["ltv"]) && $array["ltv"] !="0,00"){
 				 return $array;
 			 }
 		 }
 		 $resultado = array_filter($resultadoLTV, "limpaResultado");
 		 function ordenar($prev, $next) {
-              return str_replace([".", ","], ["", "."], $prev['ltv']) < str_replace([".", ","], ["", "."], $next['ltv']);
+              return str_replace([".", ","], ["", "."], (string)($prev['ltv'] ?? "0")) < str_replace([".", ","], ["", "."], (string)($next['ltv'] ?? "0"));
 		 }
 		 usort($resultado, 'ordenar');
 		 

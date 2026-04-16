@@ -21,22 +21,14 @@ $con = ConnectionPDO::getConnection()->getLink();
 //ini_set("display_startup_errors", 1);
 //error_reporting(E_ALL);
 
-if (!isset($GLOBALS["_SESSION"]["iduser_bko"])) {
+if (!isset($_SESSION["iduser_bko"])) {
     header("Location: login.php");
     die();
 }
 
-if (isset($_POST["startDate"])) {
-    $startDate = $_POST["startDate"];
-}
-
-if (isset($_POST["endDate"])) {
-    $endDate = $_POST["endDate"];
-}
-
-if (isset($_POST["billing"])) {
-    $billing = $_POST["billing"];
-}
+$startDate = isset($_POST["startDate"]) ? $_POST["startDate"] : date("Y-m-d", strtotime("-7 days"));
+$endDate = isset($_POST["endDate"]) ? $_POST["endDate"] : date("Y-m-d");
+$billing = isset($_POST["billing"]) ? $_POST["billing"] : null;
 
 if (!empty($_POST)) {
     if ($_POST["formcode"] == "1") {
@@ -71,7 +63,7 @@ if (!empty($_POST)) {
         $mesTemp = [
             1 => "Janeiro",
             2 => "Feveiro",
-            3 => "Março",
+            3 => "Marï¿½o",
             4 => "Abril",
             5 => "Maio",
             6 => "Junho",
@@ -112,8 +104,8 @@ echo '<div class="bg-branco">
 		<div class="container-title-icone" style="z-index: 2;">
 			<span class="material-symbols-outlined icone-question">help</span>
 			<div class="calculo-merchant hidden">
-				 <b>Legendas:</b><br> * <u>MMA</u>: Média Móvel Aritmética<br>* <u>FD</u>: Fechamento Total do dia<br>* <u>DA</u>: Total de Dias Anteriores<br><br>
-				 <b>Formula:</b><br> * MMA = (FD1 + FD2 + FD3 + FD4 + FD5) ÷ DA
+				 <b>Legendas:</b><br> * <u>MMA</u>: Mï¿½dia Mï¿½vel Aritmï¿½tica<br>* <u>FD</u>: Fechamento Total do dia<br>* <u>DA</u>: Total de Dias Anteriores<br><br>
+				 <b>Formula:</b><br> * MMA = (FD1 + FD2 + FD3 + FD4 + FD5) ï¿½ DA
 			</div>
 		</div>
 	</div>
@@ -163,8 +155,8 @@ echo '<div class="bg-branco">
 		<div class="container-title-icone" style="z-index: 2;">
 			<span class="material-symbols-outlined icone-question">help</span>
 			<div class="calculo-merchant hidden">
-				 <b>Legendas:</b><br> * <u>MMA</u>: Média Móvel Aritmética<br>* <u>FD</u>: Fechamento Total do dia<br>* <u>DA</u>: Total de Dias Anteriores<br><br>
-				 <b>Formula:</b><br> * MMA = (FD1 + FD2 + FD3 + FD4 + FD5) ÷ DA
+				 <b>Legendas:</b><br> * <u>MMA</u>: Mï¿½dia Mï¿½vel Aritmï¿½tica<br>* <u>FD</u>: Fechamento Total do dia<br>* <u>DA</u>: Total de Dias Anteriores<br><br>
+				 <b>Formula:</b><br> * MMA = (FD1 + FD2 + FD3 + FD4 + FD5) ï¿½ DA
 			</div>
 		</div>
 	</div>
@@ -264,7 +256,7 @@ echo '<div class="bg-branco">
 			<span class="material-symbols-outlined icone-question">help</span>
 			<div class="calculo-merchant hidden" style="z-index: 2">
 				 <b>Legendas:</b><br> * <u>LTV</u>: Life Time Value (Valor do Tempo de Vida)<br><br>
-				 <b>Formula:</b><br>(Ticket Médio da Empresa * Média do número de mensalidades a cada ano) * média de tempo de relacionamento
+				 <b>Formula:</b><br>(Ticket Mï¿½dio da Empresa * Mï¿½dia do nï¿½mero de mensalidades a cada ano) * mï¿½dia de tempo de relacionamento
 			</div>
 		</div>
 	</div>
@@ -313,13 +305,13 @@ echo '<div class="bg-branco">
 
 
 <div class="mais-vendidos-periodo" style="text-align: center;">
-	<h1>Produtos mais vendidos por período</h1>
+	<h1>Produtos mais vendidos por perï¿½odo</h1>
 	
 	<form method="post" class="form">
 		<div style="width: 150px" class="container-input">
 			<h4>Data Inicial <span>&#128198;</span></h4>
 			<select class="form-input" id="mais-vendidos-periodo">
-				<option value="">Selecione um Período</option>
+				<option value="">Selecione um Perï¿½odo</option>
 				<option value="week">Semanal</option>
 				<option value="day">Quinzenal</option>
 				<option value="month">Mensal</option>
@@ -453,8 +445,8 @@ echo '<div class="bg-branco">
 	
 	function showLoadingSwal() {
 	  Swal.fire({
-		title: 'Carregando informações!',
-	    html: '<p>Coletando as informações necessarias</p><img style="width: 80px;" src="../../images/loading.gif">',
+		title: 'Carregando informaï¿½ï¿½es!',
+	    html: '<p>Coletando as informaï¿½ï¿½es necessarias</p><img style="width: 80px;" src="../../images/loading.gif">',
 	    showConfirmButton: false,
 	    allowOutsideClick: false,
 	    allowEscapeKey: false,
@@ -472,7 +464,7 @@ echo '<div class="bg-branco">
 			Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
-				text: 'A Data final não pode ser menor que a inicial.'
+				text: 'A Data final nï¿½o pode ser menor que a inicial.'
 			 });
 			 
 			 return false;
@@ -501,16 +493,16 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxProdutoMerchant.php",
 		  data: { id: produtos, datainicial: data_inicial, datafinal: data_final, grafico: 2,periodo: periodo},
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
-				text: 'Ocorreu um erro na requisição'
+				text: 'Ocorreu um erro na requisiï¿½ï¿½o'
 			  });
 			}
 		  }).done(function(dataValues){
@@ -519,7 +511,7 @@ echo '<div class="bg-branco">
 				Swal.fire({
 					icon: 'warning',
 					title: 'Aviso',
-					text: 'Não foram encontrados dados na data especifica'
+					text: 'Nï¿½o foram encontrados dados na data especifica'
 				}); 
 				
 				return;
@@ -624,8 +616,8 @@ echo '<div class="bg-branco">
 			  data: { id: operadora, datainicial: data_inicial, datafinal: data_final, grafico: 2, periodo: periodo},
 			  beforeSend: function() {
 				Swal.fire({
-				  title: 'Carregando informações!',
-				  html: '<p>Coletando as informações necessarias</p><img style="width: 80px;" src="../../images/loading.gif">',
+				  title: 'Carregando informaï¿½ï¿½es!',
+				  html: '<p>Coletando as informaï¿½ï¿½es necessarias</p><img style="width: 80px;" src="../../images/loading.gif">',
 				  showConfirmButton: false,
 				  allowOutsideClick: false,
 				  allowEscapeKey: false
@@ -709,7 +701,7 @@ echo '<div class="bg-branco">
 				Swal.fire({
 					icon: 'warning',
 					title: 'Aviso',
-					text: 'Não foram encontrados dados na data especifica'
+					text: 'Nï¿½o foram encontrados dados na data especifica'
 				});
 			 }
  
@@ -717,7 +709,7 @@ echo '<div class="bg-branco">
 			   Swal.fire({
 					icon: 'error',
 					title: 'Erro',
-					text: 'Não foi possivel carregar o grafico',
+					text: 'Nï¿½o foi possivel carregar o grafico',
 					showConfirmButton: false,
 					allowOutsideClick: true,
 					allowEscapeKey: false
@@ -740,16 +732,16 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxProdutosMaisVendidos.php",
 		  data: { datainicial: data_inicial, datafinal: data_final, grafico: 2},
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
-				text: 'Ocorreu um erro na requisição'
+				text: 'Ocorreu um erro na requisiï¿½ï¿½o'
 			  });
 			}
 		  }).done(function(dataValues){
@@ -758,7 +750,7 @@ echo '<div class="bg-branco">
 				Swal.fire({
 					icon: 'warning',
 					title: 'Aviso',
-					text: 'Não foram encontrados dados na data especifica'
+					text: 'Nï¿½o foram encontrados dados na data especifica'
 				}); 
 				
 				return;
@@ -816,11 +808,11 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxProdutosPeriodo.php",
 		  data: { periodo: periodo },
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
@@ -878,16 +870,16 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxPdvAtivos.php",
 		  data: {},
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
-				text: 'Ocorreu um erro na requisição'
+				text: 'Ocorreu um erro na requisiï¿½ï¿½o'
 			  });
 			}
 		  }).done(function(dataValues){
@@ -901,7 +893,7 @@ echo '<div class="bg-branco">
 			new Chart(ctx, {
 				type: 'pie',
 				data: {
-				  labels: ["Não realizaram primeiro pedido", "Realizaram primeiro pedido"],
+				  labels: ["Nï¿½o realizaram primeiro pedido", "Realizaram primeiro pedido"],
 				  datasets: [{
 						label: "Quantidade de PDVs",
 						data: dataValues,
@@ -945,11 +937,11 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxPagamentosPorProduto.php",
 		  data: {id, datainicial, datafinal},
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
@@ -963,7 +955,7 @@ echo '<div class="bg-branco">
 				Swal.fire({
 					icon: 'warning',
 					title: 'Aviso',
-					text: 'Não foram encontrados dados na data especificada'
+					text: 'Nï¿½o foram encontrados dados na data especificada'
 				});
 				
 				return;
@@ -971,27 +963,27 @@ echo '<div class="bg-branco">
 			
 			console.log(dataValues);
 			let tipos = {
-				"1": "Transferência Bancaria",
+				"1": "Transferï¿½ncia Bancaria",
 				"2": "Saldo em conta",  // Boleto
 				"3": "Master Card",
 				"4": "Diners",
-				"5": "Transferência entre contas Bradesco",
-				"6": "Pagamento Fácil Bradesco - Débito",
-				"7": "Pagamento Fácil Bradesco - Crédito",
-				"8": "Pagamento BB - Débito sua Empresa",
-				"9": "Pagamento BB - Débito sua Conta",
-				"10": "Pagamento Itáu online",	
+				"5": "Transferï¿½ncia entre contas Bradesco",
+				"6": "Pagamento Fï¿½cil Bradesco - Dï¿½bito",
+				"7": "Pagamento Fï¿½cil Bradesco - Crï¿½dito",
+				"8": "Pagamento BB - Dï¿½bito sua Empresa",
+				"9": "Pagamento BB - Dï¿½bito sua Conta",
+				"10": "Pagamento Itï¿½u online",	
 				"11": "Pagamento Hipay online",
 				"12": "Pagamento Paypal online",
 				"13": "Pagamento EPP Cash",
 				"14": "Pagamento Visa Net",
-				"15": "Pagamento Visa Crédito",
+				"15": "Pagamento Visa Crï¿½dito",
 				"16": "Pagamento Maestro",
-				"17": "Pagamento Mastercard Crédito",
-				"18": "Pagamento Elo Débito",
-				"19": "Pagamento Elo Crédito",
-				"20": "Pagamento Diners Crédito",
-				"21": "Pagamento Discover Crédito",
+				"17": "Pagamento Mastercard Crï¿½dito",
+				"18": "Pagamento Elo Dï¿½bito",
+				"19": "Pagamento Elo Crï¿½dito",
+				"20": "Pagamento Diners Crï¿½dito",
+				"21": "Pagamento Discover Crï¿½dito",
 				"22": "Ofertas",
 				"23": "Pagamentos MCOIN - celular",
 				"24": "Pix"
@@ -1052,11 +1044,11 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxCarrinho.php",
 		  data: {datainicial, datafinal},
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
@@ -1067,27 +1059,27 @@ echo '<div class="bg-branco">
 		  }).done(function(dataValues){
 			console.log(dataValues);
 			let tipos = {
-				"1": "Transferência Bancaria",
+				"1": "Transferï¿½ncia Bancaria",
 				"2": "Saldo em conta", // Boleto
 				"3": "Master Card",
 				"4": "Diners",
-				"5": "Transferência entre contas Bradesco",
-				"6": "Pagamento Fácil Bradesco - Débito",
-				"7": "Pagamento Fácil Bradesco - Crédito",
-				"8": "Pagamento BB - Débito sua Empresa",
-				"9": "Pagamento BB - Débito sua Conta",
-				"10": "Pagamento Itáu online",	
+				"5": "Transferï¿½ncia entre contas Bradesco",
+				"6": "Pagamento Fï¿½cil Bradesco - Dï¿½bito",
+				"7": "Pagamento Fï¿½cil Bradesco - Crï¿½dito",
+				"8": "Pagamento BB - Dï¿½bito sua Empresa",
+				"9": "Pagamento BB - Dï¿½bito sua Conta",
+				"10": "Pagamento Itï¿½u online",	
 				"11": "Pagamento Hipay online",
 				"12": "Pagamento Paypal online",
 				"13": "Pagamento EPP Cash",
 				"14": "Pagamento Visa Net",
-				"15": "Pagamento Visa Crédito",
+				"15": "Pagamento Visa Crï¿½dito",
 				"16": "Pagamento Maestro",
-				"17": "Pagamento Mastercard Crédito",
-				"18": "Pagamento Elo Débito",
-				"19": "Pagamento Elo Crédito",
-				"20": "Pagamento Diners Crédito",
-				"21": "Pagamento Discover Crédito",
+				"17": "Pagamento Mastercard Crï¿½dito",
+				"18": "Pagamento Elo Dï¿½bito",
+				"19": "Pagamento Elo Crï¿½dito",
+				"20": "Pagamento Diners Crï¿½dito",
+				"21": "Pagamento Discover Crï¿½dito",
 				"22": "Ofertas",
 				"23": "Pagamentos MCOIN - celular",
 				"24": "Pix"
@@ -1158,11 +1150,11 @@ echo '<div class="bg-branco">
 		  url: "https://<?php echo $server_url_complete; ?>/dashboard/pdv/ajaxLtv.php",
 		  data: { datainicial, datafinal }, //id: id_produto,
 		  success: function(response) {
-				// Código a ser executado em caso de sucesso na requisição
+				// Cï¿½digo a ser executado em caso de sucesso na requisiï¿½ï¿½o
 			Swal.close(); // Fecha o Swal de loading
 		  },
 			error: function(xhr, textStatus, errorThrown) {
-			  // Código a ser executado em caso de erro na requisição
+			  // Cï¿½digo a ser executado em caso de erro na requisiï¿½ï¿½o
 			  Swal.close(); // Fecha o Swal de loading
 			  Swal.fire({
 				icon: 'error',
@@ -1177,7 +1169,7 @@ echo '<div class="bg-branco">
 				Swal.fire({
 					icon: 'warning',
 					title: 'Aviso',
-					text: 'Não foram encontrados dados na data especificada ou o LTV é 0'
+					text: 'Nï¿½o foram encontrados dados na data especificada ou o LTV ï¿½ 0'
 				});
 				
 				return;
@@ -1220,15 +1212,15 @@ echo '<div class="bg-branco">
 			let table = new DataTable('#myTable', {
 			    ordering: false,
 				language: {
-					lengthMenu: "Mostrar _MENU_ resultados por página",
-					zeroRecords: "Não foram encontrados CNAES",
-					info: "Mostrando a página _PAGE_ de _PAGES_",
+					lengthMenu: "Mostrar _MENU_ resultados por pï¿½gina",
+					zeroRecords: "Nï¿½o foram encontrados CNAES",
+					info: "Mostrando a pï¿½gina _PAGE_ de _PAGES_",
 					infoEmpty: "Dados inexistentes",
 					infoFiltered: "(filtro aplicado em _MAX_ registros)",
 					sSearch: "Pesquisar:",
 					paginate: {
 						previous: "Anterior",
-						next: "Próximo",
+						next: "Prï¿½ximo",
 					}
 				},
 				data: dataValues,
