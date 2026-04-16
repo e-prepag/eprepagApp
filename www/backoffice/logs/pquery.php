@@ -1,18 +1,17 @@
 <?php
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
-$pos_pagina = isset($seg_auxilar) ? $seg_auxilar : null;
+$pos_pagina = isset($seg_auxilar) ? $seg_auxilar : (isset($_REQUEST['seg_auxilar']) ? $_REQUEST['seg_auxilar'] : null);
 
 	$time_start = getmicrotime();
 
-	if(!isset($ncamp) || !$ncamp)    $ncamp       = 'log_data';
-	if(!isset($inicial) || !$inicial)  $inicial     = 0;
-	if(!isset($range) || !$range)    $range       = 1;
-	if(!isset($ordem) || !$ordem)    $ordem       = 0;
-//	if($BtnSearch) $inicial     = 0;
-//	if($BtnSearch) $range       = 1;
-//	if($BtnSearch) $total_table = 0;
-	if(isset($BtnSearch) && $BtnSearch=="Buscar") {
+	$ncamp = isset($_REQUEST['ncamp']) ? $_REQUEST['ncamp'] : 'log_data';
+	$inicial = isset($_REQUEST['inicial']) ? (int)$_REQUEST['inicial'] : 0;
+	$range = isset($_REQUEST['range']) ? (int)$_REQUEST['range'] : 1;
+	$ordem = isset($_REQUEST['ordem']) ? (int)$_REQUEST['ordem'] : 0;
+	$BtnSearch = isset($_POST['BtnSearch']) ? $_POST['BtnSearch'] : null;
+
+	if($BtnSearch=="Buscar") {
 		$inicial     = 0;
 		$range       = 1;
 		$total_table = 0;
@@ -22,18 +21,18 @@ $pos_pagina = isset($seg_auxilar) ? $seg_auxilar : null;
 	$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
 	$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
 	$max          = 4000; //$qtde_reg_tela;
-	$range_qtde   = $qtde_range_tela;
+	$range_qtde   = isset($qtde_range_tela) ? $qtde_range_tela : 10;
 	
-	$resuf = pg_exec($connid, "select uf from uf order by uf");
+	$resuf = pg_query($connid, "select uf from uf order by uf");
 
 	$sql  = " select log_data, log_hora, log_ip, shn_nome from bko_access_log, usuarios where log_user_id=id";
 	$res_count = pg_query($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = $res_count ? $res_count ? pg_num_rows($res_count) : 0 : 0;
 
 	if($ncamp == "log_hora") {
-		$ncamp == "log_data";
+		$ncamp = "log_data";
 	}
-	$sql .= " order by ".$ncamp;
+	$sql .= " order by ". (string)($ncamp ?? "log_data");
 	
 	if($ordem == 0)
 	{
@@ -50,10 +49,10 @@ $pos_pagina = isset($seg_auxilar) ? $seg_auxilar : null;
 	}
 //echo $sql."<br>";
 
-	$sql .= " limit ".$max; 
-	$sql .= " offset ".$inicial;
+	$sql .= " limit ".(int)$max; 
+	$sql .= " offset ".(int)$inicial;
 
-	$resid = pg_exec($connid, $sql);
+	$resid = pg_query($connid, $sql);
 	
 	if($max + $inicial > $total_table)
 		$reg_ate = $total_table;
@@ -123,7 +122,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
             $cor1 = $query_cor1; 
             $cor2 = $query_cor1;
             $cor3 = $query_cor2;
-            while ($pgrow = pg_fetch_array($resid))
+            while ($resid && ($pgrow = pg_fetch_array($resid)))
             {
                 $valor = 1;
 ?>

@@ -1,32 +1,34 @@
 <?php
 	require_once '../../includes/constantes.php';
     require_once $raiz_do_projeto."backoffice/includes/topo.php";
-	$pos_pagina = isset($seg_auxilar) ? $seg_auxilar : null;
+        $pos_pagina = isset($seg_auxilar) ? $seg_auxilar : (isset($_REQUEST['seg_auxilar']) ? $_REQUEST['seg_auxilar'] : null);
 
     $time_start = getmicrotime();
 
-	$ncamp       = 'n';
-	if(!isset($inicial) || !$inicial)  $inicial     = 0;
-	$range       = 0;
-	$ordem       = 0;
+        $ncamp       = 'n';
+        $inicial = isset($_REQUEST['inicial']) ? (int)$_REQUEST['inicial'] : 0;
+        $range = isset($_REQUEST['range']) ? (int)$_REQUEST['range'] : 0;
+        $ordem = isset($_REQUEST['ordem']) ? (int)$_REQUEST['ordem'] : 0;
+        $BtnSearch = isset($_POST['BtnSearch']) ? $_POST['BtnSearch'] : null;
 
-    if(isset($BtnSearch) && $BtnSearch=="Buscar") {
-		$inicial     = 0;
-		$range       = 1;
-		$total_table = 0;
-	}
+    if($BtnSearch=="Buscar") {
+                $inicial     = 0;
+                $range       = 1;
+                $total_table = 0;
+        }
+
+        $default_add  = nome_arquivo($PHP_SELF);
+        $img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
+        $img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+        $max          = isset($qtde_reg_tela) ? $qtde_reg_tela : 100;
+        $range_qtde   = isset($qtde_range_tela) ? $qtde_range_tela : 10;
+
 	
-	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
-	$max          = $qtde_reg_tela;
-	$range_qtde   = $qtde_range_tela;
-	
-	$resuf = pg_exec($connid, "select uf from uf order by uf");
+	$resuf = pg_query($connid, "select uf from uf order by uf");
     
 	$sql  = " select log_ip, count(*) as n from bko_access_log group by log_ip  ";
 	$res_count = pg_query($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = $res_count ? pg_num_rows($res_count) : 0;
 
 	$sql .= " order by ".$ncamp;
 	
@@ -41,7 +43,7 @@
         
 	}
     
-	$resid = pg_exec($connid, $sql);
+	$resid = pg_query($connid, $sql);
 ?>
 <script language="JavaScript" type="text/JavaScript">
 <!--
@@ -77,14 +79,14 @@ function GP_popupConfirmMsg(msg) { //v1.0
 			else
 				$ordem = 1;
 		?>
-          <td align="center"><strong><a href="<?php echo $default_add."?ordem=".$ordem."&ncamp=log_data&inicial=".$inicial ?>">Endereço IP</a></strong></td>
+          <td align="center"><strong><a href="<?php echo $default_add."?ordem=".$ordem."&ncamp=log_data&inicial=".$inicial ?>">Endereï¿½o IP</a></strong></td>
           <td align="center"><strong>N</strong></td>
         </tr>
           <?php
 				$cor1 = $query_cor1; 
 				$cor2 = $query_cor1;
 				$cor3 = $query_cor2;
-				while ($pgrow = pg_fetch_array($resid)) {
+				while ($resid && ($pgrow = pg_fetch_array($resid))) {
 					$valor = 1;
 
 					$bgcolor = "#666666";
