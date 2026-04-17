@@ -8,7 +8,7 @@ require_once $raiz_do_projeto."includes/gamer/functions.php";
 
 <?php
 $ativacao = array(
-				'0' => "Está na Lista",
+				'0' => "Estï¿½ na Lista",
 				'1' => "Retirado da Lista",
 			);
 
@@ -18,7 +18,7 @@ $desc 	= isset($_REQUEST['desc']) ? $_REQUEST['desc'] : '';
 $msg	= "";
 
 if (!is_csv_numeric_global($cpf,1) && !empty($cpf)) {
-	$msg	.= "CPF inválido! O CPF é composto de somente números!</br>";
+	$msg	.= "CPF invï¿½lido! O CPF ï¿½ composto de somente nï¿½meros!</br>";
 	$acao	= 'listar';
 	$cpf	= '';
 } else if(!empty($cpf)&&($acao=='inserir')){
@@ -27,45 +27,46 @@ if (!is_csv_numeric_global($cpf,1) && !empty($cpf)) {
 
 if($acao == 'inserir') {
 	if(empty($msg)) {
-        $sql = "select * from cpf_white_list where cpf =". $cpf .";";
-        $rs_log = SQLexecuteQuery($sql);
-        
+        $sql = "select * from cpf_white_list where cpf =$1;";
+        $rs_log = SQLexecuteQueryParams($sql, array($cpf));
+
 		if($rs_log && (($rs_log) ? pg_num_rows($rs_log) : 0)>0) {
-            
-			$msg = "<b class='txt-vermelho'>Este CPF já consta na White List!</b><p class='top20'></p>";
-        
+
+			$msg = "<b class='txt-vermelho'>Este CPF j consta na White List!</b><p class='top20'></p>";
+
 		} else {
-            
-			$sql = "select * from cpf_black_list where cpf = ". $cpf. ";";
-			$rs_log = SQLexecuteQuery($sql);
-					
+
+			$sql = "select * from cpf_black_list where cpf = $1;";
+			$rs_log = SQLexecuteQueryParams($sql, array($cpf));
+
             if($rs_log && (($rs_log) ? pg_num_rows($rs_log) : 0)>0) {
                 $msg = "<b class='txt-vermelho'>Este CPF AINDA CONSTA na BLACK List!</b><p class='top20'></p>";
             } else {
 
-                $sql = "INSERT INTO cpf_white_list (cpf, descricao, shn_login) VALUES (". $cpf .",'". $desc ."','". $GLOBALS['_SESSION']['userlogin_bko'] ."');";
+                $sql = "INSERT INTO cpf_white_list (cpf, descricao, shn_login) VALUES ($1, $2, $3);";
                         //echo $sql."<br>";
-                $rs_white_list = SQLexecuteQuery($sql);
-				
+                $params = array($cpf, $desc, $GLOBALS['_SESSION']['userlogin_bko']);
+                $rs_white_list = SQLexecuteQueryParams($sql, $params);
+
                     if(!$rs_white_list) {
-						$msg .= "Erro ao salvar o CPF na White List. (". $sql. ")<br>";
+						$msg .= "Erro ao salvar o CPF na White List.<br>";
                     }
                     $cpf = "";
             }//end else do if($rs_log) Black List 
         }//end else do if($rs_log) White List
 	}//end if(empty($msg))
-	
+
 	$acao = 'listar';
-	
+
 }//end if($acao == 'inserir')
 
 if($acao == 'excluir') {
-    $sql = "DELETE FROM cpf_white_list WHERE cpf =". $cpf .";";
+    $sql = "DELETE FROM cpf_white_list WHERE cpf =$1;";
 	//echo $sql;
-	$rs_white_list = SQLexecuteQuery($sql);
-	
+	$rs_white_list = SQLexecuteQueryParams($sql, array($cpf));
+
 	if(!$rs_white_list) {
-		$msg .= "Erro ao Excluir o CPF da White List. (". $sql .")<br>";
+		$msg .= "Erro ao Excluir o CPF da White List. ($sql)<br>";
 	}
 	$cpf = "";
 	$acao = 'listar';

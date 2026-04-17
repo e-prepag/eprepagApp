@@ -5,12 +5,13 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 $estado =  $_GET['estado'] ?? '';
 $cidade =  $_GET['cidade'] ?? '';
-$ps_query = "SELECT distinct ug_bairro, ug_cidade, ug_estado, count(*) as n  FROM dist_usuarios_games where ug_cidade = '$cidade' and ug_estado ='$estado' group by ug_bairro, ug_cidade, ug_estado;";	//  and ug_ativo = '1' 
+$ps_query = "SELECT distinct ug_bairro, ug_cidade, ug_estado, count(*) as n  FROM dist_usuarios_games where ug_cidade = $1 and ug_estado = $2 group by ug_bairro, ug_cidade, ug_estado;";
+$params = array($cidade, $estado);	//  and ug_ativo = '1' 
 //echo $ps_query."<br>";
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0; 
   while ($info = pg_fetch_array($res1)) {
@@ -22,12 +23,13 @@ $v = 0;
 } 
 
 //sessão de controle //
-$ps_query = "SELECT distinct ug_bairro,ug_cidade, ug_estado FROM dist_usuarios_games where ug_cidade = '$cidade' and ug_estado ='$estado';";	
+$ps_query = "SELECT distinct ug_bairro,ug_cidade, ug_estado FROM dist_usuarios_games where ug_cidade = $1 and ug_estado = $2;";
+$params = array($cidade, $estado);	
 // and ug_ativo='1'
 
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 //echo $ps_query."<br>";
 
 $v = 0;

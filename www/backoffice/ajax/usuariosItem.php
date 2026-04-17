@@ -75,10 +75,10 @@ if(Util::isAjaxRequest() && isset($_POST['reqType'])){
                                                 FROM 
                                                     nivel_acesso_item_grupo 
                                                 where 
-                                                    item_id = ".$_POST['item']."
+                                                    item_id = ?
                                             )";
         $stmt = $pdo->prepare($sqlGrupos);
-        $stmt->execute();
+        $stmt->execute(array($_POST['item']));
         $resultGrupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $sqlGruposItens = "SELECT 
@@ -92,11 +92,11 @@ if(Util::isAjaxRequest() && isset($_POST['reqType'])){
                                                     FROM 
                                                         nivel_acesso_item_grupo 
                                                     where 
-                                                        item_id = ".$_POST['item']."
+                                                        item_id = ?
                                                 )";
         
         $stmt = $pdo->prepare($sqlGruposItens);
-        $stmt->execute();
+        $stmt->execute(array($_POST['item']));
         $resultGruposItem = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         if(count($resultGrupos) > 0 || count($resultGruposItem) > 0){

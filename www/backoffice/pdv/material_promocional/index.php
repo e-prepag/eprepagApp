@@ -44,37 +44,29 @@ if($acao == 'inserir')
                                                             ) 
                                             VALUES (
                                                             NOW(), 
-                                                            '".str_replace("'",'"',$mat_promo_nome_update)."', 
-                                                            ";
-            if (empty($mat_promo_ativo)) {
-                    $sql .= "0,";
-            }else {
-                    $sql .= "1,";
-            }
-            if (empty($mat_promo_ordem)) {
-                    $sql .= "0,";
-            }else {
-                    $sql .= "$mat_promo_ordem,";
-            }
-            if (empty($mat_promo_banner)) {
-                    $sql .= "NULL,";
-            }
-            else {
-                    $sql .= "'".$mat_promo_banner."',";
-            }
-            if (empty($mat_promo_ids_inclusao)) {
-                    $sql .= "NULL,";
-            }
-            else {
-                    $sql .= "'".trim((string)($mat_promo_ids_inclusao ?? ""))."',";
-            }
-            $sql .= "   '$mat_promo_wallpapers',
-                        '$mat_promo_cartaz',
-                        '$mat_promo_torneios',
-                        '$mat_promo_detalhes');";
+                                                            $1, 
+                                                            $2,
+                                                            $3,
+                                                            $4,
+                                                            $5,
+                                                            $6,
+                                                            $7,
+                                                            $8,
+                                                            $9);";
+            $params = array(
+                    str_replace("'", '"', $mat_promo_nome_update),
+                    empty($mat_promo_ativo) ? 0 : 1,
+                    empty($mat_promo_ordem) ? 0 : $mat_promo_ordem,
+                    empty($mat_promo_banner) ? null : $mat_promo_banner,
+                    empty($mat_promo_ids_inclusao) ? null : trim((string)($mat_promo_ids_inclusao ?? "")),
+                    $mat_promo_wallpapers,
+                    $mat_promo_cartaz,
+                    $mat_promo_torneios,
+                    $mat_promo_detalhes
+            );
 
             //echo $sql."<br>";
-            $rs_material_promocional = SQLexecuteQuery($sql);
+            $rs_material_promocional = SQLexecuteQueryParams($sql, $params);
             if(!$rs_material_promocional) {
                     $msg .= "Erro ao salvar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
             }
@@ -106,29 +98,33 @@ if($acao == 'atualizar')
   	} 
         $sql = "UPDATE dist_materiais_promocionais SET
 						mp_data_alteracao		= NOW(),
-						mp_descricao			= '".str_replace("'",'"',$mat_promo_nome_update)."',
-						mp_lista_ids_inclusao		= '".trim((string)($mat_promo_ids_inclusao ?? ""))."',
-                                                mp_wallpapers                   = '".trim((string)($mat_promo_wallpapers ?? ""))."',
-                                                mp_cartaz                       = '".trim((string)($mat_promo_cartaz ?? ""))."',
-                                                mp_torneios                     = '".trim((string)($mat_promo_torneios ?? ""))."',
-                                                mp_detalhes		= '".trim((string)($mat_promo_detalhes ?? ""))."',
+						mp_descricao			= $1,
+						mp_lista_ids_inclusao		= $2,
+                                                mp_wallpapers                   = $3,
+                                                mp_cartaz                       = $4,
+                                                mp_torneios                     = $5,
+                                                mp_detalhes		= $6,
                                                 ";
-	if (!empty($mat_promo_banner)) {
-		$sql .= "		mp_imagem_banner			= '".$mat_promo_banner."',";
-	}
-	if (empty($mat_promo_ativo)) {
-		$sql .= "		mp_ativo				= '0',";
-	}else {
-		$sql .= "		mp_ativo				= '1',";
-	}
-	if (empty($mat_promo_ordem)) {
-		$sql .= "		mp_ordem				= '0'";
-	}else {
-		$sql .= "		mp_ordem				= '$mat_promo_ordem'";
-	}
-	$sql .= "	WHERE	mp_id			= $mat_promo_id_update";
-	//echo $sql."<br>:SQL<br>";
-	$rs_material_promocional = SQLexecuteQuery($sql);
+		$params = array(
+			str_replace("'", '"', $mat_promo_nome_update),
+			trim((string)($mat_promo_ids_inclusao ?? "")),
+			trim((string)($mat_promo_wallpapers ?? "")),
+			trim((string)($mat_promo_cartaz ?? "")),
+			trim((string)($mat_promo_torneios ?? "")),
+			trim((string)($mat_promo_detalhes ?? ""))
+		);
+		if (!empty($mat_promo_banner)) {
+			$params[] = $mat_promo_banner;
+			$sql .= "		mp_imagem_banner			= $" . count($params) . ",";
+		}
+		$params[] = empty($mat_promo_ativo) ? 0 : 1;
+		$sql .= "		mp_ativo				= $" . count($params) . ",";
+		$params[] = empty($mat_promo_ordem) ? 0 : $mat_promo_ordem;
+		$sql .= "		mp_ordem				= $" . count($params);
+		$params[] = $mat_promo_id_update;
+		$sql .= "	WHERE	mp_id			= $" . count($params);
+		//echo $sql."<br>:SQL<br>";
+		$rs_material_promocional = SQLexecuteQueryParams($sql, $params);
 	if(!$rs_material_promocional) {
 		$msg .= "Erro ao atualizar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
 	}

@@ -44,6 +44,7 @@ $msg = "";
 if($msg == "" && !empty($btPesquisar)){
 
 	$sql  = "SELECT * from pins_store WHERE 1=1 "; 
+	$params = array();
 
 	if($tf_v_tipo) {
 		if(!(array_key_exists($tf_v_tipo,$PINS_STORE_STATUS)) ) {
@@ -51,7 +52,8 @@ if($msg == "" && !empty($btPesquisar)){
 		}
 
 		if($tf_v_tipo) {
-			$sql .= " and pin_status='".intval($tf_v_tipo)."' ";	
+			$params[] = intval($tf_v_tipo);
+			$sql .= " and pin_status=$" . count($params) . " ";	
 		}
 	}
 	if(strlen((string)($tf_v_formato ?? ""))) {
@@ -60,38 +62,61 @@ if($msg == "" && !empty($btPesquisar)){
 		}
 
 		if(strlen((string)($tf_v_formato ?? ""))) {
-			$sql .= " and pin_formato='".intval($tf_v_formato)."' ";	
+			$params[] = intval($tf_v_formato);
+			$sql .= " and pin_formato=$" . count($params) . " ";	
 		}
 	}
-	if(strlen((string)($distributor_codigo ?? "")))
-				$sql .= " and distributor_codigo=".intval($distributor_codigo);
-	if(strlen((string)($lote ?? "")))
-				$sql .= " and pin_lote_codigo=".intval($lote);
-	if(strlen((string)($valor ?? "")))
-				$sql .= " and pin_valor=".intval($valor);
-	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
-				$sql .= " and pin_dataentrada >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
-				$sql .= " and pin_dataentrada <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
+	if(strlen((string)($distributor_codigo ?? ""))) {
+		$params[] = intval($distributor_codigo);
+		$sql .= " and distributor_codigo=$" . count($params);
+	}
+	if(strlen((string)($lote ?? ""))) {
+		$params[] = intval($lote);
+		$sql .= " and pin_lote_codigo=$" . count($params);
+	}
+	if(strlen((string)($valor ?? ""))) {
+		$params[] = intval($valor);
+		$sql .= " and pin_valor=$" . count($params);
+	}
+	if(strlen((string)($tf_v_data_inclusao_ini ?? ""))) {
+		$params[] = $tf_v_data_inclusao_ini . " 00:00:00";
+		$sql .= " and pin_dataentrada >= to_timestamp($" . count($params) . ", 'DD/MM/YYYY HH24:MI:SS')";
+	}
+	if(strlen((string)($tf_v_data_inclusao_fim ?? ""))) {
+		$params[] = $tf_v_data_inclusao_fim . " 23:59:59";
+		$sql .= " and pin_dataentrada <= to_timestamp($" . count($params) . ", 'DD/MM/YYYY HH24:MI:SS')";
+	}
 	if(strlen((string)($pin_codigo ?? ""))) {
 		//Instanciando Objetos para Descriptografia
 		$chave256bits = new Chave();
 		$ps = new AES($chave256bits->retornaChave());
-		$sql .= " and pin_codigo='".base64_encode($ps->encrypt(addslashes($pin_codigo)))."'";
+		$params[] = base64_encode($ps->encrypt($pin_codigo));
+		$sql .= " and pin_codigo=$" . count($params);
 	}
-	if(strlen((string)($pin_bloqueio ?? "")))
-				$sql .= " and pin_bloqueio=".intval($pin_bloqueio);
-	if(strlen((string)($pin_codinterno ?? "")))
-				$sql .= " and pin_codinterno=".intval($pin_codinterno);
-	if(strlen((string)($pin_serial ?? "")))
-				$sql .= " and pin_serial like '%".intval($pin_serial)."'";
-	$rs_total = SQLexecuteQuery($sql);
+	if(strlen((string)($pin_bloqueio ?? ""))) {
+		$params[] = intval($pin_bloqueio);
+		$sql .= " and pin_bloqueio=$" . count($params);
+	}
+	if(strlen((string)($pin_codinterno ?? ""))) {
+		$params[] = intval($pin_codinterno);
+		$sql .= " and pin_codinterno=$" . count($params);
+	}
+	if(strlen((string)($pin_serial ?? ""))) {
+		$params[] = '%' . intval($pin_serial);
+		$sql .= " and pin_serial like $" . count($params);
+	}
+	$rs_total = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 //echo $sql."<br>";
 	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY pin_codinterno DESC";	
-	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
+	$params_lista = $params;
+	$params_lista[] = intval(($p - 1) * $registros);
+	$offsetParam = count($params_lista);
+	$params_lista[] = intval($registros);
+	$limitParam = count($params_lista);
+	$sql .= " offset $" . $offsetParam . " limit $" . $limitParam;
 //echo $sql ."<br>\n";
-	$rs_pins = SQLexecuteQuery($sql);
+	$rs_pins = SQLexecuteQueryParams($sql, $params_lista);
 	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
@@ -239,7 +264,7 @@ include "pins_store_menu.php";
 			</table>
 <?php
 $sql_apl  = "SELECT count(*) as total from pins_store_apl_historico WHERE psah_pin_id = 0 or pin_status = 0 ";
-$rs_hist_apl = SQLexecuteQuery($sql_apl);
+$rs_hist_apl = SQLexecuteQueryParams($sql_apl, array($rs_hist_row['psdh_pin_status'], $rs_pins_row['pin_codinterno']));
 $rs_hist_apl_row = pg_fetch_array($rs_hist_apl);
 if($rs_hist_apl_row['total'] > 0) { 
 	?>
@@ -296,12 +321,12 @@ if($rs_hist_apl_row['total'] > 0) {
                   <td class="texto" align="center"><nobr>&nbsp;<?php echo $pc->decrypt(base64_decode($rs_pins_row['pin_codigo'])) ?>&nbsp;</nobr></td>
     	          <?php 
 				  //$sql  = "SELECT *,to_char(psdh_data,'DD/MM/YYYY HH24:MI:SS') as psdh_data_aux from pins_store_db_historico WHERE psdh_pin_codinterno = '".$rs_pins_row['pin_codinterno']."' order by psdh_data desc";
-				  $sql  = "SELECT psdh_pin_status,to_char(MAX(psdh_data),'DD/MM/YYYY HH24:MI:SS') as psdh_data_aux from pins_store_db_historico WHERE psdh_pin_codinterno = '".$rs_pins_row['pin_codinterno']."' group by psdh_pin_status order by MAX(psdh_data) desc";
+				  $sql  = "SELECT psdh_pin_status,to_char(MAX(psdh_data),'DD/MM/YYYY HH24:MI:SS') as psdh_data_aux from pins_store_db_historico WHERE psdh_pin_codinterno = $1 group by psdh_pin_status order by MAX(psdh_data) desc";
 //if(b_IsUsuarioReinaldo()) { 
 //echo str_replace("\n", "<br>\n", $sql)."<br>";
 //}
 				  
-				  $rs_hist = SQLexecuteQuery($sql);
+				  $rs_hist = SQLexecuteQueryParams($sql, array($rs_pins_row['pin_codinterno']));
 				  if($rs_hist) {?>
 					<tr bgcolor='#cccccc'><td colspan='10' height='1'></td></tr>
     	          	</tr><tr bgcolor="F0F0F0">
@@ -329,12 +354,12 @@ if($rs_hist_apl_row['total'] > 0) {
 						<?php echo $rs_hist_row['psdh_data_aux'];?>&nbsp;</nobr></td>
 						<td class="texto" align="left" colspan="4">
 						<?php
-						  $sql_apl  = "SELECT *,to_char(psah_data,'DD/MM/YYYY HH24:MI:SS') as psah_data_aux from pins_store_apl_historico WHERE pin_status = ".$rs_hist_row['psdh_pin_status']." and psah_pin_id = '".$rs_pins_row['pin_codinterno']."' order by psah_data DESC";
+						  $sql_apl  = "SELECT *,to_char(psah_data,'DD/MM/YYYY HH24:MI:SS') as psah_data_aux from pins_store_apl_historico WHERE pin_status = $1 and psah_pin_id = $2 order by psah_data DESC";
 //if(b_IsUsuarioReinaldo()) { 
 //echo str_replace("\n", "<br>\n", $sql_apl)."<br>";
 //}
 
-						  $rs_hist_apl = SQLexecuteQuery($sql_apl);
+						  $rs_hist_apl = SQLexecuteQueryParams($sql_apl, array($rs_hist_row['psdh_pin_status'], $rs_pins_row['pin_codinterno']));
 						  if($rs_hist_apl) { ?>
 								<table border="0" cellspacing="01" align="center" width="100%">
     	    					<?php
@@ -351,13 +376,13 @@ if($rs_hist_apl_row['total'] > 0) {
 									}
 									echo $PINS_STORE_MSG_LOG[$rs_hist_apl_row['psah_acao']]."</td><td class=\"texto\" align=\"center\" width=\"130\">".$rs_hist_apl_row['psah_data_aux']."</font>";
 									if($rs_hist_apl_row['psah_acao'] == $PINS_STORE_MSG_LOG_STATUS['SUCESSO_UTILIZACAO']) {
-										$sql_venda = "select tpc_idvenda from pins_store_pag_epp_pin where ps_pin_codinterno = ".$rs_pins_row['pin_codinterno']."";
+										$sql_venda = "select tpc_idvenda from pins_store_pag_epp_pin where ps_pin_codinterno = $1";
 //if(b_IsUsuarioReinaldo()) { 
 //echo str_replace("\n", "<br>\n", $sql_venda)."<br>";
 //}
 
 										echo "<br><div style='background-color:#ccff99; color:blue'>Consultar venda para PIN ".$rs_pins_row['pin_codinterno']."<br>";
-										$rs_venda = SQLexecuteQuery($sql_venda);
+										$rs_venda = SQLexecuteQueryParams($sql_venda, array($rs_pins_row['pin_codinterno']));
 										if($rs_venda) { 
 											while($rs_venda_row = pg_fetch_array($rs_venda)){
 												echo "<a href='/gamer/vendas/com_venda_detalhe.php?BtnSearch=1&venda_id=".$rs_venda_row['tpc_idvenda']."' target='_blank'>".$rs_venda_row['tpc_idvenda']."</a> ";

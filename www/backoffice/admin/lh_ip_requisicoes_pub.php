@@ -18,30 +18,38 @@ $registros = 50;
 $registros_total = 0;
 //rotinas de inicializacao se click em botao gerar arquivo
 
-//Vericações e Update
+//Vericaï¿½ï¿½es e Update
 $msg = "";
 
 //Recupera as vendas
 if($msg == ""){
 	$sql_filters = array();
+	$params = array();
+	$p_idx = 1;
 	$sql  = "SELECT *,to_char(dilp_data,'DD/MM/YYYY HH24:MI:SS') as dilp_data_aux from dist_ip_log_publisher "; 
-	if(isset($tf_v_data_inclusao_ini) && strlen((string)($tf_v_data_inclusao_ini ?? "")))
-				$sql_filters[] = "dilp_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(isset($tf_v_data_inclusao_fim) && strlen((string)($tf_v_data_inclusao_fim ?? "")))
-				$sql_filters[] = "dilp_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if(!empty($opr_codigo)||$opr_codigo==='0')
-				$sql_filters[] = "opr_codigo = ".addslashes($opr_codigo);
+	if(isset($tf_v_data_inclusao_ini) && strlen((string)($tf_v_data_inclusao_ini ?? ""))) {
+		$sql_filters[] = "dilp_data >= to_timestamp($" . $p_idx++ . ", 'DD/MM/YYYY HH24:MI:SS')";
+		$params[] = $tf_v_data_inclusao_ini . " 00:00:00";
+	}
+	if(isset($tf_v_data_inclusao_fim) && strlen((string)($tf_v_data_inclusao_fim ?? ""))) {
+		$sql_filters[] = "dilp_data <= to_timestamp($" . $p_idx++ . ", 'DD/MM/YYYY HH24:MI:SS')";
+		$params[] = $tf_v_data_inclusao_fim . " 23:59:59";
+	}
+	if(!empty($opr_codigo)||$opr_codigo==='0') {
+		$sql_filters[] = "opr_codigo = $" . $p_idx++;
+		$params[] = $opr_codigo;
+	}
 	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= "WHERE ".$sql_aux;
 	}
 //	echo $sql;
-	$rs_total = SQLexecuteQuery($sql);
+	$rs_total = SQLexecuteQueryParams($sql, $params);
 	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY dilp_data DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
-	$rs_log = SQLexecuteQuery($sql);
+	$rs_log = SQLexecuteQueryParams($sql, $params);
 	if(!$rs_log || (($rs_log) ? pg_num_rows($rs_log) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>

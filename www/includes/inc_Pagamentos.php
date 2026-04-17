@@ -533,8 +533,8 @@ function getStatusTransacao($stipo, $sid, &$aline) {
 			// No BancoEPP a Sonda sempre está disponível
 			if (true) {	
 				// Obtem status do pagamento no BD
-				$sql_p = "select status from tb_pag_compras where tipo_cliente='M' and iforma='Z' and numcompra='".$sid."'"; 
-				$rs_sonda = pg_exec($connid,$sql_p); 
+				$sql_p = "select status from tb_pag_compras where tipo_cliente='M' and iforma='Z' and numcompra=$1"; 
+				$rs_sonda = pg_query_params($connid, $sql_p, array($sid)); 
 
 				if(!$rs_sonda || pg_num_rows($rs_sonda) == 0) {
 					$msg = "Nenhum pagamento encontrado para Banco E-Prepag (numorder = '$sid')".PHP_EOL;
@@ -701,9 +701,9 @@ function adjust_BBDebito_SondaPOST($sid, $svalor) {
 	global $connid;
 	
 	if($svalor==0) {
-		$sql  = "select total from tb_pag_compras where numcompra='".$sid."'";
+		$sql  = "select total from tb_pag_compras where numcompra=$1";
 //		$rs_pagto = SQLexecuteQuery($sql);
-		$rs_pagto = pg_exec($connid,$sql); 
+		$rs_pagto = pg_query_params($connid, $sql, array($sid)); 
 		if(!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
 			$msg = "Não foi encontrado o pagamento '".$sid."'.".PHP_EOL;
 		} else {

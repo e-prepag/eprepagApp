@@ -205,16 +205,18 @@ if ($msg == "") {
 
                         //atualiza produto
                         if ($produto_id) {
-                                $sql = "update tb_operadora_games_produto set ogp_nome_imagem = '" . $file_dest_name . "'
-                                                where ogp_id = " . $produto_id;
-                                $ret = SQLexecuteQuery($sql);
+                                $sql = "update tb_operadora_games_produto set ogp_nome_imagem = $1
+                                                where ogp_id = $2";
+                                $params = array($file_dest_name, $produto_id);
+                                $ret = SQLexecuteQueryParams($sql, $params);
                                 if (!$ret) $msg = "Erro ao atualizar produto.\n";
 
                                 //atualiza modelo
                         } elseif ($modelo_id) {
-                                $sql = "update tb_operadora_games_produto_modelo set ogpm_nome_imagem = '" . $file_dest_name . "'
-                                                where ogpm_id = " . $modelo_id;
-                                $ret = SQLexecuteQuery($sql);
+                                $sql = "update tb_operadora_games_produto_modelo set ogpm_nome_imagem = $1
+                                                where ogpm_id = $2";
+                                $params = array($file_dest_name, $modelo_id);
+                                $ret = SQLexecuteQueryParams($sql, $params);
                                 if (!$ret) $msg = "Erro ao atualizar modelo.\n";
                         }
                 }

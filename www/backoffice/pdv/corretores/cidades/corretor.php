@@ -5,12 +5,13 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 $estado = $_GET['estado'] ?? '';
 $cidade = $_GET['cidade'] ?? '';
-$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where sem_acentos(ug_cidade) ilike sem_acentos('%".str_replace("'", "''", $cidade)."%') and ug_estado = '$estado';";
+$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where sem_acentos(ug_cidade) ilike sem_acentos($1) and ug_estado = $2;";
+$params = array('%'.$cidade.'%', $estado);
 //echo "SQL: ".$ps_query."<br>";
 /// todas as lan que estiverem nessa cidade
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0;
 while ($info = pg_fetch_array($res1)) {
@@ -28,12 +29,13 @@ while ($info = pg_fetch_array($res1)) {
 <input type='text' name='palavra' id='palavra' disabled>
 
 <?php
-$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where sem_acentos(ug_cidade) ilike sem_acentos('%".str_replace("'", "''", $cidade)."%') and ug_estado = '$estado';";
+$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where sem_acentos(ug_cidade) ilike sem_acentos($1) and ug_estado = $2;";
+$params = array('%'.$cidade.'%', $estado);
 //echo $ps_query;
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0;
 while ($info = pg_fetch_array($res1)) {

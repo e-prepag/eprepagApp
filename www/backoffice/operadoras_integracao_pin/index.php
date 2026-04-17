@@ -71,8 +71,8 @@ if($acao == 'atualizar')
 }
 if($acao == 'editar')
 {
-    $sql = "SELECT * FROM operadoras WHERE opr_codigo = $opr_codigo";
-    $rs_operadoras = SQLexecuteQuery($sql);
+    $sql = "SELECT * FROM operadoras WHERE opr_codigo = $1";
+    $rs_operadoras = SQLexecuteQueryParams($sql, array($opr_codigo));
     if(!($rs_operadoras_row = pg_fetch_array($rs_operadoras))) {
         $msg .= "Erro ao consultar informa&ccedil;&otilde;es da Operadora. ($sql)<br>";
     }

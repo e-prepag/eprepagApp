@@ -8,9 +8,10 @@ if($_POST['id_arquivo']){
     
     $id_arq = $_POST['id_arquivo'];
     
-    $sql = "UPDATE remessa_bexs set status = ".$GLOBALS['ARRAY_STATUS']['CANCELADA'].", data_atualizacao = NOW() WHERE id_arquivo = '". $id_arq. "';";
+    $sql = "UPDATE remessa_bexs set status = $1, data_atualizacao = NOW() WHERE id_arquivo = $2;";
+    $params = array($GLOBALS['ARRAY_STATUS']['CANCELADA'], $id_arq);
     
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, $params);
 
     if($rs){
         echo "A remessa de ID <strong>". $id_arq. "</strong> teve seu status atualizado para CANCELADA";

@@ -114,8 +114,9 @@ $instProdMod = new ProdutoModelo();
 			//excluir imagem
 			if($acao == "ei"){
 				$sql = "update tb_operadora_games_produto set ogp_nome_imagem = NULL
-						where ogp_id = " . $produto_id;
-				$ret = SQLexecuteQuery($sql);
+						where ogp_id = $1";
+				$params = array($produto_id);
+				$ret = SQLexecuteQueryParams($sql, $params);
 				if(!$ret) $msg = "Erro ao atualizar produto.\n";
                 else $msgSuc = "Imagem do Produto excluida com sucesso.\n";
 			}

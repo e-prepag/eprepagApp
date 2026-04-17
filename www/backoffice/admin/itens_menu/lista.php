@@ -26,21 +26,17 @@ if ($con->isConnected()){
 
     if((is_countable($abas) ? count($abas) : 0) > 0 && isset($_POST['aba']) && $_POST['aba']){
     
-        $where = " where aba_id = ".$_POST['aba'];
-        
-        $sql = "SELECT * FROM bo_menu $where order by menu_order";
+        $sql = "SELECT * FROM bo_menu where aba_id = ? order by menu_order";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([$_POST['aba']]);
 
         $menus = $stmt->fetchAll(PDO::FETCH_OBJ);
         
-        $on = "";
         if(isset($_POST['menu']) && $_POST['menu'] != ""){
             
-            $on = " AND menu.menu_id = ".$_POST['menu'];
-            $sql = "SELECT * FROM bo_item item inner join bo_menu menu on item.menu_id = menu.menu_id $on order by item.item_order asc";
+            $sql = "SELECT * FROM bo_item item inner join bo_menu menu on item.menu_id = menu.menu_id AND menu.menu_id = $1 order by item.item_order asc";
 
-            $rs = SQLexecuteQuery($sql);
+            $rs = SQLexecuteQueryParams($sql, array($_POST['menu']));
 
             if($rs) {
                 $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
@@ -56,11 +52,11 @@ if ($con->isConnected()){
                     on 
                         item.menu_id = menu.menu_id  
                     and
-                        menu.aba_id = {$_POST['aba']}
+                        menu.aba_id = $1
                     order by 
                         menu.menu_id asc";
 
-            $rs = SQLexecuteQuery($sql);
+            $rs = SQLexecuteQueryParams($sql, array($_POST['aba']));
 
             if($rs) {
                 $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
@@ -178,7 +174,7 @@ if ($con->isConnected()){
                 <td><?php echo (strlen((string)($rs_row['item_link'] ?? "")) > 60) ? substr($rs_row['item_link'],0,60)."..." : $rs_row['item_link']; ?></td>
                 <td><?php echo $rs_row['item_monitor']; ?></td>
                 <td><?php echo (@constant(trim($rs_row['menu_descricao'])) === null) ? $rs_row['menu_descricao'] : constant(trim($rs_row['menu_descricao'])); ?></td>
-                <td><?php echo ($rs_row['item_aparece_menu'] == "1") ? "Sim" : "Não"; ?></td>
+                <td><?php echo ($rs_row['item_aparece_menu'] == "1") ? "Sim" : "Nï¿½o"; ?></td>
                 <td><?php echo $rs_row['item_order']; ?></td>
             </tr>
 <?php

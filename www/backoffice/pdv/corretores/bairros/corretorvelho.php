@@ -5,12 +5,13 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 $cidade = urldecode($_GET['cidade']);
 $bairro = urldecode($_GET['bairro']);
-$ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike sem_acentos('%$bairro%') and ug_cidade = '$cidade';";
+$ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike sem_acentos($1) and ug_cidade = $2;";
+$params = array('%'.$bairro.'%', $cidade);
 //echo $ps_query;
 // todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 ?>
 <input type="radio" name="op" id="r1" value="op1" checked>
 <select id='lista_corretor' name='lista_cidades'>

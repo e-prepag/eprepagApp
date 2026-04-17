@@ -9,10 +9,11 @@ $us_coord_lat = isset($_GET['us_coord_lat']) ? $_GET['us_coord_lat'] : 0;
 $us_coord_lng = isset($_GET['us_coord_lng']) ? $_GET['us_coord_lng'] : 0;
 $us_google_maps_string = isset($_GET['us_google_maps_string']) ? $_GET['us_google_maps_string'] : '';
 $us_id = isset($_GET['us_id']) ? $_GET['us_id'] : 0;
-$sql = "UPDATE dist_usuarios_stores_cartoes SET us_coord_lat = ".$us_coord_lat.", us_coord_lng = ".$us_coord_lng.", us_google_maps_string = '".str_replace("'", "''", $us_google_maps_string)."', us_google_maps_status = Null WHERE us_id = $us_id";
+$sql = "UPDATE dist_usuarios_stores_cartoes SET us_coord_lat = $1, us_coord_lng = $2, us_google_maps_string = $3, us_google_maps_status = Null WHERE us_id = $4";
+$params = array($us_coord_lat, $us_coord_lng, $us_google_maps_string, $us_id);
 //echo $sql."<br>";
 
-$ret = SQLexecuteQuery($sql);
+$ret = SQLexecuteQueryParams($sql, $params);
 if(!$ret) {
 	$msg = "Erro ao atualizar geocoordenadas.";
 	$smsgHTML = "<font color='red'>$msg</font><br>";

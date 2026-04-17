@@ -56,10 +56,17 @@ $sql = "SELECT
 		di_http_x_forwarded_for
 	FROM dist_ip di
 		INNER JOIN dist_usuarios_games ug ON (di.ug_id=ug.ug_id) ";
-if (!empty($di_ip))
-	$sql_aux[] = "UPPER(di_ip) LIKE '%" . strtoupper($di_ip) . "%' ";
-if (!empty($ug_id))
-	$sql_aux[] = "ug.ug_id = ". $ug_id . " ";
+
+$params = array();
+$i = 1;
+if (!empty($di_ip)) {
+	$sql_aux[] = "UPPER(di_ip) LIKE $" . $i++;
+	$params[] = "%" . strtoupper($di_ip) . "%";
+}
+if (!empty($ug_id)) {
+	$sql_aux[] = "ug.ug_id = $" . $i++;
+	$params[] = $ug_id;
+}
 if (isset($sql_aux) && is_array($sql_aux)) {
 	$sql .= ' WHERE ' . implode(' AND ', $sql_aux);
 }
@@ -67,7 +74,7 @@ $sql .= ' ORDER BY ug.ug_id, di_data_ativacao desc';
 //$sql .= ' ORDER BY di_id desc';
 //echo str_replace("\n", "<br>\n", $sql)."<br>";
 //die($sql);
-$rsResposta = SQLexecuteQuery($sql);
+$rsResposta = SQLexecuteQueryParams($sql, $params);
 ?>
 <table width="100%" border="0" align="center" class="texto">
 <?php

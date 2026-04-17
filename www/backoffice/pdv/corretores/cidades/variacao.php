@@ -5,12 +5,13 @@ require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 $cidade = $_GET['cidade'] ?? '';
 $estado = $_GET['estado'] ?? '';
-$ps_query = "SELECT distinct ug_cidade, count (ug_cidade) as total FROM dist_usuarios_games where sem_acentos(ug_cidade) ilike sem_acentos('%".str_replace("'", "''", $cidade)."%') and ug_estado = '$estado' group by ug_cidade ;";
+$ps_query = "SELECT distinct ug_cidade, count (ug_cidade) as total FROM dist_usuarios_games where sem_acentos(ug_cidade) ilike sem_acentos($1) and ug_estado = $2 group by ug_cidade ;";
+$params = array('%'.$cidade.'%', $estado);
 //echo $ps_query;
 /// todas as lan que estiverem nesse cidade
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 ?>
 

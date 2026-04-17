@@ -19,14 +19,19 @@ if ($con->isConnected()){
     $pdo = $con->getLink();
     
     if(!empty($_POST)){
-        if(!empty($_POST['formaPagamento']))
-            $arrWhere[] = "id_forma = '".$_POST['formaPagamento']."'";
+        $params = array(
+            ':dataI' => Util::getData($dataI, true),
+            ':dataF' => Util::getData($dataF, true),
+        );
+
+        if(!empty($_POST['formaPagamento'])) {
+            $arrWhere[] = "id_forma = :formaPagamento";
+            $params[':formaPagamento'] = $_POST['formaPagamento'];
+        }
         
-        if(!empty($_POST['banco']))
-            $arrWhere[] = "banco = '".$_POST['banco']."'";
-        
-        if(!empty($_POST['dataInicial']) && !empty($_POST['dataFinal'])){
-            $arrWhere[] = "data >= '".Util::getData($_POST['dataInicial'], true)."' and data <= '".Util::getData($_POST['dataFinal'], true)."'";
+        if(!empty($_POST['banco'])) {
+            $arrWhere[] = "banco = :banco";
+            $params[':banco'] = $_POST['banco'];
         }
         
         if(!empty($arrWhere)){
@@ -38,12 +43,12 @@ if ($con->isConnected()){
             from 
                 taxas_transacoes_cobradas_da_epp 
             where 
-                data >= '".Util::getData($dataI, true)."' and data <= '".Util::getData($dataF, true)."'
+                data >= :dataI and data <= :dataF
                 $where
             order by data desc";
     
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute($params);
 
         $taxas = $stmt->fetchAll(PDO::FETCH_OBJ);
         $totalRegistros = (is_countable($taxas) ? count($taxas) : 0);

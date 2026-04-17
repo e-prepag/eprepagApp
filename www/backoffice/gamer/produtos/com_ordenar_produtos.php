@@ -13,9 +13,9 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
             
 
         foreach($_POST['produtos'] as $id => $odem){
-            $sql = "update tb_operadora_games_produto set ogp_ordem = " . $odem . " where ogp_id = " . $id;
+            $sql = "update tb_operadora_games_produto set ogp_ordem = $1 where ogp_id = $2";
             
-            if(!$ret1 = SQLexecuteQuery($sql)){
+            if(!$ret1 = SQLexecuteQueryParams($sql, array($odem, $id))){
                 $idErrors[] = $id;
             }
         }

@@ -8,12 +8,13 @@ $cidade = str_replace("'","\'",urldecode($_GET['cidade']));
 $bairro = str_replace("'","\'",urldecode($_GET['bairro']));
 
 
-$ps_query = "SELECT distinct ug_bairro,ug_cidade, ug_estado, count(*) as n FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike sem_acentos('%$bairro%') and ug_cidade = '$cidade' and ug_estado = '$estado' group by ug_bairro,ug_cidade, ug_estado;";
+$ps_query = "SELECT distinct ug_bairro,ug_cidade, ug_estado, count(*) as n FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike sem_acentos($1) and ug_cidade = $2 and ug_estado = $3 group by ug_bairro,ug_cidade, ug_estado;";
+$params = array('%'.$bairro.'%', $cidade, $estado);
 //echo "SQL 4334:". $ps_query;
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0;
 while ($info = pg_fetch_array($res1)) {
@@ -30,12 +31,13 @@ while ($info = pg_fetch_array($res1)) {
 <input type='text' name='palavra' id='palavra' disabled>
 
 <?php
-$ps_query = "SELECT distinct ug_bairro,ug_cidade, ug_estado, count(*) as n FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike sem_acentos('%$bairro%') and ug_cidade = '$cidade' and ug_estado = '$estado' group by ug_bairro,ug_cidade, ug_estado;";
+$ps_query = "SELECT distinct ug_bairro,ug_cidade, ug_estado, count(*) as n FROM dist_usuarios_games where sem_acentos(ug_bairro) ilike sem_acentos($1) and ug_cidade = $2 and ug_estado = $3 group by ug_bairro,ug_cidade, ug_estado;";
+$params = array('%'.$bairro.'%', $cidade, $estado);
 //echo $ps_query;
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0;
 while ($info = pg_fetch_array($res1)) {

@@ -21,14 +21,16 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 $Cidade = $_POST['cidade'] ?? "";
 $Estado = $_POST['estado'] ?? "";
 
-$SQLBairro = "set client_encoding to utf8;SELECT distinct(ug_bairro) as ug_bairro
+SQLexecuteQuery("set client_encoding to utf8;");
+$SQLBairro = "SELECT distinct(ug_bairro) as ug_bairro
 					FROM dist_usuarios_games
-					WHERE ug_cidade = '".backoffice_utf8_to_iso($Cidade)."' 
-						AND ug_estado = '".backoffice_utf8_to_iso($Estado)."' 
+					WHERE ug_cidade = $1 
+						AND ug_estado = $2 
 					ORDER BY ug_bairro";
+$params = array(backoffice_utf8_to_iso($Cidade), backoffice_utf8_to_iso($Estado));
 //echo $SQLBairro."<br>";
 
-$ResultadoCidade = SQLexecuteQuery($SQLBairro);
+$ResultadoCidade = SQLexecuteQueryParams($SQLBairro, $params);
 
 $render = '<select class="form-control" name="bairro" id="bairro">';
 $render .= '<option value="">Todos os Bairros</option>';

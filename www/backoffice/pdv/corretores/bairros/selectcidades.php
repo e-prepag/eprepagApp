@@ -4,12 +4,13 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 $estado = str_replace("'","\'",$_GET['estado']);
-$ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games where ug_estado = '$estado';";	//  and ug_ativo = '1'
+$ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games where ug_estado = $1;";
+$params = array($estado);	//  and ug_ativo = '1'
 //echo $ps_query;
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 
 //Variavel V anexa um id a div para proteger o conteúdo
@@ -26,11 +27,12 @@ $v = 0;
 
 
 //sessão de controle //
-$ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games where ug_estado = '$estado';";	//  and ug_ativo = '1'
+$ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games where ug_estado = $1;";
+$params = array($estado);	//  and ug_ativo = '1'
 
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0;
 while ($info = pg_fetch_array($res1)) { ?>

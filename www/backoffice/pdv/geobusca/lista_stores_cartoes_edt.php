@@ -35,9 +35,10 @@ $us_id = $_POST['us_id'] ?? '';
 		<?php
 				$sql = "SELECT * 
 						FROM dist_usuarios_stores_cartoes 
-						WHERE us_id = $us_id ";
+						WHERE us_id = $1 ";
+				$params = array($us_id);
 				//echo $sql.":sql<br>";
-				$rs_perguntas = SQLexecuteQuery($sql);
+				$rs_perguntas = SQLexecuteQueryParams($sql, $params);
 				while ($rs_perguntas_row = pg_fetch_array($rs_perguntas)) {
 					echo "<tr><td class='texto'> ID </td><td class='texto'> ".$rs_perguntas_row["us_id"]."<td>"; 
 					echo "<tr><td class='texto'> Endereço </td><td> <input name='us_endereco' type='text' id='us_endereco' value='".$rs_perguntas_row["us_endereco"]."' class='form'/><td></tr>"; 

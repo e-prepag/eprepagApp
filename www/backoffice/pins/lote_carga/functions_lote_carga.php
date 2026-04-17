@@ -221,9 +221,10 @@ function Ongame_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -243,9 +244,10 @@ function Ongame_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -397,9 +399,10 @@ function BilaGames_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -419,9 +422,10 @@ function BilaGames_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -572,9 +576,10 @@ function AeriaGames_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -594,9 +599,10 @@ function AeriaGames_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -752,9 +758,10 @@ function OGPlanet_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -774,9 +781,10 @@ function OGPlanet_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -926,9 +934,10 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".".PHP_EOL;
 					}
 			
@@ -948,8 +957,9 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".".PHP_EOL;
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -1070,9 +1080,10 @@ function processaLote_BHN($fileSource, $nomeArq, $opr_codigo, $fcanal){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1227,9 +1238,10 @@ function GlobalGames_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1249,9 +1261,10 @@ function GlobalGames_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -1405,9 +1418,10 @@ function GlobalGames2_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1427,9 +1441,10 @@ function GlobalGames2_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -1557,10 +1572,11 @@ function StarDoll_traduzKValor($k){
 
 			//procura pin
 			if($msg == ""){
-				$sql = "select * from pins p inner join operadoras o on p.opr_codigo = o.opr_codigo where p.opr_codigo = $opr_codigo and p.pin_codigo = '$sPinCodigo' and pin_canal='".$fcanal."' ";
+				$sql = "select * from pins p inner join operadoras o on p.opr_codigo = o.opr_codigo where p.opr_codigo = $1 and p.pin_codigo = $2 and pin_canal=$3 ";
+				$params = array($opr_codigo, $sPinCodigo, $fcanal);
 
 //echo "sql: $sql<br>";
-				$ret = SQLexecuteQuery($sql);
+				$ret = SQLexecuteQueryParams($sql, $params);
 				if($ret && (($ret) ? pg_num_rows($ret) : 0) > 0){
 					$ret_row = pg_fetch_array($ret);
 					$opr_nome = $ret_row['opr_nome'];
@@ -1617,9 +1633,10 @@ function StarDoll_traduzKValor($k){
 					if($msg == ""){
 //echo "Vai inserir<br>";
 						$sql = "insert into pins (opr_codigo, pin_status, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, '1', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, CURRENT_DATE, CURRENT_TIME, $7)";
+						$params = array($opr_codigo, '1', $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret2 = SQLexecuteQuery($sql);
+						$ret2 = SQLexecuteQueryParams($sql, $params);
 						if(!$ret2) $msg = "Erro ao inserir registro: " . $linha . "<br>\n";
 if (strlen ($erro = pg_last_error($GLOBALS['connid']))) {
 	$message  = date("Y-m-d H:i:s") . " ";
@@ -1647,9 +1664,10 @@ if (strlen ($erro = pg_last_error($GLOBALS['connid']))) {
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -1803,9 +1821,10 @@ function Softnyx_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1825,9 +1844,10 @@ function Softnyx_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -1977,9 +1997,10 @@ function Jolt_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -1999,9 +2020,10 @@ function Jolt_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -2145,9 +2167,10 @@ function Cosmopax_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, 0, '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, 0, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2174,9 +2197,10 @@ function Cosmopax_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido (A): " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -2325,9 +2349,10 @@ function Hive_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2347,9 +2372,10 @@ function Hive_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -2492,9 +2518,10 @@ function Escola24h_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -2514,9 +2541,10 @@ function Escola24h_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -2611,20 +2639,25 @@ function Escola24h_traduzKValor($k){
 
 		//arquivo ja importado?
 		if ($msg == "") {
-			$pins = array_map(function($pin) {
-				return "'" . pg_escape_string($pin) . "'";
-			}, $cargaAr);
-			$pinsList = implode(", ", $pins);
+			$params = array($opr_codigo);
+			$pinsPlaceholders = array();
+			foreach($cargaAr as $pin) {
+				$params[] = $pin;
+				$pinsPlaceholders[] = "$" . count($params);
+			}
+			$params[] = $fcanal;
+			$canalPlaceholder = "$" . count($params);
+			$pinsList = implode(", ", $pinsPlaceholders);
 	
 			$sql = "
 				SELECT pin_caracter
 				FROM pins
-				WHERE opr_codigo = $opr_codigo
+				WHERE opr_codigo = $1
 				  AND pin_caracter IN ($pinsList)
-				  AND pin_canal = '$fcanal'
+				  AND pin_canal = $canalPlaceholder
 			";
 	
-			$rs = SQLexecuteQuery($sql);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if (!$rs) {
 				$msg = "Erro ao verificar duplicidade.\n";
 			} else {
@@ -2642,8 +2675,9 @@ function Escola24h_traduzKValor($k){
 		//pin_lote_codigo
 		if($msg == "") {
 			$pin_lote_codigo = 0;
-			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_lote_codigo desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_lote_codigo from pins where opr_codigo = $1 and pin_canal=$2 order by pin_lote_codigo desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -2655,8 +2689,9 @@ function Escola24h_traduzKValor($k){
 		//pin_serial
 		if($msg == "") {
 			$pin_serial = 0;
-			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_serial desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_serial from pins where opr_codigo = $1 and pin_canal=$2 order by pin_serial desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -2676,21 +2711,28 @@ function Escola24h_traduzKValor($k){
 			$batchSize = 100;
 	
 			foreach (array_chunk($cargaAr, $batchSize) as $batch) {
-				$values = [];
+				$values = array();
+				$params = array();
 				foreach ($batch as $linha) {
-					$values[] = "(
-						$opr_codigo,
-						1,
-						'" . $pin_serial++ . "',
-						'$iPinCodigo',
-						$iPinLocal,
-						$loteValor,
-						$pin_lote_codigo,
-						CURRENT_DATE,
-						CURRENT_TIME,
-						'" . pg_escape_string($linha) . "',
-						'$fcanal'
-					)";
+					$params[] = $opr_codigo;
+					$pOpr = "$" . count($params);
+					$params[] = 1;
+					$pStatus = "$" . count($params);
+					$params[] = $pin_serial++;
+					$pSerial = "$" . count($params);
+					$params[] = $iPinCodigo;
+					$pCodigo = "$" . count($params);
+					$params[] = $iPinLocal;
+					$pLocal = "$" . count($params);
+					$params[] = $loteValor;
+					$pValor = "$" . count($params);
+					$params[] = $pin_lote_codigo;
+					$pLote = "$" . count($params);
+					$params[] = $linha;
+					$pCaracter = "$" . count($params);
+					$params[] = $fcanal;
+					$pCanal = "$" . count($params);
+					$values[] = "($pOpr, $pStatus, $pSerial, $pCodigo, $pLocal, $pValor, $pLote, CURRENT_DATE, CURRENT_TIME, $pCaracter, $pCanal)";
 				}
 	
 				$sql = "
@@ -2700,7 +2742,7 @@ function Escola24h_traduzKValor($k){
 						pin_horaentrada, pin_caracter, pin_canal
 					) VALUES " . implode(", ", $values);
 	
-				if (!SQLexecuteQuery($sql)) {
+				if (!SQLexecuteQueryParams($sql, $params)) {
 					$msg = "Erro ao inserir lote.\n";
 					break;
 				}
@@ -2788,8 +2830,9 @@ function Escola24h_traduzKValor($k){
 			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 				$linha 	= $cargaAr[$i];
 
-				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='".$fcanal."' ";
-				$rs = SQLexecuteQuery($sql);
+				$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_caracter = $2 and pin_canal=$3 ";
+				$params = array($opr_codigo, $linha, $fcanal);
+				$rs = SQLexecuteQueryParams($sql, $params);
 				if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
@@ -2806,8 +2849,9 @@ function Escola24h_traduzKValor($k){
 		//pin_lote_codigo
 		if($msg == "") {
 			$pin_lote_codigo = 0;
-			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_lote_codigo desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_lote_codigo from pins where opr_codigo = $1 and pin_canal=$2 order by pin_lote_codigo desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -2819,8 +2863,9 @@ function Escola24h_traduzKValor($k){
 		//pin_serial
 		if($msg == "") {
 			$pin_serial = 0;
-			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_serial desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_serial from pins where opr_codigo = $1 and pin_canal=$2 order by pin_serial desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -2845,8 +2890,9 @@ function Escola24h_traduzKValor($k){
 				$linha 		= $cargaAr[$i];
 
 				$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_caracter, pin_canal) ";
-				$sql .= "values ($opr_codigo, 1, '" .$pin_serial++ ."', '$linha', $iPinLocal, $loteValor, $pin_lote_codigo, CURRENT_DATE, CURRENT_TIME, '$iPincaracter', '".$fcanal."')";
-				$ret = SQLexecuteQuery($sql);
+				$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8, $9)";
+				$params = array($opr_codigo, 1, $pin_serial++, $linha, $iPinLocal, $loteValor, $pin_lote_codigo, $iPincaracter, $fcanal);
+				$ret = SQLexecuteQueryParams($sql, $params);
 				if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					
 				//Se houve erro, sai do loop
@@ -2935,8 +2981,9 @@ function Escola24h_traduzKValor($k){
 			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 				$linha 	= $cargaAr[$i];
 
-				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='s' ";
-				$rs = SQLexecuteQuery($sql);
+				$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_caracter = $2 and pin_canal='s' ";
+				$params = array($opr_codigo, $linha);
+				$rs = SQLexecuteQueryParams($sql, $params);
 				if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
@@ -2953,8 +3000,9 @@ function Escola24h_traduzKValor($k){
 		//pin_lote_codigo
 		if($msg == "") {
 			$pin_lote_codigo = 0;
-			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_lote_codigo desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_lote_codigo from pins where opr_codigo = $1 and pin_canal=$2 order by pin_lote_codigo desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -2966,8 +3014,9 @@ function Escola24h_traduzKValor($k){
 		//pin_serial
 		if($msg == "") {
 			$pin_serial = 0;
-			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_serial desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_serial from pins where opr_codigo = $1 and pin_canal=$2 order by pin_serial desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -2992,8 +3041,9 @@ function Escola24h_traduzKValor($k){
 				$linha 		= $cargaAr[$i];
 
 				$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-				$sql .= "values ($opr_codigo, 1, '" .$pin_serial++ ."', '$linha', $iPinLocal, $loteValor, $pin_lote_codigo, CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-				$ret = SQLexecuteQuery($sql);
+				$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+				$params = array($opr_codigo, 1, $pin_serial++, $linha, $iPinLocal, $loteValor, $pin_lote_codigo, $fcanal);
+				$ret = SQLexecuteQueryParams($sql, $params);
 				if(!$ret) $msg = "Erro ao inserir registro: " . $linha . " ($sql).\n";
 					
 				//Se houve erro, sai do loop
@@ -3083,8 +3133,9 @@ function Escola24h_traduzKValor($k){
 			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 				$linha 	= $cargaAr[$i];
 
-				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='s' ";
-				$rs = SQLexecuteQuery($sql);
+				$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_caracter = $2 and pin_canal='s' ";
+				$params = array($opr_codigo, $linha);
+				$rs = SQLexecuteQueryParams($sql, $params);
 				if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
@@ -3101,8 +3152,9 @@ function Escola24h_traduzKValor($k){
 		//pin_lote_codigo
 		if($msg == "") {
 			$pin_lote_codigo = 0;
-			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_lote_codigo desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_lote_codigo from pins where opr_codigo = $1 and pin_canal=$2 order by pin_lote_codigo desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -3114,8 +3166,9 @@ function Escola24h_traduzKValor($k){
 		//pin_serial
 		if($msg == "") {
 			$pin_serial = 0;
-			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_serial desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql  = "select pin_serial from pins where opr_codigo = $1 and pin_canal=$2 order by pin_serial desc limit 1";
+			$params = array($opr_codigo, $fcanal);
+			$rs = SQLexecuteQueryParams($sql, $params);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
 			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
@@ -3140,8 +3193,9 @@ function Escola24h_traduzKValor($k){
 				$linha 		= $cargaAr[$i];
 
 				$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_caracter, pin_canal) ";
-				$sql .= "values ($opr_codigo, 1, '" .$pin_serial++ ."', '$iPinCodigo', $iPinLocal, $loteValor, $pin_lote_codigo, CURRENT_DATE, CURRENT_TIME, '$linha', '".$fcanal."')";
-				$ret = SQLexecuteQuery($sql);
+				$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8, $9)";
+				$params = array($opr_codigo, 1, $pin_serial++, $iPinCodigo, $iPinLocal, $loteValor, $pin_lote_codigo, $linha, $fcanal);
+				$ret = SQLexecuteQueryParams($sql, $params);
 				if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					
 				//Se houve erro, sai do loop
@@ -3281,8 +3335,9 @@ function MUOnline_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3302,8 +3357,9 @@ function MUOnline_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -3459,9 +3515,10 @@ function GPotato_traduzKValor($k){
 
 					//procura pin
 					if($msg == ""){
-						$sql = "select count(*) as n from pins where opr_codigo=$opr_codigo and pin_serial='$sPinSerial' and pin_codigo='$sPinCodigo' and pin_valor='$sValorFace' and pin_canal='s' ";
+						$sql = "select count(*) as n from pins where opr_codigo=$1 and pin_serial=$2 and pin_codigo=$3 and pin_valor=$4 and pin_canal='s' ";
+						$params = array($opr_codigo, $sPinSerial, $sPinCodigo, $sValorFace);
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) 
 							$msg = "Erro ao procurar pin (opr_codigo=$opr_codigo, pin_serial='$sPinSerial', pin_codigo='$sPinCodigo').\n";
 						else {
@@ -3477,9 +3534,10 @@ function GPotato_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3499,8 +3557,9 @@ function GPotato_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -3653,9 +3712,10 @@ function FHLGames_traduzKValor($k){
 
 					//procura pin
 					if($msg == ""){
-						$sql = "select count(*) as n from pins where opr_codigo=$opr_codigo and pin_serial='$sPinSerial' and pin_codigo='$sPinCodigo' and pin_valor='$sValorFace' and pin_canal='s' ";
+						$sql = "select count(*) as n from pins where opr_codigo=$1 and pin_serial=$2 and pin_codigo=$3 and pin_valor=$4 and pin_canal='s' ";
+						$params = array($opr_codigo, $sPinSerial, $sPinCodigo, $sValorFace);
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) 
 							$msg = "Erro ao procurar pin (opr_codigo=$opr_codigo, pin_serial='$sPinSerial', pin_codigo='$sPinCodigo').\n";
 						else {
@@ -3671,9 +3731,10 @@ function FHLGames_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "SQL: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3693,8 +3754,9 @@ function FHLGames_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -3843,9 +3905,10 @@ function YNKinteractive_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -3865,9 +3928,10 @@ function YNKinteractive_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -4019,9 +4083,10 @@ function PayByCash_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4041,8 +4106,9 @@ function PayByCash_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -4201,9 +4267,10 @@ function Webzen_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4223,8 +4290,9 @@ function Webzen_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -4382,9 +4450,10 @@ function Coolnex_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4404,8 +4473,9 @@ function Coolnex_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -4574,8 +4644,9 @@ function KOL_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4595,8 +4666,9 @@ function KOL_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -4763,8 +4835,9 @@ function Acclaim_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4784,8 +4857,9 @@ function Acclaim_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -4951,8 +5025,9 @@ function NDoors_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -4972,8 +5047,9 @@ function NDoors_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -5139,8 +5215,9 @@ function Ignitedgames_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5160,8 +5237,9 @@ function Ignitedgames_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -5324,9 +5402,10 @@ function Ticket_Surf_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', $sLote, CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo $sql."<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5346,8 +5425,9 @@ function Ticket_Surf_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -5499,8 +5579,9 @@ function GameGol_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-						$ret = SQLexecuteQuery($sql);
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5520,8 +5601,9 @@ function GameGol_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-						$rs = SQLexecuteQuery($sql);
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -5668,9 +5750,10 @@ function GameIS_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					}
 			
@@ -5690,9 +5773,10 @@ function GameIS_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -5841,9 +5925,10 @@ function Kaizen_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -5865,9 +5950,10 @@ function Kaizen_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -6018,9 +6104,10 @@ function Onnet_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6042,9 +6129,10 @@ function Onnet_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -6192,9 +6280,10 @@ function fun_77PB_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6216,9 +6305,10 @@ function fun_77PB_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -6365,9 +6455,10 @@ function Alawar_traduzKValor($k){
 					//insere pin
 					if($msg == ""){
 						$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-						$sql .= "values ($opr_codigo, 1, '$sPinSerial', '$sPinCodigo', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+						$sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, $sPinCodigo, $iPinLocal, $sValorFace, $sLote, $fcanal);
 //echo "sql: $sql<br>";
-						$ret = SQLexecuteQuery($sql);
+						$ret = SQLexecuteQueryParams($sql, $params);
 						if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
 					} else {
 						echo "<font color='#FF0000'>Erro de validação: <b>".$msg."</b></font>\n";
@@ -6389,9 +6480,10 @@ function Alawar_traduzKValor($k){
 					if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 		
 					if($msg == ""){		    
-						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
+						$sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+						$params = array($opr_codigo, $lote, $valor);
 //echo "sql: $sql";
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, $params);
 						$ret = true;
 						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
@@ -6509,8 +6601,9 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
                         } else {
@@ -6526,8 +6619,9 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 if($lote == "" || !is_numeric($lote)) 	$msg = "Lote inválido: " . $lote . ".\n";
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -6631,9 +6725,10 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
                                         //echo $sql."<br>";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                         else $contador_PIN_importados++;
                                 }
@@ -6766,8 +6861,9 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -6787,8 +6883,9 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -6922,8 +7019,9 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -6943,8 +7041,9 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -7074,8 +7173,9 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '$sPinSerial', '', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, $sPinSerial, '', $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7095,8 +7195,9 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -7235,8 +7336,9 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7256,8 +7358,9 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -7381,8 +7484,9 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7402,8 +7506,9 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -7536,8 +7641,9 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7557,8 +7663,9 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -7704,8 +7811,9 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -7725,8 +7833,9 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -7848,8 +7957,9 @@ function processaLote_SurfTelecom($fileSource, $nomeArq, $opr_codigo, $fcanal){
                         //insere pin
                         if($msg == ""){
                                 $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                $sql .= "values ($opr_codigo, 1, '$sSerial', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                $ret = SQLexecuteQuery($sql);
+                                $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+				$params = array($opr_codigo, 1, $sSerial, $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                $ret = SQLexecuteQueryParams($sql, $params);
                                 if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".".PHP_EOL;
                         }
 
@@ -7985,8 +8095,9 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 //insere pin
                                 if($msg == ""){
 										$sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -8006,8 +8117,9 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
@@ -8157,8 +8269,9 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 //insere pin
                                 if($msg == ""){
                                         $sql = "insert into pins (opr_codigo, pin_status, pin_serial, pin_codigo, pin_local, pin_valor, pin_lote_codigo, pin_dataentrada, pin_horaentrada, pin_canal) ";
-                                        $sql .= "values ($opr_codigo, 1, '', '$sPinSerial', '$iPinLocal', '$sValorFace', '$sLote', CURRENT_DATE, CURRENT_TIME, '".$fcanal."')";
-                                        $ret = SQLexecuteQuery($sql);
+                                        $sql .= "values ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_TIME, $8)";
+						$params = array($opr_codigo, 1, '', $sPinSerial, $iPinLocal, $sValorFace, $sLote, $fcanal);
+                                        $ret = SQLexecuteQueryParams($sql, $params);
                                         if(!$ret) $msg = "Erro ao inserir registro: " . $linha . ".\n";
                                 }
 
@@ -8178,8 +8291,9 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 if($valor == "" || !is_numeric($valor)) $msg = "Valor de face inválido: " . $valor . ".\n";
 
                                 if($msg == ""){		    
-                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
-                                        $rs = SQLexecuteQuery($sql);
+                                        $sql  = "select count(*) as qtde from pins where opr_codigo = $1 and pin_lote_codigo = $2 and pin_valor = $3 and pin_canal='s' ";
+                                        $params = array($opr_codigo, $lote, $valor);
+                                        $rs = SQLexecuteQueryParams($sql, $params);
                                         $ret = true;
                                         if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);

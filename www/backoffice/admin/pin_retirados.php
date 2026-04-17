@@ -5,11 +5,11 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 $mailing_number = $_REQUEST['mailing_number'];
 
 
-$sql = "select (select count(*) from sendpin_email_list where mailing_number = $mailing_number AND email is not null ) as ncadastrados, (select count(*) from sendpin_email_list where mailing_number = $mailing_number AND email is not null AND disparado = 1 ) as ndisparados, (select count(*) from sendpin_email_list where mailing_number = $mailing_number AND email is not null AND lido = 0 AND disparado = 1 ) as nnaolidos  ";
+$sql = "select (select count(*) from sendpin_email_list where mailing_number = $1 AND email is not null ) as ncadastrados, (select count(*) from sendpin_email_list where mailing_number = $1 AND email is not null AND disparado = 1 ) as ndisparados, (select count(*) from sendpin_email_list where mailing_number = $1 AND email is not null AND lido = 0 AND disparado = 1 ) as nnaolidos  ";
 
 //echo $sql."<br>";
 //echo "DOCUMENT_ROOT: ".$_SERVER['DOCUMENT_ROOT']."<br>";
-$rss = SQLexecuteQuery($sql);
+$rss = SQLexecuteQueryParams($sql, array($mailing_number));
 if($rss && (($rss) ? pg_num_rows($rss) : 0)>0) {
     $vlr = pg_fetch_array($rss);
     $ncadastrados = $vlr['ncadastrados'];
@@ -22,7 +22,7 @@ $sql = "SELECT
         FROM
         sendpin_email_list 
         WHERE 
-        mailing_number = $mailing_number
+        mailing_number = $1
         AND 
         email is not null
         AND 
@@ -33,7 +33,7 @@ $sql = "SELECT
         datalido desc
        ";
 //echo $sql."<br>";
-$rss = SQLexecuteQuery($sql);
+$rss = SQLexecuteQueryParams($sql, array($mailing_number));
 $nlidos = (($rss) ? pg_num_rows($rss) : 0);	
 ?>
 <div class="col-md-12">
@@ -47,7 +47,7 @@ $nlidos = (($rss) ? pg_num_rows($rss) : 0);
 		<td valign="top">
             <p> Cadastrados: <?php echo $ncadastrados;?><br> 
                 Enviados: <?php echo $ndisparados." (".number_format((100*$ndisparados/(($ncadastrados>0)?$ncadastrados:1)), 2, '.', '.')."%)";?><br>
-                &nbsp;&nbsp;&nbsp;Não Lidos: <?php echo $nnaolidos." (".number_format((100*$nnaolidos/(($ndisparados>0)?$ndisparados:1)), 2, '.', '.')."%)"; ?><br> 
+                &nbsp;&nbsp;&nbsp;Nï¿½o Lidos: <?php echo $nnaolidos." (".number_format((100*$nnaolidos/(($ndisparados>0)?$ndisparados:1)), 2, '.', '.')."%)"; ?><br> 
                 &nbsp;&nbsp;&nbsp;Acessados: <?php echo $nlidos." (".number_format((100*$nlidos/(($ndisparados>0)?$ndisparados:1)), 2, '.', '.')."%)"; ?></p>
                 <?php if($ndisparados<$ncadastrados) { ?>
                     Falta para completar o envio: <?php echo "".number_format((2*($ncadastrados-$ndisparados)/60), 2, '.', '.')."" ?> mins (<?php echo "".number_format((2*($ncadastrados-$ndisparados)/60/60), 2, '.', '.')."" ?> h)<br>

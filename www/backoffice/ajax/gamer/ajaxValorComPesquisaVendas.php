@@ -4,25 +4,28 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 
 if ($_REQUEST['id']){
 	$sql = "SELECT pin_valor FROM pins WHERE 1=1 ";
+	$params = array();
 	// id=-1 para levantar valores de todas as operadoras
 	if($_REQUEST['id']!=-1) {
-		$sql .= " AND opr_codigo = ".$_REQUEST['id']."";
+		$sql .= " AND opr_codigo = $" . (count($params) + 1);
+		$params[] = $_REQUEST['id'];
 	}
 	if(isset($_REQUEST['st']) && $_REQUEST['st']) {
 		if(($_REQUEST['st']=="Vendido - TODOS") || ($_REQUEST['st']=="stVendido-TODOS")){
 			$sql .= " AND (pin_status='3' or pin_status='6' or pin_status='7')";
 		} else {
-			$sql .= " AND pin_status='".$_REQUEST['st']."'";
+			$sql .= " AND pin_status=$" . (count($params) + 1);
+			$params[] = $_REQUEST['st'];
 		}
 	}
 	if(isset($_REQUEST['cn']) && $_REQUEST['cn']) {
-		$sql .= " AND pin_canal='".$_REQUEST['cn']."'";
+		$sql .= " AND pin_canal=$" . (count($params) + 1);
+		$params[] = $_REQUEST['cn'];
 	}
 	$sql .= " GROUP BY pin_valor ORDER BY pin_valor;";
 //echo $sql."<br>";
-	$rs_oprPins = SQLexecuteQuery($sql);
+	$rs_oprPins = SQLexecuteQueryParams($sql, $params);
 }
-
 
 if($rs_oprPins){
 	while($rs_oprPins_row = pg_fetch_array($rs_oprPins)){ 

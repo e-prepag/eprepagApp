@@ -72,38 +72,30 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 							ql_ativo
 							) 
 					VALUES (
-							to_date('$quest_data_inicio','DD/MM/YYYY'), 
-							to_date('$quest_data_fim','DD/MM/YYYY'), 
-							$quest_tipo,
-							'$quest_usuario_bko',
-							'".str_replace("'",'"',$quest_nome_update)."', 
-							'$quest_tipo_usuario',
-							";
-	if (empty($quest_banner)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".$quest_banner."',";
-	}
-	if (empty($quest_ids_inclusao)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".trim((string)($quest_ids_inclusao ?? ''))."',";
-	}
-	if (empty($quest_ids_exclusao)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".trim((string)($quest_ids_exclusao ?? ''))."',";
-	}
-	if (empty($quest_ativo)) {
-		$sql .= "0);";
-	}else {
-		$sql .= "1);";
-	}
+							to_date($1,'DD/MM/YYYY'), 
+							to_date($2,'DD/MM/YYYY'), 
+							$3,
+							$4,
+							$5, 
+							$6,
+							$7,
+							$8,
+							$9,
+							$10);";
+	$params = array(
+		$quest_data_inicio,
+		$quest_data_fim,
+		$quest_tipo,
+		$quest_usuario_bko,
+		str_replace("'", '"', $quest_nome_update),
+		$quest_tipo_usuario,
+		empty($quest_banner) ? null : $quest_banner,
+		empty($quest_ids_inclusao) ? null : trim((string)($quest_ids_inclusao ?? '')),
+		empty($quest_ids_exclusao) ? null : trim((string)($quest_ids_exclusao ?? '')),
+		empty($quest_ativo) ? 0 : 1
+	);
 	//echo $sql."<br>";
-	$rs_questionario = SQLexecuteQuery($sql);
+	$rs_questionario = SQLexecuteQueryParams($sql, $params);
 	if(!$rs_questionario) {
 		$msg .= "Erro ao salvar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
 		$acao = 'listar';
@@ -169,25 +161,34 @@ if($acao == 'atualizar')
 		}
 	}
 	$sql = "UPDATE tb_questionarios SET
-						ql_texto					= '".str_replace("'",'"',$quest_nome_update)."',
-						ql_data_inicio				= to_date('".$quest_data_inicio."','DD/MM/YYYY'),           
-						ql_data_fim					= to_date('".$quest_data_fim."','DD/MM/YYYY'),
-						ql_tipo						= $quest_tipo,
-						ql_tipo_usuario				= '$quest_tipo_usuario',
-						ql_usuario_bko_responsavel	= '$quest_usuario_bko',
-						ql_lista_ids_inclusao		= '".trim((string)($quest_ids_inclusao ?? ''))."',
-						ql_lista_ids_exclusao		= '".trim((string)($quest_ids_exclusao ?? ''))."',";
+						ql_texto					= $1,
+						ql_data_inicio				= to_date($2,'DD/MM/YYYY'),           
+						ql_data_fim					= to_date($3,'DD/MM/YYYY'),
+						ql_tipo						= $4,
+						ql_tipo_usuario				= $5,
+						ql_usuario_bko_responsavel	= $6,
+						ql_lista_ids_inclusao		= $7,
+						ql_lista_ids_exclusao		= $8,";
+	$params = array(
+		str_replace("'", '"', $quest_nome_update),
+		$quest_data_inicio,
+		$quest_data_fim,
+		$quest_tipo,
+		$quest_tipo_usuario,
+		$quest_usuario_bko,
+		trim((string)($quest_ids_inclusao ?? '')),
+		trim((string)($quest_ids_exclusao ?? ''))
+	);
 	if (!empty($quest_banner)) {
-		$sql .= "		ql_imagem_banner			= '".$quest_banner."',";
+		$params[] = $quest_banner;
+		$sql .= "		ql_imagem_banner			= $" . count($params) . ",";
 	}
-	if (empty($quest_ativo)) {
-		$sql .= "		ql_ativo					= '0'";
-	}else {
-		$sql .= "		ql_ativo					= '1'";
-	}
-	$sql .= "	WHERE	ql_id_questionario			= $quest_id_update";
+	$params[] = empty($quest_ativo) ? 0 : 1;
+	$sql .= "		ql_ativo					= $" . count($params);
+	$params[] = $quest_id_update;
+	$sql .= "	WHERE	ql_id_questionario			= $" . count($params);
 	//echo $sql."<br>:SQL<br>";
-	$rs_questionario = SQLexecuteQuery($sql);
+	$rs_questionario = SQLexecuteQueryParams($sql, $params);
 	if(!$rs_questionario) {
 		$msg .= "Erro ao atualizar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
 	}

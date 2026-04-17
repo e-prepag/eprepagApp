@@ -92,8 +92,9 @@ $BtnAtualizar = $_POST['BtnAtualizar'] ?? null;
 			//excluir imagem
 			if($acao == "ei"){
 				$sql = "update tb_dist_operadora_games_produto_modelo set ogpm_nome_imagem = NULL
-						where ogpm_id = " . $modelo_id;
-				$ret = SQLexecuteQuery($sql);
+						where ogpm_id = $1";
+				$params = array($modelo_id);
+				$ret = SQLexecuteQueryParams($sql, $params);
 				if(!$ret) $msg = "Erro ao atualizar modelo.\n";
 			}
 		}

@@ -74,12 +74,13 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 				{
 					$sql = "update tb_promocoes set ";
 					if ($tipo_img == "B")
-						$sql .= "b_img_banner = '" . $fileDest_nome . "' ";
+						$sql .= "b_img_banner = $1 ";
 					else
-						$sql .= "b_img_conteudo = '" . $fileDest_nome . "' ";
-					$sql .= "where b_id = " . $banner_id;
+						$sql .= "b_img_conteudo = $1 ";
+					$sql .= "where b_id = $2";
+					$params = array($fileDest_nome, $banner_id);
 					
-					$ret = SQLexecuteQuery($sql);
+					$ret = SQLexecuteQueryParams($sql, $params);
 					
 					if(!$ret) $msg = "Erro ao atualizar banner.\n";				
 				}

@@ -23,7 +23,8 @@ $estado = pdv_utf8_to_iso(isset($_POST['c_estado']) ? $_POST['c_estado'] : '');
 
 
 // montando a query
-$query = "update dist_usuarios_games set ug_cidade = '".str_replace("'", "''", $novo_nome)."' where ";
+$query = "update dist_usuarios_games set ug_cidade = $1 where ";
+$params = array($novo_nome);
 $msg = " As Cidades :";
 
 //echo "query: $query<br>";
@@ -58,21 +59,27 @@ for ($varredor = 1; $varredor <= $size ; $varredor++) {
 
 	if ($varredor < $size ) {
 
-			$query .= " ug_cidade = '".str_replace("'", "''", $varia[$varredor])."' OR";
+			$params[] = $varia[$varredor];
+			$placeholder = "$" . count($params);
+			$query .= " ug_cidade = " . $placeholder . " OR";
 
 	} else { /// caso contrário adiciona o AND para concatenar com a cidade
 
-			$query .= " ug_cidade = '".str_replace("'", "''", $varia[$varredor])."' AND";
+			$params[] = $varia[$varredor];
+			$placeholder = "$" . count($params);
+			$query .= " ug_cidade = " . $placeholder . " AND";
 
 	}//fim if
 
 }// fim for
-$query .= " ug_estado = '$estado' ;";
+$params[] = $estado;
+$estadoPlaceholder = "$" . count($params);
+$query .= " ug_estado = " . $estadoPlaceholder . " ;";
 //echo "QUERY: ".$query."<br>";
 
 
 ////////---------- ATIVAR AQUI PARA FUNCIONAR ------------/////////
-$res = SQLexecuteQuery($query);
+$res = SQLexecuteQueryParams($query, $params);
 
 //////////------------------------------------------------//////////
 //echo $query;

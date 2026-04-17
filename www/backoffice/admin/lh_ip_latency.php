@@ -41,7 +41,7 @@ $di_ip	= isset($_REQUEST['di_ip'])	? htmlentities($_REQUEST['di_ip'])	: '';
                     </td>
                 </tr>
                 <tr align="center">
-					<span  style="font-family:verdana,arial;font-size:12px;">Obs.: O tempo de latência é medido utilizando o comando PING 4 vezes seguidas, o valor indicado é a média desses valores.</span>
+					<span  style="font-family:verdana,arial;font-size:12px;">Obs.: O tempo de latï¿½ncia ï¿½ medido utilizando o comando PING 4 vezes seguidas, o valor indicado ï¿½ a mï¿½dia desses valores.</span>
                 <td>
 <p align="center">
 <?php
@@ -51,7 +51,7 @@ $sql = "select count(*) as n from dist_ip where di_ativo = 1 and not di_data_lat
 $n_tested_with_value = getValueSingle($sql);
 
 
-$sql = "SELECT
+$sql = "SELECT 
 		(CASE WHEN (ug.ug_tipo_cadastro='PJ') THEN upper(ug.ug_nome_fantasia)||' ('||ug.ug_tipo_cadastro||')' WHEN (ug.ug_tipo_cadastro='PF') THEN upper(ug.ug_nome)||' ('||ug.ug_tipo_cadastro||')' END) as ug_nome,		
 		di.ug_id,
 		di_ativo, 
@@ -66,10 +66,16 @@ $sql = "SELECT
 	FROM dist_ip di
 		INNER JOIN dist_usuarios_games ug ON (di.ug_id=ug.ug_id) ";
 $sql_aux[] = "di_ativo = 1 ";
-if (!empty($di_ip))
-	$sql_aux[] = "UPPER(di_ip) LIKE '%" . strtoupper($di_ip) . "%' ";
-if (!empty($ug_id))
-	$sql_aux[] = "ug.ug_id = ". $ug_id . " ";
+$params = array();
+$i = 1;
+if (!empty($di_ip)) {
+	$sql_aux[] = "UPPER(di_ip) LIKE $" . $i++;
+	$params[] = "%" . strtoupper($di_ip) . "%";
+}
+if (!empty($ug_id)) {
+	$sql_aux[] = "ug.ug_id = $" . $i++;
+	$params[] = $ug_id;
+}
 if (is_array($sql_aux)) {
 	$sql .= ' WHERE ' . implode(' AND ', $sql_aux);
 }
@@ -79,8 +85,7 @@ $sql .= ' ORDER BY di_data_ativacao desc';
 //echo str_replace("\n", "<br>\n", $sql)."<br>";
 //die($sql);
 
-$rsResposta = SQLexecuteQuery($sql);
-?>
+$rsResposta = SQLexecuteQueryParams($sql, $params);?>
 <table class="table txt-preto fontsize-pp">
 <?php
 if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
@@ -101,8 +106,8 @@ if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
         <td bgcolor="#DDDDDD" align="center">REMOTE_ADDR</td>
         <td bgcolor="#DDDDDD" align="center">HTTP_CLIENT_IP</td>
         <td bgcolor="#DDDDDD" align="center">HTTP_X_FORWARDED_FOR</td>
-        <td bgcolor="#DDDDDD" align="center">Data Latência</td>
-        <td bgcolor="#DDDDDD" align="center">Latência</td>
+        <td bgcolor="#DDDDDD" align="center">Data Latï¿½ncia</td>
+        <td bgcolor="#DDDDDD" align="center">Latï¿½ncia</td>
     </tr>
 <?php
 }
@@ -164,7 +169,7 @@ while ($pgResposta = pg_fetch_array ($rsResposta)) {
 <?php 
 //	$n_tested_with_value
 	$lat_n = (($lat_n)?$lat_n:1);
-	$smsg = "Encontrada".(($n_ug!=1)?"s":"")." <span style=\"color:blue\">".$n_ug. "</span> lan".(($n_ug!=1)?"s":"").", testadas <span style=\"color:blue\">$n_tested</span> (".number_format(100*$n_tested/(($n_ug)?$n_ug:1), 2, ',', '.')."%), com valor de latência: <span style=\"color:blue\">$n_tested_with_value</span> (".number_format(100*$n_tested_with_value/(($n_ug)?$n_ug:1), 2, ',', '.')."%) Latência [<span style=\"color:blue\">$lat_min</span> ms, <span style=\"color:blue\">$lat_max</span> ms], AVG: <span style=\"color:blue\">".number_format($lat_sum/$lat_n, 2, ',', '.')."</span> ms para <span style=\"color:blue\">$lat_n</span> registros" ;
+	$smsg = "Encontrada".(($n_ug!=1)?"s":"")." <span style=\"color:blue\">".$n_ug. "</span> lan".(($n_ug!=1)?"s":"").", testadas <span style=\"color:blue\">$n_tested</span> (".number_format(100*$n_tested/(($n_ug)?$n_ug:1), 2, ',', '.')."%), com valor de latï¿½ncia: <span style=\"color:blue\">$n_tested_with_value</span> (".number_format(100*$n_tested_with_value/(($n_ug)?$n_ug:1), 2, ',', '.')."%) Latï¿½ncia [<span style=\"color:blue\">$lat_min</span> ms, <span style=\"color:blue\">$lat_max</span> ms], AVG: <span style=\"color:blue\">".number_format($lat_sum/$lat_n, 2, ',', '.')."</span> ms para <span style=\"color:blue\">$lat_n</span> registros" ;
 
 ?>
 <script language="JavaScript" type="text/JavaScript">

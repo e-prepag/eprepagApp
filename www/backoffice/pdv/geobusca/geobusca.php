@@ -18,9 +18,10 @@ $ug_coord_lng = '';
 
 if(!empty($ug_endereco)) {
 	
-	$sql = "select * from dist_usuarios_games where ug_id=$ug_id;";
+	$sql = "select * from dist_usuarios_games where ug_id=$1;";
+	$params = array($ug_id);
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, $params);
 	$rs_row = pg_fetch_array($rs);
 
 	$ug_endereco = $rs_row['ug_endereco'];

@@ -30,19 +30,23 @@ if($rsProdutosPdv = SQLexecuteQuery($sqlProdutosPdv)){
 $dataIni = (!empty($_POST['dataIni'])) ? Util::getData($_POST['dataIni'], true): date("Y-m-d");
 $dataFim = (!empty($_POST['dataFim'])) ? Util::getData($_POST['dataFim'], true): date("Y-m-d");
 
-$where = "where data >= '{$dataIni} 00:00:00' and data <= '{$dataFim} 23:59:59'";
+$where = "where data >= $1 and data <= $2";
+$params = array($dataIni . " 00:00:00", $dataFim . " 23:59:59");
 
 if(!empty($_POST['sistema'])){
-    $where .= " and upper(sistema) = upper('".$_POST['sistema']."')";
+    $where .= " and upper(sistema) = upper($" . (count($params) + 1) . ")";
+    $params[] = $_POST['sistema'];
 
     if(!empty($_POST['produtosGamers'])){
-        $where .= " and ogp_id = {$_POST['produtosGamers']}";
+        $where .= " and ogp_id = $" . (count($params) + 1);
+        $params[] = $_POST['produtosGamers'];
     }else if(!empty($_POST['produtosPdvs'])){
-        $where .= " and ogp_id = {$_POST['produtosPdvs']}";
+        $where .= " and ogp_id = $" . (count($params) + 1);
+        $params[] = $_POST['produtosPdvs'];
     }
     
     $sql = "select count(*) as total, ogp_id, sistema from clicks $where group by ogp_id, sistema  order by total desc";
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, $params);
 
     if($rs) {
         $totalRegistros = pg_num_rows($rs);

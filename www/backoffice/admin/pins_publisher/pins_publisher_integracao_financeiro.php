@@ -22,11 +22,12 @@ set_time_limit ( 30000 ) ;
 $registros_total = 0;
 //rotinas de inicializacao se click em botao gerar arquivo
 
-//VericaÁıes e Update
+//Verica√ß√µes e Update
 $msg = "";
 
 //Recupera as vendas
 if(!empty($btPesquisar)){ 
+		$params = array();
         $sql  = "SELECT *,
                         to_char(pih_data,'DD/MM/YYYY HH24:MI:SS') as pih_data_aux ";
         if(strlen((string)($data_venda_exclusao ?? "")))
@@ -44,17 +45,25 @@ if(!empty($btPesquisar)){
                 WHERE pih_codretepp='2' 
                         and pih.pin_status = '8'
                     "; 
-	if(!empty($opr_codigo))
-				$sql .= " and pih_id = ".addslashes($opr_codigo);
-	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
-				$sql .= " and pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
-				$sql .= " and pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen((string)($data_venda_exclusao ?? "")))
-                            $sql .= " and vg_ultimo_status='5' and vg_data_inclusao >= to_timestamp('".addslashes($data_venda_exclusao)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
+	if(!empty($opr_codigo)) {
+				$sql .= " and pih_id = $" . (count($params) + 1);
+				$params[] = (int)$opr_codigo;
+	}
+	if(strlen((string)($tf_v_data_inclusao_ini ?? ""))) {
+				$sql .= " and pih_data >= to_timestamp($" . (count($params) + 1) . ", 'DD/MM/YYYY HH24:MI:SS')";
+				$params[] = $tf_v_data_inclusao_ini . " 00:00:00";
+	}
+	if(strlen((string)($tf_v_data_inclusao_fim ?? ""))) {
+				$sql .= " and pih_data <= to_timestamp($" . (count($params) + 1) . ", 'DD/MM/YYYY HH24:MI:SS')";
+				$params[] = $tf_v_data_inclusao_fim . " 23:59:59";
+	}
+	if(strlen((string)($data_venda_exclusao ?? ""))) {
+                            $sql .= " and vg_ultimo_status='5' and vg_data_inclusao >= to_timestamp($" . (count($params) + 1) . ", 'DD/MM/YYYY HH24:MI:SS')";
+							$params[] = $data_venda_exclusao . " 00:00:00";
+	}
         $sql .= " ORDER BY pih_data DESC";	
 	//echo $sql ."<br>\n";
-	$rs_pins = SQLexecuteQuery($sql);
+	$rs_pins = SQLexecuteQueryParams($sql, $params);
         $registros_total = (($rs_pins) ? pg_num_rows($rs_pins) : 0);
 	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
@@ -101,8 +110,8 @@ $(function(){
     	        </tr>
     	        <tr bgcolor="F0F0F0">
     	          <td class="texto" align="center"><b>Operadora</b></td>
-    	          <td class="texto" align="center"><b>Per&iacute;odo de UtilizaÁ„o</b></td>
-    	          <td class="texto" align="center"><b>Excluir PINs Vendidos Anteriores ‡</b></td>
+    	          <td class="texto" align="center"><b>Per&iacute;odo de Utiliza√ß√£o</b></td>
+    	          <td class="texto" align="center"><b>Excluir PINs Vendidos Anteriores </b></td>
     	        </tr>
     	        <tr bgcolor="F5F5FB">
                     <td class="texto" align="center"><nobr>
@@ -132,7 +141,7 @@ $(function(){
                     <tr bgcolor="F0F0F0">
 			  <td class="texto" align="center"><b>ID do PIN</b>&nbsp;</td>
 			  <td class="texto" align="center"><b>Integrador</b>&nbsp;</td>
-			  <td class="texto" align="center"><b>Dia e Hora UtilizaÁ„o</b>&nbsp;</td>
+			  <td class="texto" align="center"><b>Dia e Hora Utiliza√ß√£o</b>&nbsp;</td>
 			  <td class="texto" align="center"><b><?php echo (strlen((string)($data_venda_exclusao ?? ""))?"Data de Venda":"VAZIO"); ?></b>&nbsp;</td>
 			  <td class="texto" align="center"><b>PIN</b>&nbsp;</td>
 			  <td class="texto" align="center"><b>Valor do PIN</b>&nbsp;</td>
@@ -161,14 +170,14 @@ $(function(){
 				if($irows==0) {
 			?>
 					<tr>
-					  <td class="texto" align="center" colspan="13">&nbsp;<font color='#FF0000'>N&atilde;o foram encontradas arquivos para os valores escolhidos</font></td>
+					  <td class="texto" align="center" colspan="13">&nbsp;<font color='#FF0000'>N√£o foram encontradas arquivos para os valores escolhidos</font></td>
 					</tr>
 			<?php
 				}
 				else {
 			?>
 					<tr>
-                        <td class="texto" align="center" colspan="13"><span class="txt-verde"><strong>Valor Total Geral no Per&iacute;odo: <?php echo number_format($valorTotalGeral,2,',','.')?></strong></span></td>
+                        <td class="texto" align="center" colspan="13"><span class="txt-verde"><strong>Valor Total Geral no Per√≠odo: <?php echo number_format($valorTotalGeral,2,',','.')?></strong></span></td>
 					</tr>
 			<?php
 				}
@@ -176,7 +185,7 @@ $(function(){
 			} else {
 		?>
     	        <tr>
-    	          <td class="texto" align="center" colspan="13">&nbsp;<font color='#FF0000'>N&atilde;o foram encontradas arquivos para os valores escolhidos</font></td>
+    	          <td class="texto" align="center" colspan="13">&nbsp;<font color='#FF0000'>N√£o foram encontradas arquivos para os valores escolhidos</font></td>
     	        </tr>
 		<?php
 			}

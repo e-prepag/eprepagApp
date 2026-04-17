@@ -11,13 +11,15 @@ if(!b_IsBKOUsuarioAdminBKO())
 }
 
 $on = "";
+$params = array();
 if(isset($_POST['aba']) && $_POST['aba'] != ""){
-    $on = " AND bo_aba.aba_id = ".$_POST['aba'];
+    $on = " AND bo_aba.aba_id = $1";
+    $params[] = $_POST['aba'];
 }
 
 $sql = "SELECT * FROM bo_menu inner join bo_aba on bo_menu.aba_id = bo_aba.aba_id $on order by menu_order asc";
 
-$rs = SQLexecuteQuery($sql);
+$rs = SQLexecuteQueryParams($sql, $params);
 
 if($rs) {
     $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);

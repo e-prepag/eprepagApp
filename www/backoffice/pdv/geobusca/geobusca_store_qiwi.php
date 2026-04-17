@@ -17,9 +17,10 @@ $us_coord_lng = '';
 
 if(!empty($us_endereco)) {
 	
-	$sql = "select * from dist_usuarios_stores_qiwi where us_id=$us_id;";
+	$sql = "select * from dist_usuarios_stores_qiwi where us_id=$1;";
+	$params = array($us_id);
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, $params);
 	$rs_row = pg_fetch_array($rs);
 
 	$us_endereco = $rs_row['us_endereco'];

@@ -164,7 +164,7 @@ $time_start_stats = getmicrotime();
 		if ($op == "ati" || $op == "can" || $op == "blo" || $op == "des") {
 			// Passa para o novo estado
 			$status_new = "";
-			$condAdicional = "";
+			$condAdicional = null;
 			$setAdicinal = "";
 			switch ($op) {
 				case "ati":
@@ -176,11 +176,11 @@ $time_start_stats = getmicrotime();
 					break;
 				case "blo":
 					$status_new = intval($PINS_STORE_STATUS_VALUES['B']);
-					$condAdicional = "and pin_status='" . intval($PINS_STORE_STATUS_VALUES['A']) . "' ";
+					$condAdicional = intval($PINS_STORE_STATUS_VALUES['A']);
 					break;
 				case "des":
 					$status_new = intval($PINS_STORE_STATUS_VALUES['A']);
-					$condAdicional = "and pin_status='" . intval($PINS_STORE_STATUS_VALUES['B']) . "' ";
+					$condAdicional = intval($PINS_STORE_STATUS_VALUES['B']);
 					break;
 			}
 			//Inicia transacao
@@ -192,8 +192,8 @@ $time_start_stats = getmicrotime();
 			// testa status do pin antes de mudar
 			$ids = "";
 			for ($i = 0; $i < (is_countable($ids_temp) ? count($ids_temp) : 0); $i++) {
-				$sql = "select pin_status from pins_store where pin_codinterno=" . intval($ids_temp[$i]) . ";";
-				$rs_pins = SQLexecuteQuery($sql);
+				$sql = "select pin_status from pins_store where pin_codinterno=$1;";
+				$rs_pins = SQLexecuteQueryParams($sql, array(intval($ids_temp[$i])));
 				if ((($rs_pins) ? pg_num_rows($rs_pins) : 0) <> 0) {
 					$rs_pin_row = pg_fetch_array($rs_pins);
 					$pin_status = $rs_pin_row['pin_status'];
@@ -206,8 +206,20 @@ $time_start_stats = getmicrotime();
 			}
 			if (strlen((string)($ids ?? "")) > 0) {
 				if ($msg == "") {
-					$sql  = "update pins_store set pin_status='" . intval($status_new) . "'" . $setAdicinal . " where pin_codinterno IN (" . $ids . ") and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['D']) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['U']) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['C']) . "' " . $condAdicional . ";";
-					$rs_pins_save = SQLexecuteQuery($sql);
+					$ids_array = array_map('intval', explode(',', $ids));
+						$params = array(intval($status_new), intval($PINS_STORE_STATUS_VALUES['D']), intval($PINS_STORE_STATUS_VALUES['U']), intval($PINS_STORE_STATUS_VALUES['C']));
+						$ids_placeholders = array();
+						foreach ($ids_array as $id) {
+							$params[] = $id;
+							$ids_placeholders[] = "$" . count($params);
+						}
+						$sql  = "update pins_store set pin_status=$1" . $setAdicinal . " where pin_codinterno IN (" . implode(',', $ids_placeholders) . ") and pin_status!=$2 and pin_status!=$3 and pin_status!=$4 ";
+						if ($condAdicional !== null) {
+							$params[] = $condAdicional;
+							$sql .= "and pin_status=$" . count($params) . " ";
+						}
+						$sql .= ";";
+						$rs_pins_save = SQLexecuteQueryParams($sql, $params);
 					if ($rs_pins_save) {
 						$msg_pin .= "<font color='#FF0000'><b>PINs atualizado com sucesso ('$op', $ids)</b></font><br>";
 					} else {
@@ -234,7 +246,8 @@ $time_start_stats = getmicrotime();
 	//Recupera as vendas
 	if ($msg == "") {
 
-		$sql  = "select * from pins_store ps where pin_status != '" . intval($PINS_STORE_STATUS_VALUES['D']) . "' "; //and pin_status != 4
+		$sql  = "select * from pins_store ps where pin_status != $1 "; //and pin_status != 4
+		$params = array(intval($PINS_STORE_STATUS_VALUES['D']));
 
 		if ($tf_v_tipo) {
 			if (!(array_key_exists($tf_v_tipo, $PINS_STORE_STATUS))) {
@@ -242,7 +255,8 @@ $time_start_stats = getmicrotime();
 			}
 
 			if ($tf_v_tipo) {
-				$sql .= " and pin_status='" . intval($tf_v_tipo) . "' ";
+				$params[] = intval($tf_v_tipo);
+				$sql .= " and pin_status=$" . count($params) . " ";
 			}
 		}
 		if (strlen((string)($tf_v_formato ?? ""))) {
@@ -251,26 +265,42 @@ $time_start_stats = getmicrotime();
 			}
 
 			if (strlen((string)($tf_v_formato ?? ""))) {
-				$sql .= " and pin_formato='" . intval($tf_v_formato) . "' ";
+				$params[] = intval($tf_v_formato);
+				$sql .= " and pin_formato=$" . count($params) . " ";
 			}
 		}
-		if (strlen((string)($distributor_codigo ?? "")))
-			$sql .= " and distributor_codigo=" . intval($distributor_codigo);
-		if (strlen((string)($lote ?? "")))
-			$sql .= " and pin_lote_codigo=" . intval($lote);
-		if (strlen((string)($valor ?? "")))
-			$sql .= " and pin_valor=" . intval($valor);
-		if (strlen((string)($tf_v_data_inclusao_ini ?? "")))
-			$sql .= " and pin_dataentrada >= to_timestamp('" . addslashes($tf_v_data_inclusao_ini) . " 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-		if (strlen((string)($tf_v_data_inclusao_fim ?? "")))
-			$sql .= " and pin_dataentrada <= to_timestamp('" . addslashes($tf_v_data_inclusao_fim) . " 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
+		if (strlen((string)($distributor_codigo ?? ""))) {
+			$params[] = intval($distributor_codigo);
+			$sql .= " and distributor_codigo=$" . count($params);
+		}
+		if (strlen((string)($lote ?? ""))) {
+			$params[] = intval($lote);
+			$sql .= " and pin_lote_codigo=$" . count($params);
+		}
+		if (strlen((string)($valor ?? ""))) {
+			$params[] = intval($valor);
+			$sql .= " and pin_valor=$" . count($params);
+		}
+		if (strlen((string)($tf_v_data_inclusao_ini ?? ""))) {
+			$params[] = $tf_v_data_inclusao_ini . " 00:00:00";
+			$sql .= " and pin_dataentrada >= to_timestamp($" . count($params) . ", 'DD/MM/YYYY HH24:MI:SS')";
+		}
+		if (strlen((string)($tf_v_data_inclusao_fim ?? ""))) {
+			$params[] = $tf_v_data_inclusao_fim . " 23:59:59";
+			$sql .= " and pin_dataentrada <= to_timestamp($" . count($params) . ", 'DD/MM/YYYY HH24:MI:SS')";
+		}
 
-		$rs_total = SQLexecuteQuery($sql);
+		$rs_total = SQLexecuteQueryParams($sql, $params);
 		if ($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 		$sql .= " order by pin_codinterno desc ";
-		$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
+		$params_lista = $params;
+		$params_lista[] = intval(($p - 1) * $registros);
+		$offsetParam = count($params_lista);
+		$params_lista[] = intval($registros);
+		$limitParam = count($params_lista);
+		$sql .= " offset $" . $offsetParam . " limit $" . $limitParam;
 		//echo $sql ."<br>\n";
-		$rs_pins = SQLexecuteQuery($sql);
+		$rs_pins = SQLexecuteQueryParams($sql, $params_lista);
 		if (!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 		// permitindo a descryptar
 		else {

@@ -34,35 +34,42 @@ if($msg == ""){
     if(strlen((string)($tf_v_data_inclusao_fim ?? "")) && strlen((string)($tf_v_data_inclusao_ini ?? ""))){
 
 	$sql_filters = array();
+	$params = array();
 	$sql  = "SELECT pih_pin_id,pih_ip_id,pih_id,pih_codretepp,pih.pin_status,to_char(pih_data,'DD/MM/YYYY HH24:MI:SS') as pih_data_aux,pin_codigo 
                  FROM pins_integracao_historico pih
                  INNER JOIN pins p ON pin_codinterno = pih_pin_id "; 
 	if(strlen((string)($tf_v_data_inclusao_ini ?? ""))){
-        $sql_filters[] = "pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
+        $sql_filters[] = "pih_data >= to_timestamp($" . (count($params) + 1) . ", 'DD/MM/YYYY HH24:MI:SS')";
+		$params[] = $tf_v_data_inclusao_ini . " 00:00:00";
         $varsel .= "&tf_v_data_inclusao_ini=$tf_v_data_inclusao_ini";
     }
 	if(strlen((string)($tf_v_data_inclusao_fim ?? ""))){
-        $sql_filters[] = "pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
+        $sql_filters[] = "pih_data <= to_timestamp($" . (count($params) + 1) . ", 'DD/MM/YYYY HH24:MI:SS')";
+		$params[] = $tf_v_data_inclusao_fim . " 23:59:59";
         $varsel .= "&tf_v_data_inclusao_fim=$tf_v_data_inclusao_fim";
     }
-	if(!empty($opr_codigo))
-				$sql_filters[] = "pih_id = ".addslashes($opr_codigo);
-	if(!empty($pin_codigo))
-				$sql_filters[] = "pih_pin_id = ".retorna_id_pin(addslashes($pin_codigo),addslashes($opr_codigo));
+	if(!empty($opr_codigo)) {
+		$sql_filters[] = "pih_id = $" . (count($params) + 1);
+		$params[] = (int)$opr_codigo;
+	}
+	if(!empty($pin_codigo)) {
+		$sql_filters[] = "pih_pin_id = $" . (count($params) + 1);
+		$params[] = retorna_id_pin($pin_codigo, $opr_codigo);
+	}
 	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= "WHERE ".$sql_aux;
 	}
 //	echo $sql;
-	$rs_total = SQLexecuteQuery($sql);
+	$rs_total = SQLexecuteQueryParams($sql, $params);
 	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY pih_data DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
-	$rs_pins = SQLexecuteQuery($sql);
+	$rs_pins = SQLexecuteQueryParams($sql, $params);
 	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
     }//end if(!strlen((string)($tf_v_data_inclusao_fim ?? "")) || !strlen((string)($tf_v_data_inclusao_ini ?? "")))
-    else $msg = "Obrigatório selecionar um intervalo de datas.".PHP_EOL;
+    else $msg = "Obrigatrio selecionar um intervalo de datas.".PHP_EOL;
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -83,7 +90,7 @@ function timedRefresh(timeoutPeriod) {
 
 function validador() {
 		if (document.form1.pin_codigo.value != "" && document.form1.pin_operacao.value == "") {
-			alert("Quando é informado o PIN é obrigatório a seleção da Operadora.");
+			alert("Quando  informado o PIN  obrigatrio a seleo da Operadora.");
 			return false;
 		}
 		else return true;

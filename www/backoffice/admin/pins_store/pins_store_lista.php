@@ -136,7 +136,7 @@ if (!empty($op)) {
 	if ($op == "ati" || $op == "can" || $op == "blo" || $op == "des") {
 		// Passa para o novo estado
 		$status_new = "";
-		$condAdicional = "";
+		$condAdicional = null;
 		$setAdicinal = "";
 		switch ($op) {
 			case "ati":
@@ -148,11 +148,11 @@ if (!empty($op)) {
 				break;
 			case "blo":
 				$status_new = intval($PINS_STORE_STATUS_VALUES['B']);
-				$condAdicional = "and pin_status='" . intval($PINS_STORE_STATUS_VALUES['A']) . "' ";
+				$condAdicional = intval($PINS_STORE_STATUS_VALUES['A']);
 				break;
 			case "des":
 				$status_new = intval($PINS_STORE_STATUS_VALUES['A']);
-				$condAdicional = "and pin_status='" . intval($PINS_STORE_STATUS_VALUES['B']) . "' ";
+				$condAdicional = intval($PINS_STORE_STATUS_VALUES['B']);
 				break;
 		}
 		//Inicia transacao
@@ -167,9 +167,14 @@ if (!empty($op)) {
 				list($codlote, $codopr) = explode("|", $ids_temp[$i]);
 				//echo "lote: ".$codlote."<br>";
 				//echo "codopr: ".$codopr."<br>";
-				$sql  = "update pins_store set pin_status='" . intval($status_new) . "'" . $setAdicinal . " where pin_lote_codigo=" . intval($codlote) . " and distributor_codigo=" . intval($codopr) . " and pin_status!='" . intval($status_new) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['D']) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['U']) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['C']) . "' " . $condAdicional;
+				$params = array(intval($status_new), intval($codlote), intval($codopr), intval($status_new), intval($PINS_STORE_STATUS_VALUES['D']), intval($PINS_STORE_STATUS_VALUES['U']), intval($PINS_STORE_STATUS_VALUES['C']));
+				$sql  = "update pins_store set pin_status=$1" . $setAdicinal . " where pin_lote_codigo=$2 and distributor_codigo=$3 and pin_status!=$4 and pin_status!=$5 and pin_status!=$6 and pin_status!=$7 ";
+				if ($condAdicional !== null) {
+					$params[] = $condAdicional;
+					$sql .= "and pin_status=$" . count($params) . " ";
+				}
 				//echo $sql."<br>";
-				$rs_pins_save = SQLexecuteQuery($sql);
+				$rs_pins_save = SQLexecuteQueryParams($sql, $params);
 				if ($rs_pins_save) {
 					$msg_pin .= "<span class='txt-verde'><b>Lote ($codlote) da Distribuidora ($codopr) atualizado com sucesso ('$op')</b></span><br>";
 				} else {
@@ -201,7 +206,8 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 
 //Recupera as vendas
 if ($msg == "" && $btPesquisar) {
-	$sql  = "select distributor_codigo, pin_lote_codigo, to_char(pin_dataentrada,'DD/MM/YYYY') as data, pin_formato, pin_valor, pin_canal from pins_store ps where pin_status!='" . intval($PINS_STORE_STATUS_VALUES['D']) . "' ";
+	$sql  = "select distributor_codigo, pin_lote_codigo, to_char(pin_dataentrada,'DD/MM/YYYY') as data, pin_formato, pin_valor, pin_canal from pins_store ps where pin_status!=$1 ";
+	$params = array(intval($PINS_STORE_STATUS_VALUES['D']));
 
 	if ($tf_v_tipo) {
 		if (!(array_key_exists($tf_v_tipo, $PINS_STORE_STATUS))) {
@@ -209,7 +215,8 @@ if ($msg == "" && $btPesquisar) {
 		}
 
 		if ($tf_v_tipo) {
-			$sql .= " and pin_status='" . intval($tf_v_tipo) . "' ";
+			$params[] = intval($tf_v_tipo);
+			$sql .= " and pin_status=$" . count($params) . " ";
 		}
 	}
 	if (strlen((string)($tf_v_formato ?? ""))) {
@@ -218,26 +225,42 @@ if ($msg == "" && $btPesquisar) {
 		}
 
 		if (strlen((string)($tf_v_formato ?? ""))) {
-			$sql .= " and pin_formato='" . intval($tf_v_formato) . "' ";
+			$params[] = intval($tf_v_formato);
+			$sql .= " and pin_formato=$" . count($params) . " ";
 		}
 	}
-	if (strlen((string)($distributor_codigo ?? "")))
-		$sql .= " and distributor_codigo=" . intval($distributor_codigo);
-	if (strlen((string)($lote ?? "")))
-		$sql .= " and pin_lote_codigo=" . intval($lote);
-	if (strlen((string)($valor ?? "")))
-		$sql .= " and pin_valor=" . intval($valor);
-	if (strlen((string)($tf_v_data_inclusao_ini ?? "")))
-		$sql .= " and pin_dataentrada >= to_timestamp('" . addslashes($tf_v_data_inclusao_ini) . " 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if (strlen((string)($tf_v_data_inclusao_fim ?? "")))
-		$sql .= " and pin_dataentrada <= to_timestamp('" . addslashes($tf_v_data_inclusao_fim) . " 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
+	if (strlen((string)($distributor_codigo ?? ""))) {
+		$params[] = intval($distributor_codigo);
+		$sql .= " and distributor_codigo=$" . count($params);
+	}
+	if (strlen((string)($lote ?? ""))) {
+		$params[] = intval($lote);
+		$sql .= " and pin_lote_codigo=$" . count($params);
+	}
+	if (strlen((string)($valor ?? ""))) {
+		$params[] = intval($valor);
+		$sql .= " and pin_valor=$" . count($params);
+	}
+	if (strlen((string)($tf_v_data_inclusao_ini ?? ""))) {
+		$params[] = $tf_v_data_inclusao_ini . " 00:00:00";
+		$sql .= " and pin_dataentrada >= to_timestamp($" . count($params) . ", 'DD/MM/YYYY HH24:MI:SS')";
+	}
+	if (strlen((string)($tf_v_data_inclusao_fim ?? ""))) {
+		$params[] = $tf_v_data_inclusao_fim . " 23:59:59";
+		$sql .= " and pin_dataentrada <= to_timestamp($" . count($params) . ", 'DD/MM/YYYY HH24:MI:SS')";
+	}
 	$sql .= " group by distributor_codigo, pin_lote_codigo, data, pin_formato, pin_valor, pin_canal ";
-	$rs_total = SQLexecuteQuery($sql);
+	$rs_total = SQLexecuteQueryParams($sql, $params);
 	if ($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " order by distributor_codigo, pin_valor ";
-	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
+	$params_lista = $params;
+	$params_lista[] = intval(($p - 1) * $registros);
+	$offsetParam = count($params_lista);
+	$params_lista[] = intval($registros);
+	$limitParam = count($params_lista);
+	$sql .= " offset $" . $offsetParam . " limit $" . $limitParam;
 	//echo $sql ."<br>\n";
-	$rs_pins = SQLexecuteQuery($sql);
+	$rs_pins = SQLexecuteQueryParams($sql, $params_lista);
 	if (!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
@@ -399,8 +422,8 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "'";
-											$rs_total = SQLexecuteQuery($sql_total);
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3";
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data']));
 											unset($rs_total_row);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
@@ -412,8 +435,8 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['D']) . "' ";
-											$rs_total = SQLexecuteQuery($sql_total);
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_status=$4 ";
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['D'])));
 											unset($rs_total_row);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
@@ -427,9 +450,9 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['P']) . "' ";
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_status=$4 ";
 											// echo $sql_total;
-											$rs_total = SQLexecuteQuery($sql_total);
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['P'])));
 											unset($rs_total_row);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
@@ -442,8 +465,8 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['A']) . "' ";
-											$rs_total = SQLexecuteQuery($sql_total);
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_status=$4 ";
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['A'])));
 											unset($rs_total_row);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
@@ -456,8 +479,8 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['U']) . "' ";
-											$rs_total = SQLexecuteQuery($sql_total);
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_status=$4 ";
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['U'])));
 											unset($rs_total_row);
 											unset($aux_utilizado);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
@@ -472,8 +495,8 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['B']) . "' ";
-											$rs_total = SQLexecuteQuery($sql_total);
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_status=$4 ";
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['B'])));
 											unset($rs_total_row);
 											unset($aux_bloqueado);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
@@ -488,8 +511,8 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['C']) . "' ";
-											$rs_total = SQLexecuteQuery($sql_total);
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_status=$4 ";
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['C'])));
 											unset($rs_total_row);
 											unset($aux_cancelado);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
@@ -504,9 +527,9 @@ if ($msg == "" && $btPesquisar) {
 									<td class="texto" align="center">
 										<nobr>&nbsp;
 											<?php
-											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_arq_gerado IS NOT NULL";
+											$sql_total = "select count(ps.pin_codinterno) as total from pins_store ps where distributor_codigo = $1 and pin_lote_codigo = $2 and to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and pin_arq_gerado IS NOT NULL";
 											//echo $sql_total;
-											$rs_total = SQLexecuteQuery($sql_total);
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data']));
 											unset($rs_total_row);
 											unset($aux_ja_arq);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
@@ -524,16 +547,16 @@ if ($msg == "" && $btPesquisar) {
 											unset($aux_total);
 											$sql_total = "select 
 									count(case when ((ps.pin_arq_gerado is not null) AND 
-									(ps.pin_status != '" . intval($PINS_STORE_STATUS_VALUES['U']) . "') AND 
-									(ps.pin_status != '" . intval($PINS_STORE_STATUS_VALUES['C']) . "') AND 
-									(ps.pin_status != '" . intval($PINS_STORE_STATUS_VALUES['B']) . "')) then 1 end) as total
+									(ps.pin_status != $4) AND 
+									(ps.pin_status != $5) AND 
+									(ps.pin_status != $6)) then 1 end) as total
 								from pins_store ps
-								where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and
-									pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and
-									to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and 
+								where distributor_codigo = $1 and
+									pin_lote_codigo = $2 and
+									to_char(pin_dataentrada,'DD/MM/YYYY') = $3 and 
 									pin_arq_gerado IS NOT NULL";
 											//echo $sql_total;
-											$rs_total = SQLexecuteQuery($sql_total);
+											$rs_total = SQLexecuteQueryParams($sql_total, array($rs_pins_row['distributor_codigo'], $rs_pins_row['pin_lote_codigo'], $rs_pins_row['data'], intval($PINS_STORE_STATUS_VALUES['U']), intval($PINS_STORE_STATUS_VALUES['C']), intval($PINS_STORE_STATUS_VALUES['B'])));
 											unset($rs_total_row);
 											unset($aux_ja_arq);
 											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {

@@ -63,17 +63,22 @@ $sql = "SELECT
 		promo_r_resposta
 	FROM promocoes_resposta pr
 		LEFT JOIN promocoes p ON (pr.promo_id=p.promo_id)";
-if (!empty($promo_r_resposta))
-	$sql_aux[] = "UPPER(promo_r_resposta) LIKE '%" . strtoupper($promo_r_resposta) . "%'";
-if (!empty($promo_id))
-	$sql_aux[] = "pr.promo_id = ". $promo_id ;
+$params = array();
+if (!empty($promo_r_resposta)) {
+	$params[] = '%' . strtoupper($promo_r_resposta) . '%';
+	$sql_aux[] = "UPPER(promo_r_resposta) LIKE $" . count($params);
+}
+if (!empty($promo_id)) {
+	$params[] = $promo_id;
+	$sql_aux[] = "pr.promo_id = $" . count($params);
+}
 if (isset($sql_aux) && is_array($sql_aux)) {
 	$sql .= ' WHERE ' . implode(' AND ', $sql_aux);
 }
 $sql .= ' ORDER BY pr.promo_r_data desc';
 //echo str_replace("\n", "<br>\n", $sql)."<br>";
 //die($sql);
-$rsResposta = SQLexecuteQuery($sql);
+$rsResposta = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 ?>
 <table class="txt-preto table fontsize-pp table-bordered">
 <?php

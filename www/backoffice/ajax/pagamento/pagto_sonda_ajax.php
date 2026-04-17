@@ -79,9 +79,10 @@ echo "<span style='font-size:10px; font-family: tahoma,arial,sans serif'>" . $da
 			'pdv' => '20',
 		);
 	
-		$sql = "SELECT * from tb_pag_compras where numcompra = '" . $numcompra . "'";
+		$sql = "SELECT * from tb_pag_compras where numcompra = $1";
+		$params = array($numcompra);
 	
-		$rs_sonda = SQLexecuteQuery($sql);
+		$rs_sonda = SQLexecuteQueryParams($sql, $params);
 		if (!$rs_sonda) {
 			echo "<font color='#FF0000'><b>Erro na Sonda da Compra (" . $numcompra . ").</b></font><br>";
 			exit;

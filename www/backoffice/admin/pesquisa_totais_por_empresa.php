@@ -20,6 +20,10 @@ if(isset($BtnSearch) && $BtnSearch) {
         $msg = "";
         
         //Montando SQL
+        $params = array();
+        $params[] = formata_data($_POST["data_inicial"],1)." 00:00:00";
+        $params[] = formata_data($_POST["data_final"],1)." 23:59:59";
+
         $sql = "
                 SELECT fp_publisher, 
                         CASE WHEN fp_company = 0 THEN 'EPP Pagamentos' 
@@ -33,17 +37,20 @@ if(isset($BtnSearch) && $BtnSearch) {
                         sum(fp_comission) as comissao,
                         date_trunc('day', fp_date) as data
                 FROM financial_processing
-                WHERE fp_date >= '".formata_data($_POST["data_inicial"],1)." 00:00:00'
-                        AND fp_date <= '".formata_data($_POST["data_final"],1)." 23:59:59' 
+                WHERE fp_date >= $1
+                        AND fp_date <= $2 
                         ";
         if($_POST["opr_codigo"] != "ALL") {
-                $sql .= "AND fp_publisher = ".$_POST["opr_codigo"];
+                $sql .= "AND fp_publisher = $" . (count($params) + 1);
+                $params[] = $_POST["opr_codigo"];
         } // end if($_POST["opr_codigo"] != "ALL")
         if($_POST["empresa"] != "ALL") {
-                $sql .= "AND fp_company = ".$_POST["empresa"];
+                $sql .= "AND fp_company = $" . (count($params) + 1);
+                $params[] = $_POST["empresa"];
         } // end if($_POST["empresa"] != "ALL")
         if($_POST["nacionalidade"] != "ALL") {
-                $sql .= "AND fp_nationality = ".$_POST["nacionalidade"];
+                $sql .= "AND fp_nationality = $" . (count($params) + 1);
+                $params[] = $_POST["nacionalidade"];
         } // end if($_POST["nacionalidade"] != "ALL")
         $sql .= " 
                 GROUP BY fp_publisher, fp_company, fp_nationality, data
@@ -51,7 +58,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                 ";
         
         //echo $sql."<br>";
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, $params);
         if($rs) {
                 if((($rs) ? pg_num_rows($rs) : 0)>0) {
                         $total_qtde = 0;
@@ -64,10 +71,10 @@ if(isset($BtnSearch) && $BtnSearch) {
                                         <td>Empresa</td>
                                         <td>Nacionalidade</td>
                                         <td>Publisher</td>
-                                        <td>Qtde Transações</td>
+                                        <td>Qtde Transaes</td>
                                         <td>Total</td>
-                                        <td>Comissão</td>
-                                        <td>Total - Comissão</td>
+                                        <td>Comisso</td>
+                                        <td>Total - Comisso</td>
                                     </tr>";
                         while ($rsRow = pg_fetch_array($rs)) {
 
@@ -100,11 +107,11 @@ if(isset($BtnSearch) && $BtnSearch) {
                                 </table>";
                 }//end if((($rs) ? pg_num_rows($rs) : 0)>0)
                 else {
-                        $msg .= "Nenhum registro selecionado no período.";
+                        $msg .= "Nenhum registro selecionado no perodo.";
                 }//end else do if((($rs) ? pg_num_rows($rs) : 0)>0)
         }//end if($rs) 
         else {
-                $msg .= "ERRO: Problema na seleção dos Totais por Empresa.<br>";
+                $msg .= "ERRO: Problema na seleo dos Totais por Empresa.<br>";
         }//end else do if($rs) 
 } // end if($BtnSearch)
 /*

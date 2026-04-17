@@ -9,12 +9,13 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 
 
 $estado = str_replace("'","\'",$_GET['estado']);
-$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where ug_estado = '$estado';";
+$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where ug_estado = $1;";
+$params = array($estado);
 //echo $ps_query;
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 
 //Variavel V anexa um id a div para proteger o conteúdo
@@ -31,11 +32,12 @@ $v = 0;
 
 
 //sessão de controle //
-$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where ug_estado = '$estado' ;";
+$ps_query = "SELECT distinct ug_cidade,ug_estado FROM dist_usuarios_games where ug_estado = $1 ;";
+$params = array($estado);
 
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 $v = 0;
 

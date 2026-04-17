@@ -12,6 +12,10 @@ if(isset($BtnSearch) && $BtnSearch) {
         $msg = "";
         
         //Montando SQL
+        $params = array();
+        $params[] = formata_data($_POST["data_inicial"],1)." 00:00:00";
+        $params[] = formata_data($_POST["data_final"],1)." 23:59:59";
+        
         $sql = "
                 SELECT sum(total) as total_dia,
                        to_char(dia,'DD/MM/YYYY') as dia_formatado
@@ -29,8 +33,8 @@ if(isset($BtnSearch) && $BtnSearch) {
                            date_trunc('day', bol_data ) as dia 
                     FROM boletos_pendentes
                         INNER JOIN boleto_bancario_games ON bol_venda_games_id = bbg_vg_id
-                    WHERE bol_data  >= '".formata_data($_POST["data_inicial"],1)." 00:00:00'
-                            AND bol_data  <= '".formata_data($_POST["data_final"],1)." 23:59:59'
+                    WHERE bol_data  >= $1
+                            AND bol_data  <= $2
                             AND substring(bol_documento from 1 for 1) IN ('2','3','6')
                     GROUP BY dia
                     )
@@ -51,8 +55,8 @@ if(isset($BtnSearch) && $BtnSearch) {
                         date_trunc('day', bol_data ) as dia 
                     FROM boletos_pendentes
                         INNER JOIN dist_boleto_bancario_games ON bol_venda_games_id = bbg_vg_id
-                    WHERE bol_data  >= '".formata_data($_POST["data_inicial"],1)." 00:00:00'
-                            AND bol_data  <= '".formata_data($_POST["data_final"],1)." 23:59:59'
+                    WHERE bol_data  >= $1
+                            AND bol_data  <= $2
                             AND substring(bol_documento from 1 for 1) IN ('1','4')
                     GROUP BY dia
                     )";
@@ -72,15 +76,17 @@ if(isset($BtnSearch) && $BtnSearch) {
                     SELECT sum(taxas) as total, 
                         date_trunc('day', datacompra) as dia 
                     FROM tb_pag_compras
-                    WHERE datacompra >= '".formata_data($_POST["data_inicial"],1)." 00:00:00'
-                            AND datacompra <= '".formata_data($_POST["data_final"],1)." 23:59:59'
+                    WHERE datacompra >= $1
+                            AND datacompra <= $2
                             AND status = 3
                             ";
             if($_POST["meio_pagto"] != "ALL") {
-                    $sql .= "AND iforma = '".$_POST["meio_pagto"]."'";
+                    $sql .= "AND iforma = $" . (count($params) + 1);
+                    $params[] = $_POST["meio_pagto"];
             }//end if($_POST["meio_pagto"] != "ALL")
             if($_POST["tipo_user"] != "ALL") {
-                    $sql .= "AND tipo_cliente = '".$_POST["tipo_user"]."'";
+                    $sql .= "AND tipo_cliente = $" . (count($params) + 1);
+                    $params[] = $_POST["tipo_user"];
             }//end if($_POST["meio_pagto"] != "ALL")
             $sql .= " 
                     GROUP BY dia
@@ -94,7 +100,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                 ORDER BY dia;
                 ";
         //echo $sql."<br>";
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, $params);
         if($rs) {
                 if((($rs) ? pg_num_rows($rs) : 0)>0) {
                         $total_geral = 0;
@@ -122,11 +128,11 @@ if(isset($BtnSearch) && $BtnSearch) {
                                 </table>";
                 }//end if((($rs) ? pg_num_rows($rs) : 0)>0)
                 else {
-                        $msg .= "Nenhum registro selecionado no período.";
+                        $msg .= "Nenhum registro selecionado no perï¿½odo.";
                 }//end else do if((($rs) ? pg_num_rows($rs) : 0)>0)
         }//end if($rs) 
         else {
-                $msg .= "ERRO: Problema na seleção das Taxas do Meios de Pagamentos.<br>";
+                $msg .= "ERRO: Problema na seleï¿½ï¿½o das Taxas do Meios de Pagamentos.<br>";
         }//end else do if($rs) 
 } // end if($BtnSearch)
 /*
@@ -170,7 +176,7 @@ if(isset($BtnSearch) && $BtnSearch) {
             </select>
         </div>
         <div class="col-md-5 top10">
-            Tipo de Usuário: 
+            Tipo de Usuï¿½rio: 
         </div>
         <div class="col-md-7 top10">
             <select class="form-control data w150" name="tipo_user" char="1" id="tipo_user" label="Meio de Pagamento">

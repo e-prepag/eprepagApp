@@ -4,12 +4,13 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 $cidade = $_GET['cidade'] ?? '';
-$ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games where ug_cidade = '$cidade';";
+$ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games where ug_cidade = $1;";
+$params = array($cidade);
 //echo $ps_query;
 /// todas as lan que estiverem nesse bairro
 //pg_send_query($conex,$ps_query);
 //$res1 = pg_get_result($conex);
-$res1 = SQLexecuteQuery($ps_query);
+$res1 = SQLexecuteQueryParams($ps_query, $params);
 
 
 

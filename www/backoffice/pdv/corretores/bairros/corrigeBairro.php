@@ -13,7 +13,8 @@ $varia = array();
 $estado =  isset($_REQUEST['c_estado']) ? $_REQUEST['c_estado'] : '';
 $cidade =  pdv_utf8_to_iso(isset($_REQUEST['c_cidade']) ? $_REQUEST['c_cidade'] : '');
 
-$query = "update dist_usuarios_games set ug_bairro = '$word' where ";
+$query = "update dist_usuarios_games set ug_bairro = $1 where ";
+$params = array($word);
 $msg = " Os Bairros :";
 
 while ( $j <= $f ) {
@@ -44,16 +45,24 @@ for ($varredor = 1; $varredor <= $size ; $varredor++) {
 
 	if ($varredor < $size ) {
 
-			$query .= " ug_bairro = '".$varia[$varredor]."' OR";
+			$params[] = $varia[$varredor];
+			$placeholder = "$" . count($params);
+			$query .= " ug_bairro = " . $placeholder . " OR";
 
 	} else { /// caso contrário adiciona o AND para concatenar com a cidade
 
-			$query .= " ug_bairro = '".$varia[$varredor]."' AND";
+			$params[] = $varia[$varredor];
+			$placeholder = "$" . count($params);
+			$query .= " ug_bairro = " . $placeholder . " AND";
 
 	}//fim if
 
 }// fim for
-$query .= " ug_cidade = '$cidade' and ug_estado = '$estado' ;";
+$params[] = $cidade;
+$cidadePlaceholder = "$" . count($params);
+$params[] = $estado;
+$estadoPlaceholder = "$" . count($params);
+$query .= " ug_cidade = " . $cidadePlaceholder . " and ug_estado = " . $estadoPlaceholder . " ;";
 echo "<br>".$query."<br>";
 //echo "<br><br>".$query."<br><br> ATIVAR A QUERY";
 
@@ -61,7 +70,7 @@ echo "<br>".$query."<br>";
 ////////---------- ATIVAR AQUI PARA FUNCIONAR ------------/////////
 //if (!pg_query($conex,$query)) {
 
-	if (!($res = SQLexecuteQuery($query))) {
+	if (!($res = SQLexecuteQueryParams($query, $params))) {
 		echo " falhou (213a)";	
 	} else {
 		echo " ok (213)"; 

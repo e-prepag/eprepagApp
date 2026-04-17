@@ -38,15 +38,15 @@ if(isset($_POST["ug_id"]) && !empty($_POST["ug_id"]) && isset($_POST["valor"]) &
 		)
 		VALUES (
 			default,
-			'".$_SESSION['iduser_bko']."',
-			".$ug_id . ",
-			".$saldo_anterior.",
-			".$valor_novo.", 
-			'".$ug_login."'
+			$1,
+			$2,
+			$3,
+			$4, 
+			$5
 		);
 		";
 		
-		$ret = SQLexecuteQuery($sql);
+		$ret = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko'], $ug_id, $saldo_anterior, $valor_novo, $ug_login));
 		
 		if(!$ret){
 			$msg = "Erro ao salvar as informações do estorno";
