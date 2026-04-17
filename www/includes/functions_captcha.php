@@ -30,7 +30,7 @@ function translateCode($scode) {
 
 	for ($placebo = 0;$placebo<$numberOfLetters;$placebo++) {
 		$schar = ord(substr($scode, $placebo, 1)) + $placebo;
-		$stmp.= str_pad($schar, 3, '0',STR_PAD_LEFT); 
+		$stmp.= str_pad((string)$schar, 3, '0',STR_PAD_LEFT); 
 	}
 	return $stmp;
 }

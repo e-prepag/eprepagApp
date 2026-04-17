@@ -893,7 +893,7 @@ function redirect($strRedirect)
 
                                                                         $body_simple = $body_html;
 
-                                                                        $boundary = md5(uniqid(time()));
+                                                                        $boundary = md5(uniqid((string)time()));
 
                                                                         $headers  = 'From: E-Prepag <suporte@e-prepag.com.br>' . $s_eol;
                                                                         $headers .= 'Reply-To: E-Prepag <suporte@e-repag.com.br>' . $s_eol;
@@ -1677,7 +1677,7 @@ pin
                                                                         $rs = SQLexecuteQuery($sql);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 while ($rs_row = pg_fetch_array($rs)) {
-                                                                                        $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format($rs_row['vgm_valor'], 2, ',', '.') . ")\n";
+                                                                                        $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format((float)$rs_row['vgm_valor'], 2, ',', '.') . ")\n";
                                                                                 }
                                                                         }
                                                                         if (!$cesta_nome || strlen($cesta_nome) == 0) {
@@ -1860,7 +1860,7 @@ pin
                                                                         $ntries = 0;
                                                                         $orderId = "";
 
-                                                                        $orderId =         date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT);
+                                                                        $orderId =         date("YmdHis") . str_pad((string)rand(0, 999), 3, "0", STR_PAD_LEFT);
                                                                         do {
 
                                                                                 //		$orderId = 	"2003120408301545872781";
@@ -1874,7 +1874,7 @@ pin
                                                                                         $pgresult = pg_fetch_array($ret);
                                                                                         $bfound = (($pgresult['n'] == 0) ? true : false);
                                                                                 }
-                                                                                $orderId =         date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT);
+                                                                                $orderId =         date("YmdHis") . str_pad((string)rand(0, 999), 3, "0", STR_PAD_LEFT);
                                                                                 $ntries++;
                                                                         } while (!$bfound && $ntries < 10);
 

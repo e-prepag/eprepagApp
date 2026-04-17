@@ -33,7 +33,7 @@ $search_unit_stats = LANG_SITE_SEARCH_MSG_2;
 
 function get_current_date() {
         $date1 = date("Y M d H i s");
-        $snow = date("d", $date1)."/".substr(mes_do_ano($date1),0,3)."/".date("Y", $date1)." ".date("h", $date1).":".date("m", $date1).":".date("s", $date1);
+        $snow = date("d", (int)$date1)."/".substr(mes_do_ano((string)$date1),0,3)."/".date("Y", (int)$date1)." ".date("h", (int)$date1).":".date("m", (int)$date1).":".date("s", (int)$date1);
         $snow = date("Y/M/d H:i:s");
         return $snow;
 }
@@ -77,13 +77,13 @@ function get_current_date() {
 	}
 
 	function mes_do_ano($this_date){
-		//'posicao = número relacionado a string de dados
+		//'posicao = nï¿½mero relacionado a string de dados
 		$meses = array("", LANG_JANUARY, LANG_FEBRUARY, LANG_MARCH, LANG_APRIL, LANG_MAY, LANG_JUNE, LANG_JULY, LANG_AUGUST, LANG_SEPTEMBER, LANG_OCTOBER, LANG_NOVEMBER, LANG_DECEMBER);
 		return $meses[date("n", strtotime($this_date))]."/".date("y", strtotime($this_date));
 	}
 
 	function mes_do_ano2($this_date){
-		//'posicao = número relacionado a string de dados
+		//'posicao = nï¿½mero relacionado a string de dados
 		$meses = array("", LANG_JANUARY, LANG_FEBRUARY, LANG_MARCH, LANG_APRIL, LANG_MAY, LANG_JUNE, LANG_JULY, LANG_AUGUST, LANG_SEPTEMBER, LANG_OCTOBER, LANG_NOVEMBER, LANG_DECEMBER);
 		return $meses[date("n", $this_date)]."/".date("y", $this_date);
 	}
@@ -338,7 +338,7 @@ function get_sql_query($query_channel, $query_type, $extra_where, $smode) {
 						$sql .= $extra_where;
 					}
 					$sql .= " group by ve_estabtipo order by vendas desc, ve_estabtipo";
-					// não colocado para rede P* como ex. Rede Ponto Certo
+					// nï¿½o colocado para rede P* como ex. Rede Ponto Certo
 					break;
 				case "por_estabelecimento": 
 					$sql = "select ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado, count(*) as n, sum(ve_valor) as vendas ";
@@ -353,7 +353,7 @@ function get_sql_query($query_channel, $query_type, $extra_where, $smode) {
 						$sql .= $extra_where;
 					}
 					$sql .= " group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado order by vendas desc, ve_estabelecimento";
-					// não colocado para rede P* como ex. Rede Ponto Certo
+					// nï¿½o colocado para rede P* como ex. Rede Ponto Certo
 					break;
 				case "por_estabelecimento_barra": 
 					$sql = "select ve_estabelecimento, ve_estabtipo, min(ve_data_inclusao) as primeira_venda, max(ve_data_inclusao) as ultima_venda,(NOW()-max(ve_data_inclusao)) as abandonou, ve_cidade, ve_estado, count(*) as n, sum(ve_valor) as vendas ";
@@ -365,7 +365,7 @@ function get_sql_query($query_channel, $query_type, $extra_where, $smode) {
 						$sql .= $extra_where;
 					}
 					$sql .= " group by ve_estabelecimento, ve_estabtipo, ve_cidade, ve_estado order by vendas desc, ve_estabelecimento";
-					// não colocado para rede P* como ex. Rede Ponto Certo
+					// nï¿½o colocado para rede P* como ex. Rede Ponto Certo
 					break;
 				case "por_usuario":  
 					$sql = "";
@@ -639,8 +639,8 @@ function get_sql_query($query_channel, $query_type, $extra_where, $smode) {
 	Para encontrar primeira e ultima compras nos registros selecionados
 	min(vg.vg_data_inclusao) as primeira_venda, max(vg.vg_data_inclusao) as ultima_venda 
 
-	Para encontrar primeira e ultima compras em todos os registros, mesmo para último mês e última semana
-	Está muito lento: 93s
+	Para encontrar primeira e ultima compras em todos os registros, mesmo para ï¿½ltimo mï¿½s e ï¿½ltima semana
+	Estï¿½ muito lento: 93s
 	(select vg1.vg_data_inclusao from tb_venda_games vg1 where vg.vg_ex_email=vg1.vg_ex_email order by vg1.vg_data_inclusao desc limit 1) as primeira_venda, (select vg1.vg_data_inclusao from tb_venda_games vg1 where vg.vg_ex_email=vg1.vg_ex_email order by vg1.vg_data_inclusao limit 1) as ultima_venda 
 */
 //echo "strlen(extra_where): ".strlen($extra_where)."<br>";
@@ -1441,7 +1441,7 @@ function get_ncadastros($query_channel, $extra_where, $smode) {
 
 
 // ==========================================================================
-// os filtros de operadoras são definidos com $where_operadora, $where_operadora_pos, $where_operadora_cartoes
+// os filtros de operadoras sï¿½o definidos com $where_operadora, $where_operadora_pos, $where_operadora_cartoes
 //	se $opr<>"" => retorna dados agrupados por operadora
 function get_sql_total_mes($extra_where, $bcomiss, $smode, $year, $b_opr, $where_origem, $possui_totalizacao_utilizacao = false, $dd_operadora = false) {
 	global $where_operadora, $where_operadora_pos, $where_operadora_cartoes, $where_operadora_gift_card,$where_operadora_gocash,$where_operadora_rede_ponto_certo,$where_opr_venda_lan,$where_opr_venda_lan_negativa,$where_opr_utilizacao_lan;
@@ -1455,7 +1455,7 @@ function get_sql_total_mes($extra_where, $bcomiss, $smode, $year, $b_opr, $where
 	$sql = "select canal, mes, sum(n) as n, sum(vendas) as vendas from ( ";
 
 //"P"
-	if(!$where_origem) {	// $where_origem é definido apenas para Stardoll em M/E
+	if(!$where_origem) {	// $where_origem ï¿½ definido apenas para Stardoll em M/E
 		$sql .= "\n(select 'P' as canal, date_trunc('month', ve_data_inclusao) as mes, count(*) as n, sum(ve_valor";
 		if($bcomiss) {
 			$sql .= "*(case when ve_jogo='HB' then (".(($COMISSOES_BRUTAS['P']['HABBO HOTEL']-$COMISSAO_POS))."./100) when ve_jogo='MU' then (".(($COMISSOES_BRUTAS['P']['MU ONLINE']-$COMISSAO_POS))."./100) when ve_jogo='OG' then (".(($COMISSOES_BRUTAS['P']['ONGAME']-$COMISSAO_POS))."./100) end)";
@@ -1678,7 +1678,7 @@ function get_sql_total_mes($extra_where, $bcomiss, $smode, $year, $b_opr, $where
 //"L"
 //	echo "<hr>'E', 'ONGAME' (".getComissaoValue("E", "ONGAME")."%)<br>";
 //	echo "<hr>'L', 'Escola 24hs' (".getComissaoValue("L", "Escola 24hs")."%)<br>";
-	if(!$where_origem) {	// $where_origem é definido apenas para Stardoll em M/E
+	if(!$where_origem) {	// $where_origem ï¿½ definido apenas para Stardoll em M/E
 
 		$sql .= "(select 'L' as canal, date_trunc('month', vg.vg_data_inclusao) as mes, sum(vgm.vgm_qtde) as n, sum(vgm.vgm_valor * vgm.vgm_qtde ";
 		if($bcomiss) {
@@ -1747,7 +1747,7 @@ function get_sql_total_mes($extra_where, $bcomiss, $smode, $year, $b_opr, $where
 		$sql .= " group by mes ) \n";  
 		$sql .= " union all \n";
 
-//"L" contendo PINs Publisher totalizados por utilização
+//"L" contendo PINs Publisher totalizados por utilizaï¿½ï¿½o
 if($possui_totalizacao_utilizacao) {
     $sql .= "
                         select  'L' as canal,
@@ -1897,7 +1897,7 @@ if($possui_totalizacao_utilizacao) {
 	}
 	$sql .= " group by mes ) \n";
         
-	// Selecionando Utilização de GiftCard
+	// Selecionando Utilizaï¿½ï¿½o de GiftCard
         $sql .= "
             union all 
             
@@ -1906,7 +1906,7 @@ if($possui_totalizacao_utilizacao) {
              where pin_status = '4' and pih_codretepp = '2'  ".$where_operadora_gift_card." and pih_data>'2008-01-01 00:00:00' 
              group by mes ) ";
         
-	// Selecionando Utilização de GoCASH
+	// Selecionando Utilizaï¿½ï¿½o de GoCASH
         $sql .=" 
             union all 
             
@@ -1929,9 +1929,9 @@ if($possui_totalizacao_utilizacao) {
 }
 
 // ==========================================================================
-// Procura $estabelecimento no array bidimensional $a_vendas_ultimo_mes, hoje com posição $iorder_1, 
-//		ordenado por valor desc, várias linhas podêm ter o mesmo valor
-// retorna a diferencia entre a posição fornecida e a encontrada em $a_vendas_ultimo_mes para o estabelecimento
+// Procura $estabelecimento no array bidimensional $a_vendas_ultimo_mes, hoje com posiï¿½ï¿½o $iorder_1, 
+//		ordenado por valor desc, vï¿½rias linhas podï¿½m ter o mesmo valor
+// retorna a diferencia entre a posiï¿½ï¿½o fornecida e a encontrada em $a_vendas_ultimo_mes para o estabelecimento
 function getPositionInArray($query_channel, $estabelecimento, $iorder_1, $a_vendas_ultimo_mes) {
 	$ipos = -1;
 	$iorder = 0;
@@ -2575,7 +2575,7 @@ function bcgGenerator($statuspgto, $canais, $fpgto, $datainicio, $datatermino, $
 // ==========================================================================
 function getSQLTotaisporJogos($opr_codigo=null,$jogo_nome=null,$data_inicial=null,$data_final=null,$pins_valor=null) {
 
-	//ATENÇÃO: para novos canais deve ser cadastrado no vetor de canais no inicio do programa financial_totais_por_jogos.php 
+	//ATENï¿½ï¿½O: para novos canais deve ser cadastrado no vetor de canais no inicio do programa financial_totais_por_jogos.php 
 	
 
 	//Transformando $jogo_nome em array para testes dos nomes

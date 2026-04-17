@@ -207,7 +207,7 @@ class AES {
         public function encrypt($x) {
                 $blockSize = 16;
                 $plaintext = $x;
-                $plaintext = str_pad($plaintext, $blockSize * ceil(strlen($plaintext) / $blockSize), chr(0));
+                $plaintext = str_pad($plaintext, (int) ($blockSize * ceil(strlen($plaintext) / $blockSize)), chr(0));
                 $cipher = 'aes-256-ecb';
                 $encrypted = openssl_encrypt($plaintext, $cipher, $this->chave, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, "");
                 return $encrypted;

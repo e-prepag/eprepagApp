@@ -183,7 +183,7 @@ function is_DateTime($dateTime)
 	$dateTime = trim($dateTime);
 
 	if (preg_match("'^(\d{2})[\-//](\d{2})[\-//](\d{4})\s(\d{2}):(\d{2})$'", $dateTime,  $matches)) {
-		return checkdate($matches[2], $matches[1], $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
+		return checkdate((int)$matches[2], (int)$matches[1], (int)$matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
@@ -384,8 +384,8 @@ function qtde_dias($data1, $data2)
 	$ano2 = substr($data2, 6);    // extraimos somete o ano final
 
 
-	$data_inicial = mktime(0, 0, 0, $mes1, $dia1, $ano1); // obtem tempo unix para data1 no formato timestamp
-	$data_final = mktime(0, 0, 0, $mes2, $dia2, $ano2); // obtem tempo unix para data2 no formato timestamp
+	$data_inicial = mktime(0, 0, 0, (int)$mes1, (int)$dia1, (int)$ano1); // obtem tempo unix para data1 no formato timestamp
+	$data_final = mktime(0, 0, 0, (int)$mes2, (int)$dia2, (int)$ano2); // obtem tempo unix para data2 no formato timestamp
 	$tempo_unix = $data_final - $data_inicial; // acha a diferen�a de tempo
 	$periodo = floor($tempo_unix / (24 * 60 * 60)); //convers�o para dias. (Para anos adicione *365)
 
@@ -408,7 +408,7 @@ function get_nivel($url)
 
 function time2sec($h, $m, $s)
 {
-	$sec = ($h * 60 * 60) + ($m * 60) + $s;
+	$sec = ((int)$h * 60 * 60) + ((int)$m * 60) + (int)$s;
 
 	return $sec;
 }
@@ -417,10 +417,10 @@ function sec2time($s)
 {
 	$h = null;
 	$time = null;
-	$m = $s / 60;
+	$m = (int)$s / 60;
 	$m = number_format($m, 2, '.', '');
 	$m_dec = substr($m, strlen($m) - 2, 2);
-	$sec = ($h * 60 * 60) + ($m * 60) + $s;
+	$sec = ((int)$h * 60 * 60) + ((int)$m * 60) + (int)$s;
 
 	return $time;
 }
@@ -922,10 +922,10 @@ function data_menos_um($data)
 		$dia = (int)$dia - 1;
 	$dia = (int)$dia - 1;
 
-	if (strlen($dia) < 2) {
+	if (strlen((string)$dia) < 2) {
 		$dia = '0' . $dia;
 	}
-	if (strlen($mes) < 2) {
+	if (strlen((string)$mes) < 2) {
 		$mes = '0' . $mes;
 	}
 
@@ -1920,10 +1920,10 @@ function formata_timestamp($data, $gravar)
 function imprimeComboSeuBanco($mensagem)
 {
 	//URL Bancos
-	$URL_BANCOS[0] = array("Bradesco Pessoa F�sica", "http://www.bradesco.com.br/");
-	$URL_BANCOS[1] = array("Bradesco Pessoa Jur�dica", "http://www.bradesco.com.br/br/pj/default.shtm?paramPag=AbaPFPJ");
-	$URL_BANCOS[2] = array("Banco do Brasil Pessoa F�sica", "https://www2.bancobrasil.com.br/aapf/aai/login.pbk?loginSCD=true");
-	$URL_BANCOS[3] = array("Banco do Brasil Pessoa Jur�dica", "https://office.bancobrasil.com.br/servlet/carregaoffice");
+	$URL_BANCOS[0] = array("Bradesco Pessoa Física", "http://www.bradesco.com.br/");
+	$URL_BANCOS[1] = array("Bradesco Pessoa Jurídica", "http://www.bradesco.com.br/br/pj/default.shtm?paramPag=AbaPFPJ");
+	$URL_BANCOS[2] = array("Banco do Brasil Pessoa Física", "https://www2.bancobrasil.com.br/aapf/aai/login.pbk?loginSCD=true");
+	$URL_BANCOS[3] = array("Banco do Brasil Pessoa Jurídica", "https://office.bancobrasil.com.br/servlet/carregaoffice");
 	//$URL_BANCOS[4] = array("Caixa Econ�mica Federal", "https://internetcaixa.caixa.gov.br/NASApp/SIIBC/index_verif.processa");
 ?>
 	<script language="javascript">
@@ -1997,7 +1997,7 @@ function levantamentoPublisherComFechamentoUtilizacao()
 	$rs_publisher = SQLexecuteQuery($sql);
 	//echo pg_num_rows($rs_publisher)."<br>";
 	if (!$rs_publisher) {
-		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utiliza��o de PINs(" . $sql . ").<br>" . PHP_EOL;
+		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(" . $sql . ").<br>" . PHP_EOL;
 		return array();
 	}
 	if (pg_num_rows($rs_publisher) == 0) {
@@ -2033,7 +2033,7 @@ function levantamentoPublisherComFechamentoUtilizacaoInternacional()
 	$rs_publisher = SQLexecuteQuery($sql);
 	//echo pg_num_rows($rs_publisher)."<br>";
 	if (!$rs_publisher) {
-		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utiliza��o de PINs(" . $sql . ").<br>" . PHP_EOL;
+		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(" . $sql . ").<br>" . PHP_EOL;
 		return array();
 	}
 	if (pg_num_rows($rs_publisher) == 0) {
@@ -2071,7 +2071,7 @@ function levantamentoPublisherComFechamentoUtilizacaoMunicipal()
 	$rs_publisher = SQLexecuteQuery($sql);
 	//echo pg_num_rows($rs_publisher)."<br>";
 	if (!$rs_publisher) {
-		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utiliza��o de PINs(" . $sql . ").<br>" . PHP_EOL;
+		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(" . $sql . ").<br>" . PHP_EOL;
 		return array();
 	}
 	if (pg_num_rows($rs_publisher) == 0) {
@@ -2111,21 +2111,21 @@ function validaAlgoritimoCPF($cpf)
 	// Valida 1o digito
 	$add = 0;
 	for ($i = 0; $i < 9; $i++)
-		$add += (substr($cpf, $i, 1) * (10 - $i));
+		$add += ((int)substr($cpf, $i, 1) * (10 - $i));
 	$rev = 11 - ($add % 11);
 	if ($rev == 10 || $rev == 11)
 		$rev = 0;
-	if ($rev != (substr($cpf, 9, 1) * 1))
+	if ($rev != ((int)substr($cpf, 9, 1) * 1))
 		return false;
 
 	// Valida 2o digito
 	$add = 0;
 	for ($i = 0; $i < 10; $i++)
-		$add += substr($cpf, $i, 1) * (11 - $i);
+		$add += (int)substr($cpf, $i, 1) * (11 - $i);
 	$rev = 11 - ($add % 11);
 	if ($rev == 10 || $rev == 11)
 		$rev = 0;
-	if ($rev != (substr($cpf, 10, 1) * 1))
+	if ($rev != ((int)substr($cpf, 10, 1) * 1))
 		return false;
 
 	return true;
@@ -2133,7 +2133,7 @@ function validaAlgoritimoCPF($cpf)
 
 function modal_includes($fancybox = true)
 {
-	$url = "https://" . $_SERVER['SERVER_NAME'];
+	$url = "https://" . htmlspecialchars($_SERVER['SERVER_NAME'], ENT_QUOTES, 'UTF-8');
 
 	$html = '';
 

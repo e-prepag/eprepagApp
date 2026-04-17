@@ -1307,7 +1307,7 @@ class FPDF
 		$im = imagecreatefromgif($file);
 		if (!$im)
 			$this->Error('Missing or incorrect image file: ' . $file);
-		imageinterlace($im, 0);
+		imageinterlace($im, false);
 		$f = @fopen('php://temp', 'rb+');
 		if ($f) {
 			// Perform conversion in memory
