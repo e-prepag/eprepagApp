@@ -3,8 +3,8 @@ require_once '../../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
-$estado =  $_GET['estado'];
-$cidade =  $_GET['cidade'];
+$estado =  $_GET['estado'] ?? '';
+$cidade =  $_GET['cidade'] ?? '';
 $ps_query = "SELECT distinct ug_bairro, ug_cidade, ug_estado, count(*) as n  FROM dist_usuarios_games where ug_cidade = '$cidade' and ug_estado ='$estado' group by ug_bairro, ug_cidade, ug_estado;";	//  and ug_ativo = '1' 
 //echo $ps_query."<br>";
 /// todas as lan que estiverem nesse bairro

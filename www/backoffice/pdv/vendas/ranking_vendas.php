@@ -124,7 +124,7 @@ if(b_IsBKOUsuarioRankingLAN()) {
 
                         //die($sql);
 			$rs_venda = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_venda);
+			$total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
 
 
                         
@@ -175,7 +175,7 @@ require_once "/www/includes/bourls.php";
                 <td class="texto">
                     <select name="tf_u_estado" id="tf_u_estado" class="form2" class="field_dados">
                             <option value="" <?php if($tf_u_estado == "") echo "selected" ?>>Selecione</option>
-                    <?php for($i=0; $i < count($SIGLA_ESTADOS); $i++){ ?>
+                    <?php for($i=0; $i < (is_countable($SIGLA_ESTADOS) ? count($SIGLA_ESTADOS) : 0); $i++){ ?>
                             <option value="<?php echo $SIGLA_ESTADOS[$i] ?>" <?php if($tf_u_estado == $SIGLA_ESTADOS[$i]) echo "selected"; ?>><?php echo $SIGLA_ESTADOS[$i] ?></option>
                     <?php } ?>
                     </select>

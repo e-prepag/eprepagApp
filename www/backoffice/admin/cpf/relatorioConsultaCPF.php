@@ -102,6 +102,20 @@ if(isset($rs) && isset($BtnSearch)) {
         //Setando variaveis para captura no mês referência
         setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
         date_default_timezone_set('America/Fortaleza');
+        $mesesConsultaCpf = array(
+            1 => 'Janeiro',
+            2 => 'Fevereiro',
+            3 => 'Mar&ccedil;o',
+            4 => 'Abril',
+            5 => 'Maio',
+            6 => 'Junho',
+            7 => 'Julho',
+            8 => 'Agosto',
+            9 => 'Setembro',
+            10 => 'Outubro',
+            11 => 'Novembro',
+            12 => 'Dezembro'
+        );
                 
 ?>
 <div class="col-md-12 bg-cinza-claro">
@@ -125,7 +139,7 @@ if(isset($rs) && isset($BtnSearch)) {
                 $mesFechamento = mktime(0, 0, 0, $key, 1, $dd_ano*1);
         ?>
                 <tr class="trListagem"> 
-                    <td><?php echo ucfirst(strftime("%B",$mesFechamento)); ?></td>
+                    <td><?php $mesNumero = (int)date('n', $mesFechamento); echo isset($mesesConsultaCpf[$mesNumero]) ? $mesesConsultaCpf[$mesNumero] : date('m', $mesFechamento); ?></td>
                     <?php
                     ksort($value);
                     foreach($value as $chave => $valor) {

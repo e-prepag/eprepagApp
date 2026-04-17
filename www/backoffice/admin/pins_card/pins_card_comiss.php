@@ -103,7 +103,7 @@ if ($rs_pins) {
           </tr>
           <?php if($msg != ""){ ?>
           <tr bgcolor="#FFFFFF">
-            <td colspan="<?php echo (count($operacao_array)*2+2);?>"><font color="red" size="2"><?php echo str_replace("\n", "<br>", $msg)?></font></td>
+            <td colspan="<?php echo ((is_countable($operacao_array) ? count($operacao_array) : 0)*2+2);?>"><font color="red" size="2"><?php echo str_replace("\n", "<br>", $msg)?></font></td>
           </tr>
           <?php } 
 		  if (is_array($totais)) {

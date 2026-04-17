@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 header("Content-Type: text/html; charset=ISO-8859-1",true);
@@ -23,9 +24,9 @@ $pagina_titulo = "E-prepag - Créditos para Games";
 require_once '../../includes/constantes.php';
 
 $url = "https://";
-$url .= $_SERVER['SERVER_NAME'];
+$url .= ($_SERVER['SERVER_NAME'] ?? "");
 
-$webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "https://".($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "");
 require_once $raiz_do_projeto."includes/access_functions.php";
 require_once $raiz_do_projeto.'includes/configIP.php';
 require_once $raiz_do_projeto.'includes/configuracaoBO.php';
@@ -40,7 +41,7 @@ $qlpr_descricao	= isset($_POST['qlpr_descricao'])	? $_POST['qlpr_descricao']		: 
 $qlp_id			= isset($_POST['qlp_id'])			? $_POST['qlp_id']				: NULL;
 $qlpr_ativo		= isset($_POST['qlpr_ativo'])		? $_POST['qlpr_ativo']			: NULL;
 
-//echo "qlpr_descricao	= ".utf8_decode($qlpr_descricao[$qlp_id])." - ".$qlpr_descricao[$qlp_id]."<br>";
+//echo "qlpr_descricao	= ".backoffice_utf8_to_iso($qlpr_descricao[$qlp_id])." - ".$qlpr_descricao[$qlp_id]."<br>";
 //echo "qlp_id			= ".$qlp_id."<br>";
 //echo "qlpr_descricao	= <pre>".print_r($qlpr_descricao,true)."</pre><br>";
 //echo "qlpr_ativo		= <pre>".print_r($qlpr_ativo,true)."</pre><br>";
@@ -166,7 +167,7 @@ if(!empty($qlpr_descricao[$qlp_id])&&!empty($qlp_id)) {
 		$aux_qlp_ordem = "NULL";
 		$aux_qlpr_ativo = 0;
 	}
-	$sql ="insert into tb_questionarios_perguntas_respostas (qlp_id,qlpr_descricao,qlpr_ativo,qlpr_ordem) values ($qlp_id,'".utf8_decode($qlpr_descricao[$qlp_id])."',$aux_qlpr_ativo,$aux_qlp_ordem) ";
+	$sql ="insert into tb_questionarios_perguntas_respostas (qlp_id,qlpr_descricao,qlpr_ativo,qlpr_ordem) values ($qlp_id,'".backoffice_utf8_to_iso($qlpr_descricao[$qlp_id])."',$aux_qlpr_ativo,$aux_qlp_ordem) ";
 	/*
 	echo $sql."<br>";
 	if (function_exists('SQLexecuteQuery')) {

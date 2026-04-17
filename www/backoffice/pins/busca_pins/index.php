@@ -2,7 +2,7 @@
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
-$nome_operador = $_SESSION["userlogin_bko"];
+$nome_operador = $_SESSION["userlogin_bko"] ?? "";
 ?>
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

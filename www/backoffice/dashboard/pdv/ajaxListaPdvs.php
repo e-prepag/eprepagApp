@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header('Content-Type: application/json; charset=utf-8');
 require_once "/www/db/connect.php"; 
 require_once "/www/db/ConnectionPDO.php"; 
@@ -11,11 +12,10 @@ $result = $query->fetchAll(PDO::FETCH_ASSOC);
 
 $newResult = [];
 foreach($result as $key => $value){
-	$value["ug_nome_fantasia"] = utf8_encode($value["ug_nome_fantasia"]);
-	array_push($newResult, $value);
+        $value["ug_nome_fantasia"] = pdv_iso_to_utf8((string)($value["ug_nome_fantasia"] ?? ""));
+        array_push($newResult, $value);
 }
 
 echo json_encode($newResult);
 
 ?>
-

@@ -10,7 +10,7 @@ if(isset($_POST)){
 
         $select = "select * from classificacao_mapas where cm_nome = '".$_POST['cm_nome']."'";
         if($pegaRegDuplicado = SQLexecuteQuery($select)){
-            if(pg_num_rows($pegaRegDuplicado) == 0){
+            if((($pegaRegDuplicado) ? pg_num_rows($pegaRegDuplicado) : 0) == 0){
                 $insert = "insert into classificacao_mapas (cm_nome, cm_status, cm_data_cadastro, opr_codigo) values('%s', '%s', current_date, %s)"; //cm_id, cm_nome, cm_status, cm_data_cadastro, opr_codigo"
                 $sql = vsprintf($insert, array($_POST['cm_nome'],$_POST['cm_status'], $_POST['opr_codigo'])).";";
 

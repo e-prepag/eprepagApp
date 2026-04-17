@@ -63,7 +63,7 @@ if(isset($tf_v_nome_arq)){
 		<?php
 			$i=0;
 			if (isset($tf_v_nome_arq)) {
-				if(pg_num_rows($rs_pins) <> 0) {
+				if((($rs_pins) ? pg_num_rows($rs_pins) : 0) <> 0) {
 			?>
 				<tr bgcolor='#000000'><td colspan='5' height='1'></td></tr>
 				<tr bgcolor="F0F0F0">

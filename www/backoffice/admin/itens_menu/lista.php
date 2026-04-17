@@ -24,7 +24,7 @@ if ($con->isConnected()){
 
     $abas = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-    if(count($abas) > 0 && isset($_POST['aba']) && $_POST['aba']){
+    if((is_countable($abas) ? count($abas) : 0) > 0 && isset($_POST['aba']) && $_POST['aba']){
     
         $where = " where aba_id = ".$_POST['aba'];
         
@@ -43,7 +43,7 @@ if ($con->isConnected()){
             $rs = SQLexecuteQuery($sql);
 
             if($rs) {
-                $totalRegistros = pg_num_rows($rs);
+                $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
             }
         }else{
             
@@ -63,7 +63,7 @@ if ($con->isConnected()){
             $rs = SQLexecuteQuery($sql);
 
             if($rs) {
-                $totalRegistros = pg_num_rows($rs);
+                $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
             }
         }
         
@@ -175,7 +175,7 @@ if ($con->isConnected()){
             <tr class="opt trListagem" id="<?php echo $rs_row['item_id']; ?>">
                 <td><?php echo $rs_row['item_id']; ?></td>
                 <td><?php echo (@constant(trim($rs_row['item_descricao'])) === null) ? $rs_row['item_descricao'] : constant(trim($rs_row['item_descricao'])); ?></td>
-                <td><?php echo (strlen($rs_row['item_link']) > 60) ? substr($rs_row['item_link'],0,60)."..." : $rs_row['item_link']; ?></td>
+                <td><?php echo (strlen((string)($rs_row['item_link'] ?? "")) > 60) ? substr($rs_row['item_link'],0,60)."..." : $rs_row['item_link']; ?></td>
                 <td><?php echo $rs_row['item_monitor']; ?></td>
                 <td><?php echo (@constant(trim($rs_row['menu_descricao'])) === null) ? $rs_row['menu_descricao'] : constant(trim($rs_row['menu_descricao'])); ?></td>
                 <td><?php echo ($rs_row['item_aparece_menu'] == "1") ? "Sim" : "Não"; ?></td>

@@ -14,9 +14,9 @@ $formatos = array('jpg','jpeg','gif','png');
 
 if($acao == 'inserir')
 {
-	$ext	= explode('/',$_FILES['mat_promo_banner']['type']);
+	$ext	= explode('/', isset($_FILES['mat_promo_banner']['type']) ? $_FILES['mat_promo_banner']['type'] : '');
 
-	if(in_array($ext[1],$formatos)) {
+	if(isset($ext[1]) && in_array($ext[1],$formatos)) {
 		$pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/material_promocional/";
 		if(file_exists("$pasta".$_FILES["mat_promo_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor, renomear antes.<br>";
@@ -66,7 +66,7 @@ if($acao == 'inserir')
                     $sql .= "NULL,";
             }
             else {
-                    $sql .= "'".trim($mat_promo_ids_inclusao)."',";
+                    $sql .= "'".trim((string)($mat_promo_ids_inclusao ?? ""))."',";
             }
             $sql .= "   '$mat_promo_wallpapers',
                         '$mat_promo_cartaz',
@@ -85,11 +85,11 @@ if($acao == 'inserir')
 
 if($acao == 'atualizar')
 {
-	$ext	= explode('/',$_FILES['mat_promo_banner']['type']);
+	$ext	= explode('/', isset($_FILES['mat_promo_banner']['type']) ? $_FILES['mat_promo_banner']['type'] : '');
 
 	$mat_promo_banner = null;
         if(!empty($_FILES["mat_promo_banner"]["name"])) {
-            if(in_array($ext[1],$formatos)) {
+            if(isset($ext[1]) && in_array($ext[1],$formatos)) {
 
                         $pasta = $raiz_do_projeto."arquivos_gerados/imagens/pdv/material_promocional/";
                         if(file_exists("$pasta".$_FILES["mat_promo_banner"]["name"])){
@@ -107,11 +107,11 @@ if($acao == 'atualizar')
         $sql = "UPDATE dist_materiais_promocionais SET
 						mp_data_alteracao		= NOW(),
 						mp_descricao			= '".str_replace("'",'"',$mat_promo_nome_update)."',
-						mp_lista_ids_inclusao		= '".trim($mat_promo_ids_inclusao)."',
-                                                mp_wallpapers                   = '".trim($mat_promo_wallpapers)."',
-                                                mp_cartaz                       = '".trim($mat_promo_cartaz)."',
-                                                mp_torneios                     = '".trim($mat_promo_torneios)."',
-                                                mp_detalhes		= '".trim($mat_promo_detalhes)."',
+						mp_lista_ids_inclusao		= '".trim((string)($mat_promo_ids_inclusao ?? ""))."',
+                                                mp_wallpapers                   = '".trim((string)($mat_promo_wallpapers ?? ""))."',
+                                                mp_cartaz                       = '".trim((string)($mat_promo_cartaz ?? ""))."',
+                                                mp_torneios                     = '".trim((string)($mat_promo_torneios ?? ""))."',
+                                                mp_detalhes		= '".trim((string)($mat_promo_detalhes ?? ""))."',
                                                 ";
 	if (!empty($mat_promo_banner)) {
 		$sql .= "		mp_imagem_banner			= '".$mat_promo_banner."',";
@@ -162,7 +162,7 @@ if($acao == 'editar')
                 $mat_promo_cartaz       = $rs_material_promocional_row['mp_cartaz'];
                 $mat_promo_torneios     = $rs_material_promocional_row['mp_torneios'];
                 $mat_promo_detalhes     = $rs_material_promocional_row['mp_detalhes'];
-		if (pg_num_rows($rs_material_promocional) > 0)
+		if ((($rs_material_promocional) ? pg_num_rows($rs_material_promocional) : 0) > 0)
 			require_once 'material_promocional_edt.php';
 		else
 			$acao = 'listar';

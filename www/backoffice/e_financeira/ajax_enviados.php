@@ -1,5 +1,6 @@
 <?php
 require_once '/www/includes/constantes.php';
+require_once __DIR__ . "/../includes/encoding.php";
 require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 // Requer conexão com banco, supondo que você use algo como $pdo ou funções nativas
@@ -105,14 +106,14 @@ foreach ($resultados as $row) {
     if (!empty($data_anomes_fmt)) {
         if ($row['tipo'] === 'MOVIMENTACAO' && strpos($data_anomes_fmt, '-') !== false) {
             // 2024-03 -> 03/2024
-            $partes = explode('-', $data_anomes_fmt);
-            if (count($partes) >= 2) {
+            $partes = explode('-', (string)($data_anomes_fmt ?? ""));
+            if ((is_countable($partes) ? count($partes) : 0) >= 2) {
                 $data_anomes_fmt = $partes[1] . '/' . $partes[0];
             }
         } elseif (($row['tipo'] === 'ABERTURA' || $row['tipo'] === 'FECHAMENTO') && strpos($data_anomes_fmt, '_') !== false) {
             // 2024-07-01_2024-12-31 -> 01/07/24 - 31/12/24
-            $partes = explode('_', $data_anomes_fmt);
-            if (count($partes) === 2) {
+            $partes = explode('_', (string)($data_anomes_fmt ?? ""));
+            if ((is_countable($partes) ? count($partes) : 0) === 2) {
                 $d1 = date('d/m/y', strtotime($partes[0]));
                 $d2 = date('d/m/y', strtotime($partes[1]));
                 $data_anomes_fmt = $d1 . ' - ' . $d2;
@@ -161,7 +162,7 @@ function converterArrayParaUtf8($dado)
         // A MÁGICA AQUI: Verifica se a string NÃO é um UTF-8 válido.
         // Se falhar no teste, sabemos que veio do banco em ISO-8859-1 e precisa converter.
         if (!mb_check_encoding($dado, 'UTF-8')) {
-            return mb_convert_encoding($dado, 'UTF-8', 'ISO-8859-1');
+            return backoffice_iso_to_utf8($dado);
         }
 
         // Se já for UTF-8 (ou não tiver acentos), devolve do jeito que está

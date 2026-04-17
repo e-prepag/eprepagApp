@@ -13,7 +13,7 @@
 
 $rs_concilia = SQLexecuteQuery($sql);
 
-    if($rs_concilia && pg_num_rows($rs_concilia) > 0)
+    if($rs_concilia && (($rs_concilia) ? pg_num_rows($rs_concilia) : 0) > 0)
     {
 ?>
         <table class="table  table-striped top10">

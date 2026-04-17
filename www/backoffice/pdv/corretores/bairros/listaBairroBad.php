@@ -8,7 +8,7 @@ $ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games group by ug_bair
 //pg_send_query($conex,$ps_query);
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 
 $ps_query = "SELECT distinct ug_bairro, count (ug_bairro) as total, ug_cidade, ug_estado  FROM dist_usuarios_games where ug_bairro !~ '^[A-Z][a-z]+ [A-Z][a-z] |[A-Z][a-z]' group by ug_bairro,ug_cidade,ug_estado order by ug_bairro";
@@ -22,7 +22,7 @@ $ps_query = "SELECT distinct ug_bairro, count (ug_bairro) as total, ug_cidade, u
 $res1 = SQLexecuteQuery($ps_query);
 
 
-$bad = pg_num_rows($res1);
+$bad = (($res1) ? pg_num_rows($res1) : 0);
 echo "Total: $bad - $total <br>";
 
 while ($info = pg_fetch_array($res1)) {

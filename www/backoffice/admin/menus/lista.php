@@ -20,7 +20,7 @@ $sql = "SELECT * FROM bo_menu inner join bo_aba on bo_menu.aba_id = bo_aba.aba_i
 $rs = SQLexecuteQuery($sql);
 
 if($rs) {
-    $totalRegistros = pg_num_rows($rs);
+    $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
 }
 else $totalRegistros = 0;
 

@@ -93,7 +93,7 @@ require_once "/www/includes/bourls.php";
                     <tr>
                       <td align="center">
                         <font size="2" face="Arial, Helvetica, sans-serif" color="#FF0000">
-                          <b>A sessão expirou</b>
+                          <b>A sessï¿½o expirou</b>
                         </font>
                       </td>
                     </tr>
@@ -110,7 +110,7 @@ require_once "/www/includes/bourls.php";
                     </tr>
                   </table>
                 <?php  } ?>
-                <?php if ($_GET['erro']) { ?>
+                <?php if (isset($_GET['erro']) && $_GET['erro']) { ?>
                   <table width="78%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                       <td align="center">
@@ -118,16 +118,16 @@ require_once "/www/includes/bourls.php";
                           <?php
                           switch ($_GET['erro']) {
                             case 1:
-                              echo "<b>Cadastro de autenticador necessário</b>";
+                              echo "<b>Cadastro de autenticador necessï¿½rio</b>";
                               break;
                             case 2:
-                              echo "<b>Usuário inválido</b>";
+                              echo "<b>Usuï¿½rio invï¿½lido</b>";
                               break;
                             case 3:
-                              echo "<b>Impossível</b>";
+                              echo "<b>Impossï¿½vel</b>";
                               break;
                             case 4:
-                              echo "<b>Token inválido</b>";
+                              echo "<b>Token invï¿½lido</b>";
                               break;
                           }
                           ?>
@@ -149,7 +149,7 @@ require_once "/www/includes/bourls.php";
         </div>
       </td>
       <td width="300">
-        <div align="right" class="text-info"><b>Versão <?php echo $major_version . "." . $minor_version . "." . $release . "." . $build ?></b></div>
+        <div align="right" class="text-info"><b>Versï¿½o <?php echo $major_version . "." . $minor_version . "." . $release . "." . $build ?></b></div>
       </td>
     </tr>
   </table>
@@ -159,7 +159,7 @@ require_once "/www/includes/bourls.php";
       $("#formLog").submit((e) => {
         e.preventDefault();
 
-        // Envia os dados do formulário via AJAX para ajax_login_aut.php, exibe o resultado no body e chama o modal
+        // Envia os dados do formulï¿½rio via AJAX para ajax_login_aut.php, exibe o resultado no body e chama o modal
         $.ajax({
           url: 'ajax_login_aut.php',
           type: 'POST',

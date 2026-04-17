@@ -2,6 +2,7 @@
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL);
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 header('Content-Type: application/json; charset=utf-8');
 require_once "/www/db/connect.php"; 
 require_once "/www/db/ConnectionPDO.php"; 
@@ -9,23 +10,23 @@ $connection = ConnectionPDO::getConnection()->getLink();
 
 $myPeriodo = "";
 
-switch($_POST["periodo"]) {
-	
-	case 'week':
-		$myPeriodo = "1 week";
-		break;
-		
-	case 'day':
-		$myPeriodo = "15 day";
-		break;
-		
-	case 'month':
-		$myPeriodo = "1 month";
-		break;
-	
-	default:
-		$myPeriodo = "1 week";
-		break;
+switch((string)($_POST["periodo"] ?? "")) {
+
+        case 'week':
+                $myPeriodo = "1 week";
+                break;
+
+        case 'day':
+                $myPeriodo = "15 day";
+                break;
+
+        case 'month':
+                $myPeriodo = "1 month";
+                break;
+
+        default:
+                $myPeriodo = "1 week";
+                break;
 }
 
 $sql = "select sum(vgm_qtde) as quantidade, vgm_nome_produto as nome from tb_dist_venda_games inner 
@@ -40,8 +41,8 @@ $result = $query->fetchAll(PDO::FETCH_ASSOC);
 $newResult = [];
 
 foreach($result as $key => $value){
-	$value["nome"] = utf8_encode($value["nome"]);
-	array_push($newResult, $value);
+        $value["nome"] = pdv_iso_to_utf8((string)($value["nome"] ?? ""));
+        array_push($newResult, $value);
 }
 
 echo json_encode($newResult);

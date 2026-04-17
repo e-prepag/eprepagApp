@@ -139,7 +139,7 @@ $rs_estornos = SQLexecuteQuery($sql);
     </div>
     <div class="panel-body">
 <?php
-        if(pg_num_rows($rs_estornos) > 0){
+        if((($rs_estornos) ? pg_num_rows($rs_estornos) : 0) > 0){
 ?>
             <table class="table">
                 <thead>

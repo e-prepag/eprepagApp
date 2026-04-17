@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 require_once "/www/includes/constantes.php";
 require_once "/www/includes/gamer/functions.php";
 require_once "/www/db/connect.php";
@@ -13,7 +13,7 @@ require_once "/www/class/pdv/classChaveMestra.php";
 
 $envia_email = new EnvioEmailAutomatico('P', 'ChaveMestra');
 
-$id = $_POST["id"];
+$id = $_POST["id"] ?? '';
 
 $conexao = ConnectionPDO::getConnection()->getLink();
 
@@ -30,7 +30,7 @@ if($retorno != false){
 	$to = strtolower($retorno["ug_email"]);
 	$cc = ""; 
 	$bcc = "";
-	$subject = utf8_decode("E-prepag - Código de Segundo Fator de Autenticação");
+	$subject = pdv_utf8_to_iso("E-prepag - Código de Segundo Fator de Autenticação");
 	$msg = $envia_email->getCorpoEmail();
 
 	$retorno = enviaEmail3($to, $cc, $bcc, $subject, $msg, "");

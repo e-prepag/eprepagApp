@@ -8,7 +8,7 @@ $ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games ";
 //pg_send_query($conex,$ps_query);
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 
 
@@ -24,7 +24,7 @@ $ps_query = "SELECT distinct ug_bairro,ug_cidade, count (ug_bairro) as total, ug
 //$res1 = pg_get_result($conex);
 $res1 = SQLexecuteQuery($ps_query);
 
-$ok = pg_num_rows($res1);
+$ok = (($res1) ? pg_num_rows($res1) : 0);
 
 echo "Total: $ok - $total <br>";
 

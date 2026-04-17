@@ -71,11 +71,11 @@ $rsResposta = SQLexecuteQuery($sql);
 ?>
 <table width="100%" border="0" align="center" class="texto">
 <?php
-if((pg_num_rows($rsResposta) != 0) && ($rsResposta)) {
+if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>
-        <td align="left" colspan="4"><?php echo "Encontrado".((pg_num_rows($rsResposta)>0)?"s":"")." ".pg_num_rows($rsResposta)." registro".((pg_num_rows($rsResposta)>0)?"s":"")."";?></td>
+        <td align="left" colspan="4"><?php echo "Encontrado".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")." ".(($rsResposta) ? pg_num_rows($rsResposta) : 0)." registro".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")."";?></td>
         <td align="center">&nbsp;</td>
     </tr>
 	<tr>

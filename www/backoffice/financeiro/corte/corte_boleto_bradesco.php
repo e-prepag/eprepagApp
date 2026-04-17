@@ -8,7 +8,7 @@
 
 	//Valida codigo do boleto
 	if($msg == ""){
-		if(!$bbc_boleto_codigo || trim($bbc_boleto_codigo) == "" || !is_numeric($bbc_boleto_codigo)) $msg = "Código do boleto inválido.\n";
+		if(!$bbc_boleto_codigo || trim((string)($bbc_boleto_codigo ?? "")) == "" || !is_numeric($bbc_boleto_codigo)) $msg = "Código do boleto inválido.\n";
 	}
 
 	//Busca dados do boleto
@@ -17,8 +17,8 @@
 				inner join cortes c on c.cor_codigo = bbc.bbc_cor_codigo
 				where bbc.bbc_boleto_codigo = $bbc_boleto_codigo";
 		$rs_boleto = SQLexecuteQuery($sql);
-		if(!$rs_boleto) $msg = "Erro ao buscar boleto.\n";
-		elseif(pg_num_rows($rs_boleto) == 0) $msg = "Nenhum boleto encontrado.\n";
+		if(!isset($rs_boleto) || !$rs_boleto) $msg = "Erro ao buscar boleto.\n";
+		elseif((($rs_boleto) ? pg_num_rows($rs_boleto) : 0) == 0) $msg = "Nenhum boleto encontrado.\n";
 		else {
 			$rs_boleto_row = pg_fetch_array($rs_boleto);
   			$bbc_bco_codigo = $rs_boleto_row['bbc_bco_codigo'];
@@ -36,7 +36,7 @@
 			if($bbc_bco_codigo != $GLOBALS['BOLETO_COD_BANCO_BRADESCO']) $msg = "Boleto não é do Bradesco.\n";
 			
 			//usuario
-			if(!$bbc_ug_id || trim($bbc_ug_id) == "" || !is_numeric($bbc_ug_id)) $msg = "Código do usuário inválido.\n";
+			if(!$bbc_ug_id || trim((string)($bbc_ug_id ?? "")) == "" || !is_numeric($bbc_ug_id)) $msg = "Código do usuário inválido.\n";
 		}
 	}
 
@@ -44,7 +44,7 @@
 	if($msg == ""){
 		$sql  = "select * from dist_usuarios_games ug where ug.ug_id = " . $bbc_ug_id;
 		$rs_estab = SQLexecuteQuery($sql);
-		if(!$rs_estab || pg_num_rows($rs_estab) == 0) $msg = "Nenhum usuário encontrado.\n";
+		if(!$rs_estab || (($rs_estab) ? pg_num_rows($rs_estab) : 0) == 0) $msg = "Nenhum usuário encontrado.\n";
 		else {
 			$rs_estab_row = pg_fetch_array($rs_estab);
 
@@ -55,12 +55,12 @@
 			else $sacado = $ug_razao_social;
 			$endereco 		= $rs_estab_row['ug_endereco'];
 			$numero 		= $rs_estab_row['ug_numero'];
-			if(trim($numero) != "") $endereco .= ", " . trim($numero);
+			if(trim((string)($numero ?? "")) != "") $endereco .= ", " . trim((string)($numero ?? ""));
 			$complemento	= $rs_estab_row['ug_complemento'];
-			if(trim($complemento) != "") $endereco .= " - " . trim($complemento);
+			if(trim((string)($complemento ?? "")) != "") $endereco .= " - " . trim((string)($complemento ?? ""));
 			$bairro 		= $rs_estab_row['ug_bairro'];
 			$municipio 		= $rs_estab_row['ug_cidade'];
-			if(trim($bairro) != "") $bairro .= " - " . trim($municipio);
+			if(trim((string)($bairro ?? "")) != "") $bairro .= " - " . trim((string)($municipio ?? ""));
 			$uf 			= $rs_estab_row['ug_estado'];
 			$cep 			= $rs_estab_row['ug_cep'];
 		}

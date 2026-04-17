@@ -181,7 +181,7 @@ function isTipo(pVal)
                     <td>* <?php if(!empty($promolh_banner)) { echo "Alterar o Banner"; } else { echo "Upload do Banner"; } ?>:</td>
                     <td>
                         <input type="file" name="promolh_banner" id="promolh_banner" size="50" />&nbsp; Formatos Permitidos (<?php
-                        for($i=0;$i<count($formatos);$i++){
+                        for($i=0;$i<(is_countable($formatos) ? count($formatos) : 0);$i++){
                                 if ($i==0)
                                         echo $formatos[$i];
                                 else echo ", ".$formatos[$i];
@@ -206,7 +206,7 @@ function isTipo(pVal)
 				<tr>
                     <td>* Regulamento da Promo&ccedil;&atilde;o:</td>
                     <td>
-                            <textarea name="promolh_regulamento" id="promolh_regulamento" cols="80" rows="5"><?php if(isset($promolh_regulamento)) echo trim($promolh_regulamento); ?></textarea></td>
+                            <textarea name="promolh_regulamento" id="promolh_regulamento" cols="80" rows="5"><?php if(isset($promolh_regulamento)) echo trim((string)($promolh_regulamento ?? "")); ?></textarea></td>
                     </td>
                 </tr>
                 <tr>

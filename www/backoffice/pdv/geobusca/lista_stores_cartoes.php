@@ -32,7 +32,7 @@ $sqlRelacao = "select * from classificacao_mapas_pdv";
 
 //echo "$sql<br>";
 $rss = SQLexecuteQuery($sql);
-$tot = pg_num_rows($rss);
+$tot = (($rss) ? pg_num_rows($rss) : 0);
 
 $rssCM = SQLexecuteQuery($sqlCM);
 
@@ -241,7 +241,7 @@ if(isset($msg))
                     break;
                 default: 
                     $statusMaps_descr = "Tipo Desconhecido";
-                    if(strlen(trim($statusMaps))==0) $statusMaps_descr .= " (Empty)";
+                    if(strlen(trim((string)($statusMaps ?? "")))==0) $statusMaps_descr .= " (Empty)";
                     else $statusMaps_descr .= " ('$statusMaps')";
                     break;
             }
@@ -255,7 +255,7 @@ if(isset($msg))
                 $statusMaps_descr .= "\n[".number_format($valores['us_coord_lat'], 2, '.', '.').", ".number_format($valores['us_coord_lng'], 2, '.', '.')."]";
             }
             
-            if(trim($statusMaps)=="") 
+            if(trim((string)($statusMaps ?? ""))=="") 
             {
                 if($valores['us_coord_lat']==0 && $valores['us_coord_lng']==0) 
                 {

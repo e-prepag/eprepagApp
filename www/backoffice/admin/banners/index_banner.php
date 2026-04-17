@@ -7,7 +7,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 // [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/connect.php';
 // [SFTP DESATIVADO] require_once $raiz_do_projeto.'sftp/classSFTPconnection.php';
 
-$bds_banner = $_FILES["bds_banner"]["name"] ?: null;
+$bds_banner = isset($_FILES["bds_banner"]["name"]) ? $_FILES["bds_banner"]["name"] : null;
 
 $acao	= isset($_REQUEST['acao']) ? $_REQUEST['acao'] : 'listar';
 
@@ -30,9 +30,9 @@ if(isset($_SESSION['userlogin_bko']) && !is_null($_SESSION['userlogin_bko'])){
 }
 if($acao == 'inserir')
 {
-	$ext	= explode('/',$_FILES['bds_banner']['type']);
+	$ext	= explode('/', isset($_FILES['bds_banner']['type']) ? $_FILES['bds_banner']['type'] : '');
 
-	if(in_array($ext[1],$formatos)) {
+	if(isset($ext[1]) && in_array($ext[1],$formatos)) {
 		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["bds_banner"]["name"])){
 			$msg .= "<span class='txt-vermelho'>Imagem de Banner já existe com este mesmo nome.<br>Favor, renomear antes.</span><br>";
@@ -75,19 +75,19 @@ if($acao == 'inserir')
 		$sql .= "NULL,";
 	}
 	else {
-		$sql .= "'".trim($bds_ids_inclusao)."',";
+		$sql .= "'".trim((string)($bds_ids_inclusao ?? ''))."',";
 	}
 	if (empty($bds_ids_exclusao)) {
 		$sql .= "NULL,";
 	}
 	else {
-		$sql .= "'".trim($bds_ids_exclusao)."',";
+		$sql .= "'".trim((string)($bds_ids_exclusao ?? ''))."',";
 	}
 	if (empty($bds_link)) {
 		$sql .= "NULL,";
 	}
 	else {
-		$sql .= "'".trim($bds_link)."',";
+		$sql .= "'".trim((string)($bds_link ?? ''))."',";
 	}
 	if (empty($bds_ativo)) {
 		$sql .= "0);";
@@ -107,7 +107,7 @@ if($acao == 'atualizar')
 	if(!empty($vetor_ordem)) {	}//end if(!empty($vetor_ordem))
 	
 	if(!empty($_FILES["bds_banner"]["name"])) {
-		$ext	= explode('/',$_FILES['bds_banner']['type']);
+		$ext	= explode('/', isset($_FILES['bds_banner']['type']) ? $_FILES['bds_banner']['type'] : '');
 		$pasta = "/www/arquivos_gerados/imagens/banners/";
 		if(file_exists("$pasta".$_FILES["bds_banner"]["name"])){
 			$msg .= "<span class='txt-vermelho'>Imagem de Banner já existe com este mesmo nome.<br>Favor, renomear antes.</span><br>";
@@ -116,7 +116,7 @@ if($acao == 'atualizar')
 		else {
 			move_uploaded_file($_FILES["bds_banner"]["tmp_name"],"$pasta".$_FILES["bds_banner"]["name"]);
 		}
-		if(!in_array($ext[1],$formatos)) {
+		if(!isset($ext[1]) || !in_array($ext[1],$formatos)) {
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
 		}
 	}
@@ -127,8 +127,8 @@ if($acao == 'atualizar')
 						bds_tipo					= $bds_tipo,
 						bds_tipo_usuario			= '$bds_tipo_usuario',
 						bds_usuario_bko_responsavel	= '$bds_usuario_bko',
-						bds_lista_ids_inclusao		= '".trim($bds_ids_inclusao)."',
-						bds_lista_ids_exclusao		= '".trim($bds_ids_exclusao)."',";
+						bds_lista_ids_inclusao		= '".trim((string)($bds_ids_inclusao ?? ''))."',
+						bds_lista_ids_exclusao		= '".trim((string)($bds_ids_exclusao ?? ''))."',";
 	if (!empty($bds_banner)) {
 		$sql .= "		bds_imagem_banner			= '".$bds_banner."',";
 	}
@@ -189,7 +189,7 @@ if($acao == 'editar')
 		$bds_banner			= $rs_banner_row['bds_imagem_banner'];
 		$bds_tipo_usuario	= $rs_banner_row['bds_tipo_usuario'];
 		$bds_link			= $rs_banner_row['bds_link'];
-		if (pg_num_rows($rs_banner) > 0)
+		if ((($rs_banner) ? pg_num_rows($rs_banner) : 0) > 0)
 			include 'banner_edt.php';
 		else
 			$acao = 'listar';

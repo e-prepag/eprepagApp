@@ -16,6 +16,17 @@ header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
+function admin_ajax_pix_to_utf8($value) {
+    if (!is_string($value) || $value === '') {
+        return $value;
+    }
+    if (preg_match('//u', $value)) {
+        return $value;
+    }
+    $converted = function_exists('iconv') ? @iconv('ISO-8859-1', 'UTF-8//IGNORE', $value) : false;
+    return ($converted !== false) ? $converted : $value;
+}
+
 
 
 
@@ -26,7 +37,7 @@ try {
     $dataInicio = isset($_GET['data_inicio']) ? $_GET['data_inicio'] . ' 00:00:00' : date('Y-m-01 00:00:00');
 $dataFim = isset($_GET['data_fim']) ? $_GET['data_fim'] . ' 23:59:59' : date('Y-m-d 23:59:59');
 
-    $tipo = $_GET['tipo'] ? $_GET['tipo']: 'todos';
+    $tipo = isset($_GET['tipo']) ? $_GET['tipo']: 'todos';
  // Força UTF-8 na conexão com o banco
 
     // Consulta SQL
@@ -71,9 +82,7 @@ WHERE p.data_inclusao BETWEEN :data_inicio AND :data_fim
     $pagamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
   // Corrige caracteres UTF-8
   array_walk_recursive($pagamentos, function (&$item) {
-    if (is_string($item) && !mb_detect_encoding($item, 'UTF-8', true)) {
-        $item = utf8_encode($item);
-    }
+    $item = admin_ajax_pix_to_utf8($item);
 });
 
 // Retorna JSON corretamente formatado

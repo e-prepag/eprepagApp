@@ -15,7 +15,7 @@ function buscanovidade($imagem_search) {
 	$sql = "SELECT * FROM tbnovidade WHERE imagem LIKE '%".$imagem_search."%'";
 	//echo $sql.';<br>';
 	$rss = SQLexecuteQuery($sql);
-	$tot = pg_num_rows($rss);
+	$tot = (($rss) ? pg_num_rows($rss) : 0);
 	
 	if($tot == 0) {
 		return $tot;
@@ -86,7 +86,8 @@ function buscanovidade($imagem_search) {
                             <td align="center"><nobr>
 							<?php
                             if($novidade != '0') {
-								echo utf8_decode($novidade); 
+								$novidade_iso = function_exists("iconv") ? @iconv("UTF-8", "ISO-8859-1//TRANSLIT", $novidade) : false;
+					echo ($novidade_iso !== false) ? $novidade_iso : $novidade; 
 							}
                             ?>
 		                        </nobr></td>

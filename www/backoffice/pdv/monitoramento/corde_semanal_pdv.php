@@ -6,7 +6,7 @@ $s_corte_dia_da_semana = "";
 //	$sql_corte_dia_da_semana  = "select count(*) as qtde from dist_usuarios_games where ug_ativo = 2 and ug_qtde_acessos = 0";
 $sql_corte_dia_da_semana  = "select ug_perfil_corte_dia_semana, count(*) as qtde from dist_usuarios_games where ug_ativo = 1 group by ug_perfil_corte_dia_semana order by ug_perfil_corte_dia_semana";
 $rs_corte_dia_da_semana = SQLexecuteQuery($sql_corte_dia_da_semana);
-if($rs_corte_dia_da_semana && pg_num_rows($rs_corte_dia_da_semana) > 0){
+if($rs_corte_dia_da_semana && (($rs_corte_dia_da_semana) ? pg_num_rows($rs_corte_dia_da_semana) : 0) > 0){
         $s_corte_dia_da_semana = "<table class='table table-bordered top10' title='Número de Lans ativas com Corte em cada dia da semana'>\n";
         $scol1 = "#C8C9E1";
         $scol2 = "#B6C8DC";

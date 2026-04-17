@@ -92,7 +92,7 @@ $sql = "SELECT
 		opr_nome,
 		(case ";
 foreach($PRODUCT_TYPE as $key => $val) {
-	$sql .= "when (opr_product_type=".$key.") then ('<nobr>".substr($val, 0, 34)."</nobr>') ";
+	$sql .= "when (opr_product_type=".$key.") then ('<nobr>".substr((string)($val ?? ""), 0, 34)."</nobr>') ";
 }
 $sql .=" end) as opr_product_type,
 		(case ";
@@ -114,7 +114,7 @@ if (is_array($sql_aux)) {
 }
 //echo $sql."<br>";
 // instancia classe para listagem
-$lista = new tabelaLista($sql, $_SERVER['PHP_SELF'], isset($paginacao) ? $paginacao : null, $inicio, $limite, $sort, $dir, $objBotoes);
+$lista = new tabelaLista($sql, ($_SERVER['PHP_SELF'] ?? ""), isset($paginacao) ? $paginacao : null, $inicio, $limite, $sort, $dir, $objBotoes);
 
 // campos a serem listados => headers
 $camposTabela = array(

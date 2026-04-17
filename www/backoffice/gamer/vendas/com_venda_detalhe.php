@@ -9,7 +9,20 @@ require_once "/www/includes/bourls.php";
 
 	set_time_limit ( 300 ) ;
 
-$venda_id = $_GET['venda_id'] ?? null;
+$venda_id = $_GET['venda_id'] ?? $_POST['venda_id'] ?? null;
+$acao = $_REQUEST['acao'] ?? null;
+$v_campo = $_REQUEST['v_campo'] ?? null;
+$v_valor_new = $_REQUEST['v_valor_new'] ?? null;
+$BtnCancelar = $_POST['BtnCancelar'] ?? null;
+$BtnDescancelar = $_POST['BtnDescancelar'] ?? null;
+$BtnConcilia = $_POST['BtnConcilia'] ?? null;
+$BtnProcessa = $_POST['BtnProcessa'] ?? null;
+$BtnListaHistorico = $_REQUEST['BtnListaHistorico'] ?? null;
+$iduser_bko = $_SESSION['iduser_bko'] ?? 0;
+$usuario_obs = $_POST['usuario_obs'] ?? null;
+$ultimo_status_obs = $_POST['ultimo_status_obs'] ?? null;
+$concilia_pagto_tipo = $_POST['concilia_pagto_tipo'] ?? null;
+$concilia_cod_sel = $_POST['concilia_cod_sel'] ?? null;
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -282,7 +295,7 @@ if($bDebug) echo "Elapsed time (A0): ".number_format(getmicrotime() - $time_star
 				\n";
 		$sql .= "where vg.vg_id = " . $venda_id;
 		$rs_venda = SQLexecuteQuery($sql);
-		if(!$rs_venda || pg_num_rows($rs_venda) == 0) $msg = "Nenhuma venda encontrada.\n";
+		if(!$rs_venda || !$rs_venda || pg_num_rows($rs_venda) == 0) $msg = "Nenhuma venda encontrada.\n";
 			$rs_venda_row = pg_fetch_array($rs_venda);
 			$vg_ug_id 				= $rs_venda_row['vg_ug_id'];
 			$vg_ultimo_status 		= $rs_venda_row['vg_ultimo_status'];
@@ -322,10 +335,10 @@ if($bDebug) echo "Elapsed time (A1): ".number_format(getmicrotime() - $time_star
 				"inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
 				"where vg.vg_id = " . $venda_id;
 		$rs_venda_modelos = SQLexecuteQuery($sql);
-		if(!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado (ND43).\n";
+		if(!$rs_venda_modelos || !$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado (ND43).\n";
 		else {
 			$total_geral = 0; $qtde_itens = 0; $qtde_produtos = 0; $vgm_pin_codinterno = "";
-			while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)){
+			while ($rs_venda_modelos && ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos))){
 				$qtde = $rs_venda_modelos_row['vgm_qtde'];
 				$valor = $rs_venda_modelos_row['vgm_valor'];
 				$vgm_pin_codinterno .= $rs_venda_modelos_row['vgm_pin_codinterno'];
@@ -366,7 +379,7 @@ if($bDebug) echo "Elapsed time (A2a): ".number_format(getmicrotime() - $time_sta
 		$sql  = "select * from usuarios_games ug " .
 				"where ug.ug_id = " . $vg_ug_id;
 		$rs_usuario = SQLexecuteQuery($sql);
-		if(!$rs_usuario || pg_num_rows($rs_usuario) == 0) $msg = "Nenhum cliente encontrado.\n";
+		if(!$rs_usuario || !$rs_usuario || pg_num_rows($rs_usuario) == 0) $msg = "Nenhum cliente encontrado.\n";
 		else {
 			$rs_usuario_row = pg_fetch_array($rs_usuario);
 			$ug_email = $rs_usuario_row['ug_email'];
@@ -393,7 +406,7 @@ if($bDebug) echo "Elapsed time (A3): ".number_format(getmicrotime() - $time_star
 			$sql  = "select * from boleto_bancario_games bbg " .
 					"where bbg.bbg_vg_id = " . $venda_id;
 			$rs_boleto = SQLexecuteQuery($sql);
-			if(!$rs_boleto || pg_num_rows($rs_boleto) == 0) $msg = "Nenhum boleto encontrado.\n";
+			if(!$rs_boleto || !$rs_boleto || pg_num_rows($rs_boleto) == 0) $msg = "Nenhum boleto encontrado.\n";
 			else {
 				$rs_boleto_row = pg_fetch_array($rs_boleto);
 				$bbg_boleto_codigo = $rs_boleto_row['bbg_boleto_codigo'];
@@ -411,7 +424,7 @@ if($bDebug) echo "Elapsed time (A3): ".number_format(getmicrotime() - $time_star
 			$sql  = "select * from tb_venda_games_redecard vgrc " .
 					"where vgrc.vgrc_vg_id = " . $venda_id;
 			$rs_redecard = SQLexecuteQuery($sql);
-			if(!$rs_redecard || pg_num_rows($rs_redecard) == 0) $msg = "Nenhum redecard encontrado.\n";
+			if(!$rs_redecard || !$rs_redecard || pg_num_rows($rs_redecard) == 0) $msg = "Nenhum redecard encontrado.\n";
 			else {
 				$rs_redecard_row = pg_fetch_array($rs_redecard);
 				$vgrc_id = $rs_redecard_row['vgrc_id'];
@@ -465,7 +478,7 @@ if($bDebug) echo "Elapsed time (A4): ".number_format(getmicrotime() - $time_star
 				$sql  = "select * from usuarios urpp " .
 						"where urpp.id = '" . $vg_user_id_concilia . "'";
 				$rs_urpp = SQLexecuteQuery($sql);
-				if(!$rs_urpp || pg_num_rows($rs_urpp) == 0){
+				if(!$rs_urpp || !$rs_urpp || pg_num_rows($rs_urpp) == 0){
 					$shn_nome = "Anonymous";
 				} else {
 					$rs_urpp_row = pg_fetch_array($rs_urpp);
@@ -593,7 +606,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 					</tr>
 		<?php
 				$total_geral = 0;
-				while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)){
+				while ($rs_venda_modelos && ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos))){
 					$qtde = $rs_venda_modelos_row['vgm_qtde'];
 					$valor = $rs_venda_modelos_row['vgm_valor'];
 					$total_geral += $valor*$qtde;
@@ -644,7 +657,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 //echo $opr_codigo_Alawar."<br>";
             if(isset($rs_venda_modelos) && $rs_venda_modelos){
                 pg_result_seek($rs_venda_modelos, 0);
-				while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)){
+				while ($rs_venda_modelos && ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos))){
 					$vgm_pin_codinterno = $rs_venda_modelos_row['vgm_pin_codinterno'];
 					$vgm_opr_codigo = $rs_venda_modelos_row['vgm_opr_codigo'];
 					$vgm_valor = $rs_venda_modelos_row['vgm_valor'];

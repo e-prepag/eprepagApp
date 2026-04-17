@@ -9,7 +9,7 @@ require_once $raiz_do_projeto."includes/pdv/inc_campeonato.php";
 
 //echo "<pre>".print_r($_POST,true)."</pre>";
 
-	if(!$vg_id_selected) $vg_id_selected = $_POST['vg_id_selected'];
+	if(empty($vg_id_selected)) $vg_id_selected = $_POST['vg_id_selected'] ?? '';
 	if($vg_id_selected) {
 
 		$sql  = "select ug_email from dist_usuarios_games where ug_id = $vg_id_selected";
@@ -39,7 +39,7 @@ echo "Manda email aviso para $vg_id_selected - $ug_email<br>";
 //echo str_replace("\n", "<br>\n", $sql);	
 
 	$rs_logins = SQLexecuteQuery($sql);
-	$n_lans = pg_num_rows($rs_logins);
+	$n_lans = (($rs_logins) ? pg_num_rows($rs_logins) : 0);
 ?>
 <style>
 .botao_avisa_pendente {
@@ -97,7 +97,7 @@ function avisa_lh(vg_id, b_aceito) {
   <td width="100%" valign="top">
 	<?php
 	
-	if($rs_logins && pg_num_rows($rs_logins) > 0){
+	if($rs_logins && (($rs_logins) ? pg_num_rows($rs_logins) : 0) > 0){
 		echo "<p>Lista de Lans cadastradas para participar no Campeonato</p>";
 		echo "<p>Na coluna da direita os botões aparecem em vermelho para as Lans que ainda não aceitaram os Termos e a coluna 'Aceito?' indica isso.</p>";
 		echo "<p>Total de PDVs encontrados: $n_lans</p>\n";
@@ -144,8 +144,8 @@ function avisa_lh(vg_id, b_aceito) {
 
 				<td align='center' width='20%'><font color='#00000'><div width='200pt'>".$rs_logins_row['ug_endereco'].", ".$rs_logins_row['ug_numero'].", ".$rs_logins_row['ug_complemento'].", ".$rs_logins_row['ug_bairro'].", ".$rs_logins_row['ug_cidade']." - ".$rs_logins_row['ug_estado']." (CEP: ".$rs_logins_row['ug_cep'].")</div></font></td>
 
-				<td align='center' title='Data aceito ".substr($rs_logins_row['ug_compet_aceito_data_aceito'], 0, 19) ."'><font color='#00000'>". ((strlen($rs_logins_row['ug_compet_aceito_data_aceito'])>0)?"Sim":"não"). "</font></td>
-				<td align='center'><input type='button' name='btn_Avisa_".$rs_logins_row['ug_id']."' value='Avisa id: ".$rs_logins_row['ug_id']."' onclick='avisa_lh(".$rs_logins_row['ug_id'].", ". ((strlen($rs_logins_row['ug_compet_aceito_data_aceito'])>0)?1:0). ")' class='". ((strlen($rs_logins_row['ug_compet_aceito_data_aceito'])>0) ? "botao_avisa_cadastrado" : "botao_avisa_pendente"). "'></td>
+				<td align='center' title='Data aceito ".substr($rs_logins_row['ug_compet_aceito_data_aceito'], 0, 19) ."'><font color='#00000'>". ((strlen((string)($rs_logins_row['ug_compet_aceito_data_aceito'] ?? ""))>0)?"Sim":"não"). "</font></td>
+				<td align='center'><input type='button' name='btn_Avisa_".$rs_logins_row['ug_id']."' value='Avisa id: ".$rs_logins_row['ug_id']."' onclick='avisa_lh(".$rs_logins_row['ug_id'].", ". ((strlen((string)($rs_logins_row['ug_compet_aceito_data_aceito'] ?? ""))>0)?1:0). ")' class='". ((strlen((string)($rs_logins_row['ug_compet_aceito_data_aceito'] ?? ""))>0) ? "botao_avisa_cadastrado" : "botao_avisa_pendente"). "'></td>
 
 				</tr>\n";
 

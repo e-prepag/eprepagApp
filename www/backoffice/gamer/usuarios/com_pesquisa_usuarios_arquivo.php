@@ -1,5 +1,5 @@
-<?php 
-
+<?php
+require_once "/www/backoffice/includes/encoding.php";
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 include $raiz_do_projeto."includes/main.php";
@@ -58,7 +58,7 @@ $tf_u_com_totais_vendas            = $_REQUEST['tf_u_com_totais_vendas'] ?? null
 
 // Decodifica cidade se necessário
 if (isset($tf_u_cidade)) {
-    $tf_u_cidade = utf8_decode($tf_u_cidade);
+    $tf_u_cidade = backoffice_utf8_to_iso($tf_u_cidade);
 }
 
 // Gera a query SQL com base nos filtros

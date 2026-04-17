@@ -5,7 +5,7 @@ $sqlCM = "SELECT * FROM classificacao_mapas order by cm_id desc"; //cm_id, cm_no
 $rss = SQLexecuteQuery($sqlCM);
 $tot = 0;
 if($rss) {
-    $tot = pg_num_rows($rss);
+    $tot = (($rss) ? pg_num_rows($rss) : 0);
 
     $arrClassMapas = array();
 

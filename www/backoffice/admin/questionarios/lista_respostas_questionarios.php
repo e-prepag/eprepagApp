@@ -161,19 +161,19 @@ if(!empty($btPesquisar))
 	$sql .= "	INNER JOIN tb_questionarios_perguntas qp ON (qpr.qlp_id=qp.qlp_id)
 				INNER JOIN tb_questionarios q ON (q.ql_id_questionario= qp.ql_id_questionario)";
 	$sql_filters[] = "q.ql_tipo_usuario = '".addslashes($ql_tipo_usuario)."'";
-	if(strlen($ql_id_questionario))
+	if(strlen((string)($ql_id_questionario ?? "")))
 				$sql_filters[] = "qp.ql_id_questionario = ".intval($ql_id_questionario);
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql_filters[] = "qru.qlpru_data_inclusao >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql_filters[] = "qru.qlpru_data_inclusao <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= " WHERE ".$sql_aux;
 	}
 	//echo $sql;
 	$rs_respostas_total = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($rs_respostas_total);
+	$total_table = (($rs_respostas_total) ? pg_num_rows($rs_respostas_total) : 0);
 	if($total_table == 0) {
 		echo "Nenhuma resposta encontrada.<br>".PHP_EOL;
 	} else {		
@@ -200,7 +200,7 @@ if(!empty($btPesquisar))
 	//echo($sql);
 
 	$rs_respostas = SQLexecuteQuery($sql);
-	if(!isset($rs_respostas) || !($rs_respostas) || (pg_num_rows($rs_respostas)==0)) {
+	if(!isset($rs_respostas) || !($rs_respostas) || ((($rs_respostas) ? pg_num_rows($rs_respostas) : 0)==0)) {
 		//echo "Erro ao consultar informa&ccedil;&otilde;es de respostas.<br>";
 	}
 	else {

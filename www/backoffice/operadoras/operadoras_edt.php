@@ -703,7 +703,7 @@ chdir('../admin');
                         </div>
                         <div class="row" id="tbNacionalInternacional">
                             <?php
-                            if (isset($rs_TrocaNacionalInternacional) && pg_num_rows($rs_TrocaNacionalInternacional) > 0) {
+                            if (isset($rs_TrocaNacionalInternacional) && $rs_TrocaNacionalInternacional && pg_num_rows($rs_TrocaNacionalInternacional) > 0) {
                                 ?>
                                 <div class="borda bloco top10">
                                     <p>Clique para editar</p>
@@ -717,7 +717,7 @@ chdir('../admin');
                                         </thead>
                                         <tbody title="Clique para editar">
                                             <?php
-                                            while ($rs_row = pg_fetch_array($rs_TrocaNacionalInternacional)) {
+                                            while ($rs_TrocaNacionalInternacional && ($rs_row = pg_fetch_array($rs_TrocaNacionalInternacional))) {
                                                 $data = explode(" ", $rs_row['otni_data']);
                                                 $data = explode("-", $data[0]);
                                                 $data = $data[2] . "/" . $data[1] . "/" . $data[0];
@@ -956,7 +956,7 @@ chdir('../admin');
                                     </style>
                                     <?php
                                     $j = 1;
-                                    if ($rs && pg_num_rows($rs) > 0) {
+                                    if ($rs && $rs && pg_num_rows($rs) > 0) {
                                         echo "<table border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;font-family:Arial, Helvetica, sans-serif; font-size:10px;'>\n
 										<tr style='text-align:center;background-color:#ffffcc;'>
 											<th class='paddingTd'>N</td>
@@ -969,9 +969,9 @@ chdir('../admin');
 											<th class='paddingTd'>Volume Min</td>
 											<th class='paddingTd'>Volume Max</td>
 										</tr>\n";
-                                        while ($rs_row = pg_fetch_array($rs)) {
+                                        while ($rs && ($rs_row = pg_fetch_array($rs))) {
                                             if ($rs_row['co_tipo'] != 'F') {
-                                                $data = substr($rs_row['co_data_inclusao'], 0, 19);
+                                                $data = substr((string)($rs_row['co_data_inclusao'] ?? ''), 0, 19);
                                                 //$data = $data;//substr($data, 0, 4) . '/' . substr($data, 2, 2). '/' . substr($data, 2, 2);
                                                 list($ano, $mes, $dia_hora) = explode('-', $data);
                                                 list($dia, $hora) = explode(' ', $dia_hora);
@@ -1166,7 +1166,7 @@ chdir('../admin');
                         <td>Termo de Ades&atilde;o:</td>
                         <td>
                             <textarea name="opr_bslan_rule" id="opr_bslan_rule" cols="80" rows="5"><?php if (isset($opr_bslan_rule))
-                            echo trim($opr_bslan_rule); ?></textarea>
+                            echo trim((string)($opr_bslan_rule ?? "")); ?></textarea>
                     </td>
                 </tr>
             </table>

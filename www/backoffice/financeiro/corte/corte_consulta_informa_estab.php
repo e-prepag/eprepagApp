@@ -17,8 +17,8 @@
 	if(isset($ncamp) && $BtnSearch) $total_table = 0;
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = $qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -302,7 +302,7 @@
 			if($tf_u_data_ultimo_acesso_ini && $tf_u_data_ultimo_acesso_fim)$sql .= " and ug.ug_data_ultimo_acesso between '".formata_data($tf_u_data_ultimo_acesso_ini,1)."' and '".formata_data($tf_u_data_ultimo_acesso_fim,1)."'";
 			if($tf_u_data_inclusao_ini && $tf_u_data_inclusao_fim) 			$sql .= " and ug.ug_data_inclusao between '".formata_data($tf_u_data_inclusao_ini,1)."' and '".formata_data($tf_u_data_inclusao_fim,1)."'";
 			if($tf_u_login) 		$sql .= " and upper(ug.ug_login) like '%" . strtoupper($tf_u_login) . "%' ";
-			if(!is_null($tf_u_corte_dia_semana) && trim($tf_u_corte_dia_semana) != "") $sqlFiltro = " and ug.ug_perfil_corte_dia_semana = $tf_u_corte_dia_semana ";
+			if(!is_null($tf_u_corte_dia_semana) && trim((string)($tf_u_corte_dia_semana ?? "")) != "") $sqlFiltro = " and ug.ug_perfil_corte_dia_semana = $tf_u_corte_dia_semana ";
 
 			if($tf_u_nome_fantasia) $sql .= " and upper(ug.ug_nome_fantasia) like '%" . strtoupper($tf_u_nome_fantasia) . "%' ";
 			if($tf_u_razao_social) 	$sql .= " and upper(ug.ug_razao_social) like '%" . strtoupper($tf_u_razao_social) . "%' ";
@@ -346,17 +346,17 @@
 
 
 			$rs_usuario = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_usuario);
+			$total_table = (($rs_usuario) ? pg_num_rows($rs_usuario) : 0);
 
 			//Ordem
 			if($ncamp){
                 $sql .= " order by ".$ncamp;
                 if($ordem == 1){
                     $sql .= " desc ";
-                    $img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_down.gif";
+                    $img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_down.gif";
                 } else {
                     $sql .= " asc ";
-                    $img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_up.gif";
+                    $img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_up.gif";
                 }
             }
 			
@@ -489,7 +489,7 @@ $(function(){
 				<select name="tf_u_corte_dia_semana">
 					<option value="">Selecione o dia do corte</option>
 					<?php foreach ($GLOBALS['CORTE_DIAS_DA_SEMANA_DESCRICAO'] as $diasId => $diasNome){ ?>
-					<option value="<?php echo $diasId; ?>" <?php if(isset($tf_u_corte_dia_semana) && trim($tf_u_corte_dia_semana) == trim($diasId)) echo "selected";?>><?php echo $diasNome; ?></option>
+					<option value="<?php echo $diasId; ?>" <?php if(isset($tf_u_corte_dia_semana) && trim((string)($tf_u_corte_dia_semana ?? "")) == trim((string)($diasId ?? ""))) echo "selected";?>><?php echo $diasNome; ?></option>
 					<?php } ?>
 				</select>
 			</td>
@@ -592,7 +592,7 @@ $(function(){
 				<select name="tf_u_estado" class="field_dados">
 					<option value="" <?php if($tf_u_estado == "") echo "selected" ?>>Selecione</option>
                                 <?php   if(isset($SIGLA_ESTADOS)){?>
-				<?php       for($i=0; $i < count($SIGLA_ESTADOS); $i++){ ?>
+				<?php       for($i=0; $i < (is_countable($SIGLA_ESTADOS) ? count($SIGLA_ESTADOS) : 0); $i++){ ?>
                                                 <option value="<?php echo $SIGLA_ESTADOS[$i] ?>" <?php if($tf_u_estado == $SIGLA_ESTADOS[$i]) echo "selected"; ?>><?php echo $SIGLA_ESTADOS[$i] ?></option>
                                 <?php 
                                             }

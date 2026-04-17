@@ -12,7 +12,7 @@ if(isset($_POST["ug_id"])){
     $ug_id = $_POST["ug_id"];
     $sql = "SELECT ug_login, ug_nome_fantasia, ug_razao_social FROM dist_usuarios_games WHERE ug_id = " . $ug_id;
     $ret = SQLexecuteQuery($sql);
-    if(pg_num_rows($ret) == 0){
+    if((($ret) ? pg_num_rows($ret) : 0) == 0){
         echo "erro";
     }else{
         $row = pg_fetch_assoc($ret);

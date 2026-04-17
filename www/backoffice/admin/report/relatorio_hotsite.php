@@ -10,7 +10,7 @@ $sql = "SELECT * FROM pesquisa_ernst_young";
 $rs = SQLexecuteQuery($sql);
 
 if($rs) {
-    $totalRegistros = pg_num_rows($rs);
+    $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
 }
 else $totalRegistros = 0;
 

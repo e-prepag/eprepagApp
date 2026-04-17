@@ -9,7 +9,7 @@ $ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games group by ug_cida
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
 
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 
 $ps_query = "SELECT distinct count (ug_cidade) as total, ug_cidade, ug_estado FROM dist_usuarios_games where ug_cidade !~ '^[A-Z][a-z]+ [A-Z][a-z] |[A-Z][a-z]' group by ug_cidade,ug_estado order by ug_cidade";
@@ -19,7 +19,7 @@ $ps_query = "SELECT distinct count (ug_cidade) as total, ug_cidade, ug_estado FR
 //$res0a = pg_get_result($conex);
 $res0a = SQLexecuteQuery($ps_query);
 
-$bad = pg_num_rows($res0a);
+$bad = (($res0a) ? pg_num_rows($res0a) : 0);
 
 $ps_query = "SELECT distinct count (ug_cidade) as total, ug_cidade, ug_estado FROM dist_usuarios_games where ug_cidade !~ '^[A-Z][a-z]+ [A-Z][a-z] |[A-Z][a-z]' group by ug_cidade,ug_estado order by ug_cidade";
 //pg_send_query($conex,$ps_query);

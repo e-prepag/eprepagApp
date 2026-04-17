@@ -133,13 +133,13 @@ function VerificaMotivo() {
             if (!empty($email)) {
                  $sql .= " AND vgpe_email like '%". $email . "%' \n";
             }
-            if(strlen($tf_v_data_inclusao_ini) && strlen($tf_v_data_inclusao_fim)) {
+            if(strlen((string)($tf_v_data_inclusao_ini ?? "")) && strlen((string)($tf_v_data_inclusao_fim ?? ""))) {
                 $sql .= " AND (vgpe_data between '".formata_data_rc($tf_v_data_inclusao_ini,1)." 00:00:00' AND '".formata_data_rc($tf_v_data_inclusao_fim,1)." 23:59:59') \n";
             }
 
             $res_tmp = SQLexecuteQuery($sql);
             if ($res_tmp) {
-                $total_table = pg_num_rows($res_tmp);
+                $total_table = (($res_tmp) ? pg_num_rows($res_tmp) : 0);
             }
 
             $max_reg = (($inicial + $max)>$total_table)?$total_table:$max;
@@ -155,7 +155,7 @@ function VerificaMotivo() {
         ?>
         <table class="table table-bordered fontsize-pp">
         <?php
-            if((pg_num_rows($rsResposta) != 0) && ($rsResposta)) {
+            if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
         ?>
             <tr>
                 <td align="center">&nbsp;</td>

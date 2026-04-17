@@ -31,17 +31,17 @@ $msg = "";
 
 //Recupera as vendas
 if($msg == ""){
-    if(strlen($tf_v_data_inclusao_fim) && strlen($tf_v_data_inclusao_ini)){
+    if(strlen((string)($tf_v_data_inclusao_fim ?? "")) && strlen((string)($tf_v_data_inclusao_ini ?? ""))){
 
 	$sql_filters = array();
 	$sql  = "SELECT pih_pin_id,pih_ip_id,pih_id,pih_codretepp,pih.pin_status,to_char(pih_data,'DD/MM/YYYY HH24:MI:SS') as pih_data_aux,pin_codigo 
                  FROM pins_integracao_historico pih
                  INNER JOIN pins p ON pin_codinterno = pih_pin_id "; 
-	if(strlen($tf_v_data_inclusao_ini)){
+	if(strlen((string)($tf_v_data_inclusao_ini ?? ""))){
         $sql_filters[] = "pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
         $varsel .= "&tf_v_data_inclusao_ini=$tf_v_data_inclusao_ini";
     }
-	if(strlen($tf_v_data_inclusao_fim)){
+	if(strlen((string)($tf_v_data_inclusao_fim ?? ""))){
         $sql_filters[] = "pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
         $varsel .= "&tf_v_data_inclusao_fim=$tf_v_data_inclusao_fim";
     }
@@ -49,19 +49,19 @@ if($msg == ""){
 				$sql_filters[] = "pih_id = ".addslashes($opr_codigo);
 	if(!empty($pin_codigo))
 				$sql_filters[] = "pih_pin_id = ".retorna_id_pin(addslashes($pin_codigo),addslashes($opr_codigo));
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= "WHERE ".$sql_aux;
 	}
 //	echo $sql;
 	$rs_total = SQLexecuteQuery($sql);
-	if($rs_total) $registros_total = pg_num_rows($rs_total);
+	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY pih_data DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
-    }//end if(!strlen($tf_v_data_inclusao_fim) || !strlen($tf_v_data_inclusao_ini))
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
+    }//end if(!strlen((string)($tf_v_data_inclusao_fim ?? "")) || !strlen((string)($tf_v_data_inclusao_ini ?? "")))
     else $msg = "Obrigatório selecionar um intervalo de datas.".PHP_EOL;
 }
 ?>

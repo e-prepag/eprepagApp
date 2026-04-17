@@ -1,6 +1,7 @@
 <?php
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
+require_once __DIR__ . "/../includes/encoding.php";
 
 $conexao = ConnectionPDO::getConnection()->getLink();
 
@@ -33,7 +34,7 @@ $stmt->bindParam(':opr_codigo', $oprCodigo, PDO::PARAM_INT);
 $stmt->execute();
 $operadora = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$operadora) {
+if(!isset($operadora) || !$operadora) {
 	die("Operadora não encontrada.");
 }
 
@@ -44,16 +45,17 @@ $stmtHistorico = $conexao->prepare($sqlHisorico);
 $stmtHistorico->bindParam(':opr_codigo', $oprCodigo, PDO::PARAM_INT);
 $stmtHistorico->execute();
 $historico = $stmtHistorico->fetchAll(PDO::FETCH_ASSOC);
-if (!$historico) {
+if(!isset($historico) || !$historico) {
 	$historico = [];
 }
 
 $sqlUserNome = "SELECT shn_nome FROM usuarios WHERE id = :user_id";
 $stmtUserNome = $conexao->prepare($sqlUserNome);
-$stmtUserNome->bindParam(':user_id', $_SESSION["iduser_bko"], PDO::PARAM_INT);
+$iduser_bko = $_SESSION["iduser_bko"] ?? null;
+$stmtUserNome->bindValue(':user_id', $iduser_bko, PDO::PARAM_INT);
 $stmtUserNome->execute();
 $userNome = $stmtUserNome->fetchColumn();
-if (!$userNome) {
+if(!isset($userNome) || !$userNome) {
 	$userNome = "Desconhecido";
 }
 
@@ -98,7 +100,7 @@ if (!$userNome) {
 			$.ajax({
 				url: "./ajax_risco_merchants.php",
 				method: "POST",
-				data: $("#formNovo").serialize() + "&acao=novo&opr_codigo=<?= $oprCodigo ?>&user_id=<?= $_SESSION["iduser_bko"] ?>",
+				data: $("#formNovo").serialize() + "&acao=novo&opr_codigo=<?= $oprCodigo ?>&user_id=<?= ($_SESSION["iduser_bko"] ?? null) ?>",
 				beforeSend: function () {
 					Swal.fire({
 						title: 'Aguarde!',
@@ -121,7 +123,7 @@ if (!$userNome) {
 						const newRow = `<tr>
 							<td>${$("#tipo_risco option:selected").text()}</td>
 							<td>${new Date().toLocaleString()}</td>
-							<td><?= utf8_decode(htmlspecialchars(utf8_encode($userNome))) ?></td>
+							<td><?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($userNome))) ?></td>
 							<td style='max-width: 300px; word-break: break-word;'>${$("#observacao").val()}</td>
 						</tr>`;
 						$("#col-historico").prepend(newRow);
@@ -197,7 +199,7 @@ if (!$userNome) {
 		<li class="active"><?php echo $sistema->menu[0]->getDescricao(); ?></li>
 		<li class="active"><a
 				href="<?php echo $sistema->item->getLink(); ?>"><?php echo $sistema->item->getDescricao(); ?> -
-				<?= utf8_decode(htmlspecialchars(utf8_encode($operadora['opr_nome']))) ?></a>
+				<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($operadora['opr_nome']))) ?></a>
 		</li>
 	</ol>
 </div>
@@ -209,7 +211,7 @@ if (!$userNome) {
 				<tr>
 					<td>Nome:</td>
 					<td>
-						<?= utf8_decode(htmlspecialchars(utf8_encode($operadora['opr_nome']))) ?>
+						<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($operadora['opr_nome']))) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>
@@ -217,9 +219,9 @@ if (!$userNome) {
 					<td>CNPJ:</td>
 					<td>
 						<?php
-						$cnpj = isset($operadora['opr_cnpj']) ? trim($operadora['opr_cnpj']) : "";
+						$cnpj = isset($operadora['opr_cnpj']) ? trim((string)($operadora['opr_cnpj'] ?? "")) : "";
 
-						echo $cnpj != "" ? utf8_decode(htmlspecialchars(utf8_encode($cnpj))) : "N&#227;o possui";
+						echo $cnpj != "" ? backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($cnpj))) : "N&#227;o possui";
 						?>
 
 					</td>
@@ -267,7 +269,7 @@ if (!$userNome) {
 					<td>Última Observação:</td>
 					<td id="ultima-obs">
 						<?php
-						echo isset($operadora['observacao']) ? utf8_decode(htmlspecialchars(utf8_encode($operadora['observacao']))) : "Não encontrado";
+						echo isset($operadora['observacao']) ? backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($operadora['observacao']))) : "Não encontrado";
 						?>
 					</td>
 				</tr>
@@ -306,9 +308,9 @@ if (!$userNome) {
 
 												$data = isset($row['data_observacao']) ? $row['data_observacao'] : "Não encontrado";
 
-												$observacao = isset($row['observacao']) ? utf8_decode(htmlspecialchars(utf8_encode($row['observacao']))) : "?";
+												$observacao = isset($row['observacao']) ? backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($row['observacao']))) : "?";
 
-												$usuario = isset($row['shn_nome']) ? utf8_decode(htmlspecialchars(utf8_encode($row['shn_nome']))) : "Desconhecido";
+												$usuario = isset($row['shn_nome']) ? backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($row['shn_nome']))) : "Desconhecido";
 
 												echo "<tr>
               									  <td>{$risco}</td>

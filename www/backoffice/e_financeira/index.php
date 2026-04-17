@@ -86,7 +86,7 @@ $data_atual = date('Y-m');
 
 			<div class="col-cancel-pins" id="container_cpfcnpj">
 				<label for="cpfcnpj" id="label_cpfcnpj">Documento</label>
-				<input id="cpfcnpj" name="cpfcnpj" value="<?php echo htmlspecialchars($cpfcnpj); ?>" class="form-control" type="text" placeholder="Digite apenas números">
+				<input id="cpfcnpj" name="cpfcnpj" value="<?php echo htmlspecialchars((string)($cpfcnpj ?? "")); ?>" class="form-control" type="text" placeholder="Digite apenas números">
 			</div>
 
 			<div class="col-cancel-pins">
@@ -156,7 +156,7 @@ $data_atual = date('Y-m');
 					echo '<div class="alert alert-info">Nenhum registro encontrado nesta página para os filtros aplicados.</div>';
 				} else {
 					foreach ($dados as $mes => $eventos) {
-						$quantidade_registros_reais += count($eventos);
+						$quantidade_registros_reais += (is_countable($eventos) ? count($eventos) : 0);
 					}
 					echo gerarRelatorioPorCompetencia($dados);
 				}
@@ -196,7 +196,7 @@ $data_atual = date('Y-m');
 				<span style="color: #666; font-size: 0.9em;">
 					<?php if ($pagina_atual == 1 && !$tem_proxima_pagina): ?>
 						(Exibindo todos os resultados)
-					<?php elseif (!$tem_proxima_pagina): ?>
+					<?php elseif(!isset($tem_proxima_pagina) || !$tem_proxima_pagina): ?>
 						(Última página - Fim dos resultados)
 					<?php else: ?>
 						(Mostrando até <?= $limite_registros ?> registros da base por arquivo gerado)

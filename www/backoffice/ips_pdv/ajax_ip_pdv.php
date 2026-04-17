@@ -1,9 +1,11 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 require_once "/www/includes/configIP.php";
 require_once "/www/includes/constantes.php";
+require_once "/www/includes/pdv_encoding.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -13,8 +15,8 @@ $conexao = ConnectionPDO::getConnection()->getLink();
 
 if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
-	$usuario_id = $_POST['usuario_id'];
-	$ip_pdv = $_POST['ip_pdv'];
+	$usuario_id = $_POST['usuario_id'] ?? null;
+	$ip_pdv = $_POST['ip_pdv'] ?? null;
 
 	// 2) Monta a parte fixa do SELECT
 	$sql = "SELECT 
@@ -112,10 +114,10 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 			$dataLine = [
 				"ug_id" => $value["ug_id"],
-				"ug_nome" => (isset($value["ug_nome_fantasia"]) ? utf8_encode($value["ug_nome_fantasia"]) : "Não encontrado"),
+				"ug_nome" => (isset($value["ug_nome_fantasia"]) ? backoffice_iso_to_utf8($value["ug_nome_fantasia"]) : "Não encontrado"),
 				"ip_pdv" => $str_ip,
 				"dominio_site" => $value["domain"] ?? "Sem site",
-				"shn_nome" => utf8_encode($value["shn_nome"]),
+				"shn_nome" => backoffice_iso_to_utf8($value["shn_nome"]),
 				"criado_em" => isset($value["created_date"]) ? $value["created_date"] : "",
 				"ativo" => isset($value["active"]) ? ($value["active"] ? "Sim" : "NÃ£o") : "",
 				"acao" => $acao
@@ -169,7 +171,8 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 	$stmt->bindParam(':ip_range_end', $ip_range_end, PDO::PARAM_STR);
 	$stmt->bindParam(':ip_range', $ip_range, PDO::PARAM_BOOL);
 	$stmt->bindParam(':domain', $domain, PDO::PARAM_STR);
-	$stmt->bindParam(':bko_user', $_POST['bko_user'], PDO::PARAM_STR);
+	$bko_user = $_POST['bko_user'] ?? "";
+		$stmt->bindParam(':bko_user', $bko_user, PDO::PARAM_STR);
 
 	if ($stmt->execute()) {
 		$id = $stmt->fetchColumn();
@@ -248,7 +251,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
-	$ativo = $_POST["ativo"] == 1;
+	$ativo = ($_POST["ativo"] ?? 0) == 1;
 
 	if ($id <= 0) {
 		echo json_encode(["status" => "error", "msg" => "ID do IP inválido."]);

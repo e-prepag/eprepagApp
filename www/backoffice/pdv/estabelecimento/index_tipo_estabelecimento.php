@@ -58,7 +58,7 @@ if($acao == 'editar')
 		$te_descricao	= $rs_tipo_estabalecimento_row['te_descricao'];
 		$te_id			= $rs_tipo_estabalecimento_row['te_id'];
 		$te_ativo		= $rs_tipo_estabalecimento_row['te_ativo'];
-		if (pg_num_rows($rs_tipo_estabalecimento) > 0)
+		if ((($rs_tipo_estabalecimento) ? pg_num_rows($rs_tipo_estabalecimento) : 0) > 0)
 			require_once 'tipo_estabelecimento_edt.php';
 		else
 			$acao = 'listar';

@@ -10,6 +10,25 @@
 	
 	$conexao = ConnectionPDO::getConnection()->getLink();
 
+	function admin_estorno_to_utf8($value) {
+		if (!is_string($value) || $value === '') {
+			return $value;
+		}
+		if (preg_match('//u', $value)) {
+			return $value;
+		}
+		$converted = function_exists('iconv') ? @iconv('ISO-8859-1', 'UTF-8//IGNORE', $value) : false;
+		return ($converted !== false) ? $converted : $value;
+	}
+
+	function admin_estorno_to_iso($value) {
+		if (!is_string($value) || $value === '') {
+			return $value;
+		}
+		$converted = function_exists('iconv') ? @iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $value) : false;
+		return ($converted !== false) ? $converted : $value;
+	}
+
     if(isset($_GET["acao"]) && $_GET["acao"] == "listar"){
 		$data = ["data" => []];
 		$sql = "select TO_CHAR(data_operacao, 'DD-MM-YYYY HH24:MI:SS') as data_operacao, est_valor, est_tipo, shn_login, ug_login, ug_descricao,est_id from estorno_pdv where ug_aprovacao is null and date(data_operacao) between :DT_INICIAL and :DT_FINAL and est_tipo = :TIPO and date(data_operacao) > '2023-07-07';";
@@ -20,7 +39,7 @@
 		$selectRows->execute();
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
 
-		if(count($resultRows) > 0){
+		if((is_countable($resultRows) ? count($resultRows) : 0) > 0){
 			foreach($resultRows as $key => $value){
 				 $dataKeys = array_keys($value);
 				 $acao = '<button class="btn btn-success btn-aprovar right10 bottom10" data-codigo="'.$value["est_id"].'" data-login="'.$value["shn_login"].'">Aprovar</button><button class="btn btn-danger btn-negar bottom10" data-codigo="'.$value["est_id"].'" data-login="'.$value["shn_login"].'">Negar</button>'; 
@@ -43,7 +62,7 @@
 					  $dataKeys[2] => $tipo,
 					  $dataKeys[3] => $value["shn_login"],
 					  $dataKeys[4] => $value["ug_login"],
-					  $dataKeys[5] => utf8_encode($value["ug_descricao"]),
+					  $dataKeys[5] => admin_estorno_to_utf8($value["ug_descricao"]),
 					  "acoes" => $acao
 				 ];
 				 array_push($data["data"], $dataLine);
@@ -111,7 +130,7 @@
 			$to = strtolower($resultRow["shn_mail"]); 
 			$cc = ""; 
 			$bcc = ""; 
-			$subject = utf8_decode("E-prepag - Solicitação de ".$tipoAcao);
+			$subject = admin_estorno_to_iso("E-prepag - Solicitação de ".$tipoAcao);
 			$legendaAcao = ($acao == "S")? "Aprovada":" Negada";
 			$html = file_get_contents("./template.html");
 			$html = str_replace(["{data-atual}", "{tipo}", "{nome}",  "{data}", "{operador}", "{resposta}"], [date("d-m-Y H:i:s"), $tipoAcao, $data["ug_login"], $data["data_operacao"], $data["ug_user_aprova"], $legendaAcao], $html);

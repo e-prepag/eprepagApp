@@ -43,7 +43,7 @@ if($tf_v_data_inclusao_fim) {
 $sql .= "order by sprs_data_inclusao desc";
 
 $rs = SQLexecuteQuery($sql);
-//echo "pg_num_rows(rs): ".pg_num_rows($rs)."<br>";
+//echo "pg_num_rows(rs): ".(($rs) ? pg_num_rows($rs) : 0)."<br>";
 
 ?>
 <link href="<?php echo $url; ?>:<?php echo $server_port; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -112,13 +112,13 @@ $rs = SQLexecuteQuery($sql);
 <?php
 
 
-	if(!$rs || pg_num_rows($rs) == 0) {
+	if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
 		echo "Nenhum produto encontrado.<br>\n";
 	} else {
 
-		$s_several = ((pg_num_rows($rs)>1)?"s":"");
+		$s_several = (((($rs) ? pg_num_rows($rs) : 0)>1)?"s":"");
 
-		echo "<p>Encontrado$s_several ".pg_num_rows($rs)." registro$s_several</p>";
+		echo "<p>Encontrado$s_several ".(($rs) ? pg_num_rows($rs) : 0)." registro$s_several</p>";
 		echo "<table border='1' cellpadding='2' cellspacing='2' bordercolor='#cccccc' style='border-collapse:collapse;'>\n";
 		echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>\n";
 		echo "<td>id</td>\n";
@@ -140,7 +140,7 @@ $rs = SQLexecuteQuery($sql);
 
 			// se limite é válido -> Procesa solicitação
 
-			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen($recibo_formatted)>0)?" title=\"".$recibo_formatted."\"":"").">\n";
+			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen((string)($recibo_formatted ?? ""))>0)?" title=\"".$recibo_formatted."\"":"").">\n";
 			echo "<td align='center'>".$rs_row['sprs_id']."</td>\n";
 			echo "<td><nobr>".substr($rs_row['sprs_data_inclusao'], 0, 19)."</nobr></td>\n";
 			echo "<td align='center'>".$rs_row['sprs_codigoproduto']."</td>\n";
@@ -151,7 +151,7 @@ $rs = SQLexecuteQuery($sql);
 			echo "<td align='center'>".$rs_row['sprs_status']."</td>\n";
 			echo "<td align='center'>".$rs_row['sprs_statustransacao']."</td>\n";
 			echo "<td align='center'><nobr>".substr($rs_row['sprs_data_recarga'], 0, 19)."</nobr></td>\n";
-			echo "<td align='center'>".((strlen($rs_row['sprs_recibo'])>0)?"<font color='red'>SIM</font>":"")."</td>\n";
+			echo "<td align='center'>".((strlen((string)($rs_row['sprs_recibo'] ?? ""))>0)?"<font color='red'>SIM</font>":"")."</td>\n";
 			echo "</tr>\n";
 		
 //			die("<br>Stop");

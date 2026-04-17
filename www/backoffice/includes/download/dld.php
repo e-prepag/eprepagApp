@@ -206,7 +206,7 @@ if (!LOG_DOWNLOADS) die();
 
 $f = @fopen(LOG_FILE, 'a+');
 if ($f) {
-  @fputs($f, date("m.d.Y g:ia")."  ".$_SERVER['REMOTE_ADDR']."  ".$fname."\n");
+  @fputs($f, date("m.d.Y g:ia")."  ".($_SERVER['REMOTE_ADDR'] ?? "")."  ".$fname."\n");
   @fclose($f);
 }
 

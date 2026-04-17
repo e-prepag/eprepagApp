@@ -29,13 +29,13 @@ if(!empty($btPesquisar)){ //case pih_gocash
 					to_char(pih_data,'DD/MM/YYYY HH24:MI:SS') as pih_data_aux from pins_integracao_cash_historico WHERE pih_codretepp='".$notify_list_values['SU']."'"; 
 	if(!empty($opr_codigo))
 				$sql .= " and pih_id = ".addslashes($opr_codigo);
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and pih_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and pih_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	$rs_total = SQLexecuteQuery($sql);
 	if($rs_total) {
-		$registros_total = pg_num_rows($rs_total);
+		$registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 		$vetorValores = array();
 		$valorTotalGeral=0;
 		while($rs_total_row = pg_fetch_array($rs_total)){
@@ -61,7 +61,7 @@ if(!empty($btPesquisar)){ //case pih_gocash
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

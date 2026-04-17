@@ -96,7 +96,7 @@ $msg = "";
 
 function formatar_valor($valor)
 {
-    $valor = trim($valor);
+    $valor = trim((string)($valor ?? ""));
 
     // Se tiver mais de uma vírgula ou ambos vírgula e ponto ? erro
     if ((substr_count($valor, ',') > 1) || (strpos($valor, ',') !== false && strpos($valor, '.') !== false)) {
@@ -122,23 +122,23 @@ function geraJsonOperadoraPagamentosBloqueados()
 	$rs_opr = SQLexecuteQuery($sql);
 	$arrJson = array();
 
-	if ($rs_opr && pg_num_rows($rs_opr) > 0) {
+	if ($rs_opr && $rs_opr && pg_num_rows($rs_opr) > 0) {
 
-		while ($rs_opr_row = pg_fetch_array($rs_opr)) {
+		while ($rs_opr && ($rs_opr_row = pg_fetch_array($rs_opr))) {
 
 			$sql = "select ogp_id from tb_operadora_games_produto where ogp_opr_codigo = " . $rs_opr_row['opr_codigo'];
 			$rs_opr_prod = SQLexecuteQuery($sql);
 			$formasBloqueadas = explode(",", $rs_opr_row['opr_tipo_pagto_bloqueados']);
 
-			if ($rs_opr_prod && pg_num_rows($rs_opr_prod) > 0) {
+			if ($rs_opr_prod && $rs_opr_prod && pg_num_rows($rs_opr_prod) > 0) {
 
-				while ($rs_opr_prod_row = pg_fetch_array($rs_opr_prod)) {
+				while ($rs_opr_prod && ($rs_opr_prod_row = pg_fetch_array($rs_opr_prod))) {
 
 					$sql = "select ogpm_nome, ogpm_id from tb_operadora_games_produto_modelo where ogpm_ogp_id = " . $rs_opr_prod_row['ogp_id'];
 					$rs_opr_prod_mod = SQLexecuteQuery($sql);
 
-					if ($rs_opr_prod_mod && pg_num_rows($rs_opr_prod_mod) > 0) {
-						while ($rs_opr_prod_mod_row = pg_fetch_array($rs_opr_prod_mod)) {
+					if ($rs_opr_prod_mod && $rs_opr_prod_mod && pg_num_rows($rs_opr_prod_mod) > 0) {
+						while ($rs_opr_prod_mod && ($rs_opr_prod_mod_row = pg_fetch_array($rs_opr_prod_mod))) {
 
 							$arrFormasPagto = array();
 							$obj = new stdClass();
@@ -218,7 +218,7 @@ if ($acao == 'inserir') {
 			}
 
 			// Retirando os espaços em Branco da variável abaixo
-			$opr_data_inicio_operacoes = trim($opr_data_inicio_operacoes);
+			$opr_data_inicio_operacoes = trim((string)($opr_data_inicio_operacoes ?? ""));
 
 			$sql = "INSERT INTO operadoras (
                         opr_flag_possui_restricao_pagto,
@@ -407,7 +407,7 @@ if ($acao == 'inserir') {
 			if (!$rs_operadoras) {
 				$msg .= "Erro ao salvar informa&ccedil;&otilde;es da Operadora. ($sql)<br>";
 			} else {
-				if ($opr_valores && count($opr_valores) > 0) {
+				if (is_array($opr_valores) && count($opr_valores) > 0) {
 					$values = [];
 					foreach ($opr_valores as $valor) {
 						$valor = floatval($valor);
@@ -537,7 +537,7 @@ if ($acao == 'atualizar') {
                     opr_distribui_ponto_certo   =" . $opr_distribui_ponto_certo . ",
                     opr_prefixo_ponto_certo     ='" . $opr_prefixo_ponto_certo . "', 
                     opr_contabiliza_utilizacao = " . $opr_contabiliza_utilizacao . ",";
-	$opr_data_inicio_operacoes = trim($opr_data_inicio_operacoes);
+	$opr_data_inicio_operacoes = trim((string)($opr_data_inicio_operacoes ?? ""));
 	if (!empty($opr_data_inicio_operacoes)) {
 		$sql .= " opr_data_inicio_operacoes = to_date('" . $opr_data_inicio_operacoes . "','DD/MM/YYYY'),";
 	} else {
@@ -741,7 +741,7 @@ if ($acao == 'editar') {
 		$rs_TrocaNacionalInternacional = SQLexecuteQuery($sqlTrocaNacionalInternacional);
 
 
-		if (pg_num_rows($rs_operadoras) > 0)
+		if ($rs_operadoras && pg_num_rows($rs_operadoras) > 0)
 			include 'operadoras_edt.php';
 		else
 			$acao = 'listar';

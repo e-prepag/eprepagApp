@@ -1,5 +1,6 @@
-<?php 
-	set_time_limit ( 6000 ) ;
+<?php
+require_once "/www/backoffice/includes/encoding.php";
+set_time_limit ( 6000 ) ;
 ob_start();
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -24,24 +25,24 @@ if(!$range)    $range       = 1;
 if(!$ordem)    $ordem       = 0;
 if($Pesquisar) $total_table = 0;
 $default_add  = nome_arquivo($PHP_SELF);
-$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+$img_proxima  = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+$img_anterior = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 $max          = 200; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
 $registros	  = $max;
 
-$dd_balancos	= $_POST['dd_balancos'];
-$dd_boletos		= $_POST['dd_boletos'];
-$dd_compras		= $_POST['dd_compras'];
+$dd_balancos	= $_POST['dd_balancos'] ?? null;
+$dd_boletos		= $_POST['dd_boletos'] ?? null;
+$dd_compras		= $_POST['dd_compras'] ?? null;
 if(!$tf_v_data_inclusao_ini) {
 	$hoje		= date("d/m/Y");
 	$tf_v_data_inclusao_ini = data_menos_n($hoje,5);
 	
 }	
 if(!$tf_v_data_inclusao_fim) $tf_v_data_inclusao_fim = $hoje;
-$tf_v_codigo	= $_POST['tf_v_codigo'];
-$ug_nome	= strtoupper($_POST['ug_nome']);
-$codigo_user	= $_POST['codigo_user'];
+$tf_v_codigo	= $_POST['tf_v_codigo'] ?? null;
+$ug_nome	= strtoupper((string)($_POST['ug_nome'] ?? ""));
+$codigo_user	= $_POST['codigo_user'] ?? null;
 
 if (isset($tf_v_codigo)){
 	$varse1 .= "&tf_v_codigo=$tf_v_codigo";
@@ -71,7 +72,7 @@ if ($codigo_user>0){
 		$sql  = "select ug_perfil_saldo from usuarios_games where ug_id=$codigo_user";
 //echo $sql . "<br>";
 		$rs_UG = SQLexecuteQuery($sql);
-		if(!$rs_UG || pg_num_rows($rs_UG) == 0) $msg = "Usu&aacute;rio $codigo_user n�o encontrado.\n";
+		if(!$rs_UG || !$rs_UG || pg_num_rows($rs_UG) == 0) $msg = "Usu&aacute;rio $codigo_user n�o encontrado.\n";
 		else {				
 			$rs_UG_row = pg_fetch_array($rs_UG);
 			$ug_perfil_saldo		= $rs_UG_row['ug_perfil_saldo'];
@@ -98,7 +99,7 @@ if ($codigo_user>0){
 						)";
 //echo $sql . "<br>";
 		$rs_Pendentes = SQLexecuteQuery($sql);
-		if(!$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute; $codigo_user n�o encontrada.\n";
+		if(!$rs_Pendentes || !$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute; $codigo_user n�o encontrada.\n";
 		else {				
 			$rs_Pendentes_row = pg_fetch_array($rs_Pendentes);
 			$ug_n			= $rs_Pendentes_row['n'];
@@ -125,7 +126,7 @@ if ($codigo_user>0){
 						)";
 //echo $sql . "<br>";
 		$rs_Pendentes = SQLexecuteQuery($sql);
-		if(!$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute;rio $codigo_user n&atilde;o encontrada.\n";
+		if(!$rs_Pendentes || !$rs_Pendentes || pg_num_rows($rs_Pendentes) == 0) $msg = "Vendas do usu&aacute;rio $codigo_user n&atilde;o encontrada.\n";
 		else {				
 			$rs_Pendentes_row = pg_fetch_array($rs_Pendentes);
 			$ug_n1			= $rs_Pendentes_row['n1'];
@@ -1077,7 +1078,7 @@ echo $search_msg . number_format(getmicrotime() - $time_start, 2, '.', '.') . $s
 				continue;
 			}
 	?>
-	<tr><td align="center" valign="middle" width="36"><?php echo getLogoBancoSmall($key)?></td><td width="200" class='texto'>&nbsp;<?php echo utf8_decode($FORMAS_PAGAMENTO_DESCRICAO[$key]) ?></td><tr>
+	<tr><td align="center" valign="middle" width="36"><?php echo getLogoBancoSmall($key)?></td><td width="200" class='texto'>&nbsp;<?php echo backoffice_utf8_to_iso($FORMAS_PAGAMENTO_DESCRICAO[$key]) ?></td><tr>
 	<?php
 		}
 	?>

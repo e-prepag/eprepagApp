@@ -8,14 +8,14 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 if($Conciliar && b_IsBKOUsuarioSondaIntegracao()) {
     
     //Capturando e convertendo os IDS de transações com o banco na lista
-    $ids = str_replace(PHP_EOL, ",",trim($ids));
+    $ids = str_replace(PHP_EOL, ",",trim((string)($ids ?? "")));
     
     //Buscando os dados necessários para executar a atualização
     $sql ="select idvenda,idcliente,total from tb_pag_compras where id_transacao_itau IN (".$ids.") and tipo_cliente='LR' and iforma='".$forma_pagamentos."' and status != 3;";
     //echo $sql."<br>";
     $rs_transacoes = SQLexecuteQuery($sql);
     //capturando o total de registros
-    $registros_total = pg_num_rows($rs_transacoes);
+    $registros_total = (($rs_transacoes) ? pg_num_rows($rs_transacoes) : 0);
     
     //verificando o sucesso na busca
     if(!$rs_transacoes || $registros_total == 0) {

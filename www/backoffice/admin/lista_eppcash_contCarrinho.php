@@ -43,7 +43,7 @@ if(!empty($pin_id)) {
 $sql .= " order by pin_qtde_carrinho desc";
 //echo "$sql<br>";
 $rs = SQLexecuteQuery($sql);
-//echo "pg_num_rows(rs): ".pg_num_rows($rs)."<br>";
+//echo "pg_num_rows(rs): ".(($rs) ? pg_num_rows($rs) : 0)."<br>";
 
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -124,12 +124,12 @@ $(function(){
 <?php
 
 
-	if(!$rs || pg_num_rows($rs) == 0) {
+	if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
 		echo "Nenhum produto encontrado.<br>\n";
 	} else {
 
-		$s_several = ((pg_num_rows($rs)>1)?"s":"");
-		echo "<p>Encontrado$s_several ".pg_num_rows($rs)." registro$s_several</p>";
+		$s_several = (((($rs) ? pg_num_rows($rs) : 0)>1)?"s":"");
+		echo "<p>Encontrado$s_several ".(($rs) ? pg_num_rows($rs) : 0)." registro$s_several</p>";
 		echo "<table border='1' cellpadding='2' cellspacing='2' bordercolor='#cccccc' style='border-collapse:collapse;'>\n";
 		echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>\n";
 		echo "<td>Qtde</td>\n";
@@ -153,7 +153,7 @@ $(function(){
 			$recibo_formatted = $rs_row['pin_qtde_carrinho'];	//wordwrap($rs_row['rprs_recibo'], 41, "\n", true);
 
 			// se limite é válido -> Procesa solicitação
-			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen($recibo_formatted)>0)?" title=\"".$recibo_formatted." tentativas\"":"").">\n";
+			echo "<tr onmouseover=\"bgColor='#CFDAD7'\" onmouseout=\"bgColor='#FFFFFF'\"".((strlen((string)($recibo_formatted ?? ""))>0)?" title=\"".$recibo_formatted." tentativas\"":"").">\n";
 			echo "<td align='center'>&nbsp;".$rs_row['pin_qtde_carrinho']."&nbsp;</td>\n";
 			echo "<td>&nbsp;".substr($rs_row['pin_dataentrada'], 0, 19)."&nbsp;</td>\n";
 			echo "<td align='center'>&nbsp;".substr($operacao_array[$rs_row['distributor_codigo']],0,strpos($operacao_array[$rs_row['distributor_codigo']],'-'))."&nbsp;</td>\n";

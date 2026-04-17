@@ -97,7 +97,7 @@ if (!empty($mat_promo_nome))
 	$smp_aux[] = "upper(mp_descricao) LIKE '%" . strtoupper($mat_promo_nome) . "%'";
 if (!empty($mat_promo_id))
 	$smp_aux[] = "mp_id = ". $mat_promo_id ;
-if (count($smp_aux)>0) {
+if ((is_countable($smp_aux) ? count($smp_aux) : 0)>0) {
 	$sql .= ' WHERE ' . implode(' AND ', $smp_aux);
 }
 //echo "SQL: ".$sql."<br>";

@@ -26,25 +26,27 @@ $msg	= "";
 
 if($acao == 'atualizar')
 {
-    $ip_inicial = $_POST['ip_inicial'];
-    $ip_final = $_POST['ip_final'];
+    $ip_inicial = $_POST['ip_inicial'] ?? array();
+    if (!is_array($ip_inicial)) $ip_inicial = array();
+    $ip_final = $_POST['ip_final'] ?? array();
+    if (!is_array($ip_final)) $ip_final = array();
 
     $ranged = '';
 
-    if ( count($ip_inicial) > 0 ) {
-        for ( $i = 0; $i < count($ip_inicial); $i++ ) {
+    if ( (is_countable($ip_inicial) ? count($ip_inicial) : 0) > 0 ) {
+        for ( $i = 0; $i < (is_countable($ip_inicial) ? count($ip_inicial) : 0); $i++ ) {
             if ( !empty($ip_inicial[$i]) && !empty($ip_final[$i]) ) {
                 $ranged .= ';' . $ip_inicial[$i] . '-' . $ip_final[$i] . ';';
             }
         }
     }
 
-    $opr_ip = $_POST['opr_ip'];
+    $opr_ip = $_POST['opr_ip'] ?? '';
 
     // Cleaning opr_ip
-    $opr_ip = trim(implode(';', array_filter(explode(';', $opr_ip))));
+    $opr_ip = trim(implode(';', array_filter(explode(';', (string)($opr_ip ?? "")))));
     // Cleaning ranged
-    $ranged = trim(implode(';', array_filter(explode(';', $ranged))));
+    $ranged = trim(implode(';', array_filter(explode(';', (string)($ranged ?? "")))));
 
     if(empty($ranged)) {
         $opr_ip .= ';189.38.238.205';
@@ -62,7 +64,7 @@ if($acao == 'atualizar')
 						opr_partner_dominio='".$opr_partner_dominio."'
 					WHERE opr_codigo = ".$opr_codigo;
 	$rs_operadoras = SQLexecuteQuery($sql);
-	if(!$rs_operadoras) {
+	if(!isset($rs_operadoras) || !$rs_operadoras) {
 		$msg .= "Erro ao atualizar informa&ccedil;&otilde;es da Operadora. ($sql)<br>";
 	}
     $acao = 'listar';
@@ -81,7 +83,7 @@ if($acao == 'editar')
         $opr_partner_check	= $rs_operadoras_row['opr_partner_check'];
         $opr_partner_email	= $rs_operadoras_row['opr_partner_email'];
         $opr_partner_dominio= $rs_operadoras_row['opr_partner_dominio'];
-        if (pg_num_rows($rs_operadoras) > 0) {
+        if ((($rs_operadoras) ? pg_num_rows($rs_operadoras) : 0) > 0) {
             include 'operadoras_edt.php';
         }
         else
@@ -98,7 +100,7 @@ if($acao == 'listar')
 {
     include 'operadoras_lst.php';
 }
-echo htmlspecialchars($msg, ENT_QUOTES, 'UTF-8');
+echo htmlspecialchars((string)($msg ?? ""), ENT_QUOTES, 'UTF-8');
 
 ?>
 </body>

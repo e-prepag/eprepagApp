@@ -231,7 +231,7 @@ if (isset($BtnSearch)) {
 
                 // Processa a seleção de produtos no POST
                 if ($tf_produto && is_array($tf_produto)) {
-                        if (count($tf_produto) == 1) {
+                        if (is_countable($tf_produto) ? count($tf_produto) : 0 == 1) {
                                 $tf_produto = $tf_produto[0];
                         } else {
                                 $tf_produto = implode("|", $tf_produto);
@@ -242,7 +242,7 @@ if (isset($BtnSearch)) {
                 }
 
                 $i = 0;
-                $num_col = count($tf_produto);
+                $num_col = is_countable($tf_produto) ? count($tf_produto) : 0;
                 while ($i <= $num_col) {
                         $filtro['produto' . $i] = $tf_produto[$i];
                         $palavra = urlencode($filtro['produto' . $i]);
@@ -252,7 +252,7 @@ if (isset($BtnSearch)) {
 
                 // Processa a seleção de valores no POST
                 if ($tf_pins && is_array($tf_pins)) {
-                        if (count($tf_pins) == 1) {
+                        if (is_countable($tf_pins) ? count($tf_pins) : 0 == 1) {
                                 $tf_pins = $tf_pins[0];
                         } else {
                                 $tf_pins = implode("|", $tf_pins);
@@ -263,7 +263,7 @@ if (isset($BtnSearch)) {
                 }
 
                 $i = 0;
-                $num_col_pin = count($tf_pins);
+                $num_col_pin = is_countable($tf_pins) ? count($tf_pins) : 0;
                 while ($i <= $num_col_pin) {
                         $filtro['pin' . $i] = $tf_pins[$i];
                         $palavra = urlencode($filtro['pin' . $i]);
@@ -314,7 +314,7 @@ if (isset($BtnSearch)) {
                 $somenteContar = 1;
                 include $raiz_do_projeto . "includes/gamer/inc_pesquisa_usuarios_sql.php";
                 $rs_usuario = SQLexecuteQuery($sql);
-                $rs_usuario_total = pg_fetch_array($rs_usuario);
+                $rs_usuario_total = $rs_usuario && pg_fetch_array($rs_usuario);
                 $total_table = $rs_usuario_total['total'];
                 // 2 => não executar a querie e montar o select completo
                 $somenteContar = 2;
@@ -1190,7 +1190,7 @@ require_once "/www/includes/bourls.php";
                                                                 $cor1 = $query_cor1;
                                                                 $cor2 = $query_cor1;
                                                                 $cor3 = $query_cor2;
-                                                                while ($rs_usuario_row = pg_fetch_array($rs_usuario)) {
+                                                                while ($rs_usuario_row = $rs_usuario && pg_fetch_array($rs_usuario)) {
                                                                         $cor1 = ($cor1 == $cor2) ? $cor3 : $cor2;
                                                                 ?>
                                                                         <tr bgcolor="<?php echo $cor1 ?>" class="texto" onmouseover="bgColor='#CFDAD7'" onmouseout="bgColor='<?php echo $cor1 ?>'">

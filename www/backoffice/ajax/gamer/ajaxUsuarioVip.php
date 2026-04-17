@@ -8,7 +8,7 @@
 	
 	require_once $raiz_do_projeto . "class/gamer/classUsuarioVip.php";
 	
-	if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST)) {
+	if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		
 		$ug_id = $_POST['ug_id'];
 		$op_id = $_POST['op_id'];

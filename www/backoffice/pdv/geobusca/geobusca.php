@@ -1,12 +1,20 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
+$_GET['ug_id'] = isset($_GET['ug_id']) ? $_GET['ug_id'] : '';
+$_GET['endereco'] = isset($_GET['endereco']) ? $_GET['endereco'] : '';
+$_GET['ug_cep'] = isset($_GET['ug_cep']) ? $_GET['ug_cep'] : '';
+
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
-$ug_id = $_GET['ug_id']; 
-$ug_endereco = $_GET['endereco']; 
-$ug_cep = $_GET['ug_cep'];
+$ug_id = $_GET['ug_id'] ?? ''; 
+$ug_endereco = $_GET['endereco'] ?? ''; 
+$ug_cep = $_GET['ug_cep'] ?? '';
+$ug_tipo_end = '';
+$ug_coord_lat = '';
+$ug_coord_lng = '';
 
 if(!empty($ug_endereco)) {
 	
@@ -91,12 +99,12 @@ $_GET['ug_cep'] = $ug_cep1.'-'.$ug_cep2;
     (<span id="ug_coord_lat"><?php echo $ug_coord_lat ?></span>; <span id="ug_coord_lng"><?php echo $ug_coord_lng ?></span>)
     <input type="button" name="buscar" class="btn btn-info btn-sm" value="Atualizar geolocalização com estes valores" id="buscar" onClick="atualizaGeo(document.getElementById('ug_coord_lat').innerHTML, document.getElementById('ug_coord_lng').innerHTML);"/>
   <hr />
-  <?php echo utf8_decode($_GET['endereco']); ?>,<?php echo $_GET['ug_cep']; ?>, Brasil
+  <?php echo pdv_utf8_to_iso($_GET['endereco']); ?>,<?php echo $_GET['ug_cep']; ?>, Brasil
   &nbsp;&nbsp;<input type="button" name="resetar" value="Renovar Endereço" id="buscar" class="btn btn-info btn-sm" onClick="document.getElementById('consulta').value = document.getElementById('consultaoculta').value ;"/>
   <br />
   ENDERE&Ccedil;O:&nbsp;
-    <input type="text" name="consulta" id="consulta" size = "100"  value="<?php echo utf8_decode($_GET['endereco']); ?>,<?php echo $_GET['ug_cep']; ?>, Brasil"/> 
-    <input type="hidden" name="consultaoculta" id="consultaoculta" size = "100"  value="<?php echo utf8_decode($_GET['endereco']); ?><?php echo $_GET['ug_cep']; ?>, Brasil"/> 
+    <input type="text" name="consulta" id="consulta" size = "100"  value="<?php echo pdv_utf8_to_iso($_GET['endereco']); ?>,<?php echo $_GET['ug_cep']; ?>, Brasil"/> 
+    <input type="hidden" name="consultaoculta" id="consultaoculta" size = "100"  value="<?php echo pdv_utf8_to_iso($_GET['endereco']); ?><?php echo $_GET['ug_cep']; ?>, Brasil"/> 
     <input type="submit" class="btn btn-info btn-sm" name="Ok" value="Consultar" />
 </p>
 </form>

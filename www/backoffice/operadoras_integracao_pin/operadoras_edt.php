@@ -300,12 +300,12 @@ if ($acao == 'novo') {
                     
                     //echo "opr_ip:".$opr_ip;
                     if (isset($opr_ip) && strpos($opr_ip, ';')) {
-                        $ips = explode(';', $opr_ip);
+                        $ips = explode(';', (string)($opr_ip ?? ""));
                         $singles_ip = '';
                         $ranged = array();
                         foreach ($ips as $ip) {
                             if (strpos($ip, '-') !== false) {
-                                list($inicial, $final) = explode('-', $ip);
+                                list($inicial, $final) = explode('-', (string)($ip ?? ""));
                                 $ranged[] = array(
                                     'inicial' => $inicial,
                                     'final' => $final,
@@ -318,11 +318,11 @@ if ($acao == 'novo') {
                     else $singles_ip = $opr_ip;
                     //echo "singles_ip:".$singles_ip;
                     // Limpando ';' desnecessarios
-                    $singles_ip = trim(implode(';', array_filter(explode(';', $singles_ip))));
+                    $singles_ip = trim(implode(';', array_filter(explode(';', (string)($singles_ip ?? "")))));
                     $primeiro_range = '';
                     $segundo_range = '';
 
-                    if (isset($ranged) && count($ranged) > 0) {
+                    if (isset($ranged) && (is_countable($ranged) ? count($ranged) : 0) > 0) {
                         $primeiro_range = $ranged[0]['inicial'];
                         $segundo_range = $ranged[0]['final'];
                     }
@@ -353,8 +353,8 @@ if ($acao == 'novo') {
                     </tr>
                     <?php
                     $i_ranged = 1;
-                    if (isset($ranged) && count($ranged) > 1) {
-                        for ($i = 1; $i < count($ranged); $i++) {
+                    if (isset($ranged) && (is_countable($ranged) ? count($ranged) : 0) > 1) {
+                        for ($i = 1; $i < (is_countable($ranged) ? count($ranged) : 0); $i++) {
                             $i_ranged++;
                             $n = 1;
                             ?>

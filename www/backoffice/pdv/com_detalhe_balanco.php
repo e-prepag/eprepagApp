@@ -14,8 +14,8 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 
 
 header("Content-Type: text/html; charset=ISO-8859-1",true); 
-$id_lan = $_GET['id_lan'];
-$bal_id = $_GET['bal_id'];
+$id_lan = $_GET['id_lan'] ?? '';
+$bal_id = $_GET['bal_id'] ?? '';
 $query = "select * from dist_balancos where db_id = '$bal_id' and db_ug_id = '$id_lan' ";
 $res = SQLexecuteQuery($query);
 	if ( $info_balanco = pg_fetch_array($res)) {
@@ -179,27 +179,27 @@ $res = SQLexecuteQuery($query);
 		</tr>
 		<tr>
 			 <td bgcolor="#EEEEEE"><div align="left"><strong>Total Boletos</strong></div></td>
-			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $val_boletos ?></div></td>
+			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $val_boletos ?></div></td>
 			 <td bgcolor="#EEEEEE"><div align="left">Qtde</div></td>
-			 <td width="179" bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $qtde_boletos ?></div></td>
+			 <td width="179" bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $qtde_boletos ?></div></td>
 		</tr>
 		<tr>
 			 <td bgcolor="#EEEEEE"><div align="left"><strong>Total Cortes</strong></div></td>
-			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $val_cortes ?></div></td>
+			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $val_cortes ?></div></td>
 			 <td bgcolor="#EEEEEE"><div align="left">Qtde</div></td>
-			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $qtde_cortes ?></div></td>
+			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $qtde_cortes ?></div></td>
 		</tr>
 	   <tr>
 			 <td bgcolor="#EEEEEE"><div align="left"><strong>Total Vendas</strong></div></td>
-			 <td width="157" bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $val_vendas ?></div></td>
+			 <td width="157" bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $val_vendas ?></div></td>
 			 <td width="110" bgcolor="#EEEEEE"><div align="left">Qtde</div></td>
-			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $qtde_vendas ?></div></td>
+			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $qtde_vendas ?></div></td>
 		</tr>
 	   <tr>
 			 <td bgcolor="#EEEEEE"><div align="left"><strong>Total Pagto Online</strong></div></td>
-			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $val_pagonline ?></div></td>
+			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $val_pagonline ?></div></td>
 			 <td bgcolor="#EEEEEE"><div align="left">Qtde</div></td>
-			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<? echo $qtde_pagonline ?></div></td>
+			 <td bgcolor="#F5F5FB"><div align="left">&nbsp;<?php  echo $qtde_pagonline ?></div></td>
 		</tr>
 		<tr>
 			 <td bgcolor="#EEEEEE">&nbsp;</td>

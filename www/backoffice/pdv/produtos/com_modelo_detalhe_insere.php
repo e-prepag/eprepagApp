@@ -9,11 +9,13 @@ $msg = "";
 
 $produto_id = $_REQUEST['produto_id'] ?? null;
 $modelo_id = $_REQUEST['modelo_id'] ?? null;
+$BtnInserir = $_POST['BtnInserir'] ?? null;
 $ogpm_ogp_id = $_POST['ogpm_ogp_id'] ?? null;
 $ogpm_ativo = $_POST['ogpm_ativo'] ?? null;
 $ogpm_pin_valor = $_POST['ogpm_pin_valor'] ?? null;
 $ogpm_valor = $_POST['ogpm_valor'] ?? null;
 $ogpm_valor_eppcash = $_POST['ogpm_valor_eppcash'] ?? null;
+$ogpm_perc_desconto = $_POST['ogpm_perc_desconto'] ?? '0,00';
 $opr_markup = $_POST['opr_markup'] ?? null;
 $ogpm_nome = $_POST['ogpm_nome'] ?? null;
 $ogpm_descricao = $_POST['ogpm_descricao'] ?? null;
@@ -29,8 +31,8 @@ if ($msg == "") {
 
   if ($BtnInserir) {
 
-    $ogpm_pin_valor_markup = str_replace(",", ".", $ogpm_pin_valor_markup) * 1;
-    $ogpm_pin_valor_markup = empty($ogpm_pin_valor_markup) ? str_replace(",", ".", $ogpm_valor) : str_replace(",", ".", $ogpm_pin_valor_markup);
+    $ogpm_pin_valor_markup = str_replace(",", ".", (string)$ogpm_pin_valor_markup);
+    $ogpm_pin_valor_markup = ($ogpm_pin_valor_markup === "") ? str_replace(",", ".", (string)$ogpm_valor) : $ogpm_pin_valor_markup;
 
     //cria objeto modelo
     $modelo = new ProdutoModelo($modelo_id, $produto_id, $ogpm_nome, $ogpm_descricao, $ogpm_valor, $ogpm_perc_desconto, $ogpm_ativo, null, null, $ogpm_pin_valor, null, null, $ogpm_pin_resquest_id, $ogpm_pin_valor_markup);
@@ -57,7 +59,7 @@ if ($msg == "") {
       $instProduto = new Produto();
       $ret = $instProduto->obterMelhorado($filtro, null, $rs);
 
-      if ($rs && pg_num_rows($rs) > 0) {
+      if ($rs && (($rs) ? pg_num_rows($rs) : 0) > 0) {
         for ($i = 0; $rs_row = pg_fetch_array($rs); $i++) {
           if (!empty($rs_row['ogp_nome'])) {
             $produto                                    = new stdClass();
@@ -110,7 +112,7 @@ if ($msg == "") {
                                                                 $instProduto = new Produto();
                                                                 $ret = $instProduto->obtermelhorado($filtro, null, $rs_produto);
                                                                 if ($ret != "") $msg = $ret;
-                                                                else if (!$rs_produto || pg_num_rows($rs_produto) == 0) $msg = "Nenhum produto encontrado.\n";
+                                                                else if (!$rs_produto || (($rs_produto) ? pg_num_rows($rs_produto) : 0) == 0) $msg = "Nenhum produto encontrado.\n";
                                                                 else {
                                                                   $rs_produto_row = pg_fetch_array($rs_produto);
                                                                   $ogp_id       = $rs_produto_row['ogp_id'];
@@ -250,7 +252,7 @@ if ($msg == "") {
                 <select name="ogpm_pin_valor" class="form2">
                   <option value="">Selecione</option>
                   <?php if ($rs_pins) while ($rs_pins_row = pg_fetch_array($rs_pins)) { ?>
-                    <option value="<?php echo $rs_pins_row['pin_valor']; ?>" <?php if ($ogpm_pin_valor == $rs_pins_row['pin_valor']) echo "selected"; ?>><?php echo number_format($rs_pins_row['pin_valor'], 2, ',', '.'); ?></option>
+                    <option value="<?php echo $rs_pins_row['pin_valor']; ?>" <?php if ($ogpm_pin_valor == $rs_pins_row['pin_valor']) echo "selected"; ?>><?php echo number_format((float)($rs_pins_row['pin_valor'] ?? 0), 2, ',', '.'); ?></option>
                   <?php } ?>
                 </select>
                 <nobr>(valores cadastrados na tabela de operadoras para <?php echo $opr_nome . ", cód: " . $ogp_opr_codigo . ""; ?>)</nobr>

@@ -25,24 +25,24 @@ $msg = "";
 if($msg == ""){
 	$sql_filters = array();
 	$sql  = "SELECT *,to_char(dilp_data,'DD/MM/YYYY HH24:MI:SS') as dilp_data_aux from dist_ip_log_publisher "; 
-	if(isset($tf_v_data_inclusao_ini) && strlen($tf_v_data_inclusao_ini))
+	if(isset($tf_v_data_inclusao_ini) && strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql_filters[] = "dilp_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(isset($tf_v_data_inclusao_fim) && strlen($tf_v_data_inclusao_fim))
+	if(isset($tf_v_data_inclusao_fim) && strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql_filters[] = "dilp_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	if(!empty($opr_codigo)||$opr_codigo==='0')
 				$sql_filters[] = "opr_codigo = ".addslashes($opr_codigo);
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= "WHERE ".$sql_aux;
 	}
 //	echo $sql;
 	$rs_total = SQLexecuteQuery($sql);
-	if($rs_total) $registros_total = pg_num_rows($rs_total);
+	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY dilp_data DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
 	$rs_log = SQLexecuteQuery($sql);
-	if(!$rs_log || pg_num_rows($rs_log) == 0) $msg = "Nenhum pin encontrado.\n";
+	if(!$rs_log || (($rs_log) ? pg_num_rows($rs_log) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="<?php echo $url; ?>:<?php echo $server_port; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

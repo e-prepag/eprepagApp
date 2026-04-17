@@ -1,4 +1,5 @@
-<?php  
+<?php
+require_once "/www/backoffice/includes/encoding.php";
 set_time_limit ( 3000 ) ;
 $pagina_titulo = "Lista de pagamentos";
 
@@ -52,7 +53,7 @@ $a_emails = array();
 $a_formas_aceitas = array("5", "6", "9", "A", "B", "E", "EG", "P", "C", "Q", "Z","R");
 
 //paginacao
-$p = $_REQUEST['p'];
+$p = $_REQUEST['p'] ?? 1;
 if(!$p) $p = 1;
 $registros = 50;
 $registros_total = 0;
@@ -235,7 +236,7 @@ echo "$s_ids<hr>";
 					 $html .= "<th><b>Venda</b></th>";
 					 $html .= "<th><b>Data inicio</b></th>";
 					 $html .= "<th><b>Data pagto</b></th>";
-					 $html .= "<th><b>".utf8_encode("Usuário")."</b></th>";
+					 $html .= "<th><b>".backoffice_iso_to_utf8("Usuário")."</b></th>";
 					 $html .= "<th><b>Canal</b></th>";
 					 $html .= "<th><b>Cesta</b></th>";
 					 $html .= "<th><b>TD</b></th>";
@@ -280,9 +281,9 @@ echo "$s_ids<hr>";
 					$html .= "<td style='text-align:center;'>".$row["idvenda"]."</td>";
 					$html .= "<td style='text-align:center;'>".$row["datainicio"]."</td>";
 					$html .= "<td style='text-align:center;'>".$row["datacompra"]."</td>";
-					$html .= "<td style='text-align:center;'>".utf8_decode($row["cliente_nome"])." (id:".$row["idcliente"].") ".$row["ug_email"]."</td>";
-					$html .= "<td style='text-align:center;'>".utf8_encode($tipo)."</td>";
-					$html .= "<td style='text-align:center;'>".utf8_encode(substr($row['cesta'],0,strlen($row['cesta'])-1))."</td>";
+					$html .= "<td style='text-align:center;'>".backoffice_utf8_to_iso($row["cliente_nome"])." (id:".$row["idcliente"].") ".$row["ug_email"]."</td>";
+					$html .= "<td style='text-align:center;'>".backoffice_iso_to_utf8($tipo)."</td>";
+					$html .= "<td style='text-align:center;'>".backoffice_iso_to_utf8(substr($row['cesta'],0,strlen($row['cesta'])-1))."</td>";
 					$html .= "<td style='text-align:center;'>".$row['tipo_deposito']."</td>";
                     $html .= "<td style='text-align:center;'>".number_format(($row['total']/100-$row['taxas']), 2, '.', '')."</td>";
 					$html .= "<td style='text-align:center;'>".number_format(($row['taxas']), 2, '.', '')."</td>";
@@ -982,7 +983,7 @@ echo "iforma: '".$rs_transacoes_row['iforma']."', subiforma: '$subiforma', valor
 					}
 				?>
 				  <td class="texto" align="center" valign="top">
-				  <a href="<?php echo $surl_vendas ?>" target="_blank"><?php echo utf8_decode(get_tipo_cliente_descricao($rs_transacoes_row['tipo_cliente'])) ?></a>
+				  <a href="<?php echo $surl_vendas ?>" target="_blank"><?php echo backoffice_utf8_to_iso(get_tipo_cliente_descricao($rs_transacoes_row['tipo_cliente'])) ?></a>
 				  <br>
 					<?php echo getLogoBancoSmall($rs_transacoes_row['iforma'], $subiforma); //(($rs_transacoes_row['iforma']==5)?"<img src='../../images/logo-bradesco-small.gif' width='15' height='15' border='0' title='Bradesco'>":(($rs_transacoes_row['iforma']==6)?"<img src='../../images/logo-bradesco-small.gif' width='15' height='15' border='0' title='Bradesco'>":(($rs_transacoes_row['iforma']==9)?"<img src='../../images/B_Brasil-small.gif' width='15' height='15' border='0' title='Banco do Brasil'>":(($rs_transacoes_row['iforma']=='A')?"<img src='../../images/itau-small.gif' width='15' height='15' border='0' title='Itaú'>":"??*??")))); 
 					?>

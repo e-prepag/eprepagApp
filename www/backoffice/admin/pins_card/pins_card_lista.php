@@ -165,7 +165,7 @@ if (!empty($op)) {
 			if (!$ret) $msg = "<font color='#FF0000'><b>Erro ao iniciar transa&cceil;&atilde;o.\n</b></font><br>";
 		}
 		// testa status do pin antes de mudar
-		for ($i = 0; $i < count($ids_temp); $i++) {
+		for ($i = 0; $i < (is_countable($ids_temp) ? count($ids_temp) : 0); $i++) {
 			if ($msg == "") {
 				list($codlote, $codopr, $opr_codigo) = explode("|", $ids_temp[$i]);
 				$sql  = "update pins_card set pin_status='" . intval($status_new) . "'" . $setAdicinal . " where pin_lote_codigo=" . intval($codlote) . " and distributor_codigo=" . intval($codopr) . " and opr_codigo=" . intval($opr_codigo) . " and pin_status!='" . intval($status_new) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['D']) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['U']) . "' and pin_status!='" . intval($PINS_STORE_STATUS_VALUES['C']) . "' " . $condAdicional;
@@ -178,7 +178,7 @@ if (!empty($op)) {
 				}
 			}
 		}
-		if (strlen($ids) > 0) {
+		if (strlen((string)($ids ?? "")) > 0) {
 			$msg_pin .= "<font color='#FF0000'><b>N&atilde;o foi selecionado nenhum LOTE v&aacute;lido ('$op', '<<$ids>>')</b></font><br>";
 		}
 		//Finaliza transacao
@@ -213,26 +213,26 @@ if ($msg == "" && isset($btPesquisar)) {
 			$sql .= " and pin_status='" . intval($tf_v_tipo) . "' ";
 		}
 	}
-	if (strlen($opr_codigo))
+	if (strlen((string)($opr_codigo ?? "")))
 		$sql .= " and opr_codigo=" . intval($opr_codigo);
-	if (strlen($distributor_codigo))
+	if (strlen((string)($distributor_codigo ?? "")))
 		$sql .= " and distributor_codigo=" . intval($distributor_codigo);
-	if (strlen($lote))
+	if (strlen((string)($lote ?? "")))
 		$sql .= " and pin_lote_codigo=" . intval($lote);
-	if (strlen($valor))
+	if (strlen((string)($valor ?? "")))
 		$sql .= " and pin_valor=" . intval($valor);
-	if (strlen($tf_v_data_inclusao_ini))
+	if (strlen((string)($tf_v_data_inclusao_ini ?? "")))
 		$sql .= " and pin_dataentrada >= to_timestamp('" . addslashes($tf_v_data_inclusao_ini) . " 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if (strlen($tf_v_data_inclusao_fim))
+	if (strlen((string)($tf_v_data_inclusao_fim ?? "")))
 		$sql .= " and pin_dataentrada <= to_timestamp('" . addslashes($tf_v_data_inclusao_fim) . " 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	$sql .= " group by opr_codigo, distributor_codigo, pin_lote_codigo, data, pin_valor ";
 	$rs_total = SQLexecuteQuery($sql);
-	if ($rs_total) $registros_total = pg_num_rows($rs_total);
+	if ($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " order by distributor_codigo, pin_valor ";
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 	//echo $sql ."<br>\n";//die();
 	$rs_pins = SQLexecuteQuery($sql);
-	if (!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+	if (!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <div class="col-md-12">
@@ -385,7 +385,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$sql_total = "select count(pc.pin_codinterno) as total from pins_card pc where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and opr_codigo = " . $rs_pins_row['opr_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "'";
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												echo $rs_total_row['total'];
 												$auxTesteDip = $rs_total_row['total'];
@@ -398,7 +398,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$sql_total = "select count(pc.pin_codinterno) as total from pins_card pc where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and opr_codigo = " . $rs_pins_row['opr_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['D']) . "' ";
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												//if ($rs_total_row['total']<$auxTesteDip)
 												if ($rs_total_row['total'] > 0)
@@ -414,7 +414,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											// echo $sql_total;
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";
@@ -428,7 +428,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$sql_total = "select count(pc.pin_codinterno) as total from pins_card pc where distributor_codigo = " . $rs_pins_row['distributor_codigo'] . " and opr_codigo = " . $rs_pins_row['opr_codigo'] . " and pin_lote_codigo = " . $rs_pins_row['pin_lote_codigo'] . " and to_char(pin_dataentrada,'DD/MM/YYYY') = '" . $rs_pins_row['data'] . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['A']) . "' ";
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";
@@ -443,7 +443,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
 											unset($aux_utilizado);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";
@@ -459,7 +459,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
 											unset($aux_bloqueado);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";
@@ -475,7 +475,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
 											unset($aux_cancelado);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";
@@ -492,7 +492,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
 											unset($aux_ja_arq);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";
@@ -520,7 +520,7 @@ if ($msg == "" && isset($btPesquisar)) {
 											$rs_total = SQLexecuteQuery($sql_total);
 											unset($rs_total_row);
 											unset($aux_ja_arq);
-											if ($rs_total && pg_num_rows($rs_total) > 0) {
+											if ($rs_total && (($rs_total) ? pg_num_rows($rs_total) : 0) > 0) {
 												$rs_total_row = pg_fetch_array($rs_total);
 												if ($rs_total_row['total'] > 0)
 													echo "<font color='#000000' size='2' style='font-weight:bold;'>" . $rs_total_row['total'] . "</font>";

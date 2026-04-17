@@ -33,7 +33,7 @@ if (!$_SESSION['secret']) {
 
         $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($fetch) == 1) {
+        if ((is_countable($fetch) ? count($fetch) : 0) == 1) {
 
             $pgrow = $fetch[0];
             $bcrypt = new SecureEncryption();

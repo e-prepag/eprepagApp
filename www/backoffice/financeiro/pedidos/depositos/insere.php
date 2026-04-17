@@ -36,9 +36,9 @@ function getCodigoHistorico($banco, $historico){
         $v = array(170=>TAR, 617=>MOV);
         return (array_key_exists((int) $historico, $v) ? $v[$historico] : 0);
     } else { // banco itau
-        if (strtolower(substr(trim($historico), 0, 3)) == 'mov') {
+        if (strtolower(substr(trim((string)($historico ?? "")), 0, 3)) == 'mov') {
             return MOV;
-        } elseif (strtolower(substr(trim($historico), 0, 3)) == 'tar') {
+        } elseif (strtolower(substr(trim((string)($historico ?? "")), 0, 3)) == 'tar') {
             return TAR;
         }
     }
@@ -55,15 +55,15 @@ function getCodigoHistorico($banco, $historico){
         $FrmEnviar = 1;
         $msg = "";
         
-        if(trim($ta_depositos) == "") {
+        if(trim((string)($ta_depositos ?? "")) == "") {
             $FrmEnviar = 0;
             $area_vazio = true;
         }
         
         if(isset($FrmEnviar) && $FrmEnviar == 1) {
-            $depositos = explode("\n", $ta_depositos);
+            $depositos = explode("\n", (string)($ta_depositos ?? ""));
 
-            if(!$dd_banco_index || trim($dd_banco_index) == "" || !is_numeric($dd_banco_index)) $msg .= "Um banco deve ser selecionado.\n";
+            if(!$dd_banco_index || trim((string)($dd_banco_index ?? "")) == "" || !is_numeric($dd_banco_index)) $msg .= "Um banco deve ser selecionado.\n";
 
             if($msg == ""){
 
@@ -79,7 +79,7 @@ function getCodigoHistorico($banco, $historico){
                 //Banco do Brasil
                 if ( $BOLETO_MONEY_BANCO_DO_BRASIL_COD_BANCO == $dd_banco ) { // Banco do Brasil - 001
                         $tipo_pagamento = '9'; // rfcb_tipo_pagamento
-                        $linhas = explode(PHP_EOL, $ta_depositos);
+                        $linhas = explode(PHP_EOL, (string)($ta_depositos ?? ""));
                         $inicioEncontrado = false;
                         $fimEncontrado = false;
 
@@ -101,16 +101,16 @@ function getCodigoHistorico($banco, $historico){
                             setlocale(LC_MONETARY, 'pt_BR');
                             foreach ( $extratoBB as $n => $linha ) {
                                 if ( $n > 0 ) {
-                                    $data_movimento = trim(substr($linha, 3, 10));
-    //                                                $data_balancete = trim(substr($linha, 18, 10)); //comentado pois com essa validacao nao importava os campos de taxa_extrato e valor_extrato de acordo com o registro importado
-                                    $cod_historico = trim(substr($linha, 30, 3));
-                                    $historico = strtoupper(trim(substr($linha, 34, 21)));
-                                    $documento = str_replace('.','', trim(substr($linha, 55, 19)));
-                                    $valor = str_replace('.', '', trim(substr($linha, 75, 15)));
+                                    $data_movimento = trim(substr((string)($linha ?? ""), 3, 10));
+    //                                                $data_balancete = trim(substr((string)($linha ?? ""), 18, 10)); //comentado pois com essa validacao nao importava os campos de taxa_extrato e valor_extrato de acordo com o registro importado
+                                    $cod_historico = trim(substr((string)($linha ?? ""), 30, 3));
+                                    $historico = strtoupper(trim(substr((string)($linha ?? ""), 34, 21)));
+                                    $documento = str_replace('.','', trim(substr((string)($linha ?? ""), 55, 19)));
+                                    $valor = str_replace('.', '', trim(substr((string)($linha ?? ""), 75, 15)));
                                     $valor = str_replace(',', '.', $valor);
-                                    $tipo = trim(substr($linha, 90, 1));
-                                    $saldo = trim(substr($linha, 93, 15));
-                                    $tipo_saldo =    trim(substr($linha, 107, 1));
+                                    $tipo = trim(substr((string)($linha ?? ""), 90, 1));
+                                    $saldo = trim(substr((string)($linha ?? ""), 93, 15));
+                                    $tipo_saldo =    trim(substr((string)($linha ?? ""), 107, 1));
                                     $data_formatada = formata_data($data_movimento,1);
                                     if ( strtoupper($historico) === STR_SALDO_EXCLUDE || strtoupper($historico) === STR_TED_EXCLUDE || in_array($cod_historico, array(COD_TRANSFERENCIA_ONLINE, COD_TRANSFERENCIA_AGENDADA, COD_DEPOSITO_BLOQUEADO))) continue;
 
@@ -125,7 +125,7 @@ function getCodigoHistorico($banco, $historico){
 
                                     $rsVerDep = SQLexecuteQuery($sqlVerDep);
 
-                                    if (pg_num_rows($rsVerDep) > 0) {
+                                    if ((($rsVerDep) ? pg_num_rows($rsVerDep) : 0) > 0) {
                                         $msg .= "Erro ao inserir depósito: Valor=\"$valor\" Data=\"$data_movimento\" Cod Doc=\"$cod_historico\" Hist=\"$historico\"  Doc=\"$documento\" - Dado Duplicado\n\n";
                                         //echo "<br>SQL: {$sqlVerDep}<br><br>";
                                     } else {
@@ -138,8 +138,8 @@ function getCodigoHistorico($banco, $historico){
                                         if ( in_array($eprepagCode, array(MOV, TAR))) {
                                             // Temos que encontrar a data correta do movimento (não data do extrato)
                                             // Banco do Brasil = D+2
-                                            list($ano, $mes, $dia) = explode('-', $data_formatada);
-                                            $dia = substr($dia, 0, 2);
+                                            list($ano, $mes, $dia) = explode('-', (string)($data_formatada ?? ""));
+                                            $dia = substr((string)($dia ?? ""), 0, 2);
                                             $data = "$dia/$mes/$ano";
                                             $stimestamp = $feriados->subDiaUtil($data, 2);
 
@@ -152,7 +152,7 @@ function getCodigoHistorico($banco, $historico){
                                             
                                             $rsVerRelFin = SQLexecuteQuery($sqlVerRelFin);
 
-                                            if ( pg_num_rows($rsVerRelFin) > 0 ) {
+                                            if ( (($rsVerRelFin) ? pg_num_rows($rsVerRelFin) : 0) > 0 ) {
                                                 // Agora que sabemos que existe a linha, vamos atualiza-la
                                                 $dataVerRelFin = pg_fetch_assoc($rsVerRelFin);
 
@@ -172,7 +172,7 @@ function getCodigoHistorico($banco, $historico){
                                         $sql  = "insert into depositos_pendentes (dep_valor, dep_data, dep_banco, dep_agencia, dep_conta, dep_cod_documento, dep_documento {$fieldCode}) ";
                                         $sql .= "values ({$valor}, '{$data_formatada}', '{$dd_banco}', '{$dd_agencia}', '{$dd_conta}', '{$historico}', '{$documento}' {$valueCode}) ";
                                         $result = pg_query($connid, $sql);
-                                        if(!$result) {
+                                        if(!isset($result) || !$result) {
                                             $msg .= "Erro ao inserir depósito: Valor=\"$valor\" Data=\"$data_movimento\" Cod Doc=\"$cod\" Doc=\"$doc\"\n$sql\n\n";
                                         }
                                     }
@@ -185,24 +185,24 @@ function getCodigoHistorico($banco, $historico){
 
                 //Caixa Economica Federal
                 if($dd_banco == $BOLETO_MONEY_CAIXA_COD_BANCO) { // 104
-                    for($t = 0; $t < count($depositos); $t++)
+                    for($t = 0; $t < (is_countable($depositos) ? count($depositos) : 0); $t++)
                         {
-                            $data=trim(substr($depositos[$t],0,12));
-                            $doc=trim(substr($depositos[$t],12,8));
-                            $cod=trim(substr($depositos[$t],20,10));
-                            $valor_tmp=substr($depositos[$t],30,13);
-                            $valor=str_replace(",",".",str_replace(".","",trim(substr($valor_tmp,0,strpos($valor_tmp,'C')))));
+                            $data=trim(substr((string)($depositos[$t] ?? ""),0,12));
+                            $doc=trim(substr((string)($depositos[$t] ?? ""),12,8));
+                            $cod=trim(substr((string)($depositos[$t] ?? ""),20,10));
+                            $valor_tmp=substr((string)($depositos[$t] ?? ""),30,13);
+                            $valor=str_replace(",",".",str_replace(".","",trim(substr((string)($valor_tmp ?? ""),0,strpos($valor_tmp,'C')))));
 
-                            if(trim($doc)!= "" && !is_numeric($doc)) $msg .= "Documento ($doc) deve ser númerico.\n";
-                            if(trim($valor)!= "" && !is_numeric($valor)) $msg .= "Valor ($valor) deve ser númerico.\n";
+                            if(trim((string)($doc ?? ""))!= "" && !is_numeric($doc)) $msg .= "Documento ($doc) deve ser númerico.\n";
+                            if(trim((string)($valor ?? ""))!= "" && !is_numeric($valor)) $msg .= "Valor ($valor) deve ser númerico.\n";
 
                             if($msg == ""){
-                                if(is_numeric(substr($data,0,2)) && is_numeric(substr($data,3,2)) && trim($cod) && trim($doc) && trim($valor)) {
+                                if(is_numeric(substr((string)($data ?? ""),0,2)) && is_numeric(substr((string)($data ?? ""),3,2)) && trim((string)($cod ?? "")) && trim((string)($doc ?? "")) && trim((string)($valor ?? ""))) {
                                     $sql  = "insert into depositos_pendentes (dep_valor, dep_data, dep_banco, dep_agencia, dep_conta, dep_cod_documento, dep_documento) ";
                                     $sql .= "values ('".$valor."', '".formata_data($data,1)."', '".$dd_banco."', '".$dd_agencia."', '".$dd_conta."', '".$cod."', '".$doc."') ";
 
                                      $result = pg_query($connid, $sql);
-                                     if(!$result) $msg .= "Erro ao inserir depósito: Valor=\"$valor\" Data=\"$data\" Cod Doc=\"$cod\" Doc=\"$doc\"\n$sql\n\n";
+                                     if(!isset($result) || !$result) $msg .= "Erro ao inserir depósito: Valor=\"$valor\" Data=\"$data\" Cod Doc=\"$cod\" Doc=\"$doc\"\n$sql\n\n";
                                 }
                             }
                         }
@@ -214,27 +214,27 @@ function getCodigoHistorico($banco, $historico){
                     $tipo_pagamento = '5'; // rfcb_tipo_pagamento
                     $linha = $depositos;
                     $data_anterior = null;
-                    for($x = 0 ; $x < count($linha) ; $x++){
+                    for($x = 0 ; $x < (is_countable($linha) ? count($linha) : 0) ; $x++){
 
-                        $data = substr($linha[$x], 164, 8);
-                        $cod = strtoupper(trim(substr($linha[$x], 49, 25)));
-                        $cod2 = strtoupper(trim(substr($linha[$x], 105, 44)));
-                        $doc = substr($linha[$x], 149, 8);
-                        $valor = substr($linha[$x], 95, 9);
+                        $data = substr((string)($linha[$x] ?? ""), 164, 8);
+                        $cod = strtoupper(trim(substr((string)($linha[$x] ?? ""), 49, 25)));
+                        $cod2 = strtoupper(trim(substr((string)($linha[$x] ?? ""), 105, 44)));
+                        $doc = substr((string)($linha[$x] ?? ""), 149, 8);
+                        $valor = substr((string)($linha[$x] ?? ""), 95, 9);
 
-                        $identReg = substr($linha[$x], 0, 1);
-                        $lanc = substr($linha[$x], 41, 1);
-                        $tipoLanc = strtoupper(substr($linha[$x], 104, 1));
-                        $agencia = substr($linha[$x], 17, 4);
-                        $conta = substr($linha[$x], 33, 8);
+                        $identReg = substr((string)($linha[$x] ?? ""), 0, 1);
+                        $lanc = substr((string)($linha[$x] ?? ""), 41, 1);
+                        $tipoLanc = strtoupper(substr((string)($linha[$x] ?? ""), 104, 1));
+                        $agencia = substr((string)($linha[$x] ?? ""), 17, 4);
+                        $conta = substr((string)($linha[$x] ?? ""), 33, 8);
 
 
                         if($identReg == '1' && $lanc == '1' && $tipoLanc == 'C'){
-                            if(substr($cod, 0, 3) == 'DEP' || substr($cod, 0, 6) == 'TRANSF' || substr($cod, 0, 3) == 'DOC' || substr($cod, 0, 3) == 'TED'){
+                            if(substr((string)($cod ?? ""), 0, 3) == 'DEP' || substr((string)($cod ?? ""), 0, 6) == 'TRANSF' || substr((string)($cod ?? ""), 0, 3) == 'DOC' || substr((string)($cod ?? ""), 0, 3) == 'TED'){
 
                                 //Validacao
                                 $dd_agencia_aux = $dd_agencia;
-                                if(strpos($dd_agencia, "-") !== false) $dd_agencia_aux = substr($dd_agencia, 0, strpos($dd_agencia, "-"));
+                                if(strpos($dd_agencia, "-") !== false) $dd_agencia_aux = substr((string)($dd_agencia ?? ""), 0, strpos($dd_agencia, "-"));
                                 $dd_agencia_aux = str_pad($dd_agencia_aux, 4, "0", STR_PAD_LEFT);
                                 $agencia_aux = str_pad($agencia, 4, "0", STR_PAD_LEFT);
                                 $dd_conta_aux = str_replace(".", "", str_replace("-", "", $dd_conta));
@@ -243,43 +243,43 @@ function getCodigoHistorico($banco, $historico){
                                 if($agencia_aux != $dd_agencia_aux) $msg .= "Agência no arquivo ($agencia) difere da agência selecionada ($dd_agencia).\n";
                                 if($conta_aux != $dd_conta_aux) $msg .= "Conta no arquivo ($conta) difere da conta selecionada ($dd_conta).\n";
 
-                                if(verifica_data(substr($data, 0, 2) . "/" . substr($data, 2, 2) . "/" . substr($data, 4, 4)) == 0) $msg .= "Data ($data) inválida.\n";
-                                if(trim($doc)!= "" && !is_numeric($doc)) $msg .= "Documento ($doc) deve ser númerico.\n";
-                                if(trim($valor)!= "" && !is_numeric($valor)) $msg .= "Valor ($valor) deve ser númerico.\n";
+                                if(verifica_data(substr((string)($data ?? ""), 0, 2) . "/" . substr((string)($data ?? ""), 2, 2) . "/" . substr((string)($data ?? ""), 4, 4)) == 0) $msg .= "Data ($data) inválida.\n";
+                                if(trim((string)($doc ?? ""))!= "" && !is_numeric($doc)) $msg .= "Documento ($doc) deve ser númerico.\n";
+                                if(trim((string)($valor ?? ""))!= "" && !is_numeric($valor)) $msg .= "Valor ($valor) deve ser númerico.\n";
 
                                 if($msg != "") break;
                                 else {
-                                    $data = substr($data, 4, 4) . "-" . substr($data, 2, 2) . "-" . substr($data, 0, 2);
+                                    $data = substr((string)($data ?? ""), 4, 4) . "-" . substr((string)($data ?? ""), 2, 2) . "-" . substr((string)($data ?? ""), 0, 2);
                                     $valor = intval($valor) / 100;
 
                                     $sql  = "select dep_valor from depositos_pendentes where ";
                                     $sql .= "   dep_valor='$valor' and dep_data='$data' and dep_cod_documento='$cod' and dep_documento='$doc'";
                                     $sql .= "   and dep_banco='$dd_banco' and dep_agencia='$dd_agencia' and dep_conta='$dd_conta' ";
                                     $result = pg_exec($connid, $sql);
-                                    if(pg_num_rows($result) > 0) {
+                                    if((($result) ? pg_num_rows($result) : 0) > 0) {
                                         $msgInfo .= "Depósito duplicado: $data, $dd_banco, $agencia, $conta, $doc, $cod, $valor, $cod2\n";
                                     } else {
                                         $sql  = "insert into depositos_pendentes (dep_valor, dep_data, dep_banco, dep_agencia, dep_conta, dep_cod_documento, dep_cod_documento2, dep_documento) ";
                                         $sql .= "values (".$valor.", '".$data."', '".$dd_banco."', '".$dd_agencia."', '".$dd_conta."', '".$cod."', '".$cod2."', '".$doc."') ";
                                         $result = pg_exec($connid, $sql);
-                                        if(!$result) $msg .= "Erro ao inserir depósito: Valor='$valor' Data='$data' Cod Doc='$cod' Doc='$doc' \n$sql\n\n";
+                                        if(!isset($result) || !$result) $msg .= "Erro ao inserir depósito: Valor='$valor' Data='$data' Cod Doc='$cod' Doc='$doc' \n$sql\n\n";
                                         //Excluindo a conta para depósito OffLine
                                         elseif ($dd_conta != $BANCO_DEP[INDICE_CONTA_BRADESCO_DEP_OFFLINE_ANTIGA][3] && $dd_conta != $BANCO_DEP[INDICE_CONTA_BRADESCO_DEP_OFFLINE_NOVA][3]) {
                                             
                                                 // Agora verificamos se essa data existe no relatorio de conciliacao bancaria
                                                 // se sim, vamos atualizar os dados
                                                 $data_formatada = $data;
-                                                $valor = str_replace(',', '.', trim($valor));
+                                                $valor = str_replace(',', '.', trim((string)($valor ?? "")));
                                                 $sqlFreeze = "SELECT rfcb_id,rfcb_data_registro FROM relfin_conciliacao_bancaria WHERE rfcb_data_registro = '{$data_formatada}' AND rfcb_tipo_pagamento='{$tipo_pagamento}' and rfcb_freeze_bradesco=1; ";
                                                 $rsFreeze = SQLexecuteQuery($sqlFreeze);
                                                 //echo "<br><br> - $sqlFreeze<br>";
-                                                if ( pg_num_rows($rsFreeze) == 0 ) {
+                                                if ( (($rsFreeze) ? pg_num_rows($rsFreeze) : 0) == 0 ) {
                                                     
                                                         // Agora que sabemos que existe a linha, vamos atualiza-la
                                                         $sqlVerRelFin = "SELECT rfcb_id,rfcb_data_registro FROM relfin_conciliacao_bancaria WHERE rfcb_data_registro = '{$data_formatada}' AND rfcb_tipo_pagamento='{$tipo_pagamento}';";
                                                         $rsVerRelFin = SQLexecuteQuery($sqlVerRelFin);
                                                         //echo "<br><br> - $sqlVerRelFin<br>";
-                                                        if ( pg_num_rows($rsVerRelFin) > 0 ) {
+                                                        if ( (($rsVerRelFin) ? pg_num_rows($rsVerRelFin) : 0) > 0 ) {
                                                             // Agora que sabemos que existe a linha, vamos atualiza-la
                                                             $dataVerRelFin = pg_fetch_assoc($rsVerRelFin);
 
@@ -306,15 +306,15 @@ function getCodigoHistorico($banco, $historico){
                                                                 $data_anterior = $data_formatada;
                                                             }//end if(!empty($data_anterior) && $data_formatada != $data_anterior)
 
-                                                        } //end if ( pg_num_rows($rsVerRelFin) > 0 )
+                                                        } //end if ( (($rsVerRelFin) ? pg_num_rows($rsVerRelFin) : 0) > 0 )
 
-                                                } //end if ( pg_num_rows($rsFreeze) == 0 )
+                                                } //end if ( (($rsFreeze) ? pg_num_rows($rsFreeze) : 0) == 0 )
                                             
                                             
                                         } //end elseif ($dd_conta != $BANCO_DEP[INDICE_CONTA_BRADESCO_DEP_OFFLINE_ANTIGA][3] && $dd_conta != $BANCO_DEP[INDICE_CONTA_BRADESCO_DEP_OFFLINE_NOVA][3])
-                                    } //end else do if(pg_num_rows($result) > 0)
+                                    } //end else do if((($result) ? pg_num_rows($result) : 0) > 0)
                                 } //end else do if($msg != "")
-                            } //end if(substr($cod, 0, 3) == 'DEP' || substr($cod, 0, 6) == 'TRANSF' || substr($cod, 0, 3) == 'DOC')
+                            } //end if(substr((string)($cod ?? ""), 0, 3) == 'DEP' || substr((string)($cod ?? ""), 0, 6) == 'TRANSF' || substr((string)($cod ?? ""), 0, 3) == 'DOC')
                         } //end if($identReg == '1' && $lanc == '1' && $tipoLanc == 'C')
                     } //end for
                     if(!empty($idRelFin)){
@@ -331,19 +331,19 @@ function getCodigoHistorico($banco, $historico){
                 // Banco Itaú
                 if ( $BOLETO_MONEY_BANCO_ITAU_COD_BANCO == $dd_banco ) { // Itaú - 341
                         $tipo_pagamento = 'A'; // rfcb_tipo_pagamento
-                        $linhas = explode(PHP_EOL, $ta_depositos);
+                        $linhas = explode(PHP_EOL, (string)($ta_depositos ?? ""));
                         if ( isset($linhas[1]) ) {
                             foreach ($linhas as $linha) {
-                                $linha = trim($linha);
+                                $linha = trim((string)($linha ?? ""));
                                 if ( !empty($linha) ) {
                                     // pegar TAR/CUSTAS COBRANCA e MOV TIT COB DISP para ir pra tabela de conciliacao
-                                    list($data, $lancamento, $valor) = explode(';', $linha);
+                                    list($data, $lancamento, $valor) = explode(';', (string)($linha ?? ""));
 
                                     if(strpos(trim(strtoupper($lancamento)), "TAR/CUSTAS COBRANCA") === false && strpos(trim(strtoupper($lancamento)), "MOV TIT COB DISP") === false){
                                         continue;
                                     }
 
-                                    $valor = str_replace(',', '.', trim($valor));
+                                    $valor = str_replace(',', '.', trim((string)($valor ?? "")));
                                     $data_formatada = formata_data($data,1);
 
                                     // Verificando dado já existe:
@@ -354,7 +354,7 @@ function getCodigoHistorico($banco, $historico){
                                                     AND dep_valor={$valor};";
 
                                     $rsVerDep = SQLexecuteQuery($sqlVerDep);
-                                    if ( pg_num_rows($rsVerDep) > 0 ) {
+                                    if ( (($rsVerDep) ? pg_num_rows($rsVerDep) : 0) > 0 ) {
                                         $msg .= "Erro ao inserir depósito: Valor=\"$valor\" Data=\"$data_formatada\" Lancamento=\"$lancamento\" - Dado Duplicado\n\n";
                                     } else {
                                         // Primeiro tratamos sobre o relatorio de conciliacao bancaria
@@ -365,8 +365,8 @@ function getCodigoHistorico($banco, $historico){
                                         //if ( in_array($eprepagCode, array(MOV, TAR)) ) {
                                             // Temos que encontrar a data correta do movimento (não data do extrato)
                                             // Banco Itaú = D+0 (passou a ser D+0 em Novembro de 2018)
-                                            list($ano, $mes, $dia) = explode('-', $data_formatada);
-                                            $dia = substr($dia, 0, 2);
+                                            list($ano, $mes, $dia) = explode('-', (string)($data_formatada ?? ""));
+                                            $dia = substr((string)($dia ?? ""), 0, 2);
                                             $data = "$dia/$mes/$ano";
                                             $stimestamp = mktime(0, 0, 0, $mes, $dia, $ano);
 
@@ -376,7 +376,7 @@ function getCodigoHistorico($banco, $historico){
                                             $sqlVerRelFin = "SELECT rfcb_id,rfcb_data_registro FROM relfin_conciliacao_bancaria WHERE rfcb_data_registro = '{$ndate}' AND rfcb_tipo_pagamento='{$tipo_pagamento}'";
                                             $rsVerRelFin = SQLexecuteQuery($sqlVerRelFin);
                                             //echo "<br><br> - $sqlVerRelFin<br>";
-                                            if ( pg_num_rows($rsVerRelFin) > 0 ) {
+                                            if ( (($rsVerRelFin) ? pg_num_rows($rsVerRelFin) : 0) > 0 ) {
                                                 // Agora que sabemos que existe a linha, vamos atualiza-la
                                                 $dataVerRelFin = pg_fetch_assoc($rsVerRelFin);
 
@@ -389,13 +389,13 @@ function getCodigoHistorico($banco, $historico){
 
                                                 //$sqlUpdateRelFin = "UPDATE relfin_conciliacao_bancaria SET {$field[$eprepagCode]['field']}={$valor} WHERE rfcb_id={$idRelFin};";
                                                 SQLexecuteQuery($sqlUpdateRelFin);
-                                            } //end if ( pg_num_rows($rsVerRelFin) > 0 )
+                                            } //end if ( (($rsVerRelFin) ? pg_num_rows($rsVerRelFin) : 0) > 0 )
                                         } //end if ( preg_match('/(mov\stit|tar\/custas)/', strtolower($lancamento)) )
                                         $sql = "insert into depositos_pendentes (dep_valor, dep_data, dep_banco, dep_agencia, dep_conta, dep_cod_documento {$fieldCode}) ";
                                         $sql .= "values ({$valor}, to_date('{$data}', 'DD-MM-YYYY'), '{$dd_banco}', '{$dd_agencia}', '{$dd_conta}', '{$lancamento}' {$valueCode}) ";
                                         $resultQry = pg_exec($connid, $sql);
-                                        if(!$resultQry) $msg .= "Erro ao inserir depósito: Valor='$valor' Data='$data' Banco='$dd_banco\' Conta='$dd_conta\' Lançamento:'$lancamento\' \n$sql\n\n";
-                                    } //end else do if ( pg_num_rows($rsVerDep) > 0 )
+                                        if(!isset($resultQry) || !$resultQry) $msg .= "Erro ao inserir depósito: Valor='$valor' Data='$data' Banco='$dd_banco\' Conta='$dd_conta\' Lançamento:'$lancamento\' \n$sql\n\n";
+                                    } //end else do if ( (($rsVerDep) ? pg_num_rows($rsVerDep) : 0) > 0 )
                                 } //end if ( !empty($linha) )
                             } //end foreach
                         } //end if ( isset($linhas[1]) )

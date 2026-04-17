@@ -7,6 +7,7 @@ require_once "/www/includes/configIP.php";
 require_once "/www/class/phpmailer/class.smtp.php";
 require_once "/www/includes/constantes.php";
 require_once "/www/includes/gamer/functions.php";
+require_once "/www/includes/pdv_encoding.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -16,14 +17,14 @@ $conexao = ConnectionPDO::getConnection()->getLink();
 
 if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 	if (isset($_GET["tipo_pesquisa"])) {
-		$tipo = $_GET["tipo_pesquisa"];
+		$tipo = $_GET["tipo_pesquisa"] ?? "";
 		if ($tipo == 0) {
 			$sql = "SELECT p.pin_codinterno, p.pin_valor, p.pin_codigo, o.opr_nome, p.pin_validade, ps.stat_descricao, p.pin_vencimento FROM pins p
 				JOIN pins_status ps ON p.pin_status = ps.stat_codigo
         		JOIN operadoras o ON p.opr_codigo = o.opr_codigo
 				WHERE p.pin_codigo = :pin";
 			$selectRows = $conexao->prepare($sql);
-			$selectRows->bindValue(":pin", $_GET["campo_pesquisa"]);
+			$selectRows->bindValue(":pin", $_GET["campo_pesquisa"] ?? "");
 		} else if ($tipo == 1) {
 			$sql = "SELECT p.pin_codinterno, p.pin_valor, p.pin_codigo, o.opr_nome, p.pin_validade, ps.stat_descricao, p.pin_vencimento FROM pins p
 				JOIN pins_status ps ON p.pin_status = ps.stat_codigo
@@ -33,7 +34,7 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 					WHERE vm.vgm_vg_id = :vg_id
 				)";
 			$selectRows = $conexao->prepare($sql);
-			$selectRows->bindValue(":vg_id", $_GET["campo_pesquisa"]);
+			$selectRows->bindValue(":vg_id", $_GET["campo_pesquisa"] ?? "");
 		} else if ($tipo == 2) {
 			$sql = "SELECT p.pin_codinterno, p.pin_valor, p.pin_codigo, o.opr_nome, p.pin_validade, ps.stat_descricao, p.pin_vencimento FROM pins p
 				JOIN pins_status ps ON p.pin_status = ps.stat_codigo
@@ -43,7 +44,7 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 					WHERE vm.vgm_vg_id = :vg_id
 				)";
 			$selectRows = $conexao->prepare($sql);
-			$selectRows->bindValue(":vg_id", $_GET["campo_pesquisa"]);
+			$selectRows->bindValue(":vg_id", $_GET["campo_pesquisa"] ?? "");
 		} else {
 			echo "Tipo de pesquisa inválido.";
 			die;
@@ -52,12 +53,12 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 		$resultRows = $selectRows->fetchAll(PDO::FETCH_ASSOC);
 
 		$data = ["data" => []];
-		if (count($resultRows) > 0) {
+		if ((is_countable($resultRows) ? count($resultRows) : 0) > 0) {
 			foreach ($resultRows as $key => $value) {
 				$dataKeys = array_keys($value);
 				$acao = "<button class='btn btn-info btn-negar' 
 							style='border-width: 0px;border-radius: 1px;box-shadow: 1px 1px 5px rgb(0,0,0,0.5);font-weight: bold;'
-							data-codigo='" . $value["pin_codinterno"] . "' data-atual='" . $_GET["reload"] . "'
+							data-codigo='" . $value["pin_codinterno"] . "' data-atual='" . ($_GET["reload"] ?? "") . "'
 						>
 							Alterar
 						</button>";
@@ -69,8 +70,8 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 					$dataKeys[2] => $value["pin_codigo"],
 					$dataKeys[3] => $value["opr_nome"],
 					$dataKeys[4] => $value["pin_validade"],
-					$dataKeys[5] => utf8_encode($value["stat_descricao"]),
-					$dataKeys[6] => ($value["pin_vencimento"] ? utf8_encode($value["pin_vencimento"]) : "Não alterada"),
+					$dataKeys[5] => pdv_iso_to_utf8($value["stat_descricao"]),
+					$dataKeys[6] => ($value["pin_vencimento"] ? pdv_iso_to_utf8($value["pin_vencimento"]) : "Não alterada"),
 				];
 				array_push($data["data"], $dataLine);
 			}
@@ -80,9 +81,9 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 	}
 	echo "Tipo de pesquisa inválido.";
 	die;
-} else if (isset($_POST["acao"]) && $_POST["acao"] == "todos" && $_POST["vg_id"] && $_POST["tipo"] && $_POST["nova_validade"]) {
+} else if (isset($_POST["acao"], $_POST["vg_id"], $_POST["tipo"], $_POST["nova_validade"]) && $_POST["acao"] == "todos" && $_POST["vg_id"] && $_POST["tipo"] && $_POST["nova_validade"]) {
 
-	$nova_validade = $_POST["nova_validade"];
+	$nova_validade = $_POST["nova_validade"] ?? "";
 	if (!$nova_validade || !is_numeric($nova_validade) || $nova_validade <= 0) {
 		echo "Nova validade não informada.";
 		die;
@@ -129,9 +130,9 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 		echo "Tipo de venda inválido.";
 		die;
 	}
-} else if (isset($_POST["acao"]) && $_POST["acao"] == "unico" && $_POST["pin"] && $_POST["nova_validade"]) {
+} else if (isset($_POST["acao"], $_POST["pin"], $_POST["nova_validade"]) && $_POST["acao"] == "unico" && $_POST["pin"] && $_POST["nova_validade"]) {
 
-	$nova_validade = $_POST["nova_validade"];
+	$nova_validade = $_POST["nova_validade"] ?? "";
 	if (!$nova_validade || !is_numeric($nova_validade) || $nova_validade <= 0) {
 		echo "Nova validade não informada.";
 		die;

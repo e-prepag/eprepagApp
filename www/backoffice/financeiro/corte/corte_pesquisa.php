@@ -23,8 +23,8 @@ require_once "/www/includes/bourls.php";
 	}
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 200;	//$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
     
@@ -139,16 +139,16 @@ require_once "/www/includes/bourls.php";
 			if($tf_u_rg) 				$sql .= " and ug.ug_rg like '%" . $tf_u_rg . "%' ";
 		
 			$rs_cortes = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_cortes);
+			$total_table = (($rs_cortes) ? pg_num_rows($rs_cortes) : 0);
 
 			//Ordem
 			$sql .= " order by ".$ncamp;
 			if($ordem == 1){
 				$sql .= " desc ";
-				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_down.gif";
+				$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_down.gif";
 			} else {
 				$sql .= " asc ";
-				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_up.gif";
+				$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_up.gif";
 			}
 		
 			$sql .= " limit ".$max; 
@@ -237,7 +237,7 @@ $(function(){
 				<select name="tf_v_status" class="form2">
 					<option value="" <?php if($tf_v_status == "") echo "selected" ?>>Selecione</option>
 					<?php foreach ($CORTE_STATUS_DESCRICAO as $statusId => $statusNome){ ?>
-					<option value="<?php echo $statusId; ?>" <?php if ($tf_v_status == $statusId) echo "selected";?>><?php echo $statusId . " - " . substr($statusNome, 0, strpos($statusNome, '.')); ?></option>
+					<option value="<?php echo $statusId; ?>" <?php if ($tf_v_status == $statusId) echo "selected";?>><?php echo $statusId . " - " . substr((string)($statusNome ?? ""), 0, strpos($statusNome, '.')); ?></option>
 					<?php } ?>
 				</select>
 			</td>
@@ -391,7 +391,7 @@ $cor3 = "#F5F5Fb";
 			<td align="right"><?php echo number_format ($rs_cortes_row['cor_venda_bruta'], 2, ',', '.') ?></td>
 			<td align="right"><?php echo number_format ($rs_cortes_row['cor_venda_comissao'], 2, ',', '.') ?></td>
 			<td align="right"><?php echo number_format ($rs_cortes_row['cor_venda_liquida'], 2, ',', '.') ?></td>
-			<td align="center" nowrap><?php echo substr($cor_status_descricao, 0, strpos($cor_status_descricao, ".")) ?></td>
+			<td align="center" nowrap><?php echo substr((string)($cor_status_descricao ?? ""), 0, strpos($cor_status_descricao, ".")) ?></td>
 			<td align="center" nowrap>
 				<?php if($cor_tipo_pagto == $GLOBALS['CORTE_FORMAS_PAGAMENTO']['BOLETO_BANCARIO']){?>
 					<?php if($rs_cortes_row['cor_bbc_boleto_codigo']){?>

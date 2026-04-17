@@ -1,4 +1,5 @@
-<?php 
+<?php
+require_once "/www/backoffice/includes/encoding.php";
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
@@ -88,8 +89,8 @@ $instProdMod = new ProdutoModelo();
                                         $produto                                    = new stdClass();
                                         $produto->tipo                              = "games";
                                         $produto->id                                = $rs_row['ogp_id'];
-                                        $produto->nome                              = htmlentities(utf8_encode($rs_row['ogp_nome']));
-                                        $produto->busca                             = htmlentities(strip_tags(Util::cleanStr2(utf8_encode($rs_row['ogp_nome'])." | ".utf8_encode($rs_row['opr_nome_loja'])))); //corrigir traducao dew caracter q nao ta funfando
+                                        $produto->nome                              = htmlentities(backoffice_iso_to_utf8($rs_row['ogp_nome']));
+                                        $produto->busca                             = htmlentities(strip_tags(Util::cleanStr2(backoffice_iso_to_utf8($rs_row['ogp_nome'])." | ".backoffice_iso_to_utf8($rs_row['opr_nome_loja'])))); //corrigir traducao dew caracter q nao ta funfando
                                         $produto->imagem                            = $rs_row['ogp_nome_imagem'];
                                         $produto->operadora                         = $rs_row['opr_nome_loja'];
                                         $produto->filtro['ogp_opr_codigo']          = $rs_row['ogp_opr_codigo'];
@@ -330,7 +331,7 @@ function abreUpload(produto_id){
             <td valign="middle">
 				<a style="text-decoration:none" href="#" onClick="abreUpload('<?php echo $produto_id ?>'); return false;">Nova imagem</a><br>
 				<?php if($ogp_nome_imagem && $ogp_nome_imagem != "" && file_exists($GLOBALS['FIS_DIR_IMAGES_PRODUTO'] . $ogp_nome_imagem)){ ?>
-					<img src="http://<?php echo $_SERVER['SERVER_NAME'] . $URL_DIR_IMAGES_PRODUTO . $ogp_nome_imagem ?>" border="0">
+					<img src="http://<?php echo ($_SERVER['SERVER_NAME'] ?? "") . $URL_DIR_IMAGES_PRODUTO . $ogp_nome_imagem ?>" border="0">
 					<br><a style="text-decoration:none" href="#" onClick="if(confirm('Deseja excluir esta imagem?')) window.location='com_produto_detalhe.php?acao=ei&produto_id=<?php echo $produto_id ?>';return false;">Excluir imagem</a>
 				<?php } ?>
 			</td>

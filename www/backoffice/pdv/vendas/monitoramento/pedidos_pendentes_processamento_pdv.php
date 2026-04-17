@@ -20,7 +20,7 @@ echo "(R) ".str_replace("\n", "<br>\n", $sql)."<br>";
 */
 $rs_processa = SQLexecuteQuery($sql);
 
-    if($rs_processa && pg_num_rows($rs_processa) > 0)
+    if($rs_processa && (($rs_processa) ? pg_num_rows($rs_processa) : 0) > 0)
     { 
 ?>
         <table class="table  table-striped top10">

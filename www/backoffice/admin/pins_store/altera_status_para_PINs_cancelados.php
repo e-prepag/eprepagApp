@@ -93,7 +93,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                             $vetorAux = array();
                             $vetorAux = explode(",",$line);
 
-                            if(strlen($vetorAux[2]) == $tamanhoEPPCash) {
+                            if(strlen((string)($vetorAux[2] ?? "")) == $tamanhoEPPCash) {
                                 
                                 //Verificando se o PIN existe no DB
                                 $idPIN = retorna_id_pin_cash($vetorAux[2]);
@@ -134,7 +134,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                                     $contadorPINnaoEncontrado++;
                                 }//end else do if($idPIN <> 0) 
                                 
-                            } //end if(strlen($vetorAux[2]) == $tamanhoEPPCash) 
+                            } //end if(strlen((string)($vetorAux[2] ?? "")) == $tamanhoEPPCash) 
                             
                             
                         }//end if(strpos($prefixo, $line))

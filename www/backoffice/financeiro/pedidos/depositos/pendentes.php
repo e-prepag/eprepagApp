@@ -28,8 +28,8 @@ require_once "/www/includes/bourls.php";
 	}
 	
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 100;	$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -58,11 +58,11 @@ require_once "/www/includes/bourls.php";
     }
 	if (isset($tf_valor_oper) && $tf_valor_oper == 'between')
 	{
-	if(isset($tf_valor) && isset($tf_valor2) && $tf_valor && $tf_valor2)     $sql .= " and dep_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim($tf_valor))) . " and  " . str_replace(',', '.', str_replace('.', '', trim($tf_valor2))) . " ";
+	if(isset($tf_valor) && isset($tf_valor2) && $tf_valor && $tf_valor2)     $sql .= " and dep_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim((string)($tf_valor ?? "")))) . " and  " . str_replace(',', '.', str_replace('.', '', trim((string)($tf_valor2 ?? "")))) . " ";
 	}
 	else
 	{
-	if(isset($tf_valor) && $tf_valor)     $sql .= " and dep_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim($tf_valor))) . " ";
+	if(isset($tf_valor) && $tf_valor)     $sql .= " and dep_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim((string)($tf_valor ?? "")))) . " ";
 	}
 /*        
 if(b_IsUsuarioWagner()) { 
@@ -70,7 +70,7 @@ if(b_IsUsuarioWagner()) {
 }
 */
 $res_count = pg_exec($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	$dep_valor_total_i=0;
 
 	while($u=pg_fetch_array($res_count))

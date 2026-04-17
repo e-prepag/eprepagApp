@@ -1,4 +1,5 @@
-<?php 
+<?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
@@ -71,7 +72,7 @@ if($msg == ""){
                     $instProduto = new Produto();
                     $ret = $instProduto->obterMelhorado($filtro, null, $rs);
 
-                    if($rs && pg_num_rows($rs) > 0)
+                    if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0)
                     {
                         for($i=0; $rs_row = pg_fetch_array($rs); $i++)
                         {
@@ -80,8 +81,8 @@ if($msg == ""){
                                 $produto                                    = new stdClass();
                                 $produto->tipo                              = "games";
                                 $produto->id                                = $rs_row['ogp_id'];
-                                $produto->nome                              = htmlentities(utf8_encode($rs_row['ogp_nome']));
-                                $produto->busca                             = htmlentities(strip_tags(Util::cleanStr2(utf8_encode($rs_row['ogp_nome'])." | ".utf8_encode($rs_row['opr_nome_loja'])))); //corrigir traducao dew caracter q nao ta funfando
+                                $produto->nome                              = htmlentities(pdv_iso_to_utf8($rs_row['ogp_nome']));
+                                $produto->busca                             = htmlentities(strip_tags(Util::cleanStr2(pdv_iso_to_utf8($rs_row['ogp_nome'])." | ".pdv_iso_to_utf8($rs_row['opr_nome_loja'])))); //corrigir traducao dew caracter q nao ta funfando
                                 $produto->imagem                            = $rs_row['ogp_nome_imagem'];
                                 $produto->operadora                         = $rs_row['opr_nome_loja'];
                                 $produto->filtro['ogp_inibi_lojas_online']  = $rs_row['ogp_inibi_lojas_online'];
@@ -140,7 +141,7 @@ if($msg == ""){
         $instProduto = new Produto();
 	$ret = $instProduto->obtermelhorado($filtro, null, $rs_produto);
 	if($ret != "") $msg = $ret;
-	else if(!$rs_produto || pg_num_rows($rs_produto) == 0) $msg = "Nenhum produto encontrado.\n";
+	else if(!$rs_produto || (($rs_produto) ? pg_num_rows($rs_produto) : 0) == 0) $msg = "Nenhum produto encontrado.\n";
 	else {
                         $rs_produto_row = pg_fetch_array($rs_produto);
                         $ogp_id 		= $rs_produto_row['ogp_id'];
@@ -471,8 +472,8 @@ function abreUpload(produto_id){
 					  <td align="center"><a style="text-decoration:none" href="com_modelo_detalhe.php?modelo_id=<?php echo $rs_produto_modelos_row['ogpm_id'] ?>"><?php echo $rs_produto_modelos_row['ogpm_id'] ?></a></td>
 					  <td align="center"><a style="text-decoration:none" href="com_modelo_detalhe.php?modelo_id=<?php echo $rs_produto_modelos_row['ogpm_id'] ?>"><?php echo $rs_produto_modelos_row['ogpm_nome'] ?></a></td>
 					  <td align="center"><?php echo ($rs_produto_modelos_row['ogpm_ativo'] == 1)?("Ativo"):("Inativo") ?></td>
-					  <td align="center"><?php echo number_format($rs_produto_modelos_row['ogpm_valor'], 2, ',', '.') ?></td>
-					  <td align="center"><?php echo number_format($rs_produto_modelos_row['ogpm_pin_valor'], 2, ',', '.') ?></td>
+					  <td align="center"><?php echo number_format((float)($rs_produto_modelos_row['ogpm_valor'] ?? 0), 2, ',', '.') ?></td>
+					  <td align="center"><?php echo number_format((float)($rs_produto_modelos_row['ogpm_pin_valor'] ?? 0), 2, ',', '.') ?></td>
                       <td align="center" width="70"><a href="#" class="btn btn-sm btn-danger" onClick="if(confirm('Deseja excluir este modelo?')) window.location='com_produto_detalhe.php?acao=e&produto_id=<?php echo $produto_id ?>&modelo_id=<?php echo $rs_produto_modelos_row['ogpm_id'] ?>';return false;">Excluir</a></td>
 					</tr>
 			<?php	} ?>

@@ -14,7 +14,7 @@ if(isset($tipo) && $tipo == 1) $dir = "remessaBradesco/";
 //echo "arquivo: ".$arquivo."<br>";
 //echo "strpos(arquivo,' ('): ".strpos($arquivo," (")."<br>";
 
-$arquivo = substr($arquivo,0,strpos($arquivo," ("));
+$arquivo = substr((string)($arquivo ?? ""),0,strpos($arquivo," ("));
 $file = $folder . $dir . $arquivo;
 
 //echo "dir: ".$file."<br>";

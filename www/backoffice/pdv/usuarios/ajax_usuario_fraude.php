@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 require "/www/db/connect.php";
 require "/www/db/ConnectionPDO.php";
 require "../../../public_html/creditos/includes/funcoes_login.php";
@@ -12,7 +13,7 @@ $pdo = ConnectionPDO::getConnection()->getLink();
 
 if ($_POST['acao'] == "add") {
     $ug_id = 0 + $_POST['ug_id'];
-    adicionarUsuarioBloqueado($ug_id, utf8_decode("(BLQ103) Usuário bloqueado manualmente pela equipe de administração do sistema."));
+    adicionarUsuarioBloqueado($ug_id, pdv_utf8_to_iso("(BLQ103) Usuário bloqueado manualmente pela equipe de administração do sistema."));
     $removeLog = $pdo->prepare("
             UPDATE dist_usuarios_games
                 SET ug_senha = 'sghfd34251j0k978l78z5x6cv12du0chim5vkhj'

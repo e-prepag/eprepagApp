@@ -154,7 +154,7 @@
 			if($tf_v_valor) 		$sql .= " and bbg_valor = ".moeda2numeric($tf_v_valor)." ";
 		
 			$rs_venda = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_venda);
+			$total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
 
 			//Total Geral
 			$totalGeral_valor = 0;
@@ -323,7 +323,7 @@ ob_end_flush();
 			<td colspan="3" class="texto">
 				<select name="tf_u_risco_classif" class="field_dados" class="form2">
 					<option value="" <?php  if($tf_u_risco_classif == "") echo "selected" ?>>Selecione</option>
-				<?php  for($i=1; $i < count($RISCO_CLASSIFICACAO_NOMES)+1; $i++){ ?>
+				<?php  for($i=1; $i < (is_countable($RISCO_CLASSIFICACAO_NOMES) ? count($RISCO_CLASSIFICACAO_NOMES) : 0)+1; $i++){ ?>
 					<option value="<?php  echo $RISCO_CLASSIFICACAO_NOMES[$i] ?>" <?php  if($tf_u_risco_classif == $RISCO_CLASSIFICACAO_NOMES[$i]) echo "selected"; ?>><?php  echo $RISCO_CLASSIFICACAO_NOMES[$i] ?></option>
 				<?php  } ?>
 				</select>

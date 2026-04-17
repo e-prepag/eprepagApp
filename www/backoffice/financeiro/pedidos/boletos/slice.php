@@ -27,8 +27,8 @@ if(isset($BtnSearch) && $BtnSearch=="Buscar") {
 }
 
 $default_add  = nome_arquivo($PHP_SELF);
-$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+$img_proxima  = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+$img_anterior = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 $max          = 100; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
 
@@ -83,7 +83,7 @@ $range_qtde   = $qtde_range_tela;
 	$msg = "";
 	if(isset($tf_opr_codigo) && is_numeric($tf_opr_codigo) && $tf_vg_id_lista && is_numeric($tf_vg_id_lista)) {
 echo "<hr>";
-if(!$bAplicar) {
+if(!isset($bAplicar) || !$bAplicar) {
 	echo "<font color='red'>BLOQUEADA a atualização em BD, aceita apenas simulação</font><br><br>";
 }
 		// Procura PINs disponíveis
@@ -121,7 +121,7 @@ echo "&nbsp;&nbsp;<b>Valor total do pedido: R\$".$venda_total.",00</b><br>";
 		// Monta a nova composição com o mesmo valor total, valores maiores primeiro
 		$a_qtdes = array();
 		$resto = $venda_total;
-		for($i=0;$i<count($a_pin_valor);$i++) {
+		for($i=0;$i<(is_countable($a_pin_valor) ? count($a_pin_valor) : 0);$i++) {
 			if(in_array($a_pin_valor[$i], $tf_pin_valor)) {
 				$a_qtdes[$a_pin_valor[$i]] = floor($resto/$a_pin_valor[$i]);
 				$resto = $resto - $a_qtdes[$a_pin_valor[$i]]*$a_pin_valor[$i];			
@@ -135,7 +135,7 @@ echo "&nbsp;&nbsp;<b>Valor total do pedido: R\$".$venda_total.",00</b><br>";
 
 		if($resto==0) {
 			echo "Nova composição para obter R\$$venda_total,00<br>";
-			for($i=0;$i<count($a_qtdes);$i++) {
+			for($i=0;$i<(is_countable($a_qtdes) ? count($a_qtdes) : 0);$i++) {
 				echo "&nbsp;&nbsp; + <b>".$a_qtdes[$a_pin_valor[$i]]."</b> PIN".(($a_qtdes[$a_pin_valor[$i]]>1)?"s":"&nbsp;")." de <b>R\$".$a_pin_valor[$i].",00</b><br>";
 			}
 			echo "<span style='color:#0000FF; background-color:#CCFFCC'>A nova composição pode ser aplicada (use o botão \"Slice Aplicar\")</span><br>\n";
@@ -158,7 +158,7 @@ echo "";
 	if(true) {	// Start bloqueo de Slice Aplicar
 	if($msg=="" && isset($BtnSliceHidden) && $BtnSliceHidden=="1") {
 //echo "Vai para Aplicar - a_pin_valor: ".print_r($a_pin_valor,true).", a_qtdes: ".print_r($a_qtdes,true)."<br>";
-		if(count($a_pin_valor)>0 && count($a_qtdes)>0) {
+		if((is_countable($a_pin_valor) ? count($a_pin_valor) : 0)>0 && (is_countable($a_qtdes) ? count($a_qtdes) : 0)>0) {
 			echo "Slice com PINs disponíveis para operadora $tf_opr_codigo<br>";
 
 			//Inicia transacao
@@ -166,14 +166,14 @@ echo "";
 				$sql = "BEGIN TRANSACTION ";
 				if($bAplicar) {
 					$ret = SQLexecuteQuery($sql);
-					if(!$ret) $msg = "Erro ao iniciar transação.\n";
+					if(!isset($ret) || !$ret) $msg = "Erro ao iniciar transação.\n";
 				} else {
 					echo "<font face='Arial, Helvetica, sans-serif' size='2' color='green'>Desativada a gravação no BD ($sql)</font><br>";
 				}
 			}
 
 			// Para cada valor disponível 
-			for($i=0;$i<count($a_qtdes);$i++) {
+			for($i=0;$i<(is_countable($a_qtdes) ? count($a_qtdes) : 0);$i++) {
 				if($msg == ""){
 					$vgm_pin_valor = $a_pin_valor[$i];
 					if($a_qtdes[$vgm_pin_valor]>0) {
@@ -187,7 +187,7 @@ echo "";
 						echo "<font face='Arial, Helvetica, sans-serif' size='2' color='#0000CC'>$i: '<b>$sql</b>'</font><br>";
 						if($bAplicar) {
 							$ret = SQLexecuteQuery($sql);
-							if(!$ret) $msg = "Erro ao inserir modelo.\n";
+							if(!isset($ret) || !$ret) $msg = "Erro ao inserir modelo.\n";
 						} else {
 							echo "<font face='Arial, Helvetica, sans-serif' size='2' color='green'>Desativada a gravação no BD ($sql)</font><br>";
 						}
@@ -205,7 +205,7 @@ echo "";
 				echo "<br><font face='Arial, Helvetica, sans-serif' size='2' color='#0000CC'>$sql</font><br>";
 				if($bAplicar) {
 					$ret = SQLexecuteQuery($sql);
-					if(!$ret) $msg = "Erro ao deletar modelo.\n";
+					if(!isset($ret) || !$ret) $msg = "Erro ao deletar modelo.\n";
 				} else {
 					echo "<font face='Arial, Helvetica, sans-serif' size='2' color='green'>Desativada a gravação no BD ($sql)</font><br>";
 				}
@@ -216,7 +216,7 @@ echo "";
 				$sql = "COMMIT TRANSACTION ";
 				if($bAplicar) {
 					$ret = SQLexecuteQuery($sql);
-					if(!$ret) $msg = "Erro ao comitar transação.\n";
+					if(!isset($ret) || !$ret) $msg = "Erro ao comitar transação.\n";
 				} else {
 					echo "<font face='Arial, Helvetica, sans-serif' size='2' color='green'>Desativada a gravação no BD ($sql)</font><br>";
 				}
@@ -224,7 +224,7 @@ echo "";
 				$sql = "ROLLBACK TRANSACTION ";
 				if($bAplicar) {
 					$ret = SQLexecuteQuery($sql);
-					if(!$ret) $msg = "Erro ao dar rollback na transação.\n";
+					if(!isset($ret) || !$ret) $msg = "Erro ao dar rollback na transação.\n";
 				} else {
 					echo "<font face='Arial, Helvetica, sans-serif' size='2' color='green'>Desativada a gravação no BD ($sql)</font><br>";
 				}
@@ -250,7 +250,7 @@ echo "";
 					if($msg == ""){
 						$sql = "BEGIN TRANSACTION ";
 	//					$ret = SQLexecuteQuery($sql);
-	//					if(!$ret) $msg = "Erro ao iniciar transação.\n";
+	//					if(!isset($ret) || !$ret) $msg = "Erro ao iniciar transação.\n";
 					}
 
 					for($i=1;$i<=$nslices;$i++) {
@@ -265,7 +265,7 @@ echo "";
 										);";
 							echo "<font face='Arial, Helvetica, sans-serif' size='2' color='#0000CC'>$sql<br>";
 	//						$ret = SQLexecuteQuery($sql);
-	//						if(!$ret) $msg = "Erro ao inserir modelo.\n";
+	//						if(!isset($ret) || !$ret) $msg = "Erro ao inserir modelo.\n";
 						} else {
 							break;
 						}
@@ -275,18 +275,18 @@ echo "";
 						$sql = "delete from into tb_venda_games_modelo where vg_id = ".$f['vg_id']." and vgm_id = ".$f['vgm_id']." and vgm_opr_codigo = ".$f['vgm_opr_codigo']." ;";
 						echo "<br><font face='Arial, Helvetica, sans-serif' size='2' color='#0000CC'>$sql<br>";
 	//					$ret = SQLexecuteQuery($sql);
-	//					if(!$ret) $msg = "Erro ao deletar modelo.\n";
+	//					if(!isset($ret) || !$ret) $msg = "Erro ao deletar modelo.\n";
 					}
 
 					//Finaliza transacao
 					if($msg == ""){
 						$sql = "COMMIT TRANSACTION ";
 	//					$ret = SQLexecuteQuery($sql);
-	//					if(!$ret) $msg = "Erro ao comitar transação.\n";
+	//					if(!isset($ret) || !$ret) $msg = "Erro ao comitar transação.\n";
 					} else {
 						$sql = "ROLLBACK TRANSACTION ";
 	//					$ret = SQLexecuteQuery($sql);
-	//					if(!$ret) $msg = "Erro ao dar rollback na transação.\n";
+	//					if(!isset($ret) || !$ret) $msg = "Erro ao dar rollback na transação.\n";
 					}
 
 				} else {
@@ -344,14 +344,14 @@ echo "";
 	}	
 
 	if(isset($dd_usuario) && $dd_usuario)		$sql .= "and ug.ug_id = ".$dd_usuario." ";		
-	if(isset($tf_valor) && $tf_valor)		$sql .= " and vgm_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim($tf_valor))) . " ";
+	if(isset($tf_valor) && $tf_valor)		$sql .= " and vgm_valor " . $tf_valor_oper . " " . str_replace(',', '.', str_replace('.', '', trim((string)($tf_valor ?? "")))) . " ";
 
 	if(isset($tf_opr_codigo) && $tf_opr_codigo) 	$sql .= " and vgm.vgm_opr_codigo = ".$tf_opr_codigo." ";
 
 //echo "sql: $sql<br>";
 
 	$res_count = pg_exec($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 	$vgm_valor_total_i = 0;
 	while($u=pg_fetch_array($res_count)) {

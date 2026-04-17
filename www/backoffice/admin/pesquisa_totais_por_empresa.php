@@ -53,7 +53,7 @@ if(isset($BtnSearch) && $BtnSearch) {
         //echo $sql."<br>";
         $rs = SQLexecuteQuery($sql);
         if($rs) {
-                if(pg_num_rows($rs)>0) {
+                if((($rs) ? pg_num_rows($rs) : 0)>0) {
                         $total_qtde = 0;
                         $total_geral = 0;
                         $total_comissao = 0;
@@ -98,10 +98,10 @@ if(isset($BtnSearch) && $BtnSearch) {
                                         <td class='text-right'>".number_format($total_liquido, 2, ",", ".")."</td>
                                     </tr>
                                 </table>";
-                }//end if(pg_num_rows($rs)>0)
+                }//end if((($rs) ? pg_num_rows($rs) : 0)>0)
                 else {
                         $msg .= "Nenhum registro selecionado no período.";
-                }//end else do if(pg_num_rows($rs)>0)
+                }//end else do if((($rs) ? pg_num_rows($rs) : 0)>0)
         }//end if($rs) 
         else {
                 $msg .= "ERRO: Problema na seleção dos Totais por Empresa.<br>";

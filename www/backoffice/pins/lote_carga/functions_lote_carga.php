@@ -1,9 +1,11 @@
 <?php
-function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro) {
+function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro = '') {
+	$arquivoAr = array();
+	$filtro = (string)($filtro ?? "");
 
 	if($filtro != ''){
-		if(strpos($filtro, ';') != strlen($filtro)) $filtro .= ';';
-		$filtro = explode(';', $filtro);
+		if(strpos($filtro, ';') != strlen((string)($filtro ?? ""))) $filtro .= ';';
+		$filtro = explode(';', (string)($filtro ?? ""));
 	}
 	if(is_dir($folder)){
 		if ($handle = opendir($folder)) {
@@ -11,7 +13,7 @@ function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro) {
 			while(false !== ($file = readdir($handle))) {
 			   if ($file != '.' && $file != '..') {
 					if($filtro != ''){
-						for($j = 0; $j < count($filtro) -1; $j++){
+						for($j = 0; $j < (is_countable($filtro) ? count($filtro) : 0) -1; $j++){
 							if(strpos(strtolower($file), strtolower($filtro[$j])) !== false){
 								if($ordem == 'nome') $arquivoAr[strtolower($file)] = $file;
 								if($ordem == 'data') $arquivoAr[date("YmdHis", filemtime($folder.$file))] = $file;
@@ -26,7 +28,7 @@ function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro) {
 			closedir($handle);
 
 			//Ordena os arquivos
-			if (count($arquivoAr) != 0) {
+			if ((is_countable($arquivoAr) ? count($arquivoAr) : 0) != 0) {
 				if($direcao == 'asc') ksort($arquivoAr);
 				if($direcao == 'desc') krsort($arquivoAr);
 			}
@@ -34,6 +36,8 @@ function buscaArquivos($folder, $ordem = 'nome', $direcao = 'asc', $filtro) {
 			return $arquivoAr;
 		}
 	}
+
+	return $arquivoAr;
 }
 
 function gravaLog($file, $mensagem){
@@ -99,7 +103,7 @@ function leLog($leLogCompleto){
 				if($leLogCompleto){
 					$buffer .= $buffer_aux;
 				} else {
-					if(trim($buffer_aux) == trim($logDelimitador)){
+					if(trim((string)($buffer_aux ?? "")) == trim((string)($logDelimitador ?? ""))){
 						break;
 					} else {
 						$buffer .= $buffer_aux;
@@ -135,9 +139,9 @@ function Ongame_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Ongame);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -149,31 +153,31 @@ function Ongame_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -194,14 +198,14 @@ function Ongame_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -243,7 +247,7 @@ function Ongame_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -310,9 +314,9 @@ function BilaGames_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_BilaGames);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -324,31 +328,31 @@ function BilaGames_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -369,14 +373,14 @@ function BilaGames_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -419,7 +423,7 @@ function BilaGames_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -485,9 +489,9 @@ function AeriaGames_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_AeriaGames);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -499,31 +503,31 @@ function AeriaGames_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -544,14 +548,14 @@ function AeriaGames_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -594,7 +598,7 @@ function AeriaGames_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -660,9 +664,9 @@ function OGPlanet_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_OGPlanet);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -674,31 +678,31 @@ function OGPlanet_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -719,14 +723,14 @@ function OGPlanet_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -774,7 +778,7 @@ function OGPlanet_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -856,9 +860,9 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Axeso5, $opr_codigo_Axeso5_new);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.".PHP_EOL;
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.".PHP_EOL;
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.".PHP_EOL;
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.".PHP_EOL;
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.".PHP_EOL;
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.".PHP_EOL;
 
 		//local
 		$iPinLocal = 19;
@@ -870,17 +874,17 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.".PHP_EOL;
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.".PHP_EOL;
 		} 
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
@@ -900,14 +904,14 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -947,7 +951,7 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -1002,9 +1006,9 @@ function processaLote_BHN($fileSource, $nomeArq, $opr_codigo, $fcanal){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Facebook_BHN,$opr_codigo_IMVU_BHN);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 36;
@@ -1015,17 +1019,17 @@ function processaLote_BHN($fileSource, $nomeArq, $opr_codigo, $fcanal){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
@@ -1044,14 +1048,14 @@ function processaLote_BHN($fileSource, $nomeArq, $opr_codigo, $fcanal){
 			
 			$seq = 1;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial     = $linhaAr[0];
                                         $sPinCodigo	= $linhaAr[1];
@@ -1135,9 +1139,9 @@ function GlobalGames_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_GlobalGames, $opr_codigo_GlobalGames3);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -1149,31 +1153,31 @@ function GlobalGames_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -1194,14 +1198,14 @@ function GlobalGames_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -1249,7 +1253,7 @@ function GlobalGames_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -1313,9 +1317,9 @@ function GlobalGames2_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_GlobalGames2);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -1327,31 +1331,31 @@ function GlobalGames2_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -1372,14 +1376,14 @@ function GlobalGames2_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -1427,7 +1431,7 @@ function GlobalGames2_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -1488,9 +1492,9 @@ function StarDoll_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_StarDoll);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 21;
@@ -1501,31 +1505,31 @@ function StarDoll_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -1536,11 +1540,11 @@ function StarDoll_traduzKValor($k){
 
 		$msg1 = "";
 		// Procura por pins existentes
-		for($i=0; $i < count($cargaAr); $i++){
+		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
 			$linha 		= $cargaAr[$i];
 
-			$linhaAr 	= explode("\t", $linha);
+			$linhaAr 	= explode("\t", (string)($linha ?? ""));
 			$sPinCodigo	= $linhaAr[0];
 			$valor = StarDoll_traduzKValor($linhaAr[1]);
 			$sValorFace = $valor;
@@ -1557,7 +1561,7 @@ function StarDoll_traduzKValor($k){
 
 //echo "sql: $sql<br>";
 				$ret = SQLexecuteQuery($sql);
-				if($ret && pg_num_rows($ret) > 0){
+				if($ret && (($ret) ? pg_num_rows($ret) : 0) > 0){
 					$ret_row = pg_fetch_array($ret);
 					$opr_nome = $ret_row['opr_nome'];
 
@@ -1588,14 +1592,14 @@ function StarDoll_traduzKValor($k){
 			$lote  = $opr_codigo . date('dmy') . "0" . $seq;
 
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = "";	//$linhaAr[0];
 				    $sPinCodigo	= $linhaAr[0];
@@ -1647,7 +1651,7 @@ if (strlen ($erro = pg_last_error($GLOBALS['connid']))) {
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -1715,9 +1719,9 @@ function Softnyx_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Softnyx);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -1729,31 +1733,31 @@ function Softnyx_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -1774,14 +1778,14 @@ function Softnyx_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -1825,7 +1829,7 @@ function Softnyx_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -1889,9 +1893,9 @@ function Jolt_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Jolt);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -1903,31 +1907,31 @@ function Jolt_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -1948,14 +1952,14 @@ function Jolt_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -1999,7 +2003,7 @@ function Jolt_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -2060,9 +2064,9 @@ function Cosmopax_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Cosmopax);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -2074,31 +2078,31 @@ function Cosmopax_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -2119,14 +2123,14 @@ function Cosmopax_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('ymdHis'); // $opr_codigo . date('dmy') . "0" . $seq;
 				    $sPinCodigo	= $linhaAr[0];
 			    	$sValorFace = $linhaAr[1];
@@ -2157,8 +2161,8 @@ function Cosmopax_traduzKValor($k){
 					$strtmp = str_replace($sai, $entra, strtolower($linha));
 					$linhaAr = explode(" ", str_replace($sai, $entra, strtolower($linha)));
 					$lote  = $opr_codigo . date('ymdHis');	//	$opr_codigo . date('dmy') . "0" . $seq;
-					$valor = Cosmopax_traduzKValor(trim($linhaAr[0]));
-					$qtd = trim($linhaAr[1]);
+					$valor = Cosmopax_traduzKValor(trim((string)($linhaAr[0] ?? "")));
+					$qtd = trim((string)($linhaAr[1] ?? ""));
 //echo "linha: $linha<br>";
 //echo "linhaAr[0]: ".$linhaAr[0]."<br>";
 //echo "linhaAr[1]: ".$linhaAr[1]."<br>";
@@ -2174,7 +2178,7 @@ function Cosmopax_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -2240,9 +2244,9 @@ function Hive_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Hive);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 31;
@@ -2254,31 +2258,31 @@ function Hive_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -2299,14 +2303,14 @@ function Hive_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dm') . "0" . $seq;
 				    $sPinCodigo	= $linhaAr[0];
 			    	$sValorFace = $valor;
@@ -2347,7 +2351,7 @@ function Hive_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -2409,9 +2413,9 @@ function Escola24h_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Escola24h);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 31;
@@ -2423,31 +2427,31 @@ function Escola24h_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -2468,14 +2472,14 @@ function Escola24h_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dm') . "0" . $seq;
 				    $sPinCodigo	= $linhaAr[0];
 			    	$sValorFace = $valor;
@@ -2514,7 +2518,7 @@ function Escola24h_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -2570,10 +2574,10 @@ function Escola24h_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_HabboHotel);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
-		if(!$loteValor || trim($loteValor) == "" || !is_numeric($loteValor)) $msg = "Valor do pin inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(!$loteValor || trim((string)($loteValor ?? "")) == "" || !is_numeric($loteValor)) $msg = "Valor do pin inválido.\n";
 		elseif(!ctype_digit($loteValor)) $msg = "Valor do pin deve ser número inteiro.\n";
 
 		//Abre arquivo e le conteudo
@@ -2582,23 +2586,23 @@ function Escola24h_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 				$num_posicoes = 8;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -2641,7 +2645,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_lote_codigo desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_lote_codigo = $rs_row['pin_lote_codigo'];
 			}
@@ -2654,7 +2658,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_serial desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_serial = $rs_row['pin_serial'];
 			}
@@ -2742,10 +2746,10 @@ function Escola24h_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Mindset);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
-		if(!$loteValor || trim($loteValor) == "" || !is_numeric($loteValor)) $msg = "Valor do pin inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(!$loteValor || trim((string)($loteValor ?? "")) == "" || !is_numeric($loteValor)) $msg = "Valor do pin inválido.\n";
 		elseif(!ctype_digit($loteValor)) $msg = "Valor do pin deve ser número inteiro.\n";
 
 		//Abre arquivo e le conteudo
@@ -2754,23 +2758,23 @@ function Escola24h_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 				$num_posicoes = 17;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -2781,12 +2785,12 @@ function Escola24h_traduzKValor($k){
 		if($msg == "") {
 			
 			$existe = false;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 				$linha 	= $cargaAr[$i];
 
 				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='".$fcanal."' ";
 				$rs = SQLexecuteQuery($sql);
-				if(!$rs || pg_num_rows($rs) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
+				if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
 					if($rs_row['qtde'] != 0){
@@ -2805,7 +2809,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_lote_codigo desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_lote_codigo = $rs_row['pin_lote_codigo'];
 			}
@@ -2818,7 +2822,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='".$fcanal."' order by pin_serial desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_serial = $rs_row['pin_serial'];
 			}
@@ -2836,7 +2840,7 @@ function Escola24h_traduzKValor($k){
 			$iPincaracter = "";
 
 			//insere lote
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -2889,10 +2893,10 @@ function Escola24h_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Vostu);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
-		if(!$loteValor || trim($loteValor) == "" || !is_numeric($loteValor)) $msg = "Valor do pin inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(!$loteValor || trim((string)($loteValor ?? "")) == "" || !is_numeric($loteValor)) $msg = "Valor do pin inválido.\n";
 		elseif(!ctype_digit($loteValor)) $msg = "Valor do pin deve ser número inteiro.\n";
 
 		//Abre arquivo e le conteudo
@@ -2901,23 +2905,23 @@ function Escola24h_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 				$num_posicoes = 17;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -2928,12 +2932,12 @@ function Escola24h_traduzKValor($k){
 		if($msg == "") {
 			
 			$existe = false;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 				$linha 	= $cargaAr[$i];
 
 				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='s' ";
 				$rs = SQLexecuteQuery($sql);
-				if(!$rs || pg_num_rows($rs) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
+				if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
 					if($rs_row['qtde'] != 0){
@@ -2952,7 +2956,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_lote_codigo desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_lote_codigo = $rs_row['pin_lote_codigo'];
 			}
@@ -2965,7 +2969,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_serial desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_serial = $rs_row['pin_serial'];
 			}
@@ -2983,7 +2987,7 @@ function Escola24h_traduzKValor($k){
 //			$iPinCodigo = "0000000000000000";
 
 			//insere lote
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -3038,10 +3042,10 @@ function Escola24h_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Brancaleone);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
-		if(!$loteValor || trim($loteValor) == "") $msg = "Valor do pin inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(!$loteValor || trim((string)($loteValor ?? "")) == "") $msg = "Valor do pin inválido.\n";
 
 		//Abre arquivo e le conteudo
 		if($msg == ""){
@@ -3049,23 +3053,23 @@ function Escola24h_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 				$num_posicoes =10;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -3076,12 +3080,12 @@ function Escola24h_traduzKValor($k){
 		if($msg == "") {
 			
 			$existe = false;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 				$linha 	= $cargaAr[$i];
 
 				$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_caracter = '$linha' and pin_canal='s' ";
 				$rs = SQLexecuteQuery($sql);
-				if(!$rs || pg_num_rows($rs) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
+				if(!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) $msg = "Erro ao pesquisar se pin já existe.\n";
 				else {
 					$rs_row = pg_fetch_array($rs);
 					if($rs_row['qtde'] != 0){
@@ -3100,7 +3104,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_lote_codigo from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_lote_codigo desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_lote_codigo.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_lote_codigo = $rs_row['pin_lote_codigo'];
 			}
@@ -3113,7 +3117,7 @@ function Escola24h_traduzKValor($k){
 			$sql  = "select pin_serial from pins where opr_codigo = $opr_codigo and pin_canal='s' order by pin_serial desc limit 1";
 			$rs = SQLexecuteQuery($sql);
 			if(!$rs) $msg = "Erro ao pesquisar pin_serial.\n";
-			elseif(pg_num_rows($rs) > 0) {
+			elseif((($rs) ? pg_num_rows($rs) : 0) > 0) {
 				$rs_row = pg_fetch_array($rs);
 				$pin_serial = $rs_row['pin_serial'];
 			}
@@ -3131,7 +3135,7 @@ function Escola24h_traduzKValor($k){
 			$iPinCodigo = "0000000000000000";
 
 			//insere lote
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -3191,9 +3195,9 @@ function MUOnline_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_MUOnline);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 26;
@@ -3205,31 +3209,31 @@ function MUOnline_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -3250,7 +3254,7 @@ function MUOnline_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -3258,7 +3262,7 @@ function MUOnline_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -3267,10 +3271,10 @@ function MUOnline_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=36) || (substr($sPinSerial,8,1)!="-") || (substr($sPinSerial,13,1)!="-") || (substr($sPinSerial,18,1)!="-") || (substr($sPinSerial,23,1)!="-")) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=36) || (substr($sPinSerial,8,1)!="-") || (substr($sPinSerial,13,1)!="-") || (substr($sPinSerial,18,1)!="-") || (substr($sPinSerial,23,1)!="-")) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=9) || (substr($sPinCodigo,4,1)!="-")) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=9) || (substr($sPinCodigo,4,1)!="-")) 	
 							$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -3301,7 +3305,7 @@ function MUOnline_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -3370,9 +3374,9 @@ function GPotato_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_GPotato);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 41;
@@ -3384,31 +3388,31 @@ function GPotato_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -3429,7 +3433,7 @@ function GPotato_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -3437,7 +3441,7 @@ function GPotato_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -3446,10 +3450,10 @@ function GPotato_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=14) || (substr($sPinSerial,4,1)!="-") || (substr($sPinSerial,9,1)!="-") ) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=14) || (substr($sPinSerial,4,1)!="-") || (substr($sPinSerial,9,1)!="-") ) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=12) ) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=12) ) 	
 							$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace) || (!in_array($sValorFace, $valor_GPotato)) ) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -3498,7 +3502,7 @@ function GPotato_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -3564,9 +3568,9 @@ function FHLGames_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_FHLGames);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 49;
@@ -3578,31 +3582,31 @@ function FHLGames_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -3623,7 +3627,7 @@ function FHLGames_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -3631,7 +3635,7 @@ function FHLGames_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -3640,10 +3644,10 @@ function FHLGames_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=10)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=10)) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=14) || (substr($sPinCodigo,4,1)!="-") || (substr($sPinCodigo,9,1)!="-")  ) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=14) || (substr($sPinCodigo,4,1)!="-") || (substr($sPinCodigo,9,1)!="-")  ) 	
 							$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace) || (!in_array($sValorFace, $valor_FHLGames)) ) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -3692,7 +3696,7 @@ function FHLGames_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -3757,9 +3761,9 @@ function YNKinteractive_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_YNKinteractive);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 19;
@@ -3771,31 +3775,31 @@ function YNKinteractive_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -3816,14 +3820,14 @@ function YNKinteractive_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -3865,7 +3869,7 @@ function YNKinteractive_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -3929,9 +3933,9 @@ function PayByCash_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_PayByCash);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 26;
@@ -3943,31 +3947,31 @@ function PayByCash_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -3988,7 +3992,7 @@ function PayByCash_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -3996,7 +4000,7 @@ function PayByCash_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
 					$sPinSerial = $linhaAr[0];
 			    	$sValorFace = $linhaAr[1]; //$valor;
@@ -4006,7 +4010,7 @@ function PayByCash_traduzKValor($k){
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 					// 012345678901234567890123
 					// FIUK-AYCZ-YHXR-EZAF-OEPE
-					if($sPinSerial == "" || (strlen($sPinSerial)!=24)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=24)) 	
 						$msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
 					if((substr($sPinSerial,4,1)!="-") || (substr($sPinSerial,9,1)!="-") || (substr($sPinSerial,14,1)!="-") || (substr($sPinSerial,19,1)!="-")) 
 						$msg = "Pin Serial inválido (5x4): " . $sPinSerial . ".\n";
@@ -4040,7 +4044,7 @@ function PayByCash_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -4107,9 +4111,9 @@ function Webzen_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Webzen, $opr_codigo_Webzen_Packs, $opr_codigo_Webzen_2, $opr_codigo_Webzen_3);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 26;
@@ -4121,31 +4125,31 @@ function Webzen_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -4166,7 +4170,7 @@ function Webzen_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -4174,7 +4178,7 @@ function Webzen_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
 					$sPinSerial = $linhaAr[0];
 			    	$sValorFace = $linhaAr[1]; //$valor;
@@ -4188,7 +4192,7 @@ function Webzen_traduzKValor($k){
                                         // Formato antigo: xxxxx-xxxxx-xxxxx-xxxxx-xxxxx (25 dígitos alfanuméricos separados por traços)
                                         // Formato novo: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (32 dígitos alfanuméricos sem traços)
 
-					if($sPinSerial == "" || (strlen($sPinSerial)!=16)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=16)) 	
 						$msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
 					//if((substr($sPinSerial,5,1)!="-") || (substr($sPinSerial,11,1)!="-") || (substr($sPinSerial,17,1)!="-") || (substr($sPinSerial,23,1)!="-")) 
 					//	$msg = "Pin Serial inválido (5x5): " . $sPinSerial . ".\n";
@@ -4222,7 +4226,7 @@ function Webzen_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -4286,9 +4290,9 @@ function Coolnex_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Coolnex);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 30;
@@ -4300,30 +4304,30 @@ function Coolnex_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -4344,7 +4348,7 @@ function Coolnex_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -4352,7 +4356,7 @@ function Coolnex_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
 					$sPinSerial = $linhaAr[0];
 			    	$sValorFace = $linhaAr[1]; //$valor;
@@ -4364,12 +4368,12 @@ function Coolnex_traduzKValor($k){
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg .= "Pin Serial inválido: " . $sPinSerial . ".\n";
 					// 0123456789012345678
 					// vwb0 d4a8 d61d 420f
-					if($sPinSerial == "" || (strlen($sPinSerial)!=19)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=19)) 	
 						$msg .= "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
-					$blocks = explode(" ", $sPinSerial);
-					if(count($blocks)!=4) 	
+					$blocks = explode(" ", (string)($sPinSerial ?? ""));
+					if((is_countable($blocks) ? count($blocks) : 0)!=4) 	
 						$msg .= "Pin Serial estrutura inválida (4x4): " . $sPinSerial . ".\n";
-					for($j=0;$j<count($blocks);$j++) {
+					for($j=0;$j<(is_countable($blocks) ? count($blocks) : 0);$j++) {
 						if(!ctype_alnum($blocks[$j])) 
 							$msg .= "Pin Serial estrutura inválida (4 bocos alfanuméricos): " . $sPinSerial . " -> ".$blocks[$j].".\n";
 					}
@@ -4403,7 +4407,7 @@ function Coolnex_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -4475,9 +4479,9 @@ function KOL_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_KOL);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 26;
@@ -4489,31 +4493,31 @@ function KOL_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -4534,7 +4538,7 @@ function KOL_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -4547,7 +4551,7 @@ function KOL_traduzKValor($k){
 //	serial: 90304089-gpuv-3jgz-1ns5-b4pm-mlpf-jozi
 //	senha:  ismo-iyj5
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= $linhaAr[1];
@@ -4556,14 +4560,14 @@ function KOL_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-//					if($sPinSerial == "" || (strlen($sPinSerial)!=38) || (substr($sPinSerial,8,1)!="-") || (substr($sPinSerial,13,1)!="-") || (substr($sPinSerial,18,1)!="-") || (substr($sPinSerial,23,1)!="-") || (substr($sPinSerial,28,1)!="-") || (substr($sPinSerial,33,1)!="-")) 	
-					$pinlen = strlen($sPinSerial)-1;
+//					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=38) || (substr($sPinSerial,8,1)!="-") || (substr($sPinSerial,13,1)!="-") || (substr($sPinSerial,18,1)!="-") || (substr($sPinSerial,23,1)!="-") || (substr($sPinSerial,28,1)!="-") || (substr($sPinSerial,33,1)!="-")) 	
+					$pinlen = strlen((string)($sPinSerial ?? ""))-1;
 //echo "pinlen: $pinlen<br>";
 //echo "-4: ".substr($sPinSerial,$pinlen-4,1).", -9: ".substr($sPinSerial,$pinlen-9,1).", -14: ".substr($sPinSerial,$pinlen-14,1).", -19: ".substr($sPinSerial,$pinlen-19,1).", -24: ".substr($sPinSerial,$pinlen-24,1).", -29: ".substr($sPinSerial,$pinlen-29,1)."<br>";
-					if($sPinSerial == "" || (!(strlen($sPinSerial)==38 || strlen($sPinSerial)==39)) || (substr($sPinSerial,$pinlen-4,1)!="-") || (substr($sPinSerial,$pinlen-9,1)!="-") || (substr($sPinSerial,$pinlen-14,1)!="-") || (substr($sPinSerial,$pinlen-19,1)!="-") || (substr($sPinSerial,$pinlen-24,1)!="-") || (substr($sPinSerial,$pinlen-29,1)!="-")) 	
+					if($sPinSerial == "" || (!(strlen((string)($sPinSerial ?? ""))==38 || strlen((string)($sPinSerial ?? ""))==39)) || (substr($sPinSerial,$pinlen-4,1)!="-") || (substr($sPinSerial,$pinlen-9,1)!="-") || (substr($sPinSerial,$pinlen-14,1)!="-") || (substr($sPinSerial,$pinlen-19,1)!="-") || (substr($sPinSerial,$pinlen-24,1)!="-") || (substr($sPinSerial,$pinlen-29,1)!="-")) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=9) || (substr($sPinCodigo,4,1)!="-")) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=9) || (substr($sPinCodigo,4,1)!="-")) 	
 							$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -4594,7 +4598,7 @@ function KOL_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -4661,9 +4665,9 @@ function Acclaim_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Acclaim);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 30;
@@ -4675,31 +4679,31 @@ function Acclaim_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -4720,17 +4724,17 @@ function Acclaim_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
-					$sPinSerial = trim($linhaAr[0]);
-				    $sPinCodigo	= trim($linhaAr[1]);
+					$sPinSerial = trim((string)($linhaAr[0] ?? ""));
+				    $sPinCodigo	= trim((string)($linhaAr[1] ?? ""));
 			    	$sValorFace = $linhaAr[2]; //$valor;
 
 //echo "[sLote: '$sLote'] [sPinSerial: '$sPinSerial'] [sPinCodigo: '$sPinCodigo'] [sValorFace: '$sValorFace']<br>";
@@ -4738,21 +4742,21 @@ function Acclaim_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=14)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=14)) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 //					echo "sPinSerial: ";
 //					if(!is_numeric($sPinSerial))  	
 //						echo "[Not is_numeric] ";
-//					if(strlen($sPinSerial)!=14) 	
+//					if(strlen((string)($sPinSerial ?? ""))!=14) 	
 //						echo " [Not 14 chars:'']";
 //					echo "<br>";
 
 //echo "IsEmpty: ".(($sPinCodigo == "")?"Yes":"No")."<br>";  
 //echo "IsNumeric: ".(is_numeric($sPinCodigo)?"Yes":"No")."<br>"; 
-//echo "Len(14): ".((strlen($sPinCodigo)==14)?"Yes":"No")."<br>";
+//echo "Len(14): ".((strlen((string)($sPinCodigo ?? ""))==14)?"Yes":"No")."<br>";
 
-					if($sPinCodigo == "" || !is_numeric($sPinCodigo) || (strlen($sPinCodigo)!=14)) 	
+					if($sPinCodigo == "" || !is_numeric($sPinCodigo) || (strlen((string)($sPinCodigo ?? ""))!=14)) 	
 						$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -4783,7 +4787,7 @@ function Acclaim_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -4849,9 +4853,9 @@ function NDoors_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_NDoors);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 30;
@@ -4863,31 +4867,31 @@ function NDoors_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -4908,17 +4912,17 @@ function NDoors_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
-					$sPinSerial = trim($linhaAr[0]);
-				    $sPinCodigo	= trim($linhaAr[1]);
+					$sPinSerial = trim((string)($linhaAr[0] ?? ""));
+				    $sPinCodigo	= trim((string)($linhaAr[1] ?? ""));
 			    	$sValorFace = $linhaAr[2]; //$valor;
 
 //echo "[sLote: '$sLote'] [sPinSerial: '$sPinSerial'] [sPinCodigo: '$sPinCodigo'] [sValorFace: '$sValorFace']<br>";
@@ -4926,21 +4930,21 @@ function NDoors_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=14)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=14)) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 //					echo "sPinSerial: ";
 //					if(!is_numeric($sPinSerial))  	
 //						echo "[Not is_numeric] ";
-//					if(strlen($sPinSerial)!=14) 	
+//					if(strlen((string)($sPinSerial ?? ""))!=14) 	
 //						echo " [Not 14 chars:'']";
 //					echo "<br>";
 
 //echo "IsEmpty: ".(($sPinCodigo == "")?"Yes":"No")."<br>";  
 //echo "IsNumeric: ".(is_numeric($sPinCodigo)?"Yes":"No")."<br>"; 
-//echo "Len(14): ".((strlen($sPinCodigo)==14)?"Yes":"No")."<br>";
+//echo "Len(14): ".((strlen((string)($sPinCodigo ?? ""))==14)?"Yes":"No")."<br>";
 
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=12)) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=12)) 	
 						$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -4971,7 +4975,7 @@ function NDoors_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -5037,9 +5041,9 @@ function Ignitedgames_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Ignitedgames);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 30;
@@ -5051,31 +5055,31 @@ function Ignitedgames_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -5096,17 +5100,17 @@ function Ignitedgames_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
-					$sPinSerial = trim($linhaAr[0]);
-				    $sPinCodigo	= trim($linhaAr[1]);
+					$sPinSerial = trim((string)($linhaAr[0] ?? ""));
+				    $sPinCodigo	= trim((string)($linhaAr[1] ?? ""));
 			    	$sValorFace = $linhaAr[2]; //$valor;
 
 //echo "[sLote: '$sLote'] [sPinSerial: '$sPinSerial'] [sPinCodigo: '$sPinCodigo'] [sValorFace: '$sValorFace']<br>";
@@ -5114,21 +5118,21 @@ function Ignitedgames_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=14)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=14)) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 //					echo "sPinSerial: ";
 //					if(!is_numeric($sPinSerial))  	
 //						echo "[Not is_numeric] ";
-//					if(strlen($sPinSerial)!=14) 	
+//					if(strlen((string)($sPinSerial ?? ""))!=14) 	
 //						echo " [Not 14 chars:'']";
 //					echo "<br>";
 
 //echo "IsEmpty: ".(($sPinCodigo == "")?"Yes":"No")."<br>";  
 //echo "IsNumeric: ".(is_numeric($sPinCodigo)?"Yes":"No")."<br>"; 
-//echo "Len(14): ".((strlen($sPinCodigo)==14)?"Yes":"No")."<br>";
+//echo "Len(14): ".((strlen((string)($sPinCodigo ?? ""))==14)?"Yes":"No")."<br>";
 
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=20)) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=20)) 	
 						$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -5159,7 +5163,7 @@ function Ignitedgames_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -5222,9 +5226,9 @@ function Ticket_Surf_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Ticket_Surf);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 30;
@@ -5236,31 +5240,31 @@ function Ticket_Surf_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -5281,17 +5285,17 @@ function Ticket_Surf_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . $seq;	//$opr_codigo . date('dmy') . "0" . $seq;
-					$sPinSerial = trim($linhaAr[0]);
-				    $sPinCodigo	= trim($linhaAr[1]);
+					$sPinSerial = trim((string)($linhaAr[0] ?? ""));
+				    $sPinCodigo	= trim((string)($linhaAr[1] ?? ""));
 			    	$sValorFace = $linhaAr[2]; //$valor;
 
 //echo "[sLote: '$sLote'] [sPinSerial: '$sPinSerial'] [sPinCodigo: '$sPinCodigo'] [sValorFace: '$sValorFace']<br>";
@@ -5299,21 +5303,21 @@ function Ticket_Surf_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "" || !is_numeric($sPinSerial)) 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-					if($sPinSerial == "" || (strlen($sPinSerial)!=14)) 	
+					if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=14)) 	
 						$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 //					echo "sPinSerial: ";
 //					if(!is_numeric($sPinSerial))  	
 //						echo "[Not is_numeric] ";
-//					if(strlen($sPinSerial)!=14) 	
+//					if(strlen((string)($sPinSerial ?? ""))!=14) 	
 //						echo " [Not 14 chars:'']";
 //					echo "<br>";
 
 //echo "IsEmpty: ".(($sPinCodigo == "")?"Yes":"No")."<br>";  
 //echo "IsNumeric: ".(is_numeric($sPinCodigo)?"Yes":"No")."<br>"; 
-//echo "Len(14): ".((strlen($sPinCodigo)==14)?"Yes":"No")."<br>";
+//echo "Len(14): ".((strlen((string)($sPinCodigo ?? ""))==14)?"Yes":"No")."<br>";
 
-					if($sPinCodigo == "" || !is_numeric($sPinCodigo) || (strlen($sPinCodigo)!=14)) 	
+					if($sPinCodigo == "" || !is_numeric($sPinCodigo) || (strlen((string)($sPinCodigo ?? ""))!=14)) 	
 						$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -5345,7 +5349,7 @@ function Ticket_Surf_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -5412,9 +5416,9 @@ function GameGol_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_GameGol);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 28;
@@ -5426,31 +5430,31 @@ function GameGol_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 		// Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
 		//valida tamanho da linha
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -5471,7 +5475,7 @@ function GameGol_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
@@ -5479,16 +5483,16 @@ function GameGol_traduzKValor($k){
 				if (strpos($linha, "unidades") === false) { // corpo
 
 //echo "[linha: $linha]<br>";
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
 					$sPinSerial = "0";
-				    $sPinCodigo	= trim($linhaAr[0]);
-			    	$sValorFace = trim($linhaAr[1]); //$valor;
-//echo "[sLote: $sLote] [sPinCodigo: $sPinCodigo] [sValorFace: $sValorFace] [strlen: ".strlen($sPinCodigo)."]<br>";
+				    $sPinCodigo	= trim((string)($linhaAr[0] ?? ""));
+			    	$sValorFace = trim((string)($linhaAr[1] ?? "")); //$valor;
+//echo "[sLote: $sLote] [sPinCodigo: $sPinCodigo] [sValorFace: $sValorFace] [strlen: ".strlen((string)($sPinCodigo ?? ""))."]<br>";
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinCodigo == "" || !is_numeric($sPinCodigo)) 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if($sPinCodigo == "" || (strlen($sPinCodigo)!=16)) 	
+					if($sPinCodigo == "" || (strlen((string)($sPinCodigo ?? ""))!=16)) 	
 							$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
@@ -5519,7 +5523,7 @@ function GameGol_traduzKValor($k){
 						$sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -5582,9 +5586,9 @@ function GameIS_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_GameIS);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 27;
@@ -5596,12 +5600,12 @@ function GameIS_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
@@ -5609,19 +5613,19 @@ function GameIS_traduzKValor($k){
 		//valida tamanho da linha
 		// Exemplo: 	"4E7855D1AC4649HS	66"
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -5642,14 +5646,14 @@ function GameIS_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . $seq;
 					$sPinSerial = $linhaAr[0];
 				    $sPinCodigo	= "0";
@@ -5690,7 +5694,7 @@ function GameIS_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -5753,9 +5757,9 @@ function Kaizen_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Kaizen);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 29;
@@ -5767,12 +5771,12 @@ function Kaizen_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
@@ -5780,19 +5784,19 @@ function Kaizen_traduzKValor($k){
 		//valida tamanho da linha
 		// Exemplo: 	"44A42C5F	14"
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -5813,14 +5817,14 @@ function Kaizen_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . $seq;
 					$sPinSerial = "";
 				    $sPinCodigo	= $linhaAr[0];
@@ -5829,9 +5833,9 @@ function Kaizen_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "") 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-//					if(strlen($sPinSerial)!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen($sPinSerial).".\n";
+//					if(strlen((string)($sPinSerial ?? ""))!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen((string)($sPinSerial ?? "")).".\n";
 					if($sPinCodigo == "") 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if(strlen($sPinCodigo)!=8) 	$msg = "Pin Código inválido: tamanho!=8 '" . $sPinCodigo . "', Len=".strlen($sPinCodigo).".\n";
+					if(strlen((string)($sPinCodigo ?? ""))!=8) 	$msg = "Pin Código inválido: tamanho!=8 '" . $sPinCodigo . "', Len=".strlen((string)($sPinCodigo ?? "")).".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
 					//insere pin
@@ -5865,7 +5869,7 @@ function Kaizen_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -5930,9 +5934,9 @@ function Onnet_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Onnet);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 29;
@@ -5944,12 +5948,12 @@ function Onnet_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
@@ -5957,19 +5961,19 @@ function Onnet_traduzKValor($k){
 		//valida tamanho da linha
 		// Exemplo: 	"44A42C5F	14"
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -5990,14 +5994,14 @@ function Onnet_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . $seq;
 					$sPinSerial = "";
 				    $sPinCodigo	= $linhaAr[0];
@@ -6006,9 +6010,9 @@ function Onnet_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "") 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-//					if(strlen($sPinSerial)!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen($sPinSerial).".\n";
+//					if(strlen((string)($sPinSerial ?? ""))!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen((string)($sPinSerial ?? "")).".\n";
 					if($sPinCodigo == "") 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if(strlen($sPinCodigo)!=15) 	$msg = "Pin Código inválido: tamanho!=15 '" . $sPinCodigo . "', Len=".strlen($sPinCodigo).".\n";
+					if(strlen((string)($sPinCodigo ?? ""))!=15) 	$msg = "Pin Código inválido: tamanho!=15 '" . $sPinCodigo . "', Len=".strlen((string)($sPinCodigo ?? "")).".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
 					//insere pin
@@ -6042,7 +6046,7 @@ function Onnet_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -6104,9 +6108,9 @@ function fun_77PB_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_77PB);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 29;
@@ -6118,12 +6122,12 @@ function fun_77PB_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
@@ -6131,19 +6135,19 @@ function fun_77PB_traduzKValor($k){
 		//valida tamanho da linha
 		// Exemplo: 	"44A42C5F	14"
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -6164,14 +6168,14 @@ function fun_77PB_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . $seq;
 					$sPinSerial = "";
 				    $sPinCodigo	= $linhaAr[0];
@@ -6180,9 +6184,9 @@ function fun_77PB_traduzKValor($k){
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "") 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-//					if(strlen($sPinSerial)!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen($sPinSerial).".\n";
+//					if(strlen((string)($sPinSerial ?? ""))!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen((string)($sPinSerial ?? "")).".\n";
 					if($sPinCodigo == "") 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if(strlen($sPinCodigo)!=12) 	$msg = "Pin Código inválido: tamanho!=12 '" . $sPinCodigo . "', Len=".strlen($sPinCodigo).".\n";
+					if(strlen((string)($sPinCodigo ?? ""))!=12) 	$msg = "Pin Código inválido: tamanho!=12 '" . $sPinCodigo . "', Len=".strlen((string)($sPinCodigo ?? "")).".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
 					//insere pin
@@ -6216,7 +6220,7 @@ function fun_77PB_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -6277,9 +6281,9 @@ function Alawar_traduzKValor($k){
 		
 		//Valida entradas
 		$operadoras = array($opr_codigo_Alawar);
-		if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-		if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-		if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+		if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+		if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+		if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
 		//local
 		$iPinLocal = 29;
@@ -6291,12 +6295,12 @@ function Alawar_traduzKValor($k){
 			$carga = fread($handle, filesize($fileSource));
 			fclose($handle);
 
-			$cargaAr = explode("\n", $carga);
-			if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+			$cargaAr = explode("\n", (string)($carga ?? ""));
+			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
 		} 
 
 // Debug
-//for($i=0; $i < count($cargaAr); $i++){
+//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //}
 //$msg = "";
@@ -6304,19 +6308,19 @@ function Alawar_traduzKValor($k){
 		//valida tamanho da linha
 		// Exemplo: 	"44A42C5F	14"
 		if($msg == ""){
-			for($i=0; $i < count($cargaAr); $i++){
-				$cargaAr[$i] = trim($cargaAr[$i]);
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+				$cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 								
 				// tira linha em branco
-				if(trim($cargaAr[$i]) == ""){
+				if(trim((string)($cargaAr[$i] ?? "")) == ""){
 					array_splice($cargaAr, $i, 1); 
 					continue;
 				}
 /*
  				//Valida tamanho da linha
 				$num_posicoes = 34;
-				if(strlen($cargaAr[$i]) != $num_posicoes){
-					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+				if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+					$msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
 					$msg .= "**" . $cargaAr[$i] . "**\n";
 					break;
 				}
@@ -6337,25 +6341,25 @@ function Alawar_traduzKValor($k){
 			
 			$seq = 0;
 			$valor = 0;
-			for($i=0; $i < count($cargaAr); $i++){
+			for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 	
 				$linha 		= $cargaAr[$i];
 
 				//dados				
 				if (strpos($linha, "unidades") === false) { // corpo
 
-					$linhaAr 	= explode("\t", $linha);
+					$linhaAr 	= explode("\t", (string)($linha ?? ""));
 					$sLote 		= $opr_codigo . date('dmy') . $seq;
 					$sPinSerial = "";
-				    $sPinCodigo	= trim($linhaAr[0]);
+				    $sPinCodigo	= trim((string)($linhaAr[0] ?? ""));
 			    	$sValorFace = $loteValor;
 
 					//Validacoes
 					if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 //					if($sPinSerial == "") 	$msg = "Pin Serial inválido: " . $sPinSerial . ".\n";
-//					if(strlen($sPinSerial)!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen($sPinSerial).".\n";
+//					if(strlen((string)($sPinSerial ?? ""))!=8) 	$msg = "Pin Serial inválido: tamanho!=8 '" . $sPinSerial . "', Len=".strlen((string)($sPinSerial ?? "")).".\n";
 					if($sPinCodigo == "") 	$msg = "Pin Código inválido: " . $sPinCodigo . ".\n";
-					if(strlen($sPinCodigo)>20) 	$msg = "Pin Código inválido: tamanho>20 '" . $sPinCodigo . "', Len=".strlen($sPinCodigo).".\n";
+					if(strlen((string)($sPinCodigo ?? ""))>20) 	$msg = "Pin Código inválido: tamanho>20 '" . $sPinCodigo . "', Len=".strlen((string)($sPinCodigo ?? "")).".\n";
 					if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
 
 					//insere pin
@@ -6389,7 +6393,7 @@ function Alawar_traduzKValor($k){
 //echo "sql: $sql";
 						$rs = SQLexecuteQuery($sql);
 						$ret = true;
-						if($rs && pg_num_rows($rs) > 0){
+						if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 							$rs_row = pg_fetch_array($rs);
 							if($rs_row['qtde'] == 0) $ret = false;
 						}			
@@ -6455,9 +6459,9 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
         $msg = "";
         //Valida entradas
         $operadoras = array($opr_codigo_BATTLEFIELD, $opr_codigo_COMMANDANDCONQUER, $opr_codigo_NEEDFORSPEED, $opr_codigo_FIFAWORLD);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
         //local
         $iPinLocal = 33;
         //Abre arquivo e le conteudo
@@ -6465,15 +6469,15 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -6489,17 +6493,17 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
         if($msg == ""){
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
                         $linha 		= $cargaAr[$i];
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=19)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=19)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
                                 //insere pin
@@ -6525,7 +6529,7 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -6575,9 +6579,9 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
         $msg = "";
         //Valida entradas
         $operadoras = array($opr_codigo_CheckOk);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
         //local
         $iPinLocal = 34;
         //Abre arquivo e le conteudo
@@ -6585,15 +6589,15 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -6610,14 +6614,14 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
                 $seq = 0;
                 $valor = 0;
                 $contador_PIN_importados = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
                         $linha 		= $cargaAr[$i];
                         //dados				
                         if (substr($linha, 0, 1) == '1') { // corpo
                                 $linhaAr[0]     = substr($linha, 13, 30);
                                 $linhaAr[1]     = substr($linha, 43, 5)*1/100;
                                 $sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
-                                $sPinSerial = trim($linhaAr[0]);
+                                $sPinSerial = trim((string)($linhaAr[0] ?? ""));
                                 $sValorFace = $linhaAr[1]; //$valor;
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
@@ -6641,7 +6645,7 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
                                 elseif (substr($linha, 0, 1) == '9') {
                                     echo "Linha do rodapé.<br>";
                                 }
-                                elseif (strlen($linha) == 0) {
+                                elseif (strlen((string)($linha ?? "")) == 0) {
                                     echo "Linha em branco.<br>";
                                 }
                         } 
@@ -6694,9 +6698,9 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
 
         //Valida entradas
         $operadoras = array($opr_codigo_XBox);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 19;
@@ -6707,17 +6711,17 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -6737,14 +6741,14 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 	= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -6753,7 +6757,7 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 if($sLote == "" || !is_numeric($sLote))
                                         $msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=25)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=25)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
 
                                 if($sValorFace == "" || !is_numeric($sValorFace))
@@ -6786,7 +6790,7 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -6850,9 +6854,9 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
 
         //Valida entradas
         $operadoras = array($opr_codigo_Encripta);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 20;
@@ -6863,17 +6867,17 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -6893,14 +6897,14 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 	= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -6909,7 +6913,7 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
                                 if($sLote == "" || !is_numeric($sLote))
                                         $msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=13)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=13)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
 
                                 if($sValorFace == "" || !is_numeric($sValorFace))
@@ -6942,7 +6946,7 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -7002,9 +7006,9 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
 
         //Valida entradas
         $operadoras = array($opr_codigo_Valvesoftware);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 23;
@@ -7015,17 +7019,17 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -7045,14 +7049,14 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 	= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -7061,7 +7065,7 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
                                 if($sLote == "" || !is_numeric($sLote))
                                         $msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=17)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=17)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
 
                                 if($sValorFace == "" || !is_numeric($sValorFace))
@@ -7094,7 +7098,7 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -7163,9 +7167,9 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
 
         //Valida entradas
         $operadoras = array($opr_codigo_G2A, $opr_codigo_G2A_2);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 37;
@@ -7177,18 +7181,18 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -7208,14 +7212,14 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -7223,7 +7227,7 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=24)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=24)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
@@ -7255,7 +7259,7 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -7309,9 +7313,9 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
 
         //Valida entradas
         $operadoras = array($opr_codigo_NoPing);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 37;
@@ -7323,18 +7327,18 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -7354,14 +7358,14 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -7369,7 +7373,7 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=23)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=23)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
@@ -7401,7 +7405,7 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -7464,9 +7468,9 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
 
         //Valida entradas
         $operadoras = array($opr_codigo_Rimo, $opr_codigo_Rimo1, $opr_codigo_Rimo2);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 38;
@@ -7478,18 +7482,18 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -7509,14 +7513,14 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -7524,7 +7528,7 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=23)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=23)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
@@ -7556,7 +7560,7 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -7633,9 +7637,9 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
 
         //Valida entradas
         $operadoras = array($opr_codigo_HabboHotel_2);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 39;
@@ -7646,18 +7650,18 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -7677,14 +7681,14 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dm') . $seq;	//	Too big for pin_lote_codigo (integer) in DB: $opr_codigo.date('dmy')."0".$seq;
                                 $sPinSerial = $linhaAr[0];
                                 $sValorFace = $linhaAr[1]; //$valor;
@@ -7692,7 +7696,7 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=8)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=8)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
@@ -7724,7 +7728,7 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -7779,9 +7783,9 @@ function processaLote_SurfTelecom($fileSource, $nomeArq, $opr_codigo, $fcanal){
 
         //Valida entradas
         $operadoras = array($opr_codigo_SurfTelecom);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.".PHP_EOL;
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.".PHP_EOL;
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.".PHP_EOL;
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.".PHP_EOL;
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.".PHP_EOL;
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.".PHP_EOL;
 
         //local
         $iPinLocal = 40;
@@ -7792,18 +7796,18 @@ function processaLote_SurfTelecom($fileSource, $nomeArq, $opr_codigo, $fcanal){
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.".PHP_EOL;
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.".PHP_EOL;
         } 
 
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
@@ -7822,7 +7826,7 @@ function processaLote_SurfTelecom($fileSource, $nomeArq, $opr_codigo, $fcanal){
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
@@ -7897,9 +7901,9 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
         $msg = "";
         //Valida entradas
         $operadoras = array($opr_codigo_exitlag);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 32;
@@ -7910,31 +7914,31 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
         // Debug
-		//for($i=0; $i < count($cargaAr); $i++){
+		//for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 		//	echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 		//}
 		//		$msg = "";
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
 /*
                         //Valida tamanho da linha
                         $num_posicoes = 34;
-                        if(strlen($cargaAr[$i]) != $num_posicoes){
-                                $msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+                        if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+                                $msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
                                 $msg .= "**" . $cargaAr[$i] . "**\n";
                                 break;
                         }
@@ -7955,16 +7959,16 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
-                                $sPinSerial = trim($linhaAr[0]);
+                                $sPinSerial = trim((string)($linhaAr[0] ?? ""));
                                 $sValorFace = $linhaAr[1]; //$valor;
 
                                  //echo "[sLote: '$sLote'] [sPinSerial: '$sPinSerial'] [sPinCodigo: '$sPinCodigo'] [sValorFace: '$sValorFace']<br>";
@@ -7973,7 +7977,7 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=16))	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=16))	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
@@ -8005,7 +8009,7 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			
@@ -8069,9 +8073,9 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
 
         //Valida entradas
         $operadoras = array($opr_codigo_Tinder_1, $opr_codigo_Tinder_2);
-        if(is_null($fileSource) || trim($fileSource) == "") $msg = "Caminho do arquivo vázio.\n";
-        if(is_null($nomeArq) || trim($nomeArq) == "") $msg = "Nome do arquivo vázio.\n";
-        if(is_null($opr_codigo) || trim($opr_codigo) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
+        if(is_null($fileSource) || trim((string)($fileSource ?? "")) == "") $msg = "Caminho do arquivo vázio.\n";
+        if(is_null($nomeArq) || trim((string)($nomeArq ?? "")) == "") $msg = "Nome do arquivo vázio.\n";
+        if(is_null($opr_codigo) || trim((string)($opr_codigo ?? "")) == "" || !is_numeric($opr_codigo) || !in_array($opr_codigo, $operadoras)) $msg = "Código da operadora inválido.\n";
 
         //local
         $iPinLocal = 50;
@@ -8083,31 +8087,31 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
                 $carga = fread($handle, filesize($fileSource));
                 fclose($handle);
 
-                $cargaAr = explode("\n", $carga);
-                if(count($cargaAr) == 0) $msg = "Arquivo vázio.\n";
+                $cargaAr = explode("\n", (string)($carga ?? ""));
+                if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
 
         // Debug
-//		for($i=0; $i < count($cargaAr); $i++){
+//		for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 //			echo "cargaAr[$i]: '".$cargaAr[$i]."'<br>";
 //		}
 //		$msg = "";
 
         //valida tamanho da linha
         if($msg == ""){
-                for($i=0; $i < count($cargaAr); $i++){
-                        $cargaAr[$i] = trim($cargaAr[$i]);
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
+                        $cargaAr[$i] = trim((string)($cargaAr[$i] ?? ""));
 
                         // tira linha em branco
-                        if(trim($cargaAr[$i]) == ""){
+                        if(trim((string)($cargaAr[$i] ?? "")) == ""){
                                 array_splice($cargaAr, $i, 1); 
                                 continue;
                         }
 /*
                         //Valida tamanho da linha
                         $num_posicoes = 34;
-                        if(strlen($cargaAr[$i]) != $num_posicoes){
-                                $msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen($cargaAr[$i]) . ":\n";
+                        if(strlen((string)($cargaAr[$i] ?? "")) != $num_posicoes){
+                                $msg = "linha " . ($i+1) . " do arquivo não tem $num_posicoes posições, possui " . strlen((string)($cargaAr[$i] ?? "")) . ":\n";
                                 $msg .= "**" . $cargaAr[$i] . "**\n";
                                 break;
                         }
@@ -8128,16 +8132,16 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
 
                 $seq = 0;
                 $valor = 0;
-                for($i=0; $i < count($cargaAr); $i++){
+                for($i=0; $i < (is_countable($cargaAr) ? count($cargaAr) : 0); $i++){
 
                         $linha 		= $cargaAr[$i];
 
                         //dados				
                         if (strpos($linha, "unidades") === false) { // corpo
 
-                                $linhaAr 	= explode("\t", $linha);
+                                $linhaAr 	= explode("\t", (string)($linha ?? ""));
                                 $sLote 		= $opr_codigo . date('dmy') . "0" . $seq;
-                                $sPinSerial = trim($linhaAr[0]);
+                                $sPinSerial = trim((string)($linhaAr[0] ?? ""));
                                 $sValorFace = $linhaAr[1]; //$valor;
 
 //echo "[sLote: '$sLote'] [sPinSerial: '$sPinSerial'] [sPinCodigo: '$sPinCodigo'] [sValorFace: '$sValorFace']<br>";
@@ -8145,7 +8149,7 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                 //Validacoes
                                 if($sLote == "" || !is_numeric($sLote)) 			$msg = "Lote inválido: " . $sLote . ".\n";
 
-                                if($sPinSerial == "" || (strlen($sPinSerial)!=36)) 	
+                                if($sPinSerial == "" || (strlen((string)($sPinSerial ?? ""))!=36)) 	
                                         $msg = "Pin Serial comprimento inválido: " . $sPinSerial . ".\n";
                                 
                                 if($sValorFace == "" || !is_numeric($sValorFace)) 	$msg = "Valor de face inválido: " . $sValorFace . ".\n";
@@ -8177,7 +8181,7 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
                                         $sql  = "select count(*) as qtde from pins where opr_codigo = $opr_codigo and pin_lote_codigo = $lote and pin_valor = $valor and pin_canal='s' ";
                                         $rs = SQLexecuteQuery($sql);
                                         $ret = true;
-                                        if($rs && pg_num_rows($rs) > 0){
+                                        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
                                                 $rs_row = pg_fetch_array($rs);
                                                 if($rs_row['qtde'] == 0) $ret = false;
                                         }			

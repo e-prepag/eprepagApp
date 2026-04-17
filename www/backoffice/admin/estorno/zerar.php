@@ -10,7 +10,7 @@ if(isset($_POST["ug_id"])){
     $ug_id = $_POST["ug_id"];
     $sql = "SELECT ug_perfil_saldo, ug_login, ug_risco_classif FROM dist_usuarios_games WHERE ug_id = " . $ug_id;
     $ret = SQLexecuteQuery($sql);
-    if(pg_num_rows($ret) == 0){
+    if((($ret) ? pg_num_rows($ret) : 0) == 0){
         $msg = "O ID não corresponde a um pdv";
     }else{
         $row = pg_fetch_assoc($ret);
@@ -178,7 +178,7 @@ if(isset($msg)){
     </div>
     <div class="panel-body">
 <?php
-        if(pg_num_rows($rs_estornos) > 0){
+        if((($rs_estornos) ? pg_num_rows($rs_estornos) : 0) > 0){
 ?>
             <table class="table">
                 <thead>

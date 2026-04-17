@@ -46,7 +46,7 @@ header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename=' . $fileName);
 $output = fopen('php://output', 'w');
 fputcsv($output, array('Id', 'CNPJ', 'Representante Legal', 'CPF do Representante Legal', 'Sócio', 'CPF do Sócio'), ";");
-if (count($pdvs) > 0) {
+if ((is_countable($pdvs) ? count($pdvs) : 0) > 0) {
     foreach ($pdvs as $row) {
         fputcsv($output, $row, ";");
     }

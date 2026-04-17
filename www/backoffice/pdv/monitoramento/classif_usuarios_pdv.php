@@ -7,7 +7,7 @@ $spendente = "";
 //	$sql  = "select count(*) as qtde from dist_usuarios_games where ug_ativo = 2 and ug_qtde_acessos = 0";
 $sql  = "select ug_substatus, count(*) as qtde from dist_usuarios_games where ug_ativo = 2 group by ug_substatus";
 $rs_pendente = SQLexecuteQuery($sql);
-if($rs_pendente && pg_num_rows($rs_pendente) > 0){
+if($rs_pendente && (($rs_pendente) ? pg_num_rows($rs_pendente) : 0) > 0){
         $spendente = "<table  class='table table-bordered top10'  width='50%'  title='Número de Lans em cada status'>\n <tr align='center'><th colspan='2'>";
         $spendente .= "Classif. ug_substatus</th></tr>\n";
         $scol1 = "#f0f0f0";
@@ -30,7 +30,7 @@ $qtde_busca = 0;
 $sbusca = "";
 $sql  = "select ug_status, count(*) as qtde from dist_usuarios_games where ug_ativo = 1 group by ug_status";
 $rs_pendente = SQLexecuteQuery($sql);
-if($rs_pendente && pg_num_rows($rs_pendente) > 0){
+if($rs_pendente && (($rs_pendente) ? pg_num_rows($rs_pendente) : 0) > 0){
         $sbusca = "<table class='table table-bordered top10' width='50%' title='Número de Lans em cada status'>\n <tr align='center'><th colspan='2'>";
         $sbusca .= "Classif. ug_status</th></tr>\n";
         $scol = $scol1;

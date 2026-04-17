@@ -31,7 +31,7 @@ echo "BtnSearch: $BtnSearch<br>";
 //echo "sql: ".$sql."<br>";
 echo "<hr>";
 	$rs_tmp = SQLexecuteQuery($sql);
-	if($rs_tmp && pg_num_rows($rs_tmp) > 0){
+	if($rs_tmp && (($rs_tmp) ? pg_num_rows($rs_tmp) : 0) > 0){
 		$rs_tmp_row = pg_fetch_array($rs_tmp);
 		$comentario = $rs_tmp_row['comentario'];
 //echo "$comentario<br>";
@@ -39,7 +39,7 @@ echo "<hr>";
 		$sout = "";
 		$sout_rev = "";
 		$s_remake = "";
-		for($i=0;$i<strlen($comentario);$i++) {
+		for($i=0;$i<strlen((string)($comentario ?? ""));$i++) {
 			if($comentario[$i]!="Ã") {
 //				echo $i." - ".$comentario[$i]." - ".ord($comentario[$i])."<br>";
 				$sout .= "'".$s_especial_chars[($i-1)/2]."' =&gt; ".ord($comentario[$i]).", ";
@@ -118,7 +118,7 @@ echo "varsel: $varsel<br>";
 			$sql .= "WHERE 1=1 ";
 			if($tf_lanhouses_id) 	$sql .= "and lanhouses_id = $tf_lanhouses_id ";
 			if($tf_lh_nome) {
-				$tf_lh_nome_sql	= strtoupper(translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_nome)),0,50))); 
+				$tf_lh_nome_sql	= strtoupper(translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_nome ?? ""))),0,50))); 
 				$sql .= "and upper(lanhouse) like '%".$tf_lh_nome_sql."%' ";
 			}
 			if($tf_lh_uf) 			$sql .= "and upper(estado) = '$tf_lh_uf' ";
@@ -126,17 +126,17 @@ echo "varsel: $varsel<br>";
 //echo "tf_lh_cidade: '$tf_lh_cidade'<br>";
 //$GLOBALS['_SESSION']['sdebug'] = "";
 //echo "remove_special_chars(tf_lh_cidade): '".remove_special_chars(translate_extended_ascii_to_utf($tf_lh_cidade))."<br>";
-//echo "translate_extended_ascii_to_utf ... (tf_lh_cidade): '".translate_extended_ascii_to_utf(substr(str_replace("'", "''", strtoupper( remove_special_chars(trim($tf_lh_cidade)) ) ),0,50)) ."'<br>";
+//echo "translate_extended_ascii_to_utf ... (tf_lh_cidade): '".translate_extended_ascii_to_utf(substr(str_replace("'", "''", strtoupper( remove_special_chars(trim((string)($tf_lh_cidade ?? ""))) ) ),0,50)) ."'<br>";
 //echo "<br>GLOBALS['_SESSION']['sdebug']: '".$GLOBALS['_SESSION']['sdebug']."'<br>";
 //$GLOBAL['_SESSION']['sdebug'] = "";
 
 				// usa strtoupper() só depois de fazer tradução com translate_extended_ascii_to_utf() 
-				$tf_lh_cidade_sql	= "%".strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_cidade)  ),0,50)) )."%"; 
+				$tf_lh_cidade_sql	= "%".strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_cidade ?? ""))  ),0,50)) )."%"; 
 				$sql .= "and upper(cidade) like '".$tf_lh_cidade_sql."' ";
 			}
 			if($tf_lh_bairro) {
 //echo "tf_lh_bairro: '$tf_lh_bairro'<br>";
-				$tf_lh_bairro_sql	= strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_bairro) ),0,50)) ); 
+				$tf_lh_bairro_sql	= strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_bairro ?? "")) ),0,50)) ); 
 				$sql .= "and upper(bairro) like '%".$tf_lh_bairro_sql."%' ";
 			}
 
@@ -158,11 +158,11 @@ FROM (
 		AND ug.ug_status = 1 ";
 
 if($tf_lh_bairro) {
-	$tf_lh_bairro_sql	= strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_bairro) ),0,50)) ); 
+	$tf_lh_bairro_sql	= strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_bairro ?? "")) ),0,50)) ); 
 	$sql .= "AND upper(ug_bairro) like '%".$tf_lh_bairro_sql."%' ";
 }
 if($tf_lh_cidade) {
-	$tf_lh_cidade_sql = "%".strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_cidade)  ),0,50)) )."%"; 
+	$tf_lh_cidade_sql = "%".strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_cidade ?? ""))  ),0,50)) )."%"; 
 	$sql .= "AND upper(ug_cidade) like '".$tf_lh_cidade_sql."' ";
 }
 if($tf_lh_uf) {
@@ -172,7 +172,7 @@ if($tf_lanhouses_id) {
 	$sql .= "AND ug_id = $tf_lanhouses_id ";
 }
 if($tf_lh_nome) {
-	$tf_lh_nome_sql	= strtoupper(translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_nome)),0,50))); 
+	$tf_lh_nome_sql	= strtoupper(translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_nome ?? ""))),0,50))); 
 	$sql .= "and upper(ug_nome) like '%".$tf_lh_nome_sql."%' ";
 }
 
@@ -189,11 +189,11 @@ UNION ALL
 		";
 
 if($tf_lh_bairro) {
-	$tf_lh_bairro_sql	= strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_bairro) ),0,50)) ); 
+	$tf_lh_bairro_sql	= strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_bairro ?? "")) ),0,50)) ); 
 	$sql .= "AND upper(us_bairro) like '%".$tf_lh_bairro_sql."%' \n";
 }
 if($tf_lh_cidade) {
-	$tf_lh_cidade_sql = "%".strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_cidade)  ),0,50)) )."%"; 
+	$tf_lh_cidade_sql = "%".strtoupper( translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_cidade ?? ""))  ),0,50)) )."%"; 
 	$sql .= "AND upper(us_cidade) like '".$tf_lh_cidade_sql."' \n";
 }
 if($tf_lh_uf) {
@@ -203,7 +203,7 @@ if($tf_lanhouses_id) {
 	$sql .= "AND us_id = $tf_lanhouses_id \n";
 }
 if($tf_lh_nome) {
-	$tf_lh_nome_sql	= strtoupper(translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim($tf_lh_nome)),0,50))); 
+	$tf_lh_nome_sql	= strtoupper(translate_extended_ascii_to_utf(substr(str_replace("'", "''", trim((string)($tf_lh_nome ?? ""))),0,50))); 
 	$sql .= "and upper(us_nome_loja) like '%".$tf_lh_nome_sql."%' ";
 }
 
@@ -223,7 +223,7 @@ if(b_IsUsuarioReinaldo()) {
 	
 			if($ret != "") $msg = $ret;
 			else {
-				$total_table = pg_num_rows($rs_lhs);
+				$total_table = (($rs_lhs) ? pg_num_rows($rs_lhs) : 0);
 //echo date("H:i:s")." - total_table: $total_table<br>";
 
 				if($total_table == 0) {

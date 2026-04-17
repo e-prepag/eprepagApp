@@ -39,38 +39,38 @@ if($msg == "" && !empty($btPesquisar)){
 			$sql .= " and pin_status='".intval($tf_v_tipo)."' ";	
 		}
 	}
-	if(strlen($opr_codigo))
+	if(strlen((string)($opr_codigo ?? "")))
 				$sql .= " and opr_codigo=".intval($opr_codigo);
-	if(strlen($distributor_codigo))
+	if(strlen((string)($distributor_codigo ?? "")))
 				$sql .= " and distributor_codigo=".intval($distributor_codigo);
-	if(strlen($lote))
+	if(strlen((string)($lote ?? "")))
 				$sql .= " and pin_lote_codigo=".intval($lote);
-	if(strlen($valor))
+	if(strlen((string)($valor ?? "")))
 				$sql .= " and pin_valor=".intval($valor);
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and pin_dataentrada >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and pin_dataentrada <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($pin_codigo)) {
+	if(strlen((string)($pin_codigo ?? ""))) {
 		//Instanciando Objetos para Descriptografia
 		$chave256bits = new Chave();
 		$pc = new AES($chave256bits->retornaChave());
 		$sql .= " and pin_codigo='".base64_encode($pc->encrypt(addslashes($pin_codigo)))."'";
 	}
-	if(strlen($pin_bloqueio))
+	if(strlen((string)($pin_bloqueio ?? "")))
 				$sql .= " and pin_bloqueio=".intval($pin_bloqueio);
-	if(strlen($pin_codinterno))
+	if(strlen((string)($pin_codinterno ?? "")))
 				$sql .= " and pin_codinterno=".intval($pin_codinterno);
-	if(strlen($pin_serial))
+	if(strlen((string)($pin_serial ?? "")))
 				$sql .= " and pin_serial like '%".intval($pin_serial)."'";
 	$rs_total = SQLexecuteQuery($sql);
 //echo $sql."<br>";
-	if($rs_total) $registros_total = pg_num_rows($rs_total);
+	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY pin_codinterno DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

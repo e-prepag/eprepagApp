@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/functions_e_financeira.php';
 
-if ($_REQUEST['acao'] == "abertura") {
+if (($_REQUEST['acao'] ?? "") == "abertura") {
 
     $data_inicio = $_GET['data_inicio'] ?? '';
     $data_fim    = $_GET['data_fim'] ?? '';
@@ -24,7 +24,7 @@ if ($_REQUEST['acao'] == "abertura") {
     } else {
         echo "Parametros inválidos";
     }
-} else if ($_REQUEST['acao'] == "fechamento") {
+} else if (($_REQUEST['acao'] ?? "") == "fechamento") {
 
     $data_inicio = $_POST['data_inicio'] ?? '';
     $data_fim    = $_POST['data_fim'] ?? '';

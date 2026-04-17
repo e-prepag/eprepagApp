@@ -8,10 +8,12 @@ set_time_limit ( 3000 ) ;
 
 $time_start = getmicrotime();
 
-$fopr    = $_POST['fopr'] ?? null;
-$fvalor  = $_POST['fvalor'] ?? null;
-$fcanal  = $_POST['fcanal'] ?? null;
-$Submit  = $_POST['Submit'] ?? null;
+$fopr    = $fopr ?? ($_REQUEST['fopr'] ?? null);
+$fvalor  = $fvalor ?? ($_REQUEST['fvalor'] ?? null);
+$fcanal  = $fcanal ?? ($_REQUEST['fcanal'] ?? null);
+$fuf     = $fuf ?? ($_REQUEST['fuf'] ?? null);
+$Submit  = $Submit ?? ($_REQUEST['Submit'] ?? null);
+$PHP_SELF = $PHP_SELF ?? ($_SERVER['PHP_SELF'] ?? "");
 
 $cor1 = "#F5F5FB";
 $cor2 = "#F5F5FB";
@@ -24,13 +26,13 @@ $prazo_amarelo_vezes = 2;
 $ChkTreinamento = "1";
 if(!$fcanal) $fcanal = 's';
 
-if($_SESSION["tipo_acesso_pub"]=='PU') {
-        $fopr = $_SESSION["opr_codigo_pub"];
+if(($_SESSION["tipo_acesso_pub"] ?? "")=='PU') {
+        $fopr = ($_SESSION["opr_codigo_pub"] ?? null);
         $Submit = "Buscar";
 }
 
-if(!$ncamp) $ncamp = 'opr_nome';
-if(!$nscamp) $nscamp = 'ec_uf, pin_valor';
+if(!isset($ncamp) || !$ncamp) $ncamp = 'opr_nome';
+if(!isset($nscamp) || !$nscamp) $nscamp = 'ec_uf, pin_valor';
 
 
 $sql = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_pin_online = 0 ";
@@ -224,9 +226,9 @@ function GP_popupConfirmMsg(msg) { //v1.0
                 <div class="row txt-cinza">
                     <div class="col-md-3">
 <?php 
-                    if($_SESSION["tipo_acesso_pub"]=='PU') 
+                    if(($_SESSION["tipo_acesso_pub"] ?? "")=='PU') 
                     {
-                        echo $_SESSION["opr_nome"];
+                        echo ($_SESSION["opr_nome"] ?? "");
                     } else 
                     {
 ?>
@@ -250,10 +252,10 @@ function GP_popupConfirmMsg(msg) { //v1.0
                     </div>
                     <div class="col-md-3">
                         <select name="fcanal" id="fcanal" class="form-control">
-                            <option value="t" <?php  if(trim($fcanal) == 't' || trim($fcanal) == '' ) echo "selected"?>><?php echo LANG_PINS_ALL_CHANNELS; ?></option>
-                            <option value="s" <?php  if(trim($fcanal) == 's') echo "selected"?>>Site</option>
-                            <option value="p" <?php  if(trim($fcanal) == 'p') echo "selected"?>>POS</option>
-                            <option value="r" <?php  if(trim($fcanal) == 'r') echo "selected"?>>Rede</option>
+                            <option value="t" <?php  if(trim((string)($fcanal ?? "")) == 't' || trim((string)($fcanal ?? "")) == '' ) echo "selected"?>><?php echo LANG_PINS_ALL_CHANNELS; ?></option>
+                            <option value="s" <?php  if(trim((string)($fcanal ?? "")) == 's') echo "selected"?>>Site</option>
+                            <option value="p" <?php  if(trim((string)($fcanal ?? "")) == 'p') echo "selected"?>>POS</option>
+                            <option value="r" <?php  if(trim((string)($fcanal ?? "")) == 'r') echo "selected"?>>Rede</option>
                         </select>
                     </div>
 <?php  
@@ -264,7 +266,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                         <select name="fuf" id="fuf" class="form-control">
                             <option value=""><?php echo LANG_PINS_ALL_STATES; ?></option>
                             <?php  while($pgec=pg_fetch_array($resec)) { ?>
-                            <option value="<?php  echo $pgec['ec_codigo'] ?>" <?php  if(trim($fuf) == trim($pgec['ec_codigo'])) echo "selected"?>><?php  echo $pgec['ec_uf'] ?></option>
+                            <option value="<?php  echo $pgec['ec_codigo'] ?>" <?php  if(trim((string)($fuf ?? "")) == trim((string)($pgec['ec_codigo'] ?? ""))) echo "selected"?>><?php  echo $pgec['ec_uf'] ?></option>
                             <?php  } ?>
                         </select>
                     </div>
@@ -295,7 +297,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 <?php
                     $cabecalho = "'".LANG_PINS_OPERATOR."','".LANG_PINS_QUANTITY_1."','".LANG_PINS_AVARAGE_DAILY_1." (".LANG_PINS_AVARAGE_DAILY_2.")','".LANG_PINS_DURATION."','".LANG_PINS_FACE_VALUE."','".LANG_PINS_TOTAL_VALUE_STOCK."'";
 
-                    if(!$resestat || pg_num_rows($resestat) == 0)
+                    if(!$resestat || (($resestat) ? pg_num_rows($resestat) : 0) == 0)
                     { 
 ?>
                         <tr> 
@@ -307,6 +309,17 @@ function GP_popupConfirmMsg(msg) { //v1.0
                     } else 
                     {
                         $a_total_geral = array();
+						$pin_total_valor = 0;
+						$pin_total_qtde = 0;
+						$total_reg = 0;
+						$valor = 0;
+						$quantidade_opr = 0;
+						$quantidade_total_opr = 0;
+						$venda_media_diaria_opr = 0;
+						$total_geral = 0;
+						$opr_nome = "";
+						$opr_codigo = 0;
+						$operadora_subtotal = array();
 
                         // Resumo
                         $sout = "<br> <br> <b><font color='#666666' size='2' face='Arial, Helvetica, sans-serif'>".LANG_PINS_SUMMARY_LAST." ".$days_for_mean." ".LANG_PINS_DAYS."</b><table border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'><tr><td align='center'><b><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".LANG_PINS_OPERATOR."</b></td><td align='center'><b><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".LANG_PINS_VALUE."</b></td><td align='center'><b><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>n pins</b></td><td align='center'><b><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>Total (R$)</b></td><td align='center'><b><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".LANG_PINS_DAYS." (R$)</b></td><td align='center'><b><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".LANG_PINS_PAGE_TITLE_2."/".LANG_DAY_2."</b></td></tr>\n";
@@ -368,7 +381,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 
                             $quantidade_opr += $pgestat['quantidade'];
 
-                            if($rs_Media && pg_num_rows($rs_Media) > 0) 
+                            if($rs_Media && (($rs_Media) ? pg_num_rows($rs_Media) : 0) > 0) 
                                 pg_fetch_array($rs_Media,0);
                             
                             $media = 0;
@@ -475,13 +488,13 @@ function GP_popupConfirmMsg(msg) { //v1.0
 <?php
                         }
 
-                        if($_SESSION["tipo_acesso_pub"]!='PU') 
+                        if(($_SESSION["tipo_acesso_pub"] ?? "")!='PU') 
                         {
                             echo "<script type='text/javascript'>\n";
                             //$stop = true;
                             foreach	($a_total_geral as $key => $val) 
                             {
-                                echo "document.getElementById('opr_".$key."').innerHTML = '".number_format(100*$val/$pin_total_valor, 2, ',', '.')."%';\n";
+                                echo "document.getElementById('opr_".$key."').innerHTML = '".number_format(100*$val/($pin_total_valor > 0 ? $pin_total_valor : 1), 2, ',', '.')."%';\n";
                             }
                             echo "</script>\n";
 			}
@@ -506,7 +519,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                           <td colspan="3" align="center"><strong><font color="#FFFFFF" size="2" face="Arial, Helvetica, sans-serif"><?php echo LANG_PINS_NO_PINS; ?></font></strong></td>
                         </tr>
 <?php  
-                    if (!$rs_esgotados || pg_num_rows($rs_esgotados) == 0)
+                    if (!$rs_esgotados || (($rs_esgotados) ? pg_num_rows($rs_esgotados) : 0) == 0)
                     {
 ?>
                         <tr bgcolor="#f5f5fb"> 
@@ -560,7 +573,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                                 
                                     } //end while ($pgest = pg_fetch_array($rs_esgotados))
                                     
-                            } //end else  do if (!$rs_esgotados || pg_num_rows($rs_esgotados) == 0)
+                            } //end else  do if (!$rs_esgotados || (($rs_esgotados) ? pg_num_rows($rs_esgotados) : 0) == 0)
                ?>
 					 
             </table>
@@ -570,7 +583,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
             </form>
 	
 <?php
-	if ($_SESSION["tipo_acesso_pub"]!='PU')  {
+	if (($_SESSION["tipo_acesso_pub"] ?? "")!='PU')  {
 		echo $sout;
 }
 ?>	  

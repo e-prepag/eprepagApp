@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/../../class/classGerarEFinanceira.php";
+require_once __DIR__ . "/../includes/encoding.php";
 
 function formatarXml(string $xmlBruto): string
 {
@@ -30,20 +31,20 @@ function xmlViewer($xmlString, $id = 'xmlViewer', $utf8 = false, $download = fal
     $xml_formatado = formatarXml($xmlString);
 
     if ($utf8) {
-        $xml_formatado = htmlspecialchars($xml_formatado);
+        $xml_formatado = htmlspecialchars((string)($xml_formatado ?? ""));
     } else {
-        $xml_formatado = utf8_decode(htmlspecialchars($xml_formatado));
+        $xml_formatado = backoffice_utf8_to_iso(htmlspecialchars((string)($xml_formatado ?? "")));
     }
 
     // O htmlspecialchars transformou os acentos (ex: &#xE1;) em &amp;#xE1;
     // Esse comando reverte APENAS as entidades numéricas (acentos) para que o navegador as renderize,
-    $xml_formatado = preg_replace('/&amp;(#\d+|#[xX][0-9a-fA-F]+);/', '&$1;', $xml_formatado);
+    $xml_formatado = preg_replace('/&amp;(#\d+|#[xX][0-9a-fA-F]+);/', '&$1;', (string)($xml_formatado ?? ''));
 
     $botaoDownloadHtml = '';
 
     if ($download) {
         // Gera um nome seguro para o arquivo baseado no ID
-        $nomeArquivo = 'xml_download_' . preg_replace('/[^a-zA-Z0-9_-]/', '', $id) . '.xml';
+        $nomeArquivo = 'xml_download_' . preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($id ?? '')) . '.xml';
 
         // Cria o HTML do botão
         $botaoDownloadHtml = <<<HTML
@@ -144,8 +145,8 @@ function gerarRelatorioPorCompetencia(array $dados)
     foreach ($dados as $anoMes => $listaDeclarados) {
 
         // Formata 202402 para Fevereiro/2024 (ou 02/2024)
-        $ano = substr($anoMes, 0, 4);
-        $mes = substr($anoMes, 4, 2);
+        $ano = substr((string)($anoMes ?? ""), 0, 4);
+        $mes = substr((string)($anoMes ?? ""), 4, 2);
         $dataLabel = "$mes/$ano";
 
         $html .= '<div class="mes-section">';
@@ -171,9 +172,9 @@ function gerarRelatorioPorCompetencia(array $dados)
             // Dados do Declarado
             $cpf_cnpj = $dd['tipo_declarado'] == 1 ? "CPF" : "CNPJ";
             $html .= '  <div class="declarado-info">';
-            $html .= '      <h3 class="declarado-nome">' . htmlspecialchars($dd['nome_declarado']) . '</h3>';
-            $html .= '      <span class="declarado-doc">' . $cpf_cnpj . ': ' . htmlspecialchars($dd['ni_declarado']) . '</span>';
-            $html .= '      <div class="declarado-end">Endereço: ' . htmlspecialchars($endereco) . '</div>';
+            $html .= '      <h3 class="declarado-nome">' . htmlspecialchars((string)($dd['nome_declarado'] ?? "")) . '</h3>';
+            $html .= '      <span class="declarado-doc">' . $cpf_cnpj . ': ' . htmlspecialchars((string)($dd['ni_declarado'] ?? "")) . '</span>';
+            $html .= '      <div class="declarado-end">Endereço: ' . htmlspecialchars((string)($endereco ?? "")) . '</div>';
             $html .= '  </div>';
 
             // 3. Tabela de Contas
@@ -211,7 +212,7 @@ function gerarRelatorioPorCompetencia(array $dados)
                     }
 
                     $html .= '<tr>';
-                    $html .= '  <td><strong>' . htmlspecialchars($conta['ug_id']) . '</strong></td>';
+                    $html .= '  <td><strong>' . htmlspecialchars((string)($conta['ug_id'] ?? "")) . '</strong></td>';
 
                     $tipos = [
                         1 => 'Titular',
@@ -219,7 +220,7 @@ function gerarRelatorioPorCompetencia(array $dados)
                     ];
 
                     $tipoRelacao = $tipos[$conta['tipo_relacao']] ?? 'Desconhecido';
-                    $html .= '  <td><span class="badge-relacao">Tipo: ' . htmlspecialchars($tipoRelacao) . '</span></td>';
+                    $html .= '  <td><span class="badge-relacao">Tipo: ' . htmlspecialchars((string)($tipoRelacao ?? "")) . '</span></td>';
 
                     $html .= '  <td class="col-money val-entrada">R$ ' . number_format($entradas, 2, ',', '.') . '</td>';
                     $html .= '  <td class="col-money val-saida">R$ ' . number_format($saidas, 2, ',', '.') . '</td>';
@@ -309,7 +310,7 @@ function extrairZip(string $caminhoZip, string $destino): array
         $nomeArquivo = $zip->getNameIndex($i);
 
         // Verifica se é um diretório (termina com /) e ignora,
-        if (substr($nomeArquivo, -1) == '/') {
+        if (substr((string)($nomeArquivo ?? ""), -1) == '/') {
             continue;
         }
 

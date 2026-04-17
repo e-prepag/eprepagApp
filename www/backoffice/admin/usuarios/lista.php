@@ -30,7 +30,7 @@ $fetch = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $usuarios = array();
 
-if (count($fetch) > 0) 
+if ((is_countable($fetch) ? count($fetch) : 0) > 0) 
 {
     for($i=0;$i<=$stmt->rowCount();$i++){
         if(isset($fetch[$i]['id']) && isset($fetch[$i]['shn_login']))

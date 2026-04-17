@@ -9,7 +9,7 @@ require_once $raiz_do_projeto . "includes/inc_functions.php";
 require_once $raiz_do_projeto . "class/classPinsStore.php";       
 
 $time_start_stats = getmicrotime();
-$sNomePaginaAux = substr($_SERVER['HTTP_REFERER'],strrpos($_SERVER['HTTP_REFERER'],'/')+1,(strlen($_SERVER['HTTP_REFERER'])-strrpos($_SERVER['HTTP_REFERER'],'/')));
+$sNomePaginaAux = substr($_SERVER['HTTP_REFERER'],strrpos($_SERVER['HTTP_REFERER'],'/')+1,(strlen((string)($_SERVER['HTTP_REFERER'] ?? ""))-strrpos($_SERVER['HTTP_REFERER'],'/')));
 $sNomePaginaAux     = isset($_POST['sNomePagina'])          ? $_POST['sNomePagina']       : $sNomePaginaAux;
     
 //paginacao
@@ -45,9 +45,9 @@ if($msg == ""){
 		$sql  = "SELECT *,to_char(psah_data,'DD/MM/YYYY HH24:MI:SS') as psah_data_aux ";
 	}
 	$sql .=" from pins_store_apl_historico WHERE (psah_pin_id = '0' or pin_status = '0') "; 
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and psah_data >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and psah_data <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	if ($make_group_by_ip == 1){
 		$sql .= " GROUP BY psah_ip_autor,psah_autor,psah_acao";	
@@ -62,13 +62,13 @@ if($msg == ""){
 		$sql .= " ORDER BY psah_data DESC";	
 	}
 	$rs_total = SQLexecuteQuery($sql);
-	if($rs_total) $registros_total = pg_num_rows($rs_total);
+	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //if(b_IsUsuarioReinaldo()) { 
 //echo "(R) ".str_replace("\b", "\b<br>", $sql)."<br>";
 //}
 	$rs_pins = SQLexecuteQuery($sql);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

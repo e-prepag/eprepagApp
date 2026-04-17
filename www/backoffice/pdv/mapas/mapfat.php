@@ -68,7 +68,7 @@ $datafim = $dataf[2].'-'.$dataf[1].'-'.$dataf[0].' 23:59:59';
 //echo '<br>'.$sqlLans.'<br>';
 			//   die;
 	$rssLans = SQLexecuteQuery($sqlLans);
-	$totLans = pg_num_rows($rssLans);
+	$totLans = (($rssLans) ? pg_num_rows($rssLans) : 0);
 	$valorMax = -1;
 
 	if($totLans > 0) {
@@ -161,7 +161,7 @@ if($conta > 0) {
 	var dadossel = [];
 	
 	<?php
-	for ($i = 0; $i <= count($places); $i++) {
+	for ($i = 0; $i <= (is_countable($places) ? count($places) : 0); $i++) {
 		echo $places[$i]."\n";
 		
 		echo "dados[".$i."] = \"".$infos[$i]."\";\n";

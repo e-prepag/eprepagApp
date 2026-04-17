@@ -42,7 +42,8 @@ $novo_ug_cel_ddi = $_POST['novo_ug_cel_ddi'] ?? null;
 $novo_ug_cel_ddd = $_POST['novo_ug_cel_ddd'] ?? null;
 $novo_ug_cel = $_POST['novo_ug_cel'] ?? null;
 $novo_ug_obs = $_POST['novo_ug_obs'] ?? null;
-$usuario_id = $_GET['usuario_id'] ?? null;
+$usuario_id = $_GET['usuario_id'] ?? $_POST['usuario_id'] ?? null;
+$acao = $_REQUEST['acao'] ?? null;
 
 $varsel = "&usuario_id=$usuario_id";
 
@@ -97,7 +98,7 @@ if ($msg == "") {
   $sql = "select * from usuarios_games ug " .
     "where ug.ug_id = " . $usuario_id;
   $rs_usuario = SQLexecuteQuery($sql);
-  if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+  if (!$rs_usuario || !$rs_usuario || pg_num_rows($rs_usuario) == 0)
     $msg = "Nenhum cliente encontrado.\n";
   else {
     $rs_usuario_row = pg_fetch_array($rs_usuario);
@@ -138,7 +139,7 @@ if ($msg == "") {
     if (!empty($rs_usuario_row['ug_observacao'])) {
       $ug_obs .= $rs_usuario_row['ug_observacao'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
     }
-    while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
+    while ($rs_usuario_obs && ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs))) {
       $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observação:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
     } //end while
 
@@ -305,7 +306,7 @@ ob_end_flush();
           $rs_row = pg_fetch_array($rs);
           //echo "pg_num_rows(rs): ".pg_num_rows($rs).$rs_row['ugc_data_cancelamento'].$rs_row['ug_id']."<br>";
 
-          if (!$rs || pg_num_rows($rs) == 0 || empty($rs_row['ugc_data_cancelamento'])) {
+          if (!$rs || !$rs || pg_num_rows($rs) == 0 || empty($rs_row['ugc_data_cancelamento'])) {
           ?>
             <td width="140"><a class="link_azul" href="#"
                 Onclick="if(confirm('Deseja alterar o Status deste usuário ?')) window.open('com_usuario_detalhe_selecao.php?v_campo=ativo&ativo=<?php echo $ug_ativo ?><?php echo $varsel ?>','selecao', 'status=0,width=500,height=200,top=0,left=0');return false;"><b>Status</b></a>
@@ -484,12 +485,12 @@ ob_end_flush();
             <td align="left" style="padding-left: 15px;"><b>Email</b></td>
             <td align="left" style="padding-left: 15px;"><b>Game</b></td>
           </tr>
-          <?php if (!$rs_vinculos || pg_num_rows($rs_vinculos) == 0) { ?>
+          <?php if (!$rs_vinculos || !$rs_vinculos || pg_num_rows($rs_vinculos) == 0) { ?>
             <tr>
               <td align="left" style="padding-left: 15px;" colspan="2">Nenhum email vinculado encontrado</td>
             </tr>
           <?php } else { ?>
-            <?php while ($rs_vinculos_row = pg_fetch_array($rs_vinculos)) {
+            <?php while ($rs_vinculos && ($rs_vinculos_row = pg_fetch_array($rs_vinculos))) {
               if ($cor1 == $cor2) {
                 $cor1 = $cor3;
               } else {

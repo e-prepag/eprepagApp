@@ -83,7 +83,7 @@ $rsResposta = SQLexecuteQuery($sql);
 ?>
 <table class="table txt-preto fontsize-pp">
 <?php
-if((pg_num_rows($rsResposta) != 0) && ($rsResposta)) {
+if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>
@@ -181,7 +181,7 @@ require_once $raiz_do_projeto."backoffice/includes/rodape_bko.php";
 		 
 //echo "<!-- sql: $sql\n -->";
 		$rs = SQLexecuteQuery($sql);
-		if($rs && pg_num_rows($rs) > 0){
+		if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0){
 			$rs_row = pg_fetch_array($rs);
 			 $ret = $rs_row[0];
 		}			

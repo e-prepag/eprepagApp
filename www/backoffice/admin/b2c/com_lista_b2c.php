@@ -88,7 +88,7 @@ order by \"vb2c_coServico\"";
 	echo "<a name='monitor_atividade'></a>\n";
 	$rs = SQLexecuteQuery($sql_monitor);
 
-	$n_rows = pg_num_rows($rs);
+	$n_rows = (($rs) ? pg_num_rows($rs) : 0);
 	if($n_rows == 0) {
 		echo "<font color='red'>Nenhum registro de integração encontrado para monitor.</font>\n";
 	} else {

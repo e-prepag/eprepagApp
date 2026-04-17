@@ -111,25 +111,25 @@ if(!empty($btPesquisar))
 					CASE WHEN ee_tipo_usuario='G' THEN 'GAMER' WHEN ee_tipo_usuario='L' THEN 'LANHOUSE' ELSE 'SEM TIPO' END as ee_tipo_usuario_aux,
 					ee_tipo_usuario
 			FROM envio_email";
-	if(strlen($ug_email))
+	if(strlen((string)($ug_email ?? "")))
 				$sql_filters[] = "ug_email like '%".addslashes($ug_email)."%'";
-	if(strlen($ug_id))
+	if(strlen((string)($ug_id ?? "")))
 				$sql_filters[] = "ug_id = ".intval($ug_id)."";
-	if(strlen($ee_tipo_usuario))
+	if(strlen((string)($ee_tipo_usuario ?? "")))
 				$sql_filters[] = "ee_tipo_usuario = '".addslashes($ee_tipo_usuario)."'";
-	if(strlen($ee_identificador))
+	if(strlen((string)($ee_identificador ?? "")))
 				$sql_filters[] = "ee_identificador = '".addslashes($ee_identificador)."'";
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql_filters[] = "ee_data_inclusao >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql_filters[] = "ee_data_inclusao <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
-	if (count($sql_filters) > 0) {
+	if ((is_countable($sql_filters) ? count($sql_filters) : 0) > 0) {
 		$sql_aux = implode(" and ", $sql_filters);
 		$sql  .= " WHERE ".$sql_aux;
 	}
 
 	$rs_email_automatico_total = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($rs_email_automatico_total);
+	$total_table = (($rs_email_automatico_total) ? pg_num_rows($rs_email_automatico_total) : 0);
 	if($total_table == 0) {
 		echo "Nenhum e-mail encontrado.<br>\n";
 	} else {		
@@ -157,7 +157,7 @@ if(b_IsUsuarioReinaldo()) {
 }
 
 	$rs_email_automatico = SQLexecuteQuery($sql);
-	if(!isset($rs_email_automatico) || !($rs_email_automatico) || (pg_num_rows($rs_email_automatico)==0)) {
+	if(!isset($rs_email_automatico) || !($rs_email_automatico) || ((($rs_email_automatico) ? pg_num_rows($rs_email_automatico) : 0)==0)) {
 		echo "Erro ao consultar informa&ccedil;&otilde;es de emails automático.<br>";
 	}
 	else {

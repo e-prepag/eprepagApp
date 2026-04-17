@@ -73,7 +73,7 @@ include "pins_card_menu.php";
                                      having count(pcdh_pin_status) < 2";
                         //echo $sql_total."<br>";
                         $rs_total = SQLexecuteQuery($sql_total);
-                        $aux_count = pg_num_rows($rs_total);
+                        $aux_count = (($rs_total) ? pg_num_rows($rs_total) : 0);
                         while($rs_total_row = pg_fetch_array($rs_total)) {
                             $bgcolor = ((++$i) % 2)?" bgcolor='#F0F0F0'":"";
                              ?>
@@ -127,7 +127,7 @@ include "pins_card_menu.php";
                                         order by data desc";
                         //echo $sql_total."<br>";
                         $rs_total = SQLexecuteQuery($sql_total);
-                        $aux_count = pg_num_rows($rs_total);
+                        $aux_count = (($rs_total) ? pg_num_rows($rs_total) : 0);
                         echo "<table>";
                         while($rs_total_row = pg_fetch_array($rs_total)) { 
                             $bgcolor = ((++$i) % 2)?" bgcolor='#F0F0F0'":"";

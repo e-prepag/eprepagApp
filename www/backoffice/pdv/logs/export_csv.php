@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL);
@@ -6,10 +7,10 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."includes/functions.php";
 require_once $raiz_do_projeto."includes/rs_ws/inc_utils.php";
 
-$ug_risco_classif = $_GET['ug_risco_classif'] ? $_GET['ug_risco_classif'] : '';
-$ug_id = $_GET['ug_id'] ? $_GET['ug_id'] : '';
-$tf_v_data_inclusao_ini = $_GET['data_ini'] ? $_GET['data_ini'] : '';
-$tf_v_data_inclusao_fim = $_GET['data_fim'] ? $_GET['data_fim'] : '';
+$ug_risco_classif = isset($_GET['ug_risco_classif']) ? $_GET['ug_risco_classif'] : '';
+$ug_id = isset($_GET['ug_id']) ? $_GET['ug_id'] : '';
+$tf_v_data_inclusao_ini = isset($_GET['data_ini']) ? $_GET['data_ini'] : '';
+$tf_v_data_inclusao_fim = isset($_GET['data_fim']) ? $_GET['data_fim'] : '';
 
 // Monte sua query com esses parametros (igual no seu relatorio)
 $sql  = "select dugsl.*, ug.ug_risco_classif, ug.ug_login
@@ -45,7 +46,7 @@ while ($rs_row = pg_fetch_array($rs)) {
         $rs_row['dugsl_id'],
         substr($rs_row['dugsl_data_inclusao'], 0, 19),
         $rs_row['dugsl_ug_id'],
-        utf8_encode($rs_row['ug_login']),
+        pdv_iso_to_utf8($rs_row['ug_login']),
         ($rs_row['ug_risco_classif'] == '1' ? 'POS' : 'PRE'),
         number_format($rs_row['dugsl_ug_perfil_saldo_antes'], 2, ',', ''),
         number_format($rs_row['dugsl_ug_perfil_saldo'], 2, ',', ''),

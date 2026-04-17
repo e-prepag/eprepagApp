@@ -1,6 +1,9 @@
 <?php
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."includes/security.php";
+
+$acao = isset($acao) ? $acao : (isset($_REQUEST['acao']) ? $_REQUEST['acao'] : '');
+
 if($acao == 'novo')
 {
     $acao = 'inserir';
@@ -21,7 +24,7 @@ function validaUsuario()
     }
     if (document.frmPreCadastro.mes.value == "")
     {
-        alert("Favor informar o Mês dos Dados de Complice.");
+        alert("Favor informar o Mï¿½s dos Dados de Complice.");
         document.frmPreCadastro.mes.focus();
         return false;
     }
@@ -75,7 +78,7 @@ function validaUsuario()
     }
     if (isNumeric(document.frmPreCadastro.c_custo_inadimplencia_emissor.value))
     {
-        alert("Favor informar Custo de Inadimplência do Emissor.");
+        alert("Favor informar Custo de Inadimplï¿½ncia do Emissor.");
         document.frmPreCadastro.c_custo_inadimplencia_emissor.focus();
         return false;
     }
@@ -115,10 +118,10 @@ function validaUsuario()
 
 function isNumeric(pVal)
 {
-	var reTipo = '(^[0-9.,]+$)'; // é a expressão regular apropriada
+	var reTipo = '(^[0-9.,]+$)'; // ï¿½ a expressï¿½o regular apropriada
 	if (!reTipo.test(pVal)&&(pVal!=''))
 	{
-		alert(pVal + " NÃO contém apenas dígitos.");
+		alert(pVal + " Nï¿½O contï¿½m apenas dï¿½gitos.");
 		return false;
 	}
 	else return true;
@@ -126,10 +129,10 @@ function isNumeric(pVal)
 
 function isTipo(pVal)
 {
-	var reTipo = /^\d+$/; // é a expressão regular apropriada
+	var reTipo = /^\d+$/; // ï¿½ a expressï¿½o regular apropriada
 	if (!reTipo.test(pVal)&&(pVal!=''))
 	{
-		alert(pVal + " NÃO contém apenas dígitos.");
+		alert(pVal + " Nï¿½O contï¿½m apenas dï¿½gitos.");
 		return false;
 	}
 	else return true;
@@ -195,7 +198,7 @@ function isTipo2(str) {
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td>* Mês: </td>
+                    <td>* Mï¿½s: </td>
                     <td>
                         <?php 
                         if($acao == 'atualizar') {
@@ -210,15 +213,13 @@ function isTipo2(str) {
                                     <option value="" >Selecione</option>
                             <?php
                                 for ($codigoMes=1; $codigoMes<=12; $codigoMes++){
-                                       if (strlen($codigoMes) == 1){
-                                               $codigoMes = '0'.$codigoMes;
-                                       }
+                                       $codigoMesStr = str_pad((string)$codigoMes, 2, '0', STR_PAD_LEFT);
 
-                                       echo '<option value="'.$codigoMes.'"';
-                                       if ($mes == $codigoMes){
+                                       echo '<option value="'.$codigoMesStr.'"';
+                                       if (isset($mes) && $mes == $codigoMesStr){
                                                echo ' SELECTED';
                                        }
-                                       echo '>'.mesNome($codigoMes).'</option>';
+                                       echo '>'.mesNome($codigoMesStr).'</option>';
                                 }
                                 ?>
                         </select>
@@ -257,7 +258,7 @@ function isTipo2(str) {
                         <div id='info_c_receita_outras_credenciador' name='info_c_receita_outras_credenciador' onclick='javascript:$("#info_c_receita_outras_credenciador").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                - Receitas provenientes dos serviços de gerenciamento de contas prestados aos estabelecimentos credenciados, tais como segunda via de extrato, etc.<br>
+                                - Receitas provenientes dos serviï¿½os de gerenciamento de contas prestados aos estabelecimentos credenciados, tais como segunda via de extrato, etc.<br>
                                 - Demais receitas provenientes do relacionamento entre credenciador e os estabelecimentos credenciados
                             </fieldset>
                         </div>
@@ -276,9 +277,9 @@ function isTipo2(str) {
                             <fieldset>
                                 <legend>Detalhes</legend>
                                 Custo incorrido nas atividades de marketing e propaganda, tais como:<br>
-                                - Custo sobre as vendas (salários dos vendedores, comissão paga aos emissores pela captura de novos clientes, etc.)<br>
+                                - Custo sobre as vendas (salï¿½rios dos vendedores, comissï¿½o paga aos emissores pela captura de novos clientes, etc.)<br>
                                 - Custo de gerenciamento de vendas<br>
-                                - Custo de promoções para estimular uso dos cartões de pagamento na rede
+                                - Custo de promoï¿½ï¿½es para estimular uso dos cartï¿½es de pagamento na rede
                             </fieldset>
                         </div>
                     </td>
@@ -295,9 +296,9 @@ function isTipo2(str) {
                         <div id='info_c_custo_risco_credenciador' name='info_c_custo_risco_credenciador' onclick='javascript:$("#info_c_custo_risco_credenciador").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                - Custo de gerenciamento dos riscos incorridos no processamento de afiliação de estabelecimentos e nos processos de tomada de decisão<br>
+                                - Custo de gerenciamento dos riscos incorridos no processamento de afiliaï¿½ï¿½o de estabelecimentos e nos processos de tomada de decisï¿½o<br>
                                 - Custo com chargebacks<br>
-                                - Assunção de falha de inadimplência de banco emissor, se for o caso
+                                - Assunï¿½ï¿½o de falha de inadimplï¿½ncia de banco emissor, se for o caso
                             </fieldset>
                         </div>
                     </td>
@@ -314,15 +315,15 @@ function isTipo2(str) {
                         <div id='info_c_custo_outros_credenciador' name='info_c_custo_outros_credenciador' onclick='javascript:$("#info_c_custo_outros_credenciador").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                - Custo incorrido nas atividades e processos referentes ao credenciamentos de novos estabelecimentos, tais como custo de entrada de dados, treinamento de pessoal, instalação de equipamentos, etc.<br>
+                                - Custo incorrido nas atividades e processos referentes ao credenciamentos de novos estabelecimentos, tais como custo de entrada de dados, treinamento de pessoal, instalaï¿½ï¿½o de equipamentos, etc.<br>
                                 - Despesas administrativas<br>
                                 - Custo com pagamento de impostos diretos (ISS, PIS, Cofins, etc)<br>
-                                - Custo de serviços:<br>
-                                &nbsp;&nbsp;- Custo de serviços a dministrativos (pessoal, material, transporte , etc)<br>
-                                &nbsp;&nbsp;- Custo pelos serviços de conciliação<br>
-                                &nbsp;&nbsp;- Custo do serviço de help desk de equipamentos, disponibilizado para os estabelecimentos<br>
-                                &nbsp;&nbsp;- Custo dos serviços prestados aos estabelecimentos<br>
-                                - Outros custos não relacionados anteriormente
+                                - Custo de serviï¿½os:<br>
+                                &nbsp;&nbsp;- Custo de serviï¿½os a dministrativos (pessoal, material, transporte , etc)<br>
+                                &nbsp;&nbsp;- Custo pelos serviï¿½os de conciliaï¿½ï¿½o<br>
+                                &nbsp;&nbsp;- Custo do serviï¿½o de help desk de equipamentos, disponibilizado para os estabelecimentos<br>
+                                &nbsp;&nbsp;- Custo dos serviï¿½os prestados aos estabelecimentos<br>
+                                - Outros custos nï¿½o relacionados anteriormente
                             </fieldset>
                         </div>
                     </td>
@@ -339,11 +340,11 @@ function isTipo2(str) {
                         <div id='info_c_custo_processamento_front_end_back_end' name='info_c_custo_processamento_front_end_back_end' onclick='javascript:$("#info_c_custo_processamento_front_end_back_end").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                - De preciação dos equipamentos instalados nos estabelecimentos, incluindo perdas e baixas<br>
+                                - De preciaï¿½ï¿½o dos equipamentos instalados nos estabelecimentos, incluindo perdas e baixas<br>
                                 - Custo dos equipamentos instalados nos estabeleciemtos credenciados<br>
-                                - Custo de manutenção dos equipamentos instalados nos estabelecimentos credenciados<br>
-                                - Custo referente aos processos de compensação e de liquidação das transações com cartões de pagamentos<br>
-                                - Custo como com Sistema de Gerenciamento de info rmaçõe s?MIS (Management Information System)
+                                - Custo de manutenï¿½ï¿½o dos equipamentos instalados nos estabelecimentos credenciados<br>
+                                - Custo referente aos processos de compensaï¿½ï¿½o e de liquidaï¿½ï¿½o das transaï¿½ï¿½es com cartï¿½es de pagamentos<br>
+                                - Custo como com Sistema de Gerenciamento de info rmaï¿½ï¿½e s?MIS (Management Information System)
                             </fieldset>
                         </div>
                     </td>
@@ -360,7 +361,7 @@ function isTipo2(str) {
                         <div id='info_c_receita_mkt_emissor' name='info_c_receita_mkt_emissor' onclick='javascript:$("#info_c_receita_mkt_emissor").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                Recursos obtidos junto aos credenciadores ou bandeiras, provenientes de repasses para aplicação em marketing e propaganda
+                                Recursos obtidos junto aos credenciadores ou bandeiras, provenientes de repasses para aplicaï¿½ï¿½o em marketing e propaganda
                             </fieldset>
                         </div>
                     </td>
@@ -377,13 +378,13 @@ function isTipo2(str) {
                         <div id='info_c_receita_outras_emissor' name='info_c_receita_outras_emissor' onclick='javascript:$("#info_c_receita_outras_emissor").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                Outras receitas oriundas das atividades de emissor de cartões de pagamentos, tais como:<br>
+                                Outras receitas oriundas das atividades de emissor de cartï¿½es de pagamentos, tais como:<br>
                                 - Receita de float<br>
                                 - Receita de seguros<br>
-                                - Receita advinda da adesão ao programa de pontuação e da conversão dos pontos em bens e serviços<br>
+                                - Receita advinda da adesï¿½o ao programa de pontuaï¿½ï¿½o e da conversï¿½o dos pontos em bens e serviï¿½os<br>
                                 - Receita de tarifa por inatividade<br>
-                                - Receita com reversão de chargeback<br>
-                                - Outras receitas não relacionadas anteriormente( excluindo-se receitas de crédito)
+                                - Receita com reversï¿½o de chargeback<br>
+                                - Outras receitas nï¿½o relacionadas anteriormente( excluindo-se receitas de crï¿½dito)
                             </fieldset>
                         </div>
                     </td>
@@ -417,10 +418,10 @@ function isTipo2(str) {
                         <div id='info_c_custo_processamento_emissor' name='info_c_custo_processamento_emissor' onclick='javascript:$("#info_c_custo_processamento_emissor").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                Despesas incorridas no processamento de transações com cartões de pagamentos, tais como:<br>
-                                - Despesas incorridas no processo de autorização<br>
-                                - Despesas incorridas nos processos de conferência de saldos e limites<br>
-                                - Despesas com depreciação de equipamentos<br>
+                                Despesas incorridas no processamento de transaï¿½ï¿½es com cartï¿½es de pagamentos, tais como:<br>
+                                - Despesas incorridas no processo de autorizaï¿½ï¿½o<br>
+                                - Despesas incorridas nos processos de conferï¿½ncia de saldos e limites<br>
+                                - Despesas com depreciaï¿½ï¿½o de equipamentos<br>
                                 - Despesas com terceirizados (pessoal e empresas contratadas)<br>
                             </fieldset>
                         </div>
@@ -438,13 +439,13 @@ function isTipo2(str) {
                         <div id='info_c_custo_mkt_emissor' name='info_c_custo_mkt_emissor' onclick='javascript:$("#info_c_custo_mkt_emissor").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                Custo com marketing e propaganda relacionados à atividade de emissor de cartões de pagamentos
+                                Custo com marketing e propaganda relacionados ï¿½ atividade de emissor de cartï¿½es de pagamentos
                             </fieldset>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td>* <a href="javascript:info_c_custo_inadimplencia_emissor();">Custo de Inadimplência do Emissor</a>: </td>
+                    <td>* <a href="javascript:info_c_custo_inadimplencia_emissor();">Custo de Inadimplï¿½ncia do Emissor</a>: </td>
                     <td>
                         <input name="c_custo_inadimplencia_emissor" type="text" id="c_custo_inadimplencia_emissor" size="15" maxlength="15" value="<?php if(isset($c_custo_inadimplencia_emissor)) echo number_format($c_custo_inadimplencia_emissor, 2, ',', '.'); ?>" />
                     </td>
@@ -455,7 +456,7 @@ function isTipo2(str) {
                         <div id='info_c_custo_inadimplencia_emissor' name='info_c_custo_inadimplencia_emissor' onclick='javascript:$("#info_c_custo_inadimplencia_emissor").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                Custo com recuperação de crédito por inadimplência, bem como com o provisionamento para fazer face aos créditos de liquidação duvidosa, conforme Resolução 2.682
+                                Custo com recuperaï¿½ï¿½o de crï¿½dito por inadimplï¿½ncia, bem como com o provisionamento para fazer face aos crï¿½ditos de liquidaï¿½ï¿½o duvidosa, conforme Resoluï¿½ï¿½o 2.682
                             </fieldset>
                         </div>
                     </td>
@@ -472,14 +473,14 @@ function isTipo2(str) {
                         <div id='info_c_custos_outros_emissor' name='info_c_custos_outros_emissor' onclick='javascript:$("#info_c_custos_outros_emissor").hide("slow");'>
                             <fieldset>
                                 <legend>Detalhes</legend>
-                                Outros custos, em reais, incorridos nas atividades de emissor de cartões de pagamentos, tais como:<br>
-                                - Custo com provisões civis e trabalhistas<br> 
-                                - Custo advindo das atividades de estabelecimento de relacionamento comercial com os portadores do cartões de pagamentos, tais como centrais de help desk , sistema de gerenciamento de informações ? MIS, portal na Internet, etc.<br>
-                                - Custo atribuído à compra ou fabricação dos cartões de pagamento, bem como ao processo de inserção dos dados no cartão<br>
-                                - Custo referente aos serviços de postagem ou de entrega dos cartões de pagamento aos portadores<br>
-                                - Custo referente ao processo de cobrança das faturas encaminhadas aos portadores (postagem, tarifas interbancárias, etc.)<br>
+                                Outros custos, em reais, incorridos nas atividades de emissor de cartï¿½es de pagamentos, tais como:<br>
+                                - Custo com provisï¿½es civis e trabalhistas<br> 
+                                - Custo advindo das atividades de estabelecimento de relacionamento comercial com os portadores do cartï¿½es de pagamentos, tais como centrais de help desk , sistema de gerenciamento de informaï¿½ï¿½es ? MIS, portal na Internet, etc.<br>
+                                - Custo atribuï¿½do ï¿½ compra ou fabricaï¿½ï¿½o dos cartï¿½es de pagamento, bem como ao processo de inserï¿½ï¿½o dos dados no cartï¿½o<br>
+                                - Custo referente aos serviï¿½os de postagem ou de entrega dos cartï¿½es de pagamento aos portadores<br>
+                                - Custo referente ao processo de cobranï¿½a das faturas encaminhadas aos portadores (postagem, tarifas interbancï¿½rias, etc.)<br>
                                 - Custo com despesas administrativas, incluindo gasto de pessoal<br>
-                                - Outros custos não relacionados anteriormente<br>
+                                - Outros custos nï¿½o relacionados anteriormente<br>
                             </fieldset>
                         </div>
                     </td>

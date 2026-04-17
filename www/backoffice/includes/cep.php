@@ -4,6 +4,7 @@
 $chave = "1rWe5Px/mdDJ8okXCFBrTMEgyF3O1A0";
 
 require_once '../../includes/constantes.php';
+require_once __DIR__ . '/encoding.php';
 
 include $raiz_do_projeto . '/includes/configCEP.php';
 
@@ -46,11 +47,11 @@ if ($cep) {
 		if (!is_object($retorno))
 			echo "ERRO1";
 		else {
-			if (trim($retorno->localidade) != "") {
-				if (trim($retorno->logradouro) != "") {
+			if (trim((string)($retorno->localidade ?? "")) != "") {
+				if (trim((string)($retorno->logradouro ?? "")) != "") {
 
-					$array_logradouro = explode(" ", $retorno->logradouro);
-					$tip_end = $array_logradouro[0];
+					$array_logradouro = explode(" ", (string)($retorno->logradouro ?? ""));
+					$tip_end = $array_logradouro[0] ?? "";
 					$end = "";
 
 					foreach ($array_logradouro as $ind => $value) {
@@ -58,12 +59,12 @@ if ($cep) {
 							$end .= $value . " ";
 						}
 					}
-					$end .= $retorno->complemento;
+					$end .= $retorno->complemento ?? "";
 				} else {
 					$tip_end = "";
 					$end = "";
 				}
-				echo utf8_decode($tip_end . "&" . $end . "&" . $retorno->bairro . "&" . $retorno->localidade . "&" . $retorno->uf);
+				echo backoffice_utf8_to_iso($tip_end . "&" . $end . "&" . ($retorno->bairro ?? "") . "&" . ($retorno->localidade ?? "") . "&" . ($retorno->uf ?? ""));
 			} else {
 				echo "ERRO2";
 			}
@@ -93,8 +94,8 @@ if ($cep) {
 		if (!is_object($retorno))
 			echo "ERRO1";
 		else {
-			if ($retorno->resultado == "1" || $retorno->resultado == "2") {
-				echo utf8_decode($retorno->tipo_logradouro . "&" . $retorno->logradouro . "&" . $retorno->bairro . "&" . $retorno->cidade . "&" . $retorno->uf);
+			if (($retorno->resultado ?? "") == "1" || ($retorno->resultado ?? "") == "2") {
+				echo backoffice_utf8_to_iso(($retorno->tipo_logradouro ?? "") . "&" . ($retorno->logradouro ?? "") . "&" . ($retorno->bairro ?? "") . "&" . ($retorno->cidade ?? "") . "&" . ($retorno->uf ?? ""));
 			} else {
 				echo "ERRO2";
 			}
@@ -116,7 +117,7 @@ function gravaLog_TMP1($mensagem)
 	$file = $raiz_do_projeto . "/arquivos_gerados/logs/log_TMP1.txt";
 
 	//Mensagem
-	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+	$mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? "") . "\n" . $mensagem . "\n";
 
 	//Grava mensagem no arquivo
 	if ($handle = fopen($file, 'a+')) {
@@ -179,7 +180,7 @@ function getFileByCURL($url, $post_parameters)
 	curl_close($curl_handle);
 	if ($buffer) {
 		$ipos = strpos($buffer, "&cep");
-		$buffer = substr($buffer, $ipos);
+		$buffer = substr((string)($buffer ?? ""), $ipos);
 		gravaLog_TMP1("ipos: $ipos\n  buffer1: '" . $buffer . "'\n");
 	}
 

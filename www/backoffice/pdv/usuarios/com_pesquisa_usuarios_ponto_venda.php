@@ -12,7 +12,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 	// Cria instância com LH teste
 	$usuarioGames = new UsuarioGames(468);
 	$bret = $usuarioGames->b_IsLogin_email_ponto_venda(1, $usuarios_ponto_venda_id);
-	$total_table = count($usuarios_ponto_venda_id);
+	$total_table = (is_countable($usuarios_ponto_venda_id) ? count($usuarios_ponto_venda_id) : 0);
 	$reg_ate = $total_table;
 
 	$s_ug_id_list = "";
@@ -92,7 +92,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						$cor2 = $query_cor1;
 						$cor3 = $query_cor2;
 
-						if((pg_num_rows($rs) != 0) && ($rs)) {
+						if(((($rs) ? pg_num_rows($rs) : 0) != 0) && ($rs)) {
 							while ($pgrs = pg_fetch_array ($rs)) {
 								//if(b_IsUsuarioReinaldo()) 
 								{

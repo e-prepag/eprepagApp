@@ -4,7 +4,7 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 
 if($opr_codigo==0) 
-	$opr_codigo = $_GET["opr_codigo"];
+	$opr_codigo = $_GET["opr_codigo"] ?? "";
 //echo "opr_codigo: ".$opr_codigo."<br>";
 //echo "arquivo: ".$arquivo."<br>";
 //echo "<pre>";

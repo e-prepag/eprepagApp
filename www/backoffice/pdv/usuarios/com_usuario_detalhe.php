@@ -1,6 +1,5 @@
 <?php
-
-
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
 set_time_limit(3000);
 
 require_once '../../../includes/constantes.php';
@@ -120,7 +119,7 @@ $novo_ug_risco_classif              = $_POST['novo_ug_risco_classif'] ?? null;
 //ini_set("display_errors", 1); 
 function corTextoContraste($hexCor)
 {
-	$hex = ltrim($hexCor, '#');
+	$hex = ltrim((string)($hexCor ?? ""), '#');
 
 	$r = hexdec(substr($hex, 0, 2));
 	$g = hexdec(substr($hex, 2, 2));
@@ -159,7 +158,7 @@ if ($msg == "") {
 	//Alterar Dados do Estabelecimento
 	if (isset($acao) && $acao == "a") {
 
-		if (!$v_campo || trim($v_campo) == '') {
+		if (!$v_campo || trim((string)($v_campo ?? "")) == '') {
 			$msgAcao = "Item a ser alterado não especificado.\n";
 		}
 
@@ -183,8 +182,8 @@ if ($msg == "") {
 			} //end if($v_campo == 'substatus')
 
 			if ($v_campo == 'riscoclassif') {
-				if (array_key_exists(utf8_decode($v_valor_new), $RISCO_CLASSIFICACAO)) {
-					$cad_usuarioGames->setRiscoClassif($RISCO_CLASSIFICACAO[utf8_decode($v_valor_new)]);
+				if (array_key_exists(pdv_utf8_to_iso($v_valor_new), $RISCO_CLASSIFICACAO)) {
+					$cad_usuarioGames->setRiscoClassif($RISCO_CLASSIFICACAO[pdv_utf8_to_iso($v_valor_new)]);
 				}
 			}
 			if ($v_campo == 'ug_perfil_senha_reimpressao')
@@ -212,7 +211,7 @@ if ($msg == "") {
 			if ($msgAcao == "") {
 				if ($v_campo == 'ativo' && $v_valor_new == "1") {
 
-					if (!$objUsuarioGames->getPerfilFormaPagto() || trim($objUsuarioGames->getPerfilFormaPagto()) == "") {
+					if (!$objUsuarioGames->getPerfilFormaPagto() || trim((string)$objUsuarioGames->getPerfilFormaPagto()) == "") {
 						$msgAcao = "Não é possivel ativar este usuário, Forma de Pagamento ainda não definida.\n";
 					}
 				}
@@ -266,7 +265,7 @@ if ($msg == "") {
 		@$msgRetValida = $instUsuarioGames->apenas_validar($objUsuarioGames);
 
 		//RA
-		if (is_null($objUsuarioGames->getRACodigo()) || trim($objUsuarioGames->getRACodigo()) == "") {
+		if (is_null($objUsuarioGames->getRACodigo()) || trim((string)$objUsuarioGames->getRACodigo()) == "") {
 			$cad_RA = $objUsuarioGames->getRAOutros();
 		} else {
 			$resatv = SQLexecuteQuery("select ra_codigo, ra_desc from ramo_atividade where ra_codigo = '" . $objUsuarioGames->getRACodigo() . "'");
@@ -568,7 +567,7 @@ ob_end_flush();
 					<td id="txt-block"><?php
 										$usuario_bloqueio = obterUsuarioBloqueado(0 + $objUsuarioGames->getId());
 										if ($usuario_bloqueio) {
-											echo "Sim. Motivo: " . utf8_decode($usuario_bloqueio['motivo']) . " - Data: " . $usuario_bloqueio['data_bloqueio'];
+											echo "Sim. Motivo: " . pdv_utf8_to_iso($usuario_bloqueio['motivo']) . " - Data: " . $usuario_bloqueio['data_bloqueio'];
 										} else {
 											echo "Não possui bloqueio por fraude";
 										}
@@ -624,7 +623,7 @@ ob_end_flush();
 							$sql = "select * from tb_tipo_estabelecimento where te_id=" . $objUsuarioGames->getTipoEstabelecimento();
 							$res_te = SQLexecuteQuery($sql);
 							if ($res_te_row = pg_fetch_array($res_te)) {
-								echo utf8_decode($res_te_row['te_descricao']);
+								echo pdv_utf8_to_iso($res_te_row['te_descricao']);
 							} //end if($res_te_row = pg_fetch_array($res_te))
 							else {
 								echo "ID n&atilde;o encontrado";
@@ -963,7 +962,7 @@ ob_end_flush();
 					<?php $sql_socios = "SELECT * FROM dist_usuarios_games_socios WHERE ug_id = " . $objUsuarioGames->getId() . " order by ugs_percentagem DESC;";
 					$res_socios = SQLexecuteQuery($sql_socios);
 
-					if ($res_socios && pg_num_rows($res_socios) > 0) {
+					if ($res_socios && (($res_socios) ? pg_num_rows($res_socios) : 0) > 0) {
 						$i = 0;
 						while ($res_row = pg_fetch_array($res_socios)) {
 					?>
@@ -1200,7 +1199,7 @@ ob_end_flush();
 							<?php
 							$sql = "select * from dist_usuarios_games_operador ugo where ugo.ugo_ug_id = " . $usuario_id . "";
 							$res_count = SQLexecuteQuery($sql);
-							$total_table = pg_num_rows($res_count);
+							$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 							//echo "sql: $sql<br>";
 							//echo "total_table: $total_table<br>";
 
@@ -1361,7 +1360,7 @@ ob_end_flush();
 						where bbg_ug_id= " . $usuario_id . "
 						) v ";
 			//$rs_venda = SQLexecuteQuery($sql);
-			//$total_table = pg_num_rows($rs_venda);
+			//$total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
 			$sql .= " order by " . $ncamp_v . " " . ($ordem_v == 1 ? "desc" : "asc");
 			//$sql .= " limit " . $max . " offset " . $inicial_v;
 			$sql .= " limit 50; ";
@@ -1369,7 +1368,7 @@ ob_end_flush();
 
 			//echo "$sql<br>";
 			$rs_venda = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_venda);
+			$total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
 			?>
 			<div id="Layer1" class="" style="position:static; width:100%; height:150px; z-index:1; overflow: auto;">
 
@@ -1405,7 +1404,7 @@ ob_end_flush();
 								href="<?php echo $default_add . "?ordem_v=" . $ordem_v . "&ncamp_v=vg_concilia&inicial_v=" . $inicial_v . $varsel ?>"
 								class="link_branco">Conciliação</a></td>
 					</tr>
-					<?php if (!$rs_venda || pg_num_rows($rs_venda) == 0) { ?>
+					<?php if (!$rs_venda || (($rs_venda) ? pg_num_rows($rs_venda) : 0) == 0) { ?>
 						<tr>
 							<td align="center" colspan="9">Nenhum pedido encontrado</td>
 						</tr>
@@ -1491,7 +1490,7 @@ ob_end_flush();
 			$sql = "select * from dist_usuarios_games_log ugl " .
 				"where ugl.ugl_ug_id = " . $usuario_id;
 			//$rs_usuario_log = SQLexecuteQuery($sql);
-			//$total_table = pg_num_rows($rs_usuario_log);
+			//$total_table = (($rs_usuario_log) ? pg_num_rows($rs_usuario_log) : 0);
 			$sql .= " order by " . $ncamp . " " . ($ordem == 1 ? "desc" : "asc");
 			//$sql .= " limit " . $max . " offset " . $inicial;
 			if ($usuario_id != 16467 && $usuario_id != 10480 && $usuario_id != 5764 && $usuario_id != 6623) {
@@ -1499,7 +1498,7 @@ ob_end_flush();
 			}
 			//echo "$sql<br>";
 			$rs_usuario_log = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_usuario_log);
+			$total_table = (($rs_usuario_log) ? pg_num_rows($rs_usuario_log) : 0);
 			//echo "varsel: $varsel<br>";
 			?>
 			<div id="Layer1" class="" style="position:static; width:100%; height:200px; z-index:1; overflow: auto;">
@@ -1520,7 +1519,7 @@ ob_end_flush();
 								class="link_branco">IP</a></td>
 						<td align="center"><a style="text-decoration:none" class="link_branco">Obs</a></td>
 					</tr>
-					<?php if (!$rs_usuario_log || pg_num_rows($rs_usuario_log) == 0) { ?>
+					<?php if (!$rs_usuario_log || (($rs_usuario_log) ? pg_num_rows($rs_usuario_log) : 0) == 0) { ?>
 						<tr>
 							<td align="center" colspan="4">Nenhum histórico encontrado</td>
 						</tr>

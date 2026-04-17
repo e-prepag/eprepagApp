@@ -14,17 +14,17 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 <?php 
 	$time_start = getmicrotime();
 
-	if(!$ncamp)    $ncamp       = 'ug_id';
-	if(!$inicial)  $inicial     = 0;
-	if(!$range)    $range       = 1;
-	if(!$ordem)    $ordem       = 1;
+	if(!isset($ncamp) || !$ncamp)    $ncamp       = 'ug_id';
+	if(!isset($inicial) || !$inicial)  $inicial     = 0;
+	if(!isset($range) || !$range)    $range       = 1;
+	if(!isset($ordem) || !$ordem)    $ordem       = 1;
 	if($BtnSearch) $inicial     = 0;
 	if($BtnSearch) $range       = 1;
 	if($BtnSearch) $total_table = 0;
 	
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 100;	//$qtde_reg_tela;
 	$range_qtde   = $qtde_range_tela;
 
@@ -34,7 +34,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 //echo $sql;
 
 	$res_count = pg_query($sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 	$sql .= " order by ".$ncamp;
 
@@ -180,7 +180,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 					}
 					if ($cor1 == $cor2) {$cor1 = $cor3;} else {$cor1 = $cor2;} 
 				}
-				if (!$valor) {
+				if(!isset($valor) || !$valor) {
 			?>
         <tr bgcolor="#f5f5fb"> 
           <td colspan="4" bgcolor="<?php echo $cor1 ?>"><div align="center"><font size="1" face="Arial, Helvetica, sans-serif" color="#666666"><strong><br>

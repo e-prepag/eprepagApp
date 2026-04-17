@@ -89,7 +89,7 @@ if (!function_exists('isVendaDeposito')) {
 
     $sql = "select vg_deposito_em_saldo from tb_dist_venda_games vg where vg.vg_id = " . $venda_id;
     $rs_venda = SQLexecuteQuery($sql);
-    if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+    if (!$rs_venda || (($rs_venda) ? pg_num_rows($rs_venda) : 0) == 0)
       $msg = "Nenhuma venda encontrada (em isvendaDeposito($venda_id)).\n";
 
     if ($msg == "") {
@@ -126,7 +126,7 @@ $vgm_pin_codinterno_tmp = "";
 if (!($isVendaDeposito == 1)) {
   //Testa vgm_pin_codinterno = null, caso contrário quer dizer que já houve uma venda (mesmo que o status mostre outra coisa)
   $vgm_pin_codinterno_tmp = get_pins_vendidos($venda_id);
-  if (trim($vgm_pin_codinterno_tmp) != "")
+  if (trim((string)($vgm_pin_codinterno_tmp ?? "")) != "")
     $msgConcilia = "Esta venda já tem PINs vendidos (PINs ID: '$vgm_pin_codinterno_tmp').\n";
 }
 
@@ -135,7 +135,7 @@ if (!($isVendaDeposito == 1)) {
 if ($msg == "") {
 
   if (!empty($vgm_id)) {
-    $sql = "update tb_dist_venda_games_modelo set vgm_nome_cpf='" . trim($vgm_nome_cpf) . "',vgm_cpf='" . trim($vgm_cpf[$vgm_id]) . "',vgm_cpf_data_nascimento='" . formata_data(trim($vgm_cpf_data_nascimento[$vgm_id]), 1) . " 00:00:00' where ";
+    $sql = "update tb_dist_venda_games_modelo set vgm_nome_cpf='" . trim((string)($vgm_nome_cpf ?? "")) . "',vgm_cpf='" . trim((string)($vgm_cpf[$vgm_id] ?? "")) . "',vgm_cpf_data_nascimento='" . formata_data(trim((string)($vgm_cpf_data_nascimento[$vgm_id] ?? "")), 1) . " 00:00:00' where ";
     if ($todos == 1)
       $sql .= "vgm_vg_id = " . $venda_id . " ;";
     else
@@ -166,7 +166,7 @@ if ($msg == "") {
       $sql = "select * from tb_dist_venda_games vg inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id where vg.vg_id = " . $venda_id . " ";
       $sql = "select * from tb_dist_venda_games vg where vg.vg_id = " . $venda_id . " ";
       $rs = SQLexecuteQuery($sql);
-      if (!$rs || pg_num_rows($rs) == 0) {
+      if (!$rs || (($rs) ? pg_num_rows($rs) : 0) == 0) {
         echo "Venda '$venda_id' não foi encontrada<br>";
       } else {
         $rs_vg = pg_fetch_array($rs);
@@ -322,7 +322,7 @@ if ($msg == "") {
   $sql = "select * from tb_dist_venda_games vg " .
     "where vg.vg_id = " . $venda_id;
   $rs_venda = SQLexecuteQuery($sql);
-  if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+  if (!$rs_venda || (($rs_venda) ? pg_num_rows($rs_venda) : 0) == 0)
     $msg = "Nenhuma venda encontrada.\n";
   $rs_venda_row = pg_fetch_array($rs_venda);
   $vg_ug_id = $rs_venda_row['vg_ug_id'];
@@ -339,7 +339,7 @@ if ($msg == "") {
   $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
   $vg_concilia = $rs_venda_row['vg_concilia'];
   $vg_data_concilia = $rs_venda_row['vg_data_concilia'];
-  $vg_user_id_concilia = trim($rs_venda_row['vg_user_id_concilia']);
+  $vg_user_id_concilia = trim((string)($rs_venda_row['vg_user_id_concilia'] ?? ""));
   $vg_dep_codigo = $rs_venda_row['vg_dep_codigo'];
   $vg_bol_codigo = $rs_venda_row['vg_bol_codigo'];
 
@@ -355,7 +355,7 @@ if ($msg == "") {
     "where vg.vg_id = " . $venda_id .
     " order by vgm_id";
   $rs_venda_modelos = SQLexecuteQuery($sql);
-  if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+  if (!$rs_venda_modelos || (($rs_venda_modelos) ? pg_num_rows($rs_venda_modelos) : 0) == 0)
     $msg = "Nenhum produto encontrado (ABCD).\n";
   else {
     $total_geral = 0;
@@ -410,7 +410,7 @@ if ($msg == "") {
   $sql = "select * from dist_usuarios_games ug " .
     "where ug.ug_id = " . $vg_ug_id;
   $rs_usuario = SQLexecuteQuery($sql);
-  if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+  if (!$rs_usuario || (($rs_usuario) ? pg_num_rows($rs_usuario) : 0) == 0)
     $msg = "Nenhum cliente encontrado.\n";
   else {
     $rs_usuario_row = pg_fetch_array($rs_usuario);
@@ -440,7 +440,7 @@ if ($msg == "") {
     $sql = "select * from dist_boleto_bancario_games bbg " .
       "where bbg.bbg_vg_id = " . $venda_id;
     $rs_boleto = SQLexecuteQuery($sql);
-    if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
+    if (!$rs_boleto || (($rs_boleto) ? pg_num_rows($rs_boleto) : 0) == 0)
       $msg = "Nenhum boleto encontrado.\n";
     else {
       $rs_boleto_row = pg_fetch_array($rs_boleto);
@@ -458,7 +458,7 @@ if ($msg == "") {
     $sql = "select * from tb_venda_games_redecard vgrc " .
       "where vgrc.vgrc_vg_id = " . $venda_id;
     $rs_redecard = SQLexecuteQuery($sql);
-    if (!$rs_redecard || pg_num_rows($rs_redecard) == 0)
+    if (!$rs_redecard || (($rs_redecard) ? pg_num_rows($rs_redecard) : 0) == 0)
       $msg = "Nenhum redecard encontrado.\n";
     else {
       $rs_redecard_row = pg_fetch_array($rs_redecard);
@@ -513,7 +513,7 @@ if ($msg == "") {
       $sql = "select * from usuarios urpp " .
         "where urpp.id = '" . $vg_user_id_concilia . "'";
       $rs_urpp = SQLexecuteQuery($sql);
-      if (!$rs_urpp || pg_num_rows($rs_urpp) == 0) {
+      if (!$rs_urpp || (($rs_urpp) ? pg_num_rows($rs_urpp) : 0) == 0) {
         $shn_nome = "Anonymous";
       } else {
         $rs_urpp_row = pg_fetch_array($rs_urpp);
@@ -688,7 +688,7 @@ ob_end_flush();
 
               if ($sem_pins) {
                 echo '<font color="#FF0000">ATENÇÃO: Essa venda teve erro ao gerar PINs, <form name="formPins" id="formPins" method="post" action=""><input type="submit" name="BtnReprocessaPins" value="Gerar PINs novamente." onclick="return GP_popupConfirmMsg("Os PINs serão reprocessados. Deseja continuar?");"></form></font>';
-              } else if (trim($vgm_pin_codinterno_tmp) == "") {
+              } else if (trim((string)($vgm_pin_codinterno_tmp ?? "")) == "") {
                 echo "<font color='#0000FF'>Sem PINs vendidos</font>";
               } else {
                 echo "<font color='#FF0000'>ATENÇÃO: Já tem PINs vendidos</font>";
@@ -822,7 +822,7 @@ ob_end_flush();
                 <td align="center" width="250">Status</td>
                 <td align="center" width="494">Observações</td>
               </tr>
-              <?php if ($rs_venda_hist && pg_num_rows($rs_venda_hist) > 0) { ?>
+              <?php if ($rs_venda_hist && (($rs_venda_hist) ? pg_num_rows($rs_venda_hist) : 0) > 0) { ?>
                 <?php while ($rs_venda_hist_row = pg_fetch_array($rs_venda_hist)) {
                   if ($cor1 == $cor2) {
                     $cor1 = $cor3;
@@ -958,19 +958,19 @@ ob_end_flush();
         </tr>
         <?php
         $pagto_nome_docto_Ar = preg_split("/;/", $PAGTO_NOME_DOCTO[$vg_pagto_banco][$vg_pagto_local]);
-        for ($i = 0; $i < count($pagto_nome_docto_Ar); $i++) {
+        for ($i = 0; $i < (is_countable($pagto_nome_docto_Ar) ? count($pagto_nome_docto_Ar) : 0); $i++) {
         ?>
           <tr bgcolor="#F5F5FB">
-            <td><b><?php echo (trim($pagto_nome_docto_Ar[$i]) == "" ? "Nro Documento" : $pagto_nome_docto_Ar[$i]); ?></b></td>
+            <td><b><?php echo (trim((string)($pagto_nome_docto_Ar[$i] ?? "")) == "" ? "Nro Documento" : $pagto_nome_docto_Ar[$i]); ?></b></td>
             <td><?php echo $pagto_num_docto[$i] ?></td>
           </tr>
         <?php } ?>
 
         <?php $arquivos = buscaArquivosIniciaCom($FOLDER_COMMERCE_UPLOAD, 'nome', 'asc', "money_comprovante_" . $venda_id . "_");
-        if (count($arquivos) > 0) { ?>
+        if ((is_countable($arquivos) ? count($arquivos) : 0) > 0) { ?>
           <tr bgcolor="#F5F5FB">
             <td><b>Comprovante</b></td>
-            <td><?php for ($j = 0; $j < count($arquivos); $j++) { ?><a style="text-decoration:none" target="_blank"
+            <td><?php for ($j = 0; $j < (is_countable($arquivos) ? count($arquivos) : 0); $j++) { ?><a style="text-decoration:none" target="_blank"
                   href="/pdv/pagamentos/com_pagto_compr_down.php?venda=<?php echo $venda_id ?>&arquivo=<?php echo $arquivos[$j] ?>">Comprovante
                   <?php echo ($j + 1) ?></a><br><?php } ?></td>
           </tr>
@@ -983,7 +983,7 @@ ob_end_flush();
         </tr>
         <tr>
           <td>
-            <?php if (isset($vgm_cpf) && count($vgm_cpf) > 0) { ?>
+            <?php if (isset($vgm_cpf) && (is_countable($vgm_cpf) ? count($vgm_cpf) : 0) > 0) { ?>
               <form name="form5" id="form5" method="post" action="">
                 <input type="hidden" name="vgm_id" id="vgm_id" value="">
                 <input type="hidden" name="vgm_nome_cpf" id="vgm_nome_cpf" value="">
@@ -1017,11 +1017,11 @@ ob_end_flush();
                   ?>
                     <tr class="texto" bgcolor="#F5F5FB">
                       <td align="left"><?php echo $vgm_descricao_modelo[$key]; ?></td>
-                      <td align="left"><input type="text" name="vgm_cpf[<? echo $key; ?>]" id="vgm_cpf[<? echo $key; ?>]"
+                      <td align="left"><input type="text" name="vgm_cpf[<?php  echo $key; ?>]" id="vgm_cpf[<?php  echo $key; ?>]"
                           value="<?php echo $value; ?>" maxlength="14" size="14" class="texto cpf" /></td>
                       <td align="left"><?php echo $vgm_nome_cpf[$key]; ?></td>
-                      <td align="left"><input type="text" name="vgm_cpf_data_nascimento[<? echo $key; ?>]"
-                          id="vgm_cpf_data_nascimento[<? echo $key; ?>]"
+                      <td align="left"><input type="text" name="vgm_cpf_data_nascimento[<?php  echo $key; ?>]"
+                          id="vgm_cpf_data_nascimento[<?php  echo $key; ?>]"
                           value="<?php echo formata_data_ts($vgm_cpf_data_nascimento[$key], 0, false, false); ?>"
                           maxlength="10" size="10" class="texto data_nasci" /></td>
                       <td align="right"><span class="glyphicon glyphicon-save-file graphycon-big" aria-hidden="true"
@@ -1281,7 +1281,7 @@ ob_end_flush();
             </tr>
             <?php $sql = "select * from depositos_pendentes dep where dep_codigo = " . $vg_dep_codigo;
             $rs_dep = SQLexecuteQuery($sql);
-            if (!$rs_dep || pg_num_rows($rs_dep) == 0) { ?>
+            if (!$rs_dep || (($rs_dep) ? pg_num_rows($rs_dep) : 0) == 0) { ?>
               <tr bgcolor="#F5F5FB">
                 <td><b>Dados do depósito</b></td>
                 <td>Depósito não encontrado</td>
@@ -1311,7 +1311,7 @@ ob_end_flush();
             </tr>
             <?php $sql = "select * from boletos_pendentes bol where bol_codigo = " . $vg_bol_codigo;
             $rs_bol = SQLexecuteQuery($sql);
-            if (!$rs_bol || pg_num_rows($rs_bol) == 0) { ?>
+            if (!$rs_bol || (($rs_bol) ? pg_num_rows($rs_bol) : 0) == 0) { ?>
               <tr bgcolor="#F5F5FB">
                 <td><b>Dados do boleto</b></td>
                 <td>Boleto não encontrado</td>
@@ -1547,14 +1547,14 @@ function get_pins_vendidos($vg_id)
   $sql_mod = "select vgm_id from tb_dist_venda_games_modelo where vgm_vg_id = $vg_id;";
   //echo "$sql_mod<br>";
   $rs_mod = SQLexecuteQuery($sql_mod);
-  if (!$rs_mod || pg_num_rows($rs_mod) == 0) {
+  if (!$rs_mod || (($rs_mod) ? pg_num_rows($rs_mod) : 0) == 0) {
     $msg = "Nenhum modelo encontrado (vg_id = $vg_id).\n";
   } else {
     while ($rs_mod_row = pg_fetch_array($rs_mod)) {;
       $vgm_id = $rs_mod_row['vgm_id'] . "";
       $sql_pin = "select vgmp_pin_codinterno from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = $vgm_id;";
       $rs_pin = SQLexecuteQuery($sql_pin);
-      if (!$rs_pin || pg_num_rows($rs_pin) == 0) {
+      if (!$rs_pin || (($rs_pin) ? pg_num_rows($rs_pin) : 0) == 0) {
         $msg = "Nenhum PIN encontrado.\n";
       } else {
         while ($rs_pin_row = pg_fetch_array($rs_pin)) {

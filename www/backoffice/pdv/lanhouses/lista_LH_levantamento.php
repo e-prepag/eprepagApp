@@ -4,7 +4,7 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 
 $sql = "SELECT * FROM tb_lans ORDER BY nome ASC;";
 $rss = SQLexecuteQuery($sql);
-$tot = pg_num_rows($rss);
+$tot = (($rss) ? pg_num_rows($rss) : 0);
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">

@@ -22,7 +22,7 @@ $ps_query = "SELECT distinct ug_bairro FROM dist_usuarios_games ";
 $res0 = SQLexecuteQuery($ps_query);
 
 
-$total_de_bairros = pg_num_rows($res0);
+$total_de_bairros = (($res0) ? pg_num_rows($res0) : 0);
 
 // seleção de cidades ordenada em ordem decrescente para acelerar 
 $ps_query = "SELECT distinct ug_bairro,ug_cidade FROM dist_usuarios_games order by ug_bairro desc";
@@ -34,7 +34,7 @@ $ps_query = "SELECT distinct ug_bairro,ug_cidade FROM dist_usuarios_games order 
 //$res1 = pg_get_result($conex);
 $res1 = SQLexecuteQuery($ps_query);
 
-$total_de_bairros_com_cidade = pg_num_rows($res1);
+$total_de_bairros_com_cidade = (($res1) ? pg_num_rows($res1) : 0);
 
 
 // conferencia 

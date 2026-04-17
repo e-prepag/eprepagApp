@@ -22,20 +22,21 @@ try {
         $con = ConnectionPDO::getConnection();
         $pdo = $con->getLink();
 
-        $login = strtoupper(trim($_POST['user']));
+        $login = strtoupper(trim((string)($_POST['user'] ?? "")));
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute(array($login));
         $fetch = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($stmt->rowCount() > 0) {
+        if ($stmt && $stmt->rowCount() > 0) {
 
             $bcrypt = new SecureEncryption();
 
-            if (!$bcrypt->verifyPassword($_POST['passw'], $fetch['shn_password'])) {
-                echo "<script>alert('Usuário ou senha inválidos');</script>";
+            if (!$bcrypt->verifyPassword((string)($_POST['passw'] ?? ""), (string)($fetch['shn_password'] ?? ""))) {
+                echo "<script>alert('Usurio ou senha invlidos');</script>";
                 exit;
             }
+
 
             $ret = true;
             if (empty($fetch['chave_autenticador'])) {
@@ -52,7 +53,7 @@ try {
             modal_token();
             exit;
         } else {
-            echo "<script>alert('Usuário ou senha inválidos aaaa');</script>";
+            echo "<script>alert('Usuï¿½rio ou senha invï¿½lidos aaaa');</script>";
         }
     }
 } catch (PDOException $e) {
@@ -61,16 +62,16 @@ try {
 
 function modal_criar_token($fetch)
 {
-    $dataUltimoAcesso = new DateTime($fetch['sem_aut_data']);
+    $dataUltimoAcesso = new DateTime((string)($fetch['sem_aut_data'] ?? "now"));
     $dataHoje = new DateTime();
 
     $diasRestantes = 28 - $dataUltimoAcesso->diff($dataHoje)->days;
 
     $btn_recusar = true;
     if ($diasRestantes > 0) {
-        $mensagemAuth = "Ative a autenticação de dois fatores, você tem <strong>{$diasRestantes} dias</strong> antes que se torne obrigatória.";
+        $mensagemAuth = "Ative a autenticaï¿½ï¿½o de dois fatores, vocï¿½ tem <strong>{$diasRestantes} dias</strong> antes que se torne obrigatï¿½ria.";
     } else {
-        $mensagemAuth = "O prazo para ativar a autenticação de dois fatores expirou, é necessário configurá-la.";
+        $mensagemAuth = "O prazo para ativar a autenticaï¿½ï¿½o de dois fatores expirou, ï¿½ necessï¿½rio configurï¿½-la.";
         $btn_recusar = false;
     }
 
@@ -93,13 +94,13 @@ function modal_criar_token($fetch)
                             <form id="redir" method="POST" action="/index2.php">
                                 <input type="hidden" name="user" value="<?= htmlspecialchars($_POST['user'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
                                 <input type="hidden" name="passw" value="<?= htmlspecialchars($_POST['passw'], ENT_QUOTES | ENT_SUBSTITUTE, 'ISO-8859-1') ?>">
-                                <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info" type="submit">Não</button>
+                                <button style="font-weight: bold; font-style: italic;" class="pull-right btn btn-info" type="submit">Nï¿½o</button>
                             </form>
                         </div>
                     <?php } ?>
                 </div>
                 <div class="modal-footer">
-                    <span class="decoration-none txt-cinza"><em>Problemas com a autenticação?</em></span>
+                    <span class="decoration-none txt-cinza"><em>Problemas com a autenticaï¿½ï¿½o?</em></span>
                     <a class="decoration-none txt-cinza" id="faca-cadastro" target="_blank" href="/"><em>Entre em
                             contato com o suporte.</em></a>
                 </div>
@@ -140,7 +141,7 @@ function modal_token()
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title text-left">Digite o token disponível no seu app de autenticação</h4>
+                    <h4 class="modal-title text-left">Digite o token disponï¿½vel no seu app de autenticaï¿½ï¿½o</h4>
                 </div>
                 <div class="modal-body espacamento">
                     <form action="/index2.php" method="POST">
@@ -160,7 +161,7 @@ function modal_token()
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <span class="decoration-none txt-cinza"><em>Problemas com a autenticação?</em></span>
+                    <span class="decoration-none txt-cinza"><em>Problemas com a autenticaï¿½ï¿½o?</em></span>
                     <a class="decoration-none txt-cinza" id="faca-cadastro" target="_blank" href="/"><em>Entre em
                             contato com o suporte.</em></a>
                 </div>
@@ -195,9 +196,9 @@ function checkDevice($userId, $pdo)
     $stmt->execute([$userId, $deviceId]);
 
     if ($stmt->fetch()) {
-        return true; // Dispositivo válido
+        return true; // Dispositivo vï¿½lido
     } else {
-        return false; // Dispositivo inválido ou expirado
+        return false; // Dispositivo invï¿½lido ou expirado
     }
 }
 ?>

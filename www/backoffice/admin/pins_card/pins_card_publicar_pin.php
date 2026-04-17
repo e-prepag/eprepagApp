@@ -121,24 +121,24 @@ if($testeSubmit=="Publicar") {
         }
         // testa status do pin antes de mudar
         $ids="";
-        for ($i=0; $i<count($ids_temp);$i++) {
+        for ($i=0; $i<(is_countable($ids_temp) ? count($ids_temp) : 0);$i++) {
                 $ids_temp[$i] = intval($ids_temp[$i]);
                 $sql = "select pin_status from pins_card where pin_codinterno=".$ids_temp[$i].";";
                 //echo $sql."<br>";
                 $rs_pins = SQLexecuteQuery($sql);
-                if(pg_num_rows($rs_pins) <> 0) {
+                if((($rs_pins) ? pg_num_rows($rs_pins) : 0) <> 0) {
                         $rs_pin_row = pg_fetch_array($rs_pins);
                         $pin_status = $rs_pin_row['pin_status'];
                         if (($pin_status == '0')||($pin_status == $PINS_STORE_STATUS_VALUES['P'])||($pin_status == $PINS_STORE_STATUS_VALUES['A'])||($pin_status == $PINS_STORE_STATUS_VALUES['U'])||($pin_status == $PINS_STORE_STATUS_VALUES['C'])) {
                                 $msg_pin .= "O PIN ".$ids_temp[$i]." n&atilde;o pode ter seu Status alterado pois est&aacute; com Status de <font color='".$PINS_STORE_STATUS_COLORS[$pin_status]."'>".strtoupper($PINS_STORE_STATUS[$pin_status])." (".$pin_status.")</font>. <br>";
                         }
-                        else if (strlen($ids)==0) {
+                        else if (strlen((string)($ids ?? ""))==0) {
                                                 $ids = $ids_temp[$i];
                                 }
                                 else $ids .= ','.$ids_temp[$i];
                 }
         }
-        if(strlen($ids)>0) {
+        if(strlen((string)($ids ?? ""))>0) {
                 if($msg == ""){
                         // Passa para o novo estado
                         $sql  = "update pins_card set pin_status='".intval($PINS_STORE_STATUS_VALUES['P'])."' where pin_codinterno IN (".$ids.") and pin_status='".intval($PINS_STORE_STATUS_VALUES['D'])."';";
@@ -169,25 +169,25 @@ if($testeSubmit=="Publicar") {
 if($msg == ""){
 
         $sql  = "select * from pins_card ps where pin_status='".intval($PINS_STORE_STATUS_VALUES['D'])."' ";
-        if(strlen($opr_codigo))
+        if(strlen((string)($opr_codigo ?? "")))
             $sql .= " and opr_codigo=".intval($opr_codigo);
-        if(strlen($distributor_codigo))
+        if(strlen((string)($distributor_codigo ?? "")))
             $sql .= " and distributor_codigo=".intval($distributor_codigo);
-        if(strlen($lote))
+        if(strlen((string)($lote ?? "")))
             $sql .= " and pin_lote_codigo=".intval($lote);
-        if(strlen($valor))
+        if(strlen((string)($valor ?? "")))
             $sql .= " and pin_valor=".intval($valor);
-        if(strlen($tf_v_data_inclusao_ini))
+        if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
             $sql .= " and pin_dataentrada >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-        if(strlen($tf_v_data_inclusao_fim))
+        if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
             $sql .= " and pin_dataentrada <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
         $rs_total = SQLexecuteQuery($sql);
-        if($rs_total) $registros_total = pg_num_rows($rs_total);
+        if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
         $sql .= " order by pin_codinterno desc ";	
         $sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
         //echo $sql ."<br>\n";
         $rs_pins = SQLexecuteQuery($sql);
-        if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+        if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 
 ?>

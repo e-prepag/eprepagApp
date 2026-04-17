@@ -181,7 +181,7 @@ if ($atualizar == "OK") {
 
                             }//end if
                             else {
-                                $logSQL .= "Valores de faixa errado:\nFinal [" . $array_aux[$i]['MAX'] . "] e Início do Próximo [" . $value[$i + 1]['MIN'] . "]\n";
+                                $logSQL .= "Valores de faixa errado: Final [" . ($value_interno['MAX'] ?? '') . "] e Inicio do Proximo [" . ($value[$i + 1]['MIN'] ?? '') . "]";
                             }
                             $i++;
                         }//end foreach
@@ -602,14 +602,8 @@ ORDER BY co_canal, co_data_inclusao DESC,co_tipo, co_volume_tipo, co_volume_min'
                                 <input name='co_comissao_dado[]' type='text' id='co_comissao_dado_<?php echo $i;?>' size='<?php echo ($auxiliar_volume_tipo==0)?'12':'6';?>' maxlength='16'
                                        value='<?php echo ($co_comissao_dado[$i]) ? $co_comissao_dado[$i] : $rs_row['co_comissao'];?>' onBlur='isTipo2(this.value);'>
                             </td>
-                            <td>
-                                <input name='co_volume_min_dado[]' type='text' id='co_volume_min_dado_<?php echo $i;?>' size='15' maxlength='13'
-                                       value='<?php echo ($co_volume_min_dado[$i]) ? $co_volume_min_dado[$i] : number_format($rs_row['co_volume_min'], 2, ',', '');?>' onBlur='isTipo2(this.value);'>
-                            </td>
-                            <td>
-                                <input name='co_volume_max_dado[]' type='text' id='co_volume_max_dado_<?php echo $i;?>' size='15' maxlength='13'
-                                       value='<?php echo ($co_volume_max_dado[$i]) ? $co_volume_max_dado[$i] : number_format($rs_row['co_volume_max'], 2, ',', '');?>' onBlur='isTipo2(this.value);'>
-                            </td>
+                            <td><input name='co_volume_min_dado[]' type='text' id='co_volume_min_dado_<?php echo $i;?>' size='15' maxlength='13' value='<?php echo ($co_volume_min_dado[$i]) ? $co_volume_min_dado[$i] : number_format((float)($rs_row['co_volume_min'] ?? 0), 2, ',', '');?>' onBlur='isTipo2(this.value);'></td>
+                            <td><input name='co_volume_max_dado[]' type='text' id='co_volume_max_dado_<?php echo $i;?>' size='15' maxlength='13' value='<?php echo ($co_volume_max_dado[$i]) ? $co_volume_max_dado[$i] : number_format((float)($rs_row['co_volume_max'] ?? 0), 2, ',', '');?>' onBlur='isTipo2(this.value);'></td>
                             <td>
                                 <img src='../images/excluir.gif' width='16' height='16' border='0' alt='Adicionar Comissão Variavel' title='Adicionar Comissão Variavel'
                                      onclick="$('#comissao_linha_<?php echo $i;?>').remove();" style='cursor:pointer;cursor:hand;'>
@@ -683,13 +677,13 @@ ORDER BY co_canal, co_data_inclusao DESC,co_tipo, co_volume_tipo, co_volume_min'
                 <td><input name='co_volume_min_dado[]' type='text' id='co_volume_min_dado[]' size='15' maxlength='13' value='";
         if ($co_volume_min_dado[$i])
             echo $co_volume_min_dado[$i];
-        else echo number_format($rs_row['co_volume_min'], 2, ',', '');
+        else echo number_format((float)($rs_row['co_volume_min'] ?? 0), 2, ',', '');
         echo "' onBlur='isTipo2(this.value);'/></td>";
         echo "
                 <td><input name='co_volume_max_dado[]' type='text' id='co_volume_max_dado[]' size='15' maxlength='13' value='";
         if ($co_volume_max_dado[$i])
             echo $co_volume_max_dado[$i];
-        else echo number_format($rs_row['co_volume_max'], 2, ',', '');
+        else echo number_format((float)($rs_row['co_volume_max'] ?? 0), 2, ',', '');
         echo "' onBlur='isTipo2(this.value);'/></td>";
 
         echo "

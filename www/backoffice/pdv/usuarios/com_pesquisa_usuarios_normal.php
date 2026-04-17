@@ -15,9 +15,9 @@ $msg       = $_REQUEST['msg'] ?? '';
 $BtnSearch = $_REQUEST['BtnSearch'] ?? null;
 
 // Filtros de pesquisa
-$ug_id    = isset($_REQUEST['ug_id']) ? trim($_REQUEST['ug_id']) : '';
+$ug_id    = isset($_REQUEST['ug_id']) ? trim((string)($_REQUEST['ug_id'] ?? "")) : '';
 $ug_id_int = ($ug_id !== '' ? (int)$ug_id : null);
-$ug_cnpj  = isset($_REQUEST['ug_cnpj']) ? trim($_REQUEST['ug_cnpj']) : '';
+$ug_cnpj  = isset($_REQUEST['ug_cnpj']) ? trim((string)($_REQUEST['ug_cnpj'] ?? "")) : '';
 $ug_cnpj_sql = ($ug_cnpj !== '' ? pg_escape_string($ug_cnpj) : '');
 
 $default_add  = nome_arquivo($PHP_SELF);
@@ -234,7 +234,7 @@ ob_end_flush();
 								$cor2 = isset($query_cor1) ? $query_cor1 : '#FFFFFF';
 								$cor3 = isset($query_cor2) ? $query_cor2 : '#F5F5F5';
 
-                                if ((pg_num_rows($rs) != 0) && ($rs)) {
+                                if (((($rs) ? pg_num_rows($rs) : 0) != 0) && ($rs)) {
                                     while ($pgrs = pg_fetch_array($rs)) {
                                         @$taxa_aproveitamento = 100. * $pgrs['vg_valor'] / ($pgrs['vg_valor'] + $pgrs['vg_valor_inc']);
                                 ?>
@@ -243,7 +243,7 @@ ob_end_flush();
                                             <td align="center" style="max-width: 350px;font-size: 10px;">
                                                 <nobr><?php echo trim((($pgrs['ug_login']) ? $pgrs['ug_login'] : "-")) ?></nobr>
                                             </td>
-                                            <td align="center" style="max-width: 310px;font-size: 10px;"><?php echo trim($pgrs['ug_email']); ?></td>
+                                            <td align="center" style="max-width: 310px;font-size: 10px;"><?php echo trim((string)($pgrs['ug_email'] ?? "")); ?></td>
                                             <?php
                                             $vg_qtde_itens = (($pgrs['vg_qtde_itens'] > 0) ? $pgrs['vg_qtde_itens'] : 1);
                                             ?>

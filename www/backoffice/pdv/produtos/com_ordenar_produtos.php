@@ -34,7 +34,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
         $instProduto = new Produto();
         $ret = $instProduto->obterMelhorado($filtro, null, $rs);
 
-        if($rs && pg_num_rows($rs) > 0)
+        if($rs && (($rs) ? pg_num_rows($rs) : 0) > 0)
         {
             for($i=0; $rs_row = pg_fetch_array($rs); $i++)
             {
@@ -119,7 +119,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
         
     $rs = pg_query("select tb.*,opr.opr_nome from tb_dist_operadora_games_produto tb inner join operadoras opr on tb.ogp_opr_codigo = opr.opr_codigo where (ogp_ativo = 1 or ogp_mostra_integracao_gamer = 1) order by tb.ogp_ordem");
 						
-    if(pg_num_rows($rs) > 0) 
+    if((($rs) ? pg_num_rows($rs) : 0) > 0) 
     {
 ?>
 <div class="col-md-12">
@@ -182,7 +182,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 ?>
                 <tr> 
                     <td colspan="6"> 
-                       Quantidade de registros ativos: <strong><?php echo pg_num_rows($rs) ?></strong>
+                       Quantidade de registros ativos: <strong><?php echo (($rs) ? pg_num_rows($rs) : 0) ?></strong>
                     </td>
                 </tr>
             </tbody>

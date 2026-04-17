@@ -53,7 +53,7 @@ if(isset($_POST['submit']))
             $stmt->execute();
             $paginas = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            $totalPaginas = count($paginas);
+            $totalPaginas = (is_countable($paginas) ? count($paginas) : 0);
 
             if(!isset($_POST['funcao'])){
                 throw new Exception("Função é um campo obrigatório.");
@@ -71,7 +71,7 @@ if(isset($_POST['submit']))
 
             $objBenchmark = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            $totalRegistros = count($objBenchmark);
+            $totalRegistros = (is_countable($objBenchmark) ? count($objBenchmark) : 0);
 
         
         }

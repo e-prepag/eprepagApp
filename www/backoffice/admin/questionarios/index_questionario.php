@@ -28,7 +28,7 @@ if(isset($_SESSION['userlogin_bko']) && !is_null($_SESSION['userlogin_bko'])){
 
 if($acao == 'inserir')
 {
-	$ext	= explode('/',$_FILES['quest_banner']['type']);
+	$ext	= explode('/', isset($_FILES['quest_banner']['type']) ? $_FILES['quest_banner']['type'] : '');
 
 	if(isset($ext[1]) && in_array($ext[1],$formatos)) {
 		$pasta = "/www/arquivos_gerados/imagens/questionario/";
@@ -89,13 +89,13 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 		$sql .= "NULL,";
 	}
 	else {
-		$sql .= "'".trim($quest_ids_inclusao)."',";
+		$sql .= "'".trim((string)($quest_ids_inclusao ?? ''))."',";
 	}
 	if (empty($quest_ids_exclusao)) {
 		$sql .= "NULL,";
 	}
 	else {
-		$sql .= "'".trim($quest_ids_exclusao)."',";
+		$sql .= "'".trim((string)($quest_ids_exclusao ?? ''))."',";
 	}
 	if (empty($quest_ativo)) {
 		$sql .= "0);";
@@ -154,7 +154,7 @@ if($acao == 'atualizar')
 	}//end if(!empty($vetor_ordem))
 	
 	if(!empty($_FILES["quest_banner"]["name"])) {
-		$ext	= explode('/',$_FILES['quest_banner']['type']);
+		$ext	= explode('/', isset($_FILES['quest_banner']['type']) ? $_FILES['quest_banner']['type'] : '');
 		$pasta = "/www/arquivos_gerados/imagens/questionario/";
 		if(file_exists("$pasta".$_FILES["quest_banner"]["name"])){
 			$msg .= "Imagem de Banner j&aacute; existe com este mesmo nome.<br>Favor renomear antes.<br>";
@@ -164,7 +164,7 @@ if($acao == 'atualizar')
 			move_uploaded_file($_FILES["quest_banner"]["tmp_name"],"$pasta".$_FILES["quest_banner"]["name"]);
 			$quest_banner = $_FILES["quest_banner"]["name"];
 		}
-		if(!in_array($ext[1],$formatos)) {
+		if(!isset($ext[1]) || !in_array($ext[1],$formatos)) {
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
 		}
 	}
@@ -175,8 +175,8 @@ if($acao == 'atualizar')
 						ql_tipo						= $quest_tipo,
 						ql_tipo_usuario				= '$quest_tipo_usuario',
 						ql_usuario_bko_responsavel	= '$quest_usuario_bko',
-						ql_lista_ids_inclusao		= '".trim($quest_ids_inclusao)."',
-						ql_lista_ids_exclusao		= '".trim($quest_ids_exclusao)."',";
+						ql_lista_ids_inclusao		= '".trim((string)($quest_ids_inclusao ?? ''))."',
+						ql_lista_ids_exclusao		= '".trim((string)($quest_ids_exclusao ?? ''))."',";
 	if (!empty($quest_banner)) {
 		$sql .= "		ql_imagem_banner			= '".$quest_banner."',";
 	}
@@ -196,7 +196,7 @@ if($acao == 'atualizar')
 	}
 
 	//Atualizando as repostas ativas
-	if (isset($qlpr_ativo) && count($qlpr_ativo)>0) {
+	if (isset($qlpr_ativo) && (is_countable($qlpr_ativo) ? count($qlpr_ativo) : 0)>0) {
 		if ($qlpr_ativo['0']<>0) {
 			//removendo todos os ativos
 			$sql = "update tb_questionarios_perguntas_respostas qpr set qlpr_ativo=0 from tb_questionarios_perguntas qp where qpr.qlp_id=qp.qlp_id and qp.ql_id_questionario=".$quest_id_update;
@@ -223,7 +223,7 @@ if($acao == 'atualizar')
 				}
 			}//end else if(!$rs_questionario_perguntas) removendo os ativos
 		}//end if ($qlpr_ativo[0]<>0) 
-	}//end if (count($qlpr_ativo)>0)
+	}//end if ((is_countable($qlpr_ativo) ? count($qlpr_ativo) : 0)>0)
 	else {
 		//removendo todos os ativos
 		$sql = "select count(*) as total from tb_questionarios_perguntas_respostas qpr INNER JOIN tb_questionarios_perguntas qp ON (qpr.qlp_id=qp.qlp_id) where qp.ql_id_questionario=".$quest_id_update;
@@ -242,10 +242,10 @@ if($acao == 'atualizar')
 					}//end if(!$rs_questionario_perguntas)
 			}//end if ($rs_questionario_perguntas_row > 0)
 		}//end else if(!($rs_questionario_perguntas_row = pg_fetch_array($rs_questionario_perguntas)))
-	}//end else if (count($qlpr_ativo)>0)
+	}//end else if ((is_countable($qlpr_ativo) ? count($qlpr_ativo) : 0)>0)
 
 	//Atualizando as perguntas ativas
-	if (isset($qlpr_ativo) && count($qlp_ativo)>0) {
+	if (isset($qlp_ativo) && (is_countable($qlp_ativo) ? count($qlp_ativo) : 0)>0) {
 		//removendo todos os ativos
 		$sql = "update tb_questionarios_perguntas set qlp_ativo=0 where ql_id_questionario=".$quest_id_update;
 		$rs_questionario_perguntas = SQLexecuteQuery($sql);
@@ -270,7 +270,7 @@ if($acao == 'atualizar')
 				$msg .= "Erro ao ativar informa&ccedil;&otilde;es de ativo. ($sql)<br>";
 			}
 		}//end else if(!$rs_questionario_perguntas) removendo os ativos
-	}//end if (count($qlp_ativo)>0)
+	}//end if ((is_countable($qlp_ativo) ? count($qlp_ativo) : 0)>0)
 	else {
 		//removendo todos os ativos
 		$sql = "select count(*) as total from tb_questionarios_perguntas where ql_id_questionario=".$quest_id_update;
@@ -289,7 +289,7 @@ if($acao == 'atualizar')
 					}//end if(!$rs_questionario_perguntas)
 			}//end if ($rs_questionario_perguntas_row > 0)
 		}//end else if(!($rs_questionario_perguntas_row = pg_fetch_array($rs_questionario_perguntas)))
-	}//end else if (count($qlpr_ativo)>0)
+	}//end else if ((is_countable($qlpr_ativo) ? count($qlpr_ativo) : 0)>0)
 
 	
 	//isset($_REQUEST['quest_id']);
@@ -329,7 +329,7 @@ if($acao == 'editar')
 		$quest_usuario_bko		= $rs_questionario_row['ql_usuario_bko_responsavel'];
 		$quest_banner			= $rs_questionario_row['ql_imagem_banner'];
 		$quest_tipo_usuario		= $rs_questionario_row['ql_tipo_usuario'];
-		if (pg_num_rows($rs_questionario) > 0)
+		if ((($rs_questionario) ? pg_num_rows($rs_questionario) : 0) > 0)
 			include 'questionario_edt.php';
 		else
 			$acao = 'listar';

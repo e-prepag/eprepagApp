@@ -12,9 +12,9 @@ $pagina_titulo = "E-prepag - Créditos para Games";
 header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 $url = "https://";
-$url .= $_SERVER['SERVER_NAME'];
+$url .= ($_SERVER['SERVER_NAME'] ?? "");
 
-$webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "https://".($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "");
 require_once $raiz_do_projeto."includes/access_functions.php";
 require_once $raiz_do_projeto.'includes/configIP.php';
 require_once $raiz_do_projeto.'includes/configuracaoBO.php';
@@ -33,7 +33,8 @@ $abaAtual = (isset($_POST['navAba'])) ? $_POST['navAba'] : "0";
 $paginaInicial = "/index.php";
 
 $sistema = new SistemaBO(SISTEMA,$abaAtual, $paginaInicial);
-$sistema->setIdUsuario($_SESSION['iduser_bko']);
+$iduser_bko = $_SESSION['iduser_bko'] ?? null;
+	$sistema->setIdUsuario($iduser_bko);
 $sistema->setArrIdsGruposUsuario();
 
 //if(!$sistema->validaAcessoItem()){
@@ -48,14 +49,14 @@ if($sistema->menu){
 
 $allAbas = $sistema->getAllAbas();
 
-$resusr = pg_exec($connid, "select shn_nome, tipo_acesso, bko_datalogin, bko_horalogin from usuarios where id='".$_SESSION["iduser_bko"]."'");
-$pgusr = pg_fetch_array($resusr);
+$resusr = pg_exec($connid, "select shn_nome, tipo_acesso, bko_datalogin, bko_horalogin from usuarios where id='".$iduser_bko."'");
+$pgusr = $resusr ? pg_fetch_array($resusr) : array();
 
-$data_login = formata_data($pgusr['bko_datalogin'], 0);
-$hora_login = $pgusr['bko_horalogin'];
+$data_login = formata_data(($pgusr['bko_datalogin'] ?? null), 0);
+$hora_login = ($pgusr['bko_horalogin'] ?? "");
 
-$data_ultimo_acesso = formata_data($_SESSION['datalog_bko'], 0);
-$hora_ultimo_acesso = $_SESSION['horalog_bko'];
+$data_ultimo_acesso = formata_data(($_SESSION['datalog_bko'] ?? null), 0);
+$hora_ultimo_acesso = ($_SESSION['horalog_bko'] ?? "");
 
 $dia_ingles = date("l");
 
@@ -80,7 +81,7 @@ switch($dia_ingles) {
                 $dia_semana = "Domingo"; break;
 }
 
-$tipo_acesso = getUsuarioTipoNome($pgusr['tipo_acesso']);
+$tipo_acesso = getUsuarioTipoNome(($pgusr['tipo_acesso'] ?? null));
 
 ?>
 <!DOCTYPE html>
@@ -122,7 +123,7 @@ $tipo_acesso = getUsuarioTipoNome($pgusr['tipo_acesso']);
 ?>
 
                     <?php
-$urlVerifica = $_SERVER['REQUEST_URI'];
+$urlVerifica = ($_SERVER['REQUEST_URI'] ?? "");
 
 if ((strpos($urlVerifica, '/dashboard/pdv/index.php') !== false || strpos($urlVerifica, '/dashboard/pdv/index2.php') !== false) || strpos($urlVerifica, '/dashboard/usuario/index.php') !== false) {
     echo ' <div class="container-fluid2 bg-cinza-claro topo-h">
@@ -173,7 +174,7 @@ if ((strpos($urlVerifica, '/dashboard/pdv/index.php') !== false || strpos($urlVe
                 $active = "active";
                 $currentAba = $aba;
             }
-            else if($abaAtual == $aba->getOrdem() && $paginaInicial == $_SERVER['SCRIPT_NAME']){
+            else if($abaAtual == $aba->getOrdem() && $paginaInicial == ($_SERVER['SCRIPT_NAME'] ?? "")){
                 $active = "active";
             }
 
@@ -238,7 +239,7 @@ if ((strpos($urlVerifica, '/dashboard/pdv/index.php') !== false || strpos($urlVe
                 $active = "active";
                 $currentAba = $aba;
             }
-            else if($abaAtual == $aba->getOrdem() && $paginaInicial == $_SERVER['SCRIPT_NAME']){
+            else if($abaAtual == $aba->getOrdem() && $paginaInicial == ($_SERVER['SCRIPT_NAME'] ?? "")){
                 $active = "active";
             }
 
@@ -270,7 +271,7 @@ $(function(){
             }
 ?>        
                 <?php
-$urlVerificaContainer = $_SERVER['REQUEST_URI'];
+$urlVerificaContainer = ($_SERVER['REQUEST_URI'] ?? "");
 
 if (strpos($urlVerificaContainer, '/dashboard/pdv/index.php') !== false || strpos($urlVerificaContainer, '/dashboard/usuario/index.php') !== false) {
   echo '<div class="txt-azul-claro col-md-12 p-bottom40 teste">';

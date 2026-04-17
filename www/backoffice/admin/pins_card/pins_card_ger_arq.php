@@ -20,17 +20,17 @@ $msg = "";
 if($msg == ""){
 
 	$sql  = "SELECT *,to_char(pcra_dataentrada,'DD/MM/YYYY HH24:MI:SS') as pcra_data_aux from pins_card_rel_arquivos WHERE 1=1 "; 
-	if(strlen($tf_v_data_inclusao_ini))
+	if(strlen((string)($tf_v_data_inclusao_ini ?? "")))
 				$sql .= " and pcra_dataentrada >= to_timestamp('".addslashes($tf_v_data_inclusao_ini)." 00:00:00', 'DD/MM/YYYY HH24:MI:SS')";
-	if(strlen($tf_v_data_inclusao_fim))
+	if(strlen((string)($tf_v_data_inclusao_fim ?? "")))
 				$sql .= " and pcra_dataentrada <= to_timestamp('".addslashes($tf_v_data_inclusao_fim)." 23:59:59', 'DD/MM/YYYY HH24:MI:SS')";
 	$rs_total = SQLexecuteQuery($sql);
-	if($rs_total) $registros_total = pg_num_rows($rs_total);
+	if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 	$sql .= " ORDER BY pcra_dataentrada DESC";	
 	$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
 //echo $sql ."<br>\n";
 	$rs_pins = SQLexecuteQuery($sql);
-	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
+	if(!$rs_pins || (($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) $msg = "Nenhum pin encontrado.\n";
 }
 ?>
 <link href="/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">

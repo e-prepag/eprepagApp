@@ -10,7 +10,7 @@ $ps_query = "SELECT distinct ug_cidade FROM dist_usuarios_games group by ug_cida
 //$res0 = pg_get_result($conex);
 $res0 = SQLexecuteQuery($ps_query);
 
-$total = pg_num_rows($res0);
+$total = (($res0) ? pg_num_rows($res0) : 0);
 
 $ps_query = "SELECT distinct count(*) as total, ug_cidade, ug_estado 
 				FROM dist_usuarios_games 
@@ -23,7 +23,7 @@ $ps_query = "SELECT distinct count(*) as total, ug_cidade, ug_estado
 //$res0a = pg_get_result($conex);
 $res0a = SQLexecuteQuery($ps_query);
 
-$bad = pg_num_rows($res0a);
+$bad = (($res0a) ? pg_num_rows($res0a) : 0);
 
 
 $ps_query = "SELECT distinct count(*) as total, ug_cidade, ug_estado 

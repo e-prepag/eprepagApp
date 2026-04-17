@@ -1,13 +1,19 @@
 <?php
-$_GET['endereco'] = utf8_decode($_GET['endereco']);
+require_once __DIR__ . "/../../../includes/pdv_encoding.php";
+$_GET['endereco'] = isset($_GET['endereco']) ? pdv_utf8_to_iso($_GET['endereco']) : '';
+$_GET['us_id'] = isset($_GET['us_id']) ? $_GET['us_id'] : '';
+$_GET['us_endereco'] = isset($_GET['us_endereco']) ? $_GET['us_endereco'] : '';
+$_GET['us_cep'] = isset($_GET['us_cep']) ? $_GET['us_cep'] : '';
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/main.php";
 require_once $raiz_do_projeto."includes/pdv/main.php";
 
-$us_id = $_GET['us_id']; 
-$us_endereco = $_GET['endereco']; 
-$us_cep = $_GET['us_cep'];
+$us_id = $_GET['us_id'] ?? ''; 
+$us_endereco = $_GET['endereco'] ?? ''; 
+$us_cep = $_GET['us_cep'] ?? '';
+$us_coord_lat = '';
+$us_coord_lng = '';
 
 if(!empty($us_endereco)) {
 	
@@ -38,8 +44,8 @@ $need_key_maps = (checkIP()?"sensor=false":"key=AIzaSyA25PAcZMc6toew3UDW1HwG8wve
 <!--ABQIAAAAeJzMJ3dLhaZ7pRKXsvNdaBT_nVl5JcFRxrUznZXV_B8X28sPKBRglwnxLGOgu8HLthjGDWHgvNS4sw   chave mdxnoip-->
 <script type="text/javascript">
 // variaveis vindas do backoffice
-	var endereco = '<?php echo $_GET[endereco]; ?>';
-	var us_id	 = eval(<?php echo $_GET[us_id]; ?>);
+	var endereco = '<?php echo $_GET['endereco']; ?>';
+	var us_id	 = eval(<?php echo $_GET['us_id']; ?>);
 	
 // Variável irá referenciar o objeto que representa o mapa
 	var meuPrimeiroMapa = "";

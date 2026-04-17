@@ -1,11 +1,12 @@
 <?php
-    if($_GET["acao"] == "novo")
+    $acaoMapa = isset($_GET["acao"]) ? $_GET["acao"] : "";
+    if($acaoMapa == "novo")
         $method = "novaPosicao";
-    elseif($_GET["acao"] == "edita") {
+    elseif($acaoMapa == "edita") {
         if(isset($_GET["id"]) && $_GET["id"] != ""){
             $select = "select * from classificacao_mapas where cm_id = '".$_GET["id"]."'";
             if($rsPublishers = SQLexecuteQuery($select)){
-                if(pg_num_rows($rsPublishers) > 0){
+                if((($rsPublishers) ? pg_num_rows($rsPublishers) : 0) > 0){
                     while($publishers = pg_fetch_array($rsPublishers)) 
                     {
                         $publisher = new stdClass;
@@ -35,7 +36,7 @@
     <ol class="breadcrumb top10">
         <li><a href="#" class="muda-aba" ordem="0">BackOffice - <?php echo $currentAba->getDescricao();?></a></li>
         <li><a href="classificacao_mapas.php">Classificações de Mapa</a></li>
-        <li class="active"><?php echo $_GET["acao"] == "novo" ? "Nova" : "Edição de"?> classificação de Mapa</li>
+        <li class="active"><?php echo $acaoMapa == "novo" ? "Nova" : "Edição de"?> classificação de Mapa</li>
     </ol>
 </div>
 <div class="col-md-12 txt-preto">

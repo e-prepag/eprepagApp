@@ -62,7 +62,7 @@ if(isset($_POST["busca"])){
     }
     
     //Removendo espaço em branco e formatação
-    $cpf = trim($cpf);
+    $cpf = trim((string)($cpf ?? ""));
 	$cpfComFormatacao = $cpf;
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
 //    $cpf = "";
@@ -219,7 +219,7 @@ if(isset($_POST["busca"])){
             <div class="form-group col-md-6">
                 <label for="dataClickFim">Publishers que Exigem CPF como Obrigatório:</label>
                 <select style="width: 320px;" class="form-control" multiple size="5" name="publishers[]" id="publishers[]">
-                    <option value="ALL"<?php if(in_array("ALL", $publishers) || count($publishers) == 0) echo " selected"; ?>>TODOS</option>
+                    <option value="ALL"<?php if(in_array("ALL", $publishers) || (is_countable($publishers) ? count($publishers) : 0) == 0) echo " selected"; ?>>TODOS</option>
                     <?php
                     foreach ($vetorPublisherLegenda as $key => $value) {
                     ?>
@@ -248,7 +248,7 @@ if(isset($_POST["busca"])){
     <table class="table table-bordered top20" id="table_dados">
 <?php 
             if(isset($rs) && $rs) {
-                $total_de_registros = pg_num_rows($rs);
+                $total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
                 if($total_de_registros > 0) {
 ?>
         <thead class="">
@@ -281,7 +281,7 @@ if(isset($_POST["busca"])){
                     while ($rsRow = pg_fetch_array($rs)) {
                         
                        // Eliminando espaços em branco inicio e fim da String
-                       $rsRow['ug_nome'] = trim($rsRow['ug_nome']);
+                       $rsRow['ug_nome'] = trim((string)($rsRow['ug_nome'] ?? ""));
 
 ?>
         <tbody title="Pedido">
@@ -317,14 +317,14 @@ if(isset($_POST["busca"])){
             </tr>
 <?php          
                     } //end if(isset($media) && $media)
-                }//end if(pg_num_rows($rs) > 0)
+                }//end if((($rs) ? pg_num_rows($rs) : 0) > 0)
                 else {
 ?>
             <tr>
                 <td colspan="7" class="no-table">Nenhum registro encontrado.</td>
             </tr>
 <?php
-                }//end else do if(pg_num_rows($rs) > 0) 
+                }//end else do if((($rs) ? pg_num_rows($rs) : 0) > 0) 
             }elseif(isset($rs)){
 ?>
             <tr>

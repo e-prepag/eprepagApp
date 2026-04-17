@@ -13,11 +13,16 @@ require_once $raiz_do_projeto . "class/util/Imagem.class.php";
 // [SFTP DESATIVADO] require_once $raiz_do_projeto . 'sftp/classSFTPconnection.php';
 $msg = "";
 
+$produto_id = isset($produto_id) ? $produto_id : (isset($_REQUEST['produto_id']) ? $_REQUEST['produto_id'] : null);
+$modelo_id = isset($modelo_id) ? $modelo_id : (isset($_REQUEST['modelo_id']) ? $_REQUEST['modelo_id'] : null);
+$BtnConcluir = isset($BtnConcluir) ? $BtnConcluir : (isset($_POST['BtnConcluir']) ? $_POST['BtnConcluir'] : null);
+
 if ($produto_id) {
-        if (!is_numeric($produto_id)) $msg = "Código do produto inválido.\n";
+        if (!is_numeric($produto_id)) $msg = "Cdigo do produto invlido.\n";
 } else if ($modelo_id) {
-        if (!is_numeric($modelo_id)) $msg = "Código do modelo inválido.\n";
-} else $msg = "Código do produto ou modelo não fornecido.\n";
+        if (!is_numeric($modelo_id)) $msg = "Cdigo do modelo invlido.\n";
+} else $msg = "Cdigo do produto ou modelo no fornecido.\n";
+
 
 
 //Processa acoes
@@ -28,12 +33,12 @@ if ($msg == "") {
 
                 $UPLOAD_DIR = realpath($GLOBALS['FIS_DIR_IMAGES_PRODUTO']);
 
-                // Validar que o diretório existe e é gravável
+                // Validar que o diretï¿½rio existe e ï¿½ gravï¿½vel
                 if (!$UPLOAD_DIR || !is_dir($UPLOAD_DIR) || !is_writable($UPLOAD_DIR)) {
-                        die("Erro: Diretório de upload inválido ou sem permissão de escrita");
+                        die("Erro: Diretï¿½rio de upload invï¿½lido ou sem permissï¿½o de escrita");
                 }
 
-                // Extensões permitidas (whitelist)
+                // Extensï¿½es permitidas (whitelist)
                 $ALLOWED_EXTENSIONS = array('jpg', 'jpeg', 'png', 'gif', 'webp');
                 $ALLOWED_MIMES = array(
                         'image/jpeg',
@@ -43,7 +48,7 @@ if ($msg == "") {
                         'image/webp'
                 );
 
-                // Tamanho máximo (1MB)
+                // Tamanho mï¿½ximo (1MB)
                 $MAX_FILE_SIZE = 1 * 1024 * 1024;
 
                 $msg = "";
@@ -64,11 +69,11 @@ if ($msg == "") {
                         }
                 }
                 if ($msg == "" && $_FILES['arquivo']['size'] > $MAX_FILE_SIZE) {
-                        $msg = "Arquivo excede o tamanho máximo permitido (1MB).";
+                        $msg = "Arquivo excede o tamanho mï¿½ximo permitido (1MB).";
                 }
 
                 if ($msg == "" && $_FILES['arquivo']['size'] == 0) {
-                        $msg = "Arquivo está vazio.";
+                        $msg = "Arquivo estï¿½ vazio.";
                 }
                 if ($msg == "") {
                         $original_name = $_FILES['arquivo']['name'];
@@ -80,26 +85,26 @@ if ($msg == "") {
                         // Remove path traversal
                         $original_name = basename($original_name);
 
-                        // Valida que não contém caracteres perigosos
+                        // Valida que nï¿½o contï¿½m caracteres perigosos
                         if (preg_match('/[^a-zA-Z0-9._-]/', $original_name)) {
-                                // Remove caracteres não seguros
+                                // Remove caracteres nï¿½o seguros
                                 $original_name = preg_replace('/[^a-zA-Z0-9._-]/', '', $original_name);
                         }
 
-                        // Obtém extensão de forma segura
+                        // Obtï¿½m extensï¿½o de forma segura
                         $file_extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
 
-                        // Valida extensão contra whitelist
+                        // Valida extensï¿½o contra whitelist
                         if (!in_array($file_extension, $ALLOWED_EXTENSIONS, true)) {
-                                $msg = "Extensão de arquivo inválida. Permitidas: " . implode(', ', $ALLOWED_EXTENSIONS);
+                                $msg = "Extensï¿½o de arquivo invï¿½lida. Permitidas: " . implode(', ', $ALLOWED_EXTENSIONS);
                         }
                 }
                 if ($msg == "") {
                         $file_source = $_FILES['arquivo']['tmp_name'];
 
-                        // Verifica se o arquivo temporário existe
+                        // Verifica se o arquivo temporï¿½rio existe
                         if (!file_exists($file_source) || !is_uploaded_file($file_source)) {
-                                $msg = "Arquivo temporário inválido.";
+                                $msg = "Arquivo temporï¿½rio invï¿½lido.";
                         }
 
                         // Valida MIME type real do arquivo
@@ -109,7 +114,7 @@ if ($msg == "") {
                                 finfo_close($finfo);
 
                                 if (!in_array($detected_mime, $ALLOWED_MIMES, true)) {
-                                        $msg = "Tipo de arquivo não permitido. Detectado: " . htmlspecialchars($detected_mime);
+                                        $msg = "Tipo de arquivo nï¿½o permitido. Detectado: " . htmlspecialchars($detected_mime);
                                 }
                         }
 
@@ -117,7 +122,7 @@ if ($msg == "") {
                         if ($msg == "") {
                                 $image_info = @getimagesize($file_source);
                                 if ($image_info === false) {
-                                        $msg = "Arquivo não é uma imagem válida.";
+                                        $msg = "Arquivo nï¿½o ï¿½ uma imagem vï¿½lida.";
                                 }
                         }
                 }
@@ -130,25 +135,25 @@ if ($msg == "") {
                                 $safe_id = intval($modelo_id);
                                 $prefix = "m";
                         } else {
-                                $msg = "ID de produto ou modelo inválido.";
+                                $msg = "ID de produto ou modelo invï¿½lido.";
                         }
                 }
                 if ($msg == "") {
                         $file_dest_name = $prefix . "_" . $safe_id . "." . $file_extension;
 
                         if (!preg_match('/^[a-z0-9_.-]+$/i', $file_dest_name)) {
-                                $msg = "Nome de arquivo gerado é inválido.";
+                                $msg = "Nome de arquivo gerado ï¿½ invï¿½lido.";
                         }
                 }
                 if ($msg == "") {
-                        // Constrói caminho absoluto
+                        // Constrï¿½i caminho absoluto
                         $file_dest_path = $UPLOAD_DIR . DIRECTORY_SEPARATOR . $file_dest_name;
 
-                        // Valida que o caminho final está dentro do diretório permitido
+                        // Valida que o caminho final estï¿½ dentro do diretï¿½rio permitido
                         $real_dest_path = realpath(dirname($file_dest_path));
 
                         if ($real_dest_path === false || strpos($real_dest_path, $UPLOAD_DIR) !== 0) {
-                                $msg = "Caminho de destino inválido (tentativa de path traversal detectada).";
+                                $msg = "Caminho de destino invï¿½lido (tentativa de path traversal detectada).";
 
                                 error_log("SECURITY: Path traversal attempt detected - Dest: $file_dest_path");
                         }
@@ -162,17 +167,17 @@ if ($msg == "") {
 
                         // Move arquivo
                         if (!move_uploaded_file($file_source, $file_dest_path)) {
-                                $msg = "Não foi possível mover o arquivo para o diretório destino.";
+                                $msg = "Nï¿½o foi possï¿½vel mover o arquivo para o diretï¿½rio destino.";
                                 error_log("Upload failed: Could not move file to $file_dest_path");
                         } else {
                                 // Valida que o arquivo foi copiado corretamente
                                 if (!file_exists($file_dest_path)) {
-                                        $msg = "Arquivo não foi salvo no destino.";
+                                        $msg = "Arquivo nï¿½o foi salvo no destino.";
                                 } elseif (filesize($file_dest_path) == 0) {
-                                        $msg = "Arquivo salvo está vazio.";
-                                        @unlink($file_dest_path); // Remove arquivo inválido
+                                        $msg = "Arquivo salvo estï¿½ vazio.";
+                                        @unlink($file_dest_path); // Remove arquivo invï¿½lido
                                 } else {
-                                        // Define permissões seguras
+                                        // Define permissï¿½es seguras
                                         chmod($file_dest_path, 0644);
 
                                         // Sucesso
@@ -182,7 +187,7 @@ if ($msg == "") {
                         }
                 }
                 if ($msg != "") {
-                        // Limpa arquivo temporário se ainda existir
+                        // Limpa arquivo temporï¿½rio se ainda existir
                         if (isset($file_source) && file_exists($file_source)) {
                                 @unlink($file_source);
                         }
@@ -250,7 +255,7 @@ if ($msg == "") {
                 function fcnOnSubmit() {
 
                         if (form1.arquivo.value == '') {
-                                alert('Arquivo não especificado');
+                                alert('Arquivo nï¿½o especificado');
                                 return false;
                         }
 

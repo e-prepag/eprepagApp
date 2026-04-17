@@ -40,7 +40,7 @@ $idsEprepag = array_filter(array_column($resultadoSelecao, 'id_eprepag'));
 $vendasPorId = [];
 
 if (!empty($idsEprepag)) {
-	$inQuery = implode(',', array_fill(0, count($idsEprepag), '?'));
+	$inQuery = implode(',', array_fill(0, (is_countable($idsEprepag) ? count($idsEprepag) : 0), '?'));
 	$sqlVendas = "SELECT vg.vg_ug_id, COUNT(vg.vg_id) as qtd
 				  FROM tb_dist_venda_games vg
 				  INNER JOIN pedidos_api_pdv p ON p.id_pedido_eprepag = vg.vg_id
@@ -131,7 +131,7 @@ unset($row);
 		</thead>
 		<tbody>
 			<?php
-			if (count($resultadoSelecao) > 0) {
+			if ((is_countable($resultadoSelecao) ? count($resultadoSelecao) : 0) > 0) {
 				foreach ($resultadoSelecao as $key => $value) {
 			?>
 					<tr>

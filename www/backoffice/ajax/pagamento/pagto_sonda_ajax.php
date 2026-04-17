@@ -52,7 +52,7 @@ echo "<span style='font-size:10px; font-family: tahoma,arial,sans serif'>" . $da
 		$pag_status = getSondaItau($pedido, $a_retorno_itau, $sitPag, $dtPag);
 		$sonda = (($pag_status == "00") ? true : false);
 		if ($sonda) {
-			$sonda = (($sonda) ? "OK" : "none");
+			$sonda = "OK";
 			$dataconfirma = "'" . substr($dtPag, 4, 4) . "-" . substr($dtPag, 2, 2) . "-" . substr($dtPag, 0, 2) . "'";
 		} else
 			$dataconfirma = null;

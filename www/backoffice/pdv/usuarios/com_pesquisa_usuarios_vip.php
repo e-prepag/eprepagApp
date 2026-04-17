@@ -13,7 +13,7 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 	$usuarioGames = new UsuarioGames(468);
 	$bret = $usuarioGames->b_IsLogin_pagamento_vip(1, $usuarios_pagamento_online_vip_id);
 //echo "<pre>".print_r($usuarios_pagamento_online_vip_id, true)."</pre>";
-	$total_table = count($usuarios_pagamento_online_vip_id);
+	$total_table = (is_countable($usuarios_pagamento_online_vip_id) ? count($usuarios_pagamento_online_vip_id) : 0);
 	$reg_ate = $total_table;
 
 	$s_ug_id_list = "";
@@ -153,7 +153,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 					<?php 	
 						}
 */
-						if((pg_num_rows($rs) != 0) && ($rs)) {
+						if(((($rs) ? pg_num_rows($rs) : 0) != 0) && ($rs)) {
 							while ($pgrs = pg_fetch_array ($rs)) {
 								//if(b_IsUsuarioReinaldo()) 
 								{

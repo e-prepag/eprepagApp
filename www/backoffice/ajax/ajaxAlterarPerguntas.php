@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
@@ -29,9 +30,9 @@ $pagina_titulo = "E-prepag - Créditos para Games";
 require_once '../../includes/constantes.php';
 
 $url = "https://";
-$url .= $_SERVER['SERVER_NAME'];
+$url .= ($_SERVER['SERVER_NAME'] ?? "");
 
-$webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "https://".($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "");
 require_once $raiz_do_projeto."includes/access_functions.php";
 require_once $raiz_do_projeto.'includes/configIP.php';
 require_once $raiz_do_projeto.'includes/configuracaoBO.php';
@@ -103,7 +104,7 @@ function MM_reload_alterar(){
 	//Adicionado a nova Pergunta
 	if($atualizar=="OK") {
 		//fazer Update
-		$sql = "update tb_questionarios_perguntas set qlp_texto='".utf8_decode($qlp_texto_alterar)."',qlp_ativo=".intval($qlp_ativo_alterar*1).",qlp_tipo='$qlp_tipo_alterar',qlp_outros=".intval($qlp_outros_alterar*1)." where qlp_id=".$qlp_id;
+		$sql = "update tb_questionarios_perguntas set qlp_texto='".backoffice_utf8_to_iso($qlp_texto_alterar)."',qlp_ativo=".intval($qlp_ativo_alterar*1).",qlp_tipo='$qlp_tipo_alterar',qlp_outros=".intval($qlp_outros_alterar*1)." where qlp_id=".$qlp_id;
 		//echo "<tr><td>".$sql.":</td></tr>";
 		$rs_questionario_perguntas = SQLexecuteQuery($sql);
 		if(!$rs_questionario_perguntas) {
