@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 header("Content-Type: text/html; charset=UTF-8",true);
@@ -43,7 +44,7 @@ foreach($lista_resposta->results as $key => $value) {
         echo $lista_resposta_produtos_detalhes->summary->productName. "<br>";
         //echo "<pre>".print_r($lista_resposta_produtos_detalhes, true)."</pre>";
         $teste_decode = json_encode($lista_resposta_produtos_detalhes,JSON_UNESCAPED_UNICODE);
-        $teste_decode = utf8_decode($teste_decode);
+        $teste_decode = backoffice_utf8_to_iso($teste_decode);
         echo "<pre>".prettyPrint($teste_decode)."</pre>";
         $contador++;
         

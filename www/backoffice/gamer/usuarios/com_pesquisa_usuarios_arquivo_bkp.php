@@ -1,10 +1,11 @@
-<?php 
+<?php
+require_once "/www/backoffice/includes/encoding.php";
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 
 include $raiz_do_projeto."includes/main.php";
 
-if(isset($tf_u_cidade)) $tf_u_cidade = utf8_decode($tf_u_cidade);
+if(isset($tf_u_cidade)) $tf_u_cidade = backoffice_utf8_to_iso($tf_u_cidade);
 
 include $raiz_do_projeto."includes/gamer/inc_pesquisa_usuarios_sql.php";
 

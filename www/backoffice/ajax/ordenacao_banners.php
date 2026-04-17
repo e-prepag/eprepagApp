@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 date_default_timezone_set('America/Fortaleza');
 $raiz_do_projeto = "/www/";
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
@@ -9,11 +10,11 @@ if(Util::isAjaxRequest())
 {
     $objBanner = new BannerBO;
     
-    if(isset($_POST['idc'])  && ($_POST['idc']!="") && isset($_POST['metodo']) && $_POST['metodo'] == "posicoes"){
+    if(($_POST['idc'] ?? "") != "" && isset($_POST['metodo']) && $_POST['metodo'] == "posicoes"){
         $filtro[] = "bs_data_inicio <= '". date('Y-m-d 00:00:00') ."'";
         $filtro[] = "bs_data_fim >= '". date('Y-m-d 00:00:00') ."'";
         $filtro[] = "bs_status = 1";
-        $filtro[] = "bsc_id = ".$_POST['idc'];
+        $filtro[] = "bsc_id = ".($_POST['idc'] ?? "");
         $posicoes = array();
         $html = "";
         $banners = $objBanner->pegaBanner($filtro);
@@ -37,17 +38,17 @@ if(Util::isAjaxRequest())
             }
         }
         
-        print ($html != "") ? $html : utf8_encode("<span class='txt-vermelho'>Não foram encontradas posições para essa categoria.</span>");
+        print ($html != "") ? $html : backoffice_iso_to_utf8("<span class='txt-vermelho'>Não foram encontradas posições para essa categoria.</span>");
         
     }
     
-    if(isset($_POST['idc']) && ($_POST['idc']!="") && isset($_POST['idp']) && ($_POST['idp']!="") && isset($_POST['metodo']) && $_POST['metodo'] == "banners"){
+    if(($_POST['idc'] ?? "") != "" && ($_POST['idp'] ?? "") != "" && isset($_POST['metodo']) && $_POST['metodo'] == "banners"){
         
         $filtro[] = "bs_status = 1";
         $filtro[] = "bs_data_inicio <= '". date('Y-m-d 00:00:00') ."'";
         $filtro[] = "bs_data_fim >= '". date('Y-m-d 00:00:00') ."'";
-        $filtro[] = "bsp_id = ".$_POST['idp'];
-        $filtro[] = "bsc_id = ".$_POST['idc'];
+        $filtro[] = "bsp_id = ".($_POST['idp'] ?? "");
+        $filtro[] = "bsc_id = ".($_POST['idc'] ?? "");
 
         $banners = $objBanner->pegaBanner($filtro);
         
@@ -87,7 +88,7 @@ if(Util::isAjaxRequest())
                 </div>';
         }
         
-        print utf8_encode($html);
+        print backoffice_iso_to_utf8($html);
     }
 }else
 {

@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 
@@ -116,7 +117,7 @@ if (preg_match('/Lat:\s*(-?\d+\.\d+),\s*Lon:\s*(-?\d+\.\d+)/', $usuario["localiz
 		<li class="active"><?php echo $sistema->menu[0]->getDescricao(); ?></li>
 		<li class="active"><a
 				href="<?php echo $sistema->item->getLink(); ?>"><?php echo $sistema->item->getDescricao(); ?> -
-				<?= utf8_decode(htmlspecialchars(utf8_encode($usuario['opr_nome']))) ?></a>
+				<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8($usuario['opr_nome']))) ?></a>
 		</li>
 	</ol>
 </div>
@@ -135,28 +136,28 @@ if (preg_match('/Lat:\s*(-?\d+\.\d+),\s*Lon:\s*(-?\d+\.\d+)/', $usuario["localiz
 				<tr>
 					<td>Nome:</td>
 					<td>
-						<?= utf8_decode(htmlspecialchars(utf8_encode(($usuario["ug_nome_cpf"] ? $usuario["ug_nome_cpf"] : "Não encontrado")))) ?>
+						<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8(($usuario["ug_nome_cpf"] ? $usuario["ug_nome_cpf"] : "Não encontrado")))) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>
 				<tr>
 					<td>CNPJ:</td>
 					<td>
-						<?= utf8_decode(htmlspecialchars(utf8_encode(($usuario["ug_cpf"] ? $usuario["ug_cpf"] : "Não encontrado")))) ?>
+						<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8(($usuario["ug_cpf"] ? $usuario["ug_cpf"] : "Não encontrado")))) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>
 				<tr>
 					<td>Email:</td>
 					<td>
-						<?= utf8_decode(htmlspecialchars(utf8_encode(($usuario["ug_email"] ? $usuario["ug_email"] : "Não encontrado")))) ?>
+						<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8(($usuario["ug_email"] ? $usuario["ug_email"] : "Não encontrado")))) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>
 				<tr>
 					<td>Endereço Cadastro:</td>
 					<td>
-						<?= utf8_decode(htmlspecialchars(utf8_encode("{$usuario['ug_bairro']}, {$usuario['ug_cidade']}-{$usuario['ug_estado']}"))) ?>
+						<?= backoffice_utf8_to_iso(htmlspecialchars(backoffice_iso_to_utf8("{$usuario['ug_bairro']}, {$usuario['ug_cidade']}-{$usuario['ug_estado']}"))) ?>
 					</td>
 					<td>&nbsp;</td>
 				</tr>

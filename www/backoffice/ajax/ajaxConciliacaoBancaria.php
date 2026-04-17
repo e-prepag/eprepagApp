@@ -1,7 +1,7 @@
 <?php
-
+require_once "/www/backoffice/includes/encoding.php";
 date_default_timezone_set ( 'America/Fortaleza' ); 
-(strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') or die('Chamada não permitida<br>Stop');
+(strtolower((string)($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) == 'xmlhttprequest') or die('Chamada não permitida<br>Stop');
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto . "includes/gamer/constantes.php";
@@ -25,8 +25,8 @@ function verifyHttpVar($var_name){
 if ( filter_has_var(INPUT_GET, 'ids') ) {
     if ( !empty($_GET['ids']) ) {
         try {
-            $tipo_pagamento = (verifyHttpVar('tipo_pagamento') ? $_GET['tipo_pagamento'] : null);
-            $id = $_GET['ids'];
+            $tipo_pagamento = (verifyHttpVar('tipo_pagamento') ? ($_GET['tipo_pagamento'] ?? null) : null);
+            $id = $_GET['ids'] ?? "";
 
             require_once $raiz_do_projeto . "class/classConciliacaoBancaria.php";
             $cb = new ConciliacaoBancaria();
@@ -36,22 +36,22 @@ if ( filter_has_var(INPUT_GET, 'ids') ) {
                 echo json_encode($return);
             } else {
                 $return['status'] = 'error';
-                $return['message'] = utf8_encode('Não foi possível agrupar as datas. Extrato não importado.');
+                $return['message'] = backoffice_iso_to_utf8('Não foi possível agrupar as datas. Extrato não importado.');
                 echo json_encode($return);
             }
         } catch (Exception $e) {
             $return['status'] = 'error';
-            $return['message'] = utf8_encode($e->getMessage());
+            $return['message'] = backoffice_iso_to_utf8($e->getMessage());
             echo json_encode($return);
         }
 
     } else {
         $return['status'] = 'error';
-        $return['message'] = utf8_encode('Valor dos Ids não informado.');
+        $return['message'] = backoffice_iso_to_utf8('Valor dos Ids não informado.');
         echo json_encode($return);
     }
 } else {
     $return['status'] = 'error';
-    $return['message'] = utf8_encode('Campo ids não informado.');
+    $return['message'] = backoffice_iso_to_utf8('Campo ids não informado.');
     echo json_encode($return);
 }

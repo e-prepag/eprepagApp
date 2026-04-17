@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
@@ -26,8 +27,8 @@ function validarData($data)
 if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 	// 1) Recebe valores do POST / valida
-	$dataInicio = validarData($_POST['dt_inicial']) ? $_POST['dt_inicial'] : null;
-	$dataFim = validarData($_POST['dt_final']) ? $_POST['dt_final'] . " 23:59:59" : null;
+	$dataInicio = validarData($_POST['dt_inicial'] ?? '') ? ($_POST['dt_inicial'] ?? '') : null;
+	$dataFim = validarData($_POST['dt_final'] ?? '') ? ($_POST['dt_final'] ?? '') . " 23:59:59" : null;
 	$usuario = isset($_POST['usuario_id']) ? trim((string)($_POST['usuario_id'] ?? "")) : null;
 
 	// 2) Monta a parte fixa do SELECT
@@ -84,7 +85,7 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 
 			$acao = "<a class='btn btn-info' href='usuario.php?usuario_id=" . $value["ug_id"] . "'
 							style='border-width: 0px;border-radius: 1px;box-shadow: 1px 1px 5px rgb(0,0,0,0.5); display: flex;width: 100%;justify-content: center;
-							data-atual='" . $_GET["reload"] . "'
+							data-atual='" . ($_GET["reload"] ?? "") . "'
 						>
 							$svg
 						</a>";
@@ -101,13 +102,13 @@ if (isset($_POST["acao"]) && $_POST["acao"] == "listar") {
 			}
 
 			$dataLine = [
-				$dataKeys[0] => ($value["versao_termo"] ? mb_convert_encoding($value["versao_termo"], 'UTF-8', 'latin1') : "N/A"),
+				$dataKeys[0] => ($value["versao_termo"] ? backoffice_iso_to_utf8($value["versao_termo"]) : "N/A"),
 				$dataKeys[1] => ($value["aceitou"] ? "Sim" : "Não"),
 				$dataKeys[2] => ($value["data_aceite"] ? $value["data_aceite"] : "N/A"),
 				$dataKeys[3] => ($value["ip"] ? $value["ip"] : "Não possui"),
-				$dataKeys[4] => ($value["dispositivo"] ? mb_convert_encoding($value["dispositivo"], 'UTF-8', 'latin1') : "N/A"),
+				$dataKeys[4] => ($value["dispositivo"] ? backoffice_iso_to_utf8($value["dispositivo"]) : "N/A"),
 				$dataKeys[5] => $localizacao,
-				$dataKeys[6] => ($value["ug_nome_fantasia"] ? mb_convert_encoding($value["ug_nome_fantasia"], 'UTF-8', 'latin1') : "Não encontrado"),
+				$dataKeys[6] => ($value["ug_nome_fantasia"] ? backoffice_iso_to_utf8($value["ug_nome_fantasia"]) : "Não encontrado"),
 				$dataKeys[7] => ($value["ug_id"] ? $value["ug_id"] : "Erro"),
 				"acao" => $acao
 			];

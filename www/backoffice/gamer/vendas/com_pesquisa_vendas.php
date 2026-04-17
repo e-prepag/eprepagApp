@@ -1,4 +1,6 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
+<?php
+require_once "/www/backoffice/includes/encoding.php";
+require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php 
 
 //ini_set('display_errors', 1);
@@ -75,8 +77,8 @@ require_once $raiz_do_projeto."includes/gamer/inc_table_saldo.php";
 	if(isset($BtnSearch) && $BtnSearch) $total_table = 0;
 
 	$default_add  = nome_arquivo($PHP_SELF);
-	$img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-	$img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+	$img_proxima  = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+	$img_anterior = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 	$max          = 50; //$qtde_reg_tela;
 	$range_qtde   = 50; //$qtde_range_tela;
 //echo "qtde_reg_tela: ".$qtde_reg_tela.", qtde_range_tela: ".$qtde_range_tela."<br>";
@@ -595,10 +597,10 @@ echo "***";
 			if($ordem == 1)
 			{
 				$sql .= " desc ";
-				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_down.gif";
+				$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_down.gif";
 			} else {
 				$sql .= " asc ";
-				$img_seta = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/seta_up.gif";
+				$img_seta = "https://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/seta_up.gif";
 			}
 		
                         if(!isset($_GET["downloadCsv"])){
@@ -1340,7 +1342,7 @@ echo "***";
 
                             $lineCsv[] = $strId;
                             $lineCsv[] = formata_data_ts($rs_venda_row['vg_data_inclusao'],0, true,true);
-                            $lineCsv[] = utf8_decode(strip_tags(html_entity_decode($pagto_tipo_aux)));
+                            $lineCsv[] = backoffice_utf8_to_iso(strip_tags(html_entity_decode($pagto_tipo_aux)));
 ?>
                             <tr bgcolor="<?php echo $cor1 ?>"  onmouseover="bgColor='#CFDAD7'" onmouseout="bgColor='<?php echo $cor1 ?>'" valign="top"> 
                                 <td class="texto" align="left">
@@ -1697,7 +1699,7 @@ echo "***";
 
                         if(isset($csv))
                         {
-                            $csv = "https://".$_SERVER['SERVER_NAME']."/includes/downloadCsv.php?csv=$csv&dir=bkov";
+                            $csv = "https://".($_SERVER['SERVER_NAME'] ?? "")."/includes/downloadCsv.php?csv=$csv&dir=bkov";
                         }elseif(isset($_GET["downloadCsv"]))
                         {
                             require_once $raiz_do_projeto."public_html/includes/downloadCsv.php";

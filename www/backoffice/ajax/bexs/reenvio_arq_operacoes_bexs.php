@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1);
 
@@ -67,7 +68,7 @@ if(!$bexs->getStatus()){
     $msg = "";
     if($msg_erro != ""){
         if(preg_match("/ERRO:/", $msg_erro)){
-            $resultado .= utf8_encode("<strong>ERRO 100</strong>: Problema de campo obrigatório! Um e-mail com o detalhamento do problema está sendo enviado para <i>financeiro@e-prepag.com.br</i>");
+            $resultado .= backoffice_iso_to_utf8("<strong>ERRO 100</strong>: Problema de campo obrigatório! Um e-mail com o detalhamento do problema está sendo enviado para <i>financeiro@e-prepag.com.br</i>");
             $msg .= "Problema com os dados da remessa referente ao Publisher ". $nome_merchant." de Perfil Operacional ". $perfil_operacional .
             "<br>Período considerado: <strong>". $data_inic. "</strong> até <strong>". $data_fim."</strong><br><br>";
 
@@ -75,20 +76,20 @@ if(!$bexs->getStatus()){
             $destino = (checkIP()) ? EMAIL_DEV : EMAILS_PROD;
             enviaEmail($destino,null,null, $assunto, $msg.$msg_erro);
         } else{
-            $resultado .= utf8_encode($msg_erro);
+            $resultado .= backoffice_iso_to_utf8($msg_erro);
         }    
     }
 
     if($msg_env_conc != ""){
         switch ($msg_env_conc){
             case "1":
-               $resultado .= utf8_encode("<strong>[INFO]</strong>: As informações da remessa e o arquivo de operações referente a este PUBLISHER neste período já foram enviados com sucesso ao BEXS!<br><br>AGUARDE a resposta do processamento do arquivo de operações que será enviada no e-mail <i>financeiro@e-prepag.com.br</i>"); 
+               $resultado .= backoffice_iso_to_utf8("<strong>[INFO]</strong>: As informações da remessa e o arquivo de operações referente a este PUBLISHER neste período já foram enviados com sucesso ao BEXS!<br><br>AGUARDE a resposta do processamento do arquivo de operações que será enviada no e-mail <i>financeiro@e-prepag.com.br</i>"); 
                 break;
             case "2":
-                $resultado .= utf8_encode("<strong>[INFO]</strong>: As informações da remessa e o arquivo de operações referentes a este PUBLISHER neste período já foram enviados e processados com SUCESSO pelo BEXS!<br><br><strong>REMESSA CONCLUÍDA!</strong>"); 
+                $resultado .= backoffice_iso_to_utf8("<strong>[INFO]</strong>: As informações da remessa e o arquivo de operações referentes a este PUBLISHER neste período já foram enviados e processados com SUCESSO pelo BEXS!<br><br><strong>REMESSA CONCLUÍDA!</strong>"); 
                 break;
             case "3":
-                $resultado .=utf8_encode("<strong>ERRO 607</strong>: O processamento da remessa de ID <strong>".str_replace(".zip", "", $bexs->getnomeArquivoZip())."</strong> já deveria ter sido realizado pelo BEXS.<br>Possível problema com a resposta. Por favor, entre em contato com o BEXS informando o ID acima para maiores esclarecimentos.");
+                $resultado .=backoffice_iso_to_utf8("<strong>ERRO 607</strong>: O processamento da remessa de ID <strong>".str_replace(".zip", "", $bexs->getnomeArquivoZip())."</strong> já deveria ter sido realizado pelo BEXS.<br>Possível problema com a resposta. Por favor, entre em contato com o BEXS informando o ID acima para maiores esclarecimentos.");
                 break;
         }
     }   

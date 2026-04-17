@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
@@ -34,9 +35,9 @@ $pagina_titulo = "E-prepag - Créditos para Games";
 require_once '../../includes/constantes.php';
 require_once "/www/includes/bourls.php";
 $url = "https://";
-$url .= $_SERVER['SERVER_NAME'];
+$url .= ($_SERVER['SERVER_NAME'] ?? "");
 
-$webstring = "https://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "https://".($_SERVER['SERVER_NAME'] ?? "") . ":" . ($_SERVER['SERVER_PORT'] ?? "");
 require_once $raiz_do_projeto."includes/access_functions.php";
 require_once $raiz_do_projeto.'includes/configIP.php';
 require_once $raiz_do_projeto.'includes/configuracaoBO.php';
@@ -47,7 +48,7 @@ require_once $raiz_do_projeto."includes/security.php";
 require_once $raiz_do_projeto."includes/functions.php";
 
 
-$qlp_texto		= isset($_POST['qlp_texto'])		? utf8_decode($_POST['qlp_texto'])	: NULL;
+$qlp_texto		= isset($_POST['qlp_texto'])		? backoffice_utf8_to_iso($_POST['qlp_texto'])	: NULL;
 $quest_id_update= isset($_POST['quest_id_update'])	? $_POST['quest_id_update']			: NULL;
 $qlp_ativo		= isset($_POST['qlp_ativo'])		? $_POST['qlp_ativo']				: NULL;
 $qlp_tipo		= isset($_POST['qlp_tipo'])			? $_POST['qlp_tipo']				: NULL;

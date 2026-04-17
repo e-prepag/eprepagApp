@@ -1,19 +1,21 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 require_once "../../../includes/constantes.php";
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 
-if ($_REQUEST['id'] > 0){
-    if(strpos($_SERVER['HTTP_REFERER'],'pdv') > 0)
+$request_id = $request_id ?? 0;
+if ($request_id > 0){
+    if(strpos(($_SERVER['HTTP_REFERER'] ?? ""),'pdv') > 0)
         $tb = "tb_dist_operadora_games_produto";
     else
         $tb = "tb_operadora_games_produto";
     
-	$sql = "SELECT ogp_id,ogp_nome FROM $tb WHERE ogp_opr_codigo = " . $_REQUEST['id'] . "";
+	$sql = "SELECT ogp_id,ogp_nome FROM $tb WHERE ogp_opr_codigo = " . $request_id . "";
 //echo $sql."<br>";
 	$rs_oprProdutos = SQLexecuteQuery($sql);
 }
 
-$id = $_REQUEST['id'];
+$id = $request_id;
 
 if(isset($rs_oprProdutos) && $rs_oprProdutos){
 
@@ -31,7 +33,7 @@ if(isset($rs_oprProdutos) && $rs_oprProdutos){
 			}
 		}								
 		?>><?php 
-		echo str_replace(" ", "&nbsp;", utf8_encode($rs_oprProdutos_row['ogp_nome'])); 
+		echo str_replace(" ", "&nbsp;", backoffice_iso_to_utf8($rs_oprProdutos_row['ogp_nome'])); 
 		?></nobr> 
 <?php 
 	}

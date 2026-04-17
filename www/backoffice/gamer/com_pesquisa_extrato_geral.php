@@ -1,5 +1,6 @@
-<?php 
-	set_time_limit ( 6000 ) ;
+<?php
+require_once "/www/backoffice/includes/encoding.php";
+set_time_limit ( 6000 ) ;
 ob_start();
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -24,24 +25,24 @@ if(!$range)    $range       = 1;
 if(!$ordem)    $ordem       = 0;
 if($Pesquisar) $total_table = 0;
 $default_add  = nome_arquivo($PHP_SELF);
-$img_proxima  = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/proxima.gif";
-$img_anterior = "http://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
+$img_proxima  = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/proxima.gif";
+$img_anterior = "http://".($_SERVER['SERVER_NAME'] ?? "").":".($_SERVER['SERVER_PORT'] ?? "")."/images/anterior.gif";
 $max          = 200; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
 $registros	  = $max;
 
-$dd_balancos	= $_POST['dd_balancos'];
-$dd_boletos		= $_POST['dd_boletos'];
-$dd_compras		= $_POST['dd_compras'];
+$dd_balancos	= $_POST['dd_balancos'] ?? null;
+$dd_boletos		= $_POST['dd_boletos'] ?? null;
+$dd_compras		= $_POST['dd_compras'] ?? null;
 if(!$tf_v_data_inclusao_ini) {
 	$hoje		= date("d/m/Y");
 	$tf_v_data_inclusao_ini = data_menos_n($hoje,5);
 	
 }	
 if(!$tf_v_data_inclusao_fim) $tf_v_data_inclusao_fim = $hoje;
-$tf_v_codigo	= $_POST['tf_v_codigo'];
-$ug_nome	= strtoupper($_POST['ug_nome']);
-$codigo_user	= $_POST['codigo_user'];
+$tf_v_codigo	= $_POST['tf_v_codigo'] ?? null;
+$ug_nome	= strtoupper((string)($_POST['ug_nome'] ?? ""));
+$codigo_user	= $_POST['codigo_user'] ?? null;
 
 if (isset($tf_v_codigo)){
 	$varse1 .= "&tf_v_codigo=$tf_v_codigo";
@@ -1077,7 +1078,7 @@ echo $search_msg . number_format(getmicrotime() - $time_start, 2, '.', '.') . $s
 				continue;
 			}
 	?>
-	<tr><td align="center" valign="middle" width="36"><?php echo getLogoBancoSmall($key)?></td><td width="200" class='texto'>&nbsp;<?php echo utf8_decode($FORMAS_PAGAMENTO_DESCRICAO[$key]) ?></td><tr>
+	<tr><td align="center" valign="middle" width="36"><?php echo getLogoBancoSmall($key)?></td><td width="200" class='texto'>&nbsp;<?php echo backoffice_utf8_to_iso($FORMAS_PAGAMENTO_DESCRICAO[$key]) ?></td><tr>
 	<?php
 		}
 	?>

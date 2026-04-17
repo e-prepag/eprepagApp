@@ -1,4 +1,5 @@
 <?php
+require_once "/www/backoffice/includes/encoding.php";
 function isAjax() {return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'));}
 function block_direct_calling() {
     if(!isAjax()) {
@@ -17,13 +18,13 @@ require_once $raiz_do_projeto."includes/pdv/main.php";
 // echo "Existe!!!";
 //else echo "Naun existe!!!";
 //die();
-$Cidade = $_POST['cidade'];
-$Estado = $_POST['estado'];
+$Cidade = $_POST['cidade'] ?? "";
+$Estado = $_POST['estado'] ?? "";
 
 $SQLBairro = "set client_encoding to utf8;SELECT distinct(ug_bairro) as ug_bairro
 					FROM dist_usuarios_games
-					WHERE ug_cidade = '".utf8_decode($Cidade)."' 
-						AND ug_estado = '".utf8_decode($Estado)."' 
+					WHERE ug_cidade = '".backoffice_utf8_to_iso($Cidade)."' 
+						AND ug_estado = '".backoffice_utf8_to_iso($Estado)."' 
 					ORDER BY ug_bairro";
 //echo $SQLBairro."<br>";
 
