@@ -4,17 +4,15 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
     
 if(isset($_POST)){
     if(empty($_POST['opr_codigo']))
-        $_POST['opr_codigo'] = "null";
+        $_POST['opr_codigo'] = NULL;
 
     if(isset($_POST['novaPosicao'])){
 
-        $select = "select * from classificacao_mapas where cm_nome = '".$_POST['cm_nome']."'";
-        if($pegaRegDuplicado = SQLexecuteQuery($select)){
+        $select = "select * from classificacao_mapas where cm_nome = $1";
+        if($pegaRegDuplicado = SQLexecuteQueryParams($select, array($_POST['cm_nome']))){
             if((($pegaRegDuplicado) ? pg_num_rows($pegaRegDuplicado) : 0) == 0){
-                $insert = "insert into classificacao_mapas (cm_nome, cm_status, cm_data_cadastro, opr_codigo) values('%s', '%s', current_date, %s)"; //cm_id, cm_nome, cm_status, cm_data_cadastro, opr_codigo"
-                $sql = vsprintf($insert, array($_POST['cm_nome'],$_POST['cm_status'], $_POST['opr_codigo'])).";";
-
-                if($ret = SQLexecuteQuery($sql)){
+                $sql = "insert into classificacao_mapas (cm_nome, cm_status, cm_data_cadastro, opr_codigo) values($1, $2, current_date, $3)";
+                                if($ret = SQLexecuteQueryParams($sql, array($_POST['cm_nome'], $_POST['cm_status'], $_POST['opr_codigo']))){
                     echo "<script>alert('Registro inserido com sucesso!');</script>";
                     unset($_POST);
                 }else{
@@ -28,10 +26,10 @@ if(isset($_POST)){
         if(isset($_POST["cmid"]))
         {
             $update = "update classificacao_mapas 
-                        set cm_nome = '".$_POST["cm_nome"]."', cm_status = '".$_POST["cm_status"]."', opr_codigo = ".$_POST['opr_codigo']."
-                        where cm_id = ".$_POST["cmid"];
+                        set cm_nome = $1, cm_status = $2, opr_codigo = $3
+                        where cm_id = $4";
 
-            if($teste = SQLexecuteQuery($update)){
+            if($teste = SQLexecuteQueryParams($update, array($_POST["cm_nome"], $_POST["cm_status"], $_POST['opr_codigo'], $_POST["cmid"]))){
                 echo "<script>alert('Registro editado com sucesso.');</script>";    
             }else{
                 echo "<script>alert('Erro ao editar registro.');</script>";    

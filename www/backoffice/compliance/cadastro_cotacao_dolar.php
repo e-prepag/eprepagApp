@@ -67,8 +67,8 @@ if (!isset($_POST['periodo']) || empty($_POST['periodo']) || $_POST['periodo'] =
     // Split ano/mes
     list($mes, $ano) = explode("/", $mesAno);
 
-    $sql = "select cd.opr_codigo from cotacao_dolar cd INNER JOIN operadoras o ON (cd.opr_codigo = o.opr_codigo) where cd_data = '" . $ano . "-" . $mes . "-01 00:00:00' ORDER BY opr_nome;";
-    $rs = SQLexecuteQuery($sql);
+    $sql = "select cd.opr_codigo from cotacao_dolar cd INNER JOIN operadoras o ON (cd.opr_codigo = o.opr_codigo) where cd_data = $1 ORDER BY opr_nome;";
+    $rs = SQLexecuteQueryParams($sql, array($ano . "-" . $mes . "-01 00:00:00"));
     if ($rs && pg_num_rows($rs) > 0) {
         while ($rs_row = pg_fetch_array($rs)) {
             $vetor_tmp[] = $rs_row['opr_codigo'];
@@ -183,9 +183,9 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
         if (!empty($value) && $msg == "") {
 
             //Verificando se exite o registro
-            $sql = "select cd_cotacao from cotacao_dolar where opr_codigo = " . $value . " and cd_data = '" . date('Y-m-d', $currentmonthVerify) . " 00:00:00';";
+            $sql = "select cd_cotacao from cotacao_dolar where opr_codigo = $1 and cd_data = $2;";
             //echo $sql."<br>";
-            $rsTeste = SQLexecuteQuery($sql);
+            $rsTeste = SQLexecuteQueryParams($sql, array($value, date('Y-m-d', $currentmonthVerify) . " 00:00:00"));
             if ($rsTeste && pg_num_rows($rsTeste)) {
 
                 if (isset($_POST["multiCotacao" . $value]) && $_POST["multiCotacao" . $value] == "1") {
@@ -200,9 +200,9 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                     list($mes, $ano) = explode("/", $mesAno);
                     list($mesProx, $anoProx) = explode("/", $mesAnoProx);
 
-                    $sql = "DELETE FROM cotacao_dolar where cd_data >= '" . $ano . "-" . $mes . "-01 00:00:00' and cd_data < '" . $anoProx . "-" . $mesProx . "-01 00:00:00' AND opr_codigo = " . $value . " AND cd_freeze = 0;";
+                    $sql = "DELETE FROM cotacao_dolar where cd_data >= $1 and cd_data < $2 AND opr_codigo = $3 AND cd_freeze = 0;";
                     //die($sql);
-                    $rs_delete_cotacao = SQLexecuteQuery($sql);
+                    $rs_delete_cotacao = SQLexecuteQueryParams($sql, array($ano . "-" . $mes . "-01 00:00:00", $anoProx . "-" . $mesProx . "-01 00:00:00", $value));
                     if (!$rs_delete_cotacao) {
                         $msg .= "Erro ao deletar as cotações de dólar para o operador $value! <br>";
                     } elseif (isset($_POST["maisdeuma"][$value])) {
@@ -214,9 +214,9 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                                     //Inserindo
                                     $diaAtual = $dia + $j;
                                     $data = $ano . "-" . $mes . "-" . $diaAtual;
-                                    $sql = "insert into cotacao_dolar values ('" . $data . " 00:00:00'," . $value . "," . str_replace(",", ".", $_POST["multiCotacaoValor" . $value][$i]) . ");";
+                                    $sql = "insert into cotacao_dolar values ($1,$2,$3);";
 
-                                    $rsInsert = SQLexecuteQuery($sql);
+                                    $rsInsert = SQLexecuteQueryParams($sql, array($data . " 00:00:00", $value, str_replace(",", ".", $_POST["multiCotacaoValor" . $value][$i])));
                                     if (!$rsInsert) $msg .= "Erro ao inserir a cotação de R$" . $_POST["multiCotacaoValor" . $value][$i] . " para do código de operador $value na data $data!<br>";
                                 }
                             }
@@ -230,8 +230,8 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                             list($mes, $ano) = explode("/", $mesAno);
                             for ($i = 1; $i <= $numDias; $i++) {
                                 $data = $ano . "-" . $mes . "-" . $i;
-                                $sql = "insert into cotacao_dolar values ('" . $data . " 00:00:00'," . $value . "," . str_replace(",", ".", $cotacao[$value]) . ");";
-                                $rsInsert = SQLexecuteQuery($sql);
+                                $sql = "insert into cotacao_dolar values ($1,$2,$3);";
+                                $rsInsert = SQLexecuteQueryParams($sql, array($data . " 00:00:00", $value, str_replace(",", ".", $cotacao[$value])));
                                 if (!$rsInsert) $msg .= "Erro ao inserir a cotação de R$" . $cotacao[$value] . " para do código de operador $value na data $data!<br>";
                             }
                         }
@@ -239,8 +239,8 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                 } else {
                     //Atualizando
                     if (!empty($cotacao[$value])) {
-                        $sql = "update cotacao_dolar set cd_cotacao = " . str_replace(",", ".", $cotacao[$value]) . " where opr_codigo = " . $value . " and cd_data = '" . date('Y-m-d', $currentmonthVerify) . " 00:00:00';";
-                        $rsUpdate = SQLexecuteQuery($sql);
+                        $sql = "update cotacao_dolar set cd_cotacao = $1 where opr_codigo = $2 and cd_data = $3;";
+                        $rsUpdate = SQLexecuteQueryParams($sql, array(str_replace(",", ".", $cotacao[$value]), $value, date('Y-m-d', $currentmonthVerify) . " 00:00:00"));
                         if (!$rsUpdate) $msg .= "Erro ao atualizar a cotação de R$ " . $cotacao[$value] . " para do código de operador $value na data " . date('Y-m-d', $currentmonthVerify) . "!<br>";
                     }
                 }
@@ -256,9 +256,9 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                                 //Inserindo
                                 $diaAtual = $dia + $j;
                                 $data = $ano . "-" . $mes . "-" . $diaAtual;
-                                $sql = "insert into cotacao_dolar values ('" . $data . " 00:00:00'," . $value . "," . str_replace(",", ".", $_POST["multiCotacaoValor" . $value][$i]) . ");";
+                                $sql = "insert into cotacao_dolar values ($1,$2,$3);";
 
-                                $rsInsert = SQLexecuteQuery($sql);
+                                $rsInsert = SQLexecuteQueryParams($sql, array($data . " 00:00:00", $value, str_replace(",", ".", $_POST["multiCotacaoValor" . $value][$i])));
                                 if (!$rsInsert) $msg .= "Erro ao inserir a cotação de R$ " . $_POST["multiCotacaoValor" . $value][$i] . " para do código de operador $value na data $data!<br>";
                             }
                         }
@@ -271,8 +271,8 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                             list($mes, $ano) = explode("/", $mesAno);
                             for ($i = 1; $i <= $numDias; $i++) {
                                 $data = $ano . "-" . $mes . "-" . $i;
-                                $sql = "insert into cotacao_dolar values ('" . $data . " 00:00:00'," . $value . "," . str_replace(",", ".", $cotacao[$value]) . ");";
-                                $rsInsert = SQLexecuteQuery($sql);
+                                $sql = "insert into cotacao_dolar values ($1,$2,$3);";
+                                $rsInsert = SQLexecuteQueryParams($sql, array($data . " 00:00:00", $value, str_replace(",", ".", $cotacao[$value])));
                                 if (!$rsInsert) $msg .= "Erro ao inserir a cotação de R$" . $cotacao[$value] . " para do código de operador $value na data $data!<br>";
                             }
                         }
@@ -280,8 +280,8 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
                 } else {
                     if (!empty($cotacao[$value])) {
                         //Inserindo
-                        $sql = "insert into cotacao_dolar values ('" . date('Y-m-d', $currentmonthVerify) . " 00:00:00'," . $value . "," . str_replace(",", ".", $cotacao[$value]) . ");";
-                        $rsInsert = SQLexecuteQuery($sql);
+                        $sql = "insert into cotacao_dolar values ($1,$2,$3);";
+                        $rsInsert = SQLexecuteQueryParams($sql, array(date('Y-m-d', $currentmonthVerify) . " 00:00:00", $value, str_replace(",", ".", $cotacao[$value])));
                         if (!$rsInsert) $msg .= "Erro ao inserir a cotação de R$ " . $cotacao[$value] . " para do código de operador $value na data " . date('Y-m-d', $currentmonthVerify) . "!<br>";
                     }
                 }
@@ -348,8 +348,8 @@ while ($resopr_row = pg_fetch_array($resopr)) {
 } //end while
 
 //Buscando dados na tabela
-$sql = "select cd_cotacao,opr_codigo,cd_freeze,cd_data from cotacao_dolar where to_char(cd_data,'YYYY-MM') = '" . date('Y-m', $currentmonth) . "';";
-$rs = SQLexecuteQuery($sql);
+$sql = "select cd_cotacao,opr_codigo,cd_freeze,cd_data from cotacao_dolar where to_char(cd_data,'YYYY-MM') = $1;";
+$rs = SQLexecuteQueryParams($sql, array(date('Y-m', $currentmonth)));
 if ($rs && pg_num_rows($rs) > 0) {
     while ($rs_row = pg_fetch_array($rs)) {
         $vetorCotacaoUSS[$rs_row['opr_codigo']] = $rs_row['cd_cotacao'];
@@ -469,11 +469,11 @@ if ($currentmonthVerify == $lastMonth) {
                     $testeCongelamento = true;
                     $readonly = "";
                     if ($multipla_cotacao == 1) {
-                        $sql = "SELECT COUNT(*), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $value AND to_char(cd_data,'YYYY-MM')  = '" . date("Y-m", $currentmonth) . "' GROUP BY cd_cotacao";
-                        $rs_num_cotacoes = SQLexecuteQuery($sql);
+                        $sql = "SELECT COUNT(*), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $1 AND to_char(cd_data,'YYYY-MM')  = $2 GROUP BY cd_cotacao";
+                        $rs_num_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
 
-                        $sql = "SELECT * FROM cotacao_dolar WHERE opr_codigo = $value AND to_char(cd_data,'YYYY-MM')  = '" . date("Y-m", $currentmonth) . "' ORDER BY cd_data";
-                        $rs_cotacoes = SQLexecuteQuery($sql);
+                        $sql = "SELECT * FROM cotacao_dolar WHERE opr_codigo = $1 AND to_char(cd_data,'YYYY-MM')  = $2 ORDER BY cd_data";
+                        $rs_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
                         $rs_row = pg_fetch_array($rs_cotacoes);
                         $cotacao_congelada = $rs_row["cd_freeze"];
                         if ($rs_cotacoes && $rs_num_cotacoes && pg_num_rows($rs_cotacoes) > 0 && (pg_num_rows($rs_num_cotacoes) > 1 || $currentmonthVerify ==  $lastMonth)) {
@@ -582,15 +582,15 @@ if ($currentmonthVerify == $lastMonth) {
                     }
                 } else {
                     $html = "";
-                    $sql = "SELECT opr_cotacao_dolar FROM operadoras WHERE opr_codigo = $value";
-                    $rs_multipla_cotacao = SQLexecuteQuery($sql);
+                    $sql = "SELECT opr_cotacao_dolar FROM operadoras WHERE opr_codigo = $1";
+                    $rs_multipla_cotacao = SQLexecuteQueryParams($sql, array($value));
                     $multipla_cotacao = pg_fetch_array($rs_multipla_cotacao)[0];
                     if ($multipla_cotacao == 1) {
-                        $sql = "SELECT COUNT(*), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $value AND to_char(cd_data,'YYYY-MM')  = '" . date("Y-m", $currentmonth) . "' GROUP BY cd_cotacao";
-                        $rs_num_cotacoes = SQLexecuteQuery($sql);
+                        $sql = "SELECT COUNT(*), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $1 AND to_char(cd_data,'YYYY-MM')  = $2 GROUP BY cd_cotacao";
+                        $rs_num_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
 
-                        $sql = "SELECT * FROM cotacao_dolar WHERE opr_codigo = $value AND to_char(cd_data,'YYYY-MM')  = '" . date("Y-m", $currentmonth) . "' ORDER BY cd_data";
-                        $rs_cotacoes = SQLexecuteQuery($sql);
+                        $sql = "SELECT * FROM cotacao_dolar WHERE opr_codigo = $1 AND to_char(cd_data,'YYYY-MM')  = $2 ORDER BY cd_data";
+                        $rs_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
                         if ($rs_cotacoes && $rs_num_cotacoes && pg_num_rows($rs_cotacoes) > 0 && pg_num_rows($rs_num_cotacoes) > 1) {
                             $rs_row = pg_fetch_array($rs_cotacoes);
                             $dataAtual = explode(" ", $rs_row["cd_data"])[0];

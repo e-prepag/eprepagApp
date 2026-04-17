@@ -17,9 +17,9 @@ if (isset($_REQUEST['id']) && intval($_REQUEST['id']) > 0) {
     $opr_codigo = intval($_REQUEST['id']);
 
     $sql = "SELECT valor FROM operadoras_valores 
-            WHERE opr_codigo = $opr_codigo 
+            WHERE opr_codigo = $1 
             ORDER BY valor";
-    $rs_oprPins = SQLexecuteQuery($sql);
+    $rs_oprPins = SQLexecuteQueryParams($sql, array($opr_codigo));
 }
 
 if ($rs_oprPins) {

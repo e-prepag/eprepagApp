@@ -72,9 +72,12 @@ $stmtTotal = $pdo->prepare($sqlTotal);
 $stmtTotal->execute($params);
 $totalRecords = $stmtTotal->fetchColumn();
 
-$sqlData = "SELECT * FROM envios_e_financeira WHERE $whereClause ORDER BY data_envio DESC LIMIT $length OFFSET $start";
+$sqlData = "SELECT * FROM envios_e_financeira WHERE $whereClause ORDER BY data_envio DESC LIMIT :length OFFSET :start";
+$paramsData = $params;
+$paramsData[':length'] = $length;
+$paramsData[':start'] = $start;
 $stmtData = $pdo->prepare($sqlData);
-$stmtData->execute($params);
+$stmtData->execute($paramsData);
 $resultados = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
 

@@ -15,12 +15,12 @@ if(!empty($_POST['reordenar'])){
     
     foreach($_POST['reordenar'] as $id => $ordem){
         
-        $sql = "select * from bo_aba where aba_id = ".$id;
-        $rs_reordena = SQLexecuteQuery($sql);
+        $sql = "select * from bo_aba where aba_id = $1";
+        $rs_reordena = SQLexecuteQueryParams($sql, array($id));
         if((($rs_reordena) ? pg_num_rows($rs_reordena) : 0) > 0) {
-            $sqlAtualizaAba = "update bo_aba set aba_order = $ordem where aba_id = $id";
+            $sqlAtualizaAba = "update bo_aba set aba_order = $1 where aba_id = $2";
             
-            if(!$rsAtualiza = SQLexecuteQuery($sqlAtualizaAba)){
+            if(!$rsAtualiza = SQLexecuteQueryParams($sqlAtualizaAba, array($ordem, $id))){
                 
                 $aba = pg_fetch_all($rs_reordena);
                 
@@ -34,9 +34,9 @@ if(!empty($_POST['reordenar'])){
 $totalRegistros = 0;
 
 if(isset($_POST['sistema'])){
-    $sql = "SELECT * FROM bo_aba where aba_sistema = '".$_POST['sistema']."' order by aba_order asc";    
+    $sql = "SELECT * FROM bo_aba where aba_sistema = $1 order by aba_order asc";    
     
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, array($_POST['sistema']));
 
     if($rs) {
         $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);

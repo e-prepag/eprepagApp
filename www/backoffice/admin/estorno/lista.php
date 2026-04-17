@@ -17,29 +17,37 @@ $registros = 50;
 $registros_total = 0;
 
 $where = " WHERE 1=1";
+$params = array();
 
 if(!empty($ug_id)){
-    $where .= " AND ug_id = " . $ug_id;
+    $params[] = $ug_id;
+    $where .= " AND ug_id = $" . count($params);
 }
 
 if(!empty($shn_login)){
-    $where .= " AND shn_login = '" . $shn_login . "'";
+    $params[] = $shn_login;
+    $where .= " AND shn_login = $" . count($params);
 }
 
 if($est_tipo != "" && ($est_tipo >= 0)){
-    $where .= " AND est_tipo = " . $est_tipo;
+    $params[] = $est_tipo;
+    $where .= " AND est_tipo = $" . count($params);
 }
 
 $sql = "SELECT count(*) as total FROM estorno_pdv" . $where;
-$rs_total = SQLexecuteQuery($sql);
+$rs_total = SQLexecuteQueryParams($sql, $params);
 $row = pg_fetch_assoc($rs_total);
 if($row) $registros_total = $row["total"];
 
 
 $sql = "SELECT * FROM estorno_pdv" . $where;
 $sql .= " ORDER BY data_operacao DESC";	
-$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
-$rs_estornos = SQLexecuteQuery($sql);
+$paramsLista = $params;
+$paramsLista[] = intval(($p - 1) * $registros);
+$sql .= " offset $" . count($paramsLista);
+$paramsLista[] = intval($registros);
+$sql .= " limit $" . count($paramsLista);
+$rs_estornos = SQLexecuteQueryParams($sql, $paramsLista);
 ?>
 
 <!--Cabeçalho-->

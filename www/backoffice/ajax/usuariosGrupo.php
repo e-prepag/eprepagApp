@@ -52,14 +52,14 @@ if(Util::isAjaxRequest() && isset($_POST['reqType'])){
         }
     }else if($_POST['reqType'] == "montaHtml" && isset($_POST['grupo'])){
         
-        $sqlUsuarios = "SELECT id,shn_login, shn_nome FROM usuarios where id NOT IN (SELECT id FROM grupos_acesso_usuarios where grupos_id = ".$_POST['grupo'].") order by shn_nome ASC";
+        $sqlUsuarios = "SELECT id,shn_login, shn_nome FROM usuarios where id NOT IN (SELECT id FROM grupos_acesso_usuarios where grupos_id = ?) order by shn_nome ASC";
         $stmt = $pdo->prepare($sqlUsuarios);
-        $stmt->execute();
+        $stmt->execute(array($_POST['grupo']));
         $resultUsuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $sqlUsuariosGrupos = "select g.id,shn_login ,u.shn_nome from grupos_acesso_usuarios g inner join usuarios u on g.id = u.id  and g.grupos_id = ".$_POST['grupo']."  order by u.shn_nome ASC";
+        $sqlUsuariosGrupos = "select g.id,shn_login ,u.shn_nome from grupos_acesso_usuarios g inner join usuarios u on g.id = u.id  and g.grupos_id = ?  order by u.shn_nome ASC";
         $stmt = $pdo->prepare($sqlUsuariosGrupos);
-        $stmt->execute();
+        $stmt->execute(array($_POST['grupo']));
         $resultUsuariosGrupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if(count($resultUsuarios) > 0 || count($resultUsuariosGrupos) > 0){

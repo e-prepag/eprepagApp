@@ -11,7 +11,11 @@ echo $descricao->MontaAreaDescricao();
 if (isset($btn_estorno) && $btn_estorno=="Estornar") {
 	//echo "<pre>".print_r($scf_id,true)."</pre>";
 	$mensagem_final = "";
-	$scf_id_lista = !empty($scf_id) ? implode(",",(array)$scf_id) : "0";
+	$scf_id_lista = !empty($scf_id) ? array_values((array)$scf_id) : array(0);
+	$scf_id_placeholders = array();
+	foreach ($scf_id_lista as $scf_id_index => $scf_id_param) {
+		$scf_id_placeholders[] = "$" . ($scf_id_index + 1);
+	}
 
 	$msg = "";
 	//Inicia transacao
@@ -20,35 +24,35 @@ if (isset($btn_estorno) && $btn_estorno=="Estornar") {
 	if(!$ret) $msg = "<font color='#FF0000'><b>Erro ao iniciar transa&cceil;&atilde;o.\n</b></font><br>";
 
 	//Confirmando os IDs
-	$sql = "SELECT scf_id from saldo_composicao_fifo WHERE scf_id IN ($scf_id_lista) AND scf_valor=scf_valor_disponivel AND scf_status=1;";
-	$rs_dados_confirmados = SQLexecuteQuery($sql);
+	$sql = "SELECT scf_id from saldo_composicao_fifo WHERE scf_id IN (" . implode(",", $scf_id_placeholders) . ") AND scf_valor=scf_valor_disponivel AND scf_status=1;";
+	$rs_dados_confirmados = SQLexecuteQueryParams($sql, $scf_id_lista);
 //	echo $sql."<br>";
 	while($rs_dados_confirmados && ($rs_dados_confirmados_row = pg_fetch_array($rs_dados_confirmados))) {
 		//transacao por transacao
 //		echo $rs_dados_confirmados_row['scf_id'].str_repeat("=",30)."<br>";
 		if($msg == ""){
-			$sql = "UPDATE saldo_composicao_fifo SET scf_valor_disponivel=0, scf_status=0 where scf_id=".$rs_dados_confirmados_row['scf_id'].";";
-			$rs_saldo_composicao_fifo = SQLexecuteQuery($sql);
+			$sql = "UPDATE saldo_composicao_fifo SET scf_valor_disponivel=0, scf_status=0 where scf_id=$1;";
+			$rs_saldo_composicao_fifo = SQLexecuteQueryParams($sql, array($rs_dados_confirmados_row['scf_id']));
 //			$rs_saldo_composicao_fifo = true;
 //			echo $sql."<br>";
 			if($rs_saldo_composicao_fifo) {
-				$sql = "INSERT INTO saldo_composicao_fifo_utilizado (scf_id, vg_id, scfu_valor) VALUES (".$rs_dados_confirmados_row['scf_id'].",0,(select scf_valor from saldo_composicao_fifo where scf_id=".$rs_dados_confirmados_row['scf_id']."));";
-				$rs_saldo_composicao_fifo_utilizado = SQLexecuteQuery($sql);
+				$sql = "INSERT INTO saldo_composicao_fifo_utilizado (scf_id, vg_id, scfu_valor) VALUES ($1,0,(select scf_valor from saldo_composicao_fifo where scf_id=$1));";
+				$rs_saldo_composicao_fifo_utilizado = SQLexecuteQueryParams($sql, array($rs_dados_confirmados_row['scf_id']));
 //				$rs_saldo_composicao_fifo_utilizado = true;
 //				echo $sql."<br>";
 				if($rs_saldo_composicao_fifo_utilizado) {
-					$sql = "UPDATE usuarios_games SET ug_perfil_saldo=ug_perfil_saldo-(select scf_valor from saldo_composicao_fifo where scf_id=".$rs_dados_confirmados_row['scf_id'].") WHERE ug_id=(select ug_id from saldo_composicao_fifo where scf_id=".$rs_dados_confirmados_row['scf_id'].");";
-					$rs_usuarios_games = SQLexecuteQuery($sql);
+					$sql = "UPDATE usuarios_games SET ug_perfil_saldo=ug_perfil_saldo-(select scf_valor from saldo_composicao_fifo where scf_id=$1) WHERE ug_id=(select ug_id from saldo_composicao_fifo where scf_id=$1);";
+					$rs_usuarios_games = SQLexecuteQueryParams($sql, array($rs_dados_confirmados_row['scf_id']));
 //					$rs_usuarios_games = true;
 //					echo $sql."<br>";
 					if($rs_usuarios_games) {
-						$sql = "INSERT INTO tb_pag_estorno (ug_id,tpe_data,tpe_valor,tpe_motivo,tpe_id_estonador,tpe_tipo_user) VALUES ((select ug_id from saldo_composicao_fifo where scf_id=".$rs_dados_confirmados_row['scf_id']."),NOW(),(select scf_valor from saldo_composicao_fifo where scf_id=".$rs_dados_confirmados_row['scf_id']."),'$motivo','".$_SESSION['iduser_bko']."','G');";
-						$rs_estorno = SQLexecuteQuery($sql);
+						$sql = "INSERT INTO tb_pag_estorno (ug_id,tpe_data,tpe_valor,tpe_motivo,tpe_id_estonador,tpe_tipo_user) VALUES ((select ug_id from saldo_composicao_fifo where scf_id=$1),NOW(),(select scf_valor from saldo_composicao_fifo where scf_id=$1),$2,$3,'G');";
+						$rs_estorno = SQLexecuteQueryParams($sql, array($rs_dados_confirmados_row['scf_id'], $motivo, $_SESSION['iduser_bko']));
 //						$rs_estorno = true;
 //						echo $sql."<br>";
 						if($rs_estorno) {
-							$sql = "SELECT * FROM usuarios_games ug INNER JOIN saldo_composicao_fifo scf ON (ug.ug_id=scf.ug_id) WHERE scf_id=".$rs_dados_confirmados_row['scf_id'].";";
-							$rs_dados_sucesso = SQLexecuteQuery($sql);
+							$sql = "SELECT * FROM usuarios_games ug INNER JOIN saldo_composicao_fifo scf ON (ug.ug_id=scf.ug_id) WHERE scf_id=$1;";
+							$rs_dados_sucesso = SQLexecuteQueryParams($sql, array($rs_dados_confirmados_row['scf_id']));
 //							echo $sql."<br>";
 							if($rs_dados_sucesso_row = pg_fetch_array($rs_dados_sucesso)) {
 								$mensagem_final .= "<font color='#FF0000'><b>Estorno do Gamer [".$rs_dados_sucesso_row['ug_nome']."] foi realizado com sucesso, seu saldo atual é R$ ".number_format($rs_dados_sucesso_row['ug_perfil_saldo'], 2, ',', '.')." para a venda ID [".$rs_dados_sucesso_row['vg_id']."] foi estornado o valor de R$ ".number_format($rs_dados_sucesso_row['scf_valor'], 2, ',', '.').".\n</b></font><br>";

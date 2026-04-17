@@ -100,8 +100,8 @@ if(isset($BtnSearch) && $BtnSearch) {
             $update = true;
         }else{
             //Verificando se no período informado existe mais de uma cotação de dólar
-            $sql = "SELECT COUNT(cd_cotacao), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = ".$cod_opr." AND cd_data >= '".date('Y-m-d',strtotime($data_inicio))." 00:00:00' AND cd_data <= '".date('Y-m-d',strtotime($data_fim))." 00:00:00' GROUP BY cd_cotacao";
-			$rs_count_cotacao = SQLexecuteQuery($sql);
+            $sql = "SELECT COUNT(cd_cotacao), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $1 AND cd_data >= $2 AND cd_data <= $3 GROUP BY cd_cotacao";
+				$rs_count_cotacao = SQLexecuteQueryParams($sql, array($cod_opr, date('Y-m-d',strtotime($data_inicio))." 00:00:00", date('Y-m-d',strtotime($data_fim))." 00:00:00"));
             if(pg_num_rows($rs_count_cotacao) > 1){
                 //Caso exista, não será permitido o update
                 $msg .= "O período selecionado engloba mais de uma cotação. Favor congelar um fragmento de cotação por vez, ou selecione um período (mês) completo.";
@@ -112,8 +112,8 @@ if(isset($BtnSearch) && $BtnSearch) {
                 if($ultimoDia != $data_fim){
                     //Caso não seja, será feito uma verificação para garantir que o período informado corresponde a todo o período de uma determinada cotação
                     //Caso o dia após o último dia informado possua a mesma cotação, significa que o intervalo não abrangeu todo o fragmento de cotação               
-                    $sql = "SELECT cd_cotacao FROM cotacao_dolar WHERE opr_codigo = ".$cod_opr." AND cd_data = '".date('Y-m-d',strtotime($data_fim . " +1 day")) . "'";
-                    $rs_verifica_proximo_dia = SQLexecuteQuery($sql);
+                    $sql = "SELECT cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $1 AND cd_data = $2";
+                    $rs_verifica_proximo_dia = SQLexecuteQueryParams($sql, array($cod_opr, date('Y-m-d',strtotime($data_fim . " +1 day"))));
                     $rs_row = pg_fetch_array($rs_verifica_proximo_dia);
                     if($cotacao == $rs_row["cd_cotacao"] && $primeiroDia != $data_inicio){
                         $msg .= "O período selecionado não engloba todo o fragmento de cotação presente no cadastro.<br> Consulte o cadastro no seguinte link: <a href='/compliance/cadastro_cotacao_dolar.php' target='_blank' > https://" . $_SERVER['SERVER_NAME'] . "/compliance/cadastro_cotacao_dolar.php </a>";
@@ -121,8 +121,8 @@ if(isset($BtnSearch) && $BtnSearch) {
                 }
                 //Passando pela validação do próximo dia, iremos fazer a verificação do dia anterior
                 if($primeiroDia != $data_inicio){
-                    $sql = "SELECT cd_cotacao FROM cotacao_dolar WHERE opr_codigo = ".$cod_opr." AND cd_data = '".date('Y-m-d',strtotime($data_inicio . " -1 day")) . "'";
-                    $rs_verifica_dia_anterior = SQLexecuteQuery($sql);
+                    $sql = "SELECT cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $1 AND cd_data = $2";
+                    $rs_verifica_dia_anterior = SQLexecuteQueryParams($sql, array($cod_opr, date('Y-m-d',strtotime($data_inicio . " -1 day"))));
                     $rs_row = pg_fetch_array($rs_verifica_dia_anterior);
                     if($cotacao == $rs_row["cd_cotacao"] && $ultimoDia != $data_fim){
                         $msg .= "O período selecionado não engloba todo o fragmento de cotação presente no cadastro.<br> Consulte o cadastro no seguinte link: <a href='/compliance/cadastro_cotacao_dolar.php' target='_blank' > https://" . $_SERVER['SERVER_NAME'] . "/compliance/cadastro_cotacao_dolar.php </a>";
@@ -140,9 +140,9 @@ if(isset($BtnSearch) && $BtnSearch) {
         if($update){
             $currentmonthVerify = mktime(0, 0, 0, intval(substr($data_fim, 5, 2)), 1, intval(substr($data_fim, 0, 4)));
 
-            $sql = "UPDATE cotacao_dolar SET cd_freeze = 1 WHERE opr_codigo = ".$cod_opr." AND cd_data >= '".date('Y-m-d',strtotime($data_inicio))." 00:00:00' AND cd_data <= '".date('Y-m-d',strtotime($data_fim))." 00:00:00';";
+            $sql = "UPDATE cotacao_dolar SET cd_freeze = 1 WHERE opr_codigo = $1 AND cd_data >= $2 AND cd_data <= $3;";
 
-            $rs_freeze = SQLexecuteQuery($sql);
+            $rs_freeze = SQLexecuteQueryParams($sql, array($cod_opr, date('Y-m-d',strtotime($data_inicio))." 00:00:00", date('Y-m-d',strtotime($data_fim))." 00:00:00"));
             if(!$rs_freeze || pg_affected_rows($rs_freeze) < 1){
                 $msg .= "<strong>ERRO 0104</strong>: Problema ao congelar a COTAÇÃO DO DÓLAR para o publisher selecionado!<br>";
                 $class = "alert-danger txt-vermelho";
@@ -151,13 +151,13 @@ if(isset($BtnSearch) && $BtnSearch) {
                 //Congelamento dos dados financeiros
                 $sql_calculo = "update financial_processing 
                                 set fp_freeze = 1
-                                where fp_publisher = ".$cod_opr."
-                                    and date(fp_start_date) = '".$data_inicio."' 
-                                    and date(fp_end_date) = '".$data_fim."' 
+                                where fp_publisher = $1
+                                    and date(fp_start_date) = $2 
+                                    and date(fp_end_date) = $3 
                                     and fp_freeze=0";
                 //echo $sql_calculo." <br>";
-			
-                $dados_calculo = SQLexecuteQuery($sql_calculo);
+				
+                $dados_calculo = SQLexecuteQueryParams($sql_calculo, array($cod_opr, $data_inicio, $data_fim));
 
                 if(!$dados_calculo || pg_affected_rows($dados_calculo) < 1 ) {
                     $msg .= "<strong>ERRO 0105</strong>: Problema ao congelar os TOTAIS FINANCEIROS para o publisher selecionado<br>Período considerado: ".substr($data_inicio,0,19)." até ".substr($data_fim,0,19)."!<br>";

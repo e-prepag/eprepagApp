@@ -10,8 +10,8 @@ if(!Util::isAjaxRequest())
 
 if(isset($_POST["ug_id"])){
     $ug_id = $_POST["ug_id"];
-    $sql = "SELECT ug_login, ug_nome_fantasia, ug_razao_social FROM dist_usuarios_games WHERE ug_id = " . $ug_id;
-    $ret = SQLexecuteQuery($sql);
+    $sql = "SELECT ug_login, ug_nome_fantasia, ug_razao_social FROM dist_usuarios_games WHERE ug_id = $1";
+    $ret = SQLexecuteQueryParams($sql, array($ug_id));
     if((($ret) ? pg_num_rows($ret) : 0) == 0){
         echo "erro";
     }else{

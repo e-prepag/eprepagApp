@@ -104,18 +104,18 @@ function MM_reload_alterar(){
 	//Adicionado a nova Pergunta
 	if($atualizar=="OK") {
 		//fazer Update
-		$sql = "update tb_questionarios_perguntas set qlp_texto='".backoffice_utf8_to_iso($qlp_texto_alterar)."',qlp_ativo=".intval($qlp_ativo_alterar*1).",qlp_tipo='$qlp_tipo_alterar',qlp_outros=".intval($qlp_outros_alterar*1)." where qlp_id=".$qlp_id;
-		//echo "<tr><td>".$sql.":</td></tr>";
-		$rs_questionario_perguntas = SQLexecuteQuery($sql);
+		$sql = "update tb_questionarios_perguntas set qlp_texto=$1,qlp_ativo=$2,qlp_tipo=$3,qlp_outros=$4 where qlp_id=$5";
+			//echo "<tr><td>".$sql.":</td></tr>";
+			$rs_questionario_perguntas = SQLexecuteQueryParams($sql, array(backoffice_utf8_to_iso($qlp_texto_alterar), intval($qlp_ativo_alterar*1), $qlp_tipo_alterar, intval($qlp_outros_alterar*1), $qlp_id));
 		if(!$rs_questionario_perguntas) {
 			echo "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
 		}
 	}
 
 	//buscar pelo id da pergunta 
-	$sql = "select * from tb_questionarios_perguntas where qlp_id=".$qlp_id;
-	//echo $sql."<br>";
-	$rs_perguntas = SQLexecuteQuery($sql);
+	$sql = "select * from tb_questionarios_perguntas where qlp_id=$1";
+		//echo $sql."<br>";
+		$rs_perguntas = SQLexecuteQueryParams($sql, array($qlp_id));
 	$rs_perguntas_row = pg_fetch_array($rs_perguntas);
 	?>
 	<tr>

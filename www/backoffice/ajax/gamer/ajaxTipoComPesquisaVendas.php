@@ -4,8 +4,8 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 
 date_default_timezone_set('America/Fortaleza');
 
-	$sql = "SELECT pin_valor FROM pins WHERE opr_codigo = " . $_REQUEST['id'] . " GROUP BY pin_valor ORDER BY pin_valor;";
-	$rs_oprPins = SQLexecuteQuery($sql);
+	$sql = "SELECT pin_valor FROM pins WHERE opr_codigo = $1 GROUP BY pin_valor ORDER BY pin_valor;";
+	$rs_oprPins = SQLexecuteQueryParams($sql, array($_REQUEST['id']));
 
 
 if($rs_oprPins){

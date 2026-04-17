@@ -4,8 +4,8 @@
         $method = "novaPosicao";
     elseif($acaoMapa == "edita") {
         if(isset($_GET["id"]) && $_GET["id"] != ""){
-            $select = "select * from classificacao_mapas where cm_id = '".$_GET["id"]."'";
-            if($rsPublishers = SQLexecuteQuery($select)){
+            $select = "select * from classificacao_mapas where cm_id = $1";
+            if($rsPublishers = SQLexecuteQueryParams($select, array($_GET["id"]))){
                 if((($rsPublishers) ? pg_num_rows($rsPublishers) : 0) > 0){
                     while($publishers = pg_fetch_array($rsPublishers)) 
                     {

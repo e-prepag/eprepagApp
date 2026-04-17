@@ -76,16 +76,16 @@ if ($atualizar == "OK") {
         $logSQL .= "Possui comissão variavel\n";
 
         //fazer Update para comissão variavel
-        $sql = "update operadoras set opr_comissao_por_volume=" . $opr_comissao_por_volume . " where opr_codigo=" . $opr_codigo;
+        $sql = "update operadoras set opr_comissao_por_volume=$1 where opr_codigo=$2";
         $logSQL .= $sql . "\n";
-        $rs_comissao = SQLexecuteQuery($sql);
+        $rs_comissao = SQLexecuteQueryParams($sql, array($opr_comissao_por_volume, $opr_codigo));
         if (!$rs_comissao) {
             $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
         } else {
 
-            $sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($opr_codigo, 'C',NOW()," . $_POST['comiss_c'] . ",'F');";
+            $sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($1, 'C',NOW(),$2,'F')";
             $logSQL .= $sql . "\n";
-            $rs_comissao = SQLexecuteQuery($sql);
+            $rs_comissao = SQLexecuteQueryParams($sql, array($opr_codigo, $_POST['comiss_c']));
             if (!$rs_comissao) {
                 $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
             } else {
@@ -107,7 +107,7 @@ if ($atualizar == "OK") {
                     //echo "<pre>";var_dump($array_aux);echo "</pre>";
                     //exit;
 
-                    SQLexecuteQuery("UPDATE tb_comissoes SET co_tipo = 'F' WHERE co_opr_codigo = {$opr_codigo} AND co_canal NOT IN ('M','E', 'L', 'P','C');");
+                    SQLexecuteQueryParams("UPDATE tb_comissoes SET co_tipo = 'F' WHERE co_opr_codigo = $1 AND co_canal NOT IN ('M','E', 'L', 'P','C')", array($opr_codigo));
 
                     foreach ($array_aux as $key => $value) {
                         //sort($value);
@@ -125,10 +125,10 @@ if ($atualizar == "OK") {
                             if ((($value_interno['MIN']!='') && ($value_interno['MAX']!='') && ($value_interno['COM']!=''))) { //
 
                                 $sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo,co_volume_min,co_volume_max,co_volume_tipo)
-                                          values ($opr_codigo, '',NOW()," . $value_interno['COM'] . ",'V'," . str_replace(",", ".", $value_interno['MIN']) . "," . str_replace(",", ".", $value_interno['MAX']) . ",'" . $key . "');";
+                                          values ($1, '',NOW(),$2,'V',$3,$4,$5)";
                                 $logSQL .= $sql . "\n";
                                 //echo $sql."<br>";
-                                $rs_comissao = SQLexecuteQuery($sql);
+                                $rs_comissao = SQLexecuteQueryParams($sql, array($opr_codigo, $value_interno['COM'], str_replace(",", ".", $value_interno['MIN']), str_replace(",", ".", $value_interno['MAX']), $key));
                                 if (!$rs_comissao) {
                                     $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
                                 }
@@ -147,7 +147,7 @@ if ($atualizar == "OK") {
 
                     $logSQL .= "Não possui diferenciação de volumes por vendas diretas e indiretas\n";
 
-                    SQLexecuteQuery("UPDATE tb_comissoes SET co_tipo = 'F' WHERE co_opr_codigo = {$opr_codigo} AND co_canal NOT IN ('M','E', 'L', 'P','C');");
+                    SQLexecuteQueryParams("UPDATE tb_comissoes SET co_tipo = 'F' WHERE co_opr_codigo = $1 AND co_canal NOT IN ('M','E', 'L', 'P','C')", array($opr_codigo));
 
                     $i = 0;
                     $array_aux = array();
@@ -170,11 +170,11 @@ if ($atualizar == "OK") {
                             //Teste de validação
                             if (($value_interno['MIN']!='' && $value_interno['MAX']!='' && $value_interno['COM']!='')) {
                                 $sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo,co_volume_min,co_volume_max)
-                                          values ($opr_codigo, '',NOW()," . $value_interno['COM'] . ",'V'," . str_replace(",", ".", $value_interno['MIN']) . "," . str_replace(",", ".", $value_interno['MAX']) . ");";
+                                          values ($1, '',NOW(),$2,'V',$3,$4)";
                                 //$sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo,co_volume_min,co_volume_max) values ($opr_codigo, '',NOW(),".$value['COM'].",'V',".str_replace(",",".",$value['MIN']).",".str_replace(",",".",$value['MAX']).");";
                                 $logSQL .= $sql . "\n";
                                 //echo $sql."<br>";
-                                $rs_comissao = SQLexecuteQuery($sql);
+                                $rs_comissao = SQLexecuteQueryParams($sql, array($opr_codigo, $value_interno['COM'], str_replace(",", ".", $value_interno['MIN']), str_replace(",", ".", $value_interno['MAX'])));
                                 if (!$rs_comissao) {
                                     $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
                                 }
@@ -197,22 +197,28 @@ if ($atualizar == "OK") {
         $logSQL .= "Possui comissão Fixa por Canal\n";
 
         //fazer Update para comissão fixa
-        $sql = "update operadoras set opr_comissao_por_volume=" . $opr_comissao_por_volume . " where opr_codigo=" . $opr_codigo;
+        $sql = "update operadoras set opr_comissao_por_volume=$1 where opr_codigo=$2";
         $logSQL .= $sql . "\n";
-        $rs_comissao = SQLexecuteQuery($sql);
+        $rs_comissao = SQLexecuteQueryParams($sql, array($opr_comissao_por_volume, $opr_codigo));
         if (!$rs_comissao) {
             $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
         } else {
-            $sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($opr_codigo, 'M',NOW()," . $_POST['comiss_m'] . ",'F');
-                    insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($opr_codigo, 'E',NOW()," . $_POST['comiss_e'] . ",'F');
-                    insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($opr_codigo, 'L',NOW()," . $_POST['comiss_l'] . ",'F');
-                    insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($opr_codigo, 'P',NOW()," . $_POST['comiss_p'] . ",'F');
-                    insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($opr_codigo, 'C',NOW()," . $_POST['comiss_c'] . ",'F');";
-            $logSQL .= $sql . "\n";
-            //echo $sql."<br>";
-            $rs_comissao = SQLexecuteQuery($sql);
-            if (!$rs_comissao) {
-                $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
+            $comissoesFixas = array(
+                'M' => $_POST['comiss_m'],
+                'E' => $_POST['comiss_e'],
+                'L' => $_POST['comiss_l'],
+                'P' => $_POST['comiss_p'],
+                'C' => $_POST['comiss_c']
+            );
+            foreach ($comissoesFixas as $canal => $comissaoFixa) {
+                $sql = "insert into tb_comissoes (co_opr_codigo,co_canal,co_data_inclusao,co_comissao,co_tipo) values ($1, $2,NOW(),$3,'F')";
+                $logSQL .= $sql . "\n";
+                //echo $sql."<br>";
+                $rs_comissao = SQLexecuteQueryParams($sql, array($opr_codigo, $canal, $comissaoFixa));
+                if (!$rs_comissao) {
+                    $msg .= "Erro ao salvar informações da comissão. ($sql)\n";
+                    break;
+                }
             }
         }//end else do if(!$rs_comissao)
 
@@ -475,13 +481,13 @@ if ($atualizar == "OK") {
             order by co_opr_codigo, co_canal, co_data_inclusao desc,co_tipo, co_volume_tipo, co_volume_min ";
 
 */
-    $sqlComissoesInvariaveis = "SELECT (100*obtem_comissao({$opr_codigo}, 'M', null, 0)) as comiss_m,
-(100*obtem_comissao({$opr_codigo}, 'E', null, 0)) as comiss_e,
-(100*obtem_comissao({$opr_codigo}, 'L', null, 0)) as comiss_l,
-(100*obtem_comissao({$opr_codigo}, 'C', null, 0)) as comiss_c,
-(100*obtem_comissao({$opr_codigo}, 'P', null, 0)) as comiss_p";
+    $sqlComissoesInvariaveis = "SELECT (100*obtem_comissao($1, 'M', null, 0)) as comiss_m,
+(100*obtem_comissao($1, 'E', null, 0)) as comiss_e,
+(100*obtem_comissao($1, 'L', null, 0)) as comiss_l,
+(100*obtem_comissao($1, 'C', null, 0)) as comiss_c,
+(100*obtem_comissao($1, 'P', null, 0)) as comiss_p";
 
-    $rsComiss = SQLexecuteQuery($sqlComissoesInvariaveis);
+    $rsComiss = SQLexecuteQueryParams($sqlComissoesInvariaveis, array($opr_codigo));
     $comissRows = pg_fetch_array($rsComiss);
 
 
@@ -489,8 +495,8 @@ if ($atualizar == "OK") {
     $sql = "select o.opr_codigo, o.opr_nome, o.opr_comissao_por_volume , c.*
 from operadoras o
 left outer join tb_comissoes c on o.opr_codigo=c.co_opr_codigo
-where  opr_codigo = {$opr_codigo}
-AND to_char(co_data_inclusao,'YYYYDDMMHH24MISS') = (select to_char(max(co_data_inclusao),'YYYYDDMMHH24MISS') from tb_comissoes where co_opr_codigo=$opr_codigo)
+where  opr_codigo = $1
+AND to_char(co_data_inclusao,'YYYYDDMMHH24MISS') = (select to_char(max(co_data_inclusao),'YYYYDDMMHH24MISS') from tb_comissoes where co_opr_codigo=$1)
     and co_canal != 'C'
     AND co_tipo != 'F'
 order by co_opr_codigo, co_canal, co_data_inclusao ASC,co_tipo, co_volume_tipo, co_volume_min;";
@@ -506,7 +512,7 @@ ORDER BY co_canal, co_data_inclusao DESC,co_tipo, co_volume_tipo, co_volume_min'
 
 
     //echo $sql;
-    $rs_comissao = SQLexecuteQuery($sql);
+    $rs_comissao = SQLexecuteQueryParams($sql, array($opr_codigo));
     $rs_comissao_row = pg_fetch_array($rs_comissao);
 
     //Auxiliar para teste se tem selecionado ou no BD o volume_tipo
@@ -581,7 +587,7 @@ ORDER BY co_canal, co_data_inclusao DESC,co_tipo, co_volume_tipo, co_volume_min'
 
                     <tbody id="body_valores_comissoes">
                     <?php
-                    $rs_comissao = SQLexecuteQuery($sql);
+                    $rs_comissao = SQLexecuteQueryParams($sql, array($opr_codigo));
                     $i = 0;
                     while ($rs_row = pg_fetch_array($rs_comissao)){
                         $trStyle = ($rs_row['co_comissao'] == 0) ? ' style=\'background-color:yellow; color:red\'' : '';

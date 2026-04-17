@@ -10,9 +10,9 @@ if ($request_id > 0){
     else
         $tb = "tb_operadora_games_produto";
     
-	$sql = "SELECT ogp_id,ogp_nome FROM $tb WHERE ogp_opr_codigo = " . $request_id . "";
+	$sql = "SELECT ogp_id,ogp_nome FROM $tb WHERE ogp_opr_codigo = $1";
 //echo $sql."<br>";
-	$rs_oprProdutos = SQLexecuteQuery($sql);
+	$rs_oprProdutos = SQLexecuteQueryParams($sql, array($request_id));
 }
 
 $id = $request_id;

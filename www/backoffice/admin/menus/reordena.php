@@ -16,12 +16,12 @@ if(!empty($_POST['reordenar'])){
     
     foreach($_POST['reordenar'] as $id => $ordem){
         
-        $sql = "select * from bo_menu where menu_id = ".$id;
-        $rs_reordena = SQLexecuteQuery($sql);
+        $sql = "select * from bo_menu where menu_id = $1";
+        $rs_reordena = SQLexecuteQueryParams($sql, array($id));
         if((($rs_reordena) ? pg_num_rows($rs_reordena) : 0) > 0) {
-            $sqlAtualizaAba = "update bo_menu set menu_order = $ordem where menu_id = $id";
+            $sqlAtualizaAba = "update bo_menu set menu_order = $1 where menu_id = $2";
             
-            if(!$rsAtualiza = SQLexecuteQuery($sqlAtualizaAba)){
+            if(!$rsAtualiza = SQLexecuteQueryParams($sqlAtualizaAba, array($ordem, $id))){
                 
                 $aba = pg_fetch_all($rs_reordena);
                 
@@ -35,9 +35,9 @@ if(!empty($_POST['reordenar'])){
 $totalRegistros = 0;
 
 if(isset($_POST['aba'])){
-    $sql = "SELECT * FROM bo_menu inner join bo_aba on bo_menu.aba_id = ".$_POST['aba']." and bo_menu.aba_id = bo_aba.aba_id order by menu_order asc";
+    $sql = "SELECT * FROM bo_menu inner join bo_aba on bo_menu.aba_id = $1 and bo_menu.aba_id = bo_aba.aba_id order by menu_order asc";
 
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, array($_POST['aba']));
 
     if($rs) {
         $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);

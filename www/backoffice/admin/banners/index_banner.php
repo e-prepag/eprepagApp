@@ -58,44 +58,32 @@ if($acao == 'inserir')
 							bds_ativo
 							) 
 					VALUES (
-							to_date('$bds_data_inicio','DD/MM/YYYY'), 
-							to_date('$bds_data_fim','DD/MM/YYYY'), 
-							$bds_tipo,
-							'$bds_usuario_bko',
-							'".str_replace("'",'"',$bds_nome_update)."', 
-							'$bds_tipo_usuario',
-							";
-	if (empty($bds_banner)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".$bds_banner."',";
-	}
-	if (empty($bds_ids_inclusao)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".trim((string)($bds_ids_inclusao ?? ''))."',";
-	}
-	if (empty($bds_ids_exclusao)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".trim((string)($bds_ids_exclusao ?? ''))."',";
-	}
-	if (empty($bds_link)) {
-		$sql .= "NULL,";
-	}
-	else {
-		$sql .= "'".trim((string)($bds_link ?? ''))."',";
-	}
-	if (empty($bds_ativo)) {
-		$sql .= "0);";
-	}else {
-		$sql .= "1);";
-	}
+							to_date($1,'DD/MM/YYYY'), 
+							to_date($2,'DD/MM/YYYY'), 
+							$3,
+							$4,
+							$5, 
+							$6,
+							$7,
+							$8,
+							$9,
+							$10,
+							$11);";
+	$params_banner = array(
+		$bds_data_inicio,
+		$bds_data_fim,
+		$bds_tipo,
+		$bds_usuario_bko,
+		str_replace("'",'"',$bds_nome_update),
+		$bds_tipo_usuario,
+		empty($bds_banner) ? null : $bds_banner,
+		empty($bds_ids_inclusao) ? null : trim((string)($bds_ids_inclusao ?? '')),
+		empty($bds_ids_exclusao) ? null : trim((string)($bds_ids_exclusao ?? '')),
+		empty($bds_link) ? null : trim((string)($bds_link ?? '')),
+		empty($bds_ativo) ? 0 : 1
+	);
 	//echo $sql."<br>";
-	$rs_banner = SQLexecuteQuery($sql);
+	$rs_banner = SQLexecuteQueryParams($sql, $params_banner);
 	if(!$rs_banner) {
 		$msg .= "Erro ao salvar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
 	}
@@ -120,29 +108,43 @@ if($acao == 'atualizar')
 			$msg .= "Arquivo N&atilde;o Possui um Formato V&aacute;lido para o Banner.<br>";
 		}
 	}
+	$params_banner = array(
+		str_replace("'",'"',$bds_nome_update),
+		$bds_data_inicio,
+		$bds_data_fim,
+		$bds_tipo,
+		$bds_tipo_usuario,
+		$bds_usuario_bko,
+		trim((string)($bds_ids_inclusao ?? '')),
+		trim((string)($bds_ids_exclusao ?? ''))
+	);
 	$sql = "UPDATE tb_banner_drop_shadow SET
-						bds_texto					= '".str_replace("'",'"',$bds_nome_update)."',
-						bds_data_inicio				= to_date('".$bds_data_inicio."','DD/MM/YYYY'),           
-						bds_data_fim				= to_date('".$bds_data_fim."','DD/MM/YYYY'),
-						bds_tipo					= $bds_tipo,
-						bds_tipo_usuario			= '$bds_tipo_usuario',
-						bds_usuario_bko_responsavel	= '$bds_usuario_bko',
-						bds_lista_ids_inclusao		= '".trim((string)($bds_ids_inclusao ?? ''))."',
-						bds_lista_ids_exclusao		= '".trim((string)($bds_ids_exclusao ?? ''))."',";
+						bds_texto					= $1,
+						bds_data_inicio				= to_date($2,'DD/MM/YYYY'),           
+						bds_data_fim				= to_date($3,'DD/MM/YYYY'),
+						bds_tipo					= $4,
+						bds_tipo_usuario			= $5,
+						bds_usuario_bko_responsavel	= $6,
+						bds_lista_ids_inclusao		= $7,
+						bds_lista_ids_exclusao		= $8,";
+	$param_index = 9;
 	if (!empty($bds_banner)) {
-		$sql .= "		bds_imagem_banner			= '".$bds_banner."',";
+		$sql .= "		bds_imagem_banner			= $".$param_index.",";
+		$params_banner[] = $bds_banner;
+		$param_index++;
 	}
 	if (!empty($bds_link)) {
-		$sql .= "		bds_link					= '".$bds_link."',";
+		$sql .= "		bds_link					= $".$param_index.",";
+		$params_banner[] = $bds_link;
+		$param_index++;
 	}
-	if (empty($bds_ativo)) {
-		$sql .= "		bds_ativo					= '0'";
-	}else {
-		$sql .= "		bds_ativo					= '1'";
-	}
-	$sql .= "	WHERE	bds_id_banner				= $bds_id_update";
+	$sql .= "		bds_ativo					= $".$param_index;
+	$params_banner[] = empty($bds_ativo) ? 0 : 1;
+	$param_index++;
+	$sql .= "	WHERE	bds_id_banner				= $".$param_index;
+	$params_banner[] = $bds_id_update;
 	//echo $sql."<br>:SQL<br>";
-	$rs_banner = SQLexecuteQuery($sql);
+	$rs_banner = SQLexecuteQueryParams($sql, $params_banner);
 	if(!$rs_banner) {
 		$msg .= "Erro ao atualizar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
 	}
@@ -170,9 +172,9 @@ if($acao == 'editar')
 					bds_link,
 					bds_tipo_usuario
 			FROM tb_banner_drop_shadow 
-			WHERE bds_id_banner = $bds_id"; 
+			WHERE bds_id_banner = $1"; 
 	//echo $sql."<br>";
-	$rs_banner = SQLexecuteQuery($sql);
+	$rs_banner = SQLexecuteQueryParams($sql, array($bds_id));
 	if(!($rs_banner_row = pg_fetch_array($rs_banner))) {
 		$msg .= "Erro ao consultar informa&ccedil;&otilde;es da question&aacute;rio. ($sql)<br>";
 	}

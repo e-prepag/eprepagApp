@@ -66,7 +66,7 @@ if(!isset($total_reg))
 	{ echo "<META HTTP-EQUIV='Refresh' Content=0;URL='http://".$_SERVER['HTTP_HOST'].":$server_port/'>"; }
 	else
 	{
-		$resusr = pg_exec($connid, "select bko_logado from usuarios where id='".$_SESSION['iduser']."'");
+		$resusr = pg_query_params($connid, "select bko_logado from usuarios where id=$1", array($_SESSION['iduser']));
 		$pgusr = pg_fetch_array($resusr);
 		
 		if($pgusr['bko_logado'] == 'N')
@@ -86,7 +86,7 @@ if(!isset($total_reg))
 	if (! $ncamp) $ncamp = 'trn_data';
 	$enviar = 1;
 	
-	$rescid = pg_exec($connid, "select cid_codigo, municipio from cidades where uf='$fuf' order by municipio");
+	$rescid = pg_query_params($connid, "select cid_codigo, municipio from cidades where uf=$1 order by municipio", array($fuf));
 	
 	if($trn_teste)
 		{ $resopr = pg_exec($connid, "select opr_nome, opr_codigo from operadoras where opr_status='1' order by opr_nome"); }

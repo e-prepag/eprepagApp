@@ -17,9 +17,9 @@ require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 require_once $raiz_do_projeto."class/classPinsStore.php";
 
 if ($_REQUEST['id'] > 0){
-	$sql = "SELECT pin_valor FROM pins WHERE opr_codigo = " . intval($_REQUEST['id']) . " GROUP BY pin_valor ORDER BY pin_valor;";
+	$sql = "SELECT pin_valor FROM pins WHERE opr_codigo = $1 GROUP BY pin_valor ORDER BY pin_valor;";
 //echo "$sql<br>";
-	$rs_oprPins = SQLexecuteQuery($sql);
+	$rs_oprPins = SQLexecuteQueryParams($sql, array($_REQUEST['id']));
 }
 
 if($rs_oprPins){

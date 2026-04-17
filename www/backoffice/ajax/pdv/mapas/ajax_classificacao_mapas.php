@@ -36,11 +36,16 @@ try{
 
     $arrLojas = array();
 
-    $delete = "delete from classificacao_mapas_pdv where cm_id in (".implode(",", $publishers).")";
+    $deleteParams = array_values($publishers);
+    $deletePlaceholders = array();
+    foreach ($deleteParams as $deleteIndex => $deleteParam) {
+        $deletePlaceholders[] = "$" . ($deleteIndex + 1);
+    }
+    $delete = "delete from classificacao_mapas_pdv where cm_id in (" . implode(",", $deletePlaceholders) . ")";
 
-    $limpa_tabela = SQLexecuteQuery($delete);
+    $limpa_tabela = SQLexecuteQueryParams($delete, $deleteParams);
 
-    $insert = "insert into classificacao_mapas_pdv (us_id, cm_id) values (%s, %s)";
+    $insert = "insert into classificacao_mapas_pdv (us_id, cm_id) values ($1, $2)";
 
 
     foreach($lojas as $loja){
@@ -50,23 +55,23 @@ try{
             $arrLojas[$tmpLoja[0]] = $tmpLoja[1]; //agrupando as lojas em array
     }
 
-    $tmp = "";
+    $ret = true;
     foreach($arrLojas as $ind => $cMapas){
         $tmpcMapas = explode("|",$cMapas); 
 
             foreach($tmpcMapas as $cMapa){
                 if(trim($cMapa) != ""){
-                    $tmp .=  vsprintf($insert, array($ind,$cMapa))."; \n";
+                    $ret = SQLexecuteQueryParams($insert, array($ind, $cMapa));
+                    if(!$ret) break 2;
                 }
             }
         }
 
-    if($ret = SQLexecuteQuery($tmp) || $tmp == ""){
+    if($ret){
         echo true;
     }else{
         throw new Exception("ERRO AO INSERIR CAMPOS");
-    }
-    
+    }    
     
 } catch (Exception $ex) {
     $geraLog = new Log("BO-CLASSIFICACAOMAPAS",array(   "ERROR: ".  $ex->getMessage(),

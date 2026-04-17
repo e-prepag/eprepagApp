@@ -2738,8 +2738,8 @@ class UsuarioGames
                 $ret = "";
                 if (($objGamesUsuario->getEmail() != $rsUltimoEmail["ug_email"]) && !empty($objGamesUsuario->getEmail())) {
 
-                    $sqlEmail = "insert into log_modificacao_email(email_anterior,email_novo,data_inclusao,usuario_bo,pdv)values('" . $rsUltimoEmail["ug_email"] . "','" . $objGamesUsuario->getEmail() . "',CURRENT_TIMESTAMP,'" . $_SESSION["userlogin_bko"] . "'," . $objGamesUsuario->getId() . ");";
-                    $ret = SQLexecuteQuery($sqlEmail);
+                    $sqlEmail = "insert into log_modificacao_email(email_anterior,email_novo,data_inclusao,usuario_bo,pdv)values($1, $2, CURRENT_TIMESTAMP, $3, $4)";
+                    $ret = SQLexecuteQueryParams($sqlEmail, array($rsUltimoEmail["ug_email"], $objGamesUsuario->getEmail(), $_SESSION["userlogin_bko"], $objGamesUsuario->getId()));
                 }
             }
         }

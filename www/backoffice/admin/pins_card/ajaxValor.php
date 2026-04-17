@@ -15,8 +15,8 @@ require_once $raiz_do_projeto . "includes/main.php";
 if ($_REQUEST['id'] > 0 AND $_REQUEST['opr_codigo'] > 0){
 	echo '<select name="pin_valor" id="pin_valor" class="combo_normal">\n';
 	echo '<option value="">Selecione o Valor</option>';
-	 $sql = "SELECT pcdv_valor from pins_card_distribuidoras_valores where opr_codigo = ".$_REQUEST['opr_codigo']." and pcd_id_distribuidor = ".$_REQUEST['id'].";";
-        $rs_operadoras = SQLexecuteQuery($sql);
+	 $sql = "SELECT pcdv_valor from pins_card_distribuidoras_valores where opr_codigo = $1 and pcd_id_distribuidor = $2;";
+        $rs_operadoras = SQLexecuteQueryParams($sql, array($_REQUEST['opr_codigo'], $_REQUEST['id']));
         while ($rs_operadoras_row = pg_fetch_array($rs_operadoras)) {
 	  echo '<option value="'.$rs_operadoras_row['pcdv_valor'].'"'.((intval($_REQUEST['pin_valor'])==$rs_operadoras_row['pcdv_valor'])?" selected":"").'>R$ '.$rs_operadoras_row['pcdv_valor']. '</option>'; 
 	}

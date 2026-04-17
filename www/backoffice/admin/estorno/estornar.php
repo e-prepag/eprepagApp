@@ -15,8 +15,8 @@ if(isset($_POST["ug_id"]) && !empty($_POST["ug_id"]) && isset($_POST["valor"]) &
     if($valor > MAX_VALOR){
         $msg = "O valor máximo permitido para estorno é de R$" . number_format(MAX_VALOR, 2, ",", ".") . ".";
     }else{
-        $sql = "SELECT ug_login, ug_perfil_saldo, ug_risco_classif FROM dist_usuarios_games WHERE ug_id = " . $ug_id;
-        $ret = SQLexecuteQuery($sql);
+        $sql = "SELECT ug_login, ug_perfil_saldo, ug_risco_classif FROM dist_usuarios_games WHERE ug_id = $1";
+        $ret = SQLexecuteQueryParams($sql, array($ug_id));
         if((($ret) ? pg_num_rows($ret) : 0) == 0){
             $msg = "O ID não corresponde a um pdv";
         }else{
@@ -26,19 +26,8 @@ if(isset($_POST["ug_id"]) && !empty($_POST["ug_id"]) && isset($_POST["valor"]) &
             $saldo_anterior = $row["ug_perfil_saldo"];
 			$valor_atual = $saldo_anterior + $valor; 
 
-			$sql = "INSERT INTO estorno_pdv(shn_id, shn_login, ug_id, ug_login, ug_saldo_anterior, ug_saldo_atual, est_tipo, est_valor, ug_descricao) "
-					. "VALUES "
-					. "("
-					. "'" . $_SESSION['iduser_bko'] . "', "
-					. "'" . $_SESSION['userlogin_bko'] . "', "
-					. $ug_id . ", "
-					. "'" . $ug_login . "', "
-					. $saldo_anterior . ", "
-					. $valor_atual . ", "
-					. "0, "
-					. $valor.",'"
-					. $_POST["descricao"]."')";
-			$ret = SQLexecuteQuery($sql);
+			$sql = "INSERT INTO estorno_pdv(shn_id, shn_login, ug_id, ug_login, ug_saldo_anterior, ug_saldo_atual, est_tipo, est_valor, ug_descricao) VALUES ($1, $2, $3, $4, $5, $6, 0, $7, $8)";
+				$ret = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko'], $_SESSION['userlogin_bko'], $ug_id, $ug_login, $saldo_anterior, $valor_atual, $valor, $_POST["descricao"]));
 			if(!$ret){
 				$msg = "Erro ao salvar as informações do estorno";
 			}
@@ -67,8 +56,8 @@ if($row) $registros_total = $row["total"];
 
 $sql = "SELECT * FROM estorno_pdv WHERE est_tipo = 0";
 $sql .= " ORDER BY data_operacao DESC";	
-$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
-$rs_estornos = SQLexecuteQuery($sql);
+$sql .= " offset $1 limit $2";
+$rs_estornos = SQLexecuteQueryParams($sql, array(intval(($p - 1) * $registros), intval($registros)));
 
 ?>
 

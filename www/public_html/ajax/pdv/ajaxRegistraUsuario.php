@@ -295,22 +295,23 @@ if ($cad_usuarioGames->getUgIdNexCafe()) {
 
 if ($cad_usuarioGames->getTipoEstabelecimento() == "Outros") {
     $temp_tipo_estabelecimento_empresa = $outro_estabelecimento;
-    $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao)='" . strtoupper(str_replace("'", '"', $temp_tipo_estabelecimento_empresa)) . "'";
-    $rs_select_tipo_estabelecimento = SQLexecuteQuery($sql);
+    $tipo_estabelecimento_empresa = strtoupper(str_replace("'", '"', $temp_tipo_estabelecimento_empresa));
+    $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao)=$1";
+    $rs_select_tipo_estabelecimento = SQLexecuteQueryParams($sql, array($tipo_estabelecimento_empresa));
     if ($rs_select_tipo_estabelecimento_row = pg_fetch_array($rs_select_tipo_estabelecimento)) {
         //echo  "rs_select_tipo_estabelecimento_row [te_id]: ".$rs_select_tipo_estabelecimento_row['te_id']."<br>";
         $cad_usuarioGames->setTipoEstabelecimento($rs_select_tipo_estabelecimento_row['te_id']);
     } //end if ($rs_select_tipo_estabelecimento_row = pg_fetch_array($rs_select_tipo_estabelecimento))
     else {
         $outro_estabelecimento = utf8_encode(str_replace("'", '"', $outro_estabelecimento));
-        $sql = "INSERT INTO tb_tipo_estabelecimento (te_ativo,te_descricao) VALUES (0,'" . $outro_estabelecimento . "');"; //".utf8_decode($resposta)."
+        $sql = "INSERT INTO tb_tipo_estabelecimento (te_ativo,te_descricao) VALUES (0,$1);"; //".utf8_decode($resposta)."
 
-        $rs_tipo_estabelecimento = SQLexecuteQuery($sql);
+        $rs_tipo_estabelecimento = SQLexecuteQueryParams($sql, array($outro_estabelecimento));
         if (!$rs_tipo_estabelecimento) {
             //echo "Erro ao salvar informa&ccedil;&otilde;es do tipo de estabelecimento.<br>";
         } else {
-            $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao)='" . strtoupper(str_replace("'", '"', $outro_estabelecimento)) . "'";
-            $rs_select_tipo_estabelecimento_inserido = SQLexecuteQuery($sql);
+            $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao)=$1";
+            $rs_select_tipo_estabelecimento_inserido = SQLexecuteQueryParams($sql, array(strtoupper(str_replace("'", '"', $outro_estabelecimento))));
             $rs_select_tipo_estabelecimento_inserido_row = pg_fetch_array($rs_select_tipo_estabelecimento_inserido);
             $cad_usuarioGames->setTipoEstabelecimento($rs_select_tipo_estabelecimento_inserido_row['te_id']);
         }

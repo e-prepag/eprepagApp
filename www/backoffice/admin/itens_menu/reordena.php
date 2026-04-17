@@ -22,12 +22,12 @@ if(!empty($_POST['reordenar'])){
     
     foreach($_POST['reordenar'] as $id => $ordem){
         
-        $sql = "select * from bo_item where item_id = ".$id;
-        $rs_reordena = SQLexecuteQuery($sql);
+        $sql = "select * from bo_item where item_id = $1";
+        $rs_reordena = SQLexecuteQueryParams($sql, array($id));
         if((($rs_reordena) ? pg_num_rows($rs_reordena) : 0) > 0) {
-            $sqlAtualizaAba = "update bo_item set item_order = $ordem where item_id = $id";
+            $sqlAtualizaAba = "update bo_item set item_order = $1 where item_id = $2";
             
-            if(!$rsAtualiza = SQLexecuteQuery($sqlAtualizaAba)){
+            if(!$rsAtualiza = SQLexecuteQueryParams($sqlAtualizaAba, array($ordem, $id))){
                 
                 $aba = pg_fetch_all($rs_reordena);
                 
@@ -48,21 +48,21 @@ $abas = $stmt->fetchAll(PDO::FETCH_OBJ);
 
 if((is_countable($abas) ? count($abas) : 0) > 0 && isset($_POST['aba']) && $_POST['aba']){
 
-    $where = " where aba_id = ".$_POST['aba'];
+    $where = " where aba_id = ?";
 
     $sql = "SELECT * FROM bo_menu $where order by menu_order";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute();
+    $stmt->execute(array($_POST['aba']));
 
     $menus = $stmt->fetchAll(PDO::FETCH_OBJ);
 
     $on = "";
     if(isset($_POST['menu']) && $_POST['menu'] != ""){
 
-        $on = " AND menu.menu_id = ".$_POST['menu'];
+        $on = " AND menu.menu_id = $1";
         $sql = "SELECT * FROM bo_item item inner join bo_menu menu on item.menu_id = menu.menu_id $on order by item.item_order asc";
 
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, array($_POST['menu']));
 
         if($rs) {
             $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);

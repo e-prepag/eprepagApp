@@ -7,7 +7,7 @@ if(empty($_SESSION["iduser_bko"]))
         exit;
 }
 
-$sql = "select bko_autoriza, bko_local_acesso from usuarios where id='".$_SESSION['iduser_bko']."'";
-$result = pg_exec($connid, $sql);   
+$sql = "select bko_autoriza, bko_local_acesso from usuarios where id=$1";
+$result = pg_query_params($connid, $sql, array($_SESSION['iduser_bko']));
 $pgrow = pg_fetch_array($result);  
 ?>

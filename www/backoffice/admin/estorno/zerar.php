@@ -8,8 +8,8 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once "/www/includes/bourls.php";
 if(isset($_POST["ug_id"])){
     $ug_id = $_POST["ug_id"];
-    $sql = "SELECT ug_perfil_saldo, ug_login, ug_risco_classif FROM dist_usuarios_games WHERE ug_id = " . $ug_id;
-    $ret = SQLexecuteQuery($sql);
+    $sql = "SELECT ug_perfil_saldo, ug_login, ug_risco_classif FROM dist_usuarios_games WHERE ug_id = $1";
+    $ret = SQLexecuteQueryParams($sql, array($ug_id));
     if((($ret) ? pg_num_rows($ret) : 0) == 0){
         $msg = "O ID não corresponde a um pdv";
     }else{
@@ -20,19 +20,8 @@ if(isset($_POST["ug_id"])){
             $ug_login = $row["ug_login"]; 
             $saldo_anterior = $row["ug_perfil_saldo"];
             $valor_atual = 0;
-			$sql = "INSERT INTO estorno_pdv(shn_id, shn_login, ug_id, ug_login, ug_saldo_anterior, ug_saldo_atual, est_tipo, est_valor, ug_descricao) "
-					. "VALUES "
-					. "("
-					. "'" . $_SESSION['iduser_bko'] . "', "
-					. "'" . $_SESSION['userlogin_bko'] . "', "
-					. $ug_id . ", "
-					. "'" . $ug_login . "', "
-					. $saldo_anterior . ", "
-					. $valor_atual . ", "
-					. "1, "
-					. "0 ,'" .
-					$_POST["descricao"] . "')";
-			$ret = SQLexecuteQuery($sql);
+			$sql = "INSERT INTO estorno_pdv(shn_id, shn_login, ug_id, ug_login, ug_saldo_anterior, ug_saldo_atual, est_tipo, est_valor, ug_descricao) VALUES ($1, $2, $3, $4, $5, $6, 1, $7, $8)";
+				$ret = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko'], $_SESSION['userlogin_bko'], $ug_id, $ug_login, $saldo_anterior, $valor_atual, 0, $_POST["descricao"]));
 			if(!$ret){
 				$msg = "Erro ao salvar as informações do estorno";
 			}
@@ -59,8 +48,8 @@ if($row) $registros_total = $row["total"];
 
 $sql = "SELECT * FROM estorno_pdv WHERE est_tipo = 1";
 $sql .= " ORDER BY data_operacao DESC";	
-$sql .= " offset " . intval(($p - 1) * $registros) . " limit " . intval($registros);
-$rs_estornos = SQLexecuteQuery($sql);
+$sql .= " offset $1 limit $2";
+$rs_estornos = SQLexecuteQueryParams($sql, array(intval(($p - 1) * $registros), intval($registros)));
 
 ?>
 

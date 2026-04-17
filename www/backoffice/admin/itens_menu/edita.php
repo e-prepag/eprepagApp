@@ -71,9 +71,10 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
         if($stmt->rowCount() == 1){
             
             if(isset($_POST["fixo"])){
-                $sql = "SELECT menu_descricao FROM bo_menu WHERE menu_id = " . $_POST["idMenu"] . "LIMIT 1";
-                $rs_menu = SQLexecuteQuery($sql);
-                $menu = pg_fetch_array($rs_menu);
+                $sql = "SELECT menu_descricao FROM bo_menu WHERE menu_id = ? LIMIT 1";
+                $stmt_menu = $pdo->prepare($sql);
+                $stmt_menu->execute(array($_POST["idMenu"]));
+                $menu = $stmt_menu->fetch(PDO::FETCH_ASSOC);
                 $nome_antigo = Util::cleanStr($_POST["nome_antigo"]);
                 $diretorio = Util::cleanStr($menu["menu_descricao"]);
                 $caminho = RAIZ_DO_PROJETO . "backoffice/manuais/" . $diretorio . "/";
@@ -86,8 +87,9 @@ if(isset($_POST['nome']) && isset($_POST['id'])) { //novo e edita
                         }                    
                     }
                     $link = "/manuais/" . $diretorio . "/" . Util::cleanStr($_POST["nome"]) . ".php";
-                    $sql = "UPDATE bo_item SET item_link = '" . $link . "', item_link_linux = '" . $link . "' WHERE item_id = " . $_POST['id'];
-                    $rs_item = SQLexecuteQuery($sql);
+                    $sql = "UPDATE bo_item SET item_link = ?, item_link_linux = ? WHERE item_id = ?";
+                    $stmt_item = $pdo->prepare($sql);
+                    $stmt_item->execute(array($link, $link, $_POST['id']));
                 }
                 
                 $msg[] = "Dados ".$texto." com sucesso. Clique <a href='lista.php'>aqui</a> para voltar.";
@@ -151,9 +153,9 @@ $abas = $stmt->fetchAll(PDO::FETCH_OBJ);
 $menus = array();
 
 if(isset($_POST['aba'])){
-    $sql = "SELECT * FROM bo_menu where aba_id = ".$_POST['aba']." order by menu_order";
+    $sql = "SELECT * FROM bo_menu where aba_id = ? order by menu_order";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute();
+    $stmt->execute(array($_POST['aba']));
 
     $menus = $stmt->fetchAll(PDO::FETCH_OBJ);
 }

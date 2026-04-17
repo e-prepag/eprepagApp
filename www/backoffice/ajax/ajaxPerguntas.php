@@ -254,25 +254,21 @@ function MM_load_resp(ID){
 	//Atualizando as perguntas ativas
 	if (isset($qlp_ativo) && count($qlp_ativo)>0) {
 		//removendo todos os ativos
-		$sql = "update tb_questionarios_perguntas set qlp_ativo=0 where ql_id_questionario=".$quest_id_update;
-		$rs_questionario_perguntas = SQLexecuteQuery($sql);
+		$sql = "update tb_questionarios_perguntas set qlp_ativo=0 where ql_id_questionario=$1";
+			$rs_questionario_perguntas = SQLexecuteQueryParams($sql, array($quest_id_update));
 		if(!$rs_questionario_perguntas) {
 			echo "Erro ao remover informa&ccedil;&otilde;es de ativo. ($sql)<br>";
 		}
 		else {
 			//ativando somente os selecionados
-			$aux_qlp_id = "";
-			foreach ($qlp_ativo as $key => $value) {
-				if (empty($aux_qlp_id)) {
-					$aux_qlp_id .= $value;
-				}
-				else {
-					$aux_qlp_id .= ",".$value;
-				}
-			}//end foreach
-			//echo $aux_qlp_id." :IDS<br>";
-			$sql = "update tb_questionarios_perguntas set qlp_ativo=1 where qlp_id IN (".$aux_qlp_id.")";
-			$rs_questionario_perguntas = SQLexecuteQuery($sql);
+			$params_qlp = array_values($qlp_ativo);
+				$placeholders_qlp = array();
+				foreach ($params_qlp as $key => $value) {
+					$placeholders_qlp[] = "$".($key + 1);
+				}//end foreach
+				//echo implode(",", $params_qlp)." :IDS<br>";
+				$sql = "update tb_questionarios_perguntas set qlp_ativo=1 where qlp_id IN (".implode(",", $placeholders_qlp).")";
+				$rs_questionario_perguntas = SQLexecuteQueryParams($sql, $params_qlp);
 			if(!$rs_questionario_perguntas) {
 				echo "Erro ao ativar informa&ccedil;&otilde;es de ativo. ($sql)<br>";
 			}
@@ -290,8 +286,10 @@ function MM_load_resp(ID){
 			$aux_qlp_ordem = "NULL";
 			$aux_qlp_ativo = 0;
 		}
-		$sql ="insert into tb_questionarios_perguntas (ql_id_questionario,qlp_texto,qlp_ativo,qlp_ordem,qlp_tipo,qlp_outros) values ($quest_id_update,'$qlp_texto',$aux_qlp_ativo,$aux_qlp_ordem,'$qlp_tipo',".intval($qlp_outros*1).") ";
-		//echo $sql."<br>"."[$qlp_outros]<br>";
+		$aux_qlp_ordem_param = ($aux_qlp_ordem === "NULL") ? null : $aux_qlp_ordem;
+			$sql ="insert into tb_questionarios_perguntas (ql_id_questionario,qlp_texto,qlp_ativo,qlp_ordem,qlp_tipo,qlp_outros) values ($1,$2,$3,$4,$5,$6) ";
+			$params = array($quest_id_update, $qlp_texto, $aux_qlp_ativo, $aux_qlp_ordem_param, $qlp_tipo, intval($qlp_outros*1));
+			//echo $sql."<br>"."[$qlp_outros]<br>";
 		/*
 		if (function_exists('SQLexecuteQuery')) {
 			echo "SQLexecuteQuery functions are available.<br />\n";
@@ -299,16 +297,16 @@ function MM_load_resp(ID){
 			echo "SQLexecuteQuery functions are NOT available.<br />\n";
 		}
 		*/
-		$rs_questionario_perguntas = SQLexecuteQuery($sql);
-		if(!$rs_questionario_perguntas) {
-			echo "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
+		$rs_questionario_perguntas = SQLexecuteQueryParams($sql, $params);
+			if(!$rs_questionario_perguntas) {
+				echo "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
+			}
 		}
-	}
 
-	//buscar pelo id do questionario todas as perguntas 
-	$sql = "select * from tb_questionarios_perguntas where ql_id_questionario=".$quest_id_update." order by qlp_ativo DESC,qlp_ordem";
-	//echo $sql."<br>";
-	$rs_perguntas = SQLexecuteQuery($sql);
+		//buscar pelo id do questionario todas as perguntas 
+		$sql = "select * from tb_questionarios_perguntas where ql_id_questionario=$1 order by qlp_ativo DESC,qlp_ordem";
+		//echo $sql."<br>";
+		$rs_perguntas = SQLexecuteQueryParams($sql, array($quest_id_update));
 	$enumerador	= 1;
 	?>
 	<tr>

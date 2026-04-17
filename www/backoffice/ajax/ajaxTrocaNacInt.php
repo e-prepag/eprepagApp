@@ -12,8 +12,8 @@ $opr = $opr ?? 0;
 $str = $str ?? null;
 $otni_id = $otni_id ?? "";
 $data = $data ?? "";
-$sqlOperadoras = "select * from operadoras where opr_codigo = ".$opr;
-$rs_operadoras = SQLexecuteQuery($sqlOperadoras);
+$sqlOperadoras = "select * from operadoras where opr_codigo = $1";
+$rs_operadoras = SQLexecuteQueryParams($sqlOperadoras, array($opr));
 
 //opr_codigo integer NOT NULL, -- Código do Publisher - Corresponde ao campo opr_codigo na tabela Operadoras
 //otni_data timestamp with time zone NOT NULL, -- Campo contendo a data de alteração de nacionalidade.
@@ -36,20 +36,22 @@ if($str == 0){
 }
 
 if(isset($origem) && !$erro){
-    $sql_operadoras = "update operadoras set opr_vinculo_empresa = 1, opr_troca_nacional_internacional = 1 where opr_codigo = ".$opr;
-    $rs_operadoras = SQLexecuteQuery($sql_operadoras);
+    $sql_operadoras = "update operadoras set opr_vinculo_empresa = 1, opr_troca_nacional_internacional = 1 where opr_codigo = $1";
+    $rs_operadoras = SQLexecuteQueryParams($sql_operadoras, array($opr));
     
     if($otni_id != ""){
-        $sql = "update operadoras_troca_nacional_internacional set otni_data = to_date('".$data."','DD/MM/YYYY'), otni_origem = $origem, otni_destino = $destino where otni_id = ".$otni_id." and opr_codigo = ".$opr;
+        $sql = "update operadoras_troca_nacional_internacional set otni_data = to_date($1,'DD/MM/YYYY'), otni_origem = $2, otni_destino = $3 where otni_id = $4 and opr_codigo = $5";
+        $params = array($data, $origem, $destino, $otni_id, $opr);
     }else{
-        $sql = "insert into operadoras_troca_nacional_internacional (opr_codigo, otni_data, otni_origem, otni_destino) values (".$opr.", to_date('".$data."','DD/MM/YYYY'), $origem, $destino)";
+        $sql = "insert into operadoras_troca_nacional_internacional (opr_codigo, otni_data, otni_origem, otni_destino) values ($1, to_date($2,'DD/MM/YYYY'), $3, $4)";
+        $params = array($opr, $data, $origem, $destino);
     }
     
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, $params);
     
     if($rs && $rs_operadoras){
-        $sqlTrocaNacionalInternacional = "select * from operadoras_troca_nacional_internacional where opr_codigo = ".$opr." order by otni_id desc";
-        $rs_TrocaNacionalInternacional = SQLexecuteQuery($sqlTrocaNacionalInternacional);
+        $sqlTrocaNacionalInternacional = "select * from operadoras_troca_nacional_internacional where opr_codigo = $1 order by otni_id desc";
+        $rs_TrocaNacionalInternacional = SQLexecuteQueryParams($sqlTrocaNacionalInternacional, array($opr));
         
         if($rs_TrocaNacionalInternacional){
             $ret = '<div class="borda bloco top10">
