@@ -2,7 +2,7 @@
 require_once __DIR__ . '/constantes_url.php';
 function getEnvVariable($varName)
 {
-	// Verifica se a variável de ambiente já está definida
+	// Verifica se a variï¿½vel de ambiente jï¿½ estï¿½ definida
 	$value = getenv($varName);
 
 	if ($value === false) {
@@ -11,7 +11,7 @@ function getEnvVariable($varName)
 			$lines = file('/www/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
 			foreach ($lines as $line) {
-				// Ignora comentários
+				// Ignora comentï¿½rios
 				if (strpos(trim($line), '#') === 0) {
 					continue;
 				}
@@ -19,63 +19,62 @@ function getEnvVariable($varName)
 				// Divide a linha em nome e valor
 				list($name, $val) = explode('=', $line, 2);
 
-				// Remove espaços e aspas
+				// Remove espaï¿½os e aspas
 				$name = trim($name);
 				$val = trim($val, " \t\n\r\0\x0B\"");
 
-				// Se o nome da variável do .env for o mesmo, define ela
+				// Se o nome da variï¿½vel do .env for o mesmo, define ela
 				if ($name === $varName) {
-					// Definindo a variável de ambiente no processo atual
+					// Definindo a variï¿½vel de ambiente no processo atual
 					putenv("$name=$val");
 					return $val;
 				}
 			}
 		}
 
-		// Se não encontrar no .env, retorna null ou algum valor padrão
+		// Se nï¿½o encontrar no .env, retorna null ou algum valor padrï¿½o
 		return null;
 	}
 
-	// Retorna o valor da variável já existente
+	// Retorna o valor da variï¿½vel jï¿½ existente
 	return $value;
 }
 
-function consultarGeoIP($ip) {
-	if($ip == 'Desconhecido')
-	{
+function consultarGeoIP($ip)
+{
+	if ($ip == 'Desconhecido') {
 		return false;
 	}
-    $url = "https://api.hgbrasil.com/geoip";
-    
-    $params = http_build_query([
-        'address' => $ip,
-        'key' => getenv('GEOIP_KEY')
-    ]);
+	$url = "https://api.hgbrasil.com/geoip";
 
-    $full_url = $url . '?' . $params;
+	$params = http_build_query([
+		'address' => $ip,
+		'key' => getenv('GEOIP_KEY')
+	]);
 
-    $ch = curl_init();
+	$full_url = $url . '?' . $params;
 
-    curl_setopt($ch, CURLOPT_URL, $full_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-    
-    $response = curl_exec($ch);
+	$ch = curl_init();
 
-    if (curl_errno($ch)) {
-        echo 'Erro cURL: ' . curl_error($ch) . "\n";
-        curl_close($ch);
-        return false;
-    }
+	curl_setopt($ch, CURLOPT_URL, $full_url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    curl_close($ch);
+	$response = curl_exec($ch);
+
+	if (curl_errno($ch)) {
+		echo 'Erro cURL: ' . curl_error($ch) . "\n";
+		curl_close($ch);
+		return false;
+	}
+
+	curl_close($ch);
 	$result = json_decode($response, true);
-	if(!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0)
-	{
+	if (!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0) {
 		return false;
 	}
-    return $result;
+	return $result;
 }
 
 // Funï¿½ï¿½o de execuï¿½ï¿½o de Instruï¿½ï¿½o no DB
@@ -90,18 +89,18 @@ function SQLexecuteQuery($sql)
 	}
 	$backtrace = debug_backtrace();
 	$callerFile = $backtrace[0]['file'];  // Pega o caminho do arquivo que chamou
-	$callerDir = dirname($callerFile);   // Obtém o diretório do arquivo que chamou
+	$callerDir = dirname($callerFile);   // Obtï¿½m o diretï¿½rio do arquivo que chamou
 
 	if (
 		strpos($callerDir, 'public_html') === false
 		&& strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false
 	) {
-		// Se não está na pasta public_html, não faz log
+		// Se nï¿½o estï¿½ na pasta public_html, nï¿½o faz log
 		return $ret;
 	}
-	// Verifica se a consulta é do tipo INSERT ou UPDATE
+	// Verifica se a consulta ï¿½ do tipo INSERT ou UPDATE
 	if (preg_match('/^\s*(INSERT|UPDATE|DELETE|USUARIOS)/i', $sql)) {
-		// Log da consulta SQL e parâmetros
+		// Log da consulta SQL e parï¿½metros
 		$log = date('Y-m-d H:i:s') . " | Query: " . $sql . PHP_EOL;
 
 		$log .= " | Called from: " . $callerFile . PHP_EOL;
@@ -112,16 +111,16 @@ function SQLexecuteQuery($sql)
 			$log .= " | IP: " . $_SERVER['REMOTE_ADDR'] . PHP_EOL;
 		}
 
-		// Linha de separação para melhorar a legibilidade
+		// Linha de separaï¿½ï¿½o para melhorar a legibilidade
 		$separator = str_repeat('*', 50);  // Cria uma linha de 50 asteriscos
 
 		// Caminho do arquivo de log
 		$logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
 
-		// Adiciona o log ao arquivo, com uma linha de separação antes de cada nova consulta
+		// Adiciona o log ao arquivo, com uma linha de separaï¿½ï¿½o antes de cada nova consulta
 		file_put_contents($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, FILE_APPEND);
 	}
-	
+
 	return $ret;
 } //end function SQLexecuteQuery($sql)
 
@@ -270,6 +269,7 @@ function find_special_character($string)
 
 function formata_mensagem($msg, $tipo)
 {
+	$msg_final = null;
 	if ($tipo == 'erro')
 		$msg_final = "<font color='#FF0000' size='2' face='arial, helvetica, sans-serif'><strong>" . $msg . "</strong></font>";
 
@@ -281,6 +281,7 @@ function formata_mensagem($msg, $tipo)
 
 function formata_mensagem2($msg, $tipo)
 {
+	$msg_final = null;
 	if ($tipo == 'erro')
 		$msg_final = "<font color='#FF0000' size='1' face='arial, helvetica, sans-serif'><strong>" . $msg . "</strong></font>";
 
@@ -292,6 +293,8 @@ function formata_mensagem2($msg, $tipo)
 
 function saudacao()
 {
+	$msg = null;
+
 	if ((date('H') >= 18 && date('H') <= 23) || (date('H') >= 0 && date('H') <= 5))  $msg = "Bom Noite";
 	if (date('H') >= 6 && date('H') <= 11)  $msg = "Bom dia";
 	if (date('H') >= 12 && date('H') <= 17) $msg = "Boa Tarde";
@@ -412,6 +415,8 @@ function time2sec($h, $m, $s)
 
 function sec2time($s)
 {
+	$h = null;
+	$time = null;
 	$m = $s / 60;
 	$m = number_format($m, 2, '.', '');
 	$m_dec = substr($m, strlen($m) - 2, 2);
@@ -433,20 +438,19 @@ function time2min($horario)
 	$hora = substr($horario, 0, 2);
 	$min = substr($horario, 2, 2);
 
-	$minutos = (60 * $hora) + $min;
+	$minutos = (60 * (int)$hora) + (int)$min;
 	return $minutos;
 }
 
 function min2time($min)
 {
 	$hora = $min / 60;
-
-	$time = $min;
+	$horario = '';
 
 	$hora = substr($horario, 0, 2);
 	$min = substr($horario, 2, 2);
 
-	$minutos = (60 * $hora) + $min;
+	$minutos = (60 * (int)$hora) + (int)$min;
 	return $minutos;
 }
 
@@ -488,7 +492,7 @@ function verificaCNPJ($string)
 			if ($i == 1) $j = 5;
 
 			$soma += $Numero[$i] * $j;
-			$j--;
+			$j = (int)$j - 1;
 
 			if ($j == 1) $j = 9;
 		}
@@ -506,7 +510,7 @@ function verificaCNPJ($string)
 				if ($i == 1) $j = 6;
 
 				$soma += $Numero[$i] * $j;
-				$j--;
+				$j = (int)$j - 1;
 
 				if ($j == 1) $j = 9;
 			}
@@ -598,6 +602,7 @@ function mascara_cnpj_cpf($documento, $tipo)
 {
 	$mask = $documento;
 	$strtam = strlen($documento);
+	$doc = null;
 	if ($tipo == 'cnpj') {
 		$dv = substr($documento, $strtam - 2, 2);
 		$dr = substr($documento, $strtam - 6, 4);
@@ -621,6 +626,7 @@ function mascara_cnpj_cpf($documento, $tipo)
 function coloca_char_esquerda($string, $qtde_total, $char)
 {
 	$aux = $string;
+	$completa = null;
 
 	for ($i = 1; $i <= ($qtde_total - strlen($aux)); $i++) {
 		$completa .= $char;
@@ -632,6 +638,7 @@ function coloca_char_esquerda($string, $qtde_total, $char)
 function coloca_char_direita($string, $qtde_total, $char)
 {
 	$aux = $string;
+	$completa = null;
 
 	for ($i = 1; $i <= ($qtde_total - strlen($aux)); $i++) {
 		$completa .= $char;
@@ -642,6 +649,9 @@ function coloca_char_direita($string, $qtde_total, $char)
 
 function gera_string($inicio, $tamanho_rand, $tipo)
 {
+	$string = null;
+	$string_formatada = null;
+
 	if ($tipo == 'A') {
 		$string = "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6";
 	}
@@ -707,6 +717,7 @@ function verifica_valor($val)
 function valida_campo_numero($numero, $tamanho = 0)
 {
 	$verifica = $numero;
+	$alerta = null;
 
 	if (strlen($numero) < $tamanho)
 		return 0;
@@ -743,6 +754,7 @@ function verifica_email($email)
 	$aux = $email;
 	$first = substr($aux, 0, 1);
 	$last = substr($aux, strlen($aux) - 1, 1);
+	$alerta = null;
 	if (ord($first) == 64 || ord($last) == 64) {
 		return 0;
 	} else {
@@ -777,7 +789,7 @@ function data_mais_um($data)
 	$mes = substr($data, 3, 2);
 	$ano = substr($data, 6, 4);
 
-	if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
+	if (((((int)$ano) % 4) == 0 and (((int)$ano) % 100) != 0) or (((int)$ano) % 400) == 0) {
 		$bissexto = 1;
 	} // Fevererio tem 29 dias
 	else {
@@ -874,7 +886,7 @@ function data_menos_um($data)
 	$mes = substr($data, 3, 2);
 	$ano = substr($data, 6, 4);
 
-	if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
+	if (((((int)$ano) % 4) == 0 and (((int)$ano) % 100) != 0) or (((int)$ano) % 400) == 0) {
 		$bissexto = 1;
 	} // Fevererio tem 29 dias
 	else {
@@ -885,7 +897,7 @@ function data_menos_um($data)
 		if ($mes == 1)
 			$mes_anterior = 12;
 		else
-			$mes_anterior = $mes - 1;
+			$mes_anterior = (int)$mes - 1;
 
 		$mes_num = 0;
 		if ($mes_anterior == 2 && $bissexto == 1) {
@@ -902,12 +914,13 @@ function data_menos_um($data)
 		}
 
 		if ($mes_anterior == 12)
-			$ano--;
+			$ano = (int)$ano - 1;
 
 		$dia = $mes_num;
 		$mes = $mes_anterior;
 	} else
-		$dia--;
+		$dia = (int)$dia - 1;
+	$dia = (int)$dia - 1;
 
 	if (strlen($dia) < 2) {
 		$dia = '0' . $dia;
@@ -942,14 +955,15 @@ function verifica_telEx($tel, $blComTraco = true)
 {
 
 	if ($blComTraco) {
-		return eregi("^[0-9]{4}-[0-9]{4}$", $tel);
+		return preg_match("/^[0-9]{4}-[0-9]{4}$/i", $tel);
 	} else {
-		return eregi("^[0-9]{8}$", $tel);
+		return preg_match("/^[0-9]{8}$/i", $tel);
 	}
 }
 
 function verifica_tel($tel)
 {
+	$alerta = null;
 	$aux = $tel;
 	$tam = strlen($aux);
 	if ($tam < 8) {
@@ -1036,6 +1050,7 @@ function monta_ddd_string($campoddd)
 {
 	$recebeDDD = $campoddd;
 	$recebeDDD .= ";";
+	$alerta = null;
 	for ($x = 1; $x <= strlen($recebeDDD); $x += 1) {
 		$ch = substr($recebeDDD, $x - 1, 1);
 		if (ord($ch) >= 48 && ord($ch) <= 57) {
@@ -1089,6 +1104,7 @@ function monta_ddd_string($campoddd)
 function valida_ddd_string($ddd)
 {
 	$verifica = $ddd;
+	$alerta = null;
 	for ($y = 1; $y <= strlen($verifica); $y += 1) {
 		$ch = substr($verifica, $y - 1, 1);
 		if ((ord($ch) >= 48 && ord($ch) <= 57) || (ord($ch) == 45) || (ord($ch) == 59)) {
@@ -1109,6 +1125,7 @@ function verifica_data($data)
 {
 	$aux = $data;
 	$tam = strlen($aux);
+	$alerta = null;
 	if ($tam < 10) {
 		return 0;
 	} else {
@@ -1161,7 +1178,7 @@ function verifica_data($data)
 						if ($mes > 12 || $dia > 31) {
 							return 0;
 						} else {
-							if ((($ano % 4) == 0 and ($ano % 100) != 0) or ($ano % 400) == 0) {
+							if (((((int)$ano) % 4) == 0 and (((int)$ano) % 100) != 0) or (((int)$ano) % 400) == 0) {
 								$bissexto = 1;
 							} else {
 								$bissexto = 0;
@@ -1201,6 +1218,7 @@ function verifica_tel_ddd($tel)
 {
 	$aux = $tel;
 	$tam = strlen($aux);
+	$alerta = null;
 	if ($tam < 11) {
 		return 0;
 	} else {
@@ -1425,6 +1443,7 @@ function limpa_string($valor)
 function valida_valor_opr($val)
 {
 	$verifica = $val;
+	$alerta = null;
 	for ($y = 1; $y <= strlen($verifica); $y += 1) {
 		$ch = substr($verifica, $y - 1, 1);
 		if (ord($ch) >= 48 && ord($ch) <= 57) {
@@ -1459,6 +1478,7 @@ function define_casa_decimal($valor, $qtde)
 {
 	$aux = $valor;
 	$contador = 0;
+	$alerta = null;
 	for ($x = 1; $x <= strlen($aux); $x++) {
 		$pos = substr($aux, $x - 1, 1);
 		if (ord($pos) == 46) {
@@ -1484,6 +1504,7 @@ function define_casa_decimal($valor, $qtde)
 function grava_comissao_banco($comissao)
 {
 	$aux = $comissao;
+	$alerta = null;
 	for ($x = 1; $x <= strlen($aux); $x++) {
 		$pos = substr($aux, $x - 1, 1);
 		if (ord($pos) >= 48 && ord($pos) <= 57) {
@@ -1524,6 +1545,7 @@ function verifica_cep($cep)
 {
 	$aux = $cep;
 	$tam = strlen($aux);
+	$alerta = null;
 	if ($tam < 9) {
 		return 0;
 	} else {
@@ -1570,6 +1592,7 @@ function moeda_char($string)
 {
 	$aux = $string;
 	$contador = 0;
+	$alerta = null;
 	for ($x = 1; $x <= strlen($aux); $x++) {
 		$pos = substr($aux, $x - 1, 1);
 		if (ord($pos) == 46) {
