@@ -6,17 +6,21 @@ require_once __DIR__ . '/bourls.php';
 require_once RAIZ_DO_PROJETO . 'includes/bourls.php';
 
 if (!function_exists('random_bytes')) {
-    function random_bytes($length)
+    /**
+     * @param int $length
+     * @return string
+     */
+    function random_bytes(int $length): string
     {
 
         // Se tiver OpenSSL, usa bytes seguros
         if (function_exists('openssl_random_pseudo_bytes')) {
-            return openssl_random_pseudo_bytes($length);
+            return (string)openssl_random_pseudo_bytes($length);
         }
-        // Fallback manual (n„o criptograficamente seguro)
+        // Fallback manual (n√£o criptograficamente seguro)
         $bytes = '';
         for ($i = 0; $i < $length; $i++) {
-            // chr(rand(0, 255)) gera um byte ?aleatÛrio?
+            // chr(rand(0, 255)) gera um byte ?aleat√≥rio?
             $bytes .= chr(mt_rand(0, 255));
         }
         return $bytes;
@@ -31,7 +35,7 @@ $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 // Construindo a URL base
 $baseUrl = $protocol . "://" . $host;
 
-if ($host == $server_url_bo) {
+if ($host == ($server_url_bo ?? '')) {
     define("SISTEMA", "backoffice");
 } else {
     define("SISTEMA", "sysadmin");
@@ -123,11 +127,11 @@ $ARRAY_INIBI_VENDA_HARDCODE = array(4708);
 $ARRAY_INIBI_PRODUTOS_VENDA_TO_ID_HARDCODE = array(281);
 
 
-//Constante de idade mÌnima para cadastro
+//Constante de idade m√≠nima para cadastro
 $IDADE_MINIMA = 16;
 
-//Constante de idade m·xima sem validaÁ„o adicional de RC
+//Constante de idade m√°xima sem valida√ß√£o adicional de RC
 $IDADE_MAXIMA = 60;
 
-//Constante que define se haver· transferÍncia SFTP dos arquivos para o Windows
+//Constante que define se haver√° transfer√™ncia SFTP dos arquivos para o Windows
 define("SFTP_TRANSFER", false);

@@ -1,24 +1,24 @@
 <?php
-//Função que verifica se o publisher exige CPF do cliente de LANHouse
-function checkingNeedCPF_LH($opr_codigo)
+//FunÃ§Ã£o que verifica se o publisher exige CPF do cliente de LANHouse
+function checkingNeedCPF_LH(mixed $opr_codigo): mixed
 {
     $sql_function = "SELECT opr_need_cpf_lh from operadoras where opr_codigo=" . intval($opr_codigo) . ";";
     $rs_function = SQLexecuteQuery($sql_function);
     $opr_need_cpf_lh = null;
-    if ($rs_function_row = pg_fetch_array($rs_function)) {
+    if ($rs_function && $rs_function_row = pg_fetch_array($rs_function)) {
         $opr_need_cpf_lh = $rs_function_row['opr_need_cpf_lh'];
     }
     return $opr_need_cpf_lh;
 } //end function checkingNeedCPF_LH
 
-//Função que chama a página para inserir o CPF
-function cpf_page()
+//FunÃ§Ã£o que chama a pÃ¡gina para inserir o CPF
+function cpf_page(): void
 {
 
-    $is_data_valid = verificaNome($GLOBALS['_SESSION']['NOME_CPF']) && verificaCPF_LH($GLOBALS['_SESSION']['CPF_LH']);
+    $is_data_valid = verificaNome($GLOBALS['_SESSION']['NOME_CPF'] ?? '') && verificaCPF_LH($GLOBALS['_SESSION']['CPF_LH'] ?? '');
 
     if (!$is_data_valid) {
-        $file = RAIZ_DO_PROJETO . 'includes/pdv/form_cpf';
+        $file = RAIZ_DO_PROJETO . 'includes/pdv/form_cpf.php';
 
         require_once $file;
         die();
@@ -26,29 +26,29 @@ function cpf_page()
 } //end function cpf_page
 
 ////Valida estrutura de CPF
-function verificaCPF_LH($cpf)
+function verificaCPF_LH(mixed $cpf): bool|int
 {
-    $cpf = preg_replace('/[^0-9]/', '', $cpf);
+    $cpf = preg_replace('/[^0-9]/', '', (string)$cpf);
 
     $RecebeCPF = $cpf;
 
-    if (strlen($RecebeCPF) != 11) {
+    if (strlen((string)$RecebeCPF) != 11) {
         return 0;
     } else
 		if ($RecebeCPF == "00000000000" || $RecebeCPF == "11111111111") {
         return 0;
     } else {
-        $Numero[1] = intval(substr($RecebeCPF, 1 - 1, 1));
-        $Numero[2] = intval(substr($RecebeCPF, 2 - 1, 1));
-        $Numero[3] = intval(substr($RecebeCPF, 3 - 1, 1));
-        $Numero[4] = intval(substr($RecebeCPF, 4 - 1, 1));
-        $Numero[5] = intval(substr($RecebeCPF, 5 - 1, 1));
-        $Numero[6] = intval(substr($RecebeCPF, 6 - 1, 1));
-        $Numero[7] = intval(substr($RecebeCPF, 7 - 1, 1));
-        $Numero[8] = intval(substr($RecebeCPF, 8 - 1, 1));
-        $Numero[9] = intval(substr($RecebeCPF, 9 - 1, 1));
-        $Numero[10] = intval(substr($RecebeCPF, 10 - 1, 1));
-        $Numero[11] = intval(substr($RecebeCPF, 11 - 1, 1));
+        $Numero[1] = intval(substr((string)$RecebeCPF, 1 - 1, 1));
+        $Numero[2] = intval(substr((string)$RecebeCPF, 2 - 1, 1));
+        $Numero[3] = intval(substr((string)$RecebeCPF, 3 - 1, 1));
+        $Numero[4] = intval(substr((string)$RecebeCPF, 4 - 1, 1));
+        $Numero[5] = intval(substr((string)$RecebeCPF, 5 - 1, 1));
+        $Numero[6] = intval(substr((string)$RecebeCPF, 6 - 1, 1));
+        $Numero[7] = intval(substr((string)$RecebeCPF, 7 - 1, 1));
+        $Numero[8] = intval(substr((string)$RecebeCPF, 8 - 1, 1));
+        $Numero[9] = intval(substr((string)$RecebeCPF, 9 - 1, 1));
+        $Numero[10] = intval(substr((string)$RecebeCPF, 10 - 1, 1));
+        $Numero[11] = intval(substr((string)$RecebeCPF, 11 - 1, 1));
 
         $soma = 10 * $Numero[1] + 9 * $Numero[2] + 8 * $Numero[3] + 7 * $Numero[4] + 6 * $Numero[5] + 5 *
             $Numero[6] + 4 * $Numero[7] + 3 * $Numero[8] + 2 * $Numero[9];
@@ -83,23 +83,23 @@ function verificaCPF_LH($cpf)
 
 
 //Valida estrutura de Nome
-function verificaNome($nome)
+function verificaNome(mixed $nome): bool
 {
 
-    $reg = '/^\\s*[a-zA-ZÀ-ú\']{1,}(\\s+[a-zA-ZÀ-ú\']{1,}\\s*)+$/';
+    $reg = '/^\\s*[a-zA-ZÃ¡-ÃºÃ-Ãš\']{1,}(\\s+[a-zA-ZÃ¡-ÃºÃ-Ãš\']{1,}\\s*)+$/';
 
-    if (preg_match($reg, $nome) && strpos($nome, "  ") === false) {
+    if (preg_match($reg, (string)$nome) && strpos((string)$nome, "  ") === false) {
         return TRUE;
     }
     return FALSE;
 } //end function verificaNome
 
-function integracao_layout($type, $data = false)
+function integracao_layout(mixed $type, mixed $data = false): ?string
 {
     global $GLOBALS;
 
     if ($type == "css" || $type == "includes") {
-        $url = "https://" . $_SERVER['SERVER_NAME'];
+        $url = "https://" . ($_SERVER['SERVER_NAME'] ?? 'localhost');
         $html = "";
         $html .= '<link rel="stylesheet" href="' . $url . '/css/form_cpf.css" type="text/css" />';
 
@@ -109,12 +109,15 @@ function integracao_layout($type, $data = false)
         $html .= PHP_EOL . '<script src="' . $url . '/js/form_cpf_valida.js"></script>';
         return $html;
     }
+    return null;
 } //end function integracao_layout
 
-function mask($val, $mask)
+function mask(mixed $val, mixed $mask): string
 {
     $maskared = '';
     $k = 0;
+    $val = (string)$val;
+    $mask = (string)$mask;
     for ($i = 0; $i <= strlen($mask) - 1; $i++) {
         if ($mask[$i] == '#') {
             if (isset($val[$k]))
@@ -127,10 +130,10 @@ function mask($val, $mask)
     return $maskared;
 } //end function mask
 
-//Função que verifica se o publisher exige CPF do cliente de LANHouse
-function checkingIsCompletedData($url_preview)
+//FunÃ§Ã£o que verifica se o publisher exige CPF do cliente de LANHouse
+function checkingIsCompletedData(mixed $url_preview): void
 {
-    //Variavel retorna necessidade de solicitação de CPF de cliente por parte da LAN House
+    //Variavel retorna necessidade de solicitaÃ§Ã£o de CPF de cliente por parte da LAN House
     $test_opr_need_cpf_lh = false;
     if (!empty($GLOBALS['_SESSION']['dist_carrinho'])) {
         //Recupera carrinho do session
@@ -139,15 +142,17 @@ function checkingIsCompletedData($url_preview)
             $rs = null;
             $opr_codigo = 0;
             if (!empty($modeloId)) {
-                if ($modeloId != $GLOBALS["NO_HAVE"]) {
+                if ($modeloId != ($GLOBALS["NO_HAVE"] ?? '')) {
                     $filtro['ogpm_ativo'] = 1;
                     $filtro['ogpm_id'] = $modeloId;
                     $filtro['com_produto'] = true;
-                    $instProdutoModelo = new ProdutoModelo;
-                    $ret = $instProdutoModelo->obter($filtro, null, $rs);
-                    if ($rs && pg_num_rows($rs) != 0) {
-                        $rs_row = pg_fetch_array($rs);
-                        $opr_codigo = $rs_row['ogp_opr_codigo'];
+                    if (class_exists('ProdutoModelo')) {
+                        $instProdutoModelo = new ProdutoModelo;
+                        $ret = $instProdutoModelo->obter($filtro, null, $rs);
+                        if ($rs && pg_num_rows($rs) != 0) {
+                            $rs_row = pg_fetch_array($rs);
+                            $opr_codigo = $rs_row['ogp_opr_codigo'];
+                        }
                     }
                 } else {
                     foreach ($qtde as $codeProd => $vetor_valor) {
@@ -155,38 +160,43 @@ function checkingIsCompletedData($url_preview)
                             $filtro['ogp_ativo'] = 1;
                             $filtro['ogp_id'] = $codeProd;
                             $filtro['opr'] = 1;
-                            $ret = (new Produto)->obtermelhorado($filtro, null, $rs);
+                            if (class_exists('Produto')) {
+                                $ret = (new Produto)->obtermelhorado($filtro, null, $rs);
 
-                            if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponível no momento.";
-                            else $rs_row = pg_fetch_array($rs);
-
-                            $opr_codigo = $rs_row["ogp_opr_codigo"];
+                                if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponÃ­vel no momento.";
+                                else {
+                                    $rs_row = pg_fetch_array($rs);
+                                    if ($rs_row) {
+                                        $opr_codigo = $rs_row["ogp_opr_codigo"];
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 //Verificando se exige CPF de cliente
                 if (!$test_opr_need_cpf_lh) {
-                    $test_opr_need_cpf_lh = checkingNeedCPF_LH($opr_codigo);
+                    $test_opr_need_cpf_lh = (bool)checkingNeedCPF_LH($opr_codigo);
                 } //end if(!$test_opr_need_cpf_lh)
             } //end if(!empty($modeloId))
         } //end foreach
 
     }
 
-    $is_data_valid = verificaNome($GLOBALS['_SESSION']['NOME_CPF']) && verificaCPF_LH($GLOBALS['_SESSION']['CPF_LH']);
+    $is_data_valid = verificaNome($GLOBALS['_SESSION']['NOME_CPF'] ?? '') && verificaCPF_LH($GLOBALS['_SESSION']['CPF_LH'] ?? '');
     if ($test_opr_need_cpf_lh && !$is_data_valid) {
         header('Location: ' . $url_preview);
         die();
     } //end if($test_opr_need_cpf_lh && !$is_data_valid)
 
-} //end function checkingNeedCPF_LH
+} //end function checkingIsCompletedData
 
-//Função que verifica se o publisher exige CPF do cliente de LANHouse e exibe a página
-function checkingIsCallFormCPF()
+//FunÃ§Ã£o que verifica se o publisher exige CPF do cliente de LANHouse e exibe a pÃ¡gina
+function checkingIsCallFormCPF(): void
 {
     //Recupera carrinho do session
-    $carrinho = $GLOBALS['_SESSION']['dist_carrinho'];
-    //Variavel retorna necessidade de solicitação de CPF de cliente por parte da LAN House
+    $carrinho = $GLOBALS['_SESSION']['dist_carrinho'] ?? [];
+    //Variavel retorna necessidade de solicitaÃ§Ã£o de CPF de cliente por parte da LAN House
     $test_opr_need_cpf_lh = false;
     foreach ($carrinho as $modeloId => $qtde) {
         $rs = null;
@@ -195,18 +205,20 @@ function checkingIsCallFormCPF()
             $filtro['ogpm_ativo'] = 1;
             $filtro['ogpm_id'] = $modeloId;
             $filtro['com_produto'] = true;
-            $ret = ProdutoModelo::obter($filtro, null, $rs);
-            if ($rs && pg_num_rows($rs) != 0) {
-                $rs_row = pg_fetch_array($rs);
-                $opr_codigo = $rs_row['ogp_opr_codigo'];
+            if (class_exists('ProdutoModelo')) {
+                $ret = ProdutoModelo::obter($filtro, null, $rs);
+                if ($rs && pg_num_rows($rs) != 0) {
+                    $rs_row = pg_fetch_array($rs);
+                    $opr_codigo = $rs_row['ogp_opr_codigo'];
+                }
             }
             //Verificando se exige CPF de cliente
             if (!$test_opr_need_cpf_lh) {
-                $test_opr_need_cpf_lh = checkingNeedCPF_LH($opr_codigo);
+                $test_opr_need_cpf_lh = (bool)checkingNeedCPF_LH($opr_codigo);
             } //end if(!$test_opr_need_cpf_lh)
         } //end if(!empty($modeloId)) 
     } //end foreach
-    $is_data_valid = verificaNome($GLOBALS['_SESSION']['NOME_CPF']) && verificaCPF_LH($GLOBALS['_SESSION']['CPF_LH']);
+    $is_data_valid = verificaNome($GLOBALS['_SESSION']['NOME_CPF'] ?? '') && verificaCPF_LH($GLOBALS['_SESSION']['CPF_LH'] ?? '');
     if ($test_opr_need_cpf_lh && !$is_data_valid) {
         include RAIZ_DO_PROJETO . 'includes/pdv/form_cpf.php';
         die();

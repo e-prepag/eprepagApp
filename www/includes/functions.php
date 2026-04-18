@@ -1,8 +1,9 @@
 <?php
 require_once __DIR__ . '/constantes_url.php';
-function getEnvVariable($varName)
+function getEnvVariable(string $varName): ?string
 {
-	// Verifica se a vari�vel de ambiente j� est� definida
+	// Verifica se a varivel de ambiente j est definida
+
 	$value = getenv($varName);
 
 	if ($value === false) {
@@ -40,7 +41,7 @@ function getEnvVariable($varName)
 	return $value;
 }
 
-function consultarGeoIP($ip)
+function consultarGeoIP(mixed $ip): bool|array
 {
 	if ($ip == 'Desconhecido') {
 		return false;
@@ -48,7 +49,7 @@ function consultarGeoIP($ip)
 	$url = "https://api.hgbrasil.com/geoip";
 
 	$params = http_build_query([
-		'address' => $ip,
+		'address' => (string)$ip,
 		'key' => getenv('GEOIP_KEY')
 	]);
 
@@ -61,26 +62,30 @@ function consultarGeoIP($ip)
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
+	/** @var string|false $response */
 	$response = curl_exec($ch);
 
-	if (curl_errno($ch)) {
-		echo 'Erro cURL: ' . curl_error($ch) . "\n";
+	if (curl_errno($ch) || $response === false) {
+		if (curl_errno($ch)) {
+			echo 'Erro cURL: ' . curl_error($ch) . "\n";
+		}
 		curl_close($ch);
 		return false;
 	}
 
 	curl_close($ch);
-	$result = json_decode($response, true);
-	if (!$result['results']['latitude'] || !$result['results']['longitude'] || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0) {
+	$result = json_decode((string)$response, true);
+	if (!is_array($result) || !isset($result['results']['latitude']) || !isset($result['results']['longitude']) || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0) {
 		return false;
 	}
 	return $result;
 }
 
-// Fun��o de execu��o de Instru��o no DB
-function SQLexecuteQuery($sql)
+// Funo de execuo de Instruo no DB
+function SQLexecuteQuery(mixed $sql): mixed
 {
-	$ret = pg_query($GLOBALS['connid'], $sql);
+	$ret = pg_query($GLOBALS['connid'], (string)$sql);
+
 	if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
 		$message  = date("Y-m-d H:i:s") . " ";
 		$message .= "Erro: " . $erro . "<br>\n";
@@ -124,9 +129,9 @@ function SQLexecuteQuery($sql)
 	return $ret;
 } //end function SQLexecuteQuery($sql)
 
-function SQLexecuteQueryParams($sql, $params)
+function SQLexecuteQueryParams(mixed $sql, array $params): mixed
 {
-	$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
+	$ret = pg_query_params($GLOBALS['connid'], (string)$sql, $params);
 	if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
 		$message  = date("Y-m-d H:i:s") . " ";
 		$message .= "Erro: " . $erro . "<br>\n";
@@ -176,27 +181,27 @@ function is_hora($val)
 	return preg_match($pattern, $val);
 }
 
-function is_DateTime($dateTime)
+function is_DateTime(mixed $dateTime): bool
 {
 
 	// Remove whitespace 
-	$dateTime = trim($dateTime);
+	$dateTime = trim((string)$dateTime);
 
 	if (preg_match("'^(\d{2})[\-//](\d{2})[\-//](\d{4})\s(\d{2}):(\d{2})$'", $dateTime,  $matches)) {
-		return checkdate((int)$matches[2], (int)$matches[1], (int)$matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
+		return checkdate((int)$matches[2], (int)$matches[1], (int)$matches[3]) && (bool)is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
 }
 
-function is_DateTimeEx($dateTime, $tipo)
+function is_DateTimeEx(mixed $dateTime, mixed $tipo): bool
 {
 	//Tipo 1: DDMMAAAAHH:MM
 	//Tipo 2: AAAAMMDDHHMMSS
 	//Tipo 3: AAAAMMDD
 
 	if ($tipo == 3) {
-		$dateTime .= "000000";
+		$dateTime = (string)$dateTime . "000000";
 		$tipo = 2;
 	}
 
@@ -205,29 +210,30 @@ function is_DateTimeEx($dateTime, $tipo)
 	else return false;
 
 	// Remove whitespace 
-	$dateTime = trim($dateTime);
+	$dateTime = trim((string)$dateTime);
 
 	if (preg_match($pattern, $dateTime,  $matches)) {
-		if ($tipo == 1) return checkdate($matches[2], $matches[1], $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
-		else if ($tipo == 2) return checkdate($matches[2], $matches[3], $matches[1]) && is_hora($matches[4] . ":" . $matches[5]);
+		if ($tipo == 1) return checkdate((int)$matches[2], (int)$matches[1], (int)$matches[3]) && (bool)is_hora($matches[4] . ":" . $matches[5]);
+		else if ($tipo == 2) return checkdate((int)$matches[2], (int)$matches[3], (int)$matches[1]) && (bool)is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
+	return false;
 } //end function is_DateTimeEx
 
-function SQLaddFields($var, $tipo)
+function SQLaddFields(mixed $var, mixed $tipo): string
 {
 
 	if (is_null($var)) return "NULL";
-	elseif ($tipo == "r") return str_replace("'", "''", $var);
-	elseif ($tipo == "s") return "'" . str_replace("'", "''", $var) . "'";
-	else return $var;
+	elseif ($tipo == "r") return str_replace("'", "''", (string)$var);
+	elseif ($tipo == "s") return "'" . str_replace("'", "''", (string)$var) . "'";
+	else return (string)$var;
 }
 
-function space_tbl_parse($string)
+function space_tbl_parse(mixed $string): array
 {
-	$textarea = $string;
-	$tabela[] = array();
+	$textarea = (string)$string;
+	$tabela = array();
 	$linhas = explode("\n", $textarea);
 	for ($a = 0; $a < count($linhas); $a++) {
 		$colunas_tmp = explode(" ", $linhas[$a]);

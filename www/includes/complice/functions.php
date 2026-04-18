@@ -2,31 +2,31 @@
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 
-function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompletos, $vetorPublisherNovos = NULL)
+function verificaFaltaCPFNome(array $vetorPublisher, mixed $diaLimite, mixed &$rs_dados_incompletos, ?array $vetorPublisherNovos = NULL): bool
 {
 
     /*********************************************
-     ***  Dia Limite para gera��o dos arquivos 
+     ***  Dia Limite para gerao dos arquivos 
      *********************************************
         $diaLimite
      */
 
-    // Instanciando a variavel para verifica��o
-    $verificadorPublishersNovos = implode(",", $vetorPublisherNovos);
+    // Instanciando a variavel para verificao
+    $verificadorPublishersNovos = is_array($vetorPublisherNovos) ? implode(",", $vetorPublisherNovos) : '';
 
-    //=========  M�s/Ano
+    //=========  Ms/Ano
     if ((int)date('j') <= (int)$diaLimite) {
         $currentmonth = mktime(0, 0, 0, (int)date('n') - 1, 1, (int)date('Y'));
     } //end if(date('j') <= 10)
     else {
         $currentmonth = mktime(0, 0, 0, (int)date('n'), 1, (int)date('Y'));
     } //end else do if(date('j') <= 10)
-    $mesAno = date('m/Y', $currentmonth);
+    $mesAno = date('m/Y', (int)$currentmonth);
 
     // Split ano/mes
     list($mes, $ano) = explode("/", $mesAno);
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         ug_cpf, 
                         ug_nome,
@@ -47,7 +47,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                             inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                     where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vg.vg_data_concilia >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
                             and (
 				ug_cpf is null
@@ -75,7 +75,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                             inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                     where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vg.vg_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and (
                                     vgm_cpf is null
                                     OR
@@ -102,7 +102,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                     where pin_status = '4' 
                         and pih_codretepp = '2'
                         and pih_data >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                         and (
                             picc_cpf is null
                             OR
@@ -129,7 +129,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
 			inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                     where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vgcbe_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                         and (
                             vgcbe_cpf is null
                             OR
@@ -161,7 +161,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                                 inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                         where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                                 and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                                and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                                and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                                 and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
                                 and (
                                     ug_cpf is null
@@ -189,7 +189,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                                 inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                         where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                                 and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                                and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                                and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                                 and (
                                     vgm_cpf is null
                                     OR
@@ -216,7 +216,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                         where pin_status = '4' 
                             and pih_codretepp = '2'
                             and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and (
                                 picc_cpf is null
                                 OR
@@ -243,7 +243,7 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
                             inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                         where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vgcbe_data_inclusao >=  (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and (
                                 vgcbe_cpf is null
                                 OR
@@ -268,11 +268,11 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
     $rs_dados_incompletos = SQLexecuteQuery($sql);
     //echo pg_num_rows($rs_dados_incompletos)."<br>";
     if (!$rs_dados_incompletos) {
-        echo "Erro na Query de Levantamento de CPFs e/ou Nome em Branco para os Publishers (" . implode(",", $vetorPublisher) . ") e Publishers Novos (" . implode(",", $vetorPublisherNovos) . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de CPFs e/ou Nome em Branco para os Publishers (" . implode(",", $vetorPublisher) . ") e Publishers Novos (" . (is_array($vetorPublisherNovos) ? implode(",", $vetorPublisherNovos) : "") . ").<br>" . PHP_EOL;
         return false;
     }
     if (pg_num_rows($rs_dados_incompletos) == 0) {
-        //echo "Vai retorna Falso. Ou seja, N�O possui dados faltantes.<br>";
+        //echo "Vai retorna Falso. Ou seja, NO possui dados faltantes.<br>";
         return false;
     } //end if(!$rs_dados_incompletos || pg_num_rows($rs_dados_incompletos) == 0)
     else {
@@ -282,31 +282,31 @@ function verificaFaltaCPFNome($vetorPublisher, $diaLimite, &$rs_dados_incompleto
 
 } //end function verificaFaltaCPFNome
 
-function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublisherNovos = NULL)
+function verificaCPFValido(array $vetorPublisher, mixed $diaLimite, mixed &$rs_dados, ?array $vetorPublisherNovos = NULL): bool
 {
 
     /*********************************************
-     ***  Dia Limite para gera��o dos arquivos 
+     ***  Dia Limite para gerao dos arquivos 
      *********************************************
         $diaLimite
      */
 
-    // Instanciando a variavel para verifica��o
-    $verificadorPublishersNovos = implode(",", $vetorPublisherNovos);
+    // Instanciando a variavel para verificao
+    $verificadorPublishersNovos = is_array($vetorPublisherNovos) ? implode(",", $vetorPublisherNovos) : '';
 
-    //=========  M�s/Ano
+    //=========  Ms/Ano
     if ((int)date('j') <= (int)$diaLimite) {
         $currentmonth = mktime(0, 0, 0, (int)date('n') - 1, 1, (int)date('Y'));
     } //end if(date('j') <= 10)
     else {
         $currentmonth = mktime(0, 0, 0, (int)date('n'), 1, (int)date('Y'));
     } //end else do if(date('j') <= 10)
-    $mesAno = date('m/Y', $currentmonth);
+    $mesAno = date('m/Y', (int)$currentmonth);
 
     // Split ano/mes
     list($mes, $ano) = explode("/", $mesAno);
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         ug_cpf, 
                         ug_nome,
@@ -325,7 +325,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
                             inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                     where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vg.vg_data_concilia >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
                             and (
 				ug_cpf is not null
@@ -352,7 +352,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
                             inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                     where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vg.vg_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and (
 				vgm_cpf is not null
                                 OR
@@ -378,7 +378,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
                     where pin_status = '4' 
                         and pih_codretepp = '2'
                         and pih_data >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                         and (
                             picc_cpf is not null
                             OR
@@ -404,7 +404,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
 			inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                     where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vgcbe_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                         and (
                             vgcbe_cpf is not null
                             OR
@@ -437,7 +437,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
                             inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                     where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
                             and (
 				ug_cpf is not null
@@ -464,7 +464,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
                             inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                     where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                             and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                             and (
 				vgm_cpf is not null
                                 OR
@@ -490,7 +490,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
                     where pin_status = '4' 
                         and pih_codretepp = '2'
                         and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                         and (
                             picc_cpf is not null
                             OR
@@ -516,7 +516,7 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
 			inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                     where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
+                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
                         and (
                             vgcbe_cpf is not null
                             OR
@@ -543,11 +543,11 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
     $rs_dados = SQLexecuteQuery($sql);
     //echo pg_num_rows($rs_dados)."<br>";
     if (!$rs_dados) {
-        echo "Erro na Query de Levantamento de CPFs e/ou Nome Preenchidos para os Publishers (" . implode(",", $vetorPublisher) . ") e Publishers Novos (" . implode(",", $vetorPublisherNovos) . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de CPFs e/ou Nome Preenchidos para os Publishers (" . implode(",", $vetorPublisher) . ") e Publishers Novos (" . (is_array($vetorPublisherNovos) ? implode(",", $vetorPublisherNovos) : "") . ").<br>" . PHP_EOL;
         return false;
     }
     if (pg_num_rows($rs_dados) == 0) {
-        //echo "Vai retorna Falso. Ou seja, N�O possui dados faltantes.<br>";
+        //echo "Vai retorna Falso. Ou seja, NO possui dados faltantes.<br>";
         return false;
     } //end if(!$rs_dados || pg_num_rows($rs_dados) == 0)
     else {
@@ -557,9 +557,9 @@ function verificaCPFValido($vetorPublisher, $diaLimite, &$rs_dados, $vetorPublis
 
 } //end function verificaCPFValido
 
-function verificaCPF_BACEN($cpf)
+function verificaCPF_BACEN(mixed $cpf): bool|int
 {
-    $cpf = preg_replace('/[^0-9]/', '', $cpf);
+    $cpf = preg_replace('/[^0-9]/', '', (string)$cpf);
 
     $RecebeCPF = $cpf;
 
@@ -613,10 +613,10 @@ function verificaCPF_BACEN($cpf)
 } //end function verificaCPF_BACEN
 
 
-function levantamentoPublisherOperantes($ano, $mes, $variado = false)
+function levantamentoPublisherOperantes(mixed $ano, mixed $mes, bool $variado = false): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo, 
                         opr_nome
@@ -624,7 +624,7 @@ function levantamentoPublisherOperantes($ano, $mes, $variado = false)
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and opr_internacional_alicota != 0
                         and opr_status = '1'
                         and opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'];
@@ -657,10 +657,10 @@ function levantamentoPublisherOperantes($ano, $mes, $variado = false)
 } //end function levantamentoPublisherOperantes()
 
 
-function levantamentoPublisherOperantesNacionais($ano, $mes)
+function levantamentoPublisherOperantesNacionais(mixed $ano, mixed $mes): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo, 
                         opr_nome
@@ -668,7 +668,7 @@ function levantamentoPublisherOperantesNacionais($ano, $mes)
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and opr_internacional_alicota = 0
                         and opr_status != '0'
                         and opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . "
@@ -702,10 +702,10 @@ function levantamentoPublisherOperantesNacionais($ano, $mes)
 } //end function levantamentoPublisherOperantesNacionais()
 
 
-function levantamentoPublisherOperantesMunicipais($ano, $mes)
+function levantamentoPublisherOperantesMunicipais(mixed $ano, mixed $mes): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo, 
                         opr_nome
@@ -713,7 +713,7 @@ function levantamentoPublisherOperantesMunicipais($ano, $mes)
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and opr_internacional_alicota = 0
                         and opr_status != '0'
                         and UPPER(opr_estado) = 'SP'
@@ -751,10 +751,10 @@ function levantamentoPublisherOperantesMunicipais($ano, $mes)
 } //end function levantamentoPublisherOperantesMunicipais()
 
 
-function levantamentoPublisherNovosOperantes($ano, $mes, $variado = false)
+function levantamentoPublisherNovosOperantes(mixed $ano, mixed $mes, bool $variado = false): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo,
                         opr_nome, 
@@ -763,7 +763,7 @@ function levantamentoPublisherNovosOperantes($ano, $mes, $variado = false)
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and opr_internacional_alicota != 0
                         and opr_status = '1'
                         and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'];
@@ -799,10 +799,10 @@ function levantamentoPublisherNovosOperantes($ano, $mes, $variado = false)
 } //end function levantamentoPublisherNovosOperantes()
 
 
-function levantamentoPublisherNovosOperantesNacionais($ano, $mes)
+function levantamentoPublisherNovosOperantesNacionais(mixed $ano, mixed $mes): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo,
                         opr_nome, 
@@ -811,7 +811,7 @@ function levantamentoPublisherNovosOperantesNacionais($ano, $mes)
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and opr_internacional_alicota = 0
                         and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . " 
                 order by opr_nome
@@ -846,10 +846,10 @@ function levantamentoPublisherNovosOperantesNacionais($ano, $mes)
 } //end function levantamentoPublisherNovosOperantesNacionais()
 
 
-function levantamentoPublisherNovosOperantesMunicipais($ano, $mes)
+function levantamentoPublisherNovosOperantesMunicipais(mixed $ano, mixed $mes): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo,
                         opr_nome, 
@@ -858,7 +858,7 @@ function levantamentoPublisherNovosOperantesMunicipais($ano, $mes)
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and opr_internacional_alicota = 0
                         and UPPER(opr_estado) = 'SP'
                         and TRIM(opr_cidade) ilike 's%o Paulo'
@@ -895,10 +895,10 @@ function levantamentoPublisherNovosOperantesMunicipais($ano, $mes)
 } //end function levantamentoPublisherNovosOperantesMunicipais()
 
 
-function alteracaoPublisherNovosJaArquivoBACEN($vetorPublisherNovos)
+function alteracaoPublisherNovosJaArquivoBACEN(array $vetorPublisherNovos): bool
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "update operadoras
                 set opr_ja_contabilizou =  " . $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'] . "
                 where 
@@ -926,10 +926,10 @@ function alteracaoPublisherNovosJaArquivoBACEN($vetorPublisherNovos)
 
 } //end function alteracaoPublisherNovosJaArquivoBACEN()
 
-function alteracaoPublisherNovosJaArquivoMunicipais($vetorPublisherNovos)
+function alteracaoPublisherNovosJaArquivoMunicipais(array $vetorPublisherNovos): bool
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "update operadoras
                 set opr_ja_contabilizou =  " . $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'] . "
                 where 
@@ -960,10 +960,10 @@ function alteracaoPublisherNovosJaArquivoMunicipais($vetorPublisherNovos)
 } //end function alteracaoPublisherNovosJaArquivoMunicipais()
 
 
-function levantamentoPublisherEppPagamentosFacilitadora($ano, $mes, $variado = false)
+function levantamentoPublisherEppPagamentosFacilitadora(mixed $ano, mixed $mes, bool $variado = false): array
 {
 
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo, 
                         opr_nome
@@ -971,7 +971,7 @@ function levantamentoPublisherEppPagamentosFacilitadora($ano, $mes, $variado = f
                 where 
                         opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS'] . " 
                         and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
+                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
                         and (opr_internacional_alicota = 0.38 OR opr_internacional_alicota = " . IOF . ")
                         and opr_status = '1'";
     if ($variado) $sql .= " and opr_cotacao_dolar = 1 ";
@@ -1007,21 +1007,21 @@ function levantamentoPublisherEppPagamentosFacilitadora($ano, $mes, $variado = f
 
 
 
-function trimestre($mes = null)
+function trimestre(mixed $mes = null): float|int
 {
     $mes = is_null($mes) ? date('m') : $mes;
-    $trim = floor(($mes - 1) / 3) + 1;
+    $trim = floor(((int)$mes - 1) / 3) + 1;
     return $trim;
 } //end function trimestre($mes=null)
 
-function semestre($mes = null)
+function semestre(mixed $mes = null): float|int
 {
     $mes = is_null($mes) ? date('m') : $mes;
-    $trim = floor(($mes - 1) / 6) + 1;
+    $trim = floor(((int)$mes - 1) / 6) + 1;
     return $trim;
 } //end function semestre($mes=null)
 
-function isTrimestral($mes)
+function isTrimestral(mixed $mes): bool
 {
     $mesesFechamentoTrimenstral = array(3, 6, 9, 12);
 
@@ -1031,7 +1031,7 @@ function isTrimestral($mes)
     return false;
 } //end function isTrimestral($mes)
 
-function isSemestral($mes)
+function isSemestral(mixed $mes): bool
 {
     $mesesFechamentoSemenstral = array(6, 12);
 
@@ -1042,7 +1042,7 @@ function isSemestral($mes)
 } //end function isSemestral($mes)
 
 
-function getStartDateTrimestral($mes, $ano)
+function getStartDateTrimestral(mixed $mes, mixed $ano): string
 {
     global $dataInicioOperacao, $testeData;
     $date = "";
@@ -1069,7 +1069,7 @@ function getStartDateTrimestral($mes, $ano)
     return $date;
 } //end function getStartDateTrimestral($mes,$ano)
 
-function getEndDateTrimestral($mes, $ano)
+function getEndDateTrimestral(mixed $mes, mixed $ano): string
 {
     $date = "";
     $trimestreAux = trimestre($mes);
@@ -1090,7 +1090,7 @@ function getEndDateTrimestral($mes, $ano)
     return $date;
 } //end function getEndDateTrimestral($mes,$ano)
 
-function getStartDateSemestral($mes, $ano)
+function getStartDateSemestral(mixed $mes, mixed $ano): string
 {
     global $dataInicioOperacao, $testeData;
     $date = "";
@@ -1111,7 +1111,7 @@ function getStartDateSemestral($mes, $ano)
     return $date;
 } //end function getStartDateSemestral($mes,$ano)
 
-function getEndDateSemestral($mes, $ano)
+function getEndDateSemestral(mixed $mes, mixed $ano): string
 {
     $date = "";
     $trimestreAux = semestre($mes);
@@ -1126,12 +1126,12 @@ function getEndDateSemestral($mes, $ano)
     return $date;
 } //end function getEndDateSemestral($mes,$ano)
 
-function verificaLimiteDetalhamento($limite, &$rs)
+function verificaLimiteDetalhamento(mixed $limite, mixed &$rs): bool
 {
-    // A vari�vel limite deve ser informada em DOLAR (USS). Ex.: $limite = 1000 significa $USS 1,000
+    // A varivel limite deve ser informada em DOLAR (USS). Ex.: $limite = 1000 significa $USS 1,000
 
     /* Calculando individualmente por publisher(PONDERAADA)
-    // Calculado a Cota��o M�dia
+    // Calculado a Cotao Mdia
     $mediaCotacao = 0;
     foreach ($GLOBALS['vetorCotacaoUSS'] as $key => $value) {
         //echo $value."*<br>";
@@ -1169,7 +1169,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
                         inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                 where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vg.vg_data_concilia >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
                         and vgm_opr_codigo = " . $value . "
                 group by ug_cpf
@@ -1186,7 +1186,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
                         inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
                 where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vg.vg_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and vgm_opr_codigo = " . $value . " 
                 group by vgm_cpf
             )
@@ -1203,7 +1203,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
 	        where pin_status = '4' 
 		        and pih_codretepp = '2'
                         and pih_data >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and pih_id = " . $value . " 
                 group by picc_cpf
             )
@@ -1220,7 +1220,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
                     inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                 where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                     and vgcbe_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                     and vgm_opr_codigo = " . $value . "  
                 group by vgcbe_cpf
             )
@@ -1247,7 +1247,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
                            inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                            and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                           and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                            and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
                            and vgm_opr_codigo = " . $value . " 
                    group by ug_cpf
@@ -1264,7 +1264,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                            and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                           and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                            and vgm_opr_codigo = " . $value . "
                    group by vgm_cpf
                 )
@@ -1282,7 +1282,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
 	        where pin_status = '4' 
 		        and pih_codretepp = '2'
                         and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and pih_id = " . $value . " 
                 group by picc_cpf
             )
@@ -1299,7 +1299,7 @@ function verificaLimiteDetalhamento($limite, &$rs)
                     inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                 where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                     and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                     and vgm_opr_codigo = " . $value . "  
                 group by vgcbe_cpf
             )
@@ -1327,9 +1327,9 @@ function verificaLimiteDetalhamento($limite, &$rs)
 
 } //end function verificaLimiteDetalhamento
 
-function verificaLimiteCOAF($limite, &$rs)
+function verificaLimiteCOAF(mixed $limite, mixed &$rs): bool
 {
-    // A vari�vel limite deve ser informada em REAIS (R$). Ex.: $limite = 1000 significa R$ 1.000,00
+    // A varivel limite deve ser informada em REAIS (R$). Ex.: $limite = 1000 means R$ 1.000,00
 
     // Selecionando os usuarios que ultrapassaram o Limite
     $sql = "
@@ -1359,7 +1359,7 @@ function verificaLimiteCOAF($limite, &$rs)
                         inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                 where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vg.vg_data_concilia >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
                         and vgm_opr_codigo = " . $value . "
                 group by ug_cpf
@@ -1376,7 +1376,7 @@ function verificaLimiteCOAF($limite, &$rs)
                         inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
                 where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                         and vg.vg_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and vgm_opr_codigo = " . $value . " 
                 group by vgm_cpf
             )
@@ -1393,7 +1393,7 @@ function verificaLimiteCOAF($limite, &$rs)
 	        where pin_status = '4' 
 		        and pih_codretepp = '2'
                         and pih_data >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and pih_id = " . $value . " 
                 group by picc_cpf
             )
@@ -1410,7 +1410,7 @@ function verificaLimiteCOAF($limite, &$rs)
                     inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                 where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                     and vgcbe_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                     and vgm_opr_codigo = " . $value . "  
                 group by vgcbe_cpf
             )
@@ -1437,7 +1437,7 @@ function verificaLimiteCOAF($limite, &$rs)
                            inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                            and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                           and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                            and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
                            and vgm_opr_codigo = " . $value . " 
                    group by ug_cpf
@@ -1454,7 +1454,7 @@ function verificaLimiteCOAF($limite, &$rs)
                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                            and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                           and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                            and vgm_opr_codigo = " . $value . "
                    group by vgm_cpf
                 )
@@ -1472,7 +1472,7 @@ function verificaLimiteCOAF($limite, &$rs)
 	        where pin_status = '4' 
 		        and pih_codretepp = '2'
                         and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                         and pih_id = " . $value . " 
                 group by picc_cpf
             )
@@ -1489,7 +1489,7 @@ function verificaLimiteCOAF($limite, &$rs)
                     inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
                 where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
                     and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", mktime(0, 0, 0, ($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
+                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
                     and vgm_opr_codigo = " . $value . "  
                 group by vgcbe_cpf
             )
@@ -1516,9 +1516,9 @@ function verificaLimiteCOAF($limite, &$rs)
     } //end else
 
 } //end function verificaLimiteCOAF
-function levantamentoPublisherObrigatorioCPF(&$vetorPublisherLegenda)
+function levantamentoPublisherObrigatorioCPF(array &$vetorPublisherLegenda): array
 {
-    // Buscando informa��es 
+    // Buscando informaes 
     $sql = "select 
                         opr_codigo, 
                         opr_nome
@@ -1544,7 +1544,7 @@ function levantamentoPublisherObrigatorioCPF(&$vetorPublisherLegenda)
         return array(0);
     } //end if(pg_num_rows($rs_operadoras_obrigatorio_cpf) == 0)
     else {
-        //echo "<b>Publishers que Exigem CPF como Obrigat�rio:</b><br><br>".PHP_EOL;
+        //echo "<b>Publishers que Exigem CPF como Obrigatrio:</b><br><br>".PHP_EOL;
         while ($rs_operadoras_obrigatorio_cpf_row = pg_fetch_array($rs_operadoras_obrigatorio_cpf)) {
 
 

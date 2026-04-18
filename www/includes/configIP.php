@@ -44,7 +44,7 @@ $ENV_LIST = array(
         'EMAIL' => 'wagner@e-prepag.com.br',
         'URL' => '/LINUXTEST.E-PREPAG.COM/'
     ),
-    // Para conseguir acessar o servidor de homologaÁ„o fora da rede E-prepag necess·rio o bloco abaixo 
+    // Para conseguir acessar o servidor de homologa√ß√£o fora da rede E-prepag necess√°rio o bloco abaixo 
     'eprepag.ddns.net' => array(
         'PREFIX_NAME' => 'eprepag',
         'COMPUTERNAME' => 'VM-TEST',
@@ -60,7 +60,7 @@ $ENV_LIST = array(
     ),
 );
 
-// Bloco que bloqueia o acesso na homologaÁ„o a partir de requisiÁ„o externa
+// Bloco que bloqueia o acesso na homologa√ß√£o a partir de requisi√ß√£o externa
 if (isset($GLOBALS['_SERVER']['SERVER_NAME']) && strtoupper(@$GLOBALS['_SERVER']['SERVER_NAME']) == 'EPREPAG.DDNS.NET') {
     die('Access Denied!');
 }
@@ -68,7 +68,10 @@ if (isset($GLOBALS['_SERVER']['SERVER_NAME']) && strtoupper(@$GLOBALS['_SERVER']
 $search_domain = array_key_exists(@$GLOBALS['_SERVER']['SERVER_NAME'], $ENV_LIST) ? $ENV_LIST[$GLOBALS['_SERVER']['SERVER_NAME']]['URL'] : null;
 
 if (!function_exists('checkIP')) {
-    function checkIP()
+    /**
+     * @return bool|array
+     */
+    function checkIP(): bool|array
     {
         $aux_return = false;
         $sComputerName = 'SERVER_WITHOUT_COMPUTERNAME';
@@ -92,7 +95,7 @@ else {
 
     $file = RAIZ_DO_PROJETO . 'arquivos_gerados/logs/log_Debug_Dupla_Funcao.txt';
     //Mensagem
-    $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\nExistiu tentativa de duplicaÁ„o de FUN«√O neste ponto. (FUN«√O: checkIP)\n";
+    $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\nExistiu tentativa de duplica√ß√£o de FUN√á√ÉO neste ponto. (FUN√á√ÉO: checkIP)\n";
     //Grava mensagem no arquivo
     if ($handle = fopen($file, 'a+')) {
         fwrite($handle, $mensagem);

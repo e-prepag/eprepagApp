@@ -7,19 +7,19 @@ function env(string $key, ?string $default = null): string
 {
     $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
 
-    if ($value === false || $value === null || $value === '') {
+    if ($value === false || $value === '') {
         if ($default !== null) {
             return $default;
         }
 
-        throw new RuntimeException("Variável de ambiente {$key} não definida.");
+        throw new RuntimeException("Variï¿½vel de ambiente {$key} nï¿½o definida.");
     }
 
     return $value;
 }
 
 /**
- * Validação de protocolo
+ * Validaï¿½ï¿½o de protocolo
  */
 $hasCertificate = filter_var(
     env('HAS_CERTIFICATE', 'false'),
@@ -36,7 +36,7 @@ $baseUrlBO = env('BACKOFFICE_URL');
 
 
 if (!filter_var($tipo_http . $baseUrl, FILTER_VALIDATE_URL)) {
-    throw new RuntimeException('EPREPAG_URL inválida.');
+    throw new RuntimeException('EPREPAG_URL invï¿½lida.');
 }
 
 /**

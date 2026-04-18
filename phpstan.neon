@@ -1,0 +1,10 @@
+parameters:
+    level: 8
+
+    paths:
+        - www/includes
+
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+
+    reportUnmatchedIgnoredErrors: false
