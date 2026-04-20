@@ -545,7 +545,6 @@ class Produto
 
 		$rs = SQLexecuteQuery($sql);
 		if (!$rs) $ret = "Erro ao obter produto(s)." . PHP_EOL;
-		echo $sql;
 		return $ret;
 	}
 
