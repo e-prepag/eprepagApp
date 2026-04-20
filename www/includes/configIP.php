@@ -69,7 +69,7 @@ $search_domain = array_key_exists(@$GLOBALS['_SERVER']['SERVER_NAME'], $ENV_LIST
 
 if (!function_exists('checkIP')) {
     /**
-     * @return bool|array
+     * @return bool|array<string, string>
      */
     function checkIP(): bool|array
     {
@@ -77,13 +77,16 @@ if (!function_exists('checkIP')) {
         $sComputerName = 'SERVER_WITHOUT_COMPUTERNAME';
         $pComputerName = 'ENV_WITHOUT_COMPUTERNAME';
         foreach ($GLOBALS['ENV_LIST'] as $IP => $parametros) {
+            if (!is_array($parametros)) continue;
+            
             if (array_key_exists('COMPUTERNAME', $GLOBALS['_SERVER'])) {
-                $sComputerName = $GLOBALS['_SERVER']['COMPUTERNAME'];
+                $sComputerName = (string)$GLOBALS['_SERVER']['COMPUTERNAME'];
             } else $sComputerName = php_uname('n');
+            
             if (array_key_exists('COMPUTERNAME', $parametros)) {
-                $pComputerName = $parametros['COMPUTERNAME'];
+                $pComputerName = (string)$parametros['COMPUTERNAME'];
             }
-            if (@$GLOBALS['_SERVER']['SERVER_NAME'] == $IP or $sComputerName == $pComputerName) {
+            if ((@$GLOBALS['_SERVER']['SERVER_NAME'] === $IP) || ($sComputerName === $pComputerName)) {
                 $aux_return = $parametros;
             } //end if($_SERVER['SERVER_NAME'] == $IP or $_SERVER['COMPUTERNAME'] == $parametros['COMPUTERNAME'])
         } //end foreach

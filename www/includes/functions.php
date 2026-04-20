@@ -1092,21 +1092,19 @@ function monta_ddd_string(mixed $campoddd): ?string
 					$var .= $s . ";";
 				}
 			}
-			$aux_tr += 1;
-		}
-		for ($t = 1; $t <= strlen($recebeDDD); $t += 1) {
-			$char = substr($recebeDDD, $t - 1, 1);
-			if (ord($char) == 59)   // Verifica se a string tem ponto e v�rgula      
-			{
-				$pv = $aux_pv;
-				$pos = $pv - 3;
-				$tst = substr($recebeDDD, $pos, 1);
-				if (ord($tst) == 59)
-					$grav = substr($recebeDDD, $pos + 1, 2);
-				$var .= $grav . ";";
+			$var = "";
+			$aux_tr = 0;
+			$aux_pv = 1;
+			$grav = "";
+
+			// ... (resto da função)
+
+			if (ord($tst) == 59)
+			$grav = substr($recebeDDD, $pos + 1, 2);
+			$var .= (string)$grav . ";";
 			}
 			$aux_pv += 1;
-		}
+			}
 		$var = str_replace(";;;;", ";", $var);
 		$var = str_replace(";;;", ";", $var);
 		$var = str_replace(";;", ";", $var);

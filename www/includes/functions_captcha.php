@@ -4,10 +4,9 @@ function generateRandomCode(): string {
 	$numbersAllowedInCode = false;	//	Set to FALSE for a 'Letters Only' Code
 	$numberOfLetters = 4;			//	Allow Minimum 20 Pixels Per Letter - See codeBoxWidth Property Above)
 
-	$GLOBALS['_SESSION']['verificationCode'] = "";
 	$ret = "";
 	for ($placebo = 1; $placebo<=$numberOfLetters;$placebo++) {
-		if ($numbersAllowedInCode == false || (rand(0, 100) / 100 > 0.49)) {
+		if (rand(0, 100) / 100 > 0.49) {
 			$number = 97 + rand(0,25);	//rand(97,122);
 	        $char = chr($number);
 	        $ret .= $char;
@@ -23,7 +22,6 @@ function generateRandomCode(): string {
 }
 
 function translateCode(mixed $scode): string {
-	$numbersAllowedInCode = false;	//	Set to FALSE for a 'Letters Only' Code
 	$numberOfLetters = 4;			//	Allow Minimum 20 Pixels Per Letter - See codeBoxWidth Property Above)
 
 	$stmp = "";

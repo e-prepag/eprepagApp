@@ -17,8 +17,8 @@ parameters:
             message: '#Cannot access offset .* on array<int\|string, string\|null>\|false#'
             path: www/includes/inc_Pagamentos.php
         -
-            message: '#Cannot access offset .* on array<int\|string, string\|null>\|false#'
-            path: www/includes/inc_Pagamentos.php
-        -
             message: '#offsetAccess.nonOffsetAccessible#'
             path: www/includes/inc_Pagamentos.php
+        -
+            message: '#Call to static method getConnection\(\) on an unknown class ConnectionPDO#'
+            path: www/includes/config.MeiosPagamentos.php

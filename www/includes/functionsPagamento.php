@@ -1,5 +1,10 @@
 <?php
 
+	/**
+	 * @param array<int|string, mixed> $arr
+	 * @param mixed $val
+	 * @return array<int, mixed>
+	 */
 	function remove_element(array &$arr, mixed $val): array{
 		foreach ($arr as $key => $value){
 			if ($arr[$key] == $val){
