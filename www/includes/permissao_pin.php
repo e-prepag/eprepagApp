@@ -1,16 +1,19 @@
 <?php
 
-function permissao_visualizar_pin()
+/**
+ * @return bool
+ */
+function permissao_visualizar_pin(): bool
 {
     global $connid;
     static $has_permission = null;
 
-    // Retorna do cache em memória se já foi verificado para não fazer queries repetidas num loop de tabela
+    // Retorna do cache em memÃ³ria se jÃ¡ foi verificado para nÃ£o fazer queries repetidas num loop de tabela
     if ($has_permission !== null) {
-        return $has_permission;
+        return (bool)$has_permission;
     }
 
-    // Se não tiver sessão ou id, bloqueia por padrão
+    // Se nÃ£o tiver sessÃ£o ou id, bloqueia por padrÃ£o
     if (empty($_SESSION['iduser_bko_pub'])) {
         $has_permission = false;
         return $has_permission;
@@ -18,7 +21,7 @@ function permissao_visualizar_pin()
 
     $id_usuario = (int)$_SESSION['iduser_bko_pub'];
 
-    // Se a conexão não estiver disponível, bloqueia por segurança
+    // Se a conexÃ£o nÃ£o estiver disponÃ­vel, bloqueia por seguranÃ§a
     if (!$connid) {
         return false;
     }
@@ -29,7 +32,7 @@ function permissao_visualizar_pin()
 
     if ($result && pg_num_rows($result) > 0) {
         $row = pg_fetch_assoc($result);
-        if ($row && isset($row['visualiza_dados']) && strtoupper($row['visualiza_dados']) === 'S') {
+        if ($row && isset($row['visualiza_dados']) && strtoupper((string)$row['visualiza_dados']) === 'S') {
             $has_permission = true;
             return $has_permission;
         }
@@ -39,7 +42,11 @@ function permissao_visualizar_pin()
     return $has_permission;
 }
 
-function mascarar_pin_id($id)
+/**
+ * @param mixed $id
+ * @return mixed
+ */
+function mascarar_pin_id(mixed $id): mixed
 {
     if (permissao_visualizar_pin()) {
         return $id;
@@ -48,7 +55,11 @@ function mascarar_pin_id($id)
     return '***';
 }
 
-function mascarar_pin_codigo($codigo)
+/**
+ * @param mixed $codigo
+ * @return mixed
+ */
+function mascarar_pin_codigo(mixed $codigo): mixed
 {
     if (permissao_visualizar_pin()) {
         return $codigo;

@@ -1,5 +1,5 @@
 <?php 
-	function data_today($sql,$num) {
+	function data_today(string $sql, string $num): string {
 		$data_fim_query = date("Y-m-d");
 		
 		$hoje = date("Y-m-d");

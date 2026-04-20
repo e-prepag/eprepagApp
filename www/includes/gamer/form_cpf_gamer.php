@@ -4,7 +4,13 @@ set_time_limit(120);
 
 require_once RAIZ_DO_PROJETO . "consulta_cpf/config.inc.cpf.php";
 require_once DIR_WEB . "includes/functions.php";
-require_once "/www/consulta_cpf/trocaAutomatica.php";
+require_once RAIZ_DO_PROJETO . "consulta_cpf/trocaAutomatica.php";
+require_once RAIZ_DO_PROJETO . "class/gamer/classIntegracao.php";
+require_once RAIZ_DO_PROJETO . "consulta_cpf/classCPF.php";
+
+if (!defined("CPF_SITUCAO_REGULAR")) {
+    define("CPF_SITUCAO_REGULAR", "REGULAR");
+}
 
 $errors = array();
 
@@ -15,7 +21,7 @@ if (isset($_POST['formsubmit'])) {
     }
 
     if (!verificaCPF_int($_POST['cpf'])) {
-        $errors[] = "CPF inválido, por favor revise o número digitado.";
+        $errors[] = "CPF invï¿½lido, por favor revise o nï¿½mero digitado.";
     } else {
 
         //    ob_clean();
@@ -43,39 +49,39 @@ if (isset($_POST['formsubmit'])) {
 
         $testeCPF = $rs_api->Req_EfetuaConsulta($parametros, $resposta);
 
-        //Verificação de idade mínima 
+        //Verificaï¿½ï¿½o de idade mï¿½nima 
         if ($testeCPF == 112) {
-            $errors[] = "O produto " . $GLOBALS["produto_idade_minima"] . " é destinado para maiores de " . $GLOBALS["IDADE_MINIMA"] . " anos. Esta compra só poderá ser concluída caso você informe o CPF e data de nascimento dos seus pais ou responsável.";
+            $errors[] = "O produto " . $GLOBALS["produto_idade_minima"] . " ï¿½ destinado para maiores de " . $GLOBALS["IDADE_MINIMA"] . " anos. Esta compra sï¿½ poderï¿½ ser concluï¿½da caso vocï¿½ informe o CPF e data de nascimento dos seus pais ou responsï¿½vel.";
         } elseif ($testeCPF == 160) {
-            $errors[] = "Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, é necessário validação de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberação do CPF.";
+            $errors[] = "Identificamos que o titular do CPF informado possui mais de " . $GLOBALS["IDADE_MAXIMA"] . " anos. Para continuar, ï¿½ necessï¿½rio validaï¿½ï¿½o de identidade pelo time de Risco e Compliance (RC). Envie um e-mail para rc@e-prepag.com.br solicitando a liberaï¿½ï¿½o do CPF.";
         }
 
         //Testando se o CPF consta na BlackList
         elseif ($testeCPF == 299) {
-            $errors[] = "Existem pendências de documentos relacionadas ao seu CPF. Por gentileza entre em contato com suporte@e-prepag.com.br para desbloqueio.<br> Como empresa de serviços financeiros, a E-prepag trabalha para manter um ambiente seguro para todos, e conta com a sua colaboração.";
+            $errors[] = "Existem pendï¿½ncias de documentos relacionadas ao seu CPF. Por gentileza entre em contato com suporte@e-prepag.com.br para desbloqueio.<br> Como empresa de serviï¿½os financeiros, a E-prepag trabalha para manter um ambiente seguro para todos, e conta com a sua colaboraï¿½ï¿½o.";
         }
 
-        //Testando se ultrapassou o limite de utilização do mesmo CPF
+        //Testando se ultrapassou o limite de utilizaï¿½ï¿½o do mesmo CPF
         elseif ($testeCPF != 171) {
 
             if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY) {
 
                 if ($testeCPF == 2) {
-                    $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "Este nï¿½mero de CPF parece nï¿½o constar na Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif ($testeCPF == 1) {
-                    $errors[] = "Atualização de sistema em andamento. Alguns serviços podem estar indisponíveis. Estamos trabalhando para normalizar tudo o mais rápido possível. Qualquer dúvida, nossa equipe de suporte está à disposição. (erro 9191)";
+                    $errors[] = "Atualizaï¿½ï¿½o de sistema em andamento. Alguns serviï¿½os podem estar indisponï¿½veis. Estamos trabalhando para normalizar tudo o mais rï¿½pido possï¿½vel. Qualquer dï¿½vida, nossa equipe de suporte estï¿½ ï¿½ disposiï¿½ï¿½o. (erro 9191)";
                     qtdeTrocaAutomatica();
                 } elseif (is_null($testeCPF)) {
-                    $errors[] = "Erro no sistema (0034). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema (0034). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 } elseif ($testeCPF == 0 && $resposta['resposta']['cpf']['situacao'] != CPF_SITUCAO_REGULAR) {
-                    $errors[] = "CPF não está regular junto a Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "CPF nï¿½o estï¿½ regular junto a Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif (!isset($resposta['resposta']['cpf']['nome'])) {
-                    $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "Este nï¿½mero de CPF parece nï¿½o constar na Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif ($testeCPF == 0 && $resposta['resposta']['cpf']['situacao'] == CPF_SITUCAO_REGULAR) {
                     $name = $resposta['resposta']['cpf']['nome'];
                 } else {
-                    $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 }
             } // end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
@@ -90,68 +96,68 @@ if (isset($_POST['formsubmit'])) {
                 fclose($file);
 
                 if ($testeCPF == 2) {
-                    $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "Este nï¿½mero de CPF parece nï¿½o constar na Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif ($testeCPF == 1) {
-                    $errors[] = "Atualização de sistema em andamento. Alguns serviços podem estar indisponíveis. Estamos trabalhando para normalizar tudo o mais rápido possível. Qualquer dúvida, nossa equipe de suporte está à disposição. (erro 9191)";
+                    $errors[] = "Atualizaï¿½ï¿½o de sistema em andamento. Alguns serviï¿½os podem estar indisponï¿½veis. Estamos trabalhando para normalizar tudo o mais rï¿½pido possï¿½vel. Qualquer dï¿½vida, nossa equipe de suporte estï¿½ ï¿½ disposiï¿½ï¿½o. (erro 9191)";
                     qtdeTrocaAutomatica();
                 } elseif (is_null($testeCPF)) {
-                    $errors[] = "Erro no sistema (0034). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema (0034). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 } elseif ($testeCPF == 0 && $resposta['result']['situacao_cadastral'] != CPF_SITUCAO_REGULAR) {
-                    $errors[] = "CPF não está regular junto a Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "CPF nï¿½o estï¿½ regular junto a Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif (!isset($resposta['result']['nome_da_pf'])) {
-                    $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "Este nï¿½mero de CPF parece nï¿½o constar na Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif ($testeCPF == 0 && $resposta['result']['situacao_cadastral'] == CPF_SITUCAO_REGULAR) {
                     $retorno["nome"] = $resposta['result']['nome_da_pf'];
                     $retorno["data_nascimento"] = $resposta['result']['data_nascimento'];
                     $name = $retorno["nome"];
                     $data_nascimento = $retorno["data_nascimento"];
                 } else {
-                    $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 }
             } elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) {
 
                 if ($testeCPF == 2) {
-                    $errors[] = "Estamos momentaneamente com falha na comunição para verificação do CPF informado. Por favor, aguarde alguns minutos e tente novamente.";
+                    $errors[] = "Estamos momentaneamente com falha na comuniï¿½ï¿½o para verificaï¿½ï¿½o do CPF informado. Por favor, aguarde alguns minutos e tente novamente.";
                 } elseif ($testeCPF == 1) {
                     $name = $resposta['pesquisas']['camposResposta']['nome'];
                     $data_nascimento = $resposta['pesquisas']['camposResposta']['data_nascimento'];
                 } else {
-                    $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0485). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0485). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                 }
             } //end  elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) 
             else {
 
                 if ($testeCPF == 2 || $testeCPF == 8) {
-                    $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "Este nï¿½mero de CPF parece nï¿½o constar na Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif ($testeCPF == 1) {
-                    $errors[] = "Atualização de sistema em andamento. Alguns serviços podem estar indisponíveis. Estamos trabalhando para normalizar tudo o mais rápido possível. Qualquer dúvida, nossa equipe de suporte está à disposição. (erro 9191)";
+                    $errors[] = "Atualizaï¿½ï¿½o de sistema em andamento. Alguns serviï¿½os podem estar indisponï¿½veis. Estamos trabalhando para normalizar tudo o mais rï¿½pido possï¿½vel. Qualquer dï¿½vida, nossa equipe de suporte estï¿½ ï¿½ disposiï¿½ï¿½o. (erro 9191)";
                     qtdeTrocaAutomatica();
                 } elseif ($testeCPF == 9) {
-                    $errors[] = "Não foi possível realizar consulta. Erro(9355). Por favor, tente novamente. Se o problema persistir entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Nï¿½o foi possï¿½vel realizar consulta. Erro(9355). Por favor, tente novamente. Se o problema persistir entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 } elseif ($testeCPF == 12) {
-                    $errors[] = "A Data de Nascimento informada é diferente do que consta nos dados da Receita. Por favor, insira a data de nascimento do CPF informado.";
+                    $errors[] = "A Data de Nascimento informada ï¿½ diferente do que consta nos dados da Receita. Por favor, insira a data de nascimento do CPF informado.";
                 } elseif (is_null($testeCPF)) {
-                    $errors[] = "Erro no sistema (0034). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema (0034). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 } elseif ($testeCPF == 3 && $resposta['pesquisas']['camposResposta']['situacao'] != CPF_SITUCAO_REGULAR) {
-                    $errors[] = "CPF não está regular junto a Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "CPF nï¿½o estï¿½ regular junto a Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif (!isset($resposta['pesquisas']['camposResposta']['nome'])) {
-                    $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
+                    $errors[] = "Este nï¿½mero de CPF parece nï¿½o constar na Receita Federal. Por favor, verifique o nï¿½mero digitado e tente novamente.";
                 } elseif ($testeCPF == 3 && $resposta['pesquisas']['camposResposta']['situacao'] == CPF_SITUCAO_REGULAR) {
                     $name = $resposta['pesquisas']['camposResposta']['nome'];
                     $data_nascimento = $resposta['pesquisas']['camposResposta']['data_nascimento'];
                 } else {
-                    $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
+                    $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o cï¿½digo do problema. Obrigado.";
                     qtdeTrocaAutomatica();
                 }
             } //end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)   
 
         } //end elseif ($testeCPF != 171)
 
-        // Atingiu o limite máximo de utilização do mesmo CPF
+        // Atingiu o limite mï¿½ximo de utilizaï¿½ï¿½o do mesmo CPF
         else {
 
             $errors[] = "Para utilizar seu CPF precisamos confirmar alguns dados pessoais. Por favor entre em contato com a E-Prepag.<br><span onclick=\'window.open(\"" . EPREPAG_URL_HTTPS_COM . "/support\");\' style=\'cursor:pointer; color:#2e5984;\'>" . EPREPAG_URL_HTTPS_COM . "/support</span>.";
@@ -195,11 +201,11 @@ if (isset($_POST['formsubmit'])) {
 
             header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);
         } elseif (empty($usuarioId)) {
-            $errors[] = "Sua sessão expirou. Por favor, faça login no sistema novamente. Obrigado!";
+            $errors[] = "Sua sessï¿½o expirou. Por favor, faï¿½a login no sistema novamente. Obrigado!";
         }
     } //end else 
     if (count($errors) > 0 && $_POST['consulta_automatica'] == '1') {
-        $msg = "Houve um problema na atualização de seus dados.<br>Por favor, tente mais tarde ou se o problema persistir entre em contato com o suporte da E-Prepag reportando.<br>";
+        $msg = "Houve um problema na atualizaï¿½ï¿½o de seus dados.<br>Por favor, tente mais tarde ou se o problema persistir entre em contato com o suporte da E-Prepag reportando.<br>";
         $msg .= "Problemas encontrados:<br>";
         foreach ($errors as $error) {
             $msg .= $error . "<br>";
@@ -208,11 +214,11 @@ if (isset($_POST['formsubmit'])) {
              //echo $sql;
              $res = SQLexecuteQuery($sql);
              if($testeCPF != 171) {
-                 $msg = "Não houve sucesso na atualização do CPF do usuário de ID[".$usuarioId."]<br>Porém foi permitido efetuar a compra e foi atualizado a data de consulta do seu CPF para ter sucesso.<br>Dados:<br>CPF: ".$_POST['cpf']."<br>Data de Nascimento: ".$_POST['data_nascimento']."<br>";
+                 $msg = "Nï¿½o houve sucesso na atualizaï¿½ï¿½o do CPF do usuï¿½rio de ID[".$usuarioId."]<br>Porï¿½m foi permitido efetuar a compra e foi atualizado a data de consulta do seu CPF para ter sucesso.<br>Dados:<br>CPF: ".$_POST['cpf']."<br>Data de Nascimento: ".$_POST['data_nascimento']."<br>";
                  foreach($errors as $key => $error){ 
                      $msg .= str_replace("\n","<br>",  $error); 
                  }
-                 enviaEmail("rc@e-prepag.com.br", "tamy@e-prepag.com.br", "wagner@e-prepag.com.br", "Erro na atualização de CPF já informado", $msg);
+                 enviaEmail("rc@e-prepag.com.br", "tamy@e-prepag.com.br", "wagner@e-prepag.com.br", "Erro na atualizaï¿½ï¿½o de CPF jï¿½ informado", $msg);
              }//end if($testeCPF != 171)
              UsuarioGames::adicionarLoginSession_ByID($usuarioId);
              header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);      
@@ -258,7 +264,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                                                 return false;
                                         }
                                         else if(!validaRespostaCPF(document.frmPreCadastro.ug_cpf.value)) {
-                                                alert('CPF inválido, por favor revise o número digitado.');
+                                                alert('CPF invï¿½lido, por favor revise o nï¿½mero digitado.');
                                                 document.frmPreCadastro.ug_cpf.focus();
                                                 document.frmPreCadastro.ug_cpf.select();
                                                 return false;
@@ -349,9 +355,9 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
         <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
             <h4 class="c1 txt-azul">Por favor, complete o campo abaixo com o seu CPF <a href="#"
                     class="btn-question glyphicon glyphicon-question-sign txt-vermelho c-pointer t0"
-                    data-msg="<h2>O que é isso?</h2>Agora todas as transações financeiras de jogos online no Brasil são condicionadas ao fornecimento de um CPF. Esta informação será solicitada em algumas compras, mas não sempre. Agradecemos a sua compreensão."
+                    data-msg="<h2>O que ï¿½ isso?</h2>Agora todas as transaï¿½ï¿½es financeiras de jogos online no Brasil sï¿½o condicionadas ao fornecimento de um CPF. Esta informaï¿½ï¿½o serï¿½ solicitada em algumas compras, mas nï¿½o sempre. Agradecemos a sua compreensï¿½o."
                     style="position: relative;"></a></h4>
-            <p><i>O CPF será solicitado apenas na sua primeira compra no jogo. A idade mínima para realizar compras é de 16 anos.</i></p>
+            <p><i>O CPF serï¿½ solicitado apenas na sua primeira compra no jogo. A idade mï¿½nima para realizar compras ï¿½ de 16 anos.</i></p>
 
             <div class="int-form1" style="position: relative;">
                 <form action="" id="cpfForm" method="POST">
@@ -396,7 +402,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
         $('div#captcha_img, div#captcha_img + a').wrapAll('<div id="captcha-wrapper">');
 
         $(document).ready(function() {
-            //jQuery(function(e){e.datepicker.regional["pt-BR"]={closeText:"Fechar",prevText:"&#x3C;Anterior",nextText:"Próximo&#x3E;",currentText:"Hoje",monthNames:["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],monthNamesShort:["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],dayNames:["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"],dayNamesShort:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],dayNamesMin:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],weekHeader:"Sm",dateFormat:"dd/mm/yy",firstDay:0,isRTL:!1,showMonthAfterYear:!1,yearSuffix:""},e.datepicker.setDefaults(e.datepicker.regional["pt-BR"])});
+            //jQuery(function(e){e.datepicker.regional["pt-BR"]={closeText:"Fechar",prevText:"&#x3C;Anterior",nextText:"Prï¿½ximo&#x3E;",currentText:"Hoje",monthNames:["Janeiro","Fevereiro","Marï¿½o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],monthNamesShort:["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],dayNames:["Domingo","Segunda-feira","Terï¿½a-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sï¿½bado"],dayNamesShort:["Dom","Seg","Ter","Qua","Qui","Sex","Sï¿½b"],dayNamesMin:["Dom","Seg","Ter","Qua","Qui","Sex","Sï¿½b"],weekHeader:"Sm",dateFormat:"dd/mm/yy",firstDay:0,isRTL:!1,showMonthAfterYear:!1,yearSuffix:""},e.datepicker.setDefaults(e.datepicker.regional["pt-BR"])});
             var currentDate = new Date();
 
             $("#data_nascimento").mask("99/99/9999");
@@ -407,7 +413,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                     var objDtNasc = new Date(parseInt(dt_nasc[2]), parseInt(dt_nasc[1]) - 1, parseInt(dt_nasc[0]));
                     if (objDtNasc.getTime() > currentDate.getTime()) {
                         $(this).val("");
-                        showMessage("Data inválida");
+                        showMessage("Data invï¿½lida");
                     }
                 }
             });
@@ -418,7 +424,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
                     var objDtNasc = new Date(parseInt(dt_nasc[2]), parseInt(dt_nasc[1]) - 1, parseInt(dt_nasc[0]));
                     if (objDtNasc.getTime() > currentDate.getTime()) {
                         $(this).val("");
-                        showMessage("Data inválida");
+                        showMessage("Data invï¿½lida");
                     }
                 }
             });
@@ -433,7 +439,7 @@ $retorno = "<div id='popup_cpf' align='left' title=''>
 
 </html>
 <?php
-//Restaurando Sessão por conta do (1REW)
+//Restaurando Sessï¿½o por conta do (1REW)
 $GLOBALS['_SESSION']['pagamento.pagto.deposito.em.saldo'] = $aux['pagamento.pagto.deposito.em.saldo'];
 $GLOBALS['_SESSION']['pagamento.pagto.deposito.em.saldo.num.docto'] = $aux['pagamento.pagto.deposito.em.saldo.num.docto'];
 ?>

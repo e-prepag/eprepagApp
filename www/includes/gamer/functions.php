@@ -7,12 +7,16 @@ use PHPMailer\PHPMailer\Exception;
 require_once '/www/vendor/autoload.php';
 
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_pagto.php";
+require_once RAIZ_DO_PROJETO . "vendor/autoload.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_economy.php";
 require_once RAIZ_DO_PROJETO . "includes/load_dotenv.php";
 
 if (!function_exists('checkIP')) {
 
-        function checkIP()
+        /**
+         * @return array|bool
+         */
+        function checkIP(): array|bool
         {
 
                 $aux_return = false;
@@ -41,10 +45,10 @@ if (!function_exists('checkIP')) {
                 } //end foreach
 
                 return $aux_return;
-        } //end function checkIP()
+        } //end function checkIP(): bool
 
 }
-function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $name = '', $replyTo = '')
+function enviaEmail4(string $to, string $cc, string $bcc, string $subject, string $body_html, string $body_plain, mixed $attach = null, bool $stringAttach = false, string $name = '', string $replyTo = ''): bool
 {
 
         $mail = new \PHPMailer\PHPMailer\PHPMailer();
@@ -52,24 +56,24 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
 
 
         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = getenv("smtp_host");
+        $mail->Host     = (string)getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
-        $mail->From     = ($replyTo != '' ? "site@e-prepag.com.br" : getenv("email_suporte"));
+        $mail->From     = ($replyTo != '' ? "site@e-prepag.com.br" : (string)getenv("email_suporte"));
         $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Username = getenv("smtp_username");  // a valid email here
-        $mail->Password = getenv("smtp_password"); //'985856';		//'850637';  985856
+        $mail->Username = (string)getenv("smtp_username");  // a valid email here
+        $mail->Password = (string)getenv("smtp_password"); //'985856';		//'850637';  985856
         $mail->FromName = "E-Prepag";        // " (EPP)"
         $mail->isHTML(true);
 
         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
         $mail->isSMTP();
         //$mail->SMTPSecure = "ssl";
-        $mail->Port     = getenv("smtp_port");
+        $mail->Port     = (int)getenv("smtp_port");
         //---------------------------------------------------------//  
 
         // Reply-to
-        $mail->addReplyTo(($replyTo != '' ? $replyTo : getenv("email_suporte")));
+        $mail->AddReplyTo(($replyTo != '' ? $replyTo : (string)getenv("email_suporte")));
 
         //To
         if ($to && trim($to) != "") {
@@ -92,20 +96,20 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         if (!empty($attach)) {
                 if ($stringAttach) {
 
-                        $mail->addStringAttachment($attach, $name);
+                        $mail->AddStringAttachment((string)$attach, $name);
                 } else {
 
-                        $mail->addAttachment($attach);
+                        $mail->addAttachment((string)$attach);
                 }
         }
         $mail->Subject = $subject;
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        return $mail->send();
+        return (bool)$mail->Send();
 } //end function enviaEmail4
 
-function declare_valida_formatacao()
+function declare_valida_formatacao(): void
 {
 
         function valida_formatacao($tipo, $tamanho, $valor)
@@ -127,7 +131,7 @@ function declare_valida_formatacao()
         }
 }
 
-function verificaCPFEx($CPF)
+function verificaCPFEx(string $CPF): int
 {
 
         if (strpos($CPF, '.') === false) return 0;
@@ -148,11 +152,12 @@ function verificaCPFEx($CPF)
                 || $CPF == '99999999999'
         ) return 0;
 
+        /** @phpstan-ignore-next-line */
         return verificaCPF($CPF);
 }
 
 
-function DVCampo_Modulo10($campo)
+function DVCampo_Modulo10(string $campo): int
 {
         $DOIS_UM = array(2, 1);
         $soma = 0;
@@ -160,8 +165,8 @@ function DVCampo_Modulo10($campo)
         $campoTmp = strrev($campo);
 
         for ($i = 0; $i < $tam; $i++) {
-                $aux = $DOIS_UM[$i % 2] * substr($campoTmp, $i, 1);
-                if ($aux >= 10) $soma = $soma + (floor($aux / 10) + $aux % 10);
+                $aux = $DOIS_UM[$i % 2] * (int)substr($campoTmp, $i, 1);
+                if ($aux >= 10) $soma = $soma + (int)(floor($aux / 10) + $aux % 10);
                 else $soma = $soma + $aux;
         }
 
@@ -172,14 +177,14 @@ function DVCampo_Modulo10($campo)
         return $dVCampo;
 }
 
-function obterIdVendaValido()
+function obterIdVendaValido(): ?int
 {
 
         $maxID = 100000000 - 1;
         $nmax = 100;
         $n = 1;
         $s_ids = "";
-        $time_start_stats = getmicrotime();
+        $time_start_stats = (float)getmicrotime();
         $venda_id_rand = mt_rand(1, $maxID);
         $s_ids .= $venda_id_rand . ", ";
         while (existeIdVenda($venda_id_rand)) {
@@ -196,7 +201,7 @@ function obterIdVendaValido()
         gravaLog_obterIdVendaValido($msg);
 
         if ($n > 1) {
-                $msg = "\tElapsed time " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "s";
+                $msg = "\tElapsed time " . number_format((float)getmicrotime() - $time_start_stats, 2, '.', '.') . "s";
                 gravaLog_obterIdVendaValido($msg);
         }
         if ($n >= $nmax) {
@@ -206,7 +211,7 @@ function obterIdVendaValido()
         return $venda_id_rand;
 }
 
-function existeIdVenda($venda_id_rand)
+function existeIdVenda(int $venda_id_rand): bool
 {
 
         $ret = true;
@@ -217,20 +222,20 @@ function existeIdVenda($venda_id_rand)
         $rs = SQLexecuteQuery($sql);
         if ($rs && pg_num_rows($rs) > 0) {
                 $rs_row = pg_fetch_array($rs);
-                if ($rs_row['qtde'] == 0) $ret = false;
+                if ($rs_row && $rs_row['qtde'] == 0) $ret = false;
         }
         return $ret;
 }
 
 if (!function_exists('gravaLog_TMP')) {
-        function gravaLog_TMP($mensagem)
+        function gravaLog_TMP(string $mensagem): void
         {
 
                 //Arquivo
                 $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_pagamento_TMP.txt";
 
                 //Mensagem
-                $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+                $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
                 //Grava mensagem no arquivo
                 if ($handle = fopen($file, 'a+')) {
@@ -240,14 +245,14 @@ if (!function_exists('gravaLog_TMP')) {
         }
 } //end if(!function_exists('gravaLog_TMP'))
 
-function gravaLog_Pagto_Insert($mensagem)
+function gravaLog_Pagto_Insert(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Pagto_Insert.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -256,14 +261,14 @@ function gravaLog_Pagto_Insert($mensagem)
         }
 }
 
-function gravaLog_MCOIN($mensagem)
+function gravaLog_MCOIN(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_pagamento_MCOIN.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -272,7 +277,7 @@ function gravaLog_MCOIN($mensagem)
         }
 }
 
-function gravaLog_Login($mensagem, $forced_save = false)
+function gravaLog_Login(string $mensagem, bool $forced_save = false): void
 {
 
         // Desativa o registro de Sucesso/Erro de logins
@@ -282,7 +287,7 @@ function gravaLog_Login($mensagem, $forced_save = false)
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_login.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . " (" . $_SERVER['REMOTE_ADDR'] . ")\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . " (" . ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . ")\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -292,14 +297,14 @@ function gravaLog_Login($mensagem, $forced_save = false)
 }
 
 
-function gravaLog_EPPCASH_PINs($mensagem)
+function gravaLog_EPPCASH_PINs(string $mensagem): void
 {
 
         //Arquivo
         $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_EPP_CASH_PINs.txt";
 
         //Mensagem
-        $mensagem =  str_repeat("-", 80) . "\n" . date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem =  str_repeat("-", 80) . "\n" . date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
                 fwrite($handle, $mensagem);
@@ -308,7 +313,7 @@ function gravaLog_EPPCASH_PINs($mensagem)
 }
 
 
-function gravaLog_obterIdVendaValido($mensagem)
+function gravaLog_obterIdVendaValido(string $mensagem): void
 {
 
         //Arquivo
@@ -324,14 +329,14 @@ function gravaLog_obterIdVendaValido($mensagem)
         }
 }
 
-function gravaLog_Temporario($mensagem)
+function gravaLog_Temporario(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_TEMPORARIO.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -340,14 +345,14 @@ function gravaLog_Temporario($mensagem)
         }
 }
 
-function gravaLog_CadastraUsuariosExpressMoney($mensagem)
+function gravaLog_CadastraUsuariosExpressMoney(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_CadastraUsuariosExpressMoney.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -356,14 +361,14 @@ function gravaLog_CadastraUsuariosExpressMoney($mensagem)
         }
 }
 
-function gravaLog_BloqueioPagtoOnline($mensagem)
+function gravaLog_BloqueioPagtoOnline(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_BloqueioPagtoOnline_Money.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -372,14 +377,14 @@ function gravaLog_BloqueioPagtoOnline($mensagem)
         }
 }
 
-function gravaLog_LimitePagtoOnline($mensagem)
+function gravaLog_LimitePagtoOnline(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_LimitePagtoOnline_Money.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -388,14 +393,14 @@ function gravaLog_LimitePagtoOnline($mensagem)
         }
 }
 
-function gravaLog_LimitePagtoOnline_Drupal($mensagem)
+function gravaLog_LimitePagtoOnline_Drupal(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_LimitePagtoOnline_Money_Drupal.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -899,7 +904,7 @@ function redirect($strRedirect)
 
                                                                         $body_simple = $body_html;
 
-                                                                        $boundary = md5(uniqid(time()));
+                                                                        $boundary = md5(uniqid((string)time()));
 
                                                                         $headers  = 'From: E-Prepag <suporte@e-prepag.com.br>' . $s_eol;
                                                                         $headers .= 'Reply-To: E-Prepag <suporte@e-repag.com.br>' . $s_eol;
@@ -1683,7 +1688,7 @@ pin
                                                                         $rs = SQLexecuteQuery($sql);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 while ($rs_row = pg_fetch_array($rs)) {
-                                                                                        $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format($rs_row['vgm_valor'], 2, ',', '.') . ")\n";
+                                                                                        $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format((float)$rs_row['vgm_valor'], 2, ',', '.') . ")\n";
                                                                                 }
                                                                         }
                                                                         if (!$cesta_nome || strlen($cesta_nome) == 0) {
@@ -1866,7 +1871,7 @@ pin
                                                                         $ntries = 0;
                                                                         $orderId = "";
 
-                                                                        $orderId =         date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT);
+                                                                        $orderId =         date("YmdHis") . str_pad((string)rand(0, 999), 3, "0", STR_PAD_LEFT);
                                                                         do {
 
                                                                                 //		$orderId = 	"2003120408301545872781";
@@ -1880,7 +1885,7 @@ pin
                                                                                         $pgresult = pg_fetch_array($ret);
                                                                                         $bfound = (($pgresult['n'] == 0) ? true : false);
                                                                                 }
-                                                                                $orderId =         date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT);
+                                                                                $orderId =         date("YmdHis") . str_pad((string)rand(0, 999), 3, "0", STR_PAD_LEFT);
                                                                                 $ntries++;
                                                                         } while (!$bfound && $ntries < 10);
 
