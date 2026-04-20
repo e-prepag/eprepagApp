@@ -9,54 +9,91 @@ require_once '/www/vendor/autoload.php';
 
 function disparaEmail($to, $cc, $bcc, $subject, $body_html, $body_plain, $codigoValidacao)
 {
+
         $mensagemLog = "";
-        $mail = new \PHPMailer\PHPMailer\PHPMailer();
-        $mail->isSMTP();
-        $mail->Host     = getenv("smtp_host");
-        $mail->SMTPAuth = true;
-        $mail->Mailer   = "smtp";
-        $mail->Username = getenv("smtp_username");
-        $mail->Password = getenv("smtp_password");
-        //$mail->SMTPSecure = "ssl";
-        $mail->Port     = getenv("smtp_port");
+        $mail = null;
 
-        $mail->From     = getenv("email_suporte");
-        $mail->FromName = "E-Prepag";
-        $mail->addReplyTo(getenv("email_suporte"));
+        try {
 
-        if ($to && trim($to) != "") {
-                $toAr = explode(",", $to);
-                foreach ($toAr as $recipient) {
-                        $mail->addAddress(trim($recipient));
+                $emailSuporte = (string)getenv("email_suporte");
+
+                if (!filter_var($emailSuporte, FILTER_VALIDATE_EMAIL)) {
+                        throw new Exception("Remetente email_suporte invalido ou nao configurado.");
                 }
-        }
 
-        if ($cc && trim($cc) != "") {
-                $ccAr = explode(",", $cc);
-                foreach ($ccAr as $ccRecipient) {
-                        $mail->addCC(trim($ccRecipient));
+
+                $mail = new PHPMailer(true);
+                $mail->isSMTP();
+                $mail->Host     = (string)getenv("smtp_host");
+                $mail->SMTPAuth = true;
+                $mail->Mailer   = "smtp";
+                $mail->Username = (string)getenv("smtp_username");
+                $mail->Password = (string)getenv("smtp_password");
+                //$mail->SMTPSecure = "ssl";
+                $mail->Port     = (int)getenv("smtp_port");
+                $mail->CharSet = 'UTF-8';
+                $mail->Timeout  = 20;
+
+                $mail->setFrom($emailSuporte, "E-Prepag");
+                $mail->addReplyTo($emailSuporte);
+
+
+                $destinatariosAdicionados = 0;
+
+                $adicionaDestinatarios = function ($emails, callable $callback) use (&$destinatariosAdicionados) {
+                        if (!$emails || trim((string)$emails) == "") {
+                                return;
+                        }
+
+                        $emailsAr = explode(",", (string)$emails);
+                        foreach ($emailsAr as $email) {
+                                $email = trim($email);
+                                if ($email == "") {
+                                        continue;
+                                }
+
+                                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                        throw new Exception("Destinatario invalido: {$email}");
+                                }
+
+                                $callback($email);
+                                $destinatariosAdicionados++;
+                        }
+                };
+
+                $adicionaDestinatarios($to, function ($email) use ($mail) {
+                        $mail->addAddress($email);
+                });
+
+                $adicionaDestinatarios($cc, function ($email) use ($mail) {
+                        $mail->addCC($email);
+                });
+
+                $adicionaDestinatarios($bcc, function ($email) use ($mail) {
+                        $mail->addBCC($email);
+                });
+
+                if ($destinatariosAdicionados == 0) {
+                        throw new Exception("Nenhum destinatario valido informado.");
                 }
-        }
 
-        if ($bcc && trim($bcc) != "") {
-                $bccAr = explode(",", $bcc);
-                foreach ($bccAr as $bccRecipient) {
-                        $mail->addBCC(trim($bccRecipient));
-                }
-        }
 
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-        $mail->Body    = $body_html;
-        $mail->AltBody = $body_plain;
+                $mail->Subject = (string)$subject;
+                $mail->isHTML(true);
+                $mail->Body    = (string)$body_html;
+                $mail->AltBody = (string)$body_plain;
 
-        $enviado = $mail->send();
-        if (!$enviado) {
-                $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Erro: Ao enviar e-mail para: {$to} - Erro: " . $mail->ErrorInfo;
+                $mail->send();
+        } catch (\Throwable $e) {
+                //$erroPhpmailer = $mail instanceof PHPMailer && $mail->ErrorInfo ? " - PHPMailer: " . $mail->ErrorInfo : "";
+                $mensagemLog = "Pagina: Game->Conta->Esqueci minha senha - Erro: Ao enviar e-mail para: {$to}";
+                //$mensagemLog .= " - Erro: " . $e->getMessage() . $erroPhpmailer;
         }
 
         $arquivoLog = '/www/arquivos_gerados/logs/envioEmailEsqueciMinhaSenha.log';
-        geraLogEnvioEmail($arquivoLog, $mensagemLog);
-
+        if (function_exists("geraLogEnvioEmail")) {
+                geraLogEnvioEmail($arquivoLog, $mensagemLog);
+        }
+        error_log($mensagemLog);
         return $mensagemLog;
 }
