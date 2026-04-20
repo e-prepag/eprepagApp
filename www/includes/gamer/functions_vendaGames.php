@@ -59,12 +59,12 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
                 else {
                         $rs_venda_row = pg_fetch_array($rs_venda);
                         if (is_array($rs_venda_row)) {
-                            $vg_ug_id = $rs_venda_row['vg_ug_id'] ?? null;
-                            $vg_id = $rs_venda_row['vg_id'] ?? null;
-                            $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'] ?? null;
-                            $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'] ?? null;
-                            $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'] ?? null;
-                            $vg_integracao_parceiro_origem_id = $rs_venda_row['vg_integracao_parceiro_origem_id'] ?? null;
+                                $vg_ug_id = $rs_venda_row['vg_ug_id'] ?? null;
+                                $vg_id = $rs_venda_row['vg_id'] ?? null;
+                                $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'] ?? null;
+                                $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'] ?? null;
+                                $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'] ?? null;
+                                $vg_integracao_parceiro_origem_id = $rs_venda_row['vg_integracao_parceiro_origem_id'] ?? null;
                         }
 
                         //valida status
@@ -1745,7 +1745,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 function processaEmailVendaGames($venda_id, $parametros)
 {
 
-        global RAIZ_DO_PROJETO;
+        global $raiz_do_projeto;
         $msg = "";
         $isExpressMoney = false;
 
@@ -3954,7 +3954,7 @@ function conciliacaoAutomaticaPagamentoOnline()
 
 function gravaLog_MonitorPedidosDuplicados($mensagem)
 {
-        global RAIZ_DO_PROJETO;
+        require_once $raiz_do_projeto;
         $bDebug = false;
         if ($bDebug)
                 echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")" . PHP_EOL;
@@ -3974,7 +3974,7 @@ function gravaLog_MonitorPedidosDuplicados($mensagem)
 
 function gravaLog_TMP_conciliacao($mensagem)
 {
-        global RAIZ_DO_PROJETO;
+        require_once $raiz_do_projeto;
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_pagamento_TMP_conciliacao.txt";
 
@@ -3990,7 +3990,7 @@ function gravaLog_TMP_conciliacao($mensagem)
 
 function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
 {
-        global RAIZ_DO_PROJETO;
+        require_once $raiz_do_projeto;
         $bDebug = false;
         if ($bDebug)
                 echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")" . PHP_EOL;
@@ -4011,7 +4011,7 @@ function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
 
 function gravaLog_Debug($mensagem)
 {
-        global RAIZ_DO_PROJETO;
+        require_once $raiz_do_projeto;
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Debug.txt";

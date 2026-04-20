@@ -63,7 +63,7 @@ function ChapterBody(string $file): void
 	$this->Cell(0,5,'(end of excerpt)');
 }
 
-function PrintChapter(mixed $num, string $title, string $file): void
+function PrintChapter(int $num, string $title, string $file): void
 {
 	$this->AddPage();
 	$this->ChapterTitle($num,$title);

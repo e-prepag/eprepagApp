@@ -4,6 +4,10 @@ require('../fpdf.php');
 class PDF extends FPDF
 {
 // Load data
+/**
+ * @param string $file
+ * @return array<int, array<int, string>>
+ */
 function LoadData(string $file): array
 {
 	// Read file lines
@@ -18,6 +22,10 @@ function LoadData(string $file): array
 }
 
 // Simple table
+/**
+ * @param array<int, string> $header
+ * @param array<int, array<int, string>> $data
+ */
 function BasicTable(array $header, array $data): void
 {
 	// Header
@@ -34,6 +42,10 @@ function BasicTable(array $header, array $data): void
 }
 
 // Better table
+/**
+ * @param array<int, string> $header
+ * @param array<int, array<int, string>> $data
+ */
 function ImprovedTable(array $header, array $data): void
 {
 	// Column widths
@@ -47,8 +59,8 @@ function ImprovedTable(array $header, array $data): void
 	{
 		$this->Cell($w[0],6,(string)$row[0],'LR');
 		$this->Cell($w[1],6,(string)$row[1],'LR');
-		$this->Cell($w[2],6,number_format((float)$row[2]),'LR',0,'R');
-		$this->Cell($w[3],6,number_format((float)$row[3]),'LR',0,'R');
+		$this->Cell($w[2],6,number_format((float)($row[2] ?? 0)),'LR',0,'R');
+		$this->Cell($w[3],6,number_format((float)($row[3] ?? 0)),'LR',0,'R');
 		$this->Ln();
 	}
 	// Closing line
@@ -56,6 +68,10 @@ function ImprovedTable(array $header, array $data): void
 }
 
 // Colored table
+/**
+ * @param array<int, string> $header
+ * @param array<int, array<int, string>> $data
+ */
 function FancyTable(array $header, array $data): void
 {
 	// Colors, line width and bold font
@@ -77,10 +93,10 @@ function FancyTable(array $header, array $data): void
 	$fill = false;
 	foreach($data as $row)
 	{
-		$this->Cell($w[0],6,(string)$row[0],'LR',0,'L',$fill);
-		$this->Cell($w[1],6,(string)$row[1],'LR',0,'L',$fill);
-		$this->Cell($w[2],6,number_format((float)$row[2]),'LR',0,'R',$fill);
-		$this->Cell($w[3],6,number_format((float)$row[3]),'LR',0,'R',$fill);
+		$this->Cell($w[0],6,(string)($row[0] ?? ''),'LR',0,'L',$fill);
+		$this->Cell($w[1],6,(string)($row[1] ?? ''),'LR',0,'L',$fill);
+		$this->Cell($w[2],6,number_format((float)($row[2] ?? 0)),'LR',0,'R',$fill);
+		$this->Cell($w[3],6,number_format((float)($row[3] ?? 0)),'LR',0,'R',$fill);
 		$this->Ln();
 		$fill = !$fill;
 	}

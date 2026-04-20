@@ -96,11 +96,10 @@ class LanguageConv {
 	    }
 	    return $unistring;
 	} elseif( LANGUAGE_CYRILLIC ) {
-	    if( CYRILLIC_FROM_WINDOWS && (!defined('LANGUAGE_CHARSET') || stristr(LANGUAGE_CHARSET, 'windows-1251')) ) {
-		$aTxt = convert_cyr_string($aTxt, "w", "k"); 
+	    if( CYRILLIC_FROM_WINDOWS && (!defined('LANGUAGE_CHARSET') || stristr((string)LANGUAGE_CHARSET, 'windows-1251')) ) {
+	        $aTxt = convert_cyr_string($aTxt, "w", "k"); 
 	    }
-	    if( !defined('LANGUAGE_CHARSET') || stristr(LANGUAGE_CHARSET, 'koi8-r') || stristr(LANGUAGE_CHARSET, 'windows-1251')) {
-		$isostring = convert_cyr_string($aTxt, "k", "i");
+	    if( !defined('LANGUAGE_CHARSET') || stristr((string)LANGUAGE_CHARSET, 'koi8-r') || stristr((string)LANGUAGE_CHARSET, 'windows-1251')) {		$isostring = convert_cyr_string($aTxt, "k", "i");
 		$unistring = LanguageConv::iso2uni($isostring);
 	    }
 	    else {

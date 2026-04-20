@@ -7,9 +7,10 @@ class Feriados
     const FERIADO_ESTADUAL = 2;
     const FERIADO_MUNICIPAL = 3;
 
-    private mixed $dia = null;
-    private mixed $mes = null;
-    private mixed $ano = null;
+    private ?int $dia = null;
+    private ?int $mes = null;
+    private ?int $ano = null;
+    /** @var array<int, array{desc: string, tipo: int}> */
     private array $feriados = array();
 
     private string $mask = 'd/m/Y';
@@ -17,26 +18,26 @@ class Feriados
     /**
      * Se não for setado o ano, será calculado pelo ano atual
      *
-     * @param mixed $ano
+     * @param int|null $ano
      * @param mixed $tipoFeriado
      */
-    public function __construct($ano = null, $tipoFeriado = null)
+    public function __construct(?int $ano = null, $tipoFeriado = null)
     {
         $this->setAno($ano);
         $this->setFeriados($tipoFeriado);
     }
 
     /**
-     * @param string $data Data - formtato: DD/MM/YYYY
+     * @param string $data Data - formato: DD/MM/YYYY
      * @return bool
      */
-    public function isFeriado($data): bool
+    public function isFeriado(string $data): bool
     {
         $vData = $this->validateData($data);
-        if ($vData) {
+        if (is_array($vData)) {
             $timestamp = mktime(0, 0, 0, (int)$vData[2], (int)$vData[1], (int)$vData[3]);
 
-            return array_key_exists((int)$timestamp, $this->feriados) ? (bool)$this->feriados[(int)$timestamp] : false;
+            return array_key_exists((int)$timestamp, $this->feriados);
         }
         return false;
     }
@@ -47,63 +48,63 @@ class Feriados
      * @param string $data
      * @return bool
      */
-    public function isDiaUtil($data): bool
+    public function isDiaUtil(string $data): bool
     {
         if ($this->isFeriado($data)) {
             return false;
         }
         $timestamp = mktime(0, 0, 0, (int)$this->mes, (int)$this->dia, (int)$this->ano);
-        $d = date('N', (int)$timestamp);
+        $d = date('N', $timestamp ?: time());
         return ((int)$d < 6);
     }
 
     /**
      * Valida se uma data é válida
-     * Retorna false se inválido ou um array contendo dia[1], mes[2] e ano[3] se válida.
+     * Retorna null se inválido ou um array contendo dia[1], mes[2] e ano[3] se válida.
      *
      * @param string $data Data no formato DD/MM/YYYY
-     * @return bool|array
+     * @return array<int, string>|null
      */
-    private function isDateValid($data): bool|array
+    private function isDateValid(string $data): ?array
     {
         $s = preg_match('/(\d{1,2})\/(\d{1,2})\/(\d{4})/', $data, $matches);
         if ($s) {
             if ((int)$matches[2] > 12 || (int)$matches[1] > 31) {
-                return false;
+                return null;
             }
             return $matches;
         }
-        return false;
+        return null;
     }
 
     /**
-     * Valida a data, retornando o ano, mes, dia se válida ou false se invalida
+     * Valida a data, retornando o ano, mes, dia se válida ou null se invalida
      *
      * @param string $data Data
-     * @return bool|array
+     * @return array<int, string>|null
      */
-    public function validateData($data): bool|array
+    public function validateData(string $data): ?array
     {
         $matches = $this->isDateValid($data);
-        if ($matches !== false) {
-            $this->dia = $matches[1];
-            $this->mes = $matches[2];
-            $this->ano = $matches[3];
+        if ($matches !== null) {
+            $this->dia = (int)$matches[1];
+            $this->mes = (int)$matches[2];
+            $this->ano = (int)$matches[3];
         }
         return $matches;
     }
 
     /**
      * @param string $data Data no formato DD/MM/YYYY
-     * @return bool|int
+     * @return int|null
      */
-    public function getTimestamp($data): bool|int
+    public function getTimestamp(string $data): ?int
     {
         $vDate = $this->isDateValid($data);
-        if ($vDate !== false) {
-            return mktime(0, 0, 0, (int)$vDate[2], (int)$vDate[1], (int)$vDate[3]);
+        if ($vDate !== null) {
+            return (int)mktime(0, 0, 0, (int)$vDate[2], (int)$vDate[1], (int)$vDate[3]);
         }
-        return false;
+        return null;
     }
 
     /**
@@ -218,13 +219,13 @@ class Feriados
      * Retorna o próximo dia útil da data informada
      *
      * @param string $data Data no formato DD/MM/YYYY
-     * @return bool|int
+     * @return int|null
      */
-    public function nextDiaUtil(string $data): bool|int
+    public function nextDiaUtil(string $data): ?int
     {
         $vData = $this->isDateValid($data);
-        if ($vData === false) {
-            return false;
+        if ($vData === null) {
+            return null;
         }
         $timestamp = (int)mktime(0, 0, 0, (int)$vData[2], (int)$vData[1], (int)$vData[3]) + (3600 * 24);
         $d = $this->isDiaUtil(date($this->mask, $timestamp));
@@ -240,13 +241,13 @@ class Feriados
      * Retorna o último dia útil anterior da data informada
      *
      * @param string $data Data no formato DD/MM/YYYY
-     * @return bool|int
+     * @return int|null
      */
-    public function lastDiaUtil(string $data): bool|int
+    public function lastDiaUtil(string $data): ?int
     {
         $vData = $this->isDateValid($data);
-        if ($vData === false) {
-            return false;
+        if ($vData === null) {
+            return null;
         }
 
         $timestamp = (int)mktime(0, 0, 0, (int)$vData[2], (int)$vData[1], (int)$vData[3]) - (3600 * 24);
@@ -265,24 +266,24 @@ class Feriados
      *
      * @param string $data Data no formato DD/MM/YYYY
      * @param int $dias Dias a serem adicionados (contando apenas dias uteis)
-     * @return bool|int
+     * @return int|null
      */
-    public function addDiaUtil(string $data, int $dias): bool|int
+    public function addDiaUtil(string $data, int $dias): ?int
     {
         if ($dias < 1) {
             return $this->getTimestamp($data);
         }
         $vData = $this->validateData($data);
-        if ($vData === false) {
-            return false;
+        if ($vData === null) {
+            return null;
         }
 
-        $novoTimestamp = $this->nextDiaUtil($data); // Dia +1 util
-        if ($novoTimestamp === false) return false;
+        $novoTimestamp = $this->nextDiaUtil($data);
+        if ($novoTimestamp === null) return null;
         $dias--;
         while ($dias) {
-            $novoTimestamp = $this->nextDiaUtil(date($this->mask, (int)$novoTimestamp)); // Dia +dias-1 util
-            if ($novoTimestamp === false) return false;
+            $novoTimestamp = $this->nextDiaUtil(date($this->mask, $novoTimestamp));
+            if ($novoTimestamp === null) return null;
             $dias -= 1;
         }
 
@@ -294,25 +295,25 @@ class Feriados
      *
      * @param string $data
      * @param int $dias
-     * @return bool|int
+     * @return int|null
      */
-    public function subDiaUtil(string $data, int $dias): bool|int
+    public function subDiaUtil(string $data, int $dias): ?int
     {
         if ($dias < 1) {
             return $this->getTimestamp($data);
         }
 
         $vData = $this->validateData($data);
-        if ($vData === false) {
-            return false;
+        if ($vData === null) {
+            return null;
         }
 
-        $timestamp = $this->lastDiaUtil($data); // Dia -1 util
-        if ($timestamp === false) return false;
+        $timestamp = $this->lastDiaUtil($data);
+        if ($timestamp === null) return null;
         $dias--;
         while ($dias) {
-            $timestamp = $this->lastDiaUtil(date($this->mask, (int)$timestamp)); // Dia -dias-1 util
-            if ($timestamp === false) return false;
+            $timestamp = $this->lastDiaUtil(date($this->mask, $timestamp));
+            if ($timestamp === null) return null;
             $dias -= 1;
         }
 
