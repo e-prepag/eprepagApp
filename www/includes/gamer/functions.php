@@ -48,8 +48,12 @@ if (!function_exists('checkIP')) {
         } //end function checkIP(): bool
 
 }
-function enviaEmail4(string $to, string $cc, string $bcc, string $subject, string $body_html, string $body_plain, mixed $attach = null, bool $stringAttach = false, string $name = '', string $replyTo = ''): bool
+function enviaEmail4(string $to, mixed $cc, mixed $bcc, string $subject, string $body_html, mixed $body_plain, mixed $attach = null, bool $stringAttach = false, string $name = '', string $replyTo = ''): bool
 {
+
+        $cc = ($cc === null || $cc === false) ? '' : (string)$cc;
+        $bcc = ($bcc === null || $bcc === false) ? '' : (string)$bcc;
+        $body_plain = ($body_plain === null || $body_plain === false) ? '' : (string)$body_plain;
 
         $mail = new \PHPMailer\PHPMailer\PHPMailer();
 
