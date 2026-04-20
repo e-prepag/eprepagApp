@@ -105,7 +105,7 @@ if ($msg == "") {
 if ($msg == "") {
     // Wagner
 
-    $produto = new Produto($rs_row['ogp_id'], $rs_row['ogp_nome'], $rs_row['ogp_descricao'], $rs_row['ogp_ativo'], $rs_row['ogp_nome_imagem'], $rs_row['ogp_data_inclusao'], $rs_row['ogp_opr_codigo'], $rs_row['ogp_mostra_integracao'], $rs_row['ogp_iof'], $rs_row['ogp_pin_request'], $rs_row['ogp_detalhes_utilizacao'], $rs_row['ogp_termos_condicoes'], $rs_row['ogp_valor_minimo'], $rs_row['ogp_valor_maximo']);
+    $produto = new Produto($rs_row['ogp_id'], $rs_row['ogp_nome'], $rs_row['ogp_descricao'], $rs_row['ogp_ativo'], $rs_row['ogp_nome_imagem'], $rs_row['ogp_data_inclusao'], $rs_row['ogp_opr_codigo'], $rs_row['ogp_mostra_integracao'], $rs_row['ogp_iof'], $rs_row['ogp_pin_request'], $rs_row['ogp_detalhes_utilizacao'], $rs_row['ogp_termos_condicoes'], $rs_row['ogp_valor_minimo'], $rs_row['ogp_valor_maximo']);
 
     if (isset($produto) && is_object($produto)) {
         $produto->setNomeOperadora($rs_row['opr_nome_loja']);
