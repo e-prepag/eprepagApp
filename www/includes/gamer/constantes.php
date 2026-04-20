@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/../constantes_url.php'; ?>
+<?php 
+require_once __DIR__ . '/../constantes_url.php'; 
+$raiz_do_projeto = dirname(__DIR__, 2) . '/';
+?>
 <?php
 //Constantes
 
@@ -20,7 +23,7 @@ $BOLETO_MONEY_ITAU_QTDE_DIAS_UTEIS_VENCIMENTO = 5;
 $PROCESS_AUTOM_IDUSER_BKO = '0401121156014';
 //	$BOLETO_TAXA_ADICIONAL = 2.00;
 $PREPAG_DOMINIO = "https://" . EPREPAG_URL . "";
-$ENTRE_CONTATO_CENTRAL = "Por favor, entre em contato com nossa Central de Atendimento através do e-mail suporte@e-prepag.com.br";
+$ENTRE_CONTATO_CENTRAL = "Por favor, entre em contato com nossa Central de Atendimento atravï¿½s do e-mail suporte@e-prepag.com.br";
 $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] = 7909;
 
 //Log de comandos SQL	
@@ -86,17 +89,17 @@ $BOLETO_MONEY_ASAAS_COD_BANCO 			= 461;
 
 $BOLETO_MONEY_ITAU_QTDE_DIAS_VENCIMENTO		= 3;	// ver BOLETO_MONEY_ITAU_QTDE_DIAS_UTEIS_VENCIMENTO = 5
 $BOLETO_MONEY_ITAU_COD_BANCO 				= 341;
-$BOLETO_MONEY_ITAU_TAXA_ADICIONAL 			= 1.99;	 //TAXA BOLETO COBRADO DO GAMER // é a taxa cobrada pelo site para pagamento por boleto Itaú 
-$BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO 		= 1.35;	// é a taxa cobrada pelo Itaú da E-Prepag para boletos
-$BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_2 		= 2.40; //1.10;	// é a taxa cobrada pelo Itaú da E-Prepag para boletos - transição para novo valor
-// a conciliação ficará com dois valores de custo desde 2011-10-13 até próxima semana
+$BOLETO_MONEY_ITAU_TAXA_ADICIONAL 			= 1.99;	 //TAXA BOLETO COBRADO DO GAMER // ï¿½ a taxa cobrada pelo site para pagamento por boleto Itaï¿½ 
+$BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO 		= 1.35;	// ï¿½ a taxa cobrada pelo Itaï¿½ da E-Prepag para boletos
+$BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_2 		= 2.40; //1.10;	// ï¿½ a taxa cobrada pelo Itaï¿½ da E-Prepag para boletos - transiï¿½ï¿½o para novo valor
+// a conciliaï¿½ï¿½o ficarï¿½ com dois valores de custo desde 2011-10-13 atï¿½ prï¿½xima semana
 $BOLETO_MONEY_ITAU_CEDENTE_AGENCIA 			= "0444";
 $BOLETO_MONEY_ITAU_CEDENTE_AGENCIA_DV 		= "1";
 $BOLETO_MONEY_ITAU_CEDENTE_CONTA 			= "77567";
 $BOLETO_MONEY_ITAU_CEDENTE_CONTA_DV 		= "0";
 $BOLETO_MONEY_ITAU_CEDENTE_CONTA_NOVA 		= "89756";
 $BOLETO_MONEY_ITAU_CEDENTE_CONTA_DV_NOVA	= "5";
-$BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_NOVA 	= 1.35;	// é a taxa cobrada pelo Itaú da E-Prepag para boletos na nova conta
+$BOLETO_MONEY_ITAU_TAXA_CUSTO_BANCO_NOVA 	= 1.35;	// ï¿½ a taxa cobrada pelo Itaï¿½ da E-Prepag para boletos na nova conta
 $BOLETO_MONEY_ITAU_CARTEIRA					= "176";
 $BOLETO_MONEY_ITAU_JUROS_AO_MES_PRCT		= 00.00; //usar valor numerico computacional 10.0 e nao 10,0
 
@@ -127,7 +130,7 @@ $SIGLA_ESTADOS = array("AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA
 
 //Formas de Pagamento
 //------------------------------------------------------------------------------------------------
-// 1: Transferência Bancária, DOC Eletrônico, Depósito ou Outros
+// 1: Transferï¿½ncia Bancï¿½ria, DOC Eletrï¿½nico, Depï¿½sito ou Outros
 //		Nao eh uma forma de pagamento propriamente dita,
 //		pois o cliente ainda nao pagou, ou pelo menos,
 //		nao entrou com os dados de pagamento.
@@ -164,18 +167,18 @@ $FORMAS_PAGAMENTO = array(
 
 );
 
-//Não apresentar na pagina de vendas da loja
+//Nï¿½o apresentar na pagina de vendas da loja
 $a_formas_ocultas = array("7", "F", "G", "H", "I", "J", "K", "L", "M");
 
 /* Legenda
-[Visa débito]			= F
-[Visa crédito]			= G
-[Mastercard débito]		= H
-[Mastercard crédito]	= I
-[Elo débito]			= J
-[Elo crédito]			= K
-[Diners crédito]		= L
-[Discover crédito]		= M
+[Visa dï¿½bito]			= F
+[Visa crï¿½dito]			= G
+[Mastercard dï¿½bito]		= H
+[Mastercard crï¿½dito]	= I
+[Elo dï¿½bito]			= J
+[Elo crï¿½dito]			= K
+[Diners crï¿½dito]		= L
+[Discover crï¿½dito]		= M
 */
 
 // 	$PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC
@@ -185,14 +188,14 @@ $a_formas_ocultas = array("7", "F", "G", "H", "I", "J", "K", "L", "M");
 //	$BOLETO_MONEY_HIPAY_COD_BANCO
 //	$BOLETO_MONEY_PAYPAL_COD_BANCO
 
-$PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC = 10;	// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento é numerico
-// não pode usar $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']
+$PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC = 10;	// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento ï¿½ numerico
+// nï¿½o pode usar $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']
 
-$PAGAMENTO_HIPAY_ONLINE_NUMERIC = 11;		// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento é numerico				
+$PAGAMENTO_HIPAY_ONLINE_NUMERIC = 11;		// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento ï¿½ numerico				
 $PAGAMENTO_HIPAY_ONLINE_TAXA = 0;
 $BOLETO_MONEY_HIPAY_COD_BANCO = "998";
 
-$PAGAMENTO_PAYPAL_ONLINE_NUMERIC = 12;		// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento é numerico
+$PAGAMENTO_PAYPAL_ONLINE_NUMERIC = 12;		// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento ï¿½ numerico
 $PAGAMENTO_PAYPAL_ONLINE_TAXA = 0;
 $PAGAMENTO_PAYPAL_ONLINE_CURRENCY = 'Brazil';
 $BOLETO_MONEY_PAYPAL_COD_BANCO = "997";
@@ -272,17 +275,17 @@ $TIPO_DEPOSITO = array(
 );
 $TIPO_DEPOSITO_LEGENDA = array(
 	1 => 'Resto de pagamento com PINs',
-	2 => 'Depósito direto no Saldo',
+	2 => 'Depï¿½sito direto no Saldo',
 	3 => 'Responder enquetes de parceiro',
-	4 => 'Promoções',
+	4 => 'Promoï¿½ï¿½es',
 	5 => 'Ofertas',
 );
 
 
 // Banco E-Prepag - Testes
 $PAGAMENTO_BANCO_EPP_ONLINE = 'Z';			// Banco E-Prepag de TESTES
-$PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC = 999;	// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento é numerico
-// não pode usar $PAGAMENTO_BANCO_EPP_ONLINE
+$PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC = 999;	// para tabelas tb_venda_games e tb_dist_venda_games o campo vg_tipo_pagamento ï¿½ numerico
+// nï¿½o pode usar $PAGAMENTO_BANCO_EPP_ONLINE
 $FORMAS_PAGAMENTO_DESCRICAO_EPP = 'Pagamento de Testes EPP';
 $FORMAS_PAGAMENTO_ICONES_EPP = 'botao_conta_epp_2.gif';
 $BANCO_EPP_TAXA_DE_SERVICO = 0;
@@ -297,7 +300,7 @@ $FORMAS_PAGAMENTO_DESCRICAO = array(
 	'5' => 'Transfer&ecirc;ncia entre contas Bradesco',
 	'6' => 'Pagamento F&aacute;cil Bradesco - D&eacute;bito',
 	'7' => 'Pagamento F&aacute;cil Bradesco - Cr&eacute;dito',
-	//'8' => 'Pagamento BB - Débito sua Empresa',
+	//'8' => 'Pagamento BB - Dï¿½bito sua Empresa',
 	'9' => 'Pagamento BB - D&eacute;bito sua Conta',
 	'A' => 'Pagamento Itau - &Agrave; vista (Transfer&ecirc;ncia)',
 	'B' => 'Pagamento Online HiPay',
@@ -328,9 +331,9 @@ $FORMAS_PAGAMENTO_DESCRICAO_NUMERICO = array(
 	'5' => 'Transfer&ecirc;ncia entre contas Bradesco',
 	'6' => 'Pagamento F&aacute;cil Bradesco - D&eacute;bito',
 	'7' => 'Pagamento F&aacute;cil Bradesco - Cr&eacute;dito',
-	//'8' => 'Pagamento BB - Débito sua Empresa',
+	//'8' => 'Pagamento BB - Dï¿½bito sua Empresa',
 	'9' => 'Pagamento BB - D&eacute;bito sua Conta',
-	'10' => "Pagamento Itáu online",
+	'10' => "Pagamento Itï¿½u online",
 	'11' => "Pagamento Hipay online",
 	'12' => "Pagamento Paypal online",
 	'13' => "Pagamento EPP Cash",
@@ -400,26 +403,26 @@ $FORMAS_PAGAMENTO_ICONES_GAMER    = array(
 	'R' => '/imagens/ico_pix.png'
 );
 
-//FORMAS DE PAGAMENTO QUE NÃO SÃO LISTADAS NA ADMINISTRAÇÃO DAS FORMAS DE PAGAMENTO PARA O PUBLISHER
+//FORMAS DE PAGAMENTO QUE Nï¿½O Sï¿½O LISTADAS NA ADMINISTRAï¿½ï¿½O DAS FORMAS DE PAGAMENTO PARA O PUBLISHER
 $FORMAS_PAGAMENTO_INATIVAS = array(
 	"O",
 	"Q"
 );
 
-$BRADESCO_TRANSFERENCIA_ENTRE_CONTAS_TAXA_ADICIONAL = 0;	// R$1.20/transação
-$BRADESCO_DEBITO_EM_CONTA_TAXA_ADICIONAL = 0;	// R$0.00/transação
+$BRADESCO_TRANSFERENCIA_ENTRE_CONTAS_TAXA_ADICIONAL = 0;	// R$1.20/transaï¿½ï¿½o
+$BRADESCO_DEBITO_EM_CONTA_TAXA_ADICIONAL = 0;	// R$0.00/transaï¿½ï¿½o
 
-$BANCO_DO_BRASIL_TAXA_DE_SERVICO	= 2.99;	// R$1.00/transação
+$BANCO_DO_BRASIL_TAXA_DE_SERVICO	= 2.99;	// R$1.00/transaï¿½ï¿½o
 
-$BANCO_ITAU_TAXA_DE_SERVICO			= 1.49;	// R$0.50/transação 
+$BANCO_ITAU_TAXA_DE_SERVICO			= 1.49;	// R$0.50/transaï¿½ï¿½o 
 
 //Status da venda
 //------------------------------------------------------------------------------------------------
 //	1: Pedido efetuado, aguardando dados do pagamento
 //	2: Dados do pagamento recebido, aguardando confirmacao de pagamento
 //	3: Pagamento confirmado e liberado para venda
-//	4: Processamento realizado. Crédito será encaminhado para o usuário
-//	5: Venda realizada. Crédito encaminhado para o usuário
+//	4: Processamento realizado. Crï¿½dito serï¿½ encaminhado para o usuï¿½rio
+//	5: Venda realizada. Crï¿½dito encaminhado para o usuï¿½rio
 //	6: Venda cancelada.
 $STATUS_VENDA = array(
 	'PEDIDO_EFETUADO' 			=> '1',
@@ -433,10 +436,10 @@ $STATUS_VENDA = array(
 //Para novos status, evitar passar de 25 caracteres ateh o primeiro ponto final.
 $STATUS_VENDA_DESCRICAO = array(
 	'1' => 'Pedido efetuado. Aguardando dados do pagamento.',
-	'2' => 'Dados do pagamento já informados. Aguardando confirmação bancária.',
+	'2' => 'Dados do pagamento jï¿½ informados. Aguardando confirmaï¿½ï¿½o bancï¿½ria.',
 	'3' => 'Pagamento confirmado. Liberado para venda.',
-	'4' => 'Processamento realizado. Crédito será encaminhado para o usuário.',
-	'5' => 'Venda realizada. Crédito encaminhado para o usuário.',
+	'4' => 'Processamento realizado. Crï¿½dito serï¿½ encaminhado para o usuï¿½rio.',
+	'5' => 'Venda realizada. Crï¿½dito encaminhado para o usuï¿½rio.',
 	'6'	=> 'Venda cancelada.'
 );
 $STATUS_VENDA_ICONES    = array(
@@ -455,11 +458,11 @@ $STATUS_VENDA_GAMER = array(
 );
 
 $STATUS_VENDA_DESCRICAO_GAMER = array(
-	'1' => 'Pedido efetuado. Aguardando finalização do pagamento.',
-	'2' => 'Pedido efetuado. Aguardando finalização do pagamento.',
-	'3' => 'Pedido efetuado. Aguardando finalização do pagamento.',
-	'4' => 'Pedido efetuado. Aguardando finalização do pagamento.',
-	'5' => 'Venda realizada. Crédito encaminhado para o usuário',
+	'1' => 'Pedido efetuado. Aguardando finalizaï¿½ï¿½o do pagamento.',
+	'2' => 'Pedido efetuado. Aguardando finalizaï¿½ï¿½o do pagamento.',
+	'3' => 'Pedido efetuado. Aguardando finalizaï¿½ï¿½o do pagamento.',
+	'4' => 'Pedido efetuado. Aguardando finalizaï¿½ï¿½o do pagamento.',
+	'5' => 'Venda realizada. Crï¿½dito encaminhado para o usuï¿½rio',
 	'6'	=> 'Venda cancelada.'
 );
 $STATUS_VENDA_ICONES_GAMER    = array(
@@ -478,34 +481,34 @@ $PAGTO_BANCOS	= array(
 	'001' => 'Banco do Brasil / Banco Postal',
 	'237' => 'Bradesco',
 	'033' => 'Santander',
-	'341' => 'Itaú',
-	'104' => 'Caixa Econômica Federal / Casas Lotéricas'
+	'341' => 'Itaï¿½',
+	'104' => 'Caixa Econï¿½mica Federal / Casas Lotï¿½ricas'
 );
 
 //Pagamento Locais
 $PAGTO_LOCAIS	= array(
 	'001' => array(
-		'01' => 'Caixa Automático / Auto-Atendimento',
-		'02' => 'Agência / Boca do Caixa',
-		'03' => 'Transferência pela Internet / DOC',
-		'04' => 'Depósito em conta corrente em dinheiro',
-		'05' => 'Auto-Atendimento Transferência entre contas correntes',
+		'01' => 'Caixa Automï¿½tico / Auto-Atendimento',
+		'02' => 'Agï¿½ncia / Boca do Caixa',
+		'03' => 'Transferï¿½ncia pela Internet / DOC',
+		'04' => 'Depï¿½sito em conta corrente em dinheiro',
+		'05' => 'Auto-Atendimento Transferï¿½ncia entre contas correntes',
 		'06' => 'Remessa do exterior',
 		'07' => 'Banco Postal'
 	),
 	'237' => array(
-		'01' => 'Caixa Automático / Auto-Atendimento',
-		'02' => 'Agência / Boca do Caixa',
-		'03' => 'Transferência pela Internet / DOC',
+		'01' => 'Caixa Automï¿½tico / Auto-Atendimento',
+		'02' => 'Agï¿½ncia / Boca do Caixa',
+		'03' => 'Transferï¿½ncia pela Internet / DOC',
 		'04' => 'Banco Postal',
-		'05' => 'BDN – Deposito em conta corrente',
+		'05' => 'BDN ï¿½ Deposito em conta corrente',
 		'06' => 'Remessa do exterior'
 	),
 	'104' => array(
-		'01' => 'Caixa Automático / Auto-Atendimento',
-		'02' => 'Agência / Boca do Caixa',
-		'03' => 'Transferência pela Internet / DOC',
-		'04' => 'Casas Lotéricas',
+		'01' => 'Caixa Automï¿½tico / Auto-Atendimento',
+		'02' => 'Agï¿½ncia / Boca do Caixa',
+		'03' => 'Transferï¿½ncia pela Internet / DOC',
+		'04' => 'Casas Lotï¿½ricas',
 		'05' => 'Caixa Aqui',
 		'06' => 'Remessa do exterior'
 	)
@@ -515,28 +518,28 @@ $PAGTO_LOCAIS	= array(
 $PAGTO_NOME_DOCTO = array(
 	'001' => array(
 		'01' => 'Nro. do Envelope',
-		'02' => 'Agência de Origem ou Débito',
-		'03' => 'Agência de Origem ou Débito;Conta de Origem ou Débito',
+		'02' => 'Agï¿½ncia de Origem ou Dï¿½bito',
+		'03' => 'Agï¿½ncia de Origem ou Dï¿½bito;Conta de Origem ou Dï¿½bito',
 		'04' => 'Nr. Documento',
-		'05' => 'Agência de débito;Conta de débito',
-		'06' => 'Remetente;Banco;País;Moeda',
+		'05' => 'Agï¿½ncia de dï¿½bito;Conta de dï¿½bito',
+		'06' => 'Remetente;Banco;Paï¿½s;Moeda',
 		'07' => 'Nro. do Documento'
 	),
 	'237' => array(
-		'01' => 'Nro. do Terminal;Nro. da Transação;Agência Tomadora',
-		'02' => 'Agência Tomadora;Nr. Terminal',
-		'03' => 'Nro. do Documento;Agencia de Débito',
-		'04' => 'Agência Relacionada e PACB',
-		'05' => 'Nro. do Terminal;Nro. da Transação',
-		'06' => 'Remetente;Banco;País;Moeda'
+		'01' => 'Nro. do Terminal;Nro. da Transaï¿½ï¿½o;Agï¿½ncia Tomadora',
+		'02' => 'Agï¿½ncia Tomadora;Nr. Terminal',
+		'03' => 'Nro. do Documento;Agencia de Dï¿½bito',
+		'04' => 'Agï¿½ncia Relacionada e PACB',
+		'05' => 'Nro. do Terminal;Nro. da Transaï¿½ï¿½o',
+		'06' => 'Remetente;Banco;Paï¿½s;Moeda'
 	),
 	'104' => array(
 		'01' => 'Nro. do Envelope',
 		'02' => 'Nro. do Documento',
-		'03' => 'Código da Operação',
-		'04' => 'Horário do Depósito',
-		'05' => 'Código da Operação;Horário do Depósito',
-		'06' => 'Remetente;Banco;País;Moeda'
+		'03' => 'Cï¿½digo da Operaï¿½ï¿½o',
+		'04' => 'Horï¿½rio do Depï¿½sito',
+		'05' => 'Cï¿½digo da Operaï¿½ï¿½o;Horï¿½rio do Depï¿½sito',
+		'06' => 'Remetente;Banco;Paï¿½s;Moeda'
 	)
 );
 
@@ -569,31 +572,31 @@ $USUARIO_GAMES_LOG_TIPOS = array(
 	'LOGIN_INTEGRACAO'				=> '18',
 );
 $USUARIO_GAMES_LOG_TIPOS_DESCRICAO = array(
-	'1' => 'Criação de Cadastro',
+	'1' => 'Criaï¿½ï¿½o de Cadastro',
 	'2' => 'Login com sucesso',
-	'3' => 'Alteração cadastral',
+	'3' => 'Alteraï¿½ï¿½o cadastral',
 	'4' => 'Troca de senha',
 	'5' => 'Realizou um pedido',
 	'6'	=> 'Informou dados do pagamento',
-	'7'	=> 'Encerrou a sessão',
-	'8'	=> 'Acessou um banner de promoção',
-	'9'  => 'Acessou a página de Ofertas Matomy',
+	'7'	=> 'Encerrou a sessï¿½o',
+	'8'	=> 'Acessou um banner de promoï¿½ï¿½o',
+	'9'  => 'Acessou a pï¿½gina de Ofertas Matomy',
 	'10' => 'Registro dos dados Ofertas Matomy (postback)',
 	'11' => 'Erro ao tentar registrar Ofertas Matomy (postback)',
-	'12' => 'Acessou a página de Ofertas SponsorPay',
+	'12' => 'Acessou a pï¿½gina de Ofertas SponsorPay',
 	'13' => 'Registro dos dados Ofertas SponsorPay (postback)',
 	'14' => 'Erro ao tentar registrar Ofertas SponsorPay (postback)',
-	'15' => 'Acessou a página de Ofertas Super Rewards',
+	'15' => 'Acessou a pï¿½gina de Ofertas Super Rewards',
 	'16' => 'Registro dos dados Ofertas Super Rewards (postback)',
 	'17' => 'Erro ao tentar registrar Ofertas Super Rewards (postback)',
-	'18' => 'Login com sucesso para liberação de saldo na integração',
-	'19' => 'Desativação por falta de uso',
-	'20' => 'Desativação por duplicidade',
+	'18' => 'Login com sucesso para liberaï¿½ï¿½o de saldo na integraï¿½ï¿½o',
+	'19' => 'Desativaï¿½ï¿½o por falta de uso',
+	'20' => 'Desativaï¿½ï¿½o por duplicidade',
 );
 
 /*
-	// Gestão de Risco
-	// Usuários cartão permitidos pela Cielo
+	// Gestï¿½o de Risco
+	// Usuï¿½rios cartï¿½o permitidos pela Cielo
 	//		foi para classLimite.php
 	$RISCO_CIELO_TOTAL_DIARIO = 200;
 	$RISCO_CIELO_PAGAMENTOS_DIARIO = 10;
@@ -601,20 +604,20 @@ $USUARIO_GAMES_LOG_TIPOS_DESCRICAO = array(
 	$RISCO_CIELO_VALOR_MIN = 0;
 	$RISCO_CIELO_VALOR_MAX = 200;
 */
-//	Gamers - Pagamento Online = no max R$700,00 por día por usuário (ver getVendasMoneyTotalDiarioOnline()) em até 10 vezes
+//	Gamers - Pagamento Online = no max R$700,00 por dï¿½a por usuï¿½rio (ver getVendasMoneyTotalDiarioOnline()) em atï¿½ 10 vezes
 $RISCO_GAMERS_TOTAL_DIARIO = 700;
 $RISCO_GAMERS_PAGAMENTOS_DIARIO = 10;
 
-//Define limite para insenção de taxas
+//Define limite para insenï¿½ï¿½o de taxas
 $RISCO_GAMERS_VALOR_MIN_PARA_TAXA = 49;
 $RISCO_GAMERS_VALOR_MIN = 5;	//60;
 $RISCO_GAMERS_VALOR_MAX = $RISCO_GAMERS_TOTAL_DIARIO;
 
-//	Gamers VIP- Pagamento Online = no max R$1500,00 por día por usuário (ver getVendasMoneyTotalDiarioOnline()) em até 20 vezes
+//	Gamers VIP- Pagamento Online = no max R$1500,00 por dï¿½a por usuï¿½rio (ver getVendasMoneyTotalDiarioOnline()) em atï¿½ 20 vezes
 $RISCO_GAMERS_VIP_TOTAL_DIARIO = 1500;
 $RISCO_GAMERS_VIP_PAGAMENTOS_DIARIO = 20;
 
-//	Gamers FREE-Integração Pagamento Online = no max R$700,00 por día por usuário (ver getVendasMoneyTotalDiarioOnline()) em até 100 vezes
+//	Gamers FREE-Integraï¿½ï¿½o Pagamento Online = no max R$700,00 por dï¿½a por usuï¿½rio (ver getVendasMoneyTotalDiarioOnline()) em atï¿½ 100 vezes
 $RISCO_GAMERS_FREE_TOTAL_DIARIO = 700;
 $RISCO_GAMERS_FREE_PAGAMENTOS_DIARIO = 100;
 $RISCO_GAMERS_FREE_MAXIMO_POR_PEDIDO = 700;
@@ -622,14 +625,14 @@ $RISCO_GAMERS_FREE_MAXIMO_POR_PEDIDO = 700;
 //	Gamers - Pagamento Boleto = no max R$1500,00 por venda 
 $RISCO_GAMERS_BOLETOS_TOTAL_DIARIO = 1500;
 
-//	Gamers - Pagamento Depósito = no max R$1500,00 por venda 
+//	Gamers - Pagamento Depï¿½sito = no max R$1500,00 por venda 
 $RISCO_GAMERS_DEPOSITOS_TOTAL_DIARIO = 1500;
 
-//	Gamers - Pagamento para Depósito no Saldo
+//	Gamers - Pagamento para Depï¿½sito no Saldo
 $RISCO_GAMERS_SALDO_TOTAL_DIARIO = 700;
 $RISCO_GAMERS_SALDO_PAGAMENTOS_DIARIO = 10;
 
-// Gamer - Integração - Prazo (em minutos) para cancelar a re-notificação automatica
+// Gamer - Integraï¿½ï¿½o - Prazo (em minutos) para cancelar a re-notificaï¿½ï¿½o automatica
 $PROCESS_AUTOM_PEDIDO_INTEGRACAO_RE_NOTIFICACAO_MINUTOS_VENCIDO = 90;
 //-----------------------------------------------------------------------------------------------
 //	Campeonatos
@@ -638,7 +641,7 @@ $CAMPEONATO_OPR_ID = 99;	// Usa Operadora Campeonatos
 $CAMPEONATO_PROD_MOD_ID = 345;	// Modelo de R$20,00
 
 
-// Para diferenciar usuários Frequente/Atrasados/Abandonados
+// Para diferenciar usuï¿½rios Frequente/Atrasados/Abandonados
 $ATRASO_GAMER_DIAS_LIM_1 = 15;
 $ATRASO_GAMER_DIAS_LIM_2 = 30;
 
@@ -659,25 +662,25 @@ $BALANCO_ZERO_FLOAT = pow(10, -3);
 //Tamanhos do PIN GoCASH
 $PIN_GOCASH_TAMANHO	= array('15', '16', '17');
 
-//Quatidade máxima de ITENS permitida na CARRINHO
+//Quatidade mï¿½xima de ITENS permitida na CARRINHO
 $QTDE_MAX_ITENS = 50;
 
-//Identificador de modelo de produto que utiliza valor variável
+//Identificador de modelo de produto que utiliza valor variï¿½vel
 $NO_HAVE = 'NO HAVE';
 
-//Identificação de empresas
+//Identificaï¿½ï¿½o de empresas
 $IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO = 1;
 $IDENTIFICACAO_EMPRESA_PAGAMENTOS = 0;
 
-// Status Empresa em relação aos arquivos do BACEN
+// Status Empresa em relaï¿½ï¿½o aos arquivos do BACEN
 $STATUS_ARQUIVO_BACEN = array(
-	'NAO_CONTABILIZOU'	 	=> '0', // NÃO contabilizou
+	'NAO_CONTABILIZOU'	 	=> '0', // Nï¿½O contabilizou
 	'CONTABILIZOU' 		 	=> '1', // Contabilizou;
-	'AGUARDANDO_RETORNO_BACEN' 	=> '2', // Já em arquivo aguardando arquivo de retorno do BACEN.
+	'AGUARDANDO_RETORNO_BACEN' 	=> '2', // Jï¿½ em arquivo aguardando arquivo de retorno do BACEN.
 );
 
 
-// Status de usuários Gamers (ug_ativo)
+// Status de usuï¿½rios Gamers (ug_ativo)
 $STATUS_USUARIO = array(
 	'USER_ATIVO'    => 1,
 	'USER_INATIVO'  => 2,
@@ -691,12 +694,12 @@ $STATUS_USUARIO_LEGENDA = array(
 	2 => 'Inativo',
 	3 => 'Fraude',
 	4 => 'Suspeita de Fraude',
-	5 => 'Bloqueio Temporário e Preventivo de Fraude',
+	5 => 'Bloqueio Temporï¿½rio e Preventivo de Fraude',
 	6 => 'Falta de Uso'
 );
 
 /*
- * Costante de porcentagem para calcular se o valor do saldo é ela% maior que o valor da compra para exibir mensagem de alerta
+ * Costante de porcentagem para calcular se o valor do saldo ï¿½ ela% maior que o valor da compra para exibir mensagem de alerta
  */
 define("PERCENT_SALDO_MAIOR_QUE_COMPRA", '0.07');
 ?>
