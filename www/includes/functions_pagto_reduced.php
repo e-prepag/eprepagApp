@@ -1,7 +1,7 @@
 <?php
 // tb_venda_games usa vg_pagto_tipo::smallint
 // tb_pag_compras usa iforma::char(1)
-function getCodigoNumericoParaPagto($iforma) {
+function getCodigoNumericoParaPagto(string $iforma): string {
 
 	$numeric_code = "0";
 	switch($iforma) {
@@ -55,7 +55,7 @@ function getCodigoNumericoParaPagto($iforma) {
 
 // tb_venda_games usa vg_pagto_tipo::smallint
 // tb_pag_compras usa iforma::char(1)
-function getCodigoCaracterParaPagto($iforma) {
+function getCodigoCaracterParaPagto(string $iforma): string {
 
 	$character_code = "";
 	switch($iforma) {

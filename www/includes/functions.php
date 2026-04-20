@@ -11,6 +11,10 @@ function getEnvVariable(string $varName): ?string
 		if (file_exists('/www/.env')) {
 			$lines = file('/www/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
+			if ($lines === false) {
+				return null;
+			}
+
 			foreach ($lines as $line) {
 				// Ignora coment�rios
 				if (strpos(trim($line), '#') === 0) {
@@ -142,7 +146,7 @@ function SQLexecuteQueryParams(mixed $sql, array $params): mixed
 } //end function SQLexecuteQueryParams($sql, $params)
 
 //Gerador de LOG de erro de instru��es no DB
-function gravaLog_SQLexecuteQuery($mensagem)
+function gravaLog_SQLexecuteQuery(mixed $mensagem): void
 {
 	//Arquivo
 	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_sql_execute_query.txt";
@@ -155,16 +159,17 @@ function gravaLog_SQLexecuteQuery($mensagem)
 	}
 } //end function gravaLog_SQLexecuteQuery($mensagem)
 
-//Fun��o para captura de tempo
-function getmicrotime()
+//Funo para captura de tempo
+function getmicrotime(): float
 {
 	list($usec, $sec) = explode(" ", microtime());
 	return ((float)$usec + (float)$sec);
 } //end function getmicrotime()
 
-function is_moeda($val)
+function is_moeda(mixed $val): bool
 {
 
+	$val = (string)$val;
 	if (strlen($val) < 4) return false;
 	if (strrpos($val, ",") != strlen($val) - 3) return false;
 	if (!is_numeric(substr($val, 0, 1))) return false;
@@ -174,11 +179,12 @@ function is_moeda($val)
 	return is_numeric($val);
 }
 
-function is_hora($val)
+function is_hora(mixed $val): bool
 {
 
+	$val = (string)$val;
 	$pattern = "/([0-1][0-9]|2[0-3]):([0-5][0-9])/";
-	return preg_match($pattern, $val);
+	return (bool)preg_match($pattern, $val);
 }
 
 function is_DateTime(mixed $dateTime): bool
@@ -247,7 +253,7 @@ function space_tbl_parse(mixed $string): array
 	return $tabela;
 }
 
-function find_special_char($string)
+function find_special_char(string $string): int
 {
 	for ($a = 0; $a < strlen($string); $a++)
 		if ((ord($string[$a]) >= 33 && ord($string[$a]) <= 64) ||
@@ -258,7 +264,7 @@ function find_special_char($string)
 	return 0;
 }
 
-function find_special_character($string)
+function find_special_character(string $string): int
 {
 	$aux = 0;
 	for ($i = 0; $i < strlen($string); $i++) {
@@ -273,7 +279,7 @@ function find_special_character($string)
 	return $aux;
 }
 
-function formata_mensagem($msg, $tipo)
+function formata_mensagem(mixed $msg, string $tipo): ?string
 {
 	$msg_final = null;
 	if ($tipo == 'erro')
@@ -285,7 +291,7 @@ function formata_mensagem($msg, $tipo)
 	return $msg_final;
 }
 
-function formata_mensagem2($msg, $tipo)
+function formata_mensagem2(mixed $msg, string $tipo): ?string
 {
 	$msg_final = null;
 	if ($tipo == 'erro')
@@ -297,7 +303,7 @@ function formata_mensagem2($msg, $tipo)
 	return $msg_final;
 }
 
-function saudacao()
+function saudacao(): ?string
 {
 	$msg = null;
 
@@ -330,7 +336,7 @@ SA�DA:
 � retornado a pagina��o na p�gina em que a fun��o foi chamada
 
 */
-function paginacao_query($inicial, $total_table, $max, $qtde_colunas, $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel)
+function paginacao_query(mixed $inicial, mixed $total_table, mixed $max, mixed $qtde_colunas, mixed $img_anterior, mixed $img_proxima, mixed $default_add, mixed $range, mixed $range_qtde, mixed $ncamp, mixed $varsel): void
 {
 	if ($total_table > $max) // S� mostra a numera��o das p�ginas se a quantidade de registros for maior do que o m�ximo permitido na tela
 	{
@@ -376,7 +382,7 @@ function paginacao_query($inicial, $total_table, $max, $qtde_colunas, $img_anter
 	}
 }
 
-function qtde_dias($data1, $data2)
+function qtde_dias(mixed $data1, mixed $data2): int
 {
 
 	// manipula data1
@@ -401,7 +407,7 @@ function qtde_dias($data1, $data2)
 		return -1;
 }
 
-function get_nivel($url)
+function get_nivel(mixed $url): string
 {
 	$separada = explode("/", $url);
 
@@ -412,14 +418,14 @@ function get_nivel($url)
 	return $string;
 }
 
-function time2sec($h, $m, $s)
+function time2sec(mixed $h, mixed $m, mixed $s): int
 {
 	$sec = ((int)$h * 60 * 60) + ((int)$m * 60) + (int)$s;
 
 	return $sec;
 }
 
-function sec2time($s)
+function sec2time(mixed $s): mixed
 {
 	$h = null;
 	$time = null;
@@ -431,7 +437,7 @@ function sec2time($s)
 	return $time;
 }
 
-function regra3($total_conhecido, $parte_conhecida, $totalx)
+function regra3(mixed $total_conhecido, mixed $parte_conhecida, mixed $totalx): string
 {
 	$x = ($parte_conhecida * $totalx) / $total_conhecido;
 	$x = number_format($x, 2, '.', '');
@@ -439,7 +445,7 @@ function regra3($total_conhecido, $parte_conhecida, $totalx)
 	return $x;
 }
 
-function time2min($horario)
+function time2min(mixed $horario): int
 {
 	$hora = substr($horario, 0, 2);
 	$min = substr($horario, 2, 2);
@@ -448,7 +454,7 @@ function time2min($horario)
 	return $minutos;
 }
 
-function min2time($min)
+function min2time(mixed $min): int
 {
 	$hora = $min / 60;
 	$horario = '';
@@ -460,7 +466,7 @@ function min2time($min)
 	return $minutos;
 }
 
-function verifica_valor_moeda($val)
+function verifica_valor_moeda(mixed $val): int
 {
 	$valor = $val;
 	$tam = strlen($valor);
@@ -483,7 +489,7 @@ function verifica_valor_moeda($val)
 	}
 }
 
-function verificaCNPJ($string)
+function verificaCNPJ(mixed $string): int
 {
 	$RecebeCNPJ = $string;
 
@@ -539,7 +545,7 @@ function verificaCNPJ($string)
 	}
 }
 
-function verificaCPF($cpf)
+function verificaCPF(mixed $cpf): mixed
 {
 
 	$RecebeCPF = $cpf;
@@ -550,7 +556,7 @@ function verificaCPF($cpf)
 	return verificaCPF2($RecebeCPF);
 }
 
-function verificaCPF2($cpf)
+function verificaCPF2(mixed $cpf): mixed
 {
 
 	$RecebeCPF = $cpf;
@@ -604,7 +610,7 @@ function verificaCPF2($cpf)
 	}
 }
 
-function mascara_cnpj_cpf($documento, $tipo)
+function mascara_cnpj_cpf(mixed $documento, mixed $tipo): ?string
 {
 	$mask = $documento;
 	$strtam = strlen($documento);
@@ -629,7 +635,7 @@ function mascara_cnpj_cpf($documento, $tipo)
 	return $doc;
 }
 
-function coloca_char_esquerda($string, $qtde_total, $char)
+function coloca_char_esquerda(mixed $string, mixed $qtde_total, mixed $char): string
 {
 	$aux = $string;
 	$completa = null;
@@ -641,7 +647,7 @@ function coloca_char_esquerda($string, $qtde_total, $char)
 	return $completa;
 }
 
-function coloca_char_direita($string, $qtde_total, $char)
+function coloca_char_direita(mixed $string, mixed $qtde_total, mixed $char): string
 {
 	$aux = $string;
 	$completa = null;
@@ -653,7 +659,7 @@ function coloca_char_direita($string, $qtde_total, $char)
 	return $aux;
 }
 
-function gera_string($inicio, $tamanho_rand, $tipo)
+function gera_string(mixed $inicio, mixed $tamanho_rand, mixed $tipo): string
 {
 	$string = null;
 	$string_formatada = null;
@@ -677,9 +683,10 @@ function gera_string($inicio, $tamanho_rand, $tipo)
 	return $senha;
 }
 
-function formata_data($data, $gravar)
+function formata_data(mixed $data, mixed $gravar): string
 {
 	$mask = $data;
+        $doc = "";
 	if ($gravar == 0) {
 		$dia = substr($mask, 8, 2);
 		$mes = substr($mask, 5, 2);
@@ -696,7 +703,7 @@ function formata_data($data, $gravar)
 	return $doc;
 }
 
-function verifica_valor($val)
+function verifica_valor(mixed $val): int
 {
 	$valor = $val;
 	$tam = strlen($valor);
@@ -720,7 +727,7 @@ function verifica_valor($val)
 	}
 }
 
-function valida_campo_numero($numero, $tamanho = 0)
+function valida_campo_numero(mixed $numero, mixed $tamanho = 0): int
 {
 	$verifica = $numero;
 	$alerta = null;
@@ -745,7 +752,7 @@ function valida_campo_numero($numero, $tamanho = 0)
 	}
 }
 
-function resgata_string($string, $pos)
+function resgata_string(mixed $string, mixed $pos): string
 {
 	$aux = $string;
 	$fim = substr($aux, strlen($aux) - ($pos - 1), $pos - 1);
@@ -755,7 +762,7 @@ function resgata_string($string, $pos)
 	return $fone_formatado;
 }
 
-function verifica_email($email)
+function verifica_email(mixed $email): int
 {
 	$aux = $email;
 	$first = substr($aux, 0, 1);
@@ -789,7 +796,7 @@ function verifica_email($email)
 	}
 }
 
-function data_mais_um($data)
+function data_mais_um(mixed $data): string
 {
 	$dia = substr($data, 0, 2);
 	$mes = substr($data, 3, 2);
@@ -876,7 +883,7 @@ function data_mais_um($data)
 	return $result_date;
 }
 
-function data_mais_n($data, $qtde_dias)
+function data_mais_n(mixed $data, mixed $qtde_dias): string
 {
 	$aux = $data;
 	for ($i = 1; $i <= $qtde_dias; $i++) {
@@ -886,7 +893,7 @@ function data_mais_n($data, $qtde_dias)
 	return $data_somada;
 }
 
-function data_menos_um($data)
+function data_menos_um(mixed $data): string
 {
 	$dia = substr($data, 0, 2);
 	$mes = substr($data, 3, 2);
@@ -939,7 +946,7 @@ function data_menos_um($data)
 	return $result_date;
 }
 
-function data_menos_n($data, $qtde_dias)
+function data_menos_n(mixed $data, mixed $qtde_dias): string
 {
 	$aux = $data;
 	for ($i = 1; $i <= $qtde_dias; $i++) {
@@ -949,7 +956,7 @@ function data_menos_n($data, $qtde_dias)
 	return $data_decrementada;
 }
 
-function nome_arquivo($url)
+function nome_arquivo(mixed $url): mixed
 {
 	$separada = explode("/", $url);
 	$reverso = array_reverse($separada);
@@ -957,7 +964,7 @@ function nome_arquivo($url)
 	return $reverso[0];
 }
 
-function verifica_telEx($tel, $blComTraco = true)
+function verifica_telEx(mixed $tel, mixed $blComTraco = true): mixed
 {
 
 	if ($blComTraco) {
@@ -967,7 +974,7 @@ function verifica_telEx($tel, $blComTraco = true)
 	}
 }
 
-function verifica_tel($tel)
+function verifica_tel(mixed $tel): int
 {
 	$alerta = null;
 	$aux = $tel;
@@ -1052,7 +1059,7 @@ function verifica_tel($tel)
 	}
 }
 
-function monta_ddd_string($campoddd)
+function monta_ddd_string(mixed $campoddd): ?string
 {
 	$recebeDDD = $campoddd;
 	$recebeDDD .= ";";
@@ -1107,7 +1114,7 @@ function monta_ddd_string($campoddd)
 	}
 }
 
-function valida_ddd_string($ddd)
+function valida_ddd_string(mixed $ddd): int
 {
 	$verifica = $ddd;
 	$alerta = null;
@@ -1127,7 +1134,7 @@ function valida_ddd_string($ddd)
 	}
 }
 
-function verifica_data($data)
+function verifica_data(mixed $data): int
 {
 	$aux = $data;
 	$tam = strlen($aux);
@@ -1220,7 +1227,7 @@ function verifica_data($data)
 	}
 }
 
-function verifica_tel_ddd($tel)
+function verifica_tel_ddd(mixed $tel): mixed
 {
 	$aux = $tel;
 	$tam = strlen($aux);
@@ -1290,7 +1297,7 @@ function verifica_tel_ddd($tel)
 
 }
 
-function Modulo10($string)
+function Modulo10(mixed $string): int
 {
 	$i16Tot = 0;
 	$ui8Especial = TRUE;
@@ -1328,7 +1335,7 @@ function Modulo10($string)
 	return ($i16Dig);
 }
 
-function valida_dv($codigo, $tipo_codigo)
+function valida_dv(mixed $codigo, mixed $tipo_codigo): int
 {
 	if ($tipo_codigo == 'estab') {
 		if (strlen($codigo) < 10 || substr($codigo, 0, 1) != 9)
@@ -1356,7 +1363,7 @@ function valida_dv($codigo, $tipo_codigo)
 		return 0;
 }
 
-function formata_string($string, $caracter, $pos)
+function formata_string(mixed $string, mixed $caracter, mixed $pos): mixed
 {
 	$aux_inic = substr($string, 0, $pos);
 	$aux_resto = substr($string, $pos, strlen($string) - $pos);
@@ -1376,7 +1383,7 @@ function formata_string($string, $caracter, $pos)
 
 # !!!!!!!!!!!!!!!!  PROVISORIO  !!!!!!!!!!!!!!!!!!!
 
-function mascara_cnpj($cnpj)
+function mascara_cnpj(mixed $cnpj): string
 {
 	$mask = $cnpj;
 	$var1 = substr("$mask", 0, 2);
@@ -1388,7 +1395,7 @@ function mascara_cnpj($cnpj)
 	return $doc;
 }
 
-function mascara_cpf($cpf)
+function mascara_cpf(mixed $cpf): string
 {
 	$mask = $cpf;
 	$var1 = substr("$mask", 0, 3);
@@ -1399,7 +1406,7 @@ function mascara_cpf($cpf)
 	return $doc;
 }
 
-function monta_data($date)
+function monta_data(mixed $date): string
 {
 	$mask = $date;
 	$dia = substr($mask, 8, 2);
@@ -1409,7 +1416,7 @@ function monta_data($date)
 	return $doc;
 }
 
-function monta_data_gravacao($date)
+function monta_data_gravacao(mixed $date): string
 {
 	$mask = $date;
 	$dia = substr($mask, 0, 2);
@@ -1419,7 +1426,7 @@ function monta_data_gravacao($date)
 	return $doc;
 }
 
-function monta_valor($pin_valor_total)
+function monta_valor(mixed $pin_valor_total): string
 {
 	$aux = $pin_valor_total;
 	$tam = strlen($aux);
@@ -1433,7 +1440,7 @@ function monta_valor($pin_valor_total)
 	return $valor_final;
 }
 
-function limpa_string($valor)
+function limpa_string(mixed $valor): string
 {
 	$aux = $valor;
 	$s = "";
@@ -1446,7 +1453,7 @@ function limpa_string($valor)
 	return $s;
 }
 
-function valida_valor_opr($val)
+function valida_valor_opr(mixed $val): int
 {
 	$verifica = $val;
 	$alerta = null;
@@ -1466,7 +1473,7 @@ function valida_valor_opr($val)
 	}
 }
 
-function organiza_casa($valor)
+function organiza_casa(mixed $valor): mixed
 {
 	$aux = $valor;
 	$tam = strlen($aux);
@@ -1480,7 +1487,7 @@ function organiza_casa($valor)
 	}
 }
 
-function define_casa_decimal($valor, $qtde)
+function define_casa_decimal(mixed $valor, mixed $qtde): string
 {
 	$aux = $valor;
 	$contador = 0;
@@ -1507,7 +1514,7 @@ function define_casa_decimal($valor, $qtde)
 	return $valor_final;
 }
 
-function grava_comissao_banco($comissao)
+function grava_comissao_banco(mixed $comissao): mixed
 {
 	$aux = $comissao;
 	$alerta = null;
@@ -1537,7 +1544,7 @@ function grava_comissao_banco($comissao)
 	return $comic;
 }
 
-function verifica_cepEx($cep, $blComTraco = true)
+function verifica_cepEx(mixed $cep, mixed $blComTraco = true): mixed
 {
 
 	if ($blComTraco) {
@@ -1547,7 +1554,7 @@ function verifica_cepEx($cep, $blComTraco = true)
 	}
 }
 
-function verifica_cep($cep)
+function verifica_cep(mixed $cep): int
 {
 	$aux = $cep;
 	$tam = strlen($aux);
@@ -1594,7 +1601,7 @@ function verifica_cep($cep)
 	}
 }
 
-function moeda_char($string)
+function moeda_char(mixed $string): string
 {
 	$aux = $string;
 	$contador = 0;
@@ -1678,7 +1685,7 @@ function moeda_char($string)
 # e retorna um valor formatado em Moeda
 # ENTRADA: 964567
 # SA�DA: 9.645,67
-function moeda_numero($string)
+function moeda_numero(mixed $string): string
 {
 	$aux = $string;
 	$tam = strlen($aux);
@@ -1715,7 +1722,7 @@ function moeda_numero($string)
 	return $valor_final;
 }
 
-function gera_id()
+function gera_id(): string
 {
 	$id = date('ymdHis') . coloca_char_esquerda(rand(1, 99999), 5, '0');
 	return $id;
@@ -1725,14 +1732,14 @@ function gera_id()
 //###################            EstabelecimentoMovimentacao
 //#####################################################################################
 function insere_EstabelecimentoMovimentacao(
-	$var_est_codigo,
-	$var_tipo,
-	$var_origem,
-	$var_mapeamento,
-	$var_mapeamento_aux,
-	$var_valor,
-	$var_descricao
-) {
+	mixed $var_est_codigo,
+	mixed $var_tipo,
+	mixed $var_origem,
+	mixed $var_mapeamento,
+	mixed $var_mapeamento_aux,
+	mixed $var_valor,
+	mixed $var_descricao
+): bool {
 	//-----------------------------------------------------------------------------------------------
 	//Funcao para inserir a movimentacao (Extrato) de um estabelecimento
 	//-----------------------------------------------------------------------------------------------
@@ -1847,7 +1854,7 @@ function insere_EstabelecimentoMovimentacao(
 	return true;
 }
 
-function gravaLog_EstabelecimentoMovimentacao($EM_mensagem)
+function gravaLog_EstabelecimentoMovimentacao(mixed $EM_mensagem): void
 {
 
 	//Arquivo
@@ -1863,7 +1870,7 @@ function gravaLog_EstabelecimentoMovimentacao($EM_mensagem)
 	}
 }
 
-function errorHandler_EstabelecimentoMovimentacao($errno, $errstr, $errfile, $errline)
+function errorHandler_EstabelecimentoMovimentacao(mixed $errno, mixed $errstr, mixed $errfile, mixed $errline): void
 {
 
 	global $EM_parametros;
@@ -1886,9 +1893,11 @@ function errorHandler_EstabelecimentoMovimentacao($errno, $errstr, $errfile, $er
 // 2 apresenta timestamp XX/XX/XXXX as YY:YY:YY
 
 
-function formata_timestamp($data, $gravar)
+function formata_timestamp(mixed $data, mixed $gravar): string
 {
+        $doc = "";
 	$mask = $data;
+        $doc = "";
 	if ($gravar == 0) {
 		$dia = substr($mask, 8, 2);
 		$mes = substr($mask, 5, 2);
@@ -1923,7 +1932,7 @@ function formata_timestamp($data, $gravar)
 	return $doc;
 }
 
-function imprimeComboSeuBanco($mensagem)
+function imprimeComboSeuBanco(mixed $mensagem): void
 {
 	//URL Bancos
 	$URL_BANCOS[0] = array("Bradesco Pessoa Física", "http://www.bradesco.com.br/");
@@ -1970,7 +1979,7 @@ function imprimeComboSeuBanco($mensagem)
 <?php
 }
 
-function gravaLog_PagtoPINEPP($mensagem)
+function gravaLog_PagtoPINEPP(mixed $mensagem): void
 {
 	//Arquivo
 	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_PagtoPINEPP.txt";
@@ -1986,8 +1995,9 @@ function gravaLog_PagtoPINEPP($mensagem)
 }
 
 //Fun��o que busca todos os Publishers que fazem o fechamento pelo data de utiliza��o do PIN
-function levantamentoPublisherComFechamentoUtilizacao()
+function levantamentoPublisherComFechamentoUtilizacao(): array
 {
+        $aux_retorno = [];
 
 	// Buscando informa��es 
 	$sql = "select 
@@ -2016,11 +2026,12 @@ function levantamentoPublisherComFechamentoUtilizacao()
 		return $aux_retorno;
 	} //end else
 
-} //end function levantamentoPublisherComFechamentoUtilizacao()
+} //end function levantamentoPublisherComFechamentoUtilizacao(): array
 
 //Fun��o que busca todos os Publishers que fazem o fechamento pelo data de utiliza��o do PIN para Publisher Internacionais
-function levantamentoPublisherComFechamentoUtilizacaoInternacional()
+function levantamentoPublisherComFechamentoUtilizacaoInternacional(): array
 {
+        $aux_retorno = [];
 
 	// Buscando informa��es 
 	$sql = "select 
@@ -2052,11 +2063,12 @@ function levantamentoPublisherComFechamentoUtilizacaoInternacional()
 		return $aux_retorno;
 	} //end else
 
-} //end function levantamentoPublisherComFechamentoUtilizacaoInternacional()
+} //end function levantamentoPublisherComFechamentoUtilizacaoInternacional(): array
 
 //Fun��o que busca todos os Publishers que fazem o fechamento pelo data de utiliza��o do PIN para Publisher com comp�liance Municipal => Cidade: S�o Paulo
-function levantamentoPublisherComFechamentoUtilizacaoMunicipal()
+function levantamentoPublisherComFechamentoUtilizacaoMunicipal(): array
 {
+        $aux_retorno = [];
 
 	// Buscando informa��es 
 	$sql = "select 
@@ -2090,12 +2102,12 @@ function levantamentoPublisherComFechamentoUtilizacaoMunicipal()
 		return $aux_retorno;
 	} //end else
 
-} //end function levantamentoPublisherComFechamentoUtilizacaoMunicipal()
+} //end function levantamentoPublisherComFechamentoUtilizacaoMunicipal(): array
 
 // Fun��o que valida o CPF em rela��o a sua estrutura e digitos verificadores
-function validaAlgoritimoCPF($cpf)
+function validaAlgoritimoCPF(mixed $cpf): bool
 {
-	$cpf = str_replace(".", "", str_replace("-", "", $cpf));
+	$cpf = (string)str_replace(".", "", str_replace("-", "", (string)$cpf));
 	if ($cpf == '') return false;
 
 	// Elimina CPFs invalidos conhecidos
@@ -2137,7 +2149,7 @@ function validaAlgoritimoCPF($cpf)
 	return true;
 } //end validaAlgoritimoCPF()
 
-function modal_includes($fancybox = true)
+function modal_includes(mixed $fancybox = true): void
 {
 	$url = "https://" . htmlspecialchars($_SERVER['SERVER_NAME'], ENT_QUOTES, 'UTF-8');
 
@@ -2155,7 +2167,7 @@ function modal_includes($fancybox = true)
 	echo $html;
 }
 
-function fix_name($str)
+function fix_name(mixed $str): string
 {
 	$name = explode(' ', strtolower($str));
 	foreach ($name as $k => $n) {
@@ -2167,7 +2179,7 @@ function fix_name($str)
 	return implode(' ', $name);
 }
 
-function get_day_of_week($date1)
+function get_day_of_week(mixed $date1): string
 {
 	require_once RAIZ_DO_PROJETO . "public_html/sys/includes/language/eprepag_lang_pt.inc.php";
 	$dia_semana = "???";
@@ -2204,7 +2216,7 @@ function get_day_of_week($date1)
 	return $dia_semana;
 }
 
-function get_day_of_week_short($date1)
+function get_day_of_week_short(mixed $date1): string
 {
 
 	$dia_semana = "???";
@@ -2238,7 +2250,7 @@ function get_day_of_week_short($date1)
 	return $dia_semana;
 }
 
-function verifica_valor_moeda_neg($val)
+function verifica_valor_moeda_neg(mixed $val): int
 {
 	$valor = $val;
 	$tam = strlen($valor);
@@ -2267,7 +2279,7 @@ function verifica_valor_moeda_neg($val)
 }
 
 //Gerador de LOG de altera��es dos manuais
-function gravaLog_Manuais($mensagem)
+function gravaLog_Manuais(mixed $mensagem): void
 {
 	//Arquivo
 	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_manuais.txt";

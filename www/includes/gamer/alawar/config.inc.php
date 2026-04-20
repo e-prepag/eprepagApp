@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/../../constantes_url.php'; ?>
+<?php 
+require_once __DIR__ . '/../../constantes_url.php'; 
+$raiz_do_projeto = dirname(__DIR__, 3) . '/';
+?>
 <?php
 
 define("PATH_API_ALAWAR", $raiz_do_projeto . "includes/gamer/alawar/");
