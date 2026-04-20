@@ -1,9 +1,10 @@
 <?php
 
+$raiz_do_projeto = "/www/";
+define("RAIZ_DO_PROJETO",$raiz_do_projeto);
+
 require_once __DIR__ . '/load_dotenv.php';
 require_once __DIR__ . '/bourls.php';
-
-require_once RAIZ_DO_PROJETO . 'includes/bourls.php';
 
 if (!function_exists('random_bytes')) {
     /**
