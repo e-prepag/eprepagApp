@@ -152,38 +152,45 @@ function displayEstoque_CARDS($opr_codigo, $distributor_codigo, $pin_valor) {
 			$msg .= "</table>".PHP_EOL;
 			$msg .= "</td></tr></table>".PHP_EOL;
 		} else {
-			$msg .= "<p><font color='#FF0000'>Não foram encontrados pins para canal 'w'</font></p><br>".PHP_EOL;
+			$msg .= "<p><font color='#FF0000'>Nï¿½o foram encontrados pins para canal 'w'</font></p><br>".PHP_EOL;
 		}
 		return $msg;
 }
 
 	
-function VetorDistribuidorasCard() {
-	foreach($GLOBALS['DISTRIBUIDORAS_CARTOES'] as $key => $val) {
-		$operacao_array[$key]=$val;
-	}
-	return $operacao_array;
+function VetorDistribuidorasCard(): array {
+    $operacao_array = [];
+    $distribuidores = $GLOBALS['DISTRIBUIDORAS_CARTOES'] ?? [];
+    foreach($distribuidores as $key => $val) {
+        $operacao_array[$key] = (string)$val;
+    }
+    return $operacao_array;
 }
 
-function VetorOperadorasCard() {
-	$sql = "select opr_codigo, opr_nome from operadoras where opr_emite_cartao_conosco=1 order by opr_nome;";
-        $rs_operadoras = SQLexecuteQuery($sql);
+function VetorOperadorasCard(): array {
+    $sql = "select opr_codigo, opr_nome from operadoras where opr_emite_cartao_conosco=1 order by opr_nome;";
+    $rs_operadoras = SQLexecuteQuery($sql);
+    $operacao_array = [];
+    if ($rs_operadoras) {
         while ($rs_operadoras_row = pg_fetch_array($rs_operadoras)) {
-        	$operacao_array[$rs_operadoras_row['opr_codigo']]=$rs_operadoras_row['opr_nome'];
-	} //end while
-        return $operacao_array;
+            if (is_array($rs_operadoras_row)) {
+                $operacao_array[(int)$rs_operadoras_row['opr_codigo']] = (string)$rs_operadoras_row['opr_nome'];
+            }
+        } //end while
+    }
+    return $operacao_array;
 }
 
 function VerificaIncomm($post_parameters, $action) {
     
-        //Concatenando posição no vetor para a consulta
+        //Concatenando posiï¿½ï¿½o no vetor para a consulta
         $post_parameters['action'] = $action;
         
         $curl_handle = curl_init();
         curl_setopt($curl_handle, CURLOPT_URL, "" . EPREPAG_URL_HTTPS . "/prepag2/commerce/epp_incomm.php");
         // verify the digital certificate
         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
-        //  verify digital certificate’s name
+        //  verify digital certificateï¿½s name
         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl_handle, CURLOPT_USERAGENT,"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);

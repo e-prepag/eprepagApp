@@ -151,7 +151,9 @@ function checkingIsCompletedData(mixed $url_preview): void
                         $ret = $instProdutoModelo->obter($filtro, null, $rs);
                         if ($rs && pg_num_rows($rs) != 0) {
                             $rs_row = pg_fetch_array($rs);
-                            $opr_codigo = $rs_row['ogp_opr_codigo'];
+                            if (is_array($rs_row)) {
+                                $opr_codigo = $rs_row['ogp_opr_codigo'] ?? 0;
+                            }
                         }
                     }
                 } else {
@@ -163,19 +165,18 @@ function checkingIsCompletedData(mixed $url_preview): void
                             if (class_exists('Produto')) {
                                 $ret = (new Produto)->obtermelhorado($filtro, null, $rs);
 
-                                if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponível no momento.";
-                                else {
+                                if ($rs && pg_num_rows($rs) > 0) {
                                     $rs_row = pg_fetch_array($rs);
-                                    if ($rs_row) {
-                                        $opr_codigo = $rs_row["ogp_opr_codigo"];
+                                    if (is_array($rs_row)) {
+                                        $opr_codigo = $rs_row["ogp_opr_codigo"] ?? 0;
                                     }
                                 }
                             }
                         }
                     }
                 }
-                //Verificando se exige CPF de cliente
-                if (!$test_opr_need_cpf_lh) {
+    //Verificando se exige CPF de cliente
+                if ($opr_codigo > 0 && !$test_opr_need_cpf_lh) {
                     $test_opr_need_cpf_lh = (bool)checkingNeedCPF_LH($opr_codigo);
                 } //end if(!$test_opr_need_cpf_lh)
             } //end if(!empty($modeloId))
@@ -207,13 +208,15 @@ function checkingIsCallFormCPF(): void
             $filtro['com_produto'] = true;
             if (class_exists('ProdutoModelo')) {
                 $ret = ProdutoModelo::obter($filtro, null, $rs);
-                if ($rs && pg_num_rows($rs) != 0) {
+                if ($rs && pg_num_rows($rs) > 0) {
                     $rs_row = pg_fetch_array($rs);
-                    $opr_codigo = $rs_row['ogp_opr_codigo'];
+                    if (is_array($rs_row)) {
+                        $opr_codigo = (int)($rs_row['ogp_opr_codigo'] ?? 0);
+                    }
                 }
             }
             //Verificando se exige CPF de cliente
-            if (!$test_opr_need_cpf_lh) {
+            if ($opr_codigo > 0 && !$test_opr_need_cpf_lh) {
                 $test_opr_need_cpf_lh = (bool)checkingNeedCPF_LH($opr_codigo);
             } //end if(!$test_opr_need_cpf_lh)
         } //end if(!empty($modeloId)) 

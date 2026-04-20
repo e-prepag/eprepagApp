@@ -118,28 +118,32 @@ function displayEstoque_POS($distributor_codigo, $pin_valor)
 		$msg .= "</table>\n";
 		$msg .= "</td></tr></table>\n";
 	} else {
-		$msg .= "<p><font color='#FF0000'>Não foram encontrados pins para canal 'w'</font></p><br>\n";
+		$msg .= "<p><font color='#FF0000'>Nï¿½o foram encontrados pins para canal 'w'</font></p><br>\n";
 	}
 	return $msg;
 }
 
 
-function VetorDistribuidoras()
+function VetorDistribuidoras(): array
 {
 	global $DISTRIBUIDORAS;
+	$operacao_array = [];
 	foreach ($DISTRIBUIDORAS as $key => $val) {
-		$operacao_array[$key] = $DISTRIBUIDORAS[$key]['distributor_name'] . ' - Formato (' . $DISTRIBUIDORAS[$key]['distributor_format'] . ')';
+		$operacao_array[$key] = (string)$DISTRIBUIDORAS[$key]['distributor_name'] . ' - Formato (' . (string)$DISTRIBUIDORAS[$key]['distributor_format'] . ')';
 	}
 	return $operacao_array;
 }
 
-function VetorOperadoras()
+function VetorOperadoras(): array
 {
 	$sql_opr = "select opr_pin_epp_formato,opr_nome,opr_codigo from operadoras where opr_pin_epp_formato is not null order by opr_nome";
 	$rs_oper = SQLexecuteQuery($sql_opr);
+	$operacao_array = [];
 	if ($rs_oper) {
 		while ($rs_oper_row = pg_fetch_array($rs_oper)) {
-			$operacao_array[$rs_oper_row['opr_codigo']] = $rs_oper_row['opr_nome'] . ' - Formato (' . $rs_oper_row['opr_pin_epp_formato'] . ')';
+            if (is_array($rs_oper_row)) {
+			    $operacao_array[(int)$rs_oper_row['opr_codigo']] = (string)$rs_oper_row['opr_nome'] . ' - Formato (' . (string)$rs_oper_row['opr_pin_epp_formato'] . ')';
+            }
 		}
 	}
 	return $operacao_array;
