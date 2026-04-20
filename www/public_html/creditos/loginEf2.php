@@ -7,7 +7,7 @@ require_once "../../includes/constantes.php";
 require_once DIR_INCS . "main.php";
 require_once DIR_INCS . "pdv/main.php";
 require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
-require '../class/GoogleAutenticator.php';
+require '../../class/GoogleAutenticator.php';
 
 // include do arquivo contendo IPs DEV
 require_once DIR_INCS . "configIP.php";
@@ -97,7 +97,7 @@ if ($_SESSION['pode_logar'] == 1) {
     } else {
 
         if (!checkDevice($login_id, $connection, true)) {
-            $ga = new PHPGangsta_GoogleAuthenticator();
+            $ga = new classGoogleAutenticator();
             if (!$ga->verifyCode($auth['ugo_chave_autenticador'], $_REQUEST['token'], 2)) {
                 $msgAuth = "Token inválido.\n";
 
@@ -208,7 +208,7 @@ if ($_SESSION['pode_logar'] == 1) {
         }
 
         if (!checkDevice($login_id, $connection, false) && !$passou_termos) {
-            $ga = new PHPGangsta_GoogleAuthenticator();
+            $ga = new classGoogleAutenticator();
             if (!$ga->verifyCode($auth['ug_chave_autenticador'], $_REQUEST['token'], 2)) {
                 $msgAuth = "Token inválido.\n";
 

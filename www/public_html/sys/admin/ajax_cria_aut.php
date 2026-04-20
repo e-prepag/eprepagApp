@@ -9,7 +9,7 @@ require_once __DIR__ . "/../../../db/ConnectionPDO.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/chave.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/AES.class.php";
-require_once __DIR__ . "/../../../class/GoogleAutenticator.php";
+require_once __DIR__ . "/../../../../class/GoogleAutenticator.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/configuracao.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/languages.php";
 require_once "../includes/funcoes_login.php";
@@ -24,7 +24,7 @@ if ($_SESSION['RECAPTCHA_TRUE'] != true) {
 
 $_SESSION['RECAPTCHA_TRUE'] = null;
 
-$ga = new PHPGangsta_GoogleAuthenticator();
+$ga = new classGoogleAutenticator();
 
 try {
     $pdo = ConnectionPDO::getConnection()->getLink();
@@ -39,7 +39,7 @@ try {
             echo "<script>alert('Error');</script>";
             exit;
         }
-        
+
         $login = strtoupper(trim($user_decript));
 
         $sql = "SELECT id, chave_autenticador, shn_password FROM usuarios WHERE shn_login = ?
@@ -107,7 +107,7 @@ try {
                         }
                     }
                 }
-                $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag bko', $secret);
+                $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag bko', $secret);
 
                 $_SESSION['id_do_usuario'] = $fetch['id'];
 

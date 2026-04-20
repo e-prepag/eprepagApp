@@ -9,7 +9,7 @@ require_once "../../../class/pdv/classGamesUsuario.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/functions.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
 require_once "../../../includes/load_dotenv.php";
-require_once __DIR__ . "/../../../class/GoogleAutenticator.php";
+require_once __DIR__ . "/../../../../class/GoogleAutenticator.php";
 require_once "../includes/funcoes_login.php";
 require_once "/www/class/classSecureEncryption.php";
 
@@ -132,7 +132,7 @@ if ($Enviar) {
                         exit;
                     }
 
-                    $ga = new PHPGangsta_GoogleAuthenticator();
+                    $ga = new classGoogleAutenticator();
                     $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token'], 2);
                     $deviceValido = checkDevice($iduser_var, $pdo);
 

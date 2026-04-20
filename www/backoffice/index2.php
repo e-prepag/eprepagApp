@@ -14,7 +14,7 @@ if (empty($user) || empty($passw)) {
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Log.class.php";
-require_once __DIR__ . "/../class/GoogleAutenticator.php";
+require_once __DIR__ . "/../../class/GoogleAutenticator.php";
 require_once "/www/class/classSecureEncryption.php";
 
 $ipReq = $_SERVER['HTTP_CF_CONNECTING_IP'] ?: $_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['REMOTE_ADDR'];
@@ -55,7 +55,7 @@ if ($Enviar) {
 
         if (!isset($pgrow)) $pgrow = array('bko_autoriza' => false);
         gravaLog_LoginBKO("Login BKO - Autoriza: '" . $pgrow['bko_autoriza'] . "'");
-        
+
 
         if ($pgrow['bko_autoriza'] == 'S') {
             $iduser_var         = $pgrow['id'];
@@ -79,7 +79,7 @@ if ($Enviar) {
                         exit;
                     }
 
-                    $ga = new PHPGangsta_GoogleAuthenticator();
+                    $ga = new classGoogleAutenticator();
                     $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token'], 2);
                     $deviceValido = checkDevice($iduser_var, $pdo);
 

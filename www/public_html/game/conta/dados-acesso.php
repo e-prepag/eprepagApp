@@ -1,7 +1,7 @@
 <?php
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
-require_once "../../class/GoogleAutenticator.php";
+require_once "../../../class/GoogleAutenticator.php";
 require_once "../../../includes/constantes_url.php";
 
 $posicao = "Inferior Internas";
@@ -16,20 +16,22 @@ if (!$usuario) {
 
 $controller->setHeader();
 
-$ga = new PHPGangsta_GoogleAuthenticator();
+$ga = new classGoogleAutenticator();
 
 $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 $secret = $ga->createSecret();
-$qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag Gamer', $secret);
+$qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag Gamer', $secret);
 $_SESSION['secret'] = $secret;
 ?>
 <script src="/js/valida.js"></script>
 <script src="/js/validaSenha.js"></script>
 <script>
-    $(function () {
-        $("#alteraSenha").click(function () {
+    $(function() {
+        $("#alteraSenha").click(function() {
 
-            waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+            waitingDialog.show('Por favor, aguarde...', {
+                dialogSize: 'sm'
+            });
 
             var erro = validaFormSenha();
             if (erro.length > 0) {
@@ -42,8 +44,14 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "pass", novaSenha: $("#novaSenha").val(), confirmaSenha: $("#confirmaSenha").val(), senha: $("#senha").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
-                success: function (obj) {
+                data: {
+                    type: "pass",
+                    novaSenha: $("#novaSenha").val(),
+                    confirmaSenha: $("#confirmaSenha").val(),
+                    senha: $("#senha").val(),
+                    token_csrf: "<?= $_SESSION["token_csrf"] ?>"
+                },
+                success: function(obj) {
 
                     waitingDialog.hide();
 
@@ -58,7 +66,7 @@ $_SESSION['secret'] = $secret;
                         return false;
                     }
                 },
-                error: function () {
+                error: function() {
                     waitingDialog.hide();
                     manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
                     return false;
@@ -67,9 +75,11 @@ $_SESSION['secret'] = $secret;
 
         });
 
-        $("#alteraLogin").click(function () {
+        $("#alteraLogin").click(function() {
 
-            waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+            waitingDialog.show('Por favor, aguarde...', {
+                dialogSize: 'sm'
+            });
 
             if ($("#novoLogin").val().lenth < 5 || $("#novoLogin").val().lenth > 100) {
                 waitingDialog.hide();
@@ -87,8 +97,14 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "novoLogin", login: $("#novoLogin").val(), confirmaLogin: $("#confirmaLogin").val(), senha: $("#l-senha").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
-                success: function (obj) {
+                data: {
+                    type: "novoLogin",
+                    login: $("#novoLogin").val(),
+                    confirmaLogin: $("#confirmaLogin").val(),
+                    senha: $("#l-senha").val(),
+                    token_csrf: "<?= $_SESSION["token_csrf"] ?>"
+                },
+                success: function(obj) {
 
                     waitingDialog.hide();
 
@@ -103,7 +119,7 @@ $_SESSION['secret'] = $secret;
                         return false;
                     }
                 },
-                error: function () {
+                error: function() {
                     waitingDialog.hide();
                     manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
                     return false;
@@ -111,9 +127,11 @@ $_SESSION['secret'] = $secret;
             });
         });
 
-        $("#alteraEmail").click(function () {
+        $("#alteraEmail").click(function() {
 
-            waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+            waitingDialog.show('Por favor, aguarde...', {
+                dialogSize: 'sm'
+            });
 
             if (!checkEmail($("#novoEmail").val())) {
                 waitingDialog.hide();
@@ -131,8 +149,14 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/dados-acesso.php",
-                data: { type: "solicitaNovoEmail", email: $("#novoEmail").val(), confirmaEmail: $("#confirmaEmail").val(), senha: true, token_csrf: "<?=$_SESSION["token_csrf"]?>" },
-                success: function (obj) {
+                data: {
+                    type: "solicitaNovoEmail",
+                    email: $("#novoEmail").val(),
+                    confirmaEmail: $("#confirmaEmail").val(),
+                    senha: true,
+                    token_csrf: "<?= $_SESSION["token_csrf"] ?>"
+                },
+                success: function(obj) {
 
                     waitingDialog.hide();
 
@@ -146,7 +170,7 @@ $_SESSION['secret'] = $secret;
                         return false;
                     }
                 },
-                error: function () {
+                error: function() {
                     waitingDialog.hide();
                     manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
                     return false;
@@ -154,9 +178,11 @@ $_SESSION['secret'] = $secret;
             });
         });
 
-        $("#alteraToken").click(function () {
+        $("#alteraToken").click(function() {
 
-            waitingDialog.show('Por favor, aguarde...', { dialogSize: 'sm' });
+            waitingDialog.show('Por favor, aguarde...', {
+                dialogSize: 'sm'
+            });
 
             if ($("#token").val().trim() === "") {
                 waitingDialog.hide();
@@ -174,8 +200,13 @@ $_SESSION['secret'] = $secret;
                 type: "POST",
                 dataType: "JSON",
                 url: "/game/ajax/alterar_autenticador.php",
-                data: { token: $("#token").val(), cad_senhaAtual: $("#cad_senhaAtual").val(), token_old: $("#token_old").val(), token_csrf: "<?=$_SESSION["token_csrf"]?>" },
-                success: function (obj) {
+                data: {
+                    token: $("#token").val(),
+                    cad_senhaAtual: $("#cad_senhaAtual").val(),
+                    token_old: $("#token_old").val(),
+                    token_csrf: "<?= $_SESSION["token_csrf"] ?>"
+                },
+                success: function(obj) {
 
                     waitingDialog.hide();
 
@@ -190,7 +221,7 @@ $_SESSION['secret'] = $secret;
                         return false;
                     }
                 },
-                error: function () {
+                error: function() {
                     waitingDialog.hide();
                     manipulaModal(1, "Erro desconhecido, favor entrar em contato com o nosso suporte.", "Erro");
                     return false;
@@ -362,7 +393,7 @@ $_SESSION['secret'] = $secret;
                         <form name="form1" action="" method="post">
                             <div class="mb-3">
                                 <label style="margin-top: 15px;" for="token_old" class="<?php if (isset($txtVermelho))
-                                    echo $txtVermelho; ?>">
+                                                                                            echo $txtVermelho; ?>">
                                     Insira o Token gerado pelo autenticador atual:
                                 </label>
                                 <input type="text" name="token_old" id="token_old" class="form-control"
@@ -370,7 +401,7 @@ $_SESSION['secret'] = $secret;
                             </div>
                             <div class="mb-3">
                                 <label style="margin-top: 15px;" for="cad_senhaAtual" class="<?php if (isset($txtVermelho))
-                                    echo $txtVermelho; ?>">
+                                                                                                    echo $txtVermelho; ?>">
                                     Insira sua senha atual:
                                 </label>
                                 <input type="password" name="cad_senhaAtual" id="cad_senhaAtual" class="form-control">
@@ -395,7 +426,7 @@ $_SESSION['secret'] = $secret;
 
                             <div class="mb-3">
                                 <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
-                                    echo $txtVermelho; ?>">
+                                                                                        echo $txtVermelho; ?>">
                                     Insira o novo Token gerado:
                                 </label>
                                 <input type="text" name="token" id="token" class="form-control">
@@ -415,14 +446,14 @@ $_SESSION['secret'] = $secret;
     </div>
     <?php
     if (!empty($banners)) {
-        ?>
+    ?>
         <div class="col-md-12 top10">
             <a href='<?php echo $banners[0]->link; ?>' target="_blank">
                 <img title="<?php echo $banners[0]->titulo; ?>" alt="<?php echo $banners[0]->titulo; ?>"
                     class="img-responsive" src="<?php echo $controller->objBanners->urlLink . $banners[0]->imagem; ?>">
             </a>
         </div>
-        <?php
+    <?php
     }
     ?>
 </div>

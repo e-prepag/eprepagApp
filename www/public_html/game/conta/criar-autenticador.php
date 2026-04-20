@@ -11,7 +11,7 @@ if ($request_uri !== $script_name) {
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once RAIZ_DO_PROJETO . 'consulta_cpf/config.inc.cpf.php';
-require_once "../../class/GoogleAutenticator.php";
+require_once "../../../class/GoogleAutenticator.php";
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
@@ -75,7 +75,7 @@ $token = $_POST['token'];
 $secret = $_SESSION['secret'];
 
 if ($token && $secret) {
-    $ga = new PHPGangsta_GoogleAuthenticator();
+    $ga = new classGoogleAutenticator();
     $checkResult = $ga->verifyCode($secret, $token, 2);
 
     if ($checkResult) {
@@ -98,15 +98,15 @@ if ($token && $secret) {
 }
 
 if (!$secret) {
-    $ga = new PHPGangsta_GoogleAuthenticator();
+    $ga = new classGoogleAutenticator();
 
     $secret = $ga->createSecret();
-    $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag Gamer', $secret);
+    $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag Gamer', $secret);
     $_SESSION['secret'] = $secret;
 }
 if (!isset($qrCodeUrl)) {
-    $ga = new PHPGangsta_GoogleAuthenticator();
-    $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag Gamer', $secret);
+    $ga = new classGoogleAutenticator();
+    $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag Gamer', $secret);
 }
 
 $controller = new HeaderController;
@@ -123,7 +123,6 @@ $termosDeUso = strip_tags($termosDeUso);
         print "manipulaModal(1,\"" . implode($erros) . "\",'Atenção');";
     }
     ?>
-
 </script>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script src="https://kit.fontawesome.com/e045fafe2e.js" crossorigin="anonymous"></script>
@@ -237,7 +236,7 @@ $termosDeUso = strip_tags($termosDeUso);
 
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
-                                echo $txtVermelho; ?>">
+                                                                                    echo $txtVermelho; ?>">
                                 Insira o Token gerado pelo app autenticador:
                             </label>
                             <input type="text" name="token" id="token" class="form-control">
@@ -282,8 +281,12 @@ $termosDeUso = strip_tags($termosDeUso);
     integrity="sha512-pHVGpX7F/27yZ0ISY+VVjyULApbDlD0/X0rgGbTqCE7WFW5MezNTWG/dnhtbBuICzsd0WQPgpE4REBLv+UqChw=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    $('#cpf').mask('000.000.000-00', { reverse: true });
-    $('#dtNasc').mask('00/00/0000', { placeholder: "__/__/____" });
+    $('#cpf').mask('000.000.000-00', {
+        reverse: true
+    });
+    $('#dtNasc').mask('00/00/0000', {
+        placeholder: "__/__/____"
+    });
 </script>
 <?php
 require_once RAIZ_DO_PROJETO . "public_html/game/includes/footer.php";

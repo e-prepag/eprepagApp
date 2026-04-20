@@ -3,7 +3,7 @@
 //ini_set("display_errors", 1);
 require_once "../../includes/constantes.php";
 require_once DIR_CLASS . "pdv/controller/MeuCadastroController.class.php";
-require_once "../class/GoogleAutenticator.php";
+require_once "../../class/GoogleAutenticator.php";
 
 $controller = new MeuCadastroController;
 
@@ -18,7 +18,7 @@ if ($token && $secret && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
 
     $cad_senhaAtual = $_POST['cad_senhaAtual'];
 
-    $ga = new PHPGangsta_GoogleAuthenticator();
+    $ga = new classGoogleAutenticator();
     $checkResult = $ga->verifyCode($secret, $token, 2);
 
     $sql = "SELECT ug_senha FROM dist_usuarios_games WHERE ug_id = ?";
@@ -50,15 +50,15 @@ if ($token && $secret && $_SESSION["token_csrf"] == $_POST["token_csrf"]) {
 }
 
 if (!$secret) {
-    $ga = new PHPGangsta_GoogleAuthenticator();
+    $ga = new classGoogleAutenticator();
 
     $secret = $ga->createSecret();
-    $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+    $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag', $secret);
     $_SESSION['secret'] = $secret;
 }
 if (!isset($qrCodeUrl)) {
-    $ga = new PHPGangsta_GoogleAuthenticator();
-    $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+    $ga = new classGoogleAutenticator();
+    $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag', $secret);
 }
 $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
@@ -155,14 +155,14 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
                         <input type="hidden" name="token_csrf" value="<?= $_SESSION["token_csrf"] ?>">
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
-                                echo $txtVermelho; ?>">
+                                                                                    echo $txtVermelho; ?>">
                                 Insira o Token gerado pelo autenticador atual:
                             </label>
                             <input type="text" name="token" id="token" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="cad_senhaAtual" class="<?php if (isset($txtVermelho))
-                                echo $txtVermelho; ?>">
+                                                                                                echo $txtVermelho; ?>">
                                 Insira sua senha atual:
                             </label>
                             <input type="password" name="cad_senhaAtual" id="cad_senhaAtual" class="form-control">
@@ -186,7 +186,7 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
-                                echo $txtVermelho; ?>">
+                                                                                    echo $txtVermelho; ?>">
                                 Insira o novo Token gerado:
                             </label>
                             <input type="text" name="token" id="token" class="form-control">
@@ -231,13 +231,13 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
             <?php
             if ($banner) {
                 foreach ($banner as $b) {
-                    ?>
+            ?>
                     <div class="row pull-right">
                         <a href="<?php echo $b->link; ?>" class="banner" id="<?php echo $b->id; ?>" target="_blank"><img
                                 src="<?php echo $controller->objBanner->urlLink . $b->imagem; ?>" width="186" class="p-3"
                                 title="<?php echo $b->titulo; ?>"></a>
                     </div>
-                    <?php
+            <?php
                 }
             }
             ?>
@@ -252,12 +252,12 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 <script src="/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>
 <script src="/js/validaSenha.js"></script>
 <script>
-    $(function () {
-        $(".salvar").click(function () {
+    $(function() {
+        $(".salvar").click(function() {
             var form = $(this).closest("form");
             var erro = [];
 
-            $(".form-control").each(function () {
+            $(".form-control").each(function() {
                 if ($(this).val().length < $(this).attr("char")) {
                     erro.push($(this).attr("label") + " deve ter " + $(this).attr("char") + " caracteres.");
                     $("label[for='" + $(this).attr("id") + "']").addClass("txt-vermelho");
