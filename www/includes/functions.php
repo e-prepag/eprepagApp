@@ -73,11 +73,9 @@ function consultarGeoIP(mixed $ip): bool|array
 		if (curl_errno($ch)) {
 			echo 'Erro cURL: ' . curl_error($ch) . "\n";
 		}
-		curl_close($ch);
 		return false;
 	}
 
-	curl_close($ch);
 	$result = json_decode((string)$response, true);
 	if (!is_array($result) || !isset($result['results']['latitude']) || !isset($result['results']['longitude']) || $result['results']['latitude'] == 0 || $result['results']['longitude'] == 0) {
 		return false;
@@ -686,7 +684,7 @@ function gera_string(mixed $inicio, mixed $tamanho_rand, mixed $tipo): string
 function formata_data(mixed $data, mixed $gravar): string
 {
 	$mask = $data;
-        $doc = "";
+	$doc = "";
 	if ($gravar == 0) {
 		$dia = substr($mask, 8, 2);
 		$mes = substr($mask, 5, 2);
@@ -1057,6 +1055,7 @@ function verifica_tel(mixed $tel): int
 			}
 		}
 	}
+	return 0;
 }
 
 function monta_ddd_string(mixed $campoddd): ?string
@@ -1064,6 +1063,7 @@ function monta_ddd_string(mixed $campoddd): ?string
 	$recebeDDD = $campoddd;
 	$recebeDDD .= ";";
 	$alerta = null;
+	$var = "";
 	for ($x = 1; $x <= strlen($recebeDDD); $x += 1) {
 		$ch = substr($recebeDDD, $x - 1, 1);
 		if (ord($ch) >= 48 && ord($ch) <= 57) {
@@ -1096,20 +1096,21 @@ function monta_ddd_string(mixed $campoddd): ?string
 			$aux_tr = 0;
 			$aux_pv = 1;
 			$grav = "";
+			$pos = isset($pos) ? $pos : 0;
+			$tst = substr($recebeDDD, $y, 1);
 
 			// ... (resto da função)
 
-			if (ord($tst) == 59)
-			$grav = substr($recebeDDD, $pos + 1, 2);
+			if ($tst !== "" && ord($tst) == 59)
+				$grav = substr($recebeDDD, $pos + 1, 2);
 			$var .= (string)$grav . ";";
-			}
-			$aux_pv += 1;
-			}
-		$var = str_replace(";;;;", ";", $var);
-		$var = str_replace(";;;", ";", $var);
-		$var = str_replace(";;", ";", $var);
-		return $var;
+		}
+		$aux_pv += 1;
 	}
+	$var = str_replace(";;;;", ";", $var);
+	$var = str_replace(";;;", ";", $var);
+	$var = str_replace(";;", ";", $var);
+	return $var;
 }
 
 function valida_ddd_string(mixed $ddd): int
@@ -1223,6 +1224,7 @@ function verifica_data(mixed $data): int
 			}
 		}
 	}
+	return 0;
 }
 
 function verifica_tel_ddd(mixed $tel): mixed
@@ -1286,14 +1288,14 @@ function verifica_tel_ddd(mixed $tel): mixed
 							} else {
 								return 1;
 							}
-						} // fechamnento do else do $inicial n�o � n�mero								
-					} // fechamnento do else do $ddd n�o � n�mero
-				} // fechamento do else do $traco																																
-			} // fechamento do else do $espa�o
-		} // fechamento da condi��o ($tam == 12)
-	} // fechamento do else do $tam
-
-}
+						}
+					} // fechamnento do else do $inicial no  nmero								
+				} // fechamnento do else do $ddd no  nmero
+			} // fechamento do else do $traco																																
+		} // fechamento do else do $espao
+	} // fechamento da condio ($tam == 12)
+	return 0;
+} // fechamento do else do $tam
 
 function Modulo10(mixed $string): int
 {
@@ -1366,7 +1368,7 @@ function formata_string(mixed $string, mixed $caracter, mixed $pos): mixed
 	$aux_inic = substr($string, 0, $pos);
 	$aux_resto = substr($string, $pos, strlen($string) - $pos);
 
-	if (strlen($aux_resto) <= strlen(aux_inic))
+	if (strlen($aux_resto) <= strlen($aux_inic))
 		$aux_r = $aux_inic . $caracter . $aux_resto;
 	else {
 		$aux_for = $caracter;
@@ -1893,9 +1895,9 @@ function errorHandler_EstabelecimentoMovimentacao(mixed $errno, mixed $errstr, m
 
 function formata_timestamp(mixed $data, mixed $gravar): string
 {
-        $doc = "";
+	$doc = "";
 	$mask = $data;
-        $doc = "";
+	$doc = "";
 	if ($gravar == 0) {
 		$dia = substr($mask, 8, 2);
 		$mes = substr($mask, 5, 2);
@@ -1995,7 +1997,7 @@ function gravaLog_PagtoPINEPP(mixed $mensagem): void
 //Fun��o que busca todos os Publishers que fazem o fechamento pelo data de utiliza��o do PIN
 function levantamentoPublisherComFechamentoUtilizacao(): array
 {
-        $aux_retorno = [];
+	$aux_retorno = [];
 
 	// Buscando informa��es 
 	$sql = "select 
@@ -2029,7 +2031,7 @@ function levantamentoPublisherComFechamentoUtilizacao(): array
 //Fun��o que busca todos os Publishers que fazem o fechamento pelo data de utiliza��o do PIN para Publisher Internacionais
 function levantamentoPublisherComFechamentoUtilizacaoInternacional(): array
 {
-        $aux_retorno = [];
+	$aux_retorno = [];
 
 	// Buscando informa��es 
 	$sql = "select 
@@ -2066,7 +2068,7 @@ function levantamentoPublisherComFechamentoUtilizacaoInternacional(): array
 //Fun��o que busca todos os Publishers que fazem o fechamento pelo data de utiliza��o do PIN para Publisher com comp�liance Municipal => Cidade: S�o Paulo
 function levantamentoPublisherComFechamentoUtilizacaoMunicipal(): array
 {
-        $aux_retorno = [];
+	$aux_retorno = [];
 
 	// Buscando informa��es 
 	$sql = "select 
