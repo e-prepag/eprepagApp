@@ -14,8 +14,6 @@ $pagina_titulo = "Saldo";
 
 class ExtratoController extends HeaderController{
     public $raiz_do_projeto;
-    
-    public UsuarioGames $usuarios;
 
     public function __construct(){
         $this->objBanner = new BannerBO;
