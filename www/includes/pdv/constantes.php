@@ -415,6 +415,12 @@ $USUARIO_GAMES_LOG_TIPOS_DESCRICAO = array(	'1' => 'Criação de Cadastro',
 
 $USUARIO_GAMES_OPERADOR_TIPOS_NOME = array(	'0'	=>	'Funcionário 2', 
                                                                                         '1'	=>	'Funcionário 1');
+if (!defined('FUNCIONARIO_2')) {
+    define('FUNCIONARIO_2', 'FUNCIONARIO_2');
+}
+if (!defined('FUNCIONARIO_1')) {
+    define('FUNCIONARIO_1', 'FUNCIONARIO_1');
+}
 $USUARIO_GAMES_OPERADOR_TIPOS = array(	'FUNCIONARIO_2' 		=> 0, 
                                                                                 'FUNCIONARIO_1' 		=> 1);
 $USUARIO_GAMES_OPERADOR_TIPOS_DESCRICAO = array(	'0' => 'Funcionário 2: Impressão de senhas',
