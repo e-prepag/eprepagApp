@@ -345,6 +345,10 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
     }
         
     public function getTotalVendas($sql){
-        return count($this->getVendas($sql,false));
+        $vendas = $this->getVendas($sql,false);
+        if (is_array($vendas) || $vendas instanceof Countable) {
+            return count($vendas);
+        }
+        return 0;
     }
 } //end class
