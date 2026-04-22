@@ -453,7 +453,7 @@ $controller->setHeader();
                         <form id='seleciona' method='post' action="/game/pedido/passo-1.php" style="display: flex; align-items:end; flex-wrap: wrap;">
                             <input type='hidden' name='acao' id='acao' value='u'>
                             <input type='hidden' name='mod' id='mod' value='NO HAVE'>
-                            <input type='hidden' name='valor' id='valor_hidden' value='5'>
+                            <input type='hidden' name='valor' id='valor_hidden' value='<?php echo number_format($produto->getValorMinimo(), 0, "", ""); ?>'>
                             <input type='hidden' name='codeProd' id='codeProd' value='<?php echo $produto->getId(); ?>'>
                             <div class="quantity-selector compact" data-min="1" data-max="999">
                                 <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
@@ -523,6 +523,25 @@ $controller->setHeader();
             $('#valor').mask('0000', {
                 reverse: true
             });
+            function syncValorVariavel() {
+                if (!$("#valor").length) return;
+
+                var min = parseInt($("#valor").attr("min"));
+                var max = parseInt($("#valor").attr("max"));
+                var valor = parseInt($("#valor").val());
+
+                if (isNaN(valor)) valor = min;
+                if (valor < min) valor = min;
+                if (valor > max) valor = max;
+
+                $("#valor").val(valor);
+                $("#valor_hidden").val(valor);
+
+                return valor;
+            }
+
+            syncValorVariavel();
+
 
             $(".bg-comprar").click(function() {
                 // Remove a borda de seleção e ícone de todos os produtos
@@ -552,6 +571,7 @@ $controller->setHeader();
             });
 
             $("#btn-adicionar-carrinho").click(function() {
+                syncValorVariavel();
                 // Envia os dados do formulário via AJAX para adiciona-carrinho.php
                 let data = {
                     acao: "u",
@@ -617,6 +637,10 @@ $controller->setHeader();
                 });
             });
 
+            $("#seleciona").submit(function() {
+                syncValorVariavel();
+            });
+
             $("#valor").change(function() {
                 var min = parseInt($("#valor").attr("min"));
                 var max = parseInt($("#valor").attr("max"));
@@ -625,13 +649,16 @@ $controller->setHeader();
 
                     var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                     $("#valor").val(min);
+                    $("#valor_hidden").val(min);
                     $(".error-list").html(html);
                 } else if (valor > max) {
                     var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                     console.log(valor);
                     $("#valor").val(max);
+                    $("#valor_hidden").val(max);
                     $(".error-list").html(html);
                 } else {
+                    $("#valor_hidden").val(valor);
                     var html = "R$" + valor + ",00";
                     $.post("/game/ajax/epp_info.php", {
                             valor: valor,
