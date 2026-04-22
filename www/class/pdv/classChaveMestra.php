@@ -4,6 +4,7 @@ require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 
 require_once "/www/class/classSecureEncryption.php";
+require_once "/www/includes/writeIfPossible.php";
 
 class ChaveMestra
 {
@@ -71,7 +72,7 @@ class ChaveMestra
 			$logLines[] = "resultado: SENHA_INVALIDA";
 		}
 		$logLines[] = str_repeat("*", 60);
-		$this->writeLogIfPossible("/www/arquivos_gerados/logs/chave_mestra.txt", $logLines);
+		writeLinesIfPossible("/www/arquivos_gerados/logs/chave_mestra.txt", $logLines);
 
 		return $quantidade;
 	}
@@ -93,19 +94,6 @@ class ChaveMestra
 		}
 
 		return $_SERVER['REMOTE_ADDR']; // fallback
-	}
-
-	private function writeLogIfPossible($path, array $lines)
-	{
-		$file = @fopen($path, "a+");
-		if ($file === false) {
-			return;
-		}
-
-		foreach ($lines as $line) {
-			fwrite($file, $line . "\n");
-		}
-		fclose($file);
 	}
 
 	public function inserirSeguro($liberado, $usuario)
@@ -248,7 +236,7 @@ class ChaveMestra
 		$query->execute();
 
 		// Log da migracao
-		$this->writeLogIfPossible("/www/arquivos_gerados/logs/chave_mestra_migration.txt", array(
+		writeLinesIfPossible("/www/arquivos_gerados/logs/chave_mestra_migration.txt", array(
 			"data: " . date("d-m-Y H:i:s"),
 			"usuario: " . $usuario,
 			"acao: migracao para bcrypt",
@@ -271,7 +259,7 @@ class ChaveMestra
 		$query->execute();
 
 		// Log do upgrade
-		$this->writeLogIfPossible("/www/log/chave_mestra_migration.txt", array(
+		writeLinesIfPossible("/www/log/chave_mestra_migration.txt", array(
 			"data: " . date("d-m-Y H:i:s"),
 			"usuario: " . $usuario,
 			"acao: upgrade hash bcrypt",
