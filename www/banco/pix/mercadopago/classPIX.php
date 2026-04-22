@@ -3,6 +3,7 @@
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
 require_once "/www/includes/load_dotenv.php";
+require_once "/www/includes/writeIfPossible.php";
 class classPIX
 {
 
@@ -56,15 +57,10 @@ class classPIX
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
         $logFilePath = "/www/arquivos_gerados/logs/mercadopago_PIX.txt";
-        $ff = fopen($logFilePath, "a+");
-
-        if ($ff) {
-            $timestamp = date("Y-m-d H:i:s");
-            $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
-                " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
-            fwrite($ff, $logEntry);
-            fclose($ff);
-        }
+        $timestamp = date("Y-m-d H:i:s");
+        $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
+            " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
+        writeFileIfPossible($logFilePath, $logEntry);
 
         if ($resposta == false) {
             $htmlErro = "
@@ -152,11 +148,8 @@ class classPIX
         } else {
             $erro = $response;
         }
-
-        $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "a+");
         $timestamp = date("Y-m-d H:i:s");
-        fwrite($ff, "resultado data:" . $timestamp . ": " . $erro . $status . "\r\n");
-        fclose($ff);
+        writeFileIfPossible("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "resultado data:" . $timestamp . ": " . $erro . $status . "\r\n");
 
         if (!$status) {
             echo ("<br><br>ERRO na Comunicação com o Banco!<br>Por favor, entre em contado com o suporte da E-Prepag e informe o erro de código PIX985235.<br>Obrigado.");
@@ -165,11 +158,8 @@ class classPIX
                 $cpf = $data['results'][0]['payer']['identification']['number'] ? $data['results'][0]['payer']['identification']['number'] : 'N/A';
                 $name = $data['results'][0]['payer']['first_name'] ? $data['results'][0]['payer']['first_name'] : 'N/A';
                 $reposta_consulta = $data['results'][0]['date_created'] ? $data['results'][0]['date_created'] : date('Y-m-d\TH:i:s.vO');
-
-                $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "a+");
                 $timestamp = date("Y-m-d H:i:s");
-                fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
-                fclose($ff);
+                writeFileIfPossible("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
 
                 $numCompra = substr($params['idpedido'], 2, 17);
                 $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;"; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
@@ -242,11 +232,8 @@ class classPIX
         } else {
             $erro = "Status não identificado";
         }
-
-        $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "a+");
         $timestamp = date("Y-m-d H:i:s");
-        fwrite($ff, "resultado data:" . $timestamp . ": " . $erro . $status . "\r\n");
-        fclose($ff);
+        writeFileIfPossible("/www/arquivos_gerados/logs/mercadopago_verifica_PIX.txt", "resultado data:" . $timestamp . ": " . $erro . $status . "\r\n");
 
         if (!$status) {
             echo ("<br><br>ERRO na Comunicação com o Banco!<br>Por favor, entre em contado com o suporte da E-Prepag e informe o erro de código PIX985235.<br>Obrigado.");
@@ -256,11 +243,8 @@ class classPIX
                 $cpf = $data['payer']['identification']['number'] ? $data['payer']['identification']['number'] : 'N/A';
                 $name = $data['payer']['first_name'] ? $data['payer']['first_name'] : 'N/A';
                 $reposta_consulta = $data['date_created'] ? $data['date_created'] : date('Y-m-d\TH:i:s.vO');
-
-                $ff = fopen("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "a+");
                 $timestamp = date("Y-m-d H:i:s");
-                fwrite($ff, "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
-                fclose($ff);
+                writeFileIfPossible("/www/arquivos_gerados/logs/mercadopago_verifica_resposta_PIX.txt", "resultado data:" . $timestamp . "data: " . $reposta_consulta . ", nome: $name, cpf: $cpf\r\n");
 
                 $numCompra = substr($numPedido, 2, 17);
                 $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;"; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
@@ -299,10 +283,7 @@ class classPIX
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . PHP_EOL;
         $log .= "---------------------------------" . PHP_EOL;
         $log .= htmlspecialchars_decode($msg);
-
-        $fp = fopen($fileLog, 'a+');
-        fwrite($fp, $log);
-        fclose($fp);
+        writeFileIfPossible($fileLog, $log);
     } //end function logEvents
 
     private function generateRandomString($length = 32)
@@ -437,13 +418,12 @@ class classPIX
         curl_close($ch);
 
         $data = json_decode($response, true);
-
-        $errorFileLog = fopen("/www/arquivos_gerados/logs/mercadopago_log_PIX_WS-Hearders.log", "a+");
+        $errorFileLog = "/www/arquivos_gerados/logs/mercadopago_log_PIX_WS-Hearders.log";
         $log = "=================================================================================================" . PHP_EOL;
         $log .= "DATA -> " . date("d/m/Y - H:i:s") . " -> Send JSON to Get QRCode" . PHP_EOL;
         $log .= "RESPONSE -> " . $response . PHP_EOL;
         $log .= "---------------------------------------------------" . PHP_EOL;
-        fwrite($errorFileLog, $log);
+        writeFileIfPossible($errorFileLog, $log);
 
         $customerId = null;
 
