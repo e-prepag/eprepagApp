@@ -62,15 +62,16 @@ class ChaveMestra
 			}
 		}
 
-		$file = fopen("/www/arquivos_gerados/logs/chave_mestra.txt", "a+");
-		fwrite($file, "data: " . date("d-m-Y H:s:s") . "\n");
-		fwrite($file, "usuario: " . $usuario . "\n");
-		fwrite($file, "quantidade: " . $quantidade . "\n");
+		$logLines = array(
+			"data: " . date("d-m-Y H:s:s"),
+			"usuario: " . $usuario,
+			"quantidade: " . $quantidade,
+		);
 		if ($invalid) {
-			fwrite($file, "resultado: SENHA_INVALIDA\n");
+			$logLines[] = "resultado: SENHA_INVALIDA";
 		}
-		fwrite($file, str_repeat("*", 60) . "\n");
-		fclose($file);
+		$logLines[] = str_repeat("*", 60);
+		$this->writeLogIfPossible("/www/arquivos_gerados/logs/chave_mestra.txt", $logLines);
 
 		return $quantidade;
 	}
@@ -92,6 +93,19 @@ class ChaveMestra
 		}
 
 		return $_SERVER['REMOTE_ADDR']; // fallback
+	}
+
+	private function writeLogIfPossible($path, array $lines)
+	{
+		$file = @fopen($path, "a+");
+		if ($file === false) {
+			return;
+		}
+
+		foreach ($lines as $line) {
+			fwrite($file, $line . "\n");
+		}
+		fclose($file);
 	}
 
 	public function inserirSeguro($liberado, $usuario)
@@ -233,13 +247,13 @@ class ChaveMestra
 		$query->bindParam(":USUARIO", $usuario);
 		$query->execute();
 
-		// Log da migração
-		$file = fopen("/www/arquivos_gerados/logs/chave_mestra_migration.txt", "a+");
-		fwrite($file, "data: " . date("d-m-Y H:i:s") . "\n");
-		fwrite($file, "usuario: " . $usuario . "\n");
-		fwrite($file, "acao: migração para bcrypt\n");
-		fwrite($file, str_repeat("*", 60) . "\n");
-		fclose($file);
+		// Log da migracao
+		$this->writeLogIfPossible("/www/arquivos_gerados/logs/chave_mestra_migration.txt", array(
+			"data: " . date("d-m-Y H:i:s"),
+			"usuario: " . $usuario,
+			"acao: migracao para bcrypt",
+			str_repeat("*", 60),
+		));
 	}
 
 	/**
@@ -257,11 +271,11 @@ class ChaveMestra
 		$query->execute();
 
 		// Log do upgrade
-		$file = fopen("/www/log/chave_mestra_migration.txt", "a+");
-		fwrite($file, "data: " . date("d-m-Y H:i:s") . "\n");
-		fwrite($file, "usuario: " . $usuario . "\n");
-		fwrite($file, "acao: upgrade hash bcrypt\n");
-		fwrite($file, str_repeat("*", 60) . "\n");
-		fclose($file);
+		$this->writeLogIfPossible("/www/log/chave_mestra_migration.txt", array(
+			"data: " . date("d-m-Y H:i:s"),
+			"usuario: " . $usuario,
+			"acao: upgrade hash bcrypt",
+			str_repeat("*", 60),
+		));
 	}
 }
