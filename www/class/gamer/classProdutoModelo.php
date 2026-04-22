@@ -20,6 +20,36 @@ class ProdutoModelo
     function ProdutoModelo() {
     }
 */
+	function __construct(
+		$pm_id 				= null,
+		$pm_p_id 			= null,
+		$pm_sNome 			= null,
+		$pm_sDescricao 		= null,
+		$pm_fValor 			= null,
+		$pm_blAtivo 		= null,
+		$pm_sNomeImagem 	= null,
+		$pm_dDataInclusao 	= null,
+		$pm_iPinValor 		= null,
+		$pm_iValorEPPCash	= null,
+		$ogpm_pin_resquest_id	= null,
+		$ogpm_pin_valor_markup	= null
+	) {
+		$this->ProdutoModelo(
+			$pm_id,
+			$pm_p_id,
+			$pm_sNome,
+			$pm_sDescricao,
+			$pm_fValor,
+			$pm_blAtivo,
+			$pm_sNomeImagem,
+			$pm_dDataInclusao,
+			$pm_iPinValor,
+			$pm_iValorEPPCash,
+			$ogpm_pin_resquest_id,
+			$ogpm_pin_valor_markup
+		);
+	}
+
 	function ProdutoModelo(
 		$pm_id 				= null,
 		$pm_p_id 			= null,

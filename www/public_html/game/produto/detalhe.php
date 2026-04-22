@@ -5,6 +5,16 @@ require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once DIR_INCS . "pdv/captura_inc.php";
 require_once DIR_CLASS . "gamer/classAlawarGames.php";
+require_once DIR_INCS . "writeIfPossible.php";
+function detalheProdutoHasValorLivre($produto) {
+    return trim((string)$produto->getValorMinimo()) !== "" || trim((string)$produto->getValorMaximo()) !== "";
+}
+
+function detalheProdutoLog($message, array $context = array()) {
+    $line = "[" . date("Y-m-d H:i:s") . "] " . $message . " " . json_encode($context) . PHP_EOL;
+    writeFileIfPossible("/www/arquivos_gerados/logs/produto-detalhe-modelos.log", $line);
+}
+
 $controller = new HeaderController;
 /*
  * Início controller
@@ -288,7 +298,7 @@ $controller->setHeader();
                 }
 
                 if (!$produto->getMostraIntegracao()) {
-                    if (is_null($produto->getValorMinimo()) && is_null($produto->getValorMaximo())) {
+                    if (!detalheProdutoHasValorLivre($produto)) {
                         $rs = null;
                         $filtro['ogpm_ativo'] = 1;
                         $produtoId = $prod;
@@ -308,8 +318,20 @@ $controller->setHeader();
                         $produto_ativo = 1;
                         $instProdutoModelo = new ProdutoModelo();
                         $ret = $instProdutoModelo->obter($filtro, "ogpm_valor asc", $rs);
+                        $qtdModelosDetalhe = $rs ? pg_num_rows($rs) : 0;
+                        detalheProdutoLog("consulta_modelos", array(
+                            "produto_id" => $produto->getId(),
+                            "produto_nome" => $produto->getNome(),
+                            "mostra_integracao" => $produto->getMostraIntegracao(),
+                            "valor_minimo" => $produto->getValorMinimo(),
+                            "valor_maximo" => $produto->getValorMaximo(),
+                            "pin_request" => $produto->getPinRequest(),
+                            "filtro" => $filtro,
+                            "qtd_modelos" => $qtdModelosDetalhe,
+                            "ret" => $ret
+                        ));
 
-                        if (!$rs || pg_num_rows($rs) == 0) {
+                        if (!$rs || $qtdModelosDetalhe == 0) {
                     ?>
                             <div class="row top10">
                                 <p class="pull-right txt-vermelho"><strong><em>Não existem modelos cadastrados para este produto.</em></strong></p>
