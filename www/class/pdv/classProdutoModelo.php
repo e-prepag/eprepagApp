@@ -19,6 +19,41 @@ class ProdutoModelo
 	var $ogpm_pin_valor_markup;
 
 
+	function __construct(
+		$pm_id 				= null,
+		$pm_p_id 			= null,
+		$pm_sNome 			= null,
+		$pm_sDescricao 		= null,
+		$pm_fValor 			= null,
+		$pm_fPercDesconto	= null,
+		$pm_blAtivo 		= null,
+		$pm_sNomeImagem 	= null,
+		$pm_dDataInclusao 	= null,
+		$pm_iPinValor 		= null,
+		$nomeProduto            = null,
+		$codOperador            = null,
+		$ogpm_pin_resquest_id	= null,
+		$ogpm_pin_valor_markup	= null
+	) {
+		$this->ProdutoModelo(
+			$pm_id,
+			$pm_p_id,
+			$pm_sNome,
+			$pm_sDescricao,
+			$pm_fValor,
+			$pm_fPercDesconto,
+			$pm_blAtivo,
+			$pm_sNomeImagem,
+			$pm_dDataInclusao,
+			$pm_iPinValor,
+			$nomeProduto,
+			$codOperador,
+			$ogpm_pin_resquest_id,
+			$ogpm_pin_valor_markup
+		);
+	}
+
+
 	function ProdutoModelo(
 		$pm_id 				= null,
 		$pm_p_id 			= null,
@@ -305,6 +340,25 @@ class ProdutoModelo
 
 		$ret = "";
 		$filtro = array_map("strtoupper", $filtro);
+		$filtro += array(
+			"com_produto" => null,
+			"ogpm_data_inclusaoMin" => null,
+			"ogpm_data_inclusaoMax" => null,
+			"ogpm_id" => null,
+			"ogpm_ogp_id" => null,
+			"ogpm_nome" => null,
+			"ogpm_nomeLike" => null,
+			"ogpm_descricao" => null,
+			"ogpm_descricaoLike" => null,
+			"ogpm_valorMin" => null,
+			"ogpm_valorMax" => null,
+			"ogpm_perc_descontoMin" => null,
+			"ogpm_perc_descontoMax" => null,
+			"ogpm_ativo" => null,
+			"ogpm_nome_imagem" => null,
+			"ogpm_nome_imagemLike" => null,
+			"ogpm_pin_valor" => null,
+		);
 
 		$sql = "select * from tb_dist_operadora_games_produto_modelo ogpm ";
 		if (!is_null($filtro['com_produto'])) $sql .= "inner join tb_dist_operadora_games_produto ogp on ogp.ogp_id = ogpm.ogpm_ogp_id";
