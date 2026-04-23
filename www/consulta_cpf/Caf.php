@@ -64,12 +64,11 @@ class ClassCaf
                 if (is_array($data) && count($data) > 0 && isset($data["data"]["taxIdNumber"])) {
 
                     $arquivo = '/www/arquivos_gerados/logs/logCaf.txt';
-
-                    $abre_arquivo = fopen($arquivo, 'a+');
-
-                    fwrite($abre_arquivo, $response . "\n");
-
-                    fclose($abre_arquivo);
+                    $abre_arquivo = @fopen($arquivo, 'a+');
+                    if ($abre_arquivo) {
+                        fwrite($abre_arquivo, $response . "\n");
+                        fclose($abre_arquivo);
+                    }
 
                     // Extrai CPF e data de nascimento
                     $dataNascimento = substr($data["data"]["birthDate"], 0, 10);
@@ -97,12 +96,10 @@ class ClassCaf
                     $error = 'Erro ao fazer a requisicaoo cURL: ' . curl_error($ch);
 
                     $arquivo = '/www/arquivos_gerados/logs/logCaferror.txt';
-
-                    $abre_arquivo = fopen($arquivo, 'a+');
-
+                    $abre_arquivo = @fopen($arquivo, 'a+');
                     if ($abre_arquivo) {
-                        fwrite($abre_arquivo, $error . "\n"); // Escreve a mensagem de erro
-                        fwrite($abre_arquivo, $response . "\n"); // Escreve a resposta da requisicao, se houver
+                        fwrite($abre_arquivo, $error . "\n");
+                        fwrite($abre_arquivo, $response . "\n");
                         fclose($abre_arquivo);
                     }
 
@@ -117,12 +114,10 @@ class ClassCaf
                 $error = 'Erro ao fazer a requisicaoo cURL: ' . curl_error($ch);
 
                 $arquivo = '/www/arquivos_gerados/logs/logCaferror.txt';
-
-                $abre_arquivo = fopen($arquivo, 'a+');
-
+                $abre_arquivo = @fopen($arquivo, 'a+');
                 if ($abre_arquivo) {
-                    fwrite($abre_arquivo, $error . "\n"); // Escreve a mensagem de erro
-                    fwrite($abre_arquivo, $response . "\n"); // Escreve a resposta da requisicao, se houver
+                    fwrite($abre_arquivo, $error . "\n");
+                    fwrite($abre_arquivo, $response . "\n");
                     fclose($abre_arquivo);
                 }
 

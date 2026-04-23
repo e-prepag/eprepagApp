@@ -345,11 +345,13 @@ class classCPF
                                                         $caf = new ClassCaf();
                                                         $lista_resposta = $caf->consultaCPF($requestParams['cpfcnpj'], $requestParams['data_nascimento']);
 
-                                                        $file = fopen("/www/arquivos_gerados/logs/logCaf.txt", "a+");
-                                                        fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
-                                                        fwrite($file, "resposta lista_resposta: " . json_encode($lista_resposta) . "\n");
-                                                        fwrite($file, str_repeat("*", 50) . "\n");
-                                                        fclose($file);
+                                                        $file = @fopen("/www/arquivos_gerados/logs/logCaf.txt", "a+");
+                                                        if ($file) {
+                                                                fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
+                                                                fwrite($file, "resposta lista_resposta: " . json_encode($lista_resposta) . "\n");
+                                                                fwrite($file, str_repeat("*", 50) . "\n");
+                                                                fclose($file);
+                                                        }
 
                                                         if (isset($lista_resposta["pesquisas"]["camposResposta"]["status"])) {
 

@@ -135,7 +135,7 @@ if ($controller->usuario->b_IsLogin_pagamento_free()) {
     $pagamentos_diario_const = $RISCO_GAMERS_PAGAMENTOS_DIARIO;
 
     $prodmod = new ProdutoModelo;
-    $dds = "";
+    $dds = [];
     $exige = [];
     $idadeproduto = [];
     $exigeCPF = levantamentoPublisherObrigatorioCPF($dds);
