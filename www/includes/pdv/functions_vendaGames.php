@@ -219,7 +219,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
     } while (true);
 }
 
-function processaVendaGames($venda_id, $EstabCod, $parametros)
+function processaVendaGames($venda_id, $EstabCod, &$parametros)
 {
     set_time_limit(0);
     global $raiz_do_projeto;
@@ -1588,6 +1588,7 @@ function processaAgendamentos($lista = null)
                     if ($BtnProcessa) {
                         //Associa pins, gera venda e credita saldo
                         if ($msgConcilia == "") {
+                            $parametros = [];
                             $parametros["ultimo_status_obs"] = $ultimo_status_obs;
                             //if($bDebug)
                             echo "  �ltimo status $ultimo_status_obs (" .
