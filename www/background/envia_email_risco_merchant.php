@@ -31,7 +31,7 @@ function verificaData($data, $quantidadeMeses)
 }
 
 function sanitiza($string){
-    return utf8_decode(htmlspecialchars(utf8_encode($string), ENT_QUOTES, 'UTF-8'));
+    return mb_convert_encoding(htmlspecialchars(mb_convert_encoding((string)$string, 'UTF-8', 'ISO-8859-1'), ENT_QUOTES, 'UTF-8'), 'ISO-8859-1', 'UTF-8');
 }
 
 function renderMerchantItem($merchant, $nivel) {
@@ -98,7 +98,7 @@ try {
         foreach ($merchants as &$merchant) {
             // Verifica se a data de atualização é válida
 
-            $merchant['data_observacao'] = substr($merchant['data_observacao'], 0, 10);
+            $merchant['data_observacao'] = isset($merchant['data_observacao']) && $merchant['data_observacao'] !== null ? substr((string)$merchant['data_observacao'], 0, 10) : null;
 
             if (isset($merchant['data_observacao']) && $merchant['data_observacao'] !== null && validarData($merchant['data_observacao'])) {
 

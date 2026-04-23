@@ -7,11 +7,15 @@ declare(strict_types=1);
  * returns the sanitized version of $params[]
  *
  * @param array<string, array<int, string>> $params
- * @param string $err_cod
+ * @param ?string $err_cod
  * @return array<string, mixed>
  */
-function sanitize_input_data_array(array $params, string &$err_cod): array
+function sanitize_input_data_array(array $params, ?string &$err_cod): array
 {
+    if ($err_cod === null) {
+        $err_cod = '';
+    }
+
     /** @var array<string, mixed> $params_out */
     $params_out = [];
     foreach ($params as $key => $val) {

@@ -42,7 +42,7 @@ if(!$arquivoLog->haveFile()) {
             }
             $msg_log .= $list_errors.PHP_EOL;
             
-            echo utf8_encode($msg_log);
+            echo mb_convert_encoding((string)$msg_log, 'UTF-8', 'ISO-8859-1');
 
             if($num_rows >= ALERT_NUMBER){
                 $msg_prob = "Foram detectados ".$num_rows." problema(s) com o sistema de consulta de CPF nos últimos ".VERIFY_TIME." minutos!".PHP_EOL."<br>Por favor, verifique se há algo de errado! Mais detalhes abaixo:<br><br>".str_replace(PHP_EOL, "<br><br>", $list_errors);
