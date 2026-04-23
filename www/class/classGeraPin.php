@@ -88,8 +88,8 @@ class GeraPinVariavel
 
 		$rs_lote = $query->fetch(PDO::FETCH_ASSOC);
 
-		if (!$rs_lote || count($rs_lote) == 0) {
-			$rs_lote = 1;
+		if (!$rs_lote || count($rs_lote) == 0 || !isset($rs_lote["max_pin_lote_codigo"])) {
+			$rs_lote = array("max_pin_lote_codigo" => 1);
 		}
 
 
@@ -100,8 +100,8 @@ class GeraPinVariavel
 
 		$rs_serial = $query->fetch(PDO::FETCH_ASSOC);
 
-		if (!$rs_serial || count($rs_serial) == 0) {
-			$rs_serial = 1;
+		if (!$rs_serial || count($rs_serial) == 0 || !isset($rs_serial["max_serial"])) {
+			$rs_serial = array("max_serial" => 1);
 		}
 
 		//instanciando a classe de cryptografia
@@ -131,8 +131,8 @@ class GeraPinVariavel
 
 		if ($aux_spin_codigo == $spin_codigo) {
 
-			$rs_serial++;
-			$spin_serial = str_pad(number_format($rs_serial, 0, '', ''), 10, "0", STR_PAD_LEFT);
+			$rs_serial["max_serial"]++;
+			$spin_serial = str_pad(number_format($rs_serial["max_serial"], 0, '', ''), 10, "0", STR_PAD_LEFT);
 
 			$sql = "SELECT * FROM pins where pin_codigo = '" . $spin_codigo . "' and opr_codigo = " . $this->opr_codigo . ";";
 			$query = $this->connection->prepare($sql);

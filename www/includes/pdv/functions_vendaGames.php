@@ -515,11 +515,41 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                             $i--;
                             continue;
                         }
-                    } catch (Exception $err) {
+                    } catch (Throwable $err) {
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                         if ($ff) {
-                        fwrite($ff, "Gerar PIN deu erro: " . $err->getMessage() . "\n");
+                        fwrite(
+                            $ff,
+                            "Gerar PIN deu erro (" .
+                                get_class($err) .
+                                ") venda: " .
+                                $venda_id .
+                                ", vgm_id: " .
+                                $vgm_id .
+                                ", msg: " .
+                                $err->getMessage() .
+                                "\n"
+                        );
+
+                        fclose($ff);
+                        }
+                    }
+
+                    if ($msg == "" && (!isset($pin_codinterno) || !is_numeric($pin_codinterno))) {
+                        $msg = "Erro ao gerar pin variavel." . PHP_EOL;
+
+                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+
+                        if ($ff) {
+                        fwrite(
+                            $ff,
+                            "Gerar PIN nao retornou pin_codinterno valido. venda: " .
+                                $venda_id .
+                                ", vgm_id: " .
+                                $vgm_id .
+                                "\n"
+                        );
 
                         fclose($ff);
                         }
