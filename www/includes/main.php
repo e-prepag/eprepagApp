@@ -1,7 +1,7 @@
 <?php
 //error_reporting(E_ALL & ~E_NOTICE);
 
-$ipVisitante = $_SERVER['REMOTE_ADDR'];
+$ipVisitante = $_SERVER['REMOTE_ADDR'] ?? '';
 
 // IP que você deseja redirecionar para fora do site
 $ipsBloqueados = [

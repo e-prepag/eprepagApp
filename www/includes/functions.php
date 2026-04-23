@@ -98,9 +98,11 @@ function SQLexecuteQuery(mixed $sql): mixed
 	$callerFile = $backtrace[0]['file'];  // Pega o caminho do arquivo que chamou
 	$callerDir = dirname($callerFile);   // Obt�m o diret�rio do arquivo que chamou
 
+	$httpHost = $_SERVER['HTTP_HOST'] ?? '';
+
 	if (
 		strpos($callerDir, 'public_html') === false
-		&& strpos($_SERVER['HTTP_HOST'], '' . EPREPAG_URL . '') == false
+		&& strpos($httpHost, '' . EPREPAG_URL . '') == false
 	) {
 		// Se n�o est� na pasta public_html, n�o faz log
 		return $ret;

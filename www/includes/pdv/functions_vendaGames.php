@@ -3,8 +3,9 @@
 $bHTML = null;
 $cReturn = PHP_EOL;
 $cSpaces = "    ";
+$remoteAddr = $_SERVER["REMOTE_ADDR"] ?? "";
 
-if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
+if ($remoteAddr == "201.93.162.169") {
     //ini_set('display_errors', 1);
     //ini_set('display_startup_errors', 1);
     //error_reporting(E_ALL);
@@ -238,6 +239,9 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
     }
 
     $msg = "";
+    $msgOut = "";
+    $total_venda = 0;
+    $s_info_venda = "";
 
     //Recupera a venda
     if ($msg == "") {
@@ -940,6 +944,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 function processaEmailVendaGames($venda_id, $parametros)
 {
     $msg = "";
+    $msgOut = "";
 
     //Recupera a venda
     if ($msg == "") {
@@ -1438,6 +1443,7 @@ function processaAgendamentos($lista = null)
         echo $header . $cReturn;
     }
     $msg = "";
+    $msgOut = "";
     if ($bDebug) {
         echo "Elapsed time A0(agendamento): " .
             number_format(getmicrotime() - $time_start_stats, 2, ".", ".") .
@@ -1573,6 +1579,9 @@ function processaAgendamentos($lista = null)
                     $msgConcilia = "";
                     $msgConciliaUsuario = "";
                     $BtnProcessa = 1;
+                    $BtnProcessaEmail = 0;
+                    $repetir_em = "";
+                    $agendamento_acao_obs = "";
                     $venda_id = $ae_vg_id;
                     $ultimo_status_obs = $ae_vg_ultimo_status_obs;
 
@@ -1659,11 +1668,11 @@ function processaAgendamentos($lista = null)
                             } else {
                                 //reagendamento
                                 $agendamento_acao =
-                                    $parametros["agendamento_acao"];
+                                    $parametros["agendamento_acao"] ?? "";
                                 $agendamento_acao_obs =
-                                    $parametros["agendamento_acao_obs"];
+                                    $parametros["agendamento_acao_obs"] ?? "";
                                 $agendamento_acao_repetir_em =
-                                    $parametros["agendamento_acao_repetir_em"];
+                                    $parametros["agendamento_acao_repetir_em"] ?? "";
                                 if ($agendamento_acao) {
                                     if ($agendamento_acao == "cancelar") {
                                         $ae_status = 3;
