@@ -956,9 +956,11 @@ $GLOBALS["jquery"] = true;
 
                                 $abre_arquivo = fopen($arquivo, 'a+');
 
+                                if ($abre_arquivo) {
                                 fwrite($abre_arquivo, json_encode($params) . "\n");
 
                                 fclose($abre_arquivo);
+                                }
 
                                 usleep(800000);
                                 echo $pix->callService($params);

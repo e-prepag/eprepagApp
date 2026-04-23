@@ -37,7 +37,9 @@ if(isset($Registrar) && $Registrar) {
                 //Abre arquivo e le conteudo
                 $handle = fopen($fileTemp, "r");
                 $arquivoRetorno = fread($handle, filesize($fileTemp));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 //le header
                 $arquivoRetornoAr = preg_split("/\n/", $arquivoRetorno);

@@ -151,7 +151,9 @@ function Ongame_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -328,7 +330,9 @@ function BilaGames_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -505,7 +509,9 @@ function AeriaGames_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -682,7 +688,9 @@ function OGPlanet_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -880,7 +888,9 @@ function processaLote_Axeso5($fileSource, $nomeArq, $opr_codigo, $fcanal){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.".PHP_EOL;
@@ -1027,7 +1037,9 @@ function processaLote_BHN($fileSource, $nomeArq, $opr_codigo, $fcanal){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -1162,7 +1174,9 @@ function GlobalGames_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -1342,7 +1356,9 @@ function GlobalGames2_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -1518,7 +1534,9 @@ function StarDoll_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -1749,7 +1767,9 @@ function Softnyx_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -1925,7 +1945,9 @@ function Jolt_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -2098,7 +2120,9 @@ function Cosmopax_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -2280,7 +2304,9 @@ function Hive_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -2451,7 +2477,9 @@ function Escola24h_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -2612,7 +2640,9 @@ function Escola24h_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -2798,7 +2828,9 @@ function Escola24h_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -2949,7 +2981,9 @@ function Escola24h_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -3101,7 +3135,9 @@ function Escola24h_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -3261,7 +3297,9 @@ function MUOnline_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -3442,7 +3480,9 @@ function GPotato_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -3639,7 +3679,9 @@ function FHLGames_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -3835,7 +3877,9 @@ function YNKinteractive_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -4009,7 +4053,9 @@ function PayByCash_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -4189,7 +4235,9 @@ function Webzen_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -4370,7 +4418,9 @@ function Coolnex_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -4561,7 +4611,9 @@ function KOL_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -4749,7 +4801,9 @@ function Acclaim_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -4939,7 +4993,9 @@ function NDoors_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -5129,7 +5185,9 @@ function Ignitedgames_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -5316,7 +5374,9 @@ function Ticket_Surf_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -5508,7 +5568,9 @@ function GameGol_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -5680,7 +5742,9 @@ function GameIS_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -5853,7 +5917,9 @@ function Kaizen_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -6032,7 +6098,9 @@ function Onnet_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -6208,7 +6276,9 @@ function fun_77PB_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -6383,7 +6453,9 @@ function Alawar_traduzKValor($k){
 		if($msg == ""){
 			$handle = fopen($fileSource, "r");
 			$carga = fread($handle, filesize($fileSource));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			$cargaAr = explode("\n", (string)($carga ?? ""));
 			if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -6560,7 +6632,9 @@ function processaLote_EletronicArts($fileSource, $nomeArq, $opr_codigo, $loteVal
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
@@ -6682,7 +6756,9 @@ function processaLote_CheckOk($fileSource, $nomeArq, $opr_codigo, $loteValor, $f
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
         } 
@@ -6804,7 +6880,9 @@ function processaLote_XBox($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -6962,7 +7040,9 @@ function processaLote_Encripta($fileSource, $nomeArq, $opr_codigo, $loteValor, $
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -7116,7 +7196,9 @@ function processaLote_Valvesoftware($fileSource, $nomeArq, $opr_codigo, $loteVal
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -7280,7 +7362,9 @@ function processaLote_G2A($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcana
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -7428,7 +7512,9 @@ function processaLote_NoPing($fileSource, $nomeArq, $opr_codigo, $loteValor, $fc
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -7585,7 +7671,9 @@ function processaLote_Rimo($fileSource, $nomeArq, $opr_codigo, $loteValor, $fcan
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -7755,7 +7843,9 @@ function processaLote_HabboHotel_2($fileSource, $nomeArq, $opr_codigo, $loteValo
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -7903,7 +7993,9 @@ function processaLote_SurfTelecom($fileSource, $nomeArq, $opr_codigo, $fcanal){
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.".PHP_EOL;
@@ -8022,7 +8114,9 @@ function processaLote_ExitLag($fileSource, $nomeArq, $opr_codigo, $fcanal){
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";
@@ -8197,7 +8291,9 @@ function processaLote_Tinder($fileSource, $nomeArq, $opr_codigo, $fcanal){
         if($msg == ""){
                 $handle = fopen($fileSource, "r");
                 $carga = fread($handle, filesize($fileSource));
+                if ($handle) {
                 fclose($handle);
+                }
 
                 $cargaAr = explode("\n", (string)($carga ?? ""));
                 if((is_countable($cargaAr) ? count($cargaAr) : 0) == 0) $msg = "Arquivo vázio.\n";

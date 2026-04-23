@@ -17,8 +17,10 @@ if (isset($_REQUEST['formsubmit'])) {
     $_REQUEST['cpf'] = preg_replace('/[^0-9]/', '', $_REQUEST['cpf']);
 
     $ff = fopen("/www/arquivos_gerados/logs/ttcpf.txt", "a+");
+    if ($ff) {
     fwrite($ff, $_REQUEST['cpf'] . "\r");
     fclose($ff);
+    }
 
     //Novo modelo de Consulta
 
@@ -77,11 +79,13 @@ if (isset($_REQUEST['formsubmit'])) {
         elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB) {
 
             $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+            if ($file) {
             fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
             fwrite($file, "codigo cpf: " . $testeCPF . "\n");
             fwrite($file, "resultado: " . json_encode($resposta) . "\n");
             fwrite($file, str_repeat("*", 50) . "\n");
             fclose($file);
+            }
 
             if ($testeCPF == 2) {
                 $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
@@ -117,11 +121,13 @@ if (isset($_REQUEST['formsubmit'])) {
         } else {
 
             $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+            if ($file) {
             fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
             fwrite($file, "parametros " . json_encode($parametros) . "\n");
             fwrite($file, "resultado PASSO 4 " . $testeCPF . "\n");
             fwrite($file, str_repeat("*", 50) . "\n");
             fclose($file);
+            }
 
             //var_dump($testeCPF);
             //var_dump($resposta);
@@ -152,12 +158,14 @@ if (isset($_REQUEST['formsubmit'])) {
         }
 
         $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+        if ($file) {
         fwrite($file, "hud do desenvolvedor \n");
         fwrite($file, "resultado code " . $testeCPF . "\n");
         fwrite($file, "resultado json " . json_encode($resposta) . "\n");
         fwrite($file, "retorno json " . json_encode($retorno) . "\n");
         fwrite($file, str_repeat("*", 50));
         fclose($file);
+        }
     } //end elseif ($testeCPF != 171)
 
     // Atingiu o limite máximo de utilização do mesmo CPF

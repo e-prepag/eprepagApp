@@ -809,8 +809,10 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		$log .= htmlspecialchars_decode($msg);			
 						
 		$fp = fopen($fileLog, 'a+');
+		if ($fp) {
 		fwrite($fp, $log);
 		fclose($fp);		
+		}
 	}//end function logEvents
 
 

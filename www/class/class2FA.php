@@ -45,11 +45,13 @@ class TwoFactorAuthenticator
 	{
 		try {
 			$file = fopen($this->project_root . "arquivos_gerados/logs/2fa_tokens.txt", "a+");
+			if ($file) {
 			fwrite($file, str_repeat("*", 50) . "\n");
 			fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 			fwrite($file, "Teste Livrodjx" . "\n");
 			fwrite($file, "email: " . $email . "\n");
 			fclose($file);
+			}
 		} catch (Exception $e) {
 			echo "Error(6) writing monitor file [" . date("Y-m-d H:i:s") . "]: " . $e->getMessage() . PHP_EOL;
 		}

@@ -496,7 +496,9 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         }
 
         $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+        if ($fileLog) {
         fwrite($fileLog, "ID VENDA CONCILIA��O ONLINE: " . $venda_id . "\n");
+        }
 
         //Recupera a venda
         if ($msg == "") {
@@ -1128,7 +1130,9 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         $msg = "";
 
         $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+        if ($fileLog) {
         fwrite($fileLog, "ID VENDA PROCESSA VENDA: " . $venda_id . "\n");
+        }
 
         // Levanta venda de Campeonato
         $b_isVendaCampeonato = isVendaCampeonato($venda_id);
@@ -1506,7 +1510,9 @@ function processaEmailVendaGames($venda_id, $parametros)
         $isExpressMoney = false;
 
         $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+        if ($fileLog) {
         fwrite($fileLog, "ID VENDA PROCESSA VENDA EMAIL: " . $venda_id . "\n");
+        }
 
 
         // Variavel teste se N�O tem PIN de Requisi��o
@@ -4725,8 +4731,10 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
         if ($rs_transacoes) {
 
                 $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+                if ($fileLog) {
                 fwrite($fileLog, "DATA DE REQUISI��O: " . date("d-m-Y H:i:s") . "\n");
                 fwrite($fileLog, "MODO DE CONCILIA��O: " . (($webhook === true) ? "WEBHOOK" : "SONDA") . "\n");
+                }
 
                 $registros_total = pg_num_rows($rs_transacoes);
                 $npags = $registros_total;

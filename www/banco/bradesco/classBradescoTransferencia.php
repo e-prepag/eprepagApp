@@ -165,8 +165,10 @@ class classBradescoTransferencia{
 		$log .= htmlspecialchars_decode($msg);			
 						
 		$fp = fopen($fileLog, 'a+');
+		if ($fp) {
 		fwrite($fp, $log);
 		fclose($fp);		
+		}
 	}
     
     private function array_to_xml(array $arr, SimpleXMLElement $xml){

@@ -163,10 +163,12 @@ class classCPF
                                 $resultWS = $this->soapClient->__soapCall($typeOfService, $cpfRequestRecord);
 
                                 $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+                                if ($file) {
                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                 fwrite($file, "retorno omnidata soap = PASSO 1 " . json_encode($resultWS) . "\n");
                                 fwrite($file, str_repeat("*", 50) . "\n");
                                 fclose($file);
+                                }
 
                                 $this->logEvents("<hr>SUCESSO" . PHP_EOL . "<pre>" . htmlentities(str_replace("><", ">\n<", $this->getTransactionMessages())) . "</pre>" . PHP_EOL . "<hr>", CPF_MSG_ERROR_LOG, 0);
 
@@ -262,11 +264,13 @@ class classCPF
                                 $serialCheck = new verificaCPF_OMNIDATA();
                                 $serialCheckResponseObj = $serialCheck->getRequestData($requestParams);
                                 $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+                                if ($file) {
                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                 fwrite($file, "params felipe: " . json_encode($requestParams) . "\n");
                                 fwrite($file, "resposta omnidata = verificaCPF_OMNIDATA " . json_encode($serialCheckResponseObj) . "\n");
                                 fwrite($file, str_repeat("*", 50) . "\n");
                                 fclose($file);
+                                }
                                 return $serialCheckResponseObj;
                         } //end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)
                 } //end if ($typeOfService == CPF_XML_REQUISICAO) 
@@ -287,11 +291,13 @@ class classCPF
                                 $serialCheck = new verificaCPF_OMNIDATA();
                                 $serialCheckResponseObj = $serialCheck->getResponseData($soapResponseData);
                                 $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+                                if ($file) {
                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                 fwrite($file, "params felipe: " . json_encode($soapResponseData) . "\n");
                                 fwrite($file, "resposta omnidata = soapResponseData " . json_encode($serialCheckResponseObj) . "\n");
                                 fwrite($file, str_repeat("*", 50) . "\n");
                                 fclose($file);
+                                }
                                 return $serialCheckResponseObj;
                         } //end elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA)
                 } //end if ($typeOfService == CPF_XML_REQUISICAO)
@@ -388,12 +394,14 @@ class classCPF
                                                         $tempoRetorno = 0;
                                                         $lista_resposta = $onminidata->result_status_search($id_search);
                                                         $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
+                                                        if ($file) {
                                                         fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                         fwrite($file, "params felipe: " . json_encode($result) . "\n");
                                                         fwrite($file, "resposta id_search: " . json_encode($id_search) . "\n");
                                                         fwrite($file, "resposta lista_resposta: " . json_encode($lista_resposta) . "\n");
                                                         fwrite($file, str_repeat("*", 50) . "\n");
                                                         fclose($file);
+                                                        }
 
                                                         while (
                                                                 $lista_resposta["pesquisas"]["camposResposta"]["status"] != "DadoDisponivel" &&
@@ -408,6 +416,7 @@ class classCPF
                                                                 $tempoRetorno++;
                                                                 sleep(10);
                                                                 $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
+                                                                if ($file) {
                                                                 fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                                 fwrite($file, "params felipe: " . json_encode($result) . "\n");
                                                                 fwrite($file, "tentativa numero: " . $tempoRetorno . "\n");
@@ -415,6 +424,7 @@ class classCPF
                                                                 fwrite($file, "resposta lista_resposta: " . json_encode($lista_resposta) . "\n");
                                                                 fwrite($file, str_repeat("*", 50) . "\n");
                                                                 fclose($file);
+                                                                }
                                                         }
                                                 }
 
@@ -425,11 +435,13 @@ class classCPF
                                                 elseif (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_OMNIDATA) {
 
                                                         $file = fopen("/www/arquivos_gerados/logs/logONMINIDATA.txt", "a+");
+                                                        if ($file) {
                                                         fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
                                                         fwrite($file, "params felipe: " . json_encode($responseCPF) . "\n");
                                                         fwrite($file, "resposta CPF_PARTNER_OMNIDATA: " . json_encode($lista_resposta) . "\n");
                                                         fwrite($file, str_repeat("*", 50) . "\n");
                                                         fclose($file);
+                                                        }
 
 
 
@@ -491,8 +503,10 @@ class classCPF
                 $log .= htmlspecialchars_decode($msg);
 
                 $fp = fopen($fileLog, 'a+');
+                if ($fp) {
                 fwrite($fp, $log);
                 fclose($fp);
+                }
         } //end function logEvents
 
         public function array_to_xml(array $arr, SimpleXMLElement $xml)
@@ -564,10 +578,12 @@ class classCPF
                 curl_close($curl);
 
                 $file_log = fopen("/www/arquivos_gerados/logs/retorono_hub_desenvolvedor.txt", "a+");
+                if ($file_log) {
                 fwrite($file_log, "data: " . date("d-m-Y H:i:s") . "\n");
                 fwrite($file_log, "resultado: " . json_encode($retorno) . "\n");
                 fwrite($file_log, str_repeat("*", 50) . "\n");
                 fclose($file_log);
+                }
 
                 if ($curlInfo["http_code"] == 200) {
                         return $retorno;

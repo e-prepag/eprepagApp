@@ -246,6 +246,7 @@ class RecebePix
 
 		$confirmaConciliacao = ($novoStatus != $antigoStatus) ? "CONCILIADO COM SUCESSO" : "PEDIDO JÝ CONCILIADO";
 		$file = fopen("/www/arquivos_gerados/logs/log_webhook.txt", "a+");
+		if ($file) {
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 		fwrite($file, "ID VENDA: " . $idVenda . "\n");
@@ -258,6 +259,7 @@ class RecebePix
 		fwrite($file, "AMBIENTE VENDA: " . $this->ambiente . "\n");
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fclose($file);
+		}
 	}
 
 	public function conciliaPix($informacoes)
@@ -328,22 +330,26 @@ class RecebePix
 
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
 				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
+				if ($file) {
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");
 				fwrite($file, "VENDA: " . $venda["idvenda"] . "\n");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fclose($file);
+				}
 				echo "e-mail enviado com sucesso";
 			} else {
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
 				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
+				if ($file) {
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");
 				fwrite($file, "VENDA: " . $venda["idvenda"] . "\n");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fclose($file);
+				}
 				echo "erro e-mail";
 			}
 		} else {

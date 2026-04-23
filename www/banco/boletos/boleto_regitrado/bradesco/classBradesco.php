@@ -82,8 +82,10 @@ class classBradesco{
 		$log .= htmlspecialchars_decode($msg);			
 						
 		$fp = fopen($fileLog, 'a+');
+		if ($fp) {
 		fwrite($fp, $log);
 		fclose($fp);		
+		}
 	}
     
     public function array_to_xml(array $arr, SimpleXMLElement $xml)

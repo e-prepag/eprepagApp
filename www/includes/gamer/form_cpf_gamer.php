@@ -88,12 +88,14 @@ if (isset($_POST['formsubmit'])) {
             elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB) {
 
                 $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+                if ($file) {
                 fwrite($file, "hud do desenvolvedor \n");
                 fwrite($file, "resultado code " . $testeCPF . "\n");
                 fwrite($file, "resultado json " . json_encode($resposta) . "\n");
                 fwrite($file, "retorno json " . json_encode($retorno) . "\n");
                 fwrite($file, str_repeat("*", 50));
                 fclose($file);
+                }
 
                 if ($testeCPF == 2) {
                     $errors[] = "Este n�mero de CPF parece n�o constar na Receita Federal. Por favor, verifique o n�mero digitado e tente novamente.";

@@ -190,8 +190,10 @@ for ($i = 0; $i <= count($gwF)-1; $i++) {
 
 $myFile = "map/exibeBCG.php";
 $fh = fopen($myFile, 'w');
+if ($fh) {
 fwrite($fh, $dados);
 fclose($fh);
+}
 
 include('map/exibeBCG.php');
 ?>

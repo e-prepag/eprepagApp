@@ -136,8 +136,10 @@ class Norton{
         $log .= htmlspecialchars_decode($msg);			
 
         $fp = fopen($fileLog, 'a+');
+        if ($fp) {
         fwrite($fp, $log);
         fclose($fp);		
+        }
     }//end function logEvents($msg, $tipoLog = 'ERROR_LOG')
     
     public function getErrorMessages($resultWS, $isSoapFault = true) {

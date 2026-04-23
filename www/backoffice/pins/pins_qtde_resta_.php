@@ -90,8 +90,10 @@ if(isset($Submit) && $Submit){
 echo $sql;
 
     $fp=fopen("../../debug.log","ab");
+	if ($fp) {
 	fwrite($fp,"\r\nIn Pins_Qtde Like as:\r\n".$sql."\r\n");
 	fclose($fp);
+	}
 	$resoprbrt = pg_exec($connid, $sql);
 */	
 	$varsel = "&fopr=$fopr&fvalor=$fvalor";

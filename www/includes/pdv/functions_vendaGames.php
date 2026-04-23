@@ -78,7 +78,9 @@ function verificaEstoque($venda_id)
 {
     $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+    if ($ff) {
     fwrite($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
+    }
 
     $msg = "";
 
@@ -448,9 +450,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 if ($vgm_ogp_id == 488) {
                     $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+                    if ($ff) {
                     fwrite($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
 
                     fclose($ff);
+                    }
                     try {
                         $geraPinEpp = new GeraPinVariavel($vgm_pin_valor, 53, 3, 1);
 
@@ -458,8 +462,10 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+                        if ($ff) {
                         fwrite($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
                         fwrite($ff, "VGM_ID: " . $vgm_id . "\n");
+                        }
 
 
                         $sql =
@@ -508,9 +514,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     } catch (Exception $err) {
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+                        if ($ff) {
                         fwrite($ff, "Gerar PIN deu erro: " . $err->getMessage() . "\n");
 
                         fclose($ff);
+                        }
                     }
                 } else {
                     //Sleep para nao sobrecarregar o servidor
@@ -539,8 +547,10 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         $vgm_pin_request == 0
                     ) {
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        if ($ff) {
                         fwrite($ff, "Entra aqui ??? " . $vgm_ogp_id);
                         fclose($ff);
+                        }
                         // Executa uma verifica��o se o a senha do pin � zerada, se for exibe o campo pin_caracter
                         $resultado = buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug);
 
@@ -1743,9 +1753,11 @@ function processaAgendamentos($lista = null)
                 "w"
             )
         ) {
+            if ($handle) {
             fwrite($handle, $smonitor);
 
             fclose($handle);
+            }
         } else {
             echo PHP_EOL .
                 "Error: Couldn't open Monitor File for writing" .

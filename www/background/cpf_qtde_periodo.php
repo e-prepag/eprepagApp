@@ -158,7 +158,9 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
     $retorno_cpf = SQLexecuteQuery($conexao, $sql);
     while($cpfs = pg_fetch_array($retorno_cpf)) {
     
+        if ($arquivo) {
         fwrite($arquivo, $cpfs["cpf"].PHP_EOL);   
+        }
         
     } //end
     fclose($arquivo);

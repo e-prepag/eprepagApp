@@ -18,7 +18,9 @@ $usuarios = new UsuarioGames;
 if (isset($_POST['login']) && !empty($_POST['login'])) {
 
     $fileLog = fopen("/www/arquivos_gerados/logs/cadastro_games.txt", "a+");
+    if ($fileLog) {
     fwrite($fileLog, "Dta requisão: " . date("d-m-Y H:i:s") . "\n");
+    }
     $postLog = $_POST;
     $chavesSensiveis = ['senha', 'conf_senha', 'cpf', 'data_nascimento', 'telefone', 'celular', 'ipAdress', 'location', 'device', 'g-recaptcha-response'];
     foreach ($chavesSensiveis as $key) {

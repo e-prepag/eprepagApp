@@ -26,8 +26,10 @@ class ManipulacaoArquivosLog {
 
     public function createLockedFile() {
         $newfile = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', 'w');
+        if ($newfile) {
         fwrite($newfile, getmypid());
         fclose($newfile);
+        }
     }//end function createLockedFile
 
     public function deleteLockedFile() {
@@ -49,8 +51,10 @@ class ManipulacaoArquivosLog {
 
     public function showBusy(){
         $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().".busy","a");
+        if ($fp) {
         fwrite($fp, date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] ." ==> Programa em uso.".PHP_EOL);
         fclose($fp);
+        }
     }//end function showBusy
     
     private function isProcess($pid){
@@ -67,7 +71,9 @@ class ManipulacaoArquivosLog {
     private function readFile() {
         $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', "r");
         $data = fgets($fp, 1024);
+        if ($fp) {
         fclose($fp);
+        }
         return $data;
     }//end readFile()
     
@@ -79,8 +85,10 @@ class ManipulacaoArquivosLog {
 function callbackLog($buffer){
     global $nome_arquivo;
     $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$nome_arquivo.".log","a");
+    if ($fp) {
     fwrite($fp, $buffer);
     fclose($fp);
+    }
 }//end function callbackLog
 
 ?>

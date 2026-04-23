@@ -214,6 +214,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										$body = json_encode($post_parameters);
 										$dados_CURL = json_encode($infoCURL);
 										$dados_buffer = json_encode($buffer);
+										if ($file) {
 										fwrite($file, '####### START #######' . PHP_EOL .
 											date('d-m-Y H:i:s') . PHP_EOL .
 											'IP ' . $_SERVER['REMOTE_ADDR'] . PHP_EOL .
@@ -225,6 +226,7 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 											'Timer Script: ' . PHP_EOL . "O script levou " . round(($fim_timer - $inicio_timer), 4) . " segundos." . PHP_EOL .
 											'####### END #######' . PHP_EOL);
 										fclose($file);
+										}
 
 										if (is_array($headers)) {
 											//logEventsONGAME('ERROR: ['.print_r($erros_curl,true).']'.PHP_EOL.'VERSION: '.print_r(curl_version(),true).PHP_EOL);

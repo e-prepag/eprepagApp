@@ -147,12 +147,14 @@ if (isset($_REQUEST['formsubmit'])) {
             }
         } else {
             $file = fopen("/www/arquivos_gerados/logs/retorno_cpf_OMNIDATA.txt", "a+");
+            if ($file) {
             fwrite($file, "logs para teste \n");
             fwrite($file, "resultado code: " . $testeCPF . "\n");
             fwrite($file, "resultado parametros: " . json_encode($parametros) . "\n");
             fwrite($file, "resultado resposta: " . json_encode($resposta) . "\n");
             fwrite($file, str_repeat("*", 50));
             fclose($file);
+            }
             if ($testeCPF == 2 || $testeCPF == 8) {
                 $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
             } elseif ($testeCPF == 1) {
