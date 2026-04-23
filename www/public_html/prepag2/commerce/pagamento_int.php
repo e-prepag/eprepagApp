@@ -45,7 +45,7 @@ $integracao_client_email = $_POST['integracao_client_email'] ?? null;
 $pagto = $_POST['pagto'] ?? null;
 $btSubmit_EPP_8593 = $_POST['btSubmit_EPP_8593'] ?? null;
 
-ini_set('display_errors', 0);
+// ini_set('display_errors', 0);
 error_reporting(0);
 
 //Definindo valor Default no caso do include estar conrrompido

@@ -1,6 +1,6 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once "../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";

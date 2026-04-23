@@ -4,7 +4,7 @@
 set_time_limit(0);
 
 // Configurar limite de memória para 512M
-ini_set('memory_limit', '512M');
+// ini_set('memory_limit', '512M');
 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";

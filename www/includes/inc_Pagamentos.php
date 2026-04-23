@@ -165,7 +165,7 @@ function getArquivoRetornoBradescoNovaIntegracao($orderID) {
         global $raiz_do_projeto;
 
         $file_token = $raiz_do_projeto.'banco/bradesco/token/token_bradesco.php';
-        ini_set('display_errors', 0);
+        // ini_set('display_errors', 0);
         if(! file_exists($file_token)){
 
             geraArquivo($file_token);
@@ -186,7 +186,7 @@ function getArquivoRetornoBradescoNovaIntegracao($orderID) {
 }
 
 function geraArquivo($file_name){
-    ini_set('display_errors', 0);
+    // ini_set('display_errors', 0);
     $url_acesso = URL_ACESSO_BRADESCO."SPSConsulta/Authentication/".BRADESCO_MERCHANTID;
     $autentica = consulta_pedidos($url_acesso);
     $array_autentica = xml_to_array_ignore_header($autentica);

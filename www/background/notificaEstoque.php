@@ -3,7 +3,7 @@
 //ini_set("display_errors", 1); 
 
 set_time_limit(10000);
-ini_set('max_execution_time', 10000); 
+// ini_set('max_execution_time', 10000); 
 
 require_once "/www/includes/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";

@@ -18,7 +18,7 @@ require_once $raiz_do_projeto."includes/inc_Pagamentos.php";
 require_once "/www/includes/bourls.php";
 
 set_time_limit ( 60000 ) ;
-ini_set("memory_limit","200M");
+// ini_set("memory_limit","200M");
 $time_start = getmicrotime();
 
 $tf_v_so_depositos = $_REQUEST['tf_v_so_depositos'] ?? null;

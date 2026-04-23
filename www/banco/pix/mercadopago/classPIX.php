@@ -1,7 +1,7 @@
 <?php
 
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
-ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
+// ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
 require_once "/www/includes/load_dotenv.php";
 require_once "/www/includes/writeIfPossible.php";
 class classPIX

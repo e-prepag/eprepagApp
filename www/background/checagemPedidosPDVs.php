@@ -7,7 +7,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 //ini_set("display_errors", 1); 
 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200); 
+// ini_set('max_execution_time', 1200); 
 
 //Data considerada
 $data_inicio = mktime(0, 0, 0, date('n'),  date('d')-1, date('Y'));

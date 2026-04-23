@@ -4,7 +4,7 @@
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 set_time_limit(180);
-ini_set('max_execution_time', 180);
+// ini_set('max_execution_time', 180);
 session_start();
 
 require_once RAIZ_DO_PROJETO . 'includes/configIP.php';

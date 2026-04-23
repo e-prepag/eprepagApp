@@ -5,7 +5,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 // - Processa totais por publisher, dia e canal
 
 error_reporting(E_ALL); 
-ini_set("display_errors", 1); 
+// ini_set("display_errors", 1); 
 function logProcessamento($mensagem) {
     $data = date("Y-m-d H:i:s");
     $pastaLogs = "logs"; // Pasta onde os logs serão armazenados

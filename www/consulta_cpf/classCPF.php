@@ -1,7 +1,7 @@
 <?php
 //Alterando o limeout do PHP para (CPF_TIMEOUT/1000) segundos
-ini_set('max_execution_time', ((CPF_TIMEOUT / 1000) + 50));
-ini_set('default_socket_timeout', ((CPF_TIMEOUT / 1000) + 5));
+// ini_set('max_execution_time', ((CPF_TIMEOUT / 1000) + 50));
+// ini_set('default_socket_timeout', ((CPF_TIMEOUT / 1000) + 5));
 
 if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
         //error_reporting(E_ALL); 

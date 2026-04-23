@@ -7,7 +7,7 @@ session_start();
 echo PHP_EOL.str_repeat("=",80).PHP_EOL."Data execução : ".date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
 
 set_time_limit(6000);
-ini_set('max_execution_time', 6000); 
+// ini_set('max_execution_time', 6000); 
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";

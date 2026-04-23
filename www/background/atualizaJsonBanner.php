@@ -1,7 +1,7 @@
 <?php
 ob_start(); 
 set_time_limit(5000);
-ini_set('max_execution_time', 5000);
+// ini_set('max_execution_time', 5000);
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";

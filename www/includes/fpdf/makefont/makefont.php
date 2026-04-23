@@ -314,7 +314,7 @@ function MakeDefinitionFile(string $file, string $type, string $enc, bool $embed
 function MakeFont(string $fontfile, string $enc = 'cp1252', bool $embed = true): void
 {
 	// Generate a font definition file
-	ini_set('auto_detect_line_endings', '1');
+	// ini_set('auto_detect_line_endings', '1');
 
 	$type = null;
 

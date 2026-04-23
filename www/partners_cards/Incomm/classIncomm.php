@@ -1,6 +1,6 @@
 <?php
 //Alterando o limeout do PHP para 200 segundos
-ini_set('max_execution_time', 200);
+// ini_set('max_execution_time', 200);
 
 class Incomm {
 		

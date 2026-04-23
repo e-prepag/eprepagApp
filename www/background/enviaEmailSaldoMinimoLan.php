@@ -3,7 +3,7 @@ require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/pdv/main.php"; 
 
 set_time_limit(3600);
-ini_set('max_execution_time', 3600);
+// ini_set('max_execution_time', 3600);
 
 /**
  * ug_substatus = 11 = Lan House Aprovada => Variável no constante.php do prepag2/dist_commerce $SUBSTATUS_LH

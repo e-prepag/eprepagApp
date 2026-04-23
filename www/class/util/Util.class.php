@@ -33,7 +33,7 @@ class Util {
             CURLOPT_SSL_VERIFYPEER  => 0
         );
 
-        ini_set("allow_url_fopen", "On");
+        // ini_set("allow_url_fopen", "On");
         $ch = curl_init($url);//$ch = curl_init($this->_jsonUrl);
         curl_setopt_array($ch, $options);
         $file = curl_exec($ch);

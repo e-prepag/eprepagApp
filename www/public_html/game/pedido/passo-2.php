@@ -27,7 +27,7 @@ require_once "/www/includes/gamer/main.php";
 require_once "/www/class/util/Util.class.php";
 include_once "/www/includes/complice/functions.php";
 /*ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);*/
 
 $prod_camp = $_POST['prod_camp'] ?? null;

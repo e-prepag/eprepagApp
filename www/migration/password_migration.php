@@ -12,7 +12,7 @@
 
 // Configurações
 set_time_limit(0); // Remove limite de tempo
-ini_set('memory_limit', '512M'); // Aumenta limite de memória
+// ini_set('memory_limit', '512M'); // Aumenta limite de memória
 
 // Inclui arquivos necessários
 $raiz_do_projeto = dirname(__FILE__) . "/../";
