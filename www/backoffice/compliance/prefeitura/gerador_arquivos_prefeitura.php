@@ -996,12 +996,16 @@ if ($file->checkFile()) {
 //==================================  Início do trecho compactando arquivos Semestrais para serem enviados para Prefeitura
 $nomeArquivoSUREM10Zipado = "SUREM10_" . $mes . $ano . ".zip"; //Exemplo: SUREM10_122014.zip
 @$file = new FilePosition($nomeArquivoSUREM10Zipado, $diretorioLotesPrefeitura);
-@$file->createZip($nomeArquivoSUREM10, false);
+$zipCriado = @$file->createZip($nomeArquivoSUREM10, false);
 
-echo "Arquivo Mensal Zipado Criado com Sucesso:
-    <a href='download_arquivo_prefeitura.php?file=" . urlencode(strtolower($nomeArquivoSUREM10Zipado)) . "&date=" . date('Ymd') . "'>
-        {$nomeArquivoSUREM10Zipado}
-    </a><br><hr><br><br>";
+if ($zipCriado && $file->checkFile()) {
+    echo "Arquivo Mensal Zipado Criado com Sucesso:
+        <a href='download_arquivo_prefeitura.php?file=" . urlencode(strtolower($nomeArquivoSUREM10Zipado)) . "&date=" . date('Ymd') . "'>
+            {$nomeArquivoSUREM10Zipado}
+        </a><br><hr><br><br>";
+} else {
+    echo "Arquivo Mensal Zipado n&atilde;o foi gerado.<br><hr><br><br>";
+}
 
 //==================================  Fim do trecho compactando arquivos Semestrais para serem enviados para Prefeitura
 

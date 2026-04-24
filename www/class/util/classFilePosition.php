@@ -16,7 +16,7 @@ class FilePosition
     private $new_dir;               // variavel de controle para a criação de um subdiretório para salvo o arquivo no formato date('Ymd')
     private $vetorHeader = array(); // cada posição do vetor deve conter a subestrutura [key][name] e [key][size]
     private $vetorLines = array();  // cada posição do vetor deve conter a subestrutura [key][name] e [key][size]
-    private $diretorio_temporario_windows = "/www/tmp/";
+    private $diretorio_temporario_windows;
 
     function __construct($fileName, $dir = null)
     {
@@ -49,6 +49,21 @@ class FilePosition
     function getNewDir()
     {
         return $this->new_dir;
+    }
+
+    function setDiretorioTemporarioWindows($dir)
+    {
+        $this->diretorio_temporario_windows = $dir;
+    }
+    function getDiretorioTemporarioWindows()
+    {
+        if (empty($this->diretorio_temporario_windows)) {
+            $this->diretorio_temporario_windows = $GLOBALS['raiz_do_projeto'] . 'arquivos_gerados/tmp/';
+        }
+        if (!is_dir($this->diretorio_temporario_windows)) {
+            mkdir($this->diretorio_temporario_windows, 0775, true);
+        }
+        return $this->diretorio_temporario_windows;
     }
 
     function setLine($line)
@@ -211,6 +226,8 @@ class FilePosition
         }
         $directory = $file;
         $file = strtolower($this->getFileName());
+        $temporaryDirectory = $this->getDiretorioTemporarioWindows();
+        $temporaryFile = $temporaryDirectory . $file;
 
         // Removendo arquivo anterior existente com mesmo nome
         if (file_exists($directory . $file)) {
@@ -220,17 +237,18 @@ class FilePosition
         // Cria o arquivo .zip
         $zip = new ZipArchive;
         echo (($debug) ? "declarando[" . $this->escreveStatus($zip->status) . "]<br>" . PHP_EOL : "");
-        echo (($debug) ? "Name File[" . $this->diretorio_temporario_windows . $file . "]<br>" . PHP_EOL : "");
-        $res = $zip->open($this->diretorio_temporario_windows . $file, ZipArchive::CREATE);
+        echo (($debug) ? "Name File[" . $temporaryFile . "]<br>" . PHP_EOL : "");
+        $res = $zip->open($temporaryFile, ZipArchive::CREATE);
         if ($res === TRUE) {
-            echo (($debug) ? "SUCESSO ao Abrir o Arquivo [" . $this->diretorio_temporario_windows . $file . "]<br>" . PHP_EOL : "");
+            echo (($debug) ? "SUCESSO ao Abrir o Arquivo [" . $temporaryFile . "]<br>" . PHP_EOL : "");
         } else {
-            echo (($debug) ? "ERRO ao Abrir o Arquivo [" . $this->diretorio_temporario_windows . $file . "]<br>" . PHP_EOL : "");
+            echo (($debug) ? "ERRO ao Abrir o Arquivo [" . $temporaryFile . "]<br>" . PHP_EOL : "");
+            return false;
         }
 
-        // Checa se o array não está vazio e adiciona os arquivos
+        // Checa se o array nao esta vazio e adiciona os arquivos
         if (count($files) > 0) {
-            // Loop do(s) arquivo(s) enviado(s) 
+            // Loop do(s) arquivo(s) enviado(s)
             foreach ($files as $key => $value) {
 
                 // Adiciona os arquivos ao zip criado
@@ -238,7 +256,7 @@ class FilePosition
                     echo (($debug) ? "ERRO ao Adicionar Arquivo [" . $directory . $value . "]<br>" . PHP_EOL : "");
                 } else echo (($debug) ? "SUCESSO ao Adicionar Arquivo [" . $directory . $value . "]<br>" . PHP_EOL : "");
 
-                // Verifica se $deleleOriginal está setada como true, se sim, apaga os arquivos
+                // Verifica se $deleleOriginal esta setada como true, se sim, apaga os arquivos
                 if ($deleleOriginal === true) {
                     // Apaga o arquivo
                     unlink($directory . $value);
@@ -250,11 +268,12 @@ class FilePosition
         //Fecha o arquivo zip
         $zip->close();
         echo (($debug) ? "close [" . $this->escreveStatus($zip->status) . "]<br>" . PHP_EOL : "");
-        echo (($debug) ? var_dump($this->diretorio_temporario_windows . $file, $directory, $file, get_current_user(), ZipArchive::CREATE) : "");
-        if (file_exists($this->diretorio_temporario_windows . $file)) echo ($debug) ? "SUcesso no Arquivo Gerado [" . $this->diretorio_temporario_windows . $file . "]!<br>" : "";
-        else echo ($debug) ? "NO FILE [" . $this->diretorio_temporario_windows . $file . "]!!!!!!<br>" : "";
-        rename($this->diretorio_temporario_windows . $file, $directory . $file);
-        @unlink($this->diretorio_temporario_windows . $file);
+        echo (($debug) ? var_dump($temporaryFile, $directory, $file, get_current_user(), ZipArchive::CREATE) : "");
+        if (file_exists($temporaryFile)) echo ($debug) ? "SUcesso no Arquivo Gerado [" . $temporaryFile . "]!<br>" : "";
+        else echo ($debug) ? "NO FILE [" . $temporaryFile . "]!!!!!!<br>" : "";
+        $renamed = rename($temporaryFile, $directory . $file);
+        @unlink($temporaryFile);
+        return ($renamed && file_exists($directory . $file));
     } //end function createZip 
 
     function escreveStatus($status)
