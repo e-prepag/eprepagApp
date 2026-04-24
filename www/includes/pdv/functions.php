@@ -272,25 +272,25 @@ function gravaLog_EnviaEmail($canal, $to, $subject)
 
 function redirect($strRedirect)
 {
-    if (ob_get_level() > 0) {
-        ob_end_clean();
-    }
+        if (ob_get_level() > 0) {
+                ob_end_clean();
+        }
 
-    if (substr($strRedirect, 0, 4) != "http") {
-        $httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : "";
-        // Limpeza de caracteres estranhos no Host
-        $httpHost = preg_replace('/[^A-Za-z0-9\.\-:]/', '', $httpHost);
-        
-        // Garante que a URL comece com /
-        $strRedirect = (substr($strRedirect, 0, 1) !== '/') ? '/' . $strRedirect : $strRedirect;
-        
-        $strRedirect = "https://" . $httpHost . $strRedirect;
-    }
+        if (substr($strRedirect, 0, 4) != "http") {
+                $httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : "";
+                // Limpeza de caracteres estranhos no Host
+                $httpHost = preg_replace('/[^A-Za-z0-9\.\-:]/', '', $httpHost);
 
-    $strRedirect = str_replace(array("\n", "\r"), '', $strRedirect);
+                // Garante que a URL comece com /
+                $strRedirect = (substr($strRedirect, 0, 1) !== '/') ? '/' . $strRedirect : $strRedirect;
 
-    header("Location: " . $strRedirect);
-    exit;
+                $strRedirect = "https://" . $httpHost . $strRedirect;
+        }
+
+        $strRedirect = str_replace(array("\n", "\r"), '', $strRedirect);
+
+        header("Location: " . $strRedirect);
+        exit;
 }
 
 function Dia_Semana($posicao)
@@ -1090,7 +1090,7 @@ function getLastOrders()
                         $msg = "<span " . (($t_diff < $t_diff_mark1) ? "style='background-color:#FF3300' title='" . $s_mark1 . "'" : (($t_diff < $t_diff_mark2) ? "style='background-color:#FF9900' title='" . $s_mark2 . "'" : " title='" . $s_mark3 . "'")) . "><a href='/prepag2/dist_commerce/conta/lista_vendas.php'>Última compra</a>: <a href='/prepag2/dist_commerce/conta/pagto_compr_redirect.php?venda=" . $rs_vendas_row['vg_id'] . " class='link_azul'>ID: " . formata_codigo_venda($rs_vendas_row['vg_id']) . "</a> (" . formata_data_ts($rs_vendas_row['vg_data_inclusao'], 0, true, false) . ") R$" . number_format($rs_vendas_row['valor'], 2, ',', '.') . " Qtd: " . $rs_vendas_row['qtde_itens'] . " (Faz " . get_time_splitted_1($t_diff) . ")" . "</span>";
                 }
                 $sql = "select ug_qtde_acessos from dist_usuarios_games where ug_id=$usuarioId";
-                $qtde_acessos = getSingleValue($sql);
+                $qtde_acessos = SQLexecuteQuery($sql);
                 $msg .= " (" . $qtde_acessos . " acesso" . (($qtde_acessos > 0) ? "s" : "") . ")";
         }
         return $msg;
@@ -2110,21 +2110,21 @@ function mostraCarrinho_pag($bprint)
                 return $cReturn;
         } // end function
 
-        function getSingleValue($sql)
-        {
+        // function getSingleValue($sql)
+        // {
 
-                $ret = null;
+        //         $ret = null;
 
-                //echo "<!-- sql: $sql\n -->";
-                $rs = SQLexecuteQuery($sql);
-                if ($rs && pg_num_rows($rs) > 0) {
-                        $rs_row = pg_fetch_array($rs);
-                        $ret = $rs_row[0];
-                }
-                //echo "<!-- resultado (getValue): " & $ret & "\n-->";
+        //         //echo "<!-- sql: $sql\n -->";
+        //         $rs = SQLexecuteQuery($sql);
+        //         if ($rs && pg_num_rows($rs) > 0) {
+        //                 $rs_row = pg_fetch_array($rs);
+        //                 $ret = $rs_row[0];
+        //         }
+        //         //echo "<!-- resultado (getValue): " & $ret & "\n-->";
 
-                return $ret;
-        }
+        //         return $ret;
+        // }
 
         function verificaValorVazioArray($array)
         {

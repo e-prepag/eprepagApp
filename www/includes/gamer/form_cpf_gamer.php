@@ -181,8 +181,25 @@ if (isset($_POST['formsubmit'])) {
 
             $cpf = implode('', $matches[0]);
 
-            $sql = "UPDATE usuarios_games SET ug_cpf='" . mask($cpf, '###.###.###-##') . "', ug_nome='" . fix_name($name) . "', ug_nome_cpf='" . fix_name($name) . "', ug_data_cpf_informado=NOW(), ug_data_nascimento = to_date('" . $data_nascimento . "','DD/MM/YYYY')  WHERE ug_id=" . $usuarioId . ";";
-            $res = SQLexecuteQuery($sql);
+            $sql = "
+    UPDATE usuarios_games
+       SET ug_cpf                 = $1,
+           ug_nome                = $2,
+           ug_nome_cpf            = $3,
+           ug_data_cpf_informado  = NOW(),
+           ug_data_nascimento     = to_date($4, 'DD/MM/YYYY')
+     WHERE ug_id = $5
+";
+
+            $params = [
+                mask($cpf, '###.###.###-##'),
+                fix_name($name),
+                fix_name($name),
+                $data_nascimento,
+                (int)$usuarioId
+            ];
+
+            $res = SQLexecuteQueryParams($sql, $params);
             if ($res) {
                 (new UsuarioGames)->adicionarLoginSession_ByID($usuarioId);
             } else {
@@ -203,21 +220,7 @@ if (isset($_POST['formsubmit'])) {
         $msg .= "Problemas encontrados:<br>";
         foreach ($errors as $error) {
             $msg .= $error . "<br>";
-        }/*
-             $sql = "UPDATE usuarios_games SET ug_data_cpf_informado=NOW() WHERE ug_id=".$usuarioId.";";
-             //echo $sql;
-             $res = SQLexecuteQuery($sql);
-             if($testeCPF != 171) {
-                 $msg = "Não houve sucesso na atualização do CPF do usuário de ID[".$usuarioId."]<br>Porém foi permitido efetuar a compra e foi atualizado a data de consulta do seu CPF para ter sucesso.<br>Dados:<br>CPF: ".$_POST['cpf']."<br>Data de Nascimento: ".$_POST['data_nascimento']."<br>";
-                 foreach($errors as $key => $error){ 
-                     $msg .= str_replace("\n","<br>",  $error); 
-                 }
-                 enviaEmail("rc@e-prepag.com.br", "tamy@e-prepag.com.br", "wagner@e-prepag.com.br", "Erro na atualização de CPF já informado", $msg);
-             }//end if($testeCPF != 171)
-             UsuarioGames::adicionarLoginSession_ByID($usuarioId);
-             header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);      
-             die();
-             */
+        }
     } //end if(count($errors) > 0 && $_POST['consulta_automatica'] == '1')
 
 }

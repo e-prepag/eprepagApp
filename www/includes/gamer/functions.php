@@ -212,9 +212,17 @@ function existeIdVenda($venda_id_rand)
         $ret = true;
 
         //SQL
-        $sql = "select count(*) as qtde from tb_venda_games ";
-        $sql .= " where vg_id = " . SQLaddFields($venda_id_rand, "");
-        $rs = SQLexecuteQuery($sql);
+        $sql = "
+    SELECT count(*) AS qtde
+    FROM tb_venda_games
+    WHERE vg_id = $1
+";
+
+        $params = [
+                $venda_id_rand
+        ];
+
+        $rs = SQLexecuteQueryParams($sql, $params);
         if ($rs && pg_num_rows($rs) > 0) {
                 $rs_row = pg_fetch_array($rs);
                 if ($rs_row['qtde'] == 0) $ret = false;
@@ -428,20 +436,34 @@ function PagtoOnlineUsuariosBloqueadosParaVIP($tipo_pagto, $ug_id, $total_carrin
         $tipo_usuario = "G";
         $is_safe = (($total_carrinho + $total_diario) < 2 * $total_limite) ? 1 : 0;
 
-        $sql = "insert into usuarios_games_pagamento_bloqueio_log (" .
-                "ugpbl_tipo_usuario, ugpbl_tipo_pagto, ugpbl_ug_id, ugpbl_valor_carrinho, " .
-                "ugpbl_valor_total, ugpbl_valor_limite, ugpbl_n_compras, ugpbl_n_compras_limite, ugpbl_is_safe " .
-                ") values (";
-        $sql .= SQLaddFields($tipo_usuario, "s") . ",";
-        $sql .= SQLaddFields($tipo_pagto, "s") . ",";
-        $sql .= SQLaddFields($ug_id, "") . ",";
-        $sql .= SQLaddFields($total_carrinho, "") . ",";
-        $sql .= SQLaddFields($total_diario, "") . ",";
-        $sql .= SQLaddFields($total_limite, "") . ",";
-        $sql .= SQLaddFields($n_compras, "") . ", ";
-        $sql .= SQLaddFields($n_compras_limite, "") . ", ";
-        $sql .= SQLaddFields($is_safe, "") . ") ";
-        $ret = SQLexecuteQuery($sql);
+        $sql = "
+    INSERT INTO usuarios_games_pagamento_bloqueio_log (
+        ugpbl_tipo_usuario,
+        ugpbl_tipo_pagto,
+        ugpbl_ug_id,
+        ugpbl_valor_carrinho,
+        ugpbl_valor_total,
+        ugpbl_valor_limite,
+        ugpbl_n_compras,
+        ugpbl_n_compras_limite,
+        ugpbl_is_safe
+    )
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+";
+
+        $params = [
+                $tipo_usuario,
+                $tipo_pagto,
+                (int)$ug_id,
+                $total_carrinho,
+                $total_diario,
+                $total_limite,
+                (int)$n_compras,
+                (int)$n_compras_limite,
+                (int)$is_safe
+        ];
+
+        $ret = SQLexecuteQueryParams($sql, $params);
 }
 
 
@@ -790,15 +812,13 @@ function redirect($strRedirect)
    */
                                                                         for ($i = 0; $i < $tam; $i++) {
                                                                                 // If I found one '<', $tag++ and continue whithout copy
-                                                                                if ($string[
-                                                                                        $i] == '<') {
+                                                                                if ($string[$i] == '<') {
                                                                                         $tag++;
                                                                                         continue;
                                                                                 }
 
                                                                                 // if I found '>', decrease $tag and continue 
-                                                                                if ($string[
-                                                                                        $i] == '>') {
+                                                                                if ($string[$i] == '>') {
                                                                                         if ($tag) {
                                                                                                 $tag--;
                                                                                         }
@@ -810,8 +830,7 @@ function redirect($strRedirect)
 
                                                                                 // if $tag is 0, can copy 
                                                                                 if ($tag == 0) {
-                                                                                        $newstring .= $string[
-                                                                                                $i]; // simple copy, only one car
+                                                                                        $newstring .= $string[$i]; // simple copy, only one car
                                                                                 }
                                                                         }
                                                                         return $newstring;
@@ -1675,12 +1694,25 @@ pin
                                                                 function montaCesta_pag_paypal($vg_id)
                                                                 {
                                                                         $cesta_nome = "";
-                                                                        $sql = "select vgm_nome_produto, vgm_qtde, vgm_nome_modelo, vgm_valor, *
-                from tb_venda_games vg 
-                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                where vg_id = $vg_id
-                order by vgm_qtde";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT
+        vgm_nome_produto,
+        vgm_qtde,
+        vgm_nome_modelo,
+        vgm_valor,
+        *
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vgm.vgm_vg_id = vg.vg_id
+    WHERE vg.vg_id = $1
+    ORDER BY vgm_qtde
+";
+
+                                                                        $params = [
+                                                                                (int)$vg_id
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 while ($rs_row = pg_fetch_array($rs)) {
                                                                                         $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format($rs_row['vgm_valor'], 2, ',', '.') . ")\n";
@@ -1796,12 +1828,43 @@ pin
                                                                         //select distinct vg.vg_id, count(vg.vg_data_inclusao) as qtde from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id 
                                                                         //where vg.vg_ug_id = 1190925 and vg_data_inclusao >= '2020-09-01' and vg_ultimo_status=5 and vgm.vgm_opr_codigo in(149,97,45,128,62,150,139,142,103,61,63,124,113,16,135,155,148,23,129,156,130,131,146,132,121,13,40,47,60,82,90,37,140,133,157,134,143,34,95,126,127,141,114,115,66) group by vg.vg_id;
 
-                                                                        $sql = "select distinct vg.vg_id, count(vg.vg_data_inclusao) as qtde from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id";
-                                                                        $sql .= " where vg.vg_ug_id = " . SQLaddFields($idusuario, "") . " and vg_data_inclusao >= '" . date('Y-m-d H:i:s', strtotime("-30 days")) . "' and vg_ultimo_status=5 and";
-                                                                        $sql .= " vgm.vgm_opr_codigo in(" . implode(',', $publishers) . ") group by vg.vg_id;";
+                                                                        $datainicial = date('Y-m-d H:i:s', strtotime('-30 days'));
 
-                                                                        //var_dump($sql);
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        /*
+ * cria placeholders din�micos para o IN (...)
+ * ($4, $5, $6 ...)
+ */
+                                                                        $placeholders = [];
+                                                                        $params = [
+                                                                                (int)$idusuario, // $1
+                                                                                $datainicial,    // $2
+                                                                                5                // $3 -> vg_ultimo_status
+                                                                        ];
+
+                                                                        $index = 4;
+
+                                                                        foreach ($publishers as $publisher) {
+                                                                                $placeholders[] = '$' . $index++;
+                                                                                $params[] = $publisher;
+                                                                        }
+
+                                                                        $inClause = implode(',', $placeholders);
+
+                                                                        $sql = "
+    SELECT DISTINCT
+        vg.vg_id,
+        COUNT(vg.vg_data_inclusao) AS qtde
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vg.vg_id = vgm.vgm_vg_id
+    WHERE vg.vg_ug_id = $1
+      AND vg_data_inclusao >= $2
+      AND vg_ultimo_status = $3
+      AND vgm.vgm_opr_codigo IN ($inClause)
+    GROUP BY vg.vg_id
+";
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 $qtde = pg_num_rows($rs);  //$rs_row['qtde'];
@@ -1818,11 +1881,32 @@ pin
                                                                 {
                                                                         $qtde = 0;
                                                                         //SQL
-                                                                        $sql = "select count(*) as qtde from tb_venda_games ";
-                                                                        $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
-                                                                        $sql .= " and vg_data_inclusao>='" . date('Y-m-d H:i:s', strtotime("-1 days")) . "' and vg_ultimo_status=5 ";
-                                                                        $sql .= " and (vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PIX_NUMERIC'] . " ); ";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $dataInicial = date('Y-m-d H:i:s', strtotime('-1 days'));
+
+                                                                        $sql = "
+    SELECT count(*) AS qtde
+    FROM tb_venda_games
+    WHERE vg_ug_id = $1
+      AND vg_data_inclusao >= $2
+      AND vg_ultimo_status = $3
+      AND vg_pagto_tipo IN ($4,$5,$6,$7,$8,$9,$10)
+";
+
+                                                                        $params = [
+                                                                                (int)$idusuario, // $1
+                                                                                $dataInicial,    // $2
+                                                                                5,               // $3
+
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'], // $4
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'],     // $5
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'],        // $6
+                                                                                $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'],                      // $7
+                                                                                $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'],                           // $8
+                                                                                $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'],                          // $9
+                                                                                $GLOBALS['PAGAMENTO_PIX_NUMERIC']                                     // $10
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 $qtde = $rs_row['qtde'];
@@ -1839,13 +1923,36 @@ pin
                                                                 {
                                                                         $total = 0;
                                                                         // novo - lista vendas nï¿½o canceladas (completas + em aberto) nas ï¿½ltimas 24h
-                                                                        $sql = "select sum(vgm_valor*vgm_qtde) as total from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id";
-                                                                        $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
-                                                                        $sql .= " and vg_data_inclusao>='" . date('Y-m-d H:i:s', strtotime("-1 days")) . "' ";
-                                                                        $sql .= " and (vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PIX_NUMERIC'] . ") ";
-                                                                        $sql .= " and (not vg_ultimo_status=6) ";
-                                                                        $sql .= " group by vg_ug_id ";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $dataInicial = date('Y-m-d H:i:s', strtotime('-1 days'));
+
+                                                                        $sql = "
+    SELECT SUM(vgm_valor * vgm_qtde) AS total
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vg.vg_id = vgm.vgm_vg_id
+    WHERE vg.vg_ug_id = $1
+      AND vg_data_inclusao >= $2
+      AND vg_pagto_tipo IN ($3,$4,$5,$6,$7,$8,$9)
+      AND vg_ultimo_status <> $10
+    GROUP BY vg_ug_id
+";
+
+                                                                        $params = [
+                                                                                (int)$idusuario, // $1
+                                                                                $dataInicial,    // $2
+
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'], // $3
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'],     // $4
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'],        // $5
+                                                                                $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'],                      // $6
+                                                                                $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'],                           // $7
+                                                                                $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'],                          // $8
+                                                                                $GLOBALS['PAGAMENTO_PIX_NUMERIC'],                                    // $9
+
+                                                                                6 // $10
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 $total = ($rs_row['total']) ? $rs_row['total'] : 0;
@@ -1871,8 +1978,17 @@ pin
 
                                                                                 //		$orderId = 	"2003120408301545872781";
                                                                                 //		$orderId = 	date("YmdHis").str_pad(rand(0,99999999), 8, "0", STR_PAD_LEFT);
-                                                                                $sql = "SELECT count(*) as n from tb_pag_compras where numcompra='" . $orderId . "'";
-                                                                                $ret = SQLexecuteQuery($sql);
+                                                                                $sql = "
+    SELECT count(*) AS n
+    FROM tb_pag_compras
+    WHERE numcompra = $1
+";
+
+                                                                                $params = [
+                                                                                        $orderId
+                                                                                ];
+
+                                                                                $ret = SQLexecuteQueryParams($sql, $params);
                                                                                 if (!$ret) {
                                                                                         echo "Erro ao recuperar transaï¿½ï¿½o de pagamento.\n";
                                                                                         die("Stop");
@@ -2000,10 +2116,19 @@ pin
                                                                         $vgm_qtde = 0;
                                                                         $vgm_pin_codinterno = "";
                                                                         //Recupera modelos
-                                                                        $sql  = "select * from tb_venda_games vg 
-					inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-				where vg.vg_id = " . $venda_id;
-                                                                        $rs_venda_modelos = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT *
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vgm.vgm_vg_id = vg.vg_id
+    WHERE vg.vg_id = $1
+";
+
+                                                                        $params = [
+                                                                                (int)$venda_id
+                                                                        ];
+
+                                                                        $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
                                                                         if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado (1ag).\n";
                                                                         if ($msg == "") {
                                                                                 //Verifica cada item de cada produto
@@ -2206,8 +2331,17 @@ function PagamentoNumeroMaximoPIN() {
                                                                                 return $opr_codigo;
                                                                         }
                                                                         //SQL
-                                                                        $sql = "select ogp_opr_codigo from tb_operadora_games_produto where ogp_id  = " . $prod_id . "";        //" and ogp_ativo = 1";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT ogp_opr_codigo
+    FROM tb_operadora_games_produto
+    WHERE ogp_id = $1
+";
+
+                                                                        $params = [
+                                                                                (int)$prod_id
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 if ($rs_row['ogp_opr_codigo'] > 0) {
@@ -2228,8 +2362,22 @@ function PagamentoNumeroMaximoPIN() {
                                                                                 return $opr_codigo;
                                                                         }
                                                                         //SQL
-                                                                        $sql = "select ogp_opr_codigo, * from tb_operadora_games_produto where ogp_id  = (select ogpm_ogp_id from tb_operadora_games_produto_modelo where ogpm_id  = " . $modelo_id . " limit 1)";        //" and ogp_ativo = 1";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT ogp_opr_codigo, *
+    FROM tb_operadora_games_produto
+    WHERE ogp_id = (
+        SELECT ogpm_ogp_id
+        FROM tb_operadora_games_produto_modelo
+        WHERE ogpm_id = $1
+        LIMIT 1
+    )
+";
+
+                                                                        $params = [
+                                                                                (int)$modelo_id
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 if ($rs_row['ogp_opr_codigo'] > 0) {
@@ -2280,17 +2428,17 @@ function PagamentoNumeroMaximoPIN() {
                                                                         return $sret;
                                                                 }
 
-                                                                function getSingleValue($sql)
-                                                                {
+                                                                // function getSingleValue($sql)
+                                                                // {
 
-                                                                        $ret = null;
-                                                                        $rs = SQLexecuteQuery($sql);
-                                                                        if ($rs && pg_num_rows($rs) > 0) {
-                                                                                $rs_row = pg_fetch_array($rs);
-                                                                                $ret = $rs_row[0];
-                                                                        }
-                                                                        return $ret;
-                                                                }
+                                                                //         $ret = null;
+                                                                //         $rs = SQLexecuteQuery($sql);
+                                                                //         if ($rs && pg_num_rows($rs) > 0) {
+                                                                //                 $rs_row = pg_fetch_array($rs);
+                                                                //                 $ret = $rs_row[0];
+                                                                //         }
+                                                                //         return $ret;
+                                                                // }
 
                                                                 //Funï¿½ï¿½o de Conversï¿½o da data
                                                                 function converteData($data_nasc)
@@ -2306,8 +2454,17 @@ function PagamentoNumeroMaximoPIN() {
                                                                 //Funï¿½ï¿½o que verifica se o publisher exige CPF do Gamer
                                                                 function checkingNeedCPFGamer($opr_codigo)
                                                                 {
-                                                                        $sql_function = "SELECT opr_need_cpf_lh from operadoras where opr_codigo=" . intval($opr_codigo) . ";";
-                                                                        $rs_function = SQLexecuteQuery($sql_function);
+                                                                        $sql_function = "
+                                                                        SELECT opr_need_cpf_lh
+                                                                        FROM operadoras
+                                                                        WHERE opr_codigo = $1
+                                                                        ";
+
+                                                                        $params = [
+                                                                                (int)$opr_codigo
+                                                                        ];
+
+                                                                        $rs_function = SQLexecuteQueryParams($sql_function, $params);
                                                                         if ($rs_function_row = pg_fetch_array($rs_function)) {
                                                                                 $opr_need_cpf_lh = $rs_function_row['opr_need_cpf_lh'];
                                                                         }

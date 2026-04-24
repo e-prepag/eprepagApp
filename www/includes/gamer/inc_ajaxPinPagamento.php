@@ -9,9 +9,18 @@ function getSaldoUsuarioFunc()
 	$ug_perfil_saldo_aux = 0;
 	$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
 
-	$sql_function = "SELECT ug_perfil_saldo from usuarios_games where ug_id=" . intval($usuarioGames->ug_id) . ";";
+	$sql_function = "
+    SELECT ug_perfil_saldo
+    FROM usuarios_games
+    WHERE ug_id = ?
+";
+
+	$params = [
+		intval($usuarioGames->ug_id),
+	];
+
 	gravaLog_EPPCASH("SQL para buscar o saldo do usuario:\n   $sql_function");
-	$rs_saldo_function = SQLexecuteQuery($sql_function);
+	$rs_saldo_function = SQLexecuteQueryParams($sql_function, $params);
 	if ($rs_saldo_function_row = pg_fetch_array($rs_saldo_function)) {
 		$ug_perfil_saldo_aux = $rs_saldo_function_row['ug_perfil_saldo'];
 	}
