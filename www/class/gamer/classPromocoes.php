@@ -82,7 +82,7 @@ class Promocoes {
 
 		$rs_promocoes = SQLexecuteQuery($sql);
 		if(!$rs_promocoes || pg_num_rows($rs_promocoes) == 0) {
-			return null;
+			return array();
 		} else {
 			while ($rs_promocoes_row = pg_fetch_array($rs_promocoes)) {
 				$this -> setPromoId($rs_promocoes_row['promo_id']);
@@ -237,6 +237,9 @@ function getPromocaoCorrente($ug_email, $ug_id, $s_opr_codigo, $vg_id = null) {
 
 		$token = new Promocoes();
 		$teste_promo = $token->BuscarPromocao($ug_email, $ug_id, $s_opr_codigo, $vg_id);
+		if (!is_array($teste_promo)) {
+			$teste_promo = array();
+		}
 		if(count($teste_promo)>0) {
 			$msg_debug .= print_r($teste_promo, true)."\n";
 			foreach($teste_promo as $key => $val) {
