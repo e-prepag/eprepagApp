@@ -36,6 +36,8 @@ $orgaoEmissorRepresentanteLegal = "SSP/SP";
 $webstring = "http://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
 
 $msg = "";
+$caminhoArquivoLote = $raiz_do_projeto . "arquivos_gerados/lotes/" . basename($_GET['nomeArq']);
+$tamanhoArquivoLote = file_exists($caminhoArquivoLote) ? filesize($caminhoArquivoLote) : false;
 
 //instancia a classe.. P=Retrato, mm =tipo de medida utilizada no casso milimetros, tipo de folha =A4
 $pdf= new FPDF("P","mm","A4");
@@ -144,7 +146,7 @@ $pdf->Cell(0,4,$_GET['nomeArq'],0,0,'L');
 $pdf->SetY("200");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,remote_filesize("/bacen/".date('Ymd')."/".$_GET['nomeArq'])." bytes",0,0,'L');
+$pdf->Cell(0,4,(($tamanhoArquivoLote !== false) ? $tamanhoArquivoLote . " bytes" : "Arquivo n�o encontrado"),0,0,'L');
 
 
 //posiciona verticalmente em mm

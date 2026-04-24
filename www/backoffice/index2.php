@@ -80,7 +80,8 @@ if ($Enviar) {
                     }
 
                     $ga = new classGoogleAutenticator();
-                    $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token'], 2);
+                    $tokenInformado = (string)($_POST['token'] ?? "");
+                    $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $tokenInformado, 2);
                     $deviceValido = checkDevice($iduser_var, $pdo);
 
                     if (!$tokenValido && !$deviceValido) {

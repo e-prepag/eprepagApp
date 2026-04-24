@@ -21,6 +21,11 @@ require_once $raiz_do_projeto . "class/util/classFilePosition.php";
 <?php
 
 $server_url = "backoffice.e-prepag.com.br";
+$diretorioLotesPrefeitura = $raiz_do_projeto . 'arquivos_gerados/lotes/';
+
+if (!is_dir($diretorioLotesPrefeitura)) {
+    mkdir($diretorioLotesPrefeitura, 0775, true);
+}
 
 //=========  Mês/Ano considerado no Elaboração dos Arquivos
 $currentmonth = mktime(0, 0, 0, (int)date('n') - 1, 1, (int)date('Y'));
@@ -137,7 +142,7 @@ $nomeArquivo = 'SUREM10_' . $mes . $ano . '.txt';
 $nomeArquivoSUREM10[] = $nomeArquivo;
 
 unset($file);
-$file = new FilePosition($nomeArquivo);
+$file = new FilePosition($nomeArquivo, $diretorioLotesPrefeitura);
 
 //=========================================================================================================================
 //1- REGISTRO DO TIPO 10
@@ -718,7 +723,7 @@ else {
                     'size' => 10
                 ),
                 10 => array(
-                    'name' => number_format($rs_row['opr_cep'], 0, '', ''),
+                    'name' => preg_replace('~[^0-9]+~', '', (string) $rs_row['opr_cep']),
                     'size' => 8
                 ),
                 11 => array(
@@ -978,7 +983,7 @@ $file->setVetorLines($vetorLines);
 // echo "</pre>";
 //echo $sql;
 
-$file->saveFile(true, true);
+$file->saveFile(false, true);
 
 if ($file->checkFile()) {
     echo "<hr>Arquivo " . $file->getFileName() . " gerado com sucesso.<br>" . PHP_EOL;
@@ -990,8 +995,8 @@ if ($file->checkFile()) {
 
 //==================================  Início do trecho compactando arquivos Semestrais para serem enviados para Prefeitura
 $nomeArquivoSUREM10Zipado = "SUREM10_" . $mes . $ano . ".zip"; //Exemplo: SUREM10_122014.zip
-@$file = new FilePosition($nomeArquivoSUREM10Zipado);
-@$file->createZip($nomeArquivoSUREM10, true);
+@$file = new FilePosition($nomeArquivoSUREM10Zipado, $diretorioLotesPrefeitura);
+@$file->createZip($nomeArquivoSUREM10, false);
 
 echo "Arquivo Mensal Zipado Criado com Sucesso:
     <a href='download_arquivo_prefeitura.php?file=" . urlencode(strtolower($nomeArquivoSUREM10Zipado)) . "&date=" . date('Ymd') . "'>
