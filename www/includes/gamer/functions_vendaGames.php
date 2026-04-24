@@ -657,6 +657,249 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         return $msg;
 }
 
+function conciliaVendaGames_Integracao($venda_id, $pagamento_id, $EstabCod, $parametros)
+{
+
+        //Validacoes
+        $msg = "";
+
+        //Valida venda id
+        if (!$venda_id)
+                $msg = "C�digo da venda n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($venda_id))
+                $msg = "C�digo da venda inv�lido." . PHP_EOL;
+
+        //Valida boleto id
+        if (!$pagamento_id)
+                $msg = "C�digo do pagamento n�o fornecido (2)." . PHP_EOL;
+        elseif (!is_numeric($pagamento_id))
+                $msg = "C�digo do pagamento inv�lido." . PHP_EOL;
+
+        //Valida EstabCod
+        if (!$EstabCod)
+                $msg = "C�digo do estabelecimento n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($EstabCod))
+                $msg = "C�digo do estabelecimento inv�lido." . PHP_EOL;
+
+        //Recupera a venda
+        if ($msg == "") {
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                        $msg = "Nenhuma venda encontrada." . PHP_EOL;
+                else {
+                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $vg_ug_id = $rs_venda_row['vg_ug_id'];
+                        $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
+                        $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
+                        $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
+
+                        //valida status
+                        if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'])
+                                $msg = "Dados do Pagamento ainda n�o recebidos(A3a) (vg_ultimo_status: '$vg_ultimo_status', != '" . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "')." . PHP_EOL;
+                }
+        }
+
+        //Recupera o pagamento pendente
+        if ($msg == "") {
+                $sql = "select * from tb_pag_compras pag where pag.numcompra = '" . $pagamento_id . "'";
+                $sql .= " and idcliente = $vg_ug_id ";
+
+                $rs_pagamento = SQLexecuteQuery($sql);
+                if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
+                        $msg = "Nenhum pagamento encontrado (B)." . PHP_EOL;
+                else {
+                        $rs_pagamento_row = pg_fetch_array($rs_pagamento);
+                        $pag_data = $rs_pagamento_row['dataconfirma'];
+                        // Testa a existencia de data cadastrada
+                        if (!trim($pag_data))
+                                $pag_data = date("Y-m-d H:i:s");
+                        $pag_valor = $rs_pagamento_row['total'] / 100;
+                        $pag_banco = $rs_pagamento_row['banco'];
+
+                        $prefix = getDocPrefix($rs_pagamento_row['iforma']);
+
+                        $pag_documento = $prefix . $rs_pagamento_row['iforma'] . "_" . $rs_pagamento_row['numcompra'];
+                }
+        }
+        //Inicia transacao
+        if ($msg == "") {
+                $sql = "BEGIN TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao iniciar transa��o." . PHP_EOL;
+        }
+
+        //Usuario backoffice
+        $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
+        if ($parametros['PROCESS_AUTOM'] == '1')
+                $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
+
+        //Concilia na venda_games e atualiza status (Integracao)
+        if ($msg == "") {
+                $sql = "update tb_venda_games set 
+                                        vg_pagto_banco = '" . $pag_banco . "',
+                                        vg_pagto_num_docto = '" . $pag_documento . "',
+                                        vg_pagto_data = '" . $pag_data . "',
+                                        vg_pagto_valor_pago = " . $pag_valor . ",
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
+
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao conciliar venda (32)" . PHP_EOL . $sql . PHP_EOL;
+        }
+
+        if (!$msg) {
+                // registro foi processado
+                $sql = "update tb_pag_compras set status_processed=1 where numcompra='" . $pagamento_id . "' ";
+                $sql .= " and idcliente = $vg_ug_id ";
+                echo "DEBUG B (atualiza status_processed=1, vendaid = $venda_id): " . $sql . PHP_EOL;
+
+                $rs_update2 = SQLexecuteQuery($sql);
+                if (!$rs_update2) {
+                        $msg = "Erro atualizando status de registro (62)." . PHP_EOL;
+                        echo $msg;
+                }
+        }
+
+        //Finaliza transacao
+        if ($msg == "") {
+                $sql = "COMMIT TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao comitar transa��o." . PHP_EOL;
+        } else {
+                $sql = "ROLLBACK TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
+        }
+
+        return $msg;
+}
+
+function conciliaVendaGames_redecard($venda_id, $redecard_id, $EstabCod, $parametros)
+{
+
+        //Validacoes
+        $msg = "";
+
+        //Valida venda id
+        if (!$venda_id)
+                $msg = "C�digo da venda n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($venda_id))
+                $msg = "C�digo da venda inv�lido." . PHP_EOL;
+
+        //Valida redecard id
+        if (!$redecard_id)
+                $msg = "C�digo do redecard n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($redecard_id))
+                $msg = "C�digo do redecard inv�lido." . PHP_EOL;
+
+        //Valida EstabCod
+        if (!$EstabCod)
+                $msg = "C�digo do estabelecimento n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($EstabCod))
+                $msg = "C�digo do estabelecimento inv�lido." . PHP_EOL;
+
+        //Recupera a venda
+        if ($msg == "") {
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                        $msg = "Nenhuma venda encontrada." . PHP_EOL;
+                else {
+                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $vg_ug_id = $rs_venda_row['vg_ug_id'];
+                        $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
+                        $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
+                        $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
+
+                        //valida status
+                        if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'])
+                                $msg = "Dados do Pagamento ainda n�o recebidos(A4)." . PHP_EOL;
+                }
+        }
+
+        //Verifica estoque
+        if ($msg == "") {
+                $msg = verificaEstoque($venda_id);
+        }
+
+        //Recupera o redecard
+        if ($msg == "") {
+                $sql = "select * from tb_venda_games_redecard vgrc
+                                where vgrc.vgrc_id = " . $redecard_id;
+                $rs_redecard = SQLexecuteQuery($sql);
+                if (!$rs_redecard || pg_num_rows($rs_redecard) == 0)
+                        $msg = "Nenhum redecard encontrado." . PHP_EOL;
+                else {
+                        $rs_redecard_row = pg_fetch_array($rs_redecard);
+                        $vgrc_total = $rs_redecard_row['vgrc_total'];
+                        $vgrc_ret2_numautent = $rs_redecard_row['vgrc_ret2_numautent'];
+                        $vgrc_ret2_data = $rs_redecard_row['vgrc_ret2_data'];
+                }
+        }
+
+        //Inicia transacao
+        if ($msg == "") {
+                $sql = "BEGIN TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao iniciar transa��o." . PHP_EOL;
+        }
+
+        //Concilia boleto
+        if ($msg == "") {
+                $sql = "update tb_venda_games_redecard set vgrc_aprovado = 1, vgrc_aprovado_data = CURRENT_TIMESTAMP
+                                where vgrc_id = " . $redecard_id;
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao aprovar redecard." . PHP_EOL;
+        }
+
+        //Usuario backoffice
+        $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
+        if ($parametros['PROCESS_AUTOM'] == '1')
+                $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
+
+        //Concilia na venda_games e atualiza status (redecard)
+        if ($msg == "") {
+                $sql = "update tb_venda_games set 
+                                        vg_pagto_data = '" . $vgrc_ret2_data . "',
+                                        vg_pagto_num_docto = '" . $vgrc_ret2_numautent . "',
+                                        vg_pagto_valor_pago = " . $vgrc_total . ",
+                                        vg_vgrc_id = " . SQLaddFields($redecard_id, "") . ",
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao conciliar venda." . PHP_EOL;
+        }
+
+        //Finaliza transacao
+        if ($msg == "") {
+                $sql = "COMMIT TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao comitar transa��o." . PHP_EOL;
+        } else {
+                $sql = "ROLLBACK TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
+        }
+
+        return $msg;
+}
+
 
 function verificaEstoque($venda_id)
 {
@@ -3752,7 +3995,6 @@ function gravaLog_TMP_conciliacao($mensagem)
 
 function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
 {
-        require_once $raiz_do_projeto;
         $bDebug = false;
         if ($bDebug)
                 echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")" . PHP_EOL;
@@ -3773,8 +4015,6 @@ function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
 
 function gravaLog_Debug($mensagem)
 {
-        require_once $raiz_do_projeto;
-
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Debug.txt";
 
