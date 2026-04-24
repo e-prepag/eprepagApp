@@ -79,9 +79,11 @@
 
 	$abre_arquivo = fopen($arquivo, 'a');
 
+	if ($abre_arquivo) {
 	fwrite($abre_arquivo, $compila_erro);
 																	
 	fclose($abre_arquivo);
+	}
 	
 	
 	exit;

@@ -7,7 +7,7 @@ session_start();
 echo PHP_EOL.str_repeat("=",80).PHP_EOL."Data execução : ".date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
 
 set_time_limit(6000);
-ini_set('max_execution_time', 6000); 
+// ini_set('max_execution_time', 6000); 
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
@@ -222,8 +222,10 @@ if($total_table > 0) {
     
     //Gerando o arquivo 
     $fp = fopen($nome_do_arquivo,"w+");
+    if ($fp) {
     fwrite($fp, $conteudo);
     fclose($fp);
+    }
     
     if(file_exists($nome_do_arquivo)) echo PHP_EOL."Arquivo gerado com Sucesso!".PHP_EOL;
   
@@ -254,7 +256,9 @@ if($total_table > 0) {
                 }//end if($writtenBytes > 0) 
                 else echo "Falha na transferencia do arquivo".PHP_EOL;
                 fclose($resFile);
+                if ($srcFile) {
                 fclose($srcFile);
+                }
             }//end else do if(ssh2_auth_password($connection, 'eprepag', 'htLGUcYI4mwCVsRjeti1') === FALSE)
         }//end else do if($connection === FALSE)
     */

@@ -12,8 +12,8 @@ require_once $raiz_do_projeto.'class/util/Util.class.php';
 
 //Alterando o limite do tempod e processamento
 set_time_limit(360);
-ini_set('max_execution_time', 360);
-ini_set('default_socket_timeout', 360);
+// ini_set('max_execution_time', 360);
+// ini_set('default_socket_timeout', 360);
 
 //Lento lista de catalogos
 $allCatalogs = new classAllCatalogs();

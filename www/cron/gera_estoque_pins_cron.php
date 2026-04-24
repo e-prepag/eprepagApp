@@ -41,6 +41,7 @@ function saveLogPinsEstoque($pins, $lote, $operadora, $valor)
 {
     try {
         $file = fopen("/www/arquivos_gerados/logs/cron_estoque_pins.txt", "a+");
+        if ($file) {
         fwrite($file, str_repeat("*", 50) . "\n");
         fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
         fwrite($file, "OPERADORA: " . $operadora . "\n");
@@ -49,6 +50,7 @@ function saveLogPinsEstoque($pins, $lote, $operadora, $valor)
         fwrite($file, "LOTE: " . $lote . "\n");
         fwrite($file, str_repeat("*", 50) . "\n");
         fclose($file);
+        }
     } catch (Exception $e) {
         echo "Error(6) writing monitor file [" . date("Y-m-d H:i:s") . "]: " . $e->getMessage() . PHP_EOL;
     }

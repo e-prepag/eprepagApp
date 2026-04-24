@@ -4,10 +4,17 @@ require('../fpdf.php');
 class PDF extends FPDF
 {
 // Load data
-function LoadData($file)
+/**
+ * @param string $file
+ * @return array<int, array<int, string>>
+ */
+function LoadData(string $file): array
 {
 	// Read file lines
 	$lines = file($file);
+	if ($lines === false) {
+		return [];
+	}
 	$data = array();
 	foreach($lines as $line)
 		$data[] = explode(';',trim($line));
@@ -15,37 +22,45 @@ function LoadData($file)
 }
 
 // Simple table
-function BasicTable($header, $data)
+/**
+ * @param array<int, string> $header
+ * @param array<int, array<int, string>> $data
+ */
+function BasicTable(array $header, array $data): void
 {
 	// Header
 	foreach($header as $col)
-		$this->Cell(40,7,$col,1);
+		$this->Cell(40,7,(string)$col,1);
 	$this->Ln();
 	// Data
 	foreach($data as $row)
 	{
 		foreach($row as $col)
-			$this->Cell(40,6,$col,1);
+			$this->Cell(40,6,(string)$col,1);
 		$this->Ln();
 	}
 }
 
 // Better table
-function ImprovedTable($header, $data)
+/**
+ * @param array<int, string> $header
+ * @param array<int, array<int, string>> $data
+ */
+function ImprovedTable(array $header, array $data): void
 {
 	// Column widths
 	$w = array(40, 35, 40, 45);
 	// Header
 	for($i=0;$i<count($header);$i++)
-		$this->Cell($w[$i],7,$header[$i],1,0,'C');
+		$this->Cell($w[$i],7,(string)$header[$i],1,0,'C');
 	$this->Ln();
 	// Data
 	foreach($data as $row)
 	{
-		$this->Cell($w[0],6,$row[0],'LR');
-		$this->Cell($w[1],6,$row[1],'LR');
-		$this->Cell($w[2],6,number_format($row[2]),'LR',0,'R');
-		$this->Cell($w[3],6,number_format($row[3]),'LR',0,'R');
+		$this->Cell($w[0],6,(string)$row[0],'LR');
+		$this->Cell($w[1],6,(string)$row[1],'LR');
+		$this->Cell($w[2],6,number_format((float)($row[2] ?? 0)),'LR',0,'R');
+		$this->Cell($w[3],6,number_format((float)($row[3] ?? 0)),'LR',0,'R');
 		$this->Ln();
 	}
 	// Closing line
@@ -53,7 +68,11 @@ function ImprovedTable($header, $data)
 }
 
 // Colored table
-function FancyTable($header, $data)
+/**
+ * @param array<int, string> $header
+ * @param array<int, array<int, string>> $data
+ */
+function FancyTable(array $header, array $data): void
 {
 	// Colors, line width and bold font
 	$this->SetFillColor(255,0,0);
@@ -64,7 +83,7 @@ function FancyTable($header, $data)
 	// Header
 	$w = array(40, 35, 40, 45);
 	for($i=0;$i<count($header);$i++)
-		$this->Cell($w[$i],7,$header[$i],1,0,'C',true);
+		$this->Cell($w[$i],7,(string)$header[$i],1,0,'C',true);
 	$this->Ln();
 	// Color and font restoration
 	$this->SetFillColor(224,235,255);
@@ -74,10 +93,10 @@ function FancyTable($header, $data)
 	$fill = false;
 	foreach($data as $row)
 	{
-		$this->Cell($w[0],6,$row[0],'LR',0,'L',$fill);
-		$this->Cell($w[1],6,$row[1],'LR',0,'L',$fill);
-		$this->Cell($w[2],6,number_format($row[2]),'LR',0,'R',$fill);
-		$this->Cell($w[3],6,number_format($row[3]),'LR',0,'R',$fill);
+		$this->Cell($w[0],6,(string)($row[0] ?? ''),'LR',0,'L',$fill);
+		$this->Cell($w[1],6,(string)($row[1] ?? ''),'LR',0,'L',$fill);
+		$this->Cell($w[2],6,number_format((float)($row[2] ?? 0)),'LR',0,'R',$fill);
+		$this->Cell($w[3],6,number_format((float)($row[3] ?? 0)),'LR',0,'R',$fill);
 		$this->Ln();
 		$fill = !$fill;
 	}

@@ -16,8 +16,6 @@ $pagina_titulo = "Funcionários";
 class FuncionarioController extends HeaderController{
     public $raiz_do_projeto;
     public $msg;
-
-     public UsuarioGames $usuarios;
         
     public function __construct(){
         $this->objBanner = new BannerBO;

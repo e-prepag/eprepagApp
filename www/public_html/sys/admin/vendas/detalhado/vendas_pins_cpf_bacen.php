@@ -7,7 +7,7 @@ ob_start(NULL, 10240000);
 
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-ini_set('memory_limit', '512M');
+// ini_set('memory_limit', '512M');
 set_time_limit(60000);
 
 require_once "../../../../../includes/constantes.php";

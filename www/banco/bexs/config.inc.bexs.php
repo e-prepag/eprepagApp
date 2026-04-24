@@ -4,7 +4,7 @@
 //ini_set("display_errors", 1); 
 require_once '../../includes/constantes.php';
 set_time_limit(90);
-ini_set('max_execution_time', 90); 
+// ini_set('max_execution_time', 90); 
 
 // include do arquivo contendo IPs DEV
 require_once $raiz_do_projeto . 'includes/configIP.php';

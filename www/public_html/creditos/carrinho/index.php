@@ -476,11 +476,13 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
             {
                 
 				$file = fopen("/www/arquivos_gerados/logs/c.txt", "a+");
+				if ($file) {
 				fwrite($file, "saldo perfil ".$controller->usuarios->getPerfilSaldo()."\n");
 				fwrite($file, "repasse ".$modelos['total_repasse']."\n");
 				fwrite($file, "const ".(($controller->usuarios->getPerfilSaldo() - $modelos['total_repasse']) < 0)."\n");
 				fwrite($file, str_repeat("*", 50)."\n");
 				fclose($file);
+				}
 				
                 $strSaldo = number_format($controller->usuarios->getPerfilSaldo(), 2, ",", ".");
                 $strTotalRepasse = number_format($modelos['total_repasse'], 2, ",", ".");

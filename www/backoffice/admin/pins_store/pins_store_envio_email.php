@@ -387,8 +387,10 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				$msgErro = $mail->ErrorInfo;
 				$arquivo = '/www/arquivos_gerados/logs/testePINstore.txt';
 				$abre_arquivo = fopen($arquivo, 'w+');
+				if ($abre_arquivo) {
 				fwrite($abre_arquivo, $msgErro . "\n");
 				fclose($abre_arquivo);
+				}
 			}
 		}
 

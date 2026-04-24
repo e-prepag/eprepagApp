@@ -4,6 +4,7 @@ require_once "/www/db/connect.php";
 require_once "/www/db/ConnectionPDO.php";
 
 require_once "/www/class/classSecureEncryption.php";
+require_once "/www/includes/writeIfPossible.php";
 
 class ChaveMestra
 {
@@ -62,15 +63,16 @@ class ChaveMestra
 			}
 		}
 
-		$file = fopen("/www/arquivos_gerados/logs/chave_mestra.txt", "a+");
-		fwrite($file, "data: " . date("d-m-Y H:s:s") . "\n");
-		fwrite($file, "usuario: " . $usuario . "\n");
-		fwrite($file, "quantidade: " . $quantidade . "\n");
+		$logLines = array(
+			"data: " . date("d-m-Y H:s:s"),
+			"usuario: " . $usuario,
+			"quantidade: " . $quantidade,
+		);
 		if ($invalid) {
-			fwrite($file, "resultado: SENHA_INVALIDA\n");
+			$logLines[] = "resultado: SENHA_INVALIDA";
 		}
-		fwrite($file, str_repeat("*", 60) . "\n");
-		fclose($file);
+		$logLines[] = str_repeat("*", 60);
+		writeLinesIfPossible("/www/arquivos_gerados/logs/chave_mestra.txt", $logLines);
 
 		return $quantidade;
 	}
@@ -233,13 +235,13 @@ class ChaveMestra
 		$query->bindParam(":USUARIO", $usuario);
 		$query->execute();
 
-		// Log da migração
-		$file = fopen("/www/arquivos_gerados/logs/chave_mestra_migration.txt", "a+");
-		fwrite($file, "data: " . date("d-m-Y H:i:s") . "\n");
-		fwrite($file, "usuario: " . $usuario . "\n");
-		fwrite($file, "acao: migração para bcrypt\n");
-		fwrite($file, str_repeat("*", 60) . "\n");
-		fclose($file);
+		// Log da migracao
+		writeLinesIfPossible("/www/arquivos_gerados/logs/chave_mestra_migration.txt", array(
+			"data: " . date("d-m-Y H:i:s"),
+			"usuario: " . $usuario,
+			"acao: migracao para bcrypt",
+			str_repeat("*", 60),
+		));
 	}
 
 	/**
@@ -257,11 +259,11 @@ class ChaveMestra
 		$query->execute();
 
 		// Log do upgrade
-		$file = fopen("/www/log/chave_mestra_migration.txt", "a+");
-		fwrite($file, "data: " . date("d-m-Y H:i:s") . "\n");
-		fwrite($file, "usuario: " . $usuario . "\n");
-		fwrite($file, "acao: upgrade hash bcrypt\n");
-		fwrite($file, str_repeat("*", 60) . "\n");
-		fclose($file);
+		writeLinesIfPossible("/www/log/chave_mestra_migration.txt", array(
+			"data: " . date("d-m-Y H:i:s"),
+			"usuario: " . $usuario,
+			"acao: upgrade hash bcrypt",
+			str_repeat("*", 60),
+		));
 	}
 }

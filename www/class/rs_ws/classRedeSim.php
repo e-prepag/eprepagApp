@@ -443,8 +443,10 @@ if($this->bdebug) echo "  == SUCCESS (2): <pre>".print_r($soapResponseData, true
 		$log .= $msg;			
 						
 		$fp = fopen($fileLog, 'a+');
+		if ($fp) {
 		fwrite($fp, $log);
 		fclose($fp);		
+		}
 	}
 
 	public function get_Operadoras_list() {

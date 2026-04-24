@@ -1,6 +1,6 @@
 <?php
 if (!function_exists('b_IsPagtoOnline')) {
-	function b_IsPagtoOnline($iforma)
+	function b_IsPagtoOnline(mixed $iforma): bool
 	{
 		if (
 			($iforma == $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) ||
@@ -30,12 +30,12 @@ $aIsLogin_pagamento_Cielo = array(
 );
 
 
-function b_IsPagtoCielo($iforma)
+function b_IsPagtoCielo(mixed $iforma): bool
 {
 	return (b_IsPagtoCieloNumeric($iforma) || b_IsPagtoCieloAlpha($iforma));
 }
 
-function b_IsPagtoCieloNumeric($iforma)
+function b_IsPagtoCieloNumeric(mixed $iforma): bool
 {
 	if (
 		($iforma == $GLOBALS['PAGAMENTO_VISA_DEBITO_NUMERIC']) ||
@@ -53,7 +53,7 @@ function b_IsPagtoCieloNumeric($iforma)
 	}
 }
 
-function b_IsPagtoCieloAlpha($iforma)
+function b_IsPagtoCieloAlpha(mixed $iforma): bool
 {
 	if (
 		($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_VISA_DEBITO']) ||
@@ -72,7 +72,7 @@ function b_IsPagtoCieloAlpha($iforma)
 }
 
 
-function b_IsPagtoBoletoDeposito($iforma)
+function b_IsPagtoBoletoDeposito(mixed $iforma): bool
 {
 	if (
 		($iforma == $GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF']) ||
@@ -84,7 +84,7 @@ function b_IsPagtoBoletoDeposito($iforma)
 }
 
 if (!function_exists('getTaxaPagtoOnline')) {
-	function getTaxaPagtoOnline($iforma)
+	function getTaxaPagtoOnline(mixed $iforma): float
 	{
 
 		$taxa = 0;
@@ -159,10 +159,10 @@ if (!function_exists('getTaxaPagtoOnline')) {
 				$taxa = $GLOBALS['PAGAMENTO_PIX_TAXA'];
 				break;
 		}
-		return $taxa;
+		return (float)$taxa;
 	}
 }
-function getDescricaoPagtoOnline($iforma0)
+function getDescricaoPagtoOnline(mixed $iforma0): string
 {
 
 	$iforma = getCodigoCaracterParaPagto($iforma0);
@@ -180,7 +180,7 @@ function getDescricaoPagtoOnline($iforma0)
 }
 
 if (!function_exists('getBcoCodigo')) {
-	function getBcoCodigo($iforma)
+	function getBcoCodigo(mixed $iforma): string
 	{
 
 		$bco_codigo = "000";
@@ -254,13 +254,13 @@ if (!function_exists('getBcoCodigo')) {
 				$bco_codigo = $GLOBALS['PAGAMENTO_PIX_COD_BANCO'];
 				break;
 		}
-		return $bco_codigo;
+		return (string)$bco_codigo;
 	}
 }
 
 // tb_venda_games usa vg_pagto_tipo::smallint
 // tb_pag_compras usa iforma::char(1)
-function getCodigoNumericoParaPagto($iforma)
+function getCodigoNumericoParaPagto(mixed $iforma): string
 {
 
 	$numeric_code = "0";
@@ -271,7 +271,7 @@ function getCodigoNumericoParaPagto($iforma)
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_CREDITO']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']:
-			$numeric_code = $iforma;
+			$numeric_code = (string)$iforma;
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']:
 		case $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']:
@@ -344,12 +344,12 @@ function getCodigoNumericoParaPagto($iforma)
 			$numeric_code = $GLOBALS['PAGAMENTO_PIX_NUMERIC'];
 			break;
 	}
-	return $numeric_code;
+	return (string)$numeric_code;
 }
 
 // tb_venda_games usa vg_pagto_tipo::smallint
 // tb_pag_compras usa iforma::char(1)
-function getCodigoCaracterParaPagto($iforma)
+function getCodigoCaracterParaPagto(mixed $iforma): string
 {
 
 	$character_code = "";
@@ -360,7 +360,7 @@ function getCodigoCaracterParaPagto($iforma)
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_CREDITO']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']:
-			$character_code = $iforma;
+			$character_code = (string)$iforma;
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']:
 		case $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']:
@@ -433,10 +433,10 @@ function getCodigoCaracterParaPagto($iforma)
 			$character_code = $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX'];
 			break;
 	}
-	return $character_code;
+	return (string)$character_code;
 }
 
-function getBancoCodigo($iforma)
+function getBancoCodigo(mixed $iforma): string
 {
 
 	$banco_codigo = "";
@@ -513,10 +513,10 @@ function getBancoCodigo($iforma)
 			$banco_codigo = $GLOBALS['PAGAMENTO_PIX_COD_BANCO'];
 			break;
 	}
-	return $banco_codigo;
+	return (string)$banco_codigo;
 }
 
-function getIconeParaPagtoGamer($iforma0)
+function getIconeParaPagtoGamer(mixed $iforma0): string
 {
 
 	$iforma = getCodigoCaracterParaPagto($iforma0);
@@ -531,10 +531,10 @@ function getIconeParaPagtoGamer($iforma0)
 		}
 	}
 
-	return $icone;
+	return (string)$icone;
 }
 
-function getIconeParaPagto($iforma0)
+function getIconeParaPagto(mixed $iforma0): string
 {
 
 	$iforma = getCodigoCaracterParaPagto($iforma0);
@@ -546,12 +546,12 @@ function getIconeParaPagto($iforma0)
 			: "DEFAULT icone - iforma: '$iforma'\n"
 		)
 	);
-	return $icone;
+	return (string)$icone;
 }
 
 // tb_venda_games usa vg_pagto_tipo::smallint
 // tb_pag_compras usa iforma::char(1)
-function getListaCodigoNumericoParaPagtoOnline()
+function getListaCodigoNumericoParaPagtoOnline(): string
 {
 
 	$numeric_code = "";
@@ -582,12 +582,12 @@ function getListaCodigoNumericoParaPagtoOnline()
 
 	$numeric_code .= $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'] . "";
 
-	return $numeric_code;
+	return (string)$numeric_code;
 }
 
 // tb_venda_games usa vg_pagto_tipo::smallint
 // tb_pag_compras usa iforma::char(1)
-function getListaCharacterParaPagtoOnline()
+function getListaCharacterParaPagtoOnline(): string
 {
 
 	$character_code = "";
@@ -618,10 +618,10 @@ function getListaCharacterParaPagtoOnline()
 
 	$character_code .= "'" . $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE'] . "'";
 
-	return $character_code;
+	return (string)$character_code;
 }
 
-function getSQLCodigoNumericoParaPagtoOnline($b_apenas_cielo = null)
+function getSQLCodigoNumericoParaPagtoOnline(mixed $b_apenas_cielo = null): string
 {
 
 	$sql_numeric_code = "CASE \n";
@@ -648,10 +648,10 @@ function getSQLCodigoNumericoParaPagtoOnline($b_apenas_cielo = null)
 		$sql_numeric_code .= "ELSE iforma::int \n";
 	}
 	$sql_numeric_code .= "END \n";
-	return $sql_numeric_code;
+	return (string)$sql_numeric_code;
 }
 
-function getSQLWhereParaPagtoOnline($b_apenas_cielo = null)
+function getSQLWhereParaPagtoOnline(mixed $b_apenas_cielo = null): string
 {
 
 	$sql_numeric_code = " (\n";
@@ -676,10 +676,10 @@ function getSQLWhereParaPagtoOnline($b_apenas_cielo = null)
 		$sql_numeric_code .= "iforma='" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX'] . "' \n";
 	}
 	$sql_numeric_code .= ") \n";
-	return $sql_numeric_code;
+	return (string)$sql_numeric_code;
 }
 
-function getSQLWhereParaPagtoOnlineConciliacao($b_apenas_cielo = null)
+function getSQLWhereParaPagtoOnlineConciliacao(mixed $b_apenas_cielo = null): string
 {
 
 	$sql_numeric_code = " (\n";
@@ -704,10 +704,10 @@ function getSQLWhereParaPagtoOnlineConciliacao($b_apenas_cielo = null)
 		$sql_numeric_code .= "rfcb_tipo_pagamento='" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX'] . "' \n";
 	}
 	$sql_numeric_code .= ") \n";
-	return $sql_numeric_code;
+	return (string)$sql_numeric_code;
 }
 
-function getSQLWhereParaVendaPagtoOnline($b_apenas_cielo = null)
+function getSQLWhereParaVendaPagtoOnline(mixed $b_apenas_cielo = null): string
 {
 
 	$sql_numeric_code = " (\n";
@@ -735,17 +735,17 @@ function getSQLWhereParaVendaPagtoOnline($b_apenas_cielo = null)
 		$sql_numeric_code .= "vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " \n";
 	}
 	$sql_numeric_code .= ") \n";
-	return $sql_numeric_code;
+	return (string)$sql_numeric_code;
 }
 
 /*
-	$b_integracao = true se estamos em integração (vindo de pagamento_int.php será sempre de integração)
+	$b_integracao = true se estamos em integrao (vindo de pagamento_int.php ser sempre de integrao)
 	$lst_opr = lista de operadoras no carrinho
 	$iforma1 = forma de pagamento segundo $FORMAS_PAGAMENTO[]
 
-	// Está incompleto: passou para classIntegracao.php
+	// Est incompleto: passou para classIntegracao.php
 */
-function b_Bloqueia_FormaPagto_para_Operadora($b_integracao, $lst_opr, $iforma1)
+function b_Bloqueia_FormaPagto_para_Operadora(mixed $b_integracao, mixed $lst_opr, mixed $iforma1): bool
 {
 	$FORMAS_PAGAMENTO_BLOQUEIO_OPERADORA = array(
 		'1' => '',
@@ -776,7 +776,7 @@ function b_Bloqueia_FormaPagto_para_Operadora($b_integracao, $lst_opr, $iforma1)
 	return false;
 }
 
-function get_oprs_em_carrinho()
+function get_oprs_em_carrinho(): string
 {
 	$s_oprs = "";
 	foreach ($GLOBALS['carrinho'] as $key => $val) {
@@ -784,39 +784,37 @@ function get_oprs_em_carrinho()
 		if ($s_oprs) $s_oprs .= ", ";
 		$s_oprs .= $opr_codigo;
 	}
-	return $s_oprs;
+	return (string)$s_oprs;
 }
 
-function get_oprs_by_produto($ogpm_id)
+function get_oprs_by_produto(mixed $ogpm_id): string
 {
 
 
-	// Se não tem modelos cadastrado -> retorna vazio (caso contrário o SQL pode retornar uma lista de produtos)
+	// Se no tem modelos cadastrado -> retorna vazio (caso contrrio o SQL pode retornar uma lista de produtos)
 	if (!$ogpm_id) {
-		return 0;
+		return "0";
 	}
 
-	$sql = "
-    SELECT ogp_opr_codigo
-    FROM tb_operadora_games_produto ogp
-    INNER JOIN tb_operadora_games_produto_modelo ogpm 
-        ON ogp.ogp_id = ogpm.ogpm_ogp_id
-    WHERE ogpm.ogpm_id = ?
-";
-
-	$rs = SQLexecuteQuery($sql, [intval($ogpm_id)]);
+	$sql = "select ogp_opr_codigo from tb_operadora_games_produto ogp ";
+	$sql .= "	inner join tb_operadora_games_produto_modelo ogpm on ogp.ogp_id = ogpm.ogpm_ogp_id ";
+	$sql .= "where 1=1 ";
+	$sql .= "	and ogpm.ogpm_id in ($ogpm_id) ";
+	$rs = SQLexecuteQuery($sql);
 
 	$ogp_opr_codigo = "0";
 	if ($rs && pg_num_rows($rs) != 0) {
 		$rs_row = pg_fetch_array($rs);
-		$ogp_opr_codigo = $rs_row['ogp_opr_codigo'];
+		if (is_array($rs_row) && isset($rs_row['ogp_opr_codigo'])) {
+			$ogp_opr_codigo = (string)$rs_row['ogp_opr_codigo'];
+		}
 	}
 
 	return $ogp_opr_codigo;
 }
 
 
-function getSQLWhereParaPagtoCieloDebito()
+function getSQLWhereParaPagtoCieloDebito(): string
 {
 	$sql_numeric_code = " (\n";
 
@@ -826,11 +824,11 @@ function getSQLWhereParaPagtoCieloDebito()
 	$sql_numeric_code .= "iforma='" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_ELO_DEBITO'] . "' \n";
 
 	$sql_numeric_code .= ") \n";
-	return $sql_numeric_code;
+	return (string)$sql_numeric_code;
 } //end function getSQLWhereParaPagtoCieloDebito()
 
 
-function getSQLWhereParaPagtoCieloCredito()
+function getSQLWhereParaPagtoCieloCredito(): string
 {
 	$sql_numeric_code = " (\n";
 
@@ -842,5 +840,5 @@ function getSQLWhereParaPagtoCieloCredito()
 	$sql_numeric_code .= "iforma='" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_DISCOVER_CREDITO'] . "' \n";
 
 	$sql_numeric_code .= ") \n";
-	return $sql_numeric_code;
+	return (string)$sql_numeric_code;
 } //end function getSQLWhereParaPagtoCieloCredito()

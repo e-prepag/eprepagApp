@@ -1,8 +1,8 @@
 <?php
-// Arquivo de configuraÁ„o de Meios de Pagamentos
+// Arquivo de configura√ß√£o de Meios de Pagamentos
 
 // ============================================
-// VETORES DE CONFIGURA«√O
+// VETORES DE CONFIGURA√á√ÉO
 // ============================================
 
 $vetorHabilita = array(
@@ -11,7 +11,7 @@ $vetorHabilita = array(
 );
 
 $vetoropcao = array(
-    "blupay" => "Casa do CrÈdito",
+    "blupay" => "Casa do Cr√©dito",
     "cielo" => "Cielo",
     "mercadopago" => "Mercado Pago",
     "asaas" => "Asaas",
@@ -28,13 +28,18 @@ $vetoropcao_boleto = array(
 );
 
 // ============================================
-// FUN«√O PARA LER CONFIGURA«’ES DO BANCO
+// FUN√á√ÉO PARA LER CONFIGURA√á√ïES DO BANCO
 // ============================================
 
-function getConfiguracaoPagamento($chave, $valorPadrao = null) {
-    static $cache = array(); // Cache para evitar m˙ltiplas consultas
+/**
+ * @param string $chave
+ * @param mixed $valorPadrao
+ * @return mixed
+ */
+function getConfiguracaoPagamento(string $chave, mixed $valorPadrao = null): mixed {
+    static $cache = array(); // Cache para evitar m√∫ltiplas consultas
     
-    // Verifica se j· est· em cache
+    // Verifica se j√° est√° em cache
     if (isset($cache[$chave])) {
         return $cache[$chave];
     }
@@ -65,18 +70,18 @@ function getConfiguracaoPagamento($chave, $valorPadrao = null) {
         return $valorPadrao;
         
     } catch(Exception $e) {
-        // Em caso de erro, registra no log e retorna valor padr„o
-        error_log("Erro ao buscar configuraÁ„o '$chave': " . $e->getMessage());
+        // Em caso de erro, registra no log e retorna valor padr√£o
+        error_log("Erro ao buscar configura√ß√£o '$chave': " . $e->getMessage());
         $cache[$chave] = $valorPadrao;
         return $valorPadrao;
     }
 }
 
 /**
- * Carrega todas as configuraÁıes de uma vez (mais eficiente)
- * @return array - Array associativo com todas as configuraÁıes
+ * Carrega todas as configura√ß√µes de uma vez (mais eficiente)
+ * @return array<string, mixed> - Array associativo com todas as configura√ß√µes
  */
-function carregarTodasConfiguracoes() {
+function carregarTodasConfiguracoes(): array {
     static $todasConfigs = null;
     
     if ($todasConfigs !== null) {
@@ -106,14 +111,14 @@ function carregarTodasConfiguracoes() {
         }
         
     } catch(Exception $e) {
-        error_log("Erro ao carregar todas as configuraÁıes: " . $e->getMessage());
+        error_log("Erro ao carregar todas as configura√ß√µes: " . $e->getMessage());
     }
     
     return $todasConfigs;
 }
 
 // ============================================
-// CARREGA TODAS AS CONFIGURA«’ES DE UMA VEZ
+// CARREGA TODAS AS CONFIGURA√á√ïES DE UMA VEZ
 // ============================================
 
 $configsPagamento = carregarTodasConfiguracoes();
@@ -122,7 +127,7 @@ $configsPagamento = carregarTodasConfiguracoes();
 // DEFINE AS CONSTANTES COM VALORES DO BANCO
 // ============================================
 
-// Constantes que definem se o Pagamento est· 1 => Ativado ou 0 => Desativado
+// Constantes que definem se o Pagamento est√° 1 => Ativado ou 0 => Desativado
 
 if (!defined('PAGAMENTO_BRADESCO')) {
     define("PAGAMENTO_BRADESCO", isset($configsPagamento['PAGAMENTO_BRADESCO']) ? $configsPagamento['PAGAMENTO_BRADESCO'] : 0);
@@ -173,7 +178,7 @@ if (!defined('VALOR_TROCA')) {
 }
 
 // ============================================
-// LIMPA VARI¡VEIS TEMPOR¡RIAS
+// LIMPA VARI√ÅVEIS TEMPOR√ÅRIAS
 // ============================================
 
 unset($configsPagamento);

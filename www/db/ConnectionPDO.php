@@ -1,6 +1,7 @@
 <?php require_once __DIR__ . '/../includes/constantes_url.php'; ?>
 <?php
 require_once __DIR__ . "/connect.php";
+require_once __DIR__ . "/../includes/writeIfPossible.php";
 
 class LoggingPDOStatement extends PDOStatement
 {
@@ -48,12 +49,7 @@ class LoggingPDOStatement extends PDOStatement
 
             $separator = str_repeat('*', 50);
             $logFile = '/www/arquivos_gerados/logs/sql_logs/logs_' . date('d_m_y') . '.log';
-
-            file_put_contents(
-                $logFile,
-                PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL,
-                FILE_APPEND
-            );
+            writeFileIfPossible($logFile, PHP_EOL . $separator . PHP_EOL . $log . PHP_EOL . PHP_EOL, "a+");
         }
 
         return parent::execute($bound_input_params);

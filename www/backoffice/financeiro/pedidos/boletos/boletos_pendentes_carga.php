@@ -203,7 +203,9 @@ if(false) $folder = "D:\\Projetos\\Outros\\E-Prepag\\Sites\\Producao\\backoffice
 			//Abre arquivo e le conteudo
 			$handle = fopen($fileDest, "r");
 			$ta_depositos = fread($handle, filesize($fileDest));
+			if ($handle) {
 			fclose($handle);
+			}
 
 			if($bco_id == "001"){
 				$msg = processaBoleto_BancoBrasil($ta_depositos, $tf_data);

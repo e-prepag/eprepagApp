@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
 <?php
 
-header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';");
+header("Content-Security-Policy: default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data:;");
 
 
 $arrCarteira = array("/game/conta/depositos-processamento.php", "/game/conta/extrato.php", "/game/carteira/detalhe-pedido.php", "/game/conta/detalhe-deposito.php", "/game/conta/add-saldo.php");

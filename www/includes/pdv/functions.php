@@ -888,7 +888,7 @@ function email_rodape($parametros)
         return $email_rod;
 }
 
-function buscaArquivosIniciaCom($folder, $ordem = 'nome', $direcao = 'asc', $iniciaCom)
+function buscaArquivosIniciaCom($folder, $ordem, $direcao, $iniciaCom)
 {
 
         $arquivoAr = array();

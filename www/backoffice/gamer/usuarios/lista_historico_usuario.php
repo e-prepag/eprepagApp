@@ -4,7 +4,7 @@ require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once $raiz_do_projeto."includes/gamer/main.php";
 require_once "/www/includes/bourls.php";
-ini_set('memory_limit','512M');
+// ini_set('memory_limit','512M');
 
 $tf_v_data_inclusao_ini = $_POST['tf_v_data_inclusao_ini'] ?? null;
 $tf_v_data_inclusao_fim = $_POST['tf_v_data_inclusao_fim'] ?? null;

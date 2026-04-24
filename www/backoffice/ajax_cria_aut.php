@@ -9,12 +9,12 @@ require_once __DIR__ . "/../db/ConnectionPDO.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/chave.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/AES.class.php";
-require_once __DIR__ . "/../class/GoogleAutenticator.php";
+require_once __DIR__ . "/../../class/GoogleAutenticator.php";
 require_once "/www/class/classSecureEncryption.php";
 
 session_start();
 
-$ga = new PHPGangsta_GoogleAuthenticator();
+$ga = new classGoogleAutenticator();
 
 try {
     $pdo = ConnectionPDO::getConnection()->getLink();
@@ -77,7 +77,7 @@ try {
                         }
                     }
                 }
-                $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag bko', $secret);
+                $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag bko', $secret);
 
                 $_SESSION['id_do_usuario'] = $fetch['id'];
 
@@ -219,7 +219,7 @@ try {
 
                                     </ol>
                                     <div style="width: 100%; display: flex; justify-content: center;">
-                                       <iframe width="300" height="170" src="https://www.youtube.com/embed/H_19Cv6jSDU" title="Tutorial autenticador" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        <iframe width="300" height="170" src="https://www.youtube.com/embed/H_19Cv6jSDU" title="Tutorial autenticador" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                                     </div>
                                 </div>
                             </div>

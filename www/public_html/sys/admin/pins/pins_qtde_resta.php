@@ -121,8 +121,10 @@ $resval = SQLexecuteQueryParams("select pin_valor from pins where opr_codigo=$1"
 echo $sql;
 
     $fp=fopen("../../debug.log","ab");
+	if ($fp) {
 	fwrite($fp,"\r\nIn Pins_Qtde Like as:\r\n".$sql."\r\n");
 	fclose($fp);
+	}
 		$resoprbrt = SQLexecuteQueryParams($sql, array());
 */	
 	$varsel = "&fopr=$fopr&fvalor=$fvalor";

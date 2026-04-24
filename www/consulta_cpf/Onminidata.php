@@ -125,9 +125,11 @@ class Onminidata {
 
 				$abre_arquivo = fopen($arquivo, 'a+');
 
+				if ($abre_arquivo) {
 				fwrite($abre_arquivo, $response . $error . "\n");
 
 				fclose($abre_arquivo);
+				}
 				
 				return $error;
 			  
@@ -138,9 +140,11 @@ class Onminidata {
 
 				$abre_arquivo = fopen($arquivo, 'a+');
 
+				if ($abre_arquivo) {
 				fwrite($abre_arquivo, $response . "\n");
 
 				fclose($abre_arquivo);
+				}
 				
 			  if ($data !== null) {
 				// Verifique se a resposta é uma matriz e se contém pelo menos um elemento

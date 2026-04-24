@@ -1,5 +1,6 @@
 <?php
 require_once "/www/includes/load_dotenv.php";
+require_once "/www/includes/writeIfPossible.php";
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 //ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
 
@@ -107,16 +108,10 @@ class classPIX
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
         $logFilePath = "/www/arquivos_gerados/logs/Asaas_PIX.txt";
-        $ff = fopen($logFilePath, "a+");
-
-        if ($ff) {
-            $timestamp = date("Y-m-d H:i:s");
-            $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
-                " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
-            fwrite($ff, $logEntry);
-            fclose($ff);
-
-        }
+        $timestamp = date("Y-m-d H:i:s");
+        $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
+            " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
+        writeFileIfPossible($logFilePath, $logEntry);
 
         if ($resposta == false) {
             $htmlErro = "
@@ -225,7 +220,7 @@ class classPIX
         $logEntry .= "Response:\n$response\n";
         $logEntry .= "HTTP Status Code: $httpCode\n";
 
-        file_put_contents("/www/arquivos_gerados/logs/Asaas_PIX.txt", $logEntry, FILE_APPEND);
+        writeFileIfPossible("/www/arquivos_gerados/logs/Asaas_PIX.txt", $logEntry);
 
         // Converte a resposta JSON para um array associativo
         $data = json_decode($response, true);

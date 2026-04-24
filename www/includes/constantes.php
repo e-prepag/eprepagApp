@@ -1,19 +1,27 @@
 <?php
+
 $raiz_do_projeto = "/www/";
-require_once "/www/includes/bourls.php";
 define("RAIZ_DO_PROJETO",$raiz_do_projeto);
 
+require_once __DIR__ . '/load_dotenv.php';
+require_once __DIR__ . '/bourls.php';
+
 if (!function_exists('random_bytes')) {
-    function random_bytes($length) {
+    /**
+     * @param int $length
+     * @return string
+     */
+    function random_bytes(int $length): string
+    {
 
         // Se tiver OpenSSL, usa bytes seguros
         if (function_exists('openssl_random_pseudo_bytes')) {
-            return openssl_random_pseudo_bytes($length);
+            return (string)openssl_random_pseudo_bytes($length);
         }
-        // Fallback manual (não criptograficamente seguro)
+        // Fallback manual (nÃ£o criptograficamente seguro)
         $bytes = '';
         for ($i = 0; $i < $length; $i++) {
-            // chr(rand(0, 255)) gera um byte ?aleatório?
+            // chr(rand(0, 255)) gera um byte ?aleatÃ³rio?
             $bytes .= chr(mt_rand(0, 255));
         }
         return $bytes;
@@ -28,72 +36,70 @@ $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 // Construindo a URL base
 $baseUrl = $protocol . "://" . $host;
 
-if (isset($baseUrl)) {
-    if($host == $server_url_bo){
-        define("SISTEMA", "backoffice");
-    }else{
-        define("SISTEMA", "sysadmin");
-    }
-}//end if (isset($GLOBALS['_SERVER']['SERVER_PORT']))
+if ($host == ($server_url_bo ?? '')) {
+    define("SISTEMA", "backoffice");
+} else {
+    define("SISTEMA", "sysadmin");
+} //end if (isset($GLOBALS['_SERVER']['SERVER_PORT']))
 
-define("DIR_WEB",RAIZ_DO_PROJETO."public_html/");
-define("DIR_IMG",RAIZ_DO_PROJETO."arquivos_gerados/");
+define("DIR_WEB", RAIZ_DO_PROJETO . "public_html/");
+define("DIR_IMG", RAIZ_DO_PROJETO . "arquivos_gerados/");
 
-define("DIR_BACKOFFICE",RAIZ_DO_PROJETO."backoffice/");
-define("DIR_BACKOFFICE_ADMIN",DIR_BACKOFFICE."admin/");
-define("DIR_BACKOFFICE_DIST_COMMERCE",DIR_BACKOFFICE."dist_commerce/");
-define("DIR_BACKOFFICE_COMMERCE",DIR_BACKOFFICE."commerce/");
+define("DIR_BACKOFFICE", RAIZ_DO_PROJETO . "backoffice/");
+define("DIR_BACKOFFICE_ADMIN", DIR_BACKOFFICE . "admin/");
+define("DIR_BACKOFFICE_DIST_COMMERCE", DIR_BACKOFFICE . "dist_commerce/");
+define("DIR_BACKOFFICE_COMMERCE", DIR_BACKOFFICE . "commerce/");
 
-define("DIR_COMMERCE",DIR_WEB."game/");
-define("DIR_DIST_COMMERCE",DIR_WEB."creditos/");
+define("DIR_COMMERCE", DIR_WEB . "game/");
+define("DIR_DIST_COMMERCE", DIR_WEB . "creditos/");
 
-define("DIR_SYS_ADMIN",DIR_WEB."sys/admin/");
+define("DIR_SYS_ADMIN", DIR_WEB . "sys/admin/");
 
-define("DIR_CREDITOS",DIR_WEB."creditos/");
-define("DIR_GAMES",DIR_WEB."game/");
+define("DIR_CREDITOS", DIR_WEB . "creditos/");
+define("DIR_GAMES", DIR_WEB . "game/");
 
-define("DIR_CLASS",RAIZ_DO_PROJETO."class/");
+define("DIR_CLASS", RAIZ_DO_PROJETO . "class/");
 
-define("DIR_JSON",RAIZ_DO_PROJETO."json/");
+define("DIR_JSON", RAIZ_DO_PROJETO . "json/");
 
-define("DIR_CSV",RAIZ_DO_PROJETO."arquivos_gerados/csv/");
+define("DIR_CSV", RAIZ_DO_PROJETO . "arquivos_gerados/csv/");
 
-define("DIR_LOG",RAIZ_DO_PROJETO."arquivos_gerados/logs/");
+define("DIR_LOG", RAIZ_DO_PROJETO . "arquivos_gerados/logs/");
 
-define("DIR_DB",RAIZ_DO_PROJETO."db/");
+define("DIR_DB", RAIZ_DO_PROJETO . "db/");
 
-define("DIR_INCS",RAIZ_DO_PROJETO."includes/");
+define("DIR_INCS", RAIZ_DO_PROJETO . "includes/");
 
-define("DIR_W_IMG_PRODUTOS","/imagens/pdv/produtos/");
+define("DIR_W_IMG_PRODUTOS", "/imagens/pdv/produtos/");
 
-define("DIR_G_IMG_PRODUTOS","/imagens/gamer/produtos/");
+define("DIR_G_IMG_PRODUTOS", "/imagens/gamer/produtos/");
 
-define("DIR_EPREPAG","/");
+define("DIR_EPREPAG", "/");
 
 define('IOF', 3.5);
 
-define("PROTOCOL","HTTPS");
+define("PROTOCOL", "HTTPS");
 
 $origem = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') ? $_SERVER['HTTP_REFERER'] : $_SERVER['SCRIPT_NAME'];
 
-if(strpos($origem,'creditos')){
-    define("CURRENT_SYSTEM","creditos");
-}elseif(strpos($origem,'game')){
-    define("CURRENT_SYSTEM","gamer");
-}else{
-    define("CURRENT_SYSTEM","gamer");
+if (strpos($origem, 'creditos')) {
+    define("CURRENT_SYSTEM", "creditos");
+} elseif (strpos($origem, 'game')) {
+    define("CURRENT_SYSTEM", "gamer");
+} else {
+    define("CURRENT_SYSTEM", "gamer");
 }
 
 /* 
  *  Constantes de retorno
  */
 
-define("RETURN_SUCCESS",1);
-define("RETURN_EMPTY",2);
-define("RETURN_WRONG",3);
-define("RETURN_CAPTCHA",4);
-define("RETURN_MAX_COUNT",5);
-define("RETURN_TWO_FACTOR",6);
+define("RETURN_SUCCESS", 1);
+define("RETURN_EMPTY", 2);
+define("RETURN_WRONG", 3);
+define("RETURN_CAPTCHA", 4);
+define("RETURN_MAX_COUNT", 5);
+define("RETURN_TWO_FACTOR", 6);
 /*
  * Constantes relacionadas ao blog
  */
@@ -122,13 +128,11 @@ $ARRAY_INIBI_VENDA_HARDCODE = array(4708);
 $ARRAY_INIBI_PRODUTOS_VENDA_TO_ID_HARDCODE = array(281);
 
 
-//Constante de idade mínima para cadastro
+//Constante de idade mÃ­nima para cadastro
 $IDADE_MINIMA = 16;
 
-//Constante de idade máxima sem validação adicional de RC
+//Constante de idade mÃ¡xima sem validaÃ§Ã£o adicional de RC
 $IDADE_MAXIMA = 60;
 
-//Constante que define se haverá transferência SFTP dos arquivos para o Windows
+//Constante que define se haverÃ¡ transferÃªncia SFTP dos arquivos para o Windows
 define("SFTP_TRANSFER", false);
-
-?>

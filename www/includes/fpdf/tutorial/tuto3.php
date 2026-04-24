@@ -3,14 +3,14 @@ require('../fpdf.php');
 
 class PDF extends FPDF
 {
-function Header()
+function Header(): void
 {
 	global $title;
 
 	// Arial bold 15
 	$this->SetFont('Arial','B',15);
 	// Calculate width of title and position
-	$w = $this->GetStringWidth($title)+6;
+	$w = $this->GetStringWidth((string)$title)+6;
 	$this->SetX((210-$w)/2);
 	// Colors of frame, background and text
 	$this->SetDrawColor(0,80,180);
@@ -19,12 +19,12 @@ function Header()
 	// Thickness of frame (1 mm)
 	$this->SetLineWidth(1);
 	// Title
-	$this->Cell($w,9,$title,1,1,'C',true);
+	$this->Cell($w,9,(string)$title,1,1,'C',true);
 	// Line break
 	$this->Ln(10);
 }
 
-function Footer()
+function Footer(): void
 {
 	// Position at 1.5 cm from bottom
 	$this->SetY(-15);
@@ -36,7 +36,7 @@ function Footer()
 	$this->Cell(0,10,'Page '.$this->PageNo(),0,0,'C');
 }
 
-function ChapterTitle($num, $label)
+function ChapterTitle(mixed $num, string $label): void
 {
 	// Arial 12
 	$this->SetFont('Arial','',12);
@@ -48,14 +48,14 @@ function ChapterTitle($num, $label)
 	$this->Ln(4);
 }
 
-function ChapterBody($file)
+function ChapterBody(string $file): void
 {
 	// Read text file
 	$txt = file_get_contents($file);
 	// Times 12
 	$this->SetFont('Times','',12);
 	// Output justified text
-	$this->MultiCell(0,5,$txt);
+	$this->MultiCell(0,5,(string)$txt);
 	// Line break
 	$this->Ln();
 	// Mention in italics
@@ -63,7 +63,7 @@ function ChapterBody($file)
 	$this->Cell(0,5,'(end of excerpt)');
 }
 
-function PrintChapter($num, $title, $file)
+function PrintChapter(int $num, string $title, string $file): void
 {
 	$this->AddPage();
 	$this->ChapterTitle($num,$title);

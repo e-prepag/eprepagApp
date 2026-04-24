@@ -256,6 +256,9 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                 $sql = "select nome from provedor_pix where ativo = 'A';";
                                                                 $ativo = SQLexecuteQuery($sql);
                                                                 $ativoNome = pg_fetch_assoc($ativo);
+                                                                if (!is_array($ativoNome)) {
+                                                                    $ativoNome = array();
+                                                                }
                                                                 /*																				
                                                                                                     if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){	
                                                                                                         //ini_set('display_errors', 1);
@@ -298,6 +301,12 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                     } else {
                                                                         $ativoNome["nome"] = PAGAMENTO_PIX_PROVEDOR;
                                                                     }
+                                                                    if (empty($ativoNome["nome"]) || !is_file(RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php')) {
+
+                                                                        $ativoNome["nome"] = "mercadopago";
+
+                                                                    }
+
                                                                     require_once RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php';
                                                                     //classe para pagamento em pix usada atualmente
                                                                     if ($ativoNome["nome"] == "asaas") {
@@ -341,6 +350,12 @@ if ($ultimo_status == $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO']) {
                                                                         echo "Pix não disponível no momento.";
                                                                     }
                                                                 } else {
+                                                                    if (empty($ativoNome["nome"]) || !is_file(RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php')) {
+
+                                                                        $ativoNome["nome"] = "mercadopago";
+
+                                                                    }
+
                                                                     require_once RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php';
                                                                     //classe para pagamento em pix usada atualmente
                                                                     if ($ativoNome["nome"] == "asaas") {

@@ -158,7 +158,9 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
     $retorno_cpf = SQLexecuteQuery($conexao, $sql);
     while($cpfs = pg_fetch_array($retorno_cpf)) {
     
+        if ($arquivo) {
         fwrite($arquivo, $cpfs["cpf"].PHP_EOL);   
+        }
         
     } //end
     fclose($arquivo);
@@ -203,7 +205,7 @@ function test($data, $limit, &$msg, &$total_cpfs_valor_superior){
 
 ob_end_flush();
 $msg .=  PHP_EOL.PHP_EOL."<b>RESUMO GERAL</b>".PHP_EOL.PHP_EOL."Total de CPFs ja existentes na tabela de CACHE: <b>".$find." Atualizados</b>".PHP_EOL.PHP_EOL."Total de CPFs NÃO localizados na tabela de CACHE: <b>".$nao_encotrados."</b>".PHP_EOL.PHP_EOL."Total de CPFs excederam o valor limite(".VALOR_LIMITE."): <b>".$total_cpfs_valor_superior." </b><br>"; //.($total_cpfs_ainda_nao_na_tabela > 0?"Lista de CPFs n�o encontrado na tabela de cache:".PHP_EOL.$msg_cpf_nao_em_cache.PHP_EOL.PHP_EOL:"");
-$msg = utf8_decode($msg);
+$msg = mb_convert_encoding((string)$msg, 'ISO-8859-1', 'UTF-8');
 
 if(!empty($msg)) {
     //if(enviaEmail($email, $cc, $bcc, $subject, str_replace(PHP_EOL,'<br>', $msg))) {

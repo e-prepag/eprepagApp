@@ -488,8 +488,10 @@ function valida_pin($cod_pin, $geralog = null)
 		$sql = "select pin_codigo,pin_valor from pins_store where pin_codigo='" . base64_encode($aes->encrypt(addslashes($cod_pin))) . "' and pin_status='" . intval($PINS_STORE_STATUS_VALUES['A']) . "'";
 
 		$ff = fopen("/www/arquivos_gerados/logs/erroFile.txt", "a+");
+		if ($ff) {
 		fwrite($ff, $sql . date('Y-m-d H:i:s') . "\r");
 		fclose($ff);
+		}
 
 		$rs_oper = SQLexecuteQuery($sql);
 		if (!$rs_oper || pg_num_rows($rs_oper) == 0) {
@@ -533,8 +535,10 @@ function valida_vencimento_pin($cod_pin, $geralog = null)
 
 
 			$ff = fopen("/www/arquivos_gerados/logs/erroFile.txt", "a+");
+			if ($ff) {
 			fwrite($ff, $sql . date('Y-m-d H:i:s') . "\r");
 			fclose($ff);
+			}
 
 			$rs_oper = SQLexecuteQuery($sql);
 			if (!$rs_oper || pg_num_rows($rs_oper) == 0) {

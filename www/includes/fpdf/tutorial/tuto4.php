@@ -4,29 +4,29 @@ require('../fpdf.php');
 class PDF extends FPDF
 {
 // Current column
-var $col = 0;
+public int $col = 0;
 // Ordinate of column start
-var $y0;
+public float|int $y0 = 0;
 
-function Header()
+function Header(): void
 {
 	// Page header
 	global $title;
 
 	$this->SetFont('Arial','B',15);
-	$w = $this->GetStringWidth($title)+6;
+	$w = $this->GetStringWidth((string)$title)+6;
 	$this->SetX((210-$w)/2);
 	$this->SetDrawColor(0,80,180);
 	$this->SetFillColor(230,230,0);
 	$this->SetTextColor(220,50,50);
 	$this->SetLineWidth(1);
-	$this->Cell($w,9,$title,1,1,'C',true);
+	$this->Cell($w,9,(string)$title,1,1,'C',true);
 	$this->Ln(10);
 	// Save ordinate
 	$this->y0 = $this->GetY();
 }
 
-function Footer()
+function Footer(): void
 {
 	// Page footer
 	$this->SetY(-15);
@@ -35,16 +35,16 @@ function Footer()
 	$this->Cell(0,10,'Page '.$this->PageNo(),0,0,'C');
 }
 
-function SetCol($col)
+function SetCol(int $col): void
 {
 	// Set position at a given column
 	$this->col = $col;
 	$x = 10+$col*65;
-	$this->SetLeftMargin($x);
-	$this->SetX($x);
+	$this->SetLeftMargin((float)$x);
+	$this->SetX((float)$x);
 }
 
-function AcceptPageBreak()
+function AcceptPageBreak(): bool
 {
 	// Method accepting or not automatic page break
 	if($this->col<2)
@@ -65,7 +65,7 @@ function AcceptPageBreak()
 	}
 }
 
-function ChapterTitle($num, $label)
+function ChapterTitle(mixed $num, string $label): void
 {
 	// Title
 	$this->SetFont('Arial','',12);
@@ -76,14 +76,14 @@ function ChapterTitle($num, $label)
 	$this->y0 = $this->GetY();
 }
 
-function ChapterBody($file)
+function ChapterBody(string $file): void
 {
 	// Read text file
 	$txt = file_get_contents($file);
 	// Font
 	$this->SetFont('Times','',12);
 	// Output text in a 6 cm width column
-	$this->MultiCell(60,5,$txt);
+	$this->MultiCell(60,5,(string)$txt);
 	$this->Ln();
 	// Mention
 	$this->SetFont('','I');
@@ -92,7 +92,7 @@ function ChapterBody($file)
 	$this->SetCol(0);
 }
 
-function PrintChapter($num, $title, $file)
+function PrintChapter(mixed $num, string $title, string $file): void
 {
 	// Add chapter
 	$this->AddPage();

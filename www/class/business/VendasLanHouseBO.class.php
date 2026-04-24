@@ -13,6 +13,7 @@ if(!isset($raiz_do_projeto))
 require_once $raiz_do_projeto."class/dao/VendasLanHouseDAO.class.php";
 require_once $raiz_do_projeto."class/util/CSV.class.php";
 require_once $raiz_do_projeto."class/util/Log.class.php";
+require_once $raiz_do_projeto."includes/writeIfPossible.php";
 
 class VendasLanHouseBO extends VendasLanHouseDAO{
     
@@ -334,9 +335,7 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                 $sql .= " order by vg_data_inclusao desc offset " . ($p - 1) * $registros . " limit " . $registros;
             $vendas= null;
 			
-			$ff = fopen("/www/arquivos_gerados/logs/ajuste-sql.txt", "a+");
-			fwrite($ff, $sql."\n");
-			fclose($ff);
+			writeFileIfPossible("/www/arquivos_gerados/logs/ajuste-sql.txt", $sql . "\n");
 
             $vendas = $this->getVendas($sql,false);
 
@@ -346,6 +345,10 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
     }
         
     public function getTotalVendas($sql){
-        return count($this->getVendas($sql,false));
+        $vendas = $this->getVendas($sql,false);
+        if (is_array($vendas) || $vendas instanceof Countable) {
+            return count($vendas);
+        }
+        return 0;
     }
 } //end class

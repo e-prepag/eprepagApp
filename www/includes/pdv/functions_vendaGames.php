@@ -3,8 +3,9 @@
 $bHTML = null;
 $cReturn = PHP_EOL;
 $cSpaces = "    ";
+$remoteAddr = $_SERVER["REMOTE_ADDR"] ?? "";
 
-if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
+if ($remoteAddr == "201.93.162.169") {
     //ini_set('display_errors', 1);
     //ini_set('display_startup_errors', 1);
     //error_reporting(E_ALL);
@@ -25,7 +26,7 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
             $usuario_id
         );
         if ($objUsuarioGames == null) {
-            $msg = "Nenhum usuário encontrado." . PHP_EOL;
+            $msg = "Nenhum usuï¿½rio encontrado." . PHP_EOL;
         } else {
             $perfilLimite = $objUsuarioGames->getPerfilLimite();
             $perfilSaldo = $objUsuarioGames->getPerfilSaldo();
@@ -78,7 +79,9 @@ function verificaEstoque($venda_id)
 {
     $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+    if ($ff) {
     fwrite($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
+    }
 
     $msg = "";
 
@@ -118,7 +121,7 @@ function verificaEstoque($venda_id)
                 $rs_pins = SQLexecuteQuery($sql);
                 if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
                     $msg .=
-                        "Não há pin de " .
+                        "Nï¿½o hï¿½ pin de " .
                         number_format($vgm_pin_valor, 2, ",", ".") .
                         " da operadora " .
                         $opr_nome .
@@ -129,7 +132,7 @@ function verificaEstoque($venda_id)
                     $pins_qtde = $rs_pins_row["pins_qtde"];
                     if ($pins_qtde < $vgm_qtde) {
                         $msg .=
-                            "Não há pin de " .
+                            "Nï¿½o hï¿½ pin de " .
                             number_format($vgm_pin_valor, 2, ",", ".") .
                             " da operadora " .
                             $opr_nome .
@@ -149,16 +152,16 @@ function verificaEstoque($venda_id)
 
 function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
 {
-    $pin_ignorados = []; // Lista para armazenar PINs já processados
+    $pin_ignorados = []; // Lista para armazenar PINs jï¿½ processados
 
     do {
-        // Monta a cláusula para ignorar os PINs já verificados
+        // Monta a clï¿½usula para ignorar os PINs jï¿½ verificados
         $ignorar_clausula = "";
         if (!empty($pin_ignorados)) {
             $ignorar_clausula = " AND pin_codigo NOT IN ('" . implode("','", $pin_ignorados) . "')";
         }
 
-        // Consulta para buscar um PIN disponível
+        // Consulta para buscar um PIN disponï¿½vel
         $sql = "SELECT * FROM pins
             WHERE opr_codigo = '" . $vgm_opr_codigo . "'
               AND pin_status = '1'
@@ -185,7 +188,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
 
         if ($pgpins["pin_codigo"] != '0000000000000000' && $pgpins["pin_codigo"] != '1111111111111111' && $pgpins["pin_codigo"] != null && $pgpins["pin_codigo"] != "") {
 
-            // Verifica se o PIN já foi vendido
+            // Verifica se o PIN jï¿½ foi vendido
             $sql = "SELECT * FROM tb_dist_venda_games_modelo_pins vp
             JOIN pins p ON p.pin_codinterno = vp.vgmp_pin_codinterno
             WHERE p.pin_codigo = '" . $pgpins["pin_codigo"] . "'";
@@ -194,20 +197,20 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
 
             if ($pin_test_duplic && pg_num_rows($pin_test_duplic) > 0 && $vgm_opr_codigo != 16) {
                 if ($bDebug) {
-                    echo "PIN já vendido, procurando o próximo..." . PHP_EOL;
+                    echo "PIN jï¿½ vendido, procurando o prï¿½ximo..." . PHP_EOL;
                 }
 
                 // Adiciona o PIN na lista de ignorados
                 $pin_ignorados[] = $pgpins["pin_codigo"];
             } else {
-                // Retorna o PIN válido
+                // Retorna o PIN vï¿½lido
                 return [
                     'success' => true,
                     'pin' => $pgpins
                 ];
             }
         } else {
-            // Retorna o PIN válido
+            // Retorna o PIN vï¿½lido
             return [
                 'success' => true,
                 'pin' => $pgpins
@@ -216,7 +219,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
     } while (true);
 }
 
-function processaVendaGames($venda_id, $EstabCod, $parametros)
+function processaVendaGames($venda_id, $EstabCod, &$parametros)
 {
     set_time_limit(0);
     global $raiz_do_projeto;
@@ -236,6 +239,9 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
     }
 
     $msg = "";
+    $msgOut = "";
+    $total_venda = 0;
+    $s_info_venda = "";
 
     //Recupera a venda
     if ($msg == "") {
@@ -263,7 +269,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 $GLOBALS["STATUS_VENDA"]["AGUARDANDO_PROCESSAMENTO"]
             ) {
                 $msg =
-                    "Venda não esta no status de " .
+                    "Venda nï¿½o esta no status de " .
                     $GLOBALS["STATUS_VENDA_DESCRICAO"][$GLOBALS["STATUS_VENDA"]["AGUARDANDO_PROCESSAMENTO"]] .
                     PHP_EOL;
 
@@ -276,7 +282,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 ) {
                     $parametros["agendamento_acao"] = "cancelar";
                     $parametros["agendamento_acao_obs"] =
-                        "Venda já foi processada." . PHP_EOL;
+                        "Venda jï¿½ foi processada." . PHP_EOL;
                 } elseif (
                     $vg_ultimo_status ==
                     $GLOBALS["STATUS_VENDA"]["VENDA_CANCELADA"]
@@ -347,7 +353,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         }
         $objUsuarioGames = (new UsuarioGames())->getUsuarioGamesById($vg_ug_id);
         if ($objUsuarioGames == null) {
-            $msg = "Nenhum usuário encontrado." . PHP_EOL;
+            $msg = "Nenhum usuï¿½rio encontrado." . PHP_EOL;
         } else {
             $ug_cel_ddd = $objUsuarioGames->getCelDDD();
             $ug_cel = $objUsuarioGames->getCel();
@@ -376,7 +382,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         }
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -448,9 +454,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 if ($vgm_ogp_id == 488) {
                     $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+                    if ($ff) {
                     fwrite($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
 
                     fclose($ff);
+                    }
                     try {
                         $geraPinEpp = new GeraPinVariavel($vgm_pin_valor, 53, 3, 1);
 
@@ -458,8 +466,10 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
+                        if ($ff) {
                         fwrite($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
                         fwrite($ff, "VGM_ID: " . $vgm_id . "\n");
+                        }
 
 
                         $sql =
@@ -505,17 +515,49 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                             $i--;
                             continue;
                         }
-                    } catch (Exception $err) {
+                    } catch (Throwable $err) {
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
-                        fwrite($ff, "Gerar PIN deu erro: " . $err->getMessage() . "\n");
+                        if ($ff) {
+                        fwrite(
+                            $ff,
+                            "Gerar PIN deu erro (" .
+                                get_class($err) .
+                                ") venda: " .
+                                $venda_id .
+                                ", vgm_id: " .
+                                $vgm_id .
+                                ", msg: " .
+                                $err->getMessage() .
+                                "\n"
+                        );
 
                         fclose($ff);
+                        }
+                    }
+
+                    if ($msg == "" && (!isset($pin_codinterno) || !is_numeric($pin_codinterno))) {
+                        $msg = "Erro ao gerar pin variavel." . PHP_EOL;
+
+                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+
+                        if ($ff) {
+                        fwrite(
+                            $ff,
+                            "Gerar PIN nao retornou pin_codinterno valido. venda: " .
+                                $venda_id .
+                                ", vgm_id: " .
+                                $vgm_id .
+                                "\n"
+                        );
+
+                        fclose($ff);
+                        }
                     }
                 } else {
                     //Sleep para nao sobrecarregar o servidor
                     //sleep(1);
-                    //FALA SÉRIO GENTE: Eu NÃO Tive que comentar isso!!!
+                    //FALA Sï¿½RIO GENTE: Eu Nï¿½O Tive que comentar isso!!!
                     //usleep(0.1*1000000);
 
                     if ($bDebug) {
@@ -532,16 +574,18 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                     //PINS
                     //---------------------------------------------------------------------------------------------------
-                    // Captura o primeiro pin válido
+                    // Captura o primeiro pin vï¿½lido
                     if (
                         $msg == "" &&
                         $vg_somente_debito == 0 &&
                         $vgm_pin_request == 0
                     ) {
                         $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        if ($ff) {
                         fwrite($ff, "Entra aqui ??? " . $vgm_ogp_id);
                         fclose($ff);
-                        // Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter
+                        }
+                        // Executa uma verificaï¿½ï¿½o se o a senha do pin ï¿½ zerada, se for exibe o campo pin_caracter
                         $resultado = buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug);
 
                         if (!$resultado['success']) {
@@ -556,7 +600,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     }
 
                     if ($bDebug) {
-                        echo " AAA+++ - Captura pin válido (iter: $i) (" .
+                        echo " AAA+++ - Captura pin vï¿½lido (iter: $i) (" .
                             number_format(
                                 getmicrotime() - $time_start_stats,
                                 2,
@@ -680,11 +724,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         }
                     }
 
-                    //Gerando o registro de requisição de PIN por Webservice
+                    //Gerando o registro de requisiï¿½ï¿½o de PIN por Webservice
                     if ($vgm_pin_request > 0) {
                         //Para produtos BHN
                         if ($vgm_pin_request == 1) {
-                            //Bloco de verificação de produto de valro variável
+                            //Bloco de verificaï¿½ï¿½o de produto de valro variï¿½vel
                             $sql =
                                 "select ogp_valor_minimo,ogp_valor_maximo,ogp_nome from tb_dist_operadora_games_produto where ogp_id=" .
                                 $vgm_ogp_id .
@@ -749,7 +793,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                             STR_PAD_LEFT
                                         ),
                                         "systemTraceAuditNumber" => str_pad(
-                                            0,
+                                            (string)0,
                                             6,
                                             "0",
                                             STR_PAD_LEFT
@@ -827,7 +871,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
             $vg_ug_id;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao atualizar saldo do usuário." . PHP_EOL;
+            $msg = "Erro ao atualizar saldo do usuï¿½rio." . PHP_EOL;
         } elseif (
             $objUsuarioGames->ug_Substatus == "9" &&
             $total_repasse * 1 != 0
@@ -848,10 +892,10 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     "rc@e-prepag.com.br,relacionamento@e-prepag.com.br",
                     null,
                     (!checkIP() ? "[PROD]" : "[DEV-HOMOLOG]") .
-                        " PDV - Promovido Automáticamente para PDV Aprovado",
+                        " PDV - Promovido Automï¿½ticamente para PDV Aprovado",
                     "PDV de ID [" .
                         $vg_ug_id .
-                        "] foi promovido automáticamente para SubStatus PDV Aprovado após a conciliação automática de sua primeira compra. ID do Pedido [" .
+                        "] foi promovido automï¿½ticamente para SubStatus PDV Aprovado apï¿½s a conciliaï¿½ï¿½o automï¿½tica de sua primeira compra. ID do Pedido [" .
                         $venda_id .
                         "]."
                 );
@@ -900,13 +944,13 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -930,6 +974,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 function processaEmailVendaGames($venda_id, $parametros)
 {
     $msg = "";
+    $msgOut = "";
 
     //Recupera a venda
     if ($msg == "") {
@@ -951,7 +996,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                 $GLOBALS["STATUS_VENDA"]["PROCESSAMENTO_REALIZADO"] &&
                 $vg_ultimo_status != $GLOBALS["STATUS_VENDA"]["VENDA_REALIZADA"]
             ) {
-                $msg = "Processamento ainda não realizado." . PHP_EOL;
+                $msg = "Processamento ainda nï¿½o realizado." . PHP_EOL;
             }
         }
     }
@@ -1026,7 +1071,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                 <td align='center'><b>Unit.&nbsp;(R$)</b></td>
                                                 <td align='center'><b>Qtde</b></td>
                                                 <td align='right'><b>Total&nbsp;(R$)</b></td>
-                                                <td align='right'><b>Comissão</b></td>
+                                                <td align='right'><b>Comissï¿½o</b></td>
                                                 <td width='5'>&nbsp;</td>
                                         </tr>";
 
@@ -1365,7 +1410,7 @@ function cancelaVendaGames($venda_id, $parametros)
             }
 
             // Cancela pagamento desta venda, se existir
-            // e se o pagamento não tiver sido feito e a venda ainda não tiver sido processada
+            // e se o pagamento nï¿½o tiver sido feito e a venda ainda nï¿½o tiver sido processada
             $sql =
                 "update tb_pag_compras set 
                                                 status_processed = 1,
@@ -1389,7 +1434,7 @@ function cancelaVendaGames($venda_id, $parametros)
     return $msg;
 }
 
-// Está usando este em processaAgendamentos.bat
+// Estï¿½ usando este em processaAgendamentos.bat
 function processaAgendamentos($lista = null)
 {
     /*	status: 1 - Agendado
@@ -1428,6 +1473,7 @@ function processaAgendamentos($lista = null)
         echo $header . $cReturn;
     }
     $msg = "";
+    $msgOut = "";
     if ($bDebug) {
         echo "Elapsed time A0(agendamento): " .
             number_format(getmicrotime() - $time_start_stats, 2, ".", ".") .
@@ -1473,7 +1519,7 @@ function processaAgendamentos($lista = null)
 
     //Executa agendamentos
     if ($msg == "") {
-        // É errado fazer um loop pelos registros da tabela tb_dist_agendamento_execucao e fazer update em tb_dist_agendamento_execucao
+        // ï¿½ errado fazer um loop pelos registros da tabela tb_dist_agendamento_execucao e fazer update em tb_dist_agendamento_execucao
         //	dentro do loop -> termina em deadlock
         //		passar a usar pg_fetch_all()
 
@@ -1524,7 +1570,7 @@ function processaAgendamentos($lista = null)
                 }
             }
             if ($bDebug) {
-                echo "  Horário OK" . PHP_EOL;
+                echo "  Horï¿½rio OK" . PHP_EOL;
             }
 
             $msg = "";
@@ -1563,15 +1609,19 @@ function processaAgendamentos($lista = null)
                     $msgConcilia = "";
                     $msgConciliaUsuario = "";
                     $BtnProcessa = 1;
+                    $BtnProcessaEmail = 0;
+                    $repetir_em = "";
+                    $agendamento_acao_obs = "";
                     $venda_id = $ae_vg_id;
                     $ultimo_status_obs = $ae_vg_ultimo_status_obs;
 
                     if ($BtnProcessa) {
                         //Associa pins, gera venda e credita saldo
                         if ($msgConcilia == "") {
+                            $parametros = [];
                             $parametros["ultimo_status_obs"] = $ultimo_status_obs;
                             //if($bDebug)
-                            echo "  Último status $ultimo_status_obs (" .
+                            echo "  ï¿½ltimo status $ultimo_status_obs (" .
                                 date("d/m/Y - H:i:s") .
                                 ")" .
                                 PHP_EOL;
@@ -1649,11 +1699,11 @@ function processaAgendamentos($lista = null)
                             } else {
                                 //reagendamento
                                 $agendamento_acao =
-                                    $parametros["agendamento_acao"];
+                                    $parametros["agendamento_acao"] ?? "";
                                 $agendamento_acao_obs =
-                                    $parametros["agendamento_acao_obs"];
+                                    $parametros["agendamento_acao_obs"] ?? "";
                                 $agendamento_acao_repetir_em =
-                                    $parametros["agendamento_acao_repetir_em"];
+                                    $parametros["agendamento_acao_repetir_em"] ?? "";
                                 if ($agendamento_acao) {
                                     if ($agendamento_acao == "cancelar") {
                                         $ae_status = 3;
@@ -1743,9 +1793,11 @@ function processaAgendamentos($lista = null)
                 "w"
             )
         ) {
+            if ($handle) {
             fwrite($handle, $smonitor);
 
             fclose($handle);
+            }
         } else {
             echo PHP_EOL .
                 "Error: Couldn't open Monitor File for writing" .
@@ -1791,13 +1843,13 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
     echo $cReturn .
         "========================================================================" .
         $cReturn;
-    echo "Prepara conciliação de pagamentos online PDV pré (registros com idvenda>0 e não processados nos últimos " .
+    echo "Prepara conciliaï¿½ï¿½o de pagamentos online PDV prï¿½ (registros com idvenda>0 e nï¿½o processados nos ï¿½ltimos " .
         $nminutes .
         " minutos, desde " .
         date("Y-m-d H:i:s", strtotime("-" . $nminutes . " minutes")) .
         ")" .
         $cReturn;
-    // Prepara conciliação de pagamentos online
+    // Prepara conciliaï¿½ï¿½o de pagamentos online
     //		$date_ini = date('Y-m-d', strtotime("-5 days"));	//"2009-01-01"; //date("Y-m-d");
     // echo "-90 minutes: ".date('Y-m-d H:i:s', strtotime("-90 minutes"))."<br>";
     $date_ini = date("Y-m-d H:i:s", strtotime("-" . $nminutes . " minutes"));
@@ -1812,12 +1864,12 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
         $sql .= " and idvenda = " . $id_venda . " ";
     }
 
-    // Opção 1 - não precissa limitar por data - apenas os pagtos com status_processed=0 serão retornados, após 90mins eles são cancelados.
+    // Opï¿½ï¿½o 1 - nï¿½o precissa limitar por data - apenas os pagtos com status_processed=0 serï¿½o retornados, apï¿½s 90mins eles sï¿½o cancelados.
     //	se houver um descancelamento de venda o pagto correspondnete vai aparecer aqui
 
-    // Opção 1 - Para processar normalmente
+    // Opï¿½ï¿½o 1 - Para processar normalmente
     //		$sql .= " and (pgt.datainicio between '".$date_ini."' and '".$date_end."') ";
-    // Opção 2 - Para incluir algum pagamento antigo descancelado
+    // Opï¿½ï¿½o 2 - Para incluir algum pagamento antigo descancelado
     //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";
 
     // Levanta apenas pagamentos recentes para completar testes
@@ -1831,7 +1883,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
 
     $rs_transacoes = SQLexecuteQuery($sql);
     if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0) {
-        $msg = "Nenhuma transação encontrada (132 PDV)." . $cReturn;
+        $msg = "Nenhuma transaï¿½ï¿½o encontrada (132 PDV)." . $cReturn;
     }
 
     $irows = 0;
@@ -1945,11 +1997,11 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         );
                     }
 
-                    // Pagamento ainda não foi feito ou não tem confirmação bancaria -  status=1 -> Sonda o banco, se estiver completo atualiza aqui
+                    // Pagamento ainda nï¿½o foi feito ou nï¿½o tem confirmaï¿½ï¿½o bancaria -  status=1 -> Sonda o banco, se estiver completo atualiza aqui
                 } elseif ($rs_transacoes_row["status"] == 1) {
                     // bloqueio para evitar consulta ao MUP
                     //if(false)
-                    // começa aqui nova função getSondaBanco()
+                    // comeï¿½a aqui nova funï¿½ï¿½o getSondaBanco()
                     $areturn = [];
                     $iret = getSondaBanco(
                         $rs_transacoes_row["iforma"],
@@ -1967,7 +2019,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                     $prefix_1 = $areturn["prefix_1"];
                     $s_sync = $areturn["s_sync"];
                     $vg_pagto_tipo = $areturn["vg_pagto_tipo"];
-                    // até aqui nova função getSondaBanco()
+                    // atï¿½ aqui nova funï¿½ï¿½o getSondaBanco()
 
                     // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
                     if ($s_sync == "NO SYNC") {
@@ -1980,7 +2032,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $ret = true; /////////////////////
                             if (!$ret) {
                                 $msg =
-                                    "Erro ao iniciar transação (PDV)." .
+                                    "Erro ao iniciar transaï¿½ï¿½o (PDV)." .
                                     $cReturn;
                             }
                         }
@@ -1998,7 +2050,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             );
                         } //end if(strlen(str_replace("'", "", $dataconfirma)) == 17)
 
-                        // Marca registro como status=3, já que se chegou aqui quer dizer que não passou por confirmaBanco.php
+                        // Marca registro como status=3, jï¿½ que se chegou aqui quer dizer que nï¿½o passou por confirmaBanco.php
                         $sql =
                             "update tb_pag_compras set datacompra=CURRENT_TIMESTAMP, dataconfirma=" .
                             $dataconfirma .
@@ -2108,7 +2160,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $sql = "COMMIT TRANSACTION ";
                             $ret = SQLexecuteQuery($sql);
                             if (!$ret) {
-                                $msg = "Erro ao comitar transação." . $cReturn;
+                                $msg = "Erro ao comitar transaï¿½ï¿½o." . $cReturn;
                             }
 
                             $msg_sonda = "PROCESSADO POR SONDA";
@@ -2118,7 +2170,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             //////			$ret  =true;												/////////////////////
                             if (!$ret) {
                                 $msg =
-                                    "Erro ao dar rollback na transação." .
+                                    "Erro ao dar rollback na transaï¿½ï¿½o." .
                                     $cReturn;
                             }
 
@@ -2147,7 +2199,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $cReturn;
                     } else {
                         // number_format(($rs_transacoes_row['total']/100 - $rs_transacoes_row['taxas']), 2, '.', '.')
-                        echo "Não Processado por sonda: forma:" .
+                        echo "Nï¿½o Processado por sonda: forma:" .
                             $rs_transacoes_row["iforma"] .
                             ", numcompra: " .
                             $rs_transacoes_row["numcompra"] .
@@ -2167,7 +2219,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $cReturn;
                     } // bloqueio para evitar consulta ao MUP
                 } else {
-                    echo "Não processado: status!=3 e Sonda=false." .
+                    echo "Nï¿½o processado: status!=3 e Sonda=false." .
                         $cReturn .
                         "numcompra: " .
                         $rs_transacoes_row["numcompra"] .
@@ -2178,7 +2230,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         $cReturn;
                 }
             } else {
-                echo "Não processado: idvenda=0." .
+                echo "Nï¿½o processado: idvenda=0." .
                     $cReturn .
                     "numcompra: " .
                     $rs_transacoes_row["numcompra"] .
@@ -2303,7 +2355,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             ":" .
                             $cReturn;
                         $parametros["ultimo_status_obs"] =
-                            "Conciliação automática em " .
+                            "Conciliaï¿½ï¿½o automï¿½tica em " .
                             date("d/m/Y - H:i:s") .
                             $cReturn;
                         if (trim($vg_ultimo_status_obs) != "") {
@@ -2385,7 +2437,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             }
                         }
 
-                        // Marca registro como processado só aqui, depois de conciliar a venda
+                        // Marca registro como processado sï¿½ aqui, depois de conciliar a venda
                         $sql = "update tb_pag_compras set status_processed=1 ";
                         $sql .=
                             "where idvenda = " .
@@ -2535,7 +2587,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
         "------------------------------------------------------------------------" .
         $cReturn;
 
-    //Conciliação PIX
+    //Conciliaï¿½ï¿½o PIX
     $msg .= conciliacaoAutomaticaPagtoPIXemPDV($id_venda);
     return $msg;
 }
@@ -2566,13 +2618,13 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     echo $cReturn .
         "========================================================================" .
         $cReturn;
-    echo "Prepara conciliação de pagamentos PIX para PDV pré (não processados nos últimos " .
+    echo "Prepara conciliaï¿½ï¿½o de pagamentos PIX para PDV prï¿½ (nï¿½o processados nos ï¿½ltimos " .
         $minutes .
         " minutos, desde " .
         date("Y-m-d H:i:s", strtotime("-" . $minutes . " minutes")) .
         ")" .
         $cReturn;
-    // Prepara conciliação de pagamentos online
+    // Prepara conciliaï¿½ï¿½o de pagamentos online
     $date_ini = date("Y-m-d H:i:s", strtotime("-" . $minutes . " minutes"));
     $date_end = date("Y-m-d H:i:s");
 
@@ -2594,7 +2646,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     $rs_transacoes = SQLexecuteQuery($sql);
     $registros_total = pg_num_rows($rs_transacoes);
     if (!$rs_transacoes || $registros_total == 0) {
-        $msg = "Nenhuma transação encontrada (132 PDV)." . $cReturn;
+        $msg = "Nenhuma transaï¿½ï¿½o encontrada (132 PDV)." . $cReturn;
     }
 
     $irows = 0;
@@ -2625,7 +2677,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
             $msg = "";
             // Venda cadastrada
             if ($rs_transacoes_row["idvenda"] > 0) {
-                // começa aqui nova função getSondaBanco()
+                // comeï¿½a aqui nova funï¿½ï¿½o getSondaBanco()
                 $areturn = [];
                 $iret = getSondaBanco(
                     $rs_transacoes_row["iforma"],
@@ -2641,7 +2693,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 $prefix_1 = $areturn["prefix_1"];
                 $s_sync = $areturn["s_sync"];
                 $vg_pagto_tipo = $areturn["vg_pagto_tipo"];
-                // até aqui nova função getSondaBanco()
+                // atï¿½ aqui nova funï¿½ï¿½o getSondaBanco()
 
                 //echo "<<<<<".json_encode($areturn).">>>>>";
 
@@ -2654,7 +2706,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         $ret = true; /////////////////////
                         if (!$ret) {
                             $msg =
-                                "Erro ao iniciar transação (PDV)." . $cReturn;
+                                "Erro ao iniciar transaï¿½ï¿½o (PDV)." . $cReturn;
                         }
                     }
                     //Arames Monster
@@ -2669,7 +2721,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         );
                     } //end if(strlen(str_replace("'", "", $dataconfirma)) == 17)
 
-                    // Marca registro como status=3, já que se chegou aqui quer dizer que não passou por confirmaBanco.php
+                    // Marca registro como status=3, jï¿½ que se chegou aqui quer dizer que nï¿½o passou por confirmaBanco.php
                     $sql =
                         "update tb_pag_compras set protocolo='Teste', datacompra=CURRENT_TIMESTAMP, dataconfirma=" .
                         $dataconfirma .
@@ -2778,7 +2830,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         $sql = "COMMIT TRANSACTION ";
                         $ret = SQLexecuteQuery($sql);
                         if (!$ret) {
-                            $msg = "Erro ao comitar transação." . $cReturn;
+                            $msg = "Erro ao comitar transaï¿½ï¿½o." . $cReturn;
                         }
 
                         $msg_sonda = "PROCESSADO POR SONDA";
@@ -2787,7 +2839,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         $ret = SQLexecuteQuery($sql);
                         if (!$ret) {
                             $msg =
-                                "Erro ao dar rollback na transação." . $cReturn;
+                                "Erro ao dar rollback na transaï¿½ï¿½o." . $cReturn;
                         }
 
                         $msg_sonda =
@@ -2817,7 +2869,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 //end if($s_sync=="NO SYNC")
                 else {
                     // number_format(($rs_transacoes_row['total']/100 - $rs_transacoes_row['taxas']), 2, '.', '.')
-                    echo "Não Processado por sonda: forma:" .
+                    echo "Nï¿½o Processado por sonda: forma:" .
                         $rs_transacoes_row["iforma"] .
                         ", numcompra: " .
                         $rs_transacoes_row["numcompra"] .
@@ -2839,7 +2891,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
             }
             //end if($rs_transacoes_row['idvenda']>0)
             else {
-                echo "Não processado: idvenda=0." .
+                echo "Nï¿½o processado: idvenda=0." .
                     $cReturn .
                     "numcompra: " .
                     $rs_transacoes_row["numcompra"] .
@@ -2952,7 +3004,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             ":" .
                             $cReturn;
                         $parametros["ultimo_status_obs"] =
-                            "Conciliação automática em " .
+                            "Conciliaï¿½ï¿½o automï¿½tica em " .
                             date("d/m/Y - H:i:s") .
                             $cReturn;
                         if (trim($vg_ultimo_status_obs) != "") {
@@ -3034,7 +3086,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             }
                         }
 
-                        // Marca registro como processado só aqui, depois de conciliar a venda
+                        // Marca registro como processado sï¿½ aqui, depois de conciliar a venda
                         $sql = "update tb_pag_compras set status_processed=1 ";
                         $sql .=
                             "where idvenda = " .
@@ -3178,7 +3230,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
 } // end conciliacaoAutomaticaPagtoPIXemPDV
 
 /*
-    // => o correto é conciliar a partir de tb_pag_compras com status=3
+    // => o correto ï¿½ conciliar a partir de tb_pag_compras com status=3
 */
 function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
 {
@@ -3187,9 +3239,9 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
 
     //Valida usuario_id
     if (!$usuario_id) {
-        $msg = "Código do usuário PDV não fornecido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV nï¿½o fornecido." . PHP_EOL;
     } elseif (!is_numeric($usuario_id)) {
-        $msg = "Código do usuário PDV inválido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV invï¿½lido." . PHP_EOL;
     }
 
     //Recupera o boleto pendente
@@ -3215,13 +3267,13 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         $sql = "BEGIN TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
     //Concilia boleto
     if ($msg == "") {
-        // a esta altura já deve estar status=3
+        // a esta altura jï¿½ deve estar status=3
         $sql =
             "update tb_pag_compras set status_processed = 1, dataconfirma = CURRENT_TIMESTAMP where idvenda = " .
             $venda_id .
@@ -3233,7 +3285,7 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         }
     }
 
-    //Credita valor do boleto no usuário LH
+    //Credita valor do boleto no usuï¿½rio LH
     if ($msg == "") {
         $sql =
             "update dist_usuarios_games set ug_perfil_saldo = coalesce(ug_perfil_saldo,0) + " .
@@ -3244,7 +3296,7 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         echo "sqlAZ3: $sql [" . getmicrotime() . "]" . PHP_EOL;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3262,7 +3314,7 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         echo "sqlA4: <span style='background-color:#CCCC66'>$sql</span><br>";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3270,16 +3322,16 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
     if ($msg == "") {
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
-        //echo "Comentários em COMMIT TRANSACTION  ============================================<br>";
+        //echo "Comentï¿½rios em COMMIT TRANSACTION  ============================================<br>";
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
-        //echo "Comentários em ROLLBACK TRANSACTION   ============================================<br>";
+        //echo "Comentï¿½rios em ROLLBACK TRANSACTION   ============================================<br>";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -3450,7 +3502,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                             ":" .
                             PHP_EOL;
                         $parametros["ultimo_status_obs"] =
-                            "Conciliação automática em " .
+                            "Conciliaï¿½ï¿½o automï¿½tica em " .
                             date("d/m/Y - H:i:s") .
                             "" .
                             PHP_EOL;
@@ -3522,7 +3574,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
 
     echo "  FINAL elapsed total time (total de $n registros): " .
         number_format(getmicrotime() - $time_start_stats, 2, ".", ".") .
-        "s, média de " .
+        "s, mï¿½dia de " .
         number_format(
             (getmicrotime() - $time_start_stats) / ($n == 0 ? 1 : $n),
             2,
@@ -3552,16 +3604,16 @@ function conciliaExpressMoneyLH_boleto(
 
     //Valida boleto id
     if (!$boleto_id) {
-        $msg = "Código do boleto não fornecido." . PHP_EOL;
+        $msg = "Cï¿½digo do boleto nï¿½o fornecido." . PHP_EOL;
     } elseif (!is_numeric($boleto_id)) {
-        $msg = "Código do boleto inválido." . PHP_EOL;
+        $msg = "Cï¿½digo do boleto invï¿½lido." . PHP_EOL;
     }
 
     //Valida usuario_id
     if (!$usuario_id) {
-        $msg = "Código do usuário PDV não fornecido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV nï¿½o fornecido." . PHP_EOL;
     } elseif (!is_numeric($usuario_id)) {
-        $msg = "Código do usuário PDV inválido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV invï¿½lido." . PHP_EOL;
     }
 
     //Recupera o boleto pendente
@@ -3587,7 +3639,7 @@ function conciliaExpressMoneyLH_boleto(
         $ret = SQLexecuteQuery($sql);
         $ret = true; /////////////////////
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -3606,7 +3658,7 @@ function conciliaExpressMoneyLH_boleto(
         }
     }
 
-    //Credita valor do boleto no usuário LH
+    //Credita valor do boleto no usuï¿½rio LH
     if ($msg == "") {
         $sql =
             "update dist_usuarios_games set ug_perfil_saldo = coalesce(ug_perfil_saldo,0) + " .
@@ -3617,7 +3669,7 @@ function conciliaExpressMoneyLH_boleto(
         echo "sqlA3: $sql" . PHP_EOL;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3635,7 +3687,7 @@ function conciliaExpressMoneyLH_boleto(
         echo "sqlA4: $sql" . PHP_EOL;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3644,13 +3696,13 @@ function conciliaExpressMoneyLH_boleto(
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -3700,7 +3752,7 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
                 $vg_ultimo_status !=
                 $GLOBALS["STATUS_VENDA"]["PAGTO_CONFIRMADO"]
             ) {
-                $msg = "Venda não esta no seu status inicial." . PHP_EOL;
+                $msg = "Venda nï¿½o esta no seu status inicial." . PHP_EOL;
             }
         }
     }
@@ -3746,7 +3798,7 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
         $sql = "BEGIN TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
     if ($blDebugMT) {
@@ -3784,13 +3836,13 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
     if ($blDebugMT) {
@@ -3836,7 +3888,7 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
                 $vg_ultimo_status !=
                 $GLOBALS["STATUS_VENDA"]["PAGTO_CONFIRMADO"]
             ) {
-                $msg = "Processamento ainda não realizado." . PHP_EOL;
+                $msg = "Processamento ainda nï¿½o realizado." . PHP_EOL;
             }
         }
     }
@@ -3929,12 +3981,12 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
                                                 <table border='0' cellspacing='0' width='90%'>
                                                 <tr>
                                                         <td class='texto'> 
-                                                                Seu pagamento de boleto Express Money PDV número <b>" .
+                                                                Seu pagamento de boleto Express Money PDV nï¿½mero <b>" .
             formata_codigo_venda($venda_id) .
             "</b> foi processado com sucesso!<br>
                                                                 No seu PDV com a E-Prepag foi creditado o valor de <b>R$" .
             number_format($parametros["valor"], 2, ",", ".") .
-            "</b> que já pode ser usado para comprar os produtos disponíveis. 
+            "</b> que jï¿½ pode ser usado para comprar os produtos disponï¿½veis. 
                                                         </td>
                                                 </tr>
                                                 </table>";

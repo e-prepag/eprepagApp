@@ -1,7 +1,7 @@
 <?php
 ob_start(); 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200);
+// ini_set('max_execution_time', 1200);
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
@@ -49,7 +49,7 @@ if(!$arquivoLog->haveFile()) {
                 $produto                                    = new stdClass();
                 $produto->tipo                              = "games";
                 $produto->id                                = $rs_row['ogp_id'];
-                $produto->nome                              = htmlentities(utf8_encode($rs_row['ogp_nome']));
+                $produto->nome                              = htmlentities(mb_convert_encoding((string)$rs_row['ogp_nome'], 'UTF-8', 'ISO-8859-1'), ENT_QUOTES, 'UTF-8');
                 $produto->busca                             = htmlentities(strip_tags(Util::cleanStr2($rs_row['ogp_nome']." | ".$rs_row['opr_nome_loja']))); //corrigir traducao dew caracter q nao ta funfando
                 $produto->imagem                            = $rs_row['ogp_nome_imagem'];
                 $produto->operadora                         = $rs_row['opr_nome_loja'];

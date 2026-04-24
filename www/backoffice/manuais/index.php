@@ -109,7 +109,9 @@ require_once DIR_CLASS . "util/Util.class.php";
                                 . 'require_once RAIZ_DO_PROJETO . "backoffice/includes/topo.php";' . PHP_EOL   
                                 . 'require_once RAIZ_DO_PROJETO . "backoffice/manuais/includes/navegacao.php";' . PHP_EOL
                                 . '?>' . PHP_EOL;
+                        if ($file) {
                         fwrite($file, $header);
+                        }
 
                         $button = "<a href='/manuais/" . $diretorio . "/".$nome_arquivo.".pdf' download='".$nome_arquivo."' class='btn btn-info'>Download</a>";
                         fwrite($file, $button);

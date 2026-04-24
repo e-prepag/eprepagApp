@@ -74,11 +74,13 @@ class CPF extends classCPF
             elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB) {
 
                 $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+                if ($file) {
                 fwrite($file, "hud do desenvolvedor \n");
                 fwrite($file, "resultado code " . $testeCPF . "\n");
                 fwrite($file, "resultado json " . json_encode($resposta) . "\n");
                 fwrite($file, str_repeat("*", 50));
                 fclose($file);
+                }
 
                 if ($testeCPF == 2) {
                     $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
@@ -111,9 +113,11 @@ class CPF extends classCPF
             } else {
 
                 $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+                if ($file) {
                 fwrite($file, "resultado " . $testeCPF . "\n");
                 fwrite($file, str_repeat("*", 50));
                 fclose($file);
+                }
 
                 if ($testeCPF == 2 || $testeCPF == 8) {
                     $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";

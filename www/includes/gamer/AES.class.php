@@ -20,16 +20,18 @@
 
 class AES {
         // The number of 32-bit words comprising the plaintext and columns comrising the state matrix of an AES cipher.
-        private static $Nb = 4;
+        private static int $Nb = 4;
         // The number of 32-bit words comprising the cipher key in this AES cipher.
-        private $Nk;
+        private int $Nk;
         // The number of rounds in this AES cipher.
-        private $Nr;
+        private int $Nr;
 
+        /** @var mixed */
         private $chave;
 
         // The S-Box substitution table.
-        private static $sBox = array(
+        /** @var array<int, int> */
+        private static array $sBox = array(
                 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
                 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
                 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
@@ -207,7 +209,7 @@ class AES {
         public function encrypt($x) {
                 $blockSize = 16;
                 $plaintext = $x;
-                $plaintext = str_pad($plaintext, $blockSize * ceil(strlen($plaintext) / $blockSize), chr(0));
+                $plaintext = str_pad($plaintext, (int) ($blockSize * ceil(strlen($plaintext) / $blockSize)), chr(0));
                 $cipher = 'aes-256-ecb';
                 $encrypted = openssl_encrypt($plaintext, $cipher, $this->chave, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, "");
                 return $encrypted;

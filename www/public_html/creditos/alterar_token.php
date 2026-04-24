@@ -1,7 +1,7 @@
 <?php require_once __DIR__ . '/../../includes/constantes_url.php'; ?>
 <?php
 require_once "../../includes/constantes.php";
-require_once "../class/GoogleAutenticator.php";
+require_once "../../class/GoogleAutenticator.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
 
 $controller = new OfflineController;
@@ -67,7 +67,7 @@ if ($_SESSION['usuario_operador']) {
     $secret = $_SESSION['secret'];
 
     if ($token && $secret) {
-        $ga = new PHPGangsta_GoogleAuthenticator();
+        $ga = new classGoogleAutenticator();
         $checkResult = $ga->verifyCode($secret, $token, 2);
 
         if ($checkResult) {
@@ -89,14 +89,14 @@ if ($_SESSION['usuario_operador']) {
         }
     }
     if (!$secret) {
-        $ga = new PHPGangsta_GoogleAuthenticator();
+        $ga = new classGoogleAutenticator();
 
         $secret = $ga->createSecret();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+        $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag', $secret);
         $_SESSION['secret'] = $secret;
     } else if (!isset($qrCodeUrl)) {
-        $ga = new PHPGangsta_GoogleAuthenticator();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+        $ga = new classGoogleAutenticator();
+        $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag', $secret);
     }
 } else {
     $sql = "select * from dist_usuarios_games where ug_id = ? and ug_ativo = 1";
@@ -154,7 +154,7 @@ if ($_SESSION['usuario_operador']) {
     $secret = $_SESSION['secret'];
 
     if ($token && $secret) {
-        $ga = new PHPGangsta_GoogleAuthenticator();
+        $ga = new classGoogleAutenticator();
         $checkResult = $ga->verifyCode($secret, $token, 2);
 
         if ($checkResult) {
@@ -176,14 +176,14 @@ if ($_SESSION['usuario_operador']) {
         }
     }
     if (!$secret) {
-        $ga = new PHPGangsta_GoogleAuthenticator();
+        $ga = new classGoogleAutenticator();
 
         $secret = $ga->createSecret();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+        $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag', $secret);
         $_SESSION['secret'] = $secret;
     } else if (!isset($qrCodeUrl)) {
-        $ga = new PHPGangsta_GoogleAuthenticator();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag', $secret);
+        $ga = new classGoogleAutenticator();
+        $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag', $secret);
     }
 }
 
@@ -297,7 +297,7 @@ require_once "includes/header-offline.php";
 
                         <div class="mb-3">
                             <label style="margin-top: 15px;" for="token" class="<?php if (isset($txtVermelho))
-                                echo $txtVermelho; ?>">
+                                                                                    echo $txtVermelho; ?>">
                                 Insira o Token gerado pelo autenticador:
                             </label>
                             <input type="text" name="token" id="token" class="form-control">
@@ -346,13 +346,13 @@ require_once "includes/header-offline.php";
             <?php
             if ($banner) {
                 foreach ($banner as $b) {
-                    ?>
+            ?>
                     <div class="row pull-right">
                         <a href="<?php echo $b->link; ?>" class="banner" id="<?php echo $b->id; ?>" target="_blank"><img
                                 src="<?php echo $controller->objBanner->urlLink . $b->imagem; ?>" width="186" class="p-3"
                                 title="<?php echo $b->titulo; ?>"></a>
                     </div>
-                    <?php
+            <?php
                 }
             }
             ?>
@@ -367,8 +367,8 @@ require_once "includes/header-offline.php";
 <script src="/js/facebook.js"></script>
 <script src="/js/jqueryui/js/jquery-ui-1.9.2.custom.min.js"></script>
 <script>
-    $(function () {
-        $("#div-copiar").click(function () {
+    $(function() {
+        $("#div-copiar").click(function() {
             copyAuthCode();
         });
     });
@@ -385,7 +385,6 @@ require_once "includes/header-offline.php";
             console.error("Erro ao copiar:", err);
         });
     }
-
 </script>
 <?php
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/footer.php";

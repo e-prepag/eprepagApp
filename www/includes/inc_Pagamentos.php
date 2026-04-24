@@ -1,48 +1,47 @@
 <?php require_once __DIR__ . '/constantes_url.php'; ?>
 <?php
 $a_formas_pagamento = array(
-	'VISA' => 'Cartão de Crédito VISA',
-	'MasterCard' => 'Cartão de Crédito MasterCard',
-	'Débito em conta Bradesco' => 'Débito em conta Bradesco',
-	'Débito em conta Banco de Brasil' => 'Débito em conta Banco de Brasil',
-	'Débito em conta Banco Real' => 'Débito em conta Banco Real',
-	'Débito em conta Itaú' => 'Débito em conta Itaú',
-	'Débito em conta Unibanco' => 'Débito em conta Unibanco',
-	'Boleto bancário' => 'Boleto bancário'
-);
+	'VISA' => 'Cartão de Crédito VISA', 
+	'MasterCard' => 'Cartão de Crédito MasterCard', 
+	'Débito em conta Bradesco' => 'Débito em conta Bradesco', 
+	'Débito em conta Banco de Brasil' => 'Débito em conta Banco de Brasil', 
+	'Débito em conta Banco Real' => 'Débito em conta Banco Real', 
+	'Débito em conta Itaú' => 'Débito em conta Itaú', 
+	'Débito em conta Unibanco' => 'Débito em conta Unibanco', 
+	'Boleto bancário' => 'Boleto bancário' 
+); 
 
 // Para manter os arquivos de retorno do bradesco e ler, no máximo, uma vez a cada minuto 
 $RETORNO_BRADESCO = array(
-	'buffer_facil' => '',
-	'data_facil' => '',
-	'data_transf' => '',
-	'data_transf' => ''
+		'buffer_facil' => '',
+		'data_facil' => '',
+		'data_transf' => '',
+		'data_transf' => ''
 );
 
 // Usar esta função
-function getArquivoRetorno($stipo)
-{
+function getArquivoRetorno($stipo) {
 	global $link_ArquivoRetornoPagtoFacil, $link_ArquivoRetornoPagtoFacil_POST, $link_ArquivoRetornoTransf, $link_ArquivoRetornoTransf_POST;
 	global $RETORNO_BRADESCO;
 	global $link_BBDebito_Sonda, $link_BBDebito_SondaPOST;
 
 	$buffer = "";
 
-	if ($stipo == "Transf") {
+	if($stipo=="Transf") {
 		$link_ArquivoRetorno = $link_ArquivoRetornoTransf;
-		$link_ArquivoRetorno_POST = $link_ArquivoRetornoTransf_POST;
-	} else if ($stipo == "PagtoFacil") {
+		$link_ArquivoRetorno_POST = $link_ArquivoRetornoTransf_POST;	
+	} else if($stipo=="PagtoFacil") {
 		$link_ArquivoRetorno = $link_ArquivoRetornoPagtoFacil;
-		$link_ArquivoRetorno_POST = $link_ArquivoRetornoPagtoFacil_POST;
-	} else if ($stipo == "BancodoBrasil") {
-		if (!$link_BBDebito_Sonda) {
-			$link_BBDebito_Sonda = "https://mpag.bb.com.br/site/mpag/REC3.jsp";
+		$link_ArquivoRetorno_POST = $link_ArquivoRetornoPagtoFacil_POST;	
+	} else if($stipo=="BancodoBrasil") {
+		if(!$link_BBDebito_Sonda) {
+                        $link_BBDebito_Sonda = "https://mpag.bb.com.br/site/mpag/REC3.jsp";
 		}
 		$link_ArquivoRetorno = $link_BBDebito_Sonda;
 		$link_ArquivoRetorno_POST = $link_BBDebito_SondaPOST;
 	}
 
-	/*
+/*
 HTTP/1.1 200 OK
 Date: Tue, 01 Sep 2009 20:29:10 GMT
 Server: Microsoft-IIS/6.0
@@ -67,7 +66,7 @@ Cache-control: private
 
 	// http://blog.unitedheroes.net/curl/
 	$curl_handle = curl_init();
-	curl_setopt($curl_handle, CURLOPT_URL, $link_ArquivoRetorno);
+	curl_setopt($curl_handle, CURLOPT_URL,$link_ArquivoRetorno);
 
 	// Some sites may protect themselves from remote logins by checking which site you came from.
 	// http://php.net/manual/en/function.curl-setopt.php
@@ -77,8 +76,8 @@ Cache-control: private
 	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);	// não verifica certificado
 	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, 0);	// então, também não verifica nome no certificado
 
-	curl_setopt($curl_handle, CURLOPT_HEADER, 1);
-	curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
+	curl_setopt($curl_handle, CURLOPT_HEADER, 1); 
+	curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"); 
 
 	curl_setopt($curl_handle, CURLOPT_POST, 1);
 	curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $link_ArquivoRetorno_POST);
@@ -94,9 +93,9 @@ Cache-control: private
 	curl_close($curl_handle);
 
 
-	if ($stipo == "BancodoBrasil") {
-		gravaLog_TMP_conciliacao_pag("Em getArquivoRetorno - BBR9 :    link_ArquivoRetorno: '" . $link_ArquivoRetorno . "'" . PHP_EOL . "   link_ArquivoRetorno_POST: '" . $link_ArquivoRetorno_POST . "'" . PHP_EOL . "  Buffer: [" . print_r($buffer, true) . "]" . PHP_EOL);
-	}
+        if($stipo=="BancodoBrasil") {
+            gravaLog_TMP_conciliacao_pag("Em getArquivoRetorno - BBR9 :    link_ArquivoRetorno: '".$link_ArquivoRetorno."'".PHP_EOL."   link_ArquivoRetorno_POST: '".$link_ArquivoRetorno_POST."'".PHP_EOL."  Buffer: [".print_r($buffer, true)."]".PHP_EOL);
+        }
 
 	return $buffer;
 }
@@ -134,17 +133,16 @@ Cache-control: private
 	#     2009082722045703332519#0000001120#27/08/09#22:05:21#081#000000#
 
 */
-function processReturnFromBradesco($stipo, $sid, $buffer, &$aline)
-{
+function processReturnFromBradesco($stipo, $sid, $buffer, &$aline) {
 	$aretorno = explode(PHP_EOL, $buffer);
-	for ($i = 10; $i < count($aretorno); $i++) {
+	for($i=10;$i<count($aretorno);$i++) {
 
 		// processa cada linha de retorno e poe em $aline
 		$aline = explode("#", $aretorno[$i]);
 
-		$sid_this = ((isset($aline[1])) ? $aline[1] : "");
-		if (strlen($sid) > 0) {
-			if ($sid == $sid_this) {
+		$sid_this = ((isset($aline[1]))?$aline[1]:"");
+		if(strlen($sid)>0) {
+			if($sid==$sid_this) {
 				return $aline[5];
 			}
 		}
@@ -152,153 +150,151 @@ function processReturnFromBradesco($stipo, $sid, $buffer, &$aline)
 	return "";
 }
 
-function processReturnFromBradescoNovaIntegracao($sid, $buffer)
-{
-
-	if (is_array($buffer) && $buffer['status']['codigo'] == 0) {
-		if ($buffer['pedidos']['pedido']['@attributes']['numero'] == $sid) {
-			return '0' . $buffer['pedidos']['pedido']['status'];
-		} else return '';
-	} else return '';
+function processReturnFromBradescoNovaIntegracao($sid, $buffer) {
+    
+    if (is_array($buffer) && $buffer['status']['codigo'] == 0) {
+        if($buffer['pedidos']['pedido']['@attributes']['numero'] == $sid) {
+            return '0'.$buffer['pedidos']['pedido']['status'];
+        }
+        else return '';
+    }
+    else return '';
 } //end function processReturnFromBradescoNovaIntegracao()
 
-function getArquivoRetornoBradescoNovaIntegracao($orderID)
-{
-	global $raiz_do_projeto;
+function getArquivoRetornoBradescoNovaIntegracao($orderID) {
+        global $raiz_do_projeto;
 
-	$file_token = $raiz_do_projeto . 'banco/bradesco/token/token_bradesco.php';
-	ini_set('display_errors', 0);
-	if (! file_exists($file_token)) {
+        $file_token = $raiz_do_projeto.'banco/bradesco/token/token_bradesco.php';
+        // ini_set('display_errors', 0);
+        if(! file_exists($file_token)){
 
-		geraArquivo($file_token);
-	} //end if(! file_exists($file_token))
-	else {
-		require_once($file_token);
-	}
+            geraArquivo($file_token);
 
-	$url_acesso = URL_ACESSO_BRADESCO . "SPSConsulta/GetOrderById/" . BRADESCO_MERCHANTID . "?token=" . $GLOBALS['token_brd'] . "&orderId=" . $orderID;
-	$consulta = consulta_pedidos($url_acesso);
-	$consulta = xml_to_array_ignore_header($consulta);
+        }//end if(! file_exists($file_token))
+        else {
+            require_once ($file_token);
+        }
 
-	if (in_array($consulta['status']['codigo'], $GLOBALS['ARRAY_ERROR_TO_NEW_TOKEN'])) {
-		geraArquivo($file_token);
-	}
-	return $consulta;
+            $url_acesso = URL_ACESSO_BRADESCO. "SPSConsulta/GetOrderById/".BRADESCO_MERCHANTID."?token=".$GLOBALS['token_brd']."&orderId=".$orderID;
+            $consulta = consulta_pedidos($url_acesso);
+            $consulta = xml_to_array_ignore_header($consulta);
+        
+        if(in_array($consulta['status']['codigo'], $GLOBALS['ARRAY_ERROR_TO_NEW_TOKEN'])){
+            geraArquivo($file_token);
+        }
+        return $consulta;
 }
 
-function geraArquivo($file_name)
-{
-	ini_set('display_errors', 0);
-	$url_acesso = URL_ACESSO_BRADESCO . "SPSConsulta/Authentication/" . BRADESCO_MERCHANTID;
-	$autentica = consulta_pedidos($url_acesso);
-	$array_autentica = xml_to_array_ignore_header($autentica);
-
-	if ($array_autentica['status']['codigo'] == '0') {
-		$token = $array_autentica['token']['token'];
-		$data_criacao_token = $array_autentica['token']['dataCriacao'];
-		$conteudoArquivo =
-			'<?php
-//' . $data_criacao_token . '
-$GLOBALS["token_brd"] = "' . $token . '";
+function geraArquivo($file_name){
+    // ini_set('display_errors', 0);
+    $url_acesso = URL_ACESSO_BRADESCO."SPSConsulta/Authentication/".BRADESCO_MERCHANTID;
+    $autentica = consulta_pedidos($url_acesso);
+    $array_autentica = xml_to_array_ignore_header($autentica);
+    
+    if($array_autentica['status']['codigo'] == '0'){
+        $token = $array_autentica['token']['token'];
+        $data_criacao_token = $array_autentica['token']['dataCriacao'];
+        $conteudoArquivo =
+'<?php
+//'.$data_criacao_token.'
+$GLOBALS["token_brd"] = "'.$token.'";
 ?>';
-		$GLOBALS["token_brd"] = $token;
-
-		$newfile = fopen($file_name, 'w');
-		if ($newfile !== false) {
-			if (fwrite($newfile, $conteudoArquivo)) {
-				fclose($newfile);
-			}
-		}
-	}
+        $GLOBALS["token_brd"] = $token;
+        
+        $newfile = fopen($file_name, 'w');
+        if($newfile !== false){
+            if(fwrite($newfile, $conteudoArquivo)){
+                fclose($newfile);
+            }
+        } 
+    }   
 }
 
-function xml2array($xmlObject, $out = array())
-{
-	foreach ((array)$xmlObject as $index => $node) {
-		$out[$index] = (is_object($node)) ? xml2array($node) : $node;
-	}
+function xml2array ( $xmlObject, $out = array () ) {
+    foreach ( (array)$xmlObject as $index => $node ) {
+        $out[$index] = (is_object($node)) ? xml2array($node) : $node;
+    }
 
-	return $out;
+    return $out;
 } //end function xml2array
 
-function xml_to_array_ignore_header($resultado)
-{
-	try {
-		$retorno = explode(PHP_EOL, $resultado);
-
-		foreach ($retorno as $i => $content) {
-			if (trim($content) == "") {
-				$indice_inicio_xml = $i + 1;
-			}
-		}
-
-		$xml_element = new SimpleXMLElement($retorno[$indice_inicio_xml]);
-		$array = xml2array($xml_element);
-
-		return $array;
-	} catch (Exception $e) {
-		return NULL;
-	}
+function xml_to_array_ignore_header($resultado){
+    try{
+            $retorno = explode(PHP_EOL, $resultado);
+            
+            foreach ($retorno as $i => $content){
+                if(trim($content) == ""){
+                    $indice_inicio_xml = $i+1;
+                }
+            }
+        
+            $xml_element = new SimpleXMLElement($retorno[$indice_inicio_xml]);
+            $array = xml2array($xml_element);
+            
+            return $array;
+            
+    } catch(Exception $e) {
+        return NULL;
+    }
 }
 
-function consulta_pedidos($url_acesso)
-{
+function consulta_pedidos($url_acesso){
+    
+    $curl_handle = curl_init();
+    curl_setopt($curl_handle, CURLOPT_URL,$url_acesso);
 
-	$curl_handle = curl_init();
-	curl_setopt($curl_handle, CURLOPT_URL, $url_acesso);
+    //string base para envio no Authorization do HEADER
+    $stringBase = EMAIL_AUTENTICACAO_BRADESCO.":".BRADESCO_CHAVE_SEGURANCA;
 
-	//string base para envio no Authorization do HEADER
-	$stringBase = EMAIL_AUTENTICACAO_BRADESCO . ":" . BRADESCO_CHAVE_SEGURANCA;
+    // http://www.php.net/manual/en/function.curl-setopt.php
+    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);	// não verifica certificado
+    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, 0);	// então, também não verifica nome no certificado
 
-	// http://www.php.net/manual/en/function.curl-setopt.php
-	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);	// não verifica certificado
-	curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, 0);	// então, também não verifica nome no certificado
+    curl_setopt($curl_handle, CURLOPT_HEADER, 1); 
+    curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"); 
+    
+    $headers = array();
+    if(checkIP() ) {
+       //URL Homologação/testes 
+       $headers[] = "Host: homolog.meiosdepagamentobradesco.com.br";
+    }
+    else {
+       //URL Producao 
+       $headers[] = "Host: meiosdepagamentobradesco.com.br";
+    }
+    $headers[] = "Accept: application/xml";
+    $headers[] = "Content-Type: application/xml; UTF-8";
+    $headers[] = "Authorization: Basic ".base64_encode($stringBase);
 
-	curl_setopt($curl_handle, CURLOPT_HEADER, 1);
-	curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
+    //Setando que a requisição se trata de um XML, cuja Authorization é do tipo Basic
+    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers);
 
-	$headers = array();
-	if (checkIP()) {
-		//URL Homologação/testes 
-		$headers[] = "Host: homolog.meiosdepagamentobradesco.com.br";
-	} else {
-		//URL Producao 
-		$headers[] = "Host: meiosdepagamentobradesco.com.br";
-	}
-	$headers[] = "Accept: application/xml";
-	$headers[] = "Content-Type: application/xml; UTF-8";
-	$headers[] = "Authorization: Basic " . base64_encode($stringBase);
+    // The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
+    curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 5);		// default: 20s, quando os bancos estão lentos ou fora do ar a conciliação fica muito lenta
+    // The maximum number of seconds to allow cURL functions to execute.
+    curl_setopt($curl_handle, CURLOPT_TIMEOUT, 10);		// default: 20s, quando os bancos estão lentos ou fora do ar a conciliação fica muito lenta
+    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
 
-	//Setando que a requisição se trata de um XML, cuja Authorization é do tipo Basic
-	curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers);
+    $buffer = curl_exec($curl_handle);
 
-	// The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
-	curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 5);		// default: 20s, quando os bancos estão lentos ou fora do ar a conciliação fica muito lenta
-	// The maximum number of seconds to allow cURL functions to execute.
-	curl_setopt($curl_handle, CURLOPT_TIMEOUT, 10);		// default: 20s, quando os bancos estão lentos ou fora do ar a conciliação fica muito lenta
-	curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
+    $info = curl_getinfo($curl_handle);
 
-	$buffer = curl_exec($curl_handle);
+    curl_close($curl_handle);
 
-	$info = curl_getinfo($curl_handle);
-
-	curl_close($curl_handle);
-
-	return $buffer;
-} //end function consulta_pedidos($url_acesso)
+    return $buffer;
+}//end function consulta_pedidos($url_acesso)
 
 
 // processa linha e poe em $aline
 // exemplo: 	'#     2009082722045703332519#0000001120#27/08/09#22:05:21#081#000000#'
-function processStringRetornoBradesco($stipo, $sstring, &$aline)
-{
+function processStringRetornoBradesco($stipo, $sstring, &$aline) {
 	$sret = "";
 	$aline = explode("#", $sstring);
-	for ($j = 0; $j < count($aline); $j++) {
-		if (strlen($aline[$j])) {
-			$sret .= "&nbsp;&nbsp;" . $j . ": <span style='background-color:#FFFF99'>" . $aline[$j] . "</span>";
-			if ($j == 5) {
-				$sret .= " - " . processReturnCodeBradesco($stipo, $aline[$j]);
+	for($j=0;$j<count($aline);$j++) {
+		if(strlen($aline[$j])) {
+			$sret .= "&nbsp;&nbsp;".$j.": <span style='background-color:#FFFF99'>".$aline[$j]."</span>";
+			if($j==5) {
+				$sret .= " - ".processReturnCodeBradesco($stipo, $aline[$j]);
 			}
 			$sret .= "<br>";
 		}
@@ -307,12 +303,11 @@ function processStringRetornoBradesco($stipo, $sstring, &$aline)
 }
 
 
-function processReturnCodeBradesco($stipo, $scode)
-{
+function processReturnCodeBradesco($stipo, $scode) {
 	$sret = "???";
-	switch ($stipo) {
+	switch($stipo) {
 		case "PagtoFacil":
-			switch ($scode) {
+			switch($scode) {
 				case "000":
 					$sret = "Não Autorizado";
 					break;
@@ -331,7 +326,7 @@ function processReturnCodeBradesco($stipo, $scode)
 			}
 			break;
 		case "Transf":
-			switch ($scode) {
+			switch($scode) {
 				case "000":
 					$sret = "Não Autorizado";
 					break;
@@ -386,23 +381,22 @@ eeeeeeee dataPagamento
 qqqqqqqqqqqqqqq qtdPontos (exclusivo para o Programa de Relacionamento de Pontos)
 
 */
-function processReturnFromBancodoBrasil($stipo, $sid, $buffer, &$aresult)
-{
+function processReturnFromBancodoBrasil($stipo, $sid, $buffer, &$aresult) {
 	$aretorno = explode(PHP_EOL, $buffer);
-	for ($i = 0; $i < count($aretorno); $i++) {
-		if (strlen(trim($aretorno[$i])) > 0 && substr($aretorno[$i], 0, 17) == $sid) {
+	for($i=0;$i<count($aretorno);$i++) {
+		if(strlen(trim($aretorno[$i]))>0 && substr($aretorno[$i],0,17) == $sid) {
 			$aresult = "";
 			// processa cada linha de retorno e poe em $aline
-			$aresult['refTran']			= substr($aretorno[$i], 0, 17);
-			$aresult['Valor']			= substr($aretorno[$i], 17, 15);
-			$aresult['idConv']			= substr($aretorno[$i], 32, 6);
-			$aresult['tpPagamento']		= substr($aretorno[$i], 38, 1);
-			$aresult['Situação']		= substr($aretorno[$i], 39, 2);
-			$aresult['dataPagamento']	= substr($aretorno[$i], 41, 8);
-			$aresult['qtdPontos']		= substr($aretorno[$i], 49, 15);
+			$aresult['refTran']			= substr($aretorno[$i],0,17);
+			$aresult['Valor']			= substr($aretorno[$i],17,15);
+			$aresult['idConv']			= substr($aretorno[$i],32,6);
+			$aresult['tpPagamento']		= substr($aretorno[$i],38,1);
+			$aresult['Situação']		= substr($aretorno[$i],39,2);
+			$aresult['dataPagamento']	= substr($aretorno[$i],41,8);
+			$aresult['qtdPontos']		= substr($aretorno[$i],49,15);
 			$sid_this = $aresult['refTran'];
-			if (strlen($sid) > 0) {
-				if ($sid == $sid_this) {
+			if(strlen($sid)>0) {
+				if($sid==$sid_this) {
 					return $aresult['Situação'];	//$aretorno[$i];
 				}
 			}
@@ -411,18 +405,17 @@ function processReturnFromBancodoBrasil($stipo, $sid, $buffer, &$aresult)
 	return "";
 }
 
-function processReturnCodeBancodoBrasil($scode)
-{
+function processReturnCodeBancodoBrasil($scode) {
 	$a_situacao = array(
-		'00' => 'pagamento efetuado',
-		'01' => 'pagamento não autorizado',
-		'02' => 'erro no processamento da consulta',
-		'03' => 'pagamento não localizado',
-		'10' => 'campo "idConv" inválido ou nulo',
-		'11' => 'valor informado é inválido, nulo ou não confere com o valor registrado',
-		'99' => 'Operação cancelada pelo cliente'
-	);
-	if (array_key_exists($scode, $a_situacao)) {
+						'00' => 'pagamento efetuado', 
+						'01' => 'pagamento não autorizado', 
+						'02' => 'erro no processamento da consulta', 
+						'03' => 'pagamento não localizado', 
+						'10' => 'campo "idConv" inválido ou nulo', 
+						'11' => 'valor informado é inválido, nulo ou não confere com o valor registrado', 
+						'99' => 'Operação cancelada pelo cliente'
+						);
+	if(array_key_exists($scode, $a_situacao)) {
 		$sret = $a_situacao[$scode];
 	} else {
 		$sret = "??";
@@ -438,44 +431,43 @@ function processReturnCodeBancodoBrasil($scode)
 //									que é chamada em lista_pagamentos.php e em function_vendaGamers.php
 // Testar em bkov2_prepag/pagamento/lista_pagamentos.php
 // Também utilizado em conciliacaoAutomaticaPagamentoOnline() (bkov2_prepag/pagamento/functions_vendaGames.php)
-function getStatusTransacao($stipo, $sid, &$aline)
-{
+function getStatusTransacao($stipo, $sid, &$aline) {
 	global $link_ArquivoRetornoPagtoFacil, $link_ArquivoRetornoPagtoFacil_POST, $link_ArquivoRetornoTransf, $link_ArquivoRetornoTransf_POST;
 	global $link_BBDebito_SondaPOST;
 	global $SONDA_BRADESCO_5_DELAY, $SONDA_BRADESCO_6_DELAY, $SONDA_BANCODOBRASIL_9_DELAY;
 	global $connid;
-	global $raiz_do_projeto;
+        global $raiz_do_projeto;
 
-	gravaLog_TMP_conciliacao_pag("Em getStatusTransacao - sid: '" . $sid . "'" . PHP_EOL);
+        gravaLog_TMP_conciliacao_pag("Em getStatusTransacao - sid: '".$sid."'".PHP_EOL);
 
-	$bUpdate = false;
+        $bUpdate = false;
 	$buffer = "";
 	$msg = "";
 
 	$pc_data_sonda_brd_5 = $pc_data_sonda_brd_6 = $pc_data_sonda_bbr_9 = $pc_data_sonda_bbr_Z = $pc_data_sonda_bbr_E = date("Y-m-d H:i:s");
 
 	// Obtem retorno armazenado no BD
-	$sql_0 = "select * from pag_config where pc_id=1";
-	$rs_config = pg_exec($connid, $sql_0);
+	$sql_0 = "select * from pag_config where pc_id=1"; 
+	$rs_config = pg_exec($connid,$sql_0); 
 
-	if (!$rs_config || pg_num_rows($rs_config) == 0) {
-		$msg = "Nenhuma configuração encontrada." . PHP_EOL;
+	if(!$rs_config || pg_num_rows($rs_config) == 0) {
+		$msg = "Nenhuma configuração encontrada.".PHP_EOL;
 	} else {
 		$rs_config_row = pg_fetch_array($rs_config);
-		if ($stipo == "Transf") {
+		if($stipo=="Transf") {
 			$pc_data_sonda_brd_5 = $rs_config_row['pc_data_sonda_brd_5'];
 			$pc_sonda_brd_5 = $rs_config_row['pc_sonda_brd_5'];
-		} else if ($stipo == "PagtoFacil") {
+		} else if($stipo=="PagtoFacil") {
 			$pc_data_sonda_brd_6 = $rs_config_row['pc_data_sonda_brd_6'];
 			$pc_sonda_brd_6 = $rs_config_row['pc_sonda_brd_6'];
-		} else if ($stipo == "BancodoBrasil") {
+		} else if($stipo=="BancodoBrasil") {
 			$pc_data_sonda_bbr_9 = $rs_config_row['pc_data_sonda_bbr_9'];
 			$pc_sonda_bbr_9 = $rs_config_row['pc_sonda_bbr_9'];
-		} else if ($stipo == "PINsEPP") {
+		} else if($stipo=="PINsEPP") {
 			$pc_data_sonda_bbr_E = "";
 			$pc_sonda_bbr_E = "";
 			$pc_sonda_bbr_E = getSondaPINsEPP($sid, $pc_data_sonda_bbr_E);
-		} else if ($stipo == "BancoEPP") {
+		} else if($stipo=="BancoEPP") {
 			$pc_data_sonda_bbr_Z = date("Y-m-d H:i:s");
 			$pc_sonda_bbr_Z = "";
 		}
@@ -490,26 +482,26 @@ function getStatusTransacao($stipo, $sid, &$aline)
 		$buffer = "";
 		$s_sonda_brd = "";																									// Debug (para permitir ACIONA)
 		// Atualiza Sonda 
-		if ($stipo == "Transf") {
-			$buffer = getArquivoRetornoBradescoNovaIntegracao($sid);
-			$bUpdate = true;
+		if($stipo=="Transf") {
+                        $buffer = getArquivoRetornoBradescoNovaIntegracao($sid);
+                        $bUpdate = true;
 		}
-		if ($stipo == "PagtoFacil") {
-			if ($time_diff_6 > $SONDA_BRADESCO_6_DELAY) {
+		if($stipo=="PagtoFacil") {
+			if($time_diff_6>$SONDA_BRADESCO_6_DELAY) {
 				$buffer = getArquivoRetorno($stipo);
 				$bUpdate = true;
 			} else {
 				$buffer = $pc_sonda_brd_6;
 			}
 		}
-		if ($stipo == "BancodoBrasil") {
+		if($stipo=="BancodoBrasil") {
 			// No Banco do Brasil consulta sempre que precissar
 			if (true) {	// $time_diff_9>$SONDA_BANCODOBRASIL_9_DELAY) {
 				// Insere $sid no string de POST
-				require_once $raiz_do_projeto . 'banco/bancodobrasil/inc_urls_bancodobrasil.php';
+				require_once $raiz_do_projeto.'banco/bancodobrasil/inc_urls_bancodobrasil.php';
 				$link_BBDebito_SondaPOST = adjust_BBDebito_SondaPOST($sid, 0);
 
-				if (!$link_BBDebito_Sonda) {
+				if(!$link_BBDebito_Sonda) {
 					$link_BBDebito_Sonda = "https://mpag.bb.com.br/site/mpag/REC3.jsp";
 				}
 
@@ -520,32 +512,32 @@ function getStatusTransacao($stipo, $sid, &$aline)
 				$buffer = $pc_sonda_bbr_9;
 			}
 		}
-		if ($stipo == "BancoItau") {
+		if($stipo=="BancoItau") {
 			// No Banco Itaú consulta sempre que precissar
-			if (true) {
+			if (true) {	
 				$buffer = getSondaItau($sid, $a_retornoitau, $sitPagitau, $dtPagitau);	//getArquivoRetorno($stipo);
 				$bUpdate = false;
 			} else {
 				$buffer = "??";
 			}
 		}
-		if ($stipo == "PINsEPP") {
-			if (true) {
+		if($stipo=="PINsEPP") {
+			if (true) {	
 				$buffer = $pc_sonda_bbr_E;
 				$bUpdate = false;
 			} else {
 				$buffer = "??";
 			}
 		}
-		if ($stipo == "BancoEPP") {
+		if($stipo=="BancoEPP") {
 			// No BancoEPP a Sonda sempre está disponível
-			if (true) {
+			if (true) {	
 				// Obtem status do pagamento no BD
-				$sql_p = "select status from tb_pag_compras where tipo_cliente='M' and iforma='Z' and numcompra='" . $sid . "'";
-				$rs_sonda = pg_exec($connid, $sql_p);
+				$sql_p = "select status from tb_pag_compras where tipo_cliente='M' and iforma='Z' and numcompra=$1"; 
+				$rs_sonda = pg_query_params($connid, $sql_p, array($sid)); 
 
-				if (!$rs_sonda || pg_num_rows($rs_sonda) == 0) {
-					$msg = "Nenhum pagamento encontrado para Banco E-Prepag (numorder = '$sid')" . PHP_EOL;
+				if(!$rs_sonda || pg_num_rows($rs_sonda) == 0) {
+					$msg = "Nenhum pagamento encontrado para Banco E-Prepag (numorder = '$sid')".PHP_EOL;
 				} else {
 					$rs_sonda_row = pg_fetch_array($rs_sonda);
 					$buffer = $rs_sonda_row['status'];
@@ -554,10 +546,10 @@ function getStatusTransacao($stipo, $sid, &$aline)
 				$bUpdate = false;
 			}
 		}
-		if ($stipo == "Cielo") {
+		if($stipo=="Cielo") {
 
 			// Rotina chamada em /tarefas/pagamento_online.php
-			$filename = $GLOBALS['raiz_do_projeto'] . "banco/cielo/include.php";
+			$filename = $GLOBALS['raiz_do_projeto']."banco/cielo/include.php";
 			include_once($filename);
 
 			// No Banco Cielo consulta sempre que precissar
@@ -565,105 +557,61 @@ function getStatusTransacao($stipo, $sid, &$aline)
 			$bUpdate = false;
 		}
 
-		if ($stipo == $GLOBALS['PAGAMENTO_PIX_NOME_BANCO']) {
-			require_once RAIZ_DO_PROJETO . 'banco/pix/mercadopago/config.inc.pix.php';
-			$buffer = getSondaPIX($sid, $aline);
-			$bUpdate = false;
+		if($stipo==$GLOBALS['PAGAMENTO_PIX_NOME_BANCO']) {
+                        require_once RAIZ_DO_PROJETO.'banco/pix/mercadopago/config.inc.pix.php'; 
+                        $buffer = getSondaPIX($sid, $aline);
+                        $bUpdate = false;
 		}
 	}
 
 	// Obteve arquivo de retorno? -> salva no BD
-	if ($bUpdate) {
-
-		$sql = null;
-		$params = [];
-
-		switch ($stipo) {
-
-			case "Transf":
-				$pc_sonda_brd_5 = $buffer;
-
-				// garante JSON válido
-				$buffer_safe = json_encode($buffer, JSON_UNESCAPED_UNICODE);
-
-				$sql = "
-                UPDATE pag_config
-                   SET pc_data_sonda_brd_5 = $1,
-                       pc_sonda_brd_5      = $2
-                 WHERE pc_id = 1
-            ";
-
-				$params = [
-					(string)$time1,
-					(string)$buffer_safe
-				];
-				break;
-
-			case "PagtoFacil":
-				$pc_sonda_brd_6 = $buffer;
-
-				$sql = "
-                UPDATE pag_config
-                   SET pc_data_sonda_brd_6 = $1,
-                       pc_sonda_brd_6      = $2
-                 WHERE pc_id = 1
-            ";
-
-				$params = [
-					(string)$time1,
-					(string)$buffer
-				];
-				break;
-
-			case "BancodoBrasil":
-				$pc_sonda_bbr_9 = $buffer;
-
-				$sql = "
-                UPDATE pag_config
-                   SET pc_data_sonda_bbr_9 = $1,
-                       pc_sonda_bbr_9      = $2
-                 WHERE pc_id = 1
-            ";
-
-				$params = [
-					(string)$time1,
-					(string)$buffer
-				];
-				break;
-
-			case "BancoItau":
-				// Não usa buffer de sonda
-				break;
-
-			case "BancoEPP":
-				$pc_sonda_bbr_Z = $buffer;
-				// sem update
-				break;
+	if($bUpdate) {
+		$sql = "";
+		$params = array();
+		if($stipo=="Transf") {
+			$pc_sonda_brd_5 = $buffer;
+                        $buffer_safe = json_encode($buffer);
+			$sql  = "update pag_config set pc_data_sonda_brd_5=$1, pc_sonda_brd_5=$2 where pc_id=1;";
+			$params = array((string)$time1, (string)$buffer_safe);
+		} else if($stipo=="PagtoFacil") {
+			$pc_sonda_brd_6 = $buffer;
+			$sql  = "update pag_config set pc_data_sonda_brd_6=$1, pc_sonda_brd_6=$2 where pc_id=1;";
+			$params = array((string)$time1, (string)$buffer);
+		} else if($stipo=="BancodoBrasil") {
+			$pc_sonda_bbr_9 = $buffer;
+			$sql  = "update pag_config set pc_data_sonda_bbr_9=$1, pc_sonda_bbr_9=$2 where pc_id=1;";
+			$params = array((string)$time1, (string)$buffer);
+		} else if($stipo=="BancoItau") {
+			// Nï¿½o deve chegar aqui, Banco Itau nï¿½o usa buffer de sonda
+		} else if($stipo=="BancoEPP") {
+			$pc_sonda_bbr_Z = $buffer;
+			$sql  = "";	//"update pag_config set pc_data_sonda_bbr_9='".$time1."', pc_sonda_bbr_9='".$buffer_safe."' where pc_id=1;";
 		}
 
-		if ($sql !== null) {
+		if($sql) {
 			$rs_config = SQLexecuteQueryParams($sql, $params);
 		}
+
 	}
 
 	$sret = "";
 	// Leu alguma coisa? -> processa
-	if ($buffer) {
-		$alinetmp = "";
-		if (($stipo == "Transf") || ($stipo == "PagtoFacil")) {
+	if($buffer) {
+		$alinetmp = "";	
+		if(($stipo=="Transf") || ($stipo=="PagtoFacil")) {
 			$sret = processReturnFromBradescoNovaIntegracao($sid, $buffer);
-			$aline = $buffer;
-		} else if ($stipo == "BancodoBrasil") {
-			$sret = processReturnFromBancodoBrasil($stipo, $sid, $buffer, $aline);
-		} else if ($stipo == "BancoItau") {
+                        $aline = $buffer;
+		} else if($stipo=="BancodoBrasil") {
+			$sret = processReturnFromBancodoBrasil($stipo, $sid, $buffer, $aline); 
+		} else if($stipo=="BancoItau") {
 			$sret = $buffer;
-		} else if ($stipo == "PINsEPP") {
+		} else if($stipo=="PINsEPP") {
 			$sret = $buffer;
-		} else if ($stipo == "BancoEPP") {
+		} else if($stipo=="BancoEPP") {
 			$sret = $buffer;
-		} else if ($stipo == "Cielo") {
+		} else if($stipo=="Cielo") {
 			$sret = $buffer;
-		} else if ($stipo == $GLOBALS['PAGAMENTO_PIX_NOME_BANCO']) {
+		} else if($stipo==$GLOBALS['PAGAMENTO_PIX_NOME_BANCO']) {
 			$sret = $buffer;
 		}
 	}
@@ -671,49 +619,49 @@ function getStatusTransacao($stipo, $sid, &$aline)
 }
 
 // Está usando esta
-function getTransacaoPagamentoOK($stipo, $sid, &$aline)
-{
-	$bPagamentoOK = false;
+function getTransacaoPagamentoOK($stipo, $sid, &$aline) {
+	$bPagamentoOK = false; 
 
-	switch ($stipo) {
+	switch($stipo) {
 		case "PagtoFacil":
-			if (getStatusTransacao($stipo, $sid, $aline) == '003') {
+			if(getStatusTransacao($stipo, $sid, $aline)=='003') {
 				$bPagamentoOK = true;
-				gravaLog_TMP_conciliacao_pag("Em getTransacaoPagamentoOK - Sonda de Pagto BRD6 (" . $sid . ")." . PHP_EOL . print_r($aline, true) . PHP_EOL);
+				gravaLog_TMP_conciliacao_pag("Em getTransacaoPagamentoOK - Sonda de Pagto BRD6 (".$sid.").".PHP_EOL.print_r($aline, true).PHP_EOL);
+
 			}
 			break;
 		case "Transf":
-			if (getStatusTransacao($stipo, $sid, $aline) == '081') {
+			if(getStatusTransacao($stipo, $sid, $aline)=='081') {
 				$bPagamentoOK = true;
-				gravaLog_TMP_conciliacao_pag("Em getTransacaoPagamentoOK - Sonda de Pagto BRD5 (" . $sid . ")." . PHP_EOL . print_r($aline, true) . PHP_EOL);
+				gravaLog_TMP_conciliacao_pag("Em getTransacaoPagamentoOK - Sonda de Pagto BRD5 (".$sid.").".PHP_EOL.print_r($aline, true).PHP_EOL);
 			}
 			break;
 		case "BancodoBrasil":
 			$aline = "";
 			$status = getStatusTransacao($stipo, $sid, $aline);
-			if ($status == '00') {
+			if($status=='00') {
 				$bPagamentoOK = true;
 			}
-			gravaLog_TMP_conciliacao_pag("Em getTransacaoPagamentoOK - Sonda de Pagto BBR9 ('" . $sid . "', OK?: $bPagamentoOK)." . PHP_EOL . print_r($aline, true) . PHP_EOL);
+			gravaLog_TMP_conciliacao_pag("Em getTransacaoPagamentoOK - Sonda de Pagto BBR9 ('".$sid."', OK?: $bPagamentoOK).".PHP_EOL.print_r($aline, true).PHP_EOL);
 			break;
 		case "BancoItau":
 			$aline = "";
 			$status = getStatusTransacao($stipo, $sid, $aline);
-			if ($status == '00') {
+			if($status=='00') {
 				$bPagamentoOK = true;
 			}
 			break;
 		case "PINsEPP":
 			$aline = "";
 			$status = getStatusTransacao($stipo, $sid, $aline);
-			if ($status == '3') {
+			if($status=='3') {
 				$bPagamentoOK = true;
 			}
 			break;
 		case "BancoEPP":
 			$aline = "";
 			$status = getStatusTransacao($stipo, $sid, $aline);
-			if ($status == '3') {
+			if($status=='3') {
 				$bPagamentoOK = true;
 			}
 			break;
@@ -722,8 +670,8 @@ function getTransacaoPagamentoOK($stipo, $sid, &$aline)
 			$status = getStatusTransacao($stipo, $sid, $aline);
 			$bPagamentoOK = $status;
 			break;
-		case $GLOBALS['PAGAMENTO_PIX_NOME_BANCO']:
-			$aline = "";
+                case $GLOBALS['PAGAMENTO_PIX_NOME_BANCO']:
+        		$aline = "";
 			$status = getStatusTransacao($stipo, $sid, $aline);
 			$bPagamentoOK = $status;
 			break;
@@ -731,11 +679,10 @@ function getTransacaoPagamentoOK($stipo, $sid, &$aline)
 	return $bPagamentoOK;
 }
 
-function gravaLog_TMP_conciliacao_pag($mensagem)
-{
+function gravaLog_TMP_conciliacao_pag($mensagem){
 
 	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_pagamento_TMP_conciliacao_pag.txt";
+	$file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_TMP_conciliacao_pag.txt";
 
 	//Mensagem
 	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
@@ -744,37 +691,36 @@ function gravaLog_TMP_conciliacao_pag($mensagem)
 	if ($handle = fopen($file, 'a+')) {
 		fwrite($handle, $mensagem);
 		fclose($handle);
-	}
+	} 
+
 }
 
 // Substitui o refTran e o valor no POST string
-function adjust_BBDebito_SondaPOST($sid, $svalor)
-{
+function adjust_BBDebito_SondaPOST($sid, $svalor) {
 	global $link_BBDebito_SondaPOST;
 	global $connid;
-
-	if ($svalor == 0) {
-		$sql  = "select total from tb_pag_compras where numcompra='" . $sid . "'";
-		//		$rs_pagto = SQLexecuteQuery($sql);
-		$rs_pagto = pg_exec($connid, $sql);
-		if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
-			$msg = "Não foi encontrado o pagamento '" . $sid . "'." . PHP_EOL;
+	
+	if($svalor==0) {
+		$sql  = "select total from tb_pag_compras where numcompra=$1";
+//		$rs_pagto = SQLexecuteQuery($sql);
+		$rs_pagto = pg_query_params($connid, $sql, array($sid)); 
+		if(!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
+			$msg = "Não foi encontrado o pagamento '".$sid."'.".PHP_EOL;
 		} else {
 			$rs_pagto_row = pg_fetch_array($rs_pagto);
 			$svalor	= str_pad($rs_pagto_row['total'], 15, "0", STR_PAD_LEFT);
 		}
 	}
 
-	$irefTran = strpos($link_BBDebito_SondaPOST, "refTran=") + strlen("refTran=");
-	$ivalorSonda = strpos($link_BBDebito_SondaPOST, "valorSonda=") + strlen("valorSonda=");
+	$irefTran = strpos($link_BBDebito_SondaPOST,"refTran=")+strlen("refTran=");
+	$ivalorSonda = strpos($link_BBDebito_SondaPOST,"valorSonda=")+strlen("valorSonda=");
 
-	$sret = substr($link_BBDebito_SondaPOST, 0, $irefTran) . $sid . "&valorSonda=" . $svalor . substr($link_BBDebito_SondaPOST, $ivalorSonda + 15);
+	$sret = substr($link_BBDebito_SondaPOST,0,$irefTran).$sid."&valorSonda=".$svalor.substr($link_BBDebito_SondaPOST,$ivalorSonda+15);
 
 	return $sret;
 }
 
-function getDocPrefix($iforma)
-{
+function getDocPrefix($iforma){
 
 	switch ($iforma) {
 		case $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']:
@@ -863,8 +809,7 @@ function getDocPrefix($iforma)
 }
 
 // Ver getBcoCodigo()
-function getCodigoBanco($iforma)
-{
+function getCodigoBanco($iforma){
 
 	switch ($iforma) {
 		case $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']:
@@ -902,8 +847,7 @@ function getCodigoBanco($iforma)
 	return $cod_banco;
 }
 
-function b_Is_vg_pagto_tipo_EPP_Cash($vg_pagto_tipo)
-{
+function b_Is_vg_pagto_tipo_EPP_Cash($vg_pagto_tipo) {
 	$bret = false;
 	switch ($vg_pagto_tipo) {
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']:		// 'E'
@@ -914,8 +858,7 @@ function b_Is_vg_pagto_tipo_EPP_Cash($vg_pagto_tipo)
 	return $bret;
 }
 // Usar b_IsPagtoOnline() para levar em conta Cielo
-function b_Is_vg_pagto_tipo_online($vg_pagto_tipo)
-{
+function b_Is_vg_pagto_tipo_online($vg_pagto_tipo) {
 
 	$bret = false;
 	switch ($vg_pagto_tipo) {
@@ -950,14 +893,13 @@ function b_Is_vg_pagto_tipo_online($vg_pagto_tipo)
 }
 
 // Usar getDescricaoPagtoOnline() para mostrar Cielo
-function get_Pagamento_Descricao($vg_pagto_tipo)
-{
+function get_Pagamento_Descricao($vg_pagto_tipo) {
 
 	$sret = "";
 	switch ($vg_pagto_tipo) {
 		case $GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO']:
-			//			$sret = "Money";
+//			$sret = "Money";
 			$sret = $GLOBALS['FORMAS_PAGAMENTO_DESCRICAO'][$vg_pagto_tipo];
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']:
@@ -985,49 +927,48 @@ function get_Pagamento_Descricao($vg_pagto_tipo)
 			$sret = $GLOBALS['FORMAS_PAGAMENTO_DESCRICAO_EPP'];
 			break;
 		default:
-			$sret = "???*(" . $vg_pagto_tipo . ")";
+			$sret = "???*(".$vg_pagto_tipo.")";
 	}
 	return $sret;
 }
 
-function getLogoBancoSmall($iforma, $isubforma = null)
-{
+function getLogoBancoSmall($iforma, $isubforma = null){
 
-	//echo "In getLogoBancoSmall(): iforma: ".$iforma."<br>";
+//echo "In getLogoBancoSmall(): iforma: ".$iforma."<br>";
 
 	switch ($iforma) {
 		case $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']:
-			$logostring = "<img src='/images/pagamento/logo-bradesco-small.gif' width='15' height='15' border='0' title='Bradesco - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo-bradesco-small.gif' width='15' height='15' border='0' title='Bradesco - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']:
-			$logostring = "<img src='/images/pagamento/logo-bradesco-small.gif' width='15' height='15' border='0' title='Bradesco - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo-bradesco-small.gif' width='15' height='15' border='0' title='Bradesco - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']:
-			$logostring = "<img src='/images/pagamento/B_Brasil-small.gif' width='15' height='15' border='0' title='Banco do Brasil - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/B_Brasil-small.gif' width='15' height='15' border='0' title='Banco do Brasil - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']:		// 'A'
 		case $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC']:					// 10
-			$logostring = "<img src='/images/pagamento/itau-small.gif' width='15' height='15' border='0' title='Itaú - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/itau-small.gif' width='15' height='15' border='0' title='Itaú - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']:		// 'E'
 		case $GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC']:					// 13
 			$logostring = "
 			<div style='width: 60px; height: 60px'>
-				<img src='/images/pagamento/Epp_cash_loja_small.jpg' style='max-width: 100%' title='PINS EPP - " . getDocPrefix($iforma) . $iforma .  (($isubforma) ? (($isubforma == 'G') ? "_GoCash" : "_??$isubforma??") : "") . "'> 
+				<img src='/images/pagamento/Epp_cash_loja_small.jpg' style='max-width: 100%' title='PINS EPP - ".getDocPrefix($iforma). $iforma .  (($isubforma)?(($isubforma=='G')?"_GoCash":"_??$isubforma??"):"") ."'> 
 			</div>
 			";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_HIPAY_ONLINE']:		// 'B'
 		case $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC']:					// 11
-			$logostring = "<img src='/images/pagamento/hipay_small.gif' width='20' height='20' border='0' title='HiPay - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/hipay_small.gif' width='20' height='20' border='0' title='HiPay - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PAYPAL_ONLINE']:		// 'P'
 		case $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC']:					// 12
-			$logostring = "<img src='/images/pagamento/paypal_small.gif' width='28' height='18' border='0' title='PayPal - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/paypal_small.gif' width='28' height='18' border='0' title='PayPal - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']:							// 'Z'
 		case $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']:					// 999
-			$logostring = "<img src='/images/pagamento/logo_eppBanco.gif' width='15' height='15' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo_eppBanco.gif' width='15' height='15' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 
 		// Cielo
@@ -1035,54 +976,53 @@ function getLogoBancoSmall($iforma, $isubforma = null)
 		case $GLOBALS['PAGAMENTO_VISA_DEBITO_NUMERIC']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_VISA_CREDITO']:
 		case $GLOBALS['PAGAMENTO_VISA_CREDITO_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/logo_small_visa.gif' width='32' height='22' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo_small_visa.gif' width='32' height='22' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_MASTER_DEBITO']:
 		case $GLOBALS['PAGAMENTO_MASTER_DEBITO_NUMERIC']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_MASTER_CREDITO']:
 		case $GLOBALS['PAGAMENTO_MASTER_CREDITO_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/logo_small_mastercard.gif' width='32' height='22' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo_small_mastercard.gif' width='32' height='22' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_ELO_DEBITO']:
 		case $GLOBALS['PAGAMENTO_ELO_DEBITO_NUMERIC']:
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_ELO_CREDITO']:
 		case $GLOBALS['PAGAMENTO_ELO_CREDITO_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/logo_small_elo.gif' width='32' height='22' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo_small_elo.gif' width='32' height='22' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_DINERS_CREDITO']:
 		case $GLOBALS['PAGAMENTO_DINERS_CREDITO_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/logo_small_diners.gif' width='32' height='22' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo_small_diners.gif' width='32' height='22' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_DISCOVER_CREDITO']:
 		case $GLOBALS['PAGAMENTO_DISCOVER_CREDITO_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/logo_small_discover.gif' width='32' height='22' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/logo_small_discover.gif' width='32' height='22' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 		case $GLOBALS['FORMAS_PAGAMENTO']['OFERTAS']:
 		case $GLOBALS['PAGAMENTO_OFERTAS_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/ico_bonus.gif' width='30' height='20' border='0' title='E-Prepag - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/ico_bonus.gif' width='30' height='20' border='0' title='E-Prepag - ".getDocPrefix($iforma).$iforma."'>";
 			break;
 
 		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_MCOIN']:
 		case $GLOBALS['PAGAMENTO_MCOIN_NUMERIC']:
-			$logostring = "<img src='/images/pagamento/ico_mcoin.gif' width='30' height='10' border='0' title='MCOIN - " . getDocPrefix($iforma) . $iforma . "'>";
+			$logostring = "<img src='/images/pagamento/ico_mcoin.gif' width='30' height='10' border='0' title='MCOIN - ".getDocPrefix($iforma).$iforma."'>";
 			break;
-		case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']:
-		case $GLOBALS['PAGAMENTO_PIX_NUMERIC']:
+                case $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']:
+                case $GLOBALS['PAGAMENTO_PIX_NUMERIC']:
 			$logostring = "
 			<div style='width: 30px; height: 30px'>
-				<img src='/images/pagamento/ico_pix.png' style='max-width: 100%' border='0' title='PIX - " . getDocPrefix($iforma) . $iforma . "'>
+				<img src='/images/pagamento/ico_pix.png' style='max-width: 100%' border='0' title='PIX - ".getDocPrefix($iforma).$iforma."'>
 			</div>
 			";
 			break;
 		default:
-			$logostring = "??? LogoBanco iforma: " . $iforma . "???";
+			$logostring = "??? LogoBanco iforma: ".$iforma."???";
 	}
-	return $logostring;
+	return $logostring ;
 }
 
 // =================================================================================
-function getSondaBanco($iforma, $numcompra, $id_transacao_itau, &$areturn)
-{
+function getSondaBanco($iforma, $numcompra, $id_transacao_itau, &$areturn) {
 	global $cReturn, $cSpaces, $sFontRedOpen, $sFontRedClose;
 
 	$dataconfirma = date("Y-m-d H:i:s");		// "CURRENT_TIMESTAMP";	// 
@@ -1095,142 +1035,145 @@ function getSondaBanco($iforma, $numcompra, $id_transacao_itau, &$areturn)
 	unset($alineP);
 	unset($alineC);
 	unset($alinePIX);
-	if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
-
+	if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'])  {
+		
 		// obtem status, OK se status='081'
 		$b_sonda_5 = getTransacaoPagamentoOK("Transf", $numcompra, $aline5);
 
 		// Se existe registro da transação -> salva data
-		if (count($aline5) > 0) {
-
-			$s_sonda = (($b_sonda_5) ? "OK" : "none");
+                if(count($aline5) > 0){
+            
+			$s_sonda = (($b_sonda_5)?"OK":"none");
 			$sBanco = "Bradesco";
-			$dataconfirma = "'" . date('Y-m-d H:i:s') . "'";
+                        $dataconfirma = "'".date('Y-m-d H:i:s')."'";
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']) {
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'])  {
 
 		// obtem status, OK se status='003'
 		$b_sonda_6 = getTransacaoPagamentoOK("PagtoFacil", $numcompra, $aline6);
 
 		// Se existe registro da transação -> salva data 	
-		if (strlen($aline6[1]) > 0) {
-			$s_sonda = (($b_sonda_6) ? "OK" : "none");
+		if(strlen($aline6[1])>0) {
+			$s_sonda = (($b_sonda_6)?"OK":"none");
 			$sBanco = "Bradesco";
-			$dataconfirma = "'" . substr($aline6[3], 6, 4) . "-" . substr($aline6[3], 3, 2) . "-" . substr($aline6[3], 0, 2) . " " . $aline6[4] . "'";
+			$dataconfirma = "'".substr($aline6[3],6,4)."-".substr($aline6[3],3,2)."-".substr($aline6[3],0,2)." ".$aline6[4]."'";
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'])  {
 
 		// obtem status, OK se status='003'
 		$b_sonda_9 = getTransacaoPagamentoOK("BancodoBrasil", $numcompra, $aline9);
-		if ($b_sonda_9) {
-			$s_sonda = (($b_sonda_9) ? "OK" : "none");
+		if($b_sonda_9) {
+			$s_sonda = (($b_sonda_9)?"OK":"none");
 			$sBanco = "Banco do Brasil";
-			echo " =====> Trecho 3 " . $aline9['dataPagamento'] . PHP_EOL;
-			if (strpos($aline9['dataPagamento'], date('Y')) == 4) {
-				$dataconfirma = "'" . substr($aline9['dataPagamento'], 4, 4) . "-" . substr($aline9['dataPagamento'], 2, 2) . "-" . substr($aline9['dataPagamento'], 0, 2) . "'";
-			} //end if(strpos($aline9['dataPagamento'], date('Y')) == 4)
-			else {
-				$dataconfirma = "'" . substr($aline9['dataPagamento'], 0, 4) . "-" . substr($aline9['dataPagamento'], 4, 2) . "-" . substr($aline9['dataPagamento'], 6, 2) . "'";
-			}
-			echo " =====> DEPOIS Trecho 3 " . $dataconfirma . PHP_EOL;
+                        echo " =====> Trecho 3 ".$aline9['dataPagamento'].PHP_EOL;
+                        if(strpos($aline9['dataPagamento'], date('Y')) == 4) {
+                            $dataconfirma = "'".substr($aline9['dataPagamento'], 4, 4)."-".substr($aline9['dataPagamento'], 2, 2)."-".substr($aline9['dataPagamento'], 0, 2)."'";
+                        } //end if(strpos($aline9['dataPagamento'], date('Y')) == 4)
+                        else {
+                            $dataconfirma = "'".substr($aline9['dataPagamento'], 0, 4)."-".substr($aline9['dataPagamento'], 4, 2)."-".substr($aline9['dataPagamento'], 6, 2)."'";
+                        }
+                        echo " =====> DEPOIS Trecho 3 ".$dataconfirma.PHP_EOL;
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
+
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE'])  {
 
 		$pedido =  str_pad($id_transacao_itau, 8, "0", STR_PAD_LEFT);
 		$pag_status = getSondaItau($pedido, $a_retorno_itau, $sitPag, $dtPag);
-		$b_sonda_A = (($pag_status == "00") ? true : false);
-		if ($b_sonda_A) {
-			$s_sonda = (($b_sonda_A) ? "OK" : "none");
+		$b_sonda_A = (($pag_status=="00")?true:false);
+		if($b_sonda_A) {
+			$s_sonda = (($b_sonda_A)?"OK":"none");
 			$sBanco = "Banco Itaú";
-			$dataconfirma = "'" . substr($dtPag, 4, 4) . "-" . substr($dtPag, 2, 2) . "-" . substr($dtPag, 0, 2) . "'";
+			$dataconfirma = "'".substr($dtPag,4,4) . "-" . substr($dtPag,2,2) . "-" . substr($dtPag,0,2) . "'";
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG']) {
+
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG'])  {
 
 		$b_sonda_E = true;	//getTransacaoPagamentoOK("PINsEPP", $numcompra, $alineZ);
-		if ($b_sonda_E) {
-			$s_sonda = (($b_sonda_E) ? "OK" : "none");
+		if($b_sonda_E) {
+			$s_sonda = (($b_sonda_E)?"OK":"none");
 			$sBanco = "PINs E-Prepag";
 			$dataconfirma = date("Y-m-D H:i:s");
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_HIPAY_ONLINE']) {
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_HIPAY_ONLINE'])  {
 
 		// Não temos Sonda para Hipay
 		$b_sonda_B = false;
-		if ($b_sonda_B) {
-			$s_sonda = (($b_sonda_B) ? "OK" : "none");
+		if($b_sonda_B) {
+			$s_sonda = (($b_sonda_B)?"OK":"none");
 			$sBanco = "Banco Hipay";
 			$dataconfirma = date("Y-m-D H:i:s");
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PAYPAL_ONLINE']) {
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PAYPAL_ONLINE'])  {
 
 		$b_sonda_P = getTransacaoPagamentoOK("Paypal", $numcompra, $alineP);
-		if ($b_sonda_P) {
-			$s_sonda = (($b_sonda_P) ? "OK" : "none");
+		if($b_sonda_P) {
+			$s_sonda = (($b_sonda_P)?"OK":"none");
 			$sBanco = "PayPal";
 			$dataconfirma = date("Y-m-D H:i:s");
 		}
-	} else if ($iforma == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']) {
+
+	} else if($iforma==$GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE'])  {
 
 		$b_sonda_Z = getTransacaoPagamentoOK("BancodoEPP", $numcompra, $alineZ);
-		if ($b_sonda_Z) {
-			$s_sonda = (($b_sonda_Z) ? "OK" : "none");
+		if($b_sonda_Z) {
+			$s_sonda = (($b_sonda_Z)?"OK":"none");
 			$sBanco = "Banco E-Prepag";
 			$dataconfirma = date("Y-m-D H:i:s");
 		}
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']) {
-		$b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $numcompra, $alinePIX);
-		$s_sonda = (($b_sonda_PIX) ? "OK" : "none");
-		if ($b_sonda_PIX) {
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX'])  {
+                $b_sonda_PIX = getTransacaoPagamentoOK($GLOBALS['PAGAMENTO_PIX_NOME_BANCO'], $numcompra, $alinePIX);
+                $s_sonda = (($b_sonda_PIX)?"OK":"none");
+		if($b_sonda_PIX) {
 			$sBanco = $GLOBALS['PAGAMENTO_PIX_NOME_BANCO'];
-			//pegar a data do JSON
-			$dataconfirma = "'" . substr(str_replace('T', ' ', $alinePIX), 0, 19) . "'";
+                        //pegar a data do JSON
+			$dataconfirma = "'".substr(str_replace('T', ' ', $alinePIX),0,19)."'";
 		}
-	} elseif (b_IsPagtoCielo($iforma)) {
+	} elseif(b_IsPagtoCielo($iforma)) {
 		$b_sonda_C = getTransacaoPagamentoOK("Cielo", $numcompra, $alineC);
-		if ($b_sonda_C) {
-			$s_sonda = (($b_sonda_C) ? "OK" : "none");
+		if($b_sonda_C) {
+			$s_sonda = (($b_sonda_C)?"OK":"none");
 			$sBanco = "Banco Cielo";
 			$dataconfirma = date("Y-m-D H:i:s");
 		}
 	}
 
 
-	$dataconfirma = str_replace("/", "-", $dataconfirma);
+	$dataconfirma = str_replace("/","-",$dataconfirma);
 
 	// Procura pagamentos em aberto no site do banco (Sonda), se (status=1 & sonda) => "NO SYNC"
 	$s_sync = "";
 	$prefix_1 = getDocPrefix($iforma);
 	$vg_pagto_tipo = $iforma;
 
-	if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
-		$s_sync = (($b_sonda_5) ? "NO SYNC" : "");
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']) {
-		$s_sync = (($b_sonda_6) ? "NO SYNC" : "");
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
-		$s_sync = (($b_sonda_9) ? "NO SYNC" : "");
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
-		$s_sync = (($b_sonda_A) ? "NO SYNC" : "");
+	if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) {
+		$s_sync = (($b_sonda_5)?"NO SYNC":"");
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO']) {
+		$s_sync = (($b_sonda_6)?"NO SYNC":"");
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
+		$s_sync = (($b_sonda_9)?"NO SYNC":"");
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
+		$s_sync = (($b_sonda_A)?"NO SYNC":"");
 		// No Itau ajusta 'A' -> 10 (usa nuemrico em tb_venda_games)
-		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'];
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_HIPAY_ONLINE']) {
-		$s_sync = (($b_sonda_B) ? "NO SYNC" : "");
+		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'];	 
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_HIPAY_ONLINE']) {
+		$s_sync = (($b_sonda_B)?"NO SYNC":"");
 		// No Hipay ajusta 'B' -> 11 (usa nuemrico em tb_venda_games)
-		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PAYPAL_ONLINE']) {
-		$s_sync = (($b_sonda_P) ? "NO SYNC" : "");
+		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];	 
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PAYPAL_ONLINE']) {
+		$s_sync = (($b_sonda_P)?"NO SYNC":"");
 		// No Itau ajusta 'P' -> 12 (usa nuemrico em tb_venda_games)
-		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];
-	} else if ($iforma == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']) {
+		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'];	 
+	} else if($iforma==$GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE']) {
 		// No Banco EPP ajusta 'Z' -> 199 (usa nuemrico em tb_venda_games)
-		$s_sync = (($b_sonda_Z) ? "NO SYNC" : "");
-		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];
-	} else if ($iforma == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']) {
-		$s_sync = (($b_sonda_PIX) ? "NO SYNC" : "");
-		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PIX_NUMERIC'];
-	} else if (b_IsPagtoCielo($iforma)) {
-		$s_sync = (($b_sonda_C) ? "NO SYNC" : "");
+		$s_sync = (($b_sonda_Z)?"NO SYNC":"");
+		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC'];	 
+	} else if($iforma==$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']) {
+		$s_sync = (($b_sonda_PIX)?"NO SYNC":"");
+		$vg_pagto_tipo = $GLOBALS['PAGAMENTO_PIX_NUMERIC'];	 
+	} else if(b_IsPagtoCielo($iforma)) {
+		$s_sync = (($b_sonda_C)?"NO SYNC":"");
 		$vg_pagto_tipo = getCodigoNumericoParaPagto($iforma);
-	}
+	} 
 
 	$areturn['s_sonda']		= $s_sonda;
 	$areturn['sBanco']		= $sBanco;
@@ -1238,7 +1181,7 @@ function getSondaBanco($iforma, $numcompra, $id_transacao_itau, &$areturn)
 	$areturn['prefix_1']		= $prefix_1;
 	$areturn['s_sync']		= $s_sync;
 	$areturn['vg_pagto_tipo']	= $vg_pagto_tipo;
-
+	
 
 	return 0;
 }
@@ -1246,91 +1189,74 @@ function getSondaBanco($iforma, $numcompra, $id_transacao_itau, &$areturn)
 // Esta função formata a assinatura digital da transação, que é um número de 256 caracteres.
 // A formatação consiste em colocar todos esses caracteres em uma tabela, separando-os em grupos
 // de 4 caracteres cada um
-function formataAssinatura($entrada)
-{
+function formataAssinatura($entrada) {
 ?>
 	<table border='1' cellpadding='1' cellspacing='2' bordercolor='#cccccc' style='border-collapse:collapse;'>
-		<TR>
-			<?php
-			$pos = 0;
-			$tam = strlen($entrada);
-			$numColuna = 0;
-			while ($pos < $tam - 1) {
-			?>
-				<TD align="center">
-					<font size="1"><?php echo substr($entrada, $pos, 4) ?></font>
-				</TD>
-				<?php
-				$pos += 4;
-				$numColuna++;
-				if ($numColuna == 16) {
-					$numColuna = 0;
-				?>
-		</TR>
-		<TR>
+	<TR>
 	<?php
-				}
-			}
+	$pos=0;
+	$tam = strlen($entrada);
+	$numColuna=0;
+	while ($pos<$tam-1) {
 	?>
-		</TR>
-	</table>
+		<TD align="center"><font size="1"><?php echo substr($entrada, $pos, 4)?></font></TD>
+		<?php
+		$pos += 4;
+		$numColuna++;
+		if ($numColuna==16) {
+			$numColuna = 0;
+		?>
+	</TR>
+	<TR>
+	<?php
+		}
+	}
+	?>
+	</TR>
+</table>
 <?php
 }
 
 // É a mesma gravaLog_TMP() de commerce/function.php e dist_commerce/function.php mas para ser usada nos retornos dos bancos
 // antes da inclusão da classPrincipal.php
-function gravaLog_TMP_Retorno($mensagem)
-{
+function gravaLog_TMP_Retorno($mensagem){
 
-	//Arquivo
-	$file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_pagamento_TMP.txt";
+        //Arquivo
+        $file = $GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/log_pagamento_TMP.txt";
 
-	//Mensagem
-	$mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
+        //Mensagem
+        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
 
-	//Grava mensagem no arquivo
-	if ($handle = fopen($file, 'a+')) {
-		fwrite($handle, $mensagem);
-		fclose($handle);
-	}
+        //Grava mensagem no arquivo
+        if ($handle = fopen($file, 'a+')) {
+                fwrite($handle, $mensagem);
+                fclose($handle);
+        } 
+
 }
 
-function get_pagto_epp_part_gocash($idvenda, &$a_parts = null)
-{
+function get_pagto_epp_part_gocash($idvenda, &$a_parts = null) {
 
 	$bret = false;
 	$a_parts = array();
 
 	// Se não tem modelos cadastrado -> retorna vazio (caso contrário o SQL pode retornar uma lista de produtos)
-	if (!$idvenda) {
+	if(!$idvenda) {
 		// Nada
 	} else {
 
-		$sql = "
-    SELECT
-        valorpagtopin,
-        valorpagtosaldo,
-        valorpagtogocash,
-        (total/100 - taxas) AS valortotal,
-        taxas
-    FROM tb_pag_compras
-    WHERE tipo_cliente = $1
-      AND idvenda = $2
-";
+		$sql = "select valorpagtopin, valorpagtosaldo, valorpagtogocash, (total/100-taxas) as valortotal, taxas from tb_pag_compras ";
+		$sql .= "where 1=1 ";
+		$sql .= "	and tipo_cliente = 'M'";
+		$sql .= "	and idvenda = $idvenda";
+		$rs = SQLexecuteQuery($sql);
 
-		$params = [
-			'M',
-			(int)$idvenda
-		];
-
-		$rs = SQLexecuteQueryParams($sql, $params);
-
-		if ($rs && pg_num_rows($rs) != 0) {
+		if($rs && pg_num_rows($rs) != 0){
 			$rs_row = pg_fetch_array($rs);
 			$a_parts['valorpagtopin']		= $rs_row['valorpagtopin'];
 			$a_parts['valorpagtosaldo']		= $rs_row['valorpagtosaldo'];
 			$a_parts['valorpagtogocash']	= $rs_row['valorpagtogocash'];
-			if ($a_parts['valorpagtogocash'] > 0) 	$bret = true;
+			if($a_parts['valorpagtogocash']>0) 	$bret = true;
 
 			$a_parts['valortotal']			= $rs_row['valortotal'];
 			$a_parts['taxas']				= $rs_row['taxas'];
@@ -1340,20 +1266,19 @@ function get_pagto_epp_part_gocash($idvenda, &$a_parts = null)
 }
 
 // Em constantesPinEpp.php foi definido $DISTRIBUIDORAS[], que contem o nome de cada distrinuidora
-function get_nome_distribuidora_by_codigo($codigo)
-{
+function get_nome_distribuidora_by_codigo($codigo) {
 	global $DISTRIBUIDORAS;
 	$snome_distribuidora = "";
-	if ($codigo == "?") {
+	if($codigo=="?") {
 		$snome_distribuidora = "Desconhecido [$codigo]";
-	} elseif ($codigo == "C") {
+	} elseif($codigo=="C") {
 		$snome_distribuidora = "Cartão GoCash";
-	} elseif (isset($DISTRIBUIDORAS)) {
-		if ($codigo > 0) {
-			if (array_key_exists($codigo, $DISTRIBUIDORAS)) {
+	} elseif(isset($DISTRIBUIDORAS)) {
+		if($codigo>0) {
+			if(array_key_exists($codigo, $DISTRIBUIDORAS)) {
 				$snome_distribuidora = $DISTRIBUIDORAS[$codigo]['distributor_name'];
 			}
-		}
+		}		
 	}
 	return $snome_distribuidora;
 }

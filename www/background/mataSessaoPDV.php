@@ -47,7 +47,7 @@ if(!$arquivoLog->haveFile())
                         $dir_session = ini_get('session.save_path');
 
                         //Capturando a lista de arquivos de Sessões
-                        $vetorSessoes = preg_grep('/sess*/', scandir($dir_session));;
+                        $vetorSessoes = preg_grep('/sess*/', scandir($dir_session) ?: []);;
 
                         //Capturando conteudo do arquivo com contendo IDs
                         $conteudoArquivoIDs = file_get_contents($fullNameArquivoIDsTMP);

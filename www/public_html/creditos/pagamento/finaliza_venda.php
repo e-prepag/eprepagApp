@@ -11,6 +11,7 @@ require_once DIR_INCS . "pdv/main.php";
 require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
 require_once DIR_INCS . "funcoes_cpf.php";
 require_once "/www/includes/load_dotenv.php";
+require_once DIR_INCS . "writeIfPossible.php";
 
 checkingIsCompletedData('/creditos/carrinho/'); ///prepag2/dist_commerce/finaliza_venda_preview
 
@@ -43,28 +44,28 @@ if (!is_dir($log_directory)) {
 	}
 }
 // $ff = fopen("/www/arquivos_gerados/logs/finaliza_venda.txt", "a+");
-$ff = fopen($log_filepath, "a+");
-fwrite($ff, "\r\n");
-fwrite($ff, "***************************************************\r\n");
-fwrite($ff, "Data.: " . date("Y-m-d H:i:s") . "\r\n");
-fwrite($ff, "Usuário Nome: " . $usuarioGames->getNome() . "\r\n");
-fwrite($ff, "Pagamento: " . $pagto . "\r\n");
-fwrite($ff, "Produtos Total: " . print_r($produtos) . "\r\n");
-fwrite($ff, "OrderId: " . $OrderId . "\r\n");
-fwrite($ff, "Forma de Pagamento: " . $iforma . "\r\n");
+$ff = @fopen($log_filepath, "a+");
+writeIfPossible($ff, "\r\n");
+writeIfPossible($ff, "***************************************************\r\n");
+writeIfPossible($ff, "Data.: " . date("Y-m-d H:i:s") . "\r\n");
+writeIfPossible($ff, "Usuário Nome: " . $usuarioGames->getNome() . "\r\n");
+writeIfPossible($ff, "Pagamento: " . $pagto . "\r\n");
+writeIfPossible($ff, "Produtos Total: " . print_r($produtos) . "\r\n");
+writeIfPossible($ff, "OrderId: " . $OrderId . "\r\n");
+writeIfPossible($ff, "Forma de Pagamento: " . $iforma . "\r\n");
 // Verifica se há sessões registradas
 if (!empty($_SESSION)) {
 	// Escreve o conteúdo da sessão no log
-	fwrite($ff, "Sessões cadastradas:\r\n");
-	fwrite($ff, print_r($_SESSION, true)); // Captura a saída de print_r como string e grava no log
+	writeIfPossible($ff, "Sessões cadastradas:\r\n");
+	writeIfPossible($ff, print_r($_SESSION, true)); // Captura a saída de print_r como string e grava no log
 } else {
-	fwrite($ff, "Nenhuma sessão registrada.\r\n");
+	writeIfPossible($ff, "Nenhuma sessão registrada.\r\n");
 }
-// fwrite($ff, "Objeto UsuarioGames completo:\r\n");
-// fwrite($ff, print_r($usuarioGames, true));  // Captura a saíd
+// writeIfPossible($ff, "Objeto UsuarioGames completo:\r\n");
+// writeIfPossible($ff, print_r($usuarioGames, true));  // Captura a saíd
 
-fwrite($ff, "***************************************************\r\n");
-fclose($ff);
+writeIfPossible($ff, "***************************************************\r\n");
+closeIfPossible($ff);
 if (!empty($_POST["g-recaptcha-response"])) {
 
 	$tokenInfo = ["secret" => getenv("HCAPTCHA_SECRET_KEY"), "response" => $_POST["g-recaptcha-response"]];  //, "remoteip" => $_SERVER["REMOTE_ADDR"]
@@ -152,54 +153,54 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 	$pagto_venda = $pagto;
 	// tipo_cliente   character varying(2),	-- 'M' - Money, 'E' - Money Express, 'LR' - Lanhouse Pré, 'LO' - Lanhouse Pos, 
 	$tipo_cliente = "LR";
-	$ff = fopen($log_filepath, "a+");
-	fwrite($ff, "\r\n");
-	fwrite($ff, "***************************************************\r\n");
+	$ff = @fopen($log_filepath, "a+");
+	writeIfPossible($ff, "\r\n");
+	writeIfPossible($ff, "***************************************************\r\n");
 	if (($pagto == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) || ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO'])) {
 		// gera nova ordem em tb_pag_compras
 		require_once RAIZ_DO_PROJETO . "banco/bradesco/inc_gen_order.php"; // 
 		$numOrder = $orderId;
-		fwrite($ff, "TRANSFERENCIA_ENTRE_CONTAS_BRADESCO - $orderId r\n");
+		writeIfPossible($ff, "TRANSFERENCIA_ENTRE_CONTAS_BRADESCO - $orderId r\n");
 	}
 
 	if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) {
 		// gera nova ordem em tb_pag_compras
 		require_once RAIZ_DO_PROJETO . "banco/bancodobrasil/inc_gen_order_bbr.php"; // 
 		$numOrder = $orderId;
-		fwrite($ff, "PAGAMENTO_BB_DEBITO_SUA_CONTA -  $orderId r\n");
+		writeIfPossible($ff, "PAGAMENTO_BB_DEBITO_SUA_CONTA -  $orderId r\n");
 	}
 
 	if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']) {
 
 		$numOrder = $orderId;
 		$pagto_venda = $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC;
-		fwrite($ff, "PAGAMENTO_BANCO_ITAU_ONLINE -  $orderId - $pagto_venda r\n");	// convert to numeric value to allow storing in tb_dist_venda_games
+		writeIfPossible($ff, "PAGAMENTO_BANCO_ITAU_ONLINE -  $orderId - $pagto_venda r\n");	// convert to numeric value to allow storing in tb_dist_venda_games
 	}
 
 
-	fwrite($ff, "Data: " . date("Y-m-d H:i:s") . "\r\n");
+	writeIfPossible($ff, "Data: " . date("Y-m-d H:i:s") . "\r\n");
 
 	// Escreve todas as variáveis e status no log
-	fwrite($ff, "Total Carrinho: " . $total_carrinho . "\r\n");
+	writeIfPossible($ff, "Total Carrinho: " . $total_carrinho . "\r\n");
 
-	fwrite($ff, "pagto: " . $pagto . "\r\n");
+	writeIfPossible($ff, "pagto: " . $pagto . "\r\n");
 
-	fwrite($ff, "pagamento venda: " . $pagto_venda . "\r\n");
+	writeIfPossible($ff, "pagamento venda: " . $pagto_venda . "\r\n");
 
-	fwrite($ff, "Taxas: " . $taxas . "\r\n");
-	fwrite($ff, "Quantidade de vendas no último dia: " . $qtde_last_dayOK . "\r\n");
-	fwrite($ff, "Total diário de vendas online: " . $total_diario . "\r\n");
-	fwrite($ff, "Tentativas Diárias OK: " . $b_TentativasDiariasOK . "\r\n");
-	fwrite($ff, "Limite Diário OK: " . $b_LimiteDiarioOK  . "\r\n");
-	fwrite($ff, "Libera Banco do Brasil: " . $b_libera_BancodoBrasil  . "\r\n");
-	fwrite($ff, "Libera Bradesco: " . $b_libera_Bradesco  . "\r\n");
-	fwrite($ff, "Libera Banco Itau: " . $b_libera_BancoItau . "\r\n");
-	fwrite($ff, "Mensagem de Bloqueio Bradesco: " . $msg_bloqueia_Bradesco . "\r\n");
-	fwrite($ff, "Mensagem de Bloqueio Banco do Brasil: " . $msg_bloqueia_BancodoBrasil . "\r\n");
-	fwrite($ff, "Mensagem de Bloqueio Banco Itau: " . $msg_bloqueia_BancoItau . "\r\n");
-	fwrite($ff, "Usuário ID: " . $id_usuario_prev . "\r\n");
-	fwrite($ff, "Usuário Nome: " . $cliente_nome_prev . "\r\n");
-	fwrite($ff, "numOrder: " . $numOrder . "\r\n");
+	writeIfPossible($ff, "Taxas: " . $taxas . "\r\n");
+	writeIfPossible($ff, "Quantidade de vendas no último dia: " . $qtde_last_dayOK . "\r\n");
+	writeIfPossible($ff, "Total diário de vendas online: " . $total_diario . "\r\n");
+	writeIfPossible($ff, "Tentativas Diárias OK: " . $b_TentativasDiariasOK . "\r\n");
+	writeIfPossible($ff, "Limite Diário OK: " . $b_LimiteDiarioOK  . "\r\n");
+	writeIfPossible($ff, "Libera Banco do Brasil: " . $b_libera_BancodoBrasil  . "\r\n");
+	writeIfPossible($ff, "Libera Bradesco: " . $b_libera_Bradesco  . "\r\n");
+	writeIfPossible($ff, "Libera Banco Itau: " . $b_libera_BancoItau . "\r\n");
+	writeIfPossible($ff, "Mensagem de Bloqueio Bradesco: " . $msg_bloqueia_Bradesco . "\r\n");
+	writeIfPossible($ff, "Mensagem de Bloqueio Banco do Brasil: " . $msg_bloqueia_BancodoBrasil . "\r\n");
+	writeIfPossible($ff, "Mensagem de Bloqueio Banco Itau: " . $msg_bloqueia_BancoItau . "\r\n");
+	writeIfPossible($ff, "Usuário ID: " . $id_usuario_prev . "\r\n");
+	writeIfPossible($ff, "Usuário Nome: " . $cliente_nome_prev . "\r\n");
+	writeIfPossible($ff, "numOrder: " . $numOrder . "\r\n");
 	// Recupera cesta
 	if (empty($numOrder)) {
 		$numOrder = $OrderAtual;
@@ -209,7 +210,7 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 		//exit(); // Interrompe a execução do script se a validação falhar
 	}
 	$sql = "SELECT * FROM tb_pag_compras WHERE numCompra='" . $numOrder . "'";
-	fwrite($ff, "sql usado: " . $sql . "\r\n");
+	writeIfPossible($ff, "sql usado: " . $sql . "\r\n");
 
 	$ret = SQLexecuteQuery($sql);
 	if (!$ret) {
@@ -223,9 +224,9 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 		if (strlen($row['cesta']) == 0 && $row['status'] != 3) {
 			// Verifica se o status é diferente a 3
 			$sql = "UPDATE tb_pag_compras SET cliente_nome='" . str_replace("'", "''", $usuarioGames->getNome()) . "', idcliente=" . $usuarioGames->getId() . ", status=1, cesta='" . str_replace("'", "''", montaCesta_pag()) . "', total=" . (100 * ($total_carrinho + $taxas)) . " WHERE numcompra='" . $numOrder . "'";		// "iforma='".$_SESSION['pagamento.pagto']."', "
-			fwrite($ff, "sql tb_pag_compras: " . $sql . "\r\n");
-			fwrite($ff, "***************************************************\r\n");
-			fclose($ff);
+			writeIfPossible($ff, "sql tb_pag_compras: " . $sql . "\r\n");
+			writeIfPossible($ff, "***************************************************\r\n");
+			closeIfPossible($ff);
 			$ret = SQLexecuteQuery($sql);
 			if (!$ret) {
 				echo "Erro ao atualizar transação de pagamento (2).\n";
@@ -233,6 +234,7 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 			}
 		}
 	}
+	closeIfPossible($ff);
 }
 
 

@@ -1,6 +1,7 @@
 <?php
+$raiz_do_projeto = dirname(__DIR__, 2) . '/';
 require_once $raiz_do_projeto . "class/classQuestionarios.php";
-	function cancelarSessao(){
+	function cancelarSessao(): void {
 	
 		// Cancela Sessao (LH) (por via das duvidas) 
 		$GLOBALS['_SESSION']['dist_usuarioGames_ser'] = null;
@@ -17,7 +18,7 @@ require_once $raiz_do_projeto . "class/classQuestionarios.php";
 		$GLOBALS['_SESSION']['usuarioGames_ser'] = null;
 		unset($GLOBALS['_SESSION']['usuarioGames_ser']);
 
-		// Cancela Sessão (Integracao)
+		// Cancela Sessï¿½o (Integracao)
 		$GLOBALS['_SESSION']['integracao_is_parceiro'] = null;
 		unset($GLOBALS['_SESSION']['integracao_is_parceiro']);
 		$GLOBALS['_SESSION']['integracao_origem_id'] = null;
