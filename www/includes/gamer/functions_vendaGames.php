@@ -51,9 +51,15 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "select * from tb_venda_games vg
-                                 where vg.vg_id = " . $venda_id;
-                $rs_venda = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT *
+    FROM tb_venda_games vg
+    WHERE vg.vg_id = ?
+";
+
+                $rs_venda = SQLexecuteQueryParams($sql, [
+                        intval($venda_id)
+                ]);
                 if (!$rs_venda || pg_num_rows($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
@@ -87,13 +93,19 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
                         if ($partner_do_notify == 1 && ($url_notify_url != "")) {
 
                                 // Monta o passo 4 da Integra��o - Notify partner
-                                $sql = "SELECT * FROM tb_integracao_pedido ip 
-                                        WHERE 1=1
-                                        and ip_store_id = '" . $vg_integracao_parceiro_origem_id . "'
-                                        and ip_vg_id = '" . $vg_id . "'";
+                                $sql = "SELECT * 
+        FROM tb_integracao_pedido ip
+        WHERE ip_store_id = ?
+          AND ip_vg_id = ?";
+
+                                $params = [
+                                        $vg_integracao_parceiro_origem_id,
+                                        $vg_id
+                                ];
+
                                 grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . "Select  registro de integra��o para o notify (A1a)" . PHP_EOL . $sql . PHP_EOL);
 
-                                $rs = SQLexecuteQuery($sql);
+                                $rs = SQLexecuteQueryParams($sql, $params);
                                 if (!$rs) {
                                         $msg_1 = date("Y-m-d H:i:s") . " - Erro ao recuperar transa��o de integra��o B2 (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
                                         echo $msg_1;
@@ -126,9 +138,15 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
 
         //Recupera o deposito
         if ($msg == "") {
-                $sql = "select * from depositos_pendentes dep
-                                 where dep_codigo = " . $dep_id;
-                $rs_dep = SQLexecuteQuery($sql);
+                $sql = "SELECT *
+        FROM depositos_pendentes dep
+        WHERE dep_codigo = ?";
+
+                $params = [
+                        $dep_id
+                ];
+
+                $rs_dep = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_dep || pg_num_rows($rs_dep) == 0)
                         $msg = "Nenhum dep�sito encontrado." . PHP_EOL;
                 else {
@@ -140,7 +158,7 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -149,9 +167,10 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         if ($msg == "") {
 
                 //Concilia deposito
-                $sql = "update depositos_pendentes set dep_aprovado = 1, dep_aprovado_data = CURRENT_DATE, dep_venda_games_id = " . $venda_id . "
-                                where dep_codigo = " . $dep_id;
-                $ret = SQLexecuteQuery($sql);
+                $sql = "update depositos_pendentes set dep_aprovado = 1, dep_aprovado_data = CURRENT_DATE, dep_venda_games_id =  $1 where dep_codigo = $2";
+
+                $params = [(int)$venda_id, (int)$dep_id];
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret)
                         $msg = "Erro ao conciliar deposito." . PHP_EOL;
         }
@@ -159,13 +178,27 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         //Concilia na venda_games e atualiza status (deposito)
         if ($msg == "") {
                 $iduser_bko = null;
-                $sql = "update tb_venda_games set 
-                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
-                                        vg_dep_codigo = " . SQLaddFields($dep_id, "") . ", 
-                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
-                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
-                                where vg_id = " . $venda_id;
-                $ret = SQLexecuteQuery($sql);
+                $sql = "
+    UPDATE tb_venda_games 
+    SET 
+        vg_concilia = 1, 
+        vg_data_concilia = CURRENT_TIMESTAMP, 
+        vg_user_id_concilia = $1,
+        vg_dep_codigo = $2, 
+        vg_ultimo_status_obs = $3,
+        vg_ultimo_status = $4
+    WHERE vg_id = $5
+";
+
+                $params = [
+                        (int)$iduser_bko,
+                        (int)$dep_id,
+                        (string)$parametros['ultimo_status_obs'],
+                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],
+                        (int)$venda_id
+                ];
+
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda." . PHP_EOL;
         }
@@ -173,12 +206,12 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -226,9 +259,16 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "select * from tb_venda_games vg
-                                 where vg.vg_id = " . $venda_id;
-                $rs_venda = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM tb_venda_games vg
+    WHERE vg.vg_id = $1
+";
+
+                $params = [
+                        (int)$venda_id
+                ];
+
+                $rs_venda = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_venda || pg_num_rows($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
@@ -260,16 +300,27 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
                         $concilia_cod_sel = null;
                         if (!$concilia_cod_sel)
                                 $concilia_cod_sel = $GLOBALS['_REQUEST']['concilia_cod_sel'];
-                        $sql = "select * 
-                                        from tb_venda_games vg
-                                                inner join boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id 
-                                                left outer join tb_pag_compras pg on (pg.idvenda = vg.vg_id and tipo_cliente = 'M')
-                                                , boletos_pendentes bol 
-                                        where (not (vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " or vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'] . ")) and vg_deposito_em_saldo = 1 
-                                                and bol_codigo = $concilia_cod_sel
-                                                and vg_id = $venda_id
-                                        order by vg_data_inclusao desc";
-                        $rs_vendas = SQLexecuteQuery($sql);
+                        $sql = "
+    SELECT * FROM tb_venda_games vg
+    INNER JOIN boleto_bancario_games bbg ON bbg.bbg_vg_id = vg.vg_id 
+    LEFT OUTER JOIN tb_pag_compras pg ON (pg.idvenda = vg.vg_id AND pg.tipo_cliente = 'M')
+    CROSS JOIN boletos_pendentes bol 
+    WHERE 
+        (NOT (vg_ultimo_status = $1 OR vg_ultimo_status = $2)) 
+        AND vg_deposito_em_saldo = 1 
+        AND bol_codigo = $3
+        AND vg_id = $4
+    ORDER BY vg_data_inclusao DESC
+";
+
+                        $params = [
+                                (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+                                (int)$GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'],
+                                (int)$concilia_cod_sel,
+                                (int)$venda_id
+                        ];
+
+                        $rs_vendas = SQLexecuteQueryParams($sql, $params);
                         if (!$rs_vendas || pg_num_rows($rs_vendas) == 0) {
                                 $msg = "Nenhuma venda de dep�sito em Saldo Gamer encontrada para concilia��o." . PHP_EOL;
                                 echo $msg;
@@ -336,9 +387,16 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
         }
         //Recupera o boleto pendente
         if ($msg == "") {
-                $sql = "select * from boletos_pendentes bol
-                                where bol.bol_codigo = " . $boleto_id;
-                $rs_boleto = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM boletos_pendentes bol
+    WHERE bol.bol_codigo = $1
+";
+
+                $params = [
+                        (int)$boleto_id
+                ];
+
+                $rs_boleto = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
                         $msg = "Nenhum boleto encontrado." . PHP_EOL;
                 else {
@@ -357,7 +415,7 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -365,21 +423,43 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 
         //atualiza boleto bancario
         if ($msg == "") {
-                $sql = "update boleto_bancario_games set bbg_pago = 1, bbg_data_pago = '" . $bol_data . "'
-                                where bbg_vg_id = " . $venda_id;
+                $sql = "
+    UPDATE boleto_bancario_games 
+    SET bbg_pago = 1, 
+        bbg_data_pago = $1
+    WHERE bbg_vg_id = $2
+";
+
+                $params = [
+                        (string)$bol_data,
+                        (int)$venda_id
+                ];
+
                 if ($vg_integracao_parceiro_origem_id != "") {
                         gravaLog_TMP("Integra��o Boleto - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  Venda de Integra��o '$vg_integracao_parceiro_origem_id' - Atualiza boleto bancario, (vg_id = $venda_id)" . PHP_EOL . "   $sql" . PHP_EOL);
                 }
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret)
                         $msg = "Erro ao atualizar boleto banc�rio." . PHP_EOL;
         }
 
         //Concilia boleto
         if ($msg == "") {
-                $sql = "update boletos_pendentes set bol_aprovado = 1, bol_aprovado_data = CURRENT_TIMESTAMP, bol_venda_games_id = " . $venda_id . "
-                                where bol_codigo = " . $boleto_id;
-                $ret = SQLexecuteQuery($sql);
+                $sql = "
+    UPDATE boletos_pendentes 
+    SET 
+        bol_aprovado = 1, 
+        bol_aprovado_data = CURRENT_TIMESTAMP, 
+        bol_venda_games_id = $1
+    WHERE bol_codigo = $2
+";
+
+                $params = [
+                        (int)$venda_id,
+                        (int)$boleto_id
+                ];
+
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret)
                         $msg = "Erro ao conciliar boleto." . PHP_EOL;
         }
@@ -395,18 +475,35 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 
         //Concilia na venda_games e atualiza status (boleto)
         if ($msg == "") {
-                $sql = "update tb_venda_games set 
-                                        vg_pagto_banco = '" . $bol_banco . "',
-                                        vg_pagto_num_docto = '" . $bol_documento . "',
-                                        vg_pagto_data = '" . $bol_data . "',
-                                        vg_pagto_valor_pago = " . $bol_valor . ",
-                                        vg_bol_codigo = " . SQLaddFields($boleto_id, "") . ",
-                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
-                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
-                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
-                                where vg_id = " . $venda_id;
+                $sql = "
+    UPDATE tb_venda_games 
+    SET 
+        vg_pagto_banco = $1,
+        vg_pagto_num_docto = $2,
+        vg_pagto_data = $3,
+        vg_pagto_valor_pago = $4,
+        vg_bol_codigo = $5,
+        vg_concilia = 1, 
+        vg_data_concilia = CURRENT_TIMESTAMP, 
+        vg_user_id_concilia = $6,
+        vg_ultimo_status_obs = $7,
+        vg_ultimo_status = $8
+    WHERE vg_id = $9
+";
 
-                $ret = SQLexecuteQuery($sql);
+                $params = [
+                        (string)$bol_banco,
+                        (string)$bol_documento,
+                        (string)$bol_data,
+                        (float)$bol_valor,
+                        (int)$boleto_id,
+                        (int)$iduser_bko,
+                        (string)$parametros['ultimo_status_obs'],
+                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],
+                        (int)$venda_id
+                ];
+
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda A1 (vg_id=$venda_id)." . PHP_EOL;
         }
@@ -422,12 +519,12 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -479,11 +576,17 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         // Valida valores
         if ($msg == "") {
                 $total_geral = 0;
-                $sql = "select * from tb_venda_games vg " .
-                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
-                        "where vg.vg_id = " . $venda_id;
+                $sql = "
+    SELECT * FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+    WHERE vg.vg_id = $1
+";
 
-                $rs_venda_modelos = SQLexecuteQuery($sql);
+                $params = [
+                        (int)$venda_id
+                ];
+
+                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
 
                 if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
                         while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
@@ -497,14 +600,21 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
         $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         if ($fileLog) {
-        fwrite($fileLog, "ID VENDA CONCILIA��O ONLINE: " . $venda_id . "\n");
+                fwrite($fileLog, "ID VENDA CONCILIA��O ONLINE: " . $venda_id . "\n");
         }
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "select * from tb_venda_games vg
-                                 where vg.vg_id = " . $venda_id;
-                $rs_venda = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM tb_venda_games vg
+    WHERE vg.vg_id = $1
+";
+
+                $params = [
+                        (int)$venda_id
+                ];
+
+                $rs_venda = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_venda || pg_num_rows($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
@@ -516,8 +626,9 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
                         fwrite($fileLog, "ULTIMO STATUS VENDA: " . $vg_ultimo_status . " - PRECISA SER '2' / " . $venda_id . " \n");
 
-                        $sql = "select count(*) as qtde from tb_venda_games_modelo where vgm_vg_id = " . $venda_id . " and vgm_pin_codinterno <> '';";
-                        $rs_venda = SQLexecuteQuery($sql);
+                        $sql = "select count(*) as qtde from tb_venda_games_modelo where vgm_vg_id = $1 and vgm_pin_codinterno <> ''";
+                        $params = [(int)$venda_id];
+                        $rs_venda = SQLexecuteQueryParams($sql, $params);
                         if (pg_num_rows($rs_venda) == 0) {
                                 //valida status 
                                 if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] && $webhook == false)
@@ -540,8 +651,9 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
                 /* ===============================
                 * Verifica pedido de integra��o
                 * =============================== */
-                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id = " . $venda_id;
-                $pedidoIntegracao = SQLexecuteQuery($sqlIntegracao);
+                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id = $1";
+                $params = [(int)$venda_id];
+                $pedidoIntegracao = SQLexecuteQueryParams($sqlIntegracao, $params);
                 $existeIntegracao = $pedidoIntegracao && pg_num_rows($pedidoIntegracao) > 0;
 
                 if (!$existeIntegracao) {
@@ -558,10 +670,10 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
         //Recupera o pagamento pendente
         if ($msg == "") {
-                $sql = "select * from tb_pag_compras pag where pag.numcompra = '" . $pagamento_id . "' ";
-                $sql .= " and idcliente = $vg_ug_id ";
+                $sql = "select * from tb_pag_compras pag where pag.numcompra = $1 and idcliente = $2";
+                $params = [(string)$pagamento_id, (int)$vg_ug_id];
 
-                $rs_pagamento = SQLexecuteQuery($sql);
+                $rs_pagamento = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
                         $msg = "Nenhum pagamento encontrado (B)." . PHP_EOL;
                 else {
@@ -594,7 +706,7 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -606,17 +718,33 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
         //Concilia na venda_games e atualiza status (PagamentoOnline)
         if ($msg == "") {
-                $sql = "update tb_venda_games set 
-                                        vg_pagto_banco = '" . $pag_banco . "',
-                                        vg_pagto_num_docto = '" . $pag_documento . "',
-                                        vg_pagto_data = '" . $pag_data . "',
-                                        vg_pagto_valor_pago = " . $pag_valor . ",
-                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
-                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
-                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
-                                where vg_id = " . $venda_id;
+                $sql = "
+    UPDATE tb_venda_games 
+    SET 
+        vg_pagto_banco = $1,
+        vg_pagto_num_docto = $2,
+        vg_pagto_data = $3,
+        vg_pagto_valor_pago = $4,
+        vg_concilia = 1, 
+        vg_data_concilia = CURRENT_TIMESTAMP, 
+        vg_user_id_concilia = $5,
+        vg_ultimo_status_obs = $6,
+        vg_ultimo_status = $7
+    WHERE vg_id = $8
+";
 
-                $ret = SQLexecuteQuery($sql);
+                $params = [
+                        (string)$pag_banco,
+                        (string)$pag_documento,
+                        (string)$pag_data,
+                        (float)$pag_valor,
+                        (int)$iduser_bko,
+                        (string)$parametros['ultimo_status_obs'],
+                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],
+                        (int)$venda_id
+                ];
+
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda (32)" . PHP_EOL . $sql . PHP_EOL;
 
@@ -625,11 +753,21 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
         if ($msg == "") {
                 // registro foi processado
-                $sql = "update tb_pag_compras set status_processed=1 where numcompra='" . $pagamento_id . "' ";
-                $sql .= " and idcliente = $vg_ug_id ";
+                $sql = "
+    UPDATE tb_pag_compras 
+    SET status_processed = 1 
+    WHERE numcompra = $1 
+    AND idcliente = $2
+";
+
+                $params = [
+                        (string)$pagamento_id,
+                        (int)$vg_ug_id
+                ];
+
                 echo "DEBUG A (status_processed = 1, idvenda = $venda_id): " . $sql . PHP_EOL;
 
-                $rs_update2 = SQLexecuteQuery($sql);
+                $rs_update2 = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_update2) {
                         $msg = "Erro atualizando status de registro (62)." . PHP_EOL;
                         echo $msg;
@@ -641,12 +779,12 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -665,11 +803,18 @@ function verificaEstoque($venda_id)
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "select * from tb_venda_games vg 
-                                inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                                inner join operadoras ope on ope.opr_codigo = vgm.vgm_opr_codigo
-                                where vg.vg_id = " . $venda_id;
-                $rs_venda_modelos = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM tb_venda_games vg 
+    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
+    INNER JOIN operadoras ope ON ope.opr_codigo = vgm.vgm_opr_codigo
+    WHERE vg.vg_id = $1
+";
+
+                $params = [
+                        (int)$venda_id
+                ];
+
+                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
                         $msg = "Nenhum produto encontrado (VE_1)." . PHP_EOL;
         }
@@ -693,11 +838,21 @@ function verificaEstoque($venda_id)
 
                                         //PINS
                                         //---------------------------------------------------------------------------------------------------
-                                        $sql = "select count(*) as pins_qtde from pins
-													where opr_codigo = " . $vgm_opr_codigo . "
-															and pin_status = '1' and pin_canal='s' 
-															and pin_valor = " . $vgm_pin_valor;
-                                        $rs_pins = SQLexecuteQuery($sql);
+                                        $sql = "
+    SELECT count(*) AS pins_qtde 
+    FROM pins
+    WHERE opr_codigo = $1
+      AND pin_status = '1' 
+      AND pin_canal = 's' 
+      AND pin_valor = $2
+";
+
+                                        $params = [
+                                                (int)$vgm_opr_codigo,
+                                                (float)$vgm_pin_valor
+                                        ];
+
+                                        $rs_pins = SQLexecuteQueryParams($sql, $params);
                                         if (!$rs_pins || pg_num_rows($rs_pins) == 0)
                                                 $msg .= "N�o h� pin de " . number_format($vgm_pin_valor, 2, ',', '.') . " da operadora " . $opr_nome . " em estoque (A)." . PHP_EOL;
                                         else {
@@ -728,9 +883,16 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "select * from tb_venda_games vg " .
-                        "where vg.vg_id = " . $venda_id;
-                $rs_venda = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM tb_venda_games vg 
+    WHERE vg.vg_id = $1
+";
+
+                $params = [
+                        (int)$venda_id
+                ];
+
+                $rs_venda = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_venda || pg_num_rows($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
@@ -751,19 +913,33 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "select * from tb_venda_games vg " .
-                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
-                        "where vg.vg_id = " . $venda_id;
-                $rs_venda_modelos = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+    WHERE vg.vg_id = $1
+";
+
+                $params = [
+                        (int)$venda_id
+                ];
+
+                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
                         $msg = "Nenhuma produto encontrado (I)." . PHP_EOL;
         }
 
         //Recupera dados do usuario
         if ($msg == "") {
-                $sql = "select * from usuarios_games ug " .
-                        "where ug.ug_id = " . $vg_ug_id;
-                $rs_usuario = SQLexecuteQuery($sql);
+                $sql = "
+    SELECT * FROM usuarios_games ug 
+    WHERE ug.ug_id = $1
+";
+
+                $params = [
+                        (int)$vg_ug_id
+                ];
+
+                $rs_usuario = SQLexecuteQueryParams($sql, $params);
                 if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
                         $msg = "Nenhum cliente encontrado." . PHP_EOL;
                 else {
@@ -778,9 +954,16 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                 //Deposito
                 if ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF']) {
 
-                        $sql = "select * from depositos_pendentes dep " .
-                                "where dep.dep_codigo = " . $vg_dep_codigo;
-                        $rs_deposito = SQLexecuteQuery($sql);
+                        $sql = "
+    SELECT * FROM depositos_pendentes dep 
+    WHERE dep.dep_codigo = $1
+";
+
+                        $params = [
+                                (int)$vg_dep_codigo
+                        ];
+
+                        $rs_deposito = SQLexecuteQueryParams($sql, $params);
                         if (!$rs_deposito || pg_num_rows($rs_deposito) == 0)
                                 $msg = "Nenhum deposito encontrado (I)." . PHP_EOL;
                         else {
@@ -797,9 +980,16 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                         //Boleto
                 } elseif ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO']) {
 
-                        $sql = "select * from boletos_pendentes bol " .
-                                "where bol.bol_codigo = " . $vg_bol_codigo;
-                        $rs_boleto = SQLexecuteQuery($sql);
+                        $sql = "
+    SELECT * FROM boletos_pendentes bol 
+    WHERE bol.bol_codigo = $1
+";
+
+                        $params = [
+                                (int)$vg_bol_codigo
+                        ];
+
+                        $rs_boleto = SQLexecuteQueryParams($sql, $params);
                         if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
                                 $msg = "Nenhum boleto encontrado (I)." . PHP_EOL;
                         else {
@@ -827,9 +1017,17 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                         */
                 ) {
 
-                        $sql = "select * from tb_pag_compras pag where pag.idvenda = " . $venda_id;
+                        $sql = "
+    SELECT * FROM tb_pag_compras pag 
+    WHERE pag.idvenda = $1
+";
+
+                        $params = [
+                                (int)$venda_id
+                        ];
+
                         echo "  DEBUG *** EE ($vg_pagto_num_docto, '" . $vg_pagto_tipo . "'): " . $sql . PHP_EOL;
-                        $rs_pagamento = SQLexecuteQuery($sql);
+                        $rs_pagamento = SQLexecuteQueryParams($sql, $params);
                         if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
                                 $msg = "Nenhum pagamento encontrado (A2)." . PHP_EOL;
                         else {
@@ -862,7 +1060,7 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -954,13 +1152,13 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
                 echo "    DUMMY Integracao OUT - " . $s_msg . PHP_EOL;
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -1058,7 +1256,7 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -1110,12 +1308,12 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -1131,7 +1329,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
         $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         if ($fileLog) {
-        fwrite($fileLog, "ID VENDA PROCESSA VENDA: " . $venda_id . "\n");
+                fwrite($fileLog, "ID VENDA PROCESSA VENDA: " . $venda_id . "\n");
         }
 
         // Levanta venda de Campeonato
@@ -1251,7 +1449,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -1489,12 +1687,12 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -1511,7 +1709,7 @@ function processaEmailVendaGames($venda_id, $parametros)
 
         $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         if ($fileLog) {
-        fwrite($fileLog, "ID VENDA PROCESSA VENDA EMAIL: " . $venda_id . "\n");
+                fwrite($fileLog, "ID VENDA PROCESSA VENDA EMAIL: " . $venda_id . "\n");
         }
 
 
@@ -3236,7 +3434,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         //Inicia transacao
                                                         if ($msg == "") {
                                                                 $sql = "BEGIN TRANSACTION ";
-                                                                $ret = SQLexecuteQuery($sql);
+                                                                $ret = SQLexecuteQueryParams($sql, null);
                                                                 $ret = true;                                                                                                /////////////////////
                                                                 if (!$ret)
                                                                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
@@ -3279,14 +3477,14 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         //Finaliza transacao
                                                         if ($msg == "") {
                                                                 $sql = "COMMIT TRANSACTION ";
-                                                                $ret = SQLexecuteQuery($sql);
+                                                                $ret = SQLexecuteQueryParams($sql, null);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                                         } else {
                                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                                $ret = SQLexecuteQuery($sql);
+                                                                $ret = SQLexecuteQueryParams($sql, null);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -3885,7 +4083,7 @@ function getValueSingle($sql)
 {
 
         $ret = null;
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, null);
         if ($rs && pg_num_rows($rs) > 0) {
                 $rs_row = pg_fetch_array($rs);
                 $ret = $rs_row[0];
@@ -4213,7 +4411,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         //Inicia transacao
                                                         if ($msg == "") {
                                                                 $sql = "BEGIN TRANSACTION ";
-                                                                $ret = SQLexecuteQuery($sql);
+                                                                $ret = SQLexecuteQueryParams($sql, null);
                                                                 $ret = true;                                                                                                /////////////////////
                                                                 if (!$ret)
                                                                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
@@ -4254,14 +4452,14 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         //Finaliza transacao
                                                         if ($msg == "") {
                                                                 $sql = "COMMIT TRANSACTION ";
-                                                                $ret = SQLexecuteQuery($sql);
+                                                                $ret = SQLexecuteQueryParams($sql, null);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                                         } else {
                                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                                $ret = SQLexecuteQuery($sql);
+                                                                $ret = SQLexecuteQueryParams($sql, null);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -4732,8 +4930,8 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
 
                 $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
                 if ($fileLog) {
-                fwrite($fileLog, "DATA DE REQUISI��O: " . date("d-m-Y H:i:s") . "\n");
-                fwrite($fileLog, "MODO DE CONCILIA��O: " . (($webhook === true) ? "WEBHOOK" : "SONDA") . "\n");
+                        fwrite($fileLog, "DATA DE REQUISI��O: " . date("d-m-Y H:i:s") . "\n");
+                        fwrite($fileLog, "MODO DE CONCILIA��O: " . (($webhook === true) ? "WEBHOOK" : "SONDA") . "\n");
                 }
 
                 $registros_total = pg_num_rows($rs_transacoes);
@@ -4808,7 +5006,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         //Inicia transacao
                                         if ($msg == "") {
                                                 $sql = "BEGIN TRANSACTION ";
-                                                $ret = SQLexecuteQuery($sql);
+                                                $ret = SQLexecuteQueryParams($sql, null);
                                                 $ret = true;                                                                                                /////////////////////
                                                 if (!$ret)
                                                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
@@ -4858,14 +5056,14 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         //Finaliza transacao
                                         if ($msg == "") {
                                                 $sql = "COMMIT TRANSACTION ";
-                                                $ret = SQLexecuteQuery($sql);
+                                                $ret = SQLexecuteQueryParams($sql, null);
                                                 if (!$ret)
                                                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                         } else {
                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                $ret = SQLexecuteQuery($sql);
+                                                $ret = SQLexecuteQueryParams($sql, null);
                                                 if (!$ret)
                                                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -5284,7 +5482,7 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -5332,12 +5530,12 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -5678,7 +5876,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 //Inicia transacao
                                                 if ($msg == "") {
                                                         $sql = "BEGIN TRANSACTION ";
-                                                        $ret = SQLexecuteQuery($sql);
+                                                        $ret = SQLexecuteQueryParams($sql, null);
                                                         $ret = true;                                                                                                /////////////////////
                                                         if (!$ret)
                                                                 $msg = "Erro ao iniciar transa��o." . PHP_EOL;
@@ -5722,14 +5920,14 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 //Finaliza transacao
                                                 if ($msg == "") {
                                                         $sql = "COMMIT TRANSACTION ";
-                                                        $ret = SQLexecuteQuery($sql);
+                                                        $ret = SQLexecuteQueryParams($sql, null);
                                                         if (!$ret)
                                                                 $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                         $msg_sonda = "PROCESSADO POR SONDA";
                                                 } else {
                                                         $sql = "ROLLBACK TRANSACTION ";
-                                                        $ret = SQLexecuteQuery($sql);
+                                                        $ret = SQLexecuteQueryParams($sql, null);
                                                         if (!$ret)
                                                                 $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -6076,7 +6274,7 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                         //Inicia transacao
                                         if ($msg == "") {
                                                 $sql = "BEGIN TRANSACTION ";
-                                                $ret = SQLexecuteQuery($sql);
+                                                $ret = SQLexecuteQueryParams($sql, null);
                                                 $ret = true;                                                                                                /////////////////////
                                                 if (!$ret)
                                                         $msg = "Erro ao iniciar transacao." . PHP_EOL;
@@ -6129,14 +6327,14 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                         //Finaliza transacao
                                         if ($msg == "") {
                                                 $sql = "COMMIT TRANSACTION ";
-                                                $ret = SQLexecuteQuery($sql);
+                                                $ret = SQLexecuteQueryParams($sql, null);
                                                 if (!$ret)
                                                         $msg = "Erro ao comitar transacao." . PHP_EOL;
 
                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                         } else {
                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                $ret = SQLexecuteQuery($sql);
+                                                $ret = SQLexecuteQueryParams($sql, null);
                                                 if (!$ret)
                                                         $msg = "Erro ao dar rollback na transacao." . PHP_EOL;
 
@@ -6310,7 +6508,7 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -6356,13 +6554,13 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
                 // Log transaction's success
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, null);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }

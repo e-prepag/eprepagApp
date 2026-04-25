@@ -2,8 +2,17 @@
 //Função que verifica se o publisher exige CPF do cliente de LANHouse
 function checkingNeedCPF_LH(mixed $opr_codigo): mixed
 {
-    $sql_function = "SELECT opr_need_cpf_lh from operadoras where opr_codigo=" . intval($opr_codigo) . ";";
-    $rs_function = SQLexecuteQuery($sql_function);
+    $sql_function = "
+    SELECT opr_need_cpf_lh
+    FROM operadoras
+    WHERE opr_codigo = :opr_codigo
+";
+
+    $params = [
+        'opr_codigo' => intval($opr_codigo),
+    ];
+
+    $rs_function = SQLexecuteQueryParams($sql_function, $params);
     $opr_need_cpf_lh = null;
     if ($rs_function && $rs_function_row = pg_fetch_array($rs_function)) {
         $opr_need_cpf_lh = $rs_function_row['opr_need_cpf_lh'];
@@ -175,7 +184,7 @@ function checkingIsCompletedData(mixed $url_preview): void
                         }
                     }
                 }
-    //Verificando se exige CPF de cliente
+                //Verificando se exige CPF de cliente
                 if ($opr_codigo > 0 && !$test_opr_need_cpf_lh) {
                     $test_opr_need_cpf_lh = (bool)checkingNeedCPF_LH($opr_codigo);
                 } //end if(!$test_opr_need_cpf_lh)

@@ -27,245 +27,215 @@ function verificaFaltaCPFNome(array $vetorPublisher, mixed $diaLimite, mixed &$r
     list($mes, $ano) = explode("/", $mesAno);
 
     // Buscando informaes 
+    $params = [];
+
+    /* =======================
+   QUERY BASE
+======================= */
+
     $sql = "select 
-                        ug_cpf, 
-                        ug_nome,
-                        ug_id,
-                        ug_email,
-                        min(data) as data_transacao,
-                        tipo
-                from ( 
-                    (select 
-                            ug_cpf, 
-                            ug_nome_cpf as ug_nome,
-                            ug_id::character varying,
-                            ug_email,
-                            vg.vg_data_concilia as data,
-                            'GAMER' as  tipo
-                    from tb_venda_games vg 
-                            inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                            inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vg.vg_data_concilia >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
-                            and (
-				ug_cpf is null
-				OR
-				ug_nome_cpf is null
-				OR
-				length(ug_cpf) < 14 
-				OR
-				ug_nome_cpf = ''
-                            )
-                            and vgm_opr_codigo IN (" . implode(",", $vetorPublisher) . ") 
-                    group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_concilia)
+            ug_cpf, 
+            ug_nome,
+            ug_id,
+            ug_email,
+            min(data) as data_transacao,
+            tipo
+        from ( 
 
-                    union all
+            (select 
+                    ug_cpf, 
+                    ug_nome_cpf as ug_nome,
+                    ug_id::character varying,
+                    ug_email,
+                    vg.vg_data_concilia as data,
+                    'GAMER' as tipo
+             from tb_venda_games vg 
+                    inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                    inner join usuarios_games ug on ug.ug_id = vg.vg_ug_id
+             where vg.vg_ultimo_status = ?
+               and vg.vg_data_concilia >= ?
+               and vg.vg_data_concilia <= ?
+               and vg.vg_ug_id != ?
+               and (
+                    ug_cpf is null OR
+                    ug_nome_cpf is null OR
+                    length(ug_cpf) < 14 OR
+                    ug_nome_cpf = ''
+               )
+               and vgm_opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_concilia)
 
-                    (select 
-                            vgm_cpf as ug_cpf, 
-                            vgm_nome_cpf as ug_nome, 
-                            ug_id::character varying,
-                            ug_email,
-                            vg.vg_data_inclusao as data,
-                            'LAN HOUSE' as  tipo
-                    from tb_dist_venda_games vg 
-                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                            inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vg.vg_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and (
-                                    vgm_cpf is null
-                                    OR
-                                    vgm_nome_cpf is null
-                                    OR
-                                    length(vgm_cpf) < 14 
-                                    OR
-                                    vgm_nome_cpf = ''
-                            )
-                            and vgm_opr_codigo IN (" . implode(",", $vetorPublisher) . ") 
-                    group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_inclusao)
+            union all
 
-                    union all
+            (select 
+                    vgm_cpf as ug_cpf, 
+                    vgm_nome_cpf as ug_nome, 
+                    ug_id::character varying,
+                    ug_email,
+                    vg.vg_data_inclusao as data,
+                    'LAN HOUSE' as tipo
+             from tb_dist_venda_games vg 
+                    inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                    inner join dist_usuarios_games ug on ug.ug_id = vg.vg_ug_id
+             where vg.vg_ultimo_status = ?
+               and vg.vg_data_inclusao >= ?
+               and vg.vg_data_inclusao <= ?
+               and (
+                    vgm_cpf is null OR
+                    vgm_nome_cpf is null OR
+                    length(vgm_cpf) < 14 OR
+                    vgm_nome_cpf = ''
+               )
+               and vgm_opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_inclusao)
 
-                    (select 
-                        picc_cpf as ug_cpf, 
-                        picc_nome as ug_nome, 
-                        'ID PIN:'||pih_pin_id as ug_id,
-                        '' as ug_email,
-                        pih_data as data,
-                        'CARTAO' as  tipo
-                    from pins_integracao_card_historico
-                            left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-                    where pin_status = '4' 
-                        and pih_codretepp = '2'
-                        and pih_data >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                        and (
-                            picc_cpf is null
-                            OR
-                            picc_nome is null
-                            OR
-                            length(picc_cpf) < 14 
-                            OR
-                            picc_nome = ''
-                        )
-                        and pih_id IN (" . implode(",", $vetorPublisher) . ")  
-                    group by picc_cpf, picc_nome, pih_pin_id, ug_email, pih_data, tipo)
-                    
-                    union all
+            union all
 
-                    (select 
-                        vgcbe_cpf as ug_cpf, 
-                        vgcbe_nome_cpf as ug_nome, 
-                        'ID Venda:'||vgcbe_vg_id as ug_id,
-                        vgcbe_ex_email as ug_email,
-                        vgcbe_data_inclusao as data,
-                        'BOLETO EXPRESS' as  tipo
-                    from tb_venda_games_cpf_boleto_express
-			inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-			inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                    where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vgcbe_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                        and (
-                            vgcbe_cpf is null
-                            OR
-                            vgcbe_nome_cpf is null
-                            OR
-                            length(vgcbe_cpf) < 14 
-                            OR
-                            vgcbe_nome_cpf = ''
-                        )
-                        and vgm_opr_codigo IN (" . implode(",", $vetorPublisher) . ")  
-                    group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
-                    ";
+            (select 
+                    picc_cpf as ug_cpf, 
+                    picc_nome as ug_nome, 
+                    'ID PIN:'||pih_pin_id as ug_id,
+                    '' as ug_email,
+                    pih_data as data,
+                    'CARTAO' as tipo
+             from pins_integracao_card_historico
+                    left outer join pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+             where pin_status = ?
+               and pih_codretepp = ?
+               and pih_data >= ?
+               and pih_data <= ?
+               and (
+                    picc_cpf is null OR
+                    picc_nome is null OR
+                    length(picc_cpf) < 14 OR
+                    picc_nome = ''
+               )
+               and pih_id IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by picc_cpf, picc_nome, pih_pin_id, ug_email, pih_data, tipo)
+
+            union all
+
+            (select 
+                    vgcbe_cpf as ug_cpf, 
+                    vgcbe_nome_cpf as ug_nome, 
+                    'ID Venda:'||vgcbe_vg_id as ug_id,
+                    vgcbe_ex_email as ug_email,
+                    vgcbe_data_inclusao as data,
+                    'BOLETO EXPRESS' as tipo
+             from tb_venda_games_cpf_boleto_express
+                    inner join tb_venda_games ON vg_id = vgcbe_vg_id
+                    inner join tb_venda_games_modelo ON vgm_vg_id = vg_id
+             where vg_ultimo_status = ?
+               and vgcbe_data_inclusao >= ?
+               and vgcbe_data_inclusao <= ?
+               and (
+                    vgcbe_cpf is null OR
+                    vgcbe_nome_cpf is null OR
+                    length(vgcbe_cpf) < 14 OR
+                    vgcbe_nome_cpf = ''
+               )
+               and vgm_opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
+";
+
+    /* =======================
+   PARAMS BASE
+======================= */
+
+    $dataInicioMes = "$ano-$mes-01 00:00:00";
+    $dataFimMes    = "$ano-$mes-" . date("t", mktime(0, 0, 0, $mes, 1, $ano)) . " 23:59:59";
+
+    $params = array_merge(
+        [
+            $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+            $dataInicioMes,
+            $dataFimMes,
+            $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY']
+        ],
+        $vetorPublisher,
+
+        [
+            $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+            $dataInicioMes,
+            $dataFimMes
+        ],
+        $vetorPublisher,
+
+        [
+            '4',
+            '2',
+            $dataInicioMes,
+            $dataFimMes
+        ],
+        $vetorPublisher,
+
+        [
+            $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+            $dataInicioMes,
+            $dataFimMes
+        ],
+        $vetorPublisher
+    );
+
+    /* =======================
+   IF PUBLISHERS NOVOS
+======================= */
+
     if (!empty($verificadorPublishersNovos)) {
-        foreach ($vetorPublisherNovos as $key => $value) {
-            //echo "Key: $key -- value: $value <br>";
+
+        foreach ($vetorPublisherNovos as $value) {
+
             $sql .= "
 
-                  union all
+        union all
 
-                     (select 
-                                ug_cpf, 
-                                ug_nome_cpf as ug_nome,
-                                ug_id::character varying,
-                                ug_email,
-                                vg.vg_data_concilia as data,
-                                'GAMER' as  tipo
-                        from tb_venda_games vg 
-                                inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                                inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                        where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                                and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                                and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                                and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
-                                and (
-                                    ug_cpf is null
-                                    OR
-                                    ug_nome_cpf is null
-                                    OR
-                                    length(ug_cpf) < 14 
-                                    OR
-                                    ug_nome_cpf = ''
-                                )
-                                and vgm_opr_codigo = " . $value . "
-                        group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_concilia)
+        (select 
+            ug_cpf,
+            ug_nome_cpf as ug_nome,
+            ug_id::character varying,
+            ug_email,
+            vg.vg_data_concilia as data,
+            'GAMER' as tipo
+         from tb_venda_games vg
+                inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
+                inner join usuarios_games ug on ug.ug_id = vg.vg_ug_id
+         where vg.vg_ultimo_status = ?
+           and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ?)
+           and vg.vg_data_concilia <= ?
+           and vg.vg_ug_id != ?
+           and (
+                ug_cpf is null OR
+                ug_nome_cpf is null OR
+                length(ug_cpf) < 14 OR
+                ug_nome_cpf = ''
+           )
+           and vgm_opr_codigo = ?
+         group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_concilia)
+        ";
 
-                        union all
+            $params[] = $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
+            $params[] = $value;
+            $params[] = $dataFimMes;
+            $params[] = $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'];
+            $params[] = $value;
+        }
+    }
 
-                        (select 
-                                vgm_cpf as ug_cpf, 
-                                vgm_nome_cpf as ug_nome, 
-                                ug_id::character varying,
-                                ug_email,
-                                vg.vg_data_inclusao as data,
-                                'LAN HOUSE' as  tipo
-                        from tb_dist_venda_games vg 
-                                inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                                inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                        where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                                and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                                and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                                and (
-                                    vgm_cpf is null
-                                    OR
-                                    vgm_nome_cpf is null
-                                    OR
-                                    length(vgm_cpf) < 14 
-                                    OR
-                                    vgm_nome_cpf = ''
-                                )
-                                and vgm_opr_codigo = " . $value . "
-                        group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo, vg_data_inclusao)
+    /* =======================
+   FINAL QUERY
+======================= */
 
-                        union all
-
-                        (select 
-                            picc_cpf as ug_cpf, 
-                            picc_nome as ug_nome, 
-                            'ID PIN:'||pih_pin_id as ug_id,
-                            '' as ug_email,
-                            pih_data as data,
-                            'CARTAO' as  tipo
-                        from pins_integracao_card_historico
-                                left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-                        where pin_status = '4' 
-                            and pih_codretepp = '2'
-                            and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and (
-                                picc_cpf is null
-                                OR
-                                picc_nome is null
-                                OR
-                                length(picc_cpf) < 14 
-                                OR
-                                picc_nome = ''
-                            )
-                            and pih_id = " . $value . " 
-                        group by picc_cpf, picc_nome, pih_pin_id, ug_email, pih_data, tipo)
-
-                        union all
-
-                        (select 
-                            vgcbe_cpf as ug_cpf, 
-                            vgcbe_nome_cpf as ug_nome, 
-                            'ID Venda:'||vgcbe_vg_id as ug_id,
-                            vgcbe_ex_email as ug_email,
-                            vgcbe_data_inclusao as data,
-                            'BOLETO EXPRESS' as  tipo
-                        from tb_venda_games_cpf_boleto_express
-                            inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-                            inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                        where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vgcbe_data_inclusao >=  (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and (
-                                vgcbe_cpf is null
-                                OR
-                                vgcbe_nome_cpf is null
-                                OR
-                                length(vgcbe_cpf) < 14 
-                                OR
-                                vgcbe_nome_cpf = ''
-                            )
-                            and vgm_opr_codigo = " . $value . " 
-                        group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
-                         ";
-        } //end foreach
-    } //end if(!empty($verificadorPublishersNovos))
     $sql .= "
-        ) tabelaUnion 
-                    group by ug_cpf, ug_nome, ug_id, ug_email, tipo 
-                    order by tipo, ug_id;  
-            ";
+        ) tabelaUnion
+        group by ug_cpf, ug_nome, ug_id, ug_email, tipo
+        order by tipo, ug_id
+";
 
-    //echo $sql.PHP_EOL; die();
-    $rs_dados_incompletos = SQLexecuteQuery($sql);
+    /* =======================
+   EXECU«√O
+======================= */
+
+    $rs_dados_incompletos = SQLexecuteQueryParams($sql, $params);
     //echo pg_num_rows($rs_dados_incompletos)."<br>";
     if (!$rs_dados_incompletos) {
         echo "Erro na Query de Levantamento de CPFs e/ou Nome em Branco para os Publishers (" . implode(",", $vetorPublisher) . ") e Publishers Novos (" . (is_array($vetorPublisherNovos) ? implode(",", $vetorPublisherNovos) : "") . ").<br>" . PHP_EOL;
@@ -307,240 +277,300 @@ function verificaCPFValido(array $vetorPublisher, mixed $diaLimite, mixed &$rs_d
     list($mes, $ano) = explode("/", $mesAno);
 
     // Buscando informaes 
+    $params = [];
+
+    /* =======================
+   DATAS
+======================= */
+
+    $dataInicioMes = "$ano-$mes-01 00:00:00";
+    $dataFimMes    = "$ano-$mes-" . date("t", mktime(0, 0, 0, $mes, 1, $ano)) . " 23:59:59";
+
+    /* =======================
+   QUERY BASE
+======================= */
+
     $sql = "select 
-                        ug_cpf, 
-                        ug_nome,
-                        ug_id,
-                        ug_email,
-                        tipo
-                from ( 
-                    (select 
-                            ug_cpf, 
-                            ug_nome_cpf as ug_nome,
-                            ug_id::character varying,
-                            ug_email,
-                            'GAMER' as  tipo
-                    from tb_venda_games vg 
-                            inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                            inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vg.vg_data_concilia >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
-                            and (
-				ug_cpf is not null
-				OR
-				ug_nome_cpf is not null
-				OR
-				length(ug_cpf) = 14 
-				OR
-				ug_nome_cpf != ''
-                            )
-                            and vgm_opr_codigo IN (" . implode(",", $vetorPublisher) . ") 
-                    group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
+            ug_cpf, 
+            ug_nome,
+            ug_id,
+            ug_email,
+            tipo
+        from (
 
-                    union all
+            (select 
+                    ug_cpf,
+                    ug_nome_cpf as ug_nome,
+                    ug_id::character varying,
+                    ug_email,
+                    'GAMER' as tipo
+             from tb_venda_games vg
+                    inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
+                    inner join usuarios_games ug on ug.ug_id = vg.vg_ug_id
+             where vg.vg_ultimo_status = ?
+               and vg.vg_data_concilia >= ?
+               and vg.vg_data_concilia <= ?
+               and vg.vg_ug_id != ?
+               and (
+                    ug_cpf is not null OR
+                    ug_nome_cpf is not null OR
+                    length(ug_cpf) = 14 OR
+                    ug_nome_cpf != ''
+               )
+               and vgm_opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
 
-                    (select 
-                            vgm_cpf as ug_cpf, 
-                            vgm_nome_cpf as ug_nome, 
-                            ug_id::character varying,
-                            ug_email,
-                            'LAN HOUSE' as  tipo
-                    from tb_dist_venda_games vg 
-                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                            inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vg.vg_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and (
-				vgm_cpf is not null
-                                OR
-				vgm_nome_cpf is not null
-                                OR
-				length(vgm_cpf) = 14 
-                                OR
-				vgm_nome_cpf != ''
-                            )
-                            and vgm_opr_codigo IN (" . implode(",", $vetorPublisher) . ") 
-                    group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
-                    
-                    union all
+            union all
 
-                    (select 
-                        picc_cpf as ug_cpf, 
-                        picc_nome as ug_nome, 
-                        'ID PIN:'||pih_pin_id as ug_id,
-                        '' as ug_email,
-                        'CARTAO' as  tipo
-                    from pins_integracao_card_historico
-                            left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-                    where pin_status = '4' 
-                        and pih_codretepp = '2'
-                        and pih_data >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                        and (
-                            picc_cpf is not null
-                            OR
-                            picc_nome is not null
-                            OR
-                            length(picc_cpf) = 14 
-                            OR
-                            picc_nome != ''
-                        )
-                        and pih_id IN (" . implode(",", $vetorPublisher) . ") 
-                    group by picc_cpf, picc_nome, pih_pin_id, ug_email, tipo)
-                    
-                    union all
+            (select 
+                    vgm_cpf as ug_cpf,
+                    vgm_nome_cpf as ug_nome,
+                    ug_id::character varying,
+                    ug_email,
+                    'LAN HOUSE' as tipo
+             from tb_dist_venda_games vg
+                    inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
+                    inner join dist_usuarios_games ug on ug.ug_id = vg.vg_ug_id
+             where vg.vg_ultimo_status = ?
+               and vg.vg_data_inclusao >= ?
+               and vg.vg_data_inclusao <= ?
+               and (
+                    vgm_cpf is not null OR
+                    vgm_nome_cpf is not null OR
+                    length(vgm_cpf) = 14 OR
+                    vgm_nome_cpf != ''
+               )
+               and vgm_opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
 
-                    (select 
-                        vgcbe_cpf as ug_cpf, 
-                        vgcbe_nome_cpf as ug_nome, 
-                        'ID Venda:'||vgcbe_vg_id as ug_id,
-                        vgcbe_ex_email as ug_email,
-                        'BOLETO EXPRESS' as  tipo
-                    from tb_venda_games_cpf_boleto_express
-			inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-			inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                    where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vgcbe_data_inclusao >= '" . $ano . "-" . $mes . "-01 00:00:00'
-                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                        and (
-                            vgcbe_cpf is not null
-                            OR
-                            vgcbe_nome_cpf is not null
-                            OR
-                            length(vgcbe_cpf) = 14 
-                            OR
-                            vgcbe_nome_cpf != ''
-                        )
-                        and vgm_opr_codigo IN (" . implode(",", $vetorPublisher) . ")  
-                    group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
+            union all
 
+            (select 
+                    picc_cpf as ug_cpf,
+                    picc_nome as ug_nome,
+                    'ID PIN:'||pih_pin_id as ug_id,
+                    '' as ug_email,
+                    'CARTAO' as tipo
+             from pins_integracao_card_historico
+                    left outer join pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+             where pin_status = ?
+               and pih_codretepp = ?
+               and pih_data >= ?
+               and pih_data <= ?
+               and (
+                    picc_cpf is not null OR
+                    picc_nome is not null OR
+                    length(picc_cpf) = 14 OR
+                    picc_nome != ''
+               )
+               and pih_id IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by picc_cpf, picc_nome, pih_pin_id, ug_email, tipo)
 
-                    ";
+            union all
+
+            (select 
+                    vgcbe_cpf as ug_cpf,
+                    vgcbe_nome_cpf as ug_nome,
+                    'ID Venda:'||vgcbe_vg_id as ug_id,
+                    vgcbe_ex_email as ug_email,
+                    'BOLETO EXPRESS' as tipo
+             from tb_venda_games_cpf_boleto_express
+                    inner join tb_venda_games ON vg_id = vgcbe_vg_id
+                    inner join tb_venda_games_modelo ON vgm_vg_id = vg_id
+             where vg_ultimo_status = ?
+               and vgcbe_data_inclusao >= ?
+               and vgcbe_data_inclusao <= ?
+               and (
+                    vgcbe_cpf is not null OR
+                    vgcbe_nome_cpf is not null OR
+                    length(vgcbe_cpf) = 14 OR
+                    vgcbe_nome_cpf != ''
+               )
+               and vgm_opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisher), '?')) . ")
+             group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
+";
+
+    /* =======================
+   PARAMS BASE
+======================= */
+
+    $params = array_merge(
+        [
+            $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+            $dataInicioMes,
+            $dataFimMes,
+            $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY']
+        ],
+        $vetorPublisher,
+
+        [
+            $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+            $dataInicioMes,
+            $dataFimMes
+        ],
+        $vetorPublisher,
+
+        [
+            '4',
+            '2',
+            $dataInicioMes,
+            $dataFimMes
+        ],
+        $vetorPublisher,
+
+        [
+            $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+            $dataInicioMes,
+            $dataFimMes
+        ],
+        $vetorPublisher
+    );
+
+    /* =======================
+   PUBLISHERS NOVOS
+======================= */
+
     if (!empty($verificadorPublishersNovos)) {
-        foreach ($vetorPublisherNovos as $key => $value) {
-            //echo "Key: $key -- value: $value <br>";
+
+        foreach ($vetorPublisherNovos as $value) {
+
             $sql .= "
 
-                  union all
+        union all
 
-                    (select 
-                            ug_cpf, 
-                            ug_nome_cpf as ug_nome,
-                            ug_id::character varying,
-                            ug_email,
-                            'GAMER' as  tipo
-                    from tb_venda_games vg 
-                            inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                            inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and vg.vg_data_concilia <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "' 
-                            and (
-				ug_cpf is not null
-				OR
-				ug_nome_cpf is not null
-				OR
-				length(ug_cpf) = 14 
-				OR
-				ug_nome_cpf != ''
-                            )
-                            and vgm_opr_codigo = " . $value . " 
-                    group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
+        (select 
+            ug_cpf,
+            ug_nome_cpf as ug_nome,
+            ug_id::character varying,
+            ug_email,
+            'GAMER' as tipo
+         from tb_venda_games vg
+                inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
+                inner join usuarios_games ug on ug.ug_id = vg.vg_ug_id
+         where vg.vg_ultimo_status = ?
+           and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ?)
+           and vg.vg_data_concilia <= ?
+           and vg.vg_ug_id != ?
+           and (
+                ug_cpf is not null OR
+                ug_nome_cpf is not null OR
+                length(ug_cpf) = 14 OR
+                ug_nome_cpf != ''
+           )
+           and vgm_opr_codigo = ?
+         group by ug_cpf, ug_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
 
-                    union all
+        union all
 
-                    (select 
-                            vgm_cpf as ug_cpf, 
-                            vgm_nome_cpf as ug_nome, 
-                            ug_id::character varying,
-                            ug_email,
-                            'LAN HOUSE' as  tipo
-                    from tb_dist_venda_games vg 
-                            inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                            inner join dist_usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                    where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                            and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                            and vg.vg_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                            and (
-				vgm_cpf is not null
-                                OR
-				vgm_nome_cpf is not null
-                                OR
-				length(vgm_cpf) = 14 
-                                OR
-				vgm_nome_cpf != ''
-                            )
-                            and vgm_opr_codigo = " . $value . " 
-                    group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
+        (select 
+            vgm_cpf as ug_cpf,
+            vgm_nome_cpf as ug_nome,
+            ug_id::character varying,
+            ug_email,
+            'LAN HOUSE' as tipo
+         from tb_dist_venda_games vg
+                inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id
+                inner join dist_usuarios_games ug on ug.ug_id = vg.vg_ug_id
+         where vg.vg_ultimo_status = ?
+           and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ?)
+           and vg.vg_data_inclusao <= ?
+           and (
+                vgm_cpf is not null OR
+                vgm_nome_cpf is not null OR
+                length(vgm_cpf) = 14 OR
+                vgm_nome_cpf != ''
+           )
+           and vgm_opr_codigo = ?
+         group by vgm_cpf, vgm_nome_cpf, vgm_opr_codigo, ug_id, ug_email, tipo)
 
-                    union all
+        union all
 
-                    (select 
-                        picc_cpf as ug_cpf, 
-                        picc_nome as ug_nome, 
-                        'ID PIN:'||pih_pin_id as ug_id,
-                        '' as ug_email,
-                        'CARTAO' as  tipo
-                    from pins_integracao_card_historico
-                            left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-                    where pin_status = '4' 
-                        and pih_codretepp = '2'
-                        and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and pih_data <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                        and (
-                            picc_cpf is not null
-                            OR
-                            picc_nome is not null
-                            OR
-                            length(picc_cpf) = 14 
-                            OR
-                            picc_nome != ''
-                        )
-                        and pih_id = " . $value . " 
-                    group by picc_cpf, picc_nome, pih_pin_id, ug_email, tipo)
+        (select 
+            picc_cpf as ug_cpf,
+            picc_nome as ug_nome,
+            'ID PIN:'||pih_pin_id as ug_id,
+            '' as ug_email,
+            'CARTAO' as tipo
+         from pins_integracao_card_historico
+                left outer join pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+         where pin_status = ?
+           and pih_codretepp = ?
+           and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ?)
+           and pih_data <= ?
+           and (
+                picc_cpf is not null OR
+                picc_nome is not null OR
+                length(picc_cpf) = 14 OR
+                picc_nome != ''
+           )
+           and pih_id = ?
+         group by picc_cpf, picc_nome, pih_pin_id, ug_email, tipo)
 
-                    union all
+        union all
 
-                    (select 
-                        vgcbe_cpf as ug_cpf, 
-                        vgcbe_nome_cpf as ug_nome, 
-                        'ID Venda:'||vgcbe_vg_id as ug_id,
-                        vgcbe_ex_email as ug_email,
-                        'BOLETO EXPRESS' as  tipo
-                    from tb_venda_games_cpf_boleto_express
-			inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-			inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                    where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and vgcbe_data_inclusao <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 23:59:59'
-                        and (
-                            vgcbe_cpf is not null
-                            OR
-                            vgcbe_nome_cpf is not null
-                            OR
-                            length(vgcbe_cpf) = 14 
-                            OR
-                            vgcbe_nome_cpf != ''
-                        )
-                        and vgm_opr_codigo = " . $value . "  
-                    group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
+        (select 
+            vgcbe_cpf as ug_cpf,
+            vgcbe_nome_cpf as ug_nome,
+            'ID Venda:'||vgcbe_vg_id as ug_id,
+            vgcbe_ex_email as ug_email,
+            'BOLETO EXPRESS' as tipo
+         from tb_venda_games_cpf_boleto_express
+                inner join tb_venda_games ON vg_id = vgcbe_vg_id
+                inner join tb_venda_games_modelo ON vgm_vg_id = vg_id
+         where vg_ultimo_status = ?
+           and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = ?)
+           and vgcbe_data_inclusao <= ?
+           and (
+                vgcbe_cpf is not null OR
+                vgcbe_nome_cpf is not null OR
+                length(vgcbe_cpf) = 14 OR
+                vgcbe_nome_cpf != ''
+           )
+           and vgm_opr_codigo = ?
+         group by vgcbe_cpf, vgcbe_nome_cpf, vgcbe_vg_id, vgcbe_ex_email, vgcbe_data_inclusao, tipo)
+        ";
 
-                  ";
-        } //end foreach
-    } //end if(!empty($verificadorPublishersNovos))
+            $params = array_merge($params, [
+                $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+                $value,
+                $dataFimMes,
+                $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'],
+                $value,
+
+                $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+                $value,
+                $dataFimMes,
+                $value,
+
+                '4',
+                '2',
+                $value,
+                $dataFimMes,
+                $value,
+
+                $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
+                $value,
+                $dataFimMes,
+                $value
+            ]);
+        }
+    }
+
+    /* =======================
+   FINAL
+======================= */
+
     $sql .= "
+        ) tabelaUnion
+        group by ug_cpf, ug_nome, ug_id, ug_email, tipo
+        order by tipo, ug_id
+";
 
-        ) tabelaUnion 
-                    group by ug_cpf, ug_nome, ug_id, ug_email, tipo 
-                    order by tipo, ug_id;  
-            ";
+    /* =======================
+   EXECU«√O
+======================= */
 
-    //echo $sql.PHP_EOL; die();
-    $rs_dados = SQLexecuteQuery($sql);
+    $rs_dados = SQLexecuteQueryParams($sql, $params);
     //echo pg_num_rows($rs_dados)."<br>";
     if (!$rs_dados) {
         echo "Erro na Query de Levantamento de CPFs e/ou Nome Preenchidos para os Publishers (" . implode(",", $vetorPublisher) . ") e Publishers Novos (" . (is_array($vetorPublisherNovos) ? implode(",", $vetorPublisherNovos) : "") . ").<br>" . PHP_EOL;
@@ -617,21 +647,60 @@ function levantamentoPublisherOperantes(mixed $ano, mixed $mes, bool $variado = 
 {
 
     // Buscando informaes 
+    $params = [];
+
+    /* =======================
+   DATA FINAL
+======================= */
+
+    $dataFimMes = "$ano-$mes-" . date("t", mktime(0, 0, 0, $mes, 1, $ano)) . " 00:00:00";
+
+    /* =======================
+   QUERY
+======================= */
+
     $sql = "select 
-                        opr_codigo, 
-                        opr_nome
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and opr_internacional_alicota != 0
-                        and opr_status = '1'
-                        and opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'];
-    if ($variado) $sql .= " and opr_cotacao_dolar = 1 ";
-    $sql .= "order by opr_nome";
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+            opr_codigo,
+            opr_nome
+        from operadoras
+        where opr_vinculo_empresa = ?
+          and opr_data_inicio_operacoes is not null
+          and opr_data_inicio_operacoes <= ?
+          and opr_internacional_alicota != 0
+          and opr_status = ?
+          and opr_ja_contabilizou = ?";
+
+    /* =======================
+   PARAMS BASE
+======================= */
+
+    $params = [
+        $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        $dataFimMes,
+        '1',
+        $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU']
+    ];
+
+    /* =======================
+   CONDI«√O OPCIONAL
+======================= */
+
+    if ($variado) {
+        $sql .= " and opr_cotacao_dolar = ?";
+        $params[] = 1;
+    }
+
+    /* =======================
+   FINAL
+======================= */
+
+    $sql .= " order by opr_nome";
+
+    /* =======================
+   EXECU«√O
+======================= */
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -661,22 +730,46 @@ function levantamentoPublisherOperantesNacionais(mixed $ano, mixed $mes): array
 {
 
     // Buscando informaes 
-    $sql = "select 
-                        opr_codigo, 
-                        opr_nome
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and opr_internacional_alicota = 0
-                        and opr_status != '0'
-                        and opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . "
-                order by opr_nome
-                ";
+    $params = [];
 
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+    /* =======================
+   DATA FINAL
+======================= */
+
+    $dataFimMes = "$ano-$mes-" . date("t", mktime(0, 0, 0, $mes, 1, $ano)) . " 00:00:00";
+
+    /* =======================
+   QUERY
+======================= */
+
+    $sql = "select 
+            opr_codigo,
+            opr_nome
+        from operadoras
+        where opr_vinculo_empresa = ?
+          and opr_data_inicio_operacoes is not null
+          and opr_data_inicio_operacoes <= ?
+          and opr_internacional_alicota = 0
+          and opr_status != ?
+          and opr_ja_contabilizou = ?
+        order by opr_nome";
+
+    /* =======================
+   PARAMS
+======================= */
+
+    $params = [
+        $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        $dataFimMes,
+        '0',
+        $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU']
+    ];
+
+    /* =======================
+   EXECU«√O
+======================= */
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -705,25 +798,50 @@ function levantamentoPublisherOperantesNacionais(mixed $ano, mixed $mes): array
 function levantamentoPublisherOperantesMunicipais(mixed $ano, mixed $mes): array
 {
 
-    // Buscando informaes 
-    $sql = "select 
-                        opr_codigo, 
-                        opr_nome
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and opr_internacional_alicota = 0
-                        and opr_status != '0'
-                        and UPPER(opr_estado) = 'SP'
-                        and TRIM(opr_cidade) ilike 's%o Paulo'
-                        and opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . "
-                order by opr_nome
-                ";
+    $params = [];
 
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+    /* =======================
+   DATA FINAL
+======================= */
+
+    $dataFimMes = "$ano-$mes-" . date("t", mktime(0, 0, 0, $mes, 1, $ano)) . " 00:00:00";
+
+    /* =======================
+   QUERY
+======================= */
+
+    $sql = "select
+            opr_codigo,
+            opr_nome
+        from operadoras
+        where opr_vinculo_empresa = ?
+          and opr_data_inicio_operacoes is not null
+          and opr_data_inicio_operacoes <= ?
+          and opr_internacional_alicota = 0
+          and opr_status != ?
+          and UPPER(opr_estado) = ?
+          and TRIM(opr_cidade) ilike ?
+          and opr_ja_contabilizou = ?
+        order by opr_nome";
+
+    /* =======================
+   PARAMS
+======================= */
+
+    $params = [
+        $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        $dataFimMes,
+        '0',
+        'SP',
+        's%o Paulo',
+        $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU']
+    ];
+
+    /* =======================
+   EXECU«√O
+======================= */
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -755,23 +873,59 @@ function levantamentoPublisherNovosOperantes(mixed $ano, mixed $mes, bool $varia
 {
 
     // Buscando informaes 
-    $sql = "select 
-                        opr_codigo,
-                        opr_nome, 
-                        to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') as data_inicio
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and opr_internacional_alicota != 0
-                        and opr_status = '1'
-                        and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'];
-    if ($variado) $sql .= " and opr_cotacao_dolar = 1 ";
-    $sql .= "order by opr_nome";
+    $params = [];
 
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+    /* =======================
+   DATA FINAL
+======================= */
+
+    $dataFimMes = "$ano-$mes-" . date("t", mktime(0, 0, 0, $mes, 1, $ano)) . " 00:00:00";
+
+    /* =======================
+   QUERY
+======================= */
+
+    $sql = "select
+            opr_codigo,
+            opr_nome,
+            to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') as data_inicio
+        from operadoras
+        where opr_vinculo_empresa = ?
+          and opr_data_inicio_operacoes is not null
+          and opr_data_inicio_operacoes <= ?
+          and opr_internacional_alicota != 0
+          and opr_status = ?
+          and opr_ja_contabilizou != ?";
+
+    /* =======================
+   PARAMS BASE
+======================= */
+
+    $params[] = $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'];
+    $params[] = $dataFimMes;
+    $params[] = '1';
+    $params[] = $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'];
+
+    /* =======================
+   CONDI«√O OPCIONAL
+======================= */
+
+    if ($variado) {
+        $sql .= " and opr_cotacao_dolar = ?";
+        $params[] = 1;
+    }
+
+    /* =======================
+   ORDER BY
+======================= */
+
+    $sql .= " order by opr_nome";
+
+    /* =======================
+   EXECU«√O
+======================= */
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -803,22 +957,33 @@ function levantamentoPublisherNovosOperantesNacionais(mixed $ano, mixed $mes): a
 {
 
     // Buscando informaes 
-    $sql = "select 
-                        opr_codigo,
-                        opr_nome, 
-                        to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') as data_inicio
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and opr_internacional_alicota = 0
-                        and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . " 
-                order by opr_nome
-                ";
+    $dataFinalMes = date(
+        'Y-m-t 00:00:00',
+        mktime(0, 0, 0, (int)$mes, 1, (int)$ano)
+    );
 
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+    $sql = "
+    SELECT 
+        opr_codigo,
+        opr_nome,
+        to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') AS data_inicio
+    FROM operadoras
+    WHERE 
+        opr_vinculo_empresa = :empresa
+        AND opr_data_inicio_operacoes IS NOT NULL
+        AND opr_data_inicio_operacoes <= :data_final_mes
+        AND opr_internacional_alicota = 0
+        AND opr_ja_contabilizou != :status_contabilizou
+    ORDER BY opr_nome
+";
+
+    $params = [
+        ':empresa'              => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        ':data_final_mes'       => $dataFinalMes,
+        ':status_contabilizou'  => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+    ];
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -850,24 +1015,37 @@ function levantamentoPublisherNovosOperantesMunicipais(mixed $ano, mixed $mes): 
 {
 
     // Buscando informaes 
-    $sql = "select 
-                        opr_codigo,
-                        opr_nome, 
-                        to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') as data_inicio
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and opr_internacional_alicota = 0
-                        and UPPER(opr_estado) = 'SP'
-                        and TRIM(opr_cidade) ilike 's%o Paulo'
-                        and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . " 
-                order by opr_nome
-                ";
+    $dataFinalMes = date(
+        'Y-m-t 00:00:00',
+        mktime(0, 0, 0, (int)$mes, 1, (int)$ano)
+    );
 
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+    $sql = "
+    SELECT 
+        opr_codigo,
+        opr_nome,
+        to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') AS data_inicio
+    FROM operadoras
+    WHERE 
+        opr_vinculo_empresa = :empresa
+        AND opr_data_inicio_operacoes IS NOT NULL
+        AND opr_data_inicio_operacoes <= :data_final_mes
+        AND opr_internacional_alicota = 0
+        AND UPPER(opr_estado) = :estado
+        AND TRIM(opr_cidade) ILIKE :cidade
+        AND opr_ja_contabilizou != :status_contabilizou
+    ORDER BY opr_nome
+";
+
+    $params = [
+        'empresa'             => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        'data_final_mes'      => $dataFinalMes,
+        'estado'              => 'SP',
+        'cidade'              => 's%o Paulo',
+        'status_contabilizou' => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+    ];
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -899,18 +1077,27 @@ function alteracaoPublisherNovosJaArquivoBACEN(array $vetorPublisherNovos): bool
 {
 
     // Buscando informaes 
-    $sql = "update operadoras
-                set opr_ja_contabilizou =  " . $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'] . "
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . " 
-                        and opr_internacional_alicota != 0
-                        and opr_codigo IN (" . implode(",", $vetorPublisherNovos) . ")
-                ";
+    $sql = "
+    UPDATE operadoras
+    SET opr_ja_contabilizou = :status_aguardando
+    WHERE 
+        opr_vinculo_empresa = :empresa
+        AND opr_data_inicio_operacoes IS NOT NULL
+        AND opr_ja_contabilizou != :status_contabilizou
+        AND opr_internacional_alicota != 0
+        AND opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisherNovos), '?')) . ")
+";
 
-    //echo $sql.PHP_EOL; die();
-    $rs_update = SQLexecuteQuery($sql);
+    $params = array_merge(
+        [
+            'status_aguardando' => $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
+            'empresa'           => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+            'status_contabilizou' => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+        ],
+        $vetorPublisherNovos
+    );
+
+    $rs_update = SQLexecuteQueryParams($sql, $params);
     if (!$rs_update) {
         echo "Erro na Query de Altera√ß√£o de Publishers para j√° em arquivo do BACEN (" . $sql . ").<br>" . PHP_EOL;
         return false;
@@ -930,20 +1117,29 @@ function alteracaoPublisherNovosJaArquivoMunicipais(array $vetorPublisherNovos):
 {
 
     // Buscando informaes 
-    $sql = "update operadoras
-                set opr_ja_contabilizou =  " . $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'] . "
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_ja_contabilizou != " . $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'] . " 
-                        and opr_internacional_alicota = 0
-                        and UPPER(opr_estado) = 'SP'
-                        and TRIM(opr_cidade) ilike 's%o Paulo'
-                        and opr_codigo IN (" . implode(",", $vetorPublisherNovos) . ")
-                ";
+    $sql = "
+    UPDATE operadoras
+    SET opr_ja_contabilizou = :status_aguardando
+    WHERE 
+        opr_vinculo_empresa = :empresa
+        AND opr_data_inicio_operacoes IS NOT NULL
+        AND opr_ja_contabilizou != :status_contabilizou
+        AND opr_internacional_alicota = 0
+        AND UPPER(opr_estado) = 'SP'
+        AND TRIM(opr_cidade) ILIKE 's%o Paulo'
+        AND opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisherNovos), '?')) . ")
+";
 
-    //echo $sql.PHP_EOL; die();
-    $rs_update = SQLexecuteQuery($sql);
+    $params = array_merge(
+        [
+            'status_aguardando'  => $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
+            'empresa'            => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+            'status_contabilizou' => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+        ],
+        $vetorPublisherNovos
+    );
+
+    $rs_update = SQLexecuteQueryParams($sql, $params);
     if (!$rs_update) {
         echo "Erro na Query de Altera√ß√£o de Publishers para j√° em arquivo para Prefeitura (" . $sql . ").<br>" . PHP_EOL;
         return false;
@@ -964,21 +1160,35 @@ function levantamentoPublisherEppPagamentosFacilitadora(mixed $ano, mixed $mes, 
 {
 
     // Buscando informaes 
-    $sql = "select 
-                        opr_codigo, 
-                        opr_nome
-                from operadoras
-                where 
-                        opr_vinculo_empresa = " . $GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS'] . " 
-                        and opr_data_inicio_operacoes is not null
-                        and opr_data_inicio_operacoes <= '" . $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00'
-                        and (opr_internacional_alicota = 0.38 OR opr_internacional_alicota = " . IOF . ")
-                        and opr_status = '1'";
-    if ($variado) $sql .= " and opr_cotacao_dolar = 1 ";
-    $sql .= "order by opr_nome";
+    $data_limite = $ano . "-" . $mes . "-" . date("t", (int)mktime(0, 0, 0, (int)$mes, 1, (int)$ano)) . " 00:00:00";
 
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_operantes = SQLexecuteQuery($sql);
+    $sql = "
+    SELECT 
+        opr_codigo, 
+        opr_nome
+    FROM operadoras
+    WHERE 
+        opr_vinculo_empresa = :empresa
+        AND opr_data_inicio_operacoes IS NOT NULL
+        AND opr_data_inicio_operacoes <= :data_limite
+        AND (opr_internacional_alicota = :aliquota_padrao OR opr_internacional_alicota = :iof)
+        AND opr_status = '1'
+";
+
+    if ($variado) {
+        $sql .= " AND opr_cotacao_dolar = 1 ";
+    }
+
+    $sql .= " ORDER BY opr_nome";
+
+    $params = [
+        'empresa'          => $GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS'],
+        'data_limite'      => $data_limite,
+        'aliquota_padrao'  => 0.38,
+        'iof'              => IOF,
+    ];
+
+    $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
@@ -1142,182 +1352,216 @@ function verificaLimiteDetalhamento(mixed $limite, mixed &$rs): bool
     */
 
     // Selecionando os usuarios que ultrapassaram o Limite
+    $params = [];
+
+    $data_inicio_mes = $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00";
+    $data_fim_mes    = $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" .
+        date("t", (int)mktime(0, 0, 0, (int)$GLOBALS['mes'], 1, (int)$GLOBALS['ano'])) . " 23:59:59";
+
     $sql = "
-        select 
-            ug_cpf,
-            sum(n) as qtde,
-            sum(total) as total_geral
-     from ( 
-                ";
+    SELECT 
+        ug_cpf,
+        SUM(n) AS qtde,
+        SUM(total) AS total_geral
+    FROM (
+";
+
     $insere_union_all = 1;
+    $i = 0;
+
     foreach ($GLOBALS['vetorPublisher'] as $key => $value) {
+
+        $i++;
+
         if ($insere_union_all > 1) {
-            $sql .= "
+            $sql .= " UNION ALL ";
+        }
 
-              union all
+        $params["status_$i"]        = $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
+        $params["data_ini_$i"]      = $data_inicio_mes;
+        $params["data_fim_$i"]      = $data_fim_mes;
+        $params["money_user_$i"]    = $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'];
+        $params["opr_$i"]           = $value;
+        $params["cotacao_$i"]       = $GLOBALS['vetorCotacaoUSS'][$value];
 
-            ";
-        } //end if($insere_union_all > 1)
         $sql .= "
-            (
-                select 
-                        ug_cpf as ug_cpf,
-                        sum(vgm.vgm_qtde) as n, 
-                        sum(vgm.vgm_valor * vgm.vgm_qtde)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                from tb_venda_games vg 
-                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                        inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vg.vg_data_concilia >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
-                        and vgm_opr_codigo = " . $value . "
-                group by ug_cpf
-            )
-            
-            union all
-            
-            (
-                select 
-                        vgm_cpf as ug_cpf, 
-                        sum(vgm.vgm_qtde) as n, 
-                        sum(vgm.vgm_valor * vgm.vgm_qtde)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                from tb_dist_venda_games vg 
-                        inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vg.vg_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and vgm_opr_codigo = " . $value . " 
-                group by vgm_cpf
-            )
-            
-            union all
-            
-            (
-                select 
-                        picc_cpf as ug_cpf, 
-                        count(*) as n, 
-                        sum(pih_pin_valor/100)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                from pins_integracao_card_historico
-                                    left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-	        where pin_status = '4' 
-		        and pih_codretepp = '2'
-                        and pih_data >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and pih_id = " . $value . " 
-                group by picc_cpf
-            )
+        (
+            SELECT 
+                ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde)/:cotacao_$i AS total
+            FROM tb_venda_games vg
+                INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+                INNER JOIN usuarios_games ug ON ug.ug_id = vg.vg_ug_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_concilia BETWEEN :data_ini_$i AND :data_fim_$i
+                AND vg.vg_ug_id != :money_user_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY ug_cpf
+        )
 
-            union all
+        UNION ALL
 
-            (
-                select 
-                    vgcbe_cpf as ug_cpf, 
-                    count(*) as n,
-                    sum(vgm_valor * vgm_qtde)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                from tb_venda_games_cpf_boleto_express
-                    inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-                    inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                    and vgcbe_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                    and vgm_opr_codigo = " . $value . "  
-                group by vgcbe_cpf
-            )
+        (
+            SELECT 
+                vgm_cpf AS ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde)/:cotacao_$i AS total
+            FROM tb_dist_venda_games vg
+                INNER JOIN tb_dist_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_inclusao BETWEEN :data_ini_$i AND :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgm_cpf
+        )
 
-         ";
+        UNION ALL
+
+        (
+            SELECT 
+                picc_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(pih_pin_valor/100)/:cotacao_$i AS total
+            FROM pins_integracao_card_historico
+                LEFT JOIN pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+            WHERE pin_status = '4'
+                AND pih_codretepp = '2'
+                AND pih_data BETWEEN :data_ini_$i AND :data_fim_$i
+                AND pih_id = :opr_$i
+            GROUP BY picc_cpf
+        )
+
+        UNION ALL
+
+        (
+            SELECT 
+                vgcbe_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(vgm_valor * vgm_qtde)/:cotacao_$i AS total
+            FROM tb_venda_games_cpf_boleto_express
+                INNER JOIN tb_venda_games ON vg_id = vgcbe_vg_id
+                INNER JOIN tb_venda_games_modelo ON vgm_vg_id = vg_id
+            WHERE vg_ultimo_status = :status_$i
+                AND vgcbe_data_inclusao BETWEEN :data_ini_$i AND :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgcbe_cpf
+        )
+    ";
+
         $insere_union_all++;
-    } //end foreach ($vetorPublisher as $key => $value)
-
+    }
 
     if (!empty($GLOBALS['verificadorPublishersNovos'])) {
+
         foreach ($GLOBALS['vetorPublisherNovos'] as $key => $value) {
-            //echo "Key: $key -- value: $value <br>";
+
+            $i++;
+
+            $params["status_$i"]     = $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
+            $params["data_fim_$i"]   = $data_fim_mes;
+            $params["money_user_$i"] = $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'];
+            $params["opr_$i"]        = $value;
+            $params["cotacao_$i"]    = $GLOBALS['vetorCotacaoUSS'][$value];
+
             $sql .= "
 
-            union all
+        UNION ALL
 
-                (
-                   select 
-                           ug_cpf as ug_cpf,
-                           sum(vgm.vgm_qtde) as n, 
-                           sum(vgm.vgm_valor * vgm.vgm_qtde)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                   from tb_venda_games vg 
-                           inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                           inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                   where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                           and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                           and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
-                           and vgm_opr_codigo = " . $value . " 
-                   group by ug_cpf
+        (
+            SELECT 
+                ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde)/:cotacao_$i AS total
+            FROM tb_venda_games vg
+                INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+                INNER JOIN usuarios_games ug ON ug.ug_id = vg.vg_ug_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_concilia >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
                 )
+                AND vg.vg_data_concilia <= :data_fim_$i
+                AND vg.vg_ug_id != :money_user_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY ug_cpf
+        )
 
-            union all
+        UNION ALL
 
-                (
-                   select 
-                           vgm_cpf as ug_cpf, 
-                           sum(vgm.vgm_qtde) as n, 
-                           sum(vgm.vgm_valor * vgm.vgm_qtde)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                   from tb_dist_venda_games vg 
-                           inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                   where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                           and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                           and vgm_opr_codigo = " . $value . "
-                   group by vgm_cpf
+        (
+            SELECT 
+                vgm_cpf AS ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde)/:cotacao_$i AS total
+            FROM tb_dist_venda_games vg
+                INNER JOIN tb_dist_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_inclusao >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
                 )
+                AND vg.vg_data_inclusao <= :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgm_cpf
+        )
 
-            
-            union all
-            
-            (
-                select 
-                        picc_cpf as ug_cpf, 
-                        count(*) as n, 
-                        sum(pih_pin_valor/100)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                from pins_integracao_card_historico
-                                    left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-	        where pin_status = '4' 
-		        and pih_codretepp = '2'
-                        and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and pih_id = " . $value . " 
-                group by picc_cpf
-            )
-            
-            union all
+        UNION ALL
 
-            (
-                select 
-                    vgcbe_cpf as ug_cpf, 
-                    count(*) as n,
-                    sum(vgm_valor * vgm_qtde)/" . $GLOBALS['vetorCotacaoUSS'][$value] . " as total 
-                from tb_venda_games_cpf_boleto_express
-                    inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-                    inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                    and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                    and vgm_opr_codigo = " . $value . "  
-                group by vgcbe_cpf
-            )
+        (
+            SELECT 
+                picc_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(pih_pin_valor/100)/:cotacao_$i AS total
+            FROM pins_integracao_card_historico
+                LEFT JOIN pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+            WHERE pin_status = '4'
+                AND pih_codretepp = '2'
+                AND pih_data >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
+                )
+                AND pih_data <= :data_fim_$i
+                AND pih_id = :opr_$i
+            GROUP BY picc_cpf
+        )
 
+        UNION ALL
 
-                    ";
-        } //end foreach
-    } //end if(!empty($verificadorPublishersNovos))
+        (
+            SELECT 
+                vgcbe_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(vgm_valor * vgm_qtde)/:cotacao_$i AS total
+            FROM tb_venda_games_cpf_boleto_express
+                INNER JOIN tb_venda_games ON vg_id = vgcbe_vg_id
+                INNER JOIN tb_venda_games_modelo ON vgm_vg_id = vg_id
+            WHERE vg_ultimo_status = :status_$i
+                AND vgcbe_data_inclusao >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
+                )
+                AND vgcbe_data_inclusao <= :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgcbe_cpf
+        )
+        ";
+        }
+    }
 
-    $sql .= " 
-        ) tabelaUnion  
-        group by ug_cpf 
-        having sum(total) > " . ($limite) . "
-        order by total_geral desc;";
+    $sql .= "
+    ) tabelaUnion
+    GROUP BY ug_cpf
+    HAVING SUM(total) > :limite
+    ORDER BY total_geral DESC
+";
 
-    //echo $sql.PHP_EOL; die();
+    $params['limite'] = $limite;
 
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, $params);
     if (!$rs || pg_num_rows($rs) == 0) {
         return false;
     } //end if(!$rs || pg_num_rows($rs) == 0)
@@ -1332,182 +1576,214 @@ function verificaLimiteCOAF(mixed $limite, mixed &$rs): bool
     // A varivel limite deve ser informada em REAIS (R$). Ex.: $limite = 1000 means R$ 1.000,00
 
     // Selecionando os usuarios que ultrapassaram o Limite
+    $params = [];
+
+    $data_inicio_mes = $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00";
+    $data_fim_mes    = $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" .
+        date("t", (int)mktime(0, 0, 0, (int)$GLOBALS['mes'], 1, (int)$GLOBALS['ano'])) . " 23:59:59";
+
     $sql = "
-        select 
-            ug_cpf,
-            sum(n) as qtde,
-            sum(total) as total_geral
-     from ( 
-                ";
+    SELECT 
+        ug_cpf,
+        SUM(n) AS qtde,
+        SUM(total) AS total_geral
+    FROM (
+";
+
     $insere_union_all = 1;
+    $i = 0;
+
     foreach ($GLOBALS['vetorPublisher'] as $key => $value) {
+
+        $i++;
+
         if ($insere_union_all > 1) {
-            $sql .= "
+            $sql .= " UNION ALL ";
+        }
 
-              union all
+        $params["status_$i"]      = $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
+        $params["data_ini_$i"]    = $data_inicio_mes;
+        $params["data_fim_$i"]    = $data_fim_mes;
+        $params["money_user_$i"]  = $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'];
+        $params["opr_$i"]         = $value;
 
-            ";
-        } //end if($insere_union_all > 1)
         $sql .= "
-            (
-                select 
-                        ug_cpf as ug_cpf,
-                        sum(vgm.vgm_qtde) as n, 
-                        sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
-                from tb_venda_games vg 
-                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                        inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vg.vg_data_concilia >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
-                        and vgm_opr_codigo = " . $value . "
-                group by ug_cpf
-            )
-            
-            union all
-            
-            (
-                select 
-                        vgm_cpf as ug_cpf, 
-                        sum(vgm.vgm_qtde) as n, 
-                        sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
-                from tb_dist_venda_games vg 
-                        inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                        and vg.vg_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and vgm_opr_codigo = " . $value . " 
-                group by vgm_cpf
-            )
-            
-            union all
-            
-            (
-                select 
-                        picc_cpf as ug_cpf, 
-                        count(*) as n, 
-                        sum(pih_pin_valor/100) as total 
-                from pins_integracao_card_historico
-                                    left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-	        where pin_status = '4' 
-		        and pih_codretepp = '2'
-                        and pih_data >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and pih_id = " . $value . " 
-                group by picc_cpf
-            )
+        (
+            SELECT 
+                ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde) AS total
+            FROM tb_venda_games vg
+                INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+                INNER JOIN usuarios_games ug ON ug.ug_id = vg.vg_ug_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_concilia BETWEEN :data_ini_$i AND :data_fim_$i
+                AND vg.vg_ug_id != :money_user_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY ug_cpf
+        )
 
-            union all
+        UNION ALL
 
-            (
-                select 
-                    vgcbe_cpf as ug_cpf, 
-                    count(*) as n,
-                    sum(vgm_valor * vgm_qtde) as total 
-                from tb_venda_games_cpf_boleto_express
-                    inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-                    inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                    and vgcbe_data_inclusao >= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-01 00:00:00'
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                    and vgm_opr_codigo = " . $value . "  
-                group by vgcbe_cpf
-            )
+        (
+            SELECT 
+                vgm_cpf AS ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde) AS total
+            FROM tb_dist_venda_games vg
+                INNER JOIN tb_dist_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_inclusao BETWEEN :data_ini_$i AND :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgm_cpf
+        )
 
-         ";
+        UNION ALL
+
+        (
+            SELECT 
+                picc_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(pih_pin_valor/100) AS total
+            FROM pins_integracao_card_historico
+                LEFT JOIN pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+            WHERE pin_status = '4'
+                AND pih_codretepp = '2'
+                AND pih_data BETWEEN :data_ini_$i AND :data_fim_$i
+                AND pih_id = :opr_$i
+            GROUP BY picc_cpf
+        )
+
+        UNION ALL
+
+        (
+            SELECT 
+                vgcbe_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(vgm_valor * vgm_qtde) AS total
+            FROM tb_venda_games_cpf_boleto_express
+                INNER JOIN tb_venda_games ON vg_id = vgcbe_vg_id
+                INNER JOIN tb_venda_games_modelo ON vgm_vg_id = vg_id
+            WHERE vg_ultimo_status = :status_$i
+                AND vgcbe_data_inclusao BETWEEN :data_ini_$i AND :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgcbe_cpf
+        )
+    ";
+
         $insere_union_all++;
-    } //end foreach ($vetorPublisher as $key => $value)
-
+    }
 
     if (!empty($GLOBALS['verificadorPublishersNovos'])) {
+
         foreach ($GLOBALS['vetorPublisherNovos'] as $key => $value) {
-            //echo "Key: $key -- value: $value <br>";
+
+            $i++;
+
+            $params["status_$i"]     = $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
+            $params["data_fim_$i"]   = $data_fim_mes;
+            $params["money_user_$i"] = $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'];
+            $params["opr_$i"]        = $value;
+
             $sql .= "
 
-            union all
+        UNION ALL
 
-                (
-                   select 
-                           ug_cpf as ug_cpf,
-                           sum(vgm.vgm_qtde) as n, 
-                           sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
-                   from tb_venda_games vg 
-                           inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                           inner join usuarios_games ug on (ug.ug_id = vg.vg_ug_id)
-                   where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                           and vg.vg_data_concilia >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_concilia <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                           and vg.vg_ug_id != '" . $GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY'] . "'
-                           and vgm_opr_codigo = " . $value . " 
-                   group by ug_cpf
+        (
+            SELECT 
+                ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde) AS total
+            FROM tb_venda_games vg
+                INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+                INNER JOIN usuarios_games ug ON ug.ug_id = vg.vg_ug_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_concilia >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
                 )
+                AND vg.vg_data_concilia <= :data_fim_$i
+                AND vg.vg_ug_id != :money_user_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY ug_cpf
+        )
 
-            union all
+        UNION ALL
 
-                (
-                   select 
-                           vgm_cpf as ug_cpf, 
-                           sum(vgm.vgm_qtde) as n, 
-                           sum(vgm.vgm_valor * vgm.vgm_qtde) as total 
-                   from tb_dist_venda_games vg 
-                           inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                   where vg.vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                           and vg.vg_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                           and vg.vg_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                           and vgm_opr_codigo = " . $value . "
-                   group by vgm_cpf
+        (
+            SELECT 
+                vgm_cpf AS ug_cpf,
+                SUM(vgm.vgm_qtde) AS n,
+                SUM(vgm.vgm_valor * vgm.vgm_qtde) AS total
+            FROM tb_dist_venda_games vg
+                INNER JOIN tb_dist_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
+            WHERE vg.vg_ultimo_status = :status_$i
+                AND vg.vg_data_inclusao >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
                 )
+                AND vg.vg_data_inclusao <= :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgm_cpf
+        )
 
-            
-            union all
-            
-            (
-                select 
-                        picc_cpf as ug_cpf, 
-                        count(*) as n, 
-                        sum(pih_pin_valor/100) as total 
-                from pins_integracao_card_historico
-                                    left outer join pins_integracao_card_cpf ON (pin_codinterno=pih_pin_id)
-	        where pin_status = '4' 
-		        and pih_codretepp = '2'
-                        and pih_data >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                        and pih_data <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                        and pih_id = " . $value . " 
-                group by picc_cpf
-            )
-            
-            union all
+        UNION ALL
 
-            (
-                select 
-                    vgcbe_cpf as ug_cpf, 
-                    count(*) as n,
-                    sum(vgm_valor * vgm_qtde) as total 
-                from tb_venda_games_cpf_boleto_express
-                    inner join tb_venda_games ON (vg_id = vgcbe_vg_id)
-                    inner join tb_venda_games_modelo ON (vgm_vg_id = vg_id)
-                where vg_ultimo_status='" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' 
-                    and vgcbe_data_inclusao >= (select opr_data_inicio_operacoes from operadoras where opr_codigo = " . $value . " )
-                    and vgcbe_data_inclusao <= '" . $GLOBALS['ano'] . "-" . $GLOBALS['mes'] . "-" . date("t", (int)mktime(0, 0, 0, (int)($GLOBALS['mes'] * 1), 1, (int)$GLOBALS['ano'])) . " 23:59:59'
-                    and vgm_opr_codigo = " . $value . "  
-                group by vgcbe_cpf
-            )
+        (
+            SELECT 
+                picc_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(pih_pin_valor/100) AS total
+            FROM pins_integracao_card_historico
+                LEFT JOIN pins_integracao_card_cpf ON pin_codinterno = pih_pin_id
+            WHERE pin_status = '4'
+                AND pih_codretepp = '2'
+                AND pih_data >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
+                )
+                AND pih_data <= :data_fim_$i
+                AND pih_id = :opr_$i
+            GROUP BY picc_cpf
+        )
 
+        UNION ALL
 
-                    ";
-        } //end foreach
-    } //end if(!empty($verificadorPublishersNovos))
+        (
+            SELECT 
+                vgcbe_cpf AS ug_cpf,
+                COUNT(*) AS n,
+                SUM(vgm_valor * vgm_qtde) AS total
+            FROM tb_venda_games_cpf_boleto_express
+                INNER JOIN tb_venda_games ON vg_id = vgcbe_vg_id
+                INNER JOIN tb_venda_games_modelo ON vgm_vg_id = vg_id
+            WHERE vg_ultimo_status = :status_$i
+                AND vgcbe_data_inclusao >= (
+                    SELECT opr_data_inicio_operacoes 
+                    FROM operadoras 
+                    WHERE opr_codigo = :opr_$i
+                )
+                AND vgcbe_data_inclusao <= :data_fim_$i
+                AND vgm_opr_codigo = :opr_$i
+            GROUP BY vgcbe_cpf
+        )
+        ";
+        }
+    }
 
-    $sql .= " 
-        ) tabelaUnion  
-        group by ug_cpf 
-        having sum(total) > " . ($limite) . "
-        order by total_geral desc;";
+    $sql .= "
+    ) tabelaUnion
+    GROUP BY ug_cpf
+    HAVING SUM(total) > :limite
+    ORDER BY total_geral DESC
+";
 
-    //echo $sql.PHP_EOL; die();
+    $params['limite'] = $limite;
 
-    $rs = SQLexecuteQuery($sql);
+    $rs = SQLexecuteQueryParams($sql, $params);
     if (!$rs || pg_num_rows($rs) == 0) {
         return false;
     } //end if(!$rs || pg_num_rows($rs) == 0)
@@ -1519,18 +1795,24 @@ function verificaLimiteCOAF(mixed $limite, mixed &$rs): bool
 function levantamentoPublisherObrigatorioCPF(array &$vetorPublisherLegenda): array
 {
     // Buscando informaes 
-    $sql = "select 
-                        opr_codigo, 
-                        opr_nome
-                from operadoras
-                where 
-                        opr_data_inicio_operacoes is not null
-                        and opr_need_cpf_lh = 1
-						and opr_status = '1' 
-                order by opr_nome
-                ";
-    //echo $sql.PHP_EOL; die();
-    $rs_operadoras_obrigatorio_cpf = SQLexecuteQuery($sql);
+    $sql = "
+    SELECT 
+        opr_codigo,
+        opr_nome
+    FROM operadoras
+    WHERE
+        opr_data_inicio_operacoes IS NOT NULL
+        AND opr_need_cpf_lh = :need_cpf
+        AND opr_status = :status
+    ORDER BY opr_nome
+";
+
+    $params = [
+        'need_cpf' => 1,
+        'status'   => '1',
+    ];
+
+    $rs_operadoras_obrigatorio_cpf = SQLexecuteQueryParams($sql, $params);
 
     $aux_retorno = [];
 
