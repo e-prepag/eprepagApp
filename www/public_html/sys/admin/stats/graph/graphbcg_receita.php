@@ -1,7 +1,8 @@
 <?php
-require_once ('./src/jpgraph.php');
-require_once ('./src/jpgraph_line.php');
-require_once ("./src/jpgraph_scatter.php");
+require_once __DIR__ . "/../../../../../vendor/autoload.php";
+
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
 
 $xmin20 = ($xmin*.20)+($xmin);
 $xmax20 = ($xmax*.20)+($xmax);
@@ -98,7 +99,7 @@ function FCallback($aYVal,$aXVal) {
 		 
 }
 
-$graph = new Graph(555,430);
+$graph = new Graph\Graph(555,430);
 $graph->SetScale("linlin");
 $graph->img->SetMargin(2,2,2,2);        
 
@@ -124,7 +125,7 @@ for ($i = 0; $i <= count($gwF)-1; $i++) {
 
 
 // Create a new scatter plot 
-$sp1 = new ScatterPlot($datay,$datax);
+$sp1 = new Plot\ScatterPlot($datay,$datax);
 $sp1->mark->SetType(MARK_FILLEDCIRCLE);
 
 // Set the scatter plot image map targets
