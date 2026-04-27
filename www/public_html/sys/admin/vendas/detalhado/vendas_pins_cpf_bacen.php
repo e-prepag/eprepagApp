@@ -940,7 +940,7 @@ if ($BtnSearch) {
                     <div class="col-md-12 bg-cinza-claro">
                         <?php
                         // Recuperando cotação de dolar
-                        if (isset($dd_opr_codigo)) {
+                        if ($BtnSearch && $dd_opr_codigo && !empty($data_inic) && isset($vetorPublishersAux[$dd_opr_codigo])) {
                             if ($vetorPublishersAux[$dd_opr_codigo]['MultiCotacaoDolar'] == 1) {
                                 $cotacao_dolar = (empty($cotacao_euro)) ? recupera_cotacao_dolar_diario($dd_opr_codigo, substr($data_inic, 5, 2), substr($data_inic, 0, 4)) : str_replace(",", ".", $cotacao_euro);
                             } //end if($vetorPublishersAux[$dd_opr_codigo]['MultiCotacaoDolar'])
@@ -1385,6 +1385,11 @@ require_once $raiz_do_projeto . "public_html/sys/includes/rodape_sys.php";
 
 function recupera_cotacao_dolar($dd_opr_codigo, $mes, $ano)
 {
+    $mes = (int)$mes;
+    $ano = (int)$ano;
+    if ($mes < 1 || $mes > 12 || $ano < 1900) {
+        return FALSE;
+    }
 
     $currentmonthVerify = mktime(0, 0, 0, $mes, 1, $ano);
     $sql = "select cd_cotacao from cotacao_dolar where opr_codigo = $1 and cd_data = $2;";
@@ -1400,6 +1405,11 @@ function recupera_cotacao_dolar($dd_opr_codigo, $mes, $ano)
 
 function recupera_cotacao_dolar_diario($dd_opr_codigo, $mes, $ano)
 {
+    $mes = (int)$mes;
+    $ano = (int)$ano;
+    if ($mes < 1 || $mes > 12 || $ano < 1900) {
+        return FALSE;
+    }
 
     $currentmonthVerify = mktime(0, 0, 0, $mes, 1, $ano);
     $sql = "select cd_cotacao,to_char(cd_data,'YYYY-MM-DD') as data from cotacao_dolar where opr_codigo = $1 and to_char(cd_data,'YYYY-MM') = $2;";
