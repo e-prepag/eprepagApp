@@ -1,14 +1,14 @@
 <?php require_once __DIR__ . '/../../../includes/constantes_url.php'; ?>
-<?php 
-header ('Content-type: text/html; charset=iso-8859-1');
+<?php
+header('Content-type: text/html; charset=iso-8859-1');
 
 require_once '../../../includes/constantes.php';
-require_once $raiz_do_projeto . "includes/fpdf/fpdf.php";
+require_once __DIR__ . "/../../../vendor/autoload.php";
 require_once $raiz_do_projeto . "includes/main.php";
 
 //=========  Mês/Ano considerado no Elaboração dos Arquivos
-$currentmonth = mktime(0, 0, 0, date('n')-1, 1, date('Y'));
-$mesAno = date('m/Y',$currentmonth);
+$currentmonth = mktime(0, 0, 0, date('n') - 1, 1, date('Y'));
+$mesAno = date('m/Y', $currentmonth);
 
 //forçando mês 06 de 2019
 //$mesAno = '06/2019';
@@ -33,127 +33,127 @@ $cpfRepresentanteLegal = "168.062.898-43";
 $rgRepresentanteLegal = "22.612.238-4";
 $orgaoEmissorRepresentanteLegal = "SSP/SP";
 
-$webstring = "http://".$_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
+$webstring = "http://" . $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'];
 
 $msg = "";
 $caminhoArquivoLote = $raiz_do_projeto . "arquivos_gerados/lotes/" . basename($_GET['nomeArq']);
 $tamanhoArquivoLote = file_exists($caminhoArquivoLote) ? filesize($caminhoArquivoLote) : false;
 
 //instancia a classe.. P=Retrato, mm =tipo de medida utilizada no casso milimetros, tipo de folha =A4
-$pdf= new FPDF("P","mm","A4");
+$pdf = new FPDF("P", "mm", "A4");
 //define a fonte a ser usada
-$pdf->SetFont('arial','',10);
+$pdf->SetFont('arial', '', 10);
 //define o titulo
 $pdf->SetTitle("Compliance");
 //assunto
 $pdf->SetSubject("Compliance Report");
 // posicao vertical no caso -1.. e o limite da margem
 $pdf->SetY("-1");
-$titulo="DOC - Declaração de Operações de Cartões de Crédito ou Débito";
+$titulo = "DOC - Declaração de Operações de Cartões de Crédito ou Débito";
 
 //endereco da imagem,posicao X(horizontal),posicao Y(vertical), tamanho altura, tamanho largura
-$pdf->Cell(0,0,'',0,1,'L');
-$pdf->Image($GLOBALS['raiz_do_projeto'] . "backoffice/images/background_anexo3.jpg", 10,10,190,0);
+$pdf->Cell(0, 0, '', 0, 1, 'L');
+$pdf->Image($GLOBALS['raiz_do_projeto'] . "backoffice/images/background_anexo3.jpg", 10, 10, 190, 0);
 
 //escreve no pdf largura,altura,conteudo,borda,quebra de linha,alinhamento
-$pdf->Cell(0,-7,$titulo,0,0,'L');
-$pdf->Cell(0,-7,'' . EPREPAG_URL_HTTP . '',0,1,'R',false,'javascript:history.go(-1);');
+$pdf->Cell(0, -7, $titulo, 0, 0, 'L');
+$pdf->Cell(0, -7, '' . EPREPAG_URL_HTTP . '', 0, 1, 'R', false, 'javascript:history.go(-1);');
 $pdf->Ln(12);
 
 //setando a cor de fundo
 $pdf->SetFillColor(255, 255, 255);
 
-$pdf->SetFont('arial','',10);
+$pdf->SetFont('arial', '', 10);
 
 //posiciona verticalmente em mm
 $pdf->SetY("73");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$nomeEmissor,0,0,'L');
+$pdf->Cell(0, 4, $nomeEmissor, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("84");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$logradouroEmissor.", ".$numeroEmissor." - ".$complementoEmissor.", ".$bairroEmissor."  ".$municipioEmissor." - ".$ufEmissor."  CEP: ".$cepEmissor ,0,0,'L');
+$pdf->Cell(0, 4, $logradouroEmissor . ", " . $numeroEmissor . " - " . $complementoEmissor . ", " . $bairroEmissor . "  " . $municipioEmissor . " - " . $ufEmissor . "  CEP: " . $cepEmissor, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("97");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$cnpjEPP,0,0,'L');
+$pdf->Cell(0, 4, $cnpjEPP, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("97");
 //posiciona horizontalmente em mm
 $pdf->SetX("120");
-$pdf->Cell(0,4,$inscricaoEstatual,0,0,'L');
+$pdf->Cell(0, 4, $inscricaoEstatual, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("111");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$CCM,0,0,'L');
+$pdf->Cell(0, 4, $CCM, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("111");
 //posiciona horizontalmente em mm
 $pdf->SetX("120");
-$pdf->Cell(0,4,$mesAno,0,0,'L');
+$pdf->Cell(0, 4, $mesAno, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("132");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$nomeRepresentanteLegal,0,0,'L');
+$pdf->Cell(0, 4, $nomeRepresentanteLegal, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("147");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$cpfRepresentanteLegal,0,0,'L');
+$pdf->Cell(0, 4, $cpfRepresentanteLegal, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("147");
 //posiciona horizontalmente em mm
 $pdf->SetX("95");
-$pdf->Cell(0,4,$rgRepresentanteLegal,0,0,'L');
+$pdf->Cell(0, 4, $rgRepresentanteLegal, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("147");
 //posiciona horizontalmente em mm
 $pdf->SetX("150");
-$pdf->Cell(0,4,$orgaoEmissorRepresentanteLegal,0,0,'L');
+$pdf->Cell(0, 4, $orgaoEmissorRepresentanteLegal, 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("189");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$_GET['nomeArq'],0,0,'L');
+$pdf->Cell(0, 4, $_GET['nomeArq'], 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("200");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,(($tamanhoArquivoLote !== false) ? $tamanhoArquivoLote . " bytes" : "Arquivo nï¿½o encontrado"),0,0,'L');
+$pdf->Cell(0, 4, (($tamanhoArquivoLote !== false) ? $tamanhoArquivoLote . " bytes" : "Arquivo nï¿½o encontrado"), 0, 0, 'L');
 
 
 //posiciona verticalmente em mm
 $pdf->SetY("211");
 //posiciona horizontalmente em mm
 $pdf->SetX("15");
-$pdf->Cell(0,4,$municipioEmissor." - ".$ufEmissor."  ".date('d/m/Y'),0,0,'L');
+$pdf->Cell(0, 4, $municipioEmissor . " - " . $ufEmissor . "  " . date('d/m/Y'), 0, 0, 'L');
 
 
 
@@ -174,11 +174,12 @@ $pdf->Cell(0,5,$pdf->PageNo().'/{nb}',0,1,'R');
 $pdf->SetDisplayMode('fullpage');
 
 //imprime a saida do arquivo..
-$pdf->Output("arquivo","I");
+$pdf->Output("arquivo", "I");
 
 
 // Função que mede o tamanho de um arquivo remoto
-function remote_filesize($url) {
+function remote_filesize($url)
+{
     static $regex = '/^Content-Length: *+\K\d++$/im';
     if (!$fp = @fopen($url, 'rb')) {
         return false;
@@ -190,5 +191,5 @@ function remote_filesize($url) {
         return (int)$matches[0];
     }
     return strlen(stream_get_contents($fp));
-}//end function remote_filesize()
+} //end function remote_filesize()
 ?>  
