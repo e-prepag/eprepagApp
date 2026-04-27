@@ -3,6 +3,7 @@
         "phpmailer/phpmailer": "^7.0",
         "symfony/dotenv": "^8.0",
         "pragmarx/google2fa": "^9.0",
-        "bacon/bacon-qr-code": "^3.1"
+        "bacon/bacon-qr-code": "^3.1",
+        "setasign/fpdf": "^1.8"
     }
 }
