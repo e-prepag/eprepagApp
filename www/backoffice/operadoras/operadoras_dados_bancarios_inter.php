@@ -11,7 +11,8 @@ if(!empty($opr_banco_intermediario)) {
 		$sql = "SELECT * FROM operadoras_banco_intermediario WHERE opr_codigo = $opr_codigo"; 
 		//echo "$sql<br>";
 		$rs_operadoras = SQLexecuteQuery($sql);
-		if($rs_operadoras_row = $rs_operadoras && pg_fetch_array($rs_operadoras)) {
+		$rs_operadoras_row = $rs_operadoras ? pg_fetch_array($rs_operadoras) : false;
+		if($rs_operadoras_row) {
 			$obi_bic_code			= $rs_operadoras_row['obi_bic_code'];
 			$obi_banco_nome			= $rs_operadoras_row['obi_banco_nome'];
 			$obi_numero_conta		= $rs_operadoras_row['obi_numero_conta'];
