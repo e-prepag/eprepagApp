@@ -1,5 +1,6 @@
 <?php
 require_once "/www/includes/load_dotenv.php";
+require_once "/www/includes/writeIfPossible.php";
 class classBoleto
 {
 
@@ -11,7 +12,7 @@ class classBoleto
         $token = getenv('ASAAS_ACCESS_TOKEN');
 
         if ($token == "") {
-            echo ("<br><br>ERRO ao obter acesso ao Banco! Asaas.<br>Obrigado.");
+            error_log("[Asaas_boleto] token_nao_configurado");
         } else {
             $this->setAccessToken($token);
             $this->url = getenv('ASAAS_API_URL');
@@ -60,15 +61,11 @@ class classBoleto
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
         $logFilePath = "/www/arquivos_gerados/logs/Asaas_boleto.txt";
-        $ff = fopen($logFilePath, "a+");
-
-        if ($ff) {
-            $timestamp = date("Y-m-d H:i:s");
-            $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
-                " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
-            fwrite($ff, $logEntry);
-            fclose($ff);
-
+        $timestamp = date("Y-m-d H:i:s");
+        $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
+            " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
+        if (!writeFileIfPossible($logFilePath, $logEntry)) {
+            error_log("[Asaas_boleto] falha_ao_gravar_log venda_id=" . $id_pedido);
         }
         return $resposta;
 
@@ -125,7 +122,7 @@ class classBoleto
             if (isset($data['id'])) {
                 $customerId = $data['id'];
             } else {
-                echo "<p>Erro ao criar cliente: " . htmlspecialchars($data['errors'][0]['description']) . "</p>";
+                error_log("[Asaas_boleto] erro_criar_cliente response=" . json_encode($data));
             }
         }
 
@@ -167,8 +164,10 @@ class classBoleto
 
         // Verifica se ocorreu algum erro
         if (curl_errno($ch)) {
-            echo 'Erro no cURL: ' . curl_error($ch);
-            exit;
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            error_log("[Asaas_boleto] erro_curl_pagamento venda_id=" . $vendaId . " erro=" . $curlError);
+            return false;
         }
 
         // Fecha a conexão cURL
@@ -180,7 +179,9 @@ class classBoleto
         // Verifica se a resposta contém os dados esperados
         if (!isset($data['bankSlipUrl'])) {
             // Extrai os dados de interesse
-            file_put_contents('/www/arquivos_gerados/logs/Asaas_boleto_erro.txt',$response);
+            if (!writeFileIfPossible("/www/arquivos_gerados/logs/Asaas_boleto_erro.txt", $response . PHP_EOL)) {
+                error_log("[Asaas_boleto] resposta_sem_bankSlipUrl venda_id=" . $vendaId . " response=" . $response);
+            }
             return false;
         }
 

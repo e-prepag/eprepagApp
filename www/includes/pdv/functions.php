@@ -1,6 +1,7 @@
 <?php require_once __DIR__ . '/../constantes_url.php'; ?>
 <?php
 require_once  __DIR__ . "/../load_dotenv.php";
+require_once  __DIR__ . "/../phpmailer_utf8.php";
 if (!function_exists('checkIP')) {
         function checkIP()
         {
@@ -614,11 +615,17 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $nome = 
         }
 
 
+        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
         $mail->Subject = $subject;
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        $sret = $mail->send();
+        try {
+                $sret = $mail->send();
+        } catch (\PHPMailer\PHPMailer\Exception $e) {
+                $sret = false;
+        }
 
         gravaLog_EnviaEmail("L", $to, $subject);
 
@@ -670,6 +677,8 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
                         $mail->addBCC($bccAr[$i]);
         }
 
+        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
         $mail->Subject = $subject;
         $mail->Body = $body_html;
         $mail->AltBody = $body_plain;
@@ -682,7 +691,11 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
                 }
         }
 
-        $sret = $mail->send();
+        try {
+                $sret = $mail->send();
+        } catch (\PHPMailer\PHPMailer\Exception $e) {
+                $sret = false;
+        }
 
         gravaLog_EnviaEmail("L", $to, $subject);
 

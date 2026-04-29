@@ -7,6 +7,11 @@ require_once DIR_INCS . "pdv/main.php";
 require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
 require_once DIR_INCS . "pdv/corte_constantes.php";
 
+function finalizaVendaExLHPgtoOnlineLog($message, array $context = array()) {
+        $context["script"] = "finaliza_vendaExLH_pgtoonline.php";
+        error_log("[finaliza_vendaExLH_pgtoonline] " . $message . " " . json_encode($context));
+}
+
 ////Recupera o usuario do session
 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
 
@@ -90,10 +95,11 @@ if($usuarioGames->b_IsLogin_pagamento())  {
         // ver montaCesta_pag() para cesta Money
         $cesta_boleto_pagto_online = "item:Crédito OnLine\n1\ncrédito\n".(100*$total_carrinho)."\n";
 
-        $sql = "UPDATE tb_pag_compras SET cliente_nome='".str_replace("'", "''", $snome)."', idcliente=".$usuarioGames->getId().", status=1, cesta='".$cesta_boleto_pagto_online."', total=".(100*($total_carrinho+$taxas))." WHERE numcompra='".$numOrder."'";		// "pagto='".$_SESSION['pagamento.pagto']."', "
-        $ret = SQLexecuteQuery($sql);
+        $sql = "UPDATE tb_pag_compras SET cliente_nome=$1, idcliente=$2, status=1, cesta=$3, total=$4 WHERE numcompra=$5";
+        $params = array($snome, $usuarioGames->getId(), $cesta_boleto_pagto_online, (100 * ($total_carrinho + $taxas)), $numOrder);
+        $ret = SQLexecuteQueryParams($sql, $params);
         if(!$ret) {
-                echo "Erro ao atualizar transação de pagamento (2).\n";
+                echo "Erro ao atualizar transacao de pagamento (2).\n";
                 die("Stop");
         }
 }
@@ -114,14 +120,14 @@ if($msg != ""){
         die("Stop");
 }
 
-// processa só se:
-//		- PagtoOnline estiver autorizado para o usuário
+// processa so se:
+//		- PagtoOnline estiver autorizado para o usuario
 //		- forma de pagto for de fato online
 //		- lan cadastrada como Pre
 if((!$usuarioGames->b_IsLogin_pagamento()) ||
         (!b_IsPagtoOnline($pagto)) ||
         (!$usuarioGames->bIsLanPre()) ) {
-                $msg = "Pagamento Online para LHs Pre não processado (pagto: '$pagto', Pré: ".(($usuarioGames->bIsLanPre())?"Sim":"Não").", Pagto_online: ".(($usuarioGames->b_IsLogin_pagamento())?"OK":"Não").", É pagto. online?: ".((b_IsPagtoOnline($pagto))?"Sim":"Não").")";
+                $msg = "Pagamento Online para LHs Pre nao processado (pagto: " . $pagto . ", Pre: " . (($usuarioGames->bIsLanPre())?"Sim":"Nao") . ", Pagto_online: " . (($usuarioGames->b_IsLogin_pagamento())?"OK":"Nao") . ", e pagto. online?: " . ((b_IsPagtoOnline($pagto))?"Sim":"Nao") . ")";
                 $strRedirect = "/creditos/mensagem.php?msg=" . urlencode($msg) . "&pt=" . urlencode("Erro") . "&link=" . urlencode("/creditos/erro.php?err=51");
                 redirect($strRedirect);
                 die("Stop sdf sd");
@@ -131,7 +137,7 @@ if((!$usuarioGames->b_IsLogin_pagamento()) ||
 if($msg == ""){
         $sql = "BEGIN TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
-        if(!$ret) $msg = "Erro ao iniciar transação.\n";
+        if(!$ret) $msg = "Erro ao iniciar transacao.\n";
 }
 
 //Gera a venda
@@ -144,17 +150,10 @@ if($msg == ""){
                 $_SESSION['pagamento.numorder'] = $orderId;
 
                 // Salva registro de vendas
-                $sql = "insert into tb_dist_venda_games (" .
-                                "vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, " .
-                                "vg_ultimo_status, vg_ultimo_status_obs, vg_deposito_em_saldo) values (";
-                $sql .= SQLaddFields($venda_id, "") . ",";
-                $sql .= SQLaddFields($usuarioId, "") . ",";
-                $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-                $sql .= SQLaddFields((($pagto==$FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'])?$PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC:(($pagto==$FORMAS_PAGAMENTO['PAGAMENTO_PIX'])?$PAGAMENTO_PIX_NUMERIC:$pagto)), "") . ",";
-                $sql .= SQLaddFields($GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'], "") . ",";
-                $sql .= SQLaddFields("", "s") . ", ";
-                $sql .= SQLaddFields("1", "") . ")";
-                $ret = SQLexecuteQuery($sql);
+                $pagto_venda_insert = (($pagto==$FORMAS_PAGAMENTO["PAGAMENTO_BANCO_ITAU_ONLINE"])?$PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC:(($pagto==$FORMAS_PAGAMENTO["PAGAMENTO_PIX"])?$PAGAMENTO_PIX_NUMERIC:$pagto));
+                $sql = "insert into tb_dist_venda_games (vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, vg_ultimo_status, vg_ultimo_status_obs, vg_deposito_em_saldo) values ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6)";
+                $params = array($venda_id, $usuarioId, $pagto_venda_insert, $GLOBALS["STATUS_VENDA"]["PEDIDO_EFETUADO"], "", "1");
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if(!$ret) {
                         $msg = "Erro ao inserir venda. Por favor, tente novamente atualizando a página. Obrigado *.\n";
                         gravaLog_BoletoExpressLH($msg."\n".$sql);
@@ -163,10 +162,11 @@ if($msg == ""){
 
         if(!$msg) {
                 // Salva venda_id em tb_pag_compras
-                $sql = "UPDATE tb_pag_compras SET idvenda=".$venda_id." WHERE numcompra='".$numOrder."'";		
-                $ret = SQLexecuteQuery($sql);
+                $sql = "UPDATE tb_pag_compras SET idvenda=$1 WHERE numcompra=$2";
+                $params = array($venda_id, $numOrder);
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if(!$ret) {
-                        $msg = "Erro ao atualizar transação de pagamento (2a, id_venda=$id_venda, numcompra='".$numOrder."').\n";
+                        $msg = "Erro ao atualizar transação de pagamento (2a, id_venda=$venda_id, numcompra='".$numOrder."').\n";
                         gravaLog_BoletoExpressLH($msg."\n".$sql);
                 }
         }
@@ -222,31 +222,22 @@ if($msg == ""){
 
         //Insere boleto na base
         //----------------------------------------------------
-        $sql = "insert into dist_boleto_bancario_games (" .
-                                "bbg_ug_id, bbg_vg_id, bbg_data_inclusao, bbg_valor, bbg_valor_taxa, " .
-                                "bbg_bco_codigo, bbg_documento, bbg_data_venc" .
-                        ") values (";
-        $sql .= SQLaddFields($usuarioId, "") . ",";
-        $sql .= SQLaddFields($venda_id, "") . ",";
-        $sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-        $sql .= SQLaddFields($total_geral + $taxa_adicional, "") . ",";
-        $sql .= SQLaddFields($taxa_adicional, "") . ",";
-        $sql .= SQLaddFields($bco_codigo, "") . ",";
-        $sql .= SQLaddFields($num_doc, "s") . ","; //documento
-        $sql .= SQLaddFields("CURRENT_DATE + interval '$qtde_dias_venc day'", "") . ")"; //vencimento
-        $ret = SQLexecuteQuery($sql);
+        $sql = "insert into dist_boleto_bancario_games (bbg_ug_id, bbg_vg_id, bbg_data_inclusao, bbg_valor, bbg_valor_taxa, bbg_bco_codigo, bbg_documento, bbg_data_venc) values ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + $7::integer)";
+        $params = array($usuarioId, $venda_id, $total_geral + $taxa_adicional, $taxa_adicional, $bco_codigo, $num_doc, $qtde_dias_venc);
+        $ret = SQLexecuteQueryParams($sql, $params);
 
         //atualiza dados do pagamento e status da venda
         if($ret){
-                $sql = "update tb_dist_venda_games set 
-                                        vg_cor_codigo = 0,  
-                                        vg_pagto_data_inclusao = " . SQLaddFields("CURRENT_TIMESTAMP", "") . ",
-                                        vg_pagto_banco = '" . $bco_codigo . "',
-                                        vg_pagto_num_docto = '" . $num_doc . "'
-                                where vg_id = " . $venda_id;
-                $ret = SQLexecuteQuery($sql);
-                if(!$ret) $msg = "Erro ao atualizar status da venda.\n";
+                $sql = "update tb_dist_venda_games set vg_cor_codigo = 0, vg_pagto_data_inclusao = CURRENT_TIMESTAMP, vg_pagto_banco = $1, vg_pagto_num_docto = $2 where vg_id = $3";
+                $params = array($bco_codigo, $num_doc, $venda_id);
+                $ret = SQLexecuteQueryParams($sql, $params);
+                if(!$ret) {
+                        $msg = "Erro ao atualizar status da venda.\n";
+                        finalizaVendaExLHPgtoOnlineLog("erro_update_tb_dist_venda_games", array("usuario_id" => $usuarioId, "venda_id" => $venda_id, "banco" => $bco_codigo, "documento" => $num_doc, "erro" => function_exists("pg_last_error") ? pg_last_error() : ""));
+                }
         } else {
+                $msg = "Erro ao inserir boleto.\n";
+                finalizaVendaExLHPgtoOnlineLog("erro_insert_dist_boleto_bancario_games", array("usuario_id" => $usuarioId, "venda_id" => $venda_id, "valor" => $total_geral + $taxa_adicional, "taxa" => $taxa_adicional, "banco" => $bco_codigo, "documento" => $num_doc, "dias_vencimento" => $qtde_dias_venc, "erro" => function_exists("pg_last_error") ? pg_last_error() : ""));
         }
 } 
 

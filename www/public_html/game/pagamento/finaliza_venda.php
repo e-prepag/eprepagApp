@@ -21,6 +21,12 @@ require_once DIR_INCS . "config.MeiosPagamentos.php";
 require_once DIR_CLASS . "gamer/classIntegracao.php";
 require_once DIR_CLASS . "gamer/classLimite.php";
 
+function finalizaVendaBoletoLog($message, array $context = array())
+{
+        $context["script"] = "finaliza_venda.php";
+        error_log("[finaliza_venda_boleto] " . $message . " " . json_encode($context));
+}
+
 $https = "https";
 
 $pagto = $_SESSION['pagamento.pagto'];
@@ -911,7 +917,7 @@ if (empty($strRedirect)) {
                                 bbg_data_venc
                             )
                             VALUES (
-                                $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + interval '$7 day'
+                                $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + $7::integer
                             )
                         ";
 
@@ -925,7 +931,26 @@ if (empty($strRedirect)) {
                         $qtde_dias_venc                   // $7 número de dias para o vencimento
                 );
 
+                finalizaVendaBoletoLog("inserindo_boleto_bancario_games", array(
+                        "venda_id" => $venda_id,
+                        "usuario_id" => $controller->usuario->getId(),
+                        "banco_boleto" => (defined("BANCO_BOLETO") ? BANCO_BOLETO : null),
+                        "bco_codigo" => $bco_codigo,
+                        "num_doc" => $num_doc,
+                        "total_geral" => $total_geral,
+                        "taxa_adicional" => $taxa_adicional,
+                        "qtde_dias_venc" => $qtde_dias_venc
+                ));
+
                 $ret = SQLexecuteQueryParams($sql, $params);
+
+                if (!$ret) {
+                        finalizaVendaBoletoLog("erro_insert_boleto_bancario_games", array(
+                                "venda_id" => $venda_id,
+                                "params" => $params,
+                                "pg_error" => pg_last_error($GLOBALS["connid"])
+                        ));
+                }
 
                 //atualiza dados do pagamento e status da venda
                 if ($ret) {
@@ -947,9 +972,15 @@ if (empty($strRedirect)) {
                         );
 
                         $ret = SQLexecuteQueryParams($sql, $params);
-                        if (!$ret)
+                        if (!$ret) {
+                                finalizaVendaBoletoLog("erro_update_venda_pos_boleto", array(
+                                        "venda_id" => $venda_id,
+                                        "bco_codigo" => $bco_codigo,
+                                        "num_doc" => $num_doc,
+                                        "pg_error" => pg_last_error($GLOBALS["connid"])
+                                ));
                                 $ret = "Erro ao atualizar status da venda.\n";
-                        else
+                        } else
                                 $ret = ""; //limpa resourceId
                 }
         }

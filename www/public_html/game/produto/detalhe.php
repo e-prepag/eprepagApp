@@ -6,11 +6,40 @@ require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once DIR_INCS . "pdv/captura_inc.php";
 require_once DIR_CLASS . "gamer/classAlawarGames.php";
 require_once DIR_INCS . "writeIfPossible.php";
-function detalheProdutoHasValorLivre($produto) {
-    return trim((string)$produto->getValorMinimo()) !== "" || trim((string)$produto->getValorMaximo()) !== "";
+function detalheProdutoHasValorLivre($produto)
+{
+    if (trim((string)$produto->getValorMinimo()) !== "" || trim((string)$produto->getValorMaximo()) !== "") {
+        return true;
+    }
+
+    if ($produto->getMostraIntegracao()) {
+        return false;
+    }
+
+    $rs = null;
+    $filtro = array(
+        "ogpm_ativo" => 1,
+        "ogpm_ogp_id" => $produto->getId()
+    );
+    $ret = (new ProdutoModelo())->obter($filtro, "ogpm_valor asc", $rs);
+
+    return $ret == "" && (!$rs || pg_num_rows($rs) == 0);
 }
 
-function detalheProdutoLog($message, array $context = array()) {
+function detalheProdutoValorMinimo($produto)
+{
+    $valor = $produto->getValorMinimo();
+    return trim((string)$valor) !== "" ? $valor : $GLOBALS["RISCO_GAMERS_VALOR_MIN"];
+}
+
+function detalheProdutoValorMaximo($produto)
+{
+    $valor = $produto->getValorMaximo();
+    return trim((string)$valor) !== "" ? $valor : $GLOBALS["RISCO_GAMERS_VALOR_MAX"];
+}
+
+function detalheProdutoLog($message, array $context = array())
+{
     $line = "[" . date("Y-m-d H:i:s") . "] " . $message . " " . json_encode($context) . PHP_EOL;
     writeFileIfPossible("/www/arquivos_gerados/logs/produto-detalhe-modelos.log", $line);
 }
@@ -115,7 +144,7 @@ if ($msg == "") {
 if ($msg == "") {
     // Wagner
 
-    $produto = new Produto($rs_row['ogp_id'], $rs_row['ogp_nome'], $rs_row['ogp_descricao'], $rs_row['ogp_ativo'], $rs_row['ogp_nome_imagem'], $rs_row['ogp_data_inclusao'], $rs_row['ogp_opr_codigo'], $rs_row['ogp_mostra_integracao'], $rs_row['ogp_iof'], $rs_row['ogp_pin_request'], $rs_row['ogp_detalhes_utilizacao'], $rs_row['ogp_termos_condicoes'], $rs_row['ogp_valor_minimo'], $rs_row['ogp_valor_maximo']);
+    $produto = new Produto($rs_row['ogp_id'], $rs_row['ogp_nome'], $rs_row['ogp_descricao'], $rs_row['ogp_ativo'], $rs_row['ogp_nome_imagem'], $rs_row['ogp_data_inclusao'], $rs_row['ogp_opr_codigo'], $rs_row['ogp_mostra_integracao'], $rs_row['ogp_iof'], $rs_row['ogp_pin_request'], $rs_row['ogp_detalhes_utilizacao'], $rs_row['ogp_termos_condicoes'], $rs_row['ogp_valor_minimo'], $rs_row['ogp_valor_maximo'], $rs_row['ogp_idade_minima']);
 
     if (isset($produto) && is_object($produto)) {
         $produto->setNomeOperadora($rs_row['opr_nome_loja']);
@@ -425,7 +454,7 @@ $controller->setHeader();
                                             <div class="form-group align-center">
                                                 <div class="input-group align-center">
                                                     <div class="input-group-addon">R$</div>
-                                                    <input type="number" class="form-control align-right" id="valor" step="1" min="<?php echo $produto->getValorMinimo(); ?>" max="<?php echo $produto->getValorMaximo(); ?>" value="<?php echo number_format($produto->getValorMinimo(), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
+                                                    <input type="number" class="form-control align-right" id="valor" step="1" min="<?php echo detalheProdutoValorMinimo($produto); ?>" max="<?php echo detalheProdutoValorMaximo($produto); ?>" value="<?php echo number_format(detalheProdutoValorMinimo($produto), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
                                                     <div class="input-group-addon">.00</div>
                                                 </div>
 
@@ -433,7 +462,7 @@ $controller->setHeader();
                                         </div>
                                         <div class="c-pointer modelo-produto" estoque="1" id="<?php echo $NO_HAVE; ?>">
                                             <div class="col-sm-12 col-md-3 col-lg-3 top15 align-center">
-                                                <span class="txt-azul-claro2 span-valor"><?php echo get_info_EPPCash_NO_Table((new ConversionPINsEPP)->get_ValorEPPCash('E', $produto->getValorMinimo())); ?></span>
+                                                <span class="txt-azul-claro2 span-valor"><?php echo get_info_EPPCash_NO_Table((new ConversionPINsEPP)->get_ValorEPPCash('E', detalheProdutoValorMinimo($produto))); ?></span>
                                             </div>
                                             <div class="col-sm-12 col-md-3 col-lg-3 top15">
                                                 <div class="" estoque="1" id="<?php echo $NO_HAVE ?>">
@@ -444,7 +473,7 @@ $controller->setHeader();
                                     </div>
                                     <div class="row top10">
                                         <div class="col-lg-12 align-center">
-                                            <span>Valor mínimo: <?php echo $produto->getValorMinimo(); ?> | Valor máximo: <?php echo $produto->getValorMaximo(); ?></span>
+                                            <span>Valor mínimo: <?php echo detalheProdutoValorMinimo($produto); ?> | Valor máximo: <?php echo detalheProdutoValorMaximo($produto); ?></span>
                                         </div>
                                     </div>
                                 </form>
@@ -453,7 +482,7 @@ $controller->setHeader();
                         <form id='seleciona' method='post' action="/game/pedido/passo-1.php" style="display: flex; align-items:end; flex-wrap: wrap;">
                             <input type='hidden' name='acao' id='acao' value='u'>
                             <input type='hidden' name='mod' id='mod' value='NO HAVE'>
-                            <input type='hidden' name='valor' id='valor_hidden' value='<?php echo number_format($produto->getValorMinimo(), 0, "", ""); ?>'>
+                            <input type='hidden' name='valor' id='valor_hidden' value='<?php echo number_format(detalheProdutoValorMinimo($produto), 0, "", ""); ?>'>
                             <input type='hidden' name='codeProd' id='codeProd' value='<?php echo $produto->getId(); ?>'>
                             <div class="quantity-selector compact" data-min="1" data-max="999">
                                 <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
@@ -523,6 +552,7 @@ $controller->setHeader();
             $('#valor').mask('0000', {
                 reverse: true
             });
+
             function syncValorVariavel() {
                 if (!$("#valor").length) return;
 

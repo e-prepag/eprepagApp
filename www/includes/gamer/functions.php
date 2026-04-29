@@ -5,6 +5,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require_once '/www/vendor/autoload.php';
+require_once '/www/includes/phpmailer_utf8.php';
 
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_pagto.php";
 require_once RAIZ_DO_PROJETO . "vendor/autoload.php";
@@ -68,7 +69,6 @@ function enviaEmail4(string $to, mixed $cc, mixed $bcc, string $subject, string 
         $mail->Username = (string)getenv("smtp_username");  // a valid email here
         $mail->Password = (string)getenv("smtp_password"); //'985856';		//'850637';  985856
         $mail->FromName = "E-Prepag";        // " (EPP)"
-        $mail->isHTML(true);
 
         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
         $mail->isSMTP();
@@ -106,11 +106,17 @@ function enviaEmail4(string $to, mixed $cc, mixed $bcc, string $subject, string 
                         $mail->addAttachment((string)$attach);
                 }
         }
+        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
         $mail->Subject = $subject;
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        return (bool)$mail->Send();
+        try {
+                return (bool)$mail->Send();
+        } catch (Exception $e) {
+                return false;
+        }
 } //end function enviaEmail4
 
 function declare_valida_formatacao(): void
@@ -889,12 +895,17 @@ function redirect($strRedirect)
                                                                         }
 
 
+                                                                        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
                                                                         $mail->Subject = $subject;
-                                                                        $mail->isHTML();
                                                                         $mail->Body    = $body_html;
                                                                         $mail->AltBody = $body_plain;
 
-                                                                        $sret = $mail->send();
+                                                                        try {
+                                                                                $sret = $mail->send();
+                                                                        } catch (Exception $e) {
+                                                                                $sret = false;
+                                                                        }
 
                                                                         gravaLog_EnviaEmail("M", $to, $subject);
 
