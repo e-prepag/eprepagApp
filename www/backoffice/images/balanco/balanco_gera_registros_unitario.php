@@ -160,7 +160,7 @@ if(is_object($objUsuarioGames)) {
 
 		$rs_total = SQLexecuteQuery($sql);
 		
-		if($rs_total) $registros_total += pg_num_rows($rs_total);
+		if($rs_total) $registros_total += (($rs_total) ? pg_num_rows($rs_total) : 0);
 
 		
 		$sql .= " order by vg.vg_data_inclusao desc " ;
@@ -205,7 +205,7 @@ if(is_object($objUsuarioGames)) {
 
 		$res_count = SQLexecuteQuery($sql);
 
-		if($res_count) $registros_total += pg_num_rows($res_count);
+		if($res_count) $registros_total += (($res_count) ? pg_num_rows($res_count) : 0);
 
 			
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ if(is_object($objUsuarioGames)) {
 				where c.cor_ug_id = $usuario_id
 				order by cor_periodo_fim desc, cor_periodo_ini desc";
 				$res_corte = SQLexecuteQuery($sql);
-	if($res_corte) $registros_total += pg_num_rows($res_corte);
+	if($res_corte) $registros_total += (($res_corte) ? pg_num_rows($res_corte) : 0);
 		
 	$info_corte = pg_fetch_array($res_corte);
 	$data_tratada = $info_corte['cor_periodo_fim'];

@@ -9,7 +9,7 @@ $total_query = "select ug_id from dist_usuarios_games where ug_ativo = '1' " ;
 
 $total_rs_query = SQLexecuteQUERY($total_query);
 
-$total_row = pg_num_rows($total_rs_query);
+$total_row = (($total_rs_query) ? pg_num_rows($total_rs_query) : 0);
 
 ?>
 

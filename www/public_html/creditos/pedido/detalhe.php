@@ -382,7 +382,7 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 						} //end if(!$rs)
 					
 						//Calculando se a quantidade de PINs é igual a quantidade de registros 
-						$totalRegistros = pg_num_rows($rs);
+						$totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
 						$sql = "select sum(vgm_qtde) as total from tb_dist_venda_games_modelo where vgm_vg_id = " . $GLOBALS['_SESSION']['venda'];
 						$rsTotal = SQLexecuteQuery($sql);
 						$rsTotalRow = pg_fetch_array($rsTotal);
@@ -590,7 +590,7 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 												?>
 										</table>
 										<?php
-								}//end if(pg_num_rows($rs) > 1)
+								}//end if((($rs) ? pg_num_rows($rs) : 0) > 1)
 								else {
 									$rs_row = pg_fetch_array($rs);
 									?>
@@ -598,7 +598,7 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 											name="emitir" checked="checked" style="display:none">
 										<?php
 									//Colocar aqui o checkbox invisivel com o unico PIN da venda
-								}//end else do if(pg_num_rows($rs) > 1)
+								}//end else do if((($rs) ? pg_num_rows($rs) : 0) > 1)
 							
 								?>
 

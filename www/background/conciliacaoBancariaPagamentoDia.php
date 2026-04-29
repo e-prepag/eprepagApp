@@ -78,7 +78,7 @@ foreach ($vetor_aux as $key => $value){
 		$sql = "select * from relfin_conciliacao_bancaria where rfcb_data_registro = '".$key."' and rfcb_tipo_pagamento = '".$key2."';";
 		//echo $sql.PHP_EOL;
 		$rs_verify = SQLexecuteQuery($sql);
-		if(pg_num_rows($rs_verify) > 0) {
+		if((($rs_verify) ? pg_num_rows($rs_verify) : 0) > 0) {
 			$rs_verify_row = pg_fetch_array($rs_verify);
 			if($rs_verify_row['rfcb_venda_gamer'] <> ($vetor_aux[$key][$key2]['M']['TOTAL']*1) || $rs_verify_row['rfcb_venda_lans'] <> ($vetor_aux[$key][$key2]['LR']['TOTAL']*1) || $rs_verify_row['rfcb_valor_dep_brad'] <> ($vetor_aux[$key][$key2]['DEP']*1)) {
 				$sql = "update relfin_conciliacao_bancaria set rfcb_venda_gamer = ".($vetor_aux[$key][$key2]['M']['TOTAL']*1).", rfcb_venda_lans = ".($vetor_aux[$key][$key2]['LR']['TOTAL']*1).", rfcb_data_atualizacao = NOW(), rfcb_qtde_gamer =  ".($vetor_aux[$key][$key2]['M']['QTDE']*1).", rfcb_qtde_lans = ".($vetor_aux[$key][$key2]['LR']['QTDE']*1).", rfcb_valor_dep_brad = ".($vetor_aux[$key][$key2]['DEP']*1)." where rfcb_id = ".$rs_verify_row['rfcb_id']." and rfcb_data_registro = '".$key."' and rfcb_tipo_pagamento = '".$key2."';";
@@ -91,7 +91,7 @@ foreach ($vetor_aux as $key => $value){
 			else {
 				echo "(".$key.") - (".$key2.") => Não é necessário atualizar o registro!".PHP_EOL;
 			}
-		}//end if(pg_num_rows($rs_verify) > 0)
+		}//end if((($rs_verify) ? pg_num_rows($rs_verify) : 0) > 0)
 		else {
 			$sql = "insert into relfin_conciliacao_bancaria (rfcb_venda_gamer, rfcb_venda_lans, rfcb_data_registro, rfcb_data_inclusao, rfcb_tipo_pagamento, rfcb_qtde_gamer, rfcb_qtde_lans, rfcb_valor_dep_brad) values (".($vetor_aux[$key][$key2]['M']['TOTAL']*1).", ".($vetor_aux[$key][$key2]['LR']['TOTAL']*1).", '".$key."', NOW(),'".$key2."', ".($vetor_aux[$key][$key2]['M']['QTDE']*1).", ".($vetor_aux[$key][$key2]['LR']['QTDE']*1).", ".($vetor_aux[$key][$key2]['DEP']*1).");";
 			echo "INSERT ".$key." PAGTO ".$key2.": ".$sql.PHP_EOL;

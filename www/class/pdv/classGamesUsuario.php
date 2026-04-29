@@ -2089,11 +2089,11 @@ class UsuarioGames
                 $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . " order by ugo_data ASC;";
                 $rs_usuario_obs = SQLexecuteQuery($sql);
                 $ug_obs = "";
-                if (pg_num_rows($rs_usuario_obs) > 0) {
+                if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                     while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
                         $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observao:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
                     } //end while
-                } //end if(pg_num_rows($rs_usuario) > 0)
+                } //end if((($rs_usuario) ? pg_num_rows($rs_usuario) : 0) > 0)
 
                 if (!is_null($ug_obs)) {
                     if (trim($ug_obs) != "") {
@@ -2262,11 +2262,11 @@ class UsuarioGames
             $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . " order by ugo_data ASC;";
             $rs_usuario_obs = SQLexecuteQuery($sql);
             $ug_obs = "";
-            if (pg_num_rows($rs_usuario_obs) > 0) {
+            if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                 while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
                     $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observao:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
                 } //end while
-            } //end if(pg_num_rows($rs_usuario) > 0)
+            } //end if((($rs_usuario) ? pg_num_rows($rs_usuario) : 0) > 0)
 
             if (!is_null($ug_obs)) {
                 if (trim($ug_obs) != "") {
@@ -4870,11 +4870,11 @@ class UsuarioGames
             $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . " order by ugo_data ASC;";
             $rs_usuario_obs = SQLexecuteQuery($sql);
             $ug_obs = NULL;
-            if (pg_num_rows($rs_usuario_obs) > 0) {
+            if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                 while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
                     $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observação:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
                 } //end while
-            } //end if(pg_num_rows($rs_usuario) > 0)
+            } //end if((($rs_usuario) ? pg_num_rows($rs_usuario) : 0) > 0)
             $usuarioGames->setObservacoes($ug_obs);
 
             $usuarioGames->setCanaisVenda($rs_row['ug_canais_venda']);
@@ -6157,7 +6157,7 @@ function checaBoletoEmAberto()
         echo "sql1: $sql<br>";
     }
     $res_count = SQLexecuteQuery($sql);
-    $total_table = pg_num_rows($res_count);
+    $total_table = ($res_count) ? pg_num_rows($res_count) : 0;
     if ($total_table > 0) {
         $rs_cortes_row = pg_fetch_array($res_count);
 

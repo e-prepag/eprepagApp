@@ -98,7 +98,7 @@
 	$sql .= "group by ano"; //", canal";
 	
 	$res_count = pg_query($connid, $sql);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 	$sql .= " order by ".$ncamp." desc";
 

@@ -5,6 +5,7 @@ require_once $raiz_do_projeto . 'includes/configIP.php';
 // include do classe de controle de servidor de envio de email
 require_once $raiz_do_projeto . 'class/util/EmailEnvironment.class.php';
 require_once $raiz_do_projeto . "includes/load_dotenv.php";
+require_once $raiz_do_projeto . "includes/phpmailer_utf8.php";
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -2129,13 +2130,19 @@ function enviaEmail3($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
 	if (!empty($attach)) {
 		$mail->addAttachment($attach);
 	}
+	eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
 	$mail->Subject = $subject;
 	$mail->Body    = $body_html;
 	$mail->AltBody = $body_plain;
 
 	//echo print_r($mail, true);
 
-	return $mail->send();
+	try {
+		return $mail->send();
+	} catch (Exception $e) {
+		return false;
+	}
 }
 
 function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $nome = '')
@@ -2192,11 +2199,17 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
 			$mail->addAttachment($attach);
 		}
 	}
+	eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
 	$mail->Subject = $subject;
 	$mail->Body    = $body_html;
 	$mail->AltBody = $body_plain;
 
-	return $mail->send();
+	try {
+		return $mail->send();
+	} catch (Exception $e) {
+		return false;
+	}
 }
 
 function get_day_of_week($date1)
@@ -2360,9 +2373,9 @@ function levantamentoPublisherComFechamentoUtilizacao()
 		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(" . $sql . ").<br>" . PHP_EOL;
 		return array();
 	}
-	if (pg_num_rows($rs_publisher) == 0) {
+	if ((($rs_publisher) ? pg_num_rows($rs_publisher) : 0) == 0) {
 		return array();
-	} //end if(pg_num_rows($rs_publisher) == 0)
+	} //end if((($rs_publisher) ? pg_num_rows($rs_publisher) : 0) == 0)
 	else {
 		while ($rs_publisher_row = pg_fetch_array($rs_publisher)) {
 			$aux_retorno[$rs_publisher_row['opr_codigo']] = $rs_publisher_row['opr_data_inicio_contabilizacao_utilizacao'];

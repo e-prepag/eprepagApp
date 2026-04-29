@@ -82,11 +82,11 @@ $rsResposta = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecute
 ?>
 <table class="txt-preto table fontsize-pp table-bordered">
 <?php
-if((pg_num_rows($rsResposta) != 0) && ($rsResposta)) {
+if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
 ?>
 	<tr>
         <td align="center"></td>
-        <td align="left" colspan="5"><?php echo "Encontrado".((pg_num_rows($rsResposta)>0)?"s":"")." ".pg_num_rows($rsResposta)." registro".((pg_num_rows($rsResposta)>0)?"s":"")."";?></td>
+        <td align="left" colspan="5"><?php echo "Encontrado".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")." ".(($rsResposta) ? pg_num_rows($rsResposta) : 0)." registro".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")."";?></td>
         <td align="center"></td>
     </tr>
 	<tr>

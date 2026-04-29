@@ -190,7 +190,7 @@ if($_SESSION['userlogin_bko']=='REINALDO') {
 			if($rs_transacoes) {
 
 				// Create a data set in range (50,70) and X-positions
-				$ndatapoints = pg_num_rows($rs_transacoes);
+				$ndatapoints = (($rs_transacoes) ? pg_num_rows($rs_transacoes) : 0);
 				//echo "ndatapoints: ".$ndatapoints."<br>";
 
 				$zmax = -1;	

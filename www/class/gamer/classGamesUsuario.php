@@ -2252,11 +2252,11 @@ class UsuarioGames
             $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . ";";
             $rs_usuario_obs = SQLexecuteQuery($sql);
             $ug_obs = NULL;
-            if (pg_num_rows($rs_usuario_obs) > 0) {
+            if ((($rs_usuario_obs) ? pg_num_rows($rs_usuario_obs) : 0) > 0) {
                 while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
                     $ug_obs .= "Em " . $rs_usuario_obs_row['data'] . PHP_EOL . "Autor: " . $rs_usuario_obs_row['ugo_user_insert'] . PHP_EOL . "Observação:" . PHP_EOL . $rs_usuario_obs_row['ug_obs'] . PHP_EOL . str_repeat("-", 40) . PHP_EOL;
                 } //end while
-            } //end if(pg_num_rows($rs_usuario) > 0)
+            } //end if((($rs_usuario) ? pg_num_rows($rs_usuario) : 0) > 0)
             $usuarioGames->setOBS($ug_obs);
             $usuarioGames->setNomedaMae($rs_row['ug_nome_da_mae']);
             $usuarioGames->setNomeCPF($rs_row['ug_nome_cpf']);

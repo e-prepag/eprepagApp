@@ -5,11 +5,13 @@
 
 //	set_time_limit ( 300 ) ;
 //header('Content-type: image/jpeg');
-        require_once "../../includes/constantes.php";
-        require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph.php";
-        require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph_line.php";
-        require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph_date.php";
-        require_once $raiz_do_projeto . "includes/functions.php";
+require_once "../../includes/constantes.php";
+require_once $raiz_do_projeto . "vendor/autoload.php";
+
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+
+require_once $raiz_do_projeto . "includes/functions.php";
 
 //echo "<pre>"; 
 //print_r($_GET);
@@ -84,7 +86,7 @@ $expiration = 600;	// time in seconds to delete image form server
 
 
 				// Create the new graph
-				$graph = new Graph(540,300);
+				$graph = new Graph\Graph(540,300);
 
 				// Slightly larger than normal margins at the bottom to have room for the x-axis labels
 				$graph->SetMargin(40,10,30,50);
@@ -107,7 +109,7 @@ $expiration = 600;	// time in seconds to delete image form server
 //				$graph->xaxis->title->Set("hora");
 				$graph->xgrid->Show();
 
-				$line = new LinePlot($data,$xdata);
+				$line = new Plot\LinePlot($data,$xdata);
 //				$line->SetLegend($monthname);
 				$line->SetFillColor('lightblue@0.5');
 				$graph->Add($line);

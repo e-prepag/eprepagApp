@@ -42,7 +42,7 @@ $vetorPublisherNovos = levantamentoPublisherNovosOperantes($ano,$mes);
 
 //Verificando se faltam Dados
 if (verificaFaltaCPFNome($vetorPublisher, $diaLimite, $rs_dados_incompletos, $vetorPublisherNovos)) {
-    $msg .= "Faltam Dados de CPF e Nome: (TOTAL [".pg_num_rows($rs_dados_incompletos)."] Usuários)<br>".PHP_EOL;
+    $msg .= "Faltam Dados de CPF e Nome: (TOTAL [".(($rs_dados_incompletos) ? pg_num_rows($rs_dados_incompletos) : 0)."] Usuários)<br>".PHP_EOL;
     while($rs_dados_incompletos_row = pg_fetch_array($rs_dados_incompletos)) {
             $msg .=  " ".$rs_dados_incompletos_row['tipo']." => ID: ".$rs_dados_incompletos_row['ug_id']." Email: ".$rs_dados_incompletos_row['ug_email']." Data da Transação: ".substr($rs_dados_incompletos_row['data_transacao'],0,19)."<br>".PHP_EOL;
     } //end while

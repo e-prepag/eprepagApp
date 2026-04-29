@@ -106,7 +106,7 @@ function gerarArquivo(varArquivo) {
 						$sql = "select * from nfse_epp where opr_codigo=$1 and nfes_periodo=$2";
 							//echo $sql."<br>";
 							$rs_periodo = SQLexecuteQueryParams($sql, array($line, $nfes_periodo));
-						if (pg_num_rows($rs_periodo) > 0) {
+						if ((($rs_periodo) ? pg_num_rows($rs_periodo) : 0) > 0) {
 							echo "<tr><td><font color='#000000' class='texto' align='center'>Per&iacute;odo j&aacute; processado para o Publisher ($line)</font></td></tr>";
 							$proc_novamente = "_segunda_via";
 						}
@@ -214,7 +214,7 @@ function gerarArquivo(varArquivo) {
 						$sql = "select * from nfse_epp_adm where opr_codigo=$1 and nfes_periodo=$2";
 						//echo $sql."<br>";
 						$rs_periodo = SQLexecuteQueryParams($sql, array($line, $nfes_periodo));
-						if (pg_num_rows($rs_periodo) > 0) {
+						if ((($rs_periodo) ? pg_num_rows($rs_periodo) : 0) > 0) {
 							echo "<tr><td><font color='#000000' class='texto' align='center'>Per&iacute;odo j&aacute; processado para o Publisher ($line)</font></td></tr>";
 							$proc_novamente_adm = "_segunda_via";
 						}

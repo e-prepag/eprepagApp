@@ -85,7 +85,7 @@ class EstornoChargeBackDAO {
             
             if($EstornoChargeBacks = SQLexecuteQuery($sql)){
                 
-                if(pg_num_rows($EstornoChargeBacks) > 0){
+                if((($EstornoChargeBacks) ? pg_num_rows($EstornoChargeBacks) : 0) > 0){
                     
                     while($lineRow = pg_fetch_array($EstornoChargeBacks)){
                         
@@ -136,7 +136,7 @@ class EstornoChargeBackDAO {
 
                     return $this->EstornoChargeBacks;
                     
-                } //end if(pg_num_rows($EstornoChargeBacks) > 0) 
+                } //end if((($EstornoChargeBacks) ? pg_num_rows($EstornoChargeBacks) : 0) > 0) 
                 
             }// end if executou a query
             

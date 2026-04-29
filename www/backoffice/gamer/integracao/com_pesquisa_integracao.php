@@ -183,7 +183,7 @@ if(isset($BtnSearch)){
                 $ret = obter($filtro, null, $rs_pedidos);
                 if($ret != "") $msg = $ret;
                 else {
-                        $n_rows = pg_num_rows($rs_pedidos);
+                        $n_rows = (($rs_pedidos) ? pg_num_rows($rs_pedidos) : 0);
 //echo "n_rows: $n_rows<br>";
 
 $b_lista = false;

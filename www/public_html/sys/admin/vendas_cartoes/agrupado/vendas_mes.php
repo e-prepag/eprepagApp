@@ -88,7 +88,7 @@
 
 	
 	$res_count = pg_query_params($connid, $sql, $query_params);
-	$total_table = pg_num_rows($res_count);
+	$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 //	$sql .= " order by ".$ncamp;
 	

@@ -24,7 +24,7 @@ echo "Now: ".date("Y-m-d H:i:s")."<br>";
 // Calcula total de lans ativas/inativas
 $total_query = "select ug_id from dist_usuarios_games order by ug_id";
 $total_rs_query = SQLexecuteQuery($total_query);
-$total_row = pg_num_rows($total_rs_query);
+$total_row = (($total_rs_query) ? pg_num_rows($total_rs_query) : 0);
 
 		$i_balanco = 1;
 //		$n_balanco = 164;
@@ -166,8 +166,8 @@ echo "&nbsp;&nbsp; = LH vi processar: ID: $usuario_id, Nome: '".(($t_lan==1)?$ob
 			$rs_total = SQLexecuteQuery($sql);
 		
 			// Acrescenta Vendas a $registros_total
-			if($rs_total) $registros_total += pg_num_rows($rs_total);
-echo "  ========= (registros_total Vendas: (mais ".pg_num_rows($rs_total).") - total: $registros_total)<br>";
+			if($rs_total) $registros_total += (($rs_total) ? pg_num_rows($rs_total) : 0);
+echo "  ========= (registros_total Vendas: (mais ".(($rs_total) ? pg_num_rows($rs_total) : 0).") - total: $registros_total)<br>";
 
 			$sql .= " order by vg.vg_data_inclusao desc " ;
 			
@@ -208,8 +208,8 @@ echo "LH Vendas: total_saida: $total_saida<br>";
 	$res_count = SQLexecuteQuery($sql);
 
 	// Acrescenta Boleto Pre a $registros_total
-	if($res_count) $registros_total += pg_num_rows($res_count);
-echo "  ========= (registros_total Boleto Pre (mais ".pg_num_rows($res_count).") - total: $registros_total)<br>";
+	if($res_count) $registros_total += (($res_count) ? pg_num_rows($res_count) : 0);
+echo "  ========= (registros_total Boleto Pre (mais ".(($res_count) ? pg_num_rows($res_count) : 0).") - total: $registros_total)<br>";
 
 		
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -243,8 +243,8 @@ echo "$sql<br>";
 	$res_pag_count = SQLexecuteQuery($sql);
 
 	// Acrescenta Boleto Pre a $registros_total
-	if($res_pag_count) $registros_total += pg_num_rows($res_pag_count);
-echo "  ========= (registros_total Pagamentos Online (mais ".pg_num_rows($res_pag_count).") - total: $registros_total)<br>";
+	if($res_pag_count) $registros_total += (($res_pag_count) ? pg_num_rows($res_pag_count) : 0);
+echo "  ========= (registros_total Pagamentos Online (mais ".(($res_pag_count) ? pg_num_rows($res_pag_count) : 0).") - total: $registros_total)<br>";
 
 		
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -269,8 +269,8 @@ echo "  ========= (registros_total Pagamentos Online (mais ".pg_num_rows($res_pa
 echo "$sql<br>";
 
 	// Acrescenta Boleto Corte a $registros_total
-	if($res_corte) $registros_total += pg_num_rows($res_corte);
-echo "  ========= (registros_total Corte (mais ".pg_num_rows($res_corte).") - total: $registros_total)<br>";
+	if($res_corte) $registros_total += (($res_corte) ? pg_num_rows($res_corte) : 0);
+echo "  ========= (registros_total Corte (mais ".(($res_corte) ? pg_num_rows($res_corte) : 0).") - total: $registros_total)<br>";
 
 	$info_corte = pg_fetch_array($res_corte);
 	$data_tratada = $info_corte['cor_periodo_fim'];

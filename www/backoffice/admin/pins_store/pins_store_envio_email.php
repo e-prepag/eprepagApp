@@ -6,6 +6,7 @@
 
 require_once $raiz_do_projeto . "includes/main.php";
 require_once "../../../includes/load_dotenv.php";
+require_once "../../../includes/phpmailer_utf8.php";
 
 set_time_limit(6000);
 
@@ -340,6 +341,13 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 				}
 				//	echo "[".$email -> Body."]";
 				//	$email -> AltBody = $body_plain;
+				$subject = $email->Subject;
+				$body_html = $email->Body;
+				$body_plain = $email->AltBody;
+				eprepag_phpmailer_prepare_utf8($email, $subject, $body_html, $body_plain);
+				$email->Subject = $subject;
+				$email->Body = $body_html;
+				$email->AltBody = $body_plain;
 				if ($email->send()) {
 					gravaLog_Depurador("Email enviado com sucesso!" . PHP_EOL);
 
@@ -384,7 +392,7 @@ if (!empty($BtnGerarArq) && $tf_v_tipo == 3) {
 					$msg .= "<font color='#FF0000'><b>Erro ao enviar o E-mail!" . PHP_EOL . "<br></b></font><br>";
 				}
 			} catch (Exception $e) {
-				$msgErro = $mail->ErrorInfo;
+				$msgErro = isset($email) ? $email->ErrorInfo : $e->getMessage();
 				$arquivo = '/www/arquivos_gerados/logs/testePINstore.txt';
 				$abre_arquivo = fopen($arquivo, 'w+');
 				if ($abre_arquivo) {

@@ -295,7 +295,7 @@ if($usuarioGames->getEmail()=="REINALDOPS@HOTMAIL.COM")  {
 }
 }
 */
-			if($i % 3 == 2 || $i == pg_num_rows($rs) - 1){
+			if($i % 3 == 2 || $i == (($rs) ? pg_num_rows($rs) : 0) - 1){
 ?>
 			<!-- Imagem -->
 			<tr>

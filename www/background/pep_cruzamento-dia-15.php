@@ -134,7 +134,7 @@ $sql = "select ug_nome,tipo,ug_cpf from (
 			order by ug_nome;
 ";
 $rs = SQLexecuteQuery($sql);
-$total_de_registros = pg_num_rows($rs);
+$total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
 $dadosTotais = pg_fetch_all($rs);
 
 function buscarray($cpfs){

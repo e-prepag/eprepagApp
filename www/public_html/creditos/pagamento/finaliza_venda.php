@@ -218,7 +218,7 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 		die("Stop");
 	}
 
-	if (pg_num_rows($ret)) {
+	if ((($ret) ? pg_num_rows($ret) : 0)) {
 		$row = pg_fetch_assoc($ret);
 
 		if (strlen($row['cesta']) == 0 && $row['status'] != 3) {

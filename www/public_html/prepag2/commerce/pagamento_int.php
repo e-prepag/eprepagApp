@@ -12,15 +12,15 @@ header("Content-Type: text/html; charset=ISO-8859-1; P3P: CP='CAO PSA OUR'", tru
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-@require_once "../../../includes/constantes.php";
-@require_once DIR_INCS . "main.php";
-@require_once DIR_INCS . "gamer/main.php";
-@require_once DIR_CLASS . "gamer/classIntegracao.php";
-@require_once DIR_CLASS . "gamer/classLimite.php";
-@require_once DIR_INCS . "gamer/functions_endereco.php";
+require_once "../../../includes/constantes.php";
+require_once DIR_INCS . "main.php";
+require_once DIR_INCS . "gamer/main.php";
+require_once DIR_CLASS . "gamer/classIntegracao.php";
+require_once DIR_CLASS . "gamer/classLimite.php";
+require_once DIR_INCS . "gamer/functions_endereco.php";
 $https = "https";
 
-@require_once DIR_INCS . "config.MeiosPagamentos.php";
+require_once DIR_INCS . "config.MeiosPagamentos.php";
 
 if (isset($_SESSION['parceiros_params_buffer'])) {
     $_POST = array_merge($_SESSION['parceiros_params_buffer'], $_POST);
@@ -44,9 +44,6 @@ $integracao_order_id = $_POST['integracao_order_id'] ?? null;
 $integracao_client_email = $_POST['integracao_client_email'] ?? null;
 $pagto = $_POST['pagto'] ?? null;
 $btSubmit_EPP_8593 = $_POST['btSubmit_EPP_8593'] ?? null;
-
-// ini_set('display_errors', 0);
-error_reporting(0);
 
 //Definindo valor Default no caso do include estar conrrompido
 if (!defined('PAGAMENTO_BRADESCO')) {

@@ -113,7 +113,7 @@ class Pins_Card {
 				$sql = "select * from pins_card where pin_codigo = '".base64_encode($this->aes->encrypt($spin_codigo))."'";
                                 //echo $sql."<br>";die();
 				$rs_pins = SQLexecuteQuery($sql);
-				if(pg_num_rows($rs_pins) == 0) {
+				if((($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) {
                                         //transacao
                                         if($msg == ""){
                                                 $sql = "insert into pins_card (pin_serial, pin_codigo, opr_codigo, distributor_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_formato) values (

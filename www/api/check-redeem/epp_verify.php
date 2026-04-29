@@ -169,14 +169,17 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										$url .= $dominio_check . "/" . $rs_oper_row['opr_partner_check'];
 										$buffer = "";
 										$curl_handle = curl_init();
+										$errorFileLog = null;
 										curl_setopt($curl_handle, CURLOPT_URL, $url);
 										//Teste solução headers para caso TLSv1.2
 										if (is_array($headers_enviar)) {
 											curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers_enviar);
 											curl_setopt($curl_handle, CURLOPT_FAILONERROR, true);
 											curl_setopt($curl_handle, CURLOPT_VERBOSE, true);
-											$errorFileLog = fopen("/www/arquivos_gerados/logs/error_epp_verify.log", "a+");
-											curl_setopt($curl_handle, CURLOPT_STDERR, $errorFileLog);
+											$errorFileLog = @fopen("/www/arquivos_gerados/logs/error_epp_verify.log", "a+");
+											if (is_resource($errorFileLog)) {
+												curl_setopt($curl_handle, CURLOPT_STDERR, $errorFileLog);
+											}
 											curl_setopt($curl_handle, CURLOPT_HEADER, 0);
 										}
 
@@ -236,6 +239,9 @@ if (strpos($teste[0]["file"], "check-redeem/index.php")) {
 										gravaLog_IntegracaoPIN('PIN [' . $pin_code . ']' . PHP_EOL . 'ERROR: [' . print_r($erros_curl, true) . ']' . PHP_EOL . 'Post parameters: ' . print_r($post_parameters, true) . PHP_EOL);
 
 										curl_close($curl_handle);
+										if (is_resource($errorFileLog)) {
+											fclose($errorFileLog);
+										}
 										//	echo $buffer."<br>";
 										list($name, $value) = explode('=', $buffer);
 										send_debug_info_by_email_PINCASH('Teste ID [' . $id . '] BUFFER Partner_Check', 'URL: [' . $url . ']<br>BUFFER Partner_Check = [' . $buffer . ']<br>', $partner_dep, $id);

@@ -65,10 +65,10 @@ if (isset($BtnSearch) && $BtnSearch) {
                                         <td class='text-right'>" . number_format($total_geral, 2, ",", ".") . "</td>
                                     </tr>
                                 </table>";
-        } //end if(pg_num_rows($rs)>0)
+        } //end if((($rs) ? pg_num_rows($rs) : 0)>0)
         else {
             $msg .= "Nenhum registro selecionado no período.";
-        } //end else do if(pg_num_rows($rs)>0)
+        } //end else do if((($rs) ? pg_num_rows($rs) : 0)>0)
     } //end if($rs) 
     else {
         $msg .= "ERRO: Problema na seleção das Taxas Anuais.<br>";

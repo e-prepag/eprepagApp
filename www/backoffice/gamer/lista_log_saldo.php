@@ -129,9 +129,9 @@ if(b_IsUsuarioReinaldo()) {
 		echo "Nenhum produto encontrado.<br>" . PHP_EOL;
 	} else {
 
-		$s_several = ((pg_num_rows($rs)>1)?"s":"");
+		$s_several = (((($rs) ? pg_num_rows($rs) : 0)>1)?"s":"");
 
-		echo "<p>Encontrado$s_several ".pg_num_rows($rs)." registro$s_several</p>";
+		echo "<p>Encontrado$s_several ".(($rs) ? pg_num_rows($rs) : 0)." registro$s_several</p>";
 		echo "<table class='table table-bordered fontsize-pp'>" . PHP_EOL;
 		
 		echo "<tr align='center' style='font-weight:bold; background-color:#ffffcc'>" . PHP_EOL;

@@ -55,7 +55,7 @@
 				where c.cor_ug_id = $usuario_id
 				order by cor_periodo_fim desc, cor_periodo_ini desc";
 		$res_count = SQLexecuteQuery($sql);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 //		$sql2 = "select * from cortes c
 //				where c.cor_ug_id = $usuario_id and cor_status=".$GLOBALS['CORTE_STATUS']['ABERTO']."
 //				order by cor_periodo_fim desc, cor_periodo_ini desc";

@@ -1,6 +1,7 @@
 <?php
 
 require_once "/www/includes/load_dotenv.php";
+require_once "/www/includes/phpmailer_utf8.php";
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -45,12 +46,16 @@ function disparaEmail($to, $cc, $bcc, $subject, $body_html, $body_plain, $codigo
                 }
         }
 
+        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
         $mail->Subject = $subject;
-        $mail->isHTML(true);
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        $enviado = $mail->send();
+        try {
+                $enviado = $mail->send();
+        } catch (Exception $e) {
+                $enviado = false;
+        }
         if (!$enviado) {
                 $mensagemLog = "Erro: Ao enviar e-mail para: {$to} - Erro: " . $mail->ErrorInfo;
         }

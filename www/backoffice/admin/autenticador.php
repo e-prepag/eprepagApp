@@ -7,7 +7,7 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 require_once $raiz_do_projeto . "includes/gamer/chave.php";
 require_once $raiz_do_projeto . "includes/gamer/AES.class.php";
 require_once $raiz_do_projeto . "class/util/Login.class.php";
-require_once __DIR__ . "/../../../class/GoogleAutenticator.php";
+require_once __DIR__ . "/../../class/GoogleAutenticator.php";
 require_once "/www/class/classSecureEncryption.php";
 
 $con = ConnectionPDO::getConnection();

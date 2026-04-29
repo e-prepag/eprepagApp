@@ -242,7 +242,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	//Adicionado por Wagner
         if($vendas_estado)
-            $total_table = pg_num_rows($vendas_estado);
+            $total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
         else
             $total_table = 0;
 //	$sql .= " order by ".$ordem; 
@@ -269,7 +269,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 	$vendas_estado = SQLexecuteQueryParams($sql, array());
 	//Adicionado por Wagner
 	if($vendas_estado)
-            $total_table = pg_num_rows($vendas_estado);
+            $total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
         else
             $total_table = 0;
 	//$sql .= " order by ".$ordem; 
@@ -301,7 +301,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			//echo $sql."<br>PG_NUM_ROWS:".pg_num_rows($vendas_estado)."<br>";
 			//Adicionado por Wagner
 			if($vendas_estado)
-                            $total_table = pg_num_rows($vendas_estado);
+                            $total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
                         else
                             $total_table = 0;
 			//echo "TOTAL_TABLE: [".$total_table."]<br>";
@@ -349,7 +349,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
 		$sql .= " limit ".$max; 
@@ -357,7 +357,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 		$bg_col = $bg_col_01;
-		$n_dias = pg_num_rows($vendas_estado);
+		$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 		$colunas[] = LANG_DAY;
 		$colunas[] = LANG_WEEK;
@@ -404,7 +404,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 			//Adicionado por Wagner
-			$total_table = pg_num_rows($vendas_estado);
+			$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 			$sql = substr($sql,0,strpos($sql, 'order'));
 			$sql .= " order by ".$ordem." ".$crescente; 
 			$sql .= " limit ".$max; 
@@ -413,7 +413,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 
 			$bg_col = $bg_col_01;
-			$n_dias = pg_num_rows($vendas_estado);
+			$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 			$colunas[] = LANG_WEEK;
 			$colunas[] = LANG_NUMBER_SALES;
@@ -445,7 +445,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			//echo "sql: $sql<br>";
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 			//Adicionado por Wagner
-			$total_table = pg_num_rows($vendas_estado);
+			$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 			$sql = substr($sql,0,strpos($sql, 'order'));
 			$sql .= " order by ".$ordem." ".$crescente; 
 			$sql .= " limit ".$max; 
@@ -506,7 +506,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
 		$sql .= " limit ".$max; 
@@ -546,7 +546,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
 		$sql .= " limit ".$max; 
@@ -555,7 +555,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		//echo "sql: $sql<br>";
 		$bg_col = $bg_col_01;
-		$n_dias = pg_num_rows($vendas_estado);
+		$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 		$colunas[] = LANG_GAME;
 		$colunas[] = LANG_ITEM;
@@ -590,7 +590,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 				$vendas_estado = SQLexecuteQueryParams($sql, array());
 				//Adicionado por Wagner
-				$total_table = pg_num_rows($vendas_estado);
+				$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 				$sql = substr($sql,0,strpos($sql, 'order'));
 				$sql .= " order by ".$ordem." ".$crescente; 
 				$sql .= " limit ".$max; 
@@ -599,7 +599,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 				
 
 				$bg_col = $bg_col_01;
-				$n_dias = pg_num_rows($vendas_estado);
+				$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 				
 				$colunas[] = LANG_MONTH;
 				$colunas[] = LANG_NUMBER_SALES;
@@ -630,7 +630,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
 		$sql .= " limit ".$max; 
@@ -639,7 +639,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		//echo "sql: $sql<br>";
 		$bg_col = $bg_col_01;
-		$n_dias = pg_num_rows($vendas_estado);
+		$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	
 		$colunas[] = LANG_GAME;
 		$colunas[] = LANG_NUMBER_SALES;
@@ -677,7 +677,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 	//echo "sql: $sql<br>";
 		$vendas_estado = SQLexecuteQueryParams($sql, array());
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
 		$sql .= " limit ".$max; 
@@ -686,7 +686,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 		
 		$extra_where = "";
 		$bg_col = $bg_col_01;
-		$n_dias = pg_num_rows($vendas_estado);
+		$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		
 		$colunas[] = LANG_GAME;
 		$colunas[] = LANG_NUMBER_SALES;
@@ -725,7 +725,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 			//Adicionado por Wagner
-			$total_table = pg_num_rows($vendas_estado);
+			$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 			$sql = substr($sql,0,strpos($sql, 'order'));
 			$sql .= " order by ".$ordem." ".$crescente; 
 			$sql .= " limit ".$max; 
@@ -790,7 +790,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			//echo "sql: $sql<br>";
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 			//Adicionado por Wagner
-			$total_table = pg_num_rows($vendas_estado);
+			$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 			$sql = substr($sql,0,strpos($sql, 'order'));
 			$sql .= " order by ".$ordem." ".$crescente; 
 			$sql .= " limit ".$max; 
@@ -899,7 +899,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 				//echo "sql: $sql<br>";
 				$vendas_estado = SQLexecuteQueryParams($sql, array());
 				//Adicionado por Wagner
-				$total_table = pg_num_rows($vendas_estado);
+				$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 				$sql = substr($sql,0,strpos($sql, 'order'));
 				$sql .= " order by ".$ordem." ".$crescente; 
 				$sql .= " limit ".$max; 
@@ -984,7 +984,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			$n_vendas = 0;
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 			//Adicionado por Wagner
-			$total_table = pg_num_rows($vendas_estado);
+			$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 			//$sql = substr($sql,0,strpos($sql, 'order'));
 			//$sql .= " order by ".$ordem." ".$crescente; 
 			//$sql .= " limit ".$max; 
@@ -1006,7 +1006,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 			//echo "sql: $sql<br>";
 			$vendas_estado = SQLexecuteQueryParams($sql, array());
 			//Adicionado por Wagner
-			$total_table = pg_num_rows($vendas_estado);
+			$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 			$sql = substr($sql,0,strpos($sql, 'order'));
 			$sql .= " order by ".$ordem." ".$crescente; 
 			$sql .= " limit ".$max; 
@@ -1073,7 +1073,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 				
 				$vendas_estado = SQLexecuteQueryParams($sql, array());
 				//Adicionado por Wagner
-				$total_table = pg_num_rows($vendas_estado);
+				$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 				//$sql .= " order by ".$ordem." ".$crescente; 
 				//$sql .= " limit ".$max; 
 				//$sql .= " offset ".$inicial;
@@ -1095,7 +1095,7 @@ if($_SESSION['button'] == LANG_SELECT) {
 				//echo "sql: $sql<br>";
 				$vendas_estado = SQLexecuteQueryParams($sql, array());
 				//Adicionado por Wagner
-				$total_table = pg_num_rows($vendas_estado);
+				$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 				//echo $sql."<br>TOTAL: ".$total_table."<br>";
 				$sql = substr($sql,0,strpos($sql, 'order'));
 				$sql .= " order by ".$ordem." ".$crescente; 

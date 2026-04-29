@@ -92,7 +92,7 @@ require_once $raiz_do_projeto."class/classDescriptionReport.php";
 //echo "$sql_n<br>";
 
 	$rsperc = SQLexecuteQuery($sql_n);
-	if((pg_num_rows($rsperc) != 0) && ($rsperc)) {
+	if(((($rsperc) ? pg_num_rows($rsperc) : 0) != 0) && ($rsperc)) {
 		$pgperc = pg_fetch_array ($rsperc);
 		$stotal = "Percentagem de utilização do estoque de 16 chars: ".$pgperc['used_lote_16']." de ".$pgperc['total_lote_16']." registros (".number_format(100*$pgperc['used_lote_16']/$pgperc['total_lote_16'], 2, '.', '.')."%)";
 	}
@@ -261,7 +261,7 @@ if ($btn_pesquisar=="Pesquisar") {
 	//echo $sql."<br>";
 	$res_tmp = SQLexecuteQuery($sql);
 	if ($res_tmp) {
-		$total_table = pg_num_rows($res_tmp);
+		$total_table = (($res_tmp) ? pg_num_rows($res_tmp) : 0);
 		$total_geral = 0;
 		while ($res_tmp_row = pg_fetch_array ($res_tmp)) {
 			$total_geral += $res_tmp_row['pgc_face_amount'];
@@ -288,7 +288,7 @@ if ($btn_pesquisar=="Pesquisar") {
     </tr>
 
 <?php
-	if((pg_num_rows($rsResposta) != 0) && ($rsResposta)) {
+	if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>

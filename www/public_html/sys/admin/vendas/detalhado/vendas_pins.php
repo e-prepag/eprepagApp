@@ -121,7 +121,7 @@ if ($BtnSearch) {
 
 	        $rs_publisher = SQLexecuteQueryParams($sql, array((int)$dd_opr_codigo));
 
-        $por_utilizacao = pg_num_rows($rs_publisher) > 0;
+        $por_utilizacao = (($rs_publisher) ? pg_num_rows($rs_publisher) : 0) > 0;
     }
 
     //Buscando PINs na banco de dados
@@ -282,7 +282,7 @@ if ($BtnSearch) {
         echo $sql;
     }
     $resid = SQLexecuteQueryParams($sql, $sql_params);
-    $total_table = pg_num_rows($resid);
+    $total_table = (($resid) ? pg_num_rows($resid) : 0);
 } //end if($BtnSearch)
 ?>
 <link href="/includes/bootstrap/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />

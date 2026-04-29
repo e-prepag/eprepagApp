@@ -530,7 +530,7 @@ ob_end_flush();
       //$sql .= " limit " . $max . " offset " . $inicial_v;
       $sql .= " limit 50;";
       $rs_venda = SQLexecuteQuery($sql);
-      $total_table = pg_num_rows($rs_venda);
+      $total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
 
       ?>
       <div id="Layer1" class="" style="position:static; width:100%; height:150px; z-index:1; overflow: auto;">
@@ -633,7 +633,7 @@ ob_end_flush();
       //$sql .= " limit " . $max . " offset " . $inicial;
       $sql .= " limit 100;";
       $rs_usuario_log = SQLexecuteQuery($sql);
-      $total_table = pg_num_rows($rs_usuario_log);
+      $total_table = (($rs_usuario_log) ? pg_num_rows($rs_usuario_log) : 0);
       ?>
       <div id="Layer1" class="" style="position:static; width:100%; height:150px; z-index:1; overflow: auto;">
         <table class="table txt-preto fontsize-pp table-bordered">
@@ -702,7 +702,7 @@ ob_end_flush();
       $sql .= " limit 5;";
       //echo $sql;
       $rs_usuario_bloqueio = SQLexecuteQuery($sql);
-      $total_table = pg_num_rows($rs_usuario_bloqueio);
+      $total_table = (($rs_usuario_bloqueio) ? pg_num_rows($rs_usuario_bloqueio) : 0);
       ?>
       <div id="Layer1" class="" style="position:static; width:100%; height:150px; z-index:1; overflow: auto;">
         <table class="table">

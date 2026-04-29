@@ -245,7 +245,7 @@ if ($BtnSearch) {
     } else {
         $resid = SQLexecuteQueryParams($sql, array());
     }
-    $total_table = pg_num_rows($resid);
+    $total_table = (($resid) ? pg_num_rows($resid) : 0);
 } //end if($BtnSearch)
 ?>
 <link href="/includes/bootstrap/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />

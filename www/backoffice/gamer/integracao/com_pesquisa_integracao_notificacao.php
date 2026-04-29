@@ -111,7 +111,7 @@ $BtnSearch = $_POST['BtnSearch'] ?? null;
 			$ret = obter($filtro, null, $rs_historico_notify);
 			if($ret != "") $msg = $ret;
 			else {
-				$n_rows = pg_num_rows($rs_historico_notify);
+				$n_rows = (($rs_historico_notify) ? pg_num_rows($rs_historico_notify) : 0);
 
 				if($n_rows == 0) {
 					$msg = "Nenhum registro de integração encontrado.\n";

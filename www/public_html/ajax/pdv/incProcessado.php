@@ -60,7 +60,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
     } //end if(!$rs)
 
     //Calculando se a quantidade de PINs é igual a quantidade de registros 
-    $totalRegistros = pg_num_rows($rs);
+    $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
     $sql = "SELECT SUM(vgm_qtde) AS total 
         FROM tb_dist_venda_games_modelo 
         WHERE vgm_vg_id = $1";
@@ -204,7 +204,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                         </div>
                 <?php
                     } //end else if($totalPins == $totalRegistros)
-                } //end else do if(pg_num_rows($rs) > 1)
+                } //end else do if((($rs) ? pg_num_rows($rs) : 0) > 1)
 
 
                 ?>

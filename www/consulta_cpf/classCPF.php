@@ -604,7 +604,7 @@ class classCPF
                 $sql = "select cpf, to_char(data_nascimento,'DD/MM/YYYY') as data_nascimento, nome from cpf_cache where cpf = " . ($requestParams['cpfcnpj'] * 1) . " and checado = 1;";
                 $busca = SQLexecuteQuery($sql);
 
-                $cmdtuples = pg_num_rows($busca);
+                $cmdtuples = (($busca) ? pg_num_rows($busca) : 0);
 
                 //Verificando se retornou consulta com sucesso
                 if ($cmdtuples === 1) {
@@ -629,7 +629,7 @@ class classCPF
                 $sql = "select qtde_utilizado from cpf_cache where cpf = " . ($requestParams['cpfcnpj'] * 1) . ";";
                 $busca = SQLexecuteQuery($sql);
 
-                $cmdtuples = pg_num_rows($busca);
+                $cmdtuples = (($busca) ? pg_num_rows($busca) : 0);
 
                 //Verificando se retornou consulta com sucesso
                 if ($cmdtuples === 1) {
@@ -651,7 +651,7 @@ class classCPF
                 $sql = "select qtde_contas from cpf_cache where cpf = " . ($requestParams['cpfcnpj'] * 1) . ";";
                 $busca = SQLexecuteQuery($sql);
 
-                $cmdtuples = pg_num_rows($busca);
+                $cmdtuples = (($busca) ? pg_num_rows($busca) : 0);
 
                 //Verificando se retornou consulta com sucesso
                 if ($cmdtuples === 1) {
@@ -660,7 +660,7 @@ class classCPF
                         $sql = "select * from usuarios_games where ug_cpf like '%" . $cpfFinal . "%' and ug_ativo = 1;";
                         $buscaUsuario = SQLexecuteQuery($sql);
 
-                        $linhas = pg_num_rows($buscaUsuario);
+                        $linhas = (($buscaUsuario) ? pg_num_rows($buscaUsuario) : 0);
 
                         if ($linhas <= 2) {
                                 return $linhas;
@@ -719,7 +719,7 @@ class classCPF
                 } else {
                         //Retornando que NÃO encontrou CPF na BlackList
                         return TRUE;
-                } //end else do if(pg_num_rows($busca)===1)
+                } //end else do if((($busca) ? pg_num_rows($busca) : 0)===1)
 
         } //end function naoEstaBlackList()
 
@@ -737,7 +737,7 @@ class classCPF
                 } else {
                         //Retornando que NÃO encontrou CPF na WhiteList
                         return FALSE;
-                } //end else do if(pg_num_rows($busca)===1)
+                } //end else do if((($busca) ? pg_num_rows($busca) : 0)===1)
 
         } //end function estaWhiteList()
 

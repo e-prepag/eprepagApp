@@ -16,9 +16,77 @@ require_once "/www/includes/gamer/chave.php";
 require_once "/www/includes/gamer/AES.class.php";
 require_once "/www/class/classGeraPin.php";
 
+if (!function_exists('writePdvLogSafe')) {
+    function writePdvLogSafe($handle, $mensagem)
+    {
+        if (is_resource($handle)) {
+            fwrite($handle, $mensagem);
+        }
+    }
+}
+
+if (!function_exists('closePdvLogSafe')) {
+    function closePdvLogSafe($handle)
+    {
+        if (is_resource($handle)) {
+            fclose($handle);
+        }
+    }
+}
+
+if (!function_exists('pdvArrayValueSafe')) {
+    function pdvArrayValueSafe($array, $key, $default = null)
+    {
+        if (!is_array($array) || !array_key_exists($key, $array)) {
+            return $default;
+        }
+
+        return $array[$key];
+    }
+}
+
+if (!function_exists('isPgResultSafe')) {
+    function isPgResultSafe($result)
+    {
+        return is_resource($result) || (is_object($result) && get_class($result) === 'PgSql\\Result');
+    }
+}
+
+if (!function_exists('pgNumRowsSafe')) {
+    function pgNumRowsSafe($result)
+    {
+        return isPgResultSafe($result) ? pg_num_rows($result) : 0;
+    }
+}
+
+if (!function_exists('pgFetchArraySafe')) {
+    function pgFetchArraySafe($result)
+    {
+        return isPgResultSafe($result) ? pg_fetch_array($result) : false;
+    }
+}
+
+if (!function_exists('pgFetchAssocSafe')) {
+    function pgFetchAssocSafe($result)
+    {
+        return isPgResultSafe($result) ? pg_fetch_assoc($result) : false;
+    }
+}
+
+if (!function_exists('pgAffectedRowsSafe')) {
+    function pgAffectedRowsSafe($result)
+    {
+        return isPgResultSafe($result) ? pg_affected_rows($result) : 0;
+    }
+}
+
 function processaVendaGamesValidacao($venda_id, $usuario_id)
 {
     $msg = "";
+    $qtde_total = 0;
+    $total_geral = 0;
+    $total_desconto = 0;
+    $total_repasse = 0;
 
     //obtem usuario
     if ($msg == "") {
@@ -41,14 +109,14 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335a)" . PHP_EOL;
         }
     }
 
     //obtem total repasse
     if ($msg == "") {
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             $valor = $rs_venda_modelos_row["vgm_valor"];
             $qtde = $rs_venda_modelos_row["vgm_qtde"];
             $perc_desconto = $rs_venda_modelos_row["vgm_perc_desconto"];
@@ -77,10 +145,10 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
 
 function verificaEstoque($venda_id)
 {
-    $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+    $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
     if ($ff) {
-    fwrite($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
+    writePdvLogSafe($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
     }
 
     $msg = "";
@@ -93,14 +161,14 @@ function verificaEstoque($venda_id)
                                 inner join operadoras ope on ope.opr_codigo = vgm.vgm_opr_codigo
                                 where vg.vg_id = " . $venda_id;
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335b)" . PHP_EOL;
         }
     }
 
     if ($msg == "") {
         //Verifica cada item de cada produro
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             $vgm_qtde = $rs_venda_modelos_row["vgm_qtde"];
             $vgm_opr_codigo = $rs_venda_modelos_row["vgm_opr_codigo"];
             $vgm_pin_valor = $rs_venda_modelos_row["vgm_pin_valor"];
@@ -119,7 +187,7 @@ function verificaEstoque($venda_id)
                                                         and pin_valor = " .
                     $vgm_pin_valor;
                 $rs_pins = SQLexecuteQuery($sql);
-                if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
+                if (!$rs_pins || pgNumRowsSafe($rs_pins) == 0) {
                     $msg .=
                         "N�o h� pin de " .
                         number_format($vgm_pin_valor, 2, ",", ".") .
@@ -128,7 +196,7 @@ function verificaEstoque($venda_id)
                         " em estoque." .
                         PHP_EOL;
                 } else {
-                    $rs_pins_row = pg_fetch_array($rs_pins);
+                    $rs_pins_row = pgFetchArraySafe($rs_pins);
                     $pins_qtde = $rs_pins_row["pins_qtde"];
                     if ($pins_qtde < $vgm_qtde) {
                         $msg .=
@@ -144,8 +212,8 @@ function verificaEstoque($venda_id)
         }
     }
 
-    fwrite($ff, "mensagem: " . $msg . "\n");
-    fclose($ff);
+    writePdvLogSafe($ff, "mensagem: " . $msg . "\n");
+    closePdvLogSafe($ff);
 
     return $msg;
 }
@@ -176,7 +244,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
         $rs_pins = SQLexecuteQuery($sql);
 
         // Verifica se encontrou algum PIN
-        if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
+        if (!$rs_pins || pgNumRowsSafe($rs_pins) == 0) {
             return [
                 'success' => false,
                 'msg' => "Nenhum pin encontrado ou estoque insuficiente para atender este pedido." . PHP_EOL
@@ -184,7 +252,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
         }
 
         // Pega o PIN encontrado
-        $pgpins = pg_fetch_array($rs_pins);
+        $pgpins = pgFetchArraySafe($rs_pins);
 
         if ($pgpins["pin_codigo"] != '0000000000000000' && $pgpins["pin_codigo"] != '1111111111111111' && $pgpins["pin_codigo"] != null && $pgpins["pin_codigo"] != "") {
 
@@ -195,7 +263,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
 
             $pin_test_duplic = SQLexecuteQuery($sql);
 
-            if ($pin_test_duplic && pg_num_rows($pin_test_duplic) > 0 && $vgm_opr_codigo != 16) {
+            if ($pin_test_duplic && pgNumRowsSafe($pin_test_duplic) > 0 && $vgm_opr_codigo != 16) {
                 if ($bDebug) {
                     echo "PIN j� vendido, procurando o pr�ximo..." . PHP_EOL;
                 }
@@ -242,6 +310,11 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
     $msgOut = "";
     $total_venda = 0;
     $s_info_venda = "";
+    $total_repasse = 0;
+    $vg_ug_id = null;
+    $vg_somente_debito = 0;
+    $produto_selecionado = null;
+    $objUsuarioGames = null;
 
     //Recupera a venda
     if ($msg == "") {
@@ -253,10 +326,10 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
         }
 
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -339,7 +412,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                 PHP_EOL;
         }
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335c)" . PHP_EOL;
         }
     }
@@ -391,7 +464,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
         $total_repasse = 0;
         $s_info_venda = "";
         //Realiza uma venda para cada item de cada produto
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             $vgm_id = $rs_venda_modelos_row["vgm_id"];
             $vgm_valor = $rs_venda_modelos_row["vgm_valor"];
             $vgm_qtde = $rs_venda_modelos_row["vgm_qtde"];
@@ -435,7 +508,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
             // Verifique se a consulta foi bem-sucedida e obtemos um recurso de resultado
             if ($verificaExist) {
                 // Extrai o valor da contagem usando pg_fetch_assoc
-                $row = pg_fetch_assoc($verificaExist);
+                $row = pgFetchAssocSafe($verificaExist);
                 $qtde = $row['qtde'];
                 if ($qtde >= $vgm_qtde) {
                     continue;
@@ -452,23 +525,24 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                 }
 
                 if ($vgm_ogp_id == 488) {
-                    $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                    $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                     if ($ff) {
-                    fwrite($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
+                    writePdvLogSafe($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
 
-                    fclose($ff);
+                    closePdvLogSafe($ff);
                     }
                     try {
                         $geraPinEpp = new GeraPinVariavel($vgm_pin_valor, 53, 3, 1);
 
                         $pin_codinterno = $geraPinEpp->gerar();
 
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                         if ($ff) {
-                        fwrite($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
-                        fwrite($ff, "VGM_ID: " . $vgm_id . "\n");
+                        writePdvLogSafe($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
+                        writePdvLogSafe($ff, "VGM_ID: " . $vgm_id . "\n");
+                        closePdvLogSafe($ff);
                         }
 
 
@@ -509,14 +583,14 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
 
                         if (!$ret)
                             $msg = "Erro ao atualizar tabela de pins." . PHP_EOL;
-                        elseif (pg_affected_rows($ret) > 1)
+                        elseif (pgAffectedRowsSafe($ret) > 1)
                             $msg = "Erro ao atualizar mais de um pin na tabela de pins." . PHP_EOL;
-                        elseif (pg_affected_rows($ret) == 0) {
+                        elseif (pgAffectedRowsSafe($ret) == 0) {
                             $i--;
                             continue;
                         }
                     } catch (Throwable $err) {
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                         if ($ff) {
                         fwrite(
@@ -532,14 +606,14 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                                 "\n"
                         );
 
-                        fclose($ff);
+                        closePdvLogSafe($ff);
                         }
                     }
 
                     if ($msg == "" && (!isset($pin_codinterno) || !is_numeric($pin_codinterno))) {
                         $msg = "Erro ao gerar pin variavel." . PHP_EOL;
 
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
                         if ($ff) {
                         fwrite(
@@ -551,7 +625,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                                 "\n"
                         );
 
-                        fclose($ff);
+                        closePdvLogSafe($ff);
                         }
                     }
                 } else {
@@ -580,10 +654,10 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                         $vg_somente_debito == 0 &&
                         $vgm_pin_request == 0
                     ) {
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
                         if ($ff) {
-                        fwrite($ff, "Entra aqui ??? " . $vgm_ogp_id);
-                        fclose($ff);
+                        writePdvLogSafe($ff, "Entra aqui ??? " . $vgm_ogp_id);
+                        closePdvLogSafe($ff);
                         }
                         // Executa uma verifica��o se o a senha do pin � zerada, se for exibe o campo pin_caracter
                         $resultado = buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug);
@@ -638,11 +712,11 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                         if (!$ret) {
                             $msg =
                                 "Erro ao atualizar tabela de pins." . PHP_EOL;
-                        } elseif (pg_affected_rows($ret) > 1) {
+                        } elseif (pgAffectedRowsSafe($ret) > 1) {
                             $msg =
                                 "Erro ao atualizar mais de um pin na tabela de pins." .
                                 PHP_EOL;
-                        } elseif (pg_affected_rows($ret) == 0) {
+                        } elseif (pgAffectedRowsSafe($ret) == 0) {
                             $i--;
                             continue;
                         }
@@ -734,7 +808,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                                 $vgm_ogp_id .
                                 ";";
                             $rs_bhn_variavel = SQLexecuteQuery($sql);
-                            $rs_bhn_variavel_row = pg_fetch_array(
+                            $rs_bhn_variavel_row = pgFetchArraySafe(
                                 $rs_bhn_variavel
                             );
 
@@ -756,7 +830,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                             $rs_bhn = SQLexecuteQuery($sql);
 
                             if ($vgm_opr_codigo == 159) {
-                                $rs_bhn_row = pg_fetch_array($rs_bhn);
+                                $rs_bhn_row = pgFetchArraySafe($rs_bhn);
                                 include_once "/www/e-pay/Epay.php";
                                 $epay = new Epay();
                                 $dados_pedido = [
@@ -779,7 +853,7 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                                     "bhn/config.inc.bhn.php";
 
                                 if ($rs_bhn) {
-                                    $rs_bhn_row = pg_fetch_array($rs_bhn);
+                                    $rs_bhn_row = pgFetchArraySafe($rs_bhn);
                                     $rs_api = new classBHN();
                                     $parametros = [
                                         "productId" =>
@@ -799,13 +873,13 @@ function processaVendaGames($venda_id, $EstabCod, &$parametros)
                                             STR_PAD_LEFT
                                         ),
                                         "transactionAmount" => str_pad(
-                                            $vgm_valor_pin * 100,
+                                            (string)($vgm_valor_pin * 100),
                                             12,
                                             "0",
                                             STR_PAD_LEFT
                                         ),
                                         "merchantTerminalId" => str_pad(
-                                            $vg_ug_id,
+                                            (string)$vg_ug_id,
                                             5,
                                             "0",
                                             STR_PAD_LEFT
@@ -983,10 +1057,10 @@ function processaEmailVendaGames($venda_id, $parametros)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
 
@@ -1009,7 +1083,7 @@ function processaEmailVendaGames($venda_id, $parametros)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335d)" . PHP_EOL;
         }
     }
@@ -1021,10 +1095,10 @@ function processaEmailVendaGames($venda_id, $parametros)
             "where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_email = $rs_usuario_row["ug_email"];
             $ug_tipo_cadastro = $rs_usuario_row["ug_tipo_cadastro"];
             $ug_sexo = $rs_usuario_row["ug_sexo"];
@@ -1080,7 +1154,7 @@ function processaEmailVendaGames($venda_id, $parametros)
         $total_desconto = 0;
         $total_repasse = 0;
         $vg_ug_id = "";
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             // Define operadora
             //if($rs_venda_modelos_row['vgm_ogp_id'] == 5) $blEmailHabbo = true;
             $blEmailHabbo =
@@ -1209,10 +1283,10 @@ function enviaEmailFormatadoComProdutos(
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
         }
@@ -1225,10 +1299,10 @@ function enviaEmailFormatadoComProdutos(
             "where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_email = $rs_usuario_row["ug_email"];
             $ug_tipo_cadastro = $rs_usuario_row["ug_tipo_cadastro"];
             $ug_sexo = $rs_usuario_row["ug_sexo"];
@@ -1274,7 +1348,7 @@ function enviaEmailFormatadoComProdutos(
         $total_geral = 0;
         $total_desconto = 0;
         $total_repasse = 0;
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             // Define operadora
             //if($rs_venda_modelos_row['vgm_ogp_id'] == 5) $blEmailHabbo = true;
             $blEmailHabbo =
@@ -1505,7 +1579,7 @@ function processaAgendamentos($lista = null)
             PHP_EOL;
 
         $rs_agendamentos = SQLexecuteQuery($sql);
-        if (!$rs_agendamentos || pg_num_rows($rs_agendamentos) == 0) {
+        if (!$rs_agendamentos || pgNumRowsSafe($rs_agendamentos) == 0) {
             $msg = "Nenhuma venda encontrada (0)." . PHP_EOL;
             $smonitor = $header0 . $msg;
         }
@@ -1523,7 +1597,7 @@ function processaAgendamentos($lista = null)
         //	dentro do loop -> termina em deadlock
         //		passar a usar pg_fetch_all()
 
-        while ($rs_agendamentos_row = pg_fetch_array($rs_agendamentos)) {
+        while ($rs_agendamentos_row = pgFetchArraySafe($rs_agendamentos)) {
             $ae_id = $rs_agendamentos_row["ae_id"];
             $ae_tipo = $rs_agendamentos_row["ae_tipo"];
             $ae_status = $rs_agendamentos_row["ae_status"];
@@ -1637,7 +1711,7 @@ function processaAgendamentos($lista = null)
                                     $venda_id .
                                     ", R$" .
                                     number_format(
-                                        $parametros["total_venda"],
+                                        pdvArrayValueSafe($parametros, "total_venda", 0),
                                         2,
                                         ",",
                                         "."
@@ -1651,13 +1725,13 @@ function processaAgendamentos($lista = null)
                                     $venda_id .
                                     " (R$" .
                                     number_format(
-                                        $parametros["total_venda"],
+                                        pdvArrayValueSafe($parametros, "total_venda", 0),
                                         2,
                                         ",",
                                         "."
                                     ) .
                                     ")</a> " .
-                                    $parametros["s_info_venda"] .
+                                    pdvArrayValueSafe($parametros, "s_info_venda", "") .
                                     PHP_EOL; //colocar no inicio da string (!empty($smonitorprocessamentos)?", ":"").
                             } else {
                                 $msgConciliaUsuario .=
@@ -1699,11 +1773,11 @@ function processaAgendamentos($lista = null)
                             } else {
                                 //reagendamento
                                 $agendamento_acao =
-                                    $parametros["agendamento_acao"] ?? "";
+                                    pdvArrayValueSafe($parametros, "agendamento_acao", "");
                                 $agendamento_acao_obs =
-                                    $parametros["agendamento_acao_obs"] ?? "";
+                                    pdvArrayValueSafe($parametros, "agendamento_acao_obs", "");
                                 $agendamento_acao_repetir_em =
-                                    $parametros["agendamento_acao_repetir_em"] ?? "";
+                                    pdvArrayValueSafe($parametros, "agendamento_acao_repetir_em", "");
                                 if ($agendamento_acao) {
                                     if ($agendamento_acao == "cancelar") {
                                         $ae_status = 3;
@@ -1877,19 +1951,19 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
 
     $rs_total = SQLexecuteQuery($sql);
     if ($rs_total) {
-        $registros_total = pg_num_rows($rs_total);
+        $registros_total = pgNumRowsSafe($rs_total);
     }
     $sql .= " order by pgt.datainicio desc ";
 
     $rs_transacoes = SQLexecuteQuery($sql);
-    if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0) {
+    if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0) {
         $msg = "Nenhuma transa��o encontrada (132 PDV)." . $cReturn;
     }
 
     $irows = 0;
     if ($rs_transacoes) {
-        echo "NRegs: " . pg_num_rows($rs_transacoes) . $cReturn;
-        while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+        echo "NRegs: " . pgNumRowsSafe($rs_transacoes) . $cReturn;
+        while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
             $irows++;
 
             $msgregister =
@@ -2010,15 +2084,15 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         $areturn
                     );
                     // get return values
-                    $s_sonda = $areturn["s_sonda"];
-                    $sBanco = $areturn["sBanco"];
-                    $dataconfirma = $areturn["dataconfirma"];
+                    $s_sonda = pdvArrayValueSafe($areturn, "s_sonda", "");
+                    $sBanco = pdvArrayValueSafe($areturn, "sBanco", "");
+                    $dataconfirma = pdvArrayValueSafe($areturn, "dataconfirma", "");
                     if ($rs_transacoes_row["iforma"] == 9) {
                         echo "===> Data do BB :" . $dataconfirma . PHP_EOL;
                     }
-                    $prefix_1 = $areturn["prefix_1"];
-                    $s_sync = $areturn["s_sync"];
-                    $vg_pagto_tipo = $areturn["vg_pagto_tipo"];
+                    $prefix_1 = pdvArrayValueSafe($areturn, "prefix_1", "");
+                    $s_sync = pdvArrayValueSafe($areturn, "s_sync", "");
+                    $vg_pagto_tipo = pdvArrayValueSafe($areturn, "vg_pagto_tipo", "");
                     // at� aqui nova fun��o getSondaBanco()
 
                     // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
@@ -2285,18 +2359,18 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
         }
 
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . $cReturn;
         }
-        echo "Encontrados registros - pg_num_rows(rs_venda): " .
-            pg_num_rows($rs_venda) .
+        echo "Encontrados registros - pgNumRowsSafe(rs_venda): " .
+            pgNumRowsSafe($rs_venda) .
             $cReturn;
     }
 
     // Busca Pagto online ExpressMoney LH
     echo " = Busca Pagto online ExpressMoney PDV" . $cReturn;
     if ($msg == "") {
-        while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $vg_id = $rs_venda_row["vg_id"];
             $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -2314,8 +2388,8 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                 "
                                         order by bbg_data_inclusao desc";
             $rs_venda_dist = SQLexecuteQuery($sql);
-            if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
-                while ($rs_venda_dist_row = pg_fetch_array($rs_venda_dist)) {
+            if ($rs_venda_dist && pgNumRowsSafe($rs_venda_dist) > 0) {
+                while ($rs_venda_dist_row = pgFetchArraySafe($rs_venda_dist)) {
                     $valor = $rs_venda_dist_row["bbg_valor"];
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
                     $bco_codigo = $rs_venda_dist_row["bco_codigo"];
@@ -2342,8 +2416,8 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                     $sql .= " and iforma = '" . $iforma . "'";
 
                     $rs_bol = SQLexecuteQuery($sql);
-                    if ($rs_bol && pg_num_rows($rs_bol) > 0) {
-                        $rs_bol_row = pg_fetch_array($rs_bol);
+                    if ($rs_bol && pgNumRowsSafe($rs_bol) > 0) {
+                        $rs_bol_row = pgFetchArraySafe($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];
 
                         $msg .=
@@ -2463,7 +2537,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         }
                     } else {
                         echo "SEM PAGAMENTOS PENDENTES (num_rows: " .
-                            pg_num_rows($rs_bol) .
+                            pgNumRowsSafe($rs_bol) .
                             ")" .
                             $cReturn;
                     }
@@ -2516,8 +2590,8 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
     }
 
     $rs_venda_pendentes = SQLexecuteQuery($sql);
-    if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-        while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+    if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+        while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
             $vg_id_pendente = $rs_venda_pendentes_row["vg_id"];
             $pag_status = $rs_venda_pendentes_row["status"];
             $vg_ultimo_status = $rs_venda_pendentes_row["vg_ultimo_status"];
@@ -2644,7 +2718,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     $sql .= " order by pgt.datainicio desc ";
 
     $rs_transacoes = SQLexecuteQuery($sql);
-    $registros_total = pg_num_rows($rs_transacoes);
+    $registros_total = pgNumRowsSafe($rs_transacoes);
     if (!$rs_transacoes || $registros_total == 0) {
         $msg = "Nenhuma transa��o encontrada (132 PDV)." . $cReturn;
     }
@@ -2652,7 +2726,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     $irows = 0;
     if ($rs_transacoes) {
         echo "NRegs: " . $registros_total . $cReturn;
-        while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+        while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
             $irows++;
 
             echo $rs_transacoes_row["numcompra"] .
@@ -2687,12 +2761,12 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 );
 
                 // get return values
-                $s_sonda = $areturn["s_sonda"];
-                $sBanco = $areturn["sBanco"];
-                $dataconfirma = $areturn["dataconfirma"];
-                $prefix_1 = $areturn["prefix_1"];
-                $s_sync = $areturn["s_sync"];
-                $vg_pagto_tipo = $areturn["vg_pagto_tipo"];
+                $s_sonda = pdvArrayValueSafe($areturn, "s_sonda", "");
+                $sBanco = pdvArrayValueSafe($areturn, "sBanco", "");
+                $dataconfirma = pdvArrayValueSafe($areturn, "dataconfirma", "");
+                $prefix_1 = pdvArrayValueSafe($areturn, "prefix_1", "");
+                $s_sync = pdvArrayValueSafe($areturn, "s_sync", "");
+                $vg_pagto_tipo = pdvArrayValueSafe($areturn, "vg_pagto_tipo", "");
                 // at� aqui nova fun��o getSondaBanco()
 
                 //echo "<<<<<".json_encode($areturn).">>>>>";
@@ -2934,18 +3008,18 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
             $sql .= " and vg_id = " . $id_venda . " ";
         }
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . $cReturn;
         }
-        echo "Encontrados registros - pg_num_rows(rs_venda): " .
-            pg_num_rows($rs_venda) .
+        echo "Encontrados registros - pgNumRowsSafe(rs_venda): " .
+            pgNumRowsSafe($rs_venda) .
             $cReturn;
     }
 
     // Busca Pagto online ExpressMoney LH
     echo " = Busca Pagto online PIX PDV" . $cReturn;
     if ($msg == "") {
-        while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $vg_id = $rs_venda_row["vg_id"];
             $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -2963,8 +3037,8 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 "
                                         order by bbg_data_inclusao desc";
             $rs_venda_dist = SQLexecuteQuery($sql);
-            if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
-                while ($rs_venda_dist_row = pg_fetch_array($rs_venda_dist)) {
+            if ($rs_venda_dist && pgNumRowsSafe($rs_venda_dist) > 0) {
+                while ($rs_venda_dist_row = pgFetchArraySafe($rs_venda_dist)) {
                     $valor = $rs_venda_dist_row["bbg_valor"];
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
                     $bco_codigo = $rs_venda_dist_row["bco_codigo"];
@@ -2991,8 +3065,8 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                     $sql .= " and iforma = '" . $iforma . "'";
 
                     $rs_bol = SQLexecuteQuery($sql);
-                    if ($rs_bol && pg_num_rows($rs_bol) > 0) {
-                        $rs_bol_row = pg_fetch_array($rs_bol);
+                    if ($rs_bol && pgNumRowsSafe($rs_bol) > 0) {
+                        $rs_bol_row = pgFetchArraySafe($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];
 
                         $msg .=
@@ -3112,7 +3186,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         }
                     } else {
                         echo "SEM PAGAMENTOS PENDENTES (num_rows: " .
-                            pg_num_rows($rs_bol) .
+                            pgNumRowsSafe($rs_bol) .
                             ")" .
                             $cReturn;
                     }
@@ -3155,8 +3229,8 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     }
 
     $rs_venda_pendentes = SQLexecuteQuery($sql);
-    if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-        while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+    if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+        while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
             $vg_id_pendente = $rs_venda_pendentes_row["vg_id"];
             $pag_status = $rs_venda_pendentes_row["status"];
             $vg_ultimo_status = $rs_venda_pendentes_row["vg_ultimo_status"];
@@ -3250,15 +3324,15 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
             "select * from tb_pag_compras pag
                                 where pag.idvenda = " . $venda_id;
         $rs_pagto = SQLexecuteQuery($sql);
-        if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
+        if (!$rs_pagto || pgNumRowsSafe($rs_pagto) == 0) {
             $msg = "Nenhum pagamento encontrado." . PHP_EOL;
         } else {
-            $rs_pagto_row = pg_fetch_array($rs_pagto);
+            $rs_pagto_row = pgFetchArraySafe($rs_pagto);
             $pag_data = $rs_pagto_row["datainicio"];
-            $pag_valor = $rs_boleto_row["total"] / 100;
-            $pag_banco = $rs_boleto_row["banco"];
-            //				$pag_documento = $rs_boleto_row['???'];
-            echo "pag_data: '$pag_data', pag_valor: $pag_valor, pag_banco: $pag_banco, pag_documento: '$pag_documento', <br>";
+            $pag_valor = $rs_pagto_row["total"] / 100;
+            $pag_banco = $rs_pagto_row["banco"];
+            $pag_iforma = $rs_pagto_row["iforma"];
+            echo "pag_data: '$pag_data', pag_valor: $pag_valor, pag_banco: $pag_banco, pag_iforma: '$pag_iforma'" . PHP_EOL;
         }
     }
 
@@ -3349,14 +3423,14 @@ function verificaSomenteDebito($venda_id)
             "select * from tb_dist_venda_games vg where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhum produto encontrado.(WM-435)" . PHP_EOL;
         }
     }
 
     if ($msg == "") {
         //Verifica cada item de cada produro
-        if ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        if ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $retorno = $rs_venda_row["vg_somente_debito"];
         }
     }
@@ -3411,16 +3485,16 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
 
         echo "sqlA0: $sql" . PHP_EOL;
         $rs_venda = SQLexecuteQueryParams($sql, $params_venda);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         }
-        echo "Encontrados " . pg_num_rows($rs_venda) . " registros" . PHP_EOL;
-        $n = pg_num_rows($rs_venda);
+        echo "Encontrados " . pgNumRowsSafe($rs_venda) . " registros" . PHP_EOL;
+        $n = pgNumRowsSafe($rs_venda);
     }
 
     // Busca boletos ExpressMoney LH
     if ($msg == "") {
-        while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $vg_id = $rs_venda_row["vg_id"];
             $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
             $vg_pagto_num_docto = $rs_venda_row["vg_pagto_num_docto"];
@@ -3443,10 +3517,10 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                 PHP_EOL;
 
             $rs_venda_dist = SQLexecuteQueryParams($sql, [$vg_ug_id, $vg_id]);
-            if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
-                //echo "  Encontrados (2) ".pg_num_rows($rs_venda_dist)." registros dist".PHP_EOL;
+            if ($rs_venda_dist && pgNumRowsSafe($rs_venda_dist) > 0) {
+                //echo "  Encontrados (2) ".pgNumRowsSafe($rs_venda_dist)." registros dist".PHP_EOL;
 
-                while ($rs_venda_dist_row = pg_fetch_array($rs_venda_dist)) {
+                while ($rs_venda_dist_row = pgFetchArraySafe($rs_venda_dist)) {
                     $valor = $rs_venda_dist_row["bbg_valor"];
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
 
@@ -3489,8 +3563,8 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                     }
 
                     $rs_bol = SQLexecuteQueryParams($sql, $params_bol);
-                    if ($rs_bol && pg_num_rows($rs_bol) > 0) {
-                        $rs_bol_row = pg_fetch_array($rs_bol);
+                    if ($rs_bol && pgNumRowsSafe($rs_bol) > 0) {
+                        $rs_bol_row = pgFetchArraySafe($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];
 
                         $msg .=
@@ -3622,10 +3696,10 @@ function conciliaExpressMoneyLH_boleto(
             "select * from boletos_pendentes bol
                                 where bol.bol_codigo = " . $boleto_id;
         $rs_boleto = SQLexecuteQuery($sql);
-        if (!$rs_boleto || pg_num_rows($rs_boleto) == 0) {
+        if (!$rs_boleto || pgNumRowsSafe($rs_boleto) == 0) {
             $msg = "Nenhum boleto encontrado." . PHP_EOL;
         } else {
-            $rs_boleto_row = pg_fetch_array($rs_boleto);
+            $rs_boleto_row = pgFetchArraySafe($rs_boleto);
             $bol_data = $rs_boleto_row["bol_data"];
             $bol_valor = $rs_boleto_row["bol_valor"];
             $bol_banco = $rs_boleto_row["bol_banco"];
@@ -3713,7 +3787,7 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
 {
     $blDebugMT = false;
     $blShowProgress = false;
-    if ($parametros["showProgress"]) {
+    if (!empty($parametros["showProgress"])) {
         $blShowProgress = true;
     }
 
@@ -3735,10 +3809,10 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
             $venda_id;
 
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -3765,10 +3839,10 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
             "select * from dist_usuarios_games ug where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_cel_ddd = $rs_usuario_row["ug_cel_ddd"];
             $ug_cel = $rs_usuario_row["ug_cel"];
             if (!is_numeric($ug_cel_ddd)) {
@@ -3784,8 +3858,8 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
     }
 
     //Enquanto nao tem deposito e boleto
-    $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
-    $vg_pagto_num_docto = $rs_venda_row["vg_pagto_num_docto"];
+    $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"] ?? null;
+    $vg_pagto_num_docto = $rs_venda_row["vg_pagto_num_docto"] ?? null;
     $ped_cod_doc_equiv = "";
     $ped_dep_codigo = null;
     $ped_bol_codigo = null;
@@ -3872,10 +3946,10 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
 
@@ -3903,10 +3977,10 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
             "where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_email = $rs_usuario_row["ug_email"];
             $ug_tipo_cadastro = $rs_usuario_row["ug_tipo_cadastro"];
             $ug_sexo = $rs_usuario_row["ug_sexo"];
@@ -4050,7 +4124,7 @@ function gravaLog_TMP_conciliacao($mensagem)
     $mensagem =
         date("Y-m-d H:i:s") .
         " " .
-        $_SERVER["SCRIPT_FILENAME"] .
+        ($_SERVER["SCRIPT_FILENAME"] ?? "") .
         PHP_EOL .
         $mensagem .
         PHP_EOL;
@@ -4070,14 +4144,14 @@ function isVendaDeposito($venda_id)
         "select vg_deposito_em_saldo from tb_dist_venda_games vg where vg.vg_id = " .
         $venda_id;
     $rs_venda = SQLexecuteQuery($sql);
-    if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+    if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
         $msg =
             "Nenhuma venda encontrada (em isvendaDeposito($venda_id))." .
             PHP_EOL;
     }
 
     if ($msg == "") {
-        $rs_venda_row = pg_fetch_array($rs_venda);
+        $rs_venda_row = pgFetchArraySafe($rs_venda);
         $vg_deposito_em_saldo = $rs_venda_row["vg_deposito_em_saldo"];
     }
     $vg_deposito_em_saldo = $vg_deposito_em_saldo == 1 ? 1 : 0;

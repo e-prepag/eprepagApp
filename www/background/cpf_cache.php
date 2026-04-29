@@ -124,7 +124,7 @@ echo $sql.PHP_EOL;
 $rs_dados_cpf = SQLexecuteQuery($sql);
         
 //Verificando Dados
-$msg .= PHP_EOL."Total de CPF ùNICOS consultados em ".date("Y-m-d",$currentmonth)."(YYYY-MM-DD):  [".pg_num_rows($rs_dados_cpf)."] CPFs<br>".PHP_EOL;
+$msg .= PHP_EOL."Total de CPF ùNICOS consultados em ".date("Y-m-d",$currentmonth)."(YYYY-MM-DD):  [".(($rs_dados_cpf) ? pg_num_rows($rs_dados_cpf) : 0)."] CPFs<br>".PHP_EOL;
 $total_cpfs_ja_existentes = 0;
 $total_cpfs_ja_existentes_checados = 0;
 $total_cpfs_novos = 0;
@@ -134,7 +134,7 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
     $sql = "select cpf,checado from cpf_cache where cpf=".$rs_dados_cpf_row['teste'].";";
     $rs_existe = SQLexecuteQuery($sql);
     //echo($sql);
-    if(pg_num_rows($rs_existe) > 0) {
+    if((($rs_existe) ? pg_num_rows($rs_existe) : 0) > 0) {
         
         //Atualizando o registro na tabela cd CPF CACHE
         echo "CPF [".$rs_dados_cpf_row['ug_cpf']."] jù existe na tabela de CACHE".PHP_EOL;
@@ -154,7 +154,7 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
             }//end else do if($rs_existe_row['checado'] == 1)
         }//end else do if(!$rs_update)
         
-    } //end if(pg_num_rows($rs_existe) > 0)
+    } //end if((($rs_existe) ? pg_num_rows($rs_existe) : 0) > 0)
     else {
         
         //Inserindo novo registro na tabela
@@ -169,7 +169,7 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
             $total_cpfs_novos++;
         }//end else do if(!$rs_update)
         
-    } //end else do if(pg_num_rows($rs_existe) > 0)
+    } //end else do if((($rs_existe) ? pg_num_rows($rs_existe) : 0) > 0)
     
 } //end while
 $msg .=  "Total de CPFs jù existentes na tabela de CACHE que jù foram validados na Receita: <b>".$total_cpfs_ja_existentes_checados." Atualizados</b><br>".PHP_EOL."Total de CPFs jù existentes na tabela de CACHE SEM validaùùo na Receita: <b>".$total_cpfs_ja_existentes." Atualizados</b><br>".PHP_EOL."Total de CPFs novos na tabela de CACHE: <b>".$total_cpfs_novos." Atualizados</b><br>".PHP_EOL;

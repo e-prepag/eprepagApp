@@ -182,7 +182,7 @@
 			$res_count = pg_query_params($connid, $estat, $query_params);
 		else
 			$res_count = pg_query($connid, $estat);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	
 		$estat .= " order by ".$ncamp; 
 

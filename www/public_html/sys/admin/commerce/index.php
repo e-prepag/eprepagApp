@@ -25,6 +25,12 @@ require_once $raiz_do_projeto . "public_html/sys/includes/gamer/inc_pub_access.p
 <div class="container">    
 <?php
 $abaMenusItensMenu = $sistema->getIndex();
+function descricaoMenuSysAdmin($descricao)
+{
+    $descricao = trim($descricao);
+    return defined($descricao) ? constant($descricao) : $descricao;
+}
+
 if(!$abaMenusItensMenu instanceof SistemaVO || $sistema->getErro()){
     
     $erro = $sistema->getErro();
@@ -65,14 +71,14 @@ if(!$abaMenusItensMenu instanceof SistemaVO || $sistema->getErro()){
         }
     ?>
             <div class="top10 lista bg-azul-claro txt-branco">
-                <strong><?php echo constant(trim($menu->getDescricao())); ?></strong>
+                <strong><?php echo descricaoMenuSysAdmin($menu->getDescricao()); ?></strong>
             </div>
             <ul class="nav nav-pills nav-stacked nav-pills-stacked-example"> 
     <?php 
             foreach($itensMenus as $item){
                 if($item->getChaveMonitor() === ""){
     ?>
-                <li role="presentation"><a href="<?php echo $item->getLink(); ?>" class="menu"><?php echo constant(trim($item->getDescricao())); ?></a></li> 
+                <li role="presentation"><a href="<?php echo $item->getLink(); ?>" class="menu"><?php echo descricaoMenuSysAdmin($item->getDescricao()); ?></a></li> 
     <?php
                 }else{
                     echo "<li role=\"presentation\">";

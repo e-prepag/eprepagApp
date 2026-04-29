@@ -127,7 +127,7 @@ if($msg == ""){
         $sql .= " group by TO_DATE(TO_CHAR(EXTRACT(YEAR FROM pgt.datainicio),'9999')||'-'||TO_CHAR(EXTRACT(MONTH FROM pgt.datainicio),'99')||'-'||TO_CHAR(EXTRACT(DAY FROM pgt.datainicio),'99'),'YYYY-MM-DD') ";
 
         $rs_total = SQLexecuteQuery($sql);
-        if($rs_total) $registros_total = pg_num_rows($rs_total);
+        if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 
         $rs_transacoes = SQLexecuteQuery($sql);
         if(!$rs_transacoes || pg_num_rows($rs_transacoes) == 0) {

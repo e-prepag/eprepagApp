@@ -941,7 +941,7 @@ chdir('../admin');
                                     echo "Erro ao listar Comissõess.\n";
                                     echo "sql: " . $sql . "<br>\n<hr>\n";
                                 }
-                                $total_table = pg_num_rows($rs);
+                                $total_table = (($rs) ? pg_num_rows($rs) : 0);
 
                                 if ($opr_comissao_por_volume) {
                                     ?>

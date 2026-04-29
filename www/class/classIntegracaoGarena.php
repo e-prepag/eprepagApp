@@ -243,7 +243,7 @@ class Garena
 	public function chamaGarena($metodo, $ambiente = "homologacao")
 	{
 
-		if (count($this->error) > 0) {
+		if ((is_countable($this->error) ? count($this->error) : 0) > 0) {
 
 			// verifica se o usuario está fazendo varias vezes a mesma requisição
 			if ($this->error[0]["Erro"] === "Esse pedido Já foi resgatado ou já está em processo de resgate (EPP0043).") {
@@ -326,7 +326,7 @@ class Garena
 		} elseif ($metodo == "POST") {
 
 			/// verifica se foi retornado o ROLE ID do usuário garena
-			if (count($this->rolesGarena) == 0) {
+			if ((is_countable($this->rolesGarena) ? count($this->rolesGarena) : 0) == 0) {
 				$this->destravaProcesso();
 				return json_encode(["Erro" => "Nenhum Usuário foi encontrado com essa conta (EPP0010)."]);
 			}
@@ -476,7 +476,7 @@ class Garena
 	private function verificaProcesso()
 	{
 
-		if (count($this->error) > 0) {
+		if ((is_countable($this->error) ? count($this->error) : 0) > 0) {
 			return json_encode($this->error[0]);
 		} else {
 			return true;

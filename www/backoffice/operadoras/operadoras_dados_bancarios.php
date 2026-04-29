@@ -15,7 +15,8 @@ if(!empty($opr_codigo)&&!empty($opr_ajax)){
         require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
 	$sql = "SELECT * FROM operadoras WHERE opr_codigo = $opr_codigo"; 
 	$rs_operadoras = SQLexecuteQuery($sql);
-	if(!($rs_operadoras_row = $rs_operadoras && pg_fetch_array($rs_operadoras))) {
+	$rs_operadoras_row = $rs_operadoras ? pg_fetch_array($rs_operadoras) : false;
+	if(!$rs_operadoras_row) {
 		$msg_banco .= "Erro ao consultar informa&ccedil;&otilde;es da Operadora. ($sql)<br>";
 	}
 	else {

@@ -2483,7 +2483,7 @@ function set_Integracao_registro()
 
 	$rs = SQLexecuteQuery($sql);
 
-	if (pg_num_rows($rs) > 0) {
+	if ((($rs) ? pg_num_rows($rs) : 0) > 0) {
 		// Este pedido já foi registrado
 		$rs_row = pg_fetch_array($rs);
 		$ip_vg_id = $rs_row['ip_vg_id'];
@@ -2496,7 +2496,7 @@ function set_Integracao_registro()
 
 						$rs1 = SQLexecuteQuery($sql);
 
-						if($rs1 || pg_num_rows($rs1) > 0){
+						if($rs1 || (($rs1) ? pg_num_rows($rs1) : 0) > 0){
 							// Este pedido já foi registrado e tem venda cadastrada
 							// -> logout e avisa
 							echo "**";
@@ -3409,10 +3409,34 @@ function get_server_DNS_by_URL($sname0)
 {
 	//	echo "sname0: $sname0\n";
 	//	echo "<hr>$sname0<br>";
-	$i_start = strpos($sname0, "//") + 2;
-	@$i_stop = strpos($sname0, "/", $i_start) - 1;
+	if (!is_string($sname0)) {
+		return "";
+	}
+
+	$sname0 = trim($sname0);
+	if ($sname0 === "") {
+		return "";
+	}
+
+	$url_info = @parse_url($sname0);
+	if (is_array($url_info) && isset($url_info["host"]) && $url_info["host"] !== "") {
+		return $url_info["host"];
+	}
+
+	$i_start = strpos($sname0, "//");
+	if ($i_start !== false) {
+		$i_start += 2;
+	} else {
+		$i_start = 0;
+	}
+
+	$i_stop = strpos($sname0, "/", $i_start);
+	if ($i_stop === false) {
+		return substr($sname0, $i_start);
+	}
+
 	//	echo "[$i_start - $i_stop] = ".($i_stop-$i_start+1)."<br>";
-	$sname = substr($sname0, $i_start, ($i_stop - $i_start + 1));
+	$sname = substr($sname0, $i_start, ($i_stop - $i_start));
 	//	echo "$sname<hr>";
 	return $sname;
 }
@@ -4085,8 +4109,8 @@ function lista_pedidos_integracao_duplicados($store_id = "", $order_id = "")
 	$sret .= "<table cellpadding='2' cellspacing='2' border='1' bordercolor='#cccccc' style='border-collapse:collapse;background-color:#FFFF99'>\n";
 	$sret .= "<tr style='text-align:center;font-weight:bold; color:blue; font-size:8pt'> <td colspan='6'><nobr>Pedidos de integração completos duplicados</nobr></td></tr>";
 	if ($res && pg_num_rows($res) > 0) {
-		$s_str = ((pg_num_rows($res) > 1) ? "s" : "");
-		$sret .= "<tr style='text-align:center;color:red; font-size:8pt'> <td colspan='6'><nobr>Existe" . ((pg_num_rows($res) > 1) ? "m" : "") . " " . pg_num_rows($res) . " pedido" . $s_str . " de integração <b>completo" . $s_str . "</b> DUPLICADO" . strtoupper($s_str) . "</nobr></td></tr>";
+		$s_str = (((($res) ? pg_num_rows($res) : 0) > 1) ? "s" : "");
+		$sret .= "<tr style='text-align:center;color:red; font-size:8pt'> <td colspan='6'><nobr>Existe" . (((($res) ? pg_num_rows($res) : 0) > 1) ? "m" : "") . " " . (($res) ? pg_num_rows($res) : 0) . " pedido" . $s_str . " de integração <b>completo" . $s_str . "</b> DUPLICADO" . strtoupper($s_str) . "</nobr></td></tr>";
 		$sret .= "<tr style='text-align:center;font-weight:bold; font-size:8pt'> <td>Store_ID</td> <td>Order_ID</td> <td>vg_id</td> <td>min_data</td> <td>max_data</td> <td>n</td></tr>";
 		while ($pg = pg_fetch_array($res)) {
 			$sret .= "<tr style='font-size:8pt'> ";
@@ -4916,8 +4940,8 @@ function lista_pedidos_bancos_pagos_com_EPPCASH()
 	$sret .= "<table cellpadding='2' cellspacing='2' border='1' bordercolor='#cccccc' style='border-collapse:collapse;background-color:#FFFF99'>\n";
 	$sret .= "<tr style='text-align:center;font-weight:bold; color:blue; font-size:8pt'> <td colspan='6'><nobr>Tipo de pagamento Diferente de EPP CASH e pagos com PINs</nobr></td></tr>";
 	if ($res && pg_num_rows($res) > 0) {
-		$s_str = ((pg_num_rows($res) > 1) ? "s" : "");
-		$sret .= "<tr style='text-align:center;color:red; font-size:8pt'> <td colspan='6'><nobr>Existe" . ((pg_num_rows($res) > 1) ? "m" : "") . " " . pg_num_rows($res) . " pedido" . $s_str . " pago" . $s_str . "</b> com EPP CASH" . strtoupper($s_str) . "</nobr></td></tr>";
+		$s_str = (((($res) ? pg_num_rows($res) : 0) > 1) ? "s" : "");
+		$sret .= "<tr style='text-align:center;color:red; font-size:8pt'> <td colspan='6'><nobr>Existe" . (((($res) ? pg_num_rows($res) : 0) > 1) ? "m" : "") . " " . (($res) ? pg_num_rows($res) : 0) . " pedido" . $s_str . " pago" . $s_str . "</b> com EPP CASH" . strtoupper($s_str) . "</nobr></td></tr>";
 		$sret .= "<tr style='text-align:center;font-weight:bold; font-size:8pt'> <td>ID Pedido</td> <td>Data</td> <td>Tipo Pagto</td> <td>Valor</td></tr>";
 		while ($pg = pg_fetch_array($res)) {
 			$sret .= "<tr style='font-size:8pt'> ";

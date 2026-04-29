@@ -200,7 +200,7 @@ if ($btn_pesquisar=="Pesquisar") {
 	//echo str_replace("\n", "<br>\n", $sql)."<br>";
 	$res_tmp = SQLexecuteQuery($sql);
 	if ($res_tmp) {
-		$total_table = pg_num_rows($res_tmp);
+		$total_table = (($res_tmp) ? pg_num_rows($res_tmp) : 0);
 		$total_geral = 0;
 		$total_geral_pedidos = 0;
 		$vetor_calculo_financeiro = array();
@@ -233,7 +233,7 @@ if ($btn_pesquisar=="Pesquisar") {
     </tr>
 
 <?php
-	if((pg_num_rows($rsResposta) != 0) && ($rsResposta)) {
+	if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta)) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>

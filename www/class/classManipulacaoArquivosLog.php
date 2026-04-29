@@ -85,10 +85,12 @@ class ManipulacaoArquivosLog {
     
     private function readFile() {
         $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', "r");
-        $data = fgets($fp, 1024);
-        if ($fp) {
-        fclose($fp);
+        if (!$fp) {
+            return "";
         }
+
+        $data = fgets($fp, 1024);
+        fclose($fp);
         return $data;
     }//end readFile()
     

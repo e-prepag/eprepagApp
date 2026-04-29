@@ -26,7 +26,7 @@ if($acao == 'inserir')
         $sql = "select * from complice where c_ano_mes =  '".$ano."-".$mes."-01';";
         //echo $sql."<br>";
         $rs_complice_verify = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_complice_verify) == 0){
+        if((($rs_complice_verify) ? pg_num_rows($rs_complice_verify) : 0) == 0){
             $sql = "INSERT INTO complice (
                                                             c_ano_mes, 
                                                             c_custo_mkt_credenciado, 
@@ -129,7 +129,7 @@ if($acao == 'editar')
 		$c_receita_credenciador         = $rs_complice_row['c_receita_credenciador'];
 		$c_receita_outras_credenciador            = $rs_complice_row['c_receita_outras_credenciador'];
 		$c_custo_processamento_front_end_back_end = $rs_complice_row['c_custo_processamento_front_end_back_end'];
-		if (pg_num_rows($rs_complice) > 0)
+		if ((($rs_complice) ? pg_num_rows($rs_complice) : 0) > 0)
 			include 'complice_edt.php';
 		else
 			$acao = 'listar';

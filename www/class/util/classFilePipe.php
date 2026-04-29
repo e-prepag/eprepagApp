@@ -80,7 +80,7 @@ class FilePipe
         // cada posição do vetor deve conter a subestrutura [key][name] e [key][size]
         foreach ($this->vetorLines as $key => $dados) {
             //para não converter automaticamente a string para maiusculo deve ser informado o parametro 'upper' no vetor dados como 'nao'
-            $tmp .= ($key == 0 ? "|" : "") . $this->format_string($dados['name'], $dados['size'], ((isset($dados['upper'])) ? FALSE : TRUE), (((count($this->vetorLines) - 1) > $key) ? FALSE : TRUE));
+            $tmp .= ($key == 0 ? "|" : "") . $this->format_string($dados['name'], $dados['size'], ((isset($dados['upper'])) ? FALSE : TRUE), ((((is_countable($this->vetorLines) ? count($this->vetorLines) : 0) - 1) > $key) ? FALSE : TRUE));
         } //end foreach
         $this->setLine($tmp);
     }
@@ -196,7 +196,7 @@ class FilePipe
         }
 
         // Checa se o array não está vazio e adiciona os arquivos
-        if (count($files) > 0) {
+        if ((is_countable($files) ? count($files) : 0) > 0) {
             // Loop do(s) arquivo(s) enviado(s) 
             foreach ($files as $key => $value) {
 

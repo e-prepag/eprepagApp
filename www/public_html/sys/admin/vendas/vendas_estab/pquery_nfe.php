@@ -550,7 +550,7 @@ if ($FrmEnviar == 1) {
     if (!$res_count) {
         die("Erro ao executar query: " . pg_last_error());
     }
-    $total_table = pg_num_rows($res_count);
+    $total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 
     if ($bDebug) {

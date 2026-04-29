@@ -476,7 +476,7 @@ if ($currentmonthVerify == $lastMonth) {
                         $rs_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
                         $rs_row = pg_fetch_array($rs_cotacoes);
                         $cotacao_congelada = $rs_row["cd_freeze"];
-                        if ($rs_cotacoes && $rs_num_cotacoes && pg_num_rows($rs_cotacoes) > 0 && (pg_num_rows($rs_num_cotacoes) > 1 || $currentmonthVerify ==  $lastMonth)) {
+                        if ($rs_cotacoes && $rs_num_cotacoes && (($rs_cotacoes) ? pg_num_rows($rs_cotacoes) : 0) > 0 && ((($rs_num_cotacoes) ? pg_num_rows($rs_num_cotacoes) : 0) > 1 || $currentmonthVerify ==  $lastMonth)) {
                             $checked = "checked";
                             $dataAtual = explode(" ", $rs_row["cd_data"])[0];
                             $valorAtual =  $rs_row["cd_cotacao"];
@@ -591,7 +591,7 @@ if ($currentmonthVerify == $lastMonth) {
 
                         $sql = "SELECT * FROM cotacao_dolar WHERE opr_codigo = $1 AND to_char(cd_data,'YYYY-MM')  = $2 ORDER BY cd_data";
                         $rs_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
-                        if ($rs_cotacoes && $rs_num_cotacoes && pg_num_rows($rs_cotacoes) > 0 && pg_num_rows($rs_num_cotacoes) > 1) {
+                        if ($rs_cotacoes && $rs_num_cotacoes && (($rs_cotacoes) ? pg_num_rows($rs_cotacoes) : 0) > 0 && (($rs_num_cotacoes) ? pg_num_rows($rs_num_cotacoes) : 0) > 1) {
                             $rs_row = pg_fetch_array($rs_cotacoes);
                             $dataAtual = explode(" ", $rs_row["cd_data"])[0];
                             $dataAtual = explode(" ", $rs_row["cd_data"])[0];

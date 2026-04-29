@@ -51,7 +51,7 @@ class AtivacaoPinTemplate {
 		@$this->setBoxCargaSaldo($paramList['box_carga_saldo'] ? true : false);
 		
 		/*
-		if($this->getBoxCargaSaldo() && count($this->getListaPINs())>0)  {
+		if($this->getBoxCargaSaldo() && (is_countable($this->getListaPINs()) ? count($this->getListaPINs()) : 0)>0)  {
 			$this->setExibeBotaoPagar(false);
 		}
 		*/
@@ -241,7 +241,7 @@ class AtivacaoPinTemplate {
 		if(!$this->getExibeBotaoPagar()||!$this->getBoxCargaSaldo()) {
 			$paginaAtivacaoPin .= $this->boxSaldoFinal();
 		}
-		elseif($this->getBoxCargaSaldo() && count($this->getListaPINs())>0)  {
+		elseif($this->getBoxCargaSaldo() && (is_countable($this->getListaPINs()) ? count($this->getListaPINs()) : 0)>0)  {
 				$paginaAtivacaoPin .= $this->boxSaldoFinal();
 		}
 		$paginaAtivacaoPin .= "
@@ -812,7 +812,7 @@ class AtivacaoPinTemplate {
 							});
 															";
 			}//end else do if(!$this->getExibeBotaoPagar())
-			if($this->getBoxCargaSaldo()&& count($this->getListaPINs())>0) {
+			if($this->getBoxCargaSaldo()&& (is_countable($this->getListaPINs()) ? count($this->getListaPINs()) : 0)>0) {
 				$paginaAtivacaoPin .= "	
 							$(document).ready(function(){
 								$.ajax({

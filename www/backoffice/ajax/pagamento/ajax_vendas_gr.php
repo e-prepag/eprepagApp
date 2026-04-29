@@ -7,9 +7,11 @@
 //header('Content-type: image/jpeg');
 
 require_once "../../../includes/constantes.php";
-require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph.php";
-require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph_scatter.php";
-require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph_plotband.php";
+require_once $raiz_do_projeto . "vendor/autoload.php";
+
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+
 require_once $raiz_do_projeto . "includes/functions.php";
 
 //$time_start_stats = getmicrotime();
@@ -140,7 +142,7 @@ function FCallback2D($yval, $xval) {
 
 // Setup a basic graph
 // width, height
-$graph = new Graph(500,300,'auto');
+$graph = new Graph\Graph(500,300,'auto');
 $graph->SetScale("linlin");
 $graph->img->SetAntiAliasing();
 
@@ -180,7 +182,7 @@ $graph->xaxis->SetTitle("minuto", "center");
 $graph->yaxis->SetTitle("hora", "middle");
 
 // Create the scatter plot
-$sp1 = new ScatterPlot($datay,$datax);
+$sp1 = new Plot\ScatterPlot($datay,$datax);
 $sp1->mark->SetType(MARK_FILLEDCIRCLE);	// MARK_FILLEDCIRCLE
 
 // http://localhost/teste/php/jpgraph-3.0.7/docportal/chunkhtml/ch15.html#fig.example3.4
@@ -200,7 +202,7 @@ $graph->Add($sp1);
 
 // http://localhost/teste/php/jpgraph-3.0.7/docportal/chunkhtml/ch14s08.html
 // Add a horizontal band
-$band = new PlotBand(HORIZONTAL,BAND_DIAGCROSS,8,18,'gray');
+$band = new Plot\PlotBand(HORIZONTAL,BAND_DIAGCROSS,8,18,'gray');
 $band->ShowFrame(false); // No border around the plot band
 $graph->Add($band);
 				

@@ -1,8 +1,9 @@
 <?php
 $cReturn = PHP_EOL;
+$remoteAddr = $_SERVER["REMOTE_ADDR"] ?? "";
 
 // Livrodjx has been here
-if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
+if ($remoteAddr == "201.93.162.169") {
         /*ini_set('display_errors', 1);
                //ini_set('display_startup_errors', 1);
                //error_reporting(E_ALL);*/
@@ -22,15 +23,68 @@ require_once RAIZ_DO_PROJETO . 'includes/gamer/chave.php';
 require_once RAIZ_DO_PROJETO . 'includes/gamer/AES.class.php';
 require_once RAIZ_DO_PROJETO . 'class/classGeraPin.php';
 
+if (!function_exists('writeLogVendaPixSafe')) {
+        function writeLogVendaPixSafe($fileLog, $mensagem)
+        {
+                if (is_resource($fileLog)) {
+                        fwrite($fileLog, $mensagem);
+                }
+        }
+}
+
+if (!function_exists('closeLogVendaPixSafe')) {
+        function closeLogVendaPixSafe($fileLog)
+        {
+                if (is_resource($fileLog)) {
+                        fclose($fileLog);
+                }
+        }
+}
+
+if (!function_exists('isPgResultSafe')) {
+        function isPgResultSafe($result)
+        {
+                return is_resource($result) || (is_object($result) && get_class($result) === 'PgSql\\Result');
+        }
+}
+
+if (!function_exists('pgNumRowsSafe')) {
+        function pgNumRowsSafe($result)
+        {
+                return isPgResultSafe($result) ? pg_num_rows($result) : 0;
+        }
+}
+
+if (!function_exists('pgFetchArraySafe')) {
+        function pgFetchArraySafe($result)
+        {
+                return isPgResultSafe($result) ? pg_fetch_array($result) : false;
+        }
+}
+
+if (!function_exists('pgFetchAssocSafe')) {
+        function pgFetchAssocSafe($result)
+        {
+                return isPgResultSafe($result) ? pg_fetch_assoc($result) : false;
+        }
+}
+
+if (!function_exists('pgAffectedRowsSafe')) {
+        function pgAffectedRowsSafe($result)
+        {
+                return isPgResultSafe($result) ? pg_affected_rows($result) : 0;
+        }
+}
+
 
 
 function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, array $parametros): string
 {
 
-        //Validacoes
-        $msg = "";
+	//Validacoes
+	$msg = "";
 
-        //Valida venda id
+	//Valida venda id
         if (!$venda_id)
                 $msg = "Cdigo da venda no fornecido." . PHP_EOL;
 
@@ -51,19 +105,13 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT *
-    FROM tb_venda_games vg
-    WHERE vg.vg_id = ?
-";
-
-                $rs_venda = SQLexecuteQueryParams($sql, [
-                        intval($venda_id)
-                ]);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         if (is_array($rs_venda_row)) {
                                 $vg_ug_id = $rs_venda_row['vg_ug_id'] ?? null;
                                 $vg_id = $rs_venda_row['vg_id'] ?? null;
@@ -93,29 +141,28 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
                         if ($partner_do_notify == 1 && ($url_notify_url != "")) {
 
                                 // Monta o passo 4 da Integra��o - Notify partner
-                                $sql = "SELECT * 
-        FROM tb_integracao_pedido ip
-        WHERE ip_store_id = ?
-          AND ip_vg_id = ?";
-
-                                $params = [
-                                        $vg_integracao_parceiro_origem_id,
-                                        $vg_id
-                                ];
-
+                                $sql = "SELECT * FROM tb_integracao_pedido ip 
+                                        WHERE 1=1
+                                        and ip_store_id = '" . $vg_integracao_parceiro_origem_id . "'
+                                        and ip_vg_id = '" . $vg_id . "'";
                                 grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . "Select  registro de integra��o para o notify (A1a)" . PHP_EOL . $sql . PHP_EOL);
 
-                                $rs = SQLexecuteQueryParams($sql, $params);
+                                $rs = SQLexecuteQuery($sql);
                                 if (!$rs) {
                                         $msg_1 = date("Y-m-d H:i:s") . " - Erro ao recuperar transa��o de integra��o B2 (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
                                         echo $msg_1;
                                         grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
-                                } else {
-                                        $rs_row = pg_fetch_array($rs);
+	                                                        } else {
+	                                                                $rs_row = pgFetchArraySafe($rs);
 
-                                        $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
+	                                                                if (!$rs_row) {
+	                                                                        $msg_1 = date("Y-m-d H:i:s") . " - Transacao de integracao nao encontrada para notify (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
+	                                                                        echo $msg_1;
+	                                                                        grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
+	                                                                } else {
+	                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
 
-                                        $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
+	                                                                $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
                                         $post_parameters .= "order_id=" . $rs_row["ip_order_id"] . "&";
                                         $post_parameters .= "amount=" . $rs_row["ip_amount"] . "&";
                                         if (strlen($rs_row["ip_product_id"]) > 0) {
@@ -132,25 +179,20 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
                                         $s_msg = "AFTER Partner Notify - Conciliacao Manual de Dep�sito (Novo esquema) (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                         grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (1): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
                                 }
-                        }
-                }
-        }
+	                        }
+	                }
+	        }
+	}
 
-        //Recupera o deposito
+	        //Recupera o deposito
         if ($msg == "") {
-                $sql = "SELECT *
-        FROM depositos_pendentes dep
-        WHERE dep_codigo = ?";
-
-                $params = [
-                        $dep_id
-                ];
-
-                $rs_dep = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_dep || pg_num_rows($rs_dep) == 0)
+                $sql = "select * from depositos_pendentes dep
+                                 where dep_codigo = " . $dep_id;
+                $rs_dep = SQLexecuteQuery($sql);
+                if (!$rs_dep || pgNumRowsSafe($rs_dep) == 0)
                         $msg = "Nenhum dep�sito encontrado." . PHP_EOL;
                 else {
-                        $rs_dep_row = pg_fetch_array($rs_dep);
+                        $rs_dep_row = pgFetchArraySafe($rs_dep);
                         $dep_valor = $rs_dep_row['dep_valor'];
                 }
         }
@@ -158,7 +200,7 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -167,10 +209,9 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         if ($msg == "") {
 
                 //Concilia deposito
-                $sql = "update depositos_pendentes set dep_aprovado = 1, dep_aprovado_data = CURRENT_DATE, dep_venda_games_id =  $1 where dep_codigo = $2";
-
-                $params = [(int)$venda_id, (int)$dep_id];
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update depositos_pendentes set dep_aprovado = 1, dep_aprovado_data = CURRENT_DATE, dep_venda_games_id = " . $venda_id . "
+                                where dep_codigo = " . $dep_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar deposito." . PHP_EOL;
         }
@@ -178,27 +219,13 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         //Concilia na venda_games e atualiza status (deposito)
         if ($msg == "") {
                 $iduser_bko = null;
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP, 
-        vg_user_id_concilia = $1,
-        vg_dep_codigo = $2, 
-        vg_ultimo_status_obs = $3,
-        vg_ultimo_status = $4
-    WHERE vg_id = $5
-";
-
-                $params = [
-                        (int)$iduser_bko,
-                        (int)$dep_id,
-                        (string)$parametros['ultimo_status_obs'],
-                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set 
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_dep_codigo = " . SQLaddFields($dep_id, "") . ", 
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda." . PHP_EOL;
         }
@@ -206,12 +233,12 @@ function conciliaVendaGames_deposito(int $venda_id, int $dep_id, int $EstabCod, 
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -259,20 +286,13 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
@@ -297,39 +317,30 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
                 } elseif ($isVendaDeposito == 1) {
                         echo "Dep�sito em saldo (2132)";
 
-                        $concilia_cod_sel = null;
-                        if (!$concilia_cod_sel)
-                                $concilia_cod_sel = $GLOBALS['_REQUEST']['concilia_cod_sel'];
-                        $sql = "
-    SELECT * FROM tb_venda_games vg
-    INNER JOIN boleto_bancario_games bbg ON bbg.bbg_vg_id = vg.vg_id 
-    LEFT OUTER JOIN tb_pag_compras pg ON (pg.idvenda = vg.vg_id AND pg.tipo_cliente = 'M')
-    CROSS JOIN boletos_pendentes bol 
-    WHERE 
-        (NOT (vg_ultimo_status = $1 OR vg_ultimo_status = $2)) 
-        AND vg_deposito_em_saldo = 1 
-        AND bol_codigo = $3
-        AND vg_id = $4
-    ORDER BY vg_data_inclusao DESC
-";
-
-                        $params = [
-                                (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
-                                (int)$GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'],
-                                (int)$concilia_cod_sel,
-                                (int)$venda_id
-                        ];
-
-                        $rs_vendas = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_vendas || pg_num_rows($rs_vendas) == 0) {
-                                $msg = "Nenhuma venda de dep�sito em Saldo Gamer encontrada para concilia��o." . PHP_EOL;
-                                echo $msg;
-                        } else {
-                                echo "Encontradas " . pg_num_rows($rs_vendas) . " vendas de dep�sito pendentes de concilia��o" . PHP_EOL;
-                                while ($rs_vendas_row = pg_fetch_array($rs_vendas)) {
-                                        $msg = "";
-                                        if ($bDebug)
-                                                echo str_repeat("-", 80) . PHP_EOL;
+                        $concilia_cod_sel = $GLOBALS['_REQUEST']['concilia_cod_sel'] ?? null;
+                        if (!$concilia_cod_sel || !is_numeric($concilia_cod_sel)) {
+                                $msg = "C�digo do boleto para concilia��o n�o informado." . PHP_EOL;
+                        }
+                        if ($msg == "") {
+                                $sql = "select * 
+                                        from tb_venda_games vg
+                                                inner join boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id 
+                                                left outer join tb_pag_compras pg on (pg.idvenda = vg.vg_id and tipo_cliente = 'M')
+                                                , boletos_pendentes bol 
+                                        where (not (vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " or vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'] . ")) and vg_deposito_em_saldo = 1 
+                                                and bol_codigo = $concilia_cod_sel
+                                                and vg_id = $venda_id
+                                        order by vg_data_inclusao desc";
+                                $rs_vendas = SQLexecuteQuery($sql);
+                                if (!$rs_vendas || pgNumRowsSafe($rs_vendas) == 0) {
+                                        $msg = "Nenhuma venda de dep�sito em Saldo Gamer encontrada para concilia��o." . PHP_EOL;
+                                        echo $msg;
+                                } else {
+                                        echo "Encontradas " . pgNumRowsSafe($rs_vendas) . " vendas de dep�sito pendentes de concilia��o" . PHP_EOL;
+                                        while ($rs_vendas_row = pgFetchArraySafe($rs_vendas)) {
+                                                $msg = "";
+                                                if ($bDebug)
+                                                        echo str_repeat("-", 80) . PHP_EOL;
 
                                         $boleto_id = $concilia_cod_sel;
                                         $usuario_id = $rs_vendas_row['vg_ug_id'];
@@ -375,6 +386,7 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
                                                                 echo "Nenhum Boleto encontrado ($venda_id, $usuario_id)" . PHP_EOL;
                                                 }
                                         }
+                                        }
                                 }
                         }
                 } else {
@@ -387,20 +399,13 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
         }
         //Recupera o boleto pendente
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM boletos_pendentes bol
-    WHERE bol.bol_codigo = $1
-";
-
-                $params = [
-                        (int)$boleto_id
-                ];
-
-                $rs_boleto = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
+                $sql = "select * from boletos_pendentes bol
+                                where bol.bol_codigo = " . $boleto_id;
+                $rs_boleto = SQLexecuteQuery($sql);
+                if (!$rs_boleto || pgNumRowsSafe($rs_boleto) == 0)
                         $msg = "Nenhum boleto encontrado." . PHP_EOL;
                 else {
-                        $rs_boleto_row = pg_fetch_array($rs_boleto);
+                        $rs_boleto_row = pgFetchArraySafe($rs_boleto);
                         $bol_data = $rs_boleto_row['bol_data'];
                         $bol_valor = $rs_boleto_row['bol_valor'];
                         $bol_banco = $rs_boleto_row['bol_banco'];
@@ -415,7 +420,7 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -423,43 +428,21 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 
         //atualiza boleto bancario
         if ($msg == "") {
-                $sql = "
-    UPDATE boleto_bancario_games 
-    SET bbg_pago = 1, 
-        bbg_data_pago = $1
-    WHERE bbg_vg_id = $2
-";
-
-                $params = [
-                        (string)$bol_data,
-                        (int)$venda_id
-                ];
-
+                $sql = "update boleto_bancario_games set bbg_pago = 1, bbg_data_pago = '" . $bol_data . "'
+                                where bbg_vg_id = " . $venda_id;
                 if ($vg_integracao_parceiro_origem_id != "") {
                         gravaLog_TMP("Integra��o Boleto - " . date("Y-m-d H:i:s") . "." . PHP_EOL . "  Venda de Integra��o '$vg_integracao_parceiro_origem_id' - Atualiza boleto bancario, (vg_id = $venda_id)" . PHP_EOL . "   $sql" . PHP_EOL);
                 }
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao atualizar boleto banc�rio." . PHP_EOL;
         }
 
         //Concilia boleto
         if ($msg == "") {
-                $sql = "
-    UPDATE boletos_pendentes 
-    SET 
-        bol_aprovado = 1, 
-        bol_aprovado_data = CURRENT_TIMESTAMP, 
-        bol_venda_games_id = $1
-    WHERE bol_codigo = $2
-";
-
-                $params = [
-                        (int)$venda_id,
-                        (int)$boleto_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update boletos_pendentes set bol_aprovado = 1, bol_aprovado_data = CURRENT_TIMESTAMP, bol_venda_games_id = " . $venda_id . "
+                                where bol_codigo = " . $boleto_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar boleto." . PHP_EOL;
         }
@@ -475,35 +458,18 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 
         //Concilia na venda_games e atualiza status (boleto)
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_banco = $1,
-        vg_pagto_num_docto = $2,
-        vg_pagto_data = $3,
-        vg_pagto_valor_pago = $4,
-        vg_bol_codigo = $5,
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP, 
-        vg_user_id_concilia = $6,
-        vg_ultimo_status_obs = $7,
-        vg_ultimo_status = $8
-    WHERE vg_id = $9
-";
+                $sql = "update tb_venda_games set 
+                                        vg_pagto_banco = '" . $bol_banco . "',
+                                        vg_pagto_num_docto = '" . $bol_documento . "',
+                                        vg_pagto_data = '" . $bol_data . "',
+                                        vg_pagto_valor_pago = " . $bol_valor . ",
+                                        vg_bol_codigo = " . SQLaddFields($boleto_id, "") . ",
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
 
-                $params = [
-                        (string)$bol_banco,
-                        (string)$bol_documento,
-                        (string)$bol_data,
-                        (float)$bol_valor,
-                        (int)$boleto_id,
-                        (int)$iduser_bko,
-                        (string)$parametros['ultimo_status_obs'],
-                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda A1 (vg_id=$venda_id)." . PHP_EOL;
         }
@@ -519,12 +485,12 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -539,10 +505,15 @@ function conciliaVendaGames_boleto($venda_id, $boleto_id, $EstabCod, $parametros
 function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod, $parametros, $webhook = false)
 {
 
-        //Validacoes
-        $msg = "";
+	//Validacoes
+	$msg = "";
+	$pag_banco = "";
+	$pag_data = "";
+	$pag_documento = "";
+	$pag_valor = 0;
+	$pag_valor_conc = 0;
 
-        //Valida venda id
+	//Valida venda id
         if (!$venda_id)
                 $msg = "C�digo da venda n�o fornecido." . PHP_EOL;
         elseif (!is_numeric($venda_id))
@@ -576,20 +547,14 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         // Valida valores
         if ($msg == "") {
                 $total_geral = 0;
-                $sql = "
-    SELECT * FROM tb_venda_games vg
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
-    WHERE vg.vg_id = $1
-";
+                $sql = "select * from tb_venda_games vg " .
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                        "where vg.vg_id = " . $venda_id;
 
-                $params = [
-                        (int)$venda_id
-                ];
+                $rs_venda_modelos = SQLexecuteQuery($sql);
 
-                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-
-                if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
-                        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                if ($rs_venda_modelos && pgNumRowsSafe($rs_venda_modelos) > 0) {
+                        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                 $qtde = $rs_venda_modelos_row['vgm_qtde'];
                                 $valor = $rs_venda_modelos_row['vgm_valor'];
                                 $total_geral += $valor * $qtde;
@@ -598,38 +563,30 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
                 echo "  - Valor total da venda (venda_id: $venda_id) " . $total_geral . PHP_EOL;
         }
 
-        $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+        $fileLog = @fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         if ($fileLog) {
-                fwrite($fileLog, "ID VENDA CONCILIA��O ONLINE: " . $venda_id . "\n");
+        writeLogVendaPixSafe($fileLog, "ID VENDA CONCILIA��O ONLINE: " . $venda_id . "\n");
         }
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
                         $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
 
-                        fwrite($fileLog, "ULTIMO STATUS VENDA: " . $vg_ultimo_status . " - PRECISA SER '2' / " . $venda_id . " \n");
+                        writeLogVendaPixSafe($fileLog, "ULTIMO STATUS VENDA: " . $vg_ultimo_status . " - PRECISA SER '2' / " . $venda_id . " \n");
 
-                        $sql = "select count(*) as qtde from tb_venda_games_modelo where vgm_vg_id = $1 and vgm_pin_codinterno <> ''";
-                        $params = [(int)$venda_id];
-                        $rs_venda = SQLexecuteQueryParams($sql, $params);
-                        if (pg_num_rows($rs_venda) == 0) {
+                        $sql = "select count(*) as qtde from tb_venda_games_modelo where vgm_vg_id = " . $venda_id . " and vgm_pin_codinterno <> '';";
+                        $rs_venda = SQLexecuteQuery($sql);
+                        if (pgNumRowsSafe($rs_venda) == 0) {
                                 //valida status 
                                 if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] && $webhook == false)
                                         $msg = "Dados do Pagamento ainda n�o recebidos(A3) (vg_ultimo_status: '$vg_ultimo_status', debia ser " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . ")." . PHP_EOL;
@@ -651,10 +608,9 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
                 /* ===============================
                 * Verifica pedido de integra��o
                 * =============================== */
-                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id = $1";
-                $params = [(int)$venda_id];
-                $pedidoIntegracao = SQLexecuteQueryParams($sqlIntegracao, $params);
-                $existeIntegracao = $pedidoIntegracao && pg_num_rows($pedidoIntegracao) > 0;
+                $sqlIntegracao = "SELECT 1 FROM tb_integracao_pedido WHERE ip_vg_id = " . $venda_id;
+                $pedidoIntegracao = SQLexecuteQuery($sqlIntegracao);
+                $existeIntegracao = $pedidoIntegracao && pgNumRowsSafe($pedidoIntegracao) > 0;
 
                 if (!$existeIntegracao) {
 
@@ -670,14 +626,14 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
         //Recupera o pagamento pendente
         if ($msg == "") {
-                $sql = "select * from tb_pag_compras pag where pag.numcompra = $1 and idcliente = $2";
-                $params = [(string)$pagamento_id, (int)$vg_ug_id];
+                $sql = "select * from tb_pag_compras pag where pag.numcompra = '" . $pagamento_id . "' ";
+                $sql .= " and idcliente = $vg_ug_id ";
 
-                $rs_pagamento = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
+                $rs_pagamento = SQLexecuteQuery($sql);
+                if (!$rs_pagamento || pgNumRowsSafe($rs_pagamento) == 0)
                         $msg = "Nenhum pagamento encontrado (B)." . PHP_EOL;
                 else {
-                        $rs_pagamento_row = pg_fetch_array($rs_pagamento);
+                        $rs_pagamento_row = pgFetchArraySafe($rs_pagamento);
                         $pag_data = $rs_pagamento_row['dataconfirma'];
                         // Testa a existencia de data cadastrada
                         if (!trim($pag_data))
@@ -706,7 +662,7 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -718,56 +674,30 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
 
         //Concilia na venda_games e atualiza status (PagamentoOnline)
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_banco = $1,
-        vg_pagto_num_docto = $2,
-        vg_pagto_data = $3,
-        vg_pagto_valor_pago = $4,
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP, 
-        vg_user_id_concilia = $5,
-        vg_ultimo_status_obs = $6,
-        vg_ultimo_status = $7
-    WHERE vg_id = $8
-";
+                $sql = "update tb_venda_games set 
+                                        vg_pagto_banco = '" . $pag_banco . "',
+                                        vg_pagto_num_docto = '" . $pag_documento . "',
+                                        vg_pagto_data = '" . $pag_data . "',
+                                        vg_pagto_valor_pago = " . $pag_valor . ",
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
 
-                $params = [
-                        (string)$pag_banco,
-                        (string)$pag_documento,
-                        (string)$pag_data,
-                        (float)$pag_valor,
-                        (int)$iduser_bko,
-                        (string)$parametros['ultimo_status_obs'],
-                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda (32)" . PHP_EOL . $sql . PHP_EOL;
 
-                fwrite($fileLog, "ATUALIZA��O STATUS VENDA PARA '3' PAGAMENTO ONLINE / " . $venda_id . " \n");
+                writeLogVendaPixSafe($fileLog, "ATUALIZA��O STATUS VENDA PARA '3' PAGAMENTO ONLINE / " . $venda_id . " \n");
         }
 
         if ($msg == "") {
                 // registro foi processado
-                $sql = "
-    UPDATE tb_pag_compras 
-    SET status_processed = 1 
-    WHERE numcompra = $1 
-    AND idcliente = $2
-";
-
-                $params = [
-                        (string)$pagamento_id,
-                        (int)$vg_ug_id
-                ];
-
+                $sql = "update tb_pag_compras set status_processed=1 where numcompra='" . $pagamento_id . "' ";
+                $sql .= " and idcliente = $vg_ug_id ";
                 echo "DEBUG A (status_processed = 1, idvenda = $venda_id): " . $sql . PHP_EOL;
 
-                $rs_update2 = SQLexecuteQueryParams($sql, $params);
+                $rs_update2 = SQLexecuteQuery($sql);
                 if (!$rs_update2) {
                         $msg = "Erro atualizando status de registro (62)." . PHP_EOL;
                         echo $msg;
@@ -779,18 +709,262 @@ function conciliaVendaGames_PagamentoOnline($venda_id, $pagamento_id, $EstabCod,
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
 
-        fwrite($fileLog, "MENSAGEM FINAL VENDA ONLINE: " . $msg . " / " . $venda_id . " \n");
-        fclose($fileLog);
+        writeLogVendaPixSafe($fileLog, "MENSAGEM FINAL VENDA ONLINE: " . $msg . " / " . $venda_id . " \n");
+        closeLogVendaPixSafe($fileLog);
+
+
+        return $msg;
+}
+
+function conciliaVendaGames_Integracao($venda_id, $pagamento_id, $EstabCod, $parametros)
+{
+
+        //Validacoes
+        $msg = "";
+
+        //Valida venda id
+        if (!$venda_id)
+                $msg = "C�digo da venda n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($venda_id))
+                $msg = "C�digo da venda inv�lido." . PHP_EOL;
+
+        //Valida boleto id
+        if (!$pagamento_id)
+                $msg = "C�digo do pagamento n�o fornecido (2)." . PHP_EOL;
+        elseif (!is_numeric($pagamento_id))
+                $msg = "C�digo do pagamento inv�lido." . PHP_EOL;
+
+        //Valida EstabCod
+        if (!$EstabCod)
+                $msg = "C�digo do estabelecimento n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($EstabCod))
+                $msg = "C�digo do estabelecimento inv�lido." . PHP_EOL;
+
+        //Recupera a venda
+        if ($msg == "") {
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
+                        $msg = "Nenhuma venda encontrada." . PHP_EOL;
+                else {
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
+                        $vg_ug_id = $rs_venda_row['vg_ug_id'];
+                        $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
+                        $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
+                        $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
+
+                        //valida status
+                        if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'])
+                                $msg = "Dados do Pagamento ainda n�o recebidos(A3a) (vg_ultimo_status: '$vg_ultimo_status', != '" . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "')." . PHP_EOL;
+                }
+        }
+
+        //Recupera o pagamento pendente
+        if ($msg == "") {
+                $sql = "select * from tb_pag_compras pag where pag.numcompra = '" . $pagamento_id . "'";
+                $sql .= " and idcliente = $vg_ug_id ";
+
+                $rs_pagamento = SQLexecuteQuery($sql);
+                if (!$rs_pagamento || pgNumRowsSafe($rs_pagamento) == 0)
+                        $msg = "Nenhum pagamento encontrado (B)." . PHP_EOL;
+                else {
+                        $rs_pagamento_row = pgFetchArraySafe($rs_pagamento);
+                        $pag_data = $rs_pagamento_row['dataconfirma'];
+                        // Testa a existencia de data cadastrada
+                        if (!trim($pag_data))
+                                $pag_data = date("Y-m-d H:i:s");
+                        $pag_valor = $rs_pagamento_row['total'] / 100;
+                        $pag_banco = $rs_pagamento_row['banco'];
+
+                        $prefix = getDocPrefix($rs_pagamento_row['iforma']);
+
+                        $pag_documento = $prefix . $rs_pagamento_row['iforma'] . "_" . $rs_pagamento_row['numcompra'];
+                }
+        }
+        //Inicia transacao
+        if ($msg == "") {
+                $sql = "BEGIN TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao iniciar transa��o." . PHP_EOL;
+        }
+
+        //Usuario backoffice
+        $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
+        if ($parametros['PROCESS_AUTOM'] == '1')
+                $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
+
+        //Concilia na venda_games e atualiza status (Integracao)
+        if ($msg == "") {
+                $sql = "update tb_venda_games set 
+                                        vg_pagto_banco = '" . $pag_banco . "',
+                                        vg_pagto_num_docto = '" . $pag_documento . "',
+                                        vg_pagto_data = '" . $pag_data . "',
+                                        vg_pagto_valor_pago = " . $pag_valor . ",
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
+
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao conciliar venda (32)" . PHP_EOL . $sql . PHP_EOL;
+        }
+
+        if (!$msg) {
+                // registro foi processado
+                $sql = "update tb_pag_compras set status_processed=1 where numcompra='" . $pagamento_id . "' ";
+                $sql .= " and idcliente = $vg_ug_id ";
+                echo "DEBUG B (atualiza status_processed=1, vendaid = $venda_id): " . $sql . PHP_EOL;
+
+                $rs_update2 = SQLexecuteQuery($sql);
+                if (!$rs_update2) {
+                        $msg = "Erro atualizando status de registro (62)." . PHP_EOL;
+                        echo $msg;
+                }
+        }
+
+        //Finaliza transacao
+        if ($msg == "") {
+                $sql = "COMMIT TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao comitar transa��o." . PHP_EOL;
+        } else {
+                $sql = "ROLLBACK TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
+        }
+
+        return $msg;
+}
+
+function conciliaVendaGames_redecard($venda_id, $redecard_id, $EstabCod, $parametros)
+{
+
+        //Validacoes
+        $msg = "";
+
+        //Valida venda id
+        if (!$venda_id)
+                $msg = "C�digo da venda n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($venda_id))
+                $msg = "C�digo da venda inv�lido." . PHP_EOL;
+
+        //Valida redecard id
+        if (!$redecard_id)
+                $msg = "C�digo do redecard n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($redecard_id))
+                $msg = "C�digo do redecard inv�lido." . PHP_EOL;
+
+        //Valida EstabCod
+        if (!$EstabCod)
+                $msg = "C�digo do estabelecimento n�o fornecido." . PHP_EOL;
+        elseif (!is_numeric($EstabCod))
+                $msg = "C�digo do estabelecimento inv�lido." . PHP_EOL;
+
+        //Recupera a venda
+        if ($msg == "") {
+                $sql = "select * from tb_venda_games vg
+                                 where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
+                        $msg = "Nenhuma venda encontrada." . PHP_EOL;
+                else {
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
+                        $vg_ug_id = $rs_venda_row['vg_ug_id'];
+                        $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
+                        $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
+                        $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
+
+                        //valida status
+                        if ($vg_ultimo_status != $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'])
+                                $msg = "Dados do Pagamento ainda n�o recebidos(A4)." . PHP_EOL;
+                }
+        }
+
+        //Verifica estoque
+        if ($msg == "") {
+                $msg = verificaEstoque($venda_id);
+        }
+
+        //Recupera o redecard
+        if ($msg == "") {
+                $sql = "select * from tb_venda_games_redecard vgrc
+                                where vgrc.vgrc_id = " . $redecard_id;
+                $rs_redecard = SQLexecuteQuery($sql);
+                if (!$rs_redecard || pgNumRowsSafe($rs_redecard) == 0)
+                        $msg = "Nenhum redecard encontrado." . PHP_EOL;
+                else {
+                        $rs_redecard_row = pgFetchArraySafe($rs_redecard);
+                        $vgrc_total = $rs_redecard_row['vgrc_total'];
+                        $vgrc_ret2_numautent = $rs_redecard_row['vgrc_ret2_numautent'];
+                        $vgrc_ret2_data = $rs_redecard_row['vgrc_ret2_data'];
+                }
+        }
+
+        //Inicia transacao
+        if ($msg == "") {
+                $sql = "BEGIN TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao iniciar transa��o." . PHP_EOL;
+        }
+
+        //Concilia boleto
+        if ($msg == "") {
+                $sql = "update tb_venda_games_redecard set vgrc_aprovado = 1, vgrc_aprovado_data = CURRENT_TIMESTAMP
+                                where vgrc_id = " . $redecard_id;
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao aprovar redecard." . PHP_EOL;
+        }
+
+        //Usuario backoffice
+        $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
+        if ($parametros['PROCESS_AUTOM'] == '1')
+                $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
+
+        //Concilia na venda_games e atualiza status (redecard)
+        if ($msg == "") {
+                $sql = "update tb_venda_games set 
+                                        vg_pagto_data = '" . $vgrc_ret2_data . "',
+                                        vg_pagto_num_docto = '" . $vgrc_ret2_numautent . "',
+                                        vg_pagto_valor_pago = " . $vgrc_total . ",
+                                        vg_vgrc_id = " . SQLaddFields($redecard_id, "") . ",
+                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "',
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao conciliar venda." . PHP_EOL;
+        }
+
+        //Finaliza transacao
+        if ($msg == "") {
+                $sql = "COMMIT TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao comitar transa��o." . PHP_EOL;
+        } else {
+                $sql = "ROLLBACK TRANSACTION ";
+                $ret = SQLexecuteQuery($sql);
+                if (!$ret)
+                        $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
+        }
 
         return $msg;
 }
@@ -803,26 +977,19 @@ function verificaEstoque($venda_id)
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    INNER JOIN operadoras ope ON ope.opr_codigo = vgm.vgm_opr_codigo
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+                $sql = "select * from tb_venda_games vg 
+                                inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                                inner join operadoras ope on ope.opr_codigo = vgm.vgm_opr_codigo
+                                where vg.vg_id = " . $venda_id;
+                $rs_venda_modelos = SQLexecuteQuery($sql);
+                if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0)
                         $msg = "Nenhum produto encontrado (VE_1)." . PHP_EOL;
         }
 
         if ($msg == "") {
 
                 //Verifica cada item de cada produro
-                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                         $vgm_qtde = $rs_venda_modelos_row['vgm_qtde'];
                         $vgm_opr_codigo = $rs_venda_modelos_row['vgm_opr_codigo'];
                         $vgm_pin_valor = $rs_venda_modelos_row['vgm_pin_valor'];
@@ -838,25 +1005,15 @@ function verificaEstoque($venda_id)
 
                                         //PINS
                                         //---------------------------------------------------------------------------------------------------
-                                        $sql = "
-    SELECT count(*) AS pins_qtde 
-    FROM pins
-    WHERE opr_codigo = $1
-      AND pin_status = '1' 
-      AND pin_canal = 's' 
-      AND pin_valor = $2
-";
-
-                                        $params = [
-                                                (int)$vgm_opr_codigo,
-                                                (float)$vgm_pin_valor
-                                        ];
-
-                                        $rs_pins = SQLexecuteQueryParams($sql, $params);
-                                        if (!$rs_pins || pg_num_rows($rs_pins) == 0)
+                                        $sql = "select count(*) as pins_qtde from pins
+													where opr_codigo = " . $vgm_opr_codigo . "
+															and pin_status = '1' and pin_canal='s' 
+															and pin_valor = " . $vgm_pin_valor;
+                                        $rs_pins = SQLexecuteQuery($sql);
+                                        if (!$rs_pins || pgNumRowsSafe($rs_pins) == 0)
                                                 $msg .= "N�o h� pin de " . number_format($vgm_pin_valor, 2, ',', '.') . " da operadora " . $opr_nome . " em estoque (A)." . PHP_EOL;
                                         else {
-                                                $rs_pins_row = pg_fetch_array($rs_pins);
+                                                $rs_pins_row = pgFetchArraySafe($rs_pins);
                                                 $pins_qtde = $rs_pins_row['pins_qtde'];
                                                 if ($pins_qtde < $vgm_qtde)
                                                         $msg .= "N�o h� suficientes pins de " . number_format($vgm_pin_valor, 2, ',', '.') . " da operadora " . $opr_nome . " em estoque (B)." . PHP_EOL;
@@ -872,31 +1029,31 @@ function verificaEstoque($venda_id)
 function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 {
         $msg = "";
+        $vg_ug_id = null;
+        $vg_pagto_banco = null;
+        $vg_pagto_num_docto = "";
+        $vg_pagto_tipo = null;
+        $vg_dep_codigo = null;
+        $vg_bol_codigo = null;
 
         if (!$venda_id) {
                 $msg = "Erro em processaVendaGamesIntegracao() [" . date("Y-m-d H:i:s") . "] - venda_id = 0";
                 return $msg;
         }
-        $ip_id = (($parametros['vg_integracao_parceiro_origem_id']) ? getIntegracaoPedidoID_By_Venda($parametros['vg_integracao_parceiro_origem_id'], $venda_id) : 0);
+        $vg_integracao_param = $parametros['vg_integracao_parceiro_origem_id'] ?? '';
+        $ip_id = (($vg_integracao_param) ? getIntegracaoPedidoID_By_Venda($vg_integracao_param, $venda_id) : 0);
 
-        grava_log_integracao_tmp("Integra��o get ip_id from vg_id em processaVendaGamesIntegracao(): " . date("Y-m-d H:i:s") . " (vg: $venda_id -> ip_id: '$ip_id', vg_integracao_parceiro_origem_id: '" . $parametros['vg_integracao_parceiro_origem_id'] . "') " . PHP_EOL);
+        grava_log_integracao_tmp("Integra��o get ip_id from vg_id em processaVendaGamesIntegracao(): " . date("Y-m-d H:i:s") . " (vg: $venda_id -> ip_id: '$ip_id', vg_integracao_parceiro_origem_id: '" . $vg_integracao_param . "') " . PHP_EOL);
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_pagto_banco = $rs_venda_row['vg_pagto_banco'];
@@ -913,37 +1070,23 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda_modelos = SQLexecuteQuery($sql);
+                if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0)
                         $msg = "Nenhuma produto encontrado (I)." . PHP_EOL;
         }
 
         //Recupera dados do usuario
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM usuarios_games ug 
-    WHERE ug.ug_id = $1
-";
-
-                $params = [
-                        (int)$vg_ug_id
-                ];
-
-                $rs_usuario = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+                $sql = "select * from usuarios_games ug " .
+                        "where ug.ug_id = " . $vg_ug_id;
+                $rs_usuario = SQLexecuteQuery($sql);
+                if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0)
                         $msg = "Nenhum cliente encontrado." . PHP_EOL;
                 else {
-                        $rs_usuario_row = pg_fetch_array($rs_usuario);
+                        $rs_usuario_row = pgFetchArraySafe($rs_usuario);
                         $ug_cel_ddd = $rs_usuario_row['ug_cel_ddd'];
                         $ug_cel = $rs_usuario_row['ug_cel'];
                 }
@@ -954,20 +1097,13 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                 //Deposito
                 if ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF']) {
 
-                        $sql = "
-    SELECT * FROM depositos_pendentes dep 
-    WHERE dep.dep_codigo = $1
-";
-
-                        $params = [
-                                (int)$vg_dep_codigo
-                        ];
-
-                        $rs_deposito = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_deposito || pg_num_rows($rs_deposito) == 0)
+                        $sql = "select * from depositos_pendentes dep " .
+                                "where dep.dep_codigo = " . $vg_dep_codigo;
+                        $rs_deposito = SQLexecuteQuery($sql);
+                        if (!$rs_deposito || pgNumRowsSafe($rs_deposito) == 0)
                                 $msg = "Nenhum deposito encontrado (I)." . PHP_EOL;
                         else {
-                                $rs_deposito_row = pg_fetch_array($rs_deposito);
+                                $rs_deposito_row = pgFetchArraySafe($rs_deposito);
                                 $dep_documento = $rs_deposito_row['dep_documento'];
                                 $ped_cod_doc_equiv = $dep_documento;
                                 $ped_dep_codigo = $vg_dep_codigo;
@@ -980,20 +1116,13 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                         //Boleto
                 } elseif ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO']) {
 
-                        $sql = "
-    SELECT * FROM boletos_pendentes bol 
-    WHERE bol.bol_codigo = $1
-";
-
-                        $params = [
-                                (int)$vg_bol_codigo
-                        ];
-
-                        $rs_boleto = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
+                        $sql = "select * from boletos_pendentes bol " .
+                                "where bol.bol_codigo = " . $vg_bol_codigo;
+                        $rs_boleto = SQLexecuteQuery($sql);
+                        if (!$rs_boleto || pgNumRowsSafe($rs_boleto) == 0)
                                 $msg = "Nenhum boleto encontrado (I)." . PHP_EOL;
                         else {
-                                $rs_boleto_row = pg_fetch_array($rs_boleto);
+                                $rs_boleto_row = pgFetchArraySafe($rs_boleto);
                                 $bol_documento = $rs_boleto_row['bol_documento'];
                                 $ped_cod_doc_equiv = $bol_documento;
                                 $ped_dep_codigo = null;
@@ -1017,21 +1146,13 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                         */
                 ) {
 
-                        $sql = "
-    SELECT * FROM tb_pag_compras pag 
-    WHERE pag.idvenda = $1
-";
-
-                        $params = [
-                                (int)$venda_id
-                        ];
-
+                        $sql = "select * from tb_pag_compras pag where pag.idvenda = " . $venda_id;
                         echo "  DEBUG *** EE ($vg_pagto_num_docto, '" . $vg_pagto_tipo . "'): " . $sql . PHP_EOL;
-                        $rs_pagamento = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
+                        $rs_pagamento = SQLexecuteQuery($sql);
+                        if (!$rs_pagamento || pgNumRowsSafe($rs_pagamento) == 0)
                                 $msg = "Nenhum pagamento encontrado (A2)." . PHP_EOL;
                         else {
-                                $rs_pagamento_row = pg_fetch_array($rs_pagamento);
+                                $rs_pagamento_row = pgFetchArraySafe($rs_pagamento);
 
                                 $prefix = getDocPrefix($rs_pagamento_row['iforma']);
 
@@ -1051,7 +1172,7 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
         //Usuario backoffice
         $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
-        if ($parametros['PROCESS_AUTOM'] == '1')
+        if (($parametros['PROCESS_AUTOM'] ?? '') == '1')
                 $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
 
         $data_corrente = date("Y/m/d");
@@ -1060,7 +1181,7 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -1068,7 +1189,7 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
         if ($msg == "") {
 
                 //Realiza uma venda para cada item de cada produto
-                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                         $vgm_id = $rs_venda_modelos_row['vgm_id'];
                         $vgm_valor = $rs_venda_modelos_row['vgm_valor'];
                         $vgm_qtde = $rs_venda_modelos_row['vgm_qtde'];
@@ -1094,27 +1215,14 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                 if ($parametros['PROCESS_AUTOM'] == '1')
                         $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
 
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago = $1,
-        vg_pagto_data_inclusao = $2,
-        vg_pagto_num_docto = $3,
-        vg_ultimo_status_obs = $4,
-        vg_ultimo_status = $5
-    WHERE vg_id = $6
-";
-
-                $params = [
-                        (float)$valor_pago,
-                        (string)$datainicio,
-                        (string)$bol_documento,
-                        (string)$parametros['ultimo_status_obs'],
-                        (int)$GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'],
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set " . PHP_EOL . "
+                                        vg_pagto_valor_pago	= " . SQLaddFields($valor_pago, "") . "," . PHP_EOL . "
+                                        vg_pagto_data_inclusao	= " . SQLaddFields($datainicio, "s") . "," . PHP_EOL . "
+                                        vg_pagto_num_docto = " . SQLaddFields($bol_documento, "s") . "," . PHP_EOL . "
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . "," . PHP_EOL . "
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'], "") . " " . PHP_EOL;
+                $sql .= "where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda." . PHP_EOL;
         }
@@ -1127,39 +1235,18 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
 
                         //atualiza boleto bancario
                         if ($msg == "") {
-                                $sql = "
-    UPDATE boleto_bancario_games 
-    SET bbg_pago = 1 
-    WHERE bbg_vg_id = $1
-";
-
-                                $params = [
-                                        (int)$venda_id
-                                ];
-
+                                $sql = "update boleto_bancario_games set bbg_pago = 1 where bbg_vg_id = " . $venda_id;
                                 echo "    DUMMY SQL Integracao - " . $sql . PHP_EOL;
-                                $ret = SQLexecuteQueryParams($sql, $params);
+                                $ret = SQLexecuteQuery($sql);
                                 if (!$ret)
                                         $msg = "Erro ao atualizar boleto banc�rio." . PHP_EOL;
                         }
 
                         //Concilia boleto
                         if ($msg == "") {
-                                $sql = "
-    UPDATE boletos_pendentes 
-    SET 
-        bol_aprovado = 1, 
-        bol_aprovado_data = CURRENT_TIMESTAMP, 
-        bol_venda_games_id = $1
-    WHERE bol_codigo = $2
-";
-
-                                $params = [
-                                        (int)$venda_id,
-                                        (int)$vg_bol_codigo
-                                ];
-
-                                $ret = SQLexecuteQueryParams($sql, $params);
+                                $sql = "update boletos_pendentes set bol_aprovado = 1, bol_aprovado_data = CURRENT_TIMESTAMP, bol_venda_games_id = " . $venda_id . "
+                                                where bol_codigo = " . $vg_bol_codigo;
+                                $ret = SQLexecuteQuery($sql);
                                 if (!$ret)
                                         $msg = "Erro ao conciliar boleto." . PHP_EOL;
                         }
@@ -1176,17 +1263,8 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
                         ($vg_pagto_tipo == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']) 
                         */
                 ) {
-                        $sql = "
-    UPDATE tb_pag_compras 
-    SET status_processed = 1 
-    WHERE idvenda = $1
-";
-
-                        $params = [
-                                (int)$venda_id
-                        ];
-
-                        $ret = SQLexecuteQueryParams($sql, $params);
+                        $sql = "update tb_pag_compras set status_processed=1 where idvenda=" . $venda_id . ";";
+                        $ret = SQLexecuteQuery($sql);
                         if (!$ret)
                                 $msg_not_relevant = "Erro ao conciliar venda (status_processed not set to '1')." . PHP_EOL;
                 }
@@ -1195,13 +1273,13 @@ function processaVendaGamesIntegracao($venda_id, $EstabCod, $parametros)
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
                 echo "    DUMMY Integracao OUT - " . $s_msg . PHP_EOL;
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -1217,20 +1295,13 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_pagto_banco = $rs_venda_row['vg_pagto_banco'];
@@ -1247,37 +1318,23 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda_modelos = SQLexecuteQuery($sql);
+                if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0)
                         $msg = "Nenhum produto encontrado (PVG_EPP_1)." . PHP_EOL;
         }
 
         //Recupera dados do usuario
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM usuarios_games ug 
-    WHERE ug.ug_id = $1
-";
-
-                $params = [
-                        (int)$vg_ug_id
-                ];
-
-                $rs_usuario = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+                $sql = "select * from usuarios_games ug " .
+                        "where ug.ug_id = " . $vg_ug_id;
+                $rs_usuario = SQLexecuteQuery($sql);
+                if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0)
                         $msg = "Nenhum cliente encontrado." . PHP_EOL;
                 else {
-                        $rs_usuario_row = pg_fetch_array($rs_usuario);
+                        $rs_usuario_row = pgFetchArraySafe($rs_usuario);
                         $ug_cel_ddd = $rs_usuario_row['ug_cel_ddd'];
                         $ug_cel = $rs_usuario_row['ug_cel'];
                 }
@@ -1288,20 +1345,12 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
                 // Pagamentos Online Banco E-Prepag
                 if ($vg_pagto_tipo == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']) {
 
-                        $sql = "
-    SELECT * FROM tb_pag_compras pag 
-    WHERE pag.numcompra = $1
-";
-
-                        $params = [
-                                (string)substr($vg_pagto_num_docto, 5)
-                        ];
-
-                        $rs_pagamento = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
+                        $sql = "select * from tb_pag_compras pag where pag.numcompra = '" . substr($vg_pagto_num_docto, 5) . "'";
+                        $rs_pagamento = SQLexecuteQuery($sql);
+                        if (!$rs_pagamento || pgNumRowsSafe($rs_pagamento) == 0)
                                 $msg = "Nenhum pagamento encontrado (A3)." . PHP_EOL;
                         else {
-                                $rs_pagamento_row = pg_fetch_array($rs_pagamento);
+                                $rs_pagamento_row = pgFetchArraySafe($rs_pagamento);
 
                                 $prefix = getDocPrefix($rs_pagamento_row['iforma']);
                                 echo "DEBUG in processaVendaGames($venda_id, EstabCod, parametros)(iforma: " . $rs_pagamento_row['iforma'] . ", prefix: '" . $prefix . "')" . PHP_EOL;
@@ -1328,7 +1377,7 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -1336,7 +1385,7 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         if ($msg == "") {
 
                 //Realiza uma venda para cada item de cada produto
-                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                         $vgm_id = $rs_venda_modelos_row['vgm_id'];
                         $vgm_valor = $rs_venda_modelos_row['vgm_valor'];
                         $vgm_qtde = $rs_venda_modelos_row['vgm_qtde'];
@@ -1356,21 +1405,11 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         //---------------------------------------------------------------------------------------------------
         //atualiza status
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_ultimo_status_obs = $1,
-        vg_ultimo_status = $2
-    WHERE vg_id = $3
-";
-
-                $params = [
-                        (string)$parametros['ultimo_status_obs'],
-                        (int)$GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'],
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set 
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'], "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda." . PHP_EOL;
         }
@@ -1378,17 +1417,9 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         //atualiza status em tabela pagamentos
         if ($msg == "") {
                 if ($vg_pagto_tipo == $GLOBALS['PAGAMENTO_BANCO_EPP_ONLINE_NUMERIC']) {
-                        $sql = "
-    UPDATE tb_pag_compras 
-    SET status_processed = 1 
-    WHERE idvenda = $1
-";
-
-                        $params = [
-                                (int)$venda_id
-                        ];
-
-                        $ret = SQLexecuteQueryParams($sql, $params);
+                        $sql = "update tb_pag_compras set status_processed=1 where idvenda=" . $venda_id . ";";
+                        echo "DEBUG EPP (atualiza status_processed=1, vendaid = $venda_id): " . $sql . PHP_EOL;
+                        $ret = SQLexecuteQuery($sql);
                         if (!$ret)
                                 $msg_not_relevant = "Erro ao conciliar venda (status_processed not set to '1')." . PHP_EOL;
                 }
@@ -1398,12 +1429,12 @@ function processaVendaGames_pagto_online_banco_epp($venda_id, $EstabCod, $parame
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -1416,10 +1447,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 {
 
         $msg = "";
+        $vg_pagto_tipo = null;
 
-        $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+        $fileLog = @fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         if ($fileLog) {
-                fwrite($fileLog, "ID VENDA PROCESSA VENDA: " . $venda_id . "\n");
+        writeLogVendaPixSafe($fileLog, "ID VENDA PROCESSA VENDA: " . $venda_id . "\n");
         }
 
         // Levanta venda de Campeonato
@@ -1428,20 +1460,13 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_pagto_banco = $rs_venda_row['vg_pagto_banco'];
@@ -1458,37 +1483,23 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda_modelos = SQLexecuteQuery($sql);
+                if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0)
                         $msg = "Nenhum produto encontrado (PVG_1)." . PHP_EOL;
         }
 
         //Recupera dados do usuario
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM usuarios_games ug 
-    WHERE ug.ug_id = $1
-";
-
-                $params = [
-                        (int)$vg_ug_id
-                ];
-
-                $rs_usuario = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+                $sql = "select * from usuarios_games ug " .
+                        "where ug.ug_id = " . $vg_ug_id;
+                $rs_usuario = SQLexecuteQuery($sql);
+                if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0)
                         $msg = "Nenhum cliente encontrado." . PHP_EOL;
                 else {
-                        $rs_usuario_row = pg_fetch_array($rs_usuario);
+                        $rs_usuario_row = pgFetchArraySafe($rs_usuario);
                         $ug_cel_ddd = $rs_usuario_row['ug_cel_ddd'];
                         $ug_cel = $rs_usuario_row['ug_cel'];
                         $ug_email = $rs_usuario_row['ug_email'];
@@ -1500,20 +1511,13 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 //Deposito
                 if ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF']) {
 
-                        $sql = "
-    SELECT * FROM depositos_pendentes dep 
-    WHERE dep.dep_codigo = $1
-";
-
-                        $params = [
-                                (int)$vg_dep_codigo
-                        ];
-
-                        $rs_deposito = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_deposito || pg_num_rows($rs_deposito) == 0)
+                        $sql = "select * from depositos_pendentes dep " .
+                                "where dep.dep_codigo = " . $vg_dep_codigo;
+                        $rs_deposito = SQLexecuteQuery($sql);
+                        if (!$rs_deposito || pgNumRowsSafe($rs_deposito) == 0)
                                 $msg = "Nenhum deposito encontrado." . PHP_EOL;
                         else {
-                                $rs_deposito_row = pg_fetch_array($rs_deposito);
+                                $rs_deposito_row = pgFetchArraySafe($rs_deposito);
                                 $dep_documento = $rs_deposito_row['dep_documento'];
                                 $ped_cod_doc_equiv = $dep_documento;
                                 $ped_dep_codigo = $vg_dep_codigo;
@@ -1523,20 +1527,13 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         //Boleto
                 } elseif ($vg_pagto_tipo == $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO']) {
 
-                        $sql = "
-    SELECT * FROM boletos_pendentes bol 
-    WHERE bol.bol_codigo = $1
-";
-
-                        $params = [
-                                (int)$vg_bol_codigo
-                        ];
-
-                        $rs_boleto = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
+                        $sql = "select * from boletos_pendentes bol " .
+                                "where bol.bol_codigo = " . $vg_bol_codigo;
+                        $rs_boleto = SQLexecuteQuery($sql);
+                        if (!$rs_boleto || pgNumRowsSafe($rs_boleto) == 0)
                                 $msg = "Nenhum boleto encontrado." . PHP_EOL;
                         else {
-                                $rs_boleto_row = pg_fetch_array($rs_boleto);
+                                $rs_boleto_row = pgFetchArraySafe($rs_boleto);
                                 $bol_documento = $rs_boleto_row['bol_documento'];
                                 $ped_cod_doc_equiv = $bol_documento;
                                 $ped_dep_codigo = null;
@@ -1545,20 +1542,12 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         // Pagamentos Online Bradesco: D�bito/Transfer�ncia - Banco do Brasil
                 } elseif (b_IsPagtoOnline($vg_pagto_tipo)) {
 
-                        $sql = "
-    SELECT * FROM tb_pag_compras pag 
-    WHERE pag.numcompra = $1
-";
-
-                        $params = [
-                                (string)substr($vg_pagto_num_docto, 5)
-                        ];
-
-                        $rs_pagamento = SQLexecuteQueryParams($sql, $params);
-                        if (!$rs_pagamento || pg_num_rows($rs_pagamento) == 0)
+                        $sql = "select * from tb_pag_compras pag where pag.numcompra = '" . substr($vg_pagto_num_docto, 5) . "'";
+                        $rs_pagamento = SQLexecuteQuery($sql);
+                        if (!$rs_pagamento || pgNumRowsSafe($rs_pagamento) == 0)
                                 $msg = "Nenhum pagamento encontrado (A1)." . PHP_EOL;
                         else {
-                                $rs_pagamento_row = pg_fetch_array($rs_pagamento);
+                                $rs_pagamento_row = pgFetchArraySafe($rs_pagamento);
 
                                 $prefix = getDocPrefix($rs_pagamento_row['iforma']);
                                 $bol_documento = $prefix . $rs_pagamento_row['iforma'] . "_" . $rs_pagamento_row['numcompra'];
@@ -1582,7 +1571,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -1594,7 +1583,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 if ($msg == "") {
 
                         //Realiza uma venda para cada item de cada produto
-                        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                 $vgm_id = $rs_venda_modelos_row['vgm_id'];
                                 $vgm_valor = $rs_venda_modelos_row['vgm_valor'];
                                 $vgm_qtde = $rs_venda_modelos_row['vgm_qtde'];
@@ -1607,21 +1596,12 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                 // Teste se o PIN n�o � de requisi��o
                                 if ($vgm_pin_request == 0) {
 
-                                        $sql = "
-    SELECT COUNT(*) AS qtde 
-    FROM tb_venda_games_modelo_pins 
-    WHERE vgmp_vgm_id = $1
-";
+                                        $verificaExist = SQLexecuteQuery("SELECT COUNT(*) AS qtde FROM tb_venda_games_modelo_pins WHERE vgmp_vgm_id = $vgm_id;");
 
-                                        $params = [
-                                                (int)$vgm_id
-                                        ];
-
-                                        $verificaExist = SQLexecuteQueryParams($sql, $params);
                                         // Verifique se a consulta foi bem-sucedida e obtemos um recurso de resultado
                                         if ($verificaExist) {
                                                 // Extrai o valor da contagem usando pg_fetch_assoc
-                                                $row = pg_fetch_assoc($verificaExist);
+                                                $row = pgFetchAssocSafe($verificaExist);
                                                 $qtde = $row['qtde'];
                                                 if ($qtde >= $vgm_qtde) {
                                                         continue;
@@ -1643,64 +1623,33 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         $pin_gerado = $geraPinEpp->gerar();
 
                                                         $sql = "
-    UPDATE pins 
-    SET
-        pin_desc = $1,
-        pin_status = '3',
-        pin_celular = $2,
-        pin_ddd = $3,
-        pin_datavenda = $4,
-        pin_datapedido = $5,
-        pin_horavenda = $6,
-        pin_horapedido = $7,
-        pin_est_codigo = $8,
-        pin_validade = CURRENT_DATE + INTERVAL '2 months'
-    WHERE pin_codinterno = $9
-";
-
-                                                        $params = [
-                                                                "Gamer, produto: " . $produto_operadora,        // $1
-                                                                (string)str_replace('-', '', $ug_cel),          // $2
-                                                                (int)($ug_cel_ddd ?: 0),                        // $3
-                                                                (string)$data_corrente,                         // $4
-                                                                (string)$data_corrente,                         // $5
-                                                                (string)$hora_corrente,                         // $6
-                                                                (string)$hora_corrente,                         // $7
-                                                                (string)$EstabCod,                              // $8
-                                                                (int)$pin_gerado                                // $9
-                                                        ];
-
-                                                        $ret = SQLexecuteQueryParams($sql, $params);
+                                                                    UPDATE pins SET
+                                                                        pin_desc       = 'Gamer, produto: $produto_operadora',
+                                                                        pin_status      = '3',
+                                                                        pin_celular     = '" . str_replace('-', '', $ug_cel) . "',
+                                                                        pin_ddd         = " . ($ug_cel_ddd ?: 0) . ",
+                                                                        pin_datavenda   = '$data_corrente',
+                                                                        pin_datapedido  = '$data_corrente',
+                                                                        pin_horavenda   = '$hora_corrente',
+                                                                        pin_horapedido  = '$hora_corrente',
+                                                                        pin_est_codigo  = '$EstabCod',
+                                                                        pin_validade    = CURRENT_DATE + INTERVAL '2 months'
+                                                                    WHERE pin_codinterno = $pin_gerado
+                                                                ";
+                                                        $ret = SQLexecuteQuery($sql);
                                                         if (!$ret)
                                                                 $msg = "Erro ao atualizar tabela de pins (3212)." . PHP_EOL;
 
-                                                        $sql = "
-    UPDATE tb_venda_games_modelo 
-    SET vgm_pin_codinterno = COALESCE(vgm_pin_codinterno, '') || $1
-    WHERE vgm_id = $2
-";
-
-                                                        $params = [
-                                                                $pin_gerado . ",", // $1: Concatena o PIN com a vírgula para manter o formato da lista
-                                                                (int)$vgm_id       // $2: ID convertido para inteiro
-                                                        ];
-
-                                                        $ret = SQLexecuteQueryParams($sql, $params);
+                                                        $sql = "update tb_venda_games_modelo set 
+							vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_gerado . ",' 
+								where vgm_id = '" . $vgm_id . "'";
+                                                        $ret = SQLexecuteQuery($sql);
                                                         if (!$ret)
                                                                 $msg = "Erro ao atualizar pin no modelo vendido." . PHP_EOL;
 
 
-                                                        $sql = "
-    INSERT INTO tb_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) 
-    VALUES ($1, $2)
-";
-
-                                                        $params = [
-                                                                (int)$vgm_id,
-                                                                (int)$pin_gerado
-                                                        ];
-
-                                                        $ret = SQLexecuteQueryParams($sql, $params);
+                                                        $sql = "insert into tb_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) values (" . $vgm_id . "," . $pin_gerado . ")";
+                                                        $ret = SQLexecuteQuery($sql);
                                                         if (!$ret)
                                                                 $msg = "Erro ao associar pin no modelo vendido." . PHP_EOL;
                                                 } else {
@@ -1709,52 +1658,35 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                         // Captura o primeiro pin v�lido
                                                         if ($msg == "") {
 
-                                                                $sqlEstoque = "
-    SELECT COUNT(*) AS qtde 
-    FROM pins 
-    WHERE opr_codigo = $1 
-      AND pin_status = '1' 
-      AND pin_canal = 's' 
-      AND pin_valor = $2
-";
-
-                                                                $params = [
-                                                                        (int)$vgm_opr_codigo,
-                                                                        (float)$vgm_pin_valor
-                                                                ];
-
-                                                                $estoqueR = SQLexecuteQueryParams($sqlEstoque, $params);
-                                                                $estoqueNoBanco = pg_fetch_array($estoqueR);
+                                                                $sqlEstoque = "select count(*) as qtde from pins where opr_codigo = " . $vgm_opr_codigo . " and pin_status = '1' and pin_canal = 's' and pin_valor = " . $vgm_pin_valor . ";";
+                                                                $estoqueR = SQLexecuteQuery($sqlEstoque);
+                                                                $estoqueNoBanco = pgFetchArraySafe($estoqueR);
                                                                 $temEstoque = (isset($estoqueNoBanco["qtde"]) && $estoqueNoBanco["qtde"] > 10) ? true : false;
 
                                                                 // Executa uma verifica��o se o a senha do pin � zerada, se for exibe o campo pin_caracter	
-                                                                // Definimos os parâmetros comuns às duas situações
-                                                                $params = [
-                                                                        (int)$vgm_opr_codigo,
-                                                                        (float)$vgm_pin_valor
-                                                                ];
-
-                                                                // Base da query que não muda
-                                                                $sql = "
-    SELECT * FROM pins
-    WHERE opr_codigo = $1
-      AND pin_status = '1'
-      AND pin_canal = 's'
-      AND pin_valor = $2
-    ORDER BY pin_codinterno ASC, pin_serial ASC
-    LIMIT 1
-";
-
-                                                                // Adicionamos o OFFSET apenas se houver estoque suficiente (conforme sua lógica original)
                                                                 if ($temEstoque) {
-                                                                        $sql .= " OFFSET 10";
+                                                                        $sql = "select * from pins
+									        where opr_codigo = " . $vgm_opr_codigo . "
+									        and pin_status = '1'
+									        and pin_canal = 's'
+									        and pin_valor = " . $vgm_pin_valor . "
+									        order by pin_codinterno asc, pin_serial asc
+									        limit 1 offset 10";
+                                                                } else {
+                                                                        $sql = "select * from pins
+									        where opr_codigo = " . $vgm_opr_codigo . "
+										and pin_status = '1' 
+                                                                                and pin_canal = 's'
+										and pin_valor = " . $vgm_pin_valor . "
+										order by pin_codinterno asc, pin_serial asc
+										limit 1;";
                                                                 }
 
-                                                                $rs_pins = SQLexecuteQueryParams($sql, $params);
-                                                                if (!$rs_pins || pg_num_rows($rs_pins) == 0)
+                                                                $rs_pins = SQLexecuteQuery($sql);
+                                                                if (!$rs_pins || pgNumRowsSafe($rs_pins) == 0)
                                                                         $msg = "Nenhum pin encontrado." . PHP_EOL;
                                                                 else {
-                                                                        $pgpins = pg_fetch_array($rs_pins);
+                                                                        $pgpins = pgFetchArraySafe($rs_pins);
                                                                         $pin_codinterno = $pgpins['pin_codinterno'];
                                                                         $pin_valor = $pgpins['pin_valor'];
                                                                         $pin_serial = $pgpins['pin_serial'];
@@ -1768,68 +1700,37 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                                                 $periodoValidade = ($vgm_opr_codigo == 166) ? "INTERVAL '60 days'" : "INTERVAL '2 months'";
 
                                                                 $sql = "
-    UPDATE pins SET
-        pin_desc       = $1,
-        pin_status     = '3',
-        pin_celular    = $2,
-        pin_ddd        = $3,
-        pin_datavenda  = $4,
-        pin_datapedido = $5,
-        pin_horavenda  = $6,
-        pin_horapedido = $7,
-        pin_est_codigo = $8,
-        pin_validade   = CURRENT_DATE + $9::interval
-    WHERE pin_codinterno = $10
-";
-
-                                                                $params = [
-                                                                        "Gamer, produto: " . $produto_operadora,    // $1
-                                                                        (string)str_replace('-', '', $ug_cel),      // $2
-                                                                        (int)$ug_cel_ddd,                           // $3
-                                                                        (string)$data_corrente,                     // $4
-                                                                        (string)$data_corrente,                     // $5
-                                                                        (string)$hora_corrente,                     // $6
-                                                                        (string)$hora_corrente,                     // $7
-                                                                        (string)$EstabCod,                          // $8
-                                                                        (string)$periodoValidade,                   // $9  (Ex: '2 months')
-                                                                        (int)$pin_codinterno                        // $10
-                                                                ];
-
-                                                                $ret = SQLexecuteQueryParams($sql, $params);
+                                                                    UPDATE pins SET
+                                                                        pin_desc       = 'Gamer, produto: $produto_operadora',
+                                                                        pin_status      = '3',
+                                                                        pin_celular     = '" . str_replace('-', '', $ug_cel) . "',
+                                                                        pin_ddd         = $ug_cel_ddd,
+                                                                        pin_datavenda   = '$data_corrente',
+                                                                        pin_datapedido  = '$data_corrente',
+                                                                        pin_horavenda   = '$hora_corrente',
+                                                                        pin_horapedido  = '$hora_corrente',
+                                                                        pin_est_codigo  = '$EstabCod',
+                                                                        pin_validade    = CURRENT_DATE + $periodoValidade
+                                                                    WHERE pin_codinterno = '$pin_codinterno'
+                                                                ";
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao atualizar tabela de pins (3212)." . PHP_EOL;
                                                         }
 
                                                         // Atualiza o serial do pin no modelo vendido
                                                         if ($msg == "") {
-                                                                $sql = "
-    UPDATE tb_venda_games_modelo 
-    SET vgm_pin_codinterno = COALESCE(vgm_pin_codinterno, '') || $1
-    WHERE vgm_id = $2
-";
-
-                                                                $params = [
-                                                                        $pin_codinterno . ",", // $1: Anexa a vírgula ao valor do PIN
-                                                                        (int)$vgm_id           // $2: Garante que o ID seja um inteiro
-                                                                ];
-
-                                                                $ret = SQLexecuteQueryParams($sql, $params);
+                                                                $sql = "update tb_venda_games_modelo set 
+									vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $pin_codinterno . ",' 
+									where vgm_id = '" . $vgm_id . "'";
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao atualizar pin no modelo vendido." . PHP_EOL;
                                                         }
 
                                                         if ($msg == "") {
-                                                                $sql = "
-    INSERT INTO tb_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) 
-    VALUES ($1, $2)
-";
-
-                                                                $params = [
-                                                                        (int)$vgm_id,
-                                                                        (int)$pin_codinterno
-                                                                ];
-
-                                                                $ret = SQLexecuteQueryParams($sql, $params);
+                                                                $sql = "insert into tb_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) values (" . $vgm_id . "," . $pin_codinterno . ")";
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao associar pin no modelo vendido." . PHP_EOL;
                                                         }
@@ -1878,61 +1779,42 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         //---------------------------------------------------------------------------------------------------
         //atualiza status
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_ultimo_status_obs = $1,
-        vg_ultimo_status = $2
-    WHERE vg_id = $3
-";
-
-                $params = [
-                        (string)$parametros['ultimo_status_obs'],
-                        (int)$GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'],
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set 
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'], "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda." . PHP_EOL;
         }
 
-        fwrite($fileLog, "ATUALIZA��O STATUS VENDA PARA '4' / " . $venda_id . " \n");
+        writeLogVendaPixSafe($fileLog, "ATUALIZA��O STATUS VENDA PARA '4' / " . $venda_id . " \n");
 
         //atualiza status em tabela pagamentos para pagamentos online
         if ($msg == "") {
 
                 if (b_IsPagtoOnline($vg_pagto_tipo)) {
 
-                        $sql = "
-    UPDATE tb_pag_compras 
-    SET status_processed = 1 
-    WHERE idvenda = $1
-";
-
-                        $params = [
-                                (int)$venda_id
-                        ];
-
-                        $ret = SQLexecuteQueryParams($sql, $params);
+                        $sql = "update tb_pag_compras set status_processed=1 where idvenda=" . $venda_id . ";";
                         echo "DEBUG C (status_processed = 1, idvenda = $venda_id): " . $sql . PHP_EOL;
 
+                        $ret = SQLexecuteQuery($sql);
                         if (!$ret)
                                 $msg_not_relevant = "Erro ao conciliar venda (status_processed not set to '1')." . PHP_EOL;
                 }
         }
 
-        fclose($fileLog);
+        closeLogVendaPixSafe($fileLog);
 
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
@@ -1947,9 +1829,9 @@ function processaEmailVendaGames($venda_id, $parametros)
         $msg = "";
         $isExpressMoney = false;
 
-        $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+        $fileLog = @fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
         if ($fileLog) {
-                fwrite($fileLog, "ID VENDA PROCESSA VENDA EMAIL: " . $venda_id . "\n");
+        writeLogVendaPixSafe($fileLog, "ID VENDA PROCESSA VENDA EMAIL: " . $venda_id . "\n");
         }
 
 
@@ -1961,20 +1843,13 @@ function processaEmailVendaGames($venda_id, $parametros)
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
@@ -1997,38 +1872,25 @@ function processaEmailVendaGames($venda_id, $parametros)
 
         //Recupera modelos
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
+                $sql = "select * from tb_venda_games vg " .
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                        "where vg.vg_id = " . $venda_id;
 
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+                $rs_venda_modelos = SQLexecuteQuery($sql);
+                if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0)
                         $msg = "Nenhum produto encontrado (PEVG_1)." . PHP_EOL;
         }
 
         //Recupera dados do usuario
         if ($msg == "") {
 
-                $sql = "
-    SELECT * FROM usuarios_games ug 
-    WHERE ug.ug_id = $1
-";
-
-                $params = [
-                        (int)$vg_ug_id
-                ];
-
-                $rs_usuario = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+                $sql = "select * from usuarios_games ug " .
+                        "where ug.ug_id = " . $vg_ug_id;
+                $rs_usuario = SQLexecuteQuery($sql);
+                if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0)
                         $msg = "Nenhum cliente encontrado." . PHP_EOL;
                 else {
-                        $rs_usuario_row = pg_fetch_array($rs_usuario);
+                        $rs_usuario_row = pgFetchArraySafe($rs_usuario);
                         $ug_email = $rs_usuario_row['ug_email'];
                         $ug_sexo = $rs_usuario_row['ug_sexo'];
                         $ug_nome = $rs_usuario_row['ug_nome'];
@@ -2055,18 +1917,11 @@ function processaEmailVendaGames($venda_id, $parametros)
         $b_isVendaCampeonato = isVendaCampeonato($venda_id);
         if ($b_isVendaCampeonato) {
 
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_modelos_campeonato = SQLexecuteQueryParams($sql, $params);
-                $rs_venda_modelos_campeonato_row = pg_fetch_array($rs_venda_modelos_campeonato);
+                $sql = "select * from tb_venda_games vg " .
+                        "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                        "where vg.vg_id = " . $venda_id;
+                $rs_venda_modelos_campeonato = SQLexecuteQuery($sql);
+                $rs_venda_modelos_campeonato_row = pgFetchArraySafe($rs_venda_modelos_campeonato);
 
                 // Define operadora e produtos
                 $vgm_opr_codigo = $rs_venda_modelos_campeonato_row['vgm_opr_codigo'];
@@ -2080,7 +1935,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                         $aux_lista_prods = "<table cellspacing='0' cellpadding='0' width='100%' style='font: normal 14px arial, sans-serif;'>" . PHP_EOL;
 
                         // Obtem o PIN vendido para cada item de cada produto
-                        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                 $vgm_id = $rs_venda_modelos_row['vgm_id'];
                                 $vgm_nome_produto = $rs_venda_modelos_row['vgm_nome_produto'];
                                 $vgm_nome_modelo = $rs_venda_modelos_row['vgm_nome_modelo'];
@@ -2102,35 +1957,17 @@ function processaEmailVendaGames($venda_id, $parametros)
 
                                                 if ($vgm_opr_codigo == 159) {
 
-                                                        $sql = "
-    SELECT ogp_valor_minimo, ogp_valor_maximo, ogp_nome 
-    FROM tb_operadora_games_produto 
-    WHERE ogp_id = $1
-";
-
-                                                        $params = [
-                                                                (int)$vgm_ogp_id
-                                                        ];
-
-                                                        $rs_bhn_variavel = SQLexecuteQueryParams($sql, $params);
-                                                        $rs_bhn_variavel_row = pg_fetch_array($rs_bhn_variavel);
+                                                        $sql = "select ogp_valor_minimo,ogp_valor_maximo,ogp_nome from tb_operadora_games_produto where ogp_id=" . $vgm_ogp_id . ";";
+                                                        $rs_bhn_variavel = SQLexecuteQuery($sql);
+                                                        $rs_bhn_variavel_row = pgFetchArraySafe($rs_bhn_variavel);
                                                         //Bloco para registro do pedido
-                                                        $sql = "
-    SELECT ogpm_pin_resquest_id, ogpm_provider_id, ogpm_cod_epay
-    FROM tb_operadora_games_produto_modelo 
-    WHERE ogpm_id = $1
-";
-
-                                                        $params = [(int)$vgm_ogpm_id];
-
-                                                        // Adiciona a condição dinâmica e o parâmetro correspondente
-                                                        if (is_null($rs_bhn_variavel_row['ogp_valor_minimo']) && is_null($rs_bhn_variavel_row['ogp_valor_maximo'])) {
-                                                                $sql .= " AND ogpm_valor = $2";
-                                                                $params[] = (float)$vgm_valor_pin;
-                                                        }
-
-                                                        $rs_bhn = SQLexecuteQueryParams($sql, $params);
-                                                        $rs_bhn_row = pg_fetch_array($rs_bhn);
+                                                        $sql = "select ogpm_pin_resquest_id,ogpm_provider_id,ogpm_cod_epay
+													from tb_operadora_games_produto_modelo 
+													where ogpm_id = $vgm_ogpm_id ";
+                                                        if (is_null($rs_bhn_variavel_row['ogp_valor_minimo']) && is_null($rs_bhn_variavel_row['ogp_valor_maximo']))
+                                                                $sql .= " and ogpm_valor = " . $vgm_valor_pin . ";";
+                                                        $rs_bhn = SQLexecuteQuery($sql);
+                                                        $rs_bhn_row = pgFetchArraySafe($rs_bhn);
 
                                                         include_once "/www/e-pay/Epay.php";
                                                         $epay = new Epay();
@@ -2147,19 +1984,11 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                         }
 
                                                         //continue;
-                                                        $sql = "
-    SELECT vgm_pin_codinterno 
-    FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vgm.vgm_id = $1
-";
-
-                                                        $params = [
-                                                                (int)$vgm_id
-                                                        ];
-
-                                                        $rs_mod = SQLexecuteQueryParams($sql, $params);
-                                                        $pin_mod_epay = pg_fetch_array($rs_mod);
+                                                        $sql = "select vgm_pin_codinterno from tb_venda_games vg " .
+                                                                "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                                                                "where vgm.vgm_id = " . $vgm_id;
+                                                        $rs_mod = SQLexecuteQuery($sql);
+                                                        $pin_mod_epay = pgFetchArraySafe($rs_mod);
                                                         $vgm_pin_codinterno = $pin_mod_epay["vgm_pin_codinterno"];
 
                                                         //}
@@ -2177,35 +2006,17 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                                 //Alterando variavel de Teste para indicar que teve PIN de Resquissi��o
                                                                 $testeNaoRequisicao = FALSE;
                                                                 //Bloco de verifica��o de produto de valro vari�vel
-                                                                $sql = "
-    SELECT ogp_valor_minimo, ogp_valor_maximo 
-    FROM tb_operadora_games_produto 
-    WHERE ogp_id = $1
-";
-
-                                                                $params = [
-                                                                        (int)$vgm_ogp_id
-                                                                ];
-
-                                                                $rs_bhn_variavel = SQLexecuteQueryParams($sql, $params);
-                                                                $rs_bhn_variavel_row = pg_fetch_array($rs_bhn_variavel);
+                                                                $sql = "select ogp_valor_minimo,ogp_valor_maximo from tb_operadora_games_produto where ogp_id=" . $vgm_ogp_id . ";";
+                                                                $rs_bhn_variavel = SQLexecuteQuery($sql);
+                                                                $rs_bhn_variavel_row = pgFetchArraySafe($rs_bhn_variavel);
                                                                 //Bloco para registro do pedido
-                                                                $sql = "
-    SELECT ogpm_pin_resquest_id 
-    FROM tb_operadora_games_produto_modelo 
-    WHERE ogpm_id = $1
-";
-
-                                                                $params = [(int)$vgm_ogpm_id];
-
-                                                                // Verifica a condição para adicionar o filtro de valor
-                                                                if (is_null($rs_bhn_variavel_row['ogp_valor_minimo']) && is_null($rs_bhn_variavel_row['ogp_valor_maximo'])) {
-                                                                        $sql .= " AND ogpm_valor = $2";
-                                                                        $params[] = (float)$vgm_valor_pin;
-                                                                }
-
-                                                                $rs_bhn = SQLexecuteQueryParams($sql, $params);
-                                                                $rs_bhn_row = pg_fetch_array($rs_bhn);
+                                                                $sql = "select ogpm_pin_resquest_id 
+															from tb_operadora_games_produto_modelo 
+															where ogpm_id = $vgm_ogpm_id ";
+                                                                if (is_null($rs_bhn_variavel_row['ogp_valor_minimo']) && is_null($rs_bhn_variavel_row['ogp_valor_maximo']))
+                                                                        $sql .= " and ogpm_valor = " . $vgm_valor_pin . ";";
+                                                                $rs_bhn = SQLexecuteQuery($sql);
+                                                                $rs_bhn_row = pgFetchArraySafe($rs_bhn);
                                                                 for ($i = 1; $i <= ($vgm_qtde * 1); $i++) {
                                                                         $parametrosRequest = array(
                                                                                 'productConfigurationId' => $rs_bhn_row['ogpm_pin_resquest_id'],
@@ -2253,28 +2064,22 @@ function processaEmailVendaGames($venda_id, $parametros)
                                         // Obtem o PIN vendido
                                         if ($msg == "") {
                                                 // Executa uma verifica��o se o a senha do pin � zerada, se for exibe o campo pin_caracter	
-                                                $sql = "
-    SELECT *, 
-           CASE 
-               WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
-               WHEN pin_codigo = '0000000000000000' THEN pin_caracter
-               ELSE pin_codigo
-           END AS case_serial
-    FROM pins
-    WHERE pin_codinterno = $1
-";
+                                                $sql = "SELECT *, 
+                                                               CASE 
+                                                                    WHEN (pin_codigo IS NULL OR pin_codigo = '') AND (pin_caracter IS NULL OR pin_caracter = '') THEN pin_serial
+                                                                    WHEN pin_codigo = '0000000000000000' THEN pin_caracter
+                                                                    ELSE pin_codigo
+                                                               END AS case_serial
+                                                        FROM pins
+                                                        WHERE pin_codinterno = " . $vgm_pin_codinternoAr[$i] . ";";
 
-                                                $params = [
-                                                        (int)$vgm_pin_codinternoAr[$i]
-                                                ];
-
-                                                $rs_pin = SQLexecuteQueryParams($sql, $params);
-                                                if (!$rs_pin || pg_num_rows($rs_pin) == 0) {
+                                                $rs_pin = SQLexecuteQuery($sql);
+                                                if (!$rs_pin || pgNumRowsSafe($rs_pin) == 0) {
                                                         $msgEmailSenhas .= "PIN n�o encontrado. [" . $GLOBALS['opr_codigo_Alawar'] . "]<br>";
                                                         $aux_lista_prods .= "<tr><td><font face='arial' color='#304D77'>PIN n�o encontrado. [" . $GLOBALS['opr_codigo_Alawar'] . "]</font></td></tr>";
                                                         $msg = "PIN n�o encontrado." . PHP_EOL;
                                                 } else {
-                                                        $pgpin = pg_fetch_array($rs_pin);
+                                                        $pgpin = pgFetchArraySafe($rs_pin);
                                                         $pin_serial = $pgpin['pin_serial'];
                                                         $case_serial = $pgpin['case_serial'];
                                                         $opr_codigo = $pgpin['opr_codigo'];
@@ -2289,19 +2094,11 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                         // Alawar - obtem o activation key ou indica o erro com o certificado
                                                         if ($vgm_opr_codigo == $GLOBALS['opr_codigo_Alawar']) {        // 55  
 
-                                                                $sql_alawar = "
-    SELECT pa_activation_key 
-    FROM pins_alawar 
-    WHERE pa_certificate_id = $1
-";
+                                                                $sql_alawar = "select pa_activation_key from pins_alawar where pa_certificate_id = '$case_serial'";
 
-                                                                $params = [
-                                                                        (string)$case_serial
-                                                                ];
-
-                                                                $rs = SQLexecuteQueryParams($sql_alawar, $params);
-                                                                if ($rs && pg_num_rows($rs) > 0) {
-                                                                        $rs_row = pg_fetch_array($rs);
+                                                                $rs = SQLexecuteQuery($sql_alawar);
+                                                                if ($rs && pgNumRowsSafe($rs) > 0) {
+                                                                        $rs_row = pgFetchArraySafe($rs);
                                                                         $case_serial = $rs_row[0];
                                                                 } else {
                                                                         $case_serial = "CERT_" . $case_serial;
@@ -2411,17 +2208,10 @@ function processaEmailVendaGames($venda_id, $parametros)
 
                 } else {
                         //Informacoes do pedido
-                        $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
-
-                        $params = [
-                                (int)$venda_id
-                        ];
-
-                        $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
+                        $sql = "select * from tb_venda_games vg " .
+                                "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                                "where vg.vg_id = " . $venda_id;
+                        $rs_venda_modelos = SQLexecuteQuery($sql);
                         $aux_lista = "<table cellspacing='0' cellpadding='5' width='100%' style='font: normal 13px arial, sans-serif;'>
                                                             <tr bgcolor='#CCCCCC'>
                                                                     <td width='3'>&nbsp;</td>
@@ -2437,7 +2227,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                         $total_geral = 0;
                         $opr_codigo_contains_EPP_Cash = false;
                         $vetorIDsProdsRequest = array();
-                        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
 
                                 // Define operadora e produtos
                                 $vgm_opr_codigo = $rs_venda_modelos_row['vgm_opr_codigo'];
@@ -2543,55 +2333,32 @@ function processaEmailVendaGames($venda_id, $parametros)
         //---------------------------------------------------------------------------------------------------
         //atualiza status
         if ($msg == "") {
-                $params = [];
-                $sql = "UPDATE tb_venda_games SET ";
-
-                // Adiciona o campo de observação apenas se necessário
+                $sql = "update tb_venda_games set ";
                 if (isset($parametros['ultimo_status_obs']) && !empty($parametros['ultimo_status_obs'])) {
-                        $sql .= " vg_ultimo_status_obs = $1, ";
-                        $params[] = (string)$parametros['ultimo_status_obs'];
+                        $sql .= " vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ", ";
                 }
-
-                // O próximo placeholder será dinâmico: $1 ou $2 dependendo do IF acima
-                $placeholder_status = "$" . (count($params) + 1);
-                $placeholder_id = "$" . (count($params) + 2);
-
-                $sql .= " vg_ultimo_status = $placeholder_status WHERE vg_id = $placeholder_id";
-
-                $params[] = (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'];
-                $params[] = (int)$venda_id;
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql .= " vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao atualizar venda (ultimo_status)." . PHP_EOL;
                 if ($msg == "") {
                         if (isset($parametros['PROCESS_TEST']) && ($parametros['PROCESS_TEST'] != 1)) {
                                 $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
-                                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP, 
-        vg_user_id_concilia = $1
-    WHERE vg_id = $2
-";
-
-                                $params = [
-                                        (string)$iduser_bko, // $1
-                                        (int)$venda_id       // $2
-                                ];
-
-                                $ret = SQLexecuteQueryParams($sql, $params);
+                                $sql = "update tb_venda_games set 
+                                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "'
+                                                where vg_id = " . $venda_id;
+                                $ret = SQLexecuteQuery($sql);
                                 if (!$ret)
                                         $msg = "Erro ao atualizar venda (data_concilia)." . PHP_EOL;
                         }
                 }
 
-                fwrite($fileLog, "ATUALIZA��O STATUS VENDA PARA '5' / " . $venda_id . " \n");
-                fwrite($fileLog, "MENSAGEM DE VENDA PROCESSA EMAIL: " . $msg . " / " . $venda_id . " \n\r");
+                writeLogVendaPixSafe($fileLog, "ATUALIZA��O STATUS VENDA PARA '5' / " . $venda_id . " \n");
+                writeLogVendaPixSafe($fileLog, "MENSAGEM DE VENDA PROCESSA EMAIL: " . $msg . " / " . $venda_id . " \n\r");
         }
 
-        fclose($fileLog);
+        closeLogVendaPixSafe($fileLog);
 
         return $msg;
 } //end function processaEmailVendaGames
@@ -2601,36 +2368,22 @@ function enviaEmailFormatadoComProdutos($venda_id, $parametros, $cc, $bcc, $subj
 
         $msg = "";
         //Recupera a venda
-        $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-        $params = [
-                (int)$venda_id
-        ];
-
-        $rs_venda = SQLexecuteQueryParams($sql, $params);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+        $sql = "select * from tb_venda_games vg " .
+                "where vg.vg_id = " . $venda_id;
+        $rs_venda = SQLexecuteQuery($sql);
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                 $msg = "Nenhuma venda encontrada." . PHP_EOL;
         else {
-                $rs_venda_row = pg_fetch_array($rs_venda);
+                $rs_venda_row = pgFetchArraySafe($rs_venda);
                 $vg_ug_id = $rs_venda_row['vg_ug_id'];
         }
 
         //Recupera dados do usuario
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM usuarios_games ug 
-    WHERE ug.ug_id = $1
-";
-
-                $params = [
-                        (int)$vg_ug_id
-                ];
-
-                $rs_usuario = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_usuario || pg_num_rows($rs_usuario) == 0)
+                $sql = "select * from usuarios_games ug " .
+                        "where ug.ug_id = " . $vg_ug_id;
+                $rs_usuario = SQLexecuteQuery($sql);
+                if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0)
                         $msg = "Nenhum cliente encontrado." . PHP_EOL;
         }
 
@@ -2644,48 +2397,26 @@ function cancelaVendaGames($venda_id, $parametros)
 
         //atualiza status
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_usuario_obs = $1,
-        vg_ultimo_status_obs = $2,
-        vg_ultimo_status = $3
-    WHERE vg_id = $4
-";
-
-                $params = [
-                        (string)$parametros['usuario_obs'],             // $1
-                        (string)$parametros['ultimo_status_obs'],      // $2
-                        (int)$GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'], // $3
-                        (int)$venda_id                                  // $4
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set 
+                                        vg_usuario_obs = " . SQLaddFields($parametros['usuario_obs'], "s") . ",
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'], "") . "
+                                where vg_id = " . $venda_id . " ";
                 echo "DEBUG Cancela Venda (vg_id = $venda_id): " . $sql . PHP_EOL;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao cancelar venda." . PHP_EOL;
                 else {
                         // Cancela pagamento desta venda, se existir
                         // e se o pagamento n�o tiver sido feito e a venda ainda n�o tiver sido processada
-                        $sql = "
-    UPDATE tb_pag_compras 
-    SET 
-        status_processed = 1,
-        status = -1
-    WHERE idvenda = $1 
-      AND status_processed = 0 
-      AND status = 1 
-      AND tipo_cliente = 'M'
-";
-
-                        $params = [
-                                (int)$venda_id
-                        ];
-
-                        $ret = SQLexecuteQueryParams($sql, $params);
+                        $sql = "update tb_pag_compras set 
+                                                status_processed = 1,
+                                                status = -1
+                                        where idvenda = " . $venda_id . " and status_processed = 0 and status = 1 and tipo_cliente='M' ";
                         echo "DEBUG Cancela Pagto (atualiza status_processed=1, vendaid = $venda_id): " . $sql . PHP_EOL;
 
                         // Ver cancelaVendasEmPedidoEfetuado()
+                        $ret = SQLexecuteQuery($sql);
                         if (!$ret)
                                 $msg = "Erro ao cancelar pagamentos de venda (venda foi cancelada)." . PHP_EOL;
                 }
@@ -2701,20 +2432,12 @@ function descancelaVendaGames($venda_id, $parametros)
 
         //Recupera a venda
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                $sql = "select * from tb_venda_games vg where vg.vg_id = " . $venda_id;
+                $rs_venda = SQLexecuteQuery($sql);
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
                 else {
-                        $rs_venda_row = pg_fetch_array($rs_venda);
+                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                         $vg_ug_id = $rs_venda_row['vg_ug_id'];
                         $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
                         $vg_pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
@@ -2729,22 +2452,14 @@ function descancelaVendaGames($venda_id, $parametros)
         //Recupera historico da venda
         if ($msg == "") {
                 // acrescenta ", vgh_status desc" em order para que os registros de status 1 e 2 apare�a~m na ordem certa, est� retornando "1" como o segundo status do hist�rico em ordem inversa de datas, por isso descancela para status 1 e n�o para 2 (as datas de 1 e 2 s�o as mesmas)
-                $sql = "
-    SELECT * FROM tb_venda_games_historico vgh 
-    WHERE vgh.vgh_vg_id = $1
-    ORDER BY vgh_data_inclusao DESC, vgh_status DESC 
-    OFFSET 1
-";
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_venda_historico = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_venda_historico || pg_num_rows($rs_venda_historico) == 0)
+                $sql = "select * from tb_venda_games_historico vgh 
+                                 where vgh.vgh_vg_id = " . $venda_id . "
+                                 order by vgh_data_inclusao desc, vgh_status desc offset 1";
+                $rs_venda_historico = SQLexecuteQuery($sql);
+                if (!$rs_venda_historico || pgNumRowsSafe($rs_venda_historico) == 0)
                         $msg = "Nenhum hist�rico da venda encontrado." . PHP_EOL;
                 else {
-                        $rs_venda_historico_row = pg_fetch_array($rs_venda_historico);
+                        $rs_venda_historico_row = pgFetchArraySafe($rs_venda_historico);
                         $vgh_status = $rs_venda_historico_row['vgh_status'];
                         $vgh_status = $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO']; // fixo 
 
@@ -2764,23 +2479,12 @@ function descancelaVendaGames($venda_id, $parametros)
         //---------------------------------------------------------------------------------------------------
         //atualiza status
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_usuario_obs = $1,
-        vg_ultimo_status_obs = $2,
-        vg_ultimo_status = $3
-    WHERE vg_id = $4
-";
-
-                $params = [
-                        (string)$parametros['usuario_obs'],    // $1
-                        (string)$parametros['ultimo_status_obs'], // $2
-                        (int)$vgh_status,                     // $3
-                        (int)$venda_id                        // $4
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set 
+                                        vg_usuario_obs = " . SQLaddFields($parametros['usuario_obs'], "s") . ",
+                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . ",
+                                        vg_ultimo_status = " . SQLaddFields($vgh_status, "") . "
+                                where vg_id = " . $venda_id;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao descancelar venda." . PHP_EOL;
         }
@@ -2798,29 +2502,20 @@ function cancelaVendasBoletoVencido()
         $msg = "";
 
         //Busca vendas com boletos vencidos
-        $sql = "
-    SELECT vg.vg_id, bbg.bbg_data_inclusao, bbg.bbg_data_venc
-    FROM tb_venda_games vg 
-    INNER JOIN boleto_bancario_games bbg ON bbg.bbg_vg_id = vg.vg_id
-    WHERE (vg.vg_concilia IS NULL OR vg.vg_concilia = 0)
-      AND vg.vg_ultimo_status = $1
-      AND vg.vg_pagto_tipo = $2
-      AND bbg.bbg_data_venc + ($3 || ' day')::interval < CURRENT_DATE
-";
-
-        $params = [
-                (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'],
-                (int)$GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'],
-                (int)$GLOBALS['PROCESS_AUTOM_BOLETO_CANCELAMENTO_DIAS_VENCIDO']
-        ];
-
-        $rs_venda_bol_venc = SQLexecuteQueryParams($sql, $params);
+        $sql = "select vg.vg_id, bbg.bbg_data_inclusao, bbg.bbg_data_venc
+                        from tb_venda_games vg 
+                        inner join boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id
+                        where (vg.vg_concilia is null or vg.vg_concilia = 0)
+                                and vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                and vg.vg_pagto_tipo = " . $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'] . "
+                                and bbg.bbg_data_venc + interval '" . $GLOBALS['PROCESS_AUTOM_BOLETO_CANCELAMENTO_DIAS_VENCIDO'] . " day' < CURRENT_DATE ";
         $msg .= PHP_EOL . PHP_EOL;
-        if (!$rs_venda_bol_venc || pg_num_rows($rs_venda_bol_venc) == 0)
+        $rs_venda_bol_venc = SQLexecuteQuery($sql);
+        if (!$rs_venda_bol_venc || pgNumRowsSafe($rs_venda_bol_venc) == 0)
                 $msg = "Nenhuma venda encontrada com boleto vencido ha mais de " . $GLOBALS['PROCESS_AUTOM_BOLETO_CANCELAMENTO_DIAS_VENCIDO'] . " dias." . PHP_EOL;
         else {
-                $msg .= "Encontrado(s) " . pg_num_rows($rs_venda_bol_venc) . " venda(s) com boleto vencido:" . PHP_EOL;
-                while ($rs_venda_bol_venc_row = pg_fetch_array($rs_venda_bol_venc)) {
+                $msg .= "Encontrado(s) " . pgNumRowsSafe($rs_venda_bol_venc) . " venda(s) com boleto vencido:" . PHP_EOL;
+                while ($rs_venda_bol_venc_row = pgFetchArraySafe($rs_venda_bol_venc)) {
                         $vg_id = $rs_venda_bol_venc_row['vg_id'];
 
                         $parametros['usuario_obs'] = "Pedido cancelado. Boleto n�o quitado 'dentro do prazo estabelecido." . PHP_EOL;
@@ -2847,41 +2542,28 @@ function cancelaVendasEmPedidoEfetuado()
 
         echo $header . PHP_EOL;
         //Busca vendas com boletos vencidos
-        $sql = "
-    SELECT vg.vg_id, vg.vg_pagto_tipo 
-    FROM tb_venda_games vg 
-    WHERE (vg.vg_concilia IS NULL OR vg.vg_concilia = 0)
-      AND vg.vg_ultimo_status = $1 
-      AND (
-          (
-            (vg_pagto_tipo = $2 OR vg_pagto_tipo = $3) 
-            AND vg.vg_data_inclusao + ($4 || ' day')::interval < CURRENT_TIMESTAMP
-          ) 
-          OR
-          (
-            (" . getSQLWhereParaVendaPagtoOnline(false) . ") 
-            AND vg.vg_data_inclusao + ($5 || ' minutes')::interval < CURRENT_TIMESTAMP
-          )
-      )
-";
-
-        $params = [
-                (int)$GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'],                             // $1
-                (int)$GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF'],                         // $2
-                (int)$GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'],                        // $3
-                (int)$GLOBALS['PROCESS_AUTOM_PEDIDO_EFETUADO_CANCELAMENTO_DIAS_VENCIDO'],    // $4
-                (int)$GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] // $5
-        ];
-
-        $rs_venda_venc = SQLexecuteQueryParams($sql, $params);
+        $sql = "select vg.vg_id, vg.vg_pagto_tipo 
+                from tb_venda_games vg 
+                where (vg.vg_concilia is null or vg.vg_concilia = 0)
+                        and vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PEDIDO_EFETUADO'] . " 
+                        and 
+                        ( ( (vg_pagto_tipo= " . $GLOBALS['FORMAS_PAGAMENTO']['DEP_DOC_TRANSF'] . " or vg_pagto_tipo= " . $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'] . " ) 
+                        and vg.vg_data_inclusao + interval '" . $GLOBALS['PROCESS_AUTOM_PEDIDO_EFETUADO_CANCELAMENTO_DIAS_VENCIDO'] . " day' < CURRENT_TIMESTAMP ) 
+                        or
+                                ( (" . getSQLWhereParaVendaPagtoOnline(false) . ") 
+                                        and (
+                                                        (vg.vg_data_inclusao + interval '" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutes' < CURRENT_TIMESTAMP)  
+                                                ) 
+                                ) 
+                        ) ";
 
         $msg .= PHP_EOL . PHP_EOL;
-
-        if (!$rs_venda_venc || pg_num_rows($rs_venda_venc) == 0) {
+        $rs_venda_venc = SQLexecuteQuery($sql);
+        if (!$rs_venda_venc || pgNumRowsSafe($rs_venda_venc) == 0) {
                 $msg = "Nenhuma venda encontrada com pedido vencido ha mais de " . $GLOBALS['PROCESS_AUTOM_PEDIDO_EFETUADO_CANCELAMENTO_DIAS_VENCIDO'] . " dias." . PHP_EOL;
         } else {
-                $msg .= "Encontrado(s) " . pg_num_rows($rs_venda_venc) . " venda(s) com pedido vencido:" . PHP_EOL;
-                while ($rs_venda_venc_row = pg_fetch_array($rs_venda_venc)) {
+                $msg .= "Encontrado(s) " . pgNumRowsSafe($rs_venda_venc) . " venda(s) com pedido vencido:" . PHP_EOL;
+                while ($rs_venda_venc_row = pgFetchArraySafe($rs_venda_venc)) {
                         $vg_id = $rs_venda_venc_row['vg_id'];
                         $vg_pagto_tipo = $rs_venda_venc_row['vg_pagto_tipo'];
 
@@ -2958,50 +2640,39 @@ function cancelaVendasEmPedidoEfetuado()
         // Cancela pagamentos sem venda cadastrada e com mais de PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO minutos
         // Este vale para todos os tipos de pagamento, n�o apenas para o Money
         $msg .= PHP_EOL . "Cancela pagamentos em aberto por mais de " . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutos" . PHP_EOL;
-        $sql = "
-    UPDATE tb_pag_compras 
-    SET 
-        status_processed = 1,
-        status = -1
-    WHERE status_processed = 0 
-      AND status = 1 
-      AND (datainicio + ($1 || ' minutes')::interval < CURRENT_TIMESTAMP)
-";
-
-        $params = [
-                (int)$GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO']
-        ];
-
-        // Opcional: Para manter o seu log de DEBUG, você pode imprimir o SQL e o array de parâmetros
-        echo "DEBUG Cancela pagtos por tempo: " . $sql . " | Parâmetros: " . json_encode($params) . PHP_EOL;
-
-        $ret = SQLexecuteQueryParams($sql, $params);
+        $sql = "update tb_pag_compras set 
+                                status_processed = 1,
+                                status = -1
+                        where 1=1
+                                        and status_processed = 0 
+                                        and status = 1 
+                                        and ((datainicio + interval '" . $GLOBALS['PROCESS_AUTOM_PEDIDO_ONLINE_EFETUADO_CANCELAMENTO_MINUTOS_VENCIDO'] . " minutes' < CURRENT_TIMESTAMP))";
+        echo "DEBUG Cancela pagtos por tempo (atualiza status_processed=1): " . $sql . PHP_EOL;
+        $ret = SQLexecuteQuery($sql);
         if (!$ret)
                 $msg .= "Erro ao cancelar pagamentos sem venda e atrasados ($sql)." . PHP_EOL;
 
         // Cancela vendas com pagamentos CIELO onde o pagamento est� com status -1
         $msg .= PHP_EOL . "Cancela vendas com pagamentos CIELO onde o pagamento est� com status -1" . PHP_EOL;
-        $sql = "
-    SELECT vg.vg_id 
-    FROM tb_venda_games vg 
-    INNER JOIN tb_pag_compras p ON p.idvenda = vg.vg_id 
-    WHERE (vg.vg_concilia IS NULL OR vg.vg_concilia = 0)
-      AND vg.vg_ultimo_status = 1 
-      AND p.status = -1
-      AND ( " . getSQLWhereParaVendaPagtoOnline(true) . " )
-";
-
-        $params = [];
-
-        echo "CANCELA vendas com pagamentos CIELO onde o pagamento está com status -1" . PHP_EOL;
-
-        $ret_cielo = SQLexecuteQueryParams($sql, $params);
-        if (!$ret_cielo || pg_num_rows($ret_cielo) == 0) {
+        $sql = "select vg.vg_id ";
+        $sql .= "from tb_venda_games vg 
+                                inner join tb_pag_compras p on p.idvenda = vg.vg_id 
+                        where 1=1
+                        and (vg.vg_concilia is null or vg.vg_concilia = 0)
+                        and vg.vg_ultimo_status = 1 
+                        and p.status = -1
+                        and 
+                                (
+                                " . getSQLWhereParaVendaPagtoOnline(true) . "
+                                ) ";
+        echo "CANCELA vendas com pagamentos CIELO onde o pagamento est� com status -1" . PHP_EOL;        //"$sql".PHP_EOL;
+        $ret_cielo = SQLexecuteQuery($sql);
+        if (!$ret_cielo || pgNumRowsSafe($ret_cielo) == 0) {
                 $msg .= "Nenhuma venda encontrada com pagamento CIELO cancelado " . PHP_EOL;
         } else {
-                $msg .= "Encontrada(s) " . pg_num_rows($ret_cielo) . " venda(s) com pagamento CIELO cancelado" . PHP_EOL;
+                $msg .= "Encontrada(s) " . pgNumRowsSafe($ret_cielo) . " venda(s) com pagamento CIELO cancelado" . PHP_EOL;
                 $ret = "";
-                while ($ret_cielo_row = pg_fetch_array($ret_cielo)) {
+                while ($ret_cielo_row = pgFetchArraySafe($ret_cielo)) {
                         $vg_id = $ret_cielo_row['vg_id'];
                         $parametros['usuario_obs'] = "Seu pagamento CIELO foi cancelado" . PHP_EOL;
                         $parametros['ultimo_status_obs'] = "Pedido cancelado. Pagamento Cielo cancelado." . PHP_EOL;
@@ -3035,27 +2706,15 @@ function conciliacaoAutomaticaBoleto()
         $msg = "";
 
         // obtem a data de 5 dias atr�s
-        $hoje = date("Y-m-d H:i:s");
-        $y = date("Y", strtotime($hoje));
-        $m = date("m", strtotime($hoje));
-        $d = date("d", strtotime($hoje));
-        $today_minus_5_days = date("Y-m-d H:i:s", mktime(0, 0, 0, $m, $d - 5, $y));
+        $today_minus_5_days = (new DateTimeImmutable("-5 days"))->setTime(0, 0, 0)->format("Y-m-d H:i:s");
 
         //Procura boletos em aberto nos �ltimos 5 dias
-        $sql = "
-    SELECT b.* FROM bancos_financeiros bf, boletos_pendentes b 
-    WHERE (bol_banco = bco_codigo) 
-      AND (bco_rpp = 1) 
-      AND bol_aprovado = 0 
-      AND bol_data >= $1 
-      AND (substr(bol_documento, 1, 1) = '2' OR substr(bol_documento, 1, 1) = '3') 
-    ORDER BY bol_codigo DESC
-";
-
-        $params = [
-                (string)$today_minus_5_days
-        ];
-
+        $sql = "select b.* ";        // "--, vg.*  "
+        $sql .= "from bancos_financeiros bf, boletos_pendentes b ";
+        $sql .= "where (bol_banco = bco_codigo) and (bco_rpp = 1) and bol_aprovado = 0 ";
+        $sql .= " and bol_data>='" . $today_minus_5_days . "' ";                // ".date("Y-m-d")."
+        $sql .= " and (substr(bol_documento,1,1)='2' or substr(bol_documento,1,1)='3') ";
+        $sql .= " order by bol_codigo desc ";
 
         //if($bDebug) 
         echo "SQL A0: " . $sql . $cReturn;
@@ -3066,15 +2725,15 @@ function conciliacaoAutomaticaBoleto()
         if ($bDebug)
                 echo "Elapsed time (Procura boleto " . (isset($n_boletos) ? $n_boletos : "") . "): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
 
-        $rs_bol = SQLexecuteQueryParams($sql, $params);
+        $rs_bol = SQLexecuteQuery($sql);
         if ($bDebug)
-                echo "pg_num_rows(rs_bol): " . pg_num_rows($rs_bol) . $cReturn . $cReturn;
+                echo "pgNumRowsSafe(rs_bol): " . pgNumRowsSafe($rs_bol) . $cReturn . $cReturn;
 
-        if ($rs_bol && (pg_num_rows($rs_bol) > 0)) {
+        if ($rs_bol && (pgNumRowsSafe($rs_bol) > 0)) {
 
                 $n_boletos = 0;
                 $s_lista_boletos_sem_vendas = "";
-                while ($rs_bol_row = pg_fetch_array($rs_bol)) {
+                while ($rs_bol_row = pgFetchArraySafe($rs_bol)) {
 
                         $msg1 .= $msg;
                         $msg = "";
@@ -3126,14 +2785,14 @@ function conciliacaoAutomaticaBoleto()
                                 echo "SQL A1: " . $sql . $cReturn;
 
                                 $rs_venda = SQLexecuteQueryParams($sql, $params_venda);
-                                if ($rs_venda && pg_num_rows($rs_venda) > 0) {
-                                        $rs_venda_row = pg_fetch_array($rs_venda);
+                                if ($rs_venda && pgNumRowsSafe($rs_venda) > 0) {
+                                        $rs_venda_row = pgFetchArraySafe($rs_venda);
                                 } else {
                                         $msg = "Nenhuma venda encontrada." . $cReturn;
                                 }
                         }
                         if ($bDebug)
-                                echo "  >> pg_num_rows(rs_venda): " . pg_num_rows($rs_venda) . $cReturn . PHP_EOL;
+                                echo "  >> pgNumRowsSafe(rs_venda): " . pgNumRowsSafe($rs_venda) . $cReturn . PHP_EOL;
 
                         if ($msg == "") {
                                 $vg_id = $rs_venda_row['vg_id'];
@@ -3161,8 +2820,8 @@ function conciliacaoAutomaticaBoleto()
                                         echo "SQL RRR: " . $sql . $cReturn;
 
                                 $rs_venda_modelos = SQLexecuteQueryParams($sql, [$vg_id]);
-                                if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
-                                        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                                if ($rs_venda_modelos && pgNumRowsSafe($rs_venda_modelos) > 0) {
+                                        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                                 $qtde = $rs_venda_modelos_row['vgm_qtde'];
                                                 $valor = $rs_venda_modelos_row['vgm_valor'];
                                                 $total_geral += $valor * $qtde;
@@ -3188,10 +2847,10 @@ function conciliacaoAutomaticaBoleto()
                                         from boleto_bancario_games bbg 
                                         where (bbg_pago = 0 or bbg_pago is null) 
                                             and bbg.bbg_vg_id = $1 ;";
-                                echo "Buscando Taxa no Banco de Dados:" . PHP_EOL . $sql . PHP_EOL;
-                                $rs_taxa = SQLexecuteQueryParams($sql, [$vg_id]);
-                                $rs_taxa_row = pg_fetch_array($rs_taxa);
-                                $taxas = $rs_taxa_row['bbg_valor_taxa'];
+	                                echo "Buscando Taxa no Banco de Dados:" . PHP_EOL . $sql . PHP_EOL;
+	                                $rs_taxa = SQLexecuteQueryParams($sql, [$vg_id]);
+	                                $rs_taxa_row = pgFetchArraySafe($rs_taxa);
+	                                $taxas = $rs_taxa_row ? $rs_taxa_row['bbg_valor_taxa'] : 0;
 
                                 if ($vg_pagto_banco == $GLOBALS['BOLETO_MONEY_BRADESCO_COD_BANCO'] || $vg_pagto_banco == $GLOBALS['BOLETO_MONEY_ASAAS_COD_BANCO']) {
 
@@ -3368,7 +3027,7 @@ function conciliacaoAutomaticaBoleto()
                                         if ($msgConcilia == "") {
                                                 //Usuario backoffice
                                                 $iduser_bko = ((isset($GLOBALS['_SESSION']['iduser_bko'])) ? $GLOBALS['_SESSION']['iduser_bko'] : 0);
-                                                if ($parametros['PROCESS_AUTOM'] == '1')
+                                                if (($parametros['PROCESS_AUTOM'] ?? '') == '1')
                                                         $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
 
                                                 $sql = "update tb_venda_games set 
@@ -3405,10 +3064,15 @@ function conciliacaoAutomaticaBoleto()
                                                                 $msg_1 = date("Y-m-d H:i:s") . " - Erro ao recuperar transa��o de integra��o (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
                                                                 echo $msg_1;
                                                                 grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
-                                                        } else {
-                                                                $rs_row = pg_fetch_array($rs);
+	                                                        } else {
+	                                                                $rs_row = pgFetchArraySafe($rs);
 
-                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
+	                                                                if (!$rs_row) {
+	                                                                        $msg_1 = date("Y-m-d H:i:s") . " - Transacao de integracao nao encontrada para notify (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
+	                                                                        echo $msg_1;
+	                                                                        grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
+	                                                                } else {
+	                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
 
                                                                 $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
                                                                 $post_parameters .= "order_id=" . $rs_row["ip_order_id"] . "&";
@@ -3425,10 +3089,11 @@ function conciliacaoAutomaticaBoleto()
                                                                 //										$sret = substr($sret1,strpos($sret1,"Content-type: text/html")+strlen("Content-type: text/html"));
                                                                 $sret = $sret1;
 
-                                                                $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Boleto (Novo esquema) (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
-                                                                grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (1): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-                                                                echo "  ==  $s_msg" . $cReturn . print_r($post_parameters, true) . $cReturn;
-                                                        }
+	                                                                $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Boleto (Novo esquema) (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
+	                                                                grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (1): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
+	                                                                echo "  ==  $s_msg" . $cReturn . print_r($post_parameters, true) . $cReturn;
+	                                                                }
+	                                                        }
                                                 }
                                         } else {
                                                 echo "ERRO Concilia (A5): $msgConcilia" . $cReturn;
@@ -3516,7 +3181,7 @@ function conciliacaoAutomaticaBoleto()
                         if ($bDebug) {
                                 $time_start_stat_this = getmicrotime();
                                 echo " ==== Elapsed time (Procura boleto 2): " . number_format($time_start_stat_this - $time_start_stats, 2, '.', '.') . " (diff prev: " . number_format($time_start_stat_this - $time_start_stats_prev, 2, '.', '.') . ")" . $cReturn;
-                                //" Nboletos2: ".pg_num_rows($rs_bol)." boletos (".$rs_bol.")".$cReturn;
+                                //" Nboletos2: ".pgNumRowsSafe($rs_bol)." boletos (".$rs_bol.")".$cReturn;
                                 $time_start_stats_prev = $time_start_stat_this;
                         }
 
@@ -3576,21 +3241,8 @@ function conciliacaoAutomaticaPagamentoOnline()
         // Os dois casos devem ser conciliados
 
         // O anterior est� demorando muito e n�o � necess�rio consultar tb_venda_games, apenas tb_pag_compras
-        $sql = "
-    SELECT * FROM tb_pag_compras pgt 
-    WHERE idvenda > 0 
-      AND status_processed = 0 
-      AND tipo_cliente = 'M' 
-      AND tipo_deposito = 0 
-      AND datainicio > (NOW() - '2 months'::interval) 
-      AND iforma NOT IN ('E', 'A', '9', '6', '5', $1)
-";
+        $sql = "select * from tb_pag_compras pgt where idvenda>0 and status_processed=0 and tipo_cliente='M' and tipo_deposito = 0 and datainicio > (now() -'2 months'::interval) and iforma!='E' and iforma!='A' and iforma!='9' and iforma!='6' and iforma!='5' and iforma!='" . $FORMAS_PAGAMENTO['PAGAMENTO_PIX'] . "'";
 
-        $params = [
-                (string)$FORMAS_PAGAMENTO['PAGAMENTO_PIX']
-        ];
-
-        $rs_total = SQLexecuteQueryParams($sql, $params);
         // status=1 and 
         // Apenas para vendas que n�o s�o integra��o
         //		$sql .= "and vg_integracao_parceiro_origem_id is null ";
@@ -3603,12 +3255,13 @@ function conciliacaoAutomaticaPagamentoOnline()
         // Op��o 2 - Para incluir algum pagamento antigo descancelado
         //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
 
+        $rs_total = SQLexecuteQuery($sql);
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 0): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
         if ($rs_total)
-                $registros_total = pg_num_rows($rs_total);
+                $registros_total = pgNumRowsSafe($rs_total);
         $sql .= " order by pgt.datainicio desc ";
 
         if ($bDebug) {
@@ -3616,21 +3269,21 @@ function conciliacaoAutomaticaPagamentoOnline()
         }
 
         $time_start_stats0 = getmicrotime();
-        $rs_transacoes = SQLexecuteQueryParams($sql, $params);
+        $rs_transacoes = SQLexecuteQuery($sql);
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
         echo $cReturn . $cReturn . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . $cReturn;        //."$sql".$cReturn;
 
-        if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
+        if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0)
                 $msg = "Nenhuma transa��o encontrada." . $cReturn;
 
         $time_start_stats0 = getmicrotime();
         $irows = 0;
         if ($rs_transacoes) {
-                $npags = pg_num_rows($rs_transacoes);
+                $npags = pgNumRowsSafe($rs_transacoes);
                 $total_pagtos_pendente = 0;
-                while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+                while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
                         $time_start_stats0_in = getmicrotime();
                         $irows++;
 
@@ -3649,27 +3302,15 @@ function conciliacaoAutomaticaPagamentoOnline()
                                         $iforma_tmp = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
 
                                         // Atualiza dados para tabela vendas
-                                        $sql_update = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago    = $1,
-        vg_pagto_tipo           = $2,
-        vg_pagto_num_docto      = $3,
-        vg_pagto_data_inclusao  = $4,
-        vg_ultimo_status        = $5
-    WHERE vg_id = $6
-";
+                                        $sql_update = "update tb_venda_games set 
+                                                                        vg_pagto_valor_pago		= " . ($rs_transacoes_row['total'] / 100) . ",
+                                                                        vg_pagto_tipo			= " . $iforma_tmp . ",
+                                                                        vg_pagto_num_docto		= '" . $prefix . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra'] . "', 
+                                                                        vg_pagto_data_inclusao	= '" . $rs_transacoes_row['datainicio'] . "',
+                                                                        vg_ultimo_status		= " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                                                where vg_id=" . $rs_transacoes_row['idvenda'] . ";";
 
-                                        $params = [
-                                                (float)($rs_transacoes_row['total'] / 100), // $1 - Valor formatado
-                                                (int)$iforma_tmp,                          // $2
-                                                (string)($prefix . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra']), // $3 - String composta
-                                                (string)$rs_transacoes_row['datainicio'],  // $4
-                                                (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $5
-                                                (int)$rs_transacoes_row['idvenda']         // $6
-                                        ];
-
-                                        $rs_update = SQLexecuteQueryParams($sql_update, $params);
+                                        $rs_update = SQLexecuteQuery($sql_update);
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 3): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                         }
@@ -3727,7 +3368,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         $b_sonda_5 = getTransacaoPagamentoOK("Transf", $rs_transacoes_row['numcompra'], $aline5);
 
                                                         // Se existe registro da transa��o -> salva data 	
-                                                        if ((isset($aline5[1])) && (strlen($aline5[1]) > 0)) {
+                                                        if ((isset($aline5[1], $aline5[3], $aline5[4])) && (strlen($aline5[1]) > 0)) {
                                                                 $s_sonda = (($b_sonda_5) ? "OK" : "none");
                                                                 $sBanco = "Bradesco";
 
@@ -3746,7 +3387,7 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         $b_sonda_6 = getTransacaoPagamentoOK("PagtoFacil", $rs_transacoes_row['numcompra'], $aline6);
 
                                                         // Se existe registro da transa��o -> salva data 	
-                                                        if ((isset($aline6[1])) && (strlen($aline6[1]) > 0)) {
+                                                        if ((isset($aline6[1], $aline6[3], $aline6[4])) && (strlen($aline6[1]) > 0)) {
                                                                 $s_sonda = (($b_sonda_6) ? "OK" : "none");
                                                                 $sBanco = "Bradesco";
                                                                 /*	
@@ -3770,17 +3411,18 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                                 $s_sonda = (($b_sonda_9) ? "OK" : "none");
                                                                 $sBanco = "Banco do Brasil";
                                                                 //     [dataPagamento] => 16092009
-                                                                echo " =====> Trecho 2 " . $aline9['dataPagamento'] . PHP_EOL;
-                                                                if (strpos($aline9['dataPagamento'], date('Y')) == 4) {
-                                                                        $dataconfirma = "'" . substr($aline9['dataPagamento'], 4, 4) . "-" . substr($aline9['dataPagamento'], 2, 2) . "-" . substr($aline9['dataPagamento'], 0, 2) . "'";
+                                                                $dataPagamento = $aline9['dataPagamento'] ?? "";
+                                                                echo " =====> Trecho 2 " . $dataPagamento . PHP_EOL;
+                                                                if ($dataPagamento !== "" && strpos($dataPagamento, date('Y')) == 4) {
+                                                                        $dataconfirma = "'" . substr($dataPagamento, 4, 4) . "-" . substr($dataPagamento, 2, 2) . "-" . substr($dataPagamento, 0, 2) . "'";
                                                                 } //end if(strpos($aline9['dataPagamento'], date('Y')) == 4) 
-                                                                else {
-                                                                        $dataconfirma = "'" . substr($aline9['dataPagamento'], 0, 4) . "-" . substr($aline9['dataPagamento'], 4, 2) . "-" . substr($aline9['dataPagamento'], 6, 2) . "'";
+                                                                else if ($dataPagamento !== "") {
+                                                                        $dataconfirma = "'" . substr($dataPagamento, 0, 4) . "-" . substr($dataPagamento, 4, 2) . "-" . substr($dataPagamento, 6, 2) . "'";
                                                                 }
                                                                 echo " =====> DEPOIS Trecho 2 " . $dataconfirma . PHP_EOL;
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
-                                                        $pedido = str_pad($rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
+                                                        $pedido = str_pad((string)$rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
 
                                                         $pag_status = getSondaItau($pedido, $a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_A = false;
@@ -3842,11 +3484,11 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         $b_sonda_C = getTransacaoPagamentoOK("Cielo", $rs_transacoes_row['numcompra'], $alineC);
 
                                                         // Se existe registro da transa��o -> salva data 	
-                                                        if ($alineC['status'] == "6") {
+                                                        if (($alineC['status'] ?? '') == "6") {
                                                                 $s_sonda = (($b_sonda_C) ? "OK" : "none");
                                                                 $sBanco = "Banco Cielo";
-                                                                $dataconfirma = "'" . substr($alineC['data'], 0, 19) . "'";
-                                                                $s_update_status_lr = ", cielo_status = '" . $alineC['status'] . "', cielo_codigo_lr = '" . $alineC['codigo_lr'] . "' ";
+                                                                $dataconfirma = "'" . substr($alineC['data'] ?? '', 0, 19) . "'";
+                                                                $s_update_status_lr = ", cielo_status = '" . $alineC['status'] . "', cielo_codigo_lr = '" . ($alineC['codigo_lr'] ?? '') . "' ";
                                                         }
                                                 }
 
@@ -3917,33 +3559,18 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         //Inicia transacao
                                                         if ($msg == "") {
                                                                 $sql = "BEGIN TRANSACTION ";
-                                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 $ret = true;                                                                                                /////////////////////
                                                                 if (!$ret)
                                                                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
                                                         }
 
                                                         // Marca registro como processado (status_processed=1), e status=3, j� que se chegou aqui quer dizer que n�o passou por confirmaBanco.php
-                                                        $sql = "
-    UPDATE tb_pag_compras 
-    SET 
-        status_processed = 1, 
-        datacompra = CURRENT_TIMESTAMP, 
-        dataconfirma = $1, 
-        status = 3 
-        $s_update_status_lr 
-    WHERE numcompra = $2
-";
-
-                                                        $params = [
-                                                                (string)$dataconfirma,
-                                                                (string)$rs_transacoes_row['numcompra']
-                                                        ];
-
+                                                        $sql = "update tb_pag_compras set status_processed=1, datacompra=CURRENT_TIMESTAMP, dataconfirma=" . $dataconfirma . ", status=3 " . $s_update_status_lr . " where numcompra='" . $rs_transacoes_row['numcompra'] . "' ";
+                                                        echo PHP_EOL . " NO SYNC => " . $sql . " " . PHP_EOL . "($msg)" . PHP_EOL;
                                                         echo "DEBUG F (atualiza status_processed=1, vendaid = " . $rs_transacoes_row['idvenda'] . "): " . $sql . PHP_EOL;
 
-                                                        $rs_update2 = SQLexecuteQueryParams($sql, $params);
-                                                        echo PHP_EOL . " NO SYNC => " . $sql . " " . PHP_EOL . "($msg)" . PHP_EOL;
+                                                        $rs_update2 = SQLexecuteQuery($sql);
                                                         if (!$rs_update2) {
                                                                 $msg = "Erro atualizando status de registro (62aa)." . $cReturn . "$sql" . $cReturn;
                                                                 echo $msg;
@@ -3952,36 +3579,16 @@ function conciliacaoAutomaticaPagamentoOnline()
 
                                                                 // Atualiza dados para tabela vendas
                                                                 //'DADOS_PAGTO_RECEBIDO' => 2
-                                                                // 1. Cálculos e montagem de strings fora da query
-                                                                $valor_total = (float)($rs_transacoes_row['total'] / 100 + $rs_transacoes_row['taxas'] + $rs_transacoes_row['frete'] + $rs_transacoes_row['manuseio']);
-                                                                $num_documento = (string)($prefix_1 . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra']);
-                                                                $usuario_obs = (string)("Pagamento Online " . $sBanco . " POR SONDA [" . $rs_transacoes_row['iforma'] . "] em " . date("Y-m-d H:i:s"));
+                                                                $sql_update = "update tb_venda_games set 
+                                                                                        vg_pagto_valor_pago		= " . ($rs_transacoes_row['total'] / 100 + $rs_transacoes_row['taxas'] + $rs_transacoes_row['frete'] + $rs_transacoes_row['manuseio']) . ",
+                                                                                        vg_pagto_tipo			= " . $vg_pagto_tipo . ",
+                                                                                        vg_pagto_num_docto		= '" . $prefix_1 . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra'] . "', 
+                                                                                        vg_pagto_data_inclusao	= '" . $rs_transacoes_row['datainicio'] . "',
+                                                                                        vg_usuario_obs			= 'Pagamento Online " . $sBanco . " POR SONDA [" . $rs_transacoes_row['iforma'] . "] em " . date("Y-m-d H:i:s") . "',
+                                                                                        vg_ultimo_status		= " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                                                                where vg_id=" . $rs_transacoes_row['idvenda'] . ";";
 
-                                                                // 2. Definição da query com placeholders
-                                                                $sql_update = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago    = $1,
-        vg_pagto_tipo           = $2,
-        vg_pagto_num_docto      = $3,
-        vg_pagto_data_inclusao  = $4,
-        vg_usuario_obs          = $5,
-        vg_ultimo_status        = $6
-    WHERE vg_id = $7
-";
-
-                                                                // 3. Mapeamento de parâmetros
-                                                                $params = [
-                                                                        $valor_total,                                   // $1
-                                                                        (int)$vg_pagto_tipo,                            // $2
-                                                                        $num_documento,                                 // $3
-                                                                        (string)$rs_transacoes_row['datainicio'],       // $4
-                                                                        $usuario_obs,                                   // $5
-                                                                        (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $6
-                                                                        (int)$rs_transacoes_row['idvenda']              // $7
-                                                                ];
-
-                                                                $rs_update = SQLexecuteQueryParams($sql_update, $params);
+                                                                $rs_update = SQLexecuteQuery($sql_update);
                                                                 $sout = $rs_transacoes_row['datainicio'] . PHP_EOL . "   " . $rs_transacoes_row['numcompra'] . PHP_EOL . "   tipo: (" . $rs_transacoes_row['iforma'] . ") " . getDescricaoPagtoOnline($rs_transacoes_row['iforma']) . "," . PHP_EOL . "   idvenda: " . $rs_transacoes_row['idvenda'] . "." . PHP_EOL;
 
                                                                 if (!$rs_update) {
@@ -3995,14 +3602,14 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                         //Finaliza transacao
                                                         if ($msg == "") {
                                                                 $sql = "COMMIT TRANSACTION ";
-                                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                                         } else {
                                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -4111,21 +3718,18 @@ function conciliacaoAutomaticaPagamentoOnline()
                 // 'DADOS_PAGTO_RECEBIDO' 		=> '2',
                 // 'PAGTO_CONFIRMADO' 			=> '3',
                 $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE (
-        (vg.vg_ultimo_status = $1 OR vg.vg_ultimo_status = $2)
-        AND " . getSQLWhereParaVendaPagtoOnline(false) . "
-    )  
-    AND vg_data_inclusao > (NOW() - '2 months'::interval)
-    AND vg_pagto_tipo NOT IN (13, 10, 9, 6, 5)
-    ORDER BY vg_data_inclusao DESC
-";
-
-                $params = [
-                        (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $1
-                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']     // $2
-                ];
-
+                    select * from tb_venda_games vg 
+                    where ((vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . " or 
+                                    vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . ")
+                            and " . getSQLWhereParaVendaPagtoOnline(false) . "
+                    )  and vg_data_inclusao > (now() -'2 months'::interval)
+                     and vg_pagto_tipo != 13 
+                     and vg_pagto_tipo != 10 
+                     and vg_pagto_tipo != 9 
+                     and vg_pagto_tipo != 6 
+                     and vg_pagto_tipo != 5 
+                    order by vg_data_inclusao desc
+                    ";
 
                 //	Vendas de integra��o s�o levantadas aqui para executar o notify
                 //	n�o precisssa de: "and vg_integracao_parceiro_origem_id is null"
@@ -4137,19 +3741,19 @@ function conciliacaoAutomaticaPagamentoOnline()
                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0000): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                 }
 
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
+                $rs_venda = SQLexecuteQuery($sql);
 
                 if ($bDebug) {
                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (00): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                 }
 
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
         }
 
         //Busca vendas
         if ($msg == "") {
-                while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+                while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
                         $vg_id = $rs_venda_row['vg_id'];
                         $vg_pagto_banco = $rs_venda_row['vg_pagto_banco'];
                         $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
@@ -4166,28 +3770,21 @@ function conciliacaoAutomaticaPagamentoOnline()
                         //obtem o valor total da venda
                         //----------------------------------------------------
                         $total_geral = 0;
-                        $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
-
-                        $params = [
-                                (int)$vg_id
-                        ];
-
+                        $sql = "select * from tb_venda_games vg " .
+                                "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                                "where vg.vg_id = " . $vg_id;
                         if ($bDebug) {
                                 echo "DEBUG (A1): " . $sql . PHP_EOL;
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0-): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
 
-                        $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
+                        $rs_venda_modelos = SQLexecuteQuery($sql);
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0+): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                 echo "get_vg_ultimo_status($vg_id) 000: " . get_vg_ultimo_status($vg_id) . PHP_EOL;
                         }
-                        if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
-                                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                        if ($rs_venda_modelos && pgNumRowsSafe($rs_venda_modelos) > 0) {
+                                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                         $qtde = $rs_venda_modelos_row['vgm_qtde'];
                                         $valor = $rs_venda_modelos_row['vgm_valor'];
                                         $total_geral += $valor * $qtde;
@@ -4201,12 +3798,12 @@ function conciliacaoAutomaticaPagamentoOnline()
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
-                        $rs_pag = SQLexecuteQueryParams($sql, $params);
+                        $rs_pag = SQLexecuteQuery($sql);
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
-                        if ($rs_pag && pg_num_rows($rs_pag) > 0) {
-                                $rs_pag_row = pg_fetch_array($rs_pag);
+                        if ($rs_pag && pgNumRowsSafe($rs_pag) > 0) {
+                                $rs_pag_row = pgFetchArraySafe($rs_pag);
                                 // Remove o prefixo "BRD6_"/"BRD5_"/"BBR9_"/"BITA_"/"HIPB_"/"PYPP_"/"BEPZ_"
                                 $pag_codigo = substr($rs_pag_row['vg_pagto_num_docto'], 5);
                                 $vg_integracao_parceiro_origem_id = $rs_pag_row['vg_integracao_parceiro_origem_id'];
@@ -4322,25 +3919,12 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                 if ($parametros['PROCESS_AUTOM'] == '1')
                                                         $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
 
-                                                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP, 
-        vg_user_id_concilia = $1,
-        vg_ultimo_status_obs = $2,
-        vg_ultimo_status = $3
-    WHERE vg_id = $4
-";
-
-                                                $params = [
-                                                        (string)$iduser_bko,                            // $1
-                                                        (string)$parametros['ultimo_status_obs'],       // $2
-                                                        (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], // $3
-                                                        (int)$vg_id                                     // $4
-                                                ];
-
-                                                $ret = SQLexecuteQueryParams($sql, $params);
+                                                $sql = "update tb_venda_games set 
+                                            vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "'," . PHP_EOL . "
+                                            vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . "," . PHP_EOL . "
+                                            vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], "") . PHP_EOL . "
+                                            where vg_id = " . $vg_id;
+                                                $ret = SQLexecuteQuery($sql);
                                                 if (!$ret)
                                                         $msg = "Erro ao atualizar venda." . PHP_EOL;
                                         }
@@ -4353,29 +3937,27 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                 if ($partner_do_notify == 1 && ($url_notify_url != "")) {
 
                                                         // Monta o passo 4 da Integra��o - Notify partner
-                                                        $sql = "
-    SELECT * FROM tb_integracao_pedido ip 
-    WHERE ip_store_id = $1 
-      AND ip_vg_id = $2
-";
-
-                                                        $params = [
-                                                                (string)$vg_integracao_parceiro_origem_id, // $1
-                                                                (string)$vg_id                            // $2
-                                                        ];
-
+                                                        $sql = "SELECT * FROM tb_integracao_pedido ip 
+                                                    WHERE 1=1
+                                                    and ip_store_id = '" . $vg_integracao_parceiro_origem_id . "'
+                                                    and ip_vg_id = '" . $vg_id . "'";
                                                         grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . "Select  registro de integra��o para o notify (A2)" . PHP_EOL . $sql . PHP_EOL);
 
-                                                        $rs = SQLexecuteQueryParams($sql, $params);
+                                                        $rs = SQLexecuteQuery($sql);
                                                         if (!$rs) {
                                                                 $msg_1 = date("Y-m-d H:i:s") . " - Erro ao recuperar transa��o de integra��o (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
                                                                 echo $msg_1;
                                                                 grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
-                                                        } else {
-                                                                $rs_row = pg_fetch_array($rs);
+	                                                        } else {
+	                                                                $rs_row = pgFetchArraySafe($rs);
 
-                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
-                                                                $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
+	                                                                if (!$rs_row) {
+	                                                                        $msg_1 = date("Y-m-d H:i:s") . " - Transacao de integracao nao encontrada para notify (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
+	                                                                        echo $msg_1;
+	                                                                        grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
+	                                                                } else {
+	                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
+	                                                                $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
                                                                 $post_parameters .= "order_id=" . $rs_row["ip_order_id"] . "&";
                                                                 $post_parameters .= "amount=" . $rs_row["ip_amount"] . "&";
                                                                 if (strlen($rs_row["ip_product_id"]) > 0) {
@@ -4387,14 +3969,15 @@ function conciliacaoAutomaticaPagamentoOnline()
                                                                 $sret1 = getIntegracaoCURL($url_notify_url, $post_parameters);
                                                                 $sret = $sret1;
 
-                                                                $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento Online (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
-                                                                grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-                                                        }
-                                                }
-                                        }
-                                        if ($msgConcilia == "") {
-                                                $smonitor .= "Venda processada: ('$vg_integracao_parceiro_origem_id') <a href='/gamer/vendas/com_venda_detalhe.php?venda_id=$vg_id' target='_blank'>$vg_id</a> (R$" . number_format($total_geral, 2, '.', '.') . ")<br>";
-                                        }
+	                                                                $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento Online (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
+	                                                                grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
+	                                                                }
+	                                                        }
+	                                                }
+	                                        }
+	                                        if ($msgConcilia == "") {
+	                                                $smonitor .= "Venda processada: ('$vg_integracao_parceiro_origem_id') <a href='/gamer/vendas/com_venda_detalhe.php?venda_id=$vg_id' target='_blank'>$vg_id</a> (R$" . number_format($total_geral, 2, '.', '.') . ")<br>";
+	                                        }
                                 }
                                 /*
                                 ================ Banco EPP - End
@@ -4409,52 +3992,35 @@ function conciliacaoAutomaticaPagamentoOnline()
 
         // Em certos casos o status da venda fica em vg_ultimo_status=3 (PAGTO_CONFIRMADO) com o pagamento completo e os PINs entregues
         //	-> tem que passar para vg_ultimo_status=5 (VENDA_REALIZADA)
-        $sql = "
-    SELECT vg.vg_id, pag.status, vg.vg_ultimo_status  
-    FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    INNER JOIN tb_pag_compras pag ON pag.idvenda = vg.vg_id 
-    WHERE (
-        vg.vg_ultimo_status = $1 
-        AND " . getSQLWhereParaVendaPagtoOnline(false) . "
-    ) 
-    AND vg_pagto_data_inclusao > '2009-01-01' 
-    AND (vgm_pin_codinterno != '' AND vgm_pin_codinterno IS NOT NULL) 
-    AND vg_integracao_parceiro_origem_id IS NULL 
-    ORDER BY vg_data_inclusao DESC
-";
-
-        $params = [
-                (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']
-        ];
-
+        $sql = "select vg.vg_id, pag.status, vg.vg_ultimo_status  
+                                from tb_venda_games vg 
+                                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                                        inner join tb_pag_compras pag on pag.idvenda = vg.vg_id 
+                                where (vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . "	
+                                                and " . getSQLWhereParaVendaPagtoOnline(false) . "
+                                                ) 
+                                        and vg_pagto_data_inclusao > '2009-01-01' and (not vgm_pin_codinterno='') 
+                                        and vg_integracao_parceiro_origem_id is null 
+                                order by vg_data_inclusao desc";
 
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (1abc): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
-        $rs_venda_pendentes = SQLexecuteQueryParams($sql, $params);
-        if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-                while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+        $rs_venda_pendentes = SQLexecuteQuery($sql);
+        if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+                while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
                         $vg_id_pendente = $rs_venda_pendentes_row['vg_id'];
                         $pag_status = $rs_venda_pendentes_row['status'];
                         $vg_ultimo_status = $rs_venda_pendentes_row['vg_ultimo_status'];
 
                         if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {        // 3 and "not vgm_pin_codinterno=''"	(from query) 
-                                $sql = "
-    UPDATE tb_venda_games 
-    SET vg_ultimo_status = $1 
-    WHERE vg_id = $2
-";
-
-                                $params = [
-                                        (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],
-                                        (int)$vg_id_pendente
-                                ];
-
+                                $sql = "update tb_venda_games
+                                                set vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " 
+                                                where vg_id = " . $vg_id_pendente;
                                 echo "==>> Atualiza status de venda de '" . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . "' para '" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' (vg_id pendente = " . $vg_id_pendente . ") " . PHP_EOL;
 
-                                $ret = SQLexecuteQueryParams($sql, $params);
+                                $ret = SQLexecuteQuery($sql);
                                 if (!$ret)
                                         $msg = "Erro ao atualizar venda com status pendente (pagamento online)" . PHP_EOL . "$sql." . PHP_EOL;
                                 else {
@@ -4479,7 +4045,6 @@ function conciliacaoAutomaticaPagamentoOnline()
 
 function gravaLog_MonitorPedidosDuplicados($mensagem)
 {
-        require_once $raiz_do_projeto;
         $bDebug = false;
         if ($bDebug)
                 echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")" . PHP_EOL;
@@ -4499,12 +4064,11 @@ function gravaLog_MonitorPedidosDuplicados($mensagem)
 
 function gravaLog_TMP_conciliacao($mensagem)
 {
-        require_once $raiz_do_projeto;
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_pagamento_TMP_conciliacao.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? "") . PHP_EOL . $mensagem . PHP_EOL;
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -4515,7 +4079,6 @@ function gravaLog_TMP_conciliacao($mensagem)
 
 function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
 {
-        require_once $raiz_do_projeto;
         $bDebug = false;
         if ($bDebug)
                 echo "  SALVA FILE MONITOR (" . date('d/m/Y - H:i:s') . ")" . PHP_EOL;
@@ -4536,13 +4099,11 @@ function gravaLog_MonitorGamer($mensagem, $tipopagamento = null)
 
 function gravaLog_Debug($mensagem)
 {
-        require_once $raiz_do_projeto;
-
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Debug.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . PHP_EOL . $mensagem . PHP_EOL;
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? "") . PHP_EOL . $mensagem . PHP_EOL;
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -4554,20 +4115,12 @@ function gravaLog_Debug($mensagem)
 function get_vg_ultimo_status($vg_id)
 {
         $vg_ultimo_status = "";
-        $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-        $params = [
-                (int)$vg_id
-        ];
-
-        $rs_venda = SQLexecuteQueryParams($sql, $params);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+        $sql = "select * from tb_venda_games vg where vg.vg_id = " . $vg_id;
+        $rs_venda = SQLexecuteQuery($sql);
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                 $msg = "Nenhuma venda encontrada." . PHP_EOL;
         else {
-                $rs_venda_row = pg_fetch_array($rs_venda);
+                $rs_venda_row = pgFetchArraySafe($rs_venda);
                 $vg_ultimo_status = $rs_venda_row['vg_ultimo_status'];
         }
         return $vg_ultimo_status;
@@ -4581,23 +4134,16 @@ function isVendaCampeonato($venda_id)
         $b_is_operadora = true;
 
         //Recupera modelos
-        $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
-
-        $params = [
-                (int)$venda_id
-        ];
-
-        $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0)
+        $sql = "select * from tb_venda_games vg 
+                                inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                        where vg.vg_id = " . $venda_id;
+        $rs_venda_modelos = SQLexecuteQuery($sql);
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0)
                 $msg = "Nenhum produto encontrado." . PHP_EOL;
 
         if ($msg == "") {
                 //Verifica cada item de cada produto
-                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                         $vgm_opr_codigo = $rs_venda_modelos_row['vgm_opr_codigo'];
                         $b_is_operadora = ($b_is_operadora && ($vgm_opr_codigo == $GLOBALS['CAMPEONATO_OPR_ID']));
                 }
@@ -4611,19 +4157,13 @@ function isVendaCampeonato($venda_id)
 function getInstrucoesPinRequest($ogp_id)
 {
 
-        $sql = "
-    SELECT ogp_nome, ogp_descricao, ogp_detalhes_utilizacao, ogp_termos_condicoes 
-    FROM tb_operadora_games_produto 
-    WHERE ogp_id = $1;
-";
-
-        $params = [
-                (int)$ogp_id
-        ];
-
-        $rs_produto = SQLexecuteQueryParams($sql, $params);
-        $rs_produto_row = pg_fetch_array($rs_produto);
-        $msg = "<hr>
+	$sql = "select ogp_nome,ogp_descricao,ogp_detalhes_utilizacao,ogp_termos_condicoes from tb_operadora_games_produto where ogp_id = $ogp_id;";
+	$rs_produto = SQLexecuteQuery($sql);
+	$rs_produto_row = pgFetchArraySafe($rs_produto);
+	if (!$rs_produto_row) {
+		return "";
+	}
+	$msg = "<hr>
                 <div style='font: normal 10px arial, sans-serif;text-align: justify;font-weight: bold;'>" . $rs_produto_row['ogp_nome'] . "</div><div style='font: normal 10px arial, sans-serif;text-align: justify;'>" . $rs_produto_row['ogp_descricao'] . "</div>
                 <div style='font: normal 10px arial, sans-serif;text-align: justify;font-weight: bold;top: 10px;'>Detalhes do Resgate</div><div style='font: normal 10px arial, sans-serif;text-align: justify;'>" . $rs_produto_row['ogp_detalhes_utilizacao'] . "</div>
                 <div style='font: normal 10px arial, sans-serif;text-align: justify;font-weight: bold;top: 10px;'>Termos e Condi��es</div><div style='font: normal 10px arial, sans-serif;text-align: justify;'>" . $rs_produto_row['ogp_termos_condicoes'] . "</div>";
@@ -4637,22 +4177,13 @@ function isVendaIntegracao($venda_id, &$vg_integracao_parceiro_origem_id)
         $vg_integracao_parceiro_origem_id = "";
 
         //Recupera modelos
-        $sql = "
-    SELECT vg_integracao_parceiro_origem_id 
-    FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-        $params = [
-                (int)$venda_id
-        ];
-
-        $rs_venda = SQLexecuteQueryParams($sql, $params);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+        $sql = "select vg_integracao_parceiro_origem_id from tb_venda_games vg where vg.vg_id = " . $venda_id;
+        $rs_venda = SQLexecuteQuery($sql);
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                 $msg = "Nenhuma venda encontrada." . PHP_EOL;
 
         if ($msg == "") {
-                $rs_venda_row = pg_fetch_array($rs_venda);
+                $rs_venda_row = pgFetchArraySafe($rs_venda);
                 $vg_integracao_parceiro_origem_id = $rs_venda_row['vg_integracao_parceiro_origem_id'];
         }
         $b_is_integracao = ($vg_integracao_parceiro_origem_id != "");
@@ -4664,22 +4195,13 @@ function isVendaDeposito($venda_id)
 
         $msg = "";
 
-        $sql = "
-    SELECT vg_deposito_em_saldo 
-    FROM tb_venda_games vg 
-    WHERE vg.vg_id = $1
-";
-
-        $params = [
-                (int)$venda_id
-        ];
-
-        $rs_venda = SQLexecuteQueryParams($sql, $params);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+        $sql = "select vg_deposito_em_saldo from tb_venda_games vg where vg.vg_id = " . $venda_id;
+        $rs_venda = SQLexecuteQuery($sql);
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                 $msg = "Nenhuma venda encontrada (em isvendaDeposito($venda_id))." . PHP_EOL;
 
         if ($msg == "") {
-                $rs_venda_row = pg_fetch_array($rs_venda);
+                $rs_venda_row = pgFetchArraySafe($rs_venda);
                 $vg_deposito_em_saldo = $rs_venda_row['vg_deposito_em_saldo'];
         }
         $vg_deposito_em_saldo = (($vg_deposito_em_saldo == 1) ? 1 : 0);
@@ -4690,9 +4212,9 @@ function getValueSingle($sql)
 {
 
         $ret = null;
-        $rs = SQLexecuteQueryParams($sql, null);
-        if ($rs && pg_num_rows($rs) > 0) {
-                $rs_row = pg_fetch_array($rs);
+        $rs = SQLexecuteQuery($sql);
+        if ($rs && pgNumRowsSafe($rs) > 0) {
+                $rs_row = pgFetchArraySafe($rs);
                 $ret = $rs_row[0];
         }
         return $ret;
@@ -4730,23 +4252,8 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
         //		$sql .= "where idvenda>0 and (status_processed=0 or vg.vg_ultimo_status=3) and tipo_cliente='M' ";
 
         // O anterior est� demorando muito e n�o � necess�rio consultar tb_venda_games, apenas tb_pag_compras
-        $sql = "
-    SELECT * FROM tb_pag_compras pgt 
-    WHERE idvenda > 0 
-      AND status_processed = 0 
-      AND tipo_cliente = 'M' 
-      AND tipo_deposito = 0 
-      AND datainicio > (NOW() - '2 months'::interval) 
-      AND iforma != $1 
-      AND iforma = $2
-";
+        $sql = "select * from tb_pag_compras pgt where idvenda>0 and status_processed=0 and tipo_cliente='M' and tipo_deposito = 0 and datainicio > (now() -'2 months'::interval) and iforma!='" . $FORMAS_PAGAMENTO['PAGAMENTO_PIX'] . "' and iforma='" . $codigoAlphaNumerico . "' "; // and iforma!='5'and iforma!='6' and iforma!='9' 
 
-        $params = [
-                (string)$FORMAS_PAGAMENTO['PAGAMENTO_PIX'], // $1
-                (string)$codigoAlphaNumerico              // $2
-        ];
-
-        $rs_total = SQLexecuteQueryParams($sql, $params);
         // Op��o 1 - n�o precissa limitar por data - apenas os pagtos com status_processed=0 ser�o retornados, ap�s 90mins eles s�o cancelados.
         //	se houver um descancelamento de venda o pagto correspondente vai aparecer aqui
 
@@ -4755,12 +4262,13 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
         // Op��o 2 - Para incluir algum pagamento antigo descancelado
         //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
 
+        $rs_total = SQLexecuteQuery($sql);
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 0): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
         if ($rs_total)
-                $registros_total = pg_num_rows($rs_total);
+                $registros_total = pgNumRowsSafe($rs_total);
         $sql .= " order by pgt.datainicio desc ";
 
         if ($bDebug) {
@@ -4768,21 +4276,21 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
         }
 
         $time_start_stats0 = getmicrotime();
-        $rs_transacoes = SQLexecuteQueryParams($sql, $params);
+        $rs_transacoes = SQLexecuteQuery($sql);
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
         echo $cReturn . $cReturn . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . $cReturn;        //."$sql".$cReturn;
 
-        if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
+        if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0)
                 $msg = "Nenhuma transa��o encontrada." . $cReturn;
 
         $time_start_stats0 = getmicrotime();
         $irows = 0;
         if ($rs_transacoes) {
-                $npags = pg_num_rows($rs_transacoes);
+                $npags = pgNumRowsSafe($rs_transacoes);
                 $total_pagtos_pendente = 0;
-                while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+                while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
                         $time_start_stats0_in = getmicrotime();
                         $irows++;
 
@@ -4801,27 +4309,15 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                         $iforma_tmp = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
 
                                         // Atualiza dados para tabela vendas
-                                        $sql_update = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago    = $1,
-        vg_pagto_tipo           = $2,
-        vg_pagto_num_docto      = $3,
-        vg_pagto_data_inclusao  = $4,
-        vg_ultimo_status        = $5
-    WHERE vg_id = $6
-";
+                                        $sql_update = "update tb_venda_games set 
+                                                                        vg_pagto_valor_pago		= " . ($rs_transacoes_row['total'] / 100) . ",
+                                                                        vg_pagto_tipo			= " . $iforma_tmp . ",
+                                                                        vg_pagto_num_docto		= '" . $prefix . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra'] . "', 
+                                                                        vg_pagto_data_inclusao	= '" . $rs_transacoes_row['datainicio'] . "',
+                                                                        vg_ultimo_status		= " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                                                where vg_id=" . $rs_transacoes_row['idvenda'] . ";";
 
-                                        $params = [
-                                                (float)($rs_transacoes_row['total'] / 100), // $1
-                                                (int)$iforma_tmp,                          // $2
-                                                (string)($prefix . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra']), // $3
-                                                (string)$rs_transacoes_row['datainicio'],  // $4
-                                                (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $5
-                                                (int)$rs_transacoes_row['idvenda']         // $6
-                                        ];
-
-                                        $rs_update = SQLexecuteQueryParams($sql_update, $params);
+                                        $rs_update = SQLexecuteQuery($sql_update);
                                         if ($bDebug) {
                                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (Prev 3): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                         }
@@ -4891,7 +4387,7 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         $b_sonda_6 = getTransacaoPagamentoOK("PagtoFacil", $rs_transacoes_row['numcompra'], $aline6);
 
                                                         // Se existe registro da transa��o -> salva data 	
-                                                        if ((isset($aline6[1])) && (strlen($aline6[1]) > 0)) {
+                                                        if ((isset($aline6[1], $aline6[3], $aline6[4])) && (strlen($aline6[1]) > 0)) {
                                                                 $s_sonda = (($b_sonda_6) ? "OK" : "none");
                                                                 $sBanco = "Bradesco";
                                                                 /*	
@@ -4911,17 +4407,18 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                                 $s_sonda = (($b_sonda_9) ? "OK" : "none");
                                                                 $sBanco = "Banco do Brasil";
                                                                 //     [dataPagamento] => 16092009 20161003
-                                                                echo "=========> Trecho 1 " . $aline9['dataPagamento'] . PHP_EOL;
-                                                                if (strpos($aline9['dataPagamento'], date('Y')) == 4) {
-                                                                        $dataconfirma = "'" . substr($aline9['dataPagamento'], 4, 4) . "-" . substr($aline9['dataPagamento'], 2, 2) . "-" . substr($aline9['dataPagamento'], 0, 2) . "'";
+                                                                $dataPagamento = $aline9['dataPagamento'] ?? "";
+                                                                echo "=========> Trecho 1 " . $dataPagamento . PHP_EOL;
+                                                                if ($dataPagamento !== "" && strpos($dataPagamento, date('Y')) == 4) {
+                                                                        $dataconfirma = "'" . substr($dataPagamento, 4, 4) . "-" . substr($dataPagamento, 2, 2) . "-" . substr($dataPagamento, 0, 2) . "'";
                                                                 } //end if(strpos($aline9['dataPagamento'], date('Y')) == 4)
-                                                                else {
-                                                                        $dataconfirma = "'" . substr($aline9['dataPagamento'], 0, 4) . "-" . substr($aline9['dataPagamento'], 4, 2) . "-" . substr($aline9['dataPagamento'], 6, 2) . "'";
+                                                                else if ($dataPagamento !== "") {
+                                                                        $dataconfirma = "'" . substr($dataPagamento, 0, 4) . "-" . substr($dataPagamento, 4, 2) . "-" . substr($dataPagamento, 6, 2) . "'";
                                                                 }
                                                                 echo "=========> DEPOIS Trecho 1 " . $dataconfirma . PHP_EOL;
                                                         }
                                                 } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
-                                                        $pedido = str_pad($rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
+                                                        $pedido = str_pad((string)$rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
 
                                                         $pag_status = getSondaItau($pedido, $a_retorno_itau, $sitPag, $dtPag);
                                                         $b_sonda_A = false;
@@ -4969,11 +4466,11 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         $b_sonda_C = getTransacaoPagamentoOK("Cielo", $rs_transacoes_row['numcompra'], $alineC);
 
                                                         // Se existe registro da transa��o -> salva data 	
-                                                        if ($alineC['status'] == "6") {
+                                                        if (($alineC['status'] ?? '') == "6") {
                                                                 $s_sonda = (($b_sonda_C) ? "OK" : "none");
                                                                 $sBanco = "Banco Cielo";
-                                                                $dataconfirma = "'" . substr($alineC['data'], 0, 19) . "'";
-                                                                $s_update_status_lr = ", cielo_status = '" . $alineC['status'] . "', cielo_codigo_lr = '" . $alineC['codigo_lr'] . "' ";
+                                                                $dataconfirma = "'" . substr($alineC['data'] ?? '', 0, 19) . "'";
+                                                                $s_update_status_lr = ", cielo_status = '" . $alineC['status'] . "', cielo_codigo_lr = '" . ($alineC['codigo_lr'] ?? '') . "' ";
                                                         }
                                                 }
 
@@ -5044,33 +4541,18 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         //Inicia transacao
                                                         if ($msg == "") {
                                                                 $sql = "BEGIN TRANSACTION ";
-                                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 $ret = true;                                                                                                /////////////////////
                                                                 if (!$ret)
                                                                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
                                                         }
 
                                                         // Marca registro como processado (status_processed=1), e status=3, j� que se chegou aqui quer dizer que n�o passou por confirmaBanco.php
-                                                        $sql = "
-    UPDATE tb_pag_compras 
-    SET 
-        status_processed = 1, 
-        datacompra = CURRENT_TIMESTAMP, 
-        dataconfirma = $1, 
-        status = 3 
-        $s_update_status_lr 
-    WHERE numcompra = $2
-";
-
-                                                        $params = [
-                                                                (string)$dataconfirma,                  // $1
-                                                                (string)$rs_transacoes_row['numcompra'] // $2
-                                                        ];
-
+                                                        $sql = "update tb_pag_compras set status_processed=1, datacompra=CURRENT_TIMESTAMP, dataconfirma=" . $dataconfirma . ", status=3 " . $s_update_status_lr . " where numcompra='" . $rs_transacoes_row['numcompra'] . "' ";
+                                                        echo PHP_EOL . " NO SYNC => " . $sql . " " . PHP_EOL . "($msg)" . PHP_EOL;
                                                         echo "DEBUG F (atualiza status_processed=1, vendaid = " . $rs_transacoes_row['idvenda'] . "): " . $sql . PHP_EOL;
 
-                                                        $rs_update2 = SQLexecuteQueryParams($sql, $params);
-                                                        echo PHP_EOL . " NO SYNC => " . $sql . " " . PHP_EOL . "($msg)" . PHP_EOL;
+                                                        $rs_update2 = SQLexecuteQuery($sql);
                                                         if (!$rs_update2) {
                                                                 $msg = "Erro atualizando status de registro (62aa)." . $cReturn . "$sql" . $cReturn;
                                                                 echo $msg;
@@ -5079,43 +4561,15 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                                                                 // Atualiza dados para tabela vendas
                                                                 //'DADOS_PAGTO_RECEBIDO' => 2
-                                                                // 1. Cálculos e montagem de strings fora da query SQL
-                                                                $valor_pago = (float)(
-                                                                        ($rs_transacoes_row['total'] / 100) +
-                                                                        $rs_transacoes_row['taxas'] +
-                                                                        $rs_transacoes_row['frete'] +
-                                                                        $rs_transacoes_row['manuseio']
-                                                                );
-
-                                                                $num_docto = (string)($prefix_1 . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra']);
-
-                                                                $usuario_obs = (string)("Pagamento Online " . $sBanco . " POR SONDA [" . $rs_transacoes_row['iforma'] . "] em " . date("Y-m-d H:i:s"));
-
-                                                                // 2. Definição da Query Parametrizada
-                                                                $sql_update = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago = $1,
-        vg_pagto_tipo = $2,
-        vg_pagto_num_docto = $3,
-        vg_pagto_data_inclusao = $4,
-        vg_usuario_obs = $5,
-        vg_ultimo_status = $6
-    WHERE vg_id = $7
-";
-
-                                                                // 3. Execução com mapeamento de parâmetros
-                                                                $params = [
-                                                                        $valor_pago,                                     // $1
-                                                                        (int)$vg_pagto_tipo,                             // $2
-                                                                        $num_docto,                                      // $3
-                                                                        (string)$rs_transacoes_row['datainicio'],        // $4
-                                                                        $usuario_obs,                                    // $5
-                                                                        (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $6
-                                                                        (int)$rs_transacoes_row['idvenda']               // $7
-                                                                ];
-
-                                                                $rs_update = SQLexecuteQueryParams($sql_update, $params);
+                                                                $sql_update = "update tb_venda_games set 
+                                                                                        vg_pagto_valor_pago		= " . ($rs_transacoes_row['total'] / 100 + $rs_transacoes_row['taxas'] + $rs_transacoes_row['frete'] + $rs_transacoes_row['manuseio']) . ",
+                                                                                        vg_pagto_tipo			= " . $vg_pagto_tipo . ",
+                                                                                        vg_pagto_num_docto		= '" . $prefix_1 . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra'] . "', 
+                                                                                        vg_pagto_data_inclusao	= '" . $rs_transacoes_row['datainicio'] . "',
+                                                                                        vg_usuario_obs			= 'Pagamento Online " . $sBanco . " POR SONDA [" . $rs_transacoes_row['iforma'] . "] em " . date("Y-m-d H:i:s") . "',
+                                                                                        vg_ultimo_status		= " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                                                                where vg_id=" . $rs_transacoes_row['idvenda'] . ";";
+                                                                $rs_update = SQLexecuteQuery($sql_update);
                                                                 $sout = $rs_transacoes_row['datainicio'] . PHP_EOL . "   " . $rs_transacoes_row['numcompra'] . PHP_EOL . "   tipo: (" . $rs_transacoes_row['iforma'] . ") " . getDescricaoPagtoOnline($rs_transacoes_row['iforma']) . "," . PHP_EOL . "   idvenda: " . $rs_transacoes_row['idvenda'] . "." . PHP_EOL;
 
                                                                 if (!$rs_update) {
@@ -5128,14 +4582,14 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                         //Finaliza transacao
                                                         if ($msg == "") {
                                                                 $sql = "COMMIT TRANSACTION ";
-                                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                                         } else {
                                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                                $ret = SQLexecuteQuery($sql);
                                                                 if (!$ret)
                                                                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -5246,22 +4700,14 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                 // 'DADOS_PAGTO_RECEBIDO' 		=> '2',
                 // 'PAGTO_CONFIRMADO' 			=> '3',
                 $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE (
-        (vg.vg_ultimo_status = $1 OR vg.vg_ultimo_status = $2)
-        AND " . getSQLWhereParaVendaPagtoOnline(false) . "
-    )  
-    AND vg_data_inclusao > (NOW() - '2 months'::interval)
-    AND vg_pagto_tipo = $3 
-    ORDER BY vg_data_inclusao DESC
-";
-
-                $params = [
-                        (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $1
-                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],     // $2
-                        (int)$codigoNumerico                                  // $3
-                ];
-
+                        select * from tb_venda_games vg 
+                        where ((vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . " or 
+                                        vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . ")
+                                and " . getSQLWhereParaVendaPagtoOnline(false) . "
+                        )  and vg_data_inclusao > (now() -'2 months'::interval)
+                        and vg_pagto_tipo=" . $codigoNumerico . " 
+                        order by vg_data_inclusao desc
+                        ";
 
                 //	Vendas de integra��o s�o levantadas aqui para executar o notify
                 //	n�o precisssa de: "and vg_integracao_parceiro_origem_id is null"
@@ -5272,18 +4718,18 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                         echo "DEBUG_ABCD: " . $sql . PHP_EOL;
                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0000): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                 }
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
+                $rs_venda = SQLexecuteQuery($sql);
                 if ($bDebug) {
                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (00): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                 }
 
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
         }
 
         //Busca vendas
         if ($msg == "") {
-                while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+                while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
                         $vg_id = $rs_venda_row['vg_id'];
                         $vg_pagto_banco = $rs_venda_row['vg_pagto_banco'];
                         $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
@@ -5300,28 +4746,21 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                         //obtem o valor total da venda
                         //----------------------------------------------------
                         $total_geral = 0;
-                        $sql = "
-    SELECT * FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    WHERE vg.vg_id = $1
-";
-
-                        $params = [
-                                (int)$vg_id
-                        ];
-
+                        $sql = "select * from tb_venda_games vg " .
+                                "inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id " .
+                                "where vg.vg_id = " . $vg_id;
                         if ($bDebug) {
                                 echo "DEBUG (A1): " . $sql . PHP_EOL;
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0-): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
 
-                        $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
+                        $rs_venda_modelos = SQLexecuteQuery($sql);
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0+): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                 echo "get_vg_ultimo_status($vg_id) 000: " . get_vg_ultimo_status($vg_id) . PHP_EOL;
                         }
-                        if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
-                                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                        if ($rs_venda_modelos && pgNumRowsSafe($rs_venda_modelos) > 0) {
+                                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                         $qtde = $rs_venda_modelos_row['vgm_qtde'];
                                         $valor = $rs_venda_modelos_row['vgm_valor'];
                                         $total_geral += $valor * $qtde;
@@ -5335,12 +4774,12 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
-                        $rs_pag = SQLexecuteQueryParams($sql, $params);
+                        $rs_pag = SQLexecuteQuery($sql);
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
-                        if ($rs_pag && pg_num_rows($rs_pag) > 0) {
-                                $rs_pag_row = pg_fetch_array($rs_pag);
+                        if ($rs_pag && pgNumRowsSafe($rs_pag) > 0) {
+                                $rs_pag_row = pgFetchArraySafe($rs_pag);
                                 // Remove o prefixo "BRD6_"/"BRD5_"/"BBR9_"/"BITA_"/"HIPB_"/"PYPP_"/"BEPZ_"
                                 $pag_codigo = substr($rs_pag_row['vg_pagto_num_docto'], 5);
                                 $vg_integracao_parceiro_origem_id = $rs_pag_row['vg_integracao_parceiro_origem_id'];
@@ -5453,25 +4892,12 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                 if ($parametros['PROCESS_AUTOM'] == '1')
                                                         $iduser_bko = $GLOBALS['PROCESS_AUTOM_IDUSER_BKO'];
 
-                                                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP, 
-        vg_user_id_concilia = $1,
-        vg_ultimo_status_obs = $2,
-        vg_ultimo_status = $3
-    WHERE vg_id = $4
-";
-
-                                                $params = [
-                                                        (string)$iduser_bko,                            // $1
-                                                        (string)$parametros['ultimo_status_obs'],       // $2
-                                                        (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], // $3
-                                                        (int)$vg_id                                     // $4
-                                                ];
-
-                                                $ret = SQLexecuteQueryParams($sql, $params);
+                                                $sql = "update tb_venda_games set 
+                                                        vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP, vg_user_id_concilia = '" . $iduser_bko . "'," . PHP_EOL . "
+                                                        vg_ultimo_status_obs = " . SQLaddFields($parametros['ultimo_status_obs'], "s") . "," . PHP_EOL . "
+                                                        vg_ultimo_status = " . SQLaddFields($GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], "") . PHP_EOL . "
+                                                        where vg_id = " . $vg_id;
+                                                $ret = SQLexecuteQuery($sql);
                                                 if (!$ret)
                                                         $msg = "Erro ao atualizar venda." . PHP_EOL;
                                         }
@@ -5484,30 +4910,28 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
                                                 if ($partner_do_notify == 1 && ($url_notify_url != "")) {
 
                                                         // Monta o passo 4 da Integra��o - Notify partner
-                                                        $sql = "
-    SELECT * FROM tb_integracao_pedido ip 
-    WHERE ip_store_id = $1 
-      AND ip_vg_id = $2
-";
-
-                                                        $params = [
-                                                                (string)$vg_integracao_parceiro_origem_id, // $1
-                                                                (string)$vg_id                            // $2
-                                                        ];
-
+                                                        $sql = "SELECT * FROM tb_integracao_pedido ip 
+                                                        WHERE 1=1
+                                                        and ip_store_id = '" . $vg_integracao_parceiro_origem_id . "'
+                                                        and ip_vg_id = '" . $vg_id . "'";
                                                         grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . "Select  registro de integra��o para o notify (A2)" . PHP_EOL . $sql . PHP_EOL);
 
-                                                        $rs = SQLexecuteQueryParams($sql, $params);
+                                                        $rs = SQLexecuteQuery($sql);
                                                         if (!$rs) {
                                                                 $msg_1 = date("Y-m-d H:i:s") . " - Erro ao recuperar transa��o de integra��o (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
                                                                 echo $msg_1;
                                                                 grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
-                                                        } else {
-                                                                $rs_row = pg_fetch_array($rs);
+	                                                        } else {
+	                                                                $rs_row = pgFetchArraySafe($rs);
 
-                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
+	                                                                if (!$rs_row) {
+	                                                                        $msg_1 = date("Y-m-d H:i:s") . " - Transacao de integracao nao encontrada para notify (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
+	                                                                        echo $msg_1;
+	                                                                        grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
+	                                                                } else {
+	                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
 
-                                                                $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
+	                                                                $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
                                                                 $post_parameters .= "order_id=" . $rs_row["ip_order_id"] . "&";
                                                                 $post_parameters .= "amount=" . $rs_row["ip_amount"] . "&";
                                                                 if (strlen($rs_row["ip_product_id"]) > 0) {
@@ -5523,12 +4947,13 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
                                                                 $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento Online (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
                                                                 grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-                                                        }
-                                                }
-                                        }
-                                        if ($msgConcilia == "") {
-                                                $smonitor .= "Venda processada: ('$vg_integracao_parceiro_origem_id') <a href='/gamer/vendas/com_venda_detalhe.php?venda_id=$vg_id' target='_blank'>$vg_id</a> (R$" . number_format($total_geral, 2, '.', '.') . ")<br>";
-                                        }
+	                                                        }
+	                                                }
+	                                        }
+	                                        }
+	                                        if ($msgConcilia == "") {
+	                                                $smonitor .= "Venda processada: ('$vg_integracao_parceiro_origem_id') <a href='/gamer/vendas/com_venda_detalhe.php?venda_id=$vg_id' target='_blank'>$vg_id</a> (R$" . number_format($total_geral, 2, '.', '.') . ")<br>";
+	                                        }
                                 }
                                 /*
                                 ================ Banco EPP - End
@@ -5542,52 +4967,35 @@ function conciliacaoAutomaticaPagamentoOnlineTipoEspecifico($codigoAlphaNumerico
 
         // Em certos casos o status da venda fica em vg_ultimo_status=3 (PAGTO_CONFIRMADO) com o pagamento completo e os PINs entregues
         //	-> tem que passar para vg_ultimo_status=5 (VENDA_REALIZADA)
-        $sql = "
-    SELECT vg.vg_id, pag.status, vg.vg_ultimo_status  
-    FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    INNER JOIN tb_pag_compras pag ON pag.idvenda = vg.vg_id 
-    WHERE (
-        vg.vg_ultimo_status = $1 
-        AND " . getSQLWhereParaVendaPagtoOnline(false) . "
-    ) 
-    AND vg_pagto_data_inclusao > '2009-01-01' 
-    AND vgm_pin_codinterno != '' 
-    AND vg_integracao_parceiro_origem_id IS NULL 
-    ORDER BY vg_data_inclusao DESC
-";
-
-        $params = [
-                (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] // $1
-        ];
-
+        $sql = "select vg.vg_id, pag.status, vg.vg_ultimo_status  
+                                from tb_venda_games vg 
+                                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                                        inner join tb_pag_compras pag on pag.idvenda = vg.vg_id 
+                                where (vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . "	
+                                                and " . getSQLWhereParaVendaPagtoOnline(false) . "
+                                                ) 
+                                        and vg_pagto_data_inclusao > '2009-01-01' and (not vgm_pin_codinterno='') 
+                                        and vg_integracao_parceiro_origem_id is null 
+                                order by vg_data_inclusao desc";
 
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (1abc): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
-        $rs_venda_pendentes = SQLexecuteQueryParams($sql, $params);
-        if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-                while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+        $rs_venda_pendentes = SQLexecuteQuery($sql);
+        if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+                while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
                         $vg_id_pendente = $rs_venda_pendentes_row['vg_id'];
                         $pag_status = $rs_venda_pendentes_row['status'];
                         $vg_ultimo_status = $rs_venda_pendentes_row['vg_ultimo_status'];
 
                         if ($vg_ultimo_status == $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO']) {        // 3 and "not vgm_pin_codinterno=''"	(from query) 
-                                $sql = "
-    UPDATE tb_venda_games 
-    SET vg_ultimo_status = $1 
-    WHERE vg_id = $2
-";
-
-                                $params = [
-                                        (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], // $1
-                                        (int)$vg_id_pendente                            // $2
-                                ];
-
-                                $ret = SQLexecuteQueryParams($sql, $params);
+                                $sql = "update tb_venda_games
+                                                set vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " 
+                                                where vg_id = " . $vg_id_pendente;
                                 echo "==>> Atualiza status de venda de '" . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . "' para '" . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . "' (vg_id pendente = " . $vg_id_pendente . ") " . PHP_EOL;
 
+                                $ret = SQLexecuteQuery($sql);
                                 if (!$ret)
                                         $msg = "Erro ao atualizar venda com status pendente (pagamento online)" . PHP_EOL . "$sql." . PHP_EOL;
                                 else {
@@ -5649,23 +5057,23 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
         }
         //echo $cReturn.$cReturn.$cReturn."TIME FOR FIRST QUERY: ".number_format(getmicrotime() - $time_start_stats0, 2, '.', '.').$cReturn;	//."$sql".$cReturn;
 
-        if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
+        if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0)
                 $msg = "Nenhuma transa��o encontrada." . $cReturn;
 
         $time_start_stats0 = getmicrotime();
         $irows = 0;
         if ($rs_transacoes) {
 
-                $fileLog = fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
+                $fileLog = @fopen("/www/arquivos_gerados/logs/log_vendaPIX.txt", "a+");
                 if ($fileLog) {
-                        fwrite($fileLog, "DATA DE REQUISI��O: " . date("d-m-Y H:i:s") . "\n");
-                        fwrite($fileLog, "MODO DE CONCILIA��O: " . (($webhook === true) ? "WEBHOOK" : "SONDA") . "\n");
+                writeLogVendaPixSafe($fileLog, "DATA DE REQUISI��O: " . date("d-m-Y H:i:s") . "\n");
+                writeLogVendaPixSafe($fileLog, "MODO DE CONCILIA��O: " . (($webhook === true) ? "WEBHOOK" : "SONDA") . "\n");
                 }
 
-                $registros_total = pg_num_rows($rs_transacoes);
+                $registros_total = pgNumRowsSafe($rs_transacoes);
                 $npags = $registros_total;
                 $total_pagtos_pendente = 0;
-                while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+                while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
                         $time_start_stats0_in = getmicrotime();
                         $irows++;
 
@@ -5734,7 +5142,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         //Inicia transacao
                                         if ($msg == "") {
                                                 $sql = "BEGIN TRANSACTION ";
-                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                $ret = SQLexecuteQuery($sql);
                                                 $ret = true;                                                                                                /////////////////////
                                                 if (!$ret)
                                                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
@@ -5778,20 +5186,21 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                                         echo $msg;
                                                 } else {
                                                         echo "Pagamento atualizado POR SONDA com sucesso (4322)." . $sout . $cReturn;
-                                                        fwrite($fileLog, "PAGAMENTO ATUALIZADO E STATUS VENDA ATUALIZADO PARA '2' / ID " . $rs_transacoes_row['idvenda'] . " \n");
+                                                        writeLogVendaPixSafe($fileLog, "PAGAMENTO ATUALIZADO E STATUS VENDA ATUALIZADO PARA '2' / ID " . $rs_transacoes_row['idvenda'] . " \n");
+
                                                 }
                                         }
                                         //Finaliza transacao
                                         if ($msg == "") {
                                                 $sql = "COMMIT TRANSACTION ";
-                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                $ret = SQLexecuteQuery($sql);
                                                 if (!$ret)
                                                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                         } else {
                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                $ret = SQLexecuteQuery($sql);
                                                 if (!$ret)
                                                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -5837,22 +5246,13 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                 // 'DADOS_PAGTO_RECEBIDO' 		=> '2',
                 // 'PAGTO_CONFIRMADO' 			=> '3',
                 $sql = "
-    SELECT * FROM tb_venda_games vg 
-    WHERE (
-        vg.vg_ultimo_status = $1 
-        OR vg.vg_ultimo_status = $2
-    ) 
-    AND vg_data_inclusao > (NOW() - '2 months'::interval)
-    AND vg_pagto_tipo = $3 
-    ORDER BY vg_data_inclusao DESC
-";
-
-                $params = [
-                        (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $1
-                        (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'],     // $2
-                        (int)$PAGAMENTO_PIX_NUMERIC                          // $3
-                ];
-
+                        select * from tb_venda_games vg 
+                        where ((vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . " or 
+                                        vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . ")
+                        )  and vg_data_inclusao > (now() -'2 months'::interval)
+                        and vg_pagto_tipo=" . $PAGAMENTO_PIX_NUMERIC . " 
+                        order by vg_data_inclusao desc
+                        ";
 
                 //	Vendas de integra��o s�o levantadas aqui para executar o notify
                 //	n�o precisssa de: "and vg_integracao_parceiro_origem_id is null"
@@ -5863,18 +5263,18 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                         echo "DEBUG_ABCD: " . $sql . PHP_EOL;
                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0000): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                 }
-                $rs_venda = SQLexecuteQueryParams($sql, $params);
+                $rs_venda = SQLexecuteQuery($sql);
                 if ($bDebug) {
                         echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (00): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                 }
 
-                if (!$rs_venda || pg_num_rows($rs_venda) == 0)
+                if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0)
                         $msg = "Nenhuma venda encontrada." . PHP_EOL;
         }
 
         //Busca vendas
         if ($msg == "") {
-                while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+                while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
                         $vg_id = $rs_venda_row['vg_id'];
                         $vg_pagto_banco = $rs_venda_row['vg_pagto_banco'];
                         $vg_pagto_num_docto = $rs_venda_row['vg_pagto_num_docto'];
@@ -5904,8 +5304,8 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0+): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                                 echo "get_vg_ultimo_status($vg_id) 000: " . get_vg_ultimo_status($vg_id) . PHP_EOL;
                         }
-                        if ($rs_venda_modelos && pg_num_rows($rs_venda_modelos) > 0) {
-                                while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+                        if ($rs_venda_modelos && pgNumRowsSafe($rs_venda_modelos) > 0) {
+                                while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
                                         $qtde = $rs_venda_modelos_row['vgm_qtde'];
                                         $valor = $rs_venda_modelos_row['vgm_valor'];
                                         $total_geral += $valor * $qtde;
@@ -5923,8 +5323,8 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                         if ($bDebug) {
                                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (0a): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
                         }
-                        if ($rs_pag && pg_num_rows($rs_pag) > 0) {
-                                $rs_pag_row = pg_fetch_array($rs_pag);
+                        if ($rs_pag && pgNumRowsSafe($rs_pag) > 0) {
+                                $rs_pag_row = pgFetchArraySafe($rs_pag);
                                 // Remove o prefixo "PIX"
                                 $pag_codigo = substr($rs_pag_row['vg_pagto_num_docto'], 5);
                                 $vg_integracao_parceiro_origem_id = $rs_pag_row['vg_integracao_parceiro_origem_id'];
@@ -5956,7 +5356,8 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         $msgConcilia = "";
 
                                         if ($msgConcilia == "") {
-                                                fwrite($fileLog, "ENTRANDO NA FUN��O PAGAMENTO ONLINE / ID " . $vg_id . " \n");
+                                                writeLogVendaPixSafe($fileLog, "ENTRANDO NA FUN��O PAGAMENTO ONLINE / ID " . $vg_id . " \n");
+
                                                 $msgConcilia = conciliaVendaGames_PagamentoOnline($vg_id, $pag_codigo, 1, $parametros, $webhook);
                                                 if ($msgConcilia == "")
                                                         $msg .= "Conciliacao(C1): Conciliado com sucesso." . PHP_EOL;
@@ -5968,7 +5369,8 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         }
                                         //Associa pins, gera venda e credita saldo
                                         if ($msgConcilia == "") {
-                                                fwrite($fileLog, "ENTRANDO NA FUN��O PROCESSA VENDA / ID " . $vg_id . " \n");
+                                                writeLogVendaPixSafe($fileLog, "ENTRANDO NA FUN��O PROCESSA VENDA / ID " . $vg_id . " \n");
+
                                                 $msgConcilia = processaVendaGames($vg_id, 1, $parametros);
                                                 if ($msgConcilia == "")
                                                         $msg .= "Processamento (Pagtos PIX): Processado com sucesso." . PHP_EOL;
@@ -5980,7 +5382,8 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                         }
                                         //envia email para o cliente de pagamento online
                                         if ($msgConcilia == "") {
-                                                fwrite($fileLog, "ENTRANDO NA FUN��O PROCESSA VENDA EMAIL / ID " . $vg_id . " \n");
+                                                writeLogVendaPixSafe($fileLog, "ENTRANDO NA FUN��O PROCESSA VENDA EMAIL / ID " . $vg_id . " \n");
+
                                                 $msgConcilia = processaEmailVendaGames($vg_id, $parametros);
                                                 if ($msgConcilia == "")
                                                         $msg .= "Envio de email: Enviado com sucesso." . PHP_EOL;
@@ -5992,7 +5395,7 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                                 $smonitor .= "Venda processada: <a href='/gamer/vendas/com_venda_detalhe.php?venda_id=$vg_id' target='_blank'>$vg_id</a> (R$" . number_format($total_geral, 2, '.', '.') . ")<br>";
                                         }
 
-                                        fclose($fileLog);
+                                        closeLogVendaPixSafe($fileLog);
                                 } else {
                                         // ===========================================================	
                                         // Processa vendas de usu�rios integra��o com pagamento PIX
@@ -6068,10 +5471,15 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                                                 $msg_1 = date("Y-m-d H:i:s") . " - Erro ao recuperar transa��o de integra��o (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
                                                                 echo $msg_1;
                                                                 grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
-                                                        } else {
-                                                                $rs_row = pg_fetch_array($rs);
+	                                                        } else {
+	                                                                $rs_row = pgFetchArraySafe($rs);
 
-                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
+	                                                                if (!$rs_row) {
+	                                                                        $msg_1 = date("Y-m-d H:i:s") . " - Transacao de integracao nao encontrada para notify (store_id: '" . $vg_integracao_parceiro_origem_id . "', vg_id: $vg_id)." . PHP_EOL;
+	                                                                        echo $msg_1;
+	                                                                        grava_log_integracao_tmp(str_repeat("-", 80) . PHP_EOL . $msg_1);
+	                                                                } else {
+	                                                                $post_parameters = "store_id=" . $rs_row["ip_store_id"] . "&";
 
                                                                 $post_parameters .= "transaction_id=" . $rs_row["ip_transaction_id"] . "&";
                                                                 $post_parameters .= "order_id=" . $rs_row["ip_order_id"] . "&";
@@ -6087,9 +5495,10 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
                                                                 $sret1 = getIntegracaoCURL($url_notify_url, $post_parameters);
                                                                 $sret = $sret1;
 
-                                                                $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento PIX (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
-                                                                grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
-                                                        }
+	                                                                $s_msg = "AFTER Partner Notify - Conciliacao Automatica de Pagamento PIX (" . date("Y-m-d H:i:s") . ")" . PHP_EOL . " - result: " . PHP_EOL . str_repeat("_", 80) . PHP_EOL . $sret . PHP_EOL . str_repeat("-", 80) . PHP_EOL;
+	                                                                grava_log_integracao_tmp(str_repeat("*", 80) . PHP_EOL . "Retorno de getIntegracaoCURL (2): " . PHP_EOL . print_r($post_parameters, true) . PHP_EOL . $s_msg . PHP_EOL);
+	                                                                }
+	                                                        }
                                                 }
                                         }
                                         if ($msgConcilia == "") {
@@ -6105,34 +5514,24 @@ function conciliacaoAutomaticaPagtoPIXemGAMER($webhook = false, $venda = 0)
 
         // Em certos casos o status da venda fica em vg_ultimo_status=3 (PAGTO_CONFIRMADO) com o pagamento completo e os PINs entregues
         //	-> tem que passar para vg_ultimo_status=5 (VENDA_REALIZADA)
-        $sql = "
-    SELECT vg.vg_id, pag.status, vg.vg_ultimo_status  
-    FROM tb_venda_games vg 
-    INNER JOIN tb_venda_games_modelo vgm ON vgm.vgm_vg_id = vg.vg_id 
-    INNER JOIN tb_pag_compras pag ON pag.idvenda = vg.vg_id 
-    WHERE (
-        vg.vg_ultimo_status = $1 
-        AND vg_pagto_tipo = $2
-    ) 
-    AND vg_pagto_data_inclusao > '2021-01-01' 
-    AND vgm_pin_codinterno != '' 
-    AND vg_integracao_parceiro_origem_id IS NULL 
-    ORDER BY vg_data_inclusao DESC
-";
-
-        $params = [
-                (int)$GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'], // $1
-                (int)$PAGAMENTO_PIX_NUMERIC                       // $2
-        ];
-
+        $sql = "select vg.vg_id, pag.status, vg.vg_ultimo_status  
+                                from tb_venda_games vg 
+                                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
+                                        inner join tb_pag_compras pag on pag.idvenda = vg.vg_id 
+                                where (vg.vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PAGTO_CONFIRMADO'] . "	
+                                                and vg_pagto_tipo=" . $PAGAMENTO_PIX_NUMERIC . "
+                                                ) 
+                                        and vg_pagto_data_inclusao > '2021-01-01' and (not vgm_pin_codinterno='') 
+                                        and vg_integracao_parceiro_origem_id is null 
+                                order by vg_data_inclusao desc";
 
         if ($bDebug) {
                 echo $cReturn . $cReturn . $cReturn . "ELAPSED TOTAL TIME (1abc): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . $cReturn;
         }
 
-        $rs_venda_pendentes = SQLexecuteQueryParams($sql, $params);
-        if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-                while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+        $rs_venda_pendentes = SQLexecuteQuery($sql);
+        if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+                while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
                         $vg_id_pendente = $rs_venda_pendentes_row['vg_id'];
                         $pag_status = $rs_venda_pendentes_row['status'];
                         $vg_ultimo_status = $rs_venda_pendentes_row['vg_ultimo_status'];
@@ -6192,22 +5591,15 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
 
         //Recupera o boleto pendente
         if ($msg == "") {
-                $sql = "
-    SELECT * FROM boletos_pendentes bol
-    WHERE bol.bol_codigo = $1
-";
-
-                $params = [
-                        (int)$bol_codigo
-                ];
-
+                $sql = "select * from boletos_pendentes bol
+                                where bol.bol_codigo = " . $bol_codigo;
                 if ($bDebug)
                         echo "sqlA1: $sql" . PHP_EOL;
-                $rs_boleto = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_boleto || pg_num_rows($rs_boleto) == 0)
+                $rs_boleto = SQLexecuteQuery($sql);
+                if (!$rs_boleto || pgNumRowsSafe($rs_boleto) == 0)
                         $msg = "Nenhum boleto encontrado." . PHP_EOL;
                 else {
-                        $rs_boleto_row = pg_fetch_array($rs_boleto);
+                        $rs_boleto_row = pgFetchArraySafe($rs_boleto);
                         $bol_data = $rs_boleto_row['bol_data'];
                         $bol_valor = $rs_boleto_row['bol_valor'];
                         $bol_banco = $rs_boleto_row['bol_banco'];
@@ -6219,131 +5611,64 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
 
         //Recupera o saldo do usu�rio
         if ($msg == "") {
-                $sql = "
-    SELECT ug_perfil_saldo 
-    FROM usuarios_games 
-    WHERE ug_id = $1
-";
-
-                $params = [
-                        (int)$usuario_id
-                ];
-
-                echo "sqlA1a: $sql" . PHP_EOL;
-                $rs_saldo = SQLexecuteQueryParams($sql, $params);
+                $sql = "select ug_perfil_saldo from usuarios_games where ug_id =" . $usuario_id;
                 if ($bDebug)
-                        if (!$rs_saldo || pg_num_rows($rs_saldo) == 0)
-                                $msg = "Nenhum usu�rio encontrado." . PHP_EOL;
-                        else {
-                                $rs_saldo_row = pg_fetch_array($rs_saldo);
-                                $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
-                                if ($bDebug)
-                                        echo " ++++B [" . date("Y-m-d H:i:s") . "] para ug_id:$usuario_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
-                        }
+                        echo "sqlA1a: $sql" . PHP_EOL;
+                $rs_saldo = SQLexecuteQuery($sql);
+                if (!$rs_saldo || pgNumRowsSafe($rs_saldo) == 0)
+                        $msg = "Nenhum usu�rio encontrado." . PHP_EOL;
+                else {
+                        $rs_saldo_row = pgFetchArraySafe($rs_saldo);
+                        $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
+                        if ($bDebug)
+                                echo " ++++B [" . date("Y-m-d H:i:s") . "] para ug_id:$usuario_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
+                }
         }
 
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
 
         //Concilia boleto
         if ($msg == "") {
-                $sql = "
-    UPDATE boletos_pendentes 
-    SET 
-        bol_aprovado = 1, 
-        bol_aprovado_data = CURRENT_TIMESTAMP, 
-        bol_venda_games_id = $1 
-    WHERE bol_codigo = $2
-";
-
-                $params = [
-                        (int)$venda_id,   // $1
-                        (int)$bol_codigo  // $2
-                ];
-
+                $sql = "update boletos_pendentes set bol_aprovado = 1, bol_aprovado_data = CURRENT_TIMESTAMP, bol_venda_games_id = " . $venda_id . " where bol_codigo = " . $bol_codigo;
                 if ($bDebug)
                         echo "sqlA2: $sql" . PHP_EOL;
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar boleto." . PHP_EOL;
         }
 
         //Credita valor do boleto no usu�rio Money
         if ($msg == "") {
-                $sql = "
-    UPDATE usuarios_games 
-    SET ug_perfil_saldo = COALESCE(ug_perfil_saldo, 0) + $1 
-    WHERE ug_id = $2
-";
-
-                $params = [
-                        (float)$parametros['valor'], // $1
-                        (int)$usuario_id             // $2
-                ];
-
+                $sql = "update usuarios_games set ug_perfil_saldo = coalesce(ug_perfil_saldo,0) + " . $parametros['valor'] . " where ug_id =" . $usuario_id;
                 if ($bDebug)
                         echo "sqlA3: $sql" . PHP_EOL;
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao creditar valor do boleto no usu�rio Money." . PHP_EOL;
         }
 
         //Completa venda Money
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_ultimo_status = $1, 
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP 
-    WHERE vg_id = $2 
-      AND vg_ug_id = $3
-";
-
-                $params = [
-                        (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], // $1
-                        (int)$venda_id,                                  // $2
-                        (int)$usuario_id                                 // $3
-                ];
-
+                $sql = "update tb_venda_games set vg_ultimo_status =  " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . ", vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP where vg_id =" . $venda_id . " and vg_ug_id =" . $usuario_id . ";";
                 if ($bDebug)
                         echo "sqlA4: $sql" . PHP_EOL;
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao completar venda Money (Boleto)." . PHP_EOL;
         }
 
         //Insere registro em saldo_fifo
         if ($msg == "") {
-                $sql = "
-    INSERT INTO saldo_composicao_fifo (
-        ug_id, 
-        scf_data_deposito, 
-        scf_valor, 
-        scf_valor_disponivel, 
-        scf_canal, 
-        scf_comissao, 
-        scf_id_pagamento, 
-        vg_id
-    ) VALUES ($1, CURRENT_TIMESTAMP, $2, $3, 'G', 0, $4, $5)
-";
-
-                $params = [
-                        (int)$usuario_id,                                 // $1
-                        (float)$parametros['valor'],                      // $2
-                        (float)$parametros['valor'],                      // $3
-                        (string)$GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'], // $4
-                        (int)($venda_id ?: 0)                             // $5
-                ];
-
+                $sql = "insert into saldo_composicao_fifo (ug_id,scf_data_deposito,scf_valor,scf_valor_disponivel,scf_canal,scf_comissao,scf_id_pagamento, vg_id) values (" . $usuario_id . ",CURRENT_TIMESTAMP," . $parametros['valor'] . "," . $parametros['valor'] . ",'G',0,'" . $GLOBALS['FORMAS_PAGAMENTO']['BOLETO_BANCARIO'] . "', " . (($venda_id) ? $venda_id : 0) . ")";
                 if ($bDebug)
                         echo "sqlA5: $sql" . PHP_EOL;
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao inserir Saldo FIFO (BOleto)." . PHP_EOL;
         }
@@ -6351,35 +5676,26 @@ function conciliaMoneyDepositoSaldo_boleto($bol_codigo, $venda_id, $usuario_id, 
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
 
         //Recupera o saldo do usu�rio no final
         if ($msg == "") {
-                $sql = "
-    SELECT ug_perfil_saldo 
-    FROM usuarios_games 
-    WHERE ug_id = $1
-";
-
-                $params = [
-                        (int)$usuario_id
-                ];
-
+                $sql = "select ug_perfil_saldo from usuarios_games where ug_id =" . $usuario_id;
                 if ($bDebug)
                         echo "sqlA1b: $sql" . PHP_EOL;
-                $rs_saldo = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_saldo || pg_num_rows($rs_saldo) == 0)
+                $rs_saldo = SQLexecuteQuery($sql);
+                if (!$rs_saldo || pgNumRowsSafe($rs_saldo) == 0)
                         $msg = "Nenhum usu�rio encontrado." . PHP_EOL;
                 else {
-                        $rs_saldo_row = pg_fetch_array($rs_saldo);
+                        $rs_saldo_row = pgFetchArraySafe($rs_saldo);
                         $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
                         if ($bDebug)
                                 echo " ++++B2 [" . date("Y-m-d H:i:s") . "] para ug_id:$usuario_id ug_perfil_saldo_prev = '$ug_perfil_saldo_prev', valor = " . $parametros['valor'] . PHP_EOL;
@@ -6418,22 +5734,8 @@ function conciliaAutomaticaMoneyDepositoSaldo()
         //		$sql .= "where idvenda>0 and (status_processed=0 or vg.vg_ultimo_status=3) and tipo_cliente='M' ";
 
         // O anterior est� demorando muito e n�o � necess�rio consultar tb_venda_games, apenas tb_pag_compras
-        $sql = "
-    SELECT * FROM tb_pag_compras pgt 
-    WHERE idvenda > 0 
-      AND status_processed = 0 
-      AND tipo_cliente = 'M' 
-      AND tipo_deposito = 2 
-      AND datainicio > (NOW() - '2 months'::interval) 
-      AND iforma != '6' 
-      AND iforma != $1
-";
+        $sql = "select * from tb_pag_compras pgt where idvenda>0 and status_processed=0 and tipo_cliente='M' and tipo_deposito = 2 and datainicio > (now() -'2 months'::interval) and iforma!='6' and iforma!='" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX'] . "' ";
 
-        $params = [
-                (string)$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIX']
-        ];
-
-        $rs_total = SQLexecuteQueryParams($sql, $params);
         // status=1 and 
         // Apenas para vendas que n�o s�o integra��o
         //		$sql .= "and vg_integracao_parceiro_origem_id is null ";
@@ -6446,12 +5748,13 @@ function conciliaAutomaticaMoneyDepositoSaldo()
         // Op��o 2 - Para incluir algum pagamento antigo descancelado
         //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";	
 
+        $rs_total = SQLexecuteQuery($sql);
         if ($bDebug) {
                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 0): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
         }
 
         if ($rs_total)
-                $registros_total = pg_num_rows($rs_total);
+                $registros_total = pgNumRowsSafe($rs_total);
         $sql .= " order by pgt.datainicio desc ";
 
         if ($bDebug) {
@@ -6459,22 +5762,22 @@ function conciliaAutomaticaMoneyDepositoSaldo()
         }
 
         $time_start_stats0 = getmicrotime();
-        $rs_transacoes = SQLexecuteQueryParams($sql, $params);
+        $rs_transacoes = SQLexecuteQuery($sql);
         if ($bDebug) {
                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 1): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
         }
         echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . "" . $cReturn;        //."$sql".$cReturn;
 
-        if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
+        if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0)
                 $msg = "Nenhuma transa��o encontrada." . $cReturn;
 
         $time_start_stats0 = getmicrotime();
         $irows = 0;
         if ($rs_transacoes) {
-                $npags = pg_num_rows($rs_transacoes);
+                $npags = pgNumRowsSafe($rs_transacoes);
                 echo "NPags: " . $npags . $cReturn;
                 $total_pagtos_pendente = 0;
-                while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+                while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
                         $time_start_stats0_in = getmicrotime();
                         $irows++;
 
@@ -6494,27 +5797,15 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                         $iforma_tmp = getCodigoNumericoParaPagto($rs_transacoes_row['iforma']);
 
                                         // Atualiza dados para tabela vendas
-                                        $sql_update = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago    = $1,
-        vg_pagto_tipo           = $2,
-        vg_pagto_num_docto      = $3,
-        vg_pagto_data_inclusao  = $4,
-        vg_ultimo_status        = $5
-    WHERE vg_id = $6
-";
+                                        $sql_update = "update tb_venda_games set 
+                                                                        vg_pagto_valor_pago		= " . ($rs_transacoes_row['total'] / 100) . ",
+                                                                        vg_pagto_tipo			= " . $iforma_tmp . ",
+                                                                        vg_pagto_num_docto		= '" . $prefix . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra'] . "', 
+                                                                        vg_pagto_data_inclusao	= '" . $rs_transacoes_row['datainicio'] . "',
+                                                                        vg_ultimo_status		= " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                                                where vg_id=" . $rs_transacoes_row['idvenda'] . ";";
 
-                                        $params = [
-                                                (float)($rs_transacoes_row['total'] / 100), // $1
-                                                (int)$iforma_tmp,                          // $2
-                                                (string)($prefix . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra']), // $3
-                                                (string)$rs_transacoes_row['datainicio'],  // $4
-                                                (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $5
-                                                (int)$rs_transacoes_row['idvenda']         // $6
-                                        ];
-
-                                        $rs_update = SQLexecuteQueryParams($sql_update, $params);
+                                        $rs_update = SQLexecuteQuery($sql_update);
                                         if ($bDebug) {
                                                 echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "ELAPSED TOTAL TIME (Prev 3): " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "" . $cReturn;
                                         }
@@ -6580,7 +5871,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 $b_sonda_6 = getTransacaoPagamentoOK("PagtoFacil", $rs_transacoes_row['numcompra'], $aline6);
 
                                                 // Se existe registro da transa��o -> salva data 	
-                                                if ((isset($aline6[1])) && (strlen($aline6[1]) > 0)) {
+                                                if ((isset($aline6[1], $aline6[3], $aline6[4])) && (strlen($aline6[1]) > 0)) {
                                                         $s_sonda = (($b_sonda_6) ? "OK" : "none");
                                                         $sBanco = "Bradesco";
                                                         /*	
@@ -6600,10 +5891,13 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                         $s_sonda = (($b_sonda_9) ? "OK" : "none");
                                                         $sBanco = "Banco do Brasil";
                                                         //     [dataPagamento] => 16092009
-                                                        $dataconfirma = "'" . substr($aline9['dataPagamento'], 4, 4) . "-" . substr($aline9['dataPagamento'], 2, 2) . "-" . substr($aline9['dataPagamento'], 0, 2) . "'";
+                                                        $dataPagamento = $aline9['dataPagamento'] ?? "";
+                                                        if ($dataPagamento !== "") {
+                                                                $dataconfirma = "'" . substr($dataPagamento, 4, 4) . "-" . substr($dataPagamento, 2, 2) . "-" . substr($dataPagamento, 0, 2) . "'";
+                                                        }
                                                 }
                                         } else if ($rs_transacoes_row['iforma'] == $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BANCO_ITAU_ONLINE']) {
-                                                $pedido = str_pad($rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
+                                                $pedido = str_pad((string)$rs_transacoes_row['id_transacao_itau'], 8, "0", STR_PAD_LEFT);
 
                                                 $pag_status = getSondaItau($pedido, $a_retorno_itau, $sitPag, $dtPag);
                                                 $b_sonda_A = false;
@@ -6661,11 +5955,11 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 $b_sonda_C = getTransacaoPagamentoOK("Cielo", $rs_transacoes_row['numcompra'], $alineC);
 
                                                 // Se existe registro da transa��o -> salva data 	
-                                                if ($alineC['status'] == "6") {
+                                                if (($alineC['status'] ?? '') == "6") {
                                                         $s_sonda = (($b_sonda_C) ? "OK" : "none");
                                                         $sBanco = "Banco Cielo";
-                                                        $dataconfirma = "'" . substr($alineC['data'], 0, 19) . "'";
-                                                        $s_update_status_lr = ", cielo_status = '" . $alineC['status'] . "', cielo_codigo_lr = '" . $alineC['codigo_lr'] . "' ";
+                                                        $dataconfirma = "'" . substr($alineC['data'] ?? '', 0, 19) . "'";
+                                                        $s_update_status_lr = ", cielo_status = '" . $alineC['status'] . "', cielo_codigo_lr = '" . ($alineC['codigo_lr'] ?? '') . "' ";
                                                 }
                                         }
 
@@ -6731,7 +6025,7 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 //Inicia transacao
                                                 if ($msg == "") {
                                                         $sql = "BEGIN TRANSACTION ";
-                                                        $ret = SQLexecuteQueryParams($sql, null);
+                                                        $ret = SQLexecuteQuery($sql);
                                                         $ret = true;                                                                                                /////////////////////
                                                         if (!$ret)
                                                                 $msg = "Erro ao iniciar transa��o." . PHP_EOL;
@@ -6739,25 +6033,11 @@ function conciliaAutomaticaMoneyDepositoSaldo()
 
                                                 // Marca registro como processado (status_processed=1), e status=3, j� que se chegou aqui quer dizer que n�o passou por confirmaBanco.php
                                                 // Retira status_processed=1 para poder encontrar o registro depois em sqlB2: 
-                                                $sql = "
-    UPDATE tb_pag_compras 
-    SET 
-        datacompra = CURRENT_TIMESTAMP, 
-        dataconfirma = $1, 
-        status = 3 
-        $s_update_status_lr 
-    WHERE numcompra = $2
-";
-
-                                                $params = [
-                                                        (string)$dataconfirma,                  // $1
-                                                        (string)$rs_transacoes_row['numcompra'] // $2
-                                                ];
-
+                                                $sql = "update tb_pag_compras set datacompra=CURRENT_TIMESTAMP, dataconfirma=" . $dataconfirma . ", status=3 " . $s_update_status_lr . " where numcompra='" . $rs_transacoes_row['numcompra'] . "' ";
                                                 echo PHP_EOL . " NO SYNC => " . $sql . " " . PHP_EOL . "($msg)" . PHP_EOL;
                                                 echo "DEBUG F (atualiza status_processed=1, vendaid = " . $rs_transacoes_row['idvenda'] . "): " . $sql . PHP_EOL;
 
-                                                $rs_update2 = SQLexecuteQueryParams($sql, $params);
+                                                $rs_update2 = SQLexecuteQuery($sql);
                                                 if (!$rs_update2) {
                                                         $msg = "Erro atualizando status de registro (62aa)." . $cReturn . "$sql" . $cReturn;
                                                         echo $msg;
@@ -6766,46 +6046,16 @@ function conciliaAutomaticaMoneyDepositoSaldo()
 
                                                         // Atualiza dados para tabela vendas
                                                         //'DADOS_PAGTO_RECEBIDO' => 2
-                                                        // 1. Cálculos e montagem de strings no PHP
-                                                        $valor_pago = (float)(
-                                                                ($rs_transacoes_row['total'] / 100) +
-                                                                $rs_transacoes_row['taxas'] +
-                                                                $rs_transacoes_row['frete'] +
-                                                                $rs_transacoes_row['manuseio']
-                                                        );
+                                                        $sql_update = "update tb_venda_games set 
+                                                                                        vg_pagto_valor_pago		= " . ($rs_transacoes_row['total'] / 100 + $rs_transacoes_row['taxas'] + $rs_transacoes_row['frete'] + $rs_transacoes_row['manuseio']) . ",
+                                                                                        vg_pagto_tipo			= " . $vg_pagto_tipo . ",
+                                                                                        vg_pagto_num_docto		= '" . $prefix_1 . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra'] . "', 
+                                                                                        vg_pagto_data_inclusao	= '" . $rs_transacoes_row['datainicio'] . "',
+                                                                                        vg_usuario_obs			= 'Pagamento Online " . $sBanco . " POR SONDA [" . $rs_transacoes_row['iforma'] . "] em " . date("Y-m-d H:i:s") . "',
+                                                                                        vg_ultimo_status		= " . $GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'] . "
+                                                                                where vg_id=" . $rs_transacoes_row['idvenda'] . ";";
 
-                                                        $num_docto = (string)($prefix_1 . $rs_transacoes_row['iforma'] . "_" . $rs_transacoes_row['numcompra']);
-
-                                                        $usuario_obs = (string)(
-                                                                "Pagamento Online " . $sBanco .
-                                                                " POR SONDA [" . $rs_transacoes_row['iforma'] . "] em " . date("Y-m-d H:i:s")
-                                                        );
-
-                                                        // 2. Definição da Query Parametrizada
-                                                        $sql_update = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_pagto_valor_pago    = $1,
-        vg_pagto_tipo           = $2,
-        vg_pagto_num_docto      = $3,
-        vg_pagto_data_inclusao  = $4,
-        vg_usuario_obs          = $5,
-        vg_ultimo_status        = $6
-    WHERE vg_id = $7
-";
-
-                                                        // 3. Execução com os parâmetros mapeados
-                                                        $params = [
-                                                                $valor_pago,                                     // $1
-                                                                (int)$vg_pagto_tipo,                             // $2
-                                                                $num_docto,                                      // $3
-                                                                (string)$rs_transacoes_row['datainicio'],        // $4
-                                                                $usuario_obs,                                    // $5
-                                                                (int)$GLOBALS['STATUS_VENDA']['DADOS_PAGTO_RECEBIDO'], // $6
-                                                                (int)$rs_transacoes_row['idvenda']               // $7
-                                                        ];
-
-                                                        $rs_update = SQLexecuteQueryParams($sql_update, $params);
+                                                        $rs_update = SQLexecuteQuery($sql_update);
                                                         $sout = $rs_transacoes_row['datainicio'] . PHP_EOL . "   " . $rs_transacoes_row['numcompra'] . PHP_EOL . "   tipo: (" . $rs_transacoes_row['iforma'] . ") " . getDescricaoPagtoOnline($rs_transacoes_row['iforma']) . "," . PHP_EOL . "   idvenda: " . $rs_transacoes_row['idvenda'] . "." . PHP_EOL;
 
                                                         if (!$rs_update) {
@@ -6819,14 +6069,14 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                                                 //Finaliza transacao
                                                 if ($msg == "") {
                                                         $sql = "COMMIT TRANSACTION ";
-                                                        $ret = SQLexecuteQueryParams($sql, null);
+                                                        $ret = SQLexecuteQuery($sql);
                                                         if (!$ret)
                                                                 $msg = "Erro ao comitar transa��o." . PHP_EOL;
 
                                                         $msg_sonda = "PROCESSADO POR SONDA";
                                                 } else {
                                                         $sql = "ROLLBACK TRANSACTION ";
-                                                        $ret = SQLexecuteQueryParams($sql, null);
+                                                        $ret = SQLexecuteQuery($sql);
                                                         if (!$ret)
                                                                 $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
 
@@ -6916,46 +6166,37 @@ function conciliaAutomaticaMoneyDepositoSaldo()
         // Procura vendas para dep�sito em saldo de Gamer nem canceladas nem completas
         // No inner join com boletos_pendentes ->
         //		bol_documento pode ter um caracter extra no final que pode ser n�o numerico, ent�o testamos s� para tipo "6" que n�o tem esse problema
-        $sql = "
-    SELECT * FROM tb_venda_games vg
-    LEFT OUTER JOIN boleto_bancario_games bbg ON bbg.bbg_vg_id = vg.vg_id 
-    LEFT OUTER JOIN tb_pag_compras pg ON pg.idvenda = vg.vg_id
-    LEFT OUTER JOIN boletos_pendentes bol ON (
-        CASE SUBSTR(bol_documento, 1, 1) 
-            WHEN '6' THEN (
-                CASE bol_banco 
-                    WHEN '033' THEN SUBSTR(bol_documento, 2, LENGTH(bol_documento)-2)::bigint
-                    WHEN '237' THEN SUBSTR(bol_documento, 2, LENGTH(bol_documento)-2)::bigint
-                    WHEN '461' THEN SUBSTR(bol_documento, 2, LENGTH(bol_documento)-2)::bigint
-                    ELSE SUBSTR(bol_documento, 2, LENGTH(bol_documento))::bigint 
-                END
-            )  
-            ELSE 0 
-        END
-    ) = vg.vg_id
-    WHERE NOT (vg_ultimo_status = $1 OR vg_ultimo_status = $2) 
-      AND vg_deposito_em_saldo = 1 
-      AND vg_data_inclusao > (NOW() - '2 months'::interval)
-      AND vg_pagto_tipo != 6
-    ORDER BY vg_data_inclusao DESC
-";
-
-        $params = [
-                (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], // $1
-                (int)$GLOBALS['STATUS_VENDA']['VENDA_CANCELADA']  // $2
-        ];
-
+        $sql = "select * 
+                        from tb_venda_games vg
+                                left outer join boleto_bancario_games bbg on bbg.bbg_vg_id = vg.vg_id 
+                                left outer join tb_pag_compras pg on pg.idvenda = vg.vg_id
+                                left outer join boletos_pendentes bol on 
+                                        (case  substr(bol_documento, 1, 1) 
+                                                        when '6' 
+                                                        then (case bol_banco 
+                                                                when '033'
+                                                                then substr(bol_documento, 2, length(bol_documento)-2)::bigint
+                                                                when '237'
+                                                                then substr(bol_documento, 2, length(bol_documento)-2)::bigint
+                                                                when '461'
+                                                                then substr(bol_documento, 2, length(bol_documento)-2)::bigint
+                                                                else substr(bol_documento, 2, length(bol_documento))::bigint end)  
+                                                        else 0 end) = vg.vg_id
+                        where (not (vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " or vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_CANCELADA'] . ")) and vg_deposito_em_saldo = 1 
+                        and vg_data_inclusao > (now() -'2 months'::interval)
+                        and vg_pagto_tipo!=6
+                         order by vg_data_inclusao desc";
 
         if ($bDebug)
                 echo "sqlA1: $sql" . PHP_EOL;
 
-        $rs_vendas = SQLexecuteQueryParams($sql, $params);
-        if (!$rs_vendas || pg_num_rows($rs_vendas) == 0) {
+        $rs_vendas = SQLexecuteQuery($sql);
+        if (!$rs_vendas || pgNumRowsSafe($rs_vendas) == 0) {
                 $msg = "Nenhuma venda de dep�sito em Saldo Gamer encontrada para concilia��o." . PHP_EOL;
                 echo $msg;
         } else {
-                echo "Encontradas " . pg_num_rows($rs_vendas) . " vendas de dep�sito pendentes de concilia��o" . PHP_EOL;
-                while ($rs_vendas_row = pg_fetch_array($rs_vendas)) {
+                echo "Encontradas " . pgNumRowsSafe($rs_vendas) . " vendas de dep�sito pendentes de concilia��o" . PHP_EOL;
+                while ($rs_vendas_row = pgFetchArraySafe($rs_vendas)) {
                         $msg = "";
                         if ($bDebug)
                                 echo str_repeat("-", 80) . PHP_EOL;
@@ -7019,25 +6260,15 @@ function conciliaAutomaticaMoneyDepositoSaldo()
                         }
                         // Procura pagamentos Online
                         elseif ($vg_pagto_tipo > 4) {
-                                $sql = "
-    SELECT * FROM tb_pag_compras pg 
-    WHERE pg.idvenda = $1 
-      AND status = 3 
-      AND status_processed = 0
-";
-
-                                $params = [
-                                        (int)$venda_id
-                                ];
-
+                                $sql = "select * from tb_pag_compras pg where pg.idvenda = " . $venda_id . " and status = 3 and status_processed = 0";
                                 echo "sqlB2: $sql" . PHP_EOL;
-                                $rs_pagto = SQLexecuteQueryParams($sql, $params);
-                                if (!$rs_pagto || pg_num_rows($rs_pagto) == 0)
+                                $rs_pagto = SQLexecuteQuery($sql);
+                                if (!$rs_pagto || pgNumRowsSafe($rs_pagto) == 0)
                                         $msg = "Nenhum pagamento online encontrado para concilia��o (Saldo Gamer, vg_pagto_tipo: $vg_pagto_tipo)." . PHP_EOL;
                                 else {
                                         if ($bDebug)
-                                                echo "Encontrados " . pg_num_rows($rs_pagto) . " pagtos para " . $rs_vendas_row['vg_id'] . PHP_EOL;
-                                        $rs_pagto_row = pg_fetch_array($rs_pagto);
+                                                echo "Encontrados " . pgNumRowsSafe($rs_pagto) . " pagtos para " . $rs_vendas_row['vg_id'] . PHP_EOL;
+                                        $rs_pagto_row = pgFetchArraySafe($rs_pagto);
                                         // conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $parametros)
                                         $venda_id = $rs_vendas_row['vg_id'];
                                         $usuario_id = $rs_vendas_row['vg_ug_id'];
@@ -7103,7 +6334,7 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
         }
 
         if ($rs_total)
-                $registros_total = pg_num_rows($rs_total);
+                $registros_total = pgNumRowsSafe($rs_total);
         $sql .= " order by pgt.datainicio desc ";
 
         if ($bDebug) {
@@ -7117,16 +6348,16 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
         }
         echo "" . $cReturn . "" . $cReturn . "" . $cReturn . "TIME FOR FIRST QUERY: " . number_format(getmicrotime() - $time_start_stats0, 2, '.', '.') . "" . $cReturn;        //."$sql".$cReturn;
 
-        if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0)
+        if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0)
                 $msg = "Nenhuma transacao encontrada." . $cReturn;
 
         $time_start_stats0 = getmicrotime();
         $irows = 0;
         if ($rs_transacoes) {
-                $npags = pg_num_rows($rs_transacoes);
+                $npags = pgNumRowsSafe($rs_transacoes);
                 echo "NPags: " . $npags . $cReturn;
                 $total_pagtos_pendente = 0;
-                while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+                while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
                         $time_start_stats0_in = getmicrotime();
                         $irows++;
 
@@ -7192,7 +6423,7 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                         //Inicia transacao
                                         if ($msg == "") {
                                                 $sql = "BEGIN TRANSACTION ";
-                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                $ret = SQLexecuteQuery($sql);
                                                 $ret = true;                                                                                                /////////////////////
                                                 if (!$ret)
                                                         $msg = "Erro ao iniciar transacao." . PHP_EOL;
@@ -7245,14 +6476,14 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                                         //Finaliza transacao
                                         if ($msg == "") {
                                                 $sql = "COMMIT TRANSACTION ";
-                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                $ret = SQLexecuteQuery($sql);
                                                 if (!$ret)
                                                         $msg = "Erro ao comitar transacao." . PHP_EOL;
 
                                                 $msg_sonda = "PROCESSADO POR SONDA";
                                         } else {
                                                 $sql = "ROLLBACK TRANSACTION ";
-                                                $ret = SQLexecuteQueryParams($sql, null);
+                                                $ret = SQLexecuteQuery($sql);
                                                 if (!$ret)
                                                         $msg = "Erro ao dar rollback na transacao." . PHP_EOL;
 
@@ -7319,12 +6550,12 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                 echo "sqlA1: $sql" . PHP_EOL;
 
         $rs_vendas = SQLexecuteQueryParams($sql, $params_vendas);
-        if (!$rs_vendas || pg_num_rows($rs_vendas) == 0) {
+        if (!$rs_vendas || pgNumRowsSafe($rs_vendas) == 0) {
                 $msg = "Nenhuma venda de deposito em Saldo Gamer encontrada para conciliacao." . PHP_EOL;
                 echo $msg;
         } else {
-                echo "Encontradas " . pg_num_rows($rs_vendas) . " vendas de deposito pendentes de conciliacao" . PHP_EOL;
-                while ($rs_vendas_row = pg_fetch_array($rs_vendas)) {
+                echo "Encontradas " . pgNumRowsSafe($rs_vendas) . " vendas de deposito pendentes de conciliacao" . PHP_EOL;
+                while ($rs_vendas_row = pgFetchArraySafe($rs_vendas)) {
                         $msg = "";
                         if ($bDebug)
                                 echo str_repeat("-", 80) . PHP_EOL;
@@ -7343,12 +6574,12 @@ function conciliaAutomaticaMoneyDepositoSaldocomPIX($webhook = false, $venda = 0
                         $sql = "select * from tb_pag_compras pg where pg.idvenda = $1 and status = 3 and status_processed = 0";
                         echo "sqlB2: $sql" . PHP_EOL;
                         $rs_pagto = SQLexecuteQueryParams($sql, [$venda_id]);
-                        if (!$rs_pagto || pg_num_rows($rs_pagto) == 0)
+                        if (!$rs_pagto || pgNumRowsSafe($rs_pagto) == 0)
                                 $msg = "Nenhum pagamento online encontrado para conciliacao (Saldo Gamer, vg_pagto_tipo: $vg_pagto_tipo)." . PHP_EOL;
                         else {
                                 if ($bDebug)
-                                        echo "Encontrados " . pg_num_rows($rs_pagto) . " pagtos para " . $rs_vendas_row['vg_id'] . PHP_EOL;
-                                $rs_pagto_row = pg_fetch_array($rs_pagto);
+                                        echo "Encontrados " . pgNumRowsSafe($rs_pagto) . " pagtos para " . $rs_vendas_row['vg_id'] . PHP_EOL;
+                                $rs_pagto_row = pgFetchArraySafe($rs_pagto);
                                 // conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $parametros)
                                 $venda_id = $rs_vendas_row['vg_id'];
                                 $usuario_id = $rs_vendas_row['vg_ug_id'];
@@ -7393,20 +6624,13 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
 
         //Recupera o boleto pendente
         if ($msg == "") {
-                $sql = "SELECT * FROM tb_pag_compras pag WHERE pag.idvenda = $1";
-
-                // Para fins de log, você pode exibir a query e os parâmetros separadamente
-                echo "sqlC1: $sql | Param: $venda_id" . PHP_EOL;
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $rs_pagto = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_pagto || pg_num_rows($rs_pagto) == 0)
+                $sql = "select * from tb_pag_compras pag where pag.idvenda = " . $venda_id;
+                echo "sqlC1: $sql" . PHP_EOL;
+                $rs_pagto = SQLexecuteQuery($sql);
+                if (!$rs_pagto || pgNumRowsSafe($rs_pagto) == 0)
                         $msg = "Nenhum pagamento encontrado." . PHP_EOL;
                 else {
-                        $rs_pagto_row = pg_fetch_array($rs_pagto);
+                        $rs_pagto_row = pgFetchArraySafe($rs_pagto);
                         $pag_data = $rs_pagto_row['datainicio'];
                         $pag_valor = $rs_pagto_row['total'] / 100;
                         $pag_banco = $rs_pagto_row['banco'];
@@ -7417,20 +6641,13 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
 
         //Recupera o saldo do usu�rio
         if ($msg == "") {
-                $sql = "SELECT ug_perfil_saldo FROM usuarios_games WHERE ug_id = $1";
-
-                // Exibe a query com o marcador e o valor separadamente para facilitar o debug
-                echo "sqlA1a: $sql | ID: $usuario_id" . PHP_EOL;
-
-                $params = [
-                        (int)$usuario_id
-                ];
-
-                $rs_saldo = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_saldo || pg_num_rows($rs_saldo) == 0)
+                $sql = "select ug_perfil_saldo from usuarios_games where ug_id =" . $usuario_id;
+                echo "sqlA1a: $sql" . PHP_EOL;
+                $rs_saldo = SQLexecuteQuery($sql);
+                if (!$rs_saldo || pgNumRowsSafe($rs_saldo) == 0)
                         $msg = "Nenhum usu�rio encontrado." . PHP_EOL;
                 else {
-                        $rs_saldo_row = pg_fetch_array($rs_saldo);
+                        $rs_saldo_row = pgFetchArraySafe($rs_saldo);
                         $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
                         echo " ++++P [" . date("Y-m-d H:i:s") . "] para ug_id: " . $usuario_id . " ug_perfil_saldo_prev = '" . $ug_perfil_saldo_prev . "', valor = " . $parametros['valor'] . PHP_EOL;
                 }
@@ -7440,7 +6657,7 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
         //Inicia transacao
         if ($msg == "") {
                 $sql = "BEGIN TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao iniciar transa��o." . PHP_EOL;
         }
@@ -7448,104 +6665,37 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
         //Concilia pagto Online
         if ($msg == "") {
                 // a esta altura j� deve estar status=3	
-                $sql = "
-    UPDATE tb_pag_compras 
-    SET status_processed = 1, 
-        dataconfirma = CURRENT_TIMESTAMP 
-    WHERE idvenda = $1
-";
-
-                // Log para depuração mostrando a query e o parâmetro
-                echo "sqlAZ2: $sql | ID: $venda_id [" . getmicrotime() . "]" . PHP_EOL;
-
-                $params = [
-                        (int)$venda_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_pag_compras set status_processed = 1, dataconfirma = CURRENT_TIMESTAMP where idvenda = " . $venda_id . "";
+                echo "sqlAZ2: $sql [" . getmicrotime() . "]" . PHP_EOL;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar boleto." . PHP_EOL;
         }
 
         //Credita valor do boleto no usu�rio Gamer
         if ($msg == "") {
-                $sql = "
-    UPDATE usuarios_games 
-    SET ug_perfil_saldo = COALESCE(ug_perfil_saldo, 0) + $1 
-    WHERE ug_id = $2
-";
-
-                // Log para depuração exibindo a query e os valores dos parâmetros
-                echo "sqlAZ3: $sql | Valor: {$parametros['valor']} | User: $usuario_id [" . getmicrotime() . "]" . PHP_EOL;
-
-                $params = [
-                        (float)$parametros['valor'], // $1
-                        (int)$usuario_id             // $2
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update usuarios_games set ug_perfil_saldo = coalesce(ug_perfil_saldo,0) + " . $parametros['valor'] . "
+                                where ug_id =" . $usuario_id;
+                echo "sqlAZ3: $sql [" . getmicrotime() . "]" . PHP_EOL;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao creditar valor do boleto no usu�rio Gamer." . PHP_EOL;
         }
 
         //Completa venda Money
         if ($msg == "") {
-                $sql = "
-    UPDATE tb_venda_games 
-    SET 
-        vg_ultimo_status = $1, 
-        vg_concilia = 1, 
-        vg_data_concilia = CURRENT_TIMESTAMP 
-    WHERE vg_id = $2 
-      AND vg_ug_id = $3
-";
-
-                // Exibimos a query com marcadores e os valores reais para facilitar o rastreio no log
-                echo "sqlZ4: $sql | Status: " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . " | Venda: $venda_id | User: $usuario_id" . PHP_EOL;
-
-                $params = [
-                        (int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], // $1
-                        (int)$venda_id,                                  // $2
-                        (int)$usuario_id                                 // $3
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "update tb_venda_games set vg_ultimo_status =  " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . ", vg_concilia = 1, vg_data_concilia = CURRENT_TIMESTAMP where vg_id =" . $venda_id . " and vg_ug_id =" . $usuario_id . ";";
+                echo "sqlZ4: $sql" . PHP_EOL;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao completar venda Money (PagtoOnline)." . PHP_EOL;
         }
 
         //Insere registro em saldo_fifo
         if ($msg == "") {
-                // 1. Definição da Query Parametrizada
-                $sql = "
-    INSERT INTO saldo_composicao_fifo (
-        ug_id, 
-        scf_data_deposito, 
-        scf_valor, 
-        scf_valor_disponivel, 
-        scf_canal, 
-        scf_comissao, 
-        scf_id_pagamento, 
-        vg_id
-    ) VALUES ($1, CURRENT_TIMESTAMP, $2, $3, 'G', 0, $4, $5)
-";
-
-                // 2. Preparação do ID da venda (garantindo 0 se nulo/falso)
-                $venda_id_final = (int)($venda_id ?: 0);
-
-                // 3. Log para depuração (exibindo os valores reais)
-                echo "sqlZ5: $sql | User: $usuario_id | Valor: {$parametros['valor']} | Forma: $pag_iforma | Venda: $venda_id_final" . PHP_EOL;
-
-                // 4. Execução com parâmetros tipados
-                $params = [
-                        (int)$usuario_id,             // $1
-                        (float)$parametros['valor'],  // $2
-                        (float)$parametros['valor'],  // $3
-                        (string)$pag_iforma,          // $4
-                        $venda_id_final               // $5
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+                $sql = "insert into saldo_composicao_fifo (ug_id,scf_data_deposito,scf_valor,scf_valor_disponivel,scf_canal,scf_comissao,scf_id_pagamento, vg_id) values (" . $usuario_id . ",CURRENT_TIMESTAMP," . $parametros['valor'] . "," . $parametros['valor'] . ",'G',0,'" . $pag_iforma . "', " . (($venda_id) ? $venda_id : 0) . ")";
+                echo "sqlZ5: $sql" . PHP_EOL;
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao inserir Saldo FIFO (PagtoOnline)." . PHP_EOL;
         }
@@ -7553,33 +6703,26 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
         //Finaliza transacao
         if ($msg == "") {
                 $sql = "COMMIT TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao comitar transa��o." . PHP_EOL;
                 // Log transaction's success
         } else {
                 $sql = "ROLLBACK TRANSACTION ";
-                $ret = SQLexecuteQueryParams($sql, null);
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao dar rollback na transa��o." . PHP_EOL;
         }
 
         //Recupera o saldo do usu�rio no final
         if ($msg == "") {
-                $sql = "SELECT ug_perfil_saldo FROM usuarios_games WHERE ug_id = $1";
-
-                // Exibe a query preparada e o valor do parâmetro para facilitar o rastreio no log
-                echo "sqlA1b: $sql | ID: $usuario_id" . PHP_EOL;
-
-                $params = [
-                        (int)$usuario_id
-                ];
-
-                $rs_saldo = SQLexecuteQueryParams($sql, $params);
-                if (!$rs_saldo || pg_num_rows($rs_saldo) == 0)
+                $sql = "select ug_perfil_saldo from usuarios_games where ug_id =" . $usuario_id;
+                echo "sqlA1b: $sql" . PHP_EOL;
+                $rs_saldo = SQLexecuteQuery($sql);
+                if (!$rs_saldo || pgNumRowsSafe($rs_saldo) == 0)
                         $msg = "Nenhum usu�rio encontrado." . PHP_EOL;
                 else {
-                        $rs_saldo_row = pg_fetch_array($rs_saldo);
+                        $rs_saldo_row = pgFetchArraySafe($rs_saldo);
                         $ug_perfil_saldo_prev = $rs_saldo_row['ug_perfil_saldo'];
                         echo " ++++P2 [" . date("Y-m-d H:i:s") . "] para ug_id: " . $usuario_id . " ug_perfil_saldo_prev = '" . $ug_perfil_saldo_prev . "', valor = " . $parametros['valor'] . PHP_EOL;
                 }
@@ -7591,22 +6734,10 @@ function conciliaMoneyDepositoSaldo_PagtoOnline($venda_id, $usuario_id, $paramet
 function concilia_eppVariavel($vg_id, $ug_id)
 {
 
-        if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169" && $ug_id == 1333904) {
-                $sql = "
-    UPDATE tb_pag_compras 
-    SET 
-        datacompra = '2023-06-29 10:14:00', 
-        status = 3, 
-        status_processed = 1, 
-        dataconfirma = '2023-06-29 10:14:00' 
-    WHERE idvenda = $1
-";
-
-                $params = [
-                        (int)$vg_id
-                ];
-
-                $ret = SQLexecuteQueryParams($sql, $params);
+        if (($_SERVER["REMOTE_ADDR"] ?? "") == "201.93.162.169" && $ug_id == 1333904) {
+                $sql = "update tb_pag_compras set datacompra = '2023-06-29 10:14:00', status = 3,status_processed = 1,dataconfirma = '2023-06-29 10:14:00' 
+		where idvenda = $vg_id;";
+                $ret = SQLexecuteQuery($sql);
                 if (!$ret)
                         $msg = "Erro ao conciliar venda." . PHP_EOL;
                 $parametros['ultimo_status_obs'] = "Teste";

@@ -43,7 +43,7 @@ if(!$arquivoLog->haveFile()) {
     echo "SQL para levantamento de IDS a serem considerados no cancelamento:".PHP_EOL.$sql.PHP_EOL;
     
     $rs = SQLexecuteQuery($sql);
-    $n_updates = pg_num_rows($rs);
+    $n_updates = (($rs) ? pg_num_rows($rs) : 0);
     echo "Encontrado".(($n_updates>1)?"s":"")." : ".$n_updates." Registro".(($n_updates>1)?"s":"")." para serem verifidos e atualizados".PHP_EOL;
 
     if(!$rs || pg_num_rows($rs) == 0) {

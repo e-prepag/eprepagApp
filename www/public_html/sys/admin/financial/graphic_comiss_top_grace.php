@@ -12,13 +12,13 @@ $language		= isset($_POST['language'])		? $_POST['language']			: null;
 unlink('images/'.trim($labeloperadora).$imagem);
 
 // jpgraph na produção
-include ("../stats/graph/src/jpgraph.php");
-include ("../stats/graph/src/jpgraph_line.php");
+require_once __DIR__ . "/../../../../vendor/autoload.php";
 
-//include ("../jpgraph/src/jpgraph.php");
-//include ("../jpgraph/src/jpgraph_line.php");
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+use Amenadiel\JpGraph\Util;
 
-$graph = new Graph(750,350,'auto');    
+$graph = new Graph\Graph(750,350,'auto');    
 $graph->SetScale("textlin");
 $graph->img->SetAntiAliasing();
 $graph->SetShadow();
@@ -89,14 +89,14 @@ else {
 		// Set new locale for Portuguese BR
 		$loc_br = setlocale(LC_ALL, 'pt_BR');
 
-		$dateLocale = new DateLocale();
+		$dateLocale = new Util\DateLocale();
 		// Use Brasil locale
 		$dateLocale->Set($loc_br);
 		// Setup graph title
 		$graph->title->Set($labeloperadora.' - Vendas - Valor Bruto R$');
 	}
 	else {
-		$dateLocale = new DateLocale();
+		$dateLocale = new Util\DateLocale();
 		// Setup graph title
 		$graph->title->Set($labeloperadora.' - Sales - Gross R$');
 	}
@@ -107,7 +107,7 @@ else {
 }
 
 // Create the three var series we will combine
-$p1 = new LinePlot($mm);
+$p1 = new Plot\LinePlot($mm);
 $p1->mark->SetType(MARK_FILLEDCIRCLE);
 $p1->mark->SetFillColor("red");
 $p1->mark->SetWidth(4);

@@ -33,7 +33,7 @@ class CategoriaEstornoChargebackDAO {
         
         try{
             $categorias = SQLexecuteQuery($sql);
-            $totalLinhas = pg_num_rows($categorias);
+            $totalLinhas = (($categorias) ? pg_num_rows($categorias) : 0);
             if($totalLinhas > 0){
                 
                 while($lineRow = pg_fetch_array($categorias)){

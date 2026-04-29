@@ -227,7 +227,7 @@ $sql .= " where 1=1 ".($dd_canal == "ATIMO")?"":$where_canal." ";
 $sql .= "group by ano"; //", canal";
 
 $res_count = SQLexecuteQueryParams($sql, $sql_main_params);
-$total_table = pg_num_rows($res_count);
+$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 $sql .= " order by ".$ncamp;
 

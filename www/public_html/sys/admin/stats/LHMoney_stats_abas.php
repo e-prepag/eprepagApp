@@ -225,10 +225,10 @@ if($abanome == LANG_STATISTICS_FOR_MONTH) {
 	//echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -264,10 +264,10 @@ if($abanome == LANG_STATISTICS_FOR_WEEK_DAY) {
 	//echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -302,10 +302,10 @@ if($abanome == LANG_STATISTICS_FOR_DAY) {
 	//echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -357,10 +357,10 @@ if($abanome == LANG_STATISTICS_FOR_GAME) {
 	//echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -400,10 +400,10 @@ if($abanome == LANG_STATISTICS_FOR_GAME_THIS_MONTH) {
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$extra_where = "";
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -457,7 +457,7 @@ if($abanome == LANG_STATISTICS_FOR_STATE) {
 	$bg_col = $bg_col_01;
 	
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -497,7 +497,7 @@ if($abanome == LANG_STATISTICS_FOR_CITY) {
 	$bg_col = $bg_col_01;
 	
 	//Adicionado por Wagner
-	$total_table = pg_num_rows($vendas_estado);
+	$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	//echo $sql."<br>TOTAL: ".$total_table."<br>";
 	$sql = substr($sql,0,strpos($sql, 'order'));
 	$sql .= " order by ".$ordem." ".$crescente; 
@@ -541,7 +541,7 @@ if($abanome == 'Lan-Houses') {
 		$bg_col = $bg_col_01;
 
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		//echo $sql."<br>TOTAL: ".$total_table."<br>";
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
@@ -593,10 +593,10 @@ if($abanome == LANG_STATISTICS_FOR_USER) {
 		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
-		$n_total_usuarios_compra = @pg_num_rows($vendas_estado);
+		$n_total_usuarios_compra = @(($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		//echo $sql."<br>TOTAL: ".$total_table."<br>";
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
@@ -678,7 +678,7 @@ if($abanome == LANG_STATISTICS_FOR_LAST_MONTH) {
 		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		//echo $sql."<br>TOTAL: ".$total_table."<br>";
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 
@@ -734,7 +734,7 @@ if($abanome == LANG_STATISTICS_FOR_LAST_WEEK) {
 		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		
 		//Adicionado por Wagner
-		$total_table = pg_num_rows($vendas_estado);
+		$total_table = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 		//echo $sql."<br>TOTAL: ".$total_table."<br>";
 		$sql = substr($sql,0,strpos($sql, 'order'));
 		$sql .= " order by ".$ordem." ".$crescente; 

@@ -164,7 +164,7 @@ class classPIX
                 $numCompra = substr($params['idpedido'], 2, 17);
                 $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;"; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
                 $rs_teste_existencia = SQLexecuteQueryParams($sql, array($numCompra));
-                if (pg_num_rows($rs_teste_existencia) == 0) {
+                if ((($rs_teste_existencia) ? pg_num_rows($rs_teste_existencia) : 0) == 0) {
                     $sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
                                                 cpf_cnpj_pagador, 
@@ -180,7 +180,7 @@ class classPIX
                         $this->logEvents("Sucesso no INSERT: " . PHP_EOL . $sql . PHP_EOL);
                     else
                         $this->logEvents("ERRO no INSERT: " . PHP_EOL . $sql . PHP_EOL);
-                } //end if(pg_num_rows($rs_teste_existencia) == 0)
+                } //end if((($rs_teste_existencia) ? pg_num_rows($rs_teste_existencia) : 0) == 0)
                 else
                     $this->logEvents("Já existe registro de dados do pagador para o pagamento " . substr($params['idpedido'], 2, 17) . PHP_EOL);
             } //end if($resposta->status == PIX_SONDA_PAGO_OK)
@@ -249,7 +249,7 @@ class classPIX
                 $numCompra = substr($numPedido, 2, 17);
                 $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;"; // AND cpf_cnpj_pagador = '".(isset($resposta->pix[0]->pagador->cpf)?$resposta->pix[0]->pagador->cpf:$resposta->pix[0]->pagador->cnpj)."'
                 $rs_teste_existencia = SQLexecuteQueryParams($sql, array($numCompra));
-                if (pg_num_rows($rs_teste_existencia) == 0) {
+                if ((($rs_teste_existencia) ? pg_num_rows($rs_teste_existencia) : 0) == 0) {
                     $sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
                                                 cpf_cnpj_pagador, 
@@ -265,7 +265,7 @@ class classPIX
                         $this->logEvents("Sucesso no INSERT: " . PHP_EOL . $sql . PHP_EOL);
                     else
                         $this->logEvents("ERRO no INSERT: " . PHP_EOL . $sql . PHP_EOL);
-                } //end if(pg_num_rows($rs_teste_existencia) == 0)
+                } //end if((($rs_teste_existencia) ? pg_num_rows($rs_teste_existencia) : 0) == 0)
                 else
                     $this->logEvents("Já existe registro de dados do pagador para o pagamento " . substr($numPedido, 2, 17) . PHP_EOL);
             } //end if($resposta->status == PIX_SONDA_PAGO_OK)

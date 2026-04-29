@@ -111,6 +111,9 @@ $varsel .= "&ug_cadastro_completo=$ug_cadastro_completo";
 $varsel .= "&tf_v_data_inclusao_ini=$tf_v_data_inclusao_ini&tf_v_data_inclusao_fim=$tf_v_data_inclusao_fim&ug_flag_usando_saldo=$ug_flag_usando_saldo";
 
 $a_lista_usuarios_VIP = get_lista_usuarios_VIP();
+if (!is_array($a_lista_usuarios_VIP)) {
+        $a_lista_usuarios_VIP = array();
+}
 
 if (isset($BtnSearch)) {
 
@@ -314,8 +317,8 @@ if (isset($BtnSearch)) {
                 $somenteContar = 1;
                 include $raiz_do_projeto . "includes/gamer/inc_pesquisa_usuarios_sql.php";
                 $rs_usuario = SQLexecuteQuery($sql);
-                $rs_usuario_total = $rs_usuario && pg_fetch_array($rs_usuario);
-                $total_table = $rs_usuario_total['total'];
+                $rs_usuario_total = $rs_usuario ? pg_fetch_array($rs_usuario) : false;
+                $total_table = $rs_usuario_total ? (int)$rs_usuario_total['total'] : 0;
                 // 2 => não executar a querie e montar o select completo
                 $somenteContar = 2;
                 include $raiz_do_projeto . "includes/gamer/inc_pesquisa_usuarios_sql.php";
@@ -1190,7 +1193,7 @@ require_once "/www/includes/bourls.php";
                                                                 $cor1 = $query_cor1;
                                                                 $cor2 = $query_cor1;
                                                                 $cor3 = $query_cor2;
-                                                                while ($rs_usuario_row = $rs_usuario && pg_fetch_array($rs_usuario)) {
+                                                                while ($rs_usuario && ($rs_usuario_row = pg_fetch_array($rs_usuario))) {
                                                                         $cor1 = ($cor1 == $cor2) ? $cor3 : $cor2;
                                                                 ?>
                                                                         <tr bgcolor="<?php echo $cor1 ?>" class="texto" onmouseover="bgColor='#CFDAD7'" onmouseout="bgColor='<?php echo $cor1 ?>'">

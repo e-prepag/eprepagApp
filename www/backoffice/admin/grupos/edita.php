@@ -183,7 +183,7 @@ if (!empty($msg)) {
                                         <a href="#menu<?= $menu->getId(); ?>" class="txt-branco" data-toggle="collapse">
                                             <strong><span class="glyphicon glyphicon-menu-right t0"></span><span
                                                     class="glyphicon glyphicon-menu-right t0"></span>
-                                                <?php echo (@constant(trim($menu->getDescricao())) === null) ? $menu->getDescricao() : constant(trim($menu->getDescricao())); ?></strong>
+                                                <?php echo defined(trim($menu->getDescricao())) ? constant(trim($menu->getDescricao())) : $menu->getDescricao(); ?></strong>
                                         </a>
                                     </div>
                                     <div id="menu<?= $menu->getId(); ?>" class="collapse">
@@ -196,7 +196,7 @@ if (!empty($msg)) {
                                                         <span class="glyphicon glyphicon-menu-right t0"></span><span
                                                             class="glyphicon glyphicon-menu-right t0"></span><span
                                                             class="glyphicon glyphicon-menu-right t0"></span>
-                                                        <?php echo (@constant(trim($item->getDescricao())) === null) ? $item->getDescricao() : constant(trim($item->getDescricao())) ?>
+                                                        <?php echo defined(trim($item->getDescricao())) ? constant(trim($item->getDescricao())) : $item->getDescricao() ?>
                                                     </a>
                                                 </li>
                                                 <?php

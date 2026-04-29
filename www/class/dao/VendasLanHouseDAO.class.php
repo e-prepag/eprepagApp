@@ -32,7 +32,7 @@ class VendasLanHouseDAO {
         
         try{
             $vendas = SQLexecuteQuery($this->sql);
-            $totalLinhas = pg_num_rows($vendas);
+            $totalLinhas = (($vendas) ? pg_num_rows($vendas) : 0);
             if($totalLinhas > 0){
                 while($lineRow = pg_fetch_array($vendas)){
                     $venda = new VendasLanHouseVO;
@@ -169,7 +169,7 @@ class VendasLanHouseDAO {
         $this->sql = $sql;    
         try{
             $primeirasVendas = SQLexecuteQuery($this->sql);
-            $totalLinhas = pg_num_rows($primeirasVendas);
+            $totalLinhas = (($primeirasVendas) ? pg_num_rows($primeirasVendas) : 0);
             if($totalLinhas > 0){
                 while($lineRow = pg_fetch_array($primeirasVendas)){
                     
