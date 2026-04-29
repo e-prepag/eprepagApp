@@ -43,7 +43,7 @@ class estilosLista
         $this->retorno = '';
         
         // verifica cada estilo
-        for($i = 0; $i < count($this->estilos); $i++)
+        for($i = 0; $i < (is_countable($this->estilos) ? count($this->estilos) : 0); $i++)
         {
             // captura string condicao
             $tempCondicao = $this->estilos[$i]['condicao'];

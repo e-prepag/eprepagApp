@@ -66,7 +66,7 @@ if (isset($_GET["acao"]) && $_GET["acao"] == "listar") {
 				$dataLine = [
 					"acoes" => $acao,
 					$dataKeys[0] => $value["pin_codinterno"],
-					$dataKeys[1] => number_format($value["pin_valor"], 2, ',', ''),
+					$dataKeys[1] => number_format((float)$value["pin_valor"], 2, ',', ''),
 					$dataKeys[2] => $value["pin_codigo"],
 					$dataKeys[3] => $value["opr_nome"],
 					$dataKeys[4] => $value["pin_validade"],

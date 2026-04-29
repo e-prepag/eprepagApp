@@ -75,7 +75,7 @@ class acoesLista
             $tempRetorno = '';
             
             // verifica cada botao
-            for($i = 0; $i < count($this->botoes); $i++)
+            for($i = 0; $i < (is_countable($this->botoes) ? count($this->botoes) : 0); $i++)
             {
                 if($this->botoes[$i]['coluna'] == $col)
                 {

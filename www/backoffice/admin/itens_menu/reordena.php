@@ -126,7 +126,7 @@ if((is_countable($abas) ? count($abas) : 0) > 0 && isset($_POST['aba']) && $_POS
 <?php 
                 foreach($menus as $menu){ 
 ?>
-                    <option value="<?php echo $menu->menu_id; ?>" <?php if(isset($_POST['menu']) != "" && $menu->menu_id == $_POST['menu']) echo "selected"; ?>><?php echo (@constant(trim($menu->menu_descricao)) === null) ? $menu->menu_descricao : constant(trim($menu->menu_descricao)); ?></option>
+                    <option value="<?php echo $menu->menu_id; ?>" <?php if(isset($_POST['menu']) != "" && $menu->menu_id == $_POST['menu']) echo "selected"; ?>><?php echo defined(trim($menu->menu_descricao)) ? constant(trim($menu->menu_descricao)) : $menu->menu_descricao; ?></option>
 <?php 
                 } 
 ?>
@@ -161,7 +161,7 @@ if((is_countable($abas) ? count($abas) : 0) > 0 && isset($_POST['aba']) && $_POS
     ?>
                 <tr class="opt trListagem c-move" id="<?php echo $rs_row['item_id']; ?>">
                     <td>
-                        <?php echo (@constant(trim($rs_row['item_descricao'])) === null) ? $rs_row['item_descricao'] : constant(trim($rs_row['item_descricao'])); ?>
+                        <?php echo defined(trim($rs_row['item_descricao'])) ? constant(trim($rs_row['item_descricao'])) : $rs_row['item_descricao']; ?>
                         <input type="hidden" name="reordenar[<?php echo $rs_row['item_id']; ?>]" value="">
                     </td>
                 </tr>

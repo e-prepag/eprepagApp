@@ -247,7 +247,7 @@ class FilePosition
         }
 
         // Checa se o array nao esta vazio e adiciona os arquivos
-        if (count($files) > 0) {
+        if ((is_countable($files) ? count($files) : 0) > 0) {
             // Loop do(s) arquivo(s) enviado(s)
             foreach ($files as $key => $value) {
 

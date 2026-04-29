@@ -594,7 +594,7 @@ else $reg_ate = $max + $inicial;
 													else
                                         if ($key == $tf_pins)
 														echo " checked";
-												?>><span title="<?php echo "n: " . $val; ?>"><?php echo number_format($key, 2, ',', '.'); ?></span>
+												?>><span title="<?php echo "n: " . $val; ?>"><?php echo number_format((float)$key, 2, ',', '.'); ?></span>
 										</div>
 								<?php  }
 								}
@@ -666,7 +666,7 @@ else $reg_ate = $max + $inicial;
 											$lineCsv[] = mascarar_pin_id($pgrow['pin_codinterno']);
 											$lineCsv[] = $pgrow['opr_nome'];
 											$lineCsv[] = ($pgrow['pin_datavenda']) ? monta_data($pgrow['pin_datavenda']) . " - " . $pgrow['pin_horavenda'] : "--";
-											$lineCsv[] = "R$ " . number_format($pgrow['pin_valor'], 2, ',', '.');
+											$lineCsv[] = "R$ " . number_format((float)$pgrow['pin_valor'], 2, ',', '.');
 											$lineCsv[] = constant("LANG_PINS_STATUS_MSG_" . $pgrow['pin_status']);
 										?>
 											<tr class="trListagem">
@@ -682,7 +682,7 @@ else $reg_ate = $max + $inicial;
 																																								} else echo "--"; ?><nobr>
 													</font>
 												</td>
-												<td class="text-right"><?php echo "R$ " . number_format($pgrow['pin_valor'], 2, ',', '.'); ?><nobr>
+												<td class="text-right"><?php echo "R$ " . number_format((float)$pgrow['pin_valor'], 2, ',', '.'); ?><nobr>
 														</font>
 												</td>
 												<td class="text-center"><?php echo constant("LANG_PINS_STATUS_MSG_" . $pgrow['pin_status']); ?></td>
@@ -735,7 +735,7 @@ else $reg_ate = $max + $inicial;
 											<td colspan="2">&nbsp;</td>
 											<td align="right"><strong>SUBTOTAL</strong></td>
 											<td>
-												<div align="right"><strong><?php echo number_format($valor_total_tela, 2, ',', '.') ?></strong></div>
+												<div align="right"><strong><?php echo number_format((float)$valor_total_tela, 2, ',', '.') ?></strong></div>
 											</td>
 											<td colspan="<?php echo $ncols_short; ?>">&nbsp;</td>
 										</tr>
@@ -743,7 +743,7 @@ else $reg_ate = $max + $inicial;
 											<td colspan="2">&nbsp;</td>
 											<td align="right"><strong>TOTAL</strong></td>
 											<td>
-												<div align="right"><strong><?php echo number_format($valor_geral, 2, ',', '.') ?></strong></div>
+												<div align="right"><strong><?php echo number_format((float)$valor_geral, 2, ',', '.') ?></strong></div>
 											</td>
 											<td colspan="<?php echo $ncols_short; ?>">&nbsp;</td>
 										</tr>

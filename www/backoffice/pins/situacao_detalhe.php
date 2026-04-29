@@ -87,7 +87,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
         </tr>
         <tr> 
           <td width="121">Valor</td>
-          <td><?php echo "R$ ".number_format($pgest['pin_valor'], 2, ',', '.') ?></td>
+          <td><?php echo "R$ ".number_format((float)$pgest['pin_valor'], 2, ',', '.') ?></td>
         </tr>
         <tr> 
           <td>Status</td>

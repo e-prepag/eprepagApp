@@ -256,7 +256,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                         <select name="fvalor" id="fvalor" class="form-control">
                             <option value=""><?php echo LANG_PINS_ALL_VALUES; ?></option>
                             <?php if($resval){ while ($pgval = pg_fetch_array ($resval)) { ?>
-                            <option value="<?php  echo $pgval['pin_valor'] ?>" <?php  if($pgval['pin_valor'] == $fvalor) echo "selected" ?>><?php  echo number_format($pgval['pin_valor'], 2, ',', '.') ?></option>
+                            <option value="<?php  echo $pgval['pin_valor'] ?>" <?php  if($pgval['pin_valor'] == $fvalor) echo "selected" ?>><?php  echo number_format((float)$pgval['pin_valor'], 2, ',', '.') ?></option>
                             <?php  }} ?>
                         </select>
                     </div>
@@ -348,9 +348,9 @@ function GP_popupConfirmMsg(msg) { //v1.0
                             <tr class="bg-cinza-claro">
                                 <td align="right"><b><?php echo $opr_nome_aux ?></b></td>
                                 <td align="center"><b><?php echo $quantidade_opr ?></b></td>
-                                <td align="center"><span title="<?php  echo $quantidade_total_opr." íte".(($quantidade_total_opr>1)?"ns":"m").", R$".number_format($venda_media_diaria_opr, 2, ',', '.')." (R$".number_format($venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."/dia)" ?>"><b><?php  echo number_format($quantidade_total_opr/$days_for_mean, 2, ',', '.') ?></b></span></td>
+                                <td align="center"><span title="<?php  echo $quantidade_total_opr." íte".(($quantidade_total_opr>1)?"ns":"m").", R$".number_format((float)$venda_media_diaria_opr, 2, ',', '.')." (R$".number_format((float)$venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."/dia)" ?>"><b><?php  echo number_format((float)$quantidade_total_opr/$days_for_mean, 2, ',', '.') ?></b></span></td>
                                 <td colspan="2"> </td>
-                                <td align="right"><b><?php  echo number_format($total_geral, 2, ',', '.'); ?></b></td>
+                                <td align="right"><b><?php  echo number_format((float)$total_geral, 2, ',', '.'); ?></b></td>
                                 <td align="center"><div id="<?php  echo "opr_".$opr_codigo_aux; ?>"> <?php  //echo "opr_".$opr_codigo_aux; ?></div></td>
                             </tr>
 <?php
@@ -360,7 +360,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                 
                                 $total_geral = 0;
                                 // Resumo
-                                $sout .= "<tr bgcolor='#CCFFCC'><td align='right' colspan='2'><b><span title='Venda média: R$". number_format($venda_media_diaria_opr/(($quantidade_total_opr>0)?$quantidade_total_opr:1), 2, ',', '.')."/pin'><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>".$opr_nome_aux."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>".$quantidade_total_opr."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>". number_format($venda_media_diaria_opr, 2, ',', '.')."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>". number_format($venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>". number_format($quantidade_total_opr/$days_for_mean, 2, ',', '.')."</b></td></tr>\n<tr bgcolor='FFFFFF'><td colspan='7' height='5'></td></tr>\n";
+                                $sout .= "<tr bgcolor='#CCFFCC'><td align='right' colspan='2'><b><span title='Venda média: R$". number_format((float)$venda_media_diaria_opr/(($quantidade_total_opr>0)?$quantidade_total_opr:1), 2, ',', '.')."/pin'><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>".$opr_nome_aux."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>".$quantidade_total_opr."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$venda_media_diaria_opr, 2, ',', '.')."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."</b></td><td align='center'><b><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$quantidade_total_opr/$days_for_mean, 2, ',', '.')."</b></td></tr>\n<tr bgcolor='FFFFFF'><td colspan='7' height='5'></td></tr>\n";
 
                                 $operadora_subtotal[] = array('opr_nome' => $opr_nome_aux, 'opr_codigo' => $opr_codigo_aux, 'venda_media_diaria_opr' => $venda_media_diaria_opr);
 
@@ -415,7 +415,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                         $venda_media_diaria_opr += $quantidade_total*$pin_valor_this;
                                 }
 ?>
-                                <td align="center"><span title="<?php  echo $quantidade_total." íte".(($quantidade_total>1)?"ns":"m").", R$".number_format($venda_media_diaria*$days_for_mean, 2, ',', '.')." (R$".number_format($venda_media_diaria, 2, ',', '.')."/dia)" ?>"><?php  echo number_format($media, 2, ',', '.') ?></span></td>
+                                <td align="center"><span title="<?php  echo $quantidade_total." íte".(($quantidade_total>1)?"ns":"m").", R$".number_format((float)$venda_media_diaria*$days_for_mean, 2, ',', '.')." (R$".number_format((float)$venda_media_diaria, 2, ',', '.')."/dia)" ?>"><?php  echo number_format((float)$media, 2, ',', '.') ?></span></td>
                                 <td align="center" class="<?php if($dias<=$prazo_vermelho_vezes*$prazo_pedido) echo "bg-vermelho"; else if($dias<=($prazo_amarelo_vezes*$prazo_pedido)) echo "bg-amarelo"; ?>"><span title="<?php  echo $prazo_pedido; ?> dias para entrega de estoque."><?php  echo $dias; ?> dia(s)</span></td>
 <?php  	
                             } else { // não tem pins vendidos no período -> deixa em branco as colunas "Média Diária (Última Semana)" e "Duração"
@@ -425,15 +425,15 @@ function GP_popupConfirmMsg(msg) { //v1.0
 <?php  	
                             } 
 ?>
-                                <td align="right"><?php  echo number_format($pin_valor_this, 2, ',', '.');?> </td>
-                                <td align="right"><?php  echo number_format($pgestat['total_face'], 2, ',', '.'); ?></td>
+                                <td align="right"><?php  echo number_format((float)$pin_valor_this, 2, ',', '.');?> </td>
+                                <td align="right"><?php  echo number_format((float)$pgestat['total_face'], 2, ',', '.'); ?></td>
                                 <td> </td>
                             </tr>
 <?php 
                             // soma para pins com vendas e sem => total_geral contem o estoque de pins
                             $total_geral += $pgestat['total_face'];
                             // Resumo
-                            $sout .= "<tr><td><font color='".get_marqued_color($opr_nome)."' size='1' face='Arial, Helvetica, sans-serif'>".$opr_nome."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".number_format($pgestat['pin_valor'], 2, ',', '.')."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".$quantidade_total."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". (($quantidade_total>0)?number_format($venda_media_diaria*$days_for_mean, 2, ',', '.'):"0")."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". (($quantidade_total>0)?number_format($venda_media_diaria, 2, ',', '.'):"0")."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format($media, 2, ',', '.')."</td></tr>\n";
+                            $sout .= "<tr><td><font color='".get_marqued_color($opr_nome)."' size='1' face='Arial, Helvetica, sans-serif'>".$opr_nome."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".number_format((float)$pgestat['pin_valor'], 2, ',', '.')."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".$quantidade_total."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". (($quantidade_total>0)?number_format((float)$venda_media_diaria*$days_for_mean, 2, ',', '.'):"0")."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". (($quantidade_total>0)?number_format((float)$venda_media_diaria, 2, ',', '.'):"0")."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$media, 2, ',', '.')."</td></tr>\n";
 
                             if ($cor1==$cor2) {$cor1=$cor3;} else {$cor1=$cor2;} 			  
                         }
@@ -446,9 +446,9 @@ function GP_popupConfirmMsg(msg) { //v1.0
                         <tr class="bg-cinza-claro">
                             <td align="right"><b><?php echo $opr_nome_aux ?></b></td>
                             <td align="center"><b><?php echo $quantidade_opr ?></b></td>
-                            <td align="center"><span title="<?php  echo $quantidade_total_opr." íte".(($quantidade_total_opr>1)?"ns":"m").", R$".number_format($venda_media_diaria_opr, 2, ',', '.')." (R$".number_format($venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."/dia)" ?>"><b><?php  echo number_format($quantidade_total_opr/$days_for_mean, 2, ',', '.') ?></b></span></td>
+                            <td align="center"><span title="<?php  echo $quantidade_total_opr." íte".(($quantidade_total_opr>1)?"ns":"m").", R$".number_format((float)$venda_media_diaria_opr, 2, ',', '.')." (R$".number_format((float)$venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."/dia)" ?>"><b><?php  echo number_format((float)$quantidade_total_opr/$days_for_mean, 2, ',', '.') ?></b></span></td>
                             <td colspan="2"></td>
-                            <td align="right"><b><?php  echo number_format($total_geral, 2, ',', '.'); ?></b></td>
+                            <td align="right"><b><?php  echo number_format((float)$total_geral, 2, ',', '.'); ?></b></td>
                             <td align="center"><div id="<?php  echo "opr_".$opr_codigo_aux; ?>"><?php  //echo "opr_".$opr_codigo_aux; ?></div></td>
                         </tr>
 <?php
@@ -461,7 +461,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                         </tr>
 <?php
                                 // Resumo
-                        $sout .= "<tr bgcolor='#CCFFCC'><td colspan='2' align='right'><b><span title='Venda média: R$". number_format($venda_media_diaria_opr/(($quantidade_total_opr>0)?$quantidade_total_opr:1), 2, ',', '.')."/pin'><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>".$opr_nome_aux."</span></b></td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".$quantidade_total_opr."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format($venda_media_diaria_opr, 2, ',', '.')."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format($venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format($quantidade_total_opr/$days_for_mean, 2, ',', '.')."</td></tr>\n<tr bgcolor='FFFFFF'><td colspan='6' height='5'></td></tr>\n";
+                        $sout .= "<tr bgcolor='#CCFFCC'><td colspan='2' align='right'><b><span title='Venda média: R$". number_format((float)$venda_media_diaria_opr/(($quantidade_total_opr>0)?$quantidade_total_opr:1), 2, ',', '.')."/pin'><font color='".get_marqued_color($opr_nome_aux)."' size='1' face='Arial, Helvetica, sans-serif'>".$opr_nome_aux."</span></b></td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>".$quantidade_total_opr."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$venda_media_diaria_opr, 2, ',', '.')."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$venda_media_diaria_opr/$days_for_mean, 2, ',', '.')."</td><td align='center'><font color='#666666' size='1' face='Arial, Helvetica, sans-serif'>". number_format((float)$quantidade_total_opr/$days_for_mean, 2, ',', '.')."</td></tr>\n<tr bgcolor='FFFFFF'><td colspan='6' height='5'></td></tr>\n";
                         $sout .= "</table>";
                         
                         if (!$valor) 
@@ -479,7 +479,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                                 <td bgcolor="#E4E4E4"><div align="center"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><strong><?php  echo number_format($pin_total_qtde, 0, ',', '.') ?></strong></div></td>
                                 <td colspan="11" bgcolor="#E4E4E4"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"></div>
                                 <div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"></div>
-                                <div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><strong><?php  echo number_format($pin_total_valor, 2, ',', '.') ?></strong></div></td>
+                                <div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><strong><?php  echo number_format((float)$pin_total_valor, 2, ',', '.') ?></strong></div></td>
                             </tr>
                             <tr>
                                 <td colspan="13" class="text-center"><a href="#" class="btn downloadCsv btn-info ">Download CSV</a></td>
@@ -493,7 +493,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                             //$stop = true;
                             foreach	($a_total_geral as $key => $val) 
                             {
-                                echo "document.getElementById('opr_".$key."').innerHTML = '".number_format(100*$val/$pin_total_valor, 2, ',', '.')."%';\n";
+                                echo "document.getElementById('opr_".$key."').innerHTML = '".number_format((float)100*$val/$pin_total_valor, 2, ',', '.')."%';\n";
                             }
                             echo "</script>\n";
 			}
@@ -565,7 +565,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						<td bgcolor="<?php  echo $cor1 ?>"><font color="#FF0000" size="2" face="Arial, Helvetica, sans-serif"> 
 						  <?php  echo $pgest['opr_nome'] ?></font></td>
 						<td bgcolor="<?php  echo $cor1 ?>"><div align="right"><font color="#FF0000" size="2" face="Arial, Helvetica, sans-serif"> 
-							<?php  echo number_format($pgest['pin_valor'], 2, ',', '.') ?> </font></div></td>
+							<?php  echo number_format((float)$pgest['pin_valor'], 2, ',', '.') ?> </font></div></td>
 					  </tr>
               <?php
                                                 } //end if($rs_count_gamer_row['total_gamer'] == 0 && $rs_count_lan_row['total_lan'] == 0)

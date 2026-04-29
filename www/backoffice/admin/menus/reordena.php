@@ -119,7 +119,7 @@ if($rs_abas = SQLexecuteQuery($sql)){
     ?>
                 <tr class="opt trListagem c-move" id="<?php echo $rs_row['menu_id']; ?>">
                     <td>
-                        <?php echo (@constant(trim($rs_row['menu_descricao'])) === null) ? $rs_row['menu_descricao'] : constant(trim($rs_row['menu_descricao'])); ?>
+                        <?php echo defined(trim($rs_row['menu_descricao'])) ? constant(trim($rs_row['menu_descricao'])) : $rs_row['menu_descricao']; ?>
                         <input type="hidden" name="reordenar[<?php echo $rs_row['menu_id']; ?>]" value="">
                     </td>
                 </tr>

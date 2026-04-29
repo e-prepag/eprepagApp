@@ -493,7 +493,7 @@ function GP_popupAlertMsg(msg) {
                                 $lineCsv[] = $pgest['pin_codinterno'];
                                 $lineCsv[] = formata_data($pgest['pin_dataentrada'], 0)." ".$pgest['pin_horaentrada'];
                                 $lineCsv[] = $pgest['opr_nome'];
-                                $lineCsv[] = number_format($pgest['pin_valor'], 2, ",", ".");
+                                $lineCsv[] = number_format((float)$pgest['pin_valor'], 2, ',', '.');
                                 $lineCsv[] = $pgest['pin_lote_codigo'];
                                 $lineCsv[] = "";
                                 $lineCsv[] = "";
@@ -508,7 +508,7 @@ function GP_popupAlertMsg(msg) {
                                 <td class="text-center"><?php echo $pgest['pin_codinterno'] ?></td>
                                 <td class="text-center"><?php echo formata_data($pgest['pin_dataentrada'], 0) ?> <?php echo $pgest['pin_horaentrada'] ?></td>
                                 <td class="text-center"><?php echo $pgest['opr_nome'] ?></td>
-                                <td class="text-center"><?php echo number_format($pgest['pin_valor'], 2, ",", ".") ?></td>
+                                <td class="text-center"><?php echo number_format((float)$pgest['pin_valor'], 2, ',', '.') ?></td>
                                 <td class="text-center"><?php echo $pgest['pin_lote_codigo'] ?></td>
                                 <td class="text-center"><?php echo "-"; ?></td>
                                 <td class="text-center"><?php echo "-"; ?></td>
@@ -525,12 +525,12 @@ function GP_popupAlertMsg(msg) {
                                 </tbody>
                                 <tr class="texto" bgcolor="#F4F4F4"> 
                                     <td colspan="3"><strong><?php echo LANG_PINS_SUBTOTAL; ?></strong></td>
-                                    <td><div align="center"><strong><?php echo number_format($bol_valor_total, 2, ',', '.') ?></strong></div></td>
+                                    <td><div align="center"><strong><?php echo number_format((float)$bol_valor_total, 2, ',', '.') ?></strong></div></td>
                                     <td colspan="6">&nbsp;</td>
                                 </tr>
                                 <tr class="texto" bgcolor="#E4E4E4"> 
                                     <td colspan="3"><strong><?php echo LANG_PINS_TOTAL; ?></strong></td>
-                                    <td><div align="center"><strong><?php echo number_format($bol_valor_total_i, 2, ',', '.') ?></strong></div></td>
+                                    <td><div align="center"><strong><?php echo number_format((float)$bol_valor_total_i, 2, ',', '.') ?></strong></div></td>
                                     <td colspan="6">&nbsp;</td>
                                 </tr>
 <?php 

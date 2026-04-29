@@ -868,7 +868,7 @@ if (!isset($_POST['download'])) {
                                                         else
                                         if ($key == $tf_pins)
                                                             echo " checked"; ?>>
-                                                <span title="<?php echo "n: " . $val; ?>"><?php echo number_format($key, 2, ',', '.'); ?></span>
+                                                <span title="<?php echo "n: " . $val; ?>"><?php echo number_format((float)$key, 2, ',', '.'); ?></span>
                                             </div>
                                     <?php
                                         }
@@ -990,7 +990,7 @@ if (!isset($_POST['download'])) {
                                                         }
                                                         ?>
                                                     </td>
-                                                    <td class="text-center"><?php echo "R$ " . number_format($pgrow['pin_valor'], 2, ',', '.'); ?></td>
+                                                    <td class="text-center"><?php echo "R$ " . number_format((float)$pgrow['pin_valor'], 2, ',', '.'); ?></td>
                                                     <?php
                                                     if (b_is_PublisherMostraEstoquePINs()) {
                                                     } else {
@@ -1020,17 +1020,17 @@ if (!isset($_POST['download'])) {
                                             <tr class="bg-cinza-claro">
                                                 <td colspan="<?php echo ($ncols1 + $ncols) ?>">&nbsp;</td>
                                                 <td><strong><?php echo LANG_PINS_SUBTOTAL; ?></strong></td>
-                                                <td class="text-right"><strong><?php echo number_format($valor_total_tela, 2, ',', '.') ?></strong></td>
+                                                <td class="text-right"><strong><?php echo number_format((float)$valor_total_tela, 2, ',', '.') ?></strong></td>
                                                 <td colspan="2">&nbsp;</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="<?php echo ($ncols1 + $ncols) ?>">&nbsp;</td>
                                                 <td><strong>TOTAL</strong></td>
-                                                <td class="text-right"><strong><?php echo number_format($valor_geral, 2, ',', '.') ?></strong></td>
+                                                <td class="text-right"><strong><?php echo number_format((float)$valor_geral, 2, ',', '.') ?></strong></td>
                                                 <td colspan="2">&nbsp;</td>
                                             </tr>
                                             <script language="JavaScript">
-                                                document.getElementById('txt_totais').innerHTML = '( <?php echo number_format($valor_total_tela, 2, ',', '.') ?> / <?php echo number_format($valor_geral, 2, ',', '.') ?>)';
+                                                document.getElementById('txt_totais').innerHTML = '( <?php echo number_format((float)$valor_total_tela, 2, ',', '.') ?> / <?php echo number_format((float)$valor_geral, 2, ',', '.') ?>)';
                                             </script>
                                             <?php
                                             paginacao_query($inicial, $total_table, $max, $colspan, $img_anterior, $img_proxima, $default_add, $range, $range_qtde, $ncamp, $varsel);
@@ -1129,7 +1129,7 @@ if (isset($_POST['download'])) {
                 $csv_row[LANG_PINS_SERIAL_NUMBER] = "-----";
         }
 
-        $csv_row[LANG_PINS_VALUE] = number_format($pgrow['pin_valor'], 2, ',', '.');
+        $csv_row[LANG_PINS_VALUE] = number_format((float)$pgrow['pin_valor'], 2, ',', '.');
 
         $csv_row[LANG_PINS_STATUS] = constant("LANG_PINS_STATUS_MSG_" . $pgrow['pin_status']);
 

@@ -528,7 +528,7 @@ function ResetCheckedValue() {
                                 else
                                     if ($key == $tf_pins)
                                         echo " checked";
-                                    ?>><span title="<?php echo "n: ".$val; ?>"><?php echo number_format($key,2,",","."); ?></span></div>
+                                    ?>><span title="<?php echo "n: ".$val; ?>"><?php echo number_format((float)$key, 2, ',', '.'); ?></span></div>
 <?php  
 
                         } 
@@ -584,7 +584,7 @@ function ResetCheckedValue() {
                                 <tr class="trListagem">
                                     <td class="text-center"><?php if($pgrow['date_seq']) { ?><?php  echo monta_data($pgrow['date_seq']); } else echo "--"; ?></td>
                                     <td class="text-center"><?php  echo 1*$pgrow['quantidade']; ?></td>
-                                    <td class="text-right"><?php  echo number_format($pgrow['total'], 2, ',', '.'); ?></td>
+                                    <td class="text-right"><?php  echo number_format((float)$pgrow['total'], 2, ',', '.'); ?></td>
                                 </tr>
 <?php  
                             }
@@ -592,12 +592,12 @@ function ResetCheckedValue() {
                                 <tr class="bg-cinza-claro"> 
                                     <td class="text-left"><strong>SUBTOTAL</strong></td>
                                     <td class="text-center"><strong><?php  echo $qtde_total_tela ?></strong></td>
-                                    <td class="text-right"><strong><?php  echo number_format($valor_total_tela, 2, ',', '.') ?></strong></td>
+                                    <td class="text-right"><strong><?php  echo number_format((float)$valor_total_tela, 2, ',', '.') ?></strong></td>
                                 </tr>
                                 <tr class="bg-cinza-claro"> 
                                     <td class="text-left"><strong>TOTAL</strong></td>
                                     <td class="text-center"><strong><?php  echo $qtde_geral ?></strong></td>
-                                    <td class="text-right"><strong><?php  //echo number_format($valor_geral, 2, ',', '.') ?></strong></td>
+                                    <td class="text-right"><strong><?php  //echo number_format((float)$valor_geral, 2, ',', '.') ?></strong></td>
                                 </tr>
                                 <tr>
                                     <td colspan="3" class="text-center">
