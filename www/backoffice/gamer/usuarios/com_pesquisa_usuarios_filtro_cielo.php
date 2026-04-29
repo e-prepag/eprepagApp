@@ -116,7 +116,7 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 	";
 
 	$rs = SQLexecuteQuery($sql);
-	$total_table = pg_num_rows($rs);
+	$total_table = (($rs) ? pg_num_rows($rs) : 0);
 
 ob_end_flush();
 ?>
@@ -199,7 +199,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						$lista_ug_id = "";
 						$n_lista_ug_id = 0;
 
-						if((pg_num_rows($rs) != 0) && ($rs)) {
+						if(((($rs) ? pg_num_rows($rs) : 0) != 0) && ($rs)) {
 
 							$i=0;			
 							while ($pgrs = pg_fetch_array ($rs)) {

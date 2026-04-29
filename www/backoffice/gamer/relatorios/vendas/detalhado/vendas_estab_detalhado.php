@@ -136,7 +136,7 @@ $estat = $estatp1;
 //--The End
 
 		$res_count = pg_query($estat);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	
 		$estat .= " order by ".$ncamp; 
 

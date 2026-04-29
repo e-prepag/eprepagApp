@@ -31,7 +31,7 @@ if(!$arquivoLog->haveFile()) {
     
     echo str_repeat("=", 60).PHP_EOL."Data execução : ".date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
     if($rs){
-        $num_rows = pg_num_rows($rs);
+        $num_rows = (($rs) ? pg_num_rows($rs) : 0);
         if($num_rows > 0){
             $msg_log = "";
             

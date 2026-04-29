@@ -32,9 +32,10 @@ $id_gocash = 1;
 //Conectando com PDO para execução da QUERY
 $con = ConnectionPDO::getConnection();
 $pdo = $con->getLink();
-$recaptcha = $_POST['g-recaptcha-response'];
+$recaptcha = $_POST['g-recaptcha-response'] ?? '';
+$erros = array();
 
-$msg_modal = false;
+$msg_modal = 0;
 $nao_carregar = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //$recaptcha = $_POST['g-recaptcha-response'];
@@ -446,7 +447,7 @@ echo modal_includes();*/
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function () {
         if (<?= $msg_modal ?> == 1) {
-            document.getElementById('error-text').innerHTML = "<?= implode($erros) ?>";
+            document.getElementById('error-text').innerHTML = "<?= implode('', is_array($erros) ? $erros : array()) ?>";
             $("#modal-load").modal();
         }
     });

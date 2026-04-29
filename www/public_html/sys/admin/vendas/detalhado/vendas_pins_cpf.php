@@ -64,9 +64,9 @@ if($BtnSearch) {
             if(!$rs_publisher) {
                 echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(".$sql.").<br>".PHP_EOL;
                 $possui_totalizacao_utilizacao = FALSE;
-            }elseif(pg_num_rows($rs_publisher) > 0) {
+            }elseif((($rs_publisher) ? pg_num_rows($rs_publisher) : 0) > 0) {
                 $possui_totalizacao_utilizacao = TRUE;
-            }//end if(pg_num_rows($rs_publisher) == 0)
+            }//end if((($rs_publisher) ? pg_num_rows($rs_publisher) : 0) == 0)
             else {
                 $possui_totalizacao_utilizacao = FALSE;
             }//end else
@@ -195,7 +195,7 @@ if($BtnSearch) {
                 ";
         //echo $sql;
 	$resid = SQLexecuteQueryParams($sql, $sql_params);
-	$total_table = pg_num_rows($resid);
+	$total_table = (($resid) ? pg_num_rows($resid) : 0);
 
 } //end if($BtnSearch)
 ?>

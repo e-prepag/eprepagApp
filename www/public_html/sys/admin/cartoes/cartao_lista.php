@@ -208,7 +208,7 @@
 			$estat  .= " where 1=1 ".$where_data." ".$where_valor." ".$where_opr." ".$where_canal." ".$where_estabelecimento." ".$where_ativo." ";		
 	
 		$res_count = pg_query($estat);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 /*	
 		if($ncamp=="vc_data") {
 			$estat .= " order by vc_data "; //" order by vc_data::date "; 

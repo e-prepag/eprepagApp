@@ -32,7 +32,7 @@ class PedidosController extends HeaderController
                 $sql = "select * from tb_dist_venda_games_modelo inner join tb_dist_venda_games_modelo_pins on vgm_id = vgmp_vgm_id 
         inner join pins on vgmp_pin_codinterno = pin_codinterno where vgm_vg_id = $idvenda and vgm_opr_codigo = 124;";
                 $retorno = SQLexecuteQuery($sql);
-                $numeroDePins = pg_num_rows($retorno);
+                $numeroDePins = (($retorno) ? pg_num_rows($retorno) : 0);
                 $pins = pg_fetch_all($retorno);
 
                 $countResgatados = 0;

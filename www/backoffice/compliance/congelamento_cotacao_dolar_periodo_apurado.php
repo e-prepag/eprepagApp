@@ -102,7 +102,7 @@ if(isset($BtnSearch) && $BtnSearch) {
             //Verificando se no período informado existe mais de uma cotação de dólar
             $sql = "SELECT COUNT(cd_cotacao), cd_cotacao FROM cotacao_dolar WHERE opr_codigo = $1 AND cd_data >= $2 AND cd_data <= $3 GROUP BY cd_cotacao";
 				$rs_count_cotacao = SQLexecuteQueryParams($sql, array($cod_opr, date('Y-m-d',strtotime($data_inicio))." 00:00:00", date('Y-m-d',strtotime($data_fim))." 00:00:00"));
-            if(pg_num_rows($rs_count_cotacao) > 1){
+            if((($rs_count_cotacao) ? pg_num_rows($rs_count_cotacao) : 0) > 1){
                 //Caso exista, não será permitido o update
                 $msg .= "O período selecionado engloba mais de uma cotação. Favor congelar um fragmento de cotação por vez, ou selecione um período (mês) completo.";
             }else{

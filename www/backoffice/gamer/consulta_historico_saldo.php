@@ -251,7 +251,7 @@ if(isset($rsResposta) && $rsResposta && pg_num_rows($rsResposta) != 0) {
 ?>
     <tr>
         <td align="center">&nbsp;</td>
-        <td align="left" colspan="4"><?php echo "Encontrado".((pg_num_rows($rsResposta)>0)?"s":"")." ".pg_num_rows($rsResposta)." registro".((pg_num_rows($rsResposta)>0)?"s":"")."";?></td>
+        <td align="left" colspan="4"><?php echo "Encontrado".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")." ".(($rsResposta) ? pg_num_rows($rsResposta) : 0)." registro".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")."";?></td>
         <td align="center">&nbsp;</td>
     </tr>
     <tr>
@@ -264,7 +264,7 @@ if(isset($rsResposta) && $rsResposta && pg_num_rows($rsResposta) != 0) {
         <td bgcolor="#DDDDDD" align="center">Saldo Final R$</td>
     </tr>
 <?php
-} //end if((pg_num_rows($rsResposta) != 0) && ($rsResposta))
+} //end if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta))
 $backcolor1 = "#ccffff";
 $backcolor2 = "#ffffff";
 $bck = $backcolor1;
@@ -304,7 +304,7 @@ if(!empty($arrayResposta)){
 
     } //end while ($pgResposta = pg_fetch_array ($rsResposta))
 }
-if(isset($rsResposta) && pg_num_rows($rsResposta) != 0) {
+if(isset($rsResposta) && (($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) {
 ?>    <tr>
         <td bgcolor="#DDDDDD" align="center">&nbsp;</td>
         <td bgcolor="#DDDDDD" align="right" colspan="2"><b>Total</b></td>
@@ -314,7 +314,7 @@ if(isset($rsResposta) && pg_num_rows($rsResposta) != 0) {
         <td bgcolor="#DDDDDD" align="right"><b><?php echo number_format($total_saldo_final, 2, ',', '.');?></b></td>
     </tr>
 <?php
-} //end if((pg_num_rows($rsResposta) != 0) && ($rsResposta))
+} //end if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta))
 ?>    
 </table>
 </p>

@@ -625,10 +625,10 @@ $rs = SQLexecuteQuery($sql);
 if (!$rs)
     echo "Erro ao selecionar os Detalhamento para os Publishers (" . implode(",", $vetorPublisher) . ").<br>" . PHP_EOL;
 else {
-    $contFatura = pg_num_rows($rs);
+    $contFatura = (($rs) ? pg_num_rows($rs) : 0);
     $arrayTipo66 = array();
     $cnpjAnterior = "";
-    if (pg_num_rows($rs) > 0) {
+    if ((($rs) ? pg_num_rows($rs) : 0) > 0) {
         echo "Com registros";
         while ($rs_row = pg_fetch_assoc($rs)) {
             // Carregando vetor para os registros Tipo 66

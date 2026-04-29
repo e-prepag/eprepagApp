@@ -156,13 +156,13 @@ if ($action == '2' && (($id * 1) == 124 || ($id * 1) == 137)) {
 		$rs_venda_user = SQLexecuteQueryParams($sql_venda_user, [$rsiD["pin_codinterno"]]);
 		$rs_user = pg_fetch_array($rs_venda_user);
 
-		if (pg_num_rows($rs_venda_user) == 0 || $rs_venda_user == false) {
+		if ((($rs_venda_user) ? pg_num_rows($rs_venda_user) : 0) == 0 || $rs_venda_user == false) {
 
 			$sql_venda_pdv = "SELECT * from tb_dist_venda_games inner join tb_dist_venda_games_modelo on vg_id= vgm_vg_id inner join tb_dist_venda_games_modelo_pins on vgm_id = vgmp_vgm_id where vgmp_pin_codinterno =$1";
 			$rs_venda_pdv = SQLexecuteQueryParams($sql_venda_pdv, [$rsiD["pin_codinterno"]]);
 			$rs_pdv = pg_fetch_array($rs_venda_pdv);
 
-			if (pg_num_rows($rs_venda_pdv) > 0) {
+			if ((($rs_venda_pdv) ? pg_num_rows($rs_venda_pdv) : 0) > 0) {
 				echo "CODRETEPP=" . converte_detalhe_codretepp($aux_codreteppTOP) . ";CODCHANNEL=1";
 				if (!is_null($aux_pin_valueTOP)) {
 					$pinValueFormatted = number_format($aux_pin_valueTOP * 100, 0, '', '');

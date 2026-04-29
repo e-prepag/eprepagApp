@@ -55,7 +55,7 @@ if(!$rs) {
 //	die("Stop");
 }
 
-$total_table = pg_num_rows($rs);
+$total_table = (($rs) ? pg_num_rows($rs) : 0);
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">

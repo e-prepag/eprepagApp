@@ -330,12 +330,12 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
     <?php
               }//end else do if($isPINCARD)
               
-    } //end if(pg_num_rows($rs_pin) > 0)
+    } //end if((($rs_pin) ? pg_num_rows($rs_pin) : 0) > 0)
     else {
     ?>
     <font color="#666666" size="2" face="Arial, Helvetica, sans-serif">Este PIN não foi encontrado em nosso banco de dados.<br>Por favor, verifique a sequência de caracteres digitados.</font>
     <?php
-    } //end else do if(pg_num_rows($rs_pin) > 0)
+    } //end else do if((($rs_pin) ? pg_num_rows($rs_pin) : 0) > 0)
 }//end if($BtnSearch && !empty($fpin))    
 ?>
         

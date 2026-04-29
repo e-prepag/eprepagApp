@@ -79,7 +79,7 @@ echo $sql.PHP_EOL;
 $rs_dados_taxa = SQLexecuteQuery($sql);
         
 //Verificando Dados
-$msg .= PHP_EOL."Levantamento do Montante Envolvido na Cobrança de Taxa de Manutenção Anual no período de ".PERIODO_CONSIDERADO." (".date("Y-m-d H:i:s").") (YYYY-MM-DD)<br>".PHP_EOL."Total de Usuários Envolvidos :  [<b>".pg_num_rows($rs_dados_taxa)."</b>]".PHP_EOL;
+$msg .= PHP_EOL."Levantamento do Montante Envolvido na Cobrança de Taxa de Manutenção Anual no período de ".PERIODO_CONSIDERADO." (".date("Y-m-d H:i:s").") (YYYY-MM-DD)<br>".PHP_EOL."Total de Usuários Envolvidos :  [<b>".(($rs_dados_taxa) ? pg_num_rows($rs_dados_taxa) : 0)."</b>]".PHP_EOL;
 $msg .= PHP_EOL."Valor Máximo da Taxa de Manutenção Anual por Período <b>R$ ".number_format(VALOR_TAXA,2,",",".")."</b> ".PHP_EOL.PHP_EOL;
 $total_geral_taxa = 0;
 while($rs_dados_taxa_row = pg_fetch_array($rs_dados_taxa)) {
@@ -162,7 +162,7 @@ if(!empty($msg)) {
     }
 }//end if(!empty($msg))
 
-echo str_repeat("_", 80) .PHP_EOL."Final de execução em: ". date('Y-m-d H:i:s'). PHP_EOL. "Elapsed time (total: ".  pg_num_rows($rs_dados_taxa)." gamers): ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL.str_repeat("=", 80).PHP_EOL;
+echo str_repeat("_", 80) .PHP_EOL."Final de execução em: ". date('Y-m-d H:i:s'). PHP_EOL. "Elapsed time (total: ".  (($rs_dados_taxa) ? pg_num_rows($rs_dados_taxa) : 0)." gamers): ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL.str_repeat("=", 80).PHP_EOL;
 
 //Fechando Conexão
 pg_close($connid);

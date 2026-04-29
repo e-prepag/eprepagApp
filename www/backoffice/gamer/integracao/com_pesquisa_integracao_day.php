@@ -127,7 +127,7 @@ $time_start = getmicrotime();
 			$ret = obter($filtro, $rs_pedidos);
 			if($ret != "") $msg = $ret;
 			else {
-				$n_rows = pg_num_rows($rs_pedidos);
+				$n_rows = (($rs_pedidos) ? pg_num_rows($rs_pedidos) : 0);
 
 				if($n_rows == 0) {
 					$msg = "Nenhum registro de integração encontrado.\n";
@@ -225,7 +225,7 @@ echo "days_in_month_prev: $days_in_month_prev<br>";
 				$ret_full = obter($filtro, $rs_pedidos_full);
 				if($ret_full != "") $msg_full = $ret_full;
 				else {
-					$n_rows_full = pg_num_rows($rs_pedidos_full);
+					$n_rows_full = (($rs_pedidos_full) ? pg_num_rows($rs_pedidos_full) : 0);
 
 					if($n_rows_full == 0) {
 						$msg_full = "Nenhum registro de integração encontrado (FULL).\n";
@@ -265,7 +265,7 @@ echo "days_in_month_prev: $days_in_month_prev<br>";
 	$sql  = "select distinct ip_client_email as cliente, count(*) as n from tb_integracao_pedido ip where 1=1 ".$sql_where." group by ip_client_email order by ip_client_email;";
 //echo "sql: $sql<br>";
 	$rs_clientes = SQLexecuteQuery($sql);
-	$n_clientes = pg_num_rows($rs_clientes);
+	$n_clientes = (($rs_clientes) ? pg_num_rows($rs_clientes) : 0);
 */
 
 ob_end_flush();

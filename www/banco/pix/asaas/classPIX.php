@@ -72,7 +72,7 @@ class classPIX
         $numCompra = substr($idpedido, 2, 17);
         $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;";
         $rs_teste_existencia = SQLexecuteQueryParams($sql, array($numCompra));
-        if (pg_num_rows($rs_teste_existencia) == 0) {
+        if ((($rs_teste_existencia) ? pg_num_rows($rs_teste_existencia) : 0) == 0) {
             $sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
                                                 cpf_cnpj_pagador, 

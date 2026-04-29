@@ -18,7 +18,7 @@ class PosicaoBannerDAO {
         
         try{
             if($posicoes = SQLexecuteQuery($sql)){
-                $totalLinhas = pg_num_rows($posicoes);
+                $totalLinhas = (($posicoes) ? pg_num_rows($posicoes) : 0);
                 if($totalLinhas > 0){
                     while($lineRow = pg_fetch_array($posicoes)){
                         $posicao = new PosicaoBannerVO(

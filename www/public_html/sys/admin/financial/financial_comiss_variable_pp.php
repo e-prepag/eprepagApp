@@ -1771,9 +1771,9 @@ function validacaoPublisherEppPagamentosFacilitadora($opr_codigo) {
             echo "Erro na Query de validação de Publishers Epp Pagamentos Facilitadora(".$sql.").<br>".PHP_EOL;
             return FALSE;
         }
-        if(pg_num_rows($rs_operadoras_operantes) == 0) {
+        if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
             return FALSE;
-        }//end if(pg_num_rows($rs_operadoras_operantes) == 0)
+        }//end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
         else {
             $rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes);
             return $rs_operadoras_operantes_row['opr_codigo'];

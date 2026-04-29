@@ -31,7 +31,7 @@ if(!$arquivoLog->haveFile()) {
     if(!$rs_vendas || pg_num_rows($rs_vendas) == 0) {
             $smonitor .= "Nenhum registro encontrado com problemas.".PHP_EOL;
     } else {
-            $smonitor .= "Encontrados ".pg_num_rows($rs_vendas)." registros com problemas".PHP_EOL;
+            $smonitor .= "Encontrados ".(($rs_vendas) ? pg_num_rows($rs_vendas) : 0)." registros com problemas".PHP_EOL;
             while($rs_vendas_row = pg_fetch_array($rs_vendas)){ 
                 if($smonitor) $smonitor .= ", ";
                 $smonitor .= $rs_vendas_row["vg_id"];

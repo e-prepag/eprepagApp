@@ -143,7 +143,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                 $cor2 = $query_cor1;
                 $cor3 = $query_cor2;
 
-                if((pg_num_rows($rs) != 0) && ($rs)) {
+                if(((($rs) ? pg_num_rows($rs) : 0) != 0) && ($rs)) {
                     while ($pgrs = pg_fetch_array ($rs)) {
                         //if(b_IsUsuarioReinaldo()) 
                         {

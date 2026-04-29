@@ -995,7 +995,7 @@ class EnvioEmailAutomatico
         echo $sql . PHP_EOL;
         $result = SQLexecuteQuery($sql);
         $lista_ids = "";
-        if (pg_num_rows($result) > 0) {
+        if ((($result) ? pg_num_rows($result) : 0) > 0) {
             while ($result_row = pg_fetch_array($result)) {
                 if (strlen($lista_ids) > 1) {
                     $lista_ids .= "," . $result_row['ug_id'];
@@ -1003,7 +1003,7 @@ class EnvioEmailAutomatico
                     $lista_ids = $result_row['ug_id'];
                 }
             }
-        } //end if(pg_num_rows($result) > 0)
+        } //end if((($result) ? pg_num_rows($result) : 0) > 0)
         return $lista_ids;
     } //end function getUsersIDs
 

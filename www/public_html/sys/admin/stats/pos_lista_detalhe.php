@@ -150,7 +150,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 		
 
 			$res_count = SQLexecuteQueryParams($estat, $estatParams);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 		$estat .= " order by ".$ncamp1; 
 

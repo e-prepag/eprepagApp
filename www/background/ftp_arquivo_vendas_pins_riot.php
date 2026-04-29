@@ -177,7 +177,7 @@ if(!$arquivoLog->haveFile()) {
             order by pin_datavenda desc, pin_horavenda desc";
     echo $sql.PHP_EOL;
     $resid = pg_exec($connid, $sql);
-    $total_table = pg_num_rows($resid);
+    $total_table = (($resid) ? pg_num_rows($resid) : 0);
 
     if($total_table > 0) {
         $conteudo = '"PSPCode";"RIOT ORDER ID";"PIN";"TransactionType";"Region";"ID";"Transaction";"Purchase";"E-Prepag + Tax";"Net Amount";"Country Code"'.PHP_EOL;

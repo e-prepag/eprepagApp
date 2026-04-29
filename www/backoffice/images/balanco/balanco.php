@@ -43,7 +43,7 @@ $query = "select ug_id,ug_perfil_saldo,ug_perfil_limite,ug_risco_classif from di
 $rs_query = SQLexecuteQUERY($query);
 
 
-while (pg_num_rows($rs_query) < 1) {
+while ((($rs_query) ? pg_num_rows($rs_query) : 0) < 1) {
 
 	$id_lan ++;
 

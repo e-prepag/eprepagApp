@@ -81,7 +81,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
                                     $ret = SQLexecuteQuery($sql);
                                     if(!$ret) $msg .= "Erro ao selecionar transação.\n";
                                     else {
-                                        if(pg_num_rows($ret)==0) {
+                                        if((($ret) ? pg_num_rows($ret) : 0)==0) {
                                                 
                                                 //Capturando o campo com o ID do Publisher
                                                 $opr_codigo = "NULL";

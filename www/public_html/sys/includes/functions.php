@@ -2373,9 +2373,9 @@ function levantamentoPublisherComFechamentoUtilizacao()
 		echo "Erro na Query de Levantamento de Publishers contendo Fechamento por Utilização de PINs(" . $sql . ").<br>" . PHP_EOL;
 		return array();
 	}
-	if (pg_num_rows($rs_publisher) == 0) {
+	if ((($rs_publisher) ? pg_num_rows($rs_publisher) : 0) == 0) {
 		return array();
-	} //end if(pg_num_rows($rs_publisher) == 0)
+	} //end if((($rs_publisher) ? pg_num_rows($rs_publisher) : 0) == 0)
 	else {
 		while ($rs_publisher_row = pg_fetch_array($rs_publisher)) {
 			$aux_retorno[$rs_publisher_row['opr_codigo']] = $rs_publisher_row['opr_data_inicio_contabilizacao_utilizacao'];

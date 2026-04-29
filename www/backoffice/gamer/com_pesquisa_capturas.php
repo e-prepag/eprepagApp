@@ -452,7 +452,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 //echo "sqlip: $sqlip<br>";
 								$rsip = SQLexecuteQuery($sqlip);
 //echo "pg_num_rows(rsip): ".pg_num_rows($rsip)."<br>";
-								if($rsip) { // && pg_num_rows($rsip) > 0){
+								if($rsip) { // && (($rsip) ? pg_num_rows($rsip) : 0) > 0){
 									$rsip_row = pg_fetch_array($rsip);
 									 $country_code = trim($rsip_row['country_code']);
 									 $country_name = $rsip_row['country_name'];

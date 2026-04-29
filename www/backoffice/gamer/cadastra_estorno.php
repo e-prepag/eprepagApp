@@ -212,7 +212,7 @@ if(isset($rsResposta) && $rsResposta && pg_num_rows($rsResposta) != 0) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>
-        <td align="left" colspan="4"><?php echo "Encontrado".((pg_num_rows($rsResposta)>0)?"s":"")." ".pg_num_rows($rsResposta)." registro".((pg_num_rows($rsResposta)>0)?"s":"")."";?></td>
+        <td align="left" colspan="4"><?php echo "Encontrado".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")." ".(($rsResposta) ? pg_num_rows($rsResposta) : 0)." registro".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")."";?></td>
         <td align="center">&nbsp;</td>
     </tr>
 	<tr>
@@ -227,7 +227,7 @@ if(isset($rsResposta) && $rsResposta && pg_num_rows($rsResposta) != 0) {
         <td bgcolor="#DDDDDD" align="center">ID da Venda</td>
     </tr>
 <?php
-} //end if((pg_num_rows($rsResposta) != 0) && ($rsResposta))
+} //end if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta))
 $backcolor1 = "#ccffff";
 $backcolor2 = "#ffffff";
 $bck = $backcolor1;
@@ -248,7 +248,7 @@ if(isset($rsResposta) && $rsResposta){
         else $bck = $backcolor1;
 } //end while ($pgResposta = pg_fetch_array ($rsResposta))
 }
-if(isset($rsResposta) && $rsResposta && (pg_num_rows($rsResposta) != 0)) {
+if(isset($rsResposta) && $rsResposta && ((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0)) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>
@@ -259,7 +259,7 @@ if(isset($rsResposta) && $rsResposta && (pg_num_rows($rsResposta) != 0)) {
         <td align="center">&nbsp;</td>
     </tr>
 <?php
-} //end if((pg_num_rows($rsResposta) != 0) && ($rsResposta))
+} //end if(((($rsResposta) ? pg_num_rows($rsResposta) : 0) != 0) && ($rsResposta))
 if (isset($btn_estorno) && $btn_estorno=="Estornar") {
 ?>
 	<tr>

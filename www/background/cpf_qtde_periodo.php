@@ -132,7 +132,7 @@ order by total_cpf desc;
 
 $rs_dados_cpf = SQLexecuteQueryTWO($conexao, $sql);
 //Verificando Dados
-$msg .= PHP_EOL."Total de CPF considerados entre ".date("Y-m-d",$initialmonth)." a ".date("Y-m-d",$currentmonth)." (YYYY-MM-DD):  [<b>".pg_num_rows($rs_dados_cpf)."</b>] CPFs <br>";
+$msg .= PHP_EOL."Total de CPF considerados entre ".date("Y-m-d",$initialmonth)." a ".date("Y-m-d",$currentmonth)." (YYYY-MM-DD):  [<b>".(($rs_dados_cpf) ? pg_num_rows($rs_dados_cpf) : 0)."</b>] CPFs <br>";
 $total_cpfs_valor_superior = 0;
 $total_cpfs_na_tabela = 0;
 $total_cpfs_ainda_nao_na_tabela = 0;
@@ -168,7 +168,7 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
 
 $sql = "SELECT cpf FROM cpf_cache WHERE cpf IN (".implode(",", $retorno_search).") group by cpf;";
 $res = SQLexecuteQueryTWO($conexao, $sql);
-$find = pg_num_rows($res);
+$find = (($res) ? pg_num_rows($res) : 0);
 $nao_encotrados = sizeof($retorno) - (int)$find;
 
 $_SESSION["b"] = 0;
@@ -243,7 +243,7 @@ echo str_repeat("_", 80) .PHP_EOL."Calculando os totais de contas com o mesmo CP
 $rs_dados_cpf = SQLexecuteQueryTWO($sql);
         
 //Verificando Dados
-$msg = PHP_EOL."Total de CPF considerados com contas ativas de GAMERS:  [".pg_num_rows($rs_dados_cpf)."] CPFs<br>";
+$msg = PHP_EOL."Total de CPF considerados com contas ativas de GAMERS:  [".(($rs_dados_cpf) ? pg_num_rows($rs_dados_cpf) : 0)."] CPFs<br>";
 echo $msg.PHP_EOL.PHP_EOL;
 $total_cpfs_na_tabela = 0;
 $total_cpfs_ainda_nao_na_tabela = 0;

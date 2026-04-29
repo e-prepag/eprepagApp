@@ -309,7 +309,7 @@ if ($dd_pins_vendas) {
 //die("Stop");
 
 $resid_count = SQLexecuteQueryParams($sql, array());
-$total_table = pg_num_rows($resid_count);
+$total_table = (($resid_count) ? pg_num_rows($resid_count) : 0);
 
 //echo "total_table: ".$total_table."<br>";
 $qtde_geral = 0;

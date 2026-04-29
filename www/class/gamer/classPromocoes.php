@@ -215,7 +215,7 @@ gravaLog_DebugPromocao("Confere token em MontarPromocao()\n ID: ".$this->getUgId
 		$rs_promocoes = SQLexecuteQuery($sql);
 		if(!$rs_promocoes) {
 			return false;
-		} else if(pg_num_rows($rs_promocoes) == 0) {
+		} else if((($rs_promocoes) ? pg_num_rows($rs_promocoes) : 0) == 0) {
 			return true;
 		}
 		else {

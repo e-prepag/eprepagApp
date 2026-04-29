@@ -57,7 +57,7 @@ echo "SQL: ".$query.$cReturn.$cReturn;
 
 $rs = SQLexecuteQUERY($query);
 
-$total_considerado = pg_num_rows($rs);
+$total_considerado = (($rs) ? pg_num_rows($rs) : 0);
 echo "PDVs Considerados: ".$total_considerado.$cReturn;
 
 $msg = "";

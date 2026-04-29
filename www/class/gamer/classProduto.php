@@ -229,7 +229,7 @@ class Produto
 			$sql_ordenar = SQLexecuteQuery($sql);
 			$cont = 0;
 
-			if (pg_num_rows($sql_ordenar) != 0)
+			if ((($sql_ordenar) ? pg_num_rows($sql_ordenar) : 0) != 0)
 				while ($codigo = pg_fetch_array($sql_ordenar)) {
 					SQLexecuteQuery("update tb_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
 					$cont++;
@@ -242,7 +242,7 @@ class Produto
 		$sql_ordenar_inat = SQLexecuteQuery($sql);
 		$cont = is_null($cont) ? pg_num_rows($sql_ordenar) : $cont;
 
-		if (pg_num_rows($sql_ordenar_inat) != 0)
+		if ((($sql_ordenar_inat) ? pg_num_rows($sql_ordenar_inat) : 0) != 0)
 			while ($codigo = pg_fetch_array($sql_ordenar_inat)) {
 				SQLexecuteQuery("update tb_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
 				$cont++;

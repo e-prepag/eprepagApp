@@ -84,7 +84,7 @@ class ConciliacaoBancaria {
         //echo "$sql\n\n";
 
         $rs = SQLexecuteQuery($sql);
-        return (pg_num_rows($rs) > 0);
+        return ((($rs) ? pg_num_rows($rs) : 0) > 0);
     }
 
     public function getDateById($id) {
@@ -128,7 +128,7 @@ class ConciliacaoBancaria {
                 AND '{$data} 23:59:59'::TIMESTAMP
                 AND rfcb_tipo_pagamento='{$tipo_pagamento}';";
         $rs = SQLexecuteQuery($sql);
-        if ( pg_num_rows($rs) > 0 ) {
+        if ( (($rs) ? pg_num_rows($rs) : 0) > 0 ) {
             while ( $r = pg_fetch_assoc($rs) ) {
                 // Ainda esta no mesmo mes e esta agrupado?
                 if ( date('m', strtotime($r['rfcb_data_registro'])) == date('m', strtotime($data)) && $r['rfcb_numero_de_dias'] > 1 ) {

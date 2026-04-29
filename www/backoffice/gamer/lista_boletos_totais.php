@@ -89,7 +89,7 @@ $BtnSearch="Buscar";
 			$ret = obter($filtro, null, $rs_pedidos);
 			if($ret != "") $msg = $ret;
 			else {
-				$total_table = pg_num_rows($rs_pedidos);
+				$total_table = (($rs_pedidos) ? pg_num_rows($rs_pedidos) : 0);
 //echo "total_table: $total_table<br>";
 				while($rs_pedidos_row = pg_fetch_array($rs_pedidos)){
 					$total_pagos_geral += $rs_pedidos_row['total_pagos'];

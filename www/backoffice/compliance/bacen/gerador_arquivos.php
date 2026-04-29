@@ -88,7 +88,7 @@ $codigoNossaBandeira = '4';             // C�digo de Nossa Bandeira de 1 (uma)
 
 //Verificando se faltam Dados
 if (verificaFaltaCPFNome($vetorPublisher, date("t",mktime(0, 0, 0, ($mes*1), 1, $ano)), $rs_dados_incompletos, $vetorPublisherNovos)) {
-    echo "<hr><b>Faltam Dados de CPF e Nome: (TOTAL [".pg_num_rows($rs_dados_incompletos)."] Usu�rios)</b><br><br>\n";
+    echo "<hr><b>Faltam Dados de CPF e Nome: (TOTAL [".(($rs_dados_incompletos) ? pg_num_rows($rs_dados_incompletos) : 0)."] Usu�rios)</b><br><br>\n";
     while($rs_dados_incompletos_row = pg_fetch_array($rs_dados_incompletos)) {
             echo " ".$rs_dados_incompletos_row['tipo']." => ID: ".$rs_dados_incompletos_row['ug_id']." DATA: ".$rs_dados_incompletos_row['data_transacao']." Email: ".$rs_dados_incompletos_row['ug_email']."<br>\n";
     } //end while
@@ -507,7 +507,7 @@ $total_5816_cpfs = 0;
 $rs = SQLexecuteQuery($sql);
 if(!$rs) echo "Erro ao selecionar os Detalhamento para os Publishers (".implode(",", $vetorPublisher).").<br>\n";
 else { 
-    $contFatura = pg_num_rows($rs);
+    $contFatura = (($rs) ? pg_num_rows($rs) : 0);
     $cpf_anterior = NULL;
     while($rs_row = pg_fetch_array($rs)) {
         
@@ -815,7 +815,7 @@ if(!empty($listaUG_CPF)) {
     $rs = SQLexecuteQuery($sql);
     if(!$rs) echo "Erro ao selecionar os Detalhamento para os Publishers (".implode(",", $vetorPublisher).").<br>\n";
     else { 
-        $contDetalhamento = pg_num_rows($rs);
+        $contDetalhamento = (($rs) ? pg_num_rows($rs) : 0);
         $cpfAnterior = "";
         while($rs_row = pg_fetch_array($rs)) {
             
@@ -1101,13 +1101,13 @@ if(isTrimestral($mes)) {
 
     $rs_nao_emitidos = SQLexecuteQuery($sql);
     
-    if(pg_num_rows($rs_nao_emitidos) != 0) {
-        echo "<hr><b>Faltam Emitir Notas: (TOTAL [".pg_num_rows($rs_nao_emitidos)."] Dias/Publishers)</b><br><br>\n";
+    if((($rs_nao_emitidos) ? pg_num_rows($rs_nao_emitidos) : 0) != 0) {
+        echo "<hr><b>Faltam Emitir Notas: (TOTAL [".(($rs_nao_emitidos) ? pg_num_rows($rs_nao_emitidos) : 0)."] Dias/Publishers)</b><br><br>\n";
         while($rs_nao_emitidos_row = pg_fetch_array($rs_nao_emitidos)) {
                 echo " * Publisher ID [".$rs_nao_emitidos_row['fp_publisher']."] => Data [".$rs_nao_emitidos_row['data_sem_notas']."] <br>\n";
         } //end while
         die("------- Emitir Notas para os Publisher e Per�odos acima antes de gerar os Arquivos -------------<br><hr>\n");
-    }//end if(pg_num_rows($rs_nao_emitidos) != 0)
+    }//end if((($rs_nao_emitidos) ? pg_num_rows($rs_nao_emitidos) : 0) != 0)
     //================================== Fim Verificando se os Dados Financeiros est�o devidamente apurados (Congelados na Gera��o de Notas)
     
     
@@ -1118,7 +1118,7 @@ if(isTrimestral($mes)) {
             WHERE c_ano_mes =  '".$ano."-".$mes."-01';"; 
     //echo $sql."<br>";
     $rs_complice = SQLexecuteQuery($sql);
-    if(pg_num_rows($rs_complice) == 1) {
+    if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 1) {
     
         
         
@@ -1129,7 +1129,7 @@ if(isTrimestral($mes)) {
                     and c_ano_mes <= '".getEndDateTrimestral($mes,$ano)." 00:00:00'"; 
         //echo $sql."<br>";
         $rs_complice = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_complice) == 3 || $testeData == $dataInicioOperacao) {
+        if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 3 || $testeData == $dataInicioOperacao) {
     
             echo "<b>Gerando Arquivos Trimestrais</b><br><br>\n";
             
@@ -2098,7 +2098,7 @@ if(isTrimestral($mes)) {
             if(!$rs) echo "Erro ao selecionar os Publishers (".implode(",", $vetorPublisher).") e Publishers Novos (".implode(",", $vetorPublisherNovos).").<br>\n";
             else { 
                 // Verificando a quantidade
-                $quantidadeLinhas = pg_num_rows($rs); //capturando a quantidade de linhas
+                $quantidadeLinhas = (($rs) ? pg_num_rows($rs) : 0); //capturando a quantidade de linhas
 
                 // Cabe�alho
                 unset($vetorHeader);
@@ -2195,7 +2195,7 @@ if(isTrimestral($mes)) {
             if(!$rs) echo "Erro ao selecionar os Publishers (".implode(",", $vetorPublisher).") e Publishers Novos (".implode(",", $vetorPublisherNovos).").<br>\n";
             else { 
                 // Verificando a quantidade
-                $quantidadeLinhas = pg_num_rows($rs); //capturando a quantidade de linhas
+                $quantidadeLinhas = (($rs) ? pg_num_rows($rs) : 0); //capturando a quantidade de linhas
 
                 // Cabe�alho
                 unset($vetorHeader);
@@ -2458,15 +2458,15 @@ if(isTrimestral($mes)) {
 
             
             
-       }//end do if(pg_num_rows($rs_complice) == 3 || $testeData == $dataInicioOperacao)
+       }//end do if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 3 || $testeData == $dataInicioOperacao)
         else {
             die("O trimestre n�o possui Todos os m�ses Necess�rios Cadastrados para os Dados Complementares de Complice no BackOffice.<br>Por favor, verificar no BackOffice.");
-        }//end else do if(pg_num_rows($rs_complice) == 3 || $testeData == $dataInicioOperacao)
+        }//end else do if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 3 || $testeData == $dataInicioOperacao)
 
-    }//end if(pg_num_rows($rs_complice_verify) == 1)
+    }//end if((($rs_complice_verify) ? pg_num_rows($rs_complice_verify) : 0) == 1)
     else {
         die("Necess�rios Cadastrar os Dados Complementares de Complice no BackOffice antes de continuar.");
-    }//end else do if(pg_num_rows($rs_complice_verify) == 1)
+    }//end else do if((($rs_complice_verify) ? pg_num_rows($rs_complice_verify) : 0) == 1)
     
 } //end if(isTrimestral($mes))
 
@@ -2547,13 +2547,13 @@ if(isSemestral($mes)) {
 
     $rs_nao_emitidos = SQLexecuteQuery($sql);
     
-    if(pg_num_rows($rs_nao_emitidos) != 0) {
-        echo "<hr><b>Faltam Emitir Notas: (TOTAL [".pg_num_rows($rs_nao_emitidos)."] Dias/Publishers)</b><br><br>\n";
+    if((($rs_nao_emitidos) ? pg_num_rows($rs_nao_emitidos) : 0) != 0) {
+        echo "<hr><b>Faltam Emitir Notas: (TOTAL [".(($rs_nao_emitidos) ? pg_num_rows($rs_nao_emitidos) : 0)."] Dias/Publishers)</b><br><br>\n";
         while($rs_nao_emitidos_row = pg_fetch_array($rs_nao_emitidos)) {
                 echo " * Publisher ID [".$rs_nao_emitidos_row['fp_publisher']."] => Data [".$rs_nao_emitidos_row['data_sem_notas']."] <br>\n";
         } //end while
         die("------- Emitir Notas para os Publisher e Per�odos acima antes de gerar os Arquivos -------------<br><hr>\n");
-    }//end if(pg_num_rows($rs_nao_emitidos) != 0)
+    }//end if((($rs_nao_emitidos) ? pg_num_rows($rs_nao_emitidos) : 0) != 0)
     //================================== Fim Verificando se os Dados Financeiros est�o devidamente apurados (Congelados na Gera��o de Notas)
   
 
@@ -2565,7 +2565,7 @@ if(isSemestral($mes)) {
             WHERE c_ano_mes =  '".$ano."-".$mes."-01';"; 
     //echo $sql."<br>";
     $rs_complice = SQLexecuteQuery($sql);
-    if(pg_num_rows($rs_complice) == 1) {
+    if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 1) {
 
         
         
@@ -2577,7 +2577,7 @@ if(isSemestral($mes)) {
                     and c_ano_mes <= '".getEndDateSemestral($mes,$ano)." 00:00:00'"; 
         //echo $sql."<br>";
         $rs_complice = SQLexecuteQuery($sql);
-        if(pg_num_rows($rs_complice) == 6 || $testeData == $dataInicioOperacao) {
+        if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 6 || $testeData == $dataInicioOperacao) {
 
     
             echo "<b>Gerando Arquivos Semestrais</b><br><br>\n";
@@ -4406,15 +4406,15 @@ if(isSemestral($mes)) {
             
             
     
-        }//end do if(pg_num_rows($rs_complice) == 6 || $testeData == $dataInicioOperacao)
+        }//end do if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 6 || $testeData == $dataInicioOperacao)
         else {
             die("O semestre n�o possui Todos os m�ses Necess�rios Cadastrados para os Dados Complementares de Complice no BackOffice.<br>Por favor, verificar no BackOffice.");
-        }//end else do if(pg_num_rows($rs_complice) == 6 || $testeData == $dataInicioOperacao)
+        }//end else do if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 6 || $testeData == $dataInicioOperacao)
 
-    }//end if(pg_num_rows($rs_complice) == 1)
+    }//end if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 1)
     else {
         die("Necess�rios Cadastrar os Dados Complementares de Complice no BackOffice antes de continuar.");
-    }//end else do if(pg_num_rows($rs_complice) == 1)
+    }//end else do if((($rs_complice) ? pg_num_rows($rs_complice) : 0) == 1)
     
 }//end if(isSemestral($mes))
 

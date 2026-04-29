@@ -189,7 +189,7 @@
 			
 //echo $sql."<br>";
 				$res_count = SQLexecuteQueryParams($sql, $sql_params);
-			$total_table = pg_num_rows($res_count);
+			$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 		
 			if($total_table == 0) $msg = LANG_PINS_NO_PINS_FOUND.".\n";		
 		

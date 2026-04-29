@@ -27,7 +27,7 @@ echo $sql.PHP_EOL.PHP_EOL;
 
 $rs = SQLexecuteQuery($sql);
 
-$qtde_registros = pg_num_rows($rs);
+$qtde_registros = (($rs) ? pg_num_rows($rs) : 0);
 if ($qtde_registros > 0 ) {
     echo "Será enviado emails para ".$qtde_registros." LANs contendo saldo menor que o mínimo".PHP_EOL;
     while ( $row = pg_fetch_array($rs) ) {

@@ -384,7 +384,7 @@ if ($BtnSearch) {
     //echo "felipe: " . $sql;
 
     $resid_count = SQLexecuteQueryParams($sql, $sql_params_main);
-    $total_table = pg_num_rows($resid_count);
+    $total_table = (($resid_count) ? pg_num_rows($resid_count) : 0);
 
     $qtde_geral = 0;
     $valor_geral = 0;

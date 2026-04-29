@@ -1387,7 +1387,7 @@ function get_ncadastros_old($query_channel, $extra_where, $smode) {
 	}
 //echo "$query_channel -> sql: $sql<br>";
 	$vendas_estado = SQLexecuteQuery($sql);
-	$ncadastros = pg_num_rows($vendas_estado);
+	$ncadastros = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 //echo "ncadastros: $ncadastros<br>";
 
 	return $ncadastros;

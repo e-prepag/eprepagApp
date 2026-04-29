@@ -1557,7 +1557,7 @@ if($vg_concilia == 1){ ?>
 			$sql .= "where (dep_banco = bco_codigo) and (bco_rpp = 1) and dep_aprovado = 0 and dep_banco = '".$vg_pagto_banco."' ";
 			$sql .= " and dep_valor = " . $vg_pagto_valor_pago. " and dep_conta != '20.459-5' and dep_conta != '1689-6'";
 			$rs_dep = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_dep);
+			$total_table = (($rs_dep) ? pg_num_rows($rs_dep) : 0);
 			$sql .= " order by " . $ncamp . " " . ((isset($ordem) &&$ordem == 1)?"asc":"desc");
 			$sql .= " limit " . $max . " offset " . $inicial;
 			$rs_dep = SQLexecuteQuery($sql);
@@ -1610,7 +1610,7 @@ if($vg_concilia == 1){ ?>
 			$sql .= "where (bol_banco = bco_codigo) and (bco_rpp = 1) and bol_aprovado = 0 and bol_banco = '".$vg_pagto_banco."' ";
 			//$sql .= " and bol_documento like '8___" . substr($vg_pagto_num_docto, 4) . "%'";
 			$rs_bol = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_bol);
+			$total_table = (($rs_bol) ? pg_num_rows($rs_bol) : 0);
 			$sql .= " order by " . $ncamp . " " . ((isset($ordem) &&$ordem == 1)?"asc":"desc");
 			$sql .= " limit " . $max ;
             if(isset($inicial)){
@@ -1663,7 +1663,7 @@ if($vg_concilia == 1){ ?>
 			$sql .= "from tb_venda_games_redecard vgrc ";
 			$sql .= "where vgrc.vgrc_aprovado = 0 and vgrc.vgrc_ret4_codret = '0' and vgrc.vgrc_vg_id = ".$venda_id;
 			$rs_redecard = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_redecard);
+			$total_table = (($rs_redecard) ? pg_num_rows($rs_redecard) : 0);
 			$sql .= " order by " . $ncamp . " " . ($ordem == 1?"asc":"desc");
 			$sql .= " limit " . $max . " offset " . $inicial;
 			$rs_redecard = SQLexecuteQuery($sql);

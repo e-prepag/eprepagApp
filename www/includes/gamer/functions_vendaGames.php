@@ -51,28 +51,28 @@ if (!function_exists('isPgResultSafe')) {
 if (!function_exists('pgNumRowsSafe')) {
         function pgNumRowsSafe($result)
         {
-                return isPgResultSafe($result) ? \pg_num_rows($result) : 0;
+                return isPgResultSafe($result) ? pg_num_rows($result) : 0;
         }
 }
 
 if (!function_exists('pgFetchArraySafe')) {
         function pgFetchArraySafe($result)
         {
-                return isPgResultSafe($result) ? \pg_fetch_array($result) : false;
+                return isPgResultSafe($result) ? pg_fetch_array($result) : false;
         }
 }
 
 if (!function_exists('pgFetchAssocSafe')) {
         function pgFetchAssocSafe($result)
         {
-                return isPgResultSafe($result) ? \pg_fetch_assoc($result) : false;
+                return isPgResultSafe($result) ? pg_fetch_assoc($result) : false;
         }
 }
 
 if (!function_exists('pgAffectedRowsSafe')) {
         function pgAffectedRowsSafe($result)
         {
-                return isPgResultSafe($result) ? \pg_affected_rows($result) : 0;
+                return isPgResultSafe($result) ? pg_affected_rows($result) : 0;
         }
 }
 

@@ -268,7 +268,7 @@ order by dia desc,
 //echo $sql.PHP_EOL.PHP_EOL;
 
 $rs = SQLexecuteQuery($sql);
-$n_updates = pg_num_rows($rs);
+$n_updates = (($rs) ? pg_num_rows($rs) : 0);
 echo "Encontrado".(($n_updates>1)?"s":"")." : ".$n_updates." Registro".(($n_updates>1)?"s":"")." para serem verifidos e atualizados".PHP_EOL.PHP_EOL;
 
 if(!$rs || pg_num_rows($rs) == 0) {
@@ -284,7 +284,7 @@ if(!$rs || pg_num_rows($rs) == 0) {
                     and fp_date = '".$rs_row['dia']."' ;";
             //echo($sql);
             $rs_existe = SQLexecuteQuery($sql);
-            $n_existente  = pg_num_rows($rs_existe);
+            $n_existente  = (($rs_existe) ? pg_num_rows($rs_existe) : 0);
             //Verificando se existe o registro
             if($n_existente == 1) {
                 $sql = "
@@ -325,7 +325,7 @@ if(!$rs || pg_num_rows($rs) == 0) {
  ***********************************************************************/
 $sql = "SELECT opr_nome, opr_codigo, opr_vinculo_empresa, substring(opr_data_inicio_operacoes::varchar from 1 for 19) as data_inicio, opr_internacional_alicota FROM operadoras;";
 $rs_publishers = SQLexecuteQuery($sql);
-$n_publishers = pg_num_rows($rs_publishers);
+$n_publishers = (($rs_publishers) ? pg_num_rows($rs_publishers) : 0);
 echo PHP_EOL.$sql.PHP_EOL.PHP_EOL."Número total de Publisher Selecionados ".$n_publishers.PHP_EOL.PHP_EOL;
 
 //Verificando se retornou ao menos 1 Publisher
@@ -377,7 +377,7 @@ if($n_publishers > 0) {
             $sql = "SELECT substring(otni_data::varchar from 1 for 19) as data_transferencia,otni_origem,otni_destino FROM operadoras_troca_nacional_internacional WHERE opr_codigo = ".$rs_publishers_row['opr_codigo']." ORDER BY otni_data;";
             echo "Verificando se teve movimentação de Internacional para nacional e vice-versa para o Publisher [".$rs_publishers_row['opr_codigo']."]:".PHP_EOL.$sql.PHP_EOL;
             $rs_TrocaNacionalInternacional = SQLexecuteQuery($sql);
-            if(pg_num_rows($rs_TrocaNacionalInternacional) > 0) {
+            if((($rs_TrocaNacionalInternacional) ? pg_num_rows($rs_TrocaNacionalInternacional) : 0) > 0) {
                 echo "** Publisher [".$rs_publishers_row['opr_codigo']."] POSSUI TROCA ".PHP_EOL;
                 $data_anterior = null;
                 while($rs_TrocaNacionalInternacional_row = pg_fetch_array($rs_TrocaNacionalInternacional)) {
@@ -433,7 +433,7 @@ if($n_publishers > 0) {
                     }//end do else do do elseif($rs_TrocaNacionalInternacional_row['otni_origem'] == 0 && $rs_TrocaNacionalInternacional_row['otni_destino'])
                     $data_anterior = $rs_TrocaNacionalInternacional_row['data_transferencia'];
                 }//end while
-            }//end if(pg_num_rows($rs_TrocaNacionalInternacional) > 0)
+            }//end if((($rs_TrocaNacionalInternacional) ? pg_num_rows($rs_TrocaNacionalInternacional) : 0) > 0)
             else {
                 echo "** Publisher [".$rs_publishers_row['opr_codigo']."] NÃO Possui Troca ".PHP_EOL;
                 //Publisher Internacional
@@ -450,7 +450,7 @@ if($n_publishers > 0) {
                     $rs_updateTrocaNacionalInternacional = SQLexecuteQuery($sql);
                     if(!$rs_updateTrocaNacionalInternacional) echo "Erro ao Atualizar ao Marcar a Nacionalidade do Publisher [".$rs_publishers_row['opr_codigo']."] para Todos os Tempos".PHP_EOL;
                 }//end else do if($rs_publishers_row['opr_internacional_alicota'] > 0)
-            }//end else do if(pg_num_rows($rs_TrocaNacionalInternacional) > 0)
+            }//end else do if((($rs_TrocaNacionalInternacional) ? pg_num_rows($rs_TrocaNacionalInternacional) : 0) > 0)
         }//end else do if($rs_publishers_row['opr_vinculo_empresa'] == 0)
         echo str_repeat('-',80).PHP_EOL;
     }//end while

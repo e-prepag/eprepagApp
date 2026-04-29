@@ -1824,7 +1824,7 @@ pin
                                                                         $rs = SQLexecuteQuery($sql);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
-                                                                                $qtde = pg_num_rows($rs);  //$rs_row['qtde'];
+                                                                                $qtde = (($rs) ? pg_num_rows($rs) : 0);  //$rs_row['qtde'];
                                                                         }
                                                                         // for Debug
                                                                         $mensagem = "In getNVendasMoney(): " .

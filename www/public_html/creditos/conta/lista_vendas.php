@@ -105,7 +105,7 @@ validaSessao();
 				)
 				) as vendas ";
 		$rs_total = SQLexecuteQuery($sql);
-		if($rs_total) $registros_total = pg_num_rows($rs_total);
+		if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 		$sql .= " order by vg_data_inclusao desc " .
 				" offset " . ($p - 1) * $registros . " limit " . $registros;
 		//echo $sql."<br>";
@@ -184,7 +184,7 @@ if(bRelatorioVendasComOperadores($usuarioGames->getLogin()) && ($rs_vendas_row['
 //echo "$sql_operador<br>\n";
 				$rs_operador = SQLexecuteQuery($sql_operador);
 
-				if($rs_operador && pg_num_rows($rs_operador ) > 0) {
+				if($rs_operador && pg_num_rows($rs_operador) > 0) {
 					$pg_operador = pg_fetch_array($rs_operador);
 					$ugo_id		= $pg_operador['ugo_id'];
 					$ugo_login	= $pg_operador['ugo_login'];

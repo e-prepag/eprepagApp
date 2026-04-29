@@ -2078,14 +2078,14 @@ Comentado por nao usar
                     $rs_djx = SQLexecuteQueryParams($sql_djx, $params);
 
                     $dadosTotais_djx = pg_fetch_all($rs_djx);
-                    $count_registers = pg_num_rows($rs_djx);
+                    $count_registers = (($rs_djx) ? pg_num_rows($rs_djx) : 0);
 
                     if ($count_registers > 0) {
 
                         /*$sql_testa_pdv = "SELECT * FROM dist_usuario_games where ug_id = ".$controller->usuario->getId().";";
 		$rs_djx2 = SQLexecuteQuery($sql_testa_pdv);
 		$dados_pdv_djx = pg_fetch($rs_djx2);
-		$count_pdv_registers = pg_num_rows($rs_djx2);
+		$count_pdv_registers = (($rs_djx2) ? pg_num_rows($rs_djx2) : 0);
 		
 		$cabecalho_adicional_caso_pdv = "";
 		

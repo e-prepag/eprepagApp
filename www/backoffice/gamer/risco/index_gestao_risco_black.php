@@ -26,7 +26,7 @@ if (b_IsBKOUsuarioAdminGestaodeRisco()) {
 		$sql = "select * from usuarios_games_black_list where ug_id = " . $ug_id;
 		$rs_log = SQLexecuteQuery($sql);
 		if ($rs_log) {
-			if (pg_num_rows($rs_log) > 0) {
+			if ((($rs_log) ? pg_num_rows($rs_log) : 0) > 0) {
 				$retorno = true;
 			}
 		}
@@ -114,7 +114,7 @@ if (b_IsBKOUsuarioAdminGestaodeRisco()) {
 			$shn_login					= $rs_black_list_row['shn_login'];
 			$ugbl_data_ultima_alteracao	= $rs_black_list_row['ugbl_data_ultima_alteracao'];
 			$ug_id						= $rs_black_list_row['ug_id'];
-			if (pg_num_rows($rs_black_list) > 0)
+			if ((($rs_black_list) ? pg_num_rows($rs_black_list) : 0) > 0)
 				include 'gestao_risco_black_edt.php';
 			else
 				$acao = 'listar';

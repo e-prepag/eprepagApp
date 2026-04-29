@@ -384,7 +384,7 @@ if(b_IsUsuarioWagner()) {
 //echo "(R) ".str_replace("\n", "\n<br>", $estat)."<br>";
 }
 		$res_count = SQLexecuteQueryParams($estat, $estat_params);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	
 
 /*
@@ -674,7 +674,7 @@ $(function(){
                                 <option value=""><?php echo LANG_PINS_ALL_VALUES; ?></option>
 <?php 
                         if($resval) {
-						    $num_rows = pg_num_rows($resval);
+						    $num_rows = (($resval) ? pg_num_rows($resval) : 0);
 						    for($i = 0; $i < $num_rows; $i++) {
 						        $resval_row = pg_fetch_array($resval, $i);
 						        if($resval_row["valor"] > 0) {

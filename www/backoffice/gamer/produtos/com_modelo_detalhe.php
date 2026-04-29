@@ -303,7 +303,7 @@ ob_end_flush();
                 <option value="">Selecione</option>
                 <?php
                 if ($rs_pins_opr) {
-                  $num_rows = pg_num_rows($rs_pins_opr);
+                  $num_rows = (($rs_pins_opr) ? pg_num_rows($rs_pins_opr) : 0);
                   for ($i = 0; $i < $num_rows; $i++) {
                     $rs_pins_opr_row = pg_fetch_array($rs_pins_opr, $i);
                 ?>

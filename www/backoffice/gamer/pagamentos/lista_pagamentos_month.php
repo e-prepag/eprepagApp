@@ -135,7 +135,7 @@ require_once $raiz_do_projeto."includes/functionsPagamento.php";
 //}
 
 		$rs_total = SQLexecuteQuery($sql);
-		if($rs_total) $registros_total = pg_num_rows($rs_total);
+		if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 
 		$rs_transacoes = SQLexecuteQuery($sql);
 		if(!$rs_transacoes || pg_num_rows($rs_transacoes) == 0) {
@@ -271,7 +271,7 @@ require_once $raiz_do_projeto."includes/functionsPagamento.php";
 						<?php 
 							$n_usuarios = 0;
 							if($rs_transacoes_nomes && pg_num_rows($rs_transacoes_nomes) > 0) {
-								$n_usuarios = pg_num_rows($rs_transacoes_nomes);
+								$n_usuarios = (($rs_transacoes_nomes) ? pg_num_rows($rs_transacoes_nomes) : 0);
 								while($rs_transacoes_nomes_row = pg_fetch_array($rs_transacoes_nomes)){ 
 									?>
 									<option value='<?php echo $rs_transacoes_nomes_row['cliente_nome'] ?>'<?php echo (($tf_v_usuario==$rs_transacoes_nomes_row['cliente_nome'])?" selected":"") ?>><?php echo $rs_transacoes_nomes_row['cliente_nome']." (".$rs_transacoes_nomes_row['n'].")"; ?></option>
