@@ -2437,18 +2437,6 @@ function PagamentoNumeroMaximoPIN() {
                                                                         return $sret;
                                                                 }
 
-                                                                // function getSingleValue($sql)
-                                                                // {
-
-                                                                //         $ret = null;
-                                                                //         $rs = SQLexecuteQuery($sql);
-                                                                //         if ($rs && pg_num_rows($rs) > 0) {
-                                                                //                 $rs_row = pg_fetch_array($rs);
-                                                                //                 $ret = $rs_row[0];
-                                                                //         }
-                                                                //         return $ret;
-                                                                // }
-
                                                                 //Funï¿½ï¿½o de Conversï¿½o da data
                                                                 function converteData($data_nasc)
                                                                 {

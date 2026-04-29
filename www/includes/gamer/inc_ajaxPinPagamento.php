@@ -36,8 +36,21 @@ function RetonaTamanhoPINEPPCASH($pin)
 		$chave256bits = new Chave();
 		$aes = new AES($chave256bits->retornaChave());
 		//Teste existencia na tabela de exceção de gocash com tamanho de 16
-		$sql = "select * from pins_gocash_lote16 where pgcl_pin_number_encrypt = '" . base64_encode($aes->encrypt(addslashes($pin))) . "'";
-		$rs_pins_gocash = SQLexecuteQuery($sql);
+		// 1. Processamento da criptografia no PHP
+		$pin_criptografado = base64_encode($aes->encrypt(addslashes($pin)));
+
+		// 2. Definição da Query com placeholder
+		$sql = "
+			SELECT * FROM pins_gocash_lote16 
+			WHERE pgcl_pin_number_encrypt = $1
+		";
+
+		$params = [
+			(string)$pin_criptografado
+		];
+
+		// 3. Execução segura
+		$rs_pins_gocash = SQLexecuteQueryParams($sql, $params);
 		if ($rs_pins_gocash && pg_num_rows($rs_pins_gocash) == 0) {
 			return true;
 		} else {
@@ -120,56 +133,79 @@ function RetonaComposicaoPagamento($valor_compra, $valor_saldo, $valor_carrinho_
 //Função que retorna o SQL para depósito em saldo do resto de PIN
 function RetonaSQLVendaDeposito($vetor)
 {
-	//Variáveis necessárias para detecção de origem Drupal da prdem
-	$varDrupal = $GLOBALS['_SESSION']['drupal_order_id'] * 1 + $GLOBALS['_SESSION']['drupal_deposit'] * 1;
-	//A multiplicação por 100 é apneas um artefato para resolver a divisão inicial do EPP CASH por 100
+	// Variáveis de detecção Drupal
+	$isDrupal = ($GLOBALS['_SESSION']['drupal_order_id'] * 1 + $GLOBALS['_SESSION']['drupal_deposit'] * 1) > 0;
+
 	$valorEPPCASH = $vetor['VALOR_DEP'] * 100;
 	$valorMoeda = (new ConversionPINsEPP)->get_Valor('E', $valorEPPCASH);
 
-	$sql_credito_venda = "insert into tb_venda_games (" .
-		"vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, " .
-		"vg_ultimo_status, vg_ultimo_status_obs, vg_http_referer_origem, vg_http_referer," .
-		"vg_concilia, vg_data_concilia, vg_pagto_data, vg_pagto_data_inclusao," .
-		"vg_deposito_em_saldo, vg_valor_eppcash,";
-	// Marcando ordem como de origem Drupal
-	if ($varDrupal > 0) {
-		$sql_credito_venda .= " vg_drupal,";
-	} //end if($varDrupal > 0)
+	// 1. Montagem das colunas
+	$columns = [
+		"vg_id",
+		"vg_ug_id",
+		"vg_data_inclusao",
+		"vg_pagto_tipo",
+		"vg_ultimo_status",
+		"vg_ultimo_status_obs",
+		"vg_http_referer_origem",
+		"vg_http_referer",
+		"vg_concilia",
+		"vg_data_concilia",
+		"vg_pagto_data",
+		"vg_pagto_data_inclusao",
+		"vg_deposito_em_saldo",
+		"vg_valor_eppcash"
+	];
 
-	$sql_credito_venda .= " vg_deposito_em_saldo_valor) values (";
+	if ($isDrupal) {
+		$columns[] = "vg_drupal";
+	}
 
-	$sql_credito_venda .= SQLaddFields($vetor['NOVO_ID'], "") . ",";
-	$sql_credito_venda .= SQLaddFields($vetor['UG_ID'], "") . ",";
-	$sql_credito_venda .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-	$sql_credito_venda .= SQLaddFields($GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC'], "") . ",";
+	$columns[] = "vg_deposito_em_saldo_valor";
 
-	$sql_credito_venda .= SQLaddFields($GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'], "") . ",";
-	$sql_credito_venda .= SQLaddFields("Depósito em Saldo de resto de pagamento com PINs EPP Cash", "s") . ", ";
-	$sql_credito_venda .= SQLaddFields($GLOBALS['_SESSION']['epp_origem'], "s") . ", ";
-	$sql_credito_venda .= SQLaddFields($GLOBALS['_SESSION']['epp_origem_referer'], "s") . ", ";
+	// 2. Preparação dos parâmetros (Data)
+	$params = [
+		(int)$vetor['NOVO_ID'],                                  // $1
+		(int)$vetor['UG_ID'],                                    // $2
+		(int)$GLOBALS['PAGAMENTO_PIN_EPREPAG_NUMERIC'],          // $3
+		(int)$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'],        // $4
+		"Depósito em Saldo de resto de pagamento com PINs EPP Cash", // $5
+		(string)$GLOBALS['_SESSION']['epp_origem'],              // $6
+		(string)$GLOBALS['_SESSION']['epp_origem_referer'],      // $7
+		(float)$valorEPPCASH                                     // $8
+	];
 
-	$sql_credito_venda .= SQLaddFields("1", "") . ",";
-	$sql_credito_venda .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-	$sql_credito_venda .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-	$sql_credito_venda .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
+	if ($isDrupal) {
+		$params[] = 1; // Valor para vg_drupal ($9 se Drupal ativo)
+	}
 
-	$sql_credito_venda .= SQLaddFields("1", "") . ",";
-	$sql_credito_venda .= SQLaddFields($valorEPPCASH, "") . ",";
-	// Marcando ordem como de origem Drupal
-	if ($varDrupal > 0) {
-		$sql_credito_venda .= SQLaddFields("1", "") . ",";
-	} //end if($varDrupal > 0)
-	$sql_credito_venda .= SQLaddFields($valorMoeda, "") . ")";
+	$params[] = (float)$valorMoeda; // Último parâmetro
 
-	//retornando o SQL montado
-	return $sql_credito_venda;
+	// 3. Montagem dos placeholders ($1, $2, $3...)
+	$placeholders = [];
+	$pCount = 1;
+
+	// Mapeamento manual para conciliar com CURRENT_TIMESTAMP que não é parâmetro
+	$valString = "$1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, $7, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, $8";
+
+	$nextIdx = 9;
+	if ($isDrupal) {
+		$valString .= ", $" . $nextIdx;
+		$nextIdx++;
+	}
+
+	$valString .= ", $" . $nextIdx;
+
+	$sql = "INSERT INTO tb_venda_games (" . implode(", ", $columns) . ") VALUES (" . $valString . ")";
+
+	return ['sql' => $sql, 'params' => $params];
 } //end function RetonaSQLVendaDeposito($vetor)
 
 //Função que executa o depósito de gocash no saldo
 function deposita_em_saldo($vetor, &$msg2)
 {
-	$sql_credito_venda = RetonaSQLVendaDeposito($vetor);
-	$ret_venda = SQLexecuteQuery($sql_credito_venda);
+	$res = RetonaSQLVendaDeposito($vetor);
+	$ret_venda = SQLexecuteQueryParams($res['sql'], $res['params']);
 	if (!$ret_venda) {
 		$msg2 .= "Erro ao inserir venda de crédito no saldo. Por favor, tente novamente atualizando a página. Obrigado 214-EPP.\n";
 		gravaLog_EPPCASH($msg2);
@@ -177,15 +213,51 @@ function deposita_em_saldo($vetor, &$msg2)
 	} else {
 		$orderId = get_newOrderID();
 		$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-		$sql_credito = "INSERT INTO tb_pag_compras (numcompra, idvenda, cliente_nome, idcliente, tipo_cliente, frete, manuseio, taxas, subtotal, cesta, tipoPagto, prazo, numParcelas, valorParcela, total, dataInicio, status, iforma, banco, tipo_deposito, status_processed, datacompra, dataconfirma, valorpagtogocash, valorpagtopin, idvenda_origem) values ('" . $orderId . "'," . $vetor['NOVO_ID'] . ", '" . $usuarioGames->ug_sNome . "', " . $usuarioGames->ug_id . ", 'M', 0, 0, 0, 0, 'Depósito em Saldo com Resto de PIN Cash C (13)', 0, 0, 0, 0, " . ((new ConversionPINsEPP)->get_Valor('E', number_format(($vetor['VALOR_DEP'] * 100), 0, ',', '')) * 100) . ", CURRENT_TIMESTAMP, 3, '" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG'] . "', '" . $GLOBALS['PAGAMENTO_PIN_EPP_COD_BANCO'] . "', ";
-		if ($vetor['ID_ORIGEM'] == 0) {
-			//$GLOBALS['TIPO_DEPOSITO']['DEPOSITO_DIRETO_COM_PAGAMENTO'] é colocado para identificar como deposito direto por conta do rollback da transação e deposito em saldo somente do gocash
-			$sql_credito .= $GLOBALS['TIPO_DEPOSITO']['DEPOSITO_DIRETO_COM_PAGAMENTO'];
-		} else {
-			$sql_credito .= $GLOBALS['TIPO_DEPOSITO']['DEPOSITO_RESTO_PINS'];
-		}
-		$sql_credito .= ", 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " . number_format($vetor['VALOR_GOCASH'], 2, '.', '') . ", " . number_format($vetor['VALOR_EPPCASH'], 2, '.', '') . ", " . $vetor['ID_ORIGEM'] . ")";
-		$ret = SQLexecuteQuery($sql_credito);
+
+		$valorTotalCalculado = (new ConversionPINsEPP)->get_Valor(
+			'E',
+			number_format(($vetor['VALOR_DEP'] * 100), 0, ',', '')
+		) * 100;
+
+		$tipoDeposito = ($vetor['ID_ORIGEM'] == 0)
+			? $GLOBALS['TIPO_DEPOSITO']['DEPOSITO_DIRETO_COM_PAGAMENTO']
+			: $GLOBALS['TIPO_DEPOSITO']['DEPOSITO_RESTO_PINS'];
+
+
+		$sql_credito = "
+			INSERT INTO tb_pag_compras (
+				numcompra, idvenda, cliente_nome, idcliente, tipo_cliente, 
+				frete, manuseio, taxas, subtotal, cesta, 
+				tipoPagto, prazo, numParcelas, valorParcela, total, 
+				dataInicio, status, iforma, banco, tipo_deposito, 
+				status_processed, datacompra, dataconfirma, 
+				valorpagtogocash, valorpagtopin, idvenda_origem
+			) VALUES (
+				$1, $2, $3, $4, 'M', 
+				0, 0, 0, 0, 'Depósito em Saldo com Resto de PIN Cash C (13)', 
+				0, 0, 0, 0, $5, 
+				CURRENT_TIMESTAMP, 3, $6, $7, $8, 
+				1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 
+				$9, $10, $11
+			)
+		";
+
+
+		$params = [
+			(string)$orderId,                                    // $1
+			(int)$vetor['NOVO_ID'],                             // $2
+			(string)$usuarioGames->ug_sNome,                    // $3
+			(int)$usuarioGames->ug_id,                          // $4
+			(float)$valorTotalCalculado,                        // $5
+			(string)$GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_PIN_EPREPAG'], // $6
+			(string)$GLOBALS['PAGAMENTO_PIN_EPP_COD_BANCO'],    // $7
+			(int)$tipoDeposito,                                 // $8
+			(float)number_format($vetor['VALOR_GOCASH'], 2, '.', ''), // $9
+			(float)number_format($vetor['VALOR_EPPCASH'], 2, '.', ''), // $10
+			(int)$vetor['ID_ORIGEM']                            // $11
+		];
+
+		$ret = SQLexecuteQueryParams($sql_credito, $params);
 		if (!$ret) {
 			$msg2 .= "Erro ao inserir compra de crédito no saldo. Por favor, tente novamente atualizando a página. Obrigado 217.\n";
 			gravaLog_EPPCASH($msg2);
@@ -202,7 +274,7 @@ function deposita_gocash_rollback($vetor, $a_pins_gocash, &$valor_saldo_rollback
 {
 	//Inicia transacao
 	$sql = "BEGIN TRANSACTION ";
-	$ret = SQLexecuteQuery($sql);
+	$ret = SQLexecuteQueryParams($sql, null);
 	if (!$ret) $msg2 = "<font color='#FF0000'><b>Erro ao iniciar transa&cceil;&atilde;o.\n</b></font><br>";
 	$valor_saldo_rollback_tmp = $valor_saldo_rollback;
 	if ($msg2 == "") {
@@ -238,9 +310,19 @@ function deposita_gocash_rollback($vetor, $a_pins_gocash, &$valor_saldo_rollback
 				if (!insereRegistro_tb_venda_games_pinepp_origem($maior, $vetor['NOVO_ID'])) {
 					$msg2 .= "<font color='#FF0000'><b>Erro ao inserir o Registro do Canal Venda PIN Cash (" . $maior['canal'] . ").\n</b></font><br>";
 				} else {
-					$sql = "UPDATE usuarios_games SET ug_perfil_saldo=" . $valor_saldo_rollback . " where ug_id=" . intval($usuarioGames->ug_id);
+					$sql = "
+						UPDATE usuarios_games 
+						SET ug_perfil_saldo = $1 
+						WHERE ug_id = $2
+					";
 					gravaLog_EPPCASH("SQL que atualiza registro do usuario na tabela usuarios_games (ROLLBACK):\n$sql");
-					$rs_saldo = SQLexecuteQuery($sql);
+
+					$params = [
+						(float)$valor_saldo_rollback, // $1
+						(int)$usuarioGames->ug_id     // $2
+					];
+
+					$rs_saldo = SQLexecuteQueryParams($sql, $params);
 					if (!$rs_saldo) {
 						$msg2 .= "<font color='#FF0000'><b>Erro ao atualizar o Saldo do Usu&aacute;rio .\n</b></font><br>";
 					} //end if(!$rs_saldo)
@@ -257,12 +339,12 @@ function deposita_gocash_rollback($vetor, $a_pins_gocash, &$valor_saldo_rollback
 	} //end if($msg2 == "")
 	if ($msg2 == "") {
 		$sql = "COMMIT TRANSACTION ";
-		$ret = SQLexecuteQuery($sql);
+		$ret = SQLexecuteQueryParams($sql, null);
 		if (!$ret) $msg2 .= "<font color='#FF0000'><b>Erro ao comitar transa&ccedil;&atilde;o do rollback.\n<br></b></font><br>";
 		else return true;
 	} else {
 		$sql = "ROLLBACK TRANSACTION ";
-		$ret = SQLexecuteQuery($sql);
+		$ret = SQLexecuteQueryParams($sql, null);
 		if (!$ret) $msg2 .= "<font color='#FF0000'><b>Erro ao dar rollback no rollback na transa&ccedil;&atilde;o.\n<br></b></font><br>";
 		else {
 			if ($valor_saldo_rollback_tmp != $valor_saldo_rollback) {
@@ -489,8 +571,8 @@ function valida_pin($cod_pin, $geralog = null)
 
 		$ff = fopen("/www/arquivos_gerados/logs/erroFile.txt", "a+");
 		if ($ff) {
-		fwrite($ff, $sql . date('Y-m-d H:i:s') . "\r");
-		fclose($ff);
+			fwrite($ff, $sql . date('Y-m-d H:i:s') . "\r");
+			fclose($ff);
 		}
 
 		$rs_oper = SQLexecuteQuery($sql);
@@ -536,8 +618,8 @@ function valida_vencimento_pin($cod_pin, $geralog = null)
 
 			$ff = fopen("/www/arquivos_gerados/logs/erroFile.txt", "a+");
 			if ($ff) {
-			fwrite($ff, $sql . date('Y-m-d H:i:s') . "\r");
-			fclose($ff);
+				fwrite($ff, $sql . date('Y-m-d H:i:s') . "\r");
+				fclose($ff);
 			}
 
 			$rs_oper = SQLexecuteQuery($sql);

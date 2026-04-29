@@ -187,15 +187,3 @@ function get_venda_pagto_com_saldo_composicao($venda_id)
 }
 
 
-// function get_db_single_value($sql)
-// {
-// 	$val = 0;
-// 	if (!$sql) {
-// 		return $val;
-// 	}
-// 	$res = SQLexecuteQuery($sql);
-// 	if ($pg = pg_fetch_array($res)) {
-// 		$val = $pg[0];
-// 	}
-// 	return $val;
-// }
