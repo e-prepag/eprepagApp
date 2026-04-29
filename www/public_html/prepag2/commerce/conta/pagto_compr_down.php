@@ -37,6 +37,9 @@ header("Content-Disposition: inline; filename=" . $safe_filename);
 
 // O restante do código de leitura agora é seguro
 $handle = fopen($file, "rb");
+if ($handle === false) {
+    die("Erro ao abrir arquivo.");
+}
 print(fread($handle, filesize($file)));
 fclose($handle);
 ob_end_flush(); 

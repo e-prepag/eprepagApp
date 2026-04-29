@@ -493,7 +493,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                             //$stop = true;
                             foreach	($a_total_geral as $key => $val) 
                             {
-                                echo "document.getElementById('opr_".$key."').innerHTML = '".number_format((float)100*$val/$pin_total_valor, 2, ',', '.')."%';\n";
+                                echo "document.getElementById('opr_".$key."').innerHTML = '".number_format((float)100*$val/($pin_total_valor > 0 ? $pin_total_valor : 1), 2, ',', '.')."%';\n";
                             }
                             echo "</script>\n";
 			}

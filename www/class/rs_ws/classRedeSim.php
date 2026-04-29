@@ -535,7 +535,7 @@ if($this->bdebug) echo "Force?: ".(($b_reset)?"YES":"nope")."<br>";
 		}
 
 		// Is it a valid ID?
-		if($id_operadora<=0 || $id_operadora>count($this->a_operadoras)) {
+		if($id_operadora<=0 || $id_operadora>(is_countable($this->a_operadoras) ? count($this->a_operadoras) : 0)) {
 			return array();
 		}
 
@@ -969,7 +969,7 @@ echo "$key => $val (R$ ".$resultReq_SegurosAction['ItemValor']->string[$key].", 
                         }
                         $sret .= "<select class='form-xl' id='planId' name='planId'>\n"; // onChange='javascript:do_change_value();'
 			$sret .= "<option value='-1'>";
-			$sret .= ((count($this->a_valores)>0)?"Selecione o Valor":"Sem valores fixos");
+			$sret .= (((is_countable($this->a_valores) ? count($this->a_valores) : 0)>0)?"Selecione o Valor":"Sem valores fixos");
 			$sret .= "</option>\n";
 			foreach($this->a_valores as $key => $val) {
                             if(!empty($val)) {
