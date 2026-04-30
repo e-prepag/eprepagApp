@@ -87,8 +87,10 @@
 					$arquivo_de_log = "/www/arquivos_gerados/logs/log-favoritos.txt";
 
 					$abre_arquivo = fopen($arquivo_de_log, 'a');
+					if ($abre_arquivo) {
 					fwrite($abre_arquivo, $compila_erro);											
 					fclose($abre_arquivo);
+					}
 				}
 				if(!empty($lista_favoritos)) {
 					foreach ($lista_favoritos as $id => $nome):

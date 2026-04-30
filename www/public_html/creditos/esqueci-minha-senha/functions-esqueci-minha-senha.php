@@ -37,8 +37,10 @@
 		
 		$conteudo = "\n{$divisor}\n\n{$dataHoraAtual} - Nova Solicitação\n{$mensagemLog}\n";
 		
+		if ($handle) {
 		fwrite($handle, $conteudo);
 		fclose($handle);
+		}
 		
 	}
 	
@@ -50,8 +52,10 @@
 		
 		$conteudo = "\n{$divisor}\n\n{$dataHoraAtual} - Nova Solicitação de\n{$mensagemLog}\n";
 		
+		if ($handle) {
 		fwrite($handle, $conteudo);
 		fclose($handle);
+		}
 		
 	}
 	
@@ -63,8 +67,10 @@
 		
 		$conteudo = "\n{$divisor}\n\n{$dataHoraAtual} - {$mensagemLog}\n";
 		
+		if ($handle) {
 		fwrite($handle, $conteudo);
 		fclose($handle);
+		}
 		
 	}
 	

@@ -41,7 +41,7 @@ if(!$arquivoLog->haveFile()) {
 
     if (verificaBloqueiosGamers($minutes, $rs_dados_bloqueios_gamers)) {
         $enviarEmails = true;
-        $msg .= PHP_EOL." Quantidade de usuários Bloqueados: (TOTAL [".pg_num_rows($rs_dados_bloqueios_gamers)."] usuários)<br><br> ".PHP_EOL;
+        $msg .= PHP_EOL." Quantidade de usuários Bloqueados: (TOTAL [".(($rs_dados_bloqueios_gamers) ? pg_num_rows($rs_dados_bloqueios_gamers) : 0)."] usuários)<br><br> ".PHP_EOL;
         $listaIDSDesbloqueio = null;
         while($rs_dados_bloqueios_gamers_row = pg_fetch_array($rs_dados_bloqueios_gamers)) {
                 $msg .=  " ID GAMER: [".$rs_dados_bloqueios_gamers_row['ug_id']."] => Hora Bloqueio: [".substr($rs_dados_bloqueios_gamers_row['maior'],0,19)."] => Limite para desbloqueio < [".substr($rs_dados_bloqueios_gamers_row['limite'],0,19)."] <br> ".PHP_EOL;
@@ -59,7 +59,7 @@ if(!$arquivoLog->haveFile()) {
 
     if (verificaBloqueiosPINs($minutes, $rs_dados_bloqueios_gamers)) {
         $enviarEmails = true;
-        $msg .= PHP_EOL."<br> Quantidade de PINs Bloqueados: (TOTAL [".pg_num_rows($rs_dados_bloqueios_gamers)."] PINs)<br><br> ".PHP_EOL;
+        $msg .= PHP_EOL."<br> Quantidade de PINs Bloqueados: (TOTAL [".(($rs_dados_bloqueios_gamers) ? pg_num_rows($rs_dados_bloqueios_gamers) : 0)."] PINs)<br><br> ".PHP_EOL;
         $listaIDSDesbloqueio = null;
         while($rs_dados_bloqueios_gamers_row = pg_fetch_array($rs_dados_bloqueios_gamers)) {
                 $msg .=  " ID PIN: [".$rs_dados_bloqueios_gamers_row['pin_codinterno']."] => Hora Bloqueio: [".substr($rs_dados_bloqueios_gamers_row['maior'],0,19)."] => Limite para desbloqueio < [".substr($rs_dados_bloqueios_gamers_row['limite'],0,19)."] <br> ".PHP_EOL;
@@ -77,7 +77,7 @@ if(!$arquivoLog->haveFile()) {
 
     if (verificaBloqueiosPINsCards($minutes, $rs_dados_bloqueios_gamers)) {
         $enviarEmails = true;
-        $msg .= PHP_EOL."<br> Quantidade de PINs CARDs Bloqueados: (TOTAL [".pg_num_rows($rs_dados_bloqueios_gamers)."] PINs)<br><br> ".PHP_EOL;
+        $msg .= PHP_EOL."<br> Quantidade de PINs CARDs Bloqueados: (TOTAL [".(($rs_dados_bloqueios_gamers) ? pg_num_rows($rs_dados_bloqueios_gamers) : 0)."] PINs)<br><br> ".PHP_EOL;
         $listaIDSDesbloqueio = null;
         while($rs_dados_bloqueios_gamers_row = pg_fetch_array($rs_dados_bloqueios_gamers)) {
                 $msg .=  " ID PIN CARD: [".$rs_dados_bloqueios_gamers_row['pin_codinterno']."] => Hora Bloqueio: [".substr($rs_dados_bloqueios_gamers_row['maior'],0,19)."] => Limite para desbloqueio < [".substr($rs_dados_bloqueios_gamers_row['limite'],0,19)."] <br> ".PHP_EOL;
@@ -141,7 +141,7 @@ function verificaBloqueiosGamers($minutos,&$rs_dados_bloqueios) {
            // echo "Erro na Query de Levantamento de Desbloqueio Automático de Gamers.<br>".PHP_EOL;
             return false;
         }
-        if(pg_num_rows($rs_dados_bloqueios) == 0) {
+        if((($rs_dados_bloqueios) ? pg_num_rows($rs_dados_bloqueios) : 0) == 0) {
             //echo "Vai retorna Falso. Ou seja, Nï¿½O possui Gamers Bloqueados.<br>";
             return false;
         }//end if(!$rs_dados_bloqueios || pg_num_rows($rs_dados_bloqueios) == 0)
@@ -174,7 +174,7 @@ function verificaBloqueiosPINs($minutos,&$rs_dados_bloqueios) {
            // echo "Erro na Query de Levantamento de Desbloqueio Automático de PINs.<br>".PHP_EOL;
             return false;
         }
-        if(pg_num_rows($rs_dados_bloqueios) == 0) {
+        if((($rs_dados_bloqueios) ? pg_num_rows($rs_dados_bloqueios) : 0) == 0) {
             //echo "Vai retorna Falso. Ou seja, Nï¿½O possui PINs Bloqueados.<br>";
             return false;
         }//end if(!$rs_dados_bloqueios || pg_num_rows($rs_dados_bloqueios) == 0)
@@ -205,7 +205,7 @@ function verificaBloqueiosPINsCards($minutos,&$rs_dados_bloqueios) {
            // echo "Erro na Query de Levantamento de Desbloqueio Automático de PINs.<br>".PHP_EOL;
             return false;
         }
-        if(pg_num_rows($rs_dados_bloqueios) == 0) {
+        if((($rs_dados_bloqueios) ? pg_num_rows($rs_dados_bloqueios) : 0) == 0) {
             //echo "Vai retorna Falso. Ou seja, Nï¿½O possui PINs Bloqueados.<br>";
             return false;
         }//end if(!$rs_dados_bloqueios || pg_num_rows($rs_dados_bloqueios) == 0)

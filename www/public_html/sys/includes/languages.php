@@ -32,6 +32,10 @@ if (!isset($_SESSION['langNome']) || ((!strlen($_SESSION['langNome']) > 0)and(!s
 require_once $raiz_do_projeto.'public_html/sys/includes/language/eprepag_lang_'.$_SESSION['langNome'].'.inc.php';
 //echo "LANG_DIR: ".$_SERVER['DOCUMENT_ROOT'].'\incs\lang\eprepag_lang_'.$_SESSION['langNome'].'.inc.php\n';
 
+if (!defined('CHARSET_NATIVE')) {
+    define('CHARSET_NATIVE', defined('LANG_CHARSET') ? LANG_CHARSET : 'ISO-8859-1');
+}
+
 @$eprepag['charsets'] = array(
     'UTF-8/' => 'UTF-8',
     ''        => CHARSET_NATIVE

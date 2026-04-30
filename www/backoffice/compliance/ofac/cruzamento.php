@@ -1,6 +1,6 @@
 <?php
 set_time_limit(1200);
-ini_set('max_execution_time', 1200);
+// ini_set('max_execution_time', 1200);
 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
@@ -225,7 +225,7 @@ if (isset($_POST["busca"])) {
     <table class="table table-bordered top20">
         <?php
         if (isset($rs) && $rs) {
-            $total_de_registros = pg_num_rows($rs);
+            $total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
             if ($total_de_registros > 0) {
         ?>
                 <thead class="">
@@ -252,7 +252,7 @@ if (isset($_POST["busca"])) {
                         //echo $sql."<br>";
                         $rsEncontrado = SQLexecuteQuery($sql);
                         // Verificando se foi encontrado algum nome
-                        if (isset($rsEncontrado) && pg_num_rows($rsEncontrado) > 0) {
+                        if (isset($rsEncontrado) && (($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) {
                             // Exibindo todas incidencias de nomes
                             while ($rsEncontradoRow = pg_fetch_array($rsEncontrado)) {
                 ?>
@@ -265,17 +265,17 @@ if (isset($_POST["busca"])) {
                                     </tr>
                     <?php
                             } //end while ($rsEncontradoRow = pg_fetch_array($rsEncontrado))
-                        } //end if(pg_num_rows($rsEncontrado) > 0) 
+                        } //end if((($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) 
                     } //end if(!empty(trim($rsRow['ug_nome']))) 
                 } //end while 
-            } //end if(pg_num_rows($rs) > 0)
+            } //end if((($rs) ? pg_num_rows($rs) : 0) > 0)
             else {
                     ?>
                     <tr>
                         <td colspan="3">Nenhum registro encontrado.</td>
                     </tr>
                 <?php
-            } //end else do if(pg_num_rows($rs) > 0) 
+            } //end else do if((($rs) ? pg_num_rows($rs) : 0) > 0) 
         } elseif (isset($rs)) {
                 ?>
                 <tr>

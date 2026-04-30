@@ -90,8 +90,10 @@ if(isset($Submit) && $Submit){
 echo $sql;
 
     $fp=fopen("../../debug.log","ab");
+	if ($fp) {
 	fwrite($fp,"\r\nIn Pins_Qtde Like as:\r\n".$sql."\r\n");
 	fclose($fp);
+	}
 	$resoprbrt = pg_exec($connid, $sql);
 */	
 	$varsel = "&fopr=$fopr&fvalor=$fvalor";
@@ -309,7 +311,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 								$media = $pgmediaopr['quantidade']/7;
 								$nrows++;
 ?>
-                  <td><div align="right"><font color="#<?php echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php echo number_format($media, 2, ',', '.') ?></font></div></td>
+                  <td><div align="right"><font color="#<?php echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php echo number_format((float)$media, 2, ',', '.') ?></font></div></td>
                   <td><div align="right"><font color="#<?php echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php echo floor($pgestat['quantidade'] / $media)?> dia(s)</font></div></td>
 <?php 
 							}
@@ -319,8 +321,8 @@ function GP_popupConfirmMsg(msg) { //v1.0
 				  <td>&nbsp;</td>
                   <td>&nbsp;</td>
 				 <?php 	} ?>
-                  <td><div align="right"><font color="#<?php echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php echo number_format($pgestat['pin_valor'], 2, ',', '.') ?></font></div></td>
-                  <td><div align="right"><font color="#<?php if(isset($corTexto)) echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php if(isset($pgestat['total_face'])) echo number_format($pgestat['total_face'], 2, ',', '.') ?></font></div></td>
+                  <td><div align="right"><font color="#<?php echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php echo number_format((float)$pgestat['pin_valor'], 2, ',', '.') ?></font></div></td>
+                  <td><div align="right"><font color="#<?php if(isset($corTexto)) echo $corTexto ?>" size="2" face="Arial, Helvetica, sans-serif"><?php if(isset($pgestat['total_face'])) echo number_format((float)$pgestat['total_face'], 2, ',', '.') ?></font></div></td>
 <?php
                     if($exclusao){
 ?>
@@ -352,7 +354,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
                   <td bgcolor="#E4E4E4"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><strong><?php echo number_format($pin_total_qtde, 0, ',', '.') ?></strong></font></div></td>
                   <td colspan="11" bgcolor="#E4E4E4"><div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"></font></div>
                     <div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"></font></div>
-                    <div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><strong><?php echo number_format($pin_total_valor, 2, ',', '.') ?></strong></font></div></td>
+                    <div align="right"><font color="#666666" size="2" face="Arial, Helvetica, sans-serif"><strong><?php echo number_format((float)$pin_total_valor, 2, ',', '.') ?></strong></font></div></td>
                 </tr>
 <?php 				
 
@@ -411,7 +413,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 						<td bgcolor="<?php echo $cor1 ?>"><font color="#FF0000" size="2" face="Arial, Helvetica, sans-serif"> 
 						  <?php echo $pgest['opr_nome'] ?></font></td>
 						<td bgcolor="<?php echo $cor1 ?>"><div align="right"><font color="#FF0000" size="2" face="Arial, Helvetica, sans-serif"> 
-							<?php echo number_format($pgest['pin_valor'], 2, ',', '.') ?> </font></div></td>
+							<?php echo number_format((float)$pgest['pin_valor'], 2, ',', '.') ?> </font></div></td>
 					  </tr>
               <?php
                                                 } //end if($rs_count_gamer_row['total_gamer'] == 0 && $rs_count_lan_row['total_lan'] == 0)

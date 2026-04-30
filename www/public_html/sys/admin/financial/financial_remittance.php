@@ -10,7 +10,7 @@ $alicota_epp_adm = array(6.38, 3.5); //6.38;
 
 //incluindo o arquivo do fpdf
 require_once "../../../../includes/constantes.php";
-require_once RAIZ_DO_PROJETO . "public_html/sys/includes/fpdf/fpdf.php";
+require_once __DIR__ . "/../../../../vendor/autoload.php";
 header('Content-type: text/html; charset=UTF-8');
 
 require DIR_INCS . "configuracao.inc";

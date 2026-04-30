@@ -17,7 +17,7 @@ function geraRemessaBradesco() {
 						and bbc.bbc_status = " . $GLOBALS['CORTE_BOLETO_STATUS']['ABERTO'];
         $rs_boletos = SQLexecuteQuery($sql);
         if(!$rs_boletos) $msg = "Erro ao obter boletos.".PHP_EOL;
-        elseif(pg_num_rows($rs_boletos) == 0) $msg = "Nenhum boleto encontrado.".PHP_EOL;
+        elseif((($rs_boletos) ? pg_num_rows($rs_boletos) : 0) == 0) $msg = "Nenhum boleto encontrado.".PHP_EOL;
     }
 
     //Recupera sequencial
@@ -379,7 +379,7 @@ function geraCorte($usuario_id, $periodo_ini = null, $periodo_fim = null, $force
                     )";
         $rs_cortes = SQLexecuteQuery($sql);
         if(!$rs_cortes) $msg = "Erro ao obter cortes já existentes.".PHP_EOL;
-        elseif(pg_num_rows($rs_cortes) != 0)  $msg = "Já existe corte no intervalo do período.".PHP_EOL;
+        elseif((($rs_cortes) ? pg_num_rows($rs_cortes) : 0) != 0)  $msg = "Já existe corte no intervalo do período.".PHP_EOL;
     }
 
     //Inicia transacao
@@ -850,7 +850,7 @@ function atualizaLimiteSugerido($usuario_id, $periodo_ini = null, $periodo_fim =
                         and (vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['PROCESSAMENTO_REALIZADO'] . " or vg_ultimo_status = " . $GLOBALS['STATUS_VENDA']['VENDA_REALIZADA'] . ")";
         $rs_vendas = SQLexecuteQuery($sql);
 			if(!$rs_vendas) $msg = "Erro ao obter a média diária.".PHP_EOL;
-        elseif (pg_num_rows($rs_vendas) != 0) {
+        elseif ((($rs_vendas) ? pg_num_rows($rs_vendas) : 0) != 0) {
             $rs_vendas_row = pg_fetch_array($rs_vendas);
             $venda_media_diaria = $rs_vendas_row['venda_liquida'];
         }

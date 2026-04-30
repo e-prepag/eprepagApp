@@ -309,7 +309,7 @@ echo "$s_ids<hr>";
         if(!$rs_transacoes || pg_num_rows($rs_transacoes) == 0) {
                 $msg = "Nenhum pagamento encontrado.\n";
         } else {
-                $registros_total = pg_num_rows($rs_transacoes);
+                $registros_total = (($rs_transacoes) ? pg_num_rows($rs_transacoes) : 0);
 
                 $total_pagamentos=0;
                 $total_taxas=0;

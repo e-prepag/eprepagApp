@@ -124,7 +124,7 @@ if (true) {	//if(is_Integracao()) {	//
 
 			// Recupera dados do pagamento
 			if ($retCompra) {
-				$nregs = pg_num_rows($retCompra);
+				$nregs = (($retCompra) ? pg_num_rows($retCompra) : 0);
 				if ($nregs == 0) {
 					$codretepp = "3"; // Order not found
 					grava_log_integracao("Integração 'Order not found (Found $nregs registers)' em EPP_NOTIFY: " . date("Y-m-d H:i:s") . "\n  ip_store_id = '" . $integracao_store_id . "', integracao_client_email: $integracao_client_email, ip_order_id = '" . $integracao_order_id . "', ip_amount  = '" . $integracao_amount . "', ip_currency_code = '" . $integracao_currency_code . "', codretepp: '$codretepp'\n");

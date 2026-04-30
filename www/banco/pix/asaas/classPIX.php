@@ -1,5 +1,6 @@
 <?php
 require_once "/www/includes/load_dotenv.php";
+require_once "/www/includes/writeIfPossible.php";
 //Alterando o limeout do PHP para (PIX_TIMEOUT/1000) segundos
 //ini_set('default_socket_timeout', ((PIX_TIMEOUT / 1000) + 5));
 
@@ -71,7 +72,7 @@ class classPIX
         $numCompra = substr($idpedido, 2, 17);
         $sql = "SELECT * FROM tb_pag_pix WHERE numcompra = $1;";
         $rs_teste_existencia = SQLexecuteQueryParams($sql, array($numCompra));
-        if (pg_num_rows($rs_teste_existencia) == 0) {
+        if ((($rs_teste_existencia) ? pg_num_rows($rs_teste_existencia) : 0) == 0) {
             $sql = "INSERT INTO tb_pag_pix( 
                                                 numcompra, 
                                                 cpf_cnpj_pagador, 
@@ -107,16 +108,10 @@ class classPIX
         $resposta = $this->sendJSON($nomeCliente, $cpfCnpj, $valor, $id_pedido, $email);
 
         $logFilePath = "/www/arquivos_gerados/logs/Asaas_PIX.txt";
-        $ff = fopen($logFilePath, "a+");
-
-        if ($ff) {
-            $timestamp = date("Y-m-d H:i:s");
-            $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
-                " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
-            fwrite($ff, $logEntry);
-            fclose($ff);
-
-        }
+        $timestamp = date("Y-m-d H:i:s");
+        $logEntry = "resultado data: " . $timestamp . ", venda_id: " . $id_pedido . ", cpfCnpj: " . $cpfCnpj . ", email: " . $email . ", nomeCliente: " . $nomeCliente .
+            " ---" . json_encode($resposta) . "----" . serialize($resposta) . "\r\n";
+        writeFileIfPossible($logFilePath, $logEntry);
 
         if ($resposta == false) {
             $htmlErro = "
@@ -225,7 +220,7 @@ class classPIX
         $logEntry .= "Response:\n$response\n";
         $logEntry .= "HTTP Status Code: $httpCode\n";
 
-        file_put_contents("/www/arquivos_gerados/logs/Asaas_PIX.txt", $logEntry, FILE_APPEND);
+        writeFileIfPossible("/www/arquivos_gerados/logs/Asaas_PIX.txt", $logEntry);
 
         // Converte a resposta JSON para um array associativo
         $data = json_decode($response, true);

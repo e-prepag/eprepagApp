@@ -13,22 +13,25 @@ $controller->setHeader();
  */
 
 //Recupera carrinho do session
-$carrinho = $_SESSION['carrinho'];
+$carrinho = (isset($_SESSION['carrinho']) && is_array($_SESSION['carrinho'])) ? $_SESSION['carrinho'] : array();
+
+//Acao
+if (!isset($acao) || !$acao) $acao = isset($_REQUEST['acao']) ? $_REQUEST['acao'] : null;
 
 //Produto Modelo
-if (!$mod) $mod = $_POST['mod'];
+if (!isset($mod) || !$mod) $mod = isset($_REQUEST['mod']) ? $_REQUEST['mod'] : null;
 
 //Idjogo
-if (!$codeProd) $codeProd = $_POST['codeProd'];
+if (!isset($codeProd) || !$codeProd) $codeProd = isset($_REQUEST['codeProd']) ? $_REQUEST['codeProd'] : null;
 
-//Valor para p´rodutos de valor variável
-$valor = $_POST['valor'] > 0 ? $_POST['valor'] : 0;
+//Valor para produtos de valor variavel
+$valor = (isset($_REQUEST['valor']) && $_REQUEST['valor'] > 0) ? $_REQUEST['valor'] : 0;
 
 /*    Teste de quantidade de itens   */
 //Captura da quantidade para teste 
-if (!$qtde_nova) {
-    if (isset($_POST['qtde'])) {
-        $qtde_nova = $_POST['qtde'];
+if (!isset($qtde_nova) || !$qtde_nova) {
+    if (isset($_REQUEST['qtde'])) {
+        $qtde_nova = $_REQUEST['qtde'];
     } else {
         $qtde_nova =  1;
     }
@@ -39,10 +42,6 @@ $msg = "";
 $pularTesteInicial = ((isset($GLOBALS['_SESSION']['carrinho']) && count($GLOBALS['_SESSION']['carrinho'])) > 0 ? TRUE : FALSE);
 
 if ($mod && $mod != "" && is_numeric($mod)) {
-    //Acao
-    if (!$acao)
-        $acao = $_POST['acao'];
-
     //Adiciona modelo no carrinho
     //---------------------------------------------------------------
     if ($acao == "a") {

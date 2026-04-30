@@ -1,5 +1,24 @@
 <?php
 
+if (!function_exists('asaasValorEmCentavos')) {
+	function asaasValorEmCentavos($valor)
+	{
+		$valor = trim((string) $valor);
+		$negativo = substr($valor, 0, 1) === '-';
+		if ($negativo) {
+			$valor = substr($valor, 1);
+		}
+
+		$partes = explode('.', $valor, 2);
+		$reais = preg_replace('/\D/', '', $partes[0]);
+		$centavos = isset($partes[1]) ? preg_replace('/\D/', '', $partes[1]) : '';
+		$centavos = substr(str_pad($centavos, 2, '0'), 0, 2);
+
+		$total = ((int) $reais * 100) + (int) $centavos;
+		return $negativo ? -$total : $total;
+	}
+}
+
 $paymentData = (isset($webhookData) && is_array($webhookData)) ? ($webhookData['payment'] ?? array()) : array();
 $originalValue = (isset($paymentData['originalValue']) && is_numeric($paymentData['originalValue'])) ? (string) $paymentData['originalValue'] : null;
 $value = (isset($paymentData['value']) && is_numeric($paymentData['value'])) ? (string) $paymentData['value'] : null;
@@ -9,11 +28,10 @@ $paymentStatus = isset($paymentStatus) ? $paymentStatus : ($paymentData['status'
 
 // Se originalValue nao for nulo, faz a verificacao
 if ($originalValue !== null) {
-	// Soma interestValue ao originalValue caso interestValue nao seja nulo
-	$calculatedValue = bcadd($originalValue, $interestValue, 2);
+	$calculatedValue = asaasValorEmCentavos($originalValue) + asaasValorEmCentavos($interestValue);
 
 	// Comparacao
-	if ($value === null || bccomp($calculatedValue, $value, 2) !== 0) {
+	if ($value === null || $calculatedValue !== asaasValorEmCentavos($value)) {
 		echo "Valores não batem";
 		exit;
 	}
@@ -148,6 +166,7 @@ class RecebeBoleto
 
 		$confirmaConciliacao = ($novoStatus != $antigoStatus) ? "CONCILIADO COM SUCESSO" : "PEDIDO JA CONCILIADO";
 		$file = fopen("/www/arquivos_gerados/logs/log_webhook.txt", "a+");
+		if ($file) {
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 		fwrite($file, "ID VENDA: " . $idVenda . "\n");
@@ -160,6 +179,7 @@ class RecebeBoleto
 		fwrite($file, "AMBIENTE VENDA: " . $this->ambiente . "\n");
 		fwrite($file, str_repeat("*", 50) . "\n");
 		fclose($file);
+		}
 	}
 
 	public function conciliaBoleto($id, $status)
@@ -242,22 +262,26 @@ class RecebeBoleto
 
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
 				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
+				if ($file) {
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");
 				fwrite($file, "VENDA: " . $venda["idvenda"] . "\n");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fclose($file);
+				}
 				echo "e-mail enviado com sucesso";
 			} else {
 				$status = ($retornoEmail == true) ? "OK" : "NOK";
 				$file = fopen("/www/arquivos_gerados/logs/emailwebhook.txt", "a+");
+				if ($file) {
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\n");
 				fwrite($file, "RETORNO DISPARO: " . $status . "\n");
 				fwrite($file, "VENDA: " . $venda["idvenda"] . "\n");
 				fwrite($file, str_repeat("*", 50) . "\n");
 				fclose($file);
+				}
 				echo "erro e-mail";
 			}
 		} else {

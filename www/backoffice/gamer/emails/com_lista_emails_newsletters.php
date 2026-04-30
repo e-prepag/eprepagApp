@@ -138,7 +138,7 @@ require_once "/www/includes/bourls.php";
 			$ret = obter($filtro, null, null, $rs_newsletter);
 				if($ret != "") $msg = $ret;
 				else {
-					$total_table = pg_num_rows($rs_newsletter);
+					$total_table = (($rs_newsletter) ? pg_num_rows($rs_newsletter) : 0);
 				} 
 			} else {
 				$total_table = $total_reg;

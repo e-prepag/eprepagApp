@@ -15,7 +15,7 @@ if (!$con->isConnected()) {
     // retornar os erros: $con->getErrors();
     die('Erro#2');
 }
-$ga = new PHPGangsta_GoogleAuthenticator();
+$ga = new classGoogleAutenticator();
 if (!$_SESSION['secret']) {
     $secret = $ga->createSecret();
     $_SESSION['secret'] = $secret;
@@ -75,7 +75,7 @@ if (!$_SESSION['secret']) {
     }
 }
 $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
-$qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag bko', $secret);
+$qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag bko', $secret);
 ?>
 <div class="col-md-12">
     <ol class="breadcrumb top10">

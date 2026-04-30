@@ -3,8 +3,9 @@
 $bHTML = null;
 $cReturn = PHP_EOL;
 $cSpaces = "    ";
+$remoteAddr = $_SERVER["REMOTE_ADDR"] ?? "";
 
-if ($_SERVER["REMOTE_ADDR"] == "201.93.162.169") {
+if ($remoteAddr == "201.93.162.169") {
     //ini_set('display_errors', 1);
     //ini_set('display_startup_errors', 1);
     //error_reporting(E_ALL);
@@ -15,9 +16,77 @@ require_once "/www/includes/gamer/chave.php";
 require_once "/www/includes/gamer/AES.class.php";
 require_once "/www/class/classGeraPin.php";
 
+if (!function_exists('writePdvLogSafe')) {
+    function writePdvLogSafe($handle, $mensagem)
+    {
+        if (is_resource($handle)) {
+            fwrite($handle, $mensagem);
+        }
+    }
+}
+
+if (!function_exists('closePdvLogSafe')) {
+    function closePdvLogSafe($handle)
+    {
+        if (is_resource($handle)) {
+            fclose($handle);
+        }
+    }
+}
+
+if (!function_exists('pdvArrayValueSafe')) {
+    function pdvArrayValueSafe($array, $key, $default = null)
+    {
+        if (!is_array($array) || !array_key_exists($key, $array)) {
+            return $default;
+        }
+
+        return $array[$key];
+    }
+}
+
+if (!function_exists('isPgResultSafe')) {
+    function isPgResultSafe($result)
+    {
+        return is_resource($result) || (is_object($result) && get_class($result) === 'PgSql\\Result');
+    }
+}
+
+if (!function_exists('pgNumRowsSafe')) {
+    function pgNumRowsSafe($result)
+    {
+        return isPgResultSafe($result) ? pg_num_rows($result) : 0;
+    }
+}
+
+if (!function_exists('pgFetchArraySafe')) {
+    function pgFetchArraySafe($result)
+    {
+        return isPgResultSafe($result) ? pg_fetch_array($result) : false;
+    }
+}
+
+if (!function_exists('pgFetchAssocSafe')) {
+    function pgFetchAssocSafe($result)
+    {
+        return isPgResultSafe($result) ? pg_fetch_assoc($result) : false;
+    }
+}
+
+if (!function_exists('pgAffectedRowsSafe')) {
+    function pgAffectedRowsSafe($result)
+    {
+        return isPgResultSafe($result) ? pg_affected_rows($result) : 0;
+    }
+}
+
 function processaVendaGamesValidacao($venda_id, $usuario_id)
 {
     $msg = "";
+    $qtde_total = 0;
+    $total_geral = 0;
+    $total_desconto = 0;
+    $total_repasse = 0;
 
     //obtem usuario
     if ($msg == "") {
@@ -25,7 +94,7 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
             $usuario_id
         );
         if ($objUsuarioGames == null) {
-            $msg = "Nenhum usuário encontrado." . PHP_EOL;
+            $msg = "Nenhum usuï¿½rio encontrado." . PHP_EOL;
         } else {
             $perfilLimite = $objUsuarioGames->getPerfilLimite();
             $perfilSaldo = $objUsuarioGames->getPerfilSaldo();
@@ -40,14 +109,14 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335a)" . PHP_EOL;
         }
     }
 
     //obtem total repasse
     if ($msg == "") {
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             $valor = $rs_venda_modelos_row["vgm_valor"];
             $qtde = $rs_venda_modelos_row["vgm_qtde"];
             $perc_desconto = $rs_venda_modelos_row["vgm_perc_desconto"];
@@ -76,9 +145,11 @@ function processaVendaGamesValidacao($venda_id, $usuario_id)
 
 function verificaEstoque($venda_id)
 {
-    $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+    $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
-    fwrite($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
+    if ($ff) {
+    writePdvLogSafe($ff, "Chegou no Verifica Estoque " . $venda_id . "\n");
+    }
 
     $msg = "";
 
@@ -90,14 +161,14 @@ function verificaEstoque($venda_id)
                                 inner join operadoras ope on ope.opr_codigo = vgm.vgm_opr_codigo
                                 where vg.vg_id = " . $venda_id;
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335b)" . PHP_EOL;
         }
     }
 
     if ($msg == "") {
         //Verifica cada item de cada produro
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             $vgm_qtde = $rs_venda_modelos_row["vgm_qtde"];
             $vgm_opr_codigo = $rs_venda_modelos_row["vgm_opr_codigo"];
             $vgm_pin_valor = $rs_venda_modelos_row["vgm_pin_valor"];
@@ -116,20 +187,20 @@ function verificaEstoque($venda_id)
                                                         and pin_valor = " .
                     $vgm_pin_valor;
                 $rs_pins = SQLexecuteQuery($sql);
-                if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
+                if (!$rs_pins || pgNumRowsSafe($rs_pins) == 0) {
                     $msg .=
-                        "Não há pin de " .
+                        "Nï¿½o hï¿½ pin de " .
                         number_format($vgm_pin_valor, 2, ",", ".") .
                         " da operadora " .
                         $opr_nome .
                         " em estoque." .
                         PHP_EOL;
                 } else {
-                    $rs_pins_row = pg_fetch_array($rs_pins);
+                    $rs_pins_row = pgFetchArraySafe($rs_pins);
                     $pins_qtde = $rs_pins_row["pins_qtde"];
                     if ($pins_qtde < $vgm_qtde) {
                         $msg .=
-                            "Não há pin de " .
+                            "Nï¿½o hï¿½ pin de " .
                             number_format($vgm_pin_valor, 2, ",", ".") .
                             " da operadora " .
                             $opr_nome .
@@ -141,24 +212,24 @@ function verificaEstoque($venda_id)
         }
     }
 
-    fwrite($ff, "mensagem: " . $msg . "\n");
-    fclose($ff);
+    writePdvLogSafe($ff, "mensagem: " . $msg . "\n");
+    closePdvLogSafe($ff);
 
     return $msg;
 }
 
 function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
 {
-    $pin_ignorados = []; // Lista para armazenar PINs já processados
+    $pin_ignorados = []; // Lista para armazenar PINs jï¿½ processados
 
     do {
-        // Monta a cláusula para ignorar os PINs já verificados
+        // Monta a clï¿½usula para ignorar os PINs jï¿½ verificados
         $ignorar_clausula = "";
         if (!empty($pin_ignorados)) {
             $ignorar_clausula = " AND pin_codigo NOT IN ('" . implode("','", $pin_ignorados) . "')";
         }
 
-        // Consulta para buscar um PIN disponível
+        // Consulta para buscar um PIN disponï¿½vel
         $sql = "SELECT * FROM pins
             WHERE opr_codigo = '" . $vgm_opr_codigo . "'
               AND pin_status = '1'
@@ -173,7 +244,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
         $rs_pins = SQLexecuteQuery($sql);
 
         // Verifica se encontrou algum PIN
-        if (!$rs_pins || pg_num_rows($rs_pins) == 0) {
+        if (!$rs_pins || pgNumRowsSafe($rs_pins) == 0) {
             return [
                 'success' => false,
                 'msg' => "Nenhum pin encontrado ou estoque insuficiente para atender este pedido." . PHP_EOL
@@ -181,33 +252,33 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
         }
 
         // Pega o PIN encontrado
-        $pgpins = pg_fetch_array($rs_pins);
+        $pgpins = pgFetchArraySafe($rs_pins);
 
         if ($pgpins["pin_codigo"] != '0000000000000000' && $pgpins["pin_codigo"] != '1111111111111111' && $pgpins["pin_codigo"] != null && $pgpins["pin_codigo"] != "") {
 
-            // Verifica se o PIN já foi vendido
+            // Verifica se o PIN jï¿½ foi vendido
             $sql = "SELECT * FROM tb_dist_venda_games_modelo_pins vp
             JOIN pins p ON p.pin_codinterno = vp.vgmp_pin_codinterno
             WHERE p.pin_codigo = '" . $pgpins["pin_codigo"] . "'";
 
             $pin_test_duplic = SQLexecuteQuery($sql);
 
-            if ($pin_test_duplic && pg_num_rows($pin_test_duplic) > 0 && $vgm_opr_codigo != 16) {
+            if ($pin_test_duplic && pgNumRowsSafe($pin_test_duplic) > 0 && $vgm_opr_codigo != 16) {
                 if ($bDebug) {
-                    echo "PIN já vendido, procurando o próximo..." . PHP_EOL;
+                    echo "PIN jï¿½ vendido, procurando o prï¿½ximo..." . PHP_EOL;
                 }
 
                 // Adiciona o PIN na lista de ignorados
                 $pin_ignorados[] = $pgpins["pin_codigo"];
             } else {
-                // Retorna o PIN válido
+                // Retorna o PIN vï¿½lido
                 return [
                     'success' => true,
                     'pin' => $pgpins
                 ];
             }
         } else {
-            // Retorna o PIN válido
+            // Retorna o PIN vï¿½lido
             return [
                 'success' => true,
                 'pin' => $pgpins
@@ -216,7 +287,7 @@ function buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug)
     } while (true);
 }
 
-function processaVendaGames($venda_id, $EstabCod, $parametros)
+function processaVendaGames($venda_id, $EstabCod, &$parametros)
 {
     set_time_limit(0);
     global $raiz_do_projeto;
@@ -236,6 +307,14 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
     }
 
     $msg = "";
+    $msgOut = "";
+    $total_venda = 0;
+    $s_info_venda = "";
+    $total_repasse = 0;
+    $vg_ug_id = null;
+    $vg_somente_debito = 0;
+    $produto_selecionado = null;
+    $objUsuarioGames = null;
 
     //Recupera a venda
     if ($msg == "") {
@@ -247,10 +326,10 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         }
 
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -263,7 +342,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 $GLOBALS["STATUS_VENDA"]["AGUARDANDO_PROCESSAMENTO"]
             ) {
                 $msg =
-                    "Venda não esta no status de " .
+                    "Venda nï¿½o esta no status de " .
                     $GLOBALS["STATUS_VENDA_DESCRICAO"][$GLOBALS["STATUS_VENDA"]["AGUARDANDO_PROCESSAMENTO"]] .
                     PHP_EOL;
 
@@ -276,7 +355,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 ) {
                     $parametros["agendamento_acao"] = "cancelar";
                     $parametros["agendamento_acao_obs"] =
-                        "Venda já foi processada." . PHP_EOL;
+                        "Venda jï¿½ foi processada." . PHP_EOL;
                 } elseif (
                     $vg_ultimo_status ==
                     $GLOBALS["STATUS_VENDA"]["VENDA_CANCELADA"]
@@ -333,7 +412,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 PHP_EOL;
         }
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335c)" . PHP_EOL;
         }
     }
@@ -347,7 +426,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         }
         $objUsuarioGames = (new UsuarioGames())->getUsuarioGamesById($vg_ug_id);
         if ($objUsuarioGames == null) {
-            $msg = "Nenhum usuário encontrado." . PHP_EOL;
+            $msg = "Nenhum usuï¿½rio encontrado." . PHP_EOL;
         } else {
             $ug_cel_ddd = $objUsuarioGames->getCelDDD();
             $ug_cel = $objUsuarioGames->getCel();
@@ -376,7 +455,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         }
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -385,7 +464,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         $total_repasse = 0;
         $s_info_venda = "";
         //Realiza uma venda para cada item de cada produto
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             $vgm_id = $rs_venda_modelos_row["vgm_id"];
             $vgm_valor = $rs_venda_modelos_row["vgm_valor"];
             $vgm_qtde = $rs_venda_modelos_row["vgm_qtde"];
@@ -429,7 +508,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
             // Verifique se a consulta foi bem-sucedida e obtemos um recurso de resultado
             if ($verificaExist) {
                 // Extrai o valor da contagem usando pg_fetch_assoc
-                $row = pg_fetch_assoc($verificaExist);
+                $row = pgFetchAssocSafe($verificaExist);
                 $qtde = $row['qtde'];
                 if ($qtde >= $vgm_qtde) {
                     continue;
@@ -446,20 +525,25 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                 }
 
                 if ($vgm_ogp_id == 488) {
-                    $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                    $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
-                    fwrite($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
+                    if ($ff) {
+                    writePdvLogSafe($ff, "Chegou no if" . $vgm_ogp_id . " venda: " . $venda_id . "\n");
 
-                    fclose($ff);
+                    closePdvLogSafe($ff);
+                    }
                     try {
                         $geraPinEpp = new GeraPinVariavel($vgm_pin_valor, 53, 3, 1);
 
                         $pin_codinterno = $geraPinEpp->gerar();
 
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
-                        fwrite($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
-                        fwrite($ff, "VGM_ID: " . $vgm_id . "\n");
+                        if ($ff) {
+                        writePdvLogSafe($ff, "PIN GERADO NESSE CARAI: " . $pin_codinterno . "\n");
+                        writePdvLogSafe($ff, "VGM_ID: " . $vgm_id . "\n");
+                        closePdvLogSafe($ff);
+                        }
 
 
                         $sql =
@@ -499,23 +583,55 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                         if (!$ret)
                             $msg = "Erro ao atualizar tabela de pins." . PHP_EOL;
-                        elseif (pg_affected_rows($ret) > 1)
+                        elseif (pgAffectedRowsSafe($ret) > 1)
                             $msg = "Erro ao atualizar mais de um pin na tabela de pins." . PHP_EOL;
-                        elseif (pg_affected_rows($ret) == 0) {
+                        elseif (pgAffectedRowsSafe($ret) == 0) {
                             $i--;
                             continue;
                         }
-                    } catch (Exception $err) {
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                    } catch (Throwable $err) {
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
 
-                        fwrite($ff, "Gerar PIN deu erro: " . $err->getMessage() . "\n");
+                        if ($ff) {
+                        fwrite(
+                            $ff,
+                            "Gerar PIN deu erro (" .
+                                get_class($err) .
+                                ") venda: " .
+                                $venda_id .
+                                ", vgm_id: " .
+                                $vgm_id .
+                                ", msg: " .
+                                $err->getMessage() .
+                                "\n"
+                        );
 
-                        fclose($ff);
+                        closePdvLogSafe($ff);
+                        }
+                    }
+
+                    if ($msg == "" && (!isset($pin_codinterno) || !is_numeric($pin_codinterno))) {
+                        $msg = "Erro ao gerar pin variavel." . PHP_EOL;
+
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+
+                        if ($ff) {
+                        fwrite(
+                            $ff,
+                            "Gerar PIN nao retornou pin_codinterno valido. venda: " .
+                                $venda_id .
+                                ", vgm_id: " .
+                                $vgm_id .
+                                "\n"
+                        );
+
+                        closePdvLogSafe($ff);
+                        }
                     }
                 } else {
                     //Sleep para nao sobrecarregar o servidor
                     //sleep(1);
-                    //FALA SÉRIO GENTE: Eu NÃO Tive que comentar isso!!!
+                    //FALA Sï¿½RIO GENTE: Eu Nï¿½O Tive que comentar isso!!!
                     //usleep(0.1*1000000);
 
                     if ($bDebug) {
@@ -532,16 +648,18 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 
                     //PINS
                     //---------------------------------------------------------------------------------------------------
-                    // Captura o primeiro pin válido
+                    // Captura o primeiro pin vï¿½lido
                     if (
                         $msg == "" &&
                         $vg_somente_debito == 0 &&
                         $vgm_pin_request == 0
                     ) {
-                        $ff = fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
-                        fwrite($ff, "Entra aqui ??? " . $vgm_ogp_id);
-                        fclose($ff);
-                        // Executa uma verificação se o a senha do pin é zerada, se for exibe o campo pin_caracter
+                        $ff = @fopen("/www/arquivos_gerados/logs/livrodjx.txt", "a+");
+                        if ($ff) {
+                        writePdvLogSafe($ff, "Entra aqui ??? " . $vgm_ogp_id);
+                        closePdvLogSafe($ff);
+                        }
+                        // Executa uma verificaï¿½ï¿½o se o a senha do pin ï¿½ zerada, se for exibe o campo pin_caracter
                         $resultado = buscarPinValido($vgm_opr_codigo, $vgm_pin_valor, $bDebug);
 
                         if (!$resultado['success']) {
@@ -556,7 +674,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     }
 
                     if ($bDebug) {
-                        echo " AAA+++ - Captura pin válido (iter: $i) (" .
+                        echo " AAA+++ - Captura pin vï¿½lido (iter: $i) (" .
                             number_format(
                                 getmicrotime() - $time_start_stats,
                                 2,
@@ -594,11 +712,11 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         if (!$ret) {
                             $msg =
                                 "Erro ao atualizar tabela de pins." . PHP_EOL;
-                        } elseif (pg_affected_rows($ret) > 1) {
+                        } elseif (pgAffectedRowsSafe($ret) > 1) {
                             $msg =
                                 "Erro ao atualizar mais de um pin na tabela de pins." .
                                 PHP_EOL;
-                        } elseif (pg_affected_rows($ret) == 0) {
+                        } elseif (pgAffectedRowsSafe($ret) == 0) {
                             $i--;
                             continue;
                         }
@@ -680,17 +798,17 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                         }
                     }
 
-                    //Gerando o registro de requisição de PIN por Webservice
+                    //Gerando o registro de requisiï¿½ï¿½o de PIN por Webservice
                     if ($vgm_pin_request > 0) {
                         //Para produtos BHN
                         if ($vgm_pin_request == 1) {
-                            //Bloco de verificação de produto de valro variável
+                            //Bloco de verificaï¿½ï¿½o de produto de valro variï¿½vel
                             $sql =
                                 "select ogp_valor_minimo,ogp_valor_maximo,ogp_nome from tb_dist_operadora_games_produto where ogp_id=" .
                                 $vgm_ogp_id .
                                 ";";
                             $rs_bhn_variavel = SQLexecuteQuery($sql);
-                            $rs_bhn_variavel_row = pg_fetch_array(
+                            $rs_bhn_variavel_row = pgFetchArraySafe(
                                 $rs_bhn_variavel
                             );
 
@@ -712,7 +830,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                             $rs_bhn = SQLexecuteQuery($sql);
 
                             if ($vgm_opr_codigo == 159) {
-                                $rs_bhn_row = pg_fetch_array($rs_bhn);
+                                $rs_bhn_row = pgFetchArraySafe($rs_bhn);
                                 include_once "/www/e-pay/Epay.php";
                                 $epay = new Epay();
                                 $dados_pedido = [
@@ -735,7 +853,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                     "bhn/config.inc.bhn.php";
 
                                 if ($rs_bhn) {
-                                    $rs_bhn_row = pg_fetch_array($rs_bhn);
+                                    $rs_bhn_row = pgFetchArraySafe($rs_bhn);
                                     $rs_api = new classBHN();
                                     $parametros = [
                                         "productId" =>
@@ -749,19 +867,19 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                                             STR_PAD_LEFT
                                         ),
                                         "systemTraceAuditNumber" => str_pad(
-                                            0,
+                                            (string)0,
                                             6,
                                             "0",
                                             STR_PAD_LEFT
                                         ),
                                         "transactionAmount" => str_pad(
-                                            $vgm_valor_pin * 100,
+                                            (string)($vgm_valor_pin * 100),
                                             12,
                                             "0",
                                             STR_PAD_LEFT
                                         ),
                                         "merchantTerminalId" => str_pad(
-                                            $vg_ug_id,
+                                            (string)$vg_ug_id,
                                             5,
                                             "0",
                                             STR_PAD_LEFT
@@ -827,7 +945,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
             $vg_ug_id;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao atualizar saldo do usuário." . PHP_EOL;
+            $msg = "Erro ao atualizar saldo do usuï¿½rio." . PHP_EOL;
         } elseif (
             $objUsuarioGames->ug_Substatus == "9" &&
             $total_repasse * 1 != 0
@@ -848,10 +966,10 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
                     "rc@e-prepag.com.br,relacionamento@e-prepag.com.br",
                     null,
                     (!checkIP() ? "[PROD]" : "[DEV-HOMOLOG]") .
-                        " PDV - Promovido Automáticamente para PDV Aprovado",
+                        " PDV - Promovido Automï¿½ticamente para PDV Aprovado",
                     "PDV de ID [" .
                         $vg_ug_id .
-                        "] foi promovido automáticamente para SubStatus PDV Aprovado após a conciliação automática de sua primeira compra. ID do Pedido [" .
+                        "] foi promovido automï¿½ticamente para SubStatus PDV Aprovado apï¿½s a conciliaï¿½ï¿½o automï¿½tica de sua primeira compra. ID do Pedido [" .
                         $venda_id .
                         "]."
                 );
@@ -900,13 +1018,13 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -930,6 +1048,7 @@ function processaVendaGames($venda_id, $EstabCod, $parametros)
 function processaEmailVendaGames($venda_id, $parametros)
 {
     $msg = "";
+    $msgOut = "";
 
     //Recupera a venda
     if ($msg == "") {
@@ -938,10 +1057,10 @@ function processaEmailVendaGames($venda_id, $parametros)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
 
@@ -951,7 +1070,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                 $GLOBALS["STATUS_VENDA"]["PROCESSAMENTO_REALIZADO"] &&
                 $vg_ultimo_status != $GLOBALS["STATUS_VENDA"]["VENDA_REALIZADA"]
             ) {
-                $msg = "Processamento ainda não realizado." . PHP_EOL;
+                $msg = "Processamento ainda nï¿½o realizado." . PHP_EOL;
             }
         }
     }
@@ -964,7 +1083,7 @@ function processaEmailVendaGames($venda_id, $parametros)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda_modelos = SQLexecuteQuery($sql);
-        if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) {
+        if (!$rs_venda_modelos || pgNumRowsSafe($rs_venda_modelos) == 0) {
             $msg = "Nenhum produto encontrado.(4335d)" . PHP_EOL;
         }
     }
@@ -976,10 +1095,10 @@ function processaEmailVendaGames($venda_id, $parametros)
             "where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_email = $rs_usuario_row["ug_email"];
             $ug_tipo_cadastro = $rs_usuario_row["ug_tipo_cadastro"];
             $ug_sexo = $rs_usuario_row["ug_sexo"];
@@ -1026,7 +1145,7 @@ function processaEmailVendaGames($venda_id, $parametros)
                                                 <td align='center'><b>Unit.&nbsp;(R$)</b></td>
                                                 <td align='center'><b>Qtde</b></td>
                                                 <td align='right'><b>Total&nbsp;(R$)</b></td>
-                                                <td align='right'><b>Comissão</b></td>
+                                                <td align='right'><b>Comissï¿½o</b></td>
                                                 <td width='5'>&nbsp;</td>
                                         </tr>";
 
@@ -1035,7 +1154,7 @@ function processaEmailVendaGames($venda_id, $parametros)
         $total_desconto = 0;
         $total_repasse = 0;
         $vg_ug_id = "";
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             // Define operadora
             //if($rs_venda_modelos_row['vgm_ogp_id'] == 5) $blEmailHabbo = true;
             $blEmailHabbo =
@@ -1164,10 +1283,10 @@ function enviaEmailFormatadoComProdutos(
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
         }
@@ -1180,10 +1299,10 @@ function enviaEmailFormatadoComProdutos(
             "where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_email = $rs_usuario_row["ug_email"];
             $ug_tipo_cadastro = $rs_usuario_row["ug_tipo_cadastro"];
             $ug_sexo = $rs_usuario_row["ug_sexo"];
@@ -1229,7 +1348,7 @@ function enviaEmailFormatadoComProdutos(
         $total_geral = 0;
         $total_desconto = 0;
         $total_repasse = 0;
-        while ($rs_venda_modelos_row = pg_fetch_array($rs_venda_modelos)) {
+        while ($rs_venda_modelos_row = pgFetchArraySafe($rs_venda_modelos)) {
             // Define operadora
             //if($rs_venda_modelos_row['vgm_ogp_id'] == 5) $blEmailHabbo = true;
             $blEmailHabbo =
@@ -1365,7 +1484,7 @@ function cancelaVendaGames($venda_id, $parametros)
             }
 
             // Cancela pagamento desta venda, se existir
-            // e se o pagamento não tiver sido feito e a venda ainda não tiver sido processada
+            // e se o pagamento nï¿½o tiver sido feito e a venda ainda nï¿½o tiver sido processada
             $sql =
                 "update tb_pag_compras set 
                                                 status_processed = 1,
@@ -1389,7 +1508,7 @@ function cancelaVendaGames($venda_id, $parametros)
     return $msg;
 }
 
-// Está usando este em processaAgendamentos.bat
+// Estï¿½ usando este em processaAgendamentos.bat
 function processaAgendamentos($lista = null)
 {
     /*	status: 1 - Agendado
@@ -1428,6 +1547,7 @@ function processaAgendamentos($lista = null)
         echo $header . $cReturn;
     }
     $msg = "";
+    $msgOut = "";
     if ($bDebug) {
         echo "Elapsed time A0(agendamento): " .
             number_format(getmicrotime() - $time_start_stats, 2, ".", ".") .
@@ -1459,7 +1579,7 @@ function processaAgendamentos($lista = null)
             PHP_EOL;
 
         $rs_agendamentos = SQLexecuteQuery($sql);
-        if (!$rs_agendamentos || pg_num_rows($rs_agendamentos) == 0) {
+        if (!$rs_agendamentos || pgNumRowsSafe($rs_agendamentos) == 0) {
             $msg = "Nenhuma venda encontrada (0)." . PHP_EOL;
             $smonitor = $header0 . $msg;
         }
@@ -1473,11 +1593,11 @@ function processaAgendamentos($lista = null)
 
     //Executa agendamentos
     if ($msg == "") {
-        // É errado fazer um loop pelos registros da tabela tb_dist_agendamento_execucao e fazer update em tb_dist_agendamento_execucao
+        // ï¿½ errado fazer um loop pelos registros da tabela tb_dist_agendamento_execucao e fazer update em tb_dist_agendamento_execucao
         //	dentro do loop -> termina em deadlock
         //		passar a usar pg_fetch_all()
 
-        while ($rs_agendamentos_row = pg_fetch_array($rs_agendamentos)) {
+        while ($rs_agendamentos_row = pgFetchArraySafe($rs_agendamentos)) {
             $ae_id = $rs_agendamentos_row["ae_id"];
             $ae_tipo = $rs_agendamentos_row["ae_tipo"];
             $ae_status = $rs_agendamentos_row["ae_status"];
@@ -1524,7 +1644,7 @@ function processaAgendamentos($lista = null)
                 }
             }
             if ($bDebug) {
-                echo "  Horário OK" . PHP_EOL;
+                echo "  Horï¿½rio OK" . PHP_EOL;
             }
 
             $msg = "";
@@ -1563,15 +1683,19 @@ function processaAgendamentos($lista = null)
                     $msgConcilia = "";
                     $msgConciliaUsuario = "";
                     $BtnProcessa = 1;
+                    $BtnProcessaEmail = 0;
+                    $repetir_em = "";
+                    $agendamento_acao_obs = "";
                     $venda_id = $ae_vg_id;
                     $ultimo_status_obs = $ae_vg_ultimo_status_obs;
 
                     if ($BtnProcessa) {
                         //Associa pins, gera venda e credita saldo
                         if ($msgConcilia == "") {
+                            $parametros = [];
                             $parametros["ultimo_status_obs"] = $ultimo_status_obs;
                             //if($bDebug)
-                            echo "  Último status $ultimo_status_obs (" .
+                            echo "  ï¿½ltimo status $ultimo_status_obs (" .
                                 date("d/m/Y - H:i:s") .
                                 ")" .
                                 PHP_EOL;
@@ -1587,7 +1711,7 @@ function processaAgendamentos($lista = null)
                                     $venda_id .
                                     ", R$" .
                                     number_format(
-                                        $parametros["total_venda"],
+                                        pdvArrayValueSafe($parametros, "total_venda", 0),
                                         2,
                                         ",",
                                         "."
@@ -1601,13 +1725,13 @@ function processaAgendamentos($lista = null)
                                     $venda_id .
                                     " (R$" .
                                     number_format(
-                                        $parametros["total_venda"],
+                                        pdvArrayValueSafe($parametros, "total_venda", 0),
                                         2,
                                         ",",
                                         "."
                                     ) .
                                     ")</a> " .
-                                    $parametros["s_info_venda"] .
+                                    pdvArrayValueSafe($parametros, "s_info_venda", "") .
                                     PHP_EOL; //colocar no inicio da string (!empty($smonitorprocessamentos)?", ":"").
                             } else {
                                 $msgConciliaUsuario .=
@@ -1649,11 +1773,11 @@ function processaAgendamentos($lista = null)
                             } else {
                                 //reagendamento
                                 $agendamento_acao =
-                                    $parametros["agendamento_acao"];
+                                    pdvArrayValueSafe($parametros, "agendamento_acao", "");
                                 $agendamento_acao_obs =
-                                    $parametros["agendamento_acao_obs"];
+                                    pdvArrayValueSafe($parametros, "agendamento_acao_obs", "");
                                 $agendamento_acao_repetir_em =
-                                    $parametros["agendamento_acao_repetir_em"];
+                                    pdvArrayValueSafe($parametros, "agendamento_acao_repetir_em", "");
                                 if ($agendamento_acao) {
                                     if ($agendamento_acao == "cancelar") {
                                         $ae_status = 3;
@@ -1743,9 +1867,11 @@ function processaAgendamentos($lista = null)
                 "w"
             )
         ) {
+            if ($handle) {
             fwrite($handle, $smonitor);
 
             fclose($handle);
+            }
         } else {
             echo PHP_EOL .
                 "Error: Couldn't open Monitor File for writing" .
@@ -1791,13 +1917,13 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
     echo $cReturn .
         "========================================================================" .
         $cReturn;
-    echo "Prepara conciliação de pagamentos online PDV pré (registros com idvenda>0 e não processados nos últimos " .
+    echo "Prepara conciliaï¿½ï¿½o de pagamentos online PDV prï¿½ (registros com idvenda>0 e nï¿½o processados nos ï¿½ltimos " .
         $nminutes .
         " minutos, desde " .
         date("Y-m-d H:i:s", strtotime("-" . $nminutes . " minutes")) .
         ")" .
         $cReturn;
-    // Prepara conciliação de pagamentos online
+    // Prepara conciliaï¿½ï¿½o de pagamentos online
     //		$date_ini = date('Y-m-d', strtotime("-5 days"));	//"2009-01-01"; //date("Y-m-d");
     // echo "-90 minutes: ".date('Y-m-d H:i:s', strtotime("-90 minutes"))."<br>";
     $date_ini = date("Y-m-d H:i:s", strtotime("-" . $nminutes . " minutes"));
@@ -1812,12 +1938,12 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
         $sql .= " and idvenda = " . $id_venda . " ";
     }
 
-    // Opção 1 - não precissa limitar por data - apenas os pagtos com status_processed=0 serão retornados, após 90mins eles são cancelados.
+    // Opï¿½ï¿½o 1 - nï¿½o precissa limitar por data - apenas os pagtos com status_processed=0 serï¿½o retornados, apï¿½s 90mins eles sï¿½o cancelados.
     //	se houver um descancelamento de venda o pagto correspondnete vai aparecer aqui
 
-    // Opção 1 - Para processar normalmente
+    // Opï¿½ï¿½o 1 - Para processar normalmente
     //		$sql .= " and (pgt.datainicio between '".$date_ini."' and '".$date_end."') ";
-    // Opção 2 - Para incluir algum pagamento antigo descancelado
+    // Opï¿½ï¿½o 2 - Para incluir algum pagamento antigo descancelado
     //		$sql .= " and ((pgt.datainicio between '".$date_ini."' and '".$date_end."') or (pgt.datainicio between '2010-01-26 00:00:00' and '2010-01-26 23:59:59'))";
 
     // Levanta apenas pagamentos recentes para completar testes
@@ -1825,19 +1951,19 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
 
     $rs_total = SQLexecuteQuery($sql);
     if ($rs_total) {
-        $registros_total = pg_num_rows($rs_total);
+        $registros_total = pgNumRowsSafe($rs_total);
     }
     $sql .= " order by pgt.datainicio desc ";
 
     $rs_transacoes = SQLexecuteQuery($sql);
-    if (!$rs_transacoes || pg_num_rows($rs_transacoes) == 0) {
-        $msg = "Nenhuma transação encontrada (132 PDV)." . $cReturn;
+    if (!$rs_transacoes || pgNumRowsSafe($rs_transacoes) == 0) {
+        $msg = "Nenhuma transaï¿½ï¿½o encontrada (132 PDV)." . $cReturn;
     }
 
     $irows = 0;
     if ($rs_transacoes) {
-        echo "NRegs: " . pg_num_rows($rs_transacoes) . $cReturn;
-        while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+        echo "NRegs: " . pgNumRowsSafe($rs_transacoes) . $cReturn;
+        while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
             $irows++;
 
             $msgregister =
@@ -1945,11 +2071,11 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         );
                     }
 
-                    // Pagamento ainda não foi feito ou não tem confirmação bancaria -  status=1 -> Sonda o banco, se estiver completo atualiza aqui
+                    // Pagamento ainda nï¿½o foi feito ou nï¿½o tem confirmaï¿½ï¿½o bancaria -  status=1 -> Sonda o banco, se estiver completo atualiza aqui
                 } elseif ($rs_transacoes_row["status"] == 1) {
                     // bloqueio para evitar consulta ao MUP
                     //if(false)
-                    // começa aqui nova função getSondaBanco()
+                    // comeï¿½a aqui nova funï¿½ï¿½o getSondaBanco()
                     $areturn = [];
                     $iret = getSondaBanco(
                         $rs_transacoes_row["iforma"],
@@ -1958,16 +2084,16 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         $areturn
                     );
                     // get return values
-                    $s_sonda = $areturn["s_sonda"];
-                    $sBanco = $areturn["sBanco"];
-                    $dataconfirma = $areturn["dataconfirma"];
+                    $s_sonda = pdvArrayValueSafe($areturn, "s_sonda", "");
+                    $sBanco = pdvArrayValueSafe($areturn, "sBanco", "");
+                    $dataconfirma = pdvArrayValueSafe($areturn, "dataconfirma", "");
                     if ($rs_transacoes_row["iforma"] == 9) {
                         echo "===> Data do BB :" . $dataconfirma . PHP_EOL;
                     }
-                    $prefix_1 = $areturn["prefix_1"];
-                    $s_sync = $areturn["s_sync"];
-                    $vg_pagto_tipo = $areturn["vg_pagto_tipo"];
-                    // até aqui nova função getSondaBanco()
+                    $prefix_1 = pdvArrayValueSafe($areturn, "prefix_1", "");
+                    $s_sync = pdvArrayValueSafe($areturn, "s_sync", "");
+                    $vg_pagto_tipo = pdvArrayValueSafe($areturn, "vg_pagto_tipo", "");
+                    // atï¿½ aqui nova funï¿½ï¿½o getSondaBanco()
 
                     // Se (!$s_sync), ou seja (status=1 & sonda) => completa a venda POR SONDA
                     if ($s_sync == "NO SYNC") {
@@ -1980,7 +2106,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $ret = true; /////////////////////
                             if (!$ret) {
                                 $msg =
-                                    "Erro ao iniciar transação (PDV)." .
+                                    "Erro ao iniciar transaï¿½ï¿½o (PDV)." .
                                     $cReturn;
                             }
                         }
@@ -1998,7 +2124,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             );
                         } //end if(strlen(str_replace("'", "", $dataconfirma)) == 17)
 
-                        // Marca registro como status=3, já que se chegou aqui quer dizer que não passou por confirmaBanco.php
+                        // Marca registro como status=3, jï¿½ que se chegou aqui quer dizer que nï¿½o passou por confirmaBanco.php
                         $sql =
                             "update tb_pag_compras set datacompra=CURRENT_TIMESTAMP, dataconfirma=" .
                             $dataconfirma .
@@ -2108,7 +2234,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $sql = "COMMIT TRANSACTION ";
                             $ret = SQLexecuteQuery($sql);
                             if (!$ret) {
-                                $msg = "Erro ao comitar transação." . $cReturn;
+                                $msg = "Erro ao comitar transaï¿½ï¿½o." . $cReturn;
                             }
 
                             $msg_sonda = "PROCESSADO POR SONDA";
@@ -2118,7 +2244,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             //////			$ret  =true;												/////////////////////
                             if (!$ret) {
                                 $msg =
-                                    "Erro ao dar rollback na transação." .
+                                    "Erro ao dar rollback na transaï¿½ï¿½o." .
                                     $cReturn;
                             }
 
@@ -2147,7 +2273,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $cReturn;
                     } else {
                         // number_format(($rs_transacoes_row['total']/100 - $rs_transacoes_row['taxas']), 2, '.', '.')
-                        echo "Não Processado por sonda: forma:" .
+                        echo "Nï¿½o Processado por sonda: forma:" .
                             $rs_transacoes_row["iforma"] .
                             ", numcompra: " .
                             $rs_transacoes_row["numcompra"] .
@@ -2167,7 +2293,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             $cReturn;
                     } // bloqueio para evitar consulta ao MUP
                 } else {
-                    echo "Não processado: status!=3 e Sonda=false." .
+                    echo "Nï¿½o processado: status!=3 e Sonda=false." .
                         $cReturn .
                         "numcompra: " .
                         $rs_transacoes_row["numcompra"] .
@@ -2178,7 +2304,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         $cReturn;
                 }
             } else {
-                echo "Não processado: idvenda=0." .
+                echo "Nï¿½o processado: idvenda=0." .
                     $cReturn .
                     "numcompra: " .
                     $rs_transacoes_row["numcompra"] .
@@ -2233,18 +2359,18 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
         }
 
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . $cReturn;
         }
-        echo "Encontrados registros - pg_num_rows(rs_venda): " .
-            pg_num_rows($rs_venda) .
+        echo "Encontrados registros - pgNumRowsSafe(rs_venda): " .
+            pgNumRowsSafe($rs_venda) .
             $cReturn;
     }
 
     // Busca Pagto online ExpressMoney LH
     echo " = Busca Pagto online ExpressMoney PDV" . $cReturn;
     if ($msg == "") {
-        while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $vg_id = $rs_venda_row["vg_id"];
             $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -2262,8 +2388,8 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                 "
                                         order by bbg_data_inclusao desc";
             $rs_venda_dist = SQLexecuteQuery($sql);
-            if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
-                while ($rs_venda_dist_row = pg_fetch_array($rs_venda_dist)) {
+            if ($rs_venda_dist && pgNumRowsSafe($rs_venda_dist) > 0) {
+                while ($rs_venda_dist_row = pgFetchArraySafe($rs_venda_dist)) {
                     $valor = $rs_venda_dist_row["bbg_valor"];
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
                     $bco_codigo = $rs_venda_dist_row["bco_codigo"];
@@ -2290,8 +2416,8 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                     $sql .= " and iforma = '" . $iforma . "'";
 
                     $rs_bol = SQLexecuteQuery($sql);
-                    if ($rs_bol && pg_num_rows($rs_bol) > 0) {
-                        $rs_bol_row = pg_fetch_array($rs_bol);
+                    if ($rs_bol && pgNumRowsSafe($rs_bol) > 0) {
+                        $rs_bol_row = pgFetchArraySafe($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];
 
                         $msg .=
@@ -2303,7 +2429,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             ":" .
                             $cReturn;
                         $parametros["ultimo_status_obs"] =
-                            "Conciliação automática em " .
+                            "Conciliaï¿½ï¿½o automï¿½tica em " .
                             date("d/m/Y - H:i:s") .
                             $cReturn;
                         if (trim($vg_ultimo_status_obs) != "") {
@@ -2385,7 +2511,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                             }
                         }
 
-                        // Marca registro como processado só aqui, depois de conciliar a venda
+                        // Marca registro como processado sï¿½ aqui, depois de conciliar a venda
                         $sql = "update tb_pag_compras set status_processed=1 ";
                         $sql .=
                             "where idvenda = " .
@@ -2411,7 +2537,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
                         }
                     } else {
                         echo "SEM PAGAMENTOS PENDENTES (num_rows: " .
-                            pg_num_rows($rs_bol) .
+                            pgNumRowsSafe($rs_bol) .
                             ")" .
                             $cReturn;
                     }
@@ -2464,8 +2590,8 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
     }
 
     $rs_venda_pendentes = SQLexecuteQuery($sql);
-    if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-        while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+    if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+        while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
             $vg_id_pendente = $rs_venda_pendentes_row["vg_id"];
             $pag_status = $rs_venda_pendentes_row["status"];
             $vg_ultimo_status = $rs_venda_pendentes_row["vg_ultimo_status"];
@@ -2535,7 +2661,7 @@ function conciliacaoAutomaticaPagtoOnlineExpressMoneyLH($id_venda = null)
         "------------------------------------------------------------------------" .
         $cReturn;
 
-    //Conciliação PIX
+    //Conciliaï¿½ï¿½o PIX
     $msg .= conciliacaoAutomaticaPagtoPIXemPDV($id_venda);
     return $msg;
 }
@@ -2566,13 +2692,13 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     echo $cReturn .
         "========================================================================" .
         $cReturn;
-    echo "Prepara conciliação de pagamentos PIX para PDV pré (não processados nos últimos " .
+    echo "Prepara conciliaï¿½ï¿½o de pagamentos PIX para PDV prï¿½ (nï¿½o processados nos ï¿½ltimos " .
         $minutes .
         " minutos, desde " .
         date("Y-m-d H:i:s", strtotime("-" . $minutes . " minutes")) .
         ")" .
         $cReturn;
-    // Prepara conciliação de pagamentos online
+    // Prepara conciliaï¿½ï¿½o de pagamentos online
     $date_ini = date("Y-m-d H:i:s", strtotime("-" . $minutes . " minutes"));
     $date_end = date("Y-m-d H:i:s");
 
@@ -2592,15 +2718,15 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     $sql .= " order by pgt.datainicio desc ";
 
     $rs_transacoes = SQLexecuteQuery($sql);
-    $registros_total = pg_num_rows($rs_transacoes);
+    $registros_total = pgNumRowsSafe($rs_transacoes);
     if (!$rs_transacoes || $registros_total == 0) {
-        $msg = "Nenhuma transação encontrada (132 PDV)." . $cReturn;
+        $msg = "Nenhuma transaï¿½ï¿½o encontrada (132 PDV)." . $cReturn;
     }
 
     $irows = 0;
     if ($rs_transacoes) {
         echo "NRegs: " . $registros_total . $cReturn;
-        while ($rs_transacoes_row = pg_fetch_array($rs_transacoes)) {
+        while ($rs_transacoes_row = pgFetchArraySafe($rs_transacoes)) {
             $irows++;
 
             echo $rs_transacoes_row["numcompra"] .
@@ -2625,7 +2751,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
             $msg = "";
             // Venda cadastrada
             if ($rs_transacoes_row["idvenda"] > 0) {
-                // começa aqui nova função getSondaBanco()
+                // comeï¿½a aqui nova funï¿½ï¿½o getSondaBanco()
                 $areturn = [];
                 $iret = getSondaBanco(
                     $rs_transacoes_row["iforma"],
@@ -2635,13 +2761,13 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 );
 
                 // get return values
-                $s_sonda = $areturn["s_sonda"];
-                $sBanco = $areturn["sBanco"];
-                $dataconfirma = $areturn["dataconfirma"];
-                $prefix_1 = $areturn["prefix_1"];
-                $s_sync = $areturn["s_sync"];
-                $vg_pagto_tipo = $areturn["vg_pagto_tipo"];
-                // até aqui nova função getSondaBanco()
+                $s_sonda = pdvArrayValueSafe($areturn, "s_sonda", "");
+                $sBanco = pdvArrayValueSafe($areturn, "sBanco", "");
+                $dataconfirma = pdvArrayValueSafe($areturn, "dataconfirma", "");
+                $prefix_1 = pdvArrayValueSafe($areturn, "prefix_1", "");
+                $s_sync = pdvArrayValueSafe($areturn, "s_sync", "");
+                $vg_pagto_tipo = pdvArrayValueSafe($areturn, "vg_pagto_tipo", "");
+                // atï¿½ aqui nova funï¿½ï¿½o getSondaBanco()
 
                 //echo "<<<<<".json_encode($areturn).">>>>>";
 
@@ -2654,7 +2780,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         $ret = true; /////////////////////
                         if (!$ret) {
                             $msg =
-                                "Erro ao iniciar transação (PDV)." . $cReturn;
+                                "Erro ao iniciar transaï¿½ï¿½o (PDV)." . $cReturn;
                         }
                     }
                     //Arames Monster
@@ -2669,7 +2795,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         );
                     } //end if(strlen(str_replace("'", "", $dataconfirma)) == 17)
 
-                    // Marca registro como status=3, já que se chegou aqui quer dizer que não passou por confirmaBanco.php
+                    // Marca registro como status=3, jï¿½ que se chegou aqui quer dizer que nï¿½o passou por confirmaBanco.php
                     $sql =
                         "update tb_pag_compras set protocolo='Teste', datacompra=CURRENT_TIMESTAMP, dataconfirma=" .
                         $dataconfirma .
@@ -2778,7 +2904,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         $sql = "COMMIT TRANSACTION ";
                         $ret = SQLexecuteQuery($sql);
                         if (!$ret) {
-                            $msg = "Erro ao comitar transação." . $cReturn;
+                            $msg = "Erro ao comitar transaï¿½ï¿½o." . $cReturn;
                         }
 
                         $msg_sonda = "PROCESSADO POR SONDA";
@@ -2787,7 +2913,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         $ret = SQLexecuteQuery($sql);
                         if (!$ret) {
                             $msg =
-                                "Erro ao dar rollback na transação." . $cReturn;
+                                "Erro ao dar rollback na transaï¿½ï¿½o." . $cReturn;
                         }
 
                         $msg_sonda =
@@ -2817,7 +2943,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 //end if($s_sync=="NO SYNC")
                 else {
                     // number_format(($rs_transacoes_row['total']/100 - $rs_transacoes_row['taxas']), 2, '.', '.')
-                    echo "Não Processado por sonda: forma:" .
+                    echo "Nï¿½o Processado por sonda: forma:" .
                         $rs_transacoes_row["iforma"] .
                         ", numcompra: " .
                         $rs_transacoes_row["numcompra"] .
@@ -2839,7 +2965,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
             }
             //end if($rs_transacoes_row['idvenda']>0)
             else {
-                echo "Não processado: idvenda=0." .
+                echo "Nï¿½o processado: idvenda=0." .
                     $cReturn .
                     "numcompra: " .
                     $rs_transacoes_row["numcompra"] .
@@ -2882,18 +3008,18 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
             $sql .= " and vg_id = " . $id_venda . " ";
         }
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . $cReturn;
         }
-        echo "Encontrados registros - pg_num_rows(rs_venda): " .
-            pg_num_rows($rs_venda) .
+        echo "Encontrados registros - pgNumRowsSafe(rs_venda): " .
+            pgNumRowsSafe($rs_venda) .
             $cReturn;
     }
 
     // Busca Pagto online ExpressMoney LH
     echo " = Busca Pagto online PIX PDV" . $cReturn;
     if ($msg == "") {
-        while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $vg_id = $rs_venda_row["vg_id"];
             $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -2911,8 +3037,8 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                 "
                                         order by bbg_data_inclusao desc";
             $rs_venda_dist = SQLexecuteQuery($sql);
-            if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
-                while ($rs_venda_dist_row = pg_fetch_array($rs_venda_dist)) {
+            if ($rs_venda_dist && pgNumRowsSafe($rs_venda_dist) > 0) {
+                while ($rs_venda_dist_row = pgFetchArraySafe($rs_venda_dist)) {
                     $valor = $rs_venda_dist_row["bbg_valor"];
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
                     $bco_codigo = $rs_venda_dist_row["bco_codigo"];
@@ -2939,8 +3065,8 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                     $sql .= " and iforma = '" . $iforma . "'";
 
                     $rs_bol = SQLexecuteQuery($sql);
-                    if ($rs_bol && pg_num_rows($rs_bol) > 0) {
-                        $rs_bol_row = pg_fetch_array($rs_bol);
+                    if ($rs_bol && pgNumRowsSafe($rs_bol) > 0) {
+                        $rs_bol_row = pgFetchArraySafe($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];
 
                         $msg .=
@@ -2952,7 +3078,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             ":" .
                             $cReturn;
                         $parametros["ultimo_status_obs"] =
-                            "Conciliação automática em " .
+                            "Conciliaï¿½ï¿½o automï¿½tica em " .
                             date("d/m/Y - H:i:s") .
                             $cReturn;
                         if (trim($vg_ultimo_status_obs) != "") {
@@ -3034,7 +3160,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                             }
                         }
 
-                        // Marca registro como processado só aqui, depois de conciliar a venda
+                        // Marca registro como processado sï¿½ aqui, depois de conciliar a venda
                         $sql = "update tb_pag_compras set status_processed=1 ";
                         $sql .=
                             "where idvenda = " .
@@ -3060,7 +3186,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
                         }
                     } else {
                         echo "SEM PAGAMENTOS PENDENTES (num_rows: " .
-                            pg_num_rows($rs_bol) .
+                            pgNumRowsSafe($rs_bol) .
                             ")" .
                             $cReturn;
                     }
@@ -3103,8 +3229,8 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
     }
 
     $rs_venda_pendentes = SQLexecuteQuery($sql);
-    if ($rs_venda_pendentes && pg_num_rows($rs_venda_pendentes) > 0) {
-        while ($rs_venda_pendentes_row = pg_fetch_array($rs_venda_pendentes)) {
+    if ($rs_venda_pendentes && pgNumRowsSafe($rs_venda_pendentes) > 0) {
+        while ($rs_venda_pendentes_row = pgFetchArraySafe($rs_venda_pendentes)) {
             $vg_id_pendente = $rs_venda_pendentes_row["vg_id"];
             $pag_status = $rs_venda_pendentes_row["status"];
             $vg_ultimo_status = $rs_venda_pendentes_row["vg_ultimo_status"];
@@ -3178,7 +3304,7 @@ function conciliacaoAutomaticaPagtoPIXemPDV($id_venda = null)
 } // end conciliacaoAutomaticaPagtoPIXemPDV
 
 /*
-    // => o correto é conciliar a partir de tb_pag_compras com status=3
+    // => o correto ï¿½ conciliar a partir de tb_pag_compras com status=3
 */
 function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
 {
@@ -3187,9 +3313,9 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
 
     //Valida usuario_id
     if (!$usuario_id) {
-        $msg = "Código do usuário PDV não fornecido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV nï¿½o fornecido." . PHP_EOL;
     } elseif (!is_numeric($usuario_id)) {
-        $msg = "Código do usuário PDV inválido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV invï¿½lido." . PHP_EOL;
     }
 
     //Recupera o boleto pendente
@@ -3198,15 +3324,15 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
             "select * from tb_pag_compras pag
                                 where pag.idvenda = " . $venda_id;
         $rs_pagto = SQLexecuteQuery($sql);
-        if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
+        if (!$rs_pagto || pgNumRowsSafe($rs_pagto) == 0) {
             $msg = "Nenhum pagamento encontrado." . PHP_EOL;
         } else {
-            $rs_pagto_row = pg_fetch_array($rs_pagto);
+            $rs_pagto_row = pgFetchArraySafe($rs_pagto);
             $pag_data = $rs_pagto_row["datainicio"];
-            $pag_valor = $rs_boleto_row["total"] / 100;
-            $pag_banco = $rs_boleto_row["banco"];
-            //				$pag_documento = $rs_boleto_row['???'];
-            echo "pag_data: '$pag_data', pag_valor: $pag_valor, pag_banco: $pag_banco, pag_documento: '$pag_documento', <br>";
+            $pag_valor = $rs_pagto_row["total"] / 100;
+            $pag_banco = $rs_pagto_row["banco"];
+            $pag_iforma = $rs_pagto_row["iforma"];
+            echo "pag_data: '$pag_data', pag_valor: $pag_valor, pag_banco: $pag_banco, pag_iforma: '$pag_iforma'" . PHP_EOL;
         }
     }
 
@@ -3215,13 +3341,13 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         $sql = "BEGIN TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
     //Concilia boleto
     if ($msg == "") {
-        // a esta altura já deve estar status=3
+        // a esta altura jï¿½ deve estar status=3
         $sql =
             "update tb_pag_compras set status_processed = 1, dataconfirma = CURRENT_TIMESTAMP where idvenda = " .
             $venda_id .
@@ -3233,7 +3359,7 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         }
     }
 
-    //Credita valor do boleto no usuário LH
+    //Credita valor do boleto no usuï¿½rio LH
     if ($msg == "") {
         $sql =
             "update dist_usuarios_games set ug_perfil_saldo = coalesce(ug_perfil_saldo,0) + " .
@@ -3244,7 +3370,7 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         echo "sqlAZ3: $sql [" . getmicrotime() . "]" . PHP_EOL;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3262,7 +3388,7 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
         echo "sqlA4: <span style='background-color:#CCCC66'>$sql</span><br>";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3270,16 +3396,16 @@ function conciliaExpressMoneyLH_PagtoOnline($venda_id, $usuario_id, $parametros)
     if ($msg == "") {
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
-        //echo "Comentários em COMMIT TRANSACTION  ============================================<br>";
+        //echo "Comentï¿½rios em COMMIT TRANSACTION  ============================================<br>";
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
-        //echo "Comentários em ROLLBACK TRANSACTION   ============================================<br>";
+        //echo "Comentï¿½rios em ROLLBACK TRANSACTION   ============================================<br>";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -3297,14 +3423,14 @@ function verificaSomenteDebito($venda_id)
             "select * from tb_dist_venda_games vg where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhum produto encontrado.(WM-435)" . PHP_EOL;
         }
     }
 
     if ($msg == "") {
         //Verifica cada item de cada produro
-        if ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        if ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $retorno = $rs_venda_row["vg_somente_debito"];
         }
     }
@@ -3359,16 +3485,16 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
 
         echo "sqlA0: $sql" . PHP_EOL;
         $rs_venda = SQLexecuteQueryParams($sql, $params_venda);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         }
-        echo "Encontrados " . pg_num_rows($rs_venda) . " registros" . PHP_EOL;
-        $n = pg_num_rows($rs_venda);
+        echo "Encontrados " . pgNumRowsSafe($rs_venda) . " registros" . PHP_EOL;
+        $n = pgNumRowsSafe($rs_venda);
     }
 
     // Busca boletos ExpressMoney LH
     if ($msg == "") {
-        while ($rs_venda_row = pg_fetch_array($rs_venda)) {
+        while ($rs_venda_row = pgFetchArraySafe($rs_venda)) {
             $vg_id = $rs_venda_row["vg_id"];
             $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
             $vg_pagto_num_docto = $rs_venda_row["vg_pagto_num_docto"];
@@ -3391,10 +3517,10 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                 PHP_EOL;
 
             $rs_venda_dist = SQLexecuteQueryParams($sql, [$vg_ug_id, $vg_id]);
-            if ($rs_venda_dist && pg_num_rows($rs_venda_dist) > 0) {
-                //echo "  Encontrados (2) ".pg_num_rows($rs_venda_dist)." registros dist".PHP_EOL;
+            if ($rs_venda_dist && pgNumRowsSafe($rs_venda_dist) > 0) {
+                //echo "  Encontrados (2) ".pgNumRowsSafe($rs_venda_dist)." registros dist".PHP_EOL;
 
-                while ($rs_venda_dist_row = pg_fetch_array($rs_venda_dist)) {
+                while ($rs_venda_dist_row = pgFetchArraySafe($rs_venda_dist)) {
                     $valor = $rs_venda_dist_row["bbg_valor"];
                     $valor_taxa = $rs_venda_dist_row["bbg_valor_taxa"];
 
@@ -3437,8 +3563,8 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                     }
 
                     $rs_bol = SQLexecuteQueryParams($sql, $params_bol);
-                    if ($rs_bol && pg_num_rows($rs_bol) > 0) {
-                        $rs_bol_row = pg_fetch_array($rs_bol);
+                    if ($rs_bol && pgNumRowsSafe($rs_bol) > 0) {
+                        $rs_bol_row = pgFetchArraySafe($rs_bol);
                         $bol_codigo = $rs_bol_row["bol_codigo"];
 
                         $msg .=
@@ -3450,7 +3576,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
                             ":" .
                             PHP_EOL;
                         $parametros["ultimo_status_obs"] =
-                            "Conciliação automática em " .
+                            "Conciliaï¿½ï¿½o automï¿½tica em " .
                             date("d/m/Y - H:i:s") .
                             "" .
                             PHP_EOL;
@@ -3522,7 +3648,7 @@ function conciliacaoAutomaticaBoletoExpressMoneyLH($vg_id = null)
 
     echo "  FINAL elapsed total time (total de $n registros): " .
         number_format(getmicrotime() - $time_start_stats, 2, ".", ".") .
-        "s, média de " .
+        "s, mï¿½dia de " .
         number_format(
             (getmicrotime() - $time_start_stats) / ($n == 0 ? 1 : $n),
             2,
@@ -3552,16 +3678,16 @@ function conciliaExpressMoneyLH_boleto(
 
     //Valida boleto id
     if (!$boleto_id) {
-        $msg = "Código do boleto não fornecido." . PHP_EOL;
+        $msg = "Cï¿½digo do boleto nï¿½o fornecido." . PHP_EOL;
     } elseif (!is_numeric($boleto_id)) {
-        $msg = "Código do boleto inválido." . PHP_EOL;
+        $msg = "Cï¿½digo do boleto invï¿½lido." . PHP_EOL;
     }
 
     //Valida usuario_id
     if (!$usuario_id) {
-        $msg = "Código do usuário PDV não fornecido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV nï¿½o fornecido." . PHP_EOL;
     } elseif (!is_numeric($usuario_id)) {
-        $msg = "Código do usuário PDV inválido." . PHP_EOL;
+        $msg = "Cï¿½digo do usuï¿½rio PDV invï¿½lido." . PHP_EOL;
     }
 
     //Recupera o boleto pendente
@@ -3570,10 +3696,10 @@ function conciliaExpressMoneyLH_boleto(
             "select * from boletos_pendentes bol
                                 where bol.bol_codigo = " . $boleto_id;
         $rs_boleto = SQLexecuteQuery($sql);
-        if (!$rs_boleto || pg_num_rows($rs_boleto) == 0) {
+        if (!$rs_boleto || pgNumRowsSafe($rs_boleto) == 0) {
             $msg = "Nenhum boleto encontrado." . PHP_EOL;
         } else {
-            $rs_boleto_row = pg_fetch_array($rs_boleto);
+            $rs_boleto_row = pgFetchArraySafe($rs_boleto);
             $bol_data = $rs_boleto_row["bol_data"];
             $bol_valor = $rs_boleto_row["bol_valor"];
             $bol_banco = $rs_boleto_row["bol_banco"];
@@ -3587,7 +3713,7 @@ function conciliaExpressMoneyLH_boleto(
         $ret = SQLexecuteQuery($sql);
         $ret = true; /////////////////////
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -3606,7 +3732,7 @@ function conciliaExpressMoneyLH_boleto(
         }
     }
 
-    //Credita valor do boleto no usuário LH
+    //Credita valor do boleto no usuï¿½rio LH
     if ($msg == "") {
         $sql =
             "update dist_usuarios_games set ug_perfil_saldo = coalesce(ug_perfil_saldo,0) + " .
@@ -3617,7 +3743,7 @@ function conciliaExpressMoneyLH_boleto(
         echo "sqlA3: $sql" . PHP_EOL;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3635,7 +3761,7 @@ function conciliaExpressMoneyLH_boleto(
         echo "sqlA4: $sql" . PHP_EOL;
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao creditar valor do boleto no usuário PDV." . PHP_EOL;
+            $msg = "Erro ao creditar valor do boleto no usuï¿½rio PDV." . PHP_EOL;
         }
     }
 
@@ -3644,13 +3770,13 @@ function conciliaExpressMoneyLH_boleto(
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
 
@@ -3661,7 +3787,7 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
 {
     $blDebugMT = false;
     $blShowProgress = false;
-    if ($parametros["showProgress"]) {
+    if (!empty($parametros["showProgress"])) {
         $blShowProgress = true;
     }
 
@@ -3683,10 +3809,10 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
             $venda_id;
 
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
             $vg_pagto_tipo = $rs_venda_row["vg_pagto_tipo"];
@@ -3700,7 +3826,7 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
                 $vg_ultimo_status !=
                 $GLOBALS["STATUS_VENDA"]["PAGTO_CONFIRMADO"]
             ) {
-                $msg = "Venda não esta no seu status inicial." . PHP_EOL;
+                $msg = "Venda nï¿½o esta no seu status inicial." . PHP_EOL;
             }
         }
     }
@@ -3713,10 +3839,10 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
             "select * from dist_usuarios_games ug where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_cel_ddd = $rs_usuario_row["ug_cel_ddd"];
             $ug_cel = $rs_usuario_row["ug_cel"];
             if (!is_numeric($ug_cel_ddd)) {
@@ -3732,8 +3858,8 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
     }
 
     //Enquanto nao tem deposito e boleto
-    $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"];
-    $vg_pagto_num_docto = $rs_venda_row["vg_pagto_num_docto"];
+    $vg_pagto_banco = $rs_venda_row["vg_pagto_banco"] ?? null;
+    $vg_pagto_num_docto = $rs_venda_row["vg_pagto_num_docto"] ?? null;
     $ped_cod_doc_equiv = "";
     $ped_dep_codigo = null;
     $ped_bol_codigo = null;
@@ -3746,7 +3872,7 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
         $sql = "BEGIN TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao iniciar transação." . PHP_EOL;
+            $msg = "Erro ao iniciar transaï¿½ï¿½o." . PHP_EOL;
         }
     }
     if ($blDebugMT) {
@@ -3784,13 +3910,13 @@ function processaExpressMoneyLH($venda_id, $usuario_id, $parametros)
         $sql = "COMMIT TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao comitar transação." . PHP_EOL;
+            $msg = "Erro ao comitar transaï¿½ï¿½o." . PHP_EOL;
         }
     } else {
         $sql = "ROLLBACK TRANSACTION ";
         $ret = SQLexecuteQuery($sql);
         if (!$ret) {
-            $msg = "Erro ao dar rollback na transação." . PHP_EOL;
+            $msg = "Erro ao dar rollback na transaï¿½ï¿½o." . PHP_EOL;
         }
     }
     if ($blDebugMT) {
@@ -3820,10 +3946,10 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
             "where vg.vg_id = " .
             $venda_id;
         $rs_venda = SQLexecuteQuery($sql);
-        if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+        if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
             $msg = "Nenhuma venda encontrada." . PHP_EOL;
         } else {
-            $rs_venda_row = pg_fetch_array($rs_venda);
+            $rs_venda_row = pgFetchArraySafe($rs_venda);
             $vg_ug_id = $rs_venda_row["vg_ug_id"];
             $vg_ultimo_status = $rs_venda_row["vg_ultimo_status"];
 
@@ -3836,7 +3962,7 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
                 $vg_ultimo_status !=
                 $GLOBALS["STATUS_VENDA"]["PAGTO_CONFIRMADO"]
             ) {
-                $msg = "Processamento ainda não realizado." . PHP_EOL;
+                $msg = "Processamento ainda nï¿½o realizado." . PHP_EOL;
             }
         }
     }
@@ -3851,10 +3977,10 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
             "where ug.ug_id = " .
             $vg_ug_id;
         $rs_usuario = SQLexecuteQuery($sql);
-        if (!$rs_usuario || pg_num_rows($rs_usuario) == 0) {
+        if (!$rs_usuario || pgNumRowsSafe($rs_usuario) == 0) {
             $msg = "Nenhum cliente encontrado." . PHP_EOL;
         } else {
-            $rs_usuario_row = pg_fetch_array($rs_usuario);
+            $rs_usuario_row = pgFetchArraySafe($rs_usuario);
             $ug_email = $rs_usuario_row["ug_email"];
             $ug_tipo_cadastro = $rs_usuario_row["ug_tipo_cadastro"];
             $ug_sexo = $rs_usuario_row["ug_sexo"];
@@ -3929,12 +4055,12 @@ function processaEmailExpressMoneyLH($venda_id, $parametros)
                                                 <table border='0' cellspacing='0' width='90%'>
                                                 <tr>
                                                         <td class='texto'> 
-                                                                Seu pagamento de boleto Express Money PDV número <b>" .
+                                                                Seu pagamento de boleto Express Money PDV nï¿½mero <b>" .
             formata_codigo_venda($venda_id) .
             "</b> foi processado com sucesso!<br>
                                                                 No seu PDV com a E-Prepag foi creditado o valor de <b>R$" .
             number_format($parametros["valor"], 2, ",", ".") .
-            "</b> que já pode ser usado para comprar os produtos disponíveis. 
+            "</b> que jï¿½ pode ser usado para comprar os produtos disponï¿½veis. 
                                                         </td>
                                                 </tr>
                                                 </table>";
@@ -3998,7 +4124,7 @@ function gravaLog_TMP_conciliacao($mensagem)
     $mensagem =
         date("Y-m-d H:i:s") .
         " " .
-        $_SERVER["SCRIPT_FILENAME"] .
+        ($_SERVER["SCRIPT_FILENAME"] ?? "") .
         PHP_EOL .
         $mensagem .
         PHP_EOL;
@@ -4018,14 +4144,14 @@ function isVendaDeposito($venda_id)
         "select vg_deposito_em_saldo from tb_dist_venda_games vg where vg.vg_id = " .
         $venda_id;
     $rs_venda = SQLexecuteQuery($sql);
-    if (!$rs_venda || pg_num_rows($rs_venda) == 0) {
+    if (!$rs_venda || pgNumRowsSafe($rs_venda) == 0) {
         $msg =
             "Nenhuma venda encontrada (em isvendaDeposito($venda_id))." .
             PHP_EOL;
     }
 
     if ($msg == "") {
-        $rs_venda_row = pg_fetch_array($rs_venda);
+        $rs_venda_row = pgFetchArraySafe($rs_venda);
         $vg_deposito_em_saldo = $rs_venda_row["vg_deposito_em_saldo"];
     }
     $vg_deposito_em_saldo = $vg_deposito_em_saldo == 1 ? 1 : 0;

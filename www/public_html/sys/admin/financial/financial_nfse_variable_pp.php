@@ -193,9 +193,9 @@ if(count($dd_operadora_multi)>0) {
                     </div>
                     <div class="col-md-3">
                         <select name="empresa" id="empresa" class="form-control">
-                            <option class="vinculo" value="ALL" <?php if($empresa == 'ALL') echo selected; ?>>Todos os vínculos</option>
-                            <option class="vinculo" value="<?php echo $IDENTIFICACAO_EMPRESA_PAGAMENTOS ?>" <?php if($empresa == strval($IDENTIFICACAO_EMPRESA_PAGAMENTOS)) echo selected; ?>>Epp Pagamentos</option>
-                            <option class="vinculo" value="<?php echo $IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO ?>" <?php if($empresa == strval($IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO)) echo selected; ?>>Epp Administradora</option>
+                            <option class="vinculo" value="ALL" <?php if($empresa == 'ALL') echo " selected"; ?>>Todos os vínculos</option>
+                            <option class="vinculo" value="<?php echo $IDENTIFICACAO_EMPRESA_PAGAMENTOS ?>" <?php if($empresa == strval($IDENTIFICACAO_EMPRESA_PAGAMENTOS)) echo " selected"; ?>>Epp Pagamentos</option>
+                            <option class="vinculo" value="<?php echo $IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO ?>" <?php if($empresa == strval($IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO)) echo " selected"; ?>>Epp Administradora</option>
                         </select>
                     </div>
                     <div class="col-md-2">

@@ -125,7 +125,7 @@ if(isset($BtnSearch) && $BtnSearch) {
 
     $rs = SQLexecuteQuery($sql);
     if($rs) {
-            if(pg_num_rows($rs)>0) {
+            if((($rs) ? pg_num_rows($rs) : 0)>0) {
                     $total_geral_real = 0;
                     $total_geral_dolar = 0;
                     $total_registros = 0;
@@ -230,14 +230,14 @@ if(isset($BtnSearch) && $BtnSearch) {
                             </table>
     </div>
 <?php
-            }//end if(pg_num_rows($rs)>0)
+            }//end if((($rs) ? pg_num_rows($rs) : 0)>0)
             else {
 ?>
                 <div class="row espacamento">
                     <div class="col-md-3 col-md-offset-4 col-sm-12 col-xs-12 alert alert-danger">Nenhum registro encontrado no período.</div>
                 </div>
 <?php
-            }//end else do if(pg_num_rows($rs)>0)
+            }//end else do if((($rs) ? pg_num_rows($rs) : 0)>0)
     }//end if($rs) 
     else {
 ?>          

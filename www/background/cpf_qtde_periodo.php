@@ -132,7 +132,7 @@ order by total_cpf desc;
 
 $rs_dados_cpf = SQLexecuteQueryTWO($conexao, $sql);
 //Verificando Dados
-$msg .= PHP_EOL."Total de CPF considerados entre ".date("Y-m-d",$initialmonth)." a ".date("Y-m-d",$currentmonth)." (YYYY-MM-DD):  [<b>".pg_num_rows($rs_dados_cpf)."</b>] CPFs <br>";
+$msg .= PHP_EOL."Total de CPF considerados entre ".date("Y-m-d",$initialmonth)." a ".date("Y-m-d",$currentmonth)." (YYYY-MM-DD):  [<b>".(($rs_dados_cpf) ? pg_num_rows($rs_dados_cpf) : 0)."</b>] CPFs <br>";
 $total_cpfs_valor_superior = 0;
 $total_cpfs_na_tabela = 0;
 $total_cpfs_ainda_nao_na_tabela = 0;
@@ -158,7 +158,9 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
     $retorno_cpf = SQLexecuteQuery($conexao, $sql);
     while($cpfs = pg_fetch_array($retorno_cpf)) {
     
+        if ($arquivo) {
         fwrite($arquivo, $cpfs["cpf"].PHP_EOL);   
+        }
         
     } //end
     fclose($arquivo);
@@ -166,7 +168,7 @@ while($rs_dados_cpf_row = pg_fetch_array($rs_dados_cpf)) {
 
 $sql = "SELECT cpf FROM cpf_cache WHERE cpf IN (".implode(",", $retorno_search).") group by cpf;";
 $res = SQLexecuteQueryTWO($conexao, $sql);
-$find = pg_num_rows($res);
+$find = (($res) ? pg_num_rows($res) : 0);
 $nao_encotrados = sizeof($retorno) - (int)$find;
 
 $_SESSION["b"] = 0;
@@ -203,7 +205,7 @@ function test($data, $limit, &$msg, &$total_cpfs_valor_superior){
 
 ob_end_flush();
 $msg .=  PHP_EOL.PHP_EOL."<b>RESUMO GERAL</b>".PHP_EOL.PHP_EOL."Total de CPFs ja existentes na tabela de CACHE: <b>".$find." Atualizados</b>".PHP_EOL.PHP_EOL."Total de CPFs NÃO localizados na tabela de CACHE: <b>".$nao_encotrados."</b>".PHP_EOL.PHP_EOL."Total de CPFs excederam o valor limite(".VALOR_LIMITE."): <b>".$total_cpfs_valor_superior." </b><br>"; //.($total_cpfs_ainda_nao_na_tabela > 0?"Lista de CPFs n�o encontrado na tabela de cache:".PHP_EOL.$msg_cpf_nao_em_cache.PHP_EOL.PHP_EOL:"");
-$msg = utf8_decode($msg);
+$msg = mb_convert_encoding((string)$msg, 'ISO-8859-1', 'UTF-8');
 
 if(!empty($msg)) {
     //if(enviaEmail($email, $cc, $bcc, $subject, str_replace(PHP_EOL,'<br>', $msg))) {
@@ -241,7 +243,7 @@ echo str_repeat("_", 80) .PHP_EOL."Calculando os totais de contas com o mesmo CP
 $rs_dados_cpf = SQLexecuteQueryTWO($sql);
         
 //Verificando Dados
-$msg = PHP_EOL."Total de CPF considerados com contas ativas de GAMERS:  [".pg_num_rows($rs_dados_cpf)."] CPFs<br>";
+$msg = PHP_EOL."Total de CPF considerados com contas ativas de GAMERS:  [".(($rs_dados_cpf) ? pg_num_rows($rs_dados_cpf) : 0)."] CPFs<br>";
 echo $msg.PHP_EOL.PHP_EOL;
 $total_cpfs_na_tabela = 0;
 $total_cpfs_ainda_nao_na_tabela = 0;

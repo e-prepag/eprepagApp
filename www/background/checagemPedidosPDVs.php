@@ -7,7 +7,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 //ini_set("display_errors", 1); 
 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200); 
+// ini_set('max_execution_time', 1200); 
 
 //Data considerada
 $data_inicio = mktime(0, 0, 0, date('n'),  date('d')-1, date('Y'));
@@ -52,7 +52,7 @@ echo "SQL :".$sql.PHP_EOL;
 $rs = SQLexecuteQuery($sql);
 $exibicaoDadosProblemas = NULL;
 if($rs) {
-    $total_de_registros = pg_num_rows($rs);
+    $total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
     if($total_de_registros > 0) {
         $cabecalho = "
         <table class='table table-bordered top20' border='1' >
@@ -90,10 +90,10 @@ if($rs) {
         else {
             echo "Problemas no envio do Email".PHP_EOL." TO: ".$email."".PHP_EOL." CC: ".$cc."".PHP_EOL." BCC: ".$bcc."".PHP_EOL." SUBJECT: ".$subject."".PHP_EOL;
         }
-    }//end if(pg_num_rows($rs) > 0)
+    }//end if((($rs) ? pg_num_rows($rs) : 0) > 0)
     else {
             echo "Nenhum Pedido com Problemas Encontrado.".PHP_EOL;
-    }//end else do if(pg_num_rows($rs) > 0) 
+    }//end else do if((($rs) ? pg_num_rows($rs) : 0) > 0) 
 }//end if($rs) 
 else echo "ERRO na query acima.".PHP_EOL;
 

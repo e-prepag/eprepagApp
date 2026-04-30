@@ -1,19 +1,18 @@
 <?php
-
+    $prod = $prod ?? 0;
+    $sTiposup = $sTiposup ?? '';
+    $varStatus = $varStatus ?? 0;
+    $sPath = $sPath ?? '';
 
 	// Mark origem from Habbo
-// $_SERVER['SCRIPT_NAME'] = "/prepag2/commerce/modelosEx.php"
-// $_SERVER['HTTP_REFERER']
-//echo "<span color='#FFFFFF' title='".$_SERVER['SCRIPT_NAME'].", ".$_SERVER['HTTP_REFERER'].", $prod'>*</span>";
 	$bHabbo = false;
-	if(($_SERVER['SCRIPT_NAME']=="/prepag2/commerce/modelosEx.php") && ($prod==5) && ($_SERVER['HTTP_REFERER']=="http://www.habbo.com.br/credits")) {
-//		echo "<span color='#FFFFFF' title='".$_SERVER['SCRIPT_NAME'].", ".$_SERVER['HTTP_REFERER'].", $prod'>*</span>";
+	if(($_SERVER['SCRIPT_NAME'] ?? '')=="/prepag2/commerce/modelosEx.php" && $prod==5 && ($_SERVER['HTTP_REFERER'] ?? '')=="http://www.habbo.com.br/credits") {
 		$bHabbo = true;		
 	}
 
 	$comando = "SELECT * " 
 			  ."FROM tbBanner " 
-			  ."WHERE tipo = 1 AND ativo=1 ".$sTiposup." "; 
+			  ."WHERE tipo = 1 AND ativo=1 ". $sTiposup ." "; 
 
 	if($bHabbo) {
 		$comando .= " AND strpos(upper(nome),'HABBO')>0"; 
@@ -23,20 +22,7 @@
 	$comando .= "ORDER BY random()";
 
 	$idbanners = "";
-//echo "<!-- ".$comando." -->\n";
-//echo "<!-- ".$prod." -->\n";
-//echo "<!-- ".$_SERVER['SCRIPT_NAME']." -->\n";
-//echo "<!-- ".$_SERVER['HTTP_REFERER']." -->\n";
-//	echo $comando."<br>";
-
-// Warning: pg_query() [function.pg-query]: Query failed: ERROR: permission denied for relation tbbanner in C:\Sites\E-Prepag\www\web\incs\functions.php on line 56
-
 	$rs_bannersSuperiores = SQLexecuteQuery($comando);
-
-//	if($rs_bannersSuperiores && pg_num_rows($rs_bannersSuperiores) > 0){
-//		echo "pg_num_rows: ".pg_num_rows($rs_bannersSuperiores)."<br>";
-//	}
-//	echo $rs_bannersSuperiores."<br>";
 ?>
 
 <script language="javascript">
@@ -49,28 +35,25 @@ var rs_bannersSuperioresURL = new Array();
 var ultimoBannerSuperior = 0;
 
 function carregaBanner(){
-	<?
-
-//	Example 
-//	if($rs_concilia && pg_num_rows($rs_concilia) > 0){
-//		$rs_concilia_row = pg_fetch_array($rs_concilia);
-//		$vg_id_prox = $rs_concilia_row['vg_id'];
-//	}
-
+	<?php
 		$linha=0;
+        $arquivo = '';
+        $url = '';
+        $spref = 's';
 		if($rs_bannersSuperiores && pg_num_rows($rs_bannersSuperiores) > 0){
 			while($rs_bannersSuperiores_row = pg_fetch_array($rs_bannersSuperiores)) {
+            if (!is_array($rs_bannersSuperiores_row)) continue;
 
 			$idbanners .= $rs_bannersSuperiores_row['idbanner'].", ";
 	
 			$arquivo = $sPath.$rs_bannersSuperiores_row['arquivo'];
 			$url = $rs_bannersSuperiores_row['urladdress'];
 			$spref = "s";
-			$url = str_replace("http", "https", strtolower($url));
+			$url = str_replace("http", "https", strtolower((string)$url));
 	?>
-			rs_bannersSuperiores[<?php echo $linha?>] = "<?php echo $arquivo; ?>";
-			rs_bannersSuperioresURL[<?php echo $linha?>] = "<?php echo $url; ?>";
-	<?
+			rs_bannersSuperiores[<?php echo $linha?>] = "<?php echo addslashes((string)$arquivo); ?>";
+			rs_bannersSuperioresURL[<?php echo $linha?>] = "<?php echo addslashes((string)$url); ?>";
+	<?php
 			$linha ++;
 			}
 		}
@@ -82,7 +65,7 @@ function carregaBanner(){
 	if(rs_bannersSuperiores.length>1) { bannersSuperioresID = window.setInterval(changeBannerSuperior, (tempoAlterarBannerSuperior * 1000)); }
 
 	// Enquete 
-	carregaEnquete(<?php echo $varStatus ?>);
+	carregaEnquete(<?php echo (int)$varStatus ?>);
 }
 
 function changeBannerSuperior(){

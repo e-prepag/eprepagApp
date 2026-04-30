@@ -110,8 +110,8 @@ grava_log_integracao_tmp(str_repeat("-", 80)."\nSelect registro de integração pa
 					$msg_1 = date("Y-m-d H:i:s")." - Erro ao recuperar transação de integração (manual) Nada encontrado (ip_id: ".$ip_id.", store_id: '".$store_id."', order_id: ".$order_id.", vg_id: $vg_id).\n   $sql\n";
 					echo $msg_1;
 grava_log_integracao_tmp(str_repeat("-", 80)."\n".$msg_1);
-				} elseif(pg_num_rows($rs_ped)>1) {
-					$msg_1 = date("Y-m-d H:i:s")." - Erro ao recuperar transação de integração (manual) Encontradas mais de uma transação (n=".pg_num_rows($rs_ped).") (ip_id: ".$ip_id.", store_id: '".$store_id."', order_id: ".$order_id.", vg_id: $vg_id).\n   $sql\n";
+				} elseif((($rs_ped) ? pg_num_rows($rs_ped) : 0)>1) {
+					$msg_1 = date("Y-m-d H:i:s")." - Erro ao recuperar transação de integração (manual) Encontradas mais de uma transação (n=".(($rs_ped) ? pg_num_rows($rs_ped) : 0).") (ip_id: ".$ip_id.", store_id: '".$store_id."', order_id: ".$order_id.", vg_id: $vg_id).\n   $sql\n";
 					echo $msg_1;
 grava_log_integracao_tmp(str_repeat("-", 80)."\n".$msg_1);
 				} else {

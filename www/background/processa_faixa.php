@@ -20,7 +20,7 @@ echo "sql: $sql".PHP_EOL;
 
 // Lista os registros encontrados:
 $rs_lans_saldo_aviso = SQLexecuteQuery($sql);
-$total_registros =  pg_num_rows($rs_lans_saldo_aviso);
+$total_registros =  (($rs_lans_saldo_aviso) ? pg_num_rows($rs_lans_saldo_aviso) : 0);
 echo "Total de Registros Levantados: ".$total_registros.PHP_EOL;
 if($rs_lans_saldo_aviso && $total_registros > 0){
         while ($rs_lans_saldo_aviso_row = pg_fetch_array($rs_lans_saldo_aviso)){

@@ -330,7 +330,7 @@ $sql .= " order by dia, mes, ano ";
 //echo $sql;
 
 $res_count = SQLexecuteQueryParams($sql, $sql_main_params);
-$total_table = pg_num_rows($res_count);
+$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
 $ordem = 0;
 $img_seta = "/sys/imagens/seta_down.gif";	

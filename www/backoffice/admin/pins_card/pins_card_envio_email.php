@@ -1,6 +1,7 @@
 <?php
 require_once $raiz_do_projeto . "includes/main.php";
 require_once "../../../includes/load_dotenv.php";
+require_once "../../../includes/phpmailer_utf8.php";
 
 set_time_limit(6000);
 
@@ -235,8 +236,21 @@ if(!empty($BtnGerarArq) && $tf_v_tipo==3) {
                         Atenciosamente,
                         Nós";
                         $email -> Subject = "Arquivo de PINs Cards Ativos";
+			$subject = $email->Subject;
+			$body_html = $email->Body;
+			$body_plain = $email->AltBody;
+			eprepag_phpmailer_prepare_utf8($email, $subject, $body_html, $body_plain);
+			$email->Subject = $subject;
+			$email->Body = $body_html;
+			$email->AltBody = $body_plain;
 			
-                        if ($email -> Send()) {
+                        $emailEnviado = false;
+                        try {
+                                $emailEnviado = $email->Send();
+                        } catch (\PHPMailer\PHPMailer\Exception $e) {
+                                $emailEnviado = false;
+                        }
+                        if ($emailEnviado) {
 				gravaLogDepuradorCard("Email enviado com sucesso!".PHP_EOL);
 				
 				$nomeArquivoProBD = substr($varArquivoRAR,(strrpos($varArquivoRAR,'/')+1),(strlen((string)($varArquivoRAR ?? ""))-strrpos($varArquivoRAR,'/')));

@@ -30,10 +30,7 @@ $search_msg_stats = LANG_SITE_SEARCH_MSG_1;
 $search_unit_stats = LANG_SITE_SEARCH_MSG_2;
 
 function get_current_date() {
-        $date1 = date("Y M d H i s");
-        $snow = date("d", $date1)."/".substr(mes_do_ano($date1),0,3)."/".date("Y", $date1)." ".date("h", $date1).":".date("m", $date1).":".date("s", $date1);
-        $snow = date("Y/M/d H:i:s");
-        return $snow;
+        return date("Y/M/d H:i:s");
 }
 
 

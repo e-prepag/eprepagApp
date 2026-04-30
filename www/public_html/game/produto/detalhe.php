@@ -5,6 +5,45 @@ require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "gamer/controller/HeaderController.class.php";
 require_once DIR_INCS . "pdv/captura_inc.php";
 require_once DIR_CLASS . "gamer/classAlawarGames.php";
+require_once DIR_INCS . "writeIfPossible.php";
+function detalheProdutoHasValorLivre($produto)
+{
+    if (trim((string)$produto->getValorMinimo()) !== "" || trim((string)$produto->getValorMaximo()) !== "") {
+        return true;
+    }
+
+    if ($produto->getMostraIntegracao()) {
+        return false;
+    }
+
+    $rs = null;
+    $filtro = array(
+        "ogpm_ativo" => 1,
+        "ogpm_ogp_id" => $produto->getId()
+    );
+    $ret = (new ProdutoModelo())->obter($filtro, "ogpm_valor asc", $rs);
+
+    return $ret == "" && (!$rs || pg_num_rows($rs) == 0);
+}
+
+function detalheProdutoValorMinimo($produto)
+{
+    $valor = $produto->getValorMinimo();
+    return trim((string)$valor) !== "" ? $valor : $GLOBALS["RISCO_GAMERS_VALOR_MIN"];
+}
+
+function detalheProdutoValorMaximo($produto)
+{
+    $valor = $produto->getValorMaximo();
+    return trim((string)$valor) !== "" ? $valor : $GLOBALS["RISCO_GAMERS_VALOR_MAX"];
+}
+
+function detalheProdutoLog($message, array $context = array())
+{
+    $line = "[" . date("Y-m-d H:i:s") . "] " . $message . " " . json_encode($context) . PHP_EOL;
+    writeFileIfPossible("/www/arquivos_gerados/logs/produto-detalhe-modelos.log", $line);
+}
+
 $controller = new HeaderController;
 /*
  * Início controller
@@ -105,7 +144,7 @@ if ($msg == "") {
 if ($msg == "") {
     // Wagner
 
-    $produto = new Produto($rs_row['ogp_id'], $rs_row['ogp_nome'], $rs_row['ogp_descricao'], $rs_row['ogp_ativo'], $rs_row['ogp_nome_imagem'], $rs_row['ogp_data_inclusao'], $rs_row['ogp_opr_codigo'], $rs_row['ogp_mostra_integracao'], $rs_row['ogp_iof'], $rs_row['ogp_pin_request'], $rs_row['ogp_detalhes_utilizacao'], $rs_row['ogp_termos_condicoes'], $rs_row['ogp_valor_minimo'], $rs_row['ogp_valor_maximo']);
+    $produto = new Produto($rs_row['ogp_id'], $rs_row['ogp_nome'], $rs_row['ogp_descricao'], $rs_row['ogp_ativo'], $rs_row['ogp_nome_imagem'], $rs_row['ogp_data_inclusao'], $rs_row['ogp_opr_codigo'], $rs_row['ogp_mostra_integracao'], $rs_row['ogp_iof'], $rs_row['ogp_pin_request'], $rs_row['ogp_detalhes_utilizacao'], $rs_row['ogp_termos_condicoes'], $rs_row['ogp_valor_minimo'], $rs_row['ogp_valor_maximo'], $rs_row['ogp_idade_minima']);
 
     if (isset($produto) && is_object($produto)) {
         $produto->setNomeOperadora($rs_row['opr_nome_loja']);
@@ -288,7 +327,7 @@ $controller->setHeader();
                 }
 
                 if (!$produto->getMostraIntegracao()) {
-                    if (is_null($produto->getValorMinimo()) && is_null($produto->getValorMaximo())) {
+                    if (!detalheProdutoHasValorLivre($produto)) {
                         $rs = null;
                         $filtro['ogpm_ativo'] = 1;
                         $produtoId = $prod;
@@ -308,8 +347,20 @@ $controller->setHeader();
                         $produto_ativo = 1;
                         $instProdutoModelo = new ProdutoModelo();
                         $ret = $instProdutoModelo->obter($filtro, "ogpm_valor asc", $rs);
+                        $qtdModelosDetalhe = $rs ? pg_num_rows($rs) : 0;
+                        detalheProdutoLog("consulta_modelos", array(
+                            "produto_id" => $produto->getId(),
+                            "produto_nome" => $produto->getNome(),
+                            "mostra_integracao" => $produto->getMostraIntegracao(),
+                            "valor_minimo" => $produto->getValorMinimo(),
+                            "valor_maximo" => $produto->getValorMaximo(),
+                            "pin_request" => $produto->getPinRequest(),
+                            "filtro" => $filtro,
+                            "qtd_modelos" => $qtdModelosDetalhe,
+                            "ret" => $ret
+                        ));
 
-                        if (!$rs || pg_num_rows($rs) == 0) {
+                        if (!$rs || $qtdModelosDetalhe == 0) {
                     ?>
                             <div class="row top10">
                                 <p class="pull-right txt-vermelho"><strong><em>Não existem modelos cadastrados para este produto.</em></strong></p>
@@ -403,7 +454,7 @@ $controller->setHeader();
                                             <div class="form-group align-center">
                                                 <div class="input-group align-center">
                                                     <div class="input-group-addon">R$</div>
-                                                    <input type="number" class="form-control align-right" id="valor" step="1" min="<?php echo $produto->getValorMinimo(); ?>" max="<?php echo $produto->getValorMaximo(); ?>" value="<?php echo number_format($produto->getValorMinimo(), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
+                                                    <input type="number" class="form-control align-right" id="valor" step="1" min="<?php echo detalheProdutoValorMinimo($produto); ?>" max="<?php echo detalheProdutoValorMaximo($produto); ?>" value="<?php echo number_format(detalheProdutoValorMinimo($produto), 0); ?>" onchange="document.getElementById('valor_hidden').value = this.value;">
                                                     <div class="input-group-addon">.00</div>
                                                 </div>
 
@@ -411,7 +462,7 @@ $controller->setHeader();
                                         </div>
                                         <div class="c-pointer modelo-produto" estoque="1" id="<?php echo $NO_HAVE; ?>">
                                             <div class="col-sm-12 col-md-3 col-lg-3 top15 align-center">
-                                                <span class="txt-azul-claro2 span-valor"><?php echo get_info_EPPCash_NO_Table((new ConversionPINsEPP)->get_ValorEPPCash('E', $produto->getValorMinimo())); ?></span>
+                                                <span class="txt-azul-claro2 span-valor"><?php echo get_info_EPPCash_NO_Table((new ConversionPINsEPP)->get_ValorEPPCash('E', detalheProdutoValorMinimo($produto))); ?></span>
                                             </div>
                                             <div class="col-sm-12 col-md-3 col-lg-3 top15">
                                                 <div class="" estoque="1" id="<?php echo $NO_HAVE ?>">
@@ -422,7 +473,7 @@ $controller->setHeader();
                                     </div>
                                     <div class="row top10">
                                         <div class="col-lg-12 align-center">
-                                            <span>Valor mínimo: <?php echo $produto->getValorMinimo(); ?> | Valor máximo: <?php echo $produto->getValorMaximo(); ?></span>
+                                            <span>Valor mínimo: <?php echo detalheProdutoValorMinimo($produto); ?> | Valor máximo: <?php echo detalheProdutoValorMaximo($produto); ?></span>
                                         </div>
                                     </div>
                                 </form>
@@ -431,7 +482,7 @@ $controller->setHeader();
                         <form id='seleciona' method='post' action="/game/pedido/passo-1.php" style="display: flex; align-items:end; flex-wrap: wrap;">
                             <input type='hidden' name='acao' id='acao' value='u'>
                             <input type='hidden' name='mod' id='mod' value='NO HAVE'>
-                            <input type='hidden' name='valor' id='valor_hidden' value='5'>
+                            <input type='hidden' name='valor' id='valor_hidden' value='<?php echo number_format(detalheProdutoValorMinimo($produto), 0, "", ""); ?>'>
                             <input type='hidden' name='codeProd' id='codeProd' value='<?php echo $produto->getId(); ?>'>
                             <div class="quantity-selector compact" data-min="1" data-max="999">
                                 <button type="button" class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
@@ -502,6 +553,26 @@ $controller->setHeader();
                 reverse: true
             });
 
+            function syncValorVariavel() {
+                if (!$("#valor").length) return;
+
+                var min = parseInt($("#valor").attr("min"));
+                var max = parseInt($("#valor").attr("max"));
+                var valor = parseInt($("#valor").val());
+
+                if (isNaN(valor)) valor = min;
+                if (valor < min) valor = min;
+                if (valor > max) valor = max;
+
+                $("#valor").val(valor);
+                $("#valor_hidden").val(valor);
+
+                return valor;
+            }
+
+            syncValorVariavel();
+
+
             $(".bg-comprar").click(function() {
                 // Remove a borda de seleção e ícone de todos os produtos
                 if (!$(this).hasClass("c-pointer")) return;
@@ -530,6 +601,7 @@ $controller->setHeader();
             });
 
             $("#btn-adicionar-carrinho").click(function() {
+                syncValorVariavel();
                 // Envia os dados do formulário via AJAX para adiciona-carrinho.php
                 let data = {
                     acao: "u",
@@ -595,6 +667,10 @@ $controller->setHeader();
                 });
             });
 
+            $("#seleciona").submit(function() {
+                syncValorVariavel();
+            });
+
             $("#valor").change(function() {
                 var min = parseInt($("#valor").attr("min"));
                 var max = parseInt($("#valor").attr("max"));
@@ -603,13 +679,16 @@ $controller->setHeader();
 
                     var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                     $("#valor").val(min);
+                    $("#valor_hidden").val(min);
                     $(".error-list").html(html);
                 } else if (valor > max) {
                     var html = "<p class='txt-vermelho'>O valor " + valor + " não esta dentro do mínimo e máximo específicado. Por favor, insira um valor entre " + min + " e " + max + "!</p>";
                     console.log(valor);
                     $("#valor").val(max);
+                    $("#valor_hidden").val(max);
                     $(".error-list").html(html);
                 } else {
+                    $("#valor_hidden").val(valor);
                     var html = "R$" + valor + ",00";
                     $.post("/game/ajax/epp_info.php", {
                             valor: valor,

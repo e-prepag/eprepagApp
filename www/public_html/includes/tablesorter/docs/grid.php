@@ -6,7 +6,7 @@ $con=pg_connect("host=$host port=$port dbname=$banco user=$usuario password=$sen
 
 $sql = "SELECT * FROM tb_lans ORDER BY nome ASC;";
 $rss = pg_query($con,$sql);
-$tot = pg_num_rows($rss);
+$tot = (($rss) ? pg_num_rows($rss) : 0);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

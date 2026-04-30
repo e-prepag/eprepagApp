@@ -7,7 +7,7 @@ require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "util/Util.class.php";
 require_once DIR_CLASS . "util/Validate.class.php";
 require_once "/www/class/class2FA.php";
-require_once "../../class/GoogleAutenticator.php";
+require_once "../../../class/GoogleAutenticator.php";
 /*
  * Programa em AJAX para efetuar o login de gamer
  * 
@@ -28,7 +28,6 @@ if (Util::isAjaxRequest()) {
 	require_once "funcoes_login.php";
 
 	if ($_SESSION['captcha_passed'] == 1) {
-
 	} else {
 		session_destroy();
 		echo "Você deve fazer a verificação do RECAPTCHA para fazer o login.";
@@ -128,7 +127,7 @@ if (Util::isAjaxRequest()) {
 				}
 			} else {
 				if (!checkDevice($auth['ug_id'], $connection, false)) {
-					$ga = new PHPGangsta_GoogleAuthenticator();
+					$ga = new classGoogleAutenticator();
 					if (!$ga->verifyCode($auth['ug_chave_autenticador'], $_POST['token'], 2)) {
 						$msgAuth = "Token inválido.\n";
 
@@ -234,7 +233,6 @@ if (Util::isAjaxRequest()) {
 					echo RETURN_TWO_FACTOR;
 				}
 			}
-
 		} else if ($validate->qtdCaracteres($_POST['login'], 2, 255) == 0) {
 			//validar minimo de 3 caracteres e verificar maximo permitido para o capmo ug_login na tabela
 			//metodo autenticarUgLogin($_POST['login'],$_POST['senha']);
@@ -254,7 +252,6 @@ if (Util::isAjaxRequest()) {
 				$erro = true;
 				$geraLog = new Log("log_login", array("Login ou senha inválidos: '" . $_POST['login']));
 				registrarTentativaFalha($_POST['login']);
-
 			} else {
 				$geraLog = new Log("log_login", array("Login com sucesso: '" . $_POST['login']));
 			}

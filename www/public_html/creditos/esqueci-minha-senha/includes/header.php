@@ -3,8 +3,8 @@
 
 	header("Content-Type: text/html; charset=ISO-8859-1",true);
 
-	ini_set('display_errors', 0);
-	ini_set('display_startup_errors', 0);
+	// ini_set('display_errors', 0);
+	// ini_set('display_startup_errors', 0);
 	error_reporting(0);
 
 ?>

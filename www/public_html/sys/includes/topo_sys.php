@@ -18,6 +18,7 @@ if (($_SESSION["tipo_acesso_pub"] != 'AD') && ($_SESSION["tipo_acesso_pub"] != '
     <link rel="stylesheet" href="/sys/css/newcss.css" type="text/css">
     <?php
     //error_reporting(E_ALL & ~E_NOTICE);
+    ?>
 
     <script language="JavaScript">
         <!--

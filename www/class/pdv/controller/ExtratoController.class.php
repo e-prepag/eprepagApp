@@ -14,8 +14,6 @@ $pagina_titulo = "Saldo";
 
 class ExtratoController extends HeaderController{
     public $raiz_do_projeto;
-    
-    public UsuarioGames $usuarios;
 
     public function __construct(){
         $this->objBanner = new BannerBO;
@@ -323,7 +321,7 @@ class ExtratoController extends HeaderController{
 		fwrite($ff, str_repeat("*", 50)."\r");
 		fclose($ff);*/
 
-        $num = pg_num_rows($rs_extrato);
+        $num = (($rs_extrato) ? pg_num_rows($rs_extrato) : 0);
         
         $arrExtratos = array();
                 
@@ -349,7 +347,7 @@ class ExtratoController extends HeaderController{
 
                 //$extrato['operador'] = $ugo_login;
                 //$extrato['idOperador'] = $ugo_id;
-                if($rs_operador && pg_num_rows($rs_operador ) > 0) {
+                if($rs_operador && pg_num_rows($rs_operador) > 0) {
                     $pg_operador = pg_fetch_array($rs_operador);
                     $extrato['operador'] = $pg_operador['operador'];
                 } 
@@ -746,7 +744,7 @@ class ExtratoController extends HeaderController{
         $sql = "select * from dist_usuarios_games_operador ugo where ugo.ugo_ug_id = $1";
         $sqlParams = array((int) $this->usuarios->getId());
         $res_count = SQLexecuteQueryParams($sql, $sqlParams);
-        $total_table = pg_num_rows($res_count);
+        $total_table = (($res_count) ? pg_num_rows($res_count) : 0);
         $rs_operadores = SQLexecuteQueryParams($sql, $sqlParams);
         $arrOperadores = array();
         

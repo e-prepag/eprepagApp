@@ -393,7 +393,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
                     echo "<center><table cellspacing='0' width='960px'>";
 
-                    $rs_modelos_row_total = pg_num_rows($rs_modelos);
+                    $rs_modelos_row_total = (($rs_modelos) ? pg_num_rows($rs_modelos) : 0);
 
                     for ($i = 0; $i < $rs_modelos_row_total; $i++) {
 
@@ -914,7 +914,7 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
 
                 if ($rs_modelos) {
 
-                    $rs_modelos_row_total = pg_num_rows($rs_modelos);
+                    $rs_modelos_row_total = (($rs_modelos) ? pg_num_rows($rs_modelos) : 0);
 
                     for ($i = 0; $i < $rs_modelos_row_total; $i++) {
 

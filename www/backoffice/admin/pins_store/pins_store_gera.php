@@ -199,8 +199,10 @@ if (!empty($pin_valor)) {
 	$conteudo .= " Segundos: ".number_format(getmicrotime() - $time_start_stats, 2, '.', '.').PHP_EOL;
 	$conteudo .= " Qtde de PINs : ".number_format($qtde, 0, '.', '.').PHP_EOL;
 	$conteudo .= "=====================Fim EPP CASH==============================".PHP_EOL;
+	if ($fp) {
 	fwrite($fp, $conteudo);
 	fclose($fp);
+	}
 }//end if (!empty($pin_valor))
 
 require_once $raiz_do_projeto."backoffice/includes/rodape_bko.php";

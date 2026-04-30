@@ -40,6 +40,9 @@ header("Content-Length: " . (string) filesize($file));
 header("Content-Disposition: inline; filename=" . $arquivo);
 
 $handle = fopen($file, "rb");
+if ($handle === false) {
+    die("Erro ao abrir arquivo.");
+}
 print(fread($handle, filesize($file)));
 fclose($handle);
 ob_end_flush(); 

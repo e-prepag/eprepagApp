@@ -238,7 +238,7 @@ if($acao == 'editar')
 		$promo_ativo			= $rs_promocoes_row['promo_ativo'];
 		$promo_label_banner		= $rs_promocoes_row['promo_label_banner'];
 		$promo_link_redir		= $rs_promocoes_row['promo_link_redir'];
-		if (pg_num_rows($rs_promocoes) > 0)
+		if ((($rs_promocoes) ? pg_num_rows($rs_promocoes) : 0) > 0)
 			include 'promocoes_edt.php';
 		else
 			$acao = 'listar';

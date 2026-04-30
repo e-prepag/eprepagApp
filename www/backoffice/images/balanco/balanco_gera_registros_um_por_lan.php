@@ -21,7 +21,7 @@ echo "Now: ".date("Y-m-d H:i:s")."<br>";
 // Calcula total de lans ativas/inativas
 $total_query = "select ug_id from dist_usuarios_games order by ug_id";
 $total_rs_query = SQLexecuteQuery($total_query);
-$total_row = pg_num_rows($total_rs_query);
+$total_row = (($total_rs_query) ? pg_num_rows($total_rs_query) : 0);
 
 		$i_balanco = 1;
 //		$n_balanco = 164;

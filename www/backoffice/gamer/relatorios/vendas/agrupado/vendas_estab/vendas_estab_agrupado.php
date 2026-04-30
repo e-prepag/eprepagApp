@@ -176,7 +176,7 @@
 		$estat .= "group by t0.trn_data, t1.uf, t2.opr_nome, t0.pin_valor";
 
 		$res_count = pg_query($estat);
-		$total_table = pg_num_rows($res_count);
+		$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 	
 		$estat .= " order by ".$ncamp; 
 

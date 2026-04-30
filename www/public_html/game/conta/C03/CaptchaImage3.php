@@ -30,17 +30,26 @@ include "Functions.php";
 Header ( 'Content-type: image/gif' );
 
 // Pega as fontes no diretorio
-if ( $dh = opendir ( "fonts/" ) ) {
+$fontDir = __DIR__ . "/fonts/";
+if ( $dh = opendir ( $fontDir ) ) {
 	while ( false !== ( $dat = readdir ( $dh ) ) ) {
 		if ( $dat != "." && $dat != ".." ) {
-			$fonts [ ] = "fonts/$dat";
+			$fonts [ ] = $fontDir . $dat;
 		}
 	}
 	closedir ( $dh );
+} else {
+	error_log ( "CaptchaImage3: nao foi possivel abrir diretorio de fontes: " . $fontDir );
 }
 
 // executa a classe
-$IMG = new Captcha ( generateRandomCode() , $fonts [ rand ( 0, ( count ( $fonts ) ) - 1 ) ], "ff0000" );
+$font = "";
+if ( isset ( $fonts ) && is_array ( $fonts ) && count ( $fonts ) > 0 ) {
+	$font = $fonts [ rand ( 0, count ( $fonts ) - 1 ) ];
+} else {
+	error_log ( "CaptchaImage3: nenhuma fonte encontrada, usando fallback GD" );
+}
+$IMG = new Captcha ( generateRandomCode() , $font, "ff0000" );
 
 // Gera o grafico
 echo $IMG->AnimatedOut ( );

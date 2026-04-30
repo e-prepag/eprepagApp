@@ -157,7 +157,7 @@ pin_status          stat_descricao                                 n
 		//echo $sql_serial."<br>";
 		$rs_serial = SQLexecuteQuery($sql_serial);
 		if ($rs_serial) {
-			if (pg_num_rows($rs_serial) > 0) {
+			if ((($rs_serial) ? pg_num_rows($rs_serial) : 0) > 0) {
 				$rs_serial_row = pg_fetch_array($rs_serial);
 				/*
 				echo $rs_serial_row['max_serial']."<br>".$pin_serial.":teste<br>";

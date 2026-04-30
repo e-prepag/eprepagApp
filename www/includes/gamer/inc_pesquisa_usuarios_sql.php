@@ -6,7 +6,7 @@ if (is_array($a_lista_usuarios_VIP) && count($a_lista_usuarios_VIP) > 0) {
 } else {
 	$sql .= ", 0 as ug_flag_vip ";
 }
-	$sql .= "
+$sql .= "
 	";
 if ($somenteContar == 1) {
 	$sql  = "select count(*) as total

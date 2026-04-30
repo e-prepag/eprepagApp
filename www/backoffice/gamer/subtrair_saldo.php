@@ -16,7 +16,7 @@ if(isset($_POST["ug_id"]) && !empty($_POST["ug_id"]) && isset($_POST["valor"]) &
 	$sql = "SELECT ug_perfil_saldo, ug_login FROM usuarios_games WHERE ug_id = " . $ug_id;
 	$ret = SQLexecuteQuery($sql);
 	
-	if(pg_num_rows($ret) == 0) {
+	if((($ret) ? pg_num_rows($ret) : 0) == 0) {
 		$msg = "Nenhum Usuário Encontrado";
 	}
 	else {

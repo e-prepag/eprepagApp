@@ -281,7 +281,7 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
                 <td><?php if($rs_pin_row['pin_dataentrada']) { ?><?php  echo monta_data($rs_pin_row['pin_dataentrada']); ?> - <?php  echo ($isPINCARD?substr($rs_pin_row['pin_dataentrada'],11,8):substr($rs_pin_row['pin_horaentrada'],0,8)); } else echo "--"; ?></td>
                 <td><?php echo ($isPINCARD?$data_vendido_aux:($rs_pin_row['pin_datavenda']?monta_data($rs_pin_row['pin_datavenda'])." - ".$rs_pin_row['pin_horavenda']: "--")); ?></td>
                 <td><?php echo ($isPINCARD?$data_utilizado_aux:($rs_pin_utilizado_row['pih_data']?monta_data($rs_pin_utilizado_row['pih_data'])." - ".substr($rs_pin_utilizado_row['pih_data'], 11, 8): "--")); ?></td>
-                <td><?php  echo "R$ ".number_format($rs_pin_row['pin_valor'], 2, ',', '.'); ?></td>
+                <td><?php  echo "R$ ".number_format((float)$rs_pin_row['pin_valor'], 2, ',', '.'); ?></td>
                 <td><?php echo "" . ($isPINCARD?($data_vendido_aux=="--"&&$rs_pin_row['pin_status'] == intval($PINS_STORE_STATUS_VALUES['A'])?"PIN Não Ativado no PDV":$PINS_STORE_STATUS[$rs_pin_row['pin_status']]):constant("LANG_PINS_STATUS_MSG_".$rs_pin_row['pin_status'])) . $mensagem_utilizacao; ?></td>
               </tr>
               <?php  
@@ -330,12 +330,12 @@ if(($BtnSearch && !empty($fpin)) || (isset($_GET["pin"]) && !empty($_GET["pin"])
     <?php
               }//end else do if($isPINCARD)
               
-    } //end if(pg_num_rows($rs_pin) > 0)
+    } //end if((($rs_pin) ? pg_num_rows($rs_pin) : 0) > 0)
     else {
     ?>
     <font color="#666666" size="2" face="Arial, Helvetica, sans-serif">Este PIN não foi encontrado em nosso banco de dados.<br>Por favor, verifique a sequência de caracteres digitados.</font>
     <?php
-    } //end else do if(pg_num_rows($rs_pin) > 0)
+    } //end else do if((($rs_pin) ? pg_num_rows($rs_pin) : 0) > 0)
 }//end if($BtnSearch && !empty($fpin))    
 ?>
         

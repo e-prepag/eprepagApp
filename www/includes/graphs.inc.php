@@ -154,8 +154,8 @@ class BAR_GRAPH {
 
 	function level_color($value, $color) {
 		if($this->barLevelColors) {
-			for($i = 0; $i < count($this->barLevelColors); $i += 2) {
-				if($i+1 < count($this->barLevelColors)) {
+			for($i = 0; $i < (is_countable($this->barLevelColors) ? count($this->barLevelColors) : 0); $i += 2) {
+				if($i+1 < (is_countable($this->barLevelColors) ? count($this->barLevelColors) : 0)) {
 					if(($this->barLevelColors[$i] > 0 && $value >= $this->barLevelColors[$i]) ||
 						 ($this->barLevelColors[$i] < 0 && $value <= $this->barLevelColors[$i])) {
 						$color = $this->barLevelColors[$i+1];
@@ -357,7 +357,7 @@ class BAR_GRAPH {
 				}
 
 				if(!isset($bc[$j]) || !$bc[$j]) {
-					if($ccnt >= count($this->colors)) $ccnt = 0;
+					if($ccnt >= (is_countable($this->colors) ? count($this->colors) : 0)) $ccnt = 0;
 					$bc[$j] = (!isset($drc[$j]) || strlen($drc[$j]) < 3) ? $this->colors[$ccnt++] : trim($drc[$j]);
 				}
 			}
@@ -365,7 +365,7 @@ class BAR_GRAPH {
 		}
 
 		if($this->barLevelColors) {
-			for($i = 0; $i < count($this->barLevelColors); $i += 2) {
+			for($i = 0; $i < (is_countable($this->barLevelColors) ? count($this->barLevelColors) : 0); $i += 2) {
 				if($this->barLevelColors[$i] == 'MAX') $this->barLevelColors[$i] = $max;
 			}
 		}

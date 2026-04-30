@@ -2,10 +2,6 @@
 //ob_clean();
 set_time_limit(120);
 require_once $raiz_do_projeto . "consulta_cpf/config.inc.cpf.php";
-
-//Include do modelo antigo
-//include 'C:\Sites\E-Prepag\www\web\prepag2\incs\rf_cpf\funcoes.php';
-
 require_once $raiz_do_projeto . 'includes/functions.php';
 require_once $raiz_do_projeto . "consulta_cpf/trocaAutomatica.php";
 require_once '/www/includes/pdv/functions.php';
@@ -21,8 +17,10 @@ if (isset($_REQUEST['formsubmit'])) {
     $_REQUEST['cpf'] = preg_replace('/[^0-9]/', '', $_REQUEST['cpf']);
 
     $ff = fopen("/www/arquivos_gerados/logs/ttcpf.txt", "a+");
+    if ($ff) {
     fwrite($ff, $_REQUEST['cpf'] . "\r");
     fclose($ff);
+    }
 
     //Novo modelo de Consulta
 
@@ -77,16 +75,17 @@ if (isset($_REQUEST['formsubmit'])) {
                 $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
                 qtdeTrocaAutomatica();
             }
-
         } // end if (CPF_PARTNER_ENVIRONMET == CPF_PARTNER_CREDIFY)
         elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_HUB) {
 
             $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+            if ($file) {
             fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
             fwrite($file, "codigo cpf: " . $testeCPF . "\n");
             fwrite($file, "resultado: " . json_encode($resposta) . "\n");
             fwrite($file, str_repeat("*", 50) . "\n");
             fclose($file);
+            }
 
             if ($testeCPF == 2) {
                 $errors[] = "Este número de CPF parece não constar na Receita Federal. Por favor, verifique o número digitado e tente novamente.";
@@ -105,12 +104,10 @@ if (isset($_REQUEST['formsubmit'])) {
                 $retorno["data_nascimento"] = $resposta['result']['data_nascimento'];
                 $name = $retorno["nome"];
                 $data_nascimento = $retorno["data_nascimento"];
-
             } else {
                 $errors[] = "Erro no sistema (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
                 qtdeTrocaAutomatica();
             }
-
         } elseif (CPF_PARTNER_ENVIRONMET == CPF_CONSULTA_CACHE) {
 
             if ($testeCPF == 2) {
@@ -121,15 +118,16 @@ if (isset($_REQUEST['formsubmit'])) {
             } else {
                 $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0485). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
             }
-
         } else {
 
             $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+            if ($file) {
             fwrite($file, "DATA " . date("d-m-Y H:i:s") . "\n");
             fwrite($file, "parametros " . json_encode($parametros) . "\n");
             fwrite($file, "resultado PASSO 4 " . $testeCPF . "\n");
             fwrite($file, str_repeat("*", 50) . "\n");
             fclose($file);
+            }
 
             //var_dump($testeCPF);
             //var_dump($resposta);
@@ -157,25 +155,24 @@ if (isset($_REQUEST['formsubmit'])) {
                 $errors[] = "Erro no sistema [" . $resposta['pesquisas']['msg'] . "] (0407). Por favor, entre em contato com suporte@e-prepag.com.br reportando o código do problema. Obrigado.";
                 qtdeTrocaAutomatica();
             }
-
         }
 
         $file = fopen("/www/arquivos_gerados/logs/retorno_cpf.txt", "a+");
+        if ($file) {
         fwrite($file, "hud do desenvolvedor \n");
         fwrite($file, "resultado code " . $testeCPF . "\n");
         fwrite($file, "resultado json " . json_encode($resposta) . "\n");
         fwrite($file, "retorno json " . json_encode($retorno) . "\n");
         fwrite($file, str_repeat("*", 50));
         fclose($file);
-
-    }//end elseif ($testeCPF != 171)
+        }
+    } //end elseif ($testeCPF != 171)
 
     // Atingiu o limite máximo de utilização do mesmo CPF
     else {
 
         $errors[] = "Este CPF está temporariamente desabilitado para compras pois atingiu o limite máximo de utilização. Por favor, confirme o número do CPF com seu cliente. Erro 171";
-
-    }//end else do elseif ($testeCPF != 171)
+    } //end else do elseif ($testeCPF != 171)
 
     if (count($errors) == 0) {
 
@@ -191,9 +188,7 @@ if (isset($_REQUEST['formsubmit'])) {
 
 
         header('Location: ' . $GLOBALS['_SERVER']['PHP_SELF']);
-
     }
-
 }
 
 $form_name = isset($_REQUEST['name']) ? $_REQUEST['name'] : $GLOBALS['_SESSION']['NOME_CPF'];
@@ -326,7 +321,11 @@ echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
         </form>
 
         <?php foreach ($errors as $error) { ?>
-            <script>$(function () { showMessage('<?php echo str_replace("\n", " ", $error); ?>'); });</script>
+            <script>
+                $(function() {
+                    showMessage('<?php echo str_replace("\n", " ", $error); ?>');
+                });
+            </script>
             <?php break; ?>
         <?php } ?>
     </div>
@@ -334,11 +333,11 @@ echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
 <script>
     $('div#captcha_img, div#captcha_img + a').wrapAll('<div id="captcha-wrapper">');
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         //jQuery(function(e){e.datepicker.regional["pt-BR"]={closeText:"Fechar",prevText:"&#x3C;Anterior",nextText:"Próximo&#x3E;",currentText:"Hoje",monthNames:["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],monthNamesShort:["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],dayNames:["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"],dayNamesShort:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],dayNamesMin:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],weekHeader:"Sm",dateFormat:"dd/mm/yy",firstDay:0,isRTL:!1,showMonthAfterYear:!1,yearSuffix:""},e.datepicker.setDefaults(e.datepicker.regional["pt-BR"])});
         var currentDate = new Date();
 
-        $(document).keypress(function (e) {
+        $(document).keypress(function(e) {
             if (e.which == 13) {
                 $('#btn_submit').click();
                 e.preventDefault();
@@ -348,7 +347,7 @@ echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
 
         $("#data_nascimento").mask("99/99/9999");
         $("#cpf").mask("999.999.999-99");
-        $("#data_nascimento").blur(function () {
+        $("#data_nascimento").blur(function() {
             if ($(this).val().length == "10") {
                 var dt_nasc = $(this).val().split("/");
                 var objDtNasc = new Date(parseInt(dt_nasc[2]), parseInt(dt_nasc[1]) - 1, parseInt(dt_nasc[0]));
@@ -359,7 +358,7 @@ echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
             }
         });
 
-        $("#data_nascimento").change(function () {
+        $("#data_nascimento").change(function() {
             if ($(this).val().length == "10") {
                 var dt_nasc = $(this).val().split("/");
                 var objDtNasc = new Date(parseInt(dt_nasc[2]), parseInt(dt_nasc[1]) - 1, parseInt(dt_nasc[0]));
@@ -374,7 +373,6 @@ echo '<script src="' . $url . '/js/jquery.mask.min.js"></script>';
         //        maxDate: currentDate
         //    });
     });
-
 </script>
 
 </body>

@@ -12,15 +12,15 @@ $language		= isset($_POST['language'])		? $_POST['language']			: null;
 unlink('images/'.trim($labeloperadora).$imagem);
 
 // jpgraph na produção
-include ("../stats/graph/src/jpgraph.php");
-include ("../stats/graph/src/jpgraph_line.php");
+require_once __DIR__ . "/../../../../vendor/autoload.php";
 
-//include ("../jpgraph/src/jpgraph.php");
-//include ("../jpgraph/src/jpgraph_line.php");
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+use Amenadiel\JpGraph\Util;
 
 
 // Create the graph. These two calls are always required
-$graph = new Graph(750,350,'auto');    
+$graph = new Graph\Graph(750,350,'auto');    
 $graph->SetScale("textlin");
 $graph->SetY2Scale("lin");
 $graph->SetShadow();
@@ -51,7 +51,7 @@ foreach ($_SESSION['graphic'][date("y")] as $mes => $valor){
 }
 
 // Create the linear plot
-$lineplot=new LinePlot($mm);
+$lineplot=new Plot\LinePlot($mm);
 // Setup the colors
 $lineplot->SetColor("blue");
 $lineplot->SetWeight(2);
@@ -80,7 +80,7 @@ foreach ($_SESSION['graphic'][str_pad((date("y")*1-1), 2 , "0", STR_PAD_LEFT)] a
 }
 
 // Create the linear plot
-$lineplot2=new LinePlot($mm);
+$lineplot2=new Plot\LinePlot($mm);
 // Setup the colors
 $lineplot2->SetColor("orange");
 $lineplot2->SetWeight(2);
@@ -137,14 +137,14 @@ else {
 		// Set new locale for Portuguese BR
 		$loc_br = setlocale(LC_ALL, 'pt_BR');
 
-		$dateLocale = new DateLocale();
+		$dateLocale = new Util\DateLocale();
 		// Use Brasil locale
 		$dateLocale->Set($loc_br);
 		// Setup graph title
 		$graph->title->Set($labeloperadora.' - Vendas - Valor Bruto R$');
 	}
 	else {
-		$dateLocale = new DateLocale();
+		$dateLocale = new Util\DateLocale();
 		// Setup graph title
 		$graph->title->Set($labeloperadora.' - Sales - Gross R$');
 	}

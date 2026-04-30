@@ -55,7 +55,7 @@ if ($Enviar) {
 
         if (!isset($pgrow)) $pgrow = array('bko_autoriza' => false);
         gravaLog_LoginBKO("Login BKO - Autoriza: '" . $pgrow['bko_autoriza'] . "'");
-        
+
 
         if ($pgrow['bko_autoriza'] == 'S') {
             $iduser_var         = $pgrow['id'];
@@ -79,8 +79,9 @@ if ($Enviar) {
                         exit;
                     }
 
-                    $ga = new PHPGangsta_GoogleAuthenticator();
-                    $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $_POST['token'], 2);
+                    $ga = new classGoogleAutenticator();
+                    $tokenInformado = (string)($_POST['token'] ?? "");
+                    $tokenValido = $ga->verifyCode($pgrow['chave_autenticador'], $tokenInformado, 2);
                     $deviceValido = checkDevice($iduser_var, $pdo);
 
                     if (!$tokenValido && !$deviceValido) {

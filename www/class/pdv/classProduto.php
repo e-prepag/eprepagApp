@@ -207,7 +207,7 @@ class Produto {
 			$sql_ordenar = SQLexecuteQuery($sql);
 			$cont = 0;
 		
-			if (pg_num_rows($sql_ordenar) != 0)
+			if ((($sql_ordenar) ? pg_num_rows($sql_ordenar) : 0) != 0)
 				while($codigo = pg_fetch_array($sql_ordenar))
 				{
 					SQLexecuteQuery("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
@@ -221,7 +221,7 @@ class Produto {
 		$sql_ordenar_inat = SQLexecuteQuery($sql);
 		$cont = is_null($cont) ? pg_num_rows($sql_ordenar) : $cont;
 		
-		if (pg_num_rows($sql_ordenar_inat) != 0)
+		if ((($sql_ordenar_inat) ? pg_num_rows($sql_ordenar_inat) : 0) != 0)
 			while($codigo = pg_fetch_array($sql_ordenar_inat))
 			{
 				SQLexecuteQuery("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
@@ -348,6 +348,27 @@ class Produto {
 
 		$ret = "";
 		$filtro = array_map("strtoupper", $filtro);
+		$filtro += array(
+			"opr" => null,
+			"opr_status" => null,
+			"ogp_id" => null,
+			"ogp_id_lista" => null,
+			"ogp_nome" => null,
+			"ogp_nomeLike" => null,
+			"ogp_descricao" => null,
+			"ogp_descricaoLike" => null,
+			"ogp_ativo" => null,
+			"ogp_mostra_integracao_gamer" => null,
+			"ogp_mostra_integracao_gamer_com_loja" => null,
+			"ogp_nome_imagem" => null,
+			"ogp_nome_imagemLike" => null,
+			"ogp_data_inclusaoMin" => null,
+			"ogp_data_inclusaoMax" => null,
+			"ogp_opr_codigo" => null,
+			"ogp_codigo_negado" => null,
+			"ogp_codigo_negado_2" => null,
+			"ogp_inibi_lojas_online" => null,
+		);
 	
 		$sql = "select * from tb_dist_operadora_games_produto ogp ";
 
@@ -438,6 +459,27 @@ class Produto {
 
 		$ret = "";
 		$filtro = array_map("strtoupper", $filtro);
+		$filtro += array(
+			"opr" => null,
+			"opr_status" => null,
+			"ogp_id" => null,
+			"ogp_id_lista" => null,
+			"ogp_nome" => null,
+			"ogp_nomeLike" => null,
+			"ogp_descricao" => null,
+			"ogp_descricaoLike" => null,
+			"ogp_ativo" => null,
+			"ogp_mostra_integracao_gamer" => null,
+			"ogp_mostra_integracao_gamer_com_loja" => null,
+			"ogp_nome_imagem" => null,
+			"ogp_nome_imagemLike" => null,
+			"ogp_data_inclusaoMin" => null,
+			"ogp_data_inclusaoMax" => null,
+			"ogp_opr_codigo" => null,
+			"ogp_codigo_negado" => null,
+			"ogp_codigo_negado_2" => null,
+			"ogp_inibi_lojas_online" => null,
+		);
 		
                 $sql = "select ogp_id, ogp_nome,ogp_descricao, ogp_descricao_api ,ogp_ativo,ogp_nome_imagem,ogp_data_inclusao,ogp_opr_codigo, ogp_mostra_integracao_gamer, ogp_iof, ogp_inibi_lojas_online, ogp_pin_request, ogp_comunicacao_cupom, ogp_valor_minimo, ogp_valor_maximo, ogp_idade_minima ";
                 

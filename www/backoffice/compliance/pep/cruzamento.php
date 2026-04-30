@@ -3,7 +3,7 @@
 //ini_set("display_errors", 1); 
 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200);
+// ini_set('max_execution_time', 1200);
 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto . "backoffice/includes/topo.php";
@@ -206,7 +206,7 @@ if (isset($_POST["busca"])) {
     <table class="table table-bordered top20">
         <?php
         if (isset($rs) && $rs) {
-            $total_de_registros = pg_num_rows($rs);
+            $total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
             if ($total_de_registros > 0) {
         ?>
                 <thead class="">
@@ -241,7 +241,7 @@ if (isset($_POST["busca"])) {
                         $rsEncontrado = SQLexecuteQuery($sql);
 
                         // Verificando se foi encontrado algum registro na PEP
-                        if (isset($rsEncontrado) && pg_num_rows($rsEncontrado) > 0) {
+                        if (isset($rsEncontrado) && (($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) {
 
                             // CASO 1: ENCONTROU NA PEP
                             // Exibindo todas incidencias
@@ -275,14 +275,14 @@ if (isset($_POST["busca"])) {
                         } // fim do if/else pg_num_rows
                     } // fim if($cpf_aux > 0)
                 } //end while 
-            } //end if(pg_num_rows($rs) > 0)
+            } //end if((($rs) ? pg_num_rows($rs) : 0) > 0)
             else {
                 ?>
                 <tr>
                     <td colspan="3">Nenhum registro encontrado.</td>
                 </tr>
             <?php
-            } //end else do if(pg_num_rows($rs) > 0) 
+            } //end else do if((($rs) ? pg_num_rows($rs) : 0) > 0) 
         } elseif (isset($rs)) {
             ?>
             <tr>

@@ -36,7 +36,7 @@ if (!$arquivoLog->haveFile()) {
     and vg_data_inclusao <= NOW()- '15 minutes'::interval ;";
     echo $sql . PHP_EOL . PHP_EOL;
     $rs = SQLexecuteQuery($sql);
-    $n_updates = pg_num_rows($rs);
+    $n_updates = (($rs) ? pg_num_rows($rs) : 0);
     echo "Encontrado" . (($n_updates > 1) ? "s" : "") . " : " . $n_updates . " Pedidos" . (($n_updates > 1) ? "s" : "") . " para serem atualizados" . PHP_EOL;
 
     if (!$rs || pg_num_rows($rs) == 0) {

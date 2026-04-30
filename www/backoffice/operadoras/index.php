@@ -608,7 +608,7 @@ if ($acao == 'atualizar') {
 		if (!empty($opr_banco_intermediario)) {
 			$sql = "SELECT * FROM operadoras_banco_intermediario WHERE opr_codigo = $opr_codigo";
 			$rs_operadoras = SQLexecuteQuery($sql);
-			$existe_registro = pg_num_rows($rs_operadoras);
+			$existe_registro = (($rs_operadoras) ? pg_num_rows($rs_operadoras) : 0);
 			if (empty($existe_registro)) {
 				$sql = "insert into operadoras_banco_intermediario (
 									opr_codigo, 

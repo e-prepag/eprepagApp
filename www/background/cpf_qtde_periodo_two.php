@@ -1,6 +1,6 @@
 <?php
 
-ini_set('display_errors', 1);
+// ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 error_reporting(E_ERROR);
 
@@ -162,7 +162,7 @@ echo "desativados ". $retorno["desativado"]."</br>";
     $rs_dados_cpf = SQLexecuteQuery($sql);
             
     //Verificando Dados
-    $msg = PHP_EOL."Total de CPF considerados com contas ativas de GAMERS:  [".pg_num_rows($rs_dados_cpf)."] CPFs<br>";
+    $msg = PHP_EOL."Total de CPF considerados com contas ativas de GAMERS:  [".(($rs_dados_cpf) ? pg_num_rows($rs_dados_cpf) : 0)."] CPFs<br>";
     echo $msg.PHP_EOL.PHP_EOL;
     $total_cpfs_na_tabela = 0;
     $total_cpfs_ainda_nao_na_tabela = 0;

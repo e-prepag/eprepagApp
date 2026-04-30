@@ -256,7 +256,7 @@ if(!empty($menus)){
 <?php 
                 foreach($menus as $menu){ 
 ?>
-                    <option value="<?php echo $menu->menu_id; ?>" <?php if($idMenu != "" && $menu->menu_id == $idMenu) echo "selected"; ?>><?php echo (@constant(trim($menu->menu_descricao)) === null) ? $menu->menu_descricao : constant(trim($menu->menu_descricao)); ?></option>
+                    <option value="<?php echo $menu->menu_id; ?>" <?php if($idMenu != "" && $menu->menu_id == $idMenu) echo "selected"; ?>><?php echo defined(trim($menu->menu_descricao)) ? constant(trim($menu->menu_descricao)) : $menu->menu_descricao; ?></option>
 <?php 
                 } 
 ?>
@@ -269,7 +269,7 @@ if(!empty($menus)){
             </label>
             <div class="col-md-6">
                 <input type="text" class="form-control top10" name="nome" maxlength="250" id="nome" value="<?php echo $nome;?>">
-                <input type="hidden" id="nomeConst" value="<?php echo (@constant(trim($nome)) === null) ? $nome : constant(trim($nome));?>">
+                <input type="hidden" id="nomeConst" value="<?php echo defined(trim($nome)) ? constant(trim($nome)) : $nome;?>">
                 
             </div>
         </div>

@@ -23,18 +23,42 @@ define ( 'ANIM_DELAYS', 10 );
 Class Captcha {
 	var $image;
 
+	function __construct ( $text, $font, $color ) {
+		$this->Captcha ( $text, $font, $color );
+	}
+
 	function Captcha ( $text, $font, $color ) {
+		if ( !function_exists ( "imageCreateTrueColor" ) ) {
+			error_log ( "Captcha: GD imageCreateTrueColor indisponivel" );
+			$this->image = null;
+			return;
+		}
 		$C              = HexDec ( $color );
 		$R              = floor ( $C / pow ( 256, 2 ) );
 		$G              = floor ( ( $C % pow ( 256, 2 ) ) / pow ( 256, 1 ) );
 		$B              = floor ( ( ( $C % pow ( 256, 2 ) ) % pow ( 256, 1 ) ) / pow ( 256, 0 ) );
 		$fsize          = 32;
-		$bound          = array ( );
-		$bound          = imageTTFBbox ( $fsize, 0, $font, $text );
-		$this->image    = imageCreateTrueColor ( $bound [ 4 ] + 5, abs($bound [ 5 ] ) + 15 );
+		$bound          = is_file($font) ? imageTTFBbox ( $fsize, 0, $font, $text ) : false;
+		if ( $bound === false ) {
+			error_log ( "Captcha: fonte TTF invalida ou bbox falhou: " . $font );
+			$this->image = $this->createFallbackImage ( $text, $R, $G, $B );
+			return;
+		}
+
+		$this->image    = imageCreateTrueColor ( max(1, $bound [ 4 ] + 5), max(1, abs($bound [ 5 ] ) + 15) );
+		if ( $this->image === false ) {
+			error_log ( "Captcha: imageCreateTrueColor falhou" );
+			$this->image = $this->createFallbackImage ( $text, $R, $G, $B );
+			return;
+		}
 
 		imageFill       ( $this->image, 0, 0, ImageColorAllocate ( $this->image, 255, 255, 204 ) );
-		imagettftext    ( $this->image, $fsize, 0, 2, abs( $bound [ 5 ] ) + 5, ImageColorAllocate ( $this->image, $R, $G, $B ), $font, $text );
+		if ( imagettftext    ( $this->image, $fsize, 0, 2, abs( $bound [ 5 ] ) + 5, ImageColorAllocate ( $this->image, $R, $G, $B ), $font, $text ) === false ) {
+			error_log ( "Captcha: imagettftext falhou com fonte: " . $font );
+			imageDestroy ( $this->image );
+			$this->image = $this->createFallbackImage ( $text, $R, $G, $B );
+			return;
+		}
 
 		$W = imageSX ( $this->image );
 		$H = imageSY ( $this->image );
@@ -43,6 +67,42 @@ Class Captcha {
 		}
 
 	}
+	function createFallbackImage ( $text, $R, $G, $B ) {
+		if ( !function_exists ( "imageCreateTrueColor" ) ) {
+			error_log ( "Captcha: fallback sem GD" );
+			return null;
+		}
+		$image = imageCreateTrueColor ( 90, 45 );
+		if ( $image === false ) {
+			error_log ( "Captcha: createFallbackImage falhou" );
+			return null;
+		}
+
+		imageFill ( $image, 0, 0, ImageColorAllocate ( $image, 255, 255, 204 ) );
+		imageString ( $image, 5, 18, 14, $text, ImageColorAllocate ( $image, $R, $G, $B ) );
+		return $image;
+	}
+
+	function emptyGif ( ) {
+		if ( !function_exists ( "imageCreateTrueColor" ) ) {
+			error_log ( "Captcha: gerando GIF minimo porque GD esta indisponivel" );
+			return base64_decode ( "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" );
+		}
+
+		$image = imageCreateTrueColor ( 1, 1 );
+		if ( $image === false ) {
+			return base64_decode ( "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" );
+		}
+
+		imageFill ( $image, 0, 0, ImageColorAllocate ( $image, 255, 255, 255 ) );
+		Ob_Start ( );
+		imageGif ( $image );
+		imageDestroy ( $image );
+		$gif = Ob_Get_Contents ( );
+		Ob_End_Clean ( );
+		return $gif;
+	}
+
 	/*
 	:::::::::::::::::::::::::::::::::::::::::::::::::::
 	::
@@ -81,6 +141,14 @@ Class Captcha {
 	*/
 	function AnimatedOut ( ) {
 
+		if ( !is_resource ( $this->image ) && !( $this->image instanceof GdImage ) ) {
+			error_log ( "Captcha: imagem principal invalida antes de AnimatedOut" );
+			return $this->emptyGif ( );
+		}
+
+		$f_arr = array ( );
+		$d_arr = array ( );
+
 		for ( $i = 0; $i < ANIM_FRAMES; $i++ ) {
 			$image = imageCreateTrueColor ( imageSX ( $this->image ), imageSY ( $this->image ) );
 
@@ -97,6 +165,10 @@ Class Captcha {
 				Ob_End_Clean	(			);
 			}
 		}
+		if ( count ( $f_arr ) === 0 ) {
+			return $this->emptyGif ( );
+		}
+
 		$GIF = new GIFEncoder ( $f_arr, $d_arr, 0, 2, -1, -1, -1, "bin" );
 		return ( $GIF->GetAnimation ( ) );
 	}

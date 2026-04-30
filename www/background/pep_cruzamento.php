@@ -7,7 +7,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 //ini_set("display_errors", 1); 
 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200); 
+// ini_set('max_execution_time', 1200); 
 
 //Data considerada
 $data_inicio = mktime(0, 0, 0, date('n')-1,  date('d'), date('Y'));
@@ -137,7 +137,7 @@ $sql = "select ug_nome,tipo,ug_cpf from (
 ";
 $rs = SQLexecuteQuery($sql);
 
-$total_de_registros = pg_num_rows($rs);
+$total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
 $dadosTotais = pg_fetch_all($rs);
 //var_dump($dadosTotais);
 //exit;
@@ -146,7 +146,7 @@ $dadosTotais = pg_fetch_all($rs);
 <table>
 <?php 
             if(isset($rs) && $rs) {
-                $total_de_registros = pg_num_rows($rs);
+                $total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
                 if($total_de_registros > 0) {
 
 		$cabecalho = "
@@ -180,7 +180,7 @@ $dadosTotais = pg_fetch_all($rs);
                             //echo $sql."<br>";
                             $rsEncontrado = SQLexecuteQuery($sql);
                             // Verificando se foi encontrado algum nome
-                            if(isset($rsEncontrado) && pg_num_rows($rsEncontrado) > 0) {
+                            if(isset($rsEncontrado) && (($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) {
                                 // Exibindo todas incidencias de nomes
                                 while ($rsEncontradoRow = pg_fetch_array($rsEncontrado)) {
 
@@ -196,10 +196,10 @@ $dadosTotais = pg_fetch_all($rs);
 									$sqlNew = "UPDATE pep SET enviado_email = 1 WHERE cpf = ".str_replace("-","",str_replace(".", "", $rsRow['ug_cpf']))*1 .";";
 									SQLexecuteQuery($sqlNew);
                                 }//end while ($rsEncontradoRow = pg_fetch_array($rsEncontrado))
-                            }//end if(pg_num_rows($rsEncontrado) > 0) 
+                            }//end if((($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) 
                         }//end if($cpf_aux > 0)
                     }//end while 
-                }//end if(pg_num_rows($rs) > 0)
+                }//end if((($rs) ? pg_num_rows($rs) : 0) > 0)
                 else {
             $exibicaoDadosProblemas = "<tr>
 				<td>Nenhum registro encontrado.</td>
@@ -209,7 +209,7 @@ $dadosTotais = pg_fetch_all($rs);
 				<td>Nenhum registro encontrado.</td>
             </tr>";
 
-                }//end else do if(pg_num_rows($rs) > 0) 
+                }//end else do if((($rs) ? pg_num_rows($rs) : 0) > 0) 
             }elseif(isset($rs)){
 
             $exibicaoDadosProblemas = "<tr>
@@ -336,7 +336,7 @@ pg_close($connid);
 ";
 $rs = SQLexecuteQuery($sql);
 
-$total_de_registros = pg_num_rows($rs);
+$total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
 $dadosTotais = pg_fetch_all($rs);
 //var_dump($dadosTotais);
 //exit;

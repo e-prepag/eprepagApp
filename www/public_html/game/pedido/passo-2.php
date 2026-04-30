@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../../includes/constantes_url.php'; 
+<?php require_once __DIR__ . '/../../../includes/constantes_url.php';
 
 // Correcao bug sessao Internet Explorer 6,7,8
 header('P3P: CP="CAO PSA OUR"');
@@ -27,7 +27,7 @@ require_once "/www/includes/gamer/main.php";
 require_once "/www/class/util/Util.class.php";
 include_once "/www/includes/complice/functions.php";
 /*ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);*/
 
 $prod_camp = $_POST['prod_camp'] ?? null;
@@ -77,7 +77,7 @@ if (!defined('PAGAMENTO_PIX')) {
 
 $pix_permit = [8972, 1344351, 1354068, 21152];
 
-// Variï¿½vel a ser verificada
+// Variável a ser verificada
 $id_user = $controller->usuario->getId();
 
 $btSubmit = $_POST['btSubmit'];
@@ -85,7 +85,7 @@ $btSubmit = $_POST['btSubmit'];
 //Recupra carrinho do session
 $carrinho = $GLOBALS['_SESSION']['carrinho'];
 
-//Marcando que nï¿½o ï¿½ compra de integraï¿½ï¿½o
+//Marcando que não é compra de integração
 $GLOBALS['_SESSION']['is_integration'] = false;
 
 if ($controller->usuario->getId() == 1286357) {
@@ -111,7 +111,7 @@ if ($controller->usuario->getId() == 1286357) {
     require_once "/www/class/classIntegracaoGarena.php";
     $classGarena = new Garena(["validacao", $ogp_garena], $_POST["useridgarena"], "usuario"); 
    
-    $auth = $classGarena->chamaGarena("GET"); // Para produï¿½ï¿½o passar o segundo parametro 'producao'
+    $auth = $classGarena->chamaGarena("GET"); // Para produção passar o segundo parametro 'producao'
 	if($auth !== true){
 		$_SESSION["erroGarena"] = $auth;
 		header("location: EPREPAG_URL_HTTPS/game/pedido/passo-1.php");
@@ -121,21 +121,21 @@ if ($controller->usuario->getId() == 1286357) {
 }
 
 
-//Definindo valor mï¿½ximo
+//Definindo valor máximo
 if ($controller->usuario->b_IsLogin_pagamento_free()) {
     $total_diario_const = $RISCO_GAMERS_FREE_TOTAL_DIARIO;
     $pagamentos_diario_const = $RISCO_GAMERS_FREE_PAGAMENTOS_DIARIO;
-    //	Gamers VIP- Pagamento Online = no max R$1000,00 por dï¿½a por usuï¿½rio (ver getVendasMoneyTotalDiarioOnline()) em atï¿½ 20 vezes
+    //	Gamers VIP- Pagamento Online = no max R$1000,00 por dia por usuário (ver getVendasMoneyTotalDiarioOnline()) em até 20 vezes
 } elseif ($controller->usuario->b_IsLogin_pagamento_vip()) {
     $total_diario_const = $RISCO_GAMERS_VIP_TOTAL_DIARIO;
     $pagamentos_diario_const = $RISCO_GAMERS_VIP_PAGAMENTOS_DIARIO;
-    //	Gamers - Pagamento Online = no max R$450,00 por dï¿½a por usuï¿½rio (ver getVendasMoneyTotalDiarioOnline()) em atï¿½ 10 vezes
+    //	Gamers - Pagamento Online = no max R$450,00 por dia por usuário (ver getVendasMoneyTotalDiarioOnline()) em até 10 vezes
 } else {
     $total_diario_const = $RISCO_GAMERS_TOTAL_DIARIO;
     $pagamentos_diario_const = $RISCO_GAMERS_PAGAMENTOS_DIARIO;
 
     $prodmod = new ProdutoModelo;
-    $dds = "";
+    $dds = [];
     $exige = [];
     $idadeproduto = [];
     $exigeCPF = levantamentoPublisherObrigatorioCPF($dds);
@@ -257,7 +257,7 @@ $bloqueioPercentual = false;
 /*if($cpfvazio) { ?>
 
 	<script>
-	manipulaModal(1,"<div style='background-color: #fff; padding: 30px; display: flex; flex-direction: column'><label for='data_nascimento'>Data de Nascimento</label><input type='date' name='data_nascimento' placeholder='00/00/0000' value='03-03-2002'/><br /><label for='data_nascimento'>CPF</label><input style='padding: 10px' type='text' name='cpf' placeholder='000.000.000-00'/><br/><button id='teste' style='width: 200px; margin: 0px auto; padding: 10px;'>Salvar</button></div>","Preencha as informaï¿½ï¿½es restantes abaixo <?php echo str_replace('00:00:00', '', $controller->usuario->ug_dDataNascimento); ?>"); 
+	manipulaModal(1,"<div style='background-color: #fff; padding: 30px; display: flex; flex-direction: column'><label for='data_nascimento'>Data de Nascimento</label><input type='date' name='data_nascimento' placeholder='00/00/0000' value='03-03-2002'/><br /><label for='data_nascimento'>CPF</label><input style='padding: 10px' type='text' name='cpf' placeholder='000.000.000-00'/><br/><button id='teste' style='width: 200px; margin: 0px auto; padding: 10px;'>Salvar</button></div>","Preencha as informações restantes abaixo <?php echo str_replace('00:00:00', '', $controller->usuario->ug_dDataNascimento); ?>"); 
 			
 			$('#teste').click(function() {
 				console.log("aa");
@@ -328,7 +328,7 @@ if ($btSubmit || $iforma) {
 
     //Validacao formas de pagamento		
     if ($msg == "") {
-        if (!in_array($pagto, $FORMAS_PAGAMENTO)) $msg = "Forma de pagamento invï¿½lida.";
+        if (!in_array($pagto, $FORMAS_PAGAMENTO)) $msg = "Forma de pagamento inválida.";
     }
     //Adiciona dados no session
     if ($msg == "") {
@@ -358,7 +358,7 @@ if ($btSubmit || $iforma) {
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-12 txt-azul-claro top10">
-                                <span class="glyphicon glyphicon-triangle-right graphycon-big" aria-hidden="true"></span><strong>Atualizaï¿½ï¿½o Dados de Endereï¿½o</strong>
+                                <span class="glyphicon glyphicon-triangle-right graphycon-big" aria-hidden="true"></span><strong>Atualização Dados de Endereço</strong>
                             </div>
                         </div>
                     </div>
@@ -368,7 +368,7 @@ if ($btSubmit || $iforma) {
         } else {
             //redireciona
 
-            /// garena nova integraï¿½ï¿½o
+            /// garena nova integração
             if (isset($_POST["useridgarena"]) && !empty($_POST["useridgarena"])) {
                 $_SESSION["contaGarena"] = $_POST["useridgarena"];
             }
@@ -402,7 +402,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                 <?php
 
                 if ($bloqueioPercentual == true) {
-                    echo ' manipulaModal(1,"Seu <b>limite de compras</b> neste CPF consta em 80% para prosseguir com a compra de PINS, por gentileza efetue contato com o suporte@e-prepag.com.br para aumento do limite de vendas.","Atenï¿½ï¿½o");';
+                    echo ' manipulaModal(1,"Seu <b>limite de compras</b> neste CPF consta em 80% para prosseguir com a compra de PINS, por gentileza efetue contato com o suporte@e-prepag.com.br para aumento do limite de vendas.","Atenção");';
                     // $("#modal-load").on("hidden.bs.modal", function () { location.href="/game/pedido/passo-1.php" });
                 }
 
@@ -440,7 +440,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                         //end if($controller->usuario->b_IsLogin_pagamento())
                     } elseif ($naocompra) {
                     ?>
-                        manipulaModal(1, "O <b>limite mï¿½ximo</b> de compras por mï¿½s foi <b>excedido</b>", "Erro");
+                        manipulaModal(1, "O <b>limite máximo</b> de compras por mês foi <b>excedido</b>", "Erro");
                         $('#modal-load').on('hidden.bs.modal', function() {
                             location.href = '/game/pedido/passo-1.php'
                         });
@@ -453,7 +453,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
         ?>
 
 
-            manipulaModal(1,"<div style='background-color: #fff; padding: 30px; display: flex; flex-direction: column'><label for='data_nascimento'>Data de Nascimento</label><input type='date' name='data_nascimento' placeholder='00/00/0000' value='' /><br /><label for='data_nascimento'>CPF</label><input style='padding: 10px' type='text' name='cpf' placeholder='000.000.000-00' /><br /><button id='teste' style='width: 200px; margin: 0px auto; padding: 10px;'>Salvar</button></div>","Preencha as informaï¿½ï¿½es restantes abaixo");
+            manipulaModal(1,"<div style='background-color: #fff; padding: 30px; display: flex; flex-direction: column'><label for='data_nascimento'>Data de Nascimento</label><input type='date' name='data_nascimento' placeholder='00/00/0000' value='' /><br /><label for='data_nascimento'>CPF</label><input style='padding: 10px' type='text' name='cpf' placeholder='000.000.000-00' /><br /><button id='teste' style='width: 200px; margin: 0px auto; padding: 10px;'>Salvar</button></div>","Preencha as informações restantes abaixo");
 
             $('#teste').click(function() {
             console.log("aa");
@@ -466,14 +466,14 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
         <?php
                     } else {
         ?>
-            manipulaModal(1,"Seu cadastro estï¿½ incompleto ou apresenta algum problema. Por favor, acesse ?Meu Cadastro? para revisar e corrigir seus dados. Caso o erro persista, entre em contato com o suporte.","Erro");
+            manipulaModal(1,"Seu cadastro está incompleto ou apresenta algum problema. Por favor, acesse ?Meu Cadastro? para revisar e corrigir seus dados. Caso o erro persista, entre em contato com o suporte.","Erro");
             $('#modal-load').on('hidden.bs.modal', function () { location.href='/game/' });
             </script>
     <?php
                         die();
                     }
                 } //end if($controller->usuario->logado) 
-                else $msg .= "Usuï¿½rio com TimeOut.\nLogar novamente.";
+                else $msg .= "Usuário com TimeOut.\nLogar novamente.";
     ?>
     </script>
     <!--Div Box que exibe Saiba Mais PINs EPP -->
@@ -570,7 +570,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                             </div>
                                             <div class="row">
                                                 <div class="col-xs-5 col-sm-5">
-                                                    Preï¿½o Total:
+                                                    Preço Total:
                                                 </div>
                                                 <div class="col-xs-7 col-sm-7">
                                                     R$ <?php echo number_format($rs_row['ogpm_valor'] * $qtde, 2, ',', '.'); ?>
@@ -578,7 +578,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                             </div>
                                             <div class="row">
                                                 <div class="col-xs-5 col-sm-5 nowrap">
-                                                    Preï¿½o em:
+                                                    Preço em:
                                                 </div>
                                                 <div class="col-xs-7 col-sm-7">
                                                     <?php echo get_info_EPPCash_NO_Table($rs_row['ogpm_valor_eppcash'] * $qtde); ?>
@@ -597,7 +597,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                             $filtro['ogp_mostra_integracao_com_loja'] = '1';
                                             $filtro['opr'] = 1;
                                             $ret = (new Produto)->obterMelhorado($filtro, null, $rs);
-                                            if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponï¿½vel no momento.";
+                                            if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponível no momento.";
                                             else $rs_row = pg_fetch_array($rs);
                                             $total_geral += $valor * $quantidade;
                                             $total_geral_pin_epp_cash  += (new ConversionPINsEPP)->get_ValorEPPCash('E', $valor) * $quantidade;
@@ -637,7 +637,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-xs-5 col-sm-5">
-                                                        Preï¿½o Total:
+                                                        Preço Total:
                                                     </div>
                                                     <div class="col-xs-7 col-sm-7">
                                                         R$ <?php echo number_format($valor * $quantidade, 2, ',', '.'); ?>
@@ -645,7 +645,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-xs-5 col-sm-5 nowrap">
-                                                        Preï¿½o em:
+                                                        Preço em:
                                                     </div>
                                                     <div class="col-xs-7 col-sm-7">
                                                         <?php echo get_info_EPPCash_NO_Table((new ConversionPINsEPP)->get_ValorEPPCash('E', $valor) * $quantidade); ?>
@@ -673,7 +673,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                 </div>
                                 <div class="row">
                                     <div class="col-xs-5 col-sm-5">
-                                        Preï¿½o
+                                        Preço
                                     </div>
                                     <div class="col-xs-7 col-sm-7">
                                         R$ <?php echo number_format($total_geral, 2, ',', '.') ?>
@@ -681,7 +681,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                 </div>
                                 <div class="row">
                                     <div class="col-xs-5 col-sm-5 nowrap">
-                                        Preï¿½o em
+                                        Preço em
                                     </div>
                                     <div class="col-xs-7 col-sm-7">
                                         <?php echo get_info_EPPCash_NO_Table($total_geral_pin_epp_cash); ?>
@@ -693,10 +693,10 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                     <tr class="bg-cinza-claro text-center">
                                         <th class="txt-left">Produto</th>
                                         <th>I.O.F.</th>
-                                        <th>Valor unitï¿½rio</th>
+                                        <th>Valor unitário</th>
                                         <th>Qtde.</th>
                                         <th>Total</th>
-                                        <th>Preï¿½o em</th>
+                                        <th>Preço em</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -758,7 +758,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                                     $filtro['ogp_mostra_integracao_com_loja'] = '1';
                                                     $filtro['opr'] = 1;
                                                     $ret = (new Produto)->obtermelhorado($filtro, null, $rs);
-                                                    if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponï¿½vel no momento.";
+                                                    if (!$rs || pg_num_rows($rs) == 0) $msg = "Nenhum produto disponível no momento.";
                                                     else $rs_row = pg_fetch_array($rs);
                                                 ?>
 
@@ -799,7 +799,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                         <input type="hidden" name="tipo" value="venda_gamer">
                         <input type="hidden" name="btSubmit" value="">
                         <?php
-                        // REGRAS DE DISPONIBILIZAï¿½ï¿½O DE MEIOS DE PAGAMENTOS
+                        // REGRAS DE DISPONIBILIZAÇÃO DE MEIOS DE PAGAMENTOS
                         $b_bloqueia_Ongame = false;
 
                         // Se carrinho contem algum produto da Ongame -> bloqueia
@@ -832,13 +832,13 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
 
                             $total_carrinho = mostraCarrinho_pag(false, 1, $libera_pagamento);
 
-                            //Variavel utilizada para isenï¿½ï¿½o de taxas
+                            //Variavel utilizada para isenção de taxas
                             $valor_tmp = $total_geral;
 
-                            // Testa que usuï¿½rio comprou no mï¿½ximo 10 vezes nas ï¿½ltimas 24 horas
+                            // Testa que usuário comprou no máximo 10 vezes nas últimas 24 horas
                             $qtde_last_dayOK = getNVendasMoney($controller->usuario->getId());
 
-                            // Calcula o total nas ï¿½ltimas 24 horas para pagamentos Online 
+                            // Calcula o total nas últimas 24 horas para pagamentos Online 
                             $total_diario = getVendasMoneyTotalDiarioOnline($controller->usuario->getId());
 
                             if ($controller->usuario->b_IsLogin_pagamento_free()) {
@@ -860,10 +860,10 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                             // Libera pagamento Online Banco do Brasil
                             $b_libera_BancodoBrasil = $b_LimiteDiarioOK && $b_TentativasDiariasOK && $libera_pagamento['BancodoBrasil']; // && $controller->usuario->b_IsLogin_pagamento_bancodobrasil();
 
-                            // Libera pagamento Online Banco Itaï¿½
+                            // Libera pagamento Online Banco Itaú
                             $b_libera_BancoItau = $b_LimiteDiarioOK && $b_TentativasDiariasOK && $controller->usuario->b_IsLogin_pagamento_bancoitau() && $libera_pagamento['BancoItau'];
 
-                            // Libera Bradesco apenas se limite diario nï¿½o ultrapassado //produtos (Habbo e GPotato) e tem atï¿½ 5 compras nas ï¿½ltimas 24 horas
+                            // Libera Bradesco apenas se limite diario não ultrapassado //produtos (Habbo e GPotato) e tem até 5 compras nas últimas 24 horas
                             $b_libera_Bradesco = $b_LimiteDiarioOK && $b_TentativasDiariasOK && $libera_pagamento['Bradesco'];    //$b_IsProdutoOK && 
 
                             // Libera pagamento Online Hipay
@@ -872,10 +872,10 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                             // Libera pagamento Online Paypal
                             $b_libera_Paypal = $b_LimiteDiarioOK && $b_TentativasDiariasOK && $controller->usuario->b_IsLogin_pagamento_paypal() && $libera_pagamento['Paypal'];
 
-                            // Libera Boleto apenas se o valor da venda nï¿½o ultrapassa o limite por venda
+                            // Libera Boleto apenas se o valor da venda não ultrapassa o limite por venda
                             $b_libera_Boleto = $b_ValorBoletoOK && $libera_pagamento['Boleto'];
 
-                            // Libera Depï¿½sito apenas se o valor da venda nï¿½o ultrapassa o limite por venda
+                            // Libera Depósito apenas se o valor da venda não ultrapassa o limite por venda
                             $b_libera_Deposito =  false; //$b_ValorDepositoOK && $libera_pagamento['Deposito'];	
 
                             // Libera Epp CASH
@@ -884,26 +884,26 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                             // Libera PIX
                             $b_libera_Pix = $b_LimiteDiarioOK && $b_TentativasDiariasOK && $libera_pagamento["Pix"];
 
-                            $msg_bloqueia_Bradesco = (!$b_libera_Bradesco) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diï¿½rio de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Nï¿½mero de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diï¿½rio.</p>" : "")) : "";
+                            $msg_bloqueia_Bradesco = (!$b_libera_Bradesco) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diário de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Número de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diário.</p>" : "")) : "";
 
-                            $msg_bloqueia_BancodoBrasil = (!$b_libera_BancodoBrasil) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diï¿½rio de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Nï¿½mero de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diï¿½rio.</p>" : "")) : "";
+                            $msg_bloqueia_BancodoBrasil = (!$b_libera_BancodoBrasil) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diário de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Número de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diário.</p>" : "")) : "";
 
-                            $msg_bloqueia_BancoItau = (!$b_libera_BancoItau) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diï¿½rio de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Nï¿½mero de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diï¿½rio.</p>" : "")) : "";
+                            $msg_bloqueia_BancoItau = (!$b_libera_BancoItau) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diário de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Número de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diário.</p>" : "")) : "";
 
-                            $msg_bloqueia_Hipay = (!$b_libera_Hipay) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diï¿½rio de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Nï¿½mero de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diï¿½rio.</p>" : "")) : "";
+                            $msg_bloqueia_Hipay = (!$b_libera_Hipay) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diário de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Número de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diário.</p>" : "")) : "";
 
-                            $msg_bloqueia_Paypal = (!$b_libera_Paypal) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diï¿½rio de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Nï¿½mero de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diï¿½rio.</p>" : "")) : "";
+                            $msg_bloqueia_Paypal = (!$b_libera_Paypal) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite diário de compras on-line.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Número de pagamentos online (" . $qtde_last_dayOK . ") ultrapassa o limite diário.</p>" : "")) : "";
 
-                            $msg_bloqueia_Boleto = (!$b_libera_Boleto) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite de compras por boleto.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Nï¿½mero de pagamentos (" . $qtde_last_dayOK . ") ultrapassa o limite diï¿½rio.</p>" : "")) : "";
+                            $msg_bloqueia_Boleto = (!$b_libera_Boleto) ? ((!$b_LimiteDiarioOK) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite de compras por boleto.</p>" : ((!$b_TentativasDiariasOK) ? "<p class='txt-azul fontsize-pp'>Número de pagamentos (" . $qtde_last_dayOK . ") ultrapassa o limite diário.</p>" : "")) : "";
 
-                            $msg_bloqueia_Deposito = (!$b_libera_Deposito) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite de compras por depï¿½sito.</p>" : "";
+                            $msg_bloqueia_Deposito = (!$b_libera_Deposito) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite de compras por depósito.</p>" : "";
 
                             $msg_bloqueia_Pix = (!$b_libera_Pix) ? "<p class='txt-azul fontsize-pp'>Sua compra de " . number_format($total_carrinho, 2, ',', '.') . " ultrapassa o limite de compras por pix.</p>" : "";
 
-                            // Comeï¿½a Gestï¿½o de Risco CIELO
+                            // Começa Gestáo de Risco CIELO
                             $carrinho_tmp = $GLOBALS['_SESSION']['carrinho'];
                             $params = array();
-                            // $pagto = 'G' (Visa Crï¿½dito), quando passa aqi aonda nï¿½o foi escolhido o $pagto -> uma forma para todos 
+                            // $pagto = 'G' (Visa Crédito), quando passa aqi aonda não foi escolhido o $pagto -> uma forma para todos 
                             $limite = new Limite('G', $controller->usuario->getId(), $total_carrinho, $carrinho_tmp, "week");
                             $mensagem = "";
                             $ret_regras_cielo = $limite->aplicaRegrasCieloNovas($mensagem, $params);
@@ -913,18 +913,18 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                 $b_libera_Cielo = false;
                                 gravaLog_BloqueioPagtoOnline("Pagamento Cielo Bloqueado\n    pagto: $pagto, usuarioGames->getId(): " . $controller->usuario->getId() . ", total_carrinho: $total_carrinho, qtde_last_dayOK: " . $qtde_last_dayOK . ", total_diario: " . $total_diario . "\n    " . $mensagem);
                             }
-                            $msg_bloqueia_Cielo = (!$b_libera_Cielo) ? "<p class='txt-azul fontsize-pp'>Pagamento indisponï¿½vel</p>" : "";
-                            // Termina Gestï¿½o de Risco CIELO
+                            $msg_bloqueia_Cielo = (!$b_libera_Cielo) ? "<p class='txt-azul fontsize-pp'>Pagamento indisponível</p>" : "";
+                            // Termina Gestáo de Risco CIELO
 
 
                             if (!$b_TentativasDiariasOK || !$b_LimiteDiarioOK) {
                                 $msg_block = "Pagamento Online BLOQUEADO ******  ";
 
                                 $smsg_bloqueio =
-                                    "	Usuï¿½rio: ID: " . $controller->usuario->getId() . ",\n" .
-                                    "	Regras bloqueio: b_TentativasDiariasOK: " . (($b_TentativasDiariasOK) ? "SIM" : "nï¿½o") . " (n: $qtde_last_dayOK), " .
-                                    "b_LimiteDiarioOK: " . (($b_LimiteDiarioOK) ? "SIM" : "nï¿½o") . ", " .
-                                    "b_libera_Cielo: " . (($b_libera_Cielo) ? "SIM" : "nï¿½o") . " \n" .
+                                    "	Usuário: ID: " . $controller->usuario->getId() . ",\n" .
+                                    "	Regras bloqueio: b_TentativasDiariasOK: " . (($b_TentativasDiariasOK) ? "SIM" : "não") . " (n: $qtde_last_dayOK), " .
+                                    "b_LimiteDiarioOK: " . (($b_LimiteDiarioOK) ? "SIM" : "não") . ", " .
+                                    "b_libera_Cielo: " . (($b_libera_Cielo) ? "SIM" : "não") . " \n" .
                                     "	total_carrinho: " . number_format($total_carrinho, 2, ',', '.') . ", total_diario: " . number_format($total_diario, 2, ',', '.') . "\n" .
                                     "	solicitado: " . number_format(($total_carrinho + $total_diario), 2, ',', '.') . " de " . number_format($total_diario_const, 2, ',', '.') . "\n" .
                                     "";
@@ -941,7 +941,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                             }
                             $mensagem = "=====================================================================================\n" .
                                 "$msg_block (" . date("Y-m-d H:i:s") . ")\n" .
-                                "  Usuï¿½rio: ID: " . $controller->usuario->getId() . ",\n" .
+                                "  Usuário: ID: " . $controller->usuario->getId() . ",\n" .
                                 "  qtde_last_dayOK: " . $qtde_last_dayOK . "\n" .
                                 "  total_diario: " . number_format($total_diario, 2, ',', '.') . "\n" .
                                 "  total_diario_const: " . number_format($total_diario_const, 2, ',', '.') . "\n" .
@@ -957,10 +957,10 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                 "\n";
                             gravaLog_BloqueioPagtoOnline($mensagem);
 
-                            //Verifica se o pagamento com EPP CASH estï¿½ habilitado
+                            //Verifica se o pagamento com EPP CASH está habilitado
                             $have_eppcash = false;
 
-                            //Verifica se apenas o pagamento EPP CASH estï¿½ habilitado
+                            //Verifica se apenas o pagamento EPP CASH está habilitado
                             $only_eppcash = false;
 
                             //Conta a quantidade de pagamentos habilitados
@@ -1015,7 +1015,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                             <input type="hidden" name="idu" value="0">
                             <input type="hidden" name="sno" value="0">
                             <?php
-                            //Variï¿½vel para identificar quando ï¿½ necessï¿½rio pular linha
+                            //Variável para identificar quando é necessário pular linha
                             $cont_colunas = 0;
                             ?>
                             <div class="row espacamento">
@@ -1050,11 +1050,11 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                                     <p class="fontsize-pp bottom0 top20">PIX</p>
                                                     <?php
                                                     if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_PIX_TAXA != 0) {
-                                                        echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_PIX_TAXA, 2, ',', '.') . "</p>";
+                                                        echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_PIX_TAXA, 2, ',', '.') . "</p>";
                                                     } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                     else {
-                                                        echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
-                                                        //echo "<p class='txt-vermelho fontsize-pp bottom0'>ATENï¿½AO pix itaï¿½ indisponï¿½vel<br> <strong>faï¿½a o pagamento pix por outro banco</strong></p>";
+                                                        echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
+                                                        //echo "<p class='txt-vermelho fontsize-pp bottom0'>ATENÇÃO pix itaú indisponível<br> <strong>faça o pagamento pix por outro banco</strong></p>";
                                                     } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                     ?>
                                                     <p class="txt-verde fontsize-pp">Entrega Imediata</p>
@@ -1094,14 +1094,14 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                          name="btn_5" 
                                          onMouseOver="document.btn_5.src='/imagens/pag/pagto_forma_debito_visa2.gif'" 
                                          onMouseOut="document.btn_5.src='/imagens/pag/pagto_forma_debito_visa1.gif'" 
-                                         title="Bradesco pagamento (Dï¿½bito em conta)" 
+                                         title="Bradesco pagamento (Débito em conta)" 
                                          onClick="save_shipping(<?php // echo $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO'] 
                                                                 ?>, <?php // echo (($controller->usuario->getId()>0)?$controller->usuario->getId():"0") 
                                                                     ?>, '<?php // echo $controller->usuario->getNome() 
-                                                                                                                                                ?>');">
+                                                                            ?>');">
                                 </p>-->
-                                                <!--                                <p class="txt-vermelho fontsize-pp bottom0">Sem taxa de serviï¿½o</p>
-                                <p class="txt-verde fontsize-pp">Entrega em atï¿½ 90 minutos</p>
+                                                <!--                                <p class="txt-vermelho fontsize-pp bottom0">Sem taxa de serviço</p>
+                                <p class="txt-verde fontsize-pp">Entrega em até 90 minutos</p>
                                 <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']) echo " checked"; ?>></span>-->
                                             <?php
                                             } //end if($b_libera_Bradesco && PAGAMENTO_BRADESCO && false)
@@ -1120,23 +1120,23 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                                     class="c-pointer btnPgto"
                                                     style="width:100%; max-width: 100px;"
                                                     name="btn_5"
-                                                    title="Bradesco pagamento (Transferï¿½ncia entre contas)"
+                                                    title="Bradesco pagamento (Transferência entre contas)"
                                                     onClick="<?php echo $onclick; ?>">
                                             </div>
                                             <div class="col-xs-8">
                                                 <?php
                                                 if ($b_libera_Bradesco && PAGAMENTO_BRADESCO) {
                                                 ?>
-                                                    <p class="fontsize-pp bottom0 top20">TRANSFERï¿½NCIA ENTRE CONTAS</p>
+                                                    <p class="fontsize-pp bottom0 top20">TRANSFERÊNCIA ENTRE CONTAS</p>
                                                     <?php
                                                     if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $BRADESCO_TRANSFERENCIA_ENTRE_CONTAS_TAXA_ADICIONAL != 0) {
-                                                        echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($BRADESCO_TRANSFERENCIA_ENTRE_CONTAS_TAXA_ADICIONAL, 2, ',', '.') . "</p>";
+                                                        echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($BRADESCO_TRANSFERENCIA_ENTRE_CONTAS_TAXA_ADICIONAL, 2, ',', '.') . "</p>";
                                                     } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                     else {
-                                                        echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                        echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                     } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                     ?>
-                                                    <p class="txt-verde fontsize-pp">Entrega em atï¿½ 90 minutos</p>
+                                                    <p class="txt-verde fontsize-pp">Entrega em até 90 minutos</p>
                                                     <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) echo " checked"; ?>></span>
                                                 <?php
                                                 } else {
@@ -1153,20 +1153,20 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                         name="btn_22br" 
                                         onmouseover="document.btn_22br.src='/imagens/pag/pagto_forma_deposito2.gif'" 
                                         onmouseout="document.btn_22br.src='/imagens/pag/pagto_forma_deposito1.gif'" 
-                                        width="110" height="35" border="0" title="Bradesco pagamento depï¿½sito"
+                                        width="110" height="35" border="0" title="Bradesco pagamento depósito"
                                         onClick="save_shipping(<?php // echo $FORMAS_PAGAMENTO['DEP_DOC_TRANSF'] 
                                                                 ?>, <?php // echo (($controller->usuario->getId()>0)?$controller->usuario->getId():"0") 
                                                                     ?>, '<?php // echo $controller->usuario->getNome() 
-                                                                                                                                ?>');">
+                                                                            ?>');">
                                 </p>
-                                <p class="txt-vermelho fontsize-pp bottom0">Sem taxa de serviï¿½o</p>
-                                <p class="txt-verde fontsize-pp">Entrega em atï¿½ 1 dia ï¿½til</p>
-                                <p class="fontsize-pp txt-preto"><strong>Depï¿½sito, DOC
-                                    Transferï¿½ncia offline
+                                <p class="txt-vermelho fontsize-pp bottom0">Sem taxa de serviço</p>
+                                <p class="txt-verde fontsize-pp">Entrega em até 1 dia útil</p>
+                                <p class="fontsize-pp txt-preto"><strong>Depósito, DOC
+                                    Transferência offline
                                     Ag.2062-1<br>
                                     Cc.0030265-1</strong>
                                 </p>
-                                <p class="txt-preto fontsize-pp"><input type="checkbox" name="pagto_ja_fiz" id="pagto_ja_fiz" value="1" class="" <?php if ($pagto_ja_fiz == "1") echo "checked"; ?>>  Fiz o depï¿½sito e quero informar os dados.</p>
+                                <p class="txt-preto fontsize-pp"><input type="checkbox" name="pagto_ja_fiz" id="pagto_ja_fiz" value="1" class="" <?php if ($pagto_ja_fiz == "1") echo "checked"; ?>>  Fiz o depósito e quero informar os dados.</p>
                                 <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['DEP_DOC_TRANSF'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['DEP_DOC_TRANSF']) echo " checked"; ?>></span>-->
                                         <?php
                                             //                                } //end if($b_libera_Deposito)
@@ -1218,16 +1218,16 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                                     <?php
                                                     if ($b_libera_BancoItau) {
                                                     ?>
-                                                        <p class="fontsize-pp bottom0 top20">TRANSFERï¿½NCIA ENTRE CONTAS</p>
+                                                        <p class="fontsize-pp bottom0 top20">TRANSFERÊNCIA ENTRE CONTAS</p>
                                                         <?php
                                                         if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $BANCO_ITAU_TAXA_DE_SERVICO != 0) {
-                                                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($BANCO_ITAU_TAXA_DE_SERVICO, 2, ',', '.') . "</p>";
+                                                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($BANCO_ITAU_TAXA_DE_SERVICO, 2, ',', '.') . "</p>";
                                                         } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                         else {
-                                                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                         } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                         ?>
-                                                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                         <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']) echo " checked"; ?>></span>
                                                     <?php
                                                     } else {
@@ -1238,7 +1238,7 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                         <?php
                                             } //end if(PAGAMENTO_ITAU && $controller->usuario->b_IsLogin_pagamento_bancoitau())
                                             else {
-                                                echo "<p class='txt-azul fontsize-pp'>Serviï¿½o indisponï¿½vel no momento</p>";
+                                                echo "<p class='txt-azul fontsize-pp'>Serviço indisponível no momento</p>";
                                             }
                                             // Linha Banco Itau - fim
 
@@ -1292,22 +1292,22 @@ require_once DIR_WEB . 'game/includes/cabecalho.php';
                                 onClick="save_shipping(<?php // echo $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA'] 
                                                         ?>, <?php // echo (($controller->usuario->getId()>0)?$controller->usuario->getId():"0") 
                                                             ?>, '<?php // echo $controller->usuario->getNome() 
-                                                                                                                                    ?>');">
+                                                                    ?>');">
                             </p>-->
                                                 <div class="col-xs-8">
                                                     <?php
                                                     if ($b_libera_BancodoBrasil) {
                                                     ?>
-                                                        <p class="fontsize-pp bottom0 top20">Dï¿½BITO EM CONTA</p>
+                                                        <p class="fontsize-pp bottom0 top20">DÉBITO EM CONTA</p>
                                                         <?php
                                                         if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $BANCO_DO_BRASIL_TAXA_DE_SERVICO != 0) {
-                                                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($BANCO_DO_BRASIL_TAXA_DE_SERVICO, 2, ',', '.') . "</p>";
+                                                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($BANCO_DO_BRASIL_TAXA_DE_SERVICO, 2, ',', '.') . "</p>";
                                                         } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                         else {
-                                                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                         } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                         ?>
-                                                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                         <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) echo " checked"; ?>></span>
                                                     <?php
                                                     } else {
@@ -1438,19 +1438,19 @@ Comentado por nao usar
                                                     class="c-pointer btnPgto"
                                                     style="width:100%; max-width: 100px;"
                                                     name="btn_5"
-                                                    title="Pagamento por Depï¿½sito"
+                                                    title="Pagamento por Depósito"
                                                     onClick="save_shipping(<?php echo $FORMAS_PAGAMENTO['DEP_DOC_TRANSF'] ?>, <?php echo (($controller->usuario->getId() > 0) ? $controller->usuario->getId() : "0") ?>, '<?php echo $controller->usuario->getNome() ?>');">
                                             </div>
                                             <div class="col-xs-8">
-                                                <p class="fontsize-pp bottom0">Depï¿½sito / DOC / TED</p>
-                                                <p class="txt-vermelho fontsize-pp bottom0">Sem taxa de serviï¿½o</p>
-                                                <p class="txt-verde fontsize-pp">Entrega em atï¿½ 1 dia ï¿½til</p>
-                                                <!--                                <p class="fontsize-pp txt-preto"><strong>Depï¿½sito, DOC
-                                    Transferï¿½ncia offline
+                                                <p class="fontsize-pp bottom0">Depósito / DOC / TED</p>
+                                                <p class="txt-vermelho fontsize-pp bottom0">Sem taxa de serviço</p>
+                                                <p class="txt-verde fontsize-pp">Entrega em até 1 dia útil</p>
+                                                <!--                                <p class="fontsize-pp txt-preto"><strong>Depósito, DOC
+                                    Transferência offline
                                     Ag.2062-1<br>
                                     Cc.0030265-1</strong>
                                 </p>-->
-                                                <p class="txt-preto fontsize-pp"><input type="checkbox" name="pagto_ja_fiz" id="pagto_ja_fiz" value="1" onchange='check_deposito(this);' class="" <?php if ($pagto_ja_fiz == "1") echo "checked"; ?>> Apï¿½s efetuar o pagamento, clique aqui para informar os dados.</p>
+                                                <p class="txt-preto fontsize-pp"><input type="checkbox" name="pagto_ja_fiz" id="pagto_ja_fiz" value="1" onchange='check_deposito(this);' class="" <?php if ($pagto_ja_fiz == "1") echo "checked"; ?>> Após efetuar o pagamento, clique aqui para informar os dados.</p>
                                                 <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['DEP_DOC_TRANSF'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['DEP_DOC_TRANSF']) echo " checked"; ?>></span>
                                             </div>
                                         </div>
@@ -1487,23 +1487,23 @@ Comentado por nao usar
                                                         class="c-pointer btnPgto"
                                                         style="width:100%; max-width: 100px;"
                                                         name="btn_2"
-                                                        title="Boleto Bancï¿½rio"
+                                                        title="Boleto Bancário"
                                                         onClick="<?php echo $onclick; ?>">
                                                 </div>
                                                 <div class="col-xs-8">
                                                     <?php
                                                     if ($b_libera_Boleto) {
                                                     ?>
-                                                        <p class="fontsize-pp bottom0 top20">BOLETO BANCï¿½RIO</p>
+                                                        <p class="fontsize-pp bottom0 top20">BOLETO BANCÁRIO</p>
                                                         <?php
                                                         if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $BOLETO_TAXA_ADICIONAL != 0) {
-                                                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($BOLETO_TAXA_ADICIONAL, 2, ',', '.') . "</p>";
+                                                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($BOLETO_TAXA_ADICIONAL, 2, ',', '.') . "</p>";
                                                         } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                         else {
-                                                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                         } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                         ?>
-                                                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 2 dias ï¿½teis.</p>
+                                                        <p class="txt-verde fontsize-pp">Entrega em até 2 dias úteis.</p>
                                                         <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['BOLETO_BANCARIO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['BOLETO_BANCARIO']) echo " checked"; ?>></span>
                                                     <?php
                                                     } else {
@@ -1515,7 +1515,7 @@ Comentado por nao usar
 
                                             } //end if(PAGAMENTO_BOLETO)
                                             else {
-                                                echo "<p class='txt-azul fontsize-pp'>Serviï¿½o indisponï¿½vel no momento</p>";
+                                                echo "<p class='txt-azul fontsize-pp'>Serviço indisponível no momento</p>";
                                             }
                                             // Linha Boleto - fim
 
@@ -1554,12 +1554,12 @@ Comentado por nao usar
                                                 </div>
                                                 <div class="col-xs-8">
                                                     <p class="fontsize-pp bottom0">E-PREPAG CASH</p>
-                                                    <p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>
+                                                    <p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>
                                                     <p class="txt-verde fontsize-pp">Entrega Imediata</p>
                                                     <?php
                                                     if (!$only_eppcash) {
                                                     ?>
-                                                        <p class="txt-azul fontsize-pp bottom0"><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafVtNFXtVWl4P">Nï¿½o tem um PIN?</a></p>
+                                                        <p class="txt-azul fontsize-pp bottom0"><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafVtNFXtVWl4P">Não tem um PIN?</a></p>
                                                     <?php
                                                     }
                                                     ?>
@@ -1568,7 +1568,7 @@ Comentado por nao usar
                                         <?php
                                             } //end if ($controller->usuario->b_IsLogin_pagamento_pin_EPP_Cash() && b_pin_forma_pagamento() && $b_libera_EppCash && PAGAMENTO_EPREPAG_CASH)
                                             else {
-                                                echo "<p class='txt-azul fontsize-pp'>Serviï¿½o indisponï¿½vel no momento</p>";
+                                                echo "<p class='txt-azul fontsize-pp'>Serviço indisponível no momento</p>";
                                             }
                                             // Linha PIN E-PREPAG - fim
 
@@ -1582,10 +1582,10 @@ Comentado por nao usar
                                 ?>
                                     <div class="col-xs-12 col-md-6 mt-sm-20">
                                         <span class="txt-cinza">
-                                            Para finalizar esta compra, vocï¿½ precisa de um <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Cartï¿½o E-Prepag Cash</a></b> ou <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/conta/add-saldo.php">saldo</a></b> em seu cartï¿½o E-Prepag.<br>
-                                            Caso jï¿½ possua um <b>cartï¿½o</b> ou <b>saldo</b>, clique no botï¿½o <b>"E-PREPAG Cash"</b> e finalize a compra.<br><br>
-                                            Caso queira adquirir um Cartï¿½o E-Prepag Cash, <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">clique aqui</a></b><br>
-                                            <i>(Vocï¿½ pode pagar por boleto bancï¿½rio, transferï¿½ncia, dï¿½bito em conta, depï¿½sito bancï¿½rio, DOC ou TED)</i>
+                                            Para finalizar esta compra, você precisa de um <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">Cartão E-Prepag Cash</a></b> ou <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/conta/add-saldo.php">saldo</a></b> em seu cartão E-Prepag.<br>
+                                            Caso já possua um <b>cartão</b> ou <b>saldo</b>, clique no botão <b>"E-PREPAG Cash"</b> e finalize a compra.<br><br>
+                                            Caso queira adquirir um Cartão E-Prepag Cash, <b><a href="<?= EPREPAG_URL_HTTPS ?>/game/produto/detalhe.php?token=IlJQTB5TdFZVAj0XFwEHNwdDTRYafFtNGHlHQxg">clique aqui</a></b><br>
+                                            <i>(Você pode pagar por boleto bancário, transferência, débito em conta, depósito bancário, DOC ou TED)</i>
                                         </span>
                                     </div>
                                 <?php
@@ -1636,16 +1636,16 @@ Comentado por nao usar
                                                         <?php
                                                         if ($liberado) {
                                                         ?>
-                                                            <p class="fontsize-pp bottom0">VISA - Dï¿½BITO</p>
+                                                            <p class="fontsize-pp bottom0">VISA - DÉBITO</p>
                                                             <?php
                                                             if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_VISA_DEBITO_TAXA != 0) {
-                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_VISA_DEBITO_TAXA, 2, ',', '.') . "</p>";
+                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_VISA_DEBITO_TAXA, 2, ',', '.') . "</p>";
                                                             } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             else {
-                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                             } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             ?>
-                                                            <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                            <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                             <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_VISA_DEBITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_VISA_DEBITO']) echo " checked"; ?>></span>
 
                                                         <?php
@@ -1667,13 +1667,13 @@ Comentado por nao usar
 ?>
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_VISA_DEBITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_VISA_DEBITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_VISA_DEBITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
 <?php */
                                             ?>
                                         <?php
@@ -1702,16 +1702,16 @@ Comentado por nao usar
                                                         <?php
                                                         if ($liberado) {
                                                         ?>
-                                                            <p class="fontsize-pp bottom0">VISA - CRï¿½DITO</p>
+                                                            <p class="fontsize-pp bottom0">VISA - CRÉDITO</p>
                                                             <?php
                                                             if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_VISA_CREDITO_TAXA != 0) {
-                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_VISA_CREDITO_TAXA, 2, ',', '.') . "</p>";
+                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_VISA_CREDITO_TAXA, 2, ',', '.') . "</p>";
                                                             } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             else {
-                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                             } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             ?>
-                                                            <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                            <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                             <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_VISA_CREDITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_VISA_CREDITO']) echo " checked"; ?>></span>
 
                                                         <?php
@@ -1732,13 +1732,13 @@ Comentado por nao usar
 ?>
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_VISA_CREDITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_VISA_CREDITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_VISA_CREDITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
 <?php
 */
                                             ?>
@@ -1753,13 +1753,13 @@ Comentado por nao usar
                         width="110" height="35" border="0" title="<?php echo $FORMAS_PAGAMENTO_DESCRICAO[$FORMAS_PAGAMENTO['PAGAMENTO_MASTER_DEBITO']] ?>" onClick="save_shipping('<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_MASTER_DEBITO'] ?>', <?php echo (($controller->usuario->getId()>0)?$controller->usuario->getId():"0") ?>, '<?php echo $controller->usuario->getNome() ?>');">
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_MASTER_DEBITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_MASTER_DEBITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_MASTER_DEBITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                         <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_MASTER_DEBITO']?>" <?php if($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_MASTER_DEBITO']) echo " checked"; ?>></span>
 <?php
 */
@@ -1786,16 +1786,16 @@ Comentado por nao usar
                                                         <?php
                                                         if ($liberado) {
                                                         ?>
-                                                            <p class="fontsize-pp bottom0">MASTERCARD - CRï¿½DITO</p>
+                                                            <p class="fontsize-pp bottom0">MASTERCARD - CRÉDITO</p>
                                                             <?php
                                                             if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_MASTER_CREDITO_TAXA != 0) {
-                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_MASTER_CREDITO_TAXA, 2, ',', '.') . "</p>";
+                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_MASTER_CREDITO_TAXA, 2, ',', '.') . "</p>";
                                                             } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             else {
-                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                             } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             ?>
-                                                            <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                            <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                             <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_MASTER_CREDITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_MASTER_CREDITO']) echo " checked"; ?>></span>
 
                                                         <?php
@@ -1816,13 +1816,13 @@ Comentado por nao usar
 ?>
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_MASTER_CREDITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_MASTER_CREDITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_MASTER_CREDITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
 <?php 
 */
                                             ?>
@@ -1838,13 +1838,13 @@ Comentado por nao usar
                         width="110" height="35" border="0" title="<?php echo $FORMAS_PAGAMENTO_DESCRICAO[$FORMAS_PAGAMENTO['PAGAMENTO_ELO_DEBITO']] ?>" onClick="save_shipping('<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_ELO_DEBITO'] ?>', <?php echo (($controller->usuario->getId()>0)?$controller->usuario->getId():"0") ?>, '<?php echo $controller->usuario->getNome() ?>')"><br>
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_ELO_DEBITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_ELO_DEBITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_ELO_DEBITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                         <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_ELO_DEBITO']?>" <?php if($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_ELO_DEBITO']) echo " checked"; ?>></span>
 <?php 
 */
@@ -1872,16 +1872,16 @@ Comentado por nao usar
                                                         <?php
                                                         if ($liberado) {
                                                         ?>
-                                                            <p class="fontsize-pp bottom0">ELO - CRï¿½DITO</p>
+                                                            <p class="fontsize-pp bottom0">ELO - CRÉDITO</p>
                                                             <?php
                                                             if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_ELO_CREDITO_TAXA != 0) {
-                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_ELO_CREDITO_TAXA, 2, ',', '.') . "</p>";
+                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_ELO_CREDITO_TAXA, 2, ',', '.') . "</p>";
                                                             } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             else {
-                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                             } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             ?>
-                                                            <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                            <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                             <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_ELO_CREDITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_ELO_CREDITO']) echo " checked"; ?>></span>
 
                                                         <?php
@@ -1903,13 +1903,13 @@ Comentado por nao usar
 ?>
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_ELO_CREDITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_ELO_CREDITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_ELO_CREDITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
 <?php
 */
                                             ?>
@@ -1939,16 +1939,16 @@ Comentado por nao usar
                                                         <?php
                                                         if ($liberado) {
                                                         ?>
-                                                            <p class="fontsize-pp bottom0">DINERS - CRï¿½DITO</p>
+                                                            <p class="fontsize-pp bottom0">DINERS - CRÉDITO</p>
                                                             <?php
                                                             if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_DINERS_CREDITO_TAXA != 0) {
-                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_DINERS_CREDITO_TAXA, 2, ',', '.') . "</p>";
+                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_DINERS_CREDITO_TAXA, 2, ',', '.') . "</p>";
                                                             } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             else {
-                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                             } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             ?>
-                                                            <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                            <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                             <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_DINERS_CREDITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_DINERS_CREDITO']) echo " checked"; ?>></span>
 
                                                         <?php
@@ -1970,13 +1970,13 @@ Comentado por nao usar
 ?>
                         <?php
                         if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_DINERS_CREDITO_TAXA != 0) {
-                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_DINERS_CREDITO_TAXA, 2, ',', '.')."</p>";
+                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_DINERS_CREDITO_TAXA, 2, ',', '.')."</p>";
                         }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         else {
-                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                         }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                         ?>
-                        <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                        <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
 <?php 
 */
                                             ?>
@@ -2006,17 +2006,17 @@ Comentado por nao usar
                                                         <?php
                                                         if ($liberado) {
                                                         ?>
-                                                            <p class="fontsize-pp bottom0">DISCOVER - CRï¿½DITO</p>
+                                                            <p class="fontsize-pp bottom0">DISCOVER - CRÉDITO</p>
                                                             <?php
                                                             if ($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_DISCOVER_CREDITO_TAXA != 0) {
-                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ " . number_format($PAGAMENTO_DISCOVER_CREDITO_TAXA, 2, ',', '.') . "</p>";
+                                                                echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ " . number_format($PAGAMENTO_DISCOVER_CREDITO_TAXA, 2, ',', '.') . "</p>";
                                                             } //end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             else {
-                                                                //echo "<p class='txt-vermelho fontsize-pp bottom0'>ATENï¿½AO pix no itau estï¿½ fora do ar</p>";
-                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                                                //echo "<p class='txt-vermelho fontsize-pp bottom0'>ATENÇÃO pix no itau está fora do ar</p>";
+                                                                echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                                             } //end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                                             ?>
-                                                            <p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>
+                                                            <p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>
                                                             <span style='display:none'><input type="radio" name="pagto" value="<?php echo $FORMAS_PAGAMENTO['PAGAMENTO_DISCOVER_CREDITO'] ?>" <?php if ($pagto == $FORMAS_PAGAMENTO['PAGAMENTO_DISCOVER_CREDITO']) echo " checked"; ?>></span>
 
                                                         <?php
@@ -2037,18 +2037,18 @@ Comentado por nao usar
                                         }
 
                                         //                        if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA && $PAGAMENTO_DISCOVER_CREDITO_TAXA != 0) {
-                                        //                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviï¿½o: R$ ".number_format($PAGAMENTO_DISCOVER_CREDITO_TAXA, 2, ',', '.')."</p>";
+                                        //                            echo "<p class='txt-cinza fontsize-pp bottom0'>Taxa de serviço: R$ ".number_format($PAGAMENTO_DISCOVER_CREDITO_TAXA, 2, ',', '.')."</p>";
                                         //                        }//end if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                         //                        else {
-                                        //                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviï¿½o</p>";
+                                        //                            echo "<p class='txt-vermelho fontsize-pp bottom0'>Sem taxa de serviço</p>";
                                         //                        }//end else do if($valor_tmp < $RISCO_GAMERS_VALOR_MIN_PARA_TAXA)
                                         ?>
-                                        <!--<p class="txt-verde fontsize-pp">Entrega em atï¿½ 30 minutos</p>-->
+                                        <!--<p class="txt-verde fontsize-pp">Entrega em até 30 minutos</p>-->
                             <?php
 
                                     } //end if(($controller->usuario->b_IsLogin_pagamento_Cielo() && b_cielo_forma_pagamento() && PAGAMENTO_CIELO) && (!$b_bloqueia_Ongame) && $libera_pagamento['Cielo'] ) 
                                     else {
-                                        echo "<p class='txt-azul fontsize-pp'>Serviï¿½o indisponï¿½vel no momento</p>";
+                                        echo "<p class='txt-azul fontsize-pp'>Serviço indisponível no momento</p>";
                                     }
                                     // Linha CIELO - fim
 
@@ -2066,10 +2066,10 @@ Comentado por nao usar
 
 
                 /*
-		O cï¿½digo abaixo foi feito por Livrodjx, ele basicamente verifica se hï¿½ um CPF e se esse CPF cruza com a tabela
+		O código abaixo foi feito por Livrodjx, ele basicamente verifica se há um CPF e se esse CPF cruza com a tabela
 		de pessoas politicamente expostas, se caso houver um registro ele envia um e-mail que houve uma tentativa de compra.
 		
-		Algumas variï¿½veis tem a extensï¿½o _djx apenas para nï¿½o haver conflito com o resto do cï¿½digo
+		Algumas variáveis tem a extensão _djx apenas para não haver conflito com o resto do código
 	*/
 
                 if (isset($cpf)) {
@@ -2078,18 +2078,18 @@ Comentado por nao usar
                     $rs_djx = SQLexecuteQueryParams($sql_djx, $params);
 
                     $dadosTotais_djx = pg_fetch_all($rs_djx);
-                    $count_registers = pg_num_rows($rs_djx);
+                    $count_registers = (($rs_djx) ? pg_num_rows($rs_djx) : 0);
 
                     if ($count_registers > 0) {
 
                         /*$sql_testa_pdv = "SELECT * FROM dist_usuario_games where ug_id = ".$controller->usuario->getId().";";
 		$rs_djx2 = SQLexecuteQuery($sql_testa_pdv);
 		$dados_pdv_djx = pg_fetch($rs_djx2);
-		$count_pdv_registers = pg_num_rows($rs_djx2);
+		$count_pdv_registers = (($rs_djx2) ? pg_num_rows($rs_djx2) : 0);
 		
 		$cabecalho_adicional_caso_pdv = "";
 		
-		$cabecalho_adicional_caso_pdv = " ATRAVï¿½S DE PDV (ID ".$dados_pdv_djx['ug_id']." )";
+		$cabecalho_adicional_caso_pdv = " ATRAVÉS DE PDV (ID ".$dados_pdv_djx['ug_id']." )";
 		
 		if($count_pdv_registers > 0) {
 		}*/
@@ -2101,7 +2101,7 @@ Comentado por nao usar
 			<tr>
 				<th style='padding:5px;'>Produto</th>
 				<th style='padding:5px;'>I.O.F.</th>
-				<th style='padding:5px;'>Valor unitï¿½rio</th>
+				<th style='padding:5px;'>Valor unitário</th>
 				<th style='padding:5px;'>Qtde</th>
 				<th style='padding:5px;'>Total</th>
 			</tr>

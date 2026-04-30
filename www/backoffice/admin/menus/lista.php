@@ -108,7 +108,7 @@ if ($con->isConnected()){
 ?>
             <tr class="opt trListagem" id="<?php echo $rs_row['menu_id']; ?>">
                 <td><?php echo $rs_row['menu_id']; ?></td>
-                <td><?php echo (@constant(trim($rs_row['menu_descricao'])) === null) ? $rs_row['menu_descricao'] : constant(trim($rs_row['menu_descricao'])); ?></td>
+                <td><?php echo defined(trim($rs_row['menu_descricao'])) ? constant(trim($rs_row['menu_descricao'])) : $rs_row['menu_descricao']; ?></td>
                 <td><?php echo $rs_row['aba_descricao']; ?></td>
             </tr>
 <?php

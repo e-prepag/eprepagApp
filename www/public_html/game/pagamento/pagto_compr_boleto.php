@@ -13,6 +13,12 @@ require_once DIR_CLASS . "gamer/classIntegracao.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
 require_once DIR_INCS . "gamer/venda_e_modelos_logica.php";
 
+function pagtoComprBoletoLog($message, array $context = array())
+{
+    $context["script"] = "pagto_compr_boleto.php";
+    error_log("[pagto_compr_boleto] " . $message . " " . json_encode($context));
+}
+
 $rs_venda_row = pg_fetch_array($rs_venda);
 $pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
 $ultimo_status = $rs_venda_row['vg_ultimo_status'];
@@ -70,73 +76,65 @@ if (isset($_SESSION['usuarioGames_ser']) && !is_null($_SESSION['usuarioGames_ser
 }
 
 
+$boletoJsAction = "alert(" . json_encode("Nao foi possivel preparar a emissao do boleto. Tente novamente ou entre em contato com o suporte.") . ");";
+if (isset($usuarioGames) && $usuarioGames) {
+    $usuario_id = $usuarioGames->getId();
+    $token = date("YmdHis", strtotime("+20 day")) . "," . $venda_id . "," . $usuario_id;
+    $objEncryption = new Encryption();
+    $token = $objEncryption->encrypt($token);
+
+    if (BANCO_BOLETO == "asaas" || $controller->usuario->getId() == 1354068) {
+        require_once "../../../banco/asaas/classBoletoAsaas.php";
+        $buscarBoleto = "SELECT bbg_valor FROM boleto_bancario_games WHERE bbg_vg_id = $1;";
+        $rsBoleto = SQLexecuteQueryParams($buscarBoleto, [$venda_id]);
+        $boletoEncontrado = $rsBoleto ? pg_fetch_array($rsBoleto) : false;
+
+        if (!$boletoEncontrado) {
+            pagtoComprBoletoLog("boleto_bancario_games_nao_encontrado", array(
+                "venda_id" => $venda_id,
+                "usuario_id" => $usuario_id,
+                "pg_error" => pg_last_error($GLOBALS["connid"])
+            ));
+            $boletoJsAction = "alert(" . json_encode("Boleto nao encontrado para esta venda. Tente novamente ou entre em contato com o suporte.") . ");";
+        } else {
+            $boleto_valor = $boletoEncontrado["bbg_valor"];
+            $classBoleto = new classBoleto();
+            $params = array(
+                "cpf_cnpj" => str_replace("-", "", str_replace(".", "", $usuarioGames->ug_sCPF)),
+                "nome" => $usuarioGames->ug_nome_cpf,
+                "valor" => number_format(($boleto_valor), 2, ".", ""),
+                "descricao" => "E-PREPAG",
+                "idpedido" => "GM" . $venda_id,
+                "email" => $usuarioGames->ug_sEmail
+            );
+            $link = $classBoleto->callService($params);
+            if ($link) {
+                $boletoJsAction = "window.open(" . json_encode($link) . ", " . json_encode("boleto") . ", " . json_encode("") . ");";
+            } else {
+                pagtoComprBoletoLog("asaas_sem_link", array(
+                    "venda_id" => $venda_id,
+                    "usuario_id" => $usuario_id,
+                    "boleto_valor" => $boleto_valor
+                ));
+                $boletoJsAction = "alert(" . json_encode("Erro ao gerar boleto " . $boleto_valor . ".") . ");";
+            }
+        }
+    } elseif (BANCO_BOLETO == "bradesco") {
+        $boletoJsAction = "window.open(" . json_encode("/boletos/gamer/boleto_bradesco.php?token=" . $token) . ", " . json_encode("boleto") . ", " . json_encode("") . ");";
+    } elseif ($usuarioGames->b_Is_Boleto_Banespa()) {
+        $boletoJsAction = "window.open(" . json_encode("/SICOB/BoletoWebBanespaCommerce.php?token=" . $token) . ", " . json_encode("boleto") . ", " . json_encode("") . ");";
+    } elseif ($usuarioGames->b_Is_Boleto_Itau()) {
+        $boletoJsAction = "window.open(" . json_encode("/SICOB/BoletoWebItauCommerce.php?token=" . $token) . ", " . json_encode("boleto") . ", " . json_encode("") . ");";
+    } else {
+        $boletoJsAction = "window.open(" . json_encode("/SICOB/BoletoWebCaixaCommerce.php?venda=" . $venda_id) . ", " . json_encode("boleto") . ", " . json_encode("") . ");";
+    }
+}
+
 $pagina_titulo = "Comprovante";
 ?>
 <script>
     function fcnJanelaBoleto() {
-        <?php
-
-        if ($usuarioGames) {
-            //Codigo do usuario
-            $usuario_id = $usuarioGames->getId();
-
-            $token = date('YmdHis', strtotime("+20 day")) . "," . $venda_id . "," . $usuario_id;
-            $objEncryption = new Encryption();
-            $token = $objEncryption->encrypt($token);
-            $server_url = "" . EPREPAG_URL . "";
-            if (checkIP()) {
-                $server_url = $_SERVER['SERVER_NAME'];
-            }
-
-            $parametros['prepag_dominio'] = "https://" . $server_url;
-
-            if (BANCO_BOLETO == "asaas" || $controller->usuario->getId() == 1354068) {
-                require_once "../../../banco/asaas/classBoletoAsaas.php";
-                $classBoleto = new classBoleto();
-
-                $buscarBoleto = "SELECT bbg_valor FROM boleto_bancario_games WHERE bbg_vg_id = $1;";
-
-                $boletoEncontrado = pg_fetch_array(SQLexecuteQueryParams($buscarBoleto, [$venda_id]));
-                $boleto_valor = $boletoEncontrado["bbg_valor"];
-
-                $params = array (
-                    'cpf_cnpj'  => str_replace('-', '', str_replace('.', '', $usuarioGames->ug_sCPF)),
-                    'nome'      => $usuarioGames->ug_nome_cpf,
-                    'valor'     => number_format(($boleto_valor),2,'.',''),
-                    'descricao' => "E-PREPAG",
-                    'idpedido'  => "GM".$venda_id,
-                    'email'    => $usuarioGames->ug_sEmail
-                ); 
-                $link = $classBoleto->callService($params);
-                if ($link) {
-                    ?>
-                    window.open('<?php echo $link ?>', 'boleto', '');
-                    <?php
-                }else{
-                    ?>
-                    alert('Erro ao gerar boleto <?=$boleto_valor?>.');
-                    console.log('<?= ($buscarBoleto . "\n" . $boletoEncontrado) ?>');
-                    <?php
-                }
-            } elseif (BANCO_BOLETO == "bradesco") {
-                ?>
-                window.open('/boletos/gamer/boleto_bradesco.php?token=<?php echo $token ?>', 'boleto', '');
-                <?php
-            } elseif ($usuarioGames->b_Is_Boleto_Banespa()) {
-                ?>
-                window.open('/SICOB/BoletoWebBanespaCommerce.php?token=<?php echo $token ?>', 'boleto', '');
-                <?php
-            } elseif ($usuarioGames->b_Is_Boleto_Itau()) {
-                ?>
-                window.open('/SICOB/BoletoWebItauCommerce.php?token=<?php echo $token ?>', 'boleto', '');
-                <?php
-            } else {
-                ?>
-                window.open('/SICOB/BoletoWebCaixaCommerce.php?venda=<?php echo $venda_id ?>', 'boleto', '');
-                <?php
-            }
-        }
-        ?>
+        <?php echo $boletoJsAction; ?>
     }
 </script>
 <div class="container txt-azul-claro bg-branco">

@@ -26,8 +26,10 @@ class ManipulacaoArquivosLog {
 
     public function createLockedFile() {
         $newfile = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', 'w');
+        if ($newfile) {
         fwrite($newfile, getmypid());
         fclose($newfile);
+        }
     }//end function createLockedFile
 
     public function deleteLockedFile() {
@@ -49,23 +51,44 @@ class ManipulacaoArquivosLog {
 
     public function showBusy(){
         $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().".busy","a");
+        if ($fp) {
         fwrite($fp, date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] ." ==> Programa em uso.".PHP_EOL);
         fclose($fp);
+        }
     }//end function showBusy
     
     private function isProcess($pid){
-        $plist = explode(PHP_EOL, shell_exec('ps -eo pid'));
-        //echo "Lista de Processos".print_r($plist,true)." ID no arquivo: ".$pid.PHP_EOL;
-        if(in_array($pid, $plist)) return true;
-        else return false;
+        $pid = (int)$pid;
+        if($pid <= 0) {
+            return false;
+        }
+
+        if(function_exists('posix_kill')) {
+            return @posix_kill($pid, 0);
+        }
+
+        return is_dir('/proc/'.$pid);
     }//end function isProcess
 
     public function killProcess($pid){
-        shell_exec("kill -9 " . $pid);
+        $pid = (int)$pid;
+        if($pid <= 0) {
+            return false;
+        }
+
+        if(function_exists('posix_kill')) {
+            return @posix_kill($pid, 9);
+        }
+
+        return false;
     }//end function killProcess
     
     private function readFile() {
         $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$this->getNomeArquivo().'.locked', "r");
+        if (!$fp) {
+            return "";
+        }
+
         $data = fgets($fp, 1024);
         fclose($fp);
         return $data;
@@ -79,8 +102,10 @@ class ManipulacaoArquivosLog {
 function callbackLog($buffer){
     global $nome_arquivo;
     $fp = fopen($GLOBALS['raiz_do_projeto']."arquivos_gerados/logs/".$nome_arquivo.".log","a");
+    if ($fp) {
     fwrite($fp, $buffer);
     fclose($fp);
+    }
 }//end function callbackLog
 
 ?>

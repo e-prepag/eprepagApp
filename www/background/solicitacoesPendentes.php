@@ -50,7 +50,7 @@
 			$to = "daniela.oliveira@e-prepag.com.br";
 			$cc = "glaucia@e-prepag.com.br"; 
 			$bcc = ""; 
-			$subject = utf8_decode("E-prepag - Solicitação de saldo");
+			$subject = mb_convert_encoding("E-prepag - Solicitação de saldo", 'ISO-8859-1', 'UTF-8');
 			enviaEmail3($to, $cc, $bcc, $subject, $layoutFinal, "");		
 			
 			

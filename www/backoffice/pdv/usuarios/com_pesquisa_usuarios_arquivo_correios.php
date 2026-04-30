@@ -124,8 +124,10 @@ if($file->checkFile()){
     if($str = file_get_contents($txt)){
         $str = str_replace("\n", "\r\n", $str);
         $handle = fopen($txt, "w+");
+        if ($handle) {
         fwrite($handle, $str);
         fclose($handle);
+        }
         
     }
 ?>

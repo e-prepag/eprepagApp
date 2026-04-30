@@ -14,7 +14,7 @@ $inicial = 0;
 
 $sql = "select * from dist_usuarios_games_operador ugo where ugo.ugo_ug_id = ".$controller->usuarios->getId()." order by ugo.ugo_nome";
 $res_count = SQLexecuteQuery($sql);
-$total_table = pg_num_rows($res_count);
+$total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 //echo "sql: $sql<br>";
 //echo "total_table: $total_table<br>";
 

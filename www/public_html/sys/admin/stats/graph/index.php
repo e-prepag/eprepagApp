@@ -508,7 +508,7 @@ function montaPeriodo(periodo) {
 // resgato o total de vendas por operadoras
 $rss = bcgGenerator($statuspgto, $canais, $fpgto, $periodo1, $data_inicial, $connid, $itensgeral, $groupgeral, $itensespec, $groupespec, $where, $itensespec2, $tipoconsulta);
 
-$tot = pg_num_rows($rss);
+$tot = (($rss) ? pg_num_rows($rss) : 0);
 
 if($tot > 0) {
 	while($vlr=pg_fetch_array($rss)) {
@@ -533,7 +533,7 @@ if($tot > 0) {
 
 // resgato o total de vendas por operadoras no periodo anterior
 $rss = bcgGenerator($statuspgto, $canais, $fpgto, $periodo2, $data_final, $connid, $itensgeral, $groupgeral, $itensespec, $groupespec, $where, $itensespec2, $tipoconsulta);
-$tot = pg_num_rows($rss);
+$tot = (($rss) ? pg_num_rows($rss) : 0);
 if($tot > 0) {
 	while($vlr=pg_fetch_array($rss)) {
 		

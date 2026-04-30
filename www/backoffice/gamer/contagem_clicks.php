@@ -10,7 +10,7 @@ require_once "/www/includes/bourls.php";
 $sqlProdutosGamer = "select ogp_nome as nome, ogp_id as id from tb_operadora_games_produto order by ogp_nome";
 
 if($rsProdutosGamer = SQLexecuteQuery($sqlProdutosGamer)){
-    if(pg_num_rows($rsProdutosGamer)){
+    if((($rsProdutosGamer) ? pg_num_rows($rsProdutosGamer) : 0)){
         while($rs_row = pg_fetch_array($rsProdutosGamer)) {
             $produtosGamer[$rs_row['id']] = $rs_row['nome'];
         }
@@ -20,7 +20,7 @@ if($rsProdutosGamer = SQLexecuteQuery($sqlProdutosGamer)){
 $sqlProdutosPdv = "select ogp_nome as nome, ogp_id as id from tb_dist_operadora_games_produto order by ogp_nome";
 
 if($rsProdutosPdv = SQLexecuteQuery($sqlProdutosPdv)){
-    if(pg_num_rows($rsProdutosPdv)){
+    if((($rsProdutosPdv) ? pg_num_rows($rsProdutosPdv) : 0)){
         while($rs_row = pg_fetch_array($rsProdutosPdv)) {
             $produtosPdv[$rs_row['id']] = $rs_row['nome'];
         }
@@ -49,7 +49,7 @@ if(!empty($_POST['sistema'])){
     $rs = SQLexecuteQueryParams($sql, $params);
 
     if($rs) {
-        $totalRegistros = pg_num_rows($rs);
+        $totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
     }
     else 
         $totalRegistros = 0;

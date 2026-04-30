@@ -8,7 +8,7 @@ class ClickBannerDAO {
         
         $this->clicks = array();
         $clicks = SQLexecuteQueryParams($sql, $params);
-        $totalLinhas = pg_num_rows($clicks);
+        $totalLinhas = (($clicks) ? pg_num_rows($clicks) : 0);
         if($totalLinhas > 0){
             
             while($lineRow = pg_fetch_array($clicks)){

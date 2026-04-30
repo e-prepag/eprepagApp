@@ -823,6 +823,9 @@ $GLOBALS["jquery"] = true;
                         $sql = "select nome from provedor_pix where ativo = 'A';";
                         $ativo = SQLexecuteQuery($sql);
                         $ativoNome = pg_fetch_assoc($ativo);
+                        if (!is_array($ativoNome)) {
+                            $ativoNome = array();
+                        }
 
                         if (!defined("PAGAMENTO_PIX_CHAVEAMENTO")) {
                             include "/www/includes/config.MeiosPagamentos.php";
@@ -834,6 +837,12 @@ $GLOBALS["jquery"] = true;
                             } else {
                                 $ativoNome["nome"] = PAGAMENTO_PIX_PROVEDOR;
                             }
+                            if (empty($ativoNome["nome"]) || !is_file(RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php')) {
+
+                                $ativoNome["nome"] = "asaas";
+
+                            }
+
                             require_once RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php';
                             //classe para pagamento em pix usada atualmente
                             if ($ativoNome["nome"] == "asaas") {
@@ -888,6 +897,12 @@ $GLOBALS["jquery"] = true;
                                 echo "Pix não disponível no momento.";
                             }
                         } else {
+                            if (empty($ativoNome["nome"]) || !is_file(RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php')) {
+
+                                $ativoNome["nome"] = "asaas";
+
+                            }
+
                             require_once RAIZ_DO_PROJETO . 'banco/pix/' . $ativoNome["nome"] . '/config.inc.pix.php';
 
                             if ($ativoNome["nome"] == "asaas") {
@@ -941,9 +956,11 @@ $GLOBALS["jquery"] = true;
 
                                 $abre_arquivo = fopen($arquivo, 'a+');
 
+                                if ($abre_arquivo) {
                                 fwrite($abre_arquivo, json_encode($params) . "\n");
 
                                 fclose($abre_arquivo);
+                                }
 
                                 usleep(800000);
                                 echo $pix->callService($params);

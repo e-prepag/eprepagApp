@@ -7,9 +7,11 @@
 //header('Content-type: image/jpeg');
 
 require_once "../../../includes/constantes.php";
-require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph.php";
-require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph_bar.php";
-require_once $raiz_do_projeto . "includes/jpgraph/src/jpgraph_line.php";
+require_once $raiz_do_projeto . "vendor/autoload.php";
+
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+
 require_once $raiz_do_projeto . "includes/functions.php";
 
 
@@ -80,7 +82,7 @@ grava_log_graph($sout);
 
 // Setup a basic graph
 // width, height
-$graph = new Graph(500,300,'auto');
+$graph = new Graph\Graph(500,300,'auto');
 //$graph->SetShadow('gray@0.4',5);
 $graph->SetScale("linlin");
 //$graph->img->SetAntiAliasing();
@@ -133,7 +135,7 @@ $graph->SetTickDensity(TICKD_DENSE, TICKD_DENSE);
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 // Create the bar plot
-$b1 = new BarPlot($data_hora);
+$b1 = new Plot\BarPlot($data_hora);
 //$b1->SetLegend("Vendas por hora");
 $b1->SetWidth(1.0);
 $b1->SetShadow('gray@0.5');
@@ -149,7 +151,7 @@ $b1->value->SetColor('red@0.4');
 $b1->value->Show();
 
 // Create accumulative graph
-$lplot = new LinePlot($hist);
+$lplot = new Plot\LinePlot($hist);
 
 // We want the line plot data point in the middle of the bars
 $lplot->SetBarCenter();

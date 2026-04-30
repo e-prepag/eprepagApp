@@ -267,7 +267,7 @@ require_once "/www/includes/bourls.php";
 //die("Stop");
 		
 			$rs_venda = SQLexecuteQuery($sql);
-			$total_table = pg_num_rows($rs_venda);
+			$total_table = (($rs_venda) ? pg_num_rows($rs_venda) : 0);
 
 			//Total Geral
 			$totalGeral_valor = 0;

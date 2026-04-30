@@ -3,7 +3,7 @@
 //ini_set("display_errors", 1); 
 
 set_time_limit(6000);
-ini_set('max_execution_time', 6000); 
+// ini_set('max_execution_time', 6000); 
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
@@ -50,7 +50,7 @@ if(!$arquivoLog->haveFile()) {
     echo $sql.PHP_EOL;
     $rs_venda_identifica = SQLexecuteQuery($sql);
 
-    echo "total: ".pg_num_rows($rs_venda_identifica).PHP_EOL;
+    echo "total: ".(($rs_venda_identifica) ? pg_num_rows($rs_venda_identifica) : 0).PHP_EOL;
 
 
     while ($rs_venda_identifica_row = pg_fetch_array($rs_venda_identifica)){

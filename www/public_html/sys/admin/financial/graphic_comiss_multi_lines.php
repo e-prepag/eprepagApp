@@ -12,14 +12,14 @@ $language		= isset($_POST['language'])		? $_POST['language']			: null;
 unlink('images/'.trim($labeloperadora).$imagem);
 
 // jpgraph na produção
-include ("../stats/graph/src/jpgraph.php");
-include ("../stats/graph/src/jpgraph_line.php");
+require_once __DIR__ . "/../../../../vendor/autoload.php";
 
-//include ("../jpgraph/src/jpgraph.php");
-//include ("../jpgraph/src/jpgraph_line.php");
+use Amenadiel\JpGraph\Graph;
+use Amenadiel\JpGraph\Plot;
+use Amenadiel\JpGraph\Util;
 
 // Create the basic graph
-$graph = new Graph(750,350,'auto');    
+$graph = new Graph\Graph(750,350,'auto');    
 $graph->SetMarginColor('white');
 $graph->SetScale("textlin");	 //SetScale($aAxisType, $aYMin, $aYMax, $aXMin, $aXMax)
 $graph->SetFrame(false);
@@ -73,7 +73,7 @@ foreach ($_SESSION['graphic'] as $year => $m){
 	//ordenando
 	ksort($mm);
 	// Create the three var series we will combine
-	$bplot[$i] = new LinePlot($mm);
+	$bplot[$i] = new Plot\LinePlot($mm);
 	$bplot[$i] -> mark -> SetType(MARK_FILLEDCIRCLE);
 	$bplot[$i] -> mark -> SetFillColor($colors[$i]);
 	$bplot[$i] -> mark -> SetWidth(3);
@@ -123,14 +123,14 @@ else {
 		// Set new locale for Portuguese BR
 		$loc_br = setlocale(LC_ALL, 'pt_BR');
 
-		$dateLocale = new DateLocale();
+		$dateLocale = new Util\DateLocale();
 		// Use Brasil locale
 		$dateLocale->Set($loc_br);
 		// Setup graph title
 		$graph->title->Set($labeloperadora.' - Vendas - Valor Bruto R$');
 	}
 	else {
-		$dateLocale = new DateLocale();
+		$dateLocale = new Util\DateLocale();
 		// Setup graph title
 		$graph->title->Set($labeloperadora.' - Sales - Gross R$');
 	}

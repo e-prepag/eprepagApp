@@ -126,7 +126,7 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 
     $rs = SQLexecuteQuery($sql_regs);
 						
-    if(pg_num_rows($rs) > 0) 
+    if((($rs) ? pg_num_rows($rs) : 0) > 0) 
     { 
 ?>
         <div class="col-md-12">
@@ -188,7 +188,7 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
         <?php } ?>
              <tr> 
                 <td colspan="6"> 
-                    Quantidade de registros ativos: <strong><?php echo pg_num_rows($rs) ?></strong> - <a href="#" id="lnkReord2">Reordenar os produtos por ordem alfabética</a>
+                    Quantidade de registros ativos: <strong><?php echo (($rs) ? pg_num_rows($rs) : 0) ?></strong> - <a href="#" id="lnkReord2">Reordenar os produtos por ordem alfabética</a>
                 </td>
             </tr>
         </tbody>

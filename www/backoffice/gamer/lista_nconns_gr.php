@@ -58,7 +58,7 @@ if($msg == ""){
                         $sql .= " and scc_data_inclusao between '".formata_data($tf_v_data_inclusao_ini,1)." 00:00:00' and '".formata_data($tf_v_data_inclusao_fim,1)." 23:59:59' ";
 
         $rs_total = SQLexecuteQuery($sql);
-        if($rs_total) $registros_total = pg_num_rows($rs_total);
+        if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 
         $sql .= "order by scc_data_inclusao desc; ";	// " order by vp.ptr_id desc ";	//
 
@@ -144,7 +144,7 @@ $data_start = date("Y-m-d H:i:s", strtotime( substr( $tf_v_data_inclusao_ini,6,4
 			if($rs_transacoes) {
 
 // Create a data set in range (50,70) and X-positions
-$ndatapoints = pg_num_rows($rs_transacoes);
+$ndatapoints = (($rs_transacoes) ? pg_num_rows($rs_transacoes) : 0);
 $samplerate = 240; 
 $start = time();
 $end = $start+$ndatapoints*$samplerate;

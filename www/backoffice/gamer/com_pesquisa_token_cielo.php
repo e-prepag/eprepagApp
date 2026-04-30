@@ -133,11 +133,11 @@ echo $sql;
     </tr>
 
 <?php
-	if($rsResposta && (pg_num_rows($rsResposta) > 0)) {
+	if($rsResposta && ((($rsResposta) ? pg_num_rows($rsResposta) : 0) > 0)) {
 ?>
 	<tr>
         <td align="center">&nbsp;</td>
-        <td align="left" colspan="4"><?php echo "Encontrado".((pg_num_rows($rsResposta)>0)?"s":"")." ".pg_num_rows($rsResposta)." registro".((pg_num_rows($rsResposta)>0)?"s":"")."";?>
+        <td align="left" colspan="4"><?php echo "Encontrado".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")." ".(($rsResposta) ? pg_num_rows($rsResposta) : 0)." registro".(((($rsResposta) ? pg_num_rows($rsResposta) : 0)>0)?"s":"")."";?>
 		</td>
         <td align="center">&nbsp;</td>
     </tr>

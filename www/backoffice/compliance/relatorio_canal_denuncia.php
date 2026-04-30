@@ -102,7 +102,7 @@ if (isset($BtnSearch) && $BtnSearch) {
 
         $rs = SQLexecuteQuery($sql);
         if ($rs) {
-            $num_registros = pg_num_rows($rs);
+            $num_registros = (($rs) ? pg_num_rows($rs) : 0);
             if ($num_registros > 0) {
         ?>
                 <table class='table table-bordered txt-preto text-center fontsize-p'>

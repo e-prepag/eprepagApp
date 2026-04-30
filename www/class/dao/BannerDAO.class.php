@@ -117,7 +117,7 @@ class BannerDAO
 
         try {
             if ($banners = SQLexecuteQueryParams($sql, $params)) {
-                $totalLinhas = pg_num_rows($banners);
+                $totalLinhas = (($banners) ? pg_num_rows($banners) : 0);
                 if ($totalLinhas > 0) {
 
                     while ($lineRow = pg_fetch_array($banners)) {
@@ -249,7 +249,7 @@ class BannerDAO
         $posicao_upper = strtoupper($posicao);
         try {
             if ($posicao = SQLexecuteQueryParams($sql, [$posicao_upper])) {
-                if (pg_num_rows($posicao) > 0) {
+                if ((($posicao) ? pg_num_rows($posicao) : 0) > 0) {
 
                     $lineRow = pg_fetch_array($posicao);
                     return $lineRow['bsp_id'];
@@ -272,7 +272,7 @@ class BannerDAO
 
         try {
             if ($categoria = SQLexecuteQueryParams($sql, [$categoria_upper])) {
-                if (pg_num_rows($categoria) > 0) {
+                if ((($categoria) ? pg_num_rows($categoria) : 0) > 0) {
 
                     $lineRow = pg_fetch_array($categoria);
                     return $lineRow['bsc_id'];

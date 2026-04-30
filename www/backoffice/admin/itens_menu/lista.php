@@ -128,7 +128,7 @@ if ($con->isConnected()){
 <?php 
                 foreach($menus as $menu){ 
 ?>
-                    <option value="<?php echo $menu->menu_id; ?>" <?php if(isset($_POST['menu']) != "" && $menu->menu_id == $_POST['menu']) echo "selected"; ?>><?php echo (@constant(trim($menu->menu_descricao)) === null) ? $menu->menu_descricao : constant(trim($menu->menu_descricao)); ?></option>
+                    <option value="<?php echo $menu->menu_id; ?>" <?php if(isset($_POST['menu']) != "" && $menu->menu_id == $_POST['menu']) echo "selected"; ?>><?php echo defined(trim($menu->menu_descricao)) ? constant(trim($menu->menu_descricao)) : $menu->menu_descricao; ?></option>
 <?php 
                 } 
 ?>
@@ -170,10 +170,10 @@ if ($con->isConnected()){
 ?>
             <tr class="opt trListagem" id="<?php echo $rs_row['item_id']; ?>">
                 <td><?php echo $rs_row['item_id']; ?></td>
-                <td><?php echo (@constant(trim($rs_row['item_descricao'])) === null) ? $rs_row['item_descricao'] : constant(trim($rs_row['item_descricao'])); ?></td>
+                <td><?php echo defined(trim($rs_row['item_descricao'])) ? constant(trim($rs_row['item_descricao'])) : $rs_row['item_descricao']; ?></td>
                 <td><?php echo (strlen((string)($rs_row['item_link'] ?? "")) > 60) ? substr($rs_row['item_link'],0,60)."..." : $rs_row['item_link']; ?></td>
                 <td><?php echo $rs_row['item_monitor']; ?></td>
-                <td><?php echo (@constant(trim($rs_row['menu_descricao'])) === null) ? $rs_row['menu_descricao'] : constant(trim($rs_row['menu_descricao'])); ?></td>
+                <td><?php echo defined(trim($rs_row['menu_descricao'])) ? constant(trim($rs_row['menu_descricao'])) : $rs_row['menu_descricao']; ?></td>
                 <td><?php echo ($rs_row['item_aparece_menu'] == "1") ? "Sim" : "N�o"; ?></td>
                 <td><?php echo $rs_row['item_order']; ?></td>
             </tr>

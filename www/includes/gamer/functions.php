@@ -5,14 +5,19 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require_once '/www/vendor/autoload.php';
+require_once '/www/includes/phpmailer_utf8.php';
 
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_pagto.php";
+require_once RAIZ_DO_PROJETO . "vendor/autoload.php";
 require_once RAIZ_DO_PROJETO . "includes/gamer/functions_economy.php";
 require_once RAIZ_DO_PROJETO . "includes/load_dotenv.php";
 
 if (!function_exists('checkIP')) {
 
-        function checkIP()
+        /**
+         * @return array|bool
+         */
+        function checkIP(): array|bool
         {
 
                 $aux_return = false;
@@ -41,35 +46,38 @@ if (!function_exists('checkIP')) {
                 } //end foreach
 
                 return $aux_return;
-        } //end function checkIP()
+        } //end function checkIP(): bool
 
 }
-function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach = null, $stringAttach = false, $name = '', $replyTo = '')
+function enviaEmail4(string $to, mixed $cc, mixed $bcc, string $subject, string $body_html, mixed $body_plain, mixed $attach = null, bool $stringAttach = false, string $name = '', string $replyTo = ''): bool
 {
+
+        $cc = ($cc === null || $cc === false) ? '' : (string)$cc;
+        $bcc = ($bcc === null || $bcc === false) ? '' : (string)$bcc;
+        $body_plain = ($body_plain === null || $body_plain === false) ? '' : (string)$body_plain;
 
         $mail = new \PHPMailer\PHPMailer\PHPMailer();
 
 
 
         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
-        $mail->Host     = getenv("smtp_host");
+        $mail->Host     = (string)getenv("smtp_host");
         //---------------------------------------------------------//
         $mail->Mailer   = "smtp";
-        $mail->From     = ($replyTo != '' ? "site@e-prepag.com.br" : getenv("email_suporte"));
+        $mail->From     = ($replyTo != '' ? "site@e-prepag.com.br" : (string)getenv("email_suporte"));
         $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Username = getenv("smtp_username");  // a valid email here
-        $mail->Password = getenv("smtp_password"); //'985856';		//'850637';  985856
+        $mail->Username = (string)getenv("smtp_username");  // a valid email here
+        $mail->Password = (string)getenv("smtp_password"); //'985856';		//'850637';  985856
         $mail->FromName = "E-Prepag";        // " (EPP)"
-        $mail->isHTML(true);
 
         //-----Alteraï¿½ï¿½o exigida pela BaseNet(11/2017)-------------//
         $mail->isSMTP();
         //$mail->SMTPSecure = "ssl";
-        $mail->Port     = getenv("smtp_port");
+        $mail->Port     = (int)getenv("smtp_port");
         //---------------------------------------------------------//  
 
         // Reply-to
-        $mail->addReplyTo(($replyTo != '' ? $replyTo : getenv("email_suporte")));
+        $mail->AddReplyTo(($replyTo != '' ? $replyTo : (string)getenv("email_suporte")));
 
         //To
         if ($to && trim($to) != "") {
@@ -92,20 +100,26 @@ function enviaEmail4($to, $cc, $bcc, $subject, $body_html, $body_plain, $attach 
         if (!empty($attach)) {
                 if ($stringAttach) {
 
-                        $mail->addStringAttachment($attach, $name);
+                        $mail->AddStringAttachment((string)$attach, $name);
                 } else {
 
-                        $mail->addAttachment($attach);
+                        $mail->addAttachment((string)$attach);
                 }
         }
+        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
         $mail->Subject = $subject;
         $mail->Body    = $body_html;
         $mail->AltBody = $body_plain;
 
-        return $mail->send();
+        try {
+                return (bool)$mail->Send();
+        } catch (Exception $e) {
+                return false;
+        }
 } //end function enviaEmail4
 
-function declare_valida_formatacao()
+function declare_valida_formatacao(): void
 {
 
         function valida_formatacao($tipo, $tamanho, $valor)
@@ -127,7 +141,7 @@ function declare_valida_formatacao()
         }
 }
 
-function verificaCPFEx($CPF)
+function verificaCPFEx(string $CPF): int
 {
 
         if (strpos($CPF, '.') === false) return 0;
@@ -148,11 +162,12 @@ function verificaCPFEx($CPF)
                 || $CPF == '99999999999'
         ) return 0;
 
+        /** @phpstan-ignore-next-line */
         return verificaCPF($CPF);
 }
 
 
-function DVCampo_Modulo10($campo)
+function DVCampo_Modulo10(string $campo): int
 {
         $DOIS_UM = array(2, 1);
         $soma = 0;
@@ -160,8 +175,8 @@ function DVCampo_Modulo10($campo)
         $campoTmp = strrev($campo);
 
         for ($i = 0; $i < $tam; $i++) {
-                $aux = $DOIS_UM[$i % 2] * substr($campoTmp, $i, 1);
-                if ($aux >= 10) $soma = $soma + (floor($aux / 10) + $aux % 10);
+                $aux = $DOIS_UM[$i % 2] * (int)substr($campoTmp, $i, 1);
+                if ($aux >= 10) $soma = $soma + (int)(floor($aux / 10) + $aux % 10);
                 else $soma = $soma + $aux;
         }
 
@@ -172,14 +187,14 @@ function DVCampo_Modulo10($campo)
         return $dVCampo;
 }
 
-function obterIdVendaValido()
+function obterIdVendaValido(): ?int
 {
 
         $maxID = 100000000 - 1;
         $nmax = 100;
         $n = 1;
         $s_ids = "";
-        $time_start_stats = getmicrotime();
+        $time_start_stats = (float)getmicrotime();
         $venda_id_rand = mt_rand(1, $maxID);
         $s_ids .= $venda_id_rand . ", ";
         while (existeIdVenda($venda_id_rand)) {
@@ -196,7 +211,7 @@ function obterIdVendaValido()
         gravaLog_obterIdVendaValido($msg);
 
         if ($n > 1) {
-                $msg = "\tElapsed time " . number_format(getmicrotime() - $time_start_stats, 2, '.', '.') . "s";
+                $msg = "\tElapsed time " . number_format((float)getmicrotime() - $time_start_stats, 2, '.', '.') . "s";
                 gravaLog_obterIdVendaValido($msg);
         }
         if ($n >= $nmax) {
@@ -206,31 +221,39 @@ function obterIdVendaValido()
         return $venda_id_rand;
 }
 
-function existeIdVenda($venda_id_rand)
+function existeIdVenda(int $venda_id_rand): bool
 {
 
         $ret = true;
 
         //SQL
-        $sql = "select count(*) as qtde from tb_venda_games ";
-        $sql .= " where vg_id = " . SQLaddFields($venda_id_rand, "");
-        $rs = SQLexecuteQuery($sql);
+        $sql = "
+    SELECT count(*) AS qtde
+    FROM tb_venda_games
+    WHERE vg_id = $1
+";
+
+        $params = [
+                $venda_id_rand
+        ];
+
+        $rs = SQLexecuteQueryParams($sql, $params);
         if ($rs && pg_num_rows($rs) > 0) {
                 $rs_row = pg_fetch_array($rs);
-                if ($rs_row['qtde'] == 0) $ret = false;
+                if ($rs_row && $rs_row['qtde'] == 0) $ret = false;
         }
         return $ret;
 }
 
 if (!function_exists('gravaLog_TMP')) {
-        function gravaLog_TMP($mensagem)
+        function gravaLog_TMP(string $mensagem): void
         {
 
                 //Arquivo
                 $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_pagamento_TMP.txt";
 
                 //Mensagem
-                $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+                $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
                 //Grava mensagem no arquivo
                 if ($handle = fopen($file, 'a+')) {
@@ -240,14 +263,14 @@ if (!function_exists('gravaLog_TMP')) {
         }
 } //end if(!function_exists('gravaLog_TMP'))
 
-function gravaLog_Pagto_Insert($mensagem)
+function gravaLog_Pagto_Insert(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_Pagto_Insert.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -256,14 +279,14 @@ function gravaLog_Pagto_Insert($mensagem)
         }
 }
 
-function gravaLog_MCOIN($mensagem)
+function gravaLog_MCOIN(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_pagamento_MCOIN.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -272,7 +295,7 @@ function gravaLog_MCOIN($mensagem)
         }
 }
 
-function gravaLog_Login($mensagem, $forced_save = false)
+function gravaLog_Login(string $mensagem, bool $forced_save = false): void
 {
 
         // Desativa o registro de Sucesso/Erro de logins
@@ -282,7 +305,7 @@ function gravaLog_Login($mensagem, $forced_save = false)
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_login.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . " (" . $_SERVER['REMOTE_ADDR'] . ")\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . " (" . ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . ")\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -292,14 +315,14 @@ function gravaLog_Login($mensagem, $forced_save = false)
 }
 
 
-function gravaLog_EPPCASH_PINs($mensagem)
+function gravaLog_EPPCASH_PINs(string $mensagem): void
 {
 
         //Arquivo
         $file = $GLOBALS['raiz_do_projeto'] . "arquivos_gerados/logs/log_EPP_CASH_PINs.txt";
 
         //Mensagem
-        $mensagem =  str_repeat("-", 80) . "\n" . date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem =  str_repeat("-", 80) . "\n" . date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
                 fwrite($handle, $mensagem);
@@ -308,7 +331,7 @@ function gravaLog_EPPCASH_PINs($mensagem)
 }
 
 
-function gravaLog_obterIdVendaValido($mensagem)
+function gravaLog_obterIdVendaValido(string $mensagem): void
 {
 
         //Arquivo
@@ -324,14 +347,14 @@ function gravaLog_obterIdVendaValido($mensagem)
         }
 }
 
-function gravaLog_Temporario($mensagem)
+function gravaLog_Temporario(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_TEMPORARIO.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -340,14 +363,14 @@ function gravaLog_Temporario($mensagem)
         }
 }
 
-function gravaLog_CadastraUsuariosExpressMoney($mensagem)
+function gravaLog_CadastraUsuariosExpressMoney(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_CadastraUsuariosExpressMoney.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -356,14 +379,14 @@ function gravaLog_CadastraUsuariosExpressMoney($mensagem)
         }
 }
 
-function gravaLog_BloqueioPagtoOnline($mensagem)
+function gravaLog_BloqueioPagtoOnline(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_BloqueioPagtoOnline_Money.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -372,14 +395,14 @@ function gravaLog_BloqueioPagtoOnline($mensagem)
         }
 }
 
-function gravaLog_LimitePagtoOnline($mensagem)
+function gravaLog_LimitePagtoOnline(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_LimitePagtoOnline_Money.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -388,14 +411,14 @@ function gravaLog_LimitePagtoOnline($mensagem)
         }
 }
 
-function gravaLog_LimitePagtoOnline_Drupal($mensagem)
+function gravaLog_LimitePagtoOnline_Drupal(string $mensagem): void
 {
 
         //Arquivo
         $file = RAIZ_DO_PROJETO . "arquivos_gerados/logs/log_LimitePagtoOnline_Money_Drupal.txt";
 
         //Mensagem
-        $mensagem = date('Y-m-d H:i:s') . " " . $_SERVER["SCRIPT_FILENAME"] . "\n" . $mensagem . "\n";
+        $mensagem = date('Y-m-d H:i:s') . " " . ($_SERVER["SCRIPT_FILENAME"] ?? 'unknown') . "\n" . $mensagem . "\n";
 
         //Grava mensagem no arquivo
         if ($handle = fopen($file, 'a+')) {
@@ -428,20 +451,34 @@ function PagtoOnlineUsuariosBloqueadosParaVIP($tipo_pagto, $ug_id, $total_carrin
         $tipo_usuario = "G";
         $is_safe = (($total_carrinho + $total_diario) < 2 * $total_limite) ? 1 : 0;
 
-        $sql = "insert into usuarios_games_pagamento_bloqueio_log (" .
-                "ugpbl_tipo_usuario, ugpbl_tipo_pagto, ugpbl_ug_id, ugpbl_valor_carrinho, " .
-                "ugpbl_valor_total, ugpbl_valor_limite, ugpbl_n_compras, ugpbl_n_compras_limite, ugpbl_is_safe " .
-                ") values (";
-        $sql .= SQLaddFields($tipo_usuario, "s") . ",";
-        $sql .= SQLaddFields($tipo_pagto, "s") . ",";
-        $sql .= SQLaddFields($ug_id, "") . ",";
-        $sql .= SQLaddFields($total_carrinho, "") . ",";
-        $sql .= SQLaddFields($total_diario, "") . ",";
-        $sql .= SQLaddFields($total_limite, "") . ",";
-        $sql .= SQLaddFields($n_compras, "") . ", ";
-        $sql .= SQLaddFields($n_compras_limite, "") . ", ";
-        $sql .= SQLaddFields($is_safe, "") . ") ";
-        $ret = SQLexecuteQuery($sql);
+        $sql = "
+    INSERT INTO usuarios_games_pagamento_bloqueio_log (
+        ugpbl_tipo_usuario,
+        ugpbl_tipo_pagto,
+        ugpbl_ug_id,
+        ugpbl_valor_carrinho,
+        ugpbl_valor_total,
+        ugpbl_valor_limite,
+        ugpbl_n_compras,
+        ugpbl_n_compras_limite,
+        ugpbl_is_safe
+    )
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+";
+
+        $params = [
+                $tipo_usuario,
+                $tipo_pagto,
+                (int)$ug_id,
+                $total_carrinho,
+                $total_diario,
+                $total_limite,
+                (int)$n_compras,
+                (int)$n_compras_limite,
+                (int)$is_safe
+        ];
+
+        $ret = SQLexecuteQueryParams($sql, $params);
 }
 
 
@@ -790,15 +827,13 @@ function redirect($strRedirect)
    */
                                                                         for ($i = 0; $i < $tam; $i++) {
                                                                                 // If I found one '<', $tag++ and continue whithout copy
-                                                                                if ($string[
-                                                                                        $i] == '<') {
+                                                                                if ($string[$i] == '<') {
                                                                                         $tag++;
                                                                                         continue;
                                                                                 }
 
                                                                                 // if I found '>', decrease $tag and continue 
-                                                                                if ($string[
-                                                                                        $i] == '>') {
+                                                                                if ($string[$i] == '>') {
                                                                                         if ($tag) {
                                                                                                 $tag--;
                                                                                         }
@@ -810,8 +845,7 @@ function redirect($strRedirect)
 
                                                                                 // if $tag is 0, can copy 
                                                                                 if ($tag == 0) {
-                                                                                        $newstring .= $string[
-                                                                                                $i]; // simple copy, only one car
+                                                                                        $newstring .= $string[$i]; // simple copy, only one car
                                                                                 }
                                                                         }
                                                                         return $newstring;
@@ -880,12 +914,17 @@ function redirect($strRedirect)
                                                                         }
 
 
+                                                                        eprepag_phpmailer_prepare_utf8($mail, $subject, $body_html, $body_plain);
+
                                                                         $mail->Subject = $subject;
-                                                                        $mail->isHTML();
                                                                         $mail->Body    = $body_html;
                                                                         $mail->AltBody = $body_plain;
 
-                                                                        $sret = $mail->send();
+                                                                        try {
+                                                                                $sret = $mail->send();
+                                                                        } catch (Exception $e) {
+                                                                                $sret = false;
+                                                                        }
 
                                                                         gravaLog_EnviaEmail("M", $to, $subject);
 
@@ -899,7 +938,7 @@ function redirect($strRedirect)
 
                                                                         $body_simple = $body_html;
 
-                                                                        $boundary = md5(uniqid(time()));
+                                                                        $boundary = md5(uniqid((string)time()));
 
                                                                         $headers  = 'From: E-Prepag <suporte@e-prepag.com.br>' . $s_eol;
                                                                         $headers .= 'Reply-To: E-Prepag <suporte@e-repag.com.br>' . $s_eol;
@@ -1675,15 +1714,28 @@ pin
                                                                 function montaCesta_pag_paypal($vg_id)
                                                                 {
                                                                         $cesta_nome = "";
-                                                                        $sql = "select vgm_nome_produto, vgm_qtde, vgm_nome_modelo, vgm_valor, *
-                from tb_venda_games vg 
-                        inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                where vg_id = $vg_id
-                order by vgm_qtde";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT
+        vgm_nome_produto,
+        vgm_qtde,
+        vgm_nome_modelo,
+        vgm_valor,
+        *
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vgm.vgm_vg_id = vg.vg_id
+    WHERE vg.vg_id = $1
+    ORDER BY vgm_qtde
+";
+
+                                                                        $params = [
+                                                                                (int)$vg_id
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 while ($rs_row = pg_fetch_array($rs)) {
-                                                                                        $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format($rs_row['vgm_valor'], 2, ',', '.') . ")\n";
+                                                                                        $cesta_nome .= $rs_row['vgm_qtde'] . " x " . $rs_row['vgm_nome_modelo'] . " (R\$" . number_format((float)$rs_row['vgm_valor'], 2, ',', '.') . ")\n";
                                                                                 }
                                                                         }
                                                                         if (!$cesta_nome || strlen($cesta_nome) == 0) {
@@ -1796,15 +1848,46 @@ pin
                                                                         //select distinct vg.vg_id, count(vg.vg_data_inclusao) as qtde from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id 
                                                                         //where vg.vg_ug_id = 1190925 and vg_data_inclusao >= '2020-09-01' and vg_ultimo_status=5 and vgm.vgm_opr_codigo in(149,97,45,128,62,150,139,142,103,61,63,124,113,16,135,155,148,23,129,156,130,131,146,132,121,13,40,47,60,82,90,37,140,133,157,134,143,34,95,126,127,141,114,115,66) group by vg.vg_id;
 
-                                                                        $sql = "select distinct vg.vg_id, count(vg.vg_data_inclusao) as qtde from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id";
-                                                                        $sql .= " where vg.vg_ug_id = " . SQLaddFields($idusuario, "") . " and vg_data_inclusao >= '" . date('Y-m-d H:i:s', strtotime("-30 days")) . "' and vg_ultimo_status=5 and";
-                                                                        $sql .= " vgm.vgm_opr_codigo in(" . implode(',', $publishers) . ") group by vg.vg_id;";
+                                                                        $datainicial = date('Y-m-d H:i:s', strtotime('-30 days'));
 
-                                                                        //var_dump($sql);
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        /*
+ * cria placeholders din�micos para o IN (...)
+ * ($4, $5, $6 ...)
+ */
+                                                                        $placeholders = [];
+                                                                        $params = [
+                                                                                (int)$idusuario, // $1
+                                                                                $datainicial,    // $2
+                                                                                5                // $3 -> vg_ultimo_status
+                                                                        ];
+
+                                                                        $index = 4;
+
+                                                                        foreach ($publishers as $publisher) {
+                                                                                $placeholders[] = '$' . $index++;
+                                                                                $params[] = $publisher;
+                                                                        }
+
+                                                                        $inClause = implode(',', $placeholders);
+
+                                                                        $sql = "
+    SELECT DISTINCT
+        vg.vg_id,
+        COUNT(vg.vg_data_inclusao) AS qtde
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vg.vg_id = vgm.vgm_vg_id
+    WHERE vg.vg_ug_id = $1
+      AND vg_data_inclusao >= $2
+      AND vg_ultimo_status = $3
+      AND vgm.vgm_opr_codigo IN ($inClause)
+    GROUP BY vg.vg_id
+";
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
-                                                                                $qtde = pg_num_rows($rs);  //$rs_row['qtde'];
+                                                                                $qtde = (($rs) ? pg_num_rows($rs) : 0);  //$rs_row['qtde'];
                                                                         }
                                                                         // for Debug
                                                                         $mensagem = "In getNVendasMoney(): " .
@@ -1818,11 +1901,32 @@ pin
                                                                 {
                                                                         $qtde = 0;
                                                                         //SQL
-                                                                        $sql = "select count(*) as qtde from tb_venda_games ";
-                                                                        $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
-                                                                        $sql .= " and vg_data_inclusao>='" . date('Y-m-d H:i:s', strtotime("-1 days")) . "' and vg_ultimo_status=5 ";
-                                                                        $sql .= " and (vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PIX_NUMERIC'] . " ); ";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $dataInicial = date('Y-m-d H:i:s', strtotime('-1 days'));
+
+                                                                        $sql = "
+    SELECT count(*) AS qtde
+    FROM tb_venda_games
+    WHERE vg_ug_id = $1
+      AND vg_data_inclusao >= $2
+      AND vg_ultimo_status = $3
+      AND vg_pagto_tipo IN ($4,$5,$6,$7,$8,$9,$10)
+";
+
+                                                                        $params = [
+                                                                                (int)$idusuario, // $1
+                                                                                $dataInicial,    // $2
+                                                                                5,               // $3
+
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'], // $4
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'],     // $5
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'],        // $6
+                                                                                $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'],                      // $7
+                                                                                $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'],                           // $8
+                                                                                $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'],                          // $9
+                                                                                $GLOBALS['PAGAMENTO_PIX_NUMERIC']                                     // $10
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 $qtde = $rs_row['qtde'];
@@ -1839,13 +1943,36 @@ pin
                                                                 {
                                                                         $total = 0;
                                                                         // novo - lista vendas nï¿½o canceladas (completas + em aberto) nas ï¿½ltimas 24h
-                                                                        $sql = "select sum(vgm_valor*vgm_qtde) as total from tb_venda_games vg inner join tb_venda_games_modelo vgm on vg.vg_id = vgm.vgm_vg_id";
-                                                                        $sql .= " where vg_ug_id = " . SQLaddFields($idusuario, "");
-                                                                        $sql .= " and vg_data_inclusao>='" . date('Y-m-d H:i:s', strtotime("-1 days")) . "' ";
-                                                                        $sql .= " and (vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'] . " or vg_pagto_tipo=" . $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'] . " or vg_pagto_tipo=" . $GLOBALS['PAGAMENTO_PIX_NUMERIC'] . ") ";
-                                                                        $sql .= " and (not vg_ultimo_status=6) ";
-                                                                        $sql .= " group by vg_ug_id ";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $dataInicial = date('Y-m-d H:i:s', strtotime('-1 days'));
+
+                                                                        $sql = "
+    SELECT SUM(vgm_valor * vgm_qtde) AS total
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vg.vg_id = vgm.vgm_vg_id
+    WHERE vg.vg_ug_id = $1
+      AND vg_data_inclusao >= $2
+      AND vg_pagto_tipo IN ($3,$4,$5,$6,$7,$8,$9)
+      AND vg_ultimo_status <> $10
+    GROUP BY vg_ug_id
+";
+
+                                                                        $params = [
+                                                                                (int)$idusuario, // $1
+                                                                                $dataInicial,    // $2
+
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO'], // $3
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_FACIL_BRADESCO_DEBITO'],     // $4
+                                                                                $GLOBALS['FORMAS_PAGAMENTO']['PAGAMENTO_BB_DEBITO_SUA_CONTA'],        // $5
+                                                                                $GLOBALS['PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC'],                      // $6
+                                                                                $GLOBALS['PAGAMENTO_HIPAY_ONLINE_NUMERIC'],                           // $7
+                                                                                $GLOBALS['PAGAMENTO_PAYPAL_ONLINE_NUMERIC'],                          // $8
+                                                                                $GLOBALS['PAGAMENTO_PIX_NUMERIC'],                                    // $9
+
+                                                                                6 // $10
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 $total = ($rs_row['total']) ? $rs_row['total'] : 0;
@@ -1866,13 +1993,22 @@ pin
                                                                         $ntries = 0;
                                                                         $orderId = "";
 
-                                                                        $orderId =         date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT);
+                                                                        $orderId =         date("YmdHis") . str_pad((string)rand(0, 999), 3, "0", STR_PAD_LEFT);
                                                                         do {
 
                                                                                 //		$orderId = 	"2003120408301545872781";
                                                                                 //		$orderId = 	date("YmdHis").str_pad(rand(0,99999999), 8, "0", STR_PAD_LEFT);
-                                                                                $sql = "SELECT count(*) as n from tb_pag_compras where numcompra='" . $orderId . "'";
-                                                                                $ret = SQLexecuteQuery($sql);
+                                                                                $sql = "
+    SELECT count(*) AS n
+    FROM tb_pag_compras
+    WHERE numcompra = $1
+";
+
+                                                                                $params = [
+                                                                                        $orderId
+                                                                                ];
+
+                                                                                $ret = SQLexecuteQueryParams($sql, $params);
                                                                                 if (!$ret) {
                                                                                         echo "Erro ao recuperar transaï¿½ï¿½o de pagamento.\n";
                                                                                         die("Stop");
@@ -1880,7 +2016,7 @@ pin
                                                                                         $pgresult = pg_fetch_array($ret);
                                                                                         $bfound = (($pgresult['n'] == 0) ? true : false);
                                                                                 }
-                                                                                $orderId =         date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT);
+                                                                                $orderId =         date("YmdHis") . str_pad((string)rand(0, 999), 3, "0", STR_PAD_LEFT);
                                                                                 $ntries++;
                                                                         } while (!$bfound && $ntries < 10);
 
@@ -2000,10 +2136,19 @@ pin
                                                                         $vgm_qtde = 0;
                                                                         $vgm_pin_codinterno = "";
                                                                         //Recupera modelos
-                                                                        $sql  = "select * from tb_venda_games vg 
-					inner join tb_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-				where vg.vg_id = " . $venda_id;
-                                                                        $rs_venda_modelos = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT *
+    FROM tb_venda_games vg
+    INNER JOIN tb_venda_games_modelo vgm
+        ON vgm.vgm_vg_id = vg.vg_id
+    WHERE vg.vg_id = $1
+";
+
+                                                                        $params = [
+                                                                                (int)$venda_id
+                                                                        ];
+
+                                                                        $rs_venda_modelos = SQLexecuteQueryParams($sql, $params);
                                                                         if (!$rs_venda_modelos || pg_num_rows($rs_venda_modelos) == 0) $msg = "Nenhum produto encontrado (1ag).\n";
                                                                         if ($msg == "") {
                                                                                 //Verifica cada item de cada produto
@@ -2206,8 +2351,17 @@ function PagamentoNumeroMaximoPIN() {
                                                                                 return $opr_codigo;
                                                                         }
                                                                         //SQL
-                                                                        $sql = "select ogp_opr_codigo from tb_operadora_games_produto where ogp_id  = " . $prod_id . "";        //" and ogp_ativo = 1";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT ogp_opr_codigo
+    FROM tb_operadora_games_produto
+    WHERE ogp_id = $1
+";
+
+                                                                        $params = [
+                                                                                (int)$prod_id
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 if ($rs_row['ogp_opr_codigo'] > 0) {
@@ -2228,8 +2382,22 @@ function PagamentoNumeroMaximoPIN() {
                                                                                 return $opr_codigo;
                                                                         }
                                                                         //SQL
-                                                                        $sql = "select ogp_opr_codigo, * from tb_operadora_games_produto where ogp_id  = (select ogpm_ogp_id from tb_operadora_games_produto_modelo where ogpm_id  = " . $modelo_id . " limit 1)";        //" and ogp_ativo = 1";
-                                                                        $rs = SQLexecuteQuery($sql);
+                                                                        $sql = "
+    SELECT ogp_opr_codigo, *
+    FROM tb_operadora_games_produto
+    WHERE ogp_id = (
+        SELECT ogpm_ogp_id
+        FROM tb_operadora_games_produto_modelo
+        WHERE ogpm_id = $1
+        LIMIT 1
+    )
+";
+
+                                                                        $params = [
+                                                                                (int)$modelo_id
+                                                                        ];
+
+                                                                        $rs = SQLexecuteQueryParams($sql, $params);
                                                                         if ($rs && pg_num_rows($rs) > 0) {
                                                                                 $rs_row = pg_fetch_array($rs);
                                                                                 if ($rs_row['ogp_opr_codigo'] > 0) {
@@ -2280,18 +2448,6 @@ function PagamentoNumeroMaximoPIN() {
                                                                         return $sret;
                                                                 }
 
-                                                                function getSingleValue($sql)
-                                                                {
-
-                                                                        $ret = null;
-                                                                        $rs = SQLexecuteQuery($sql);
-                                                                        if ($rs && pg_num_rows($rs) > 0) {
-                                                                                $rs_row = pg_fetch_array($rs);
-                                                                                $ret = $rs_row[0];
-                                                                        }
-                                                                        return $ret;
-                                                                }
-
                                                                 //Funï¿½ï¿½o de Conversï¿½o da data
                                                                 function converteData($data_nasc)
                                                                 {
@@ -2306,8 +2462,17 @@ function PagamentoNumeroMaximoPIN() {
                                                                 //Funï¿½ï¿½o que verifica se o publisher exige CPF do Gamer
                                                                 function checkingNeedCPFGamer($opr_codigo)
                                                                 {
-                                                                        $sql_function = "SELECT opr_need_cpf_lh from operadoras where opr_codigo=" . intval($opr_codigo) . ";";
-                                                                        $rs_function = SQLexecuteQuery($sql_function);
+                                                                        $sql_function = "
+                                                                        SELECT opr_need_cpf_lh
+                                                                        FROM operadoras
+                                                                        WHERE opr_codigo = $1
+                                                                        ";
+
+                                                                        $params = [
+                                                                                (int)$opr_codigo
+                                                                        ];
+
+                                                                        $rs_function = SQLexecuteQueryParams($sql_function, $params);
                                                                         if ($rs_function_row = pg_fetch_array($rs_function)) {
                                                                                 $opr_need_cpf_lh = $rs_function_row['opr_need_cpf_lh'];
                                                                         }

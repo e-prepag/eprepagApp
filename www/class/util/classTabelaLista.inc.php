@@ -84,7 +84,7 @@ class tabelaLista
             return false;
         }
 
-        if (count($this->camposTabela) == 0) {
+        if ((is_countable($this->camposTabela) ? count($this->camposTabela) : 0) == 0) {
             $this->msg = 'Não há campos para retorno ou headers para lista!';
             return false;
         }
@@ -101,7 +101,7 @@ class tabelaLista
         $html[] = '  <input type="hidden" name="sort" value="' . $this->sort . '" />';
         $html[] = '  <input type="hidden" name="dir" value="' . $this->dir . '" />';
 
-        if (count($this->formFields) > 0) {
+        if ((is_countable($this->formFields) ? count($this->formFields) : 0) > 0) {
             foreach ($this->formFields as $name => $value) {
                 $html[] = '  <input type="hidden" name="' . $name . '" value="' . $value . '" />';
             }

@@ -76,7 +76,7 @@ if (is_array($sbds_aux)) {
 
 $res_tmp = SQLexecuteQuery($sql);
 if ($res_tmp) {
-	$total_table = pg_num_rows($res_tmp);
+	$total_table = (($res_tmp) ? pg_num_rows($res_tmp) : 0);
 }
 
 $max_reg = (($inicial + $max)>$total_table)?$total_table:$max;

@@ -7,7 +7,7 @@
 ***************************************************************************************/
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
-ini_set('memory_limit', '-1');
+// ini_set('memory_limit', '-1');
 
 set_time_limit(18000);
 
@@ -57,7 +57,7 @@ echo "SQL: ".$query.$cReturn.$cReturn;
 
 $rs = SQLexecuteQUERY($query);
 
-$total_considerado = pg_num_rows($rs);
+$total_considerado = (($rs) ? pg_num_rows($rs) : 0);
 echo "PDVs Considerados: ".$total_considerado.$cReturn;
 
 $msg = "";

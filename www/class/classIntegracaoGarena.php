@@ -243,7 +243,7 @@ class Garena
 	public function chamaGarena($metodo, $ambiente = "homologacao")
 	{
 
-		if (count($this->error) > 0) {
+		if ((is_countable($this->error) ? count($this->error) : 0) > 0) {
 
 			// verifica se o usuario está fazendo varias vezes a mesma requisição
 			if ($this->error[0]["Erro"] === "Esse pedido Já foi resgatado ou já está em processo de resgate (EPP0043).") {
@@ -326,7 +326,7 @@ class Garena
 		} elseif ($metodo == "POST") {
 
 			/// verifica se foi retornado o ROLE ID do usuário garena
-			if (count($this->rolesGarena) == 0) {
+			if ((is_countable($this->rolesGarena) ? count($this->rolesGarena) : 0) == 0) {
 				$this->destravaProcesso();
 				return json_encode(["Erro" => "Nenhum Usuário foi encontrado com essa conta (EPP0010)."]);
 			}
@@ -415,31 +415,37 @@ class Garena
 							} else {
 								//array_push($this->error, ["Erro"=>"Erro no cadastro da conta Garena (EPP0014)."]);
 								$file = fopen("/www/arquivos_gerados/logs/problema_GARENA.txt", "a+");
+								if ($file) {
 								fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 								fwrite($file, "ERRO FINAL CONTA USUADA\r");
 								fwrite($file, "CONTA USADA: " . $this->conta . "\r");
 								fwrite($file, str_repeat("*", 50) . "\r");
 								fclose($file);
+								}
 							}
 						} else {
 							//$this->destravaProcesso();
 							//array_push($this->error, ["Erro"=>"Erro no cadastro do código gerado pela Garena (EPP0015)."]);
 							$file = fopen("/www/arquivos_gerados/logs/problema_GARENA.txt", "a+");
+							if ($file) {
 							fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 							fwrite($file, "ERRO FINAL GUID GARENA\r");
 							fwrite($file, "CONTA USADA: " . $this->conta . "\r");
 							fwrite($file, str_repeat("*", 50) . "\r");
 							fclose($file);
+							}
 						}
 					} else {
 						//$this->destravaProcesso();
 						//array_push($this->error, ["Erro"=>"Erro no cadastro do guid gerado pela EPP (EPP0016)."]);
 						$file = fopen("/www/arquivos_gerados/logs/problema_GARENA.txt", "a+");
+						if ($file) {
 						fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 						fwrite($file, "ERRO FINAL GUID EPP\r");
 						fwrite($file, "CONTA USADA: " . $this->conta . "\r");
 						fwrite($file, str_repeat("*", 50) . "\r");
 						fclose($file);
+						}
 					}
 				} else {
 					if ($resultado["error"] != 2) {
@@ -470,7 +476,7 @@ class Garena
 	private function verificaProcesso()
 	{
 
-		if (count($this->error) > 0) {
+		if ((is_countable($this->error) ? count($this->error) : 0) > 0) {
 			return json_encode($this->error[0]);
 		} else {
 			return true;
@@ -738,6 +744,7 @@ class Garena
 
 		$fileName = "/www/arquivos_gerados/logs/retorno_GARENA.txt";
 		$file = fopen($fileName, "a+");
+		if ($file) {
 		fwrite($file, "DATA: " . date("d-m-Y H:i:s") . "\r");
 		fwrite($file, "TIPO: " . $type . "\r");
 		fwrite($file, "CONTA: " . $conta . "\r");
@@ -746,6 +753,7 @@ class Garena
 		fwrite($file, "TEMPO DURACAO: " . $tempoDuracao . "\r");
 		fwrite($file, str_repeat("*", 50) . "\r");
 		fclose($file);
+		}
 	}
 
 	public static function BuscaIdPin($pin, $id = "")
@@ -920,6 +928,7 @@ class Garena
 		curl_close($curlToken);
 
 		$ff = fopen("/www/arquivos_gerados/logs/testeRecap2.txt", "a+");
+		if ($ff) {
 		fwrite($ff, "data: " . date("d-m-Y H:i:s") . "\r\n");
 		fwrite($ff, "ip: " . self::getClientIP() . "\r\n");
 		fwrite($ff, "token: " . $token . "\r\n");
@@ -928,6 +937,7 @@ class Garena
 		//fwrite($ff, "dados-R: ".http_build_query($dados)."\r\n");
 		fwrite($ff, str_repeat("*", 45) . "\r");
 		fclose($ff);
+		}
 
 		if ($retorno["success"] == true) {
 			if ($retorno["score"] >= 0.7) {

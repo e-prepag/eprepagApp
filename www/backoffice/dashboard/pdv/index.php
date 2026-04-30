@@ -9,7 +9,7 @@
 <?php
 session_start();
 
-ini_set('memory_limit', '8192M');
+// ini_set('memory_limit', '8192M');
 set_time_limit(0);
 
 require_once "/www/db/connect.php";

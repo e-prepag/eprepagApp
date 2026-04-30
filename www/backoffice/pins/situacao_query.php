@@ -514,7 +514,7 @@ function ResetCheckedValue() {
 		  <td><?php  if(isset($pgrow['pin_datavenda'])) echo monta_data($pgrow['pin_datavenda']) ?> <?php  if(isset($pgrow['pin_horavenda'])) echo $pgrow['pin_horavenda']?></nobr></td>
 		  <td align="center"><?php  echo ((b_IsBKOUsuarioAdminPINs() || b_IsBKOUsuarioAdminBKO() || b_Is_PIN_Vendido($pgrow['pin_status']))?@formata_string($pgrow['case_codigo'], ' ', 4):"-") ?></nobr></td>
           <td align="center"><?php  echo ((b_IsBKOUsuarioAdminPINs() || b_IsBKOUsuarioAdminBKO() || b_Is_PIN_Vendido($pgrow['pin_status']))?$pgrow['pin_serial']:"-"); ?></nobr></td>
-          <td align="right"><nobr><?php  echo "R$ ".number_format($pgrow['pin_valor'], 2, ',', '.'); ?></nobr></td>
+          <td align="right"><nobr><?php  echo "R$ ".number_format((float)$pgrow['pin_valor'], 2, ',', '.'); ?></nobr></td>
           <td align="center"><span title="<?php echo "(canal = '".$pgrow['pin_canal']."')" ?>"><?php  echo (($pgrow['pin_canal']=='s') ? "Site" : (($pgrow['pin_canal']=='p') ? "POS" : (($pgrow['pin_canal']=='r') ? "Rede" : (($pgrow['pin_canal']=='a') ? "AtimoPay" : "???")))); ?></td>
           <td><?php  echo $a_status[$pgrow['pin_status']]; ?></nobr></td>
         </tr>

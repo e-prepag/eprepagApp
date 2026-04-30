@@ -3,14 +3,16 @@
 //ini_set("display_errors", 1); 
 
 set_time_limit(10000);
-ini_set('max_execution_time', 10000); 
+// ini_set('max_execution_time', 10000); 
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "class/classManipulacaoArquivosLog.php";
 require_once $raiz_do_projeto . "includes/gamer/main.php";
 
      $file = fopen("/www/arquivos_gerados/logs/log_notifica_estoque.txt", "a+");
+     if ($file) {
      fwrite($file, "INICIO DE EXECUÇÃO : ".date("m-d-Y H:i:s")."\n");
+     }
     /**
      * Início do procedimento
      */

@@ -13,7 +13,7 @@ function block_direct_calling() {
 block_direct_calling();
 
 //error_reporting(E_ALL);
-ini_set("display_errors", 1);
+// ini_set("display_errors", 1);
 
 if(empty(session_id())){
     //session não está inicada

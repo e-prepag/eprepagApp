@@ -38,7 +38,7 @@ if(!empty($dd_ano) && !empty($dd_mes)){
                  ORDER BY dia;"; 
 	//echo $sql;
 	$rs_pins = SQLexecuteQuery($sql);
-	if($rs_pins) $registros_total = pg_num_rows($rs_pins);
+	if($rs_pins) $registros_total = (($rs_pins) ? pg_num_rows($rs_pins) : 0);
 	if(!$rs_pins || pg_num_rows($rs_pins) == 0) $msg = "Nenhum pin encontrado.\n";
         
 } //end if(!empty($dd_ano) && !empty($dd_mes))

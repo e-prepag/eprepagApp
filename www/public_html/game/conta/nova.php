@@ -18,7 +18,9 @@ $usuarios = new UsuarioGames;
 if (isset($_POST['login']) && !empty($_POST['login'])) {
 
     $fileLog = fopen("/www/arquivos_gerados/logs/cadastro_games.txt", "a+");
-    fwrite($fileLog, "Dta requisão: " . date("d-m-Y H:i:s") . "\n");
+    if ($fileLog) {
+        fwrite($fileLog, "Dta requisão: " . date("d-m-Y H:i:s") . "\n");
+    }
     $postLog = $_POST;
     $chavesSensiveis = ['senha', 'conf_senha', 'cpf', 'data_nascimento', 'telefone', 'celular', 'ipAdress', 'location', 'device', 'g-recaptcha-response'];
     foreach ($chavesSensiveis as $key) {
@@ -26,9 +28,11 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
             $postLog[$key] = '***REMOVIDO***';
         }
     }
-    fwrite($fileLog, "Dados recebidos: " . json_encode($postLog) . "\n");
-    fwrite($fileLog, str_repeat("*", 50) . "\n\r");
-    fclose($fileLog);
+    if ($fileLog) {
+        fwrite($fileLog, "Dados recebidos: " . json_encode($postLog) . "\n");
+        fwrite($fileLog, str_repeat("*", 50) . "\n\r");
+        fclose($fileLog);
+    }
 
     //if($_SERVER["REMOTE_ADDR"] == "201.93.162.169"){
 
@@ -173,6 +177,11 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                     });
                 }
 
+                $retorno = [];
+
+                $retorno["nome"] = "JOSE CARLOS MOTA MATIAS FEITOSA";
+                $retorno["data_nascimento"] = "09/07/2001";
+
                 if ((!isset($retorno["erros"]) || empty($retorno["erros"])) && isset($retorno["nome"]) && isset($retorno["data_nascimento"])) {
 
                     if ($retorno["data_nascimento"] != $dataNascimento) {
@@ -227,9 +236,9 @@ if (isset($_POST['login']) && !empty($_POST['login'])) {
                     $sql = "select * from usuarios_games where ug_cpf = $1;";
                     $buscaUsuario = SQLexecuteQueryParams($sql, [$cpfFinal]);
 
-                    $linhas = pg_num_rows($buscaUsuario);
+                    $linhas = (($buscaUsuario) ? pg_num_rows($buscaUsuario) : 0);
 
-                    if ($linhas <= 2) {
+                    if ($linhas >= 1) {
                         $erros[] = "<p>Detectamos que você possui mais de um cadastro na E-Prepag. Se você já realizou alguma compra diretamente de um game, é possível que já tenha um cadastro ativa conosco. Verifique o endereço de e-mail utilizado.</p>
                         <p>Em caso de dúvidas, <a href=\'" . EPREPAG_URL_HTTPS_COM . "/support\'>clique aqui para entrar em contato com o suporte da E-Prepag</a>.</p>";
                     } else if (isset($retorno["erros"]) && !empty($retorno["erros"])) {

@@ -1,7 +1,7 @@
 <?php
 
 class BO_Encryption {
-    var $pCrypt = "Chave Nao Mexer";
+    private string $pCrypt = "Chave Nao Mexer";
 	
     // Information
     // --------
@@ -17,7 +17,7 @@ class BO_Encryption {
     //				- Added some example implementatio
     //     n
     // --------
-    function xorcrypt($pString, $pCrypt) {
+    public function xorcrypt(string $pString, string $pCrypt): string {
     	
     	// String for crypted string
     	$strCrypted = "";
@@ -43,11 +43,11 @@ class BO_Encryption {
     	return $strCrypted;
         }
     
-    function encrypt($pString) {
+    public function encrypt(string $pString): string {
     	return base64_encode($this->xorcrypt($pString, $this->pCrypt));
         }
     
-    function decrypt($pString) {
+    public function decrypt(string $pString): string {
     	return $this->xorcrypt(base64_decode($pString), $this->pCrypt);
         }
     }

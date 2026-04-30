@@ -5,8 +5,8 @@ ob_start();
 //ini_set("display_errors", 1); 
 
 set_time_limit(3600);
-ini_set('max_execution_time', 3600);
-ini_set('memory_limit', '256M');
+// ini_set('max_execution_time', 3600);
+// ini_set('memory_limit', '256M');
 
 require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
@@ -245,7 +245,7 @@ if ($BtnSearch) {
     } else {
         $resid = SQLexecuteQueryParams($sql, array());
     }
-    $total_table = pg_num_rows($resid);
+    $total_table = (($resid) ? pg_num_rows($resid) : 0);
 } //end if($BtnSearch)
 ?>
 <link href="/includes/bootstrap/css/bootstrap.min_new.css" rel="stylesheet" type="text/css" />

@@ -5,7 +5,7 @@
 // error_reporting(E_ALL);  // Exibe todos os tipos de erros
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
-require '../class/GoogleAutenticator.php';
+require '../../class/GoogleAutenticator.php';
 require_once "/www/includes/load_dotenv.php";
 require_once __DIR__ . '/includes/funcoes_login.php';
 
@@ -47,7 +47,7 @@ $login = $_REQUEST["login"];
 $login = strtoupper(trim($login));
 $senha = $_REQUEST["senha"];
 $recaptcha = $_REQUEST["g-recaptcha-response"];
-if(getenv("AMBIENTE") == "HOMOLOGACAO") {
+if (getenv("AMBIENTE") == "HOMOLOGACAO") {
     // Passou
 
 } else if ($recaptcha != "") {
@@ -169,12 +169,11 @@ if (empty($user)) {
     } else {
         $usuario_operador = true;
     }
-
 }
 
 if ($usuario_operador) {
     $verificaBlock = obterUsuarioBloqueado($user['pdv_id']);
-    if($verificaBlock != null){
+    if ($verificaBlock != null) {
         $msg = utf8_decode($verificaBlock['motivo']) . " Seu PDV está bloqueado.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -195,7 +194,7 @@ if ($usuario_operador) {
         header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
-    if(buscarUsuariosSemLog($pdo, $user['pdv_id'])) {
+    if (buscarUsuariosSemLog($pdo, $user['pdv_id'])) {
         $msg = "(BLQ102) Este PDV ainda não foi validado para acesso ao sistema.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -229,7 +228,6 @@ if ($usuario_operador) {
         header("Location: /creditos/loginEf2.php");
         exit;
     }
-
 } else {
 
     $senha_usuario = $user["ug_senha"];
@@ -237,7 +235,7 @@ if ($usuario_operador) {
     $secureEncryption = new SecureEncryption();
     $ret_senha = $secureEncryption->verifyPassword($senha, $senha_usuario);
 
-    if(!$ret_senha){
+    if (!$ret_senha) {
         $msg = "Login ou senha inválidos.\n";
 
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
@@ -255,7 +253,7 @@ if ($usuario_operador) {
     }
 
     $verificaBlock = obterUsuarioBloqueado($user['ug_id']);
-    if($verificaBlock != null){
+    if ($verificaBlock != null) {
         $msg = utf8_decode($verificaBlock['motivo']) . " Seu PDV está bloqueado.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -276,7 +274,7 @@ if ($usuario_operador) {
         header("Location: /creditos/pagina_bloqueio.php?msg=" . urlencode($msg) . "&login=" . urlencode($login));
         exit;
     }
-    if(buscarUsuariosSemLog($pdo, $user['ug_id'])) {
+    if (buscarUsuariosSemLog($pdo, $user['ug_id'])) {
         $msg = "(BLQ102) Este PDV ainda não foi validado para acesso ao sistema.";
         $linha = "1[" . date('Y-m-d H:i:s') . "] [$login] $msg" . PHP_EOL;
         file_put_contents('/www/arquivos_gerados/logs/log_login.txt', $linha, FILE_APPEND);
@@ -316,7 +314,7 @@ if ($usuario_operador) {
 <div class="container txt-cinza bg-branco  p-bottom40">
     <?php
     if (isset($msg) && $msg != "") {
-        ?>
+    ?>
         <div class="col-md-12 top20">
             <div class="alert alert-danger" role="alert">
                 <span class="glyphicon glyphicon-exclamation-sign t0" aria-hidden="true"></span>
@@ -324,7 +322,7 @@ if ($usuario_operador) {
                 <?php echo $msg; ?>
             </div>
         </div>
-        <?php
+    <?php
     }
     ?>
     <div class="row top10">
@@ -383,22 +381,24 @@ if ($usuario_operador) {
         <?php
         if ($banner) {
             foreach ($banner as $b) {
-                ?>
+        ?>
                 <a href="<?php echo $b->link; ?>" class="banner p-8" id="<?php echo $b->id; ?>" target="_blank"><img
                         src="<?php echo $objBanner->urlLink . $b->imagem; ?>" title="<?php echo $b->titulo; ?>"></a>
-                <?php
+            <?php
             }
             ?>
             <script>
-                $(function () {
-                    $(function () {
-                        $(".banner").click(function () {
-                            $.get("/ajax/pdv/clickBanner.php", { id: $(this).attr("id") });
+                $(function() {
+                    $(function() {
+                        $(".banner").click(function() {
+                            $.get("/ajax/pdv/clickBanner.php", {
+                                id: $(this).attr("id")
+                            });
                         });
                     });
                 });
             </script>
-            <?php
+        <?php
         }
         ?>
     </div>

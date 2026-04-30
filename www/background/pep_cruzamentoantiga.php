@@ -7,7 +7,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 //ini_set("display_errors", 1); 
 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200); 
+// ini_set('max_execution_time', 1200); 
 
 //Data considerada
 $data_inicio = mktime(0, 0, 0, date('n')-1,  date('d'), date('Y'));
@@ -134,7 +134,7 @@ echo "SQL :".$sql.PHP_EOL;
 $rs = SQLexecuteQuery($sql);
 $exibicaoDadosProblemas = NULL;
 if($rs) {
-    $total_de_registros = pg_num_rows($rs);
+    $total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
     if($total_de_registros > 0) {
         $cabecalho = "
         <table class='table table-bordered top20' >
@@ -167,7 +167,7 @@ if($rs) {
                             //echo $sql.PHP_EOL;
                             $rsEncontrado = SQLexecuteQuery($sql);
                             // Verificando se foi encontrado algum nome
-                            if(isset($rsEncontrado) && pg_num_rows($rsEncontrado) > 0) {
+                            if(isset($rsEncontrado) && (($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) {
                                 // Exibindo todas incidencias de nomes
                                 while ($rsEncontradoRow = pg_fetch_array($rsEncontrado)) {
                                     
@@ -182,13 +182,13 @@ if($rs) {
                                                 </tr>
                                     ";
                                 }//end while ($rsEncontradoRow = pg_fetch_array($rsEncontrado))
-                            }//end if(pg_num_rows($rsEncontrado) > 0) 
+                            }//end if((($rsEncontrado) ? pg_num_rows($rsEncontrado) : 0) > 0) 
                         }//end if($cpf_aux > 0)
                     }//end while 
-                }//end if(pg_num_rows($rs) > 0)
+                }//end if((($rs) ? pg_num_rows($rs) : 0) > 0)
                 else {
                         echo "Nenhum registro encontrado.".PHP_EOL;
-                }//end else do if(pg_num_rows($rs) > 0) 
+                }//end else do if((($rs) ? pg_num_rows($rs) : 0) > 0) 
 }//end if($rs) 
 else echo "ERRO na query acima.".PHP_EOL;
 

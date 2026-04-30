@@ -3,7 +3,7 @@
 
 require_once "../../includes/constantes.php";
 require_once RAIZ_DO_PROJETO . "class/pdv/controller/OffLineController.class.php";
-require '../class/GoogleAutenticator.php';
+require '../../class/GoogleAutenticator.php';
 
 
 $controller = new OfflineController;
@@ -177,7 +177,7 @@ if ($authData) {
 <div class="container txt-cinza bg-branco  p-bottom40">
     <?php
     if (isset($msg) && $msg != "") {
-        ?>
+    ?>
         <div class="col-md-12 top20">
             <div class="alert alert-danger" role="alert">
                 <span class="glyphicon glyphicon-exclamation-sign t0" aria-hidden="true"></span>
@@ -185,7 +185,7 @@ if ($authData) {
                 <?php echo $msg; ?>
             </div>
         </div>
-        <?php
+    <?php
     }
     ?>
     <div class="row top10">
@@ -260,22 +260,24 @@ if ($authData) {
         <?php
         if ($banner) {
             foreach ($banner as $b) {
-                ?>
+        ?>
                 <a href="<?php echo $b->link; ?>" class="banner p-8" id="<?php echo $b->id; ?>" target="_blank"><img
                         src="<?php echo $objBanner->urlLink . $b->imagem; ?>" title="<?php echo $b->titulo; ?>"></a>
-                <?php
+            <?php
             }
             ?>
             <script>
-                $(function () {
-                    $(function () {
-                        $(".banner").click(function () {
-                            $.get("/ajax/pdv/clickBanner.php", { id: $(this).attr("id") });
+                $(function() {
+                    $(function() {
+                        $(".banner").click(function() {
+                            $.get("/ajax/pdv/clickBanner.php", {
+                                id: $(this).attr("id")
+                            });
                         });
                     });
                 });
             </script>
-            <?php
+        <?php
         }
         ?>
     </div>

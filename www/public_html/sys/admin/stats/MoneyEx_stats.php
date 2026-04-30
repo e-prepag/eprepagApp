@@ -261,7 +261,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 //echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	echo "<a name='Totalpormes'></a><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
 	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." <?php echo LANG_STATISTICS_FOR_MONTH; ?> (".(($vendas_estado)?pg_num_rows($vendas_estado):"0")." ".LANG_MONTHS.")</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_MONTH_2."</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
@@ -281,7 +281,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 //echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	echo "<a name='Totalpordiadasemana'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
 	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_WEEK_DAY."</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_STATISTICS_DAY_OF_THE_WEEK."</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
@@ -301,9 +301,9 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 //echo "sql: $sql<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	echo "<a name='Totalpordia'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
-	echo "<tr><th align='center' colspan='5'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_DAY." (".pg_num_rows($vendas_estado)." ".LANG_DAYS.")</font></b></th></tr>";
+	echo "<tr><th align='center' colspan='5'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_DAY." (".(($vendas_estado) ? pg_num_rows($vendas_estado) : 0)." ".LANG_DAYS.")</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_DAY_2."</td><td align='center'>&nbsp;</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
 	if($vendas_estado && $b_show_listings) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
@@ -334,9 +334,9 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 //echo "sql: ".$sql."<br>";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	echo "<a name='Totalporjogo'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
-	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_GAME." (".pg_num_rows($vendas_estado)." ".LANG_STATISTICS_GAME_1.") [".date("d/M/Y",strtotime($data_min)).", ".date("d/M/Y",strtotime($data_max))."]</font></b></th></tr>";
+	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_GAME." (".(($vendas_estado) ? pg_num_rows($vendas_estado) : 0)." ".LANG_STATISTICS_GAME_1.") [".date("d/M/Y",strtotime($data_min)).", ".date("d/M/Y",strtotime($data_max))."]</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_STATISTICS_GAME."</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
 	if($vendas_estado && $b_show_listings) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
@@ -359,9 +359,9 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 	$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 	$extra_where = "";
 	$bg_col = $bg_col_01;
-	$n_dias = pg_num_rows($vendas_estado);
+	$n_dias = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 	echo "<a name='Totalporjogonestemes'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
-	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_GAME." (".pg_num_rows($vendas_estado)." ".LANG_STATISTICS_GAME_1.") ".LANG_STATISTICS_THIS_MONTH."</font></b></th></tr>";
+	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_GAME." (".(($vendas_estado) ? pg_num_rows($vendas_estado) : 0)." ".LANG_STATISTICS_GAME_1.") ".LANG_STATISTICS_THIS_MONTH."</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_STATISTICS_GAME."</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
 	if($vendas_estado && $b_show_listings) {
 		$valtmp = 0;
@@ -387,7 +387,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 	$previous_value = -1;
 	$bg_col = $bg_col_01;
 	echo "<a name='Totalporestado'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
-	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_STATE." (".pg_num_rows($vendas_estado)." ".LANG_STATISTICS_STATES.") [".date("d/M/Y",strtotime($data_min)).", ".date("d/M/Y",strtotime($data_max))."]</font></b></th></tr>";
+	echo "<tr><th align='center' colspan='4'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_STATE." (".(($vendas_estado) ? pg_num_rows($vendas_estado) : 0)." ".LANG_STATISTICS_STATES.") [".date("d/M/Y",strtotime($data_min)).", ".date("d/M/Y",strtotime($data_max))."]</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_POS_STATE."</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
 	if($vendas_estado && $b_show_listings) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
@@ -407,7 +407,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 	$previous_value = -1;
 	$bg_col = $bg_col_01;
 	echo "<a name='Totalporcidade'><table class='txt-cinza' border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>";
-	echo "<tr><th align='center' colspan='5'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_CITY." (".pg_num_rows($vendas_estado)." ".LANG_STATISTICS_CITIES.") [".date("d/M/Y",strtotime($data_min)).", ".date("d/M/Y",strtotime($data_max))."]</font></b></th></tr>";
+	echo "<tr><th align='center' colspan='5'><b><font color='#337ab7'>".LANG_STATISTICS_TOTAL." ".$dd_operadora_nome." ".LANG_STATISTICS_FOR_CITY." (".(($vendas_estado) ? pg_num_rows($vendas_estado) : 0)." ".LANG_STATISTICS_CITIES.") [".date("d/M/Y",strtotime($data_min)).", ".date("d/M/Y",strtotime($data_max))."]</font></b></th></tr>";
 	echo "<tr bgcolor='#99CCFF'><td align='center'>".LANG_POS_CITY."</td><td align='center'>".LANG_POS_STATE."</td><td align='center'>".LANG_STATISTICS_SALES_NUMBER."</td><td align='center'>".LANG_STATISTICS_SALES_VALUE." (".LANG_STATISTICS_IN." R\$)</td><td align='center'>% ".LANG_STATISTICS_IN_VALUE."</td></tr>";
 	if($vendas_estado && $b_show_listings) {
 		while ($vendas_estado_row = pg_fetch_array($vendas_estado)){
@@ -428,7 +428,7 @@ require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 		$vendas_estado = SQLexecuteQueryParams($sql, $queryParams);
 		$previous_value = -1;
 		$bg_col = $bg_col_01;
-		$n_total_usuarios_compra = pg_num_rows($vendas_estado);
+		$n_total_usuarios_compra = (($vendas_estado) ? pg_num_rows($vendas_estado) : 0);
 
 //echo "n_cadastros: ".$n_cadastros."<br>";
 //echo "pg_num_rows(vendas_estado): ".pg_num_rows($vendas_estado)."<br>";

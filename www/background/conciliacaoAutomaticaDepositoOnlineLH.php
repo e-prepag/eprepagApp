@@ -1,7 +1,7 @@
 <?php
 ob_start(); 
 set_time_limit(3600);
-ini_set('max_execution_time', 3600); 
+// ini_set('max_execution_time', 3600); 
 
 // include do arquivo contendo IPs DEV
 require_once "../includes/main.php";

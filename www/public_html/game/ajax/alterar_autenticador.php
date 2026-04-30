@@ -5,7 +5,7 @@ session_start();
 //ini_set("display_errors", 1); 
 require_once "../../../includes/constantes.php";
 require_once DIR_CLASS . "util/Util.class.php";
-require_once "../../class/GoogleAutenticator.php";
+require_once "../../../class/GoogleAutenticator.php";
 
 /*
  * Programa em AJAX validar os dados de seguranca
@@ -25,7 +25,7 @@ if (Util::isAjaxRequest()) {
     $retorno->erro = '';
     $retorno->sucesso = false;
 
-    if($_POST["token_csrf"] != $_SESSION["token_csrf"]){
+    if ($_POST["token_csrf"] != $_SESSION["token_csrf"]) {
         $retorno->erro = "Requisição inválida";
         print json_encode($retorno);
         die;
@@ -41,7 +41,7 @@ if (Util::isAjaxRequest()) {
         require_once DIR_INCS . "gamer/main.php";
 
         $usuario = unserialize($_SESSION['usuarioGames_ser']);
-        if(!$usuario){
+        if (!$usuario) {
             echo "Acesso não permitido.";
             exit;
         }
@@ -57,7 +57,7 @@ if (Util::isAjaxRequest()) {
 
             $cad_id = $usuario->getId();
 
-            if($cad_id == 0 || !$cad_id){
+            if ($cad_id == 0 || !$cad_id) {
                 print "Acesso não permitido.";
                 exit;
             }
@@ -66,7 +66,7 @@ if (Util::isAjaxRequest()) {
 
             $objEncryption = new SecureEncryption();
 
-            $ga = new PHPGangsta_GoogleAuthenticator();
+            $ga = new classGoogleAutenticator();
             $checkResult = $ga->verifyCode($secret, $token, 2);
 
             if ($checkResult) {
@@ -92,7 +92,7 @@ if (Util::isAjaxRequest()) {
                     } else {
                         $retorno->erro = "Senha ou Token inválidos! Verifique se o Token atual foi inserido corretamente.";
                     }
-                }else{
+                } else {
                     $retorno->erro = "Senha ou Token inválidos! Verifique se o Token atual foi inserido corretamente.";
                 }
             } else {
@@ -100,10 +100,8 @@ if (Util::isAjaxRequest()) {
                 $retorno->erro = "Token novo inválido! Verifique se o Token foi inserido corretamente.";
             }
         }
-
     } else {
         $retorno->erro = "Senha não preenchida";
-
     }
 
     if ($retorno->erro != '') {

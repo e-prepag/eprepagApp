@@ -24,7 +24,7 @@ if ($_SESSION['RECAPTCHA_TRUE'] != true) {
 
 $_SESSION['RECAPTCHA_TRUE'] = null;
 
-$ga = new PHPGangsta_GoogleAuthenticator();
+$ga = new classGoogleAutenticator();
 
 try {
     $pdo = ConnectionPDO::getConnection()->getLink();
@@ -39,7 +39,7 @@ try {
             echo "<script>alert('Error');</script>";
             exit;
         }
-        
+
         $login = strtoupper(trim($user_decript));
 
         $sql = "SELECT id, chave_autenticador, shn_password FROM usuarios WHERE shn_login = ?
@@ -107,7 +107,7 @@ try {
                         }
                     }
                 }
-                $qrCodeUrl = $ga->getQRCodeGoogleUrl('E-Prepag bko', $secret);
+                $qrCodeUrl = $ga->getQRCodeImageUrl('E-Prepag bko', $secret);
 
                 $_SESSION['id_do_usuario'] = $fetch['id'];
 

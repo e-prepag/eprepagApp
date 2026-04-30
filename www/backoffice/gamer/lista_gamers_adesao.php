@@ -90,7 +90,7 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 //die("<br>Stop");
 
 	$rs_logins = SQLexecuteQuery($sql);
-	$n_gamers = pg_num_rows($rs_logins);
+	$n_gamers = (($rs_logins) ? pg_num_rows($rs_logins) : 0);
 ?>
 <style>
 .botao_avisa_pendente {

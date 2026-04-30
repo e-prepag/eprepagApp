@@ -7,7 +7,7 @@ header("Content-Type: text/html; charset=ISO-8859-1",true);
 //ini_set("display_errors", 1); 
 
 set_time_limit(1200);
-ini_set('max_execution_time', 1200); 
+// ini_set('max_execution_time', 1200); 
 
 //Data considerada
 $data_inicio = mktime(0, 0, 0, date('n')-1,  date('d'), date('Y'));
@@ -134,7 +134,7 @@ $sql = "select ug_nome,tipo,ug_cpf from (
 			order by ug_nome;
 ";
 $rs = SQLexecuteQuery($sql);
-$total_de_registros = pg_num_rows($rs);
+$total_de_registros = (($rs) ? pg_num_rows($rs) : 0);
 $dadosTotais = pg_fetch_all($rs);
 
 function buscarray($cpfs){

@@ -1,9 +1,12 @@
 <?php
 declare(strict_types=1);
 
+use BaconQrCode\Common\ErrorCorrectionLevel;
+use BaconQrCode\Renderer\GDLibRenderer;
+use BaconQrCode\Writer;
 use PragmaRX\Google2FA\Google2FA;
 
-require_once '/www/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 class classGoogleAutenticator
 {
@@ -82,7 +85,7 @@ class classGoogleAutenticator
         ?string $title = null,
         array $params = []
     ): string {
-        $company = $title ?? '';
+        $company = $title ?? $name;
 
         return $this->google2fa->getQRCodeUrl(
             $company,
@@ -128,6 +131,77 @@ class classGoogleAutenticator
             rawurlencode($level),
             rawurlencode($otpUrl)
         );
+    }
+
+    /**
+     * Retorna um data URI PNG do QR Code, pronto para usar no src de img.
+     *
+     * @param string      $name
+     * @param string      $secret
+     * @param string|null $title
+     * @param array       $params
+     * @return string
+     */
+    public function getQRCodeImageUrl(
+        string $name,
+        string $secret,
+        ?string $title = null,
+        array $params = []
+    ): string {
+        $size = isset($params["size"])
+            ? (int) $params["size"]
+            : (isset($params["width"]) ? (int) $params["width"] : 200);
+        $margin = isset($params["margin"]) ? (int) $params["margin"] : 4;
+        $level = strtoupper((string)($params["level"] ?? "M"));
+
+        if ($size <= 0) {
+            $size = 200;
+        }
+
+        if ($margin < 0) {
+            $margin = 0;
+        }
+
+        if (!function_exists("iconv")) {
+            throw new RuntimeException("A extensao iconv do PHP e obrigatoria para gerar QR Code com bacon/bacon-qr-code.");
+        }
+
+        $levels = [
+            "L" => ErrorCorrectionLevel::L(),
+            "M" => ErrorCorrectionLevel::M(),
+            "Q" => ErrorCorrectionLevel::Q(),
+            "H" => ErrorCorrectionLevel::H(),
+        ];
+
+        if (!extension_loaded("gd") || !function_exists("gd_info")) {
+            throw new RuntimeException("A extensao gd do PHP e obrigatoria para gerar QR Code PNG com bacon/bacon-qr-code.");
+        }
+
+        $renderer = new GDLibRenderer($size, $margin, "png");
+        $writer = new Writer($renderer);
+        $png = $writer->writeString(
+            $this->getQRCodeOtpAuthUrl($name, $secret, $title),
+            "UTF-8",
+            $levels[$level] ?? $levels["M"]
+        );
+
+        return "data:image/png;base64," . base64_encode($png);
+    }
+
+    /**
+     * Retorna a URL otpauth gerada pelo provedor Google2FA.
+     *
+     * @param string      $name
+     * @param string      $secret
+     * @param string|null $title
+     * @return string
+     */
+    private function getQRCodeOtpAuthUrl(
+        string $name,
+        string $secret,
+        ?string $title = null
+    ): string {
+        return $this->getQRCodeGoogleUrl($name, $secret, $title);
     }
 
     /**

@@ -109,7 +109,7 @@ if($BtnSearch && $BtnSearch!=1 && $FrmEnviar==1 ) {
             ";
 
         $rs = SQLexecuteQueryParams($estat, $sql_params);
-        $total_table = pg_num_rows($rs);
+        $total_table = (($rs) ? pg_num_rows($rs) : 0);
 
 }//end if($BtnSearch && $BtnSearch!=1 && $FrmEnviar==1 )
 

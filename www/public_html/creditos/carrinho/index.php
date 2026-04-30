@@ -173,7 +173,7 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
                         $rs_verifica = SQLexecuteQuery($sql);
                         
                         if($rs_verifica){
-                            if(pg_num_rows($rs_verifica) > 0){
+                            if((($rs_verifica) ? pg_num_rows($rs_verifica) : 0) > 0){
                                 $teste_facilitadora = true;
                             }
                         }
@@ -265,7 +265,7 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
                                     $rs_verifica = SQLexecuteQuery($sql);
 
                                     if($rs_verifica){
-                                        if(pg_num_rows($rs_verifica) > 0){
+                                        if((($rs_verifica) ? pg_num_rows($rs_verifica) : 0) > 0){
                                             $teste_facilitadora = true;
                                         }
                                     }
@@ -476,11 +476,13 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
             {
                 
 				$file = fopen("/www/arquivos_gerados/logs/c.txt", "a+");
+				if ($file) {
 				fwrite($file, "saldo perfil ".$controller->usuarios->getPerfilSaldo()."\n");
 				fwrite($file, "repasse ".$modelos['total_repasse']."\n");
 				fwrite($file, "const ".(($controller->usuarios->getPerfilSaldo() - $modelos['total_repasse']) < 0)."\n");
 				fwrite($file, str_repeat("*", 50)."\n");
 				fclose($file);
+				}
 				
                 $strSaldo = number_format($controller->usuarios->getPerfilSaldo(), 2, ",", ".");
                 $strTotalRepasse = number_format($modelos['total_repasse'], 2, ",", ".");
@@ -624,7 +626,7 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 			$sql_djx = "SELECT * FROM pep WHERE cpf = $cpf_djx and enviado_email = 0; ";
 			$rs_djx = SQLexecuteQuery($sql_djx);
 			$dadosTotais_djx = pg_fetch_all($rs_djx);
-			$count_registers = pg_num_rows($rs_djx);
+			$count_registers = (($rs_djx) ? pg_num_rows($rs_djx) : 0);
 			
 			
 			if($count_registers > 0) {
@@ -671,7 +673,7 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 							$rs_verifica = SQLexecuteQuery($sql);
 							
 							if($rs_verifica){
-								if(pg_num_rows($rs_verifica) > 0){
+								if((($rs_verifica) ? pg_num_rows($rs_verifica) : 0) > 0){
 									$teste_facilitadora = true;
 								}
 							}

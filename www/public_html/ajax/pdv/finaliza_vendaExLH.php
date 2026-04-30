@@ -14,6 +14,11 @@ require_once DIR_CLASS . "pdv/classOperadorGamesUsuario.php";
 $_PaginaOperador1Permitido = 53;
 require_once DIR_INCS . "pdv/corte_constantes.php";
 require_once DIR_INCS . "config.MeiosPagamentos.php";
+
+function finalizaVendaExLHBoletoLog($message, array $context = array()) {
+	$context["script"] = "finaliza_vendaExLH.php";
+	error_log("[finaliza_vendaExLH_boleto] " . $message . " " . json_encode($context));
+}
 //validacao
 
 $token_csrf      = $_REQUEST['token_csrf'] ?? null;
@@ -187,7 +192,7 @@ if ($msg == "") {
 			        bbg_documento,
 			        bbg_data_venc
 			    ) VALUES (
-			        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + INTERVAL '$7 day'
+			        $1, $2, CURRENT_TIMESTAMP, $3, $4, $5, $6, CURRENT_DATE + $7::integer
 			    )
 			";
 
@@ -226,10 +231,13 @@ if ($msg == "") {
 
 		$ret = SQLexecuteQueryParams($sql, $params);
 
-		if (!$ret)
+		if (!$ret) {
 			$msg = "Erro ao atualizar status da venda.\n";
+			finalizaVendaExLHBoletoLog("erro_update_tb_dist_venda_games", array("usuario_id" => $usuarioId, "venda_id" => $venda_id, "banco" => $bco_codigo, "documento" => $num_doc, "erro" => function_exists("pg_last_error") ? pg_last_error() : ""));
+		}
 	} else {
-		//echo "ret: $ret<br>";
+		$msg = "Erro ao inserir boleto.\n";
+		finalizaVendaExLHBoletoLog("erro_insert_dist_boleto_bancario_games", array("usuario_id" => $usuarioId, "venda_id" => $venda_id, "valor" => $total_geral + $taxa_adicional, "taxa" => $taxa_adicional, "banco" => $bco_codigo, "documento" => $num_doc, "dias_vencimento" => $qtde_dias_venc, "erro" => function_exists("pg_last_error") ? pg_last_error() : ""));
 	}
 } else {
 	//echo "msg: $msg<br>";

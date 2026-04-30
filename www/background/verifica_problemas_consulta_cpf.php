@@ -1,7 +1,7 @@
 <?php
 ob_start(); 
 set_time_limit(3600);
-ini_set('max_execution_time', 3600);
+// ini_set('max_execution_time', 3600);
 
 require_once "../includes/main.php";
 require_once $raiz_do_projeto . "includes/pdv/main.php";
@@ -31,7 +31,7 @@ if(!$arquivoLog->haveFile()) {
     
     echo str_repeat("=", 60).PHP_EOL."Data execução : ".date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
     if($rs){
-        $num_rows = pg_num_rows($rs);
+        $num_rows = (($rs) ? pg_num_rows($rs) : 0);
         if($num_rows > 0){
             $msg_log = "";
             
@@ -42,7 +42,7 @@ if(!$arquivoLog->haveFile()) {
             }
             $msg_log .= $list_errors.PHP_EOL;
             
-            echo utf8_encode($msg_log);
+            echo mb_convert_encoding((string)$msg_log, 'UTF-8', 'ISO-8859-1');
 
             if($num_rows >= ALERT_NUMBER){
                 $msg_prob = "Foram detectados ".$num_rows." problema(s) com o sistema de consulta de CPF nos últimos ".VERIFY_TIME." minutos!".PHP_EOL."<br>Por favor, verifique se há algo de errado! Mais detalhes abaixo:<br><br>".str_replace(PHP_EOL, "<br><br>", $list_errors);
