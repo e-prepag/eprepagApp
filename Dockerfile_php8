@@ -1,0 +1,89 @@
+# --- Estágio de Dependências ---
+FROM php:8.4-fpm-alpine AS builder
+
+# Instalar dependências de sistema para compilação
+RUN apk add --no-cache \
+    libzip-dev \
+    libpq-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libxml2-dev \
+    icu-dev \
+    oniguruma-dev \
+    linux-headers \
+    curl \
+    git
+
+# Instalar extensões PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+    mysqli \
+    pgsql \
+    pdo_pgsql \
+    pdo_mysql \
+    gd \
+    zip \
+    intl \
+    opcache \
+    bcmath
+
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+
+# Copiar arquivos do composer primeiro para aproveitar o cache de camadas do Docker
+COPY ./www/composer.json ./www/composer.lock* ./
+
+# Instalar dependências (ignorando scripts para segurança e otimizando autoloader)
+RUN composer install --no-dev --no-scripts --no-interaction --optimize-autoloader
+
+# --- Estágio Final ---
+FROM php:8.4-fpm-alpine
+
+# Instalar apenas libs runtime necessárias
+RUN apk add --no-cache \
+    libzip \
+    libpq \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libxml2 \
+    icu-libs \
+    oniguruma
+
+# Copiar extensões do builder
+COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
+COPY --from=builder /usr/local/include/php/ext /usr/local/include/php/ext
+RUN docker-php-ext-enable mysqli pgsql pdo_pgsql pdo_mysql gd zip intl opcache bcmath
+
+# Copiar as dependências instaladas pelo Composer
+COPY --from=builder /app/vendor /www/vendor
+
+# Configurações de Hardening do PHP
+RUN { \
+    echo 'opcache.memory_consumption=128'; \
+    echo 'opcache.interned_strings_buffer=8'; \
+    echo 'opcache.max_accelerated_files=4000'; \
+    echo 'opcache.revalidate_freq=2'; \
+    echo 'opcache.fast_shutdown=1'; \
+    echo 'expose_php=Off'; \
+    echo 'display_errors=Off'; \
+    echo 'log_errors=On'; \
+    echo 'error_reporting=E_ALL & ~E_DEPRECATED & ~E_STRICT'; \
+    echo 'disable_functions=system,exec,shell_exec,passthru,proc_open,popen,curl_multi_exec,parse_ini_file,show_source,symlink,link,pcntl_exec,pcntl_fork,pcntl_waitpid,pcntl_alarm,pcntl_signal,proc_get_status,apache_setenv,enable_dl,chown,chgrp,chmod,highlight_file,php_strip_whitespace,filegroup,fileowner,ini_restore,ini_set'; \
+    } > /usr/local/etc/php/conf.d/security-hardened.ini
+
+# Criar usuário não-root para execução
+RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
+
+WORKDIR /www
+
+# Garantir permissões corretas (incluindo a pasta vendor copiada)
+RUN chown -R appuser:appgroup /www
+
+USER appuser
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD nc -z 127.0.0.1 9000 || exit 1
