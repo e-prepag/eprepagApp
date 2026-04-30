@@ -45,8 +45,8 @@ class MeuCadastroController extends HeaderController{
             if ($objUsuarios->getTipoEstabelecimento() == "Outros") 
             {
                 $temp_tipo_estabelecimento_empresa = $post['outro_estabelecimento'];
-                $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao)='" . strtoupper(str_replace("'", '"', $temp_tipo_estabelecimento_empresa)) . "'";
-                $rs_select_tipo_estabelecimento = SQLexecuteQuery($sql);
+                $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao) = $1";
+                $rs_select_tipo_estabelecimento = SQLexecuteQueryParams($sql, array(strtoupper(str_replace("'", '"', $temp_tipo_estabelecimento_empresa))));
                 
                 if ($rs_select_tipo_estabelecimento_row = pg_fetch_array($rs_select_tipo_estabelecimento))
                 {
@@ -56,9 +56,9 @@ class MeuCadastroController extends HeaderController{
                 else 
                 {
                     $post['outro_estabelecimento'] = utf8_encode(str_replace("'", '"', $post['outro_estabelecimento']));
-                    $sql = "INSERT INTO tb_tipo_estabelecimento (te_ativo,te_descricao) VALUES (0,'" . $post['outro_estabelecimento'] . "');"; //".utf8_decode($resposta)."
+                    $sql = "INSERT INTO tb_tipo_estabelecimento (te_ativo,te_descricao) VALUES (0, $1);"; //".utf8_decode($resposta)."
 
-                    $rs_tipo_estabelecimento = SQLexecuteQuery($sql);
+                    $rs_tipo_estabelecimento = SQLexecuteQueryParams($sql, array($post['outro_estabelecimento']));
                     
                     if (!$rs_tipo_estabelecimento)
                     {
@@ -66,8 +66,8 @@ class MeuCadastroController extends HeaderController{
                     } 
                     else 
                     {
-                        $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao)='" . strtoupper(str_replace("'", '"', $post['outro_estabelecimento'])) . "'";
-                        $rs_select_tipo_estabelecimento_inserido = SQLexecuteQuery($sql);
+                        $sql = "select te_id from tb_tipo_estabelecimento where UPPER(te_descricao) = $1";
+                        $rs_select_tipo_estabelecimento_inserido = SQLexecuteQueryParams($sql, array(strtoupper(str_replace("'", '"', $post['outro_estabelecimento']))));
                         $rs_select_tipo_estabelecimento_inserido_row = pg_fetch_array($rs_select_tipo_estabelecimento_inserido);
                         $objUsuarios->setTipoEstabelecimento($rs_select_tipo_estabelecimento_inserido_row['te_id']);
                     }

@@ -137,6 +137,28 @@ class UsuarioGamesOperador {
     }
     
     
+
+	private static function addParam(&$params, $value)
+	{
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private static function orderByOperador($orderBy)
+	{
+		if (is_null($orderBy) || trim((string) $orderBy) == '') return null;
+		$permitidos = array('ugo_id', 'ugo_ug_id', 'ugo_login', 'ugo_senha', 'ugo_ativo', 'ugo_data_inclusao', 'ugo_data_ultimo_acesso', 'ugo_qtde_acessos', 'ugo_tipo', 'ugo_nome', 'ugo_email');
+		$partes = array();
+		foreach (explode(',', $orderBy) as $parte) {
+			$tokens = preg_split('/\s+/', trim($parte));
+			$coluna = strtolower($tokens[0] ?? '');
+			$direcao = strtoupper($tokens[1] ?? 'ASC');
+			if (!in_array($coluna, $permitidos) || !in_array($direcao, array('ASC', 'DESC'))) return null;
+			$partes[] = $coluna . ' ' . $direcao;
+		}
+		return count($partes) ? implode(', ', $partes) : null;
+	}
+
     function inserir(&$objOperadorGamesUsuario){
         $server_url = "" . EPREPAG_URL . "";
             if(checkIP()) {
@@ -146,74 +168,47 @@ class UsuarioGamesOperador {
  		$ret = UsuarioGamesOperador::validarCampos($objOperadorGamesUsuario, true);
  
  		if($ret == ""){
-	 		if(UsuarioGamesOperador::existeLogin($objOperadorGamesUsuario->getLogin(), null, null )) {	// $objOperadorGamesUsuario->getUgId()
-	 			$ret = "Login já cadastrado.";
+	 		if(UsuarioGamesOperador::existeLogin($objOperadorGamesUsuario->getLogin(), null, null )) {
+	 			$ret = "Login ja cadastrado.";
 	 		}
  		}
  		
  		if($ret == ""){
- 			
- 			//Formata
  			$objEncryption = new SecureEncryption();
  			$senha = $objEncryption->hashPassword(trim($objOperadorGamesUsuario->getSenha()));
-			$dataInclusao = "CURRENT_TIMESTAMP";
-			$dataUltimoAcesso = "CURRENT_TIMESTAMP";
- 			$qtdeAcessos = 0;
-			
-			//SQL
- 			$sql = "insert into dist_usuarios_games_operador(ugo_ug_id, ugo_login, ugo_senha, ugo_ativo, ugo_data_inclusao, 
- 						ugo_data_ultimo_acesso, ugo_qtde_acessos, ugo_tipo, ugo_nome, ugo_email
-					) values (";
+			$qtdeAcessos = 0;
+			$sql = "insert into dist_usuarios_games_operador(ugo_ug_id, ugo_login, ugo_senha, ugo_ativo, ugo_data_inclusao, ugo_data_ultimo_acesso, ugo_qtde_acessos, ugo_tipo, ugo_nome, ugo_email) values ($1, $2, $3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $4, $5, $6, $7)";
+			$params = array($objOperadorGamesUsuario->getUgId(), trim(strtoupper($objOperadorGamesUsuario->getLogin())), $senha, $qtdeAcessos, $objOperadorGamesUsuario->getTipo(), trim(strtoupper($objOperadorGamesUsuario->getNome())), trim(strtoupper($objOperadorGamesUsuario->getEmail())));
 
- 			$sql .= SQLaddFields($objOperadorGamesUsuario->getUgId(), "") . ",";
- 			$sql .= SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getLogin())), "s") . ",";
- 			$sql .= SQLaddFields($senha, "s") . ",";
- 			$sql .= "1,";
- 			$sql .= SQLaddFields($dataInclusao, "") . ",";
- 			$sql .= SQLaddFields($dataUltimoAcesso, "") . ",";
- 			$sql .= SQLaddFields($qtdeAcessos, "") . ",";
- 			$sql .= SQLaddFields($objOperadorGamesUsuario->getTipo(), "s") . ",";
-
- 			$sql .= SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getNome())), "s") . ",";
- 			$sql .= SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getEmail())), "s") . ")";
-//echo "sql: $sql<br>";
-
-			$ret = SQLexecuteQuery($sql);
-			if(!$ret) $ret = "Erro ao inserir operador.\n<!--\n".$sql."\n-->";
+			$ret = SQLexecuteQueryParams($sql, $params);
+			if(!$ret) $ret = "Erro ao inserir operador.\n";
 			else{
 				$ret = "";				
 				$rs_id = SQLexecuteQuery("select currval('dist_usuarios_games_operador_id_seq') as last_id");
 				if($rs_id && pg_num_rows($rs_id) > 0){
 					$rs_id_row = pg_fetch_array($rs_id);
 					$objOperadorGamesUsuario->setId($rs_id_row['last_id']);
-					
-					//Log na base
 					usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CADASTRA_OPERADOR'], $objOperadorGamesUsuario->getUgId(), null);
-					
-					//Envia email
-					//--------------------------------------------------------------------------------
 					$parametros['prepag_dominio'] = "http://" . $server_url;
 					$parametros['nome'] = $objOperadorGamesUsuario->getNome();
 
 					$msgEmail  = email_cabecalho($parametros);
 					$msgEmail .= "  <br><br>
 									<table border='0' cellspacing='0'>
-		            				<tr><td>&nbsp;</td></tr>
-		            				<tr valign='middle' bgcolor='#FFFFFF'>
-		            					<td align='left' class='texto'>
-											Confirmamos a recepção do seu cadastro de operador junto ao E-Prepag LanHouses. <br>
-											Você pode começar a usar esse cadastro imediatamente.<br>
-		            					</td>
-		            				</tr>
-		            				<tr><td>&nbsp;</td></tr>
-		        					</table>
-		        				";
+	            				<tr><td>&nbsp;</td></tr>
+	            				<tr valign='middle' bgcolor='#FFFFFF'>
+	            					<td align='left' class='texto'>
+											Confirmamos a recepcao do seu cadastro de operador junto ao E-Prepag LanHouses. <br>
+											Voce pode comecar a usar esse cadastro imediatamente.<br>
+	            					</td>
+	            				</tr>
+	            				<tr><td>&nbsp;</td></tr>
+	        					</table>
+	        				";
 					$msgEmail .= email_rodape($parametros);
 					enviaEmail($objOperadorGamesUsuario->getEmail(), null, null, "E-Prepag - Cadastro de Operador de LanHouse", $msgEmail);
-										
 				}					
 			}			
-			
  		}
  		
  		return $ret;   	
@@ -225,76 +220,39 @@ class UsuarioGamesOperador {
  		$ret = UsuarioGamesOperador::validarCampos($objOperadorGamesUsuario, false);
 
  		if($ret == ""){
-			//SQL
- 			$sql = "update dist_usuarios_games_operador set ";
- 			if(!is_null($objOperadorGamesUsuario->getAtivo())) 			$sql .= " ugo_ativo = " 				. SQLaddFields(trim($objOperadorGamesUsuario->getAtivo()), "") . ",";
- 			if(!is_null($objOperadorGamesUsuario->getLogin())) 			$sql .= " ugo_login = " 				. SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getLogin())), "s") . ",";
+			$params = array();
+			$sets = array();
+			if(!is_null($objOperadorGamesUsuario->getAtivo())) $sets[] = "ugo_ativo = " . self::addParam($params, trim($objOperadorGamesUsuario->getAtivo()));
+			if(!is_null($objOperadorGamesUsuario->getLogin())) $sets[] = "ugo_login = " . self::addParam($params, trim(strtoupper($objOperadorGamesUsuario->getLogin())));
 
  			if(!is_null($objOperadorGamesUsuario->getSenha())) 	{
 	 			$objEncryption = new SecureEncryption();
  				$senha = $objEncryption->hashPassword(trim($objOperadorGamesUsuario->getSenha()));
-				$sql .= " ugo_senha = '". $senha . "',";
+				$sets[] = "ugo_senha = " . self::addParam($params, $senha);
 			}
 
-			if(!is_null($objOperadorGamesUsuario->getTipo())) 			$sql .= " ugo_tipo = " 				. SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getTipo())), "s") . ",";
-			if(!is_null($objOperadorGamesUsuario->getNome())) 			$sql .= " ugo_nome = " 				. SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getNome())), "s") . ",";
-			if(!is_null($objOperadorGamesUsuario->getEmail())) 			$sql .= " ugo_email = " 				. SQLaddFields(trim(strtoupper($objOperadorGamesUsuario->getEmail())), "s") . ",";
+			if(!is_null($objOperadorGamesUsuario->getTipo())) $sets[] = "ugo_tipo = " . self::addParam($params, trim(strtoupper($objOperadorGamesUsuario->getTipo())));
+			if(!is_null($objOperadorGamesUsuario->getNome())) $sets[] = "ugo_nome = " . self::addParam($params, trim(strtoupper($objOperadorGamesUsuario->getNome())));
+			if(!is_null($objOperadorGamesUsuario->getEmail())) $sets[] = "ugo_email = " . self::addParam($params, trim(strtoupper($objOperadorGamesUsuario->getEmail())));
 
-			if(substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
-			$sql .= " where ugo_id = " . SQLaddFields($objOperadorGamesUsuario->getId(), "");
-			$sql .= " AND ugo_ug_id = " . SQLaddFields($objOperadorGamesUsuario->getUgId(), "");
+			$sql = "update dist_usuarios_games_operador set " . implode(", ", $sets);
+			$sql .= " where ugo_id = " . self::addParam($params, $objOperadorGamesUsuario->getId());
+			$sql .= " AND ugo_ug_id = " . self::addParam($params, $objOperadorGamesUsuario->getUgId());
 			
-			$ret = SQLexecuteQuery($sql);
-//echo "sql: $sql<br>";
-//die("");
+			$ret = SQLexecuteQueryParams($sql, $params);
 			if(!$ret) $ret = "Erro ao atualizar operador.\n";
 			else {
                                 $cmdtuples = pg_affected_rows($ret);
-                                //echo $cmdtuples . " tuples are affected.<br>\n";
                                 if($cmdtuples > 0) {
-                                    
-                                        //Grava no arquivo o ID do PDV para Exclusão de todas as Sessões abertas
                                         $nome_tmp = $raiz_do_projeto."arquivos_gerados/logs/idsOpPDVs.txt";
                                         if ($handle = fopen($nome_tmp, 'a+')) {
                                                 fwrite($handle, $objOperadorGamesUsuario->getId().PHP_EOL);
                                                 fclose($handle);
-                                        }//end if ($handle = fopen($nome_tmp, 'a+'))
-                                        
+                                        }
         				$ret = "";
                                 } else {
-                                        $ret = "Operador ou PDV não cadastrados. Por favor, entre em contato com nossa Central de Atendimento através do e-mail suporte@e-prepag.com.br. Obrigado.";	
+                                        $ret = "Operador ou PDV nao cadastrados. Por favor, entre em contato com nossa Central de Atendimento atraves do e-mail suporte@e-prepag.com.br. Obrigado.";	
                                 }
-/*
-				//Log na base
-				usuarios_games_operador_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['ALTERACAO_DO_CADASTRO'], null, null);
-
-				$objOperadorGamesUsuario = unserialize($_SESSION['dist_usuarioGamesOperador_ser']);
-				if(is_object($objOperadorGamesUsuario))	{
-					//Envia email
-					//--------------------------------------------------------------------------------
-					$parametros['prepag_dominio'] = "EPREPAG_URL_HTTP";
-					$parametros['nome_fantasia'] = $objOperadorGamesUsuario->getNomefantasia();
-					$parametros['tipo_cadastro'] = $objOperadorGamesUsuario->getTipoCadastro();
-					$parametros['nome'] = $objOperadorGamesUsuario->getNome();
-					$parametros['sexo'] = $objOperadorGamesUsuario->getSexo();
-
-					$msgEmail  = email_cabecalho($parametros);
-					$msgEmail .= "  <br><br>
-									<table border='0' cellspacing='0'>
-									<tr><td>&nbsp;</td></tr>
-									<tr valign='middle' bgcolor='#FFFFFF'>
-										<td align='left' class='texto'>
-											Você acessou nosso site e alterou seu cadastro.<br><br>
-											Utilize seu login " . $objOperadorGamesUsuario->getLogin() . " para acessar sua conta e realizar compras em nosso site.
-										</td>
-									</tr>
-									<tr><td>&nbsp;</td></tr>
-									</table>
-								";
-					$msgEmail .= email_rodape($parametros);
-					if(!is_null($objOperadorGamesUsuario->getEmail())) enviaEmail($objOperadorGamesUsuario->getEmail(), null, null, "E-Prepag - Atualização de Cadastro", $msgEmail);
-				}
-*/
 			}				
 
  		}
@@ -302,7 +260,6 @@ class UsuarioGamesOperador {
  		return $ret;   	
     }
     
-
 	function validarCamposLogin($senha, $senhaConf, $login){
 //echo "validarCamposLogin('$senha', '$senhaConf', '$login')<br>"; 
 		$ret = "";
@@ -365,14 +322,17 @@ class UsuarioGamesOperador {
  		return $ret;
 	}
 
+
 	function obter($filtro, $orderBy, &$rs){
 
 		$ret = "";
-		$filtro = array_map("strtoupper", $filtro);
+		$params = array();
+		$filtro = is_array($filtro) ? array_map("strtoupper", $filtro) : array();
+		$filtro += array('ugo_id' => null, 'ugo_ug_id' => null, 'ugo_ativo' => null, 'ugo_data_inclusaoMin' => null, 'ugo_data_inclusaoMax' => null, 'ugo_data_ultimo_acessoMin' => null, 'ugo_data_ultimo_acessoMax' => null, 'ugo_qtde_acessosMin' => null, 'ugo_qtde_acessosMax' => null, 'ugo_login' => null, 'ugo_loginLike' => null, 'ugo_tipo' => null, 'ugo_nome' => null, 'ugo_nome_Like' => null, 'ugo_email' => null);
 	
 		$sql = "select * from dist_usuarios_games_operador ";
 
-		if(!is_null($filtro) && $filtro != ""){
+		if(!empty($filtro)){
 
 			if(!is_null($filtro['ugo_data_inclusaoMin']) && !is_null($filtro['ugo_data_inclusaoMax'])){
 				$filtro['ugo_data_inclusaoMin'] = formata_data_ts($filtro['ugo_data_inclusaoMin'] . " 00:00:00", 1, true, true);
@@ -382,65 +342,39 @@ class UsuarioGamesOperador {
 			if(!is_null($filtro['ugo_data_ultimo_acessoMin']) && !is_null($filtro['ugo_data_ultimo_acessoMax'])){
 				$filtro['ugo_data_ultimo_acessoMin'] = formata_data_ts($filtro['ugo_data_ultimo_acessoMin'] . " 00:00:00", 1, true, true);
 				$filtro['ugo_data_ultimo_acessoMax'] = formata_data_ts($filtro['ugo_data_ultimo_acessoMax'] . " 23:59:59", 1, true, true);
-			}			
+			}
 
-
-			$sql .= " where 1=1";
-			
-			$sql .= " and (" . (is_null($filtro['ugo_id'])?1:0);
-			$sql .= "=1 or ugo_id = " . SQLaddFields($filtro['ugo_id'], "") . ")";
-
-                        $sql .= " and (" . (is_null($filtro['ugo_ug_id'])?1:0);
-                        $sql .= "=1 or ugo_ug_id = " . SQLaddFields($filtro['ugo_ug_id'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ugo_ativo'])?1:0);
-			$sql .= "=1 or ugo_ativo = " . SQLaddFields($filtro['ugo_ativo'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ugo_data_inclusaoMin']) || is_null($filtro['ugo_data_inclusaoMax'])?1:0);
-			$sql .= "=1 or ugo_data_inclusao between " . SQLaddFields($filtro['ugo_data_inclusaoMin'], "") . " and " . SQLaddFields($filtro['ugo_data_inclusaoMax'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ugo_data_ultimo_acessoMin']) || is_null($filtro['ugo_data_ultimo_acessoMax'])?1:0);
-			$sql .= "=1 or ugo_data_ultimo_acesso between " . SQLaddFields($filtro['ugo_data_ultimo_acessoMin'], "") . " and " . SQLaddFields($filtro['ugo_data_ultimo_acessoMax'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ugo_qtde_acessosMin']) || is_null($filtro['ugo_qtde_acessosMax'])?1:0);
-			$sql .= "=1 or ugo_qtde_acessos between " . SQLaddFields($filtro['ugo_qtde_acessosMin'], "") . " and " . SQLaddFields($filtro['ugo_qtde_acessosMax'], "") . ")";
-
-
-
-			$sql .= " and (" . (is_null($filtro['ugo_login'])?1:0);
-			$sql .= "=1 or ugo_login = '" . SQLaddFields($filtro['ugo_login'], "r") . "')";
-			$sql .= " and (" . (is_null($filtro['ugo_loginLike'])?1:0);
-			$sql .= "=1 or ugo_login like '%" . SQLaddFields($filtro['ugo_loginLike'], "r") . "%')";
-			
-
-			$sql .= " and (" . (is_null($filtro['ugo_tipo'])?1:0);
-			$sql .= "=1 or ugo_tipo = " . SQLaddFields($filtro['ugo_tipo'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ugo_nome'])?1:0);
-			$sql .= "=1 or ugo_nome = '" . SQLaddFields($filtro['ugo_nome'], "r") . "')";
-			$sql .= " and (" . (is_null($filtro['ugo_nome_Like'])?1:0);
-			$sql .= "=1 or ugo_nome like '%" . SQLaddFields($filtro['ugo_nome_Like'], "r") . "%')";
-
-			$sql .= " and (" . (is_null($filtro['ugo_email'])?1:0);
-			$sql .= "=1 or ugo_email = '" . SQLaddFields($filtro['ugo_email'], "r") . "')";
-			$sql .= " and (" . (is_null($filtro['ugo_email'])?1:0);
-			$sql .= "=1 or ugo_email like '%" . SQLaddFields($filtro['ugo_email'], "r") . "%')";
-
+			$where = array();
+			if(!is_null($filtro['ugo_id'])) $where[] = "ugo_id = " . self::addParam($params, $filtro['ugo_id']);
+			if(!is_null($filtro['ugo_ug_id'])) $where[] = "ugo_ug_id = " . self::addParam($params, $filtro['ugo_ug_id']);
+			if(!is_null($filtro['ugo_ativo'])) $where[] = "ugo_ativo = " . self::addParam($params, $filtro['ugo_ativo']);
+			if(!is_null($filtro['ugo_data_inclusaoMin']) && !is_null($filtro['ugo_data_inclusaoMax'])) $where[] = "ugo_data_inclusao between " . self::addParam($params, $filtro['ugo_data_inclusaoMin']) . " and " . self::addParam($params, $filtro['ugo_data_inclusaoMax']);
+			if(!is_null($filtro['ugo_data_ultimo_acessoMin']) && !is_null($filtro['ugo_data_ultimo_acessoMax'])) $where[] = "ugo_data_ultimo_acesso between " . self::addParam($params, $filtro['ugo_data_ultimo_acessoMin']) . " and " . self::addParam($params, $filtro['ugo_data_ultimo_acessoMax']);
+			if(!is_null($filtro['ugo_qtde_acessosMin']) && !is_null($filtro['ugo_qtde_acessosMax'])) $where[] = "ugo_qtde_acessos between " . self::addParam($params, $filtro['ugo_qtde_acessosMin']) . " and " . self::addParam($params, $filtro['ugo_qtde_acessosMax']);
+			if(!is_null($filtro['ugo_login'])) $where[] = "ugo_login = " . self::addParam($params, $filtro['ugo_login']);
+			if(!is_null($filtro['ugo_loginLike'])) $where[] = "ugo_login like " . self::addParam($params, '%' . $filtro['ugo_loginLike'] . '%');
+			if(!is_null($filtro['ugo_tipo'])) $where[] = "ugo_tipo = " . self::addParam($params, $filtro['ugo_tipo']);
+			if(!is_null($filtro['ugo_nome'])) $where[] = "ugo_nome = " . self::addParam($params, $filtro['ugo_nome']);
+			if(!is_null($filtro['ugo_nome_Like'])) $where[] = "ugo_nome like " . self::addParam($params, '%' . $filtro['ugo_nome_Like'] . '%');
+			if(!is_null($filtro['ugo_email'])) {
+				$where[] = "ugo_email = " . self::addParam($params, $filtro['ugo_email']);
+				$where[] = "ugo_email like " . self::addParam($params, '%' . $filtro['ugo_email'] . '%');
+			}
+			if (count($where)) $sql .= " where " . implode(" and ", $where);
 		}
 		
-		if(!is_null($orderBy)) $sql .= " order by " . $orderBy;
+		$order = self::orderByOperador($orderBy);
+		if($order) $sql .= " order by " . $order;
 
-//echo "sql: $sql<br>";
-
-		$rs = SQLexecuteQuery($sql);
+		$rs = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		if(!$rs) $ret = "Erro ao obter operador(s).\n";
 
 		return $ret;
 
 	}
 
-	// O login é unico nas tabelas dist_usuarios_games_operador e dist_usuarios_games (leva em conta até cadastros que não estão mais ativos)
-	// os campos $usuario_id_excessao, $usuario_id_lanhouse não são usados mais
+	// O login e unico nas tabelas dist_usuarios_games_operador e dist_usuarios_games (leva em conta ate cadastros que nao estao mais ativos)
+	// os campos $usuario_id_excessao, $usuario_id_lanhouse nao sao usados mais
     function existeLogin($login, $usuario_id_excessao, $usuario_id_lanhouse){
 
 		$ret = true;
@@ -448,41 +382,23 @@ class UsuarioGamesOperador {
 		$qtde_02 = 0;
 		$login = strtoupper(trim($login));
 
-		//SQL
-		$sql = "select count(*) as qtde from dist_usuarios_games_operador ";
-		$sql .= " where ugo_login = " . SQLaddFields($login, "s");
-//		$sql .= " and ugo_ug_id = " . SQLaddFields(trim($usuario_id_lanhouse), "");
-//		if($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-//			$sql .= " and ugo_id = " . SQLaddFields(trim($usuario_id_excessao), "");
-
-//echo "ret: ".(($ret)?"True":"False")."<br>";
-//echo "sql1: $sql<br>";
-		$rs = SQLexecuteQuery($sql);
+		$sql = "select count(*) as qtde from dist_usuarios_games_operador where ugo_login = $1";
+		$rs = SQLexecuteQueryParams($sql, array($login));
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
 			$qtde_01 = $rs_row['qtde'];
 		}			
 
-//echo "ret: ".(($ret)?"True":"False")."<br>";
 		if($qtde_01==0) {
-			//SQL
-			$sql = "select count(*) as qtde from dist_usuarios_games ";
-			$sql .= " where ug_login = " . SQLaddFields($login, "s");
-//			if($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-//				$sql .= " and ug_id = " . SQLaddFields(trim($usuario_id_excessao), "");
-
-//echo "sql2: $sql<br>";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select count(*) as qtde from dist_usuarios_games where ug_login = $1";
+			$rs = SQLexecuteQueryParams($sql, array($login));
 			if($rs && pg_num_rows($rs) > 0){
 				$rs_row = pg_fetch_array($rs);
 				$qtde_02 = $rs_row['qtde'];
 			}			
 		}
 
-//echo "qtde_01: $qtde_01, qtde_02: $qtde_02, (".($qtde_01 + $qtde_02).")<br>";
 		if (($qtde_01 + $qtde_02)==0) $ret = false;
-//echo "ret: ".(($ret)?"True":"False")."<br>";
-//die("Em existeLogin<br>");
 		return $ret;   	
     }
     
@@ -542,11 +458,8 @@ class UsuarioGamesOperador {
 //echo "ug_ativo: ".$ug_ativo."<br>";
                 
 		if($ug_ativo==1 && $ug_substatus==11 || $ug_ativo==1 && $ug_substatus==9) {
-			//SQL
-			$sql = "select count(*) as qtde from dist_usuarios_games_operador ";
-			$sql .= " where ugo_ativo = 1 ";
-			$sql .= " and ugo_login = " . SQLaddFields($login, "s");
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select count(*) as qtde from dist_usuarios_games_operador where ugo_ativo = 1 and ugo_login = $1";
+			$rs = SQLexecuteQueryParams($sql, array($login));
 			if($rs && pg_num_rows($rs) > 0){
 				$rs_row = pg_fetch_array($rs);
 				if($rs_row['qtde'] > 0) $ret = true;
@@ -581,15 +494,12 @@ class UsuarioGamesOperador {
  		return $ret;   	
     }
     
+
     function LoginAutomatico($ugo_id,$login, $aut = false) { //Autentica usuario
 
 		$ret = false;
-		//SQL
-		$sql = "select ugo_ug_id from dist_usuarios_games_operador ";
-		$sql .= " where ugo_ativo = 1 ";
-		$sql .= " and ugo_id = " . SQLaddFields($ugo_id, "");
-
-                $rs_id = SQLexecuteQuery($sql);
+		$sql = "select ugo_ug_id from dist_usuarios_games_operador where ugo_ativo = 1 and ugo_id = $1";
+                $rs_id = SQLexecuteQueryParams($sql, array($ugo_id));
 		if($rs_id && pg_num_rows($rs_id) > 0){
 			$rs_id_row = pg_fetch_array($rs_id);
 			$ugo_ug_id = $rs_id_row['ugo_ug_id'];
@@ -604,24 +514,17 @@ class UsuarioGamesOperador {
 		}
 
 		if($ug_ativo==1 && $ug_substatus==11 || $ug_ativo==1 && $ug_substatus==9) {
-			//SQL
-			$sql = "select count(*) as qtde from dist_usuarios_games_operador ";
-			$sql .= " where ugo_ativo = 1 ";
-        		$sql .= " and ugo_id = " . SQLaddFields($ugo_id, "");
-
-                        $rs = SQLexecuteQuery($sql);
+			$sql = "select count(*) as qtde from dist_usuarios_games_operador where ugo_ativo = 1 and ugo_id = $1";
+                        $rs = SQLexecuteQueryParams($sql, array($ugo_id));
 			if($rs && pg_num_rows($rs) > 0){
 				$rs_row = pg_fetch_array($rs);
 				if($rs_row['qtde'] > 0) $ret = true;
 			}			
 
-			//Adiciona objeto usuario no session
 			if($ret){
 		                $ret = UsuarioGamesOperador::adicionarLoginSession($login, $ugo_ug_id); 
      			}
 
-			//Atualiza ultimo acesso
-			//------------------------------------------------------------------
 			if($ret){
 				UsuarioGamesOperador::atualiza_ultimo_acesso($login);
 				$obs = "";
@@ -639,16 +542,9 @@ class UsuarioGamesOperador {
     }
     
     function atualiza_ultimo_acesso($login) {
-
-            //Atualiza ultimo acesso
-            //------------------------------------------------------------------
             if($login){
-                    //SQL
-                    $sql = "update dist_usuarios_games_operador set ";
-                    $sql .= " ugo_data_ultimo_acesso = CURRENT_TIMESTAMP,";
-                    $sql .= " ugo_qtde_acessos = ugo_qtde_acessos + 1 ";
-                    $sql .= " where ugo_login = " . SQLaddFields($login, "s");
-                    $rs = SQLexecuteQuery($sql);			
+                    $sql = "update dist_usuarios_games_operador set ugo_data_ultimo_acesso = CURRENT_TIMESTAMP, ugo_qtde_acessos = ugo_qtde_acessos + 1 where ugo_login = $1";
+                    $rs = SQLexecuteQueryParams($sql, array($login));			
             }
     }//end function atualiza_ultimo_acesso
 

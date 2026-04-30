@@ -89,16 +89,10 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		$vb2c_comissao_para_repasse	= $params['comissao_para_repasse'];
 		
 		$sql = "INSERT INTO tb_vendas_b2c (vb2c_vg_id, vb2c_coServico, vb2c_precoServico, vb2c_prazoVigencia, vb2c_comissao_total, vb2c_comissao_para_repasse)
-								VALUES (";
-		$sql .= SQLaddFields($vb2c_vg_id, ""). ",";
-		$sql .= SQLaddFields($vb2c_coServico, "s"). ",";
-		$sql .= SQLaddFields($vb2c_precoServico, ""). ",";
-		$sql .= SQLaddFields($vb2c_prazoVigencia, "s"). ",";
-		$sql .= SQLaddFields($vb2c_comissao_total, ""). ",";
-		$sql .= SQLaddFields($vb2c_comissao_para_repasse, ""). "";
-		$sql .= ");";
+								VALUES ($1, $2, $3, $4, $5, $6);";
+		$paramsSql = array($vb2c_vg_id, $vb2c_coServico, $vb2c_precoServico, $vb2c_prazoVigencia, $vb2c_comissao_total, $vb2c_comissao_para_repasse);
 
-		$rs   = SQLexecuteQuery($sql);
+		$rs   = SQLexecuteQueryParams($sql, $paramsSql);
 		if($rs) {
 			$ret = true;
 		}
@@ -435,8 +429,8 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		do{
 			$vg_id = rand(1, 1e7-1);
 
-			$sql = "select * from tb_vendas_b2c where vb2c_vg_id = $vg_id order by \"vb2c_dataVenda\" desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select * from tb_vendas_b2c where vb2c_vg_id = $1 order by \"vb2c_dataVenda\" desc limit 1";
+			$rs = SQLexecuteQueryParams($sql, array($vg_id));
 			if(!$rs || pg_num_rows($rs) == 0) {
 				$b_unique = true;
 				break;
@@ -464,21 +458,21 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		$comissao_total		= $this->get_ComissaoTotal($params['product']);
 		$comissao_repasse	= $this->get_ComissaoRepasse($params['product']);
 		$sql = "INSERT INTO tb_vendas_b2c (vb2c_vg_id, \"vb2c_coServico\", \"vb2c_dataVenda\", \"vb2c_precoServico\", \"vb2c_prazoVigencia\", vb2c_comissao_total, vb2c_comissao_para_repasse, vb2c_ug_id, vb2c_ug_id_lan) ";
-		$sql .= "VALUES ($vg_id, '".$params['product']."', NOW(), $valor, '$vigencia', $comissao_total, $comissao_repasse, ".$params['ug_id'].", $ug_id);";
+		$sql .= "VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7, $8);";
 //echo "SQL: ".$sql."<br>";
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, array($vg_id, $params['product'], $valor, $vigencia, $comissao_total, $comissao_repasse, $params['ug_id'], $ug_id));
 		if(!$rs) {
 			echo "Erro ao Salvar Pedido (256).";
 			return false;
 		} 
 		else {
-			$sql = "select * from tb_vendas_b2c_ug_to_dist_ug where vb2cud_ug_id_gamer=".$params['ug_id']." and vb2cud_ug_id_lan=$ug_id;";
+			$sql = "select * from tb_vendas_b2c_ug_to_dist_ug where vb2cud_ug_id_gamer = $1 and vb2cud_ug_id_lan = $2;";
 //echo "SQL: ".$sql."<br>";
-			$rs_busca = SQLexecuteQuery($sql);
+			$rs_busca = SQLexecuteQueryParams($sql, array($params['ug_id'], $ug_id));
 			if($rs_busca && pg_num_rows($rs_busca) == 0) {
-				$sql = "INSERT INTO tb_vendas_b2c_ug_to_dist_ug (vb2cud_ug_id_gamer, vb2cud_ug_id_lan) VALUES (".$params['ug_id'].", $ug_id)";
+				$sql = "INSERT INTO tb_vendas_b2c_ug_to_dist_ug (vb2cud_ug_id_gamer, vb2cud_ug_id_lan) VALUES ($1, $2)";
 //echo "SQL: ".$sql."<br>";
-				$rs_ids = SQLexecuteQuery($sql);
+				$rs_ids = SQLexecuteQueryParams($sql, array($params['ug_id'], $ug_id));
 				if(!$rs_ids) {
 					echo "Erro ao Salvar Pedido (257).";
 					return false;
@@ -503,10 +497,10 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		$statusPin			= $params['statusPin'];
 		$status				= $params['status'];
 																								
-		$sql = "UPDATE tb_vendas_b2c SET \"vb2c_dataCadastroVenda\" = '$dataCadastroVenda', vb2c_pin = '$pin', \"vb2c_statusPin\" = '$statusPin', vb2c_status = '$status' ";
-		$sql .= "WHERE vb2c_vg_id=$vg_id;";
+		$sql = "UPDATE tb_vendas_b2c SET \"vb2c_dataCadastroVenda\" = $1, vb2c_pin = $2, \"vb2c_statusPin\" = $3, vb2c_status = $4 ";
+		$sql .= "WHERE vb2c_vg_id = $5;";
 //echo "SQL: ".$sql."<br>";
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, array($dataCadastroVenda, $pin, $statusPin, $status, $vg_id));
 		if(!$rs) {
 			echo "Erro ao Atualizar Pedido (258).";
 			return false;
@@ -518,9 +512,9 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 
 	function get_dados_da_Lan($ug_id, &$params) {
 		$params = array();
-		$sql  = "select ug_ativo, ug_tipo_cadastro, ug_perfil_limite, ug_perfil_saldo, ug_risco_classif from dist_usuarios_games where ug_id = " . $ug_id;
+		$sql  = "select ug_ativo, ug_tipo_cadastro, ug_perfil_limite, ug_perfil_saldo, ug_risco_classif from dist_usuarios_games where ug_id = $1";
 //echo "$sql\n";
-		$rs_lan = SQLexecuteQuery($sql);
+		$rs_lan = SQLexecuteQueryParams($sql, array($ug_id));
 		if(!$rs_lan || pg_num_rows($rs_lan) == 0) {
 		} else {
 			$rs_lan_row = pg_fetch_array($rs_lan);
@@ -535,8 +529,8 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		$sret = false;
 		if (($vg_id*1) > 0){
 			if($this->get_service_status()) {
-				$sql = "select to_char(\"vb2c_dataVenda\",'YYYY-MM-DD HH24:MI:SS') as \"vb2c_dataVenda_aux\",* from tb_vendas_b2c where vb2c_vg_id = $vg_id";
-				$rs_b2c = SQLexecuteQuery($sql);
+				$sql = "select to_char(\"vb2c_dataVenda\",'YYYY-MM-DD HH24:MI:SS') as \"vb2c_dataVenda_aux\",* from tb_vendas_b2c where vb2c_vg_id = $1";
+				$rs_b2c = SQLexecuteQueryParams($sql, array($vg_id));
 				if(!$rs_b2c || pg_num_rows($rs_b2c) == 0) {
 				} else {
 					//carregando dados
@@ -690,8 +684,8 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		if(!$vg_id) {
 			return -1;
 		}
-		$sql = "select * from tb_vendas_b2c where vb2c_vg_id = $vg_id order by \"vb2c_dataVenda\" desc limit 1";
-		$rs = SQLexecuteQuery($sql);
+		$sql = "select * from tb_vendas_b2c where vb2c_vg_id = $1 order by \"vb2c_dataVenda\" desc limit 1";
+		$rs = SQLexecuteQueryParams($sql, array($vg_id));
 		if(!$rs || pg_num_rows($rs) == 0) {
 			echo "Nenhum produto encontrado.\n";
 			return -2;
@@ -720,8 +714,8 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		if(!$vg_id) {
 			return null;
 		}
-		$sql = "select * from tb_vendas_b2c where vb2c_vg_id = $vg_id and vb2c_status = '1' order by \"vb2c_dataVenda\" desc limit 1";
-		$rs = SQLexecuteQuery($sql);
+		$sql = "select * from tb_vendas_b2c where vb2c_vg_id = $1 and vb2c_status = '1' order by \"vb2c_dataVenda\" desc limit 1";
+		$rs = SQLexecuteQueryParams($sql, array($vg_id));
 		if(!$rs || pg_num_rows($rs) == 0) {
 			echo "Nenhum produto encontrado.\n";
 			return null;
@@ -737,8 +731,8 @@ $this->logEvents("<hr>ERRO\n<pre>".htmlentities(str_replace("><", ">\n<", $this-
 		if(!$ug_id) {
 			return null;
 		}
-		$sql = "select * from usuarios_games where ug_id = $ug_id ";
-		$rs = SQLexecuteQuery($sql);
+		$sql = "select * from usuarios_games where ug_id = $1 ";
+		$rs = SQLexecuteQueryParams($sql, array($ug_id));
 		if(!$rs || pg_num_rows($rs) == 0) {
 			echo "Nenhum produto encontrado.\n";
 			return null;

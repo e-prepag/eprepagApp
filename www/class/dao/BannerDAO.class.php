@@ -9,6 +9,42 @@ class BannerDAO
     public $banners = array();
     public $erros = array();
 
+    private function parseLegacyWhere($cond, &$params)
+    {
+        $cond = trim($cond);
+        if (preg_match("/^UPPER\(bs_titulo\)\s+like\s+'%(.*)%'$/i", $cond, $m)) {
+            $params[] = '%' . $m[1] . '%';
+            return "UPPER(bs_titulo) like $" . count($params);
+        }
+        if (preg_match("/^bs_data_cadastro\s*=\s*'([^']+)'$/", $cond, $m)) {
+            $params[] = $m[1];
+            return "bs_data_cadastro = $" . count($params);
+        }
+        if (preg_match('/^(bsp_id|bsc_id|bs_status)\s*=\s*(\d+)$/', $cond, $m)) {
+            $params[] = (int) $m[2];
+            return $m[1] . " = $" . count($params);
+        }
+        if (preg_match("/^\(bs_data_inicio\s+<=\s+'([^']+)'\s+and\s+bs_data_fim\s+>=\s+'([^']+)'\s+and\s+bs_status\s*=\s*(\d+)\)$/i", $cond, $m)) {
+            $params[] = $m[1];
+            $phInicio = '$' . count($params);
+            $params[] = $m[2];
+            $phFim = '$' . count($params);
+            $params[] = (int) $m[3];
+            $phStatus = '$' . count($params);
+            return "(bs_data_inicio <= $phInicio and bs_data_fim >= $phFim and bs_status = $phStatus)";
+        }
+        if (preg_match("/^\(bs_data_inicio\s+>\s+'([^']+)'\s+or\s+bs_data_fim\s+<\s+'([^']+)'\s+or\s+bs_status\s*=\s*(\d+)\)$/i", $cond, $m)) {
+            $params[] = $m[1];
+            $phInicio = '$' . count($params);
+            $params[] = $m[2];
+            $phFim = '$' . count($params);
+            $params[] = (int) $m[3];
+            $phStatus = '$' . count($params);
+            return "(bs_data_inicio > $phInicio or bs_data_fim < $phFim or bs_status = $phStatus)";
+        }
+        return null;
+    }
+
     public function get($where, $limit = null, $order = "")
     {
 
@@ -63,12 +99,16 @@ class BannerDAO
                 }
                 if (!empty($where_strings)) {
                     $sql .= " WHERE " . implode(" AND ", $where_strings);
+                }            } else {
+                $where_strings = [];
+                foreach ($where as $cond) {
+                    $where_sql = $this->parseLegacyWhere($cond, $params);
+                    if ($where_sql !== null) {
+                        $where_strings[] = $where_sql;
+                    }
                 }
-            } else {
-                // --- MODO LEGADO (INSEGURO) ---
-                $filtro_inseguro = implode(" AND ", $where);
-                if ($filtro_inseguro != "") {
-                    $sql .= " WHERE " . $filtro_inseguro;
+                if (!empty($where_strings)) {
+                    $sql .= " WHERE " . implode(" AND ", $where_strings);
                 }
             }
         }

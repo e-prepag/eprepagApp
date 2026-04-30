@@ -924,8 +924,8 @@ class EnvioEmailAutomatico
         } else {
             $sql .= "COALESCE(CASE WHEN (ug_tipo_cadastro='PJ') THEN ug_nome_fantasia WHEN (ug_tipo_cadastro='PF') THEN ug_nome END, ug_nome_fantasia, ug_razao_social, ug_nome, ug_login) as ug_nome_full,* from dist_usuarios_games ";
         }
-        $sql .= "where ug_id = " . $this->getUgID();
-        $result = SQLexecuteQuery($sql);
+        $sql .= "where ug_id = $1";
+        $result = SQLexecuteQueryParams($sql, [$this->getUgID()]);
         if ($result_row = pg_fetch_array($result)) {
             if (array_key_exists('ug_responsavel', $result_row) && $this->getResponsavel() == "") {
                 $this->setResponsavel($result_row['ug_responsavel']);
@@ -949,9 +949,9 @@ class EnvioEmailAutomatico
     {
         // Em alguns casos ug_id pode não estar definido => usa 0 para evitar erro no SQL query
         $ug_id = (($this->getUgID()) ? $this->getUgID() : 0);
-        $sql = "insert into envio_email (ee_data_inclusao, ee_tipo_usuario, ug_id, ug_email, ee_identificador) values (NOW(), '" . strtoupper($this->getTipoUsuario()) . "', " . $ug_id . ", '" . $this->getUgEmail() . "', '" . $this->getIdentificadorEmail() . "');";
+        $sql = "insert into envio_email (ee_data_inclusao, ee_tipo_usuario, ug_id, ug_email, ee_identificador) values (NOW(), $1, $2, $3, $4);";
         //$result = 0;
-        $result = SQLexecuteQuery($sql);
+        $result = SQLexecuteQueryParams($sql, [strtoupper($this->getTipoUsuario()), $ug_id, $this->getUgEmail(), $this->getIdentificadorEmail()]);
         if ($result) return true;
         else return false;
     } //end function setLogEnvioEmail
@@ -965,8 +965,9 @@ class EnvioEmailAutomatico
         } else {
             $sql .= " dist_usuarios_games ug ";
         }
+        $sql_params = [$this->getSaldoMaiorQ(), $this->getPeriodoSemUsarSaldo(), strtoupper($this->getTipoUsuario()), $this->getPeriodoNovoEnvio()];
         $sql .= " 
-            where ug_perfil_saldo > " . $this->getSaldoMaiorQ();
+            where ug_perfil_saldo > $1";
         if ($this->getTipoUsuario() == 'G') {
             $sql .= " 
                 and (
@@ -974,7 +975,7 @@ class EnvioEmailAutomatico
                     from tb_venda_games vg 
                     where vg.vg_ug_id = ug.ug_id 
                         and vg.vg_ultimo_status = 5 
-                        and vg.vg_data_inclusao >= (NOW()-'" . $this->getPeriodoSemUsarSaldo() . " days'::interval)) = 0";
+                        and vg.vg_data_inclusao >= (NOW()-($2::int * interval '1 day'))) = 0";
         } else {
             $sql .= " 
                 and (
@@ -982,18 +983,18 @@ class EnvioEmailAutomatico
                     from tb_dist_venda_games vg 
                     where vg.vg_ug_id = ug.ug_id 
                         and vg.vg_ultimo_status = 5 
-                        and vg.vg_data_inclusao >= (NOW()-'" . $this->getPeriodoSemUsarSaldo() . " days'::interval)) = 0";
+                        and vg.vg_data_inclusao >= (NOW()-($2::int * interval '1 day'))) = 0";
         }
         $sql .= " 
                 and coalesce(
                                 (select extract(DAY from date_trunc('day', (NOW()-MAX(ee_data_inclusao)))) as delay 
                                 from envio_email ee
                                        where ee.ug_id = ug.ug_id 
-                                        AND ee.ee_tipo_usuario = '" . strtoupper($this->getTipoUsuario()) . "')
-                                , (" . $this->getPeriodoNovoEnvio() . "+1)
-                        ) > " . $this->getPeriodoNovoEnvio();
+                                        AND ee.ee_tipo_usuario = $3)
+                                , ($4::int+1)
+                        ) > $4::int";
         echo $sql . PHP_EOL;
-        $result = SQLexecuteQuery($sql);
+        $result = SQLexecuteQueryParams($sql, $sql_params);
         $lista_ids = "";
         if ((($result) ? pg_num_rows($result) : 0) > 0) {
             while ($result_row = pg_fetch_array($result)) {

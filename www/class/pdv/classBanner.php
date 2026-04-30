@@ -172,37 +172,43 @@ class Banner
     	$this->b_contador = $b_contador;
     }
 	
+
+	private function addParam(&$params, $value)
+	{
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private function orderByBanner($orderBy)
+	{
+		if (is_null($orderBy) || trim((string) $orderBy) == '') return null;
+		$permitidos = array('b_id', 'b_nome', 'b_texto_conteudo', 'b_conteudo', 'b_tipo', 'b_ativo', 'b_img_banner', 'b_img_conteudo', 'b_data_expira', 'b_data_inicio', 'b_titulo', 'b_url', 'b_contador');
+		$partes = array();
+		foreach (explode(',', $orderBy) as $parte) {
+			$tokens = preg_split('/\s+/', trim($parte));
+			$coluna = strtolower($tokens[0] ?? '');
+			$direcao = strtoupper($tokens[1] ?? 'ASC');
+			if (!in_array($coluna, $permitidos) || !in_array($direcao, array('ASC', 'DESC'))) return null;
+			$partes[] = $coluna . ' ' . $direcao;
+		}
+		return count($partes) ? implode(', ', $partes) : null;
+	}
+
     function inserir(&$objBanner)
 	{
  		$ret = $this->validarCampos($objBanner);
  
  		if($ret == "")
 		{
- 			$sql = "insert into tb_promocoes(" .
- 					"b_nome, b_texto_conteudo, b_conteudo, b_tipo, " .
- 					"b_ativo, b_img_banner, b_img_conteudo, b_data_expira, b_data_inicio, b_titulo, b_url, b_contador) values (";
- 			$sql .= SQLaddFields($objBanner->getNome(), "s") . ",";
- 			$sql .= SQLaddFields($objBanner->getTextoConteudo(), "s") . ",";
-			$sql .= SQLaddFields($objBanner->getConteudo(), "") . ",";
-			$sql .= SQLaddFields($objBanner->getTipo(), "") . ",";
-			$sql .= SQLaddFields($objBanner->getAtivo(), "") . ",";
- 			$sql .= SQLaddFields($objBanner->getImgBanner(), "s") . ",";
-			$sql .= SQLaddFields($objBanner->getImgConteudo(), "s") . ",";
-			$sql .= SQLaddFields(formata_data($objBanner->getDataExpira(),1), "s") . ",";
-			$sql .= SQLaddFields(formata_data($objBanner->getDataInicio(),1), "s") . ",";
-			$sql .= SQLaddFields($objBanner->getTitulo(), "s") . ",";
-			$sql .= SQLaddFields($objBanner->getUrl(), "s") . ",";
-			
 			$sql_contador = "select max(b_contador) as contador from tb_promocoes";
 			$ret_contador = SQLexecuteQuery($sql_contador);
 			if (!$ret_contador)
 				$ret = "Erro ao inserir banner.\n";
 			else
 			{
-				$sql .= SQLaddFields(pg_fetch_result($ret_contador,0,0), "") . ")";
-				
-				$ret = SQLexecuteQuery($sql);
-				
+				$sql = "insert into tb_promocoes(b_nome, b_texto_conteudo, b_conteudo, b_tipo, b_ativo, b_img_banner, b_img_conteudo, b_data_expira, b_data_inicio, b_titulo, b_url, b_contador) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
+				$params = array($objBanner->getNome(), $objBanner->getTextoConteudo(), $objBanner->getConteudo(), $objBanner->getTipo(), $objBanner->getAtivo(), $objBanner->getImgBanner(), $objBanner->getImgConteudo(), formata_data($objBanner->getDataExpira(),1), formata_data($objBanner->getDataInicio(),1), $objBanner->getTitulo(), $objBanner->getUrl(), pg_fetch_result($ret_contador,0,0));
+				$ret = SQLexecuteQueryParams($sql, $params);
 				
 				if(!$ret) 
 					$ret = "Erro ao inserir banner.\n";
@@ -214,7 +220,7 @@ class Banner
 					{
 						$rs_id_row = pg_fetch_array($rs_id);
 						$objBanner->setId($rs_id_row['last_id']);
-					}					
+					}
 				}
 			}		
  		}
@@ -228,22 +234,23 @@ class Banner
  
  		if($ret == "")
 		{
- 			$sql = "update tb_promocoes set ";
- 			if(!is_null($objBanner->getNome())) 			$sql .= " b_nome = " 		 . SQLaddFields($objBanner->getNome(), "s") . ",";
- 			if(!is_null($objBanner->getTextoConteudo())) 	$sql .= " b_texto_conteudo = "  . SQLaddFields($objBanner->getTextoConteudo(), "s") . ",";
-			if(!is_null($objBanner->getConteudo())) 		$sql .= " b_conteudo = "  . SQLaddFields($objBanner->getConteudo(), "") . ",";
-			if(!is_null($objBanner->getTipo())) 			$sql .= " b_tipo = "  . SQLaddFields($objBanner->getTipo(), "") . ",";
- 			if(!is_null($objBanner->getAtivo())) 			$sql .= " b_ativo = " 	 . SQLaddFields($objBanner->getAtivo(), "") . ",";
- 			if(!is_null($objBanner->getImgBanner())) 		$sql .= " b_img_banner = " . SQLaddFields($objBanner->getImgBanner(), "s") . ",";
-			if(!is_null($objBanner->getImgConteudo())) 		$sql .= " b_img_conteudo = " . SQLaddFields($objBanner->getImgConteudo(), "s") . ",";
-			if(!is_null($objBanner->getDataExpira())) 		$sql .= " b_data_expira = " . SQLaddFields(formata_data($objBanner->getDataExpira(),1), "s") . ",";
-			if(!is_null($objBanner->getDataInicio())) 		$sql .= " b_data_inicio = " . SQLaddFields(formata_data($objBanner->getDataInicio(),1), "s") . ",";
-			if(!is_null($objBanner->getTitulo())) 			$sql .= " b_titulo = " . SQLaddFields($objBanner->getTitulo(), "s") . ",";
-			if(!is_null($objBanner->getUrl())) 				$sql .= " b_url = " . SQLaddFields($objBanner->getUrl(), "s") . "";
+			$params = array();
+			$sets = array();
+			if(!is_null($objBanner->getNome())) $sets[] = "b_nome = " . $this->addParam($params, $objBanner->getNome());
+			if(!is_null($objBanner->getTextoConteudo())) $sets[] = "b_texto_conteudo = " . $this->addParam($params, $objBanner->getTextoConteudo());
+			if(!is_null($objBanner->getConteudo())) $sets[] = "b_conteudo = " . $this->addParam($params, $objBanner->getConteudo());
+			if(!is_null($objBanner->getTipo())) $sets[] = "b_tipo = " . $this->addParam($params, $objBanner->getTipo());
+			if(!is_null($objBanner->getAtivo())) $sets[] = "b_ativo = " . $this->addParam($params, $objBanner->getAtivo());
+			if(!is_null($objBanner->getImgBanner())) $sets[] = "b_img_banner = " . $this->addParam($params, $objBanner->getImgBanner());
+			if(!is_null($objBanner->getImgConteudo())) $sets[] = "b_img_conteudo = " . $this->addParam($params, $objBanner->getImgConteudo());
+			if(!is_null($objBanner->getDataExpira())) $sets[] = "b_data_expira = " . $this->addParam($params, formata_data($objBanner->getDataExpira(),1));
+			if(!is_null($objBanner->getDataInicio())) $sets[] = "b_data_inicio = " . $this->addParam($params, formata_data($objBanner->getDataInicio(),1));
+			if(!is_null($objBanner->getTitulo())) $sets[] = "b_titulo = " . $this->addParam($params, $objBanner->getTitulo());
+			if(!is_null($objBanner->getUrl())) $sets[] = "b_url = " . $this->addParam($params, $objBanner->getUrl());
+			$sql = "update tb_promocoes set " . implode(", ", $sets);
+ 			$sql .= " where b_id = " . $this->addParam($params, $objBanner->getId());
 			
- 			$sql .= " where b_id = " . SQLaddFields($objBanner->getId(), "");
-			
-			$ret = SQLexecuteQuery($sql);
+			$ret = SQLexecuteQueryParams($sql, $params);
 			if(!$ret) $ret = "Erro ao atualizar banner.\n";
 			else $ret = "";
  		}
@@ -280,11 +287,13 @@ class Banner
 
 	function obter($filtro, $orderBy, &$rs) {
 		$ret = "";
-		$filtro = array_map("strtoupper", $filtro);
+		$params = array();
+		$filtro = is_array($filtro) ? array_map("strtoupper", $filtro) : array();
+		$filtro += array('b_id' => null, 'b_nome' => null, 'b_nomeLike' => null, 'b_conteudo' => null, 'b_tipo' => null, 'b_status' => null, 'b_titulo' => null, 'b_tituloLike' => null, 'b_data_hoje' => null, 'b_data_expiraMin' => null, 'b_data_expiraMax' => null, 'b_data_inicioMin' => null, 'b_data_inicioMax' => null, 'b_url' => null, 'b_urlLike' => null);
 			
 		$sql = "select * from tb_promocoes ";
 
-		if(!is_null($filtro) && $filtro != "")
+		if(!empty($filtro))
 		{
 			if(!is_null($filtro['b_data_expiraMin']) && !is_null($filtro['b_data_expiraMax']))
 			{
@@ -298,65 +307,30 @@ class Banner
 				$filtro['b_data_inicioMax'] = str_replace("00:00:00","",formata_data_ts($filtro['b_data_inicioMax'],2,false,false));
 			}
 			
-			$sql .= " where 1=1";
-			
-			$sql .= " and (" . (is_null($filtro['b_id'])?1:0);
-			$sql .= "=1 or b_id = " . SQLaddFields($filtro['b_id'], "") . ")";
-			
-			$sql .= " and (" . (is_null($filtro['b_nome'])?1:0);
-			$sql .= "=1 or upper(b_nome) = '" . SQLaddFields($filtro['b_nome'], "r") . "')";
-			
-			$sql .= " and (" . (is_null($filtro['b_nomeLike'])?1:0);
-			$sql .= "=1 or upper(b_nome) like '%" . SQLaddFields($filtro['b_nomeLike'], "r") . "%')";
-			
-			$sql .= " and (" . (is_null($filtro['b_conteudo'])?1:0);
-			$sql .= "=1 or b_conteudo = " . SQLaddFields($filtro['b_conteudo'], "") . ")";
-			
-			$sql .= " and (" . (is_null($filtro['b_tipo'])?1:0);
-			$sql .= "=1 ";
-			if ($filtro["b_tipo"] == 3)	
-			{
-				$sql .= "or b_tipo = " . SQLaddFields('1', "") . "";
-				$sql .= " or b_tipo = " . SQLaddFields('2', "") . ")";
+			$where = array();
+			if(!is_null($filtro['b_id'])) $where[] = "b_id = " . $this->addParam($params, $filtro['b_id']);
+			if(!is_null($filtro['b_nome'])) $where[] = "upper(b_nome) = " . $this->addParam($params, $filtro['b_nome']);
+			if(!is_null($filtro['b_nomeLike'])) $where[] = "upper(b_nome) like " . $this->addParam($params, '%' . $filtro['b_nomeLike'] . '%');
+			if(!is_null($filtro['b_conteudo'])) $where[] = "b_conteudo = " . $this->addParam($params, $filtro['b_conteudo']);
+			if(!is_null($filtro['b_tipo'])) {
+				if ($filtro['b_tipo'] == 3) $where[] = "b_tipo in (1, 2)";
+				else if ($filtro['b_tipo'] == 4) $where[] = "b_tipo in (0, 2)";
+				else $where[] = "b_tipo = " . $this->addParam($params, $filtro['b_tipo']);
 			}
-			else if ($filtro["b_tipo"] == 4)	
-			{
-				$sql .= "or b_tipo = " . SQLaddFields('0', "") . "";
-				$sql .= " or b_tipo = " . SQLaddFields('2', "") . ")";
-			}
-			else
-				$sql .= "or b_tipo = " . SQLaddFields($filtro['b_tipo'], "") . ")";
-			
-			$sql .= " and (" . (is_null($filtro['b_status'])?1:0);
-			$sql .= "=1 or b_ativo = " . SQLaddFields( (($filtro['b_status']==1)?1:0), "") . ")";			
-			
-			$sql .= " and (" . (is_null($filtro['b_titulo'])?1:0);
-			$sql .= "=1 or b_titulo = '" . SQLaddFields($filtro['b_titulo'], "r") . "')";
-			$sql .= " and (" . (is_null($filtro['b_tituloLike'])?1:0);
-			$sql .= "=1 or upper(b_titulo) like '%" . SQLaddFields($filtro['b_tituloLike'], "r") . "%')";
-			
-			$sql .= " and (" . (is_null($filtro['b_data_hoje'])?1:0);
-			$sql .= "=1 or b_data_expira >= '" . SQLaddFields($filtro['b_data_hoje'], "r") . "' and b_data_inicio <= '" . SQLaddFields($filtro['b_data_hoje'], "") . "')";
-			
-			$sql .= " and (" . (is_null($filtro['b_data_expiraMin']) || is_null($filtro['b_data_expiraMax'])?1:0);
-			$sql .= "=1 or b_data_expira between '" . SQLaddFields($filtro['b_data_expiraMin'], "") . "' and '" . SQLaddFields($filtro['b_data_expiraMax'], "") . "')";
-			
-			$sql .= " and (" . (is_null($filtro['b_data_inicioMin']) || is_null($filtro['b_data_inicioMax'])?1:0);
-			$sql .= "=1 or b_data_inicio between '" . SQLaddFields($filtro['b_data_inicioMin'], "") . "' and '" . SQLaddFields($filtro['b_data_inicioMax'], "") . "')";
-			
-			$sql .= " and (" . (is_null($filtro['b_url'])?1:0);
-			$sql .= "=1 or b_url = '" . SQLaddFields($filtro['b_url'], "r") . "')";
-			$sql .= " and (" . (is_null($filtro['b_urlLike'])?1:0);
-			$sql .= "=1 or upper(b_url) like '%" . SQLaddFields($filtro['b_urlLike'], "r") . "%')";
+			if(!is_null($filtro['b_status'])) $where[] = "b_ativo = " . $this->addParam($params, (($filtro['b_status']==1)?1:0));
+			if(!is_null($filtro['b_titulo'])) $where[] = "b_titulo = " . $this->addParam($params, $filtro['b_titulo']);
+			if(!is_null($filtro['b_tituloLike'])) $where[] = "upper(b_titulo) like " . $this->addParam($params, '%' . $filtro['b_tituloLike'] . '%');
+			if(!is_null($filtro['b_data_hoje'])) $where[] = "(b_data_expira >= " . $this->addParam($params, $filtro['b_data_hoje']) . " and b_data_inicio <= " . $this->addParam($params, $filtro['b_data_hoje']) . ")";
+			if(!is_null($filtro['b_data_expiraMin']) && !is_null($filtro['b_data_expiraMax'])) $where[] = "b_data_expira between " . $this->addParam($params, $filtro['b_data_expiraMin']) . " and " . $this->addParam($params, $filtro['b_data_expiraMax']);
+			if(!is_null($filtro['b_data_inicioMin']) && !is_null($filtro['b_data_inicioMax'])) $where[] = "b_data_inicio between " . $this->addParam($params, $filtro['b_data_inicioMin']) . " and " . $this->addParam($params, $filtro['b_data_inicioMax']);
+			if(!is_null($filtro['b_url'])) $where[] = "b_url = " . $this->addParam($params, $filtro['b_url']);
+			if(!is_null($filtro['b_urlLike'])) $where[] = "upper(b_url) like " . $this->addParam($params, '%' . $filtro['b_urlLike'] . '%');
+			if (count($where)) $sql .= " where " . implode(" and ", $where);
 		}
 		
-		$sql = str_replace("'null'","null",$sql);
-		$sql = str_replace("'NULL'","NULL",$sql);
-		
-		if(!is_null($orderBy))
-			$sql .= " order by " . $orderBy;
-//echo "<!-- $sql -->";
-		$rs = SQLexecuteQuery($sql);
+		$order = $this->orderByBanner($orderBy);
+		if($order) $sql .= " order by " . $order;
+		$rs = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		if(!$rs) $ret = "Erro ao obter banner(s).\n";
 
 		return $ret;

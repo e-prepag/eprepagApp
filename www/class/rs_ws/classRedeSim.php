@@ -1103,8 +1103,8 @@ echo "$key => $val (R$ ".$resultReq_SegurosAction['ItemValor']->string[$key].", 
 		do{
 			$vg_id = rand(1, 1e7-1);
 
-			$sql = "select * from tb_recarga_pedidos_rede_sim where rprs_vg_id = $vg_id order by rprs_data_inclusao desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select * from tb_recarga_pedidos_rede_sim where rprs_vg_id = $1 order by rprs_data_inclusao desc limit 1";
+			$rs = SQLexecuteQueryParams($sql, array($vg_id));
 			if(!$rs || pg_num_rows($rs) == 0) {
 				$b_unique = true;
 				break;
@@ -1127,8 +1127,9 @@ echo "$key => $val (R$ ".$resultReq_SegurosAction['ItemValor']->string[$key].", 
 			$ug_id = 0;
 		}
 		$sql = "INSERT INTO tb_recarga_pedidos_rede_sim ( rprs_data_inclusao,  rprs_tipo,  rprs_vg_id,  rprs_codigooperadora,  rprs_codigorede,  rprs_codigoproduto,  rprs_numerocelular,  rprs_valor, rprs_ug_id, rprs_email, rprs_nir, rprs_comissao_total, rprs_comissao_para_repasse, rprs_label_operadora ) ";
-		$sql .= "VALUES (NOW(),'$tipo',$vg_id, '".$params['provider']."', '".$params['codigorede']."', '".$params['planId']."','".$params['numerocelular']."', ".$params['valor'].", $ug_id, '".$params['email']."', '".$params['nir']."', ".$this->get_Comissao_EPP(trim(strtoupper($params['labelProvider']))).", ".$this->get_Comissao_LAN(trim(strtoupper($params['labelProvider']))).", '".$params['labelProvider']."');";
-		$rs = SQLexecuteQuery($sql);
+		$sql .= "VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);";
+		$paramsSql = array($tipo, $vg_id, $params['provider'], $params['codigorede'], $params['planId'], $params['numerocelular'], $params['valor'], $ug_id, $params['email'], $params['nir'], $this->get_Comissao_EPP(trim(strtoupper($params['labelProvider']))), $this->get_Comissao_LAN(trim(strtoupper($params['labelProvider']))), $params['labelProvider']);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 	//if($this->bdebug) echo "SQL:[$sql]<br>";
                 if(!$rs) {
 			echo "Erro ao Salvar Recarga (256).";
@@ -1146,8 +1147,8 @@ echo "$key => $val (R$ ".$resultReq_SegurosAction['ItemValor']->string[$key].", 
 		do{
 			$vg_id = rand(1, 1e7-1);
 
-			$sql = "select * from tb_seguro_pedidos_rede_sim where sprs_vg_id = $vg_id order by sprs_data_inclusao desc limit 1";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select * from tb_seguro_pedidos_rede_sim where sprs_vg_id = $1 order by sprs_data_inclusao desc limit 1";
+			$rs = SQLexecuteQueryParams($sql, array($vg_id));
 			if(!$rs || pg_num_rows($rs) == 0) {
 				$b_unique = true;
 				break;
@@ -1171,8 +1172,9 @@ echo "$key => $val (R$ ".$resultReq_SegurosAction['ItemValor']->string[$key].", 
 			$ug_id = 0; 
 		}
 		$sql = "INSERT INTO tb_seguro_pedidos_rede_sim (sprs_data_inclusao, sprs_tipo, sprs_vg_id, sprs_codigoproduto, sprs_valor, sprs_contrato, sprs_ug_id, sprs_email, sprs_cpf) ";
-		$sql .= "VALUES (NOW(),'$tipo',$vg_id, '".$params['provider']."', ".$params['valor'].", '".$params['contrato']."', $ug_id, '".$params['email']."', '".$params['cpf']."');";
-		$rs = SQLexecuteQuery($sql);
+		$sql .= "VALUES (NOW(), $1, $2, $3, $4, $5, $6, $7, $8);";
+		$paramsSql = array($tipo, $vg_id, $params['provider'], $params['valor'], $params['contrato'], $ug_id, $params['email'], $params['cpf']);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		if(!$rs) {
 			echo "Erro ao Salvar Recarga (256).";
 			return false;

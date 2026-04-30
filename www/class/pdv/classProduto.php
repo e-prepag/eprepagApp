@@ -199,10 +199,60 @@ class Produto {
     	$this->ogp_inibi_lojas_online = $ogp_inibi_lojas_online;
     }
     
+
+	private function addParam(&$params, $value)
+	{
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private function addIdList(&$params, $list)
+	{
+		$ids = array_filter(array_map('trim', explode(',', (string) $list)), 'ctype_digit');
+		$placeholders = array();
+		foreach ($ids as $id) {
+			$placeholders[] = $this->addParam($params, (int) $id);
+		}
+		return $placeholders;
+	}
+
+	private function orderByProduto($orderBy)
+	{
+		if (is_null($orderBy) || trim((string) $orderBy) == '') return null;
+		$permitidos = array(
+			'ogp_id' => 'ogp_id', 'ogp.ogp_id' => 'ogp.ogp_id',
+			'ogp_nome' => 'ogp_nome', 'ogp.ogp_nome' => 'ogp.ogp_nome',
+			'ogp_descricao' => 'ogp_descricao', 'ogp.ogp_descricao' => 'ogp.ogp_descricao',
+			'ogp_descricao_api' => 'ogp_descricao_api', 'ogp.ogp_descricao_api' => 'ogp.ogp_descricao_api',
+			'ogp_ativo' => 'ogp_ativo', 'ogp.ogp_ativo' => 'ogp.ogp_ativo',
+			'ogp_nome_imagem' => 'ogp_nome_imagem', 'ogp.ogp_nome_imagem' => 'ogp.ogp_nome_imagem',
+			'ogp_data_inclusao' => 'ogp_data_inclusao', 'ogp.ogp_data_inclusao' => 'ogp.ogp_data_inclusao',
+			'ogp_opr_codigo' => 'ogp_opr_codigo', 'ogp.ogp_opr_codigo' => 'ogp.ogp_opr_codigo',
+			'ogp_mostra_integracao_gamer' => 'ogp_mostra_integracao_gamer', 'ogp.ogp_mostra_integracao_gamer' => 'ogp.ogp_mostra_integracao_gamer',
+			'ogp_ordem' => 'ogp_ordem', 'ogp.ogp_ordem' => 'ogp.ogp_ordem',
+			'ogp_iof' => 'ogp_iof', 'ogp.ogp_iof' => 'ogp.ogp_iof',
+			'ogp_inibi_lojas_online' => 'ogp_inibi_lojas_online', 'ogp.ogp_inibi_lojas_online' => 'ogp.ogp_inibi_lojas_online',
+			'ogp_pin_request' => 'ogp_pin_request', 'ogp.ogp_pin_request' => 'ogp.ogp_pin_request',
+			'ogp_comunicacao_cupom' => 'ogp_comunicacao_cupom', 'ogp.ogp_comunicacao_cupom' => 'ogp.ogp_comunicacao_cupom',
+			'ogp_valor_minimo' => 'ogp_valor_minimo', 'ogp.ogp_valor_minimo' => 'ogp.ogp_valor_minimo',
+			'ogp_valor_maximo' => 'ogp_valor_maximo', 'ogp.ogp_valor_maximo' => 'ogp.ogp_valor_maximo',
+			'ogp_idade_minima' => 'ogp_idade_minima', 'ogp.ogp_idade_minima' => 'ogp.ogp_idade_minima',
+			'opr_nome_loja' => 'opr_nome_loja', 'ope.opr_nome_loja' => 'ope.opr_nome_loja'
+		);
+		$partes = array();
+		foreach (explode(',', $orderBy) as $parte) {
+			$tokens = preg_split('/\s+/', trim($parte));
+			$coluna = strtolower($tokens[0] ?? '');
+			$direcao = strtoupper($tokens[1] ?? 'ASC');
+			if (!isset($permitidos[$coluna]) || !in_array($direcao, array('ASC', 'DESC'))) return null;
+			$partes[] = $permitidos[$coluna] . ' ' . $direcao;
+		}
+		return count($partes) ? implode(', ', $partes) : null;
+	}
+
 	function reordenar($cont) {
 		if(is_null($cont))
 		{
-			//Ativos
 			$sql = "select ogp_id from tb_dist_operadora_games_produto where ogp_ativo = 1 order by ogp_nome ASC";
 			$sql_ordenar = SQLexecuteQuery($sql);
 			$cont = 0;
@@ -210,21 +260,19 @@ class Produto {
 			if ((($sql_ordenar) ? pg_num_rows($sql_ordenar) : 0) != 0)
 				while($codigo = pg_fetch_array($sql_ordenar))
 				{
-					SQLexecuteQuery("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
+					SQLexecuteQueryParams("update tb_dist_operadora_games_produto set ogp_ordem = $1 where ogp_id = $2", array($cont, $codigo["ogp_id"]));
 					$cont++;
 				}
 		}
 		
-		//Inativos
 		$sql = "select ogp_id from tb_dist_operadora_games_produto where ogp_ativo <> 1 order by ogp_nome ASC";
-//echo "sql: $sql<br>";
 		$sql_ordenar_inat = SQLexecuteQuery($sql);
 		$cont = is_null($cont) ? pg_num_rows($sql_ordenar) : $cont;
 		
 		if ((($sql_ordenar_inat) ? pg_num_rows($sql_ordenar_inat) : 0) != 0)
 			while($codigo = pg_fetch_array($sql_ordenar_inat))
 			{
-				SQLexecuteQuery("update tb_dist_operadora_games_produto set ogp_ordem = " . $cont . " where ogp_id = " . $codigo["ogp_id"] . "");
+				SQLexecuteQueryParams("update tb_dist_operadora_games_produto set ogp_ordem = $1 where ogp_id = $2", array($cont, $codigo["ogp_id"]));
 				$cont++;
 			}
 	}
@@ -234,34 +282,15 @@ class Produto {
  		$ret = Produto::validarCampos($objProduto);
  
  		if($ret == ""){
- 			$sql = "insert into tb_dist_operadora_games_produto(" .
- 					"ogp_nome, ogp_descricao, ogp_ativo, " .
- 					"ogp_nome_imagem, ogp_data_inclusao, ogp_opr_codigo, " .
- 				 	"ogp_mostra_integracao_gamer, ogp_ordem, ogp_iof, ogp_inibi_lojas_online, " .
- 				 	"ogp_pin_request,ogp_valor_minimo, ogp_valor_maximo, ogp_idade_minima".
- 				 	") values (";
- 			$sql .= SQLaddFields($objProduto->getNome(), "s") . ",";
- 			$sql .= SQLaddFields($objProduto->getDescricao(), "s") . ",";
- 			$sql .= SQLaddFields($objProduto->getAtivo(), "") . ",";
- 			$sql .= SQLaddFields($objProduto->getNomeImagem(), "s") . ",";
- 			$sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
- 			$sql .= SQLaddFields($objProduto->getOprCodigo(), "") . ",";
-			$sql .= SQLaddFields($objProduto->getMostraIntegracao(), "") . ",";
-
-			// Adiciona numero total de registros na tabela (diferencia ativo/inativo)
 			if ($objProduto->getAtivo() != 1)
 				$sql_ordem = SQLexecuteQuery("select count(*) as total from tb_dist_operadora_games_produto");
 			else
 				$sql_ordem = SQLexecuteQuery("select count(ogp_id) as total from tb_dist_operadora_games_produto where ogp_ativo = 1");
 			$total_ordem = pg_fetch_result($sql_ordem,0,0);
-			$sql .= SQLaddFields($total_ordem, "") . ",";
-			$sql .= SQLaddFields($objProduto->getIOF(), "") . ",";
-			$sql .= SQLaddFields($objProduto->getInibiLojasOnline(), "") . ",";
-			$sql .= SQLaddFields($objProduto->getPinRequest(), "") . ",";
-                        $sql .= SQLaddFields($objProduto->getValorMinimo(), "") . ",";
-                        $sql .= SQLaddFields($objProduto->getValorMaximo(), "") . ",";
-			$sql .= SQLaddFields($objProduto->getIdadeMinima(), "") . ");";
-			$ret = SQLexecuteQuery($sql);
+
+ 			$sql = "insert into tb_dist_operadora_games_produto(ogp_nome, ogp_descricao, ogp_ativo, ogp_nome_imagem, ogp_data_inclusao, ogp_opr_codigo, ogp_mostra_integracao_gamer, ogp_ordem, ogp_iof, ogp_inibi_lojas_online, ogp_pin_request, ogp_valor_minimo, ogp_valor_maximo, ogp_idade_minima) values ($1, $2, $3, $4, CURRENT_TIMESTAMP, $5, $6, $7, $8, $9, $10, $11, $12, $13);";
+			$params = array($objProduto->getNome(), $objProduto->getDescricao(), $objProduto->getAtivo(), $objProduto->getNomeImagem(), $objProduto->getOprCodigo(), $objProduto->getMostraIntegracao(), $total_ordem, $objProduto->getIOF(), $objProduto->getInibiLojasOnline(), $objProduto->getPinRequest(), $objProduto->getValorMinimo(), $objProduto->getValorMaximo(), $objProduto->getIdadeMinima());
+			$ret = SQLexecuteQueryParams($sql, $params);
 			if(!$ret) $ret = "Erro ao inserir produto.\n";
 			else{
 				$ret = "";
@@ -270,12 +299,10 @@ class Produto {
 				if($rs_id && pg_num_rows($rs_id) > 0){
 					$rs_id_row = pg_fetch_array($rs_id);
 					$objProduto->setId($rs_id_row['last_id']);
-				}					
+				}
 
-				// Se for ativo -> reordena
 				if ($objProduto->getAtivo() == 1) $objProduto->reordenar($total_ordem + 1);
-
-			}			
+			}
  		}
 		
  		return $ret;   	
@@ -286,23 +313,25 @@ class Produto {
  		$ret = $this->validarCampos($objProduto);
  
  		if($ret == ""){
- 			$sql = "update tb_dist_operadora_games_produto set ";
- 			if(!is_null($objProduto->getNome())) 			$sql .= " ogp_nome = " 			. SQLaddFields($objProduto->getNome(), "s")		. ",";
- 			if(!is_null($objProduto->getDescricao())) 		$sql .= " ogp_descricao = "		. SQLaddFields($objProduto->getDescricao(), "s")	. ",";
-			if(!is_null($objProduto->getDescricaoApi()))	$sql .= "ogp_descricao_api = " . SQLaddFields($objProduto->getDescricaoApi(), "s")	. ",";
- 			if(!is_null($objProduto->getAtivo())) 			$sql .= " ogp_ativo = " 		. SQLaddFields($objProduto->getAtivo(), "")		. ",";
- 			if(!is_null($objProduto->getNomeImagem())) 		$sql .= " ogp_nome_imagem = "		. SQLaddFields($objProduto->getNomeImagem(), "s")	. ",";
- 			if(!is_null($objProduto->getMostraIntegracao()))        $sql .= " ogp_mostra_integracao_gamer = ".SQLaddFields($objProduto->getMostraIntegracao(), "")	. ",";
-			if(!is_null($objProduto->getOprCodigo())) 		$sql .= " ogp_opr_codigo = "		. SQLaddFields($objProduto->getOprCodigo(), "")		. ", ";
-			if(!is_null($objProduto->getIOF())) 			$sql .= " ogp_iof = "			. SQLaddFields($objProduto->getIOF(), "")               . ",";
-			if(!is_null($objProduto->getInibiLojasOnline())) 	$sql .= " ogp_inibi_lojas_online = "	. SQLaddFields($objProduto->getInibiLojasOnline(), "")  . ",";
-			if(!is_null($objProduto->getPinRequest())) 		$sql .= " ogp_pin_request = "		. SQLaddFields($objProduto->getPinRequest(), "")  	. ", ";
-                        if(!is_null($objProduto->getComunicacaoCupom())) 	$sql .= " ogp_comunicacao_cupom = "	. SQLaddFields(trim($objProduto->getComunicacaoCupom()), "s")  	. ", ";
-			$sql .= " ogp_valor_minimo = "		. SQLaddFields($objProduto->getValorMinimo(), "")  	. ",";
-			$sql .= " ogp_valor_maximo = "		. SQLaddFields($objProduto->getValorMaximo(), "")  	. ",";
-                        if(!is_null($objProduto->getIdadeMinima()))             $sql .= " ogp_idade_minima = "		. SQLaddFields($objProduto->getIdadeMinima(), "")  	. "";
-                        $sql .= " where ogp_id = " . SQLaddFields($objProduto->getId(), "");
-			$ret = SQLexecuteQuery($sql);
+			$params = array();
+			$sets = array();
+			if(!is_null($objProduto->getNome())) $sets[] = "ogp_nome = " . $this->addParam($params, $objProduto->getNome());
+			if(!is_null($objProduto->getDescricao())) $sets[] = "ogp_descricao = " . $this->addParam($params, $objProduto->getDescricao());
+			if(!is_null($objProduto->getDescricaoApi())) $sets[] = "ogp_descricao_api = " . $this->addParam($params, $objProduto->getDescricaoApi());
+			if(!is_null($objProduto->getAtivo())) $sets[] = "ogp_ativo = " . $this->addParam($params, $objProduto->getAtivo());
+			if(!is_null($objProduto->getNomeImagem())) $sets[] = "ogp_nome_imagem = " . $this->addParam($params, $objProduto->getNomeImagem());
+			if(!is_null($objProduto->getMostraIntegracao())) $sets[] = "ogp_mostra_integracao_gamer = " . $this->addParam($params, $objProduto->getMostraIntegracao());
+			if(!is_null($objProduto->getOprCodigo())) $sets[] = "ogp_opr_codigo = " . $this->addParam($params, $objProduto->getOprCodigo());
+			if(!is_null($objProduto->getIOF())) $sets[] = "ogp_iof = " . $this->addParam($params, $objProduto->getIOF());
+			if(!is_null($objProduto->getInibiLojasOnline())) $sets[] = "ogp_inibi_lojas_online = " . $this->addParam($params, $objProduto->getInibiLojasOnline());
+			if(!is_null($objProduto->getPinRequest())) $sets[] = "ogp_pin_request = " . $this->addParam($params, $objProduto->getPinRequest());
+			if(!is_null($objProduto->getComunicacaoCupom())) $sets[] = "ogp_comunicacao_cupom = " . $this->addParam($params, trim($objProduto->getComunicacaoCupom()));
+			$sets[] = "ogp_valor_minimo = " . $this->addParam($params, $objProduto->getValorMinimo());
+			$sets[] = "ogp_valor_maximo = " . $this->addParam($params, $objProduto->getValorMaximo());
+			if(!is_null($objProduto->getIdadeMinima())) $sets[] = "ogp_idade_minima = " . $this->addParam($params, $objProduto->getIdadeMinima());
+			$sql = "update tb_dist_operadora_games_produto set " . implode(", ", $sets);
+			$sql .= " where ogp_id = " . $this->addParam($params, $objProduto->getId());
+			$ret = SQLexecuteQueryParams($sql, $params);
 			if(!$ret) $ret = "Erro ao atualizar produto.\n";
 			else $ret = "";
  		}
@@ -347,7 +376,8 @@ class Produto {
 	function obter($filtro, $orderBy, &$rs){
 
 		$ret = "";
-		$filtro = array_map("strtoupper", $filtro);
+		$params = array();
+		$filtro = is_array($filtro) ? array_map("strtoupper", $filtro) : array();
 		$filtro += array(
 			"opr" => null,
 			"opr_status" => null,
@@ -372,83 +402,48 @@ class Produto {
 	
 		$sql = "select * from tb_dist_operadora_games_produto ogp ";
 
-		if(!is_null($filtro) && $filtro != ""){
-		
-			if(!is_null($filtro['opr']))
-				$sql .= " inner join operadoras ope on ope.opr_codigo = ogp.ogp_opr_codigo";
-
+		if(!empty($filtro)){
+			if(!is_null($filtro['opr'])) $sql .= " inner join operadoras ope on ope.opr_codigo = ogp.ogp_opr_codigo";
 
 			if(!is_null($filtro['ogp_data_inclusaoMin']) && !is_null($filtro['ogp_data_inclusaoMax'])){
 				$filtro['ogp_data_inclusaoMin'] = formata_data_ts($filtro['ogp_data_inclusaoMin'] . " 00:00:00", 1, true, true);
 				$filtro['ogp_data_inclusaoMax'] = formata_data_ts($filtro['ogp_data_inclusaoMax'] . " 23:59:59", 1, true, true);
-			}			
-
-			$sql .= " where 1=1";
-			
-			if(!is_null($filtro['opr_status'])) $sql .= " and ope.opr_status = '" . $filtro['opr_status'] . "' ";
-
-			$sql .= " and (" . (is_null($filtro['ogp_id'])?1:0);
-			$sql .= "=1 or ogp.ogp_id = " . SQLaddFields($filtro['ogp_id'], "") . ")";
-			
-			$sql .= " and (" . (is_null($filtro['ogp_id_lista'])?1:0);
-			$sql .= "=1 or ogp.ogp_id in (" . SQLaddFields($filtro['ogp_id_lista'], "") . "))";
-			
-			$sql .= " and (" . (is_null($filtro['ogp_nome'])?1:0);
-			$sql .= "=1 or upper(ogp.ogp_nome) = '" . SQLaddFields($filtro['ogp_nome'], "r") . "')";
-			
-			$sql .= " and (" . (is_null($filtro['ogp_nomeLike'])?1:0);
-			$sql .= "=1 or upper(ogp.ogp_nome) like '%" . SQLaddFields($filtro['ogp_nomeLike'], "r") . "%')";
-			
-			$sql .= " and (" . (is_null($filtro['ogp_descricao'])?1:0);
-			$sql .= "=1 or upper(ogp.ogp_descricao) = '" . SQLaddFields($filtro['ogp_descricao'], "r") . "')";
-			
-			$sql .= " and (" . (is_null($filtro['ogp_descricaoLike'])?1:0);
-			$sql .= "=1 or upper(ogp.ogp_descricao) like '%" . SQLaddFields($filtro['ogp_descricaoLike'], "r") . "%')";
-			
-
-			if($filtro['ogp_mostra_integracao_gamer_com_loja']) {
-				$sql .= " and (0";
-				$sql .= "=1 or ((ogp.ogp_ativo = 1) or (ogp_mostra_integracao_gamer = ".$filtro['ogp_mostra_integracao_gamer_com_loja']." and ogp.ogp_ativo = 0) )) \n";
-			} else {
-			$sql .= " and (" . (is_null($filtro['ogp_ativo'])?1:0);
-				$sql .= "=1 or ogp.ogp_ativo = " . SQLaddFields($filtro['ogp_ativo'], "") . ") \n";
-			
-				$sql .= " and (" . (is_null($filtro['ogp_mostra_integracao_gamer'])?1:0);
-				$sql .= "=1 or ogp.ogp_mostra_integracao_gamer = " . SQLaddFields($filtro['ogp_mostra_integracao_gamer'], "") . ") \n";
 			}
 
+			$sql .= " where 1=1";
+			if(!is_null($filtro['opr_status'])) $sql .= " and ope.opr_status = " . $this->addParam($params, $filtro['opr_status']) . " ";
+			if(!is_null($filtro['ogp_id'])) $sql .= " and ogp.ogp_id = " . $this->addParam($params, $filtro['ogp_id']);
+			if(!is_null($filtro['ogp_id_lista'])) {
+				$ids = $this->addIdList($params, $filtro['ogp_id_lista']);
+				$sql .= count($ids) ? " and ogp.ogp_id in (" . implode(', ', $ids) . ")" : " and 1=0";
+			}
+			if(!is_null($filtro['ogp_nome'])) $sql .= " and upper(ogp.ogp_nome) = " . $this->addParam($params, $filtro['ogp_nome']);
+			if(!is_null($filtro['ogp_nomeLike'])) $sql .= " and upper(ogp.ogp_nome) like " . $this->addParam($params, '%' . $filtro['ogp_nomeLike'] . '%');
+			if(!is_null($filtro['ogp_descricao'])) $sql .= " and upper(ogp.ogp_descricao) = " . $this->addParam($params, $filtro['ogp_descricao']);
+			if(!is_null($filtro['ogp_descricaoLike'])) $sql .= " and upper(ogp.ogp_descricao) like " . $this->addParam($params, '%' . $filtro['ogp_descricaoLike'] . '%');
 
-			
-			$sql .= " and (" . (is_null($filtro['ogp_nome_imagem'])?1:0);
-			$sql .= "=1 or upper(ogp.ogp_nome_imagem) = '" . SQLaddFields($filtro['ogp_nome_imagem'], "r") . "')";
+			if($filtro['ogp_mostra_integracao_gamer_com_loja']) {
+				$sql .= " and ((ogp.ogp_ativo = 1) or (ogp_mostra_integracao_gamer = " . $this->addParam($params, $filtro['ogp_mostra_integracao_gamer_com_loja']) . " and ogp.ogp_ativo = 0)) ";
+			} else {
+				if(!is_null($filtro['ogp_ativo'])) $sql .= " and ogp.ogp_ativo = " . $this->addParam($params, $filtro['ogp_ativo']);
+				if(!is_null($filtro['ogp_mostra_integracao_gamer'])) $sql .= " and ogp.ogp_mostra_integracao_gamer = " . $this->addParam($params, $filtro['ogp_mostra_integracao_gamer']);
+			}
 
-			$sql .= " and (" . (is_null($filtro['ogp_nome_imagemLike'])?1:0);
-			$sql .= "=1 or upper(ogp.ogp_nome_imagem) like '%" . SQLaddFields($filtro['ogp_nome_imagemLike'], "r") . "%')";
-
-			$sql .= " and (" . (is_null($filtro['ogp_data_inclusaoMin']) || is_null($filtro['ogp_data_inclusaoMax'])?1:0);
-			$sql .= "=1 or ogp.ogp_data_inclusao between " . SQLaddFields($filtro['ogp_data_inclusaoMin'], "") . " and " . SQLaddFields($filtro['ogp_data_inclusaoMax'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ogp_opr_codigo'])?1:0);
-			$sql .= "=1 or ogp.ogp_opr_codigo = " . SQLaddFields($filtro['ogp_opr_codigo'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ogp_codigo_negado'])?1:0);
-			$sql .= "=1 or ogp.ogp_id <> " . SQLaddFields($filtro['ogp_codigo_negado'], "") . ")";
-
-			$sql .= " and (" . (is_null($filtro['ogp_codigo_negado_2'])?1:0);
-			$sql .= "=1 or ogp.ogp_id not in (" . SQLaddFields($filtro['ogp_codigo_negado_2'], "") . ") )";
+			if(!is_null($filtro['ogp_nome_imagem'])) $sql .= " and upper(ogp.ogp_nome_imagem) = " . $this->addParam($params, $filtro['ogp_nome_imagem']);
+			if(!is_null($filtro['ogp_nome_imagemLike'])) $sql .= " and upper(ogp.ogp_nome_imagem) like " . $this->addParam($params, '%' . $filtro['ogp_nome_imagemLike'] . '%');
+			if(!is_null($filtro['ogp_data_inclusaoMin']) && !is_null($filtro['ogp_data_inclusaoMax'])) $sql .= " and ogp.ogp_data_inclusao between " . $this->addParam($params, $filtro['ogp_data_inclusaoMin']) . " and " . $this->addParam($params, $filtro['ogp_data_inclusaoMax']);
+			if(!is_null($filtro['ogp_opr_codigo'])) $sql .= " and ogp.ogp_opr_codigo = " . $this->addParam($params, $filtro['ogp_opr_codigo']);
+			if(!is_null($filtro['ogp_codigo_negado'])) $sql .= " and ogp.ogp_id <> " . $this->addParam($params, $filtro['ogp_codigo_negado']);
+			if(!is_null($filtro['ogp_codigo_negado_2'])) {
+				$ids = $this->addIdList($params, $filtro['ogp_codigo_negado_2']);
+				if (count($ids)) $sql .= " and ogp.ogp_id not in (" . implode(', ', $ids) . ")";
+			}
 		}
 		
-		if(!is_null($orderBy)) 
-			$sql .= " order by " . $orderBy;
-		else
-			$sql .= " order by ogp_ordem ASC";
-		
-//echo "<!-- $sql\n -->";
+		$order = $this->orderByProduto($orderBy);
+		$sql .= $order ? " order by " . $order : " order by ogp_ordem ASC";
 
-//echo $sql."<br>\n";
-//die();
-
-		$rs = SQLexecuteQuery($sql);
+		$rs = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		if(!$rs) $ret = "Erro ao obter produto(s).\n";
 
 		return $ret;
@@ -458,7 +453,8 @@ class Produto {
 	function obterMelhorado($filtro, $orderBy, &$rs){
 
 		$ret = "";
-		$filtro = array_map("strtoupper", $filtro);
+		$params = array();
+		$filtro = is_array($filtro) ? array_map("strtoupper", $filtro) : array();
 		$filtro += array(
 			"opr" => null,
 			"opr_status" => null,
@@ -481,81 +477,59 @@ class Produto {
 			"ogp_inibi_lojas_online" => null,
 		);
 		
-                $sql = "select ogp_id, ogp_nome,ogp_descricao, ogp_descricao_api ,ogp_ativo,ogp_nome_imagem,ogp_data_inclusao,ogp_opr_codigo, ogp_mostra_integracao_gamer, ogp_iof, ogp_inibi_lojas_online, ogp_pin_request, ogp_comunicacao_cupom, ogp_valor_minimo, ogp_valor_maximo, ogp_idade_minima ";
-                
-                if(!is_null($filtro['opr']))
-                {
-                    $sql .= ", ope.opr_nome_loja  "; //isso mudará
-                }
-                                    
-                $sql .= "from tb_dist_operadora_games_produto ogp ";
-                
-		if(!is_null($filtro) && $filtro != ""){
+		$sql = "select ogp_id, ogp_nome,ogp_descricao, ogp_descricao_api ,ogp_ativo,ogp_nome_imagem,ogp_data_inclusao,ogp_opr_codigo, ogp_mostra_integracao_gamer, ogp_iof, ogp_inibi_lojas_online, ogp_pin_request, ogp_comunicacao_cupom, ogp_valor_minimo, ogp_valor_maximo, ogp_idade_minima ";
+		if(!is_null($filtro['opr'])) $sql .= ", ope.opr_nome_loja  ";
+		$sql .= "from tb_dist_operadora_games_produto ogp ";
 		
-			if(!is_null($filtro['opr']))
-				$sql .= " inner join operadoras ope on ope.opr_codigo = ogp.ogp_opr_codigo";
-
+		if(!empty($filtro)){
+			if(!is_null($filtro['opr'])) $sql .= " inner join operadoras ope on ope.opr_codigo = ogp.ogp_opr_codigo";
 
 			if(!is_null($filtro['ogp_data_inclusaoMin']) && !is_null($filtro['ogp_data_inclusaoMax'])){
 				$filtro['ogp_data_inclusaoMin'] = formata_data_ts($filtro['ogp_data_inclusaoMin'] . " 00:00:00", 2, true, true);
 				$filtro['ogp_data_inclusaoMax'] = formata_data_ts($filtro['ogp_data_inclusaoMax'] . " 23:59:59", 2, true, true);
-			}			
-
-			$sql .= " where 1=1";
-			
-			if(!is_null($filtro['opr_status'])) $sql .= " and ope.opr_status = '" . $filtro['opr_status'] . "' ";
-
-			if(!is_null($filtro['ogp_id'])) $sql .= " and ogp.ogp_id = " . SQLaddFields($filtro['ogp_id'], "") . " ";
-
-			if(!is_null($filtro['ogp_id_lista'])) $sql .= " and ogp.ogp_id in (" . SQLaddFields($filtro['ogp_id_lista'], "") . ") ";
-
-			if(!is_null($filtro['ogp_nome'])) $sql .= " and upper(ogp.ogp_nome) = '" . SQLaddFields($filtro['ogp_nome'], "r") . "' ";
-
-			if(!is_null($filtro['ogp_nomeLike'])) $sql .= " and upper(ogp.ogp_nome) like '%" . SQLaddFields($filtro['ogp_nomeLike'], "r") . "%' ";
-
-			if(!is_null($filtro['ogp_nome'])) $sql .= " and upper(ogp.ogp_nome) = '" . SQLaddFields($filtro['ogp_nome'], "r") . "' ";
-
-			if(!is_null($filtro['ogp_descricao'])) $sql .= " and upper(ogp.ogp_descricao) = '" . SQLaddFields($filtro['ogp_descricao'], "r") . "' ";
-
-			if(!is_null($filtro['ogp_descricaoLike'])) $sql .= " and upper(ogp.ogp_descricao) like '%" . SQLaddFields($filtro['ogp_descricaoLike'], "r") . "%' ";
-
-			if($filtro['ogp_mostra_integracao_gamer_com_loja']) {
-				$sql .= " and ((ogp.ogp_ativo = 1) or (ogp_mostra_integracao_gamer = ".$filtro['ogp_mostra_integracao_gamer_com_loja']." and ogp.ogp_ativo = 0) ) \n";
-			} else {
-                                $sql .= " and (" . (is_null($filtro['ogp_ativo'])?1:0);
-				$sql .= "=1 or ogp.ogp_ativo = " . SQLaddFields($filtro['ogp_ativo'], "") . ") \n";
-			
-				$sql .= " and (" . (is_null($filtro['ogp_mostra_integracao_gamer'])?1:0);
-				$sql .= "=1 or ogp.ogp_mostra_integracao_gamer = " . SQLaddFields($filtro['ogp_mostra_integracao_gamer'], "") . ") \n";
 			}
 
-			if(!is_null($filtro['ogp_nome_imagem'])) $sql .= " and upper(ogp.ogp_nome_imagem) = '" . SQLaddFields($filtro['ogp_nome_imagem'], "r") . "' ";
+			$sql .= " where 1=1";
+			if(!is_null($filtro['opr_status'])) $sql .= " and ope.opr_status = " . $this->addParam($params, $filtro['opr_status']) . " ";
+			if(!is_null($filtro['ogp_id'])) $sql .= " and ogp.ogp_id = " . $this->addParam($params, $filtro['ogp_id']) . " ";
+			if(!is_null($filtro['ogp_id_lista'])) {
+				$ids = $this->addIdList($params, $filtro['ogp_id_lista']);
+				$sql .= count($ids) ? " and ogp.ogp_id in (" . implode(', ', $ids) . ") " : " and 1=0 ";
+			}
+			if(!is_null($filtro['ogp_nome'])) $sql .= " and upper(ogp.ogp_nome) = " . $this->addParam($params, $filtro['ogp_nome']) . " ";
+			if(!is_null($filtro['ogp_nomeLike'])) $sql .= " and upper(ogp.ogp_nome) like " . $this->addParam($params, '%' . $filtro['ogp_nomeLike'] . '%') . " ";
+			if(!is_null($filtro['ogp_nome'])) $sql .= " and upper(ogp.ogp_nome) = " . $this->addParam($params, $filtro['ogp_nome']) . " ";
+			if(!is_null($filtro['ogp_descricao'])) $sql .= " and upper(ogp.ogp_descricao) = " . $this->addParam($params, $filtro['ogp_descricao']) . " ";
+			if(!is_null($filtro['ogp_descricaoLike'])) $sql .= " and upper(ogp.ogp_descricao) like " . $this->addParam($params, '%' . $filtro['ogp_descricaoLike'] . '%') . " ";
 
-			if(!is_null($filtro['ogp_nome_imagemLike'])) $sql .= " and upper(ogp.ogp_nome_imagem) like '%" . SQLaddFields($filtro['ogp_nome_imagemLike'], "r") . "%' ";
+			if($filtro['ogp_mostra_integracao_gamer_com_loja']) {
+				$sql .= " and ((ogp.ogp_ativo = 1) or (ogp_mostra_integracao_gamer = " . $this->addParam($params, $filtro['ogp_mostra_integracao_gamer_com_loja']) . " and ogp.ogp_ativo = 0) ) ";
+			} else {
+				if(!is_null($filtro['ogp_ativo'])) $sql .= " and ogp.ogp_ativo = " . $this->addParam($params, $filtro['ogp_ativo']) . " ";
+				if(!is_null($filtro['ogp_mostra_integracao_gamer'])) $sql .= " and ogp.ogp_mostra_integracao_gamer = " . $this->addParam($params, $filtro['ogp_mostra_integracao_gamer']) . " ";
+			}
 
-			if(!is_null($filtro['ogp_data_inclusaoMin'])) $sql .= " and ogp.ogp_data_inclusao between " . SQLaddFields($filtro['ogp_data_inclusaoMin'], "s") . " and " . SQLaddFields($filtro['ogp_data_inclusaoMax'], "s") . " ";
-
-			if(!is_null($filtro['ogp_opr_codigo'])) $sql .= " and ogp.ogp_opr_codigo = " . SQLaddFields($filtro['ogp_opr_codigo'], "") . " ";
-
-			if(!is_null($filtro['ogp_codigo_negado'])) $sql .= " and ogp.ogp_id <> " . SQLaddFields($filtro['ogp_codigo_negado'], "") . " ";
-
-			if(!is_null($filtro['ogp_codigo_negado_2'])) $sql .= " and ogp.ogp_id not in (" . SQLaddFields($filtro['ogp_codigo_negado_2'], "") . ") ";
-
+			if(!is_null($filtro['ogp_nome_imagem'])) $sql .= " and upper(ogp.ogp_nome_imagem) = " . $this->addParam($params, $filtro['ogp_nome_imagem']) . " ";
+			if(!is_null($filtro['ogp_nome_imagemLike'])) $sql .= " and upper(ogp.ogp_nome_imagem) like " . $this->addParam($params, '%' . $filtro['ogp_nome_imagemLike'] . '%') . " ";
+			if(!is_null($filtro['ogp_data_inclusaoMin'])) $sql .= " and ogp.ogp_data_inclusao between " . $this->addParam($params, $filtro['ogp_data_inclusaoMin']) . " and " . $this->addParam($params, $filtro['ogp_data_inclusaoMax']) . " ";
+			if(!is_null($filtro['ogp_opr_codigo'])) $sql .= " and ogp.ogp_opr_codigo = " . $this->addParam($params, $filtro['ogp_opr_codigo']) . " ";
+			if(!is_null($filtro['ogp_codigo_negado'])) $sql .= " and ogp.ogp_id <> " . $this->addParam($params, $filtro['ogp_codigo_negado']) . " ";
+			if(!is_null($filtro['ogp_codigo_negado_2'])) {
+				$ids = $this->addIdList($params, $filtro['ogp_codigo_negado_2']);
+				if (count($ids)) $sql .= " and ogp.ogp_id not in (" . implode(', ', $ids) . ") ";
+			}
 			if($filtro['ogp_inibi_lojas_online'] == 1) $sql .= " and ogp.ogp_inibi_lojas_online != 1 ";
-                        
 		}
 		
-		if(!is_null($orderBy)) 
-			$sql .= " order by " . $orderBy;
-		else
-			$sql .= " order by ogp_ordem ASC";
+		$order = $this->orderByProduto($orderBy);
+		$sql .= $order ? " order by " . $order : " order by ogp_ordem ASC";
 		                
-		$rs = SQLexecuteQuery($sql);              
+		$rs = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		if(!$rs) $ret = "Erro ao obter produto(s).\n";
 
 		return $ret;
 
 	}
         
-}
-?>
+	}
+	?>

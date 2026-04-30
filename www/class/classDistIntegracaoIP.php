@@ -179,8 +179,8 @@ class DistIntegracaoIP {
 	}//end function verifica_campos_obrigatorios()
 
 	function retorna_ip_integracao($opr_codigo) {
-		$sql = "select opr_ip from operadoras where opr_codigo=".$opr_codigo." and opr_ip!='';";
-		$rs_log = SQLexecuteQuery($sql);
+		$sql = "select opr_ip from operadoras where opr_codigo = $1 and opr_ip != '';";
+		$rs_log = SQLexecuteQueryParams($sql, [$opr_codigo]);
 		if($rs_log) { 
 			$rs_log_row = pg_fetch_array($rs_log);
 			if ($rs_log_row['opr_ip'] != '')
@@ -192,8 +192,8 @@ class DistIntegracaoIP {
 
 	function retorna_ug_id() {
 		//verificar o que fazer se acontecer de LANs diferente possuirem o mesmo IP cadastrado +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		$sql = "select ug_id from dist_ip where di_ip = '".addslashes($this->getIP())."' and di_ativo = 1";
-		$rs_log = SQLexecuteQuery($sql);
+		$sql = "select ug_id from dist_ip where di_ip = $1 and di_ativo = 1";
+		$rs_log = SQLexecuteQueryParams($sql, [$this->getIP()]);
 		if($rs_log) { 
 			$rs_log_row = pg_fetch_array($rs_log);
 			if ($rs_log_row['ug_id'] != '')
@@ -205,8 +205,8 @@ class DistIntegracaoIP {
 
 	function ip_log_publisher($codret) { 
 		$sql = "INSERT INTO dist_ip_log_publisher (opr_codigo, dilp_ip_publisher, dilp_data, dilp_ip_verificado, ug_id, dilp_codretepp_interno, dilp_codretepp,dilp_email,dilp_jogo,dilp_promocao) 
-				VALUES (".intval($this->getID()).",'".retorna_ip_acesso()."',NOW(),'".$this->getIP()."',".intval($this->retorna_ug_id()).",".intval($codret).",".intval($this->converte_detalhe_codretepp($codret)).",'".$this->getEmail()."','".$this->getJogo()."','".$this->getPromocao()."')";
-		$rs_log = SQLexecuteQuery($sql);
+				VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7, $8, $9)";
+		$rs_log = SQLexecuteQueryParams($sql, [intval($this->getID()), retorna_ip_acesso(), $this->getIP(), intval($this->retorna_ug_id()), intval($codret), intval($this->converte_detalhe_codretepp($codret)), $this->getEmail(), $this->getJogo(), $this->getPromocao()]);
 		if(!$rs_log) {
 			 echo "<font color='#FF0000'><b>Erro na gera&ccedil;&atilde;o de LOG.\n</b></font><br>";
 		}
@@ -246,8 +246,8 @@ class DistIntegracaoIP {
 				if ($aux_opr_ip <> 0 && $aux_teste_IP) {
 					if($this->retorna_ug_id()) {
 						//if(retorna_ip_acesso()==$this->auxIP) {
-							$sql="select (CASE WHEN (ug.ug_tipo_cadastro='PJ') THEN upper(ug.ug_nome_fantasia)||' ('||ug.ug_tipo_cadastro||')' WHEN (ug.ug_tipo_cadastro='PF') THEN upper(ug.ug_nome)||' ('||ug.ug_tipo_cadastro||')' END) as ug_nome2,* from dist_usuarios_games ug where ug_id=".$this->retorna_ug_id();
-							$rs_detalhes = SQLexecuteQuery($sql);
+							$sql="select (CASE WHEN (ug.ug_tipo_cadastro='PJ') THEN upper(ug.ug_nome_fantasia)||' ('||ug.ug_tipo_cadastro||')' WHEN (ug.ug_tipo_cadastro='PF') THEN upper(ug.ug_nome)||' ('||ug.ug_tipo_cadastro||')' END) as ug_nome2,* from dist_usuarios_games ug where ug_id = $1";
+							$rs_detalhes = SQLexecuteQueryParams($sql, [$this->retorna_ug_id()]);
 							if($rs_detalhes) {
 								$rs_detalhes_row = pg_fetch_array($rs_detalhes);
 								$mensagem .= "ID da LAN: ".$rs_detalhes_row['ug_id']."\n";

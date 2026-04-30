@@ -196,25 +196,11 @@ class ProdutoModelo
 		$ret = ProdutoModelo::validarCampos($objProdutoModelo);
 
 		if ($ret == "") {
-			$sql = "insert into tb_operadora_games_produto_modelo(" .
-				"ogpm_ogp_id, ogpm_nome, ogpm_descricao, ogpm_valor, ogpm_ativo, " .
-				"ogpm_nome_imagem, ogpm_pin_valor, ogpm_valor_eppcash, ogpm_data_inclusao, ogpm_pin_resquest_id, ogpm_pin_valor_markup) values (";
-			$sql .= SQLaddFields($objProdutoModelo->getProdutoId(), "") . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getNome(), "s") . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getDescricao(), "s") . ",";
-			$sql .= SQLaddFields(str_replace(',', '.', moeda2numeric($objProdutoModelo->getValor())), "") . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getAtivo(), "") . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getNomeImagem(), "s") . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getPinValor(), "") . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getValorEPPCash(), "") . ",";
-			$sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-			$sql .= ($objProdutoModelo->getPinRequestId() == "" ? "NULL" : SQLaddFields($objProdutoModelo->getPinRequestId(), "s")) . ",";
-			$sql .= SQLaddFields($objProdutoModelo->getValorMarkup(), "") . ");";
-			//echo "objProdutoModelo->getValor(): ".$objProdutoModelo->getValor()."<br>";
-			//echo "moeda2numeric(objProdutoModelo->getValor()): ".moeda2numeric($objProdutoModelo->getValor())."<br>";
-			//	echo "$sql<br>";
-			$ret = SQLexecuteQuery($sql);
-			if (!$ret) $ret = "Erro ao inserir modelo.\n";
+			$sql = "insert into tb_operadora_games_produto_modelo(ogpm_ogp_id, ogpm_nome, ogpm_descricao, ogpm_valor, ogpm_ativo, ogpm_nome_imagem, ogpm_pin_valor, ogpm_valor_eppcash, ogpm_data_inclusao, ogpm_pin_resquest_id, ogpm_pin_valor_markup) values ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, $9, $10);";
+			$params = array($objProdutoModelo->getProdutoId(), $objProdutoModelo->getNome(), $objProdutoModelo->getDescricao(), str_replace(',', '.', moeda2numeric($objProdutoModelo->getValor())), $objProdutoModelo->getAtivo(), $objProdutoModelo->getNomeImagem(), $objProdutoModelo->getPinValor(), $objProdutoModelo->getValorEPPCash(), ($objProdutoModelo->getPinRequestId() == "" ? null : $objProdutoModelo->getPinRequestId()), $objProdutoModelo->getValorMarkup());
+			$ret = SQLexecuteQueryParams($sql, $params);
+			if (!$ret) $ret = "Erro ao inserir modelo.
+";
 			else {
 				$ret = "";
 				$rs_id = SQLexecuteQuery("select currval('operadora_games_produto_modelo_id_seq') as last_id");
@@ -234,22 +220,23 @@ class ProdutoModelo
 		$ret = ProdutoModelo::validarCampos($objProdutoModelo);
 
 		if ($ret == "") {
-			$sql = "update tb_operadora_games_produto_modelo set ";
-			if (!is_null($objProdutoModelo->getProdutoId())) $sql .= " ogpm_ogp_id = " 	  .	SQLaddFields($objProdutoModelo->getProdutoId(), "") . ",";
-			if (!is_null($objProdutoModelo->getNome())) 		$sql .= " ogpm_nome = " 	  . SQLaddFields($objProdutoModelo->getNome(), "s") . ",";
-			if (!is_null($objProdutoModelo->getDescricao())) $sql .= " ogpm_descricao = "  . SQLaddFields($objProdutoModelo->getDescricao(), "s") . ",";
-			if (!is_null($objProdutoModelo->getValor())) 	$sql .= " ogpm_valor = " 	  .	SQLaddFields(moeda2numeric($objProdutoModelo->getValor()), "") . ",";
-			if (!is_null($objProdutoModelo->getAtivo())) 	$sql .= " ogpm_ativo = " 	  . SQLaddFields($objProdutoModelo->getAtivo(), "") . ",";
-			if (!is_null($objProdutoModelo->getNomeImagem())) $sql .= " ogpm_nome_imagem = " . SQLaddFields($objProdutoModelo->getNomeImagem(), "s") . ", ";
-			if (!is_null($objProdutoModelo->getPinValor()))	$sql .= " ogpm_pin_valor = "  . SQLaddFields($objProdutoModelo->getPinValor(), "") . ", ";
-			if (!is_null($objProdutoModelo->getValorEPPCash()))	$sql .= " ogpm_valor_eppcash = "  . SQLaddFields($objProdutoModelo->getValorEPPCash(), "") . ", ";
-			if (!is_null($objProdutoModelo->getPinRequestId()))	$sql .= " ogpm_pin_resquest_id = " . ($objProdutoModelo->getPinRequestId() == "" ? "NULL" : SQLaddFields($objProdutoModelo->getPinRequestId(), "s")) . ", ";
-			if (!is_null($objProdutoModelo->getValorMarkup()))	$sql .= " ogpm_pin_valor_markup = "  . SQLaddFields($objProdutoModelo->getValorMarkup(), "") . " ";
-
-			$sql .= " where ogpm_id = " . SQLaddFields($objProdutoModelo->getId(), "");
-
-			$ret = SQLexecuteQuery($sql);
-			if (!$ret) $ret = "Erro ao atualizar modelo.\n";
+			$params = array();
+			$sets = array();
+			$addParam = function ($value) use (&$params) { $params[] = $value; return '$' . count($params); };
+			if (!is_null($objProdutoModelo->getProdutoId())) $sets[] = "ogpm_ogp_id = " . $addParam($objProdutoModelo->getProdutoId());
+			if (!is_null($objProdutoModelo->getNome())) $sets[] = "ogpm_nome = " . $addParam($objProdutoModelo->getNome());
+			if (!is_null($objProdutoModelo->getDescricao())) $sets[] = "ogpm_descricao = " . $addParam($objProdutoModelo->getDescricao());
+			if (!is_null($objProdutoModelo->getValor())) $sets[] = "ogpm_valor = " . $addParam(moeda2numeric($objProdutoModelo->getValor()));
+			if (!is_null($objProdutoModelo->getAtivo())) $sets[] = "ogpm_ativo = " . $addParam($objProdutoModelo->getAtivo());
+			if (!is_null($objProdutoModelo->getNomeImagem())) $sets[] = "ogpm_nome_imagem = " . $addParam($objProdutoModelo->getNomeImagem());
+			if (!is_null($objProdutoModelo->getPinValor())) $sets[] = "ogpm_pin_valor = " . $addParam($objProdutoModelo->getPinValor());
+			if (!is_null($objProdutoModelo->getValorEPPCash())) $sets[] = "ogpm_valor_eppcash = " . $addParam($objProdutoModelo->getValorEPPCash());
+			if (!is_null($objProdutoModelo->getPinRequestId())) $sets[] = is_null($objProdutoModelo->getPinRequestId()) || $objProdutoModelo->getPinRequestId() == "" ? "ogpm_pin_resquest_id = NULL" : "ogpm_pin_resquest_id = " . $addParam($objProdutoModelo->getPinRequestId());
+			if (!is_null($objProdutoModelo->getValorMarkup())) $sets[] = "ogpm_pin_valor_markup = " . $addParam($objProdutoModelo->getValorMarkup());
+			$sql = "update tb_operadora_games_produto_modelo set " . implode(", ", $sets) . " where ogpm_id = " . $addParam($objProdutoModelo->getId());
+			$ret = SQLexecuteQueryParams($sql, $params);
+			if (!$ret) $ret = "Erro ao atualizar modelo.
+";
 			else $ret = "";
 		}
 
@@ -453,8 +440,27 @@ class ProdutoModelo
 			}
 		}
 
-		if (!is_null($orderBy) && trim((string)$orderBy) !== "" && preg_match("/^[a-zA-Z0-9_.,\s]+$/", (string)$orderBy)) {
-			$sql .= "order by " . $orderBy . "\n";
+		$orderAllow = array(
+			"ogpm_id" => "ogpm.ogpm_id",
+			"ogpm_ogp_id" => "ogpm.ogpm_ogp_id",
+			"ogpm_nome" => "ogpm.ogpm_nome",
+			"ogpm_descricao" => "ogpm.ogpm_descricao",
+			"ogpm_valor" => "ogpm.ogpm_valor",
+			"ogpm_ativo" => "ogpm.ogpm_ativo",
+			"ogpm_nome_imagem" => "ogpm.ogpm_nome_imagem",
+			"ogpm_data_inclusao" => "ogpm.ogpm_data_inclusao",
+			"ogpm_pin_valor" => "ogpm.ogpm_pin_valor",
+			"ogpm_valor_eppcash" => "ogpm.ogpm_valor_eppcash"
+		);
+		if (!is_null($orderBy) && trim((string)$orderBy) !== "") {
+			$orderParts = array();
+			foreach (explode(",", (string)$orderBy) as $part) {
+				$bits = preg_split("/\s+/", trim($part));
+				$field = $bits[0];
+				$dir = isset($bits[1]) && strtolower($bits[1]) == "desc" ? "desc" : "asc";
+				if (isset($orderAllow[$field])) $orderParts[] = $orderAllow[$field] . " " . $dir;
+			}
+			if ($orderParts) $sql .= "order by " . implode(", ", $orderParts) . "\n";
 		}
 
 		$rs = SQLexecuteQueryParams($sql, $params);
@@ -473,12 +479,12 @@ class ProdutoModelo
 
 			if ($filtro == "") {
 
-				$sql = "select * from tb_operadora_games_produto pr inner join tb_operadora_games_produto_modelo prm on pr.ogp_id = prm.ogpm_ogp_id where prm.ogpm_id = " . $idprod . ";";
-				$ret = SQLexecuteQuery($sql);
+				$sql = "select * from tb_operadora_games_produto pr inner join tb_operadora_games_produto_modelo prm on pr.ogp_id = prm.ogpm_ogp_id where prm.ogpm_id = $1;";
+				$ret = SQLexecuteQueryParams($sql, [$idprod]);
 			} else {
 
-				$sql = "select * from tb_operadora_games_produto where ogp_id = " . $idprod . ";";
-				$ret = SQLexecuteQuery($sql);
+				$sql = "select * from tb_operadora_games_produto where ogp_id = $1;";
+				$ret = SQLexecuteQueryParams($sql, [$idprod]);
 			}
 		}
 
@@ -495,9 +501,9 @@ class ProdutoModelo
 
 		if ($ret == "") {
 			$sql = "delete from tb_operadora_games_produto_modelo ";
-			$sql .= " where ogpm_id = " . SQLaddFields($produto_modelo_id, "");
+			$sql .= " where ogpm_id = $1";
 
-			$ret = SQLexecuteQuery($sql);
+			$ret = SQLexecuteQueryParams($sql, [$produto_modelo_id]);
 			if (!$ret) $ret = "Erro ao excluir modelo.\n";
 			else $ret = "";
 		}
@@ -515,14 +521,14 @@ class ProdutoModelo
 
 		if ($ret == "") {
 			$sql = "select count(*) as quantidade from pins ";
-			$sql .= "where opr_codigo = " . SQLaddFields($opr_codigo, "") . " ";
-			$sql .= "and pin_valor = " . SQLaddFields($pin_valor, "") . " ";
+			$sql .= "where opr_codigo = $1 ";
+			$sql .= "and pin_valor = $2 ";
 			$sql .= "and pin_canal = 's' ";
 			$sql .= "and pin_status = '1' ";
 			$sql .= "group by opr_codigo, pin_valor, pin_status";
 			//echo "<!-- sql=" . $sql . "--><br>";
 
-			$rs_count = SQLexecuteQuery($sql);
+			$rs_count = SQLexecuteQueryParams($sql, [$opr_codigo, $pin_valor]);
 			if ($rs_count && pg_num_rows($rs_count) > 0) {
 				$rs_count_value = pg_fetch_array($rs_count);
 				$ret = $rs_count_value['quantidade'];
@@ -543,11 +549,11 @@ class ProdutoModelo
 			$sql = "select ogp_opr_codigo ";
 			$sql .= "from tb_operadora_games_produto_modelo ogpm  ";
 			$sql .= "	inner join tb_operadora_games_produto ogp on ogp.ogp_id = ogpm.ogpm_ogp_id ";
-			$sql .= "where (ogpm.ogpm_id = " . $this->getId() . ")";
+			$sql .= "where (ogpm.ogpm_id = $1)";
 			//echo "<!-- sql=" . $sql . "--><br>";
 			//echo "" . $sql . "<br>";
 
-			$rs_opr = SQLexecuteQuery($sql);
+			$rs_opr = SQLexecuteQueryParams($sql, [$this->getId()]);
 			if ($rs_opr && pg_num_rows($rs_opr) > 0) {
 				$rs_opr_value = pg_fetch_array($rs_opr);
 				$ret = $rs_opr_value['ogp_opr_codigo'];

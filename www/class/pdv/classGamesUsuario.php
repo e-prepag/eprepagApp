@@ -1596,6 +1596,12 @@ class UsuarioGames
             $dataInclusao = "CURRENT_TIMESTAMP";
             $dataUltimoAcesso = "CURRENT_TIMESTAMP";
             $qtdeAcessos = 0;
+
+            $params = array();
+            $addParam = function ($value) use (&$params) {
+                $params[] = $value;
+                return "$" . count($params);
+            };
             if (!is_null($objGamesUsuario->getDataNascimento())) $dataNascimento = formata_data($objGamesUsuario->getDataNascimento(), 1);
             if (is_null($objGamesUsuario->getUgOngame())) $objGamesUsuario->setUgOngame("n");
 
@@ -1630,138 +1636,138 @@ class UsuarioGames
 
                     ) values (";
 
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getLogin())), "s") . ",";
-            $sql .= SQLaddFields($senha, "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getStatusBusca()), "") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getSubstatus()), "") . ",";
-            $sql .= SQLaddFields($dataInclusao, "") . ",";
-            $sql .= SQLaddFields($dataUltimoAcesso, "") . ",";
-            $sql .= SQLaddFields($qtdeAcessos, "") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getLogin()))) . ",";
+            $sql .= $addParam($senha) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getAtivo())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getStatusBusca())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getSubstatus())) . ",";
+            $sql .= "CURRENT_TIMESTAMP,";
+            $sql .= "CURRENT_TIMESTAMP,";
+            $sql .= $addParam($qtdeAcessos) . ",";
 
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getNomeFantasia())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getRazaoSocial())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getCNPJ())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getResponsavel())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getNomeFantasia()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getRazaoSocial()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getCNPJ()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getResponsavel()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getEmail()))) . ",";
 
-            $sql .= SQLaddFields(trim($objGamesUsuario->getEndereco()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getTipoEnd()), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getBairro()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getCidade()), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getEndereco())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getTipoEnd())) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getNumero()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getComplemento()))) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getBairro())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getCidade())) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getEstado()))) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getCEP())) . ",";
 
-            $sql .= SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getCel()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getFaxDDI()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getFaxDDD()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getFax()), "s") . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getTelDDI())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getTelDDD())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getTel())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getCelDDI())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getCelDDD())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getCel())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getFaxDDI())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getFaxDDD())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getFax())) . ",";
 
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getRACodigo())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getRAOutros())), "s") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getRACodigo()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getRAOutros()))) . ",";
 
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getContato01Nome())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getContato01Cargo())), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getContato01TelDDI()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getContato01TelDDD()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getContato01Tel()), "s") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getContato01Nome()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getContato01Cargo()))) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getContato01TelDDI())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getContato01TelDDD())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getContato01Tel())) . ",";
 
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getRiscoClassif())), "") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getRiscoClassif()))) . ",";
 
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoCadastro())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
-            $sql .= SQLaddFields($dataNascimento, "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getTipoCadastro()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getNome()))) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getCPF())) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getRG())) . ",";
+            $sql .= $addParam($dataNascimento) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getSexo()))) . ",";
 
-            $sql .= SQLaddFields(trim($objGamesUsuario->getPerfilSenhaReimpressao()), "s") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getPerfilFormaPagto(), "") . ",";
-            $sql .= SQLaddFields((int) moeda2numeric($objGamesUsuario->getPerfilLimite()), "") . ",";
-            $sql .= SQLaddFields((int) moeda2numeric($objGamesUsuario->getPerfilSaldo()), "") . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getPerfilSenhaReimpressao())) . ",";
+            $sql .= $addParam($objGamesUsuario->getPerfilFormaPagto()) . ",";
+            $sql .= $addParam((int) moeda2numeric($objGamesUsuario->getPerfilLimite())) . ",";
+            $sql .= $addParam((int) moeda2numeric($objGamesUsuario->getPerfilSaldo())) . ",";
 
-            $sql .= SQLaddFields($objGamesUsuario->getPerfilCorteDiaSemana(), "") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getPerfilCorteUltimoCorte(), "s") . ",";
-            $sql .= SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimiteSugerido()), "") . ",";
-            $sql .= SQLaddFields(moeda2numeric($objGamesUsuario->getCreditoPendente()), "") . ",";
-
-
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getInscrEstadual())), "s") . ",";
-            $sql .= SQLaddFields(trim($objGamesUsuario->getSite()), "s") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getAberturaAno(), "") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getAberturaMes(), "") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getCartoes())), "s") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getFaturaMediaMensal(), "") . ",";
-
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalNome())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalRG())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCPF())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTelDDI())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTelDDD())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTel())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCelDDI())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCelDDD())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCel())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalEmail())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalMSN())), "s") . ",";
-
-            $sql .= SQLaddFields($objGamesUsuario->getReprVendaIgualReprLegal(), "") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaNome())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaRG())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCPF())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTelDDI())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTelDDD())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTel())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCelDDI())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCelDDD())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCel())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaEmail())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaMSN())), "s") . ",";
-
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Banco())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Agencia())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Conta())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Abertura())), "s") . ",";
-
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Banco())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Agencia())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Conta())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Abertura())), "s") . ",";
-
-            $sql .= SQLaddFields($objGamesUsuario->getComputadoresQtde(), "") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getComunicacaoVisual())), "s") . ",";
-
-            $sql .= SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimiteRef()), "") . ",";
-
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getFicouSabendo())), "s") . ",";
-
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getCompet_participa())), "s") . ",";
-            $sql .= SQLaddFields(trim(strtoupper($objGamesUsuario->getCompet_promoveu())), "s") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getCompet_participantes_fifa(), "") . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getCompet_participantes_wc3(), "") . ",";
-
-            $sql .= SQLaddFields($objGamesUsuario->getUgOngame(), "s") . ",";
-
-            $sql .= SQLaddFields($objGamesUsuario->getUgIdNexCafe(), "s") . ", ";
-            $sql .= SQLaddFields($objGamesUsuario->getUgLoginNexCafeAuto(), "") . ", ";
-            $sql .= SQLaddFields((($objGamesUsuario->getUgIdNexCafe()) ? "CURRENT_TIMESTAMP" : "NULL"), "") . ", ";  /* Se o Cadastro ou Edição foi acionado pelo NexCafé */
+            $sql .= $addParam($objGamesUsuario->getPerfilCorteDiaSemana()) . ",";
+            $sql .= $addParam($objGamesUsuario->getPerfilCorteUltimoCorte()) . ",";
+            $sql .= $addParam(moeda2numeric($objGamesUsuario->getPerfilLimiteSugerido())) . ",";
+            $sql .= $addParam(moeda2numeric($objGamesUsuario->getCreditoPendente())) . ",";
 
 
-            $sql .= SQLaddFields($objGamesUsuario->getTipoEstabelecimentoParaBanco(), "") . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getInscrEstadual()))) . ",";
+            $sql .= $addParam(trim($objGamesUsuario->getSite())) . ",";
+            $sql .= $addParam($objGamesUsuario->getAberturaAno()) . ",";
+            $sql .= $addParam($objGamesUsuario->getAberturaMes()) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getCartoes()))) . ",";
+            $sql .= $addParam($objGamesUsuario->getFaturaMediaMensal()) . ",";
 
-            $sql .= intval(SQLaddFields($objGamesUsuario->getAlteraSenha(), "") * 1) . ",";
-            $sql .= intval(SQLaddFields($objGamesUsuario->getExibirContrato(), "") * 1) . ",";
-            $sql .= SQLaddFields($objGamesUsuario->getTipoVenda(), "s") . ", ";
-            $sql .= SQLaddFields((($objGamesUsuario->getDataAceite()) ? "CURRENT_TIMESTAMP" : "NULL"), "") . ")";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalNome()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalRG()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCPF()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTelDDI()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTelDDD()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTel()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCelDDI()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCelDDD()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCel()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalEmail()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprLegalMSN()))) . ",";
 
-            $ret = SQLexecuteQuery($sql);
+            $sql .= $addParam($objGamesUsuario->getReprVendaIgualReprLegal()) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaNome()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaRG()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCPF()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTelDDI()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTelDDD()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTel()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCelDDI()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCelDDD()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCel()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaEmail()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getReprVendaMSN()))) . ",";
+
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Banco()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Agencia()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Conta()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Abertura()))) . ",";
+
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Banco()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Agencia()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Conta()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Abertura()))) . ",";
+
+            $sql .= $addParam($objGamesUsuario->getComputadoresQtde()) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getComunicacaoVisual()))) . ",";
+
+            $sql .= $addParam(moeda2numeric($objGamesUsuario->getPerfilLimiteRef())) . ",";
+
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getFicouSabendo()))) . ",";
+
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getCompet_participa()))) . ",";
+            $sql .= $addParam(trim(strtoupper($objGamesUsuario->getCompet_promoveu()))) . ",";
+            $sql .= $addParam($objGamesUsuario->getCompet_participantes_fifa()) . ",";
+            $sql .= $addParam($objGamesUsuario->getCompet_participantes_wc3()) . ",";
+
+            $sql .= $addParam($objGamesUsuario->getUgOngame()) . ",";
+
+            $sql .= $addParam($objGamesUsuario->getUgIdNexCafe()) . ", ";
+            $sql .= $addParam($objGamesUsuario->getUgLoginNexCafeAuto()) . ", ";
+            $sql .= (($objGamesUsuario->getUgIdNexCafe()) ? "CURRENT_TIMESTAMP" : "NULL") . ", ";  /* Se o Cadastro ou Edição foi acionado pelo NexCafé */
+
+
+            $sql .= $addParam($objGamesUsuario->getTipoEstabelecimentoParaBanco()) . ",";
+
+            $sql .= $addParam(intval($objGamesUsuario->getAlteraSenha() * 1)) . ",";
+            $sql .= $addParam(intval($objGamesUsuario->getExibirContrato() * 1)) . ",";
+            $sql .= $addParam($objGamesUsuario->getTipoVenda()) . ", ";
+            $sql .= (($objGamesUsuario->getDataAceite()) ? "CURRENT_TIMESTAMP" : "NULL") . ")";
+
+            $ret = SQLexecuteQueryParams($sql, $params);
 
             if (!$ret) $ret = "Erro ao inserir usuário.\n<!--" . PHP_EOL . $sql . "\n-->";
             else {
@@ -2086,8 +2092,8 @@ class UsuarioGames
                         unset($array_socios);
                     }
                 }
-                $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . " order by ugo_data ASC;";
-                $rs_usuario_obs = SQLexecuteQuery($sql);
+                $sql_obs = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = $1 order by ugo_data ASC;";
+                $rs_usuario_obs = SQLexecuteQueryParams($sql_obs, array($objGamesUsuario->getId()));
                 $ug_obs = "";
                 if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                     while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
@@ -2097,8 +2103,8 @@ class UsuarioGames
 
                 if (!is_null($ug_obs)) {
                     if (trim($ug_obs) != "") {
-                        $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES (" . $objGamesUsuario->getId() . "," . SQLaddFields(trim($ug_obs), "s") . ",'" . $GLOBALS['_SESSION']['userlogin_bko'] . "');";
-                        $ret_insert_obs = SQLexecuteQuery($sql_insert_obs);
+                        $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES ($1, $2, $3);";
+                        $ret_insert_obs = SQLexecuteQueryParams($sql_insert_obs, array($objGamesUsuario->getId(), trim($ug_obs), $GLOBALS['_SESSION']['userlogin_bko']));
                         if (!$ret_insert_obs) echo "Erro ao atualizar Observação do Usuário." . PHP_EOL;
                     } //end if(trim($objGamesUsuario->getObservacoes()) != "")
                 } //end if(!is_null($objGamesUsuario->getObservacoes()))  
@@ -2183,6 +2189,12 @@ class UsuarioGames
         $ret = UsuarioGames::validarCampos($objGamesUsuario, false);
 
         if ($ret == "") {
+
+            $params = array();
+            $addParam = function ($value) use (&$params) {
+                $params[] = $value;
+                return "$" . count($params);
+            };
             if (UsuarioGames::existeLogin($objGamesUsuario->getLogin(), $objGamesUsuario->getId())) {
                 $ret = "Login já cadastrado.";
             }
@@ -2221,46 +2233,46 @@ class UsuarioGames
 
             //SQL
             $sql = "update dist_usuarios_games set ";
-            if (!is_null($objGamesUsuario->getAtivo()))             $sql .= " ug_ativo = "                 . SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
-            if (!is_null($objGamesUsuario->getStatusBusca()))     $sql .= " ug_status = "             . SQLaddFields(trim($objGamesUsuario->getStatusBusca()), "") . ",";
-            if (!is_null($objGamesUsuario->getSubstatus()))             $sql .= " ug_substatus = "                 . SQLaddFields(trim($objGamesUsuario->getSubstatus()), "") . ",";
-            if (!is_null($objGamesUsuario->getLogin()))             $sql .= " ug_login = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getLogin())), "s") . ",";
+            if (!is_null($objGamesUsuario->getAtivo()))             $sql .= " ug_ativo = "                 . $addParam(trim($objGamesUsuario->getAtivo())) . ",";
+            if (!is_null($objGamesUsuario->getStatusBusca()))     $sql .= " ug_status = "             . $addParam(trim($objGamesUsuario->getStatusBusca())) . ",";
+            if (!is_null($objGamesUsuario->getSubstatus()))             $sql .= " ug_substatus = "                 . $addParam(trim($objGamesUsuario->getSubstatus())) . ",";
+            if (!is_null($objGamesUsuario->getLogin()))             $sql .= " ug_login = "                 . $addParam(trim(strtoupper($objGamesUsuario->getLogin()))) . ",";
 
-            if (!is_null($objGamesUsuario->getNomeFantasia()))     $sql .= " ug_nome_fantasia = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getNomeFantasia())), "s") . ",";
-            if (!is_null($objGamesUsuario->getRazaoSocial()))     $sql .= " ug_razao_social = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getRazaoSocial())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCNPJ()))             $sql .= " ug_cnpj = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getCNPJ())), "s") . ",";
-            if (!is_null($objGamesUsuario->getResponsavel()))     $sql .= " ug_responsavel = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getResponsavel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getEmail()))             $sql .= " ug_email = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
+            if (!is_null($objGamesUsuario->getNomeFantasia()))     $sql .= " ug_nome_fantasia = "         . $addParam(trim(strtoupper($objGamesUsuario->getNomeFantasia()))) . ",";
+            if (!is_null($objGamesUsuario->getRazaoSocial()))     $sql .= " ug_razao_social = "         . $addParam(trim(strtoupper($objGamesUsuario->getRazaoSocial()))) . ",";
+            if (!is_null($objGamesUsuario->getCNPJ()))             $sql .= " ug_cnpj = "                 . $addParam(trim(strtoupper($objGamesUsuario->getCNPJ()))) . ",";
+            if (!is_null($objGamesUsuario->getResponsavel()))     $sql .= " ug_responsavel = "         . $addParam(trim(strtoupper($objGamesUsuario->getResponsavel()))) . ",";
+            if (!is_null($objGamesUsuario->getEmail()))             $sql .= " ug_email = "                 . $addParam(trim(strtoupper($objGamesUsuario->getEmail()))) . ",";
 
-            if (!is_null($objGamesUsuario->getEndereco()))         $sql .= " ug_endereco = "             . SQLaddFields(trim($objGamesUsuario->getEndereco()), "s") . ",";
-            if (!is_null($objGamesUsuario->getTipoEnd()))         $sql .= " ug_tipo_end = "             . SQLaddFields(trim($objGamesUsuario->getTipoEnd()), "s") . ",";
-            if (!is_null($objGamesUsuario->getNumero()))         $sql .= " ug_numero = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
-            if (!is_null($objGamesUsuario->getComplemento()))     $sql .= " ug_complemento = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
-            if (!is_null($objGamesUsuario->getBairro()))         $sql .= " ug_bairro = "             . SQLaddFields(trim($objGamesUsuario->getBairro()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCidade()))         $sql .= " ug_cidade = "             . SQLaddFields(trim($objGamesUsuario->getCidade()), "s") . ",";
-            if (!is_null($objGamesUsuario->getEstado()))         $sql .= " ug_estado = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCEP()))             $sql .= " ug_cep = "                 . SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
+            if (!is_null($objGamesUsuario->getEndereco()))         $sql .= " ug_endereco = "             . $addParam(trim($objGamesUsuario->getEndereco())) . ",";
+            if (!is_null($objGamesUsuario->getTipoEnd()))         $sql .= " ug_tipo_end = "             . $addParam(trim($objGamesUsuario->getTipoEnd())) . ",";
+            if (!is_null($objGamesUsuario->getNumero()))         $sql .= " ug_numero = "             . $addParam(trim(strtoupper($objGamesUsuario->getNumero()))) . ",";
+            if (!is_null($objGamesUsuario->getComplemento()))     $sql .= " ug_complemento = "         . $addParam(trim(strtoupper($objGamesUsuario->getComplemento()))) . ",";
+            if (!is_null($objGamesUsuario->getBairro()))         $sql .= " ug_bairro = "             . $addParam(trim($objGamesUsuario->getBairro())) . ",";
+            if (!is_null($objGamesUsuario->getCidade()))         $sql .= " ug_cidade = "             . $addParam(trim($objGamesUsuario->getCidade())) . ",";
+            if (!is_null($objGamesUsuario->getEstado()))         $sql .= " ug_estado = "             . $addParam(trim(strtoupper($objGamesUsuario->getEstado()))) . ",";
+            if (!is_null($objGamesUsuario->getCEP()))             $sql .= " ug_cep = "                 . $addParam(trim($objGamesUsuario->getCEP())) . ",";
 
-            if (!is_null($objGamesUsuario->getTelDDI()))         $sql .= " ug_tel_ddi = "             . SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getTelDDD()))         $sql .= " ug_tel_ddd = "             . SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getTel()))             $sql .= " ug_tel = "                 . SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCelDDI()))         $sql .= " ug_cel_ddi = "             . SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel_ddd = "             . SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel = "                 . SQLaddFields(trim($objGamesUsuario->getCel()), "s") . " ,";
-            if (!is_null($objGamesUsuario->getFaxDDI()))         $sql .= " ug_fax_ddi = "             . SQLaddFields(trim($objGamesUsuario->getFaxDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getFaxDDD()))         $sql .= " ug_fax_ddd = "             . SQLaddFields(trim($objGamesUsuario->getFaxDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getFax()))             $sql .= " ug_fax = "                 . SQLaddFields(trim($objGamesUsuario->getFax()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTelDDI()))         $sql .= " ug_tel_ddi = "             . $addParam(trim($objGamesUsuario->getTelDDI())) . ",";
+            if (!is_null($objGamesUsuario->getTelDDD()))         $sql .= " ug_tel_ddd = "             . $addParam(trim($objGamesUsuario->getTelDDD())) . ",";
+            if (!is_null($objGamesUsuario->getTel()))             $sql .= " ug_tel = "                 . $addParam(trim($objGamesUsuario->getTel())) . ",";
+            if (!is_null($objGamesUsuario->getCelDDI()))         $sql .= " ug_cel_ddi = "             . $addParam(trim($objGamesUsuario->getCelDDI())) . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel_ddd = "             . $addParam(trim($objGamesUsuario->getCelDDD())) . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel = "                 . $addParam(trim($objGamesUsuario->getCel())) . " ,";
+            if (!is_null($objGamesUsuario->getFaxDDI()))         $sql .= " ug_fax_ddi = "             . $addParam(trim($objGamesUsuario->getFaxDDI())) . ",";
+            if (!is_null($objGamesUsuario->getFaxDDD()))         $sql .= " ug_fax_ddd = "             . $addParam(trim($objGamesUsuario->getFaxDDD())) . ",";
+            if (!is_null($objGamesUsuario->getFax()))             $sql .= " ug_fax = "                 . $addParam(trim($objGamesUsuario->getFax())) . ",";
 
-            if (!is_null($objGamesUsuario->getRACodigo()))         $sql .= " ug_ra_codigo = "             . SQLaddFields(trim($objGamesUsuario->getRACodigo()), "s") . ",";
-            if (!is_null($objGamesUsuario->getRAOutros()))         $sql .= " ug_ra_outros = "             . SQLaddFields(trim($objGamesUsuario->getRAOutros()), "s") . ",";
+            if (!is_null($objGamesUsuario->getRACodigo()))         $sql .= " ug_ra_codigo = "             . $addParam(trim($objGamesUsuario->getRACodigo())) . ",";
+            if (!is_null($objGamesUsuario->getRAOutros()))         $sql .= " ug_ra_outros = "             . $addParam(trim($objGamesUsuario->getRAOutros())) . ",";
 
-            if (!is_null($objGamesUsuario->getContato01TelDDI())) $sql .= " ug_contato01_tel_ddi = "     . SQLaddFields(trim($objGamesUsuario->getContato01TelDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01TelDDD())) $sql .= " ug_contato01_tel_ddd = "     . SQLaddFields(trim($objGamesUsuario->getContato01TelDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01Tel()))     $sql .= " ug_contato01_tel = "         . SQLaddFields(trim($objGamesUsuario->getContato01Tel()), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01Nome()))     $sql .= " ug_contato01_nome = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getContato01Nome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01Cargo())) $sql .= " ug_contato01_cargo = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getContato01Cargo())), "s") . ",";
-            $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . " order by ugo_data ASC;";
-            $rs_usuario_obs = SQLexecuteQuery($sql);
+            if (!is_null($objGamesUsuario->getContato01TelDDI())) $sql .= " ug_contato01_tel_ddi = "     . $addParam(trim($objGamesUsuario->getContato01TelDDI())) . ",";
+            if (!is_null($objGamesUsuario->getContato01TelDDD())) $sql .= " ug_contato01_tel_ddd = "     . $addParam(trim($objGamesUsuario->getContato01TelDDD())) . ",";
+            if (!is_null($objGamesUsuario->getContato01Tel()))     $sql .= " ug_contato01_tel = "         . $addParam(trim($objGamesUsuario->getContato01Tel())) . ",";
+            if (!is_null($objGamesUsuario->getContato01Nome()))     $sql .= " ug_contato01_nome = "     . $addParam(trim(strtoupper($objGamesUsuario->getContato01Nome()))) . ",";
+            if (!is_null($objGamesUsuario->getContato01Cargo())) $sql .= " ug_contato01_cargo = "     . $addParam(trim(strtoupper($objGamesUsuario->getContato01Cargo()))) . ",";
+            $sql_obs = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = $1 order by ugo_data ASC;";
+                $rs_usuario_obs = SQLexecuteQueryParams($sql_obs, array($objGamesUsuario->getId()));
             $ug_obs = "";
             if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                 while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
@@ -2270,116 +2282,111 @@ class UsuarioGames
 
             if (!is_null($ug_obs)) {
                 if (trim($ug_obs) != "") {
-                    $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES (" . $objGamesUsuario->getId() . "," . SQLaddFields(trim($ug_obs), "s") . ",'" . $GLOBALS['_SESSION']['userlogin_bko'] . "');";
-
-                    // if(!is_null($objGamesUsuario->getObservacoes())) {
-                    //     if(trim($objGamesUsuario->getObservacoes()) != "") {  
-                    //         $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES (".$objGamesUsuario->getId().",". SQLaddFields(trim($objGamesUsuario->getObservacoes()), "s") . ",'".$GLOBALS['_SESSION']['userlogin_bko']."');";
-                    //echo $sql_insert_obs;
-                    $ret_insert_obs = SQLexecuteQuery($sql_insert_obs);
+                    $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES ($1, $2, $3);";
+                    $ret_insert_obs = SQLexecuteQueryParams($sql_insert_obs, array($objGamesUsuario->getId(), trim($ug_obs), $GLOBALS['_SESSION']['userlogin_bko']));
                     if (!$ret_insert_obs) echo "Erro ao atualizar Observação do Usuário." . PHP_EOL;
                 } //end if(trim($objGamesUsuario->getObservacoes()) != "")
             } //end if(!is_null($objGamesUsuario->getObservacoes())) 
 
             if (!is_null($objGamesUsuario->getRiscoClassif())) {
                 if (array_key_exists($objGamesUsuario->getRiscoClassif(), $GLOBALS['RISCO_CLASSIFICACAO_NOMES'])) {
-                    $sql .= " ug_risco_classif = " . SQLaddFields(trim($objGamesUsuario->getRiscoClassif()), "") . ",";
+                    $sql .= " ug_risco_classif = " . $addParam(trim($objGamesUsuario->getRiscoClassif())) . ",";
                 }
             }
 
-            if (!is_null($objGamesUsuario->getTipoCadastro()))     $sql .= " ug_tipo_cadastro = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoCadastro())), "s") . ",";
-            if (!is_null($objGamesUsuario->getNome()))             $sql .= " ug_nome = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCPF()))             $sql .= " ug_cpf = "                 . SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
-            if (!is_null($objGamesUsuario->getRG()))             $sql .= " ug_rg = "                 . SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
-            if (!is_null($objGamesUsuario->getDataNascimento())) $sql .= " ug_data_nascimento = "    . SQLaddFields(trim($dataNascimento), "s") . ",";
-            if (!is_null($objGamesUsuario->getSexo()))             $sql .= " ug_sexo = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getTipoCadastro()))     $sql .= " ug_tipo_cadastro = "         . $addParam(trim(strtoupper($objGamesUsuario->getTipoCadastro()))) . ",";
+            if (!is_null($objGamesUsuario->getNome()))             $sql .= " ug_nome = "                 . $addParam(trim(strtoupper($objGamesUsuario->getNome()))) . ",";
+            if (!is_null($objGamesUsuario->getCPF()))             $sql .= " ug_cpf = "                 . $addParam(trim($objGamesUsuario->getCPF())) . ",";
+            if (!is_null($objGamesUsuario->getRG()))             $sql .= " ug_rg = "                 . $addParam(trim($objGamesUsuario->getRG())) . ",";
+            if (!is_null($objGamesUsuario->getDataNascimento())) $sql .= " ug_data_nascimento = "    . $addParam(trim($dataNascimento)) . ",";
+            if (!is_null($objGamesUsuario->getSexo()))             $sql .= " ug_sexo = "                 . $addParam(trim(strtoupper($objGamesUsuario->getSexo()))) . ",";
 
-            if (!is_null($objGamesUsuario->getPerfilSenhaReimpressao()))     $sql .= " ug_perfil_senha_reimpressao = "         . SQLaddFields(trim($objGamesUsuario->getPerfilSenhaReimpressao()), "s") . ",";
-            if (!is_null($objGamesUsuario->getPerfilFormaPagto()))             $sql .= " ug_perfil_forma_pagto = "             . SQLaddFields((($objGamesUsuario->getPerfilFormaPagto()) ? $objGamesUsuario->getPerfilFormaPagto() : 0), "") . ",";
-            if (!is_null($objGamesUsuario->getPerfilLimite()))                 $sql .= " ug_perfil_limite = "                     . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimite()), "") . ",";
-            if (!is_null($objGamesUsuario->getPerfilSaldo()))                 $sql .= " ug_perfil_saldo = "                     . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilSaldo()), "") . ",";
+            if (!is_null($objGamesUsuario->getPerfilSenhaReimpressao()))     $sql .= " ug_perfil_senha_reimpressao = "         . $addParam(trim($objGamesUsuario->getPerfilSenhaReimpressao())) . ",";
+            if (!is_null($objGamesUsuario->getPerfilFormaPagto()))             $sql .= " ug_perfil_forma_pagto = "             . $addParam((($objGamesUsuario->getPerfilFormaPagto()) ? $objGamesUsuario->getPerfilFormaPagto() : 0)) . ",";
+            if (!is_null($objGamesUsuario->getPerfilLimite()))                 $sql .= " ug_perfil_limite = "                     . $addParam(moeda2numeric($objGamesUsuario->getPerfilLimite())) . ",";
+            if (!is_null($objGamesUsuario->getPerfilSaldo()))                 $sql .= " ug_perfil_saldo = "                     . $addParam(moeda2numeric($objGamesUsuario->getPerfilSaldo())) . ",";
 
-            if (!is_null($objGamesUsuario->getPerfilCorteDiaSemana()))         $sql .= " ug_perfil_corte_dia_semana = "         . SQLaddFields($objGamesUsuario->getPerfilCorteDiaSemana(), "") . ",";
-            if (!is_null($objGamesUsuario->getPerfilCorteUltimoCorte()))     $sql .= " ug_perfil_corte_ultimo_corte = "         . SQLaddFields($objGamesUsuario->getPerfilCorteUltimoCorte(), "s") . ",";
-            if (!is_null($objGamesUsuario->getPerfilLimiteSugerido()))         $sql .= " ug_perfil_limite_sugerido = "         . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimiteSugerido()), "") . ",";
-            if (!is_null($objGamesUsuario->getCreditoPendente()))             $sql .= " ug_credito_pendente = "                 . SQLaddFields(moeda2numeric($objGamesUsuario->getCreditoPendente()), "") . ",";
+            if (!is_null($objGamesUsuario->getPerfilCorteDiaSemana()))         $sql .= " ug_perfil_corte_dia_semana = "         . $addParam($objGamesUsuario->getPerfilCorteDiaSemana()) . ",";
+            if (!is_null($objGamesUsuario->getPerfilCorteUltimoCorte()))     $sql .= " ug_perfil_corte_ultimo_corte = "         . $addParam($objGamesUsuario->getPerfilCorteUltimoCorte()) . ",";
+            if (!is_null($objGamesUsuario->getPerfilLimiteSugerido()))         $sql .= " ug_perfil_limite_sugerido = "         . $addParam(moeda2numeric($objGamesUsuario->getPerfilLimiteSugerido())) . ",";
+            if (!is_null($objGamesUsuario->getCreditoPendente()))             $sql .= " ug_credito_pendente = "                 . $addParam(moeda2numeric($objGamesUsuario->getCreditoPendente())) . ",";
 
-            if (!is_null($objGamesUsuario->getInscrEstadual()))                 $sql .= " ug_inscr_estadual = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getInscrEstadual())), "s") . ",";
-            if (!is_null($objGamesUsuario->getSite()))                         $sql .= " ug_site = "                             . SQLaddFields(strtoupper($objGamesUsuario->getSite()), "s") . ",";
-            if (!is_null($objGamesUsuario->getAberturaAno()))                 $sql .= " ug_abertura_ano = "                     . SQLaddFields($objGamesUsuario->getAberturaAno(), "") . ",";
-            if (!is_null($objGamesUsuario->getAberturaMes()))                 $sql .= " ug_abertura_mes = "                     . SQLaddFields($objGamesUsuario->getAberturaMes(), "") . ",";
-            if (!is_null($objGamesUsuario->getCartoes()))                     $sql .= " ug_cartoes = "                         . SQLaddFields(trim(strtoupper($objGamesUsuario->getCartoes())), "s") . ",";
-            if (!is_null($objGamesUsuario->getFaturaMediaMensal()))             $sql .= " ug_fatura_media_mensal = "             . SQLaddFields($objGamesUsuario->getFaturaMediaMensal(), "") . ",";
+            if (!is_null($objGamesUsuario->getInscrEstadual()))                 $sql .= " ug_inscr_estadual = "                 . $addParam(trim(strtoupper($objGamesUsuario->getInscrEstadual()))) . ",";
+            if (!is_null($objGamesUsuario->getSite()))                         $sql .= " ug_site = "                             . $addParam(strtoupper($objGamesUsuario->getSite())) . ",";
+            if (!is_null($objGamesUsuario->getAberturaAno()))                 $sql .= " ug_abertura_ano = "                     . $addParam($objGamesUsuario->getAberturaAno()) . ",";
+            if (!is_null($objGamesUsuario->getAberturaMes()))                 $sql .= " ug_abertura_mes = "                     . $addParam($objGamesUsuario->getAberturaMes()) . ",";
+            if (!is_null($objGamesUsuario->getCartoes()))                     $sql .= " ug_cartoes = "                         . $addParam(trim(strtoupper($objGamesUsuario->getCartoes()))) . ",";
+            if (!is_null($objGamesUsuario->getFaturaMediaMensal()))             $sql .= " ug_fatura_media_mensal = "             . $addParam($objGamesUsuario->getFaturaMediaMensal()) . ",";
 
-            if (!is_null($objGamesUsuario->getReprLegalNome()))                 $sql .= " ug_repr_legal_nome = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalNome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalRG()))                 $sql .= " ug_repr_legal_rg = "                     . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalRG())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCPF()))                 $sql .= " ug_repr_legal_cpf = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCPF())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalTelDDI()))             $sql .= " ug_repr_legal_tel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalTelDDD()))             $sql .= " ug_repr_legal_tel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalTel()))                 $sql .= " ug_repr_legal_tel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCelDDI()))             $sql .= " ug_repr_legal_cel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCelDDD()))             $sql .= " ug_repr_legal_cel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCel()))                 $sql .= " ug_repr_legal_cel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalEmail()))             $sql .= " ug_repr_legal_email = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalEmail())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalMSN()))                 $sql .= " ug_repr_legal_msn = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalMSN())), "s") . ",";
+            if (!is_null($objGamesUsuario->getReprLegalNome()))                 $sql .= " ug_repr_legal_nome = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalNome()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalRG()))                 $sql .= " ug_repr_legal_rg = "                     . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalRG()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCPF()))                 $sql .= " ug_repr_legal_cpf = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCPF()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalTelDDI()))             $sql .= " ug_repr_legal_tel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalTelDDD()))             $sql .= " ug_repr_legal_tel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalTel()))                 $sql .= " ug_repr_legal_tel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCelDDI()))             $sql .= " ug_repr_legal_cel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCelDDD()))             $sql .= " ug_repr_legal_cel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCel()))                 $sql .= " ug_repr_legal_cel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalEmail()))             $sql .= " ug_repr_legal_email = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalEmail()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalMSN()))                 $sql .= " ug_repr_legal_msn = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalMSN()))) . ",";
 
-            if (!is_null($objGamesUsuario->getReprVendaIgualReprLegal()))    $sql .= " ug_repr_venda_igual_repr_legal = "     . SQLaddFields($objGamesUsuario->getReprVendaIgualReprLegal(), "") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaNome()))                 $sql .= " ug_repr_venda_nome = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaNome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaRG()))                 $sql .= " ug_repr_venda_rg = "                     . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaRG())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCPF()))                 $sql .= " ug_repr_venda_cpf = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCPF())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaTelDDI()))             $sql .= " ug_repr_venda_tel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaTelDDD()))             $sql .= " ug_repr_venda_tel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaTel()))                 $sql .= " ug_repr_venda_tel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCelDDI()))             $sql .= " ug_repr_venda_cel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCelDDD()))             $sql .= " ug_repr_venda_cel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCel()))                 $sql .= " ug_repr_venda_cel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaEmail()))             $sql .= " ug_repr_venda_email = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaEmail())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaMSN()))                 $sql .= " ug_repr_venda_msn = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaMSN())), "s") . ",";
+            if (!is_null($objGamesUsuario->getReprVendaIgualReprLegal()))    $sql .= " ug_repr_venda_igual_repr_legal = "     . $addParam($objGamesUsuario->getReprVendaIgualReprLegal()) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaNome()))                 $sql .= " ug_repr_venda_nome = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaNome()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaRG()))                 $sql .= " ug_repr_venda_rg = "                     . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaRG()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCPF()))                 $sql .= " ug_repr_venda_cpf = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCPF()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaTelDDI()))             $sql .= " ug_repr_venda_tel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaTelDDD()))             $sql .= " ug_repr_venda_tel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaTel()))                 $sql .= " ug_repr_venda_tel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCelDDI()))             $sql .= " ug_repr_venda_cel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCelDDD()))             $sql .= " ug_repr_venda_cel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCel()))                 $sql .= " ug_repr_venda_cel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaEmail()))             $sql .= " ug_repr_venda_email = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaEmail()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaMSN()))                 $sql .= " ug_repr_venda_msn = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaMSN()))) . ",";
 
-            if (!is_null($objGamesUsuario->getDadosBancarios01Banco()))         $sql .= " ug_dados_bancarios_01_banco = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Banco())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios01Agencia()))     $sql .= " ug_dados_bancarios_01_agencia = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Agencia())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios01Conta()))         $sql .= " ug_dados_bancarios_01_conta = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Conta())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios01Abertura()))     $sql .= " ug_dados_bancarios_01_abertura = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Abertura())), "s") . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Banco()))         $sql .= " ug_dados_bancarios_01_banco = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Banco()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Agencia()))     $sql .= " ug_dados_bancarios_01_agencia = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Agencia()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Conta()))         $sql .= " ug_dados_bancarios_01_conta = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Conta()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Abertura()))     $sql .= " ug_dados_bancarios_01_abertura = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Abertura()))) . ",";
 
-            if (!is_null($objGamesUsuario->getDadosBancarios02Banco()))         $sql .= " ug_dados_bancarios_02_banco = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Banco())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios02Agencia()))     $sql .= " ug_dados_bancarios_02_agencia = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Agencia())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios02Conta()))         $sql .= " ug_dados_bancarios_02_conta = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Conta())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios02Abertura()))     $sql .= " ug_dados_bancarios_02_abertura = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Abertura())), "s") . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Banco()))         $sql .= " ug_dados_bancarios_02_banco = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Banco()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Agencia()))     $sql .= " ug_dados_bancarios_02_agencia = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Agencia()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Conta()))         $sql .= " ug_dados_bancarios_02_conta = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Conta()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Abertura()))     $sql .= " ug_dados_bancarios_02_abertura = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Abertura()))) . ",";
 
-            if (!is_null($objGamesUsuario->getComputadoresQtde()))             $sql .= " ug_computadores_qtde = "                 . SQLaddFields($objGamesUsuario->getComputadoresQtde(), "") . ",";
-            if (!is_null($objGamesUsuario->getComunicacaoVisual()))             $sql .= " ug_comunicacao_visual = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getComunicacaoVisual())), "s") . ",";
+            if (!is_null($objGamesUsuario->getComputadoresQtde()))             $sql .= " ug_computadores_qtde = "                 . $addParam($objGamesUsuario->getComputadoresQtde()) . ",";
+            if (!is_null($objGamesUsuario->getComunicacaoVisual()))             $sql .= " ug_comunicacao_visual = "             . $addParam(trim(strtoupper($objGamesUsuario->getComunicacaoVisual()))) . ",";
 
-            if (!is_null($objGamesUsuario->getPerfilLimiteRef()))                 $sql .= " ug_perfil_limite_ref = "                     . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimiteRef()), "") . ",";
+            if (!is_null($objGamesUsuario->getPerfilLimiteRef()))                 $sql .= " ug_perfil_limite_ref = "                     . $addParam(moeda2numeric($objGamesUsuario->getPerfilLimiteRef())) . ",";
 
-            if (!is_null($objGamesUsuario->getFicouSabendo()))                 $sql .= " ug_ficou_sabendo = "                     . SQLaddFields(trim(strtoupper($objGamesUsuario->getFicouSabendo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getFicouSabendo()))                 $sql .= " ug_ficou_sabendo = "                     . $addParam(trim(strtoupper($objGamesUsuario->getFicouSabendo()))) . ",";
 
-            if (!is_null($objGamesUsuario->getCompet_participa()))                 $sql .= " ug_compet_participa = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getCompet_participa())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCompet_promoveu()))                 $sql .= " ug_compet_promoveu = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getCompet_promoveu())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCompet_participantes_fifa()))         $sql .= " ug_compet_participantes_fifa = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getCompet_participantes_fifa())), "") . ",";
-            if (!is_null($objGamesUsuario->getCompet_participantes_wc3()))         $sql .= " ug_compet_participantes_wc3 = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getCompet_participantes_wc3())), "") . ",";
+            if (!is_null($objGamesUsuario->getCompet_participa()))                 $sql .= " ug_compet_participa = "             . $addParam(trim(strtoupper($objGamesUsuario->getCompet_participa()))) . ",";
+            if (!is_null($objGamesUsuario->getCompet_promoveu()))                 $sql .= " ug_compet_promoveu = "             . $addParam(trim(strtoupper($objGamesUsuario->getCompet_promoveu()))) . ",";
+            if (!is_null($objGamesUsuario->getCompet_participantes_fifa()))         $sql .= " ug_compet_participantes_fifa = "     . $addParam(trim(strtoupper($objGamesUsuario->getCompet_participantes_fifa()))) . ",";
+            if (!is_null($objGamesUsuario->getCompet_participantes_wc3()))         $sql .= " ug_compet_participantes_wc3 = "     . $addParam(trim(strtoupper($objGamesUsuario->getCompet_participantes_wc3()))) . ",";
 
-            if (!is_null($objGamesUsuario->getUgOngame()))     $sql .= " ug_ongame = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getUgOngame())), "s") . ",";
+            if (!is_null($objGamesUsuario->getUgOngame()))     $sql .= " ug_ongame = " . $addParam(trim(strtoupper($objGamesUsuario->getUgOngame()))) . ",";
 
-            if (!is_null($objGamesUsuario->getTipoEstabelecimento()))    $sql .= " ug_te_id = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEstabelecimentoParaBanco())), "") . ",";
+            if (!is_null($objGamesUsuario->getTipoEstabelecimento()))    $sql .= " ug_te_id = " . $addParam(trim(strtoupper($objGamesUsuario->getTipoEstabelecimentoParaBanco()))) . ",";
 
-            if (!is_null($objGamesUsuario->getUgIdNexCafe())) $sql .= " ug_id_nexcafe = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getUgIdNexCafe())), "s") . ",";
-            if (!is_null($objGamesUsuario->getUgLoginNexCafeAuto())) $sql .= " ug_login_nexcafe_auto = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getUgLoginNexCafeAuto())), "") . ",";
+            if (!is_null($objGamesUsuario->getUgIdNexCafe())) $sql .= " ug_id_nexcafe = " . $addParam(trim(strtoupper($objGamesUsuario->getUgIdNexCafe()))) . ",";
+            if (!is_null($objGamesUsuario->getUgLoginNexCafeAuto())) $sql .= " ug_login_nexcafe_auto = " . $addParam(trim(strtoupper($objGamesUsuario->getUgLoginNexCafeAuto()))) . ",";
 
-            if (!is_null($objGamesUsuario->getAlteraSenha())) $sql .= " ug_alterar_senha = " . intval(SQLaddFields($objGamesUsuario->getAlteraSenha(), "") * 1) . ",";
-            if (!is_null($objGamesUsuario->getExibirContrato())) $sql .= " ug_exibir_contrato = " . intval(SQLaddFields($objGamesUsuario->getExibirContrato(), "") * 1) . ",";
-            if (!is_null($objGamesUsuario->getDataAceite())) $sql .= " ug_data_aceite_adesao = " . SQLaddFields((($objGamesUsuario->getDataAceite()) ? "CURRENT_TIMESTAMP" : "NULL"), "") . ",";
+            if (!is_null($objGamesUsuario->getAlteraSenha())) $sql .= " ug_alterar_senha = " . $addParam(intval($objGamesUsuario->getAlteraSenha() * 1)) . ",";
+            if (!is_null($objGamesUsuario->getExibirContrato())) $sql .= " ug_exibir_contrato = " . $addParam(intval($objGamesUsuario->getExibirContrato() * 1)) . ",";
+            if (!is_null($objGamesUsuario->getDataAceite())) $sql .= " ug_data_aceite_adesao = " . (($objGamesUsuario->getDataAceite()) ? "CURRENT_TIMESTAMP" : "NULL") . ",";
 
-            if (!is_null($objGamesUsuario->getRecargaCelular())) $sql .= " ug_recarga_celular = " . intval(SQLaddFields($objGamesUsuario->getRecargaCelular(), "") * 1) . ",";
+            if (!is_null($objGamesUsuario->getRecargaCelular())) $sql .= " ug_recarga_celular = " . $addParam(intval($objGamesUsuario->getRecargaCelular() * 1)) . ",";
 
-            if (!is_null($objGamesUsuario->getTipoVenda())) $sql .= " ug_tipo_venda = " . SQLaddFields($objGamesUsuario->getTipoVenda(), "s") . ",";
+            if (!is_null($objGamesUsuario->getTipoVenda())) $sql .= " ug_tipo_venda = " . $addParam($objGamesUsuario->getTipoVenda()) . ",";
 
-            if (!is_null($objGamesUsuario->getCanaisVenda())) $sql .= " ug_canais_venda = " . SQLaddFields($objGamesUsuario->getCanaisVenda(), 'n');
+            if (!is_null($objGamesUsuario->getCanaisVenda())) $sql .= " ug_canais_venda = " . $addParam($objGamesUsuario->getCanaisVenda());
 
             if ($objGamesUsuario->getDataAprovacao() == "" && $objGamesUsuario->getSubstatus() == 11) $sql .= " ug_data_aprovacao = NOW(),";
 
             if (substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
 
-            $sql .= " where ug_id = " . SQLaddFields($objGamesUsuario->getId(), "");
+            $sql .= " where ug_id = " . $addParam($objGamesUsuario->getId());
 
             switch ($objGamesUsuario->getSubstatus()) {
                 case 2:
@@ -2418,7 +2425,7 @@ class UsuarioGames
                     } //end if($objGamesUsuario->getDataAprovacao() == "")
                     break;
             }
-            $ret = SQLexecuteQuery($sql);
+            $ret = SQLexecuteQueryParams($sql, $params);
             if (!$ret) $ret = "Erro ao atualizar usuário." . PHP_EOL;
             else {
                 $ret = "";
@@ -2477,6 +2484,12 @@ class UsuarioGames
         $ret_all = UsuarioGames::validarCampos($objGamesUsuario, false, $ateracao_usuario);
 
         if ($ret == "") {
+
+            $params = array();
+            $addParam = function ($value) use (&$params) {
+                $params[] = $value;
+                return "$" . count($params);
+            };
             if (UsuarioGames::existeLogin($objGamesUsuario->getLogin(), $objGamesUsuario->getId())) {
                 $ret_all .= "Login já cadastrado." . PHP_EOL;
             }
@@ -2494,8 +2507,8 @@ class UsuarioGames
             }
         }
 
-        $sqlUltimoEmail = "select ug_email from dist_usuarios_games where ug_id = " . $objGamesUsuario->getId() . ";";
-        $retEmail = SQLexecuteQuery($sqlUltimoEmail);
+        $sqlUltimoEmail = "select ug_email from dist_usuarios_games where ug_id = $1";
+        $retEmail = SQLexecuteQueryParams($sqlUltimoEmail, array($objGamesUsuario->getId()));
         $rsUltimoEmail = pg_fetch_array($retEmail);
 
 
@@ -2520,154 +2533,153 @@ class UsuarioGames
 
             //SQL
             $sql = "update dist_usuarios_games set ";
-            if (!is_null($objGamesUsuario->getAtivo()))             $sql .= " ug_ativo = "                 . SQLaddFields(trim($objGamesUsuario->getAtivo()), "") . ",";
-            if (!is_null($objGamesUsuario->getStatusBusca()))     $sql .= " ug_status = "             . SQLaddFields(trim($objGamesUsuario->getStatusBusca()), "") . ",";
-            if (!is_null($objGamesUsuario->getSubstatus()))             $sql .= " ug_substatus = "                 . SQLaddFields(trim($objGamesUsuario->getSubstatus()), "") . ",";
-            if (!is_null($objGamesUsuario->getLogin()))             $sql .= " ug_login = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getLogin())), "s") . ",";
+            if (!is_null($objGamesUsuario->getAtivo()))             $sql .= " ug_ativo = "                 . $addParam(trim($objGamesUsuario->getAtivo())) . ",";
+            if (!is_null($objGamesUsuario->getStatusBusca()))     $sql .= " ug_status = "             . $addParam(trim($objGamesUsuario->getStatusBusca())) . ",";
+            if (!is_null($objGamesUsuario->getSubstatus()))             $sql .= " ug_substatus = "                 . $addParam(trim($objGamesUsuario->getSubstatus())) . ",";
+            if (!is_null($objGamesUsuario->getLogin()))             $sql .= " ug_login = "                 . $addParam(trim(strtoupper($objGamesUsuario->getLogin()))) . ",";
 
-            if (!is_null($objGamesUsuario->getNomeFantasia()))     $sql .= " ug_nome_fantasia = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getNomeFantasia())), "s") . ",";
-            if (!is_null($objGamesUsuario->getRazaoSocial()))     $sql .= " ug_razao_social = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getRazaoSocial())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCNPJ()))             $sql .= " ug_cnpj = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getCNPJ())), "s") . ",";
-            if (!is_null($objGamesUsuario->getResponsavel()))     $sql .= " ug_responsavel = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getResponsavel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getEmail()))             $sql .= " ug_email = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getEmail())), "s") . ",";
+            if (!is_null($objGamesUsuario->getNomeFantasia()))     $sql .= " ug_nome_fantasia = "         . $addParam(trim(strtoupper($objGamesUsuario->getNomeFantasia()))) . ",";
+            if (!is_null($objGamesUsuario->getRazaoSocial()))     $sql .= " ug_razao_social = "         . $addParam(trim(strtoupper($objGamesUsuario->getRazaoSocial()))) . ",";
+            if (!is_null($objGamesUsuario->getCNPJ()))             $sql .= " ug_cnpj = "                 . $addParam(trim(strtoupper($objGamesUsuario->getCNPJ()))) . ",";
+            if (!is_null($objGamesUsuario->getResponsavel()))     $sql .= " ug_responsavel = "         . $addParam(trim(strtoupper($objGamesUsuario->getResponsavel()))) . ",";
+            if (!is_null($objGamesUsuario->getEmail()))             $sql .= " ug_email = "                 . $addParam(trim(strtoupper($objGamesUsuario->getEmail()))) . ",";
 
-            if (!is_null($objGamesUsuario->getEndereco()))         $sql .= " ug_endereco = "             . SQLaddFields(trim($objGamesUsuario->getEndereco()), "s") . ",";
-            if (!is_null($objGamesUsuario->getTipoEnd()))         $sql .= " ug_tipo_end = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEnd())), "s") . ",";
-            if (!is_null($objGamesUsuario->getNumero()))         $sql .= " ug_numero = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getNumero())), "s") . ",";
-            if (!is_null($objGamesUsuario->getComplemento()))     $sql .= " ug_complemento = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getComplemento())), "s") . ",";
-            if (!is_null($objGamesUsuario->getBairro()))         $sql .= " ug_bairro = "             . SQLaddFields(trim($objGamesUsuario->getBairro()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCidade()))         $sql .= " ug_cidade = "             . SQLaddFields(trim($objGamesUsuario->getCidade()), "s") . ",";
-            if (!is_null($objGamesUsuario->getEstado()))         $sql .= " ug_estado = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getEstado())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCEP()))             $sql .= " ug_cep = "                 . SQLaddFields(trim($objGamesUsuario->getCEP()), "s") . ",";
+            if (!is_null($objGamesUsuario->getEndereco()))         $sql .= " ug_endereco = "             . $addParam(trim($objGamesUsuario->getEndereco())) . ",";
+            if (!is_null($objGamesUsuario->getTipoEnd()))         $sql .= " ug_tipo_end = "             . $addParam(trim(strtoupper($objGamesUsuario->getTipoEnd()))) . ",";
+            if (!is_null($objGamesUsuario->getNumero()))         $sql .= " ug_numero = "             . $addParam(trim(strtoupper($objGamesUsuario->getNumero()))) . ",";
+            if (!is_null($objGamesUsuario->getComplemento()))     $sql .= " ug_complemento = "         . $addParam(trim(strtoupper($objGamesUsuario->getComplemento()))) . ",";
+            if (!is_null($objGamesUsuario->getBairro()))         $sql .= " ug_bairro = "             . $addParam(trim($objGamesUsuario->getBairro())) . ",";
+            if (!is_null($objGamesUsuario->getCidade()))         $sql .= " ug_cidade = "             . $addParam(trim($objGamesUsuario->getCidade())) . ",";
+            if (!is_null($objGamesUsuario->getEstado()))         $sql .= " ug_estado = "             . $addParam(trim(strtoupper($objGamesUsuario->getEstado()))) . ",";
+            if (!is_null($objGamesUsuario->getCEP()))             $sql .= " ug_cep = "                 . $addParam(trim($objGamesUsuario->getCEP())) . ",";
 
-            if (!is_null($objGamesUsuario->getTelDDI()))         $sql .= " ug_tel_ddi = "             . SQLaddFields(trim($objGamesUsuario->getTelDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getTelDDD()))         $sql .= " ug_tel_ddd = "             . SQLaddFields(trim($objGamesUsuario->getTelDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getTel()))             $sql .= " ug_tel = "                 . SQLaddFields(trim($objGamesUsuario->getTel()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCelDDI()))         $sql .= " ug_cel_ddi = "             . SQLaddFields(trim($objGamesUsuario->getCelDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel_ddd = "             . SQLaddFields(trim($objGamesUsuario->getCelDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel = "                 . SQLaddFields(trim($objGamesUsuario->getCel()), "s") . " ,";
-            if (!is_null($objGamesUsuario->getFaxDDI()))         $sql .= " ug_fax_ddi = "             . SQLaddFields(trim($objGamesUsuario->getFaxDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getFaxDDD()))         $sql .= " ug_fax_ddd = "             . SQLaddFields(trim($objGamesUsuario->getFaxDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getFax()))             $sql .= " ug_fax = "                 . SQLaddFields(trim($objGamesUsuario->getFax()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTelDDI()))         $sql .= " ug_tel_ddi = "             . $addParam(trim($objGamesUsuario->getTelDDI())) . ",";
+            if (!is_null($objGamesUsuario->getTelDDD()))         $sql .= " ug_tel_ddd = "             . $addParam(trim($objGamesUsuario->getTelDDD())) . ",";
+            if (!is_null($objGamesUsuario->getTel()))             $sql .= " ug_tel = "                 . $addParam(trim($objGamesUsuario->getTel())) . ",";
+            if (!is_null($objGamesUsuario->getCelDDI()))         $sql .= " ug_cel_ddi = "             . $addParam(trim($objGamesUsuario->getCelDDI())) . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel_ddd = "             . $addParam(trim($objGamesUsuario->getCelDDD())) . ",";
+            if (!is_null($objGamesUsuario->getCelDDD()))         $sql .= " ug_cel = "                 . $addParam(trim($objGamesUsuario->getCel())) . " ,";
+            if (!is_null($objGamesUsuario->getFaxDDI()))         $sql .= " ug_fax_ddi = "             . $addParam(trim($objGamesUsuario->getFaxDDI())) . ",";
+            if (!is_null($objGamesUsuario->getFaxDDD()))         $sql .= " ug_fax_ddd = "             . $addParam(trim($objGamesUsuario->getFaxDDD())) . ",";
+            if (!is_null($objGamesUsuario->getFax()))             $sql .= " ug_fax = "                 . $addParam(trim($objGamesUsuario->getFax())) . ",";
 
-            if (!is_null($objGamesUsuario->getRACodigo()))         $sql .= " ug_ra_codigo = "             . SQLaddFields(trim($objGamesUsuario->getRACodigo()), "s") . ",";
-            if (!is_null($objGamesUsuario->getRAOutros()))         $sql .= " ug_ra_outros = "             . SQLaddFields(trim($objGamesUsuario->getRAOutros()), "s") . ",";
+            if (!is_null($objGamesUsuario->getRACodigo()))         $sql .= " ug_ra_codigo = "             . $addParam(trim($objGamesUsuario->getRACodigo())) . ",";
+            if (!is_null($objGamesUsuario->getRAOutros()))         $sql .= " ug_ra_outros = "             . $addParam(trim($objGamesUsuario->getRAOutros())) . ",";
 
-            if (!is_null($objGamesUsuario->getContato01TelDDI())) $sql .= " ug_contato01_tel_ddi = "     . SQLaddFields(trim($objGamesUsuario->getContato01TelDDI()), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01TelDDD())) $sql .= " ug_contato01_tel_ddd = "     . SQLaddFields(trim($objGamesUsuario->getContato01TelDDD()), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01Tel()))     $sql .= " ug_contato01_tel = "         . SQLaddFields(trim($objGamesUsuario->getContato01Tel()), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01Nome()))     $sql .= " ug_contato01_nome = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getContato01Nome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getContato01Cargo())) $sql .= " ug_contato01_cargo = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getContato01Cargo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getContato01TelDDI())) $sql .= " ug_contato01_tel_ddi = "     . $addParam(trim($objGamesUsuario->getContato01TelDDI())) . ",";
+            if (!is_null($objGamesUsuario->getContato01TelDDD())) $sql .= " ug_contato01_tel_ddd = "     . $addParam(trim($objGamesUsuario->getContato01TelDDD())) . ",";
+            if (!is_null($objGamesUsuario->getContato01Tel()))     $sql .= " ug_contato01_tel = "         . $addParam(trim($objGamesUsuario->getContato01Tel())) . ",";
+            if (!is_null($objGamesUsuario->getContato01Nome()))     $sql .= " ug_contato01_nome = "     . $addParam(trim(strtoupper($objGamesUsuario->getContato01Nome()))) . ",";
+            if (!is_null($objGamesUsuario->getContato01Cargo())) $sql .= " ug_contato01_cargo = "     . $addParam(trim(strtoupper($objGamesUsuario->getContato01Cargo()))) . ",";
 
             if (!is_null($objGamesUsuario->getObservacoes())) {
                 if (trim($objGamesUsuario->getObservacoes()) != "") {
-                    $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES (" . $objGamesUsuario->getId() . "," . SQLaddFields(trim($objGamesUsuario->getObservacoes()), "s") . ",'" . $GLOBALS['_SESSION']['userlogin_bko'] . "');";
-                    //echo $sql_insert_obs;
-                    $ret_insert_obs = SQLexecuteQuery($sql_insert_obs);
+                    $sql_insert_obs = "INSERT INTO dist_usuarios_games_obs VALUES ($1, $2, $3);";
+                    $ret_insert_obs = SQLexecuteQueryParams($sql_insert_obs, array($objGamesUsuario->getId(), trim($objGamesUsuario->getObservacoes()), $GLOBALS['_SESSION']['userlogin_bko']));
                     if (!$ret_insert_obs) echo "Erro ao atualizar Observação do Usuário." . PHP_EOL;
                 } //end if(trim($objGamesUsuario->getObservacoes()) != "")
             } //end if(!is_null($objGamesUsuario->getObservacoes())) 
             if (!is_null($objGamesUsuario->getRiscoClassif())) {
                 if (array_key_exists($objGamesUsuario->getRiscoClassif(), $GLOBALS['RISCO_CLASSIFICACAO_NOMES'])) {
-                    $sql .= " ug_risco_classif = " . SQLaddFields(trim($objGamesUsuario->getRiscoClassif()), "") . ",";
+                    $sql .= " ug_risco_classif = " . $addParam(trim($objGamesUsuario->getRiscoClassif())) . ",";
                 }
             }
 
-            if (!is_null($objGamesUsuario->getTipoCadastro()))     $sql .= " ug_tipo_cadastro = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoCadastro())), "s") . ",";
-            if (!is_null($objGamesUsuario->getNome()))             $sql .= " ug_nome = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getNome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getCPF()))             $sql .= " ug_cpf = "                 . SQLaddFields(trim($objGamesUsuario->getCPF()), "s") . ",";
+            if (!is_null($objGamesUsuario->getTipoCadastro()))     $sql .= " ug_tipo_cadastro = "         . $addParam(trim(strtoupper($objGamesUsuario->getTipoCadastro()))) . ",";
+            if (!is_null($objGamesUsuario->getNome()))             $sql .= " ug_nome = "                 . $addParam(trim(strtoupper($objGamesUsuario->getNome()))) . ",";
+            if (!is_null($objGamesUsuario->getCPF()))             $sql .= " ug_cpf = "                 . $addParam(trim($objGamesUsuario->getCPF())) . ",";
 
-            if (!is_null($objGamesUsuario->getRG()))             $sql .= " ug_rg = "                 . SQLaddFields(trim($objGamesUsuario->getRG()), "s") . ",";
-            if (!is_null($objGamesUsuario->getDataNascimento()) && $objGamesUsuario->getDataNascimento() != "") $sql .= " ug_data_nascimento = "    . SQLaddFields(trim($dataNascimento), "s") . ",";
-            if (!is_null($objGamesUsuario->getSexo()))             $sql .= " ug_sexo = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getSexo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getRG()))             $sql .= " ug_rg = "                 . $addParam(trim($objGamesUsuario->getRG())) . ",";
+            if (!is_null($objGamesUsuario->getDataNascimento()) && $objGamesUsuario->getDataNascimento() != "") $sql .= " ug_data_nascimento = "    . $addParam(trim($dataNascimento)) . ",";
+            if (!is_null($objGamesUsuario->getSexo()))             $sql .= " ug_sexo = "                 . $addParam(trim(strtoupper($objGamesUsuario->getSexo()))) . ",";
 
-            if (!is_null($objGamesUsuario->getPerfilSenhaReimpressao()))     $sql .= " ug_perfil_senha_reimpressao = "         . SQLaddFields(trim($objGamesUsuario->getPerfilSenhaReimpressao()), "s") . ",";
-            if (!is_null($objGamesUsuario->getPerfilFormaPagto()))             $sql .= " ug_perfil_forma_pagto = "             . SQLaddFields($objGamesUsuario->getPerfilFormaPagto(), "") . ",";
-            if (!is_null($objGamesUsuario->getPerfilLimite()))                 $sql .= " ug_perfil_limite = "                     . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimite()), "") . ",";
-            if (!is_null($objGamesUsuario->getPerfilSaldo()))                 $sql .= " ug_perfil_saldo = "                     . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilSaldo()), "") . ",";
+            if (!is_null($objGamesUsuario->getPerfilSenhaReimpressao()))     $sql .= " ug_perfil_senha_reimpressao = "         . $addParam(trim($objGamesUsuario->getPerfilSenhaReimpressao())) . ",";
+            if (!is_null($objGamesUsuario->getPerfilFormaPagto()))             $sql .= " ug_perfil_forma_pagto = "             . $addParam($objGamesUsuario->getPerfilFormaPagto()) . ",";
+            if (!is_null($objGamesUsuario->getPerfilLimite()))                 $sql .= " ug_perfil_limite = "                     . $addParam(moeda2numeric($objGamesUsuario->getPerfilLimite())) . ",";
+            if (!is_null($objGamesUsuario->getPerfilSaldo()))                 $sql .= " ug_perfil_saldo = "                     . $addParam(moeda2numeric($objGamesUsuario->getPerfilSaldo())) . ",";
 
-            if (!is_null($objGamesUsuario->getPerfilCorteDiaSemana()))         $sql .= " ug_perfil_corte_dia_semana = "         . SQLaddFields($objGamesUsuario->getPerfilCorteDiaSemana(), "") . ",";
-            if (!is_null($objGamesUsuario->getPerfilCorteUltimoCorte()))     $sql .= " ug_perfil_corte_ultimo_corte = "         . SQLaddFields($objGamesUsuario->getPerfilCorteUltimoCorte(), "s") . ",";
-            if (!is_null($objGamesUsuario->getPerfilLimiteSugerido()))         $sql .= " ug_perfil_limite_sugerido = "         . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimiteSugerido()), "") . ",";
-            if (!is_null($objGamesUsuario->getCreditoPendente()))             $sql .= " ug_credito_pendente = "                 . SQLaddFields(moeda2numeric($objGamesUsuario->getCreditoPendente()), "") . ",";
+            if (!is_null($objGamesUsuario->getPerfilCorteDiaSemana()))         $sql .= " ug_perfil_corte_dia_semana = "         . $addParam($objGamesUsuario->getPerfilCorteDiaSemana()) . ",";
+            if (!is_null($objGamesUsuario->getPerfilCorteUltimoCorte()))     $sql .= " ug_perfil_corte_ultimo_corte = "         . $addParam($objGamesUsuario->getPerfilCorteUltimoCorte()) . ",";
+            if (!is_null($objGamesUsuario->getPerfilLimiteSugerido()))         $sql .= " ug_perfil_limite_sugerido = "         . $addParam(moeda2numeric($objGamesUsuario->getPerfilLimiteSugerido())) . ",";
+            if (!is_null($objGamesUsuario->getCreditoPendente()))             $sql .= " ug_credito_pendente = "                 . $addParam(moeda2numeric($objGamesUsuario->getCreditoPendente())) . ",";
 
-            if (!is_null($objGamesUsuario->getInscrEstadual()))                 $sql .= " ug_inscr_estadual = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getInscrEstadual())), "s") . ",";
-            if (!is_null($objGamesUsuario->getSite()))                         $sql .= " ug_site = "                             . SQLaddFields(strtoupper($objGamesUsuario->getSite()), "s") . ",";
-            if (!is_null($objGamesUsuario->getAberturaAno()))                 $sql .= " ug_abertura_ano = "                     . SQLaddFields($objGamesUsuario->getAberturaAno(), "") . ",";
-            if (!is_null($objGamesUsuario->getAberturaMes()))                 $sql .= " ug_abertura_mes = "                     . SQLaddFields($objGamesUsuario->getAberturaMes(), "") . ",";
-            if (!is_null($objGamesUsuario->getCartoes()))                     $sql .= " ug_cartoes = "                         . SQLaddFields(trim(strtoupper($objGamesUsuario->getCartoes())), "s") . ",";
-            if (!is_null($objGamesUsuario->getFaturaMediaMensal()))             $sql .= " ug_fatura_media_mensal = "             . SQLaddFields($objGamesUsuario->getFaturaMediaMensal(), "") . ",";
+            if (!is_null($objGamesUsuario->getInscrEstadual()))                 $sql .= " ug_inscr_estadual = "                 . $addParam(trim(strtoupper($objGamesUsuario->getInscrEstadual()))) . ",";
+            if (!is_null($objGamesUsuario->getSite()))                         $sql .= " ug_site = "                             . $addParam(strtoupper($objGamesUsuario->getSite())) . ",";
+            if (!is_null($objGamesUsuario->getAberturaAno()))                 $sql .= " ug_abertura_ano = "                     . $addParam($objGamesUsuario->getAberturaAno()) . ",";
+            if (!is_null($objGamesUsuario->getAberturaMes()))                 $sql .= " ug_abertura_mes = "                     . $addParam($objGamesUsuario->getAberturaMes()) . ",";
+            if (!is_null($objGamesUsuario->getCartoes()))                     $sql .= " ug_cartoes = "                         . $addParam(trim(strtoupper($objGamesUsuario->getCartoes()))) . ",";
+            if (!is_null($objGamesUsuario->getFaturaMediaMensal()))             $sql .= " ug_fatura_media_mensal = "             . $addParam($objGamesUsuario->getFaturaMediaMensal()) . ",";
 
-            if (!is_null($objGamesUsuario->getReprLegalNome()))                 $sql .= " ug_repr_legal_nome = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalNome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalRG()))                 $sql .= " ug_repr_legal_rg = "                     . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalRG())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCPF()))                 $sql .= " ug_repr_legal_cpf = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCPF())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalDataNascimento()) && $objGamesUsuario->getReprLegalDataNascimento() != "")      $sql .= " ug_repr_legal_data_nascimento = "     . SQLaddFields(trim(strtoupper($dataNascimentoRepr)), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalTelDDI()))             $sql .= " ug_repr_legal_tel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalTelDDD()))             $sql .= " ug_repr_legal_tel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalTel()))                 $sql .= " ug_repr_legal_tel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalTel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCelDDI()))             $sql .= " ug_repr_legal_cel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCelDDD()))             $sql .= " ug_repr_legal_cel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalCel()))                 $sql .= " ug_repr_legal_cel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalCel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalEmail()))             $sql .= " ug_repr_legal_email = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalEmail())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprLegalMSN()))                 $sql .= " ug_repr_legal_msn = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprLegalMSN())), "s") . ",";
+            if (!is_null($objGamesUsuario->getReprLegalNome()))                 $sql .= " ug_repr_legal_nome = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalNome()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalRG()))                 $sql .= " ug_repr_legal_rg = "                     . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalRG()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCPF()))                 $sql .= " ug_repr_legal_cpf = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCPF()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalDataNascimento()) && $objGamesUsuario->getReprLegalDataNascimento() != "")      $sql .= " ug_repr_legal_data_nascimento = "     . $addParam(trim(strtoupper($dataNascimentoRepr))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalTelDDI()))             $sql .= " ug_repr_legal_tel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalTelDDD()))             $sql .= " ug_repr_legal_tel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalTel()))                 $sql .= " ug_repr_legal_tel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalTel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCelDDI()))             $sql .= " ug_repr_legal_cel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCelDDD()))             $sql .= " ug_repr_legal_cel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalCel()))                 $sql .= " ug_repr_legal_cel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalCel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalEmail()))             $sql .= " ug_repr_legal_email = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalEmail()))) . ",";
+            if (!is_null($objGamesUsuario->getReprLegalMSN()))                 $sql .= " ug_repr_legal_msn = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprLegalMSN()))) . ",";
 
-            if (!is_null($objGamesUsuario->getReprVendaIgualReprLegal()))    $sql .= " ug_repr_venda_igual_repr_legal = "     . SQLaddFields($objGamesUsuario->getReprVendaIgualReprLegal(), "") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaNome()))                 $sql .= " ug_repr_venda_nome = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaNome())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaRG()))                 $sql .= " ug_repr_venda_rg = "                     . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaRG())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCPF()))                 $sql .= " ug_repr_venda_cpf = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCPF())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaTelDDI()))             $sql .= " ug_repr_venda_tel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaTelDDD()))             $sql .= " ug_repr_venda_tel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaTel()))                 $sql .= " ug_repr_venda_tel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaTel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCelDDI()))             $sql .= " ug_repr_venda_cel_ddi = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCelDDI())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCelDDD()))             $sql .= " ug_repr_venda_cel_ddd = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCelDDD())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaCel()))                 $sql .= " ug_repr_venda_cel = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaCel())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaEmail()))             $sql .= " ug_repr_venda_email = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaEmail())), "s") . ",";
-            if (!is_null($objGamesUsuario->getReprVendaMSN()))                 $sql .= " ug_repr_venda_msn = "                 . SQLaddFields(trim(strtoupper($objGamesUsuario->getReprVendaMSN())), "s") . ",";
+            if (!is_null($objGamesUsuario->getReprVendaIgualReprLegal()))    $sql .= " ug_repr_venda_igual_repr_legal = "     . $addParam($objGamesUsuario->getReprVendaIgualReprLegal()) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaNome()))                 $sql .= " ug_repr_venda_nome = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaNome()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaRG()))                 $sql .= " ug_repr_venda_rg = "                     . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaRG()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCPF()))                 $sql .= " ug_repr_venda_cpf = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCPF()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaTelDDI()))             $sql .= " ug_repr_venda_tel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaTelDDD()))             $sql .= " ug_repr_venda_tel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaTel()))                 $sql .= " ug_repr_venda_tel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaTel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCelDDI()))             $sql .= " ug_repr_venda_cel_ddi = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCelDDI()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCelDDD()))             $sql .= " ug_repr_venda_cel_ddd = "             . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCelDDD()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaCel()))                 $sql .= " ug_repr_venda_cel = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaCel()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaEmail()))             $sql .= " ug_repr_venda_email = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaEmail()))) . ",";
+            if (!is_null($objGamesUsuario->getReprVendaMSN()))                 $sql .= " ug_repr_venda_msn = "                 . $addParam(trim(strtoupper($objGamesUsuario->getReprVendaMSN()))) . ",";
 
-            if (!is_null($objGamesUsuario->getDadosBancarios01Banco()))         $sql .= " ug_dados_bancarios_01_banco = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Banco())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios01Agencia()))     $sql .= " ug_dados_bancarios_01_agencia = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Agencia())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios01Conta()))         $sql .= " ug_dados_bancarios_01_conta = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Conta())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios01Abertura()))     $sql .= " ug_dados_bancarios_01_abertura = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios01Abertura())), "s") . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Banco()))         $sql .= " ug_dados_bancarios_01_banco = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Banco()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Agencia()))     $sql .= " ug_dados_bancarios_01_agencia = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Agencia()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Conta()))         $sql .= " ug_dados_bancarios_01_conta = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Conta()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios01Abertura()))     $sql .= " ug_dados_bancarios_01_abertura = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios01Abertura()))) . ",";
 
-            if (!is_null($objGamesUsuario->getDadosBancarios02Banco()))         $sql .= " ug_dados_bancarios_02_banco = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Banco())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios02Agencia()))     $sql .= " ug_dados_bancarios_02_agencia = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Agencia())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios02Conta()))         $sql .= " ug_dados_bancarios_02_conta = "         . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Conta())), "s") . ",";
-            if (!is_null($objGamesUsuario->getDadosBancarios02Abertura()))     $sql .= " ug_dados_bancarios_02_abertura = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getDadosBancarios02Abertura())), "s") . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Banco()))         $sql .= " ug_dados_bancarios_02_banco = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Banco()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Agencia()))     $sql .= " ug_dados_bancarios_02_agencia = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Agencia()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Conta()))         $sql .= " ug_dados_bancarios_02_conta = "         . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Conta()))) . ",";
+            if (!is_null($objGamesUsuario->getDadosBancarios02Abertura()))     $sql .= " ug_dados_bancarios_02_abertura = "     . $addParam(trim(strtoupper($objGamesUsuario->getDadosBancarios02Abertura()))) . ",";
 
-            if (!is_null($objGamesUsuario->getComputadoresQtde()))             $sql .= " ug_computadores_qtde = "                 . SQLaddFields($objGamesUsuario->getComputadoresQtde(), "") . ",";
-            if (!is_null($objGamesUsuario->getComunicacaoVisual()))             $sql .= " ug_comunicacao_visual = "             . SQLaddFields(trim(strtoupper($objGamesUsuario->getComunicacaoVisual())), "s") . ",";
+            if (!is_null($objGamesUsuario->getComputadoresQtde()))             $sql .= " ug_computadores_qtde = "                 . $addParam($objGamesUsuario->getComputadoresQtde()) . ",";
+            if (!is_null($objGamesUsuario->getComunicacaoVisual()))             $sql .= " ug_comunicacao_visual = "             . $addParam(trim(strtoupper($objGamesUsuario->getComunicacaoVisual()))) . ",";
 
-            if (!is_null($objGamesUsuario->getPerfilLimiteRef()))                 $sql .= " ug_perfil_limite_ref = "                     . SQLaddFields(moeda2numeric($objGamesUsuario->getPerfilLimiteRef()), "") . ",";
+            if (!is_null($objGamesUsuario->getPerfilLimiteRef()))                 $sql .= " ug_perfil_limite_ref = "                     . $addParam(moeda2numeric($objGamesUsuario->getPerfilLimiteRef())) . ",";
 
-            if (!is_null($objGamesUsuario->getFicouSabendo()))     $sql .= " ug_ficou_sabendo = "     . SQLaddFields(trim(strtoupper($objGamesUsuario->getFicouSabendo())), "s") . ",";
+            if (!is_null($objGamesUsuario->getFicouSabendo()))     $sql .= " ug_ficou_sabendo = "     . $addParam(trim(strtoupper($objGamesUsuario->getFicouSabendo()))) . ",";
 
-            if (!is_null($objGamesUsuario->getUgOngame()))    $sql .= " ug_ongame = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getUgOngame())), "s") . ",";
+            if (!is_null($objGamesUsuario->getUgOngame()))    $sql .= " ug_ongame = " . $addParam(trim(strtoupper($objGamesUsuario->getUgOngame()))) . ",";
 
-            if (!is_null($objGamesUsuario->getTipoEstabelecimento()))    $sql .= " ug_te_id = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getTipoEstabelecimentoParaBanco())), "") . ",";
+            if (!is_null($objGamesUsuario->getTipoEstabelecimento()))    $sql .= " ug_te_id = " . $addParam(trim(strtoupper($objGamesUsuario->getTipoEstabelecimentoParaBanco()))) . ",";
 
-            if (!is_null($objGamesUsuario->getUgIdNexCafe())) $sql .= " ug_id_nexcafe = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getUgIdNexCafe())), "s") . ",";
-            if (!is_null($objGamesUsuario->getUgLoginNexCafeAuto())) $sql .= " ug_login_nexcafe_auto = " . SQLaddFields(trim(strtoupper($objGamesUsuario->getUgLoginNexCafeAuto())), "") . ",";
+            if (!is_null($objGamesUsuario->getUgIdNexCafe())) $sql .= " ug_id_nexcafe = " . $addParam(trim(strtoupper($objGamesUsuario->getUgIdNexCafe()))) . ",";
+            if (!is_null($objGamesUsuario->getUgLoginNexCafeAuto())) $sql .= " ug_login_nexcafe_auto = " . $addParam(trim(strtoupper($objGamesUsuario->getUgLoginNexCafeAuto()))) . ",";
 
-            if (!is_null($objGamesUsuario->getAlteraSenha())) $sql .= " ug_alterar_senha = " . intval(SQLaddFields($objGamesUsuario->getAlteraSenha(), "") * 1) . ",";
-            if (!is_null($objGamesUsuario->getExibirContrato())) $sql .= " ug_exibir_contrato = " . intval(SQLaddFields($objGamesUsuario->getExibirContrato(), "") * 1) . ",";
-            if (!is_null($objGamesUsuario->getDataAceite())) $sql .= " ug_data_aceite_adesao = " . SQLaddFields((($objGamesUsuario->getDataAceite()) ? "CURRENT_TIMESTAMP" : "NULL"), "") . ",";
+            if (!is_null($objGamesUsuario->getAlteraSenha())) $sql .= " ug_alterar_senha = " . $addParam(intval($objGamesUsuario->getAlteraSenha() * 1)) . ",";
+            if (!is_null($objGamesUsuario->getExibirContrato())) $sql .= " ug_exibir_contrato = " . $addParam(intval($objGamesUsuario->getExibirContrato() * 1)) . ",";
+            if (!is_null($objGamesUsuario->getDataAceite())) $sql .= " ug_data_aceite_adesao = " . (($objGamesUsuario->getDataAceite()) ? "CURRENT_TIMESTAMP" : "NULL") . ",";
 
-            if (!is_null($objGamesUsuario->getRecargaCelular())) $sql .= " ug_recarga_celular = " . intval(SQLaddFields($objGamesUsuario->getRecargaCelular(), "") * 1) . ",";
+            if (!is_null($objGamesUsuario->getRecargaCelular())) $sql .= " ug_recarga_celular = " . $addParam(intval($objGamesUsuario->getRecargaCelular() * 1)) . ",";
 
-            if (!is_null($objGamesUsuario->getVIP())) $sql .= " ug_vip = " . intval(SQLaddFields($objGamesUsuario->getVIP(), "") * 1) . ",";
+            if (!is_null($objGamesUsuario->getVIP())) $sql .= " ug_vip = " . $addParam(intval($objGamesUsuario->getVIP() * 1)) . ",";
 
-            if (!is_null($objGamesUsuario->getPossuiRestricaoProdutos())) $sql .= " ug_possui_restricao_produtos = " . intval(SQLaddFields($objGamesUsuario->getPossuiRestricaoProdutos(), "") * 1) . ",";
+            if (!is_null($objGamesUsuario->getPossuiRestricaoProdutos())) $sql .= " ug_possui_restricao_produtos = " . $addParam(intval($objGamesUsuario->getPossuiRestricaoProdutos() * 1)) . ",";
 
-            if (!is_null($objGamesUsuario->getTipoVenda())) $sql .= " ug_tipo_venda = " . SQLaddFields($objGamesUsuario->getTipoVenda(), "s") . ",";
+            if (!is_null($objGamesUsuario->getTipoVenda())) $sql .= " ug_tipo_venda = " . $addParam($objGamesUsuario->getTipoVenda()) . ",";
 
-            if (!is_null($objGamesUsuario->getCanaisVenda())) $sql .= " ug_canais_venda = " . SQLaddFields(trim($objGamesUsuario->getCanaisVenda()), "s") . ",";
+            if (!is_null($objGamesUsuario->getCanaisVenda())) $sql .= " ug_canais_venda = " . $addParam(trim($objGamesUsuario->getCanaisVenda())) . ",";
 
-            if (!is_null($objGamesUsuario->getDataExpiraSenha())) $sql .= " ug_data_expiracao_senha = " . SQLaddFields($dataExpiraSenha, "s") . ",";
+            if (!is_null($objGamesUsuario->getDataExpiraSenha())) $sql .= " ug_data_expiracao_senha = " . $addParam($dataExpiraSenha) . ",";
             if ($objGamesUsuario->getDataAprovacao() == "" && $objGamesUsuario->getSubstatus() == 11) $sql .= " ug_data_aprovacao = NOW(),";
 
             if (substr($sql, -1) == ",") $sql = substr($sql, 0, strlen($sql) - 1);
 
-            $sql .= " where ug_id = " . SQLaddFields($objGamesUsuario->getId(), "");
+            $sql .= " where ug_id = " . $addParam($objGamesUsuario->getId());
 
             switch ($objGamesUsuario->getSubstatus()) {
                 case 2:
@@ -2706,7 +2718,7 @@ class UsuarioGames
                     } //end if($objGamesUsuario->getDataAprovacao() == "")
                     break;
             }
-            $ret = SQLexecuteQuery($sql);
+            $ret = SQLexecuteQueryParams($sql, $params);
 
             if (!is_null($objGamesUsuario->getAtivo())) {
                 usleep(300000);
@@ -4171,8 +4183,8 @@ class UsuarioGames
     function obterUltimoCorteStatus()
     {
         $cor_status = "";
-        $sql = "select c.cor_status from cortes c where c.cor_ug_id = " . $this->ug_id . "";
-        $rs = SQLexecuteQuery($sql);
+        $sql = "select c.cor_status from cortes c where c.cor_ug_id = $1";
+        $rs = SQLexecuteQueryParams($sql, array($this->ug_id));
         if ($rs && pg_num_rows($rs) != 0) {
             $rs_row = pg_fetch_array($rs);
             $cor_status = $rs_row['cor_status'];
@@ -4182,261 +4194,129 @@ class UsuarioGames
 
     function obter($filtro, $orderBy, &$rs)
     {
-
         $ret = "";
-        $filtro = array_map("strtoupper", $filtro);
-
-        $sql = "select * from dist_usuarios_games ";
-
-        if (!is_null($filtro) && $filtro != "") {
-
-            if (isset($filtro['ug_data_inclusaoMin']) && !is_null($filtro['ug_data_inclusaoMin']) && isset($filtro['ug_data_inclusaoMax']) && !is_null($filtro['ug_data_inclusaoMax'])) {
-                $filtro['ug_data_inclusaoMin'] = formata_data_ts($filtro['ug_data_inclusaoMin'] . " 00:00:00", 1, true, true);
-                $filtro['ug_data_inclusaoMax'] = formata_data_ts($filtro['ug_data_inclusaoMax'] . " 23:59:59", 1, true, true);
-            }
-
-            if (isset($filtro['ug_data_ultimo_acessoMin']) && !is_null($filtro['ug_data_ultimo_acessoMin']) && isset($filtro['ug_data_ultimo_acessoMax']) && !is_null($filtro['ug_data_ultimo_acessoMax'])) {
-                $filtro['ug_data_ultimo_acessoMin'] = formata_data_ts($filtro['ug_data_ultimo_acessoMin'] . " 00:00:00", 1, true, true);
-                $filtro['ug_data_ultimo_acessoMax'] = formata_data_ts($filtro['ug_data_ultimo_acessoMax'] . " 23:59:59", 1, true, true);
-            }
-
-            if (isset($filtro['ug_data_nascimentoMin']) && !is_null($filtro['ug_data_nascimentoMin']) && isset($filtro['ug_data_nascimentoMax']) && !is_null($filtro['ug_data_nascimentoMax'])) {
-                $filtro['ug_data_nascimentoMin'] = formata_data_ts($filtro['ug_data_nascimentoMin'] . " 00:00:00", 1, true, true);
-                $filtro['ug_data_nascimentoMax'] = formata_data_ts($filtro['ug_data_nascimentoMax'] . " 23:59:59", 1, true, true);
-            }
-
-            if (isset($filtro['ug_iRiscoClassif']) && is_null($filtro['ug_iRiscoClassif'])) {
-                $filtro['ug_iRiscoClassif'] = 0;
-            }
-
-            $sql .= " where 1=1";
-
-            $sql .= " and (" . (is_null($filtro['ug_id']) ? 1 : 0);
-            $sql .= "=1 or ug_id = " . SQLaddFields($filtro['ug_id'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_ativo']) ? 1 : 0);
-            $sql .= "=1 or ug_ativo = " . SQLaddFields($filtro['ug_ativo'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_substatus']) ? 1 : 0);
-            $sql .= "=1 " . (!is_null($filtro['ug_substatus']) ? " or ug_substatus IN " . SQLaddFields($filtro['ug_substatus'], "") : "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_data_inclusaoMin']) || is_null($filtro['ug_data_inclusaoMax']) ? 1 : 0);
-            $sql .= "=1 or ug_data_inclusao between " . SQLaddFields($filtro['ug_data_inclusaoMin'], "") . " and " . SQLaddFields($filtro['ug_data_inclusaoMax'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_data_ultimo_acessoMin']) || is_null($filtro['ug_data_ultimo_acessoMax']) ? 1 : 0);
-            $sql .= "=1 or ug_data_ultimo_acesso between " . SQLaddFields($filtro['ug_data_ultimo_acessoMin'], "") . " and " . SQLaddFields($filtro['ug_data_ultimo_acessoMax'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_qtde_acessosMin']) || is_null($filtro['ug_qtde_acessosMax']) ? 1 : 0);
-            $sql .= "=1 or ug_qtde_acessos between " . SQLaddFields($filtro['ug_qtde_acessosMin'], "") . " and " . SQLaddFields($filtro['ug_qtde_acessosMax'], "") . ")";
-
-
-
-            $sql .= " and (" . (is_null($filtro['ug_login']) ? 1 : 0);
-            $sql .= "=1 or ug_login = '" . SQLaddFields($filtro['ug_login'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_loginLike']) ? 1 : 0);
-            $sql .= "=1 or ug_login like '%" . SQLaddFields($filtro['ug_loginLike'], "r") . "%')";
-
-
-            $sql .= " and (" . (is_null($filtro['ug_nome_fantasia']) ? 1 : 0);
-            $sql .= "=1 or ug_nome_fantasia = '" . SQLaddFields($filtro['ug_nome_fantasia'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_nome_fantasiaLike']) ? 1 : 0);
-            $sql .= "=1 or ug_nome_fantasia like '%" . SQLaddFields($filtro['ug_nome_fantasiaLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_razao_social']) ? 1 : 0);
-            $sql .= "=1 or ug_razao_social = '" . SQLaddFields($filtro['ug_razao_social'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_razao_socialLike']) ? 1 : 0);
-            $sql .= "=1 or ug_razao_social like '%" . SQLaddFields($filtro['ug_razao_socialLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_cnpj']) ? 1 : 0);
-            $sql .= "=1 or ug_cnpj = '" . SQLaddFields($filtro['ug_cnpj'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_responsavel']) ? 1 : 0);
-            $sql .= "=1 or ug_responsavel = '" . SQLaddFields($filtro['ug_responsavel'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_responsavelLike']) ? 1 : 0);
-            $sql .= "=1 or ug_responsavel like '%" . SQLaddFields($filtro['ug_responsavelLike'], "r") . "%')";
-
-
-
-            $sql .= " and (" . (is_null($filtro['ug_endereco']) ? 1 : 0);
-            $sql .= "=1 or ug_endereco = '" . SQLaddFields($filtro['ug_endereco'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_enderecoLike']) ? 1 : 0);
-            $sql .= "=1 or ug_endereco like '%" . SQLaddFields($filtro['ug_enderecoLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_numero']) ? 1 : 0);
-            $sql .= "=1 or ug_numero = '" . SQLaddFields($filtro['ug_numero'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_complemento']) ? 1 : 0);
-            $sql .= "=1 or ug_complemento = '" . SQLaddFields($filtro['ug_complemento'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_bairro']) ? 1 : 0);
-            $sql .= "=1 or ug_bairro = '" . SQLaddFields($filtro['ug_bairro'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_bairroLike']) ? 1 : 0);
-            $sql .= "=1 or ug_bairro like '%" . SQLaddFields($filtro['ug_bairroLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_cidade']) ? 1 : 0);
-            $sql .= "=1 or ug_cidade = '" . SQLaddFields($filtro['ug_cidade'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_cidadeLike']) ? 1 : 0);
-            $sql .= "=1 or ug_cidade like '%" . SQLaddFields($filtro['ug_cidadeLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_estado']) ? 1 : 0);
-            $sql .= "=1 or ug_estado = '" . SQLaddFields($filtro['ug_estado'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_cep']) ? 1 : 0);
-            $sql .= "=1 or ug_cep = '" . SQLaddFields($filtro['ug_cep'], "r") . "')";
-
-            //Tel
-            $sql .= " and (" . (is_null($filtro['ug_tel_ddi']) ? 1 : 0);
-            $sql .= "=1 or ug_tel_ddi = '" . SQLaddFields($filtro['ug_tel_ddi'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_tel_ddd']) ? 1 : 0);
-            $sql .= "=1 or ug_tel_ddd = '" . SQLaddFields($filtro['ug_tel_ddd'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_tel']) ? 1 : 0);
-            $sql .= "=1 or ug_tel = '" . SQLaddFields($filtro['ug_tel'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_telLike']) ? 1 : 0);
-            $sql .= "=1 or ug_tel like '%" . SQLaddFields($filtro['ug_telLike'], "r") . "%')";
-
-            //Cel
-            $sql .= " and (" . (is_null($filtro['ug_cel_ddi']) ? 1 : 0);
-            $sql .= "=1 or ug_cel_ddi = '" . SQLaddFields($filtro['ug_cel_ddi'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_cel_ddd']) ? 1 : 0);
-            $sql .= "=1 or ug_cel_ddd = '" . SQLaddFields($filtro['ug_cel_ddd'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_cel']) ? 1 : 0);
-            $sql .= "=1 or ug_cel = '" . SQLaddFields($filtro['ug_cel'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_celLike']) ? 1 : 0);
-            $sql .= "=1 or ug_cel like '%" . SQLaddFields($filtro['ug_celLike'], "r") . "%')";
-
-            //Fax
-            $sql .= " and (" . (is_null($filtro['ug_fax_ddi']) ? 1 : 0);
-            $sql .= "=1 or ug_fax_ddi = '" . SQLaddFields($filtro['ug_fax_ddi'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_fax_ddd']) ? 1 : 0);
-            $sql .= "=1 or ug_fax_ddd = '" . SQLaddFields($filtro['ug_fax_ddd'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_fax']) ? 1 : 0);
-            $sql .= "=1 or ug_fax = '" . SQLaddFields($filtro['ug_fax'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_faxLike']) ? 1 : 0);
-            $sql .= "=1 or ug_fax like '%" . SQLaddFields($filtro['ug_faxLike'], "r") . "%')";
-
-
-            //RA
-            $sql .= " and (" . (is_null($filtro['ug_ra_codigo']) ? 1 : 0);
-            $sql .= "=1 or ug_ra_codigo = '" . SQLaddFields($filtro['ug_ra_codigo'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_ra_outros']) ? 1 : 0);
-            $sql .= "=1 or ug_ra_outros = '" . SQLaddFields($filtro['ug_ra_outros'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_ra_outrosLike']) ? 1 : 0);
-            $sql .= "=1 or ug_ra_outros like '%" . SQLaddFields($filtro['ug_ra_outrosLike'], "r") . "%')";
-
-            //Contato 01
-            $sql .= " and (" . (is_null($filtro['ug_contato01_tel_ddi']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_tel_ddi = '" . SQLaddFields($filtro['ug_contato01_tel_ddi'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_contato01_tel_ddd']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_tel_ddd = '" . SQLaddFields($filtro['ug_contato01_tel_ddd'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_contato01_tel']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_tel = '" . SQLaddFields($filtro['ug_contato01_tel'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_contato01_telLike']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_tel like '%" . SQLaddFields($filtro['ug_contato01_telLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_contato01_nome']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_nome = '" . SQLaddFields($filtro['ug_contato01_nome'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_contato01_nomeLike']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_nome like '%" . SQLaddFields($filtro['ug_contato01_nomeLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_contato01_cargo']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_cargo = '" . SQLaddFields($filtro['ug_contato01_cargo'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_contato01_cargoLike']) ? 1 : 0);
-            $sql .= "=1 or ug_contato01_cargo like '%" . SQLaddFields($filtro['ug_contato01_cargoLike'], "r") . "%')";
-
-            //RiscoClassif
-            $risco = (is_null($filtro['ug_iRiscoClassif'])) ? "0" : $filtro['ug_iRiscoClassif'];
-            $sql .= " and (" . ((is_null($filtro['ug_iRiscoClassif']) || ($filtro['ug_iRiscoClassif'] == 0)) ? 1 : 0);
-            $sql .= "=1 or ug_risco_classif = " . $risco . ")"; //SQLaddFields($filtro['ug_iRiscoClassif'], "") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_tipo_cadastro']) ? 1 : 0);
-            $sql .= "=1 or ug_tipo_cadastro = '" . SQLaddFields($filtro['ug_tipo_cadastro'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_nome']) ? 1 : 0);
-            $sql .= "=1 or ug_nome = '" . SQLaddFields($filtro['ug_nome'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_nomeLike']) ? 1 : 0);
-            $sql .= "=1 or ug_nome like '%" . SQLaddFields($filtro['ug_nomeLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_cpf']) ? 1 : 0);
-            $sql .= "=1 or ug_cpf = '" . SQLaddFields($filtro['ug_cpf'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_rg']) ? 1 : 0);
-            $sql .= "=1 or ug_rg = '" . SQLaddFields($filtro['ug_rg'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_data_nascimentoMin']) || is_null($filtro['ug_data_nascimentoMax']) ? 1 : 0);
-            $sql .= "=1 or ug_data_nascimento between " . SQLaddFields($filtro['ug_data)nascimentoMin'], "") . " and " . SQLaddFields($filtro['ug_data_nascimentoMax'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_sexo']) ? 1 : 0);
-            $sql .= "=1 or ug_sexo = '" . SQLaddFields($filtro['ug_sexo'], "r") . "')";
-
-
-            $sql .= " and (" . (is_null($filtro['ug_perfil_senha_reimpressao']) ? 1 : 0);
-            $sql .= "=1 or ug_perfil_senha_reimpressao = '" . SQLaddFields($filtro['ug_perfil_senha_reimpressao'], "r") . "')";
-            $sql .= " and (" . (is_null($filtro['ug_perfil_senha_reimpressaoLike']) ? 1 : 0);
-            $sql .= "=1 or ug_perfil_senha_reimpressao like '%" . SQLaddFields($filtro['ug_perfil_senha_reimpressaoLike'], "r") . "%')";
-
-            $sql .= " and (" . (is_null($filtro['ug_perfil_forma_pagto']) ? 1 : 0);
-            $sql .= "=1 or ug_perfil_forma_pagto = " . SQLaddFields($filtro['ug_perfil_forma_pagto'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_perfil_limiteMin']) || is_null($filtro['ug_perfil_limiteMax']) ? 1 : 0);
-            $sql .= "=1 or ug_perfil_limite between " . SQLaddFields($filtro['ug_perfil_limiteMin'], "") . " and " . SQLaddFields($filtro['ug_perfil_limiteMax'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_perfil_saldoMin']) || is_null($filtro['ug_perfil_saldoMax']) ? 1 : 0);
-            $sql .= "=1 or ug_perfil_saldo between " . SQLaddFields($filtro['ug_perfil_saldoMin'], "") . " and " . SQLaddFields($filtro['ug_perfil_saldoMax'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_compet_participa']) ? 1 : 0);
-            $sql .= "=1 or ug_compet_participa = '" . SQLaddFields($filtro['ug_compet_participa'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_compet_promoveu']) ? 1 : 0);
-            $sql .= "=1 or ug_compet_promoveu = '" . SQLaddFields($filtro['ug_compet_promoveu'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_ongame']) ? 1 : 0);
-            $sql .= "=1 or ug_ongame = '" . SQLaddFields($filtro['ug_ongame'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_te_id']) ? 1 : 0);
-            $sql .= "=1 or ug_te_id = " . SQLaddFields($filtro['ug_te_id'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_id_nexcafe']) ? 1 : 0);
-            $sql .= "=1 or ug_id_nexcafe = '" . SQLaddFields($filtro['ug_id_nexcafe'], "r") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_login_nexcafe_auto']) ? 1 : 0);
-            $sql .= "=1 or ug_login_nexcafe_auto = " . SQLaddFields($filtro['ug_login_nexcafe_auto'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_data_inclusao_nexcafe']) || is_null($filtro['ug_data_inclusao_nexcafe']) ? 1 : 0);
-            $sql .= "=1 or ug_data_inclusao_nexcafe between " . SQLaddFields($filtro['ug_data_inclusao_nexcafe'], "") . " and " . SQLaddFields($filtro['ug_data_inclusao_nexcafe'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_alterar_senha']) ? 1 : 0);
-            $sql .= "=1 or ug_alterar_senha = " . SQLaddFields($filtro['ug_alterar_senha'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_exibir_contrato']) ? 1 : 0);
-            $sql .= "=1 or ug_exibir_contrato = " . SQLaddFields($filtro['ug_exibir_contrato'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_data_aceite_adesao']) || is_null($filtro['ug_data_aceite_adesao']) ? 1 : 0);
-            $sql .= "=1 or ug_data_aceite_adesao between " . SQLaddFields($filtro['ug_data_aceite_adesao'], "") . " and " . SQLaddFields($filtro['ug_data_aceite_adesao'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_tipo_venda']) || is_null($filtro['ug_tipo_venda']) ? 1 : 0);
-            $sql .= "=1 or ug_tipo_venda = '" . SQLaddFields($filtro['ug_tipo_venda'], "s") . "')";
-
-            $sql .= " and (" . (is_null($filtro['ug_recarga_celular']) ? 1 : 0);
-            $sql .= "=1 or ug_recarga_celular = " . SQLaddFields($filtro['ug_recarga_celular'], "") . ")";
-
-            $sql .= " and (" . (is_null($filtro['ug_data_aprovacao']) ? 1 : 0);
-            $sql .= "=1 or ug_data_aprovacao = " . SQLaddFields($filtro['ug_data_aprovacao'], "") . ")";
+        $params = array();
+        $filtro = is_array($filtro) ? array_map("strtoupper", $filtro) : array();
+        $get = function ($key) use (&$filtro) { return array_key_exists($key, $filtro) ? $filtro[$key] : null; };
+        $has = function ($key) use ($get) { $value = $get($key); return !is_null($value) && $value !== ""; };
+        $addParam = function ($value) use (&$params) { $params[] = $value; return '$' . count($params); };
+        $addEq = function (&$where, $key, $column) use ($has, $get, $addParam) { if ($has($key)) $where[] = $column . " = " . $addParam($get($key)); };
+        $addLike = function (&$where, $key, $column) use ($has, $get, $addParam) { if ($has($key)) $where[] = $column . " like " . $addParam('%' . $get($key) . '%'); };
+        $addBetween = function (&$where, $keyMin, $keyMax, $column) use ($has, $get, $addParam) { if ($has($keyMin) && $has($keyMax)) $where[] = $column . " between " . $addParam($get($keyMin)) . " and " . $addParam($get($keyMax)); };
+        $addIn = function (&$where, $key, $column) use ($has, $get, $addParam) {
+            if (!$has($key)) return;
+            $ids = is_array($get($key)) ? $get($key) : preg_split('/\s*,\s*/', trim((string) $get($key), '() '), -1, PREG_SPLIT_NO_EMPTY);
+            $placeholders = array();
+            foreach ($ids as $id) if (is_numeric($id)) $placeholders[] = $addParam((int) $id);
+            $where[] = count($placeholders) ? $column . " in (" . implode(', ', $placeholders) . ")" : "1=0";
+        };
+
+        if ($has('ug_data_inclusaoMin') && $has('ug_data_inclusaoMax')) {
+            $filtro['ug_data_inclusaoMin'] = formata_data_ts($get('ug_data_inclusaoMin') . " 00:00:00", 1, true, true);
+            $filtro['ug_data_inclusaoMax'] = formata_data_ts($get('ug_data_inclusaoMax') . " 23:59:59", 1, true, true);
+        }
+        if ($has('ug_data_ultimo_acessoMin') && $has('ug_data_ultimo_acessoMax')) {
+            $filtro['ug_data_ultimo_acessoMin'] = formata_data_ts($get('ug_data_ultimo_acessoMin') . " 00:00:00", 1, true, true);
+            $filtro['ug_data_ultimo_acessoMax'] = formata_data_ts($get('ug_data_ultimo_acessoMax') . " 23:59:59", 1, true, true);
+        }
+        if ($has('ug_data_nascimentoMin') && $has('ug_data_nascimentoMax')) {
+            $filtro['ug_data_nascimentoMin'] = formata_data_ts($get('ug_data_nascimentoMin') . " 00:00:00", 1, true, true);
+            $filtro['ug_data_nascimentoMax'] = formata_data_ts($get('ug_data_nascimentoMax') . " 23:59:59", 1, true, true);
         }
 
-        if (!is_null($orderBy)) $sql .= " order by " . $orderBy;
+        $where = array();
+        $addEq($where, 'ug_id', 'ug_id');
+        $addEq($where, 'ug_ativo', 'ug_ativo');
+        $addIn($where, 'ug_substatus', 'ug_substatus');
+        $addBetween($where, 'ug_data_inclusaoMin', 'ug_data_inclusaoMax', 'ug_data_inclusao');
+        $addBetween($where, 'ug_data_ultimo_acessoMin', 'ug_data_ultimo_acessoMax', 'ug_data_ultimo_acesso');
+        $addBetween($where, 'ug_qtde_acessosMin', 'ug_qtde_acessosMax', 'ug_qtde_acessos');
+        $addEq($where, 'ug_login', 'ug_login');
+        $addLike($where, 'ug_loginLike', 'ug_login');
+        $addEq($where, 'ug_nome_fantasia', 'ug_nome_fantasia');
+        $addLike($where, 'ug_nome_fantasiaLike', 'ug_nome_fantasia');
+        $addEq($where, 'ug_razao_social', 'ug_razao_social');
+        $addLike($where, 'ug_razao_socialLike', 'ug_razao_social');
+        $addEq($where, 'ug_cnpj', 'ug_cnpj');
+        $addEq($where, 'ug_responsavel', 'ug_responsavel');
+        $addLike($where, 'ug_responsavelLike', 'ug_responsavel');
+        $addEq($where, 'ug_endereco', 'ug_endereco');
+        $addLike($where, 'ug_enderecoLike', 'ug_endereco');
+        $addEq($where, 'ug_numero', 'ug_numero');
+        $addEq($where, 'ug_complemento', 'ug_complemento');
+        $addEq($where, 'ug_bairro', 'ug_bairro');
+        $addLike($where, 'ug_bairroLike', 'ug_bairro');
+        $addEq($where, 'ug_cidade', 'ug_cidade');
+        $addLike($where, 'ug_cidadeLike', 'ug_cidade');
+        $addEq($where, 'ug_estado', 'ug_estado');
+        $addEq($where, 'ug_cep', 'ug_cep');
+        $addEq($where, 'ug_tel_ddi', 'ug_tel_ddi');
+        $addEq($where, 'ug_tel_ddd', 'ug_tel_ddd');
+        $addEq($where, 'ug_tel', 'ug_tel');
+        $addLike($where, 'ug_telLike', 'ug_tel');
+        $addEq($where, 'ug_cel_ddi', 'ug_cel_ddi');
+        $addEq($where, 'ug_cel_ddd', 'ug_cel_ddd');
+        $addEq($where, 'ug_cel', 'ug_cel');
+        $addLike($where, 'ug_celLike', 'ug_cel');
+        $addEq($where, 'ug_fax_ddi', 'ug_fax_ddi');
+        $addEq($where, 'ug_fax_ddd', 'ug_fax_ddd');
+        $addEq($where, 'ug_fax', 'ug_fax');
+        $addLike($where, 'ug_faxLike', 'ug_fax');
+        $addEq($where, 'ug_ra_codigo', 'ug_ra_codigo');
+        $addEq($where, 'ug_ra_outros', 'ug_ra_outros');
+        $addLike($where, 'ug_ra_outrosLike', 'ug_ra_outros');
+        $addEq($where, 'ug_contato01_tel_ddi', 'ug_contato01_tel_ddi');
+        $addEq($where, 'ug_contato01_tel_ddd', 'ug_contato01_tel_ddd');
+        $addEq($where, 'ug_contato01_tel', 'ug_contato01_tel');
+        $addLike($where, 'ug_contato01_telLike', 'ug_contato01_tel');
+        $addEq($where, 'ug_contato01_nome', 'ug_contato01_nome');
+        $addLike($where, 'ug_contato01_nomeLike', 'ug_contato01_nome');
+        $addEq($where, 'ug_contato01_cargo', 'ug_contato01_cargo');
+        $addLike($where, 'ug_contato01_cargoLike', 'ug_contato01_cargo');
+        if ($has('ug_iRiscoClassif') && $get('ug_iRiscoClassif') != 0) $where[] = "ug_risco_classif = " . $addParam($get('ug_iRiscoClassif'));
+        $addEq($where, 'ug_tipo_cadastro', 'ug_tipo_cadastro');
+        $addEq($where, 'ug_nome', 'ug_nome');
+        $addLike($where, 'ug_nomeLike', 'ug_nome');
+        $addEq($where, 'ug_cpf', 'ug_cpf');
+        $addEq($where, 'ug_rg', 'ug_rg');
+        $addBetween($where, 'ug_data_nascimentoMin', 'ug_data_nascimentoMax', 'ug_data_nascimento');
+        $addEq($where, 'ug_sexo', 'ug_sexo');
+        $addEq($where, 'ug_perfil_senha_reimpressao', 'ug_perfil_senha_reimpressao');
+        $addLike($where, 'ug_perfil_senha_reimpressaoLike', 'ug_perfil_senha_reimpressao');
+        $addEq($where, 'ug_perfil_forma_pagto', 'ug_perfil_forma_pagto');
+        $addBetween($where, 'ug_perfil_limiteMin', 'ug_perfil_limiteMax', 'ug_perfil_limite');
+        $addBetween($where, 'ug_perfil_saldoMin', 'ug_perfil_saldoMax', 'ug_perfil_saldo');
+        $addEq($where, 'ug_compet_participa', 'ug_compet_participa');
+        $addEq($where, 'ug_compet_promoveu', 'ug_compet_promoveu');
+        $addEq($where, 'ug_ongame', 'ug_ongame');
+        $addEq($where, 'ug_te_id', 'ug_te_id');
+        $addEq($where, 'ug_id_nexcafe', 'ug_id_nexcafe');
+        $addEq($where, 'ug_login_nexcafe_auto', 'ug_login_nexcafe_auto');
+        $addBetween($where, 'ug_data_inclusao_nexcafe', 'ug_data_inclusao_nexcafe', 'ug_data_inclusao_nexcafe');
+        $addEq($where, 'ug_alterar_senha', 'ug_alterar_senha');
+        $addEq($where, 'ug_exibir_contrato', 'ug_exibir_contrato');
+        $addBetween($where, 'ug_data_aceite_adesao', 'ug_data_aceite_adesao', 'ug_data_aceite_adesao');
+        $addEq($where, 'ug_tipo_venda', 'ug_tipo_venda');
+        $addEq($where, 'ug_recarga_celular', 'ug_recarga_celular');
+        $addEq($where, 'ug_data_aprovacao', 'ug_data_aprovacao');
 
-        $rs = SQLexecuteQuery($sql);
-        if (!$rs) $ret = "Erro ao obter usuário(s)." . PHP_EOL;
+        $sql = "select * from dist_usuarios_games";
+        if (count($where)) $sql .= " where " . implode(" and ", $where);
+
+        if (!is_null($orderBy) && trim((string) $orderBy) != '') {
+            $permitidos = array('ug_id','ug_login','ug_ativo','ug_status','ug_substatus','ug_data_inclusao','ug_data_ultimo_acesso','ug_qtde_acessos','ug_nome_fantasia','ug_razao_social','ug_cnpj','ug_responsavel','ug_email','ug_endereco','ug_bairro','ug_cidade','ug_estado','ug_cep','ug_nome','ug_cpf','ug_rg','ug_data_nascimento','ug_tipo_cadastro','ug_risco_classif','ug_tipo_venda','ug_recarga_celular','ug_data_aprovacao');
+            $orders = array();
+            foreach (explode(',', $orderBy) as $parte) {
+                $tokens = preg_split('/\s+/', trim($parte));
+                $coluna = strtolower($tokens[0] ?? '');
+                $direcao = strtoupper($tokens[1] ?? 'ASC');
+                if (in_array($coluna, $permitidos) && in_array($direcao, array('ASC', 'DESC'))) $orders[] = $coluna . ' ' . $direcao;
+            }
+            if (count($orders)) $sql .= " order by " . implode(', ', $orders);
+        }
+
+        $rs = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
+        if (!$rs) $ret = "Erro ao obter usuario(s)." . PHP_EOL;
 
         return $ret;
     }
@@ -4458,15 +4338,14 @@ class UsuarioGames
         extract($params, EXTR_OVERWRITE);
 
         $login = strtoupper(trim($login));
+        $paramsSql = array($login);
+        $sql = "select count(*) as qtde from dist_usuarios_games where ug_login = $1";
+        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao)) {
+            $paramsSql[] = trim($usuario_id_excessao);
+            $sql .= " and ug_id <> $" . count($paramsSql);
+        }
 
-        //SQL
-        $sql = "select count(*) as qtde from dist_usuarios_games ";
-        $sql .= " where ug_login = " . SQLaddFields($login, "s");
-        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-            $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
-
-
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, $paramsSql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
@@ -4482,12 +4361,8 @@ class UsuarioGames
         if (strlen($operador_id) == 0) {
             return false;
         }
-        //SQL
-        $sql = "select count(*) as qtde from dist_usuarios_games_operador ";
-        $sql .= " where ugo_id = " . $operador_id;
-        $sql .= " and ugo_ug_id = " . $usuario_id;
-
-        $rs = SQLexecuteQuery($sql);
+        $sql = "select count(*) as qtde from dist_usuarios_games_operador where ugo_id = $1 and ugo_ug_id = $2";
+        $rs = SQLexecuteQueryParams($sql, array($operador_id, $usuario_id));
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
@@ -4601,14 +4476,14 @@ class UsuarioGames
     {
 
         $ret = true;
+        $paramsSql = array(trim($cnpj));
+        $sql = "select count(*) as qtde from dist_usuarios_games where ug_cnpj IS NOT NULL and ug_cnpj <> '' and ug_cnpj = $1";
+        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao)) {
+            $paramsSql[] = trim($usuario_id_excessao);
+            $sql .= " and ug_id <> $" . count($paramsSql);
+        }
 
-        //SQL
-        $sql = "select count(*) as qtde from dist_usuarios_games ";
-        $sql .= " where ug_cnpj IS NOT NULL and ug_cnpj <> '' and ug_cnpj = " . SQLaddFields(trim($cnpj), "s");
-        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-            $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
-
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, $paramsSql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
@@ -4621,14 +4496,14 @@ class UsuarioGames
     {
 
         $ret = true;
+        $paramsSql = array(trim($cpf));
+        $sql = "select count(*) as qtde from dist_usuarios_games where ug_cpf IS NOT NULL and ug_cpf <> '' and ug_cpf <> '00000000000' and ug_cpf <> '..-' and ug_cpf = $1";
+        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao)) {
+            $paramsSql[] = trim($usuario_id_excessao);
+            $sql .= " and ug_id <> $" . count($paramsSql);
+        }
 
-        //SQL
-        $sql = "select count(*) as qtde from dist_usuarios_games ";
-        $sql .= " where ug_cpf IS NOT NULL and ug_cpf <> '' and ug_cpf <> '00000000000' and ug_cpf <> '..-' and ug_cpf = " . SQLaddFields(trim($cpf), "s");
-        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-            $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
-
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, $paramsSql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
@@ -4641,14 +4516,14 @@ class UsuarioGames
     {
 
         $ret = true;
+        $paramsSql = array(trim($rg));
+        $sql = "select count(*) as qtde from dist_usuarios_games where ug_rg IS NOT NULL and ug_rg <> '' and ug_rg = $1";
+        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao)) {
+            $paramsSql[] = trim($usuario_id_excessao);
+            $sql .= " and ug_id <> $" . count($paramsSql);
+        }
 
-        //SQL
-        $sql = "select count(*) as qtde from dist_usuarios_games ";
-        $sql .= " where ug_rg IS NOT NULL and ug_rg <> '' and ug_rg = " . SQLaddFields(trim($rg), "s");
-        if ($usuario_id_excessao && !is_null($usuario_id_excessao) && is_numeric($usuario_id_excessao))
-            $sql .= " and ug_id <> " . SQLaddFields(trim($usuario_id_excessao), "");
-
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, $paramsSql);
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
@@ -4867,8 +4742,8 @@ class UsuarioGames
             $usuarioGames->setContato01Nome($rs_row['ug_contato01_nome']);
             $usuarioGames->setContato01Cargo($rs_row['ug_contato01_cargo']);
 
-            $sql = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = " . $rs_row['ug_id'] . " order by ugo_data ASC;";
-            $rs_usuario_obs = SQLexecuteQuery($sql);
+            $sql_obs = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = $1 order by ugo_data ASC;";
+                $rs_usuario_obs = SQLexecuteQueryParams($sql_obs, array($objGamesUsuario->getId()));
             $ug_obs = NULL;
             if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                 while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
@@ -5352,12 +5227,8 @@ class UsuarioGames
         $login = strtoupper(trim($login0));
 
         //SQL
-        $sql = "select count(*) as qtde, ug_email from dist_usuarios_games ";
-        $sql .= " where ug_login = " . SQLaddFields($login0, "s");
-        $sql .= " and ug_senha = " . SQLaddFields($senha, "s");
-        $sql .= " group by ug_email";
-
-        $rs = SQLexecuteQuery($sql);
+        $sql = "select count(*) as qtde, ug_email from dist_usuarios_games where ug_login = $1 and ug_senha = $2 group by ug_email";
+        $rs = SQLexecuteQueryParams($sql, array($login0, $senha));
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] > 0) {
@@ -5383,7 +5254,7 @@ class UsuarioGames
                 elseif (!verifica_email2($email))     $ret .= "O Email é inválido." . PHP_EOL;
             }
             if (!$ret) {
-                $sql_update .= " ug_email = " . SQLaddFields($email, "s");
+                $sql_update .= " ug_email = $1";
                 $msg_modificacoes = "Email atualizado de '" . strtoupper($email_prev) . "' para '" . strtoupper($email) . "'";
             }
 
@@ -5391,9 +5262,8 @@ class UsuarioGames
             if (!$ret) {
                 $sql = "update dist_usuarios_games set ";
                 $sql .= $sql_update;
-                $sql .= " where ug_login = " . SQLaddFields($login0, "s");
-                $sql .= " and ug_senha = " . SQLaddFields($senha, "s");
-                $ret = SQLexecuteQuery($sql);
+                $sql .= " where ug_login = $2 and ug_senha = $3";
+                $ret = SQLexecuteQueryParams($sql, array($email, $login0, $senha));
 
                 // Atualiza o SESSION
                 if ($ret) {
@@ -5580,9 +5450,8 @@ class UsuarioGames
     {
         if ($op == 1) {
             $a_logins = array();
-            $nivel_desejado = (int)$nivel_desejado; // Cast para inteiro por segurança no SQL
-            $sql = "SELECT ug_id FROM dist_usuarios_games WHERE ug_vip = {$nivel_desejado} ORDER BY ug_id;";
-            $rs_usuarios = SQLexecuteQuery($sql);
+            $sql = "SELECT ug_id FROM dist_usuarios_games WHERE ug_vip = $1 ORDER BY ug_id;";
+            $rs_usuarios = SQLexecuteQueryParams($sql, array($nivel_desejado));
 
             while ($rs_usuarios_row = pg_fetch_array($rs_usuarios)) {
                 $a_logins[] = $rs_usuarios_row['ug_id'];
@@ -5749,10 +5618,8 @@ class UsuarioGames
 
     function atualizarCompet_participa($ug_id, $ug_compet_participa)
     {
-        $sql = "update dist_usuarios_games set ";
-        $sql .= " ug_compet_participa = " . SQLaddFields($ug_compet_participa, "s") . "";
-        $sql .= " where ug_id = " . SQLaddFields($ug_id, "") . "";
-        $ret = SQLexecuteQuery($sql);
+        $sql = "update dist_usuarios_games set ug_compet_participa = $1 where ug_id = $2";
+        $ret = SQLexecuteQueryParams($sql, array($ug_compet_participa, $ug_id));
 
         if ($ret) {
             return true;
@@ -5762,10 +5629,8 @@ class UsuarioGames
 
     function atualizarUgOngame($ug_id, $ug_ongame)
     {
-        $sql = "update dist_usuarios_games set ";
-        $sql .= " ug_ongame = " . SQLaddFields($ug_ongame, "s") . "";
-        $sql .= " where ug_id = " . SQLaddFields($ug_id, "") . "";
-        $ret = SQLexecuteQuery($sql);
+        $sql = "update dist_usuarios_games set ug_ongame = $1 where ug_id = $2";
+        $ret = SQLexecuteQueryParams($sql, array($ug_ongame, $ug_id));
         if ($ret) {
             return true;
         }
@@ -5774,10 +5639,8 @@ class UsuarioGames
 
     function atualizarTipoEstabelecimento($ug_id, $ug_te_id)
     {
-        $sql = "update dist_usuarios_games set ";
-        $sql .= " ug_te_id = " . SQLaddFields($ug_te_id, "s") . "";
-        $sql .= " where ug_id = " . SQLaddFields($ug_id, "") . "";
-        $ret = SQLexecuteQuery($sql);
+        $sql = "update dist_usuarios_games set ug_te_id = $1 where ug_id = $2";
+        $ret = SQLexecuteQueryParams($sql, array($ug_te_id, $ug_id));
         if ($ret) {
             return true;
         }
@@ -5787,10 +5650,8 @@ class UsuarioGames
     function existeLoginNexCafe($login_nxc)
     {
         $ret = true;
-        $sql = "select count(*) as qtde from dist_usuarios_games ";
-        $sql .= " where ug_id_nexcafe IS NOT NULL and ug_id_nexcafe <> '' and ug_id_nexcafe = " . SQLaddFields(strtoupper(trim($login_nxc)), "s");
-
-        $rs = SQLexecuteQuery($sql);
+        $sql = "select count(*) as qtde from dist_usuarios_games where ug_id_nexcafe IS NOT NULL and ug_id_nexcafe <> '' and ug_id_nexcafe = $1";
+        $rs = SQLexecuteQueryParams($sql, array(strtoupper(trim($login_nxc))));
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             if ($rs_row['qtde'] == 0) $ret = false;
@@ -5807,11 +5668,8 @@ class UsuarioGames
         // Atualiza LOG de Operações pelo NexCafe
         //------------------------------------------------------------------
         if ($usuarioGames) {
-            $sql = "update dist_usuarios_games set ";
-            $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP,";
-            $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
-            $sql .= " where ug_login = " . SQLaddFields($loginNXC, "s");
-            $rs = SQLexecuteQuery($sql);
+            $sql = "update dist_usuarios_games set ug_data_ultimo_acesso = CURRENT_TIMESTAMP, ug_qtde_acessos = ug_qtde_acessos + 1 where ug_login = $1";
+            $rs = SQLexecuteQueryParams($sql, array($loginNXC));
 
             usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['CARREGA_SESSAO_NEXCAFE'], $usuarioGames->getId(), null);
         }
@@ -5824,15 +5682,13 @@ class UsuarioGames
     {
 
         $ret = false;
-        $dataRegistro = "CURRENT_TIMESTAMP";
-        $loginAutomatico = $loginAutomatico ? 1 : 'DEFAULT';
-
-        $sql = "update dist_usuarios_games set ";
-        $sql .= " ug_data_inclusao_nexcafe = " . SQLaddFields($dataRegistro, "") . ",";
-        $sql .= " ug_id_nexcafe = " . SQLaddFields(strtoupper($login_nexcafe), "s") . ",";
-        $sql .= " ug_login_nexcafe_auto = " . SQLaddFields($loginAutomatico, "");
-        $sql .= " where ug_id = " . SQLaddFields($ug_id, "");
-        $rs = SQLexecuteQuery($sql);
+        if ($loginAutomatico) {
+            $sql = "update dist_usuarios_games set ug_data_inclusao_nexcafe = CURRENT_TIMESTAMP, ug_id_nexcafe = $1, ug_login_nexcafe_auto = $2 where ug_id = $3";
+            $rs = SQLexecuteQueryParams($sql, array(strtoupper($login_nexcafe), 1, $ug_id));
+        } else {
+            $sql = "update dist_usuarios_games set ug_data_inclusao_nexcafe = CURRENT_TIMESTAMP, ug_id_nexcafe = $1, ug_login_nexcafe_auto = DEFAULT where ug_id = $2";
+            $rs = SQLexecuteQueryParams($sql, array(strtoupper($login_nexcafe), $ug_id));
+        }
 
         usuarios_games_log($GLOBALS['USUARIO_GAMES_LOG_TIPOS']['UPDATE_REGISTRO_NEXCAFE'], $ug_id, null);
 
@@ -5986,10 +5842,8 @@ class UsuarioGames
         $login = strtoupper(trim($login));
 
         //SQL
-        $sql = "select ug_id from dist_usuarios_games ";
-        $sql .= " where ug_login = " . SQLaddFields($login, "s");
-
-        $rs = SQLexecuteQuery($sql);
+        $sql = "select ug_id from dist_usuarios_games where ug_login = $1";
+        $rs = SQLexecuteQueryParams($sql, array($login));
         if ($rs && pg_num_rows($rs) > 0) {
             $rs_row = pg_fetch_array($rs);
             $ret_id = $rs_row['ug_id'];
@@ -6005,11 +5859,8 @@ class UsuarioGames
         //------------------------------------------------------------------
         if ($ug_id) {
             //SQL
-            $sql = "update dist_usuarios_games set ";
-            $sql .= " ug_data_ultimo_acesso = CURRENT_TIMESTAMP, ";
-            $sql .= " ug_qtde_acessos = ug_qtde_acessos + 1 ";
-            $sql .= " where ug_id = " . SQLaddFields($ug_id, "");
-            $rs = SQLexecuteQuery($sql);
+            $sql = "update dist_usuarios_games set ug_data_ultimo_acesso = CURRENT_TIMESTAMP, ug_qtde_acessos = ug_qtde_acessos + 1 where ug_id = $1";
+            $rs = SQLexecuteQueryParams($sql, array($ug_id));
         }
     } //end function atualiza_ultimo_acesso
 
@@ -6152,22 +6003,22 @@ function checaBoletoEmAberto()
         echo "GLOBALS['CORTE_FORMAS_PAGAMENTO']['BOLETO_BANCARIO']: " . $GLOBALS['CORTE_FORMAS_PAGAMENTO']['BOLETO_BANCARIO'] . "<br>";
         echo "GLOBALS['CORTE_STATUS']['ABERTO']: " . $GLOBALS['CORTE_STATUS']['ABERTO'] . "<br>";
     }
-    $sql = "select * from cortes c where c.cor_ug_id = " . $usuario_id . " and cor_status=1 order by cor_periodo_fim desc, cor_periodo_ini desc";
+    $sql = "select * from cortes c where c.cor_ug_id = $1 and cor_status=1 order by cor_periodo_fim desc, cor_periodo_ini desc";
     if ($bDebug) {
         echo "sql1: $sql<br>";
     }
-    $res_count = SQLexecuteQuery($sql);
+    $res_count = SQLexecuteQueryParams($sql, array($usuario_id));
     $total_table = ($res_count) ? pg_num_rows($res_count) : 0;
     if ($total_table > 0) {
         $rs_cortes_row = pg_fetch_array($res_count);
 
         if ($rs_cortes_row['cor_status'] == $GLOBALS['CORTE_STATUS']['ABERTO']) {
             if ($rs_cortes_row['cor_bbc_boleto_codigo'] && $rs_cortes_row['cor_tipo_pagto'] == $GLOBALS['CORTE_FORMAS_PAGAMENTO']['BOLETO_BANCARIO']) {
-                $sql = "select * from boleto_bancario_cortes bbc where bbc.bbc_boleto_codigo = " . $rs_cortes_row['cor_bbc_boleto_codigo'];
+                $sql = "select * from boleto_bancario_cortes bbc where bbc.bbc_boleto_codigo = $1";
                 if ($bDebug) {
                     echo "sql2: $sql<br>";
                 }
-                $rs_boleto = SQLexecuteQuery($sql);
+                $rs_boleto = SQLexecuteQueryParams($sql, array($rs_cortes_row['cor_bbc_boleto_codigo']));
                 if ($rs_boleto && pg_num_rows($rs_boleto) > 0) {
                     $rs_boleto_row = pg_fetch_array($rs_boleto);
                     $bbc_status = $rs_boleto_row['bbc_status'];

@@ -11,13 +11,21 @@ class PosicaoBannerDAO {
                 from 
                         tb_banner_store_posicao";
         
-        if($filtro != "")
-            $sql .= " where ".$filtro;
+        $params = array();
+        if($filtro != "") {
+            if(preg_match('/^\s*(bsp_id|bsp_status)\s*=\s*(\d+)\s*$/', $filtro, $matches)) {
+                $sql .= " where " . $matches[1] . " = $1";
+                $params[] = (int) $matches[2];
+            } else {
+                $this->erros[] = "Filtro invalido";
+                return false;
+            }
+        }
         
         $sql .= " order by bsp_data_cadastro desc";
         
         try{
-            if($posicoes = SQLexecuteQuery($sql)){
+            if($posicoes = (count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql))){
                 $totalLinhas = (($posicoes) ? pg_num_rows($posicoes) : 0);
                 if($totalLinhas > 0){
                     while($lineRow = pg_fetch_array($posicoes)){
@@ -47,16 +55,9 @@ class PosicaoBannerDAO {
     public function insert(PosicaoBannerVO $posicao){
         
         try {
-            $sql = vsprintf("insert into "
-                    . "         tb_banner_store_posicao "
-                    . "      (bsp_descricao, bsp_tamanho, bsp_data_cadastro, bsp_status) values ('%s', '%s', CURRENT_DATE, %s)",
-                            array(
-                                    $posicao->getDescricao(),
-                                    $posicao->getTamanho(),
-                                    $posicao->getStatus() 
-                                )
-                    );
-            $retorno = SQLexecuteQuery($sql);
+            $sql = "insert into tb_banner_store_posicao
+                         (bsp_descricao, bsp_tamanho, bsp_data_cadastro, bsp_status) values ($1, $2, CURRENT_DATE, $3)";
+            $retorno = SQLexecuteQueryParams($sql, [$posicao->getDescricao(), $posicao->getTamanho(), $posicao->getStatus()]);
             if($retorno) {
                 return true;
             }else{
@@ -70,23 +71,16 @@ class PosicaoBannerDAO {
     
     public function update(PosicaoBannerVO $posicao){
         try {
-            $sql = vsprintf(
-                    "update 
+            $sql = "update 
                         tb_banner_store_posicao 
                     set
-                        bsp_descricao = '%s',
-                        bsp_tamanho = '%s',
-                        bsp_status = %s
+                        bsp_descricao = $1,
+                        bsp_tamanho = $2,
+                        bsp_status = $3
                     where 
-                        bsp_id = %s;",array(
-                                        $posicao->getDescricao(),
-                                        $posicao->getTamanho(),
-                                        $posicao->getStatus(),
-                                        $posicao->getId()
-                                    )
-                    );
+                        bsp_id = $4;";
 
-            $retorno = SQLexecuteQuery($sql);
+            $retorno = SQLexecuteQueryParams($sql, [$posicao->getDescricao(), $posicao->getTamanho(), $posicao->getStatus(), $posicao->getId()]);
             if($retorno) {
                 return true;
             }else{

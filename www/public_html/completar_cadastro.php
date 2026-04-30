@@ -164,8 +164,9 @@ echo $objClassEmail->MontaEmailEspecifico();
 /*$chave_mestra = new ChaveMestra();
 $chave_mestra->inserirChaveMestra($result["ug_id"]);
 
-$sql = "select chave from dist_usuarios_games_chave where usuario = ". $result["ug_id"];
+$sql = "select chave from dist_usuarios_games_chave where usuario = :ug_id";
 $query = $connection->prepare($sql);
+$query->bindValue(':ug_id', $result["ug_id"], PDO::PARAM_INT);
 $query->execute();
 
 if($query->rowCount() > 0) {

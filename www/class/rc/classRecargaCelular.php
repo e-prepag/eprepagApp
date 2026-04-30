@@ -165,9 +165,9 @@ class RecargaCelular {
 		do{
 			$vg_id = rand(1, 1e7-1);
 
-			$sql = "select * from tb_recarga_pedidos where rp_vg_id = $vg_id order by rp_data_inclusao desc limit 1";
+			$sql = "select * from tb_recarga_pedidos where rp_vg_id = $1 order by rp_data_inclusao desc limit 1";
 //echo "[$iloop] $sql<br>";
-			$rs = SQLexecuteQuery($sql);
+			$rs = SQLexecuteQueryParams($sql, array($vg_id));
 			if(!$rs || pg_num_rows($rs) == 0) {
 				$b_unique = true;
 				break;
@@ -185,9 +185,9 @@ class RecargaCelular {
 		if(!$vg_id) {
 			return -1;
 		}
-		$sql = "select * from tb_recarga_pedidos where rp_vg_id = $vg_id order by rp_data_inclusao desc limit 1";
+		$sql = "select * from tb_recarga_pedidos where rp_vg_id = $1 order by rp_data_inclusao desc limit 1";
 //echo "carregaPedido($sql)<br>\n";
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, array($vg_id));
 		if(!$rs || pg_num_rows($rs) == 0) {
 			echo "Nenhum produto encontrado ($sql).\n";
 			return -2;
@@ -889,9 +889,10 @@ gravaLog_RC_processing("SolicitacaoRecarga: \n".print_r(json_encode($aret), true
 
 			$sfield = ((ctype_lower($tipo))?"rc_parametros":"rc_retorno");
 			$sql = "INSERT INTO tb_recarga_consultas (rc_tipo, $sfield, rc_StatusTransacao, rc_CodigoOperadora, rc_CodigoRede, rc_urlLogo, rc_ddd) ";
-			$sql .= "VALUES ('$tipo', '".str_replace("'", "''", $params['smsg'])."', '".$params['result']."', '".$params['operadora']."', '".$params['rede']."', '".substr($params['urlLogo'], 0, 512)."', '".substr($params['ddd'], 0, 2)."');";
+			$sql .= "VALUES ($1, $2, $3, $4, $5, $6, $7);";
+			$paramsSql = array($tipo, $params['smsg'], $params['result'], $params['operadora'], $params['rede'], substr($params['urlLogo'], 0, 512), substr($params['ddd'], 0, 2));
 //echo "Salvando '$sql' ".$GLOBALS['cReturn']."";
-			$rs = SQLexecuteQuery($sql);
+			$rs = SQLexecuteQueryParams($sql, $paramsSql);
 			if(!$rs) {
 echo "Erro ao Salvar Consulta '$sql' (1) ".$GLOBALS['cReturn']."";
 			} else {
@@ -912,9 +913,10 @@ echo "Erro ao Salvar Consulta '$sql' (1) ".$GLOBALS['cReturn']."";
 
 			$sfield = ((ctype_lower($tipo))?"rp_parametros":"rp_retorno");
 			$sql = "INSERT INTO tb_recarga_pedidos (rp_tipo, $sfield, rp_statustransacao, rp_codigooperadora, rp_codigorede, rp_VersaoOperadora, rp_VersaoFilial, rp_codigoproduto, rp_numerocelular, rp_valor, rp_vg_id, rp_ug_id, rp_ddd, rp_parametros) ";
-			$sql .= "VALUES ('$tipo', '".$params['smsg']."', '".$params['result']."', '".$params['operadora']."', '".$params['rede']."', ".$params['versaooperadora'].", ".$params['versaofilial'].", '".$params['produto']."', '".$params['celular']."', ".$params['valor'].", ".$params['vg_id'].", ".$params['ug_id'].", '".$params['ddd']."', '".$params['params']."');";
+			$sql .= "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);";
+			$paramsSql = array($tipo, $params['smsg'], $params['result'], $params['operadora'], $params['rede'], $params['versaooperadora'], $params['versaofilial'], $params['produto'], $params['celular'], $params['valor'], $params['vg_id'], $params['ug_id'], $params['ddd'], $params['params']);
 //echo "Salvando '$sql' ".$GLOBALS['cReturn']."";
-			$rs = SQLexecuteQuery($sql);
+			$rs = SQLexecuteQueryParams($sql, $paramsSql);
 			if(!$rs) {
 echo "Erro ao Salvar '$sql' (2) ".$GLOBALS['cReturn']."";
 			} else {
@@ -929,14 +931,18 @@ echo "Erro ao Salvar '$sql' (2) ".$GLOBALS['cReturn']."";
 		// Salva para os casos onde precisa chamar atualizaPedido() depois de ROLLBACK
 		$this->params_atualiza = $params;
 		if($vg_id) {
-			$data_recarga = (($params['data_recarga']=="null" || is_null($params['data_recarga']) || ($params['data_recarga']=="")) ? "null" : ("'".$params['data_recarga']."'"));
-			$sql = "UPDATE tb_recarga_pedidos set rp_statustransacao = '".$params['statusTransacao']."', rp_status = '".$params['status']."', rp_parametros = '".$params['params']."', rp_data_recarga = ".$data_recarga." ";
+			$data_recarga = (($params['data_recarga']=="null" || is_null($params['data_recarga']) || ($params['data_recarga']=="")) ? null : $params['data_recarga']);
+			$paramsSql = array($params['statusTransacao'], $params['status'], $params['params'], $data_recarga);
+			$sql = "UPDATE tb_recarga_pedidos set rp_statustransacao = $1, rp_status = $2, rp_parametros = $3, rp_data_recarga = $4 ";
 			if(isset($params['recibo'])) {
-				$sql .= ", rp_recibo = '".$params['recibo']."' ";
+				$paramsSql[] = $params['recibo'];
+				$sql .= ", rp_recibo = $" . count($paramsSql) . " ";
 			}
-			$sql .= " WHERE rp_vg_id = ".$params['vg_id']." and rp_numerocelular = '".$params['celular']."' and rp_status = '0'; ";
+			$paramsSql[] = $params['vg_id'];
+			$paramsSql[] = $params['celular'];
+			$sql .= " WHERE rp_vg_id = $" . (count($paramsSql) - 1) . " and rp_numerocelular = $" . count($paramsSql) . " and rp_status = '0'; ";
 
-			$rs = SQLexecuteQuery($sql);
+			$rs = SQLexecuteQueryParams($sql, $paramsSql);
 			if(!$rs) {
 echo "Em atualizaPedido() - Erro ao atualizar pedido '$sql' (2) ".$GLOBALS['cReturn']."";
 			} else {
@@ -1260,10 +1266,10 @@ if (!function_exists('SQLexecuteQuery')) {
 
 		if($varBlDebug){
 			echo "".$GLOBALS['cReturn']."" . $sql . "".$GLOBALS['cReturn']."";
-			if(substr($sql, 0, 6) == "select")	$ret = pg_query ($_config['db_connid'], $sql);
+			if(substr($sql, 0, 6) == "select")	$ret = pg_query_params($_config['db_connid'], $sql, array());
 			else $ret = 1;
 		} else {
-			$ret = pg_query ($_config['db_connid'], $sql);
+			$ret = pg_query_params($_config['db_connid'], $sql, array());
 		}
 
 		error_reporting ($lev); //DEFAULT!!
@@ -1380,9 +1386,9 @@ function get_operadora_nome_by_codigo($codigo_operadora) {
 
 function get_dados_da_Lan($ug_id, &$params) {
 	$params = array();
-	$sql  = "select ug_ativo, ug_tipo_cadastro, ug_perfil_limite, ug_perfil_saldo, ug_risco_classif from dist_usuarios_games where ug_id = " . $ug_id;
+	$sql  = "select ug_ativo, ug_tipo_cadastro, ug_perfil_limite, ug_perfil_saldo, ug_risco_classif from dist_usuarios_games where ug_id = $1";
 //echo "$sql\n";
-	$rs_lan = SQLexecuteQuery($sql);
+	$rs_lan = SQLexecuteQueryParams($sql, array($ug_id));
 	if(!$rs_lan || pg_num_rows($rs_lan) == 0) {
 	} else {
 		$rs_lan_row = pg_fetch_array($rs_lan);

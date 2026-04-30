@@ -689,12 +689,13 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		}
 
 		//SQL
+		$paramsSql = array($this->getIdUsuario(), $this->periodo_data_anterior);
 		$sql = "select sum(vg_pagto_valor_pago) as total from tb_venda_games ";
-		$sql .= " where vg_ug_id = " . SQLaddFields($this->getIdUsuario(), "");
-		$sql .= " and vg_data_inclusao>='".$this->periodo_data_anterior."' ";	
+		$sql .= " where vg_ug_id = $1";
+		$sql .= " and vg_data_inclusao >= $2 ";	
 		$sql .= $this->getCondicoes()." and vg_ultimo_status=5 ";
 
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
@@ -753,13 +754,14 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		*/
 
 		//SQL
+		$paramsSql = array($this->idusuario, (int)$this->intervalo_para_vendas_em_aberto);
 		$sql = "select count(*) as qtde from tb_venda_games ";
-		$sql .= " where vg_ug_id = " . SQLaddFields($this->idusuario, "");
-		$sql .= " and vg_data_inclusao>=(CURRENT_TIMESTAMP - interval '".$this->intervalo_para_vendas_em_aberto." minute')";
+		$sql .= " where vg_ug_id = $1";
+		$sql .= " and vg_data_inclusao >= (CURRENT_TIMESTAMP - ($2::int * interval '1 minute'))";
 		$sql .= " and not (vg_ultimo_status = 6) ";	
 		$sql .= $this->getCondicoes()." ; ";	// escolhe pagamentos Cielo
 
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
@@ -811,13 +813,14 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		*/
 
 		//SQL
+		$paramsSql = array($this->idusuario, $this->periodo_data_anterior);
 		$sql = "select count(*) as qtde from tb_venda_games ";
-		$sql .= " where vg_ug_id = " . SQLaddFields($this->idusuario, "");
-		$sql .= " and vg_data_inclusao>='".$this->periodo_data_anterior."' ";
+		$sql .= " where vg_ug_id = $1";
+		$sql .= " and vg_data_inclusao >= $2 ";
 		$sql .= " and vg_ultimo_status=5 ";
 		$sql .= $this->getCondicoes()." ; ";	// escolhe pagamentos Cielo
 
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			$rs_row = pg_fetch_array($rs);
@@ -943,7 +946,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$sql = "select count(*) as total,cielo_pan from tb_venda_games vg ";
 		$sql .= " inner join tb_pag_compras pc on (vg.vg_id = pc.idvenda) ";
 		$sql .= " inner join codigo_confirmacao cc on (vg.vg_id = cc.cc_vg_id) ";
-		$sql .= " where vg_ug_id = " . SQLaddFields($this->getIdUsuario(), "");
+		$sql .= " where vg_ug_id = " . SQL_PARAM_LEGACY_COMMENT($this->getIdUsuario(), "");
 		$sql .= " and vg_pagto_tipo=".getCodigoNumericoParaPagto($this->getIForma())." and vg_ultimo_status=5 and cc_status='0' ";
 		$sql .= " group by cielo_pan ";
 		$sql .= " having count(*) =1 ";
@@ -951,7 +954,7 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 		$rs = SQLexecuteQuery($sql);
 		if($rs && pg_num_rows($rs)== 1){
 			//Teste se j� foi digitado com sucesso o Token para a primeira venda
-			//$sql = "select * from codigo_confirmacao where cc_tipo_usuario='M' and cc_ug_id=".SQLaddFields($this->getIdUsuario(), "")." and cc_tipo_pagamento='".$this->getIForma()."' and cc_status='0';";
+			//$sql = "select * from codigo_confirmacao where cc_tipo_usuario='M' and cc_ug_id=".SQL_PARAM_LEGACY_COMMENT($this->getIdUsuario(), "")." and cc_tipo_pagamento='".$this->getIForma()."' and cc_status='0';";
 			//$rs_token_verify = SQLexecuteQuery($sql);
 			//echo $sql;
 			//if(pg_num_rows($rs_token_verify) == 1) {
@@ -969,26 +972,28 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 	}//end function getPrimeiraVendaGamers()
 */
 	function getPrimeiraVendaGamers(&$cielo_pan,&$data_exibicao) {
+		$paramsSql = array($this->getIdUsuario(), getCodigoNumericoParaPagto($this->getIForma()));
 		$sql = "select cielo_pan from tb_venda_games vg ";
 		$sql .= " inner join tb_pag_compras pc on (vg.vg_id = pc.idvenda) ";
-		$sql .= " where vg_ug_id = " . SQLaddFields($this->getIdUsuario(), "");
-		$sql .= " and vg_pagto_tipo=".getCodigoNumericoParaPagto($this->getIForma())." and vg_ultimo_status=5 ";
+		$sql .= " where vg_ug_id = $1";
+		$sql .= " and vg_pagto_tipo = $2 and vg_ultimo_status=5 ";
 		$sql .= " and cielo_pan IS NOT NULL ";
 		$sql .= " group by cielo_pan ";
 		//echo $sql."<br>";
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		$rs_row = array('qtde' => 0);
 		if($rs && pg_num_rows($rs) > 0){
 			while ($rs_row = pg_fetch_array($rs)) {
 				$cielo_pan = $rs_row['cielo_pan'];
+				$paramsToken = array($this->getIdUsuario(), getCodigoNumericoParaPagto($this->getIForma()), $cielo_pan);
 				$sql = "select to_char(cc_aux.cc_data_inclusao,'DD/MM/YYYY HH24:MI') as data_exibicao,* from codigo_confirmacao cc_aux where cc_aux.cc_data_inclusao = ( ";
 				$sql .= "select min(cc_data_inclusao) from tb_venda_games vg ";
 				$sql .= " inner join tb_pag_compras pc on (vg.vg_id = pc.idvenda) ";
 				$sql .= " inner join codigo_confirmacao cc on (vg.vg_id = cc.cc_vg_id) ";
-				$sql .= " where vg_ug_id = " . SQLaddFields($this->getIdUsuario(), "");
-				$sql .= " and vg_pagto_tipo=".getCodigoNumericoParaPagto($this->getIForma())." and vg_ultimo_status=5 ";
-				$sql .= " and cielo_pan = '".$cielo_pan."') ";
-				$rs_token_verify = SQLexecuteQuery($sql);
+				$sql .= " where vg_ug_id = $1";
+				$sql .= " and vg_pagto_tipo = $2 and vg_ultimo_status=5 ";
+				$sql .= " and cielo_pan = $3) ";
+				$rs_token_verify = SQLexecuteQueryParams($sql, $paramsToken);
 				//echo $sql;
 				if($rs_token_verify) {
 					while ($rs_token_verify_row = pg_fetch_array($rs_token_verify)) {
@@ -1010,27 +1015,29 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 	}//end function getPrimeiraVendaGamers()
 
 	function setStatusTokenUtilizado($cielo_pan,$token) {
+		$paramsSql = array($this->getIdUsuario(), getCodigoNumericoParaPagto($this->getIForma()), $cielo_pan);
 		$sql = "select * from tb_venda_games vg ";
 		$sql .= " inner join tb_pag_compras pc on (vg.vg_id = pc.idvenda) ";
 		$sql .= " inner join codigo_confirmacao cc on (vg.vg_id = cc.cc_vg_id) ";
-		$sql .= " where vg_ug_id = " . SQLaddFields($this->getIdUsuario(), "");
-		$sql .= " and vg_pagto_tipo =".getCodigoNumericoParaPagto($this->getIForma())." and vg_ultimo_status = 5 and cc_status = '0' ";
-		$sql .= " and cielo_pan = '".$cielo_pan."'";
+		$sql .= " where vg_ug_id = $1";
+		$sql .= " and vg_pagto_tipo = $2 and vg_ultimo_status = 5 and cc_status = '0' ";
+		$sql .= " and cielo_pan = $3";
 		sleep(1);
 		//echo $sql."<br>";
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		if($rs && pg_num_rows($rs)== 1){
 			$rs_row = pg_fetch_array($rs);
 			$cc_id_aux = $rs_row['cc_id'];
 			$cc_codigo_aux = $rs_row['cc_codigo'];
 			//echo $cc_id_aux."<br>".$cc_codigo_aux."<br>";
 			if($cc_codigo_aux == $token) {
+				$paramsUpdate = array($this->getIdUsuario(), $this->getIForma(), $cc_id_aux);
 				$sql = "update codigo_confirmacao ";
 				$sql .= " set cc_status = '1', cc_data_confirmado = NOW() ";
-				$sql .= " where cc_ug_id = " . SQLaddFields($this->getIdUsuario(), "");
-				$sql .= " and cc_tipo_pagamento = '".$this->getIForma()."' and cc_id = ".$cc_id_aux." and cc_tipo_usuario = 'M' ";
+				$sql .= " where cc_ug_id = $1";
+				$sql .= " and cc_tipo_pagamento = $2 and cc_id = $3 and cc_tipo_usuario = 'M' ";
 				//echo $sql."<br>";
-				$rs_token_verify = SQLexecuteQuery($sql);
+				$rs_token_verify = SQLexecuteQueryParams($sql, $paramsUpdate);
 				if($rs_token_verify) {
 					return true;
 				}
@@ -1053,28 +1060,41 @@ if(isset($_SESSION['usuarioGames_ser'])) {
 //		estrutura: Array ( [opr_codigo1] => n1; [opr_codigo] => n2; ... ) onde os n1, n2... s�o o total de pins de cada operadora presente na venda
 function converte_carrinho_em_operadoras($carrinho) {
 	
-	$s_carrinho = "";
-	$s_carrinho_ogp_id = "";
+	$modeloIds = array();
+	$produtoIds = array();
         $carrinho_operadoras = array();
         if(count($carrinho) > 0) {
             foreach($carrinho as  $key => $val) {
                 if($key !== $GLOBALS['NO_HAVE']) {
-                    $s_carrinho .= (($s_carrinho)?",":"")."$key";
+                    if (is_numeric($key)) $modeloIds[] = (int)$key;
                 }
                 else {
-                    $s_carrinho_ogp_id .= (($s_carrinho_ogp_id)?",":"").key($val);
+                    $produtoId = is_array($val) ? key($val) : null;
+                    if (is_numeric($produtoId)) $produtoIds[] = (int)$produtoId;
                 }
             }
         }//end if(count($carrinho) > 0)
-	if($s_carrinho != "" || $s_carrinho_ogp_id != "") {
+	if(count($modeloIds) > 0 || count($produtoIds) > 0) {
+		$paramsSql = array();
+		$where = array();
+		if (count($modeloIds) > 0) {
+			$ph = array();
+			foreach ($modeloIds as $id) { $paramsSql[] = $id; $ph[] = '$' . count($paramsSql); }
+			$where[] = "ogpm_id IN (" . implode(", ", $ph) . ")";
+		}
+		if (count($produtoIds) > 0) {
+			$ph = array();
+			foreach ($produtoIds as $id) { $paramsSql[] = $id; $ph[] = '$' . count($paramsSql); }
+			$where[] = "ogp.ogp_id IN (" . implode(", ", $ph) . ")";
+		}
 		$sql = "select ogp_opr_codigo, ogpm_id
 		from tb_operadora_games_produto ogp
 			inner join tb_operadora_games_produto_modelo ogpm on ogp.ogp_id = ogpm.ogpm_ogp_id 
-		where ".(!empty($s_carrinho)?" ogpm_id IN (".$s_carrinho.")":"").(!empty($s_carrinho_ogp_id)?(!empty($s_carrinho)?" OR":"")." ogp.ogp_id IN (".$s_carrinho_ogp_id.")":"")."
+		where " . implode(" OR ", $where) . "
 		order by ogp_opr_codigo";
 	//echo "$sql<br>";
 
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		if($rs){
 			while ($rs_row = pg_fetch_array($rs)){
 				$opr_codigo = $rs_row['ogp_opr_codigo'];

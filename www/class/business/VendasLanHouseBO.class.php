@@ -100,23 +100,26 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
     
     public function getPrimeiraVenda($dataInicial, $dataFinal, $ultimoStatus = 5, $depositoEmSaldo = 1){
                 
+        $paramsPrimeiraVenda = [$ultimoStatus, $depositoEmSaldo, $dataInicial . " 00:00:00", $dataFinal . " 23:59:59"];
         $sqlPrimeiraVenda = "select 
                         vg_ug_id, MIN(vg_data_inclusao) AS vg_data_inclusao
                 from 
                         tb_dist_venda_games
                 where 
-                        vg_ultimo_status = {$ultimoStatus} AND vg_deposito_em_saldo = {$depositoEmSaldo}
+                        vg_ultimo_status = $1 AND vg_deposito_em_saldo = $2
                 group by 
                         vg_ug_id
                 having 
-                        MIN(vg_data_inclusao) >= '{$dataInicial} 00:00:00' and MIN(vg_data_inclusao) <= '{$dataFinal} 23:59:59' 
+                        MIN(vg_data_inclusao) >= $3 and MIN(vg_data_inclusao) <= $4 
                 order by vg_data_inclusao DESC; ";
                         
-        $objPrimeiraVenda = $this->getSqlPrimeiraVenda($sqlPrimeiraVenda);
+        $objPrimeiraVenda = $this->getSqlPrimeiraVenda($sqlPrimeiraVenda, $paramsPrimeiraVenda);
         
         if(is_array($objPrimeiraVenda)){
             foreach($objPrimeiraVenda as $ind => $venda){
                 $dataInicial = $venda["venda"]->getDataInclusao();
+                $dataPrimeiraVenda = formata_data(substr($dataInicial,0,10), 1);
+                $paramsValorTotalPrimeiraVenda = [$venda["venda"]->getCodUsuario(), $dataPrimeiraVenda . " 00:00:00", $dataPrimeiraVenda . " 23:59:59", $ultimoStatus, $depositoEmSaldo];
                 $sqlValorTotalPrimeiraVenda =  "select 
                                                         SUM( CASE vg_pagto_tipo WHEN 2 THEN bol_valor ELSE vg_pagto_valor_pago END) as valor_total, 
                                                         count(distinct(vg_pagto_tipo)) tipo,
@@ -128,23 +131,41 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                                                         left outer join tb_pag_compras ON vg_id = idvenda 
                                                         left outer join boletos_pendentes ON bol_venda_games_id = vg_id
                                                 where 
-                                                        vg_ug_id = {$venda["venda"]->getCodUsuario()} 
-                                                        and vg_data_inclusao >= '".formata_data(substr($dataInicial,0,10), 1)." 00:00:00' 
-                                                        and vg_data_inclusao <= '".formata_data(substr($dataInicial,0,10), 1)." 23:59:59'
-                                                        and vg_ultimo_status = {$ultimoStatus}
-                                                        and vg_deposito_em_saldo = {$depositoEmSaldo}
+                                                        vg_ug_id = $1 
+                                                        and vg_data_inclusao >= $2 
+                                                        and vg_data_inclusao <= $3
+                                                        and vg_ultimo_status = $4
+                                                        and vg_deposito_em_saldo = $5
                                                 group by nome, vg_ug_id, ug_vip ";
 
-                $this->getSqlPrimeiraVenda($sqlValorTotalPrimeiraVenda);
+                $this->getSqlPrimeiraVenda($sqlValorTotalPrimeiraVenda, $paramsValorTotalPrimeiraVenda);
             }    
         }
         
         return $this->vendas;
             
     }
-    
     public function getPedidoVendas($usuarioId,$registros = 20,$p = 1,$boolNaoImpresso = false){
         
+        $params = [$usuarioId];
+        $phUsuarioId = '$1';
+        $phCodigo = null;
+        $phDataIni = null;
+        $phDataFim = null;
+
+        if(isset($_POST['tf_v_codigo']) && is_numeric($_POST['tf_v_codigo'])) {
+            $params[] = (int) $_POST['tf_v_codigo'];
+            $phCodigo = '$' . count($params);
+        }
+
+        if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim'])) {
+            if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0) {
+                $params[] = formata_data($_POST['tf_v_data_inclusao_ini'],1) . " 00:00:00";
+                $phDataIni = '$' . count($params);
+                $params[] = formata_data($_POST['tf_v_data_inclusao_fim'],1) . " 23:59:59";
+                $phDataFim = '$' . count($params);
+            }
+        }
         
         $sql  = "select 
                     vg_id, 
@@ -180,7 +201,7 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
 							left join 
                                 pedidos_api_pdv api on api.id_pedido_eprepag = vg.vg_id
                             where 
-                                vg.vg_ug_id=" . $usuarioId;
+                                vg.vg_ug_id=" . $phUsuarioId;
         if($boolNaoImpresso) {
             $sql .= " and vgm.vgm_id IN ( 
                                         select vgmp.vgmp_vgm_id 
@@ -196,12 +217,11 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
             
         } //end if($boolNaoImpresso)]
         
-            if(isset($_POST['tf_v_codigo']) && is_numeric($_POST['tf_v_codigo'])) 
-                $sql .= " and vg.vg_id=" . $_POST['tf_v_codigo'];
+            if($phCodigo) 
+                $sql .= " and vg.vg_id=" . $phCodigo;
 		
-            if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim']))
-                if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0)
-                    $sql .= " and vg.vg_data_inclusao >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and vg.vg_data_inclusao <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
+            if($phDataIni && $phDataFim)
+                $sql .= " and vg.vg_data_inclusao >= " . $phDataIni . " and vg.vg_data_inclusao <= " . $phDataFim;
 		
             $sql .=     " group by 
                             vg.vg_id, api.id_pedido_parceiro, vg.vg_data_inclusao, vg.vg_pagto_tipo, vg.vg_ultimo_status, vg.vg_usuario_obs
@@ -225,17 +245,16 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                             from 
                                 tb_vendas_b2c b2c
                             where 
-                                vb2c_ug_id_lan =" . $usuarioId." AND  
+                                vb2c_ug_id_lan =" . $phUsuarioId . " AND  
                                 vb2c_status <> 'N'";
             
-                if(isset($_POST['tf_v_codigo']) && is_numeric($_POST['tf_v_codigo'])) 
-                    $sql .=    " and vb2c_vg_id= " . $_POST['tf_v_codigo'];
+                if($phCodigo) 
+                    $sql .=    " and vb2c_vg_id= " . $phCodigo;
 
-                if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim']))
-                        if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0)
-                            $sql .= " and \"vb2c_dataVenda\" >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and \"vb2c_dataVenda\" <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
+                if($phDataIni && $phDataFim)
+                    $sql .= " and \"vb2c_dataVenda\" >= " . $phDataIni . " and \"vb2c_dataVenda\" <= " . $phDataFim;
                 ################################tb_recarga_pedidos_rede_sim
-                $sql .="    )
+                $sql .= "    )
                             union all 
                             (
                                 select 
@@ -253,14 +272,13 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                                 from 
                                     tb_recarga_pedidos_rede_sim  rp 
                                 where 
-                                    rprs_ug_id =" . $usuarioId;
+                                    rprs_ug_id =" . $phUsuarioId;
 
-                if(isset($_POST['tf_v_codigo']) && is_numeric($_POST['tf_v_codigo'])) 
-                    $sql .= " and rprs_vg_id=" . $_POST['tf_v_codigo'];
+                if($phCodigo) 
+                    $sql .= " and rprs_vg_id=" . $phCodigo;
 
-                if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim']))
-                        if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0)
-                                $sql .= " and rprs_data_recarga >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and rprs_data_recarga <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
+                if($phDataIni && $phDataFim)
+                    $sql .= " and rprs_data_recarga >= " . $phDataIni . " and rprs_data_recarga <= " . $phDataFim;
 
                 ########################tb_seguro_pedidos_rede_sim
                 $sql .=         " and rprs_data_recarga is not null
@@ -282,14 +300,13 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                                 from 
                                     tb_seguro_pedidos_rede_sim  sprs
                                 where 
-                                    sprs_ug_id =" . $usuarioId;
+                                    sprs_ug_id =" . $phUsuarioId;
 
-                if(isset($_POST['tf_v_codigo']) && is_numeric($_POST['tf_v_codigo'])) 
-                    $sql .= " and sprs_vg_id=" . $_POST['tf_v_codigo'];
+                if($phCodigo) 
+                    $sql .= " and sprs_vg_id=" . $phCodigo;
 
-                if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim']))
-                        if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0)
-                                $sql .= " and sprs_data_seguro >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and sprs_data_seguro <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
+                if($phDataIni && $phDataFim)
+                    $sql .= " and sprs_data_seguro >= " . $phDataIni . " and sprs_data_seguro <= " . $phDataFim;
 
                 ################################tb_recarga_pedidos
                 $sql .=         " and sprs_data_seguro is not null
@@ -311,14 +328,13 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                                 from 
                                     tb_recarga_pedidos  trp
                                 where 
-                                    rp_ug_id =" . $usuarioId;
+                                    rp_ug_id =" . $phUsuarioId;
 
-                if(isset($_POST['tf_v_codigo']) && is_numeric($_POST['tf_v_codigo'])) 
-                    $sql .= " and rp_vg_id=" . $_POST['tf_v_codigo'];
+                if($phCodigo) 
+                    $sql .= " and rp_vg_id=" . $phCodigo;
 
-                if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim']))
-                        if(verifica_data($_POST['tf_v_data_inclusao_ini']) != 0 && verifica_data($_POST['tf_v_data_inclusao_fim']) != 0)
-                                $sql .= " and rp_data_recarga >= '".formata_data($_POST['tf_v_data_inclusao_ini'],1)." 00:00:00' and rp_data_recarga <= '".formata_data($_POST['tf_v_data_inclusao_fim'],1)." 23:59:59'";
+                if($phDataIni && $phDataFim)
+                    $sql .= " and rp_data_recarga >= " . $phDataIni . " and rp_data_recarga <= " . $phDataFim;
 
                 $sql .=         " and rp_data_recarga is not null
                             )";
@@ -328,24 +344,32 @@ class VendasLanHouseBO extends VendasLanHouseDAO{
                     ) as vendas ";
             
             
-            $qtd = $this->getTotalVendas($sql);
+            $qtd = $this->getTotalVendas($sql, $params);
 
-            //quando o usuario esta na pagina 2 ou + e pesquisa por um id de pedido, o P nao deixa trazer o resultado, pois pesquisa por id de venda só retorna 1 resultado, entao o order by/offset e limit não se fazem necessario
-            if(!isset($_POST['tf_v_codigo']) || $_POST['tf_v_codigo'] == "")
-                $sql .= " order by vg_data_inclusao desc offset " . ($p - 1) * $registros . " limit " . $registros;
+            //quando o usuario esta na pagina 2 ou + e pesquisa por um id de pedido, o P nao deixa trazer o resultado, pois pesquisa por id de venda so retorna 1 resultado, entao o order by/offset e limit nao se fazem necessario
+            $paramsLista = $params;
+            if(!isset($_POST['tf_v_codigo']) || $_POST['tf_v_codigo'] == "") {
+                $offset = (int) (($p - 1) * $registros);
+                $limit = (int) $registros;
+                $paramsLista[] = $offset;
+                $phOffset = '$' . count($paramsLista);
+                $paramsLista[] = $limit;
+                $phLimit = '$' . count($paramsLista);
+                $sql .= " order by vg_data_inclusao desc offset " . $phOffset . " limit " . $phLimit;
+            }
             $vendas= null;
 			
-			writeFileIfPossible("/www/arquivos_gerados/logs/ajuste-sql.txt", $sql . "\n");
+			writeFileIfPossible("/www/arquivos_gerados/logs/ajuste-sql.txt", $sql . "
+");
 
-            $vendas = $this->getVendas($sql,false);
+            $vendas = $this->getVendas($sql,false, $paramsLista);
 
             $pedido['qtd'] = $qtd;
             $pedido['vendas'] = $vendas;
             return $pedido;
     }
-        
-    public function getTotalVendas($sql){
-        $vendas = $this->getVendas($sql,false);
+    public function getTotalVendas($sql, $params = array()){
+        $vendas = $this->getVendas($sql,false, $params);
         if (is_array($vendas) || $vendas instanceof Countable) {
             return count($vendas);
         }

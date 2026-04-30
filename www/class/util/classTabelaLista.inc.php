@@ -54,10 +54,10 @@ class tabelaLista
     {
         $this->sql        = $sql;
         $this->action     = $action;
-        $this->inicio     = $inicio;
-        $this->limite     = $limite;
+        $this->inicio     = (int) $inicio;
+        $this->limite     = (int) $limite;
         $this->sort       = $sort;
-        $this->dir        = $dir;
+        $this->dir        = strtoupper($dir) == 'DESC' ? 'DESC' : 'ASC';
         $this->botoes     = $botoes;
         $this->estilos    = $estilos;
         $this->formFields = $formFields;
@@ -315,6 +315,11 @@ class tabelaLista
      */
     private function geraSql()
     {
+        $campos = is_array($this->camposTabela) ? array_keys($this->camposTabela) : array();
+        if (!in_array($this->sort, $campos)) {
+            $this->sort = count($campos) ? $campos[0] : '';
+        }
+
         // o sql mais interno eh o original
         // o segundo, o que cria a coluna id com os numeros em sequencia
         // o externo eh o que seleciona a parte necessaria de acordo com a paginacao

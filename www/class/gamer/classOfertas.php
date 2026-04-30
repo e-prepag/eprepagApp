@@ -3,6 +3,79 @@
 class Ofertas {
 		
 	public function __construct() { }	
+
+	private function addParam(&$params, $value) {
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private function filtroValue($filtro, $key) {
+		return is_array($filtro) && array_key_exists($key, $filtro) ? $filtro[$key] : null;
+	}
+
+	private function addOffersWhere(&$sql, &$params, &$filtro) {
+		if (!is_array($filtro)) $filtro = array();
+
+		if ($this->filtroValue($filtro, 'ugo_id') !== null && $this->filtroValue($filtro, 'ugo_id') !== '') {
+			$sql .= " AND ug_ofertas.ugo_id = " . $this->addParam($params, $this->filtroValue($filtro, 'ugo_id'));
+		}
+
+		if ($this->filtroValue($filtro, 'ugo_oferta_id') !== null && $this->filtroValue($filtro, 'ugo_oferta_id') !== '') {
+			$sql .= " AND ug_ofertas.ugo_oferta_id LIKE " . $this->addParam($params, '%' . $this->filtroValue($filtro, 'ugo_oferta_id') . '%');
+		}
+
+		if ($this->filtroValue($filtro, 'ugoc_descricao') !== null && $this->filtroValue($filtro, 'ugoc_descricao') !== '') {
+			$sql .= " AND UPPER(ug_ofertas_canal.ugoc_descricao) LIKE " . $this->addParam($params, '%' . strtoupper($this->filtroValue($filtro, 'ugoc_descricao')) . '%');
+		}
+
+		if ($this->filtroValue($filtro, 'ugo_transaction_id') !== null && $this->filtroValue($filtro, 'ugo_transaction_id') !== '') {
+			$sql .= " AND ug_ofertas.ugo_transaction_id LIKE " . $this->addParam($params, '%' . $this->filtroValue($filtro, 'ugo_transaction_id') . '%');
+		}
+
+		if ($this->filtroValue($filtro, 'ugo_valor_credito') !== null && $this->filtroValue($filtro, 'ugo_valor_credito') !== '') {
+			$sql .= " AND ug_ofertas.ugo_valor_credito = " . $this->addParam($params, $this->filtroValue($filtro, 'ugo_valor_credito') ? $this->filtroValue($filtro, 'ugo_valor_credito') : 0);
+		}
+
+		if ($this->filtroValue($filtro, 'ugo_ug_email') !== null && $this->filtroValue($filtro, 'ugo_ug_email') !== '') {
+			$sql .= " AND UPPER(ug_ofertas.ugo_ug_email) LIKE " . $this->addParam($params, '%' . strtoupper($this->filtroValue($filtro, 'ugo_ug_email')) . '%');
+		}
+
+		if ($this->filtroValue($filtro, 'ugo_status') !== null && $this->filtroValue($filtro, 'ugo_status') !== '') {
+			$sql .= " AND ug_ofertas.ugo_status = " . $this->addParam($params, $this->filtroValue($filtro, 'ugo_status'));
+		}
+
+		if ($this->filtroValue($filtro, 'ugo_data_adesao_oferta_ini') && $this->filtroValue($filtro, 'ugo_data_adesao_oferta_fim')) {
+			$filtro['ugo_data_adesao_oferta_ini'] = formata_data_ts($this->filtroValue($filtro, 'ugo_data_adesao_oferta_ini') . " 00:00:00", 2, true, true);
+			$filtro['ugo_data_adesao_oferta_fim'] = formata_data_ts($this->filtroValue($filtro, 'ugo_data_adesao_oferta_fim') . " 23:59:59", 2, true, true);
+			$sql .= " AND ug_ofertas.ugo_data_adesao_oferta between " . $this->addParam($params, $filtro['ugo_data_adesao_oferta_ini']) . " and " . $this->addParam($params, $filtro['ugo_data_adesao_oferta_fim']);
+		}
+		else if ($this->filtroValue($filtro, 'ugo_data_adesao_oferta_ini') !== null && $this->filtroValue($filtro, 'ugo_data_adesao_oferta_fim') === null) {
+			$filtro['ugo_data_adesao_oferta_ini'] = formata_data_ts($this->filtroValue($filtro, 'ugo_data_adesao_oferta_ini') . " 00:00:00", 2, true, true);
+			$sql .= " AND ug_ofertas.ugo_data_adesao_oferta >= " . $this->addParam($params, $filtro['ugo_data_adesao_oferta_ini']);
+		}
+	}
+
+	private function getOffersOrderBy($orderBy) {
+		$allow = array(
+			'ugo_id' => 'ug_ofertas.ugo_id',
+			'ugo_oferta_id' => 'ug_ofertas.ugo_oferta_id',
+			'ugoc_descricao' => 'ug_ofertas_canal.ugoc_descricao',
+			'ugo_transaction_id' => 'ug_ofertas.ugo_transaction_id',
+			'ugo_valor_credito' => 'ug_ofertas.ugo_valor_credito',
+			'ugo_ug_email' => 'ug_ofertas.ugo_ug_email',
+			'ugo_status' => 'ug_ofertas.ugo_status',
+			'ugo_data_adesao_oferta' => 'ug_ofertas.ugo_data_adesao_oferta',
+			'descricao' => 'ug_ofertas_status.descricao'
+		);
+		$parts = array();
+		foreach (explode(',', (string)$orderBy) as $part) {
+			$bits = preg_split('/\s+/', trim($part));
+			$field = $bits[0];
+			$dir = isset($bits[1]) && strtolower($bits[1]) == 'desc' ? 'DESC' : 'ASC';
+			if (isset($allow[$field])) $parts[] = $allow[$field] . ' ' . $dir;
+		}
+		return implode(', ', $parts);
+	}
 	
 	/*
 	 * Retorna as informacoes de todos os canais de ofertas disponiveis na Loja
@@ -50,8 +123,8 @@ class Ofertas {
 	*/
 	public function getIframeByOfferChannel($idOfferChannel, $emailUser) {
 		
-		$sql = "SELECT ugoc_canal_url, ugoc_app_id, ugoc_descricao FROM usuarios_games_ofertas_canal WHERE ugoc_id=".$idOfferChannel;
-		$rs = SQLexecuteQuery($sql);		
+		$sql = "SELECT ugoc_canal_url, ugoc_app_id, ugoc_descricao FROM usuarios_games_ofertas_canal WHERE ugoc_id=$1";
+		$rs = SQLexecuteQueryParams($sql, array($idOfferChannel));		
 		$result = pg_fetch_assoc($rs);
 				
 		$urlPainelOferta = str_replace("[APP_ID]", $result["ugoc_app_id"], $result["ugoc_canal_url"]);
@@ -88,57 +161,14 @@ class Ofertas {
 					 1=1 
 					 AND ug_ofertas.ugo_ugoc_id=ug_ofertas_canal.ugoc_id 
 					 AND ug_ofertas.ugo_status=ug_ofertas_status.ugo_status_id ";
+		$params = array();
+		$this->addOffersWhere($sql, $params, $filtro);
 					
-		if(!is_null($filtro['ugo_id']) && $filtro['ugo_id'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_id'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_id = " . SQLaddFields($filtro['ugo_id'], "") . ")";
-		}
-	
-		if(!is_null($filtro['ugo_oferta_id']) && $filtro['ugo_oferta_id'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_oferta_id'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_oferta_id LIKE '%" . SQLaddFields($filtro['ugo_oferta_id'], "r") . "%')";
-		}
-		
-		if(!is_null($filtro['ugoc_descricao']) && $filtro['ugoc_descricao'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugoc_descricao'])?1:0);
-			$sql .= "=1 OR UPPER(ug_ofertas_canal.ugoc_descricao) LIKE '%" . SQLaddFields(strtoupper($filtro['ugoc_descricao']), "r") . "%')";
-		}
-		
-		if(!is_null($filtro['ugo_transaction_id']) && $filtro['ugo_transaction_id'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_transaction_id'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_transaction_id LIKE '%" . SQLaddFields($filtro['ugo_transaction_id'], "r") . "%')";
-		}
-				
-		if(!is_null($filtro['ugo_valor_credito']) && $filtro['ugo_valor_credito'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_valor_credito'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_valor_credito = " . SQLaddFields($filtro['ugo_valor_credito']?$filtro['ugo_valor_credito']:0, "") . ")";
-		}
-		
-		if(!is_null($filtro['ugo_ug_email']) && $filtro['ugo_ug_email'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_ug_email'])?1:0);
-			$sql .= "=1 OR UPPER(ug_ofertas.ugo_ug_email) LIKE '%" . SQLaddFields(strtoupper($filtro['ugo_ug_email']), "r") . "%')";
-		}
-		
-		if(!is_null($filtro['ugo_status']) && $filtro['ugo_status'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_status'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_status = " . SQLaddFields($filtro['ugo_status'], "") . ")";
-		}
-		
-		if ($filtro['ugo_data_adesao_oferta_ini'] && $filtro['ugo_data_adesao_oferta_fim']) {
-			$filtro['ugo_data_adesao_oferta_ini'] = formata_data_ts($filtro['ugo_data_adesao_oferta_ini'] . " 00:00:00", 2, true, true);
-			$filtro['ugo_data_adesao_oferta_fim'] = formata_data_ts($filtro['ugo_data_adesao_oferta_fim'] . " 23:59:59", 2, true, true);
-				
-			$sql .= " AND (ug_ofertas.ugo_data_adesao_oferta between " . SQLaddFields($filtro['ugo_data_adesao_oferta_ini'], "s") . " and " . SQLaddFields($filtro['ugo_data_adesao_oferta_fim'], "s") . ")";
-		}
-		else if (!is_null($filtro['ugo_data_adesao_oferta_ini']) && is_null($filtro['ugo_data_adesao_oferta_fim'])) {
-			$filtro['ugo_data_adesao_oferta_ini'] = formata_data_ts($filtro['ugo_data_adesao_oferta_ini'] . " 00:00:00", 2, true, true);
-			$sql .= " AND (ug_ofertas.ugo_data_adesao_oferta >= " . SQLaddFields($filtro['ugo_data_adesao_oferta_ini'], "s"). ")";
-		}	
-		
-		if(!is_null($orderBy) && $orderBy != "") $sql .= " ORDER BY " . $orderBy;
-		if(!is_null($limitQuery) && $limitQuery != 0) $sql .= " LIMIT " . $limitQuery;
-		if(!is_null($offSetQuery) && $offSetQuery != 0) $sql .= " OFFSET " . $offSetQuery;			
-		$rs = SQLexecuteQuery($sql);
+		$orderSql = $this->getOffersOrderBy($orderBy);
+		if($orderSql != "") $sql .= " ORDER BY " . $orderSql;
+		if(!is_null($limitQuery) && (int)$limitQuery != 0) $sql .= " LIMIT " . (int)$limitQuery;
+		if(!is_null($offSetQuery) && (int)$offSetQuery != 0) $sql .= " OFFSET " . (int)$offSetQuery;			
+		$rs = $params ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		$listOfOffers = array();
 	
 		if ($rs) {
@@ -168,58 +198,14 @@ class Ofertas {
 					 1=1 
 					 AND ug_ofertas.ugo_ugoc_id=ug_ofertas_canal.ugoc_id 
 					 AND ug_ofertas.ugo_status=ug_ofertas_status.ugo_status_id ";
-		
-		if(!is_null($filtro['ugo_id']) && $filtro['ugo_id'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_id'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_id = " . SQLaddFields($filtro['ugo_id'], "") . ")";
-		}
+		$params = array();
+		$this->addOffersWhere($sql, $params, $filtro);
 	
-		if(!is_null($filtro['ugo_oferta_id']) && $filtro['ugo_oferta_id'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_oferta_id'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_oferta_id LIKE '%" . SQLaddFields($filtro['ugo_oferta_id'], "r") . "%')";
-		}
-	
-		if(!is_null($filtro['ugoc_descricao']) && $filtro['ugoc_descricao'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugoc_descricao'])?1:0);
-			$sql .= "=1 OR UPPER(ug_ofertas_canal.ugoc_descricao) LIKE '%" . SQLaddFields(strtoupper($filtro['ugoc_descricao']), "r") . "%')";
-		}
-	
-		if(!is_null($filtro['ugo_transaction_id']) && $filtro['ugo_transaction_id'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_transaction_id'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_transaction_id LIKE '%" . SQLaddFields($filtro['ugo_transaction_id'], "r") . "%')";
-		}
-	
-		if(!is_null($filtro['ugo_valor_credito']) && $filtro['ugo_valor_credito'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_valor_credito'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_valor_credito = " . SQLaddFields($filtro['ugo_valor_credito']?$filtro['ugo_valor_credito']:0, "") . ")";
-		}
-	
-		if(!is_null($filtro['ugo_ug_email']) && $filtro['ugo_ug_email'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_ug_email'])?1:0);
-			$sql .= "=1 OR UPPER(ug_ofertas.ugo_ug_email) LIKE '%" . SQLaddFields(strtoupper($filtro['ugo_ug_email']), "r") . "%')";
-		}
-	
-		if(!is_null($filtro['ugo_status']) && $filtro['ugo_status'] != "") {
-			$sql .= " AND (" . (is_null($filtro['ugo_status'])?1:0);
-			$sql .= "=1 OR ug_ofertas.ugo_status = " . SQLaddFields($filtro['ugo_status'], "") . ")";
-		}
-	
-		if ($filtro['ugo_data_adesao_oferta_ini'] && $filtro['ugo_data_adesao_oferta_fim']) {
-			$filtro['ugo_data_adesao_oferta_ini'] = formata_data_ts($filtro['ugo_data_adesao_oferta_ini'] . " 00:00:00", 2, true, true);
-			$filtro['ugo_data_adesao_oferta_fim'] = formata_data_ts($filtro['ugo_data_adesao_oferta_fim'] . " 23:59:59", 2, true, true);
-	
-			$sql .= " AND (ug_ofertas.ugo_data_adesao_oferta between " . SQLaddFields($filtro['ugo_data_adesao_oferta_ini'], "s") . " and " . SQLaddFields($filtro['ugo_data_adesao_oferta_fim'], "s") . ")";
-		}
-		else if (!is_null($filtro['ugo_data_adesao_oferta_ini']) && is_null($filtro['ugo_data_adesao_oferta_fim'])) {
-			$filtro['ugo_data_adesao_oferta_ini'] = formata_data_ts($filtro['ugo_data_adesao_oferta_ini'] . " 00:00:00", 2, true, true);
-			$sql .= " AND (ug_ofertas.ugo_data_adesao_oferta >= " . SQLaddFields($filtro['ugo_data_adesao_oferta_ini'], "s"). ")";
-		}
-	
-		$rs = SQLexecuteQuery($sql);
+		$rs = $params ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		$resultTotal = pg_fetch_assoc($rs);	
 		return $resultTotal;
 	}	
-	
+
 	/*
 	 * Retorna a lista de Status das Ofertas
 	 *

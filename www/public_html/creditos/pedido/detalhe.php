@@ -25,26 +25,26 @@ require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/header.php";
 
 function getEstilosUsuarioPDO($userId, PDO $pdo)
 {
-    // Configurações recomendadas
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-    $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+	// Configurações recomendadas
+	$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+	$pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 
-    $sql = "SELECT ug_estilo, OCTET_LENGTH(ug_logo) AS logo_tamanho FROM dist_usuarios_games WHERE ug_id = :userId";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
-    $stmt->execute();
+	$sql = "SELECT ug_estilo, OCTET_LENGTH(ug_logo) AS logo_tamanho FROM dist_usuarios_games WHERE ug_id = :userId";
+	$stmt = $pdo->prepare($sql);
+	$stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+	$stmt->execute();
 
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+	$resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($resultado && isset($resultado['ug_estilo'])) {
-        $dados = json_decode($resultado['ug_estilo'], true);
+	if ($resultado && isset($resultado['ug_estilo'])) {
+		$dados = json_decode($resultado['ug_estilo'], true);
 
 		$dados['logo_existe'] = !empty($resultado['logo_tamanho']) && $resultado['logo_tamanho'] > 0;
 
-        return is_array($dados) ? $dados : array();
-    }
+		return is_array($dados) ? $dados : array();
+	}
 
-    return array();
+	return array();
 }
 
 if (isset($_REQUEST['envia_email']) && $_REQUEST['envia_email'] == 1) {
@@ -96,7 +96,7 @@ if (empty($pedido['produtos'])) {
 }
 
 if ($pedido['venda']) {
-	?>
+?>
 	<div class="container txt-azul-claro bg-branco">
 		<div class="row">
 			<div class="col-md-12">
@@ -123,13 +123,13 @@ if ($pedido['venda']) {
 									global $pedido;
 
 									// $controller->usuarios->getId() 
-									$sqlQtde = "select vg_data_inclusao,vg_id,vgm_id,vg_ug_id,vgm_ogp_id,vgm_qtde as qtde_original,(select count(*) from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = vgm_id) as qtde_recebida from tb_dist_venda_games_modelo inner join tb_dist_venda_games on vgm_vg_id = vg_id where vgm_qtde <> (select count(*) from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = vgm_id) and vg_id not in(14827296,33147950,82290948,96353986,58057989) and vg_ug_id = " . $controller->usuarios->getId() . " and vg_ultimo_status = '5' and vg_data_inclusao >= '2022-01-01' and (select count(*) from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = vgm_id) <> 0 order by qtde_recebida desc;";
-									$rs = SQLexecuteQuery($sqlQtde);
+									$sqlQtde = "select vg_data_inclusao,vg_id,vgm_id,vg_ug_id,vgm_ogp_id,vgm_qtde as qtde_original,(select count(*) from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = vgm_id) as qtde_recebida from tb_dist_venda_games_modelo inner join tb_dist_venda_games on vgm_vg_id = vg_id where vgm_qtde <> (select count(*) from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = vgm_id) and vg_id not in(14827296,33147950,82290948,96353986,58057989) and vg_ug_id = $1 and vg_ultimo_status = '5' and vg_data_inclusao >= '2022-01-01' and (select count(*) from tb_dist_venda_games_modelo_pins where vgmp_vgm_id = vgm_id) <> 0 order by qtde_recebida desc;";
+									$rs = SQLexecuteQueryParams($sqlQtde, array($controller->usuarios->getId()));
 									$dadosQtde = pg_fetch_assoc($rs);
 
 									if (!empty($dadosQtde) && $dadosQtde != false) {
-										$sqlIdProd = "select ogp_id from tb_dist_venda_games inner join tb_dist_venda_games_modelo on vg_id = vgm_vg_id inner join tb_dist_operadora_games_produto on vgm_ogp_id = ogp_id where vg_id =" . $GLOBALS['_SESSION']['venda'];
-										$proid = SQLexecuteQuery($sqlIdProd);
+										$sqlIdProd = "select ogp_id from tb_dist_venda_games inner join tb_dist_venda_games_modelo on vg_id = vgm_vg_id inner join tb_dist_operadora_games_produto on vgm_ogp_id = ogp_id where vg_id = $1";
+										$proid = SQLexecuteQueryParams($sqlIdProd, array($GLOBALS['_SESSION']['venda']));
 										$idprodepp = pg_fetch_assoc($proid);
 										if ($dadosQtde["vgm_ogp_id"] == $idprodepp["ogp_id"]) {
 											return true;
@@ -138,17 +138,16 @@ if ($pedido['venda']) {
 									} else {
 										return false;
 									}
-
 								}
 
 								//if($controller->usuarios->getId() == 17371){
 								//buscaQtdeExcedida();
-							
+
 								//col-xs-4 col-sm-4 bg-cinza-claro
 								//}
-							
+
 								//17371 nosso id andre
-							
+
 								//$idBloqueados = [7045,12667,12881,17944,12881,7950,15025,10701,5944,15434,17148,13333,17589,5944,8074,17396,14350,18686,9952,12404];  
 								//if(!in_array($controller->usuarios->getId(), $idBloqueados)){
 								//if(!buscaQtdeExcedida()){
@@ -178,7 +177,7 @@ if ($pedido['venda']) {
 							$total_geral += $geral;
 							$total_desconto += $desconto;
 							$total_repasse += $repasse;
-							?>
+						?>
 							<div class="col-xs-12 col-sm-12 bg-branco hidden-lg hidden-md espacamento borda-fina">
 								<div class="row">
 									<div class="col-xs-3 col-sm-5">
@@ -237,7 +236,7 @@ if ($pedido['venda']) {
 									</div>
 								</div>
 							</div>
-							<?php
+						<?php
 						}
 						?>
 						<div class="col-xs-12 col-sm-12 hidden-lg hidden-md bg-cinza-claro espacamento borda-fina">
@@ -324,7 +323,7 @@ if ($pedido['venda']) {
 									$total_geral += $geral;
 									$total_desconto += $desconto;
 									$total_repasse += $repasse;
-									?>
+								?>
 									<tr class="text-center">
 										<td><?php echo $produto->getNomeProduto() . " - " . $produto->getModelo(); ?></td>
 										<td><?php echo (($produto->getIOF() == 1) ? "Incluso" : ""); ?></td>
@@ -334,7 +333,7 @@ if ($pedido['venda']) {
 										<td><?php echo number_format($desconto, 2, ',', '.'); ?></td>
 										<td><?php echo number_format($repasse, 2, ',', '.') ?></td>
 									</tr>
-									<?php
+								<?php
 								}
 								?>
 								<tr class="bg-cinza-claro text-center">
@@ -349,18 +348,18 @@ if ($pedido['venda']) {
 				</div>
 				<?php
 				if (isset($msg) && $msg != "") {
-					?>
+				?>
 					<div class="row">
 						<div class="col-md-12 espacamento txt-verde text-center">
 							<strong><?php echo $msg; ?></strong>
 						</div>
 					</div>
-					<?php
+				<?php
 				}
 				?>
 				<div class="row espacamento content">
 					<div class="col-md-12 text-center" <?php if (!isset($_REQUEST['nao_emitidos']) || $_REQUEST['nao_emitidos'] != 1)
-						echo 'style="display:none;"'; ?> id="box-lan-hope">
+															echo 'style="display:none;"'; ?> id="box-lan-hope">
 						<!-- FIM NOVO BLOCO dsds -->
 						<?php
 						$sql = "select vgm.vgm_ogp_id,pg.pin_status,pg.pin_game_id,pg.pin_status_trava,pg.pin_guid_epp,pg.pin_guid_parceiro,p.pin_valor,vgm.vgm_nome_produto,vgm.vgm_ogp_id,vgm.vgm_opr_codigo,vgm.vgm_nome_modelo,p.pin_codinterno, p.pin_vencimento, p.pin_codigo, p.pin_lote_codigo, p.pin_serial, vgmp.vgmp_impressao_qtde, vgmp.vgmp_impressao_ult_data, vgm.vgm_id, vgm_pin_request 
@@ -369,22 +368,22 @@ from pins_dist p
     inner join tb_dist_venda_games_modelo_pins vgmp on p.pin_codinterno = vgmp.vgmp_pin_codinterno 
     inner join tb_dist_venda_games_modelo vgm on vgm.vgm_id = vgmp.vgmp_vgm_id 
     inner join tb_dist_venda_games vg on vg.vg_id = vgm.vgm_vg_id 
-where vg.vg_id = " . $GLOBALS['_SESSION']['venda'] . "
-    and vg.vg_ug_id = " . $controller->usuarios->getId() . " and vg.vg_ultimo_status = '5'
+where vg.vg_id = $1
+    and vg.vg_ug_id = $2 and vg.vg_ultimo_status = '5'
 order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_serial;";
 
-						$rs = SQLexecuteQuery($sql);
+						$rs = SQLexecuteQueryParams($sql, array($GLOBALS['_SESSION']['venda'], $controller->usuarios->getId()));
 						if (!$rs) {
-							?>
+						?>
 							<p class="text-red">Nenhum produto encontrado (ERRO: WM390).</p>
-							<?php
+						<?php
 							die();
 						} //end if(!$rs)
-					
-						//Calculando se a quantidade de PINs é igual a quantidade de registros 
+
+						//Calculando se a quantidade de PINs ï¿½ igual a quantidade de registros 
 						$totalRegistros = (($rs) ? pg_num_rows($rs) : 0);
-						$sql = "select sum(vgm_qtde) as total from tb_dist_venda_games_modelo where vgm_vg_id = " . $GLOBALS['_SESSION']['venda'];
-						$rsTotal = SQLexecuteQuery($sql);
+						$sql = "select sum(vgm_qtde) as total from tb_dist_venda_games_modelo where vgm_vg_id = $1";
+						$rsTotal = SQLexecuteQueryParams($sql, array($GLOBALS['_SESSION']['venda']));
 						$rsTotalRow = pg_fetch_array($rsTotal);
 						$totalPins = $rsTotalRow['total'];
 
@@ -401,28 +400,28 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 								<?php
 								if ($totalPins > 0) {
 									$checkbox = true;
-									?>
+								?>
 									<!-- NOVO BLOCO -->
 									<div class="row text-center espacamento content">
 										<?php
 										if ($totalPins > 1) {
-											?>
+										?>
 											<div class="txt-preto pull-left col-md-12 text-left">
 												<input type="checkbox" id="checkall">
 												<label for="checkall" class="fontweightnormal">Selecionar Todos</label>
 											</div>
-											<?php
+										<?php
 										}
 										$sqlGarena = "select count(*) as tot,
     (
         SELECT vgm_ogp_id
         FROM tb_dist_venda_games_modelo
-        WHERE vgm_opr_codigo = 124 and vgm_vg_id = " . $GLOBALS['_SESSION']['venda'] . "
+        WHERE vgm_opr_codigo = 124 and vgm_vg_id = $1
         GROUP BY vgm_ogp_id
         ORDER BY COUNT(*) DESC
         LIMIT 1
-    ) AS vgm_ogp_id from tb_dist_venda_games_modelo where vgm_opr_codigo = 124 and vgm_vg_id =" . $GLOBALS['_SESSION']['venda'];
-										$dadosGarena = SQLexecuteQuery($sqlGarena);
+    ) AS vgm_ogp_id from tb_dist_venda_games_modelo where vgm_opr_codigo = 124 and vgm_vg_id = $1";
+										$dadosGarena = SQLexecuteQueryParams($sqlGarena, array($GLOBALS['_SESSION']['venda']));
 										$totalGarena = pg_fetch_array($dadosGarena);
 
 										if ($totalGarena["tot"] > 0) { //&&($controller->usuarios->getId() == 17371 || $controller->usuarios->getId() == 7503 || $controller->usuarios->getId() == 7630 || $controller->usuarios->getId() == 13885)
@@ -469,14 +468,14 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 														$liberaDepositoGarena = true;
 														//$classbloqueia = "bloque";
 													}
-													?>
+												?>
 													<tr>
 														<td id="td2emitir<?php echo $contador; ?>">
 															<?php
 															if ($rs_row['vgmp_impressao_qtde'] > 0) {
-																?>
+															?>
 																<span class="txt-verde glyphicon glyphicon-ok t0"></span>
-																<?php
+															<?php
 															}
 															?>
 														</td>
@@ -492,52 +491,52 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 														<td id="tdemitir<?php echo $contador; ?>">
 															<?php //Verificando se já foi impresso
-																		if ($rs_row['vgmp_impressao_qtde'] > 0) {
-																			echo "<span class='pull-left'>Emitido&nbsp;</span> ";
-																			$sql = "select * from tb_dist_venda_games_produto_email where vgpe_pin_codinterno = " . $rs_row['pin_codinterno'] . ";";
-																			$rs_forma = SQLexecuteQuery($sql);
-																			if ($rs_forma) {
-																				$total_email = 0;
-																				$lista_emails = "";
-																				while ($rs_forma_row = pg_fetch_array($rs_forma)) {
-																					$total_email++;
-																					if (empty($lista_emails))
-																						$lista_emails .= $rs_forma_row['vgpe_email'];
-																					else
-																						$lista_emails .= ",\n " . $rs_forma_row['vgpe_email'];
-																				} //end while
-																				//echo "[$total_email]";
-																				if ($total_email >= $rs_row['vgmp_impressao_qtde']) {
-																					?>
+															if ($rs_row['vgmp_impressao_qtde'] > 0) {
+																echo "<span class='pull-left'>Emitido&nbsp;</span> ";
+																$sql = "select * from tb_dist_venda_games_produto_email where vgpe_pin_codinterno = $1;";
+																$rs_forma = SQLexecuteQueryParams($sql, array($rs_row['pin_codinterno']));
+																if ($rs_forma) {
+																	$total_email = 0;
+																	$lista_emails = "";
+																	while ($rs_forma_row = pg_fetch_array($rs_forma)) {
+																		$total_email++;
+																		if (empty($lista_emails))
+																			$lista_emails .= $rs_forma_row['vgpe_email'];
+																		else
+																			$lista_emails .= ",\n " . $rs_forma_row['vgpe_email'];
+																	} //end while
+																	//echo "[$total_email]";
+																	if ($total_email >= $rs_row['vgmp_impressao_qtde']) {
+															?>
 																		<span class="glyphicon glyphicon-envelope t0 left"
 																			alt='Email para: <?php echo $lista_emails; ?>'
 																			title='Email para: <?php echo "\n " . $lista_emails; ?>'></span>
 																		<div style="display:none"><?php echo $lista_emails; ?></div>
-																		<?php
-																				} elseif ($total_email == 0) {
-																					?>
+																	<?php
+																	} elseif ($total_email == 0) {
+																	?>
 																		<span class="glyphicon glyphicon-print t0 left" alt='Impresso'
 																			title='Impresso'></span>
-																		<?php
-																				} else {
-																					?>
+																	<?php
+																	} else {
+																	?>
 																		<span class="glyphicon glyphicon-envelope t0 left"
 																			alt='Email para: <?php echo $lista_emails; ?>'
 																			title='Email para: <?php echo "\n " . $lista_emails; ?>'></span>
 																		<span class="glyphicon glyphicon-print t0 left" alt='Impresso'
 																			title='Impresso'></span>
-																		<?php
-																				}
-																			}//end if($rs_forma)
-															
-																		}//end if($rs_row['vgmp_impressao_qtde'] > 0)
-															
-																		// pega data de utilizacao 
-																		$sqlUtilizacao = "select pih_data from pins_integracao_historico where pih_pin_id =" . $rs_row["pin_codinterno"];
-																		$rs_util = SQLexecuteQuery($sqlUtilizacao);
-																		$dataUtil = pg_fetch_assoc($rs_util);
+															<?php
+																	}
+																} //end if($rs_forma)
 
-																		?>
+															} //end if($rs_row['vgmp_impressao_qtde'] > 0)
+
+															// pega data de utilizacao 
+															$sqlUtilizacao = "select pih_data from pins_integracao_historico where pih_pin_id = $1";
+															$rs_util = SQLexecuteQueryParams($sqlUtilizacao, array($rs_row["pin_codinterno"]));
+															$dataUtil = pg_fetch_assoc($rs_util);
+
+															?>
 														</td>
 														<td><?php echo $rs_row['vgm_nome_produto'] . ": " . $rs_row['vgm_nome_modelo']; ?>
 														</td>
@@ -547,20 +546,20 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 														<?php
 														if ((isset($liberaDepositoGarena) && $liberaDepositoGarena === true)) { //($controller->usuarios->getId() == 17371 || $controller->usuarios->getId() == 273) &&
-															?>
+														?>
 															<td></td>
 															<td>
 																<?php
 																if ($controller->usuarios->getId() != null) { //17371
-																	?>
+																?>
 																	<button type="button" class="btn btn-success depositarPin"
 																		id="depositarPin">Resgatar</button>
-																	<?php
+																<?php
 																}
 																?>
 															</td>
-															<?php //<a href="#" class="link-conta"> 
-																			unset($liberaDepositoGarena);
+														<?php //<a href="#" class="link-conta"> 
+															unset($liberaDepositoGarena);
 														} else if ($rs_row['pin_game_id'] != null && $rs_row['pin_game_id'] != "" && $dataUtil["pih_data"] != "" && $dataUtil["pih_data"] != null) {
 															echo '<td>Data de resgate: <b class="txt-verde">' . substr($dataUtil["pih_data"], 8, 2) . "/" . substr($dataUtil["pih_data"], 5, 2) . "/" . substr($dataUtil["pih_data"], 0, 4) . "-" . substr($dataUtil["pih_data"], 11, 8) . '</b></td>';
 															echo '<td>Conta usada: <b class="txt-verde txt-conta border-verify-user">' . $rs_row['pin_game_id'] . '</b><div id="user" data-prod="' . $rs_row['vgm_ogp_id'] . '"></div></td>';
@@ -573,34 +572,34 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 													</tr>
 													<?php
 													$contador++;
-												}//end while($rs_row = pg_fetch_array($rs))
+												} //end while($rs_row = pg_fetch_array($rs))
 												if ($totalPins > $totalRegistros) {
 													$subTotal = $totalPins - $totalRegistros;
 													for ($i = $subTotal; $i > 0; $i--) {
-														?>
+													?>
 														<tr>
 															<td colspan="5">
 																PIN ainda em processamento. Aguarde um instante.
 															</td>
 														</tr>
-														<?php
-													}//end for
-												}//end if($totalPins > $totalRegistros)
-										
+												<?php
+													} //end for
+												} //end if($totalPins > $totalRegistros)
+
 												?>
 										</table>
-										<?php
-								}//end if((($rs) ? pg_num_rows($rs) : 0) > 1)
+									<?php
+								} //end if((($rs) ? pg_num_rows($rs) : 0) > 1)
 								else {
 									$rs_row = pg_fetch_array($rs);
 									?>
 										<input type="checkbox" value="<?php echo $rs_row['pin_codinterno']; ?>" id="emitir"
 											name="emitir" checked="checked" style="display:none">
-										<?php
+									<?php
 									//Colocar aqui o checkbox invisivel com o unico PIN da venda
-								}//end else do if((($rs) ? pg_num_rows($rs) : 0) > 1)
-							
-								?>
+								} //end else do if((($rs) ? pg_num_rows($rs) : 0) > 1)
+
+									?>
 
 							</form>
 						</div>
@@ -613,18 +612,18 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 							let vd = "<?php echo $idVendCalc; ?>";
 							var iptCheckBox = <?php echo (isset($checkbox)) ? "true" : "false"; ?>;
 							//funcao de Envio de Email
-							$(function () {
+							$(function() {
 
-								$("#checkall").click(function () {
+								$("#checkall").click(function() {
 
 									var res = this.checked;
-									$(':checkbox').each(function () {
+									$(':checkbox').each(function() {
 										this.checked = res;
 									});
 
 								});
 
-								$(document).on("click", ".txt-conta", function (event) {
+								$(document).on("click", ".txt-conta", function(event) {
 
 									let ele = $(event.target);
 									ele.css("position", "relative");
@@ -632,8 +631,15 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 									$.ajax({
 										url: "<?= EPREPAG_URL_HTTPS ?>/ajax/garena/verificaProduto.php",
 										method: "POST",
-										data: { vde: <?php echo $GLOBALS['_SESSION']['venda']; ?>, codigo: $($(event.target.parentElement.parentElement).children()[2]).children()[0].value, garena: event.target.innerText, prod: div.data().prod, user: true, type: "pdv" },
-										beforeSend: function () {
+										data: {
+											vde: <?php echo $GLOBALS['_SESSION']['venda']; ?>,
+											codigo: $($(event.target.parentElement.parentElement).children()[2]).children()[0].value,
+											garena: event.target.innerText,
+											prod: div.data().prod,
+											user: true,
+											type: "pdv"
+										},
+										beforeSend: function() {
 											div.html("Aguarde ....");
 											div.css({
 												padding: "7px",
@@ -645,7 +651,7 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 												position: "absolute"
 											});
 										}
-									}).done(function (res) {
+									}).done(function(res) {
 										let dados = JSON.parse(res);
 										div.html("Nome de usuário: <b>" + dados[0].nome + "</b>");
 										div.delay(4000).fadeOut(800);
@@ -668,17 +674,17 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 					
 								});*/
 
-								$(".reemite").click(function () {
+								$(".reemite").click(function() {
 									$('#box-lan-hope').toggle();
 								});
 
-								$("#emailPin").click(function () {
+								$("#emailPin").click(function() {
 
 									let usr = <?php echo $controller->usuarios->getId(); ?>;
 
 									if ($(":checkbox:checked").length > 0 || iptCheckBox == false) {
 										let blocks = 0;
-										$("input:checkbox:checked").each(function () {
+										$("input:checkbox:checked").each(function() {
 											let id = $(this).attr("id").replace("emitir", "");
 											let vl = $(this).parent().parent().find("#td3id" + id);
 											if (vl.html() == 124) {
@@ -702,15 +708,15 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 											type: 'POST',
 											url: 'https://<?php echo $server_url; ?>/creditos/ajax/emailCupom.php',
 											data: showValues(),
-											beforeSend: function () {
+											beforeSend: function() {
 												$('#box-lan-hope').html("<img src='/imagens/loading1.gif' border='0' title='Pedido aguardando processamento....'/><p class='text-red'>Pedido aguardando processamento.</p>");
 											},
-											success: function (html) {
+											success: function(html) {
 												//$('#box-lan-hope').html(html);
 												$('#box-lan-hope').html(html);
 												//console.log(html);
 											},
-											error: function () {
+											error: function() {
 												alert('Erro Valor');
 											}
 										});
@@ -722,13 +728,13 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 									}
 								});
 
-								$("#imprimirPin").click(function () {
+								$("#imprimirPin").click(function() {
 
 									var id = false;
 									let blocks = 0;
 									let usr = <?php echo $controller->usuarios->getId(); ?>;
 
-									$("input:checkbox:checked").each(function () {
+									$("input:checkbox:checked").each(function() {
 										let id = $(this).attr("id").replace("emitir", "");
 										let vl = $(this).parent().parent().find("#td3id" + id);
 										if (vl.html() == 124) {
@@ -748,7 +754,7 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 								
 									}else{ */
 
-									$("input:checkbox").each(function () {
+									$("input:checkbox").each(function() {
 										if ($(this).is(":checked")) {
 											id = $(this).attr("id");
 											var td = $("#td" + id);
@@ -782,12 +788,12 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 								});
 
-								$("#downloadPin").click(function () {
+								$("#downloadPin").click(function() {
 
 									let blocks = 0;
 									let usr = <?php echo $controller->usuarios->getId(); ?>;
 
-									$("input:checkbox:checked").each(function () {
+									$("input:checkbox:checked").each(function() {
 										let id = $(this).attr("id").replace("emitir", "");
 										let vl = $(this).parent().parent().find("#td3id" + id);
 										if (vl.html() == 124) {
@@ -815,15 +821,15 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 											type: 'POST',
 											url: '/creditos/imprimir_cupom.php',
 											data: showValues(),
-											beforeSend: function () {
+											beforeSend: function() {
 												$('#downloadPin').html("<span><i>Iniciando download..</i></span>");
 											},
 
-											success: function (html) {
+											success: function(html) {
 												$('#downloadPin').html(html);
 												$('#downloadPin').html("<span>Download</span>");
 											},
-											error: function () {
+											error: function() {
 												alert('Problema no download do PIN');
 											}
 										});
@@ -834,10 +840,10 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 									//}
 								});
 
-								$(document).on("click", ".depositarPin", function (event) {
+								$(document).on("click", ".depositarPin", function(event) {
 
 									let check = 0;
-									$("input:checkbox").each(function () {
+									$("input:checkbox").each(function() {
 
 										if ($(this).is(":checked")) {
 											if (check == 0) {
@@ -848,8 +854,18 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 													} else {
 														let tr = $(this.parentElement.parentElement);
 														let div = $('<div class="modal-garena"><input type="text" id="id_garena" name="id_garena"><span id="span_id_garena">Preencha o campo com o ID da conta do garena que irá receber os créditos</span><button type="button" class="btn btn-success" id="confirmaContaGarena">Confirmar</button></div>');
-														tr.css({ position: "relative" });
-														div.css({ position: "absolute", left: "0", zIndex: "1", top: "52px", width: "100%", padding: "15px", backgroundColor: "#eeeeee" });
+														tr.css({
+															position: "relative"
+														});
+														div.css({
+															position: "absolute",
+															left: "0",
+															zIndex: "1",
+															top: "52px",
+															width: "100%",
+															padding: "15px",
+															backgroundColor: "#eeeeee"
+														});
 														tr.append(div);
 														//$("#close").css({width:"20px", float:"right"}); 
 													}
@@ -857,12 +873,18 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 													check = 1;
 													$(this.parentElement.parentElement).find(".depositarPin").addClass("btn-click");
 													$("#form1").attr("action", "");
-													$("#id_garena").css({ display: "block" });
-													$("#span_id_garena").css({ color: "#16a3dc" });
+													$("#id_garena").css({
+														display: "block"
+													});
+													$("#span_id_garena").css({
+														color: "#16a3dc"
+													});
 													$("#span_id_garena").fadeIn(800);
 													$("#confirmaContaGarena").fadeIn(900);
 												} else {
-													$(".alert-notify").css({ display: "block" });
+													$(".alert-notify").css({
+														display: "block"
+													});
 													$(".alert-notify").html("Não é possivel seleciona mais de um pin para o resgate Garena");
 													if ($(".alert-notify").hasClass("alert-success")) {
 														$(".alert-notify").removeClass("alert-success");
@@ -884,7 +906,9 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 									if (check == 0) {
 
-										$(".alert-notify").css({ display: "block" });
+										$(".alert-notify").css({
+											display: "block"
+										});
 										$(".alert-notify").html("Selecione um pin para o resgate");
 										if ($(".alert-notify").hasClass("alert-success")) {
 											$(".alert-notify").removeClass("alert-success");
@@ -894,21 +918,27 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 										if ($("div").hasClass("modal-garena")) {
 											$(".modal-garena").remove();
-											$("#id_garena").css({ display: "none" });
-											$("#span_id_garena").css({ display: "none" });
-											$("#confirmaContaGarena").css({ display: "none" });
+											$("#id_garena").css({
+												display: "none"
+											});
+											$("#span_id_garena").css({
+												display: "none"
+											});
+											$("#confirmaContaGarena").css({
+												display: "none"
+											});
 										}
 
 									}
 
 								});
 
-								$(document).on("click", "#confirmaContaGarena", function (event) {
+								$(document).on("click", "#confirmaContaGarena", function(event) {
 
 									event.preventDefault();
 									idP = new Array();
 									let trg = '';
-									$("input:checkbox:checked").each(function () {
+									$("input:checkbox:checked").each(function() {
 										idP.push($(this).attr("value"));
 										trg = $(this.parentElement.parentElement);
 									});
@@ -923,21 +953,31 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 												url: "<?= EPREPAG_URL_HTTPS ?>/ajax/garena/verificaProduto.php",
 												method: "POST",
-												data: { codigo: idP, garena: idGarena, type: "pdv", valid: true, vde: vd },
-												beforeSend: function () {
+												data: {
+													codigo: idP,
+													garena: idGarena,
+													type: "pdv",
+													valid: true,
+													vde: vd
+												},
+												beforeSend: function() {
 
 													$("#confirmaContaGarena").html("Processando...");
-													$("#span_id_garena").css({ color: "#16a3dc" });
+													$("#span_id_garena").css({
+														color: "#16a3dc"
+													});
 													$("#confirmaContaGarena").prop("disabled", true);
 
 												}
 
-											}).done(function (resultRoles) {
+											}).done(function(resultRoles) {
 
 												let dados = JSON.parse(resultRoles);
 												if (dados.hasOwnProperty('Erro')) {
 
-													$(".alert-notify").css({ display: "block" });
+													$(".alert-notify").css({
+														display: "block"
+													});
 													$(".alert-notify").html(dados.Erro);
 													if ($(".alert-notify").hasClass("alert-success")) {
 														$(".alert-notify").removeClass("alert-success");
@@ -969,20 +1009,28 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 																url: "<?= EPREPAG_URL_HTTPS ?>/ajax/garena/verificaProduto.php",
 																method: "POST",
-																data: { codigo: idP, garena: idGarena, type: "pdv", vde: vd, roles: resultRoles },
-																beforeSend: function () {
+																data: {
+																	codigo: idP,
+																	garena: idGarena,
+																	type: "pdv",
+																	vde: vd,
+																	roles: resultRoles
+																},
+																beforeSend: function() {
 
 																	$("#confirmaContaGarena").html("Processando...");
 																	$("#confirmaContaGarena").prop("disabled", true);
 
 																}
 
-															}).done(function (result) {
+															}).done(function(result) {
 
 																let retorno = JSON.parse(result);
 																if (retorno.hasOwnProperty('Erro')) {
 
-																	$(".alert-notify").css({ display: "block" });
+																	$(".alert-notify").css({
+																		display: "block"
+																	});
 																	$(".alert-notify").html(retorno.Erro);
 																	if ($(".alert-notify").hasClass("alert-success")) {
 																		$(".alert-notify").removeClass("alert-success");
@@ -997,10 +1045,14 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 
 
-																	$(".alert-notify").css({ display: "block" });
+																	$(".alert-notify").css({
+																		display: "block"
+																	});
 																	$(".alert-notify").html(retorno.Sucesso);
 																	if (trg != '') {
-																		trg.find(".depositarPin").css({ display: "none" });
+																		trg.find(".depositarPin").css({
+																			display: "none"
+																		});
 																		$(trg.find(".depositarPin").parent().parent().children()[0]).html("<span class='txt-verde glyphicon glyphicon-ok t0'></span>");
 																		$(trg.find(".depositarPin").parent().parent().children()[6]).html('Data de resgate: <b class="txt-verde">' + retorno.dataUtilizacao + '</b>');
 																		trg.find(".depositarPin").parent().html("Conta usada: <b class='txt-verde'>" + idGarena + "</b>");
@@ -1047,9 +1099,11 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 													});
 												}
 
-											}).fail(function (result) {
+											}).fail(function(result) {
 
-												$(".alert-notify").css({ display: "block" });
+												$(".alert-notify").css({
+													display: "block"
+												});
 												$(".alert-notify").html("Não foi possivel fazer o resgate dos creditos");
 												if ($(".alert-notify").hasClass("alert-success")) {
 													$(".alert-notify").removeClass("alert-success");
@@ -1064,7 +1118,9 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 										} else if (idP.length > 1) {
 
-											$(".alert-notify").css({ display: "block" });
+											$(".alert-notify").css({
+												display: "block"
+											});
 											$(".alert-notify").html("Por favor selecione um pin por vez");
 											if ($(".alert-notify").hasClass("alert-success")) {
 												$(".alert-notify").removeClass("alert-success");
@@ -1074,7 +1130,9 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 
 										} else {
 
-											$(".alert-notify").css({ display: "block" });
+											$(".alert-notify").css({
+												display: "block"
+											});
 											$(".alert-notify").html("Nenhum pin foi selecionado");
 											if ($(".alert-notify").hasClass("alert-success")) {
 												$(".alert-notify").removeClass("alert-success");
@@ -1085,7 +1143,9 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 										}
 
 									} else {
-										$("#span_id_garena").css({ color: "red" });
+										$("#span_id_garena").css({
+											color: "red"
+										});
 										$("#id_garena").focus();
 									}
 
@@ -1095,28 +1155,28 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 						</script>
 						<?php
 						if ($totalPins == $totalRegistros || $totalRegistros > 0) {
-							?>
+						?>
 							<p class="txt-vermelho errorBox"></p>
 							<p>
 								<?php
 								if ($podeEnviarEmail) {
-									?>
+								?>
 									<button type="button" class="btn btn-success" id="emailPin"
 										title="Clique aqui para enviar o PIN por email">Enviar por e-mail</button>
 									<button type="button" class="btn btn-success" id="downloadPin"
 										title="Clique aqui para baixar as informações do PIN em formato CSV/Excel"
 										value="">Download</button>
-									<?php
+								<?php
 								} //if($podeEnviarEmail)
-						
+
 
 								?>
 
 								<button type="button" class="btn btn-success" id="imprimirPin">Imprimir</button>
 
 							</p>
-							<?php
-						}//end if($totalPins == $totalRegistros || $totalRegistros > 0)
+						<?php
+						} //end if($totalPins == $totalRegistros || $totalRegistros > 0)
 						?>
 						<!-- -->
 					</div>
@@ -1128,12 +1188,12 @@ order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_seri
 		</div>
 	</div>
 
-	<?php
+<?php
 } else {
-	?>
+?>
 	<div class="container txt-azul-claro bg-branco espacamento">
 		<p class="txt-vermelho">Nenhum produto encontrado (ERRO: WM111).</p>
 	</div>
-	<?php
+<?php
 }
 require_once RAIZ_DO_PROJETO . "public_html/creditos/includes/footer.php";

@@ -90,19 +90,33 @@ class BannerRelatorio
     	$this->br_b_codigo = $br_b_codigo;
     }
     
+
+	private function addParam(&$params, $value)
+	{
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private function orderByRelatorio($orderBy)
+	{
+		if (is_null($orderBy) || trim((string) $orderBy) == '') return null;
+		$permitidos = array('br_data' => 'br.br_data', 'br_hora' => 'br.br_hora', 'br_tipo_usuario' => 'br.br_tipo_usuario', 'br_ug_dist_codigo' => 'br.br_ug_dist_codigo', 'br_ug_codigo' => 'br.br_ug_codigo', 'br_b_codigo' => 'br.br_b_codigo', 'br_codigo_dist' => 'br_codigo_dist', 'br_nome_dist' => 'br_nome_dist', 'br_nome_fantasia_dist' => 'br_nome_fantasia_dist', 'br_codigo' => 'br_codigo', 'br_nome' => 'br_nome');
+		$partes = array();
+		foreach (explode(',', $orderBy) as $parte) {
+			$tokens = preg_split('/\s+/', trim($parte));
+			$coluna = strtolower($tokens[0] ?? '');
+			$direcao = strtoupper($tokens[1] ?? 'ASC');
+			if (!isset($permitidos[$coluna]) || !in_array($direcao, array('ASC', 'DESC'))) return null;
+			$partes[] = $permitidos[$coluna] . ' ' . $direcao;
+		}
+		return count($partes) ? implode(', ', $partes) : null;
+	}
+
     function inserir(&$objBannerRelatorio)
 	{ 		
-		$sql = "insert into tb_promocoes_relatorios(" .
-				"br_data, br_hora, br_tipo_usuario, br_ug_dist_codigo, br_ug_codigo, " .
-				"br_b_codigo) values (";
-		$sql .= SQLaddFields($objBannerRelatorio->getData(), "s") . ",";
-		$sql .= SQLaddFields($objBannerRelatorio->getHora(), "s") . ",";
-		$sql .= SQLaddFields($objBannerRelatorio->getTipoUsuario(), "") . ",";
-		$sql .= SQLaddFields($objBannerRelatorio->getCodigoUsuarioDist(), "") . ",";
-		$sql .= SQLaddFields($objBannerRelatorio->getCodigoUsuario(), "") . ",";
-		$sql .= SQLaddFields($objBannerRelatorio->getCodigoBanner(), "") . ")";
-	
-		$ret = SQLexecuteQuery($sql);
+		$sql = "insert into tb_promocoes_relatorios(br_data, br_hora, br_tipo_usuario, br_ug_dist_codigo, br_ug_codigo, br_b_codigo) values ($1, $2, $3, $4, $5, $6)";
+		$params = array($objBannerRelatorio->getData(), $objBannerRelatorio->getHora(), $objBannerRelatorio->getTipoUsuario(), $objBannerRelatorio->getCodigoUsuarioDist(), $objBannerRelatorio->getCodigoUsuario(), $objBannerRelatorio->getCodigoBanner());
+		$ret = SQLexecuteQueryParams($sql, $params);
 		
  		return $ret;   	
     }    
@@ -110,23 +124,24 @@ class BannerRelatorio
 	function obter($filtro, $orderBy, &$rs)
 	{
 		$ret = "";
-		$filtro = array_map("strtoupper", $filtro);
+		$params = array();
+		$filtro = is_array($filtro) ? array_map("strtoupper", $filtro) : array();
 	
 		$sql = "select br.br_data,br.br_hora,br.br_tipo_usuario,br.br_ug_dist_codigo as br_codigo_dist,dist.ug_nome as br_nome_dist,dist.ug_nome_fantasia as br_nome_fantasia_dist,br_ug_codigo as br_codigo,ug.ug_nome as br_nome 
 				from tb_promocoes_relatorios br 
 				left join usuarios_games ug on br.br_ug_codigo = ug.ug_id 
 				left join dist_usuarios_games dist on br.br_ug_dist_codigo = dist.ug_id";
 		
-		if(!is_null($filtro) && $filtro != "")
-			if (!is_null($filtro["b_id"]))
-				$sql .= " where br.br_b_codigo = " . SQLaddFields($filtro['b_id'], "") . "";						
+		if(!empty($filtro) && !is_null($filtro["b_id"] ?? null))
+			$sql .= " where br.br_b_codigo = " . $this->addParam($params, $filtro['b_id']);						
 		
-		if(!is_null($orderBy)) 
-			$sql .= " order by " . $orderBy;
+		$order = $this->orderByRelatorio($orderBy);
+		if($order) 
+			$sql .= " order by " . $order;
 		
-		$rs = SQLexecuteQuery($sql);
+		$rs = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 		if(!$rs) 
-			$ret = "Erro ao obter relatório(s).\n";
+			$ret = "Erro ao obter relatorio(s).\n";
 
 		return $ret;
 	}

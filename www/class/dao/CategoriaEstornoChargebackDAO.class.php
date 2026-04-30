@@ -26,13 +26,21 @@ class CategoriaEstornoChargebackDAO {
                         categoria_estorno_chargeback";
         $this->categorias = array();
         
-        if($filtro != "")
-            $sql .= " where ".$filtro;
+        $params = array();
+        if($filtro != "") {
+            if(preg_match('/^\s*(cec_id|cec_status)\s*=\s*(\d+)\s*$/', $filtro, $matches)) {
+                $sql .= " where " . $matches[1] . " = $1";
+                $params[] = (int) $matches[2];
+            } else {
+                $this->erros[] = "Filtro invalido";
+                return false;
+            }
+        }
         
         $sql .= " order by cec_data_cadastro desc";
         
         try{
-            $categorias = SQLexecuteQuery($sql);
+            $categorias = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
             $totalLinhas = (($categorias) ? pg_num_rows($categorias) : 0);
             if($totalLinhas > 0){
                 
@@ -61,15 +69,10 @@ class CategoriaEstornoChargebackDAO {
     public function insert(CategoriaEstornoChargebackVO $categoria){
         
         try {
-            $sql = vsprintf(
-                    "insert into categoria_estorno_chargeback
-                    (cec_descricao, cec_data_cadastro, cec_status) values ('%s', CURRENT_DATE, %s)",array(
-                                                                            $categoria->getDescricao(),
-                                                                            $categoria->getStatus() 
-                                                                        )
-                    );
+            $sql = "insert into categoria_estorno_chargeback
+                    (cec_descricao, cec_data_cadastro, cec_status) values ($1, CURRENT_DATE, $2)";
             
-            $retorno = SQLexecuteQuery($sql);
+            $retorno = SQLexecuteQueryParams($sql, [$categoria->getDescricao(), $categoria->getStatus()]);
             if($retorno) {
                 return true;
             }else{
@@ -83,20 +86,14 @@ class CategoriaEstornoChargebackDAO {
     
     public function update(CategoriaEstornoChargebackVO $categoria){
         try {
-            $sql = vsprintf(
-                    "update 
+            $sql = "update 
                         categoria_estorno_chargeback 
                     set
-                        cec_descricao = '%s',
-                        cec_status = %s
+                        cec_descricao = $1,
+                        cec_status = $2
                     where 
-                        cec_id = %s;",array(
-                                        $categoria->getDescricao(),
-                                        $categoria->getStatus(),
-                                        $categoria->getId()
-                                    )
-                    );
-            $retorno = SQLexecuteQuery($sql);
+                        cec_id = $3;";
+            $retorno = SQLexecuteQueryParams($sql, [$categoria->getDescricao(), $categoria->getStatus(), $categoria->getId()]);
             if($retorno) {
                 return true;
             }else{

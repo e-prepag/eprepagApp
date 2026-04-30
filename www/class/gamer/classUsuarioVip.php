@@ -8,8 +8,8 @@
 		private $op_nome = null;
 		
 		public function getStatusVip($ug_id) {
-			$sql = "select ug_vip_status from tb_gamers_vip where ug_id = {$ug_id};";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select ug_vip_status from tb_gamers_vip where ug_id = $1;";
+			$rs = SQLexecuteQueryParams($sql, [$ug_id]);
 			$status = pg_fetch_array($rs);
 			
 			
@@ -23,16 +23,16 @@
 		}
 		
 		public function getDataInclusao($ug_id) {
-			$sql = "select ug_data_inclusao from tb_gamers_vip where ug_id = {$ug_id};";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select ug_data_inclusao from tb_gamers_vip where ug_id = $1;";
+			$rs = SQLexecuteQueryParams($sql, [$ug_id]);
 			$data_inclusao = pg_fetch_array($rs);
 			
 			return $data_inclusao['ug_data_inclusao'];
 		}
 		
 		public function getNomeOperador($ug_id) {
-			$sql = "select op_nome from tb_gamers_vip where ug_id = {$ug_id};";
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select op_nome from tb_gamers_vip where ug_id = $1;";
+			$rs = SQLexecuteQueryParams($sql, [$ug_id]);
 			$nome_operador = pg_fetch_array($rs);
 			
 			return $nome_operador['op_nome'];
@@ -42,13 +42,13 @@
 			
 			if (!empty($ug_id)) {
 				
-				$sqlPesquisa = "select * from usuarios_games where ug_id = {$ug_id}";
-				$rsPesquisa = SQLexecuteQuery($sqlPesquisa);
+				$sqlPesquisa = "select * from usuarios_games where ug_id = $1";
+				$rsPesquisa = SQLexecuteQueryParams($sqlPesquisa, [$ug_id]);
 				$dadosPesquisa = pg_fetch_array($rsPesquisa);
 
-				$sqlVerificaCadastroVIP = "select ug_vip_status from tb_gamers_vip where ug_id = {$ug_id};";
+				$sqlVerificaCadastroVIP = "select ug_vip_status from tb_gamers_vip where ug_id = $1;";
 
-				$rsPesquisaCadastroVIP = SQLexecuteQuery($sqlVerificaCadastroVIP);
+				$rsPesquisaCadastroVIP = SQLexecuteQueryParams($sqlVerificaCadastroVIP, [$ug_id]);
 				$dadosPesquisaCadastroVIP = pg_fetch_array($rsPesquisaCadastroVIP);
 					
 				if (!empty($dadosPesquisa) && $dadosPesquisaCadastroVIP['ug_vip_status'] == 1) {
@@ -62,7 +62,7 @@
 					
 					$sqlAdicao = "insert into tb_gamers_vip (ug_id, ug_vip_status, ug_data_inclusao, op_id, op_nome) values ($1, $2, $3, $4, $5)";
 					$rsAdicao = SQLexecuteQueryParams($sqlAdicao, [$ug_id, $ug_vip_status, $ug_data_inclusao, $op_id, $op_nome]);
-					$dadosAdicao = SQLexecuteQuery($rsAdicao);
+					$dadosAdicao = $rsAdicao;
 					/*
 					$sqlConsultaBloqueio = "select * from usuarios_games_pagamento_bloqueio_log where ugpbl_ug_id = {$ug_id};";
 					$consultaBloqueio = SQLexecuteQuery($sqlConsultaBloqueio);

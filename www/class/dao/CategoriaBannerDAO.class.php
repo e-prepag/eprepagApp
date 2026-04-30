@@ -12,13 +12,21 @@ class CategoriaBannerDAO {
                         tb_banner_store_categorias";
         $this->categorias = array();
         
-        if($filtro != "")
-            $sql .= " where ".$filtro;
+        $params = array();
+        if($filtro != "") {
+            if(preg_match('/^\s*(bsc_id|bsc_status)\s*=\s*(\d+)\s*$/', $filtro, $matches)) {
+                $sql .= " where " . $matches[1] . " = $1";
+                $params[] = (int) $matches[2];
+            } else {
+                $this->erros[] = "Filtro invalido";
+                return false;
+            }
+        }
         
         $sql .= " order by bsc_data_cadastro desc";
         
         try{
-            $categorias = SQLexecuteQuery($sql);
+            $categorias = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
             $totalLinhas = (($categorias) ? pg_num_rows($categorias) : 0);
             if($totalLinhas > 0){
                 
@@ -47,15 +55,10 @@ class CategoriaBannerDAO {
     public function insert(CategoriaBannerVO $categoria){
         
         try {
-            $sql = vsprintf(
-                    "insert into tb_banner_store_categorias
-                    (bsc_descricao, bsc_data_cadastro, bsc_status) values ('%s', CURRENT_DATE, %s)",array(
-                                                                            $categoria->getDescricao(),
-                                                                            $categoria->getStatus() 
-                                                                        )
-                    );
+            $sql = "insert into tb_banner_store_categorias
+                    (bsc_descricao, bsc_data_cadastro, bsc_status) values ($1, CURRENT_DATE, $2)";
             
-            $retorno = SQLexecuteQuery($sql);
+            $retorno = SQLexecuteQueryParams($sql, [$categoria->getDescricao(), $categoria->getStatus()]);
             if($retorno) {
                 return true;
             }else{
@@ -69,20 +72,14 @@ class CategoriaBannerDAO {
     
     public function update(CategoriaBannerVO $categoria){
         try {
-            $sql = vsprintf(
-                    "update 
+            $sql = "update 
                         tb_banner_store_categorias 
                     set
-                        bsc_descricao = '%s',
-                        bsc_status = %s
+                        bsc_descricao = $1,
+                        bsc_status = $2
                     where 
-                        bsc_id = %s;",array(
-                                        $categoria->getDescricao(),
-                                        $categoria->getStatus(),
-                                        $categoria->getId()
-                                    )
-                    );
-            $retorno = SQLexecuteQuery($sql);
+                        bsc_id = $3;";
+            $retorno = SQLexecuteQueryParams($sql, [$categoria->getDescricao(), $categoria->getStatus(), $categoria->getId()]);
             if($retorno) {
                 return true;
             }else{

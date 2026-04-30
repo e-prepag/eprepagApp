@@ -87,7 +87,7 @@ class EstornoChargeBackBO extends EstornoChargeBackDAO {
                 throw new Exception;
             }
             
-            $filtro["ec_id"] =  "ec.ec_id = ".$post["ec_id"];
+            $filtro[] = ["ec.ec_id", "=", (int) $post["ec_id"]];
             $EstornoChargeBackAntigo = $this->pegaEstornoChargeBack($filtro);
             if(empty($EstornoChargeBackAntigo))
             {
