@@ -1,0 +1,39 @@
+.git
+.gitignore
+*.md
+*.png
+*.sln
+.vscode
+.codex
+
+# Ignorar o diretório www/vendor local se existir
+www/vendor/
+
+# Ignorar arquivos gerados e temporários que podem ter nomes com caracteres estranhos
+www/arquivos_gerados/
+www/tmp/
+www/log/
+
+# Ignorar arquivos binários e de backup
+*.zip
+*.rar
+*.7z
+*.bak
+*.old
+
+# Ignorar certificados e chaves do diretório raiz
+*.cer
+*.pfx
+*.pem
+*.key
+
+# Ignorar pastas com nomes de arquivos que possuem caracteres não-UTF-8 (causam erro no build)
+www/public_html/imagens/
+www/public_html/includes/tablesorter/docs/
+
+# Manter apenas o essencial para o build
+!www/
+!Dockerfile_php8
+!compose_php8.yml
+!docker-config/
+!assinador-dotnet/

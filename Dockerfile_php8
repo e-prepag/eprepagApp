@@ -53,6 +53,9 @@ RUN apk add --no-cache \
     icu-libs \
     oniguruma
 
+# Criar estrutura de diretórios antecipadamente
+RUN mkdir -p /www/vendor /www/app /www/arquivos_gerados /www/tmp
+
 # Copiar extensões do builder
 COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
 COPY --from=builder /usr/local/include/php/ext /usr/local/include/php/ext
@@ -60,6 +63,17 @@ RUN docker-php-ext-enable mysqli pgsql pdo_pgsql pdo_mysql gd zip intl opcache b
 
 # Copiar as dependências instaladas pelo Composer
 COPY --from=builder /app/vendor /www/vendor
+
+# No Estágio Final, o código também é copiado para a imagem (essencial para produção)
+COPY ./www /www/app
+
+# Criar links simbólicos para compatibilidade com caminhos legados
+RUN ln -s /www/vendor /www/app/vendor && \
+    ln -s /www/app/class /www/class && \
+    ln -s /www/app/includes /www/includes && \
+    ln -s /www/app/api /www/api && \
+    ln -s /www/app/banco /www/banco && \
+    ln -s /www/app/db /www/db
 
 # Configurações de Hardening do PHP
 RUN { \
@@ -78,9 +92,9 @@ RUN { \
 # Criar usuário não-root para execução
 RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
 
-WORKDIR /www
+WORKDIR /www/app
 
-# Garantir permissões corretas (incluindo a pasta vendor copiada)
+# Garantir permissões corretas
 RUN chown -R appuser:appgroup /www
 
 USER appuser
