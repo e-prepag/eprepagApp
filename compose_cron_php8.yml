@@ -1,0 +1,31 @@
+name: eprepag-cron-php8
+
+services:
+  cron:
+    build:
+      context: ./cron_php8
+      dockerfile: Dockerfile
+    container_name: eprepag-cron-php8
+    restart: unless-stopped
+    volumes:
+      - ./www:/www:ro
+      - ./www/arquivos_gerados:/www/arquivos_gerados:rw
+      - ./www/tmp:/www/tmp:rw
+    networks:
+      - backend_net
+    env_file:
+      - ./www/.env
+    environment:
+      - TZ=America/Sao_Paulo
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+
+networks:
+  backend_net:
+    external: true
+    name: eprepag-php8_backend_net
