@@ -79,15 +79,17 @@ class SistemaDAO{
 
             $arrAbas = [];
 
-            $where = "where aba_sistema = '$sistema'";
+            $where = "where aba_sistema = ?";
+            $params = [$sistema];
         
             if($strAba != ""){
-                $where .= " and aba_order = $strAba";
+                $where .= " and aba_order = ?";
+                $params[] = $strAba;
             }
 
             $sql = "SELECT * FROM bo_aba $where order by aba_order asc";
             $stmt = $this->prepareStatement($sql);
-            $stmt->execute();
+            $stmt->execute($params);
 
             $fetchAbas = $stmt->fetchAll(PDO::FETCH_OBJ);
 
@@ -197,12 +199,16 @@ class SistemaDAO{
     protected function getItensMenu($id){
         
         $where = " AND item_link_linux IS NOT NULL";
+        $params = [$id];
         $itensUsuario = $this->getItensUsuario() ?? [];
         //echo "<script>console.log(".json_encode($itensUsuario).")</script>";
         if(!empty($itensUsuario)){
-            
-            $in = implode(",",$itensUsuario);
-            $where .= " AND item_id in($in)";
+            $placeholders = [];
+            foreach($itensUsuario as $itemUsuario){
+                $params[] = $itemUsuario;
+                $placeholders[] = '?';
+            }
+            $where .= " AND item_id in(" . implode(",", $placeholders) . ")";
         }
         
         if($this->getPaginaInicial() == $_SERVER['SCRIPT_NAME']){
@@ -212,11 +218,7 @@ class SistemaDAO{
         $sql = "SELECT * FROM bo_item WHERE menu_id = ? $where ORDER BY item_order asc";
                 
         $stmt = $this->prepareStatement($sql);
-        $stmt->execute(
-                array(
-                    $id
-                )
-            );
+        $stmt->execute($params);
 
         $fetchItensMenu = $stmt->fetchAll(PDO::FETCH_OBJ);
         $arrItensMenu = array();
@@ -247,10 +249,10 @@ class SistemaDAO{
     
     public function getItemByLink($link){
         
-        $sql = "select * from bo_item WHERE item_link_linux = '$link' AND item_link_linux IS NOT NULL";
+        $sql = "select * from bo_item WHERE item_link_linux = ? AND item_link_linux IS NOT NULL";
         
         $stmt = $this->prepareStatement($sql);
-        $stmt->execute();
+        $stmt->execute([$link]);
 
         $fetchItensMenu = $stmt->fetchAll(PDO::FETCH_OBJ);
         $arrItensMenu = array();
@@ -330,19 +332,21 @@ class SistemaDAO{
             $this->setArrIdsGruposUsuario();
         
         $where = "";
+        $params = [];
         
         if($idItem !== null){
-            $where = " and item_id = $idItem ";
+            $where = " and item_id = ? ";
+            $params[] = $idItem;
         }
         
-        $stridsGrupos = implode(",",$this->arrIdGrupos);
         $arrIdItens = array();
         
-        if($stridsGrupos != ''){
-            $sql = "SELECT item_id FROM nivel_acesso_item_grupo where grupos_id in($stridsGrupos) $where group by item_id";
+        if(!empty($this->arrIdGrupos)){
+            $placeholders = implode(',', array_fill(0, count($this->arrIdGrupos), '?'));
+            $sql = "SELECT item_id FROM nivel_acesso_item_grupo where grupos_id in($placeholders) $where group by item_id";
 
             $stmt = $this->prepareStatement($sql);
-            $stmt->execute();
+            $stmt->execute(array_merge($this->arrIdGrupos, $params));
 
             $fetchitensAcessoGrupos = $stmt->fetchAll(PDO::FETCH_OBJ);
 

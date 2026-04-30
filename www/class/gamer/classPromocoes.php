@@ -64,6 +64,22 @@ class Promocoes {
 		$this->url = "" . EPREPAG_URL . "";
 	}
 
+	private function addParam(&$params, $value) {
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private function placeholdersCsv($csv, &$params) {
+		$placeholders = array();
+		foreach (explode(',', (string)$csv) as $value) {
+			$value = trim($value);
+			if ($value !== '' && is_numeric($value)) {
+				$placeholders[] = $this->addParam($params, (int)$value);
+			}
+		}
+		return $placeholders;
+	}
+
 	function BuscarPromocao($email, $ug_id, $opr_codigo, $vg_id=null) {
 
 		$this	->	setEmail	($email);
@@ -71,16 +87,19 @@ class Promocoes {
 	    $this	->	setOprCodigo($opr_codigo);
 		$this	->	setVgId		($vg_id);
 	    $caminho = "http://".$this->url."/prepag2/commerce/images/promocoes/";
+		$params = array();
+		$oprPlaceholders = $this->placeholdersCsv($this->getOprCodigo(), $params);
+		if (!$oprPlaceholders) return array();
 		$sql = "SELECT * 
 				FROM promocoes 
-				WHERE opr_codigo in (".$this->getOprCodigo().")
+				WHERE opr_codigo in (" . implode(', ', $oprPlaceholders) . ")
 					AND promo_ativo = '1'
 					AND promo_data_inicio <= NOW() 
 					AND (promo_data_fim + interval '1 day')   >= NOW()";
 //gravaLog_DebugPromocao("==== PROMOCAO SQL: $sql\n");
 
 
-		$rs_promocoes = SQLexecuteQuery($sql);
+		$rs_promocoes = SQLexecuteQueryParams($sql, $params);
 		if(!$rs_promocoes || pg_num_rows($rs_promocoes) == 0) {
 			return array();
 		} else {
@@ -114,11 +133,11 @@ gravaLog_DebugPromocao("Confere token em MontarPromocao()\n ID: ".$this->getUgId
 		
 		$sql = "SELECT * 
 				FROM promocoes 
-				WHERE promo_id = ".$this	->	getPromoId()."
+				WHERE promo_id = $1
 					AND promo_ativo = '1'
 					AND promo_data_inicio <= NOW() 
 					AND (promo_data_fim + interval '1 day')   >= NOW()";
-		$rs_promocao = SQLexecuteQuery($sql);
+		$rs_promocao = SQLexecuteQueryParams($sql, array($this	->	getPromoId()));
 		//echo $sql.":sql<br>";
 		
 		if(!$rs_promocao || pg_num_rows($rs_promocao) == 0) {
@@ -143,13 +162,8 @@ gravaLog_DebugPromocao("Confere token em MontarPromocao()\n ID: ".$this->getUgId
 											promo_r_data, 
 											promo_r_resposta
 										) 
-								VALUES (
-										'".$this	->	getEmail()."', 
-										".$this		->	getUgId().", 
-										".$this		->	getPromoId().", 
-										NOW(), 
-										'".$this	->	getResposta	()."');";
-				$rs_promocoes = SQLexecuteQuery($sql);
+								VALUES ($1, $2, $3, NOW(), $4);";
+				$rs_promocoes = SQLexecuteQueryParams($sql, array($this	->	getEmail(), $this		->	getUgId() == 'NULL' ? null : $this		->	getUgId(), $this		->	getPromoId(), $this	->	getResposta	()));
 				$retorno = "<script type='text/javascript'>\nwindow.location='".$rs_promocao_row['promo_link_redir']."'\n</script>\n";
 			}
 			return $retorno;
@@ -165,26 +179,20 @@ gravaLog_DebugPromocao("Confere token em MontarPromocao()\n ID: ".$this->getUgId
 		$this	->	setVgId		($vg_id);
 	    if ($this	->	 VerificarRespondeu()) {
 			$sql = "INSERT INTO promocoes_resposta (
-										promo_r_email, 
-										ug_id,
-										promo_id,
-										promo_r_data, 
-										promo_r_resposta,
-										vg_id
-									) 
-							VALUES (
-									'".$this	->	getEmail()."', 
-									".$this		->	getUgId().", 
-									".$this		->	getPromoId().", 
-									NOW(), 
-									'".$this	->	getResposta	()."', 
-									".$this		->	getVgId().");";
+									promo_r_email, 
+									ug_id,
+									promo_id,
+									promo_r_data, 
+									promo_r_resposta,
+									vg_id
+								) 
+							VALUES ($1, $2, $3, NOW(), $4, $5);";
 			/*
 			if ($this	->	getEmail() == "WAGNER@E-PREPAG.COM.BR") {
 				echo $sql."<br>";
 			}
 			*/
-			$rs_promocoes = SQLexecuteQuery($sql);
+			$rs_promocoes = SQLexecuteQueryParams($sql, array($this	->	getEmail(), $this		->	getUgId() == 'NULL' ? null : $this		->	getUgId(), $this		->	getPromoId(), $this	->	getResposta	(), $this		->	getVgId()));
 			if(!$rs_promocoes) {
 				return "Erro ao salvar informa&ccedil;&otilde;es da Promo&ccedil;&atilde;o.<br>Tente mais tarde<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
 			}
@@ -196,23 +204,24 @@ gravaLog_DebugPromocao("Confere token em MontarPromocao()\n ID: ".$this->getUgId
 	}
 
 	function VerificarRespondeu() {
+		$params = array($this	->	getEmail(), $this	->	getPromoId(), $this	->	getVgId());
 		$sql = "SELECT * 
 				FROM promocoes_resposta 
-				WHERE promo_r_email	= '".$this	->	getEmail()."'
-					AND promo_id	= ".$this	->	getPromoId()."
-					AND vg_id = ".$this	->	getVgId();
+				WHERE promo_r_email	= $1
+					AND promo_id	= $2
+					AND vg_id = $3";
 		if ($this	->	getUgId() == 'NULL') {
-			$sql .= "	AND ug_id		IS ".$this	->	getUgId();
+			$sql .= "	AND ug_id		IS NULL";
 		}
 		else {
-			$sql .= "	AND ug_id		= ".$this	->	getUgId();
+			$sql .= "	AND ug_id		= " . $this->addParam($params, $this	->	getUgId());
 		}
 		/*
 		if ($this	->	getEmail() == "WAGNER@E-PREPAG.COM.BR") {
 			echo $sql."<br>";
 		}
 		*/
-		$rs_promocoes = SQLexecuteQuery($sql);
+		$rs_promocoes = SQLexecuteQueryParams($sql, $params);
 		if(!$rs_promocoes) {
 			return false;
 		} else if((($rs_promocoes) ? pg_num_rows($rs_promocoes) : 0) == 0) {

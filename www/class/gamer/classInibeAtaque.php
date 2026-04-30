@@ -37,10 +37,10 @@ class InibeAtaque {
 				from tb_venda_games
 				where 
 					vg_data_inclusao between (NOW()-'1 minutes'::interval) and NOW() 
-					and vg_ex_email = '".$this->getEmail()."'
-					and vg_http_referer_ip = '".$this->getIp()."';
+					and vg_ex_email = $1
+					and vg_http_referer_ip = $2;
 				";
-		$rs   = SQLexecuteQuery($sql);
+		$rs   = SQLexecuteQueryParams($sql, array($this->getEmail(), $this->getIp()));
 		
 		//colocando o retorno como Não Ataque
 		$ret = false;

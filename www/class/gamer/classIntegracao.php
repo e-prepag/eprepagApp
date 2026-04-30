@@ -2420,6 +2420,24 @@ function get_Integracao_carrinho($params)
 	return $carrinho;
 }
 
+function integracao_sql_param(&$params, $value)
+{
+	$params[] = $value;
+	return '$' . count($params);
+}
+
+function integracao_sql_int_placeholders(&$params, $csv)
+{
+	$placeholders = array();
+	foreach (explode(',', (string) $csv) as $id) {
+		$id = trim($id);
+		if ($id !== '' && is_numeric($id)) {
+			$placeholders[] = integracao_sql_param($params, (int) $id);
+		}
+	}
+	return implode(', ', $placeholders);
+}
+
 // ================================================
 function get_Integracao_modelo($store_id, $valor, &$iativo, &$nome, $product_id = 0)
 {
@@ -2435,17 +2453,22 @@ function get_Integracao_modelo($store_id, $valor, &$iativo, &$nome, $product_id 
 	}
 
 	//grava_log_integracao("In get_Integracao_modelo: (prod_id=$prod_id)\n");
+	$paramsSql = array();
+	$prodPlaceholders = integracao_sql_int_placeholders($paramsSql, $prod_id);
+	if ($prodPlaceholders == '') {
+		return 0;
+	}
 	$sql = "select * from tb_operadora_games_produto ogp ";
 	//	if($amount_free==0) {	// Não faz diferencia se o cadastro é amount_free: Sempre vai ter que cadastrar pelo menos um modelo, mesmo inativo
 	$sql .= "	inner join tb_operadora_games_produto_modelo ogpm on ogp.ogp_id = ogpm.ogpm_ogp_id ";
 	//	}
 	$sql .= "where 1=1 ";
-	$sql .= "	and ogp.ogp_id in ($prod_id) ";
+	$sql .= "	and ogp.ogp_id in ($prodPlaceholders) ";
 	if ($product_id > 0) {
-		$sql .= "	and ogp.ogp_id = $product_id ";
+		$sql .= "	and ogp.ogp_id = " . integracao_sql_param($paramsSql, (int) $product_id) . " ";
 	}
 	if ($valor > 0) {
-		$sql .= "	and ogpm.ogpm_pin_valor = $valor ";
+		$sql .= "	and ogpm.ogpm_pin_valor = " . integracao_sql_param($paramsSql, $valor) . " ";
 	}
 	$sql .= "order by ogp_id desc";
 	//		"	--and (0=1 or ogp.ogp_ativo = 1) "
@@ -2454,7 +2477,7 @@ function get_Integracao_modelo($store_id, $valor, &$iativo, &$nome, $product_id 
 	//die("Stop");
 
 	//grava_log_integracao("In get_Integracao_modelo (ASDERF): $sql\n");
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, $paramsSql);
 
 	$mod_id = "0";
 	if ($rs && pg_num_rows($rs) != 0) {
@@ -2478,10 +2501,10 @@ function set_Integracao_registro()
 	//print_r2($GLOBALS['_POST']);
 
 	// Procura por pedido - para evitar o F5
-	$sql = "select * from tb_integracao_pedido where ip_store_id = '" . $GLOBALS['_POST']['store_id'] . "' and ip_order_id = '" . $GLOBALS['_POST']['order_id'] . "';";
+	$sql = "select * from tb_integracao_pedido where ip_store_id = $1 and ip_order_id = $2;";
 	//if($GLOBALS['_POST']['client_email']=="gamer_test@HOTMAIL.COM") echo  $sql ."<br>";
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, array($GLOBALS['_POST']['store_id'], $GLOBALS['_POST']['order_id']));
 
 	if ((($rs) ? pg_num_rows($rs) : 0) > 0) {
 		// Este pedido já foi registrado
@@ -2494,7 +2517,7 @@ function set_Integracao_registro()
 						$sql = "select * from tb_venda_games where vg_id = $ip_vg_id and vg_integracao_parceiro_origem_id = '". $GLOBALS['_POST']['store_id']."';";
 			//if($GLOBALS['_POST']['client_email']=="gamer_test@HOTMAIL.COM") echo  $sql ."<br>";
 
-						$rs1 = SQLexecuteQuery($sql);
+						$rs1 = SQLexecuteQuery_LEGACY_COMMENT($sql);
 
 						if($rs1 || (($rs1) ? pg_num_rows($rs1) : 0) > 0){
 							// Este pedido já foi registrado e tem venda cadastrada
@@ -2506,27 +2529,29 @@ function set_Integracao_registro()
 		}
 	} else {
 
-		// OK -> insere novo pedido de integração
-		$sql = "insert into tb_integracao_pedido ( ip_store_id, ip_currency_code, ip_order_id, ip_order_description, ip_product_id, ip_amount, ip_store_session, ip_client_email, ip_language, ip_client_id, ip_client_name, ip_client_zip_code, ip_client_street, ip_client_suburb, ip_client_number, ip_client_city, ip_client_state, ip_client_country, ip_client_telephone ) values ( '" .
-			$GLOBALS['_POST']['store_id'] . "', '" .
-			$GLOBALS['_POST']['currency_code'] . "', '" .
-			$GLOBALS['_POST']['order_id'] . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['order_description']) . "', " .
-			(($GLOBALS['_POST']['product_id']) ? $GLOBALS['_POST']['product_id'] : 0) . ", '" .
-			$GLOBALS['_POST']['amount'] . "', '" .
-			$GLOBALS['_POST']['store_session'] . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_email']) . "', '" .
-			$GLOBALS['_POST']['language'] . "', '" .
-			$GLOBALS['_POST']['client_id'] . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_name']) . "', '" .
-			$GLOBALS['_POST']['client_zcode'] . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_street']) . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_suburb']) . "', '" .
-			$GLOBALS['_POST']['client_number'] . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_city']) . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_state']) . "', '" .
-			str_replace("'", "''", $GLOBALS['_POST']['client_country']) . "', '" .
-			$GLOBALS['_POST']['client_telephone'] . "');";
+		// OK -> insere novo pedido de integracao
+		$sql = "insert into tb_integracao_pedido ( ip_store_id, ip_currency_code, ip_order_id, ip_order_description, ip_product_id, ip_amount, ip_store_session, ip_client_email, ip_language, ip_client_id, ip_client_name, ip_client_zip_code, ip_client_street, ip_client_suburb, ip_client_number, ip_client_city, ip_client_state, ip_client_country, ip_client_telephone ) values ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19);";
+		$paramsSql = array(
+			$GLOBALS['_POST']['store_id'],
+			$GLOBALS['_POST']['currency_code'],
+			$GLOBALS['_POST']['order_id'],
+			$GLOBALS['_POST']['order_description'],
+			(($GLOBALS['_POST']['product_id']) ? $GLOBALS['_POST']['product_id'] : 0),
+			$GLOBALS['_POST']['amount'],
+			$GLOBALS['_POST']['store_session'],
+			$GLOBALS['_POST']['client_email'],
+			$GLOBALS['_POST']['language'],
+			$GLOBALS['_POST']['client_id'],
+			$GLOBALS['_POST']['client_name'],
+			$GLOBALS['_POST']['client_zcode'],
+			$GLOBALS['_POST']['client_street'],
+			$GLOBALS['_POST']['client_suburb'],
+			$GLOBALS['_POST']['client_number'],
+			$GLOBALS['_POST']['client_city'],
+			$GLOBALS['_POST']['client_state'],
+			$GLOBALS['_POST']['client_country'],
+			$GLOBALS['_POST']['client_telephone']
+		);
 
 		//		ip_transaction_id,
 		//		str_replace("'","''",$GLOBALS['_POST']['transaction_id'])."', '".
@@ -2539,7 +2564,7 @@ function set_Integracao_registro()
 
 		grava_log_integracao($sql);
 
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		$b_ret = true;
 	}
 
@@ -2552,8 +2577,8 @@ function VerifyPaymentsMethods($store_id)
 	foreach ($partner_list as $key => $val) {
 		if ($val['partner_id'] == $store_id) {
 			$oprCod = $val['partner_opr_codigo'];
-			$sql = "select opr_tipo_pagto_bloqueados from operadoras where opr_status = '1' and opr_flag_possui_restricao_pagto = 1 and opr_codigo = " . $oprCod;
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select opr_tipo_pagto_bloqueados from operadoras where opr_status = '1' and opr_flag_possui_restricao_pagto = 1 and opr_codigo = $1";
+			$rs = SQLexecuteQueryParams($sql, array($oprCod));
 			$resultado = pg_fetch_array($rs);
 			return $resultado;
 		}
@@ -2566,8 +2591,8 @@ function verifica_nome_operadora($store_id)
 	foreach ($partner_list as $key => $val) {
 		if ($val['partner_id'] == $store_id) {
 			$oprCod = $val['partner_opr_codigo'];
-			$sql = "select opr_nome_loja from operadoras where opr_status = '1' and opr_flag_possui_restricao_pagto = 1 and opr_codigo = " . $oprCod;
-			$rs = SQLexecuteQuery($sql);
+			$sql = "select opr_nome_loja from operadoras where opr_status = '1' and opr_flag_possui_restricao_pagto = 1 and opr_codigo = $1";
+			$rs = SQLexecuteQueryParams($sql, array($oprCod));
 			$resultado = pg_fetch_array($rs);
 			return $resultado;
 		}
@@ -3132,12 +3157,13 @@ function getPartner_payments_list($id)
 				inner join tb_venda_games vg on vg.vg_id = pc.idvenda
 			WHERE ( not (vg.vg_integracao_parceiro_origem_id is null)) ";
 
+	$paramsSql = array();
 	if ($id && $id > 0) {
-		$sql .= "		and vg.vg_integracao_parceiro_origem_id = '$id'	";
+		$sql .= "		and vg.vg_integracao_parceiro_origem_id = " . integracao_sql_param($paramsSql, $id) . "	";
 	}
 	$sql .= "order by pc.datainicio desc";
 	//echo "sql: $sql<br>";
-	$retCompra = SQLexecuteQuery($sql);
+	$retCompra = $paramsSql ? SQLexecuteQueryParams($sql, $paramsSql) : SQLexecuteQuery($sql);
 	if (!$retCompra) {
 		$numOrder = isset($numOrder) ? $numOrder : null;
 
@@ -3311,12 +3337,13 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 		// recupera os dados da integracao.
 		$sql = "SELECT * FROM tb_integracao_pedido ip
 				WHERE 1=1
-					and ip_store_id = '" . $store_id . "'
-					and ip_order_id = '" . $order_id . "'
-					and ip_amount = '" . $amount . "'
-					and ip_client_email = '" . $client_email . "'
-					and ip_currency_code = '" . $currency_code . "'
+					and ip_store_id = $1
+					and ip_order_id = $2
+					and ip_amount = $3
+					and ip_client_email = $4
+					and ip_currency_code = $5
 				order by ip_id desc";
+		$paramsSql = array($store_id, $order_id, $amount, $client_email, $currency_code);
 		//					left outer join tb_pag_compras pc on ip.ip_vg_id = pc.idvenda
 		//				order by pc.datainicio desc";
 		//					"and ip_id = '".$transaction_id."'"
@@ -3326,7 +3353,7 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 		//echo "sql: $sql<br>";
 		grava_log_integracao("Integração em setNotifyPartnerAboutTransaction: " . date("Y-m-d H:i:s") . "\n  $sql\n");
 
-		$rs = SQLexecuteQuery($sql);
+		$rs = SQLexecuteQueryParams($sql, $paramsSql);
 		if (!$rs) {
 			echo "Erro ao recuperar transação de integração (B) ('$order_id').<br>\n";
 			die("Stop");
@@ -3353,14 +3380,15 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 				// recupera os dados da compra efetuada.
 				$sql = "SELECT * FROM tb_venda_games vg
 						WHERE 1=1
-							and vg_integracao_parceiro_origem_id = '" . $store_id . "'
-							and vg_id = '" . $ip_vg_id . "'
+							and vg_integracao_parceiro_origem_id = $1
+							and vg_id = $2
 						order by vg_datas_inclusao desc";
+				$paramsVenda = array($store_id, $ip_vg_id);
 				//echo "sql: $sql<br>";
 				grava_log_integracao("Integração em setNotifyPartnerAboutTransaction: " . date("Y-m-d H:i:s") . "\n  $sql\n");
 
-				$rs_vg = SQLexecuteQuery($sql);
-				if (!$rs) {
+				$rs_vg = SQLexecuteQueryParams($sql, $paramsVenda);
+				if (!$rs_vg) {
 					$msg = "Erro ao recuperar venda de transação de integração (ABC) (store_id: '$store_id', ip_vg_id: '$ip_vg_id').<br>\n";
 					grava_log_integracao("Integração em setNotifyPartnerAboutTransaction: " . date("Y-m-d H:i:s") . "\n   $msg\n   $sql\n");
 					echo $msg;
@@ -3372,16 +3400,17 @@ function setNotifyPartnerAboutTransaction($parceiro_params)
 					if ($vg_ultimo_status == '5') {
 						// Marca pedido como notificado - ip_status_confirmed	ip_data_confirmed
 						$sql_update = "update tb_integracao_pedido set ip_status_confirmed = 1, ip_data_confirmed = CURRENT_TIMESTAMP
-							WHERE ip_id = " . $ip_id . "
-								and ip_store_id = '" . $store_id . "'
-								and ip_order_id = '" . $order_id . "'
-								and ip_amount = '" . $amount . "'
-								and ip_client_email = '" . $client_email . "'
-								and ip_currency_code = '" . $currency_code . "'";
+							WHERE ip_id = $1
+								and ip_store_id = $2
+								and ip_order_id = $3
+								and ip_amount = $4
+								and ip_client_email = $5
+								and ip_currency_code = $6";
+						$paramsUpdate = array($ip_id, $store_id, $order_id, $amount, $client_email, $currency_code);
 						//echo "$sql_update<br>";
 						grava_log_integracao("Integração em setNotifyPartnerAboutTransaction (Update): " . date("Y-m-d H:i:s") . "\n  $sql_update\n");
 
-						$rs = SQLexecuteQuery($sql_update);
+						$rs = SQLexecuteQueryParams($sql_update, $paramsUpdate);
 						//				echo "<font color='blue'>Pedido notificado ID: $order_id de Parceiro $store_id com sucesso.</font><br>";
 
 						// Notificação aceita e processada
@@ -3757,9 +3786,9 @@ function grava_log_notify_db($store_id, $client_email, $cmd, $codretepp, $curren
 		$vg_id = 0;
 	$sql_insert = "insert into tb_integracao_pedido_notificacao_historico ";
 	$sql_insert .= "(ipnh_store_id, ipnh_client_email, ipnh_cmd, ipnh_codretepp, ipnh_currency_code, ipnh_order_id, ipnh_amount, ipnh_vg_id) ";
-	$sql_insert .= "values ('$store_id', '$client_email', '$cmd', '$codretepp', '$currency_code', '$order_id', '$amount', $vg_id);";
+	$sql_insert .= "values ($1, $2, $3, $4, $5, $6, $7, $8);";
 	//echo "$sql_insert<br>";
-	$rs = SQLexecuteQuery($sql_insert);
+	$rs = SQLexecuteQueryParams($sql_insert, array($store_id, $client_email, $cmd, $codretepp, $currency_code, $order_id, $amount, $vg_id));
 }
 
 
@@ -3790,10 +3819,10 @@ function getIntegracaoStatus($store_id, $order_id, &$a_retorno)
 		from tb_integracao_pedido_notificacao_historico ipnh
 			left outer join tb_venda_games vg on vg.vg_id = ipnh_vg_id
 			left outer join tb_pag_compras pg on pg.idvenda = ipnh_vg_id
-		where 1=1 and ipnh.ipnh_store_id = '$store_id' and ipnh.ipnh_order_id = '$order_id' ";
+		where 1=1 and ipnh.ipnh_store_id = $1 and ipnh.ipnh_order_id = $2 ";
 	//echo "".$sql."<br>";
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, array($store_id, $order_id));
 
 	if ($rs && pg_num_rows($rs) != 0) {
 		$rs_row = pg_fetch_array($rs);
@@ -3820,10 +3849,10 @@ function getIntegracaoPedidoID_By_Venda($store_id, $vg_id)
 
 	$sql = "select ip_id
 		from tb_integracao_pedido ip
-		where 1=1 and ip.ip_store_id = '$store_id' and ip.ip_vg_id = '$vg_id' ";
+		where 1=1 and ip.ip_store_id = $1 and ip.ip_vg_id = $2 ";
 	//echo "".$sql."<br>";
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, array($store_id, $vg_id));
 
 	if ($rs && pg_num_rows($rs) > 0) {
 		$rs_row = pg_fetch_array($rs);
@@ -3993,12 +4022,14 @@ function get_valor_for_product($carrinho_modelo_id)
 		//echo "  ==  partner_id: $partner_id   - modelo_id = $carrinho_modelo_id<br>";
 
 		// Procura o modelo para oproduto cadastrado
+		$paramsProdutos = array();
+		$produtoPlaceholders = integracao_sql_int_placeholders($paramsProdutos, $produto_id_registrado);
 		$sql_produtos = "select * from tb_operadora_games_produto_modelo ogpm
 							where 1=1
-								and (0=1 or ogpm.ogpm_ogp_id in (" . $produto_id_registrado . "))
+								and (0=1" . ($produtoPlaceholders != '' ? " or ogpm.ogpm_ogp_id in ($produtoPlaceholders)" : "") . ")
 							order by ogpm.ogpm_ogp_id, ogpm.ogpm_valor";
 		//if($partner_id=="10408") echo "".str_replace("\n","<br>\n",$sql_produtos)."<br>";
-		$resprods = SQLexecuteQuery($sql_produtos);
+		$resprods = $paramsProdutos ? SQLexecuteQueryParams($sql_produtos, $paramsProdutos) : SQLexecuteQuery($sql_produtos);
 		if ($resprods && pg_num_rows($resprods) > 0) {
 			while ($pgoprods = pg_fetch_array($resprods)) {
 				if ($carrinho_modelo_id == $pgoprods['ogpm_id']) {
@@ -4067,8 +4098,8 @@ function b_order_exists($store_id, $order_id)
 	$b_order_exists = false;
 
 	// Procura pedido
-	$sql_orders = "select * from tb_integracao_pedido where ip_store_id = '$store_id' and ip_order_id = '$order_id';";
-	$resorders = SQLexecuteQuery($sql_orders);
+	$sql_orders = "select * from tb_integracao_pedido where ip_store_id = $1 and ip_order_id = $2;";
+	$resorders = SQLexecuteQueryParams($sql_orders, array($store_id, $order_id));
 	if ($resorders && pg_num_rows($resorders) > 0) {
 		/*
 				$pgorders = pg_fetch_array ($resorders)
@@ -4088,11 +4119,14 @@ function lista_pedidos_integracao_duplicados($store_id = "", $order_id = "")
 		where ip_data_inclusao >= NOW()-'3 month'::interval
 			and (select vg_ultimo_status from tb_venda_games where vg_id = ip_vg_id ) = 5
 		";
+	$paramsSql = array();
 	if ($store_id) {
-		$sql .= "and ip_store_id = '$store_id'\n";
+		$sql .= "and ip_store_id = " . integracao_sql_param($paramsSql, $store_id) . "
+";
 	}
 	if ($order_id) {
-		$sql .= "and ip_order_id = '$order_id'\n";
+		$sql .= "and ip_order_id = " . integracao_sql_param($paramsSql, $order_id) . "
+";
 	}
 	$sql .= "group by ip_store_id, ip_order_id, ip_vg_id, vg_ultimo_status
 		having count(*) >1
@@ -4103,7 +4137,7 @@ function lista_pedidos_integracao_duplicados($store_id = "", $order_id = "")
 	echo str_replace("\n", "<br>\n", $sql)."<br>";
 	}
 	*/
-	$res = SQLexecuteQuery($sql);
+	$res = $paramsSql ? SQLexecuteQueryParams($sql, $paramsSql) : SQLexecuteQuery($sql);
 
 	$sret = "";
 	$sret .= "<table cellpadding='2' cellspacing='2' border='1' bordercolor='#cccccc' style='border-collapse:collapse;background-color:#FFFF99'>\n";
@@ -4240,9 +4274,9 @@ function SolicitaCPF($ug_id)
                     FROM usuarios_games
                     WHERE ug_ativo = '1'
                             AND (length(ug_cpf) < 14 OR ug_cpf IS NULL)
-                            AND ug_id = " . $ug_id . ";";
+                            AND ug_id = $1;";
 	//echo $sql.":sql<br>";
-	$rs_cpf = SQLexecuteQuery($sql);
+	$rs_cpf = SQLexecuteQueryParams($sql, array($ug_id));
 
 	if ($rs_cpf && pg_num_rows($rs_cpf) > 0) {
 		require($_SERVER['DOCUMENT_ROOT'] . '/prepag2/incs/rf_cpf/funcoes.php');
@@ -4398,9 +4432,9 @@ function SolicitaCPF($ug_id)
                             FROM usuarios_games
                             WHERE ug_ativo = '1'
                                 AND (ug_nome !~* '^\\\\s*[a-zA-ZÀ-ú\']{2,}(\\\\s+[a-zA-ZÀ-ú\']{2,}\\\\s*)+$' OR ug_nome='' )
-                                AND ug_id = " . $ug_id . ";";
+                                AND ug_id = $1;";
 		//echo $sql."<br>";
-		$rs_nome = SQLexecuteQuery($sql);
+		$rs_nome = SQLexecuteQueryParams($sql, array($ug_id));
 
 		if ($rs_nome && pg_num_rows($rs_nome) > 0) {
 			$retorno = "<div id='popup_cpf' align='left' title=''>
@@ -4617,7 +4651,7 @@ function cpf_page($partner_list)
 	/*
 	if(empty($user->ug_data_cpf_informado)|| empty($user->ug_nome_cpf)) {
 		$sql_update = "update usuarios_games set ug_data_cpf_informado=NOW(), ug_nome_cpf = ug_nome where ug_id=".$usuarioGames->getId().";";
-		$rs = SQLexecuteQuery($sql_update);
+		$rs = SQLexecuteQuery_LEGACY_COMMENT($sql_update);
 	}//end if(empty($user->ug_data_cpf_informado)|| empty($user->ug_data_cpf_informado))
 	*/
 
@@ -4842,8 +4876,8 @@ function integracao_layout($type, $data = false)
 //Função que verifica se o publisher exige CPF do Gamer
 function checkingNeedCPF($opr_codigo)
 {
-	$sql_function = "SELECT opr_need_cpf_lh from operadoras where opr_codigo=" . intval($opr_codigo) . ";";
-	$rs_function = SQLexecuteQuery($sql_function);
+	$sql_function = "SELECT opr_need_cpf_lh from operadoras where opr_codigo = $1;";
+	$rs_function = SQLexecuteQueryParams($sql_function, array((int) $opr_codigo));
 	if ($rs_function_row = pg_fetch_array($rs_function)) {
 		$opr_need_cpf_lh = $rs_function_row['opr_need_cpf_lh'];
 	}

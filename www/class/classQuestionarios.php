@@ -127,14 +127,14 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 				WHERE ql_ativo = '1'
 					AND ql_data_inicio <= NOW() 
 					AND (ql_data_fim + interval '1 day')   >= NOW()
-					AND ql_tipo_usuario = '".$this	->	getTipoUsuario()."'
+					AND ql_tipo_usuario = $1
 				ORDER BY ql_tipo";
 
 //gravaLog_DebugQuestionario("==== QUESTIONARIO SQL: $sql\n");
 
 		//echo $sql.":sql<br>";
 			
-		$rs_questionarios = SQLexecuteQuery($sql);
+		$rs_questionarios = SQLexecuteQueryParams($sql, [$this->getTipoUsuario()]);
 		if(!$rs_questionarios) {
 			return null;
 		} else {
@@ -194,9 +194,9 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 					from tb_questionarios_respostas_usuarios qru 
 						inner join tb_questionarios_perguntas_respostas qpr ON (qpr.qlpr_id = qru.qlpr_id)
 						inner join tb_questionarios_perguntas qp ON (qp.qlp_id = qpr.qlp_id)
-					where qru.ug_id=".$this->getUgId()." 
-						AND qp.ql_id_questionario=".$aux_matriz[$i]['id'];
-			$rs_resposta = SQLexecuteQuery($sql);
+					where qru.ug_id = $1 
+						AND qp.ql_id_questionario = $2";
+			$rs_resposta = SQLexecuteQueryParams($sql, [$this->getUgId(), $aux_matriz[$i]['id']]);
 			//echo $sql.":sql<br>";
 			$rs_resposta_row = pg_fetch_array($rs_resposta);
 			if ($rs_resposta_row['total']==0) {
@@ -259,10 +259,10 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 		$sql = "SELECT * 
 				FROM tb_questionarios_perguntas 
 				WHERE qlp_ativo = '1'
-					AND ql_id_questionario = ".$this -> getIdQuest()."
+					AND ql_id_questionario = $1
 				ORDER BY qlp_ordem ";
 		//echo $sql.":sql<br>";
-		$rs_questionario = SQLexecuteQuery($sql);
+		$rs_questionario = SQLexecuteQueryParams($sql, [$this->getIdQuest()]);
 		
 		if(!$rs_questionario || pg_num_rows($rs_questionario) == 0) {
 			return "Question&aacute;rio sem perguntas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
@@ -280,7 +280,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 				$sql = "SELECT * 
 						FROM tb_questionarios_perguntas_respostas 
 						WHERE qlpr_ativo = '1'
-							AND qlp_id = ".$rs_questionario_row['qlp_id']."
+							AND qlp_id = $1
 						ORDER BY qlpr_ordem ";
 				//echo $sql.":sql<br>";
 				if($rs_questionario_row['qlp_tipo']=='U') {
@@ -289,7 +289,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 					$aux_multiplos[$rs_questionario_row['qlp_texto']] = $rs_questionario_row['qlp_id'];
 				}
 				$aux_show_others = $rs_questionario_row['qlp_outros'];
-				$rs_perguntas = SQLexecuteQuery($sql);
+				$rs_perguntas = SQLexecuteQueryParams($sql, [$rs_questionario_row['qlp_id']]);
 				if(!$rs_perguntas || pg_num_rows($rs_perguntas) == 0) {
 					return "Pergunta ['".$rs_questionario_row['qlp_texto']."'] sem respostas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
 				} else {
@@ -347,10 +347,10 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 		$sql = "SELECT * 
 				FROM tb_questionarios_perguntas 
 				WHERE qlp_ativo = '1'
-					AND ql_id_questionario = ".$this -> getIdQuest()."
+					AND ql_id_questionario = $1
 				ORDER BY qlp_ordem ";
 		//echo $sql.":sql<br>";
-		$rs_questionario = SQLexecuteQuery($sql);
+		$rs_questionario = SQLexecuteQueryParams($sql, [$this->getIdQuest()]);
 		
 		if(!$rs_questionario || pg_num_rows($rs_questionario) == 0) {
 			return "Question&aacute;rio sem perguntas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
@@ -368,7 +368,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 				$sql = "SELECT * 
 						FROM tb_questionarios_perguntas_respostas 
 						WHERE qlpr_ativo = '1'
-							AND qlp_id = ".$rs_questionario_row['qlp_id']."
+							AND qlp_id = $1
 						ORDER BY qlpr_ordem ";
 				//echo $sql.":sql<br>";
 				if($rs_questionario_row['qlp_tipo']=='U') {
@@ -377,7 +377,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 					$aux_multiplos[$rs_questionario_row['qlp_texto']] = $rs_questionario_row['qlp_id'];
 				}
 				$aux_show_others = $rs_questionario_row['qlp_outros'];
-				$rs_perguntas = SQLexecuteQuery($sql);
+				$rs_perguntas = SQLexecuteQueryParams($sql, [$rs_questionario_row['qlp_id']]);
 				if(!$rs_perguntas || pg_num_rows($rs_perguntas) == 0) {
 					return "Pergunta ['".$rs_questionario_row['qlp_texto']."'] sem respostas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
 				} else {
@@ -435,10 +435,10 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 		$sql = "SELECT * 
 				FROM tb_questionarios_perguntas 
 				WHERE qlp_ativo = '1'
-					AND ql_id_questionario = ".$this -> getIdQuest()."
+					AND ql_id_questionario = $1
 				ORDER BY qlp_ordem ";
 		//echo $sql.":sql<br>";
-		$rs_questionario = SQLexecuteQuery($sql);
+		$rs_questionario = SQLexecuteQueryParams($sql, [$this->getIdQuest()]);
 		
 		if(!$rs_questionario || pg_num_rows($rs_questionario) == 0) {
 			return "Question&aacute;rio sem perguntas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
@@ -456,7 +456,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 				$sql = "SELECT * 
 						FROM tb_questionarios_perguntas_respostas 
 						WHERE qlpr_ativo = '1'
-							AND qlp_id = ".$rs_questionario_row['qlp_id']."
+							AND qlp_id = $1
 						ORDER BY qlpr_ordem ";
 				//echo $sql.":sql<br>";
 				if($rs_questionario_row['qlp_tipo']=='U') {
@@ -465,7 +465,7 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 					$aux_multiplos[$rs_questionario_row['qlp_texto']] = $rs_questionario_row['qlp_id'];
 				}
 				$aux_show_others = $rs_questionario_row['qlp_outros'];
-				$rs_perguntas = SQLexecuteQuery($sql);
+				$rs_perguntas = SQLexecuteQueryParams($sql, [$rs_questionario_row['qlp_id']]);
 				if(!$rs_perguntas || pg_num_rows($rs_perguntas) == 0) {
 					return "Pergunta ['".$rs_questionario_row['qlp_texto']."'] sem respostas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
 				} else {
@@ -525,9 +525,9 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 				from tb_questionarios_respostas_usuarios qru 
 					inner join tb_questionarios_perguntas_respostas qpr ON (qpr.qlpr_id = qru.qlpr_id)
 					inner join tb_questionarios_perguntas qp ON (qp.qlp_id = qpr.qlp_id)
-				where qru.ug_id=".$this->getUgId()." 
-					AND qp.ql_id_questionario=".$this	->	getIdQuest	();
-		$rs_resposta = SQLexecuteQuery($sql);
+				where qru.ug_id = $1 
+					AND qp.ql_id_questionario = $2";
+		$rs_resposta = SQLexecuteQueryParams($sql, [$this->getUgId(), $this->getIdQuest()]);
 		//echo $sql.":sql<br>";
 		$rs_resposta_row = pg_fetch_array($rs_resposta);
 		$retorno = $rs_resposta_row['total'];
@@ -542,10 +542,10 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 			$sql = "SELECT * 
 					FROM tb_questionarios_perguntas 
 					WHERE qlp_ativo = '1'
-						AND ql_id_questionario = ".$this -> getIdQuest()."
+						AND ql_id_questionario = $1
 					ORDER BY qlp_ordem ";
 			//echo $sql.":sql<br>";
-			$rs_questionario = SQLexecuteQuery($sql);
+			$rs_questionario = SQLexecuteQueryParams($sql, [$this->getIdQuest()]);
 			if(!$rs_questionario || pg_num_rows($rs_questionario) == 0) {
 				return "Question&aacute;rio sem perguntas!<br><br>\n<input type='button' name='Submit' value='FECHAR' onClick='javascript:window.close();'/>\n";
 			} else {
@@ -562,14 +562,14 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 
 	function InsereNovaResposta($qlp_id,$resposta){
 		$retorno = 0;
-		$sql ="insert into tb_questionarios_perguntas_respostas (qlp_id,qlpr_descricao,qlpr_ativo) values ($qlp_id,'$resposta',0) ";//".utf8_decode($resposta)."
-		$rs_questionario_repostas = SQLexecuteQuery($sql);
+		$sql ="insert into tb_questionarios_perguntas_respostas (qlp_id,qlpr_descricao,qlpr_ativo) values ($1, $2, 0) ";//".utf8_decode($resposta)."
+		$rs_questionario_repostas = SQLexecuteQueryParams($sql, [$qlp_id, $resposta]);
 		if(!$rs_questionario_repostas) {
 			$retorno = "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
 		}
 		else {
-			$sql ="select qlpr_id from tb_questionarios_perguntas_respostas where qlpr_descricao='$resposta' and qlp_id=$qlp_id";
-			$rs_questionario_select_repostas = SQLexecuteQuery($sql);
+			$sql ="select qlpr_id from tb_questionarios_perguntas_respostas where qlpr_descricao = $1 and qlp_id = $2";
+			$rs_questionario_select_repostas = SQLexecuteQueryParams($sql, [$resposta, $qlp_id]);
 			$rs_questionario_select_repostas_row = pg_fetch_array($rs_questionario_select_repostas);
 			$retorno = $rs_questionario_select_repostas_row['qlpr_id'];
 		}
@@ -578,8 +578,8 @@ ql_tipo_usuario character varying(1) NOT NULL DEFAULT 'L'::character varying, --
 
 	function InsereRespostaUsuario($qlpr_id){
 		$retorno = false;
-		$sql ="insert into tb_questionarios_respostas_usuarios (qlpr_id,ug_id,qlpru_data_inclusao,qlpru_tipo_usuario) values ($qlpr_id,".$this->getUgId().",NOW(),'".$this -> getTipoUsuario()."') ";
-		$rs_questionario_repostas = SQLexecuteQuery($sql);
+		$sql ="insert into tb_questionarios_respostas_usuarios (qlpr_id,ug_id,qlpru_data_inclusao,qlpru_tipo_usuario) values ($1, $2, NOW(), $3) ";
+		$rs_questionario_repostas = SQLexecuteQueryParams($sql, [$qlpr_id, $this->getUgId(), $this->getTipoUsuario()]);
 		if(!$rs_questionario_repostas) {
 			$retorno = "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
 		}

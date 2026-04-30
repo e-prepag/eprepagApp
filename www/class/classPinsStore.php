@@ -75,12 +75,12 @@ class Pins_Store {
 
 		// Adquire um advisory lock para garantir exclusividade
 		$lock_key = hash('sha256', "pin_store_generation_{$distributor_codigo}");
-		$sql_lock = "SELECT pg_advisory_lock(hashtext('$lock_key'))";
-		SQLexecuteQuery($sql_lock);
+		$sql_lock = "SELECT pg_advisory_lock(hashtext($1))";
+		SQLexecuteQueryParams($sql_lock, [$lock_key]);
 
         // Cria LoteID
-		$sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins_store where distributor_codigo = ".$distributor_codigo;
-		$rs_lote = SQLexecuteQuery($sql);
+		$sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins_store where distributor_codigo = $1";
+		$rs_lote = SQLexecuteQueryParams($sql, [$distributor_codigo]);
 		if(!$rs_lote || pg_num_rows($rs_lote) == 0) {
 			$ilote = 1;
 		} else {
@@ -88,8 +88,8 @@ class Pins_Store {
 			$ilote = $rs_lote_row['max_pin_lote_codigo'] + 1;
 		}
 		// Obtem o ultimo serial
-		$sql_serial = "select CAST(pin_serial AS BIGINT) as max_serial from pins_store where distributor_codigo = ".$distributor_codigo." order by CAST(pin_serial AS BIGINT) desc limit 1;";
-		$rs_serial = SQLexecuteQuery($sql_serial);
+		$sql_serial = "select CAST(pin_serial AS BIGINT) as max_serial from pins_store where distributor_codigo = $1 order by CAST(pin_serial AS BIGINT) desc limit 1;";
+		$rs_serial = SQLexecuteQueryParams($sql_serial, [$distributor_codigo]);
 		if($rs_serial && pg_num_rows($rs_serial) > 0) {
 			$rs_serial_row = pg_fetch_array($rs_serial);
 			$pin_serial = $rs_serial_row['max_serial']+1;
@@ -122,16 +122,17 @@ class Pins_Store {
 				$pin_serial ++;
 				$spin_serial = str_pad($pin_serial, $this->serial_length, "0", STR_PAD_LEFT);
         		// Testa existencia no banco de dados
-				$sql = "select * from pins_store where pin_codigo = '".base64_encode($this->aes->encrypt($spin_codigo))."'";
-				$rs_pins = SQLexecuteQuery($sql);
+				$pin_codigo_crypt = base64_encode($this->aes->encrypt($spin_codigo));
+				$sql = "select * from pins_store where pin_codigo = $1";
+				$rs_pins = SQLexecuteQueryParams($sql, [$pin_codigo_crypt]);
 				if(!$rs_pins || pg_num_rows($rs_pins) == 0) {
 					//Teste existencia no estoque do publisher
-					$sql = "select * from pins where pin_codigo = '".$spin_codigo."'";
-					$rs_pins_pub = SQLexecuteQuery($sql);
+					$sql = "select * from pins where pin_codigo = $1";
+					$rs_pins_pub = SQLexecuteQueryParams($sql, [$spin_codigo]);
 					if(!$rs_pins_pub || pg_num_rows($rs_pins_pub) == 0) {
 						//Teste existencia na tabela de exceção de gocash com tamanho de 16
-						$sql = "select * from pins_gocash_lote16 where pgcl_pin_number_encrypt = '".base64_encode($this->aes->encrypt($spin_codigo))."'";
-						$rs_pins_gocash = SQLexecuteQuery($sql);
+						$sql = "select * from pins_gocash_lote16 where pgcl_pin_number_encrypt = $1";
+						$rs_pins_gocash = SQLexecuteQueryParams($sql, [$pin_codigo_crypt]);
 						if(!$rs_pins_gocash || pg_num_rows($rs_pins_gocash) == 0) {
 							//transacao
 							if($msg == ""){
@@ -150,18 +151,18 @@ class Pins_Store {
 								    ) 
 								    VALUES 
 								    (
-								        '".$spin_serial."', 
-								        '".base64_encode($this->aes->encrypt($spin_codigo))."', 
+								        $1, 
+								        $2, 
 								        '', 
-								        ".$distributor_codigo.", 
-								        ".$pin_valor.", 
-								        ".$ilote.", 
+								        $3, 
+								        $4, 
+								        $5, 
 								        CURRENT_TIMESTAMP, 
 								        'w', 
-								        '".$sformato."'
+								        $6
 								    );
 								";
-								$rs_pins_save = SQLexecuteQuery($sql);
+								$rs_pins_save = SQLexecuteQueryParams($sql, [$spin_serial, $pin_codigo_crypt, $distributor_codigo, $pin_valor, $ilote, $sformato]);
 								if(!$rs_pins_save ) {
 									$msg = "Erro ao salvar o novo PIN ($sql)<br>";
 								}
@@ -184,8 +185,8 @@ class Pins_Store {
 		}
 
 		 // Libera o advisory lock
-		 $sql_unlock = "SELECT pg_advisory_unlock(hashtext('$lock_key'))";
-		 SQLexecuteQuery($sql_unlock);
+		 $sql_unlock = "SELECT pg_advisory_unlock(hashtext($1))";
+		 SQLexecuteQueryParams($sql_unlock, [$lock_key]);
 
 		//Finaliza transacao
 		if($msg == ""){

@@ -220,8 +220,8 @@ class bank_sonda {
 	}
 	public function save_banks_sonda_array() {
 		$ret = serialize($this->_bank_sonda);
-		$sql  = "update pag_config set pc_banks_sonda_array = '".$ret."', pc_data_banks_sonda_array = CURRENT_TIMESTAMP where pc_id = 1;";
-		$rs = SQLexecuteQuery($sql);
+		$sql  = "update pag_config set pc_banks_sonda_array = $1, pc_data_banks_sonda_array = CURRENT_TIMESTAMP where pc_id = 1;";
+		$rs = SQLexecuteQueryParams($sql, [$ret]);
 	}
 
 }

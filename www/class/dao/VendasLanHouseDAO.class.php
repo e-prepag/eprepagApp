@@ -25,13 +25,13 @@ class VendasLanHouseDAO {
         
     }
     
-    public function getVendas($sql,$formata = true){
+    public function getVendas($sql,$formata = true, $params = array()){
        
         $this->sql = $sql;
         $this->vendas = array();
         
         try{
-            $vendas = SQLexecuteQuery($this->sql);
+            $vendas = count($params) ? SQLexecuteQueryParams($this->sql, $params) : SQLexecuteQuery($this->sql);
             $totalLinhas = (($vendas) ? pg_num_rows($vendas) : 0);
             if($totalLinhas > 0){
                 while($lineRow = pg_fetch_array($vendas)){
@@ -127,11 +127,11 @@ class VendasLanHouseDAO {
                 from tb_dist_venda_games_modelo vgm 
                         inner join operadoras opr on opr.opr_codigo = vgm.vgm_opr_codigo 
                         inner join tb_dist_operadora_games_produto ogp on ogp.ogp_id =  vgm.vgm_ogp_id 
-                where vgm_vg_id = " . $idVenda. "; ";
+                where vgm_vg_id = $1; ";
         $this->produtos = array();
         
         try{
-            $resultProdutos = SQLexecuteQuery($sql);
+            $resultProdutos = SQLexecuteQueryParams($sql, [$idVenda]);
             if($resultProdutos && pg_num_rows($resultProdutos) > 0){
                     while($lineProd = pg_fetch_array($resultProdutos)){
                         $produto = new ProdutosLanHouseVO;
@@ -164,11 +164,11 @@ class VendasLanHouseDAO {
         
     }
     
-    public function getSqlPrimeiraVenda($sql){
+    public function getSqlPrimeiraVenda($sql, $params = array()){
         //echo "<br><hr><br>".$sql."<br><hr><br>"; #descomente para ver as querys 
         $this->sql = $sql;    
         try{
-            $primeirasVendas = SQLexecuteQuery($this->sql);
+            $primeirasVendas = count($params) ? SQLexecuteQueryParams($this->sql, $params) : SQLexecuteQuery($this->sql);
             $totalLinhas = (($primeirasVendas) ? pg_num_rows($primeirasVendas) : 0);
             if($totalLinhas > 0){
                 while($lineRow = pg_fetch_array($primeirasVendas)){

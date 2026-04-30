@@ -58,19 +58,19 @@ class Pins_Card {
 
 		// Adquire um advisory lock para garantir exclusividade
 		$lock_key = hash('sha256', "pin_card_generation_{$opr_codigo}_{$distributor_codigo}");
-		$sql_lock = "SELECT pg_advisory_lock(hashtext('$lock_key'))";
-		SQLexecuteQuery($sql_lock);
+		$sql_lock = "SELECT pg_advisory_lock(hashtext($1))";
+		SQLexecuteQueryParams($sql_lock, [$lock_key]);
 		
 		// Busca o formato do PIN na constante
-                $sql = "select * from pins_card_distribuidoras where opr_codigo = ".$opr_codigo." and pcd_id_distribuidor = ".$distributor_codigo.";";
-                $rs_distribuidoras = SQLexecuteQuery($sql);
+                $sql = "select * from pins_card_distribuidoras where opr_codigo = $1 and pcd_id_distribuidor = $2;";
+                $rs_distribuidoras = SQLexecuteQueryParams($sql, [$opr_codigo, $distributor_codigo]);
                 $rs_distribuidoras_row = pg_fetch_array($rs_distribuidoras);
                 $sformato = $rs_distribuidoras_row['pcd_formato'];
 		$this->set_config($sformato);
 		
                 // Cria LoteID
-		$sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins_card where opr_codigo = ".$opr_codigo." and distributor_codigo = ".$distributor_codigo;
-		$rs_lote = SQLexecuteQuery($sql);
+		$sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins_card where opr_codigo = $1 and distributor_codigo = $2";
+		$rs_lote = SQLexecuteQueryParams($sql, [$opr_codigo, $distributor_codigo]);
 		if(!$rs_lote || pg_num_rows($rs_lote) == 0) {
 			$ilote = 1;
 		} else {
@@ -78,9 +78,9 @@ class Pins_Card {
 			$ilote = $rs_lote_row['max_pin_lote_codigo'] + 1;
 		}
 		// Obtem o ultimo serial
-		$sql_serial = "select MAX(CAST(pin_serial AS BIGINT)) as max_serial from pins_card where opr_codigo = ".$opr_codigo." and distributor_codigo = ".$distributor_codigo.";";
+		$sql_serial = "select MAX(CAST(pin_serial AS BIGINT)) as max_serial from pins_card where opr_codigo = $1 and distributor_codigo = $2;";
                 //echo $sql_serial."<br>";die();
-		$rs_serial = SQLexecuteQuery($sql_serial);
+		$rs_serial = SQLexecuteQueryParams($sql_serial, [$opr_codigo, $distributor_codigo]);
 		if($rs_serial) {
 			$rs_serial_row = pg_fetch_array($rs_serial);
 			$pin_serial = $rs_serial_row['max_serial']+1;
@@ -110,23 +110,24 @@ class Pins_Card {
 			if ($aux_spin_codigo == $spin_codigo) {
 				$spin_serial = str_pad($pin_serial, $this->serial_length, "0", STR_PAD_LEFT);
                                 // Testa existencia no banco de dados
-				$sql = "select * from pins_card where pin_codigo = '".base64_encode($this->aes->encrypt($spin_codigo))."'";
+				$pin_codigo_crypt = base64_encode($this->aes->encrypt($spin_codigo));
+				$sql = "select * from pins_card where pin_codigo = $1";
                                 //echo $sql."<br>";die();
-				$rs_pins = SQLexecuteQuery($sql);
+				$rs_pins = SQLexecuteQueryParams($sql, [$pin_codigo_crypt]);
 				if((($rs_pins) ? pg_num_rows($rs_pins) : 0) == 0) {
                                         //transacao
                                         if($msg == ""){
                                                 $sql = "insert into pins_card (pin_serial, pin_codigo, opr_codigo, distributor_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_formato) values (
 												(
-								            		SELECT LPAD(
+									            	SELECT LPAD(
                     									(COALESCE(MAX(CAST(pin_serial AS BIGINT)), 0) + 1)::text, 
                     									10, '0') 
-								            		FROM pins_card 
-								            		WHERE opr_codigo = ".$opr_codigo." and distributor_codigo = ".$distributor_codigo."
-								        		)
-												, '".base64_encode($this->aes->encrypt($spin_codigo))."', ".$opr_codigo.", ".$distributor_codigo.", ".$pin_valor.", ".$ilote.", CURRENT_TIMESTAMP, '".$sformato."');";
+									            	FROM pins_card 
+									            	WHERE opr_codigo = $1 and distributor_codigo = $2
+									        		)
+												, $3, $1, $2, $4, $5, CURRENT_TIMESTAMP, $6);";
                                                 //echo $sql."<br>"."Tamanho do PIN encriptado [".strlen(base64_encode($this->aes->encrypt($spin_codigo)))."]<br>";
-                                                $rs_pins_save = SQLexecuteQuery($sql);
+                                                $rs_pins_save = SQLexecuteQueryParams($sql, [$opr_codigo, $distributor_codigo, $pin_codigo_crypt, $pin_valor, $ilote, $sformato]);
                                                 if(!$rs_pins_save ) {
                                                         $msg = "Erro ao salvar o novo PIN ($sql)<br>";
                                                 }
@@ -145,8 +146,8 @@ class Pins_Card {
 		}
 
 		// Libera o advisory lock
-		$sql_unlock = "SELECT pg_advisory_unlock(hashtext('$lock_key'))";
-		SQLexecuteQuery($sql_unlock);
+		$sql_unlock = "SELECT pg_advisory_unlock(hashtext($1))";
+		SQLexecuteQueryParams($sql_unlock, [$lock_key]);
 
 		//Finaliza transacao
 		if($msg == ""){

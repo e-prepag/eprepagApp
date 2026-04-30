@@ -5,8 +5,8 @@ class classRegistroPinRequest
 
         static function verificaExisteRegistroBHN($dadosPedido)
         {
-                $sql = "SELECT bhn_id FROM pedidos_egift_bhn WHERE vgm_id = " . $dadosPedido['vgm_id'] . " AND vg_id = " . $dadosPedido['vg_id'] . " AND opr_codigo = " . $dadosPedido['opr_codigo'] . ";";
-                $rs_teste = SQLexecuteQuery($sql);
+                $sql = "SELECT bhn_id FROM pedidos_egift_bhn WHERE vgm_id = $1 AND vg_id = $2 AND opr_codigo = $3;";
+                $rs_teste = SQLexecuteQueryParams($sql, [$dadosPedido['vgm_id'], $dadosPedido['vg_id'], $dadosPedido['opr_codigo']]);
                 if (!$rs_teste || pg_num_rows($rs_teste) == 0) {
                         return FALSE;
                 } else {
@@ -17,8 +17,8 @@ class classRegistroPinRequest
         private function nextLote($pinParams)
         {
 
-                $sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins where opr_codigo = " . $pinParams['opr_codigo'] . ";";
-                $rs_lote = SQLexecuteQuery($sql);
+                $sql = "select max(pin_lote_codigo) as max_pin_lote_codigo from pins where opr_codigo = $1;";
+                $rs_lote = SQLexecuteQueryParams($sql, [$pinParams['opr_codigo']]);
                 if (!$rs_lote || pg_num_rows($rs_lote) == 0) {
                         $ilote = 1;
                 } else {
@@ -32,6 +32,7 @@ class classRegistroPinRequest
         {
                 //Verificando se io PIN já foi inserido no estoque anteriormente
                 if (!$objectAux->getPinCodInterno($pinParams)) {
+                        $pin_lote_codigo = $objectAux->nextLote($pinParams);
                         $sql = "insert into pins ( 
                                                pin_serial, 
                                                pin_codigo, 
@@ -49,24 +50,24 @@ class classRegistroPinRequest
                                                pin_est_codigo,
                                                pin_validade) 
                             values (
-                                            '" . $pinParams['pin_serial'] . "',
-                                            '" . $pinParams['pin_codigo'] . "', 
-                                            " . $pinParams['opr_codigo'] . ",
-                                            " . $pinParams['bhn_valor'] . ", 
-                                            " . $objectAux->nextLote($pinParams) . ", 
+                                            $1,
+                                            $2, 
+                                            $3,
+                                            $4, 
+                                            $5, 
                                             CURRENT_TIMESTAMP, 
                                             's', 
                                             NOW(),
                                             '3',
                                             NOW(),
                                             NOW(),
-                                            '" . date("H:i:s") . "',
-                                            '" . date("H:i:s") . "',
+                                            $6,
+                                            $7,
                                             '1',
                                             (NOW() + interval '2 month')
                                     );";
 
-                        $rs_pins_save = SQLexecuteQuery($sql);
+                        $rs_pins_save = SQLexecuteQueryParams($sql, [$pinParams['pin_serial'], $pinParams['pin_codigo'], $pinParams['opr_codigo'], $pinParams['bhn_valor'], $pin_lote_codigo, date("H:i:s"), date("H:i:s")]);
                         if (!$rs_pins_save) {
                                 echo "Erro ao salvar o novo PIN ($sql)" . PHP_EOL;
                                 return false;
@@ -82,8 +83,8 @@ class classRegistroPinRequest
 
         private function getPinCodInterno($pinParams)
         {
-                $sql = "select pin_codinterno from pins where pin_codigo = '" . $pinParams['pin_codigo'] . "' and opr_codigo = " . $pinParams['opr_codigo'] . " ORDER BY pin_dataentrada DESC, pin_horaentrada DESC LIMIT 1;";
-                $rs_pins_estoque = SQLexecuteQuery($sql);
+                $sql = "select pin_codinterno from pins where pin_codigo = $1 and opr_codigo = $2 ORDER BY pin_dataentrada DESC, pin_horaentrada DESC LIMIT 1;";
+                $rs_pins_estoque = SQLexecuteQueryParams($sql, [$pinParams['pin_codigo'], $pinParams['opr_codigo']]);
                 if (!$rs_pins_estoque) {
                         echo "Erro ao selecionar o novo PIN no estoque ($sql)" . PHP_EOL;
                         return false;
@@ -97,8 +98,8 @@ class classRegistroPinRequest
         {
                 $codigoInterno = $this->getPinCodInterno($pinParams);
                 if ($codigoInterno) {
-                        $sql = "insert into tb_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) values (" . $pinParams['vgm_id'] . "," . $codigoInterno . ");";
-                        $ret = SQLexecuteQuery($sql);
+                        $sql = "insert into tb_venda_games_modelo_pins (vgmp_vgm_id, vgmp_pin_codinterno) values ($1, $2);";
+                        $ret = SQLexecuteQueryParams($sql, [$pinParams['vgm_id'], $codigoInterno]);
                         if (!$ret) {
                                 echo "Erro ao associar pin no modelo vendido." . PHP_EOL;
                                 return false;
@@ -111,8 +112,8 @@ class classRegistroPinRequest
 
         private function atualizaModelo($pinParams, $codigoInterno)
         {
-                $sql = "update tb_venda_games_modelo set vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || '" . $codigoInterno . ",' WHERE vgm_id = '" . $pinParams['vgm_id'] . "';";
-                $ret = SQLexecuteQuery($sql);
+                $sql = "update tb_venda_games_modelo set vgm_pin_codinterno = coalesce(vgm_pin_codinterno,'') || $1 WHERE vgm_id = $2;";
+                $ret = SQLexecuteQueryParams($sql, [$codigoInterno . ',', $pinParams['vgm_id']]);
                 if (!$ret) {
                         echo "Erro ao atualizar registro de modelo de pedido com o ID do PIN." . PHP_EOL;
                         return false;

@@ -79,12 +79,12 @@ class GeraPinVariavel
 	{
 		$sql = "SELECT pin_lote_codigo as max_pin_lote_codigo
 			FROM pins 
-			WHERE opr_codigo = " . $this->opr_codigo . "
+			WHERE opr_codigo = :opr_codigo
 			ORDER BY pins.pin_codinterno  DESC 
 			LIMIT 1;";
 
 		$query = $this->connection->prepare($sql);
-		$query->execute();
+		$query->execute([':opr_codigo' => $this->opr_codigo]);
 
 		$rs_lote = $query->fetch(PDO::FETCH_ASSOC);
 
@@ -93,10 +93,10 @@ class GeraPinVariavel
 		}
 
 
-		$sql_serial = "select CAST(pin_serial AS BIGINT) as max_serial from pins where opr_codigo = " . $this->opr_codigo . " order by pin_codinterno desc limit 1;";
+		$sql_serial = "select CAST(pin_serial AS BIGINT) as max_serial from pins where opr_codigo = :opr_codigo order by pin_codinterno desc limit 1;";
 
 		$query = $this->connection->prepare($sql_serial);
-		$query->execute();
+		$query->execute([':opr_codigo' => $this->opr_codigo]);
 
 		$rs_serial = $query->fetch(PDO::FETCH_ASSOC);
 
@@ -134,40 +134,59 @@ class GeraPinVariavel
 			$rs_serial["max_serial"]++;
 			$spin_serial = str_pad(number_format($rs_serial["max_serial"], 0, '', ''), 10, "0", STR_PAD_LEFT);
 
-			$sql = "SELECT * FROM pins where pin_codigo = '" . $spin_codigo . "' and opr_codigo = " . $this->opr_codigo . ";";
+			$sql = "SELECT * FROM pins where pin_codigo = :pin_codigo and opr_codigo = :opr_codigo;";
 			$query = $this->connection->prepare($sql);
-			$query->execute();
+			$query->execute([':pin_codigo' => $spin_codigo, ':opr_codigo' => $this->opr_codigo]);
 			$rs_pins = $query->fetchAll(PDO::FETCH_ASSOC);
 
 			if (count($rs_pins) == 0) {
 
-				$sql = "select * from pins_store where pin_codigo = '" . base64_encode($aes->encrypt($spin_codigo)) . "'";
+				$pin_codigo_crypt = base64_encode($aes->encrypt($spin_codigo));
+
+				$sql = "select * from pins_store where pin_codigo = :pin_codigo";
 				$query = $this->connection->prepare($sql);
+				$query->execute([':pin_codigo' => $pin_codigo_crypt]);
 				$rs_pins_store = $query->fetchAll(PDO::FETCH_ASSOC);
 
-				$sql = "select * from pins where pin_codigo = '" . base64_encode($aes->encrypt($spin_codigo)) . "'";
+				$sql = "select * from pins where pin_codigo = :pin_codigo";
 				$query = $this->connection->prepare($sql);
+				$query->execute([':pin_codigo' => $pin_codigo_crypt]);
 				$rs_pin = $query->fetchAll(PDO::FETCH_ASSOC);
 
 				if (count($rs_pins_store) == 0 && count($rs_pin) == 0) {
 
-					$sql = "insert into pins (pin_serial, pin_codigo, opr_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_canal, pin_horaentrada,pin_status,pin_validade) values ('" . $spin_serial . "', '" . $spin_codigo . "', " . $this->opr_codigo . ", " . $this->valor_pin . ", " . $rs_lote["max_pin_lote_codigo"] . ", CURRENT_TIMESTAMP, 's', NOW(),'1',(NOW() + interval '2 month'));";
+					$sql = "insert into pins (pin_serial, pin_codigo, opr_codigo, pin_valor, pin_lote_codigo, pin_dataentrada, pin_canal, pin_horaentrada,pin_status,pin_validade) values (:pin_serial, :pin_codigo, :opr_codigo, :pin_valor, :pin_lote_codigo, CURRENT_TIMESTAMP, 's', NOW(),'1',(NOW() + interval '2 month'));";
 					$query = $this->connection->prepare($sql);
-					$query->execute();
+					$query->execute([
+						':pin_serial' => $spin_serial,
+						':pin_codigo' => $spin_codigo,
+						':opr_codigo' => $this->opr_codigo,
+						':pin_valor' => $this->valor_pin,
+						':pin_lote_codigo' => $rs_lote["max_pin_lote_codigo"],
+					]);
 					$last_pin_inserted = $this->connection->lastInsertId();
 
-					$chaveaes = base64_encode($aes->encrypt($spin_codigo));
+					$chaveaes = $pin_codigo_crypt;
 
-					$sql = "insert into pins_store (pin_serial, pin_codigo, pin_caracter, distributor_codigo, pin_valor, pin_lote_codigo, pin_dataentrada,pin_status, pin_canal, pin_formato) values ('" . $spin_serial . "', '" . $chaveaes . "', '', " . $this->distributor . ", " . $this->valor_pin . ", " . $rs_lote["max_pin_lote_codigo"] . ", CURRENT_TIMESTAMP, 3, 'w', '4');";
+					$sql = "insert into pins_store (pin_serial, pin_codigo, pin_caracter, distributor_codigo, pin_valor, pin_lote_codigo, pin_dataentrada,pin_status, pin_canal, pin_formato) values (:pin_serial, :pin_codigo, '', :distributor_codigo, :pin_valor, :pin_lote_codigo, CURRENT_TIMESTAMP, 3, 'w', '4');";
 					$query = $this->connection->prepare($sql);
-					$query->execute();
+					$query->execute([
+						':pin_serial' => $spin_serial,
+						':pin_codigo' => $chaveaes,
+						':distributor_codigo' => $this->distributor,
+						':pin_valor' => $this->valor_pin,
+						':pin_lote_codigo' => $rs_lote["max_pin_lote_codigo"],
+					]);
 					$last_pin_inserted_store = $this->connection->lastInsertId();
 
 					$rowCount = $query->rowCount();
 
-					$sql = "INSERT INTO tb_pins_store_pins (pins_pin_codinterno, pins_store_pin_codinterno) values ($last_pin_inserted, $last_pin_inserted_store)";
+					$sql = "INSERT INTO tb_pins_store_pins (pins_pin_codinterno, pins_store_pin_codinterno) values (:pins_pin_codinterno, :pins_store_pin_codinterno)";
 					$query = $this->connection->prepare($sql);
-					$query->execute();
+					$query->execute([
+						':pins_pin_codinterno' => $last_pin_inserted,
+						':pins_store_pin_codinterno' => $last_pin_inserted_store,
+					]);
 
 					$this->saveLog($spin_codigo . " (" . $chaveaes . ")", $rs_lote["max_pin_lote_codigo"], $this->opr_codigo, $this->valor_pin);
 					return $last_pin_inserted;

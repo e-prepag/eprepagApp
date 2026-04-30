@@ -127,7 +127,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 				WHERE bds_ativo = '1'
 					AND bds_data_inicio <= NOW() 
 					AND (bds_data_fim + interval '1 day')   >= NOW()
-					AND bds_tipo_usuario = '".$this	->	getTipoUsuario()."'
+					AND bds_tipo_usuario = $1
 					AND bds_imagem_banner IS NOT NULL
 				ORDER BY bds_id_banner";
 
@@ -135,7 +135,7 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 
 		//echo $sql.":sql<br>";
 			
-		$rs_banners = SQLexecuteQuery($sql);
+		$rs_banners = SQLexecuteQueryParams($sql, [$this->getTipoUsuario()]);
 		if(!$rs_banners) {
 			return null;
 		} else {
@@ -192,9 +192,9 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 			//echo $aux_matriz[$i]['id']."<br>";
 			$sql = "select count(bdsc.*) as total 
 					from tb_banner_drop_shadow_clicks bdsc 
-					where bdsc.ug_id=".$this->getUgId()." 
-						AND bdsc.bds_id_banner=".$aux_matriz[$i]['id'];
-			$rs_resposta = SQLexecuteQuery($sql);
+					where bdsc.ug_id = $1 
+						AND bdsc.bds_id_banner = $2";
+			$rs_resposta = SQLexecuteQueryParams($sql, [$this->getUgId(), $aux_matriz[$i]['id']]);
 			//echo $sql.":sql<br>";
 			$rs_resposta_row = pg_fetch_array($rs_resposta);
 			if ($rs_resposta_row['total']==0) {
@@ -322,9 +322,9 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 	function VerificarRespondeu() {
 		$sql = "SELECT count(bdsc.*) as total 
 				FROM tb_banner_drop_shadow_clicks bdsc 
-				WHERE bdsc.ug_id			=".$this->getUgId()." 
-					AND bdsc.bds_id_banner	=".$this->getIdBanner();
-		$rs_resposta = SQLexecuteQuery($sql);
+				WHERE bdsc.ug_id			= $1 
+					AND bdsc.bds_id_banner	= $2";
+		$rs_resposta = SQLexecuteQueryParams($sql, [$this->getUgId(), $this->getIdBanner()]);
 		//echo $sql.":sql<br>";
 		$rs_resposta_row = pg_fetch_array($rs_resposta);
 		$retorno = $rs_resposta_row['total'];
@@ -336,8 +336,8 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 			$this->setIdBanner($idBanner);
 		}
 		$retorno = false;
-		$sql ="INSERT INTO tb_banner_drop_shadow_clicks (bds_id_banner, ug_id, bdsc_data_inclusao, bdsc_tipo_usuario) VALUES (".$this->getIdBanner().",".$this->getUgId().",NOW(),'".$this -> getTipoUsuario()."'); ";
-		$rs_banner_repostas = SQLexecuteQuery($sql);
+		$sql ="INSERT INTO tb_banner_drop_shadow_clicks (bds_id_banner, ug_id, bdsc_data_inclusao, bdsc_tipo_usuario) VALUES ($1, $2, NOW(), $3); ";
+		$rs_banner_repostas = SQLexecuteQueryParams($sql, [$this->getIdBanner(), $this->getUgId(), $this->getTipoUsuario()]);
 		if(!$rs_banner_repostas) {
 			$retorno = "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
 		}
@@ -348,12 +348,14 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 	function InsereClick(){
 		$retorno = false;
 		if($this->getTipoBanner()==1) {
-			$sql ="INSERT INTO tb_banner_drop_shadow_clicks (bds_id_banner, ug_id, bdsc_data_inclusao, bdsc_tipo_usuario, bdsc_click) VALUES (".$this->getIdBanner().",".$this->getUgId().",NOW(),'".$this -> getTipoUsuario()."', 1);";
+			$sql ="INSERT INTO tb_banner_drop_shadow_clicks (bds_id_banner, ug_id, bdsc_data_inclusao, bdsc_tipo_usuario, bdsc_click) VALUES ($1, $2, NOW(), $3, 1);";
+			$sql_params = [$this->getIdBanner(), $this->getUgId(), $this->getTipoUsuario()];
 		}//end if($this->getTipoBanner()==1)
 		else {
-			$sql ="UPDATE tb_banner_drop_shadow_clicks SET bdsc_click=1 WHERE bds_id_banner=".$this->getIdBanner()." AND ug_id=".$this->getUgId()." AND bdsc_tipo_usuario='".$this -> getTipoUsuario()."';";
+			$sql ="UPDATE tb_banner_drop_shadow_clicks SET bdsc_click=1 WHERE bds_id_banner = $1 AND ug_id = $2 AND bdsc_tipo_usuario = $3;";
+			$sql_params = [$this->getIdBanner(), $this->getUgId(), $this->getTipoUsuario()];
 		}//end else if($this->getTipoBanner()==1)
-		$rs_banner_repostas = SQLexecuteQuery($sql);
+		$rs_banner_repostas = SQLexecuteQueryParams($sql, $sql_params);
 		if(!$rs_banner_repostas) {
 			$retorno = "Erro ao salvar informa&ccedil;&otilde;es da pergunta. ($sql)<br>";
 		}
@@ -365,8 +367,8 @@ bds_texto character varying(256) NOT NULL, -- Campo contendo uma descrição para 
 		$retorno = false;
 		$sql = "SELECT * 
 				FROM tb_banner_drop_shadow 
-				WHERE bds_id_banner=$bds_id_banner;";
-		$rs_banners = SQLexecuteQuery($sql);
+				WHERE bds_id_banner = $1;";
+		$rs_banners = SQLexecuteQueryParams($sql, [$bds_id_banner]);
 		if(!$rs_banners) {
 			return null;
 		} else {

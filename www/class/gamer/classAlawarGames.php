@@ -4,6 +4,36 @@ class AlawarGames {
 
 	
 	public function __construct() { }
+
+	private function addParam(&$params, $value) {
+		$params[] = $value;
+		return '$' . count($params);
+	}
+
+	private function filtroValue($filtro, $key) {
+		return is_array($filtro) && array_key_exists($key, $filtro) ? $filtro[$key] : null;
+	}
+
+	private function orderSql($orderBy) {
+		$allow = array(
+			'pag_id' => 'pag_id',
+			'pag_name' => 'pag_name',
+			'pag_status' => 'pag_status',
+			'pag_symbol_code' => 'pag_symbol_code',
+			'pag_online_game' => 'pag_online_game',
+			'pag_ug_id_related' => 'pag_ug_id_related',
+			'pag_data_inclusao' => 'pag_data_inclusao',
+			'pag_data_alteracao' => 'pag_data_alteracao'
+		);
+		$parts = array();
+		foreach (explode(',', (string)$orderBy) as $part) {
+			$bits = preg_split('/\s+/', trim($part));
+			$field = $bits[0];
+			$dir = isset($bits[1]) && strtolower($bits[1]) == 'desc' ? 'DESC' : 'ASC';
+			if (isset($allow[$field])) $parts[] = $allow[$field] . ' ' . $dir;
+		}
+		return implode(', ', $parts);
+	}
 	
 	/* Monta o campo <select> com a lista de jogos validos */
 	public function createComboBox($id_jogo) {
@@ -190,78 +220,80 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 						to_char(pag_data_inclusao, 'dd/mm/yyyy') as pag_data_inclusao_format, 
 						to_char(pag_data_alteracao, 'dd/mm/yyyy') as pag_data_alteracao_format, 
 						* 
-				 FROM 
+					 FROM 
 						pins_alawar_games 
-				 WHERE 1=1 \n";
+					 WHERE 1=1 \n";
+		$params = array();
 		
 		if(!is_null($filtro) && $filtro != ""){
-			$sql .= " AND (" . (is_null($filtro['pag_id'])?1:0);
-			$sql .= "=1 OR pag_id = " . SQLaddFields($filtro['pag_id'], "") . ")\n";				
-		
-			$sql .= " AND (" . (is_null($filtro['pag_status'])?1:0);
-			$sql .= "=1 OR pag_status = " . SQLaddFields(($filtro['pag_status']?1:0), "") . ")\n";
-
-			$sql .= " AND (" . (is_null($filtro['pag_symbol_code'])?1:0);
-			$sql .= "=1 OR pag_symbol_code LIKE '%" . SQLaddFields($filtro['pag_symbol_code'], "r") . "%')\n";
-		
-			$sql .= " AND (" . (is_null($filtro['pag_online_game'])?1:0);
-			$sql .= "=1 OR pag_online_game = " . SQLaddFields($filtro['pag_online_game']?1:0, "") . ")\n";
-		
-			$sql .= " AND (" . (is_null($filtro['pag_ug_id_related'])?1:0);
-			$sql .= "=1 OR pag_ug_id_related = " . SQLaddFields($filtro['pag_ug_id_related'], "") . ")\n";
-		
-			$sql .= " AND (" . (is_null($filtro['pag_name'])?1:0);
-			$sql .= "=1 OR UPPER(pag_name) LIKE '%" . SQLaddFields(strtoupper($filtro['pag_name']), "r") . "%')\n";			
+			if ($this->filtroValue($filtro, 'pag_id') !== null && $this->filtroValue($filtro, 'pag_id') !== '') {
+				$sql .= " AND pag_id = " . $this->addParam($params, $this->filtroValue($filtro, 'pag_id')) . "\n";
+			}
+			if ($this->filtroValue($filtro, 'pag_status') !== null && $this->filtroValue($filtro, 'pag_status') !== '') {
+				$sql .= " AND pag_status = " . $this->addParam($params, $this->filtroValue($filtro, 'pag_status') ? 1 : 0) . "\n";
+			}
+			if ($this->filtroValue($filtro, 'pag_symbol_code') !== null && $this->filtroValue($filtro, 'pag_symbol_code') !== '') {
+				$sql .= " AND pag_symbol_code LIKE " . $this->addParam($params, '%' . $this->filtroValue($filtro, 'pag_symbol_code') . '%') . "\n";
+			}
+			if ($this->filtroValue($filtro, 'pag_online_game') !== null && $this->filtroValue($filtro, 'pag_online_game') !== '') {
+				$sql .= " AND pag_online_game = " . $this->addParam($params, $this->filtroValue($filtro, 'pag_online_game') ? 1 : 0) . "\n";
+			}
+			if ($this->filtroValue($filtro, 'pag_ug_id_related') !== null && $this->filtroValue($filtro, 'pag_ug_id_related') !== '') {
+				$sql .= " AND pag_ug_id_related = " . $this->addParam($params, $this->filtroValue($filtro, 'pag_ug_id_related')) . "\n";
+			}
+			if ($this->filtroValue($filtro, 'pag_name') !== null && $this->filtroValue($filtro, 'pag_name') !== '') {
+				$sql .= " AND UPPER(pag_name) LIKE " . $this->addParam($params, '%' . strtoupper($this->filtroValue($filtro, 'pag_name')) . '%') . "\n";			
+			}
 		
 			/* Data de Inclusao */
-			if ($filtro['pag_data_inclusao_ini'] && $filtro['pag_data_inclusao_fim']) {
+			if ($this->filtroValue($filtro, 'pag_data_inclusao_ini') && $this->filtroValue($filtro, 'pag_data_inclusao_fim')) {
 				$filtro['pag_data_inclusao_ini'] = formata_data_ts($filtro['pag_data_inclusao_ini'] . " 00:00:00", 2, true, true);
 				$filtro['pag_data_inclusao_fim'] = formata_data_ts($filtro['pag_data_inclusao_fim'] . " 23:59:59", 2, true, true);
-				
-				$sql .= " AND (pag_data_inclusao between " . SQLaddFields($filtro['pag_data_inclusao_ini'], "s") . " and " . SQLaddFields($filtro['pag_data_inclusao_fim'], "s") . ")\n";
+				$sql .= " AND (pag_data_inclusao between " . $this->addParam($params, $filtro['pag_data_inclusao_ini']) . " and " . $this->addParam($params, $filtro['pag_data_inclusao_fim']) . ")\n";
 			}
 		
 			/* Data de Alteracao */
-			if($filtro['pag_data_alteracao_ini'] && $filtro['pag_data_alteracao_fim']) {
+			if($this->filtroValue($filtro, 'pag_data_alteracao_ini') && $this->filtroValue($filtro, 'pag_data_alteracao_fim')) {
 				$filtro['pag_data_alteracao_ini'] = formata_data_ts($filtro['pag_data_alteracao_ini'] . " 00:00:00", 2, true, true);
 				$filtro['pag_data_alteracao_fim'] = formata_data_ts($filtro['pag_data_alteracao_fim'] . " 23:59:59", 2, true, true);
-					
-				$sql .= " AND (pag_data_alteracao between " . SQLaddFields($filtro['pag_data_alteracao_ini'], "s") . " and " . SQLaddFields($filtro['pag_data_alteracao_fim'], "s") . ")\n";
+				$sql .= " AND (pag_data_alteracao between " . $this->addParam($params, $filtro['pag_data_alteracao_ini']) . " and " . $this->addParam($params, $filtro['pag_data_alteracao_fim']) . ")\n";
 			}
 		}
-		if(!is_null($orderBy) && $orderBy != "") $sql .= " ORDER BY " . $orderBy;
-		if(!is_null($limitQuery) && $limitQuery != 0) $sql .= " LIMIT " . $limitQuery;
-		if(!is_null($offSetQuery) && $offSetQuery != 0) $sql .= " OFFSET " . $offSetQuery;
+		$orderSql = $this->orderSql($orderBy);
+		if($orderSql != "") $sql .= " ORDER BY " . $orderSql;
+		if(!is_null($limitQuery) && (int)$limitQuery != 0) $sql .= " LIMIT " . (int)$limitQuery;
+		if(!is_null($offSetQuery) && (int)$offSetQuery != 0) $sql .= " OFFSET " . (int)$offSetQuery;
 				
 		//echo $sql;
 //echo "Em getGamesBy\nSQL: $sql \n";
-		$rs = SQLexecuteQuery($sql);
+		$rs = $params ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
 				
 		$listOfGames = array();
 		
 		if ($rs) {
 			while ($result = pg_fetch_assoc($rs)) {
 				$listOfGames[$result['pag_id']] = array('pag_name' => $result['pag_name'], 
-														'pag_symbol_code' => $result['pag_symbol_code'],
-														'pag_status' => $result['pag_status'],
-														'pag_online_game' => $result['pag_online_game'],
-														'pag_ug_id_related' => $result['pag_ug_id_related'],
-														'pag_icon' => $result['pag_icon'],
-														'pag_data_inclusao' => $result['pag_data_inclusao_format'],
-														'pag_data_alteracao' => $result['pag_data_alteracao_format'],
-														'pag_online_game_page_url' => $result['pag_online_game_page_url'],
-														'pag_online_game_width' => $result['pag_online_game_width'],
-														'pag_online_game_height' => $result['pag_online_game_height'],
-														'pag_online_embed' => $result['pag_online_embed'],
-														'pag_online_game_swf_width' => $result['pag_online_game_swf_width'],
-														'pag_online_game_swf_height' => $result['pag_online_game_swf_height'],
-														'pag_description' => $result['pag_description']);				
+												'pag_symbol_code' => $result['pag_symbol_code'],
+												'pag_status' => $result['pag_status'],
+												'pag_online_game' => $result['pag_online_game'],
+												'pag_ug_id_related' => $result['pag_ug_id_related'],
+												'pag_icon' => $result['pag_icon'],
+												'pag_data_inclusao' => $result['pag_data_inclusao_format'],
+												'pag_data_alteracao' => $result['pag_data_alteracao_format'],
+												'pag_online_game_page_url' => $result['pag_online_game_page_url'],
+												'pag_online_game_width' => $result['pag_online_game_width'],
+												'pag_online_game_height' => $result['pag_online_game_height'],
+												'pag_online_embed' => $result['pag_online_embed'],
+												'pag_online_game_swf_width' => $result['pag_online_game_swf_width'],
+												'pag_online_game_swf_height' => $result['pag_online_game_swf_height'],
+												'pag_description' => $result['pag_description']);				
 			}		
 		}
 
 //echo "Em getGamesBy result\n".print_r($listOfGames, true)."\n";
 		return $listOfGames;
 	}
+
 	
 	
 	/* Insere um Game da Base de Dados */
@@ -287,28 +319,31 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 			$gameSwfWidth = $gameData['swf_width'] ? $gameData['swf_width'] : "DEFAULT";
 			$gameSwfHeight = $gameData['swf_height'] ? $gameData['swf_height'] : "DEFAULT";
 				
+			$params = array();
+			$values = array(
+				$this->addParam($params, $gameID),
+				$this->addParam($params, $gameSymbolCode),
+				$this->addParam($params, $gameName),
+				$this->addParam($params, $gameStatus),
+				$this->addParam($params, $gameOnline),
+				$gameRelatedID === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameRelatedID),
+				$this->addParam($params, $gameIcon),
+				"CURRENT_TIMESTAMP",
+				"CURRENT_TIMESTAMP",
+				$this->addParam($params, $gameOnlinePageURL),
+				$gameWidth === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameWidth),
+				$gameHeight === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameHeight),
+				$this->addParam($params, $gameOnlineEmbed),
+				$gameSwfWidth === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameSwfWidth),
+				$gameSwfHeight === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameSwfHeight),
+				$this->addParam($params, $gameDescription)
+			);
 			$sql  = "INSERT INTO pins_alawar_games 
 						(pag_id, pag_symbol_code, pag_name, pag_status, pag_online_game, pag_ug_id_related, pag_icon, 
 						 pag_data_inclusao, pag_data_alteracao, pag_online_game_page_url, pag_online_game_width, pag_online_game_height,
 						 pag_online_embed, pag_online_game_swf_width, pag_online_game_swf_height, pag_description) 
-					VALUES (";
-			$sql .= SQLaddFields($gameID, ""). ",";
-			$sql .= SQLaddFields($gameSymbolCode, "s"). ",";
-			$sql .= SQLaddFields($gameName, "s"). ",";
-			$sql .= SQLaddFields($gameStatus, ""). ",";
-			$sql .= SQLaddFields($gameOnline, ""). ",";
-			$sql .= SQLaddFields($gameRelatedID, ""). ",";
-			$sql .= SQLaddFields($gameIcon, "s"). ",";
-			$sql .= SQLaddFields($gameDataInclusao, ""). ",";
-			$sql .= SQLaddFields($gameDataAlteracao, ""). ",";
-			$sql .= SQLaddFields($gameOnlinePageURL, "s"). ",";
-			$sql .= SQLaddFields($gameWidth, ""). ",";
-			$sql .= SQLaddFields($gameHeight, ""). ",";
-			$sql .= SQLaddFields($gameOnlineEmbed, "s"). ",";
-			$sql .= SQLaddFields($gameSwfWidth, ""). ",";
-			$sql .= SQLaddFields($gameSwfHeight, ""). ",";
-			$sql .= SQLaddFields($gameDescription, "s"). ")";
-			$rs   = SQLexecuteQuery($sql);		
+					VALUES (" . implode(", ", $values) . ")";
+			$rs   = SQLexecuteQueryParams($sql, $params);		
 			
 			if($rs) {
 				$ret = true;
@@ -348,26 +383,26 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 		$ret = false;
 	
 		try {
-			$sql  = "UPDATE pins_alawar_games set ";						
-			$sql .= "	pag_id=".SQLaddFields($gameID, "");
+			$params = array();
+			$sets = array("pag_id=" . $this->addParam($params, $gameID));
 			
-			if ($gameName)  { $sql .= ", pag_name=".SQLaddFields($gameName, "s"); }			
-			if ($gameSymbolCode) { $sql .= ", pag_symbol_code=". SQLaddFields($gameSymbolCode, "s"); }
-			if ($gameStatus) { $sql .= ", pag_status=". SQLaddFields($gameStatus, ""); }
-			if ($gameOnline) { $sql .= ", pag_online_game=". SQLaddFields($gameOnline, ""); }
-			if ($gameRelatedID)	{ $sql .= ", pag_ug_id_related=". SQLaddFields($gameRelatedID, ""); }
-			if ($gameOnlinePageURL)	{ $sql .= ", pag_online_game_page_url=". SQLaddFields($gameOnlinePageURL, "s"); }
-			if ($gameWidth)	{ $sql .= ", pag_online_game_width=". SQLaddFields($gameWidth, ""); } 
-			if ($gameHeight) { $sql .= ", pag_online_game_height=". SQLaddFields($gameHeight, ""); }
-			if ($gameIcon)	{ $sql .= ", pag_icon=". SQLaddFields($gameIcon, "s"); }
-			if ($gameOnlineEmbed)	{ $sql .= ", pag_online_embed=". SQLaddFields($gameOnlineEmbed, "s"); }
-			if ($gameSwfWidth)	{ $sql .= ", pag_online_game_swf_width=". SQLaddFields($gameSwfWidth, ""); } 
-			if ($gameSwfHeight) { $sql .= ", pag_online_game_swf_height=". SQLaddFields($gameSwfHeight, ""); }
-			if ($gameDataAlteracao) { $sql .= ", pag_data_alteracao=". SQLaddFields($gameDataAlteracao, ""); }
-			if ($gameDescription) { $sql .= ", pag_description=". SQLaddFields($gameDescription, "s"); }
+			if ($gameName)  { $sets[] = "pag_name=" . $this->addParam($params, $gameName); }			
+			if ($gameSymbolCode) { $sets[] = "pag_symbol_code=" . $this->addParam($params, $gameSymbolCode); }
+			if ($gameStatus) { $sets[] = "pag_status=" . $this->addParam($params, $gameStatus); }
+			if ($gameOnline) { $sets[] = "pag_online_game=" . $this->addParam($params, $gameOnline); }
+			if ($gameRelatedID) { $sets[] = "pag_ug_id_related=" . ($gameRelatedID === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameRelatedID)); }
+			if ($gameOnlinePageURL) { $sets[] = "pag_online_game_page_url=" . $this->addParam($params, $gameOnlinePageURL); }
+			if ($gameWidth) { $sets[] = "pag_online_game_width=" . ($gameWidth === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameWidth)); } 
+			if ($gameHeight) { $sets[] = "pag_online_game_height=" . ($gameHeight === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameHeight)); }
+			if ($gameIcon) { $sets[] = "pag_icon=" . $this->addParam($params, $gameIcon); }
+			if ($gameOnlineEmbed) { $sets[] = "pag_online_embed=" . $this->addParam($params, $gameOnlineEmbed); }
+			if ($gameSwfWidth) { $sets[] = "pag_online_game_swf_width=" . ($gameSwfWidth === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameSwfWidth)); } 
+			if ($gameSwfHeight) { $sets[] = "pag_online_game_swf_height=" . ($gameSwfHeight === "DEFAULT" ? "DEFAULT" : $this->addParam($params, $gameSwfHeight)); }
+			if ($gameDataAlteracao) { $sets[] = "pag_data_alteracao=CURRENT_TIMESTAMP"; }
+			if ($gameDescription) { $sets[] = "pag_description=" . $this->addParam($params, $gameDescription); }
 							
-			$sql .= " WHERE pag_id=".SQLaddFields($gameID, ""). " ";						
-			$rs   = SQLexecuteQuery($sql);
+			$sql = "UPDATE pins_alawar_games set " . implode(", ", $sets) . " WHERE pag_id=" . $this->addParam($params, $gameID) . " ";
+			$rs   = SQLexecuteQueryParams($sql, $params);
 							
 			if($rs) {
 				$ret = true;
@@ -390,8 +425,8 @@ echo "VERIFY INSERT ".$jogoCasualProperties['game_id']."\n";
 		$ret = false;
 	
 		try {
-			$sql  = "UPDATE pins_alawar_games set pag_status=0, pag_data_alteracao=CURRENT_TIMESTAMP WHERE pag_id=".SQLaddFields($gameID, "");				
-			$rs   = SQLexecuteQuery($sql);
+			$sql  = "UPDATE pins_alawar_games set pag_status=0, pag_data_alteracao=CURRENT_TIMESTAMP WHERE pag_id=$1";				
+			$rs   = SQLexecuteQueryParams($sql, array($gameID));
 				
 			if($rs) {
 				$ret = true;

@@ -30,8 +30,8 @@ class PedidosController extends HeaderController
         {
 
                 $sql = "select * from tb_dist_venda_games_modelo inner join tb_dist_venda_games_modelo_pins on vgm_id = vgmp_vgm_id 
-        inner join pins on vgmp_pin_codinterno = pin_codinterno where vgm_vg_id = $idvenda and vgm_opr_codigo = 124;";
-                $retorno = SQLexecuteQuery($sql);
+        inner join pins on vgmp_pin_codinterno = pin_codinterno where vgm_vg_id = $1 and vgm_opr_codigo = 124;";
+                $retorno = SQLexecuteQueryParams($sql, array($idvenda));
                 $numeroDePins = (($retorno) ? pg_num_rows($retorno) : 0);
                 $pins = pg_fetch_all($retorno);
 
@@ -67,8 +67,8 @@ class PedidosController extends HeaderController
         public function getVenda($idVenda)
         {
                 $vendasBO = new VendasLanHouseBO;
-                $sql = "select * from tb_dist_venda_games where vg_id = " . $idVenda . " and vg_ug_id = " . $this->usuarios->getId();
-                $pedido['venda'] = $vendasBO->getVendas($sql);
+                $sql = "select * from tb_dist_venda_games where vg_id = $1 and vg_ug_id = $2";
+                $pedido['venda'] = $vendasBO->getVendas($sql, true, array($idVenda, $this->usuarios->getId()));
 
                 $pedido['produtos'] = $vendasBO->getProdutosVenda($idVenda);
 
@@ -82,14 +82,14 @@ class PedidosController extends HeaderController
                     inner join tb_dist_venda_games_modelo_pins vgmp on p.pin_codinterno = vgmp.vgmp_pin_codinterno 
                     inner join tb_dist_venda_games_modelo vgm on vgm.vgm_id = vgmp.vgmp_vgm_id 
                     inner join tb_dist_venda_games vg on vg.vg_id = vgm.vgm_vg_id 
-                where vg.vg_id = " . $idVenda . " 
-                    and vg.vg_ug_id = " . $this->usuarios->getId() . " 
+                where vg.vg_id = $1 
+                    and vg.vg_ug_id = $2 
                 order by vgmp.vgmp_impressao_ult_data desc, vgmp.vgmp_impressao_qtde, p.pin_serial;";
 
                 $semImpressao = false;
 
                 try {
-                        $resultProdutos = SQLexecuteQuery($sql);
+                        $resultProdutos = SQLexecuteQueryParams($sql, array($idVenda, $this->usuarios->getId()));
                         if ($resultProdutos && pg_num_rows($resultProdutos) > 0) {
                                 while ($lineProd = pg_fetch_array($resultProdutos)) {
                                         if ($lineProd['vgmp_impressao_qtde'] < 1)

@@ -56,20 +56,88 @@ class EstornoChargeBackDAO {
     public function __construct(){
     }
     
+    private function parseFiltroLegacy($cond, &$params)
+    {
+        $cond = trim($cond);
+        $allowed = array('ec.ec_id','ec_id','ec.cec_id','cec_id','ec_data_devolucao','ec_forma_devolucao','vg_id','opr_codigo','ec_tipo','ec_tipo_usuario','ec_pin_bloqueado','ug_id','edb_cpf_cnpj','edb_titular','ec_cod_autorizacao','ec_valor');
+        if (preg_match("/^UPPER\((edb_titular)\)\s+like\s+'%(.*)%'$/i", $cond, $m)) {
+            $params[] = '%' . strtoupper($m[2]) . '%';
+            return 'UPPER(' . $m[1] . ') like $' . count($params);
+        }
+        if (preg_match("/^([a-zA-Z_][a-zA-Z0-9_.]*)\s*(=|>=|<=|>|<)\s*'([^']*)'$/", $cond, $m) && in_array($m[1], $allowed)) {
+            $params[] = $m[3];
+            return $m[1] . ' ' . $m[2] . ' $' . count($params);
+        }
+        if (preg_match('/^([a-zA-Z_][a-zA-Z0-9_.]*)\s*(=|>=|<=|>|<)\s*(-?\d+(?:\.\d+)?)$/', $cond, $m) && in_array($m[1], $allowed)) {
+            $params[] = $m[3];
+            return $m[1] . ' ' . $m[2] . ' $' . count($params);
+        }
+        return null;
+    }
+
+    private function buildFiltroWhere($filtro, &$params)
+    {
+        $where = array();
+        if (!is_array($filtro)) return '';
+        $allowed = array('ec.ec_id','ec_id','ec.cec_id','cec_id','ec_data_devolucao','ec_forma_devolucao','vg_id','opr_codigo','ec_tipo','ec_tipo_usuario','ec_pin_bloqueado','ug_id','edb_cpf_cnpj','edb_titular','ec_cod_autorizacao','ec_valor');
+        $operators = array('=', '<>', '>', '<', '>=', '<=', 'LIKE', 'ILIKE');
+        foreach ($filtro as $cond) {
+            if (is_array($cond) && count($cond) === 3 && in_array($cond[0], $allowed) && in_array(strtoupper($cond[1]), $operators)) {
+                $params[] = $cond[2];
+                $where[] = $cond[0] . ' ' . strtoupper($cond[1]) . ' $' . count($params);
+            } elseif (is_string($cond)) {
+                $parsed = $this->parseFiltroLegacy($cond, $params);
+                if ($parsed !== null) $where[] = $parsed;
+            }
+        }
+        return count($where) ? ' WHERE ' . implode(' AND ', $where) : '';
+    }
+
+    private function insertRow($table, $fields, $returning = '')
+    {
+        $columns = array();
+        $values = array();
+        $params = array();
+        foreach ($fields as $key => $value) {
+            $columns[] = $key;
+            $params[] = $value;
+            $ph = '$' . count($params);
+            $values[] = (is_string($value) && substr_count($value, '/') == 2) ? "to_date($ph,'DD/MM/YYYY')" : $ph;
+        }
+        $sql = "INSERT INTO $table (" . implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')' . $returning . ';';
+        return SQLexecuteQueryParams($sql, $params);
+    }
+
+    private function updateRow($table, $fields, $idColumn, $idValue)
+    {
+        $sets = array();
+        $params = array();
+        foreach ($fields as $key => $value) {
+            if ($key == $idColumn) continue;
+            if ($value === '') {
+                $sets[] = $key . ' = NULL';
+                continue;
+            }
+            $params[] = $value;
+            $ph = '$' . count($params);
+            $sets[] = (is_string($value) && substr_count($value, '/') == 2) ? $key . " = to_date($ph,'DD/MM/YYYY')" : $key . ' = ' . $ph;
+        }
+        if (!count($sets)) return false;
+        $params[] = $idValue;
+        $sql = "UPDATE $table SET " . implode(', ', $sets) . " WHERE $idColumn = $" . count($params) . ';';
+        return SQLexecuteQueryParams($sql, $params);
+    }
+    
     public function get($filtro = null, $limit = null){
-        
-        //Verificando se foi passado filtros de Dados Bancários
         $innerJoin = false;
         if(is_array($filtro)) {
                 $objTeste = new EstornoDadosBancariosVO();
                 foreach ($filtro as $key => $value) {
-                        if($objTeste->isCampoTabela($key)) {
+                        if($objTeste->isCampoTabela($key) || (is_array($value) && isset($value[0]) && $objTeste->isCampoTabela($value[0]))) {
                                 $innerJoin = true;
-                        }//end if(EstornoDadosBancariosVO::isCampoTabela($key))
-                }//end foreach
-        }//end if(is_array($filtro))
-       
-        //Montando a Query
+                        }
+                }
+        }
         $sql = "SELECT 
                     ec.ec_id as id,*
                 FROM estorno_chargeback as ec
@@ -77,280 +145,129 @@ class EstornoChargeBackDAO {
                     ";
         if($innerJoin) $sql .= "INNER JOIN estorno_dados_bancarios as edb ON ec.ec_id = edb.ec_id ".PHP_EOL."                      ";
         else $sql .= "LEFT OUTER JOIN estorno_dados_bancarios as edb ON ec.ec_id = edb.ec_id ".PHP_EOL."                      ";
-        if (is_array($filtro))  $sql .= ' WHERE ' . implode(' AND ', $filtro);
+        $params = array();
+        $sql .= $this->buildFiltroWhere($filtro, $params);
         $sql .= " ORDER BY ec_data_devolucao DESC";
-        if($limit) $sql .= " LIMIT ".$limit;
-        
+        if($limit) {
+            $params[] = (int) $limit;
+            $sql .= " LIMIT $" . count($params);
+        }
         try{
-            
-            if($EstornoChargeBacks = SQLexecuteQuery($sql)){
-                
-                if((($EstornoChargeBacks) ? pg_num_rows($EstornoChargeBacks) : 0) > 0){
-                    
-                    while($lineRow = pg_fetch_array($EstornoChargeBacks)){
-                        
-                        $arrayTemp = array();
-						$codesGarena = [];
-						
-						if($lineRow["ec_tipo_usuario"] == "L"){
-							$infoSale = "select vg_data_inclusao,vg_pagto_tipo,ug_responsavel,ug_cpf from tb_dist_venda_games inner join dist_usuarios_games on vg_ug_id = ug_id where vg_id =". $lineRow["vg_id"];
-							
-							$infoCodeGarena = "select pin_guid_parceiro from tb_dist_venda_games_modelo left join tb_dist_venda_games_modelo_pins on vgmp_vgm_id = vgm_id left join pins on pin_codinterno = vgmp_pin_codinterno where vgm_vg_id =". $lineRow["vg_id"];
-							$dataCodeExec = SQLexecuteQuery($infoCodeGarena);
-							while($row = pg_fetch_array($dataCodeExec)){
-								if($row["pin_guid_parceiro"] != "" && $row["pin_guid_parceiro"] != null){
-									$codesGarena[] = $row["pin_guid_parceiro"];
-								}
-							}
-							
-							
-							//select vg_data_inclusao,vg_pagto_tipo,ug_responsavel,ug_cpf from tb_dist_venda_games inner join dist_usuarios_games on vg_ug_id = ug_id where vg_id =
-						}else{
-							$infoSale = "select vg_data_inclusao,vg_pagto_tipo,ug_nome,ug_cpf from tb_venda_games inner join usuarios_games on vg_ug_id = ug_id where vg_id =". $lineRow["vg_id"]; 
-							
-							$infoCodeGarena = "select pin_guid_parceiro from tb_venda_games_modelo left join tb_venda_games_modelo_pins on vgmp_vgm_id = vgm_id left join pins on pin_codinterno = vgmp_pin_codinterno where vgm_vg_id =". $lineRow["vg_id"];
-							$dataCodeExec = SQLexecuteQuery($infoCodeGarena);
-							while($row = pg_fetch_array($dataCodeExec)){
-								if($row["pin_guid_parceiro"] != "" && $row["pin_guid_parceiro"] != null){
-									$codesGarena[] = $row["pin_guid_parceiro"];
-								}
-							}
-					     	
-						}
-						$dataSaleExec = SQLexecuteQuery($infoSale);
-						$dataSale = pg_fetch_array($dataSaleExec);
-						
-						// fazer inner join na tabela de venda de acordo com o tipo de cliente 
-                    
-                        $EstornoChargeBack = new EstornoChargeBackVO($lineRow);
-                        $arrayTemp = Util::object_to_array($EstornoChargeBack->dados);
-                        unset($EstornoChargeBack);
-						$arrayTemp["vg_data_inclusao"] = $dataSale["vg_data_inclusao"];
-						$arrayTemp["vg_pagto_tipo"] = $dataSale["vg_pagto_tipo"];
-						$arrayTemp["ug_cpf"] = $dataSale["ug_cpf"];
-						$arrayTemp["cod_garena"] = $codesGarena;
-						$arrayTemp["usuarioNome"] = ($lineRow["ec_tipo_usuario"] == "L")? $dataSale["ug_responsavel"]: $dataSale["ug_nome"];
-                        $this->EstornoChargeBacks[] = $arrayTemp;
-                        
-                    }//end while
-
-                    return $this->EstornoChargeBacks;
-                    
-                } //end if((($EstornoChargeBacks) ? pg_num_rows($EstornoChargeBacks) : 0) > 0) 
-                
-            }// end if executou a query
-            
-        } catch (Exception $ex) {
-            $this->erros[] = $ex->getMessage();
-            return false;
-        }//end catch
-	
-    } //end function get
-    
-    public function insert (EstornoChargeBackVO $EstornoChargeBack, ?EstornoDadosBancariosVO $EstornoDadosBancarios = null){
-        
-        try {
-            
-            $arrayTemp = $EstornoChargeBack->dados;
-            $arrayCampos = array();
-            $arrayFormatoValores = array();
-            foreach ($arrayTemp as $key => $value) {
-                    if($value != "" && $EstornoChargeBack->isCampoTabela($key)) {
-                            $arrayCampos[$key] = $value;
-                            if(is_string($value) && substr_count($value, '/') ==  2) {
-                                    $arrayFormatoValores[] = "to_date('%s','DD/MM/YYYY')";
-                            }//end if(substr_count($value, '/') ==  2)
-                            else {
-                                    $arrayFormatoValores[] = "'%s'";
-                            }//end else if(substr_count($value, '/') ==  2)
-                    }//end if(!is_null($value))
-            }//end foreach
-            if(count($arrayCampos) > 0) {
-                    $query = "INSERT INTO estorno_chargeback ";
-                    $query .= '(' . implode(', ', array_keys($arrayCampos)).')';
-                    $query .= " VALUES (" . implode(", ", $arrayFormatoValores).") RETURNING Currval('estorno_chargeback_ec_id_seq');";
-                    $sql = vsprintf($query, $arrayCampos);
-                    $retorno = SQLexecuteQuery($sql);
-                    if($retorno) {
-								if(!($EstornoDadosBancarios instanceof EstornoDadosBancariosVO)) {
-									throw new Exception("FALHA AO INSERIR NOVO ESTORNO / CHARGEBACK. Não é uma classe estorno");
-								}
-                            $arrayTemp = $EstornoDadosBancarios->dados;
-                            $arrayCampos = array();
-                            $arrayFormatoValores = array();
-                            foreach ($arrayTemp as $key => $value) {
-                                    if($value != "" && $EstornoDadosBancarios->isCampoTabela($key)) {
-                                            $arrayCampos[$key] = $value;
-                                            if(is_string($value) && substr_count($value, '/') ==  2) {
-                                                    $arrayFormatoValores[] = "to_date('%s','DD/MM/YYYY')";
-                                            }//end if(substr_count($value, '/') ==  2)
-                                            else {
-                                                    $arrayFormatoValores[] = "'%s'";
-                                            }//end else if(substr_count($value, '/') ==  2)
-                                    }//end if(!is_null($value))
-                            }//end foreach
-                            if(count($arrayCampos) > 0) {
-                                    //Capturando a sequence do ultimo inserido
-                                    $fetch = pg_fetch_row($retorno);
-                                    $arrayCampos['ec_id'] = $fetch[0]; 
-                                    $arrayFormatoValores[] = "'%s'";
-                                    $query = "INSERT INTO estorno_dados_bancarios ";
-                                    $query .= '(' . implode(', ', array_keys($arrayCampos)).')';
-                                    $query .= ' VALUES (' . implode(', ', $arrayFormatoValores).');';
-                                    $sql = vsprintf($query, $arrayCampos);
-                                    $retornoDadosBancarios = SQLexecuteQuery($sql);
-                                    if($retornoDadosBancarios) {
-                                            return true;
-                                    }else{
-                                            throw new Exception("FALHA AO INSERIR DADOS BANCÁRIOS DO NOVO ESTORNO / CHARGEBACK. Query: $sql\n");
-                                    }                            
-                            }//end if(count($arrayCampos) > 0)
-                            else return true;
+            $EstornoChargeBacks = count($params) ? SQLexecuteQueryParams($sql, $params) : SQLexecuteQuery($sql);
+            if($EstornoChargeBacks && ((($EstornoChargeBacks) ? pg_num_rows($EstornoChargeBacks) : 0) > 0)){
+                while($lineRow = pg_fetch_array($EstornoChargeBacks)){
+                    $arrayTemp = array();
+                    $codesGarena = [];
+                    if($lineRow["ec_tipo_usuario"] == "L"){
+                        $infoSale = "select vg_data_inclusao,vg_pagto_tipo,ug_responsavel,ug_cpf from tb_dist_venda_games inner join dist_usuarios_games on vg_ug_id = ug_id where vg_id = $1";
+                        $infoCodeGarena = "select pin_guid_parceiro from tb_dist_venda_games_modelo left join tb_dist_venda_games_modelo_pins on vgmp_vgm_id = vgm_id left join pins on pin_codinterno = vgmp_pin_codinterno where vgm_vg_id = $1";
                     }else{
-                            throw new Exception("FALHA AO INSERIR NOVO ESTORNO / CHARGEBACK. Query: $sql\n");
+                        $infoSale = "select vg_data_inclusao,vg_pagto_tipo,ug_nome,ug_cpf from tb_venda_games inner join usuarios_games on vg_ug_id = ug_id where vg_id = $1";
+                        $infoCodeGarena = "select pin_guid_parceiro from tb_venda_games_modelo left join tb_venda_games_modelo_pins on vgmp_vgm_id = vgm_id left join pins on pin_codinterno = vgmp_pin_codinterno where vgm_vg_id = $1";
                     }
-                
-            }//end if(count($arrayCampos) > 0) 
-            
+                    $dataCodeExec = SQLexecuteQueryParams($infoCodeGarena, [$lineRow["vg_id"]]);
+                    while($row = pg_fetch_array($dataCodeExec)){
+                        if($row["pin_guid_parceiro"] != "" && $row["pin_guid_parceiro"] != null){
+                            $codesGarena[] = $row["pin_guid_parceiro"];
+                        }
+                    }
+                    $dataSaleExec = SQLexecuteQueryParams($infoSale, [$lineRow["vg_id"]]);
+                    $dataSale = pg_fetch_array($dataSaleExec);
+                    $EstornoChargeBack = new EstornoChargeBackVO($lineRow);
+                    $arrayTemp = Util::object_to_array($EstornoChargeBack->dados);
+                    unset($EstornoChargeBack);
+                    $arrayTemp["vg_data_inclusao"] = $dataSale["vg_data_inclusao"];
+                    $arrayTemp["vg_pagto_tipo"] = $dataSale["vg_pagto_tipo"];
+                    $arrayTemp["ug_cpf"] = $dataSale["ug_cpf"];
+                    $arrayTemp["cod_garena"] = $codesGarena;
+                    $arrayTemp["usuarioNome"] = ($lineRow["ec_tipo_usuario"] == "L")? $dataSale["ug_responsavel"]: $dataSale["ug_nome"];
+                    $this->EstornoChargeBacks[] = $arrayTemp;
+                }
+                return $this->EstornoChargeBacks;
+            }
         } catch (Exception $ex) {
             $this->erros[] = $ex->getMessage();
             return false;
         }
-        
+    } //end function get
+    public function insert (EstornoChargeBackVO $EstornoChargeBack, ?EstornoDadosBancariosVO $EstornoDadosBancarios = null){
+        try {
+            $arrayCampos = array();
+            foreach ($EstornoChargeBack->dados as $key => $value) {
+                if($value != "" && $EstornoChargeBack->isCampoTabela($key)) $arrayCampos[$key] = $value;
+            }
+            if(count($arrayCampos) > 0) {
+                $retorno = $this->insertRow('estorno_chargeback', $arrayCampos, " RETURNING Currval('estorno_chargeback_ec_id_seq')");
+                if($retorno) {
+                    if(!($EstornoDadosBancarios instanceof EstornoDadosBancariosVO)) throw new Exception("FALHA AO INSERIR NOVO ESTORNO / CHARGEBACK.");
+                    $arrayCampos = array();
+                    foreach ($EstornoDadosBancarios->dados as $key => $value) {
+                        if($value != "" && $EstornoDadosBancarios->isCampoTabela($key)) $arrayCampos[$key] = $value;
+                    }
+                    if(count($arrayCampos) > 0) {
+                        $fetch = pg_fetch_row($retorno);
+                        $arrayCampos['ec_id'] = $fetch[0]; 
+                        $retornoDadosBancarios = $this->insertRow('estorno_dados_bancarios', $arrayCampos);
+                        if($retornoDadosBancarios) return true;
+                        throw new Exception("FALHA AO INSERIR DADOS BANCARIOS DO NOVO ESTORNO / CHARGEBACK.
+");
+                    }
+                    return true;
+                }
+                throw new Exception("FALHA AO INSERIR NOVO ESTORNO / CHARGEBACK.
+");
+            }
+        } catch (Exception $ex) {
+            $this->erros[] = $ex->getMessage();
+            return false;
+        }
     } //end function insert
-    
     public function update (EstornoChargeBackVO $EstornoChargeBack, $ec_id, ?EstornoDadosBancariosVO $EstornoDadosBancarios = null){
         try {
             if(!is_null($ec_id)) {
-                    
-                    $arrayTemp = $EstornoChargeBack->dados;
-                    $arrayCampos = array();
-                    $arrayFormatoValores = array();
-                    foreach ($arrayTemp as $key => $value) {
-                            if($EstornoChargeBack->isCampoTabela($key))  {
-                                    if($key  != 'ec_id') {
-                                            $arrayCampos[$key] = $value;
-                                            if(is_string($value) && substr_count($value, '/') ==  2) {
-                                                    $arrayFormatoValores[$key] = "to_date('%s','DD/MM/YYYY')";
-                                            }//end if(substr_count($value, '/') ==  2)
-                                            elseif($value == ""){
-                                                    $arrayFormatoValores[$key] = "%s";
-                                                    $arrayCampos[$key] = 'NULL';
-                                            }//end elseif($value == "")
-                                            else {
-                                                    $arrayFormatoValores[$key] = "'%s'";
-                                            }//end else if(substr_count($value, '/') ==  2)
-                                    }//end if($key  != 'ec_id')
-                            }//end if(!is_null($value))
-                    }//end foreach
-                    if(count($arrayCampos) > 0) {
-
-                            $query = "UPDATE estorno_chargeback SET ";
-                            $sets = false;
-                            foreach ($arrayCampos as $key => $value) {
-                                if($key != 'ec_id') {
-                                    $query .= ($sets?', ':'').$key.' = ' .$arrayFormatoValores[$key] .' ';
-                                    $sets = true;
-                                }//end if(key($arrayCampos) != 'ec_id')
-                            }// end for
-                            $query .= " WHERE ec_id = ".$ec_id.";";
-                            $sql = vsprintf($query, $arrayCampos);
-                            $retorno = SQLexecuteQuery($sql);
-                            if($retorno) {
-								if(!($EstornoDadosBancarios instanceof EstornoDadosBancariosVO)) {
-									return true;
-								}
-                                //Tratando e atualizando dados bancários
-                                $arrayTemp = $EstornoDadosBancarios->dados;
-                                $arrayCampos = array();
-                                $arrayFormatoValores = array();
-                                $arrayTesteDelete = array();
-                                foreach ($arrayTemp as $key => $value) {
-                                        if($EstornoDadosBancarios->isCampoTabela($key)) {
-                                                if($key  != 'edb_id') {
-                                                        $arrayCampos[$key] = $value;
-                                                        if(is_string($value) && substr_count($value, '/') ==  2) {
-                                                                $arrayFormatoValores[$key] = "to_date('%s','DD/MM/YYYY')";
-                                                        }//end if(substr_count($value, '/') ==  2)
-                                                        elseif($value == ""){
-                                                                $arrayFormatoValores[$key] = "%s";
-                                                                $arrayCampos[$key] = 'NULL';
-                                                                $arrayTesteDelete[$key] = $value;
-                                                        }//end elseif($value == "")
-                                                        else {
-                                                                $arrayFormatoValores[$key] = "'%s'";
-                                                        }//end else if(substr_count($value, '/') ==  2)
-                                                }//end if($key  != 'edb_id')
-                                        }//end if($EstornoDadosBancarios->isCampoTabela($key))
-                                }//end foreach
-                                
-                                $sql = "SELECT edb_id FROM estorno_dados_bancarios WHERE ec_id = ".$ec_id.";";
-                                $retornoExiste = SQLexecuteQuery($sql);
-                                if($retornoExiste && pg_num_rows($retornoExiste) >= 1) {
-                                   // echo "<pre>arrayTesteDelete".print_r($arrayTesteDelete,true)."arrayCampos".print_r($arrayCampos,true)."</pre>";
-                                        if(count($arrayTesteDelete) == count($arrayCampos)) { 
-                                                //echo "DELETAR";
-                                                $sql = "DELETE FROM estorno_dados_bancarios WHERE ec_id = ".$ec_id.";";
-                                                //echo $sql;
-                                                $retornoDadosBancarios = SQLexecuteQuery($sql);
-                                                if(pg_affected_rows($retornoDadosBancarios) > 0) {
-                                                        return true;
-                                                }else{
-                                                        throw new Exception("FALHA AO ATUALIZAR USANDO DELETE DADOS BANCÁRIOS DO NOVO ESTORNO / CHARGEBACK. Query: $sql\n");
-                                                }  
-
-                                        }//end if(count($arrayTesteDelete) == count($arrayCampos))
-                                        else { 
-                                                //echo "UPDATE";
-                                                $query = "UPDATE estorno_dados_bancarios SET ";
-                                                $sets = false;
-                                                foreach ($arrayCampos as $key => $value) {
-                                                    if($key != 'edb_id') { 
-                                                        $query .= ($sets?', ':'').$key.' = ' .$arrayFormatoValores[$key] .' ';
-                                                        $sets = true;
-                                                    }//end if(key($arrayCampos) != 'ec_id')
-                                                }// end for
-                                                $query .= " WHERE ec_id = ".$ec_id.";";
-                                                $sql = vsprintf($query, $arrayCampos);
-                                                //echo $sql;
-                                                $retornoDadosBancarios = SQLexecuteQuery($sql);
-                                                if($retornoDadosBancarios) {
-                                                        return true;
-                                                }else{
-                                                        throw new Exception("FALHA AO ATUALIZAR DADOS BANCÁRIOS DO NOVO ESTORNO / CHARGEBACK. Query: $sql\n");
-                                                }                             
-                                        }//end else do if(count($arrayTesteDelete) == count($arrayCampos))
-                                }//end if($retornoExiste && pg_num_rows($retornoExiste) >= 1)
-                                else {
-                                        //echo "INSERT";
-                                        $arrayCampos['ec_id'] = $ec_id; 
-                                        $arrayFormatoValores[] = "'%s'";
-                                        $query = "INSERT INTO estorno_dados_bancarios ";
-                                        $query .= '(' . implode(', ', array_keys($arrayCampos)).')';
-                                        $query .= ' VALUES (' . implode(', ', $arrayFormatoValores).');';
-                                        $sql = vsprintf($query, $arrayCampos);
-                                        //echo $sql;
-                                        $retornoDadosBancarios = SQLexecuteQuery($sql);
-                                        if($retornoDadosBancarios) {
-                                                return true;
-                                        }else{
-                                                throw new Exception("FALHA AO ATUALIZAR USANDO INSERT DADOS BANCÁRIOS DO NOVO ESTORNO / CHARGEBACK. Query: $sql\n");
-                                        }            
-                                }//end else do if($retornoExiste && pg_num_rows($retornoExiste) >= 1)
-
-                            }else{
-                                $this->erros[] = "ERRO AO ATUALIZAR ESTORNO / CHARGEBACK. Query: $sql \n ";
+                $arrayCampos = array();
+                foreach ($EstornoChargeBack->dados as $key => $value) {
+                    if($EstornoChargeBack->isCampoTabela($key) && $key != 'ec_id') $arrayCampos[$key] = $value;
+                }
+                if(count($arrayCampos) > 0) {
+                    $retorno = $this->updateRow('estorno_chargeback', $arrayCampos, 'ec_id', $ec_id);
+                    if($retorno) {
+                        if(!($EstornoDadosBancarios instanceof EstornoDadosBancariosVO)) return true;
+                        $arrayCampos = array();
+                        $arrayTesteDelete = array();
+                        foreach ($EstornoDadosBancarios->dados as $key => $value) {
+                            if($EstornoDadosBancarios->isCampoTabela($key) && $key != 'edb_id') {
+                                $arrayCampos[$key] = $value;
+                                if($value == "") $arrayTesteDelete[$key] = $value;
                             }
-                            
-                    }//end if(count($arrayCampos) > 0) 
-                    
-            }//end if(!is_null($ec_id)) 
-            
+                        }
+                        $retornoExiste = SQLexecuteQueryParams("SELECT edb_id FROM estorno_dados_bancarios WHERE ec_id = $1;", [$ec_id]);
+                        if($retornoExiste && pg_num_rows($retornoExiste) >= 1) {
+                            if(count($arrayTesteDelete) == count($arrayCampos)) { 
+                                $retornoDadosBancarios = SQLexecuteQueryParams("DELETE FROM estorno_dados_bancarios WHERE ec_id = $1;", [$ec_id]);
+                                if(pg_affected_rows($retornoDadosBancarios) > 0) return true;
+                                throw new Exception("FALHA AO ATUALIZAR USANDO DELETE DADOS BANCARIOS DO NOVO ESTORNO / CHARGEBACK.
+");
+                            }
+                            $retornoDadosBancarios = $this->updateRow('estorno_dados_bancarios', $arrayCampos, 'ec_id', $ec_id);
+                            if($retornoDadosBancarios) return true;
+                            throw new Exception("FALHA AO ATUALIZAR DADOS BANCARIOS DO NOVO ESTORNO / CHARGEBACK.
+");
+                        }
+                        $arrayCampos['ec_id'] = $ec_id; 
+                        $retornoDadosBancarios = $this->insertRow('estorno_dados_bancarios', $arrayCampos);
+                        if($retornoDadosBancarios) return true;
+                        throw new Exception("FALHA AO ATUALIZAR USANDO INSERT DADOS BANCARIOS DO NOVO ESTORNO / CHARGEBACK.
+");
+                    }
+                    $this->erros[] = "ERRO AO ATUALIZAR ESTORNO / CHARGEBACK.
+ ";
+                }
+            }
         } catch (Exception $ex) {
             $this->erros[] = $ex->getMessage();
             return false;
         }
-        
     } //end function update
     
     

@@ -78,18 +78,18 @@ class ConciliacaoBancaria {
     public function alreadyImportado($tipo_pagamento, $data){
         // Verificar se ja foi importado
         $sql = "SELECT dep_codigo FROM depositos_pendentes
-                    WHERE dep_banco='{$tipo_pagamento}'
-                    AND dep_data='{$data}';";
+                    WHERE dep_banco = $1
+                    AND dep_data = $2;";
 
         //echo "$sql\n\n";
 
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, [$tipo_pagamento, $data]);
         return ((($rs) ? pg_num_rows($rs) : 0) > 0);
     }
 
     public function getDateById($id) {
-        $sql = "SELECT rfcb_data_registro FROM relfin_conciliacao_bancaria WHERE rfcb_id = {$id}";
-        $rs = SQLexecuteQuery($sql);
+        $sql = "SELECT rfcb_data_registro FROM relfin_conciliacao_bancaria WHERE rfcb_id = $1";
+        $rs = SQLexecuteQueryParams($sql, [$id]);
         $fetched = pg_fetch_assoc($rs);
         if ( array_key_exists('rfcb_data_registro', $fetched) ) {
             return $fetched['rfcb_data_registro'];
@@ -124,10 +124,10 @@ class ConciliacaoBancaria {
 
         $sql = "SELECT * FROM relfin_conciliacao_bancaria
                 WHERE rfcb_data_registro
-                BETWEEN '{$data_inicio}'::TIMESTAMP
-                AND '{$data} 23:59:59'::TIMESTAMP
-                AND rfcb_tipo_pagamento='{$tipo_pagamento}';";
-        $rs = SQLexecuteQuery($sql);
+                BETWEEN $1::TIMESTAMP
+                AND $2::TIMESTAMP
+                AND rfcb_tipo_pagamento = $3;";
+        $rs = SQLexecuteQueryParams($sql, [$data_inicio, $data . ' 23:59:59', $tipo_pagamento]);
         if ( (($rs) ? pg_num_rows($rs) : 0) > 0 ) {
             while ( $r = pg_fetch_assoc($rs) ) {
                 // Ainda esta no mesmo mes e esta agrupado?
