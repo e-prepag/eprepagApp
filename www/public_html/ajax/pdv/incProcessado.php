@@ -126,8 +126,8 @@ if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuari
                                         <?php //Verificando se já foi impresso
                                         if ($rs_row['vgmp_impressao_qtde'] > 0) {
                                             echo "<span class='pull-left'>Emitido</span> ";
-                                            $sql = "select * from tb_dist_venda_games_produto_email where vgpe_pin_codinterno = " . $rs_row['pin_codinterno'] . ";";
-                                            $rs_forma = SQLexecuteQuery($sql);
+                                            $sql = "select * from tb_dist_venda_games_produto_email where vgpe_pin_codinterno = $1;";
+                                            $rs_forma = SQLexecuteQueryParams($sql, array($rs_row['pin_codinterno']));
                                             if ($rs_forma) {
                                                 $total_email = 0;
                                                 $lista_emails = "";
