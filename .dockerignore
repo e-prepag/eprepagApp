@@ -1,0 +1,40 @@
+# 1. Bloquear TUDO por padrão para evitar arquivos com nomes estranhos (UTF-8 error)
+**
+
+# 2. Permitir apenas arquivos de configuração do Docker e infra
+!Dockerfile_php8
+!compose_php8.yml
+!docker-config/
+!docker-config/**
+!assinador-dotnet/
+!assinador-dotnet/**
+!cron_php8/
+!cron_php8/**
+!compose_cron_php8.yml
+!.dockerignore
+
+# 3. Permitir o código fonte (apenas estrutura básica)
+!www/
+!www/**
+
+# 4. Bloquear EXPLICITAMENTE pastas que contêm arquivos legados com nomes problemáticos
+# (Essas pastas serão montadas via volume no compose_php8.yml)
+www/public_html/imagens/**
+www/public_html/includes/tablesorter/docs/**
+www/arquivos_gerados/**
+www/tmp/**
+www/log/**
+www/vendor/**
+www/backoffice_old/**
+
+# 5. Bloquear arquivos de lixo e binários em qualquer lugar
+**/*.zip
+**/*.rar
+**/*.7z
+**/*.bak
+**/*.old
+**/*.log
+**/*.sql
+**/.git/**
+**/.vscode/**
+**/.codex/**
