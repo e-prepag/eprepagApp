@@ -55,6 +55,9 @@ $usuario_id = $controller->usuarios->getId();
 
 $varsel .= "";
 
+$sql_params = array((int)$usuario_id);
+$usuario_id_idx = "$" . count($sql_params);
+
 //Validacao
 //------------------------------------------------------------------------------------------------------------------
 $msg = "";
@@ -83,7 +86,7 @@ if($msg == "" && $msgFatal == ""){
      }
      $sql .= " 
             where 
-                c.cor_ug_id = ".$usuario_id;
+                c.cor_ug_id = $usuario_id_idx";
     
     if(isset($_POST['tf_v_data_inclusao_ini']) && isset($_POST['tf_v_data_inclusao_fim']))
     {
@@ -110,7 +113,11 @@ if($msg == "" && $msgFatal == ""){
     
     
     if(isset($_GET['nao-emitido']) && $_GET['nao-emitido'] == 1) {
-        $sql .= " and (bbc_status = ".$GLOBALS['CORTE_BOLETO_STATUS']['ABERTO']." OR bbc_status = ".$GLOBALS['CORTE_BOLETO_STATUS']['ENVIADO'].") ";
+        $sql_params[] = (int)$GLOBALS['CORTE_BOLETO_STATUS']['ABERTO'];
+        $aberto_idx = "$" . count($sql_params);
+        $sql_params[] = (int)$GLOBALS['CORTE_BOLETO_STATUS']['ENVIADO'];
+        $enviado_idx = "$" . count($sql_params);
+        $sql .= " and (bbc_status = $aberto_idx OR bbc_status = $enviado_idx) ";
     }
     else {
         // Validação e sanitização das datas
@@ -126,32 +133,29 @@ if($msg == "" && $msgFatal == ""){
         }
         
         if($data_inicio && $data_fim) {
-            $sql .= " and cor_periodo_ini >= $1 and cor_periodo_fim <= $2";
-            $sql_params = array($data_inicio, $data_fim);
+            $sql_params[] = $data_inicio;
+            $data_inicio_idx = "$" . count($sql_params);
+            $sql_params[] = $data_fim;
+            $data_fim_idx = "$" . count($sql_params);
+            $sql .= " and cor_periodo_ini >= $data_inicio_idx and cor_periodo_fim <= $data_fim_idx";
         }
     }
         
     
-    $sql .=" order by 
+    $sql .= " order by 
                 cor_periodo_fim desc, cor_periodo_ini desc";
 
-
-    if(isset($sql_params) && !empty($sql_params)) {
-        $res_count = SQLexecuteQueryParams($sql, $sql_params);
-    } else {
-        $res_count = SQLexecuteQuery($sql);
-    }
+    $res_count = SQLexecuteQueryParams($sql, $sql_params);
     $total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
-    $sql .= " limit ".$max; 
-    $sql .= " offset ".$inicial;
-    
+    $sql_params[] = (int)$max;
+    $max_idx = "$" . count($sql_params);
+    $sql_params[] = (int)$inicial;
+    $inicial_idx = "$" . count($sql_params);
+    $sql .= " limit $max_idx";
+    $sql .= " offset $inicial_idx";
 
-    if(isset($sql_params) && !empty($sql_params)) {
-        $rs_cortes = SQLexecuteQueryParams($sql, $sql_params);
-    } else {
-        $rs_cortes = SQLexecuteQuery($sql);
-    }
+    $rs_cortes = SQLexecuteQueryParams($sql, $sql_params);
     $iptHidden['tf_v_data_inclusao_ini'] = $_POST['tf_v_data_inclusao_ini'];
     $iptHidden['tf_v_data_inclusao_fim'] = $_POST['tf_v_data_inclusao_fim'];
 }	

@@ -42,8 +42,8 @@ if(!isset($_SESSION['dist_usuarioGamesOperador_ser'])){
 	$usuario = $pdvInfo->ugo_ug_id; //    ugo_id
 }
 
-$sql = 'select ug_vip, ug_ativo from dist_usuarios_games where ug_id = '.$usuario;
-$rs_vip = SQLexecuteQuery($sql);
+	$sql = 'select ug_vip, ug_ativo from dist_usuarios_games where ug_id = $1';
+$rs_vip = SQLexecuteQueryParams($sql, array((int)$usuario));
 $retornoVip = pg_fetch_assoc($rs_vip);
 $showModal = false;
 if ($retornoVip["ug_ativo"] == "2") {
@@ -168,9 +168,9 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
                                 and opr_data_inicio_operacoes <= NOW()
                                 and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
                                 and opr_status != '0'
-                                and opr_codigo  = ".$modelo['modelo']->getCodOperador();
+								and opr_codigo = $1";
                         
-                        $rs_verifica = SQLexecuteQuery($sql);
+							$rs_verifica = SQLexecuteQueryParams($sql, array((int)$modelo['modelo']->getCodOperador()));
                         
                         if($rs_verifica){
                             if((($rs_verifica) ? pg_num_rows($rs_verifica) : 0) > 0){
@@ -260,9 +260,9 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
                                         and opr_data_inicio_operacoes <= NOW()
                                         and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
                                         and opr_status != '0'
-                                        and opr_codigo  = ".$prod["produto"]["ogp_opr_codigo"];
+											and opr_codigo = $1";
 
-                                    $rs_verifica = SQLexecuteQuery($sql);
+										$rs_verifica = SQLexecuteQueryParams($sql, array((int)$prod["produto"]["ogp_opr_codigo"]));
 
                                     if($rs_verifica){
                                         if((($rs_verifica) ? pg_num_rows($rs_verifica) : 0) > 0){
@@ -623,8 +623,8 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 			
 			$cpf_djx = implode('', $matches[0]);
 			
-			$sql_djx = "SELECT * FROM pep WHERE cpf = $cpf_djx and enviado_email = 0; ";
-			$rs_djx = SQLexecuteQuery($sql_djx);
+				$sql_djx = "SELECT * FROM pep WHERE cpf = $1 and enviado_email = 0; ";
+				$rs_djx = SQLexecuteQueryParams($sql_djx, array($cpf_djx));
 			$dadosTotais_djx = pg_fetch_all($rs_djx);
 			$count_registers = (($rs_djx) ? pg_num_rows($rs_djx) : 0);
 			
@@ -668,9 +668,9 @@ $_SESSION["token_csrf"] = bin2hex(random_bytes(32));
 									and opr_data_inicio_operacoes <= NOW()
 									and (opr_internacional_alicota = 0.38 or opr_internacional_alicota = ".IOF.")
 									and opr_status != '0'
-									and opr_codigo  = ".$modelo['modelo']->getCodOperador();
+								and opr_codigo = $1";
 							
-							$rs_verifica = SQLexecuteQuery($sql);
+							$rs_verifica = SQLexecuteQueryParams($sql, array((int)$modelo['modelo']->getCodOperador()));
 							
 							if($rs_verifica){
 								if((($rs_verifica) ? pg_num_rows($rs_verifica) : 0) > 0){

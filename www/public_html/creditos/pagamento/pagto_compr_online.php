@@ -20,7 +20,7 @@ if (!isset($_SESSION['pagamento.numorder'])) {
 //Recupera usuario
 if (isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser'])) {
     $dist_usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
-    $dist_usuarioId = $dist_usuarioGames->getId();
+    $dist_usuarioId = (int)$dist_usuarioGames->getId();
 }
 
 $rs_venda_row = pg_fetch_array($rs_venda);
@@ -28,9 +28,8 @@ $pagto_tipo = $rs_venda_row['vg_pagto_tipo'];
 $iforma = $pagto_tipo; //$_SESSION['pagamento.pagto'];
 $ultimo_status = $rs_venda_row['vg_ultimo_status'];
 
-$sql = "select * from tb_pag_compras " .
-    "where idvenda = " . $venda_id . " and idcliente=" . $usuarioId;
-$rs_pagto = SQLexecuteQuery($sql);
+$sql = "select * from tb_pag_compras where idvenda = $1 and idcliente = $2";
+$rs_pagto = SQLexecuteQueryParams($sql, array((int)$venda_id, (int)$usuarioId));
 if (!$rs_pagto || pg_num_rows($rs_pagto) == 0) {
     $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
 } else {
@@ -65,8 +64,8 @@ if (($pagto_tipo == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) ||
 } else if ($pagto_tipo == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC) { //$FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']
 
     // Recupera Itau ID
-    $sql = "select * from tb_pag_compras where idvenda = " . $venda_id . " and idcliente=" . $usuarioId;
-    $rs_pagto_id = SQLexecuteQuery($sql);
+    $sql = "select * from tb_pag_compras where idvenda = $1 and idcliente = $2";
+    $rs_pagto_id = SQLexecuteQueryParams($sql, array((int)$venda_id, (int)$usuarioId));
     if (!$rs_pagto_id || pg_num_rows($rs_pagto_id) == 0) {
         $msg = "Não foi encontrado o pagamento para a venda " . $venda_id . ".\n";
     } else {

@@ -12,15 +12,14 @@ validaSessao();
 	$varsel .= "&tf_v_data_inclusao_ini=$tf_v_data_inclusao_ini&tf_v_data_inclusao_fim=$tf_v_data_inclusao_fim";
 
 	//paginacao
-	$p = $_REQUEST['p'];
-	if(!$p) $p = 1;
+		$p = (isset($_REQUEST['p']) && is_numeric($_REQUEST['p'])) ? (int)$_REQUEST['p'] : 1;
 	$registros = 20;
 	$registros_total = 0;
 
 	//Recupera usuario
 	if(isset($_SESSION['dist_usuarioGames_ser']) && !is_null($_SESSION['dist_usuarioGames_ser'])){
 		$usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
-		$usuarioId = $usuarioGames->getId();
+			$usuarioId = (int)$usuarioGames->getId();
 	}
 
 	//Validacoes
@@ -28,6 +27,9 @@ validaSessao();
 
 	//Recupera as vendas
 	if($msg == ""){
+
+			$sql_params = array((int)$usuarioId);
+			$usuario_idx = '$' . count($sql_params);
 
 		$sql  = "
 				select 
@@ -55,7 +57,7 @@ validaSessao();
 					sum(vgm.vgm_valor * vgm.vgm_qtde - vgm.vgm_valor * vgm.vgm_qtde * vgm_perc_desconto / 100) as repasse
 				from tb_dist_venda_games vg 
 					inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-				where vg.vg_ug_id=" . $usuarioId;
+				where vg.vg_ug_id=$usuario_idx";
 		if($tf_v_codigo && is_numeric($tf_v_codigo)) $sql .= " and vg.vg_id=" . $tf_v_codigo;
 		if($tf_v_data_inclusao_ini && $tf_v_data_inclusao_fim) 
 			if(verifica_data($tf_v_data_inclusao_ini) != 0 && verifica_data($tf_v_data_inclusao_fim) != 0)
@@ -75,7 +77,7 @@ validaSessao();
 					1 as qtde_produtos, 
 					(\"vb2c_precoServico\" * vb2c_comissao_para_repasse / 100) as repasse
 				from tb_vendas_b2c  
-				where vb2c_ug_id_lan =" . $usuarioId;
+				where vb2c_ug_id_lan =$usuario_idx";
 		if($tf_v_codigo && is_numeric($tf_v_codigo)) $sql .= " and vb2c_vg_id=" . $tf_v_codigo;
 		if($tf_v_data_inclusao_ini && $tf_v_data_inclusao_fim) 
 			if(verifica_data($tf_v_data_inclusao_ini) != 0 && verifica_data($tf_v_data_inclusao_fim) != 0)
@@ -95,7 +97,7 @@ validaSessao();
 					1 as qtde_produtos, 
 					(rprs_valor * rprs_comissao_para_repasse / 100) as repasse
 				from tb_recarga_pedidos_rede_sim  
-				where rprs_ug_id =" . $usuarioId;
+				where rprs_ug_id =$usuario_idx";
 		if($tf_v_codigo && is_numeric($tf_v_codigo)) $sql .= " and rprs_vg_id=" . $tf_v_codigo;
 		if($tf_v_data_inclusao_ini && $tf_v_data_inclusao_fim) 
 			if(verifica_data($tf_v_data_inclusao_ini) != 0 && verifica_data($tf_v_data_inclusao_fim) != 0)
@@ -104,16 +106,16 @@ validaSessao();
                                     and rprs_data_recarga is not null
 				)
 				) as vendas ";
-		$rs_total = SQLexecuteQuery($sql);
+		$rs_total = SQLexecuteQueryParams($sql, $sql_params);
 		if($rs_total) $registros_total = (($rs_total) ? pg_num_rows($rs_total) : 0);
 		$sql .= " order by vg_data_inclusao desc " .
-				" offset " . ($p - 1) * $registros . " limit " . $registros;
+				" offset " . ((int)(($p - 1) * $registros)) . " limit " . (int)$registros;
 		//echo $sql."<br>";
 		
 //if($usuarioGames->getLogin()=="REINALDOLH") {
 //	echo str_replace("\n", "<br>\n", $sql)."<br>";
 //}
-		$rs_vendas = SQLexecuteQuery($sql);
+		$rs_vendas = SQLexecuteQueryParams($sql, $sql_params);
 		if(!$rs_vendas || pg_num_rows($rs_vendas) == 0) $msg = "Nenhuma venda encontrada.\n";
 
 	}
@@ -180,9 +182,9 @@ validaSessao();
 
 if(bRelatorioVendasComOperadores($usuarioGames->getLogin()) && ($rs_vendas_row['vg_pagto_tipo'] != "B2C")) {
 
-				$sql_operador = "select ugo_id, ugo_login from dist_usuarios_games_operador_log ugol inner join dist_usuarios_games_operador ugo on ugol.ugol_ugo_id = ugo.ugo_id where ugol.ugol_vg_id = ".$rs_vendas_row['vg_id']."";
+					$sql_operador = "select ugo_id, ugo_login from dist_usuarios_games_operador_log ugol inner join dist_usuarios_games_operador ugo on ugol.ugol_ugo_id = ugo.ugo_id where ugol.ugol_vg_id = $1";
 //echo "$sql_operador<br>\n";
-				$rs_operador = SQLexecuteQuery($sql_operador);
+					$rs_operador = SQLexecuteQueryParams($sql_operador, array((int)$rs_vendas_row['vg_id']));
 
 				if($rs_operador && pg_num_rows($rs_operador) > 0) {
 					$pg_operador = pg_fetch_array($rs_operador);

@@ -41,20 +41,29 @@ if($tf_version=="undefined") $tf_version = "";
 	$rs_platforms = SQLexecuteQuery($sql);
 
 	//Browser - Browsers
+	$params_browsers = array();
 	$sql  = "select browser_browser, count(*) as n from tb_CanalAcesso where not browser_browser is null ";
 	if($tf_platform) {
-		$sql .= " and strpos(upper(browser_platform),'".str_replace("'","''",strtoupper($tf_platform))."')>0 ";	
+		$params_browsers[] = strtoupper($tf_platform);
+		$sql .= " and strpos(upper(browser_platform),$" . count($params_browsers) . ")>0 ";
 	}
 	$sql .= "group by browser_browser order by browser_browser";	// "--, min(data) as data_min, max(data) as data_max "
-	$rs_browsers = SQLexecuteQuery($sql);
+	$rs_browsers = $params_browsers ? SQLexecuteQueryParams($sql, $params_browsers) : SQLexecuteQuery($sql);
 
 	//Browser - Versoes
+	$params_versions = array();
 	$sql  = "select browser_browser, browser_version, count(*) as n from tb_CanalAcesso where 1=1 ";
-	if($tf_platform) { $sql  .= " and strpos(upper(browser_platform),'".str_replace("'","''",strtoupper($tf_platform))."')>0 ";	 }
-	if($tf_browser) { $sql  .= " and strpos(upper(browser_browser),'".str_replace("'","''",strtoupper($tf_browser))."')>0 ";	 }
+	if($tf_platform) {
+		$params_versions[] = strtoupper($tf_platform);
+		$sql .= " and strpos(upper(browser_platform),$" . count($params_versions) . ")>0 ";
+	}
+	if($tf_browser) {
+		$params_versions[] = strtoupper($tf_browser);
+		$sql .= " and strpos(upper(browser_browser),$" . count($params_versions) . ")>0 ";
+	}
 //	if($tf_version) { $sql  .= " and strpos(upper(browser_version),'".str_replace("'","''",strtoupper($tf_version))."')>0 ";	 }
 	$sql  .= " group by browser_browser, browser_version order by browser_browser, browser_version";	
-	$rs_versions = SQLexecuteQuery($sql);
+	$rs_versions = $params_versions ? SQLexecuteQueryParams($sql, $params_versions) : SQLexecuteQuery($sql);
 
 
 ?>

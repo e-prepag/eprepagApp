@@ -16,8 +16,12 @@ fputcsv($output, [
     'Valor de Venda ao Consumidor'
 ]);
 
-$sql = base64_decode($_POST['sql']);
-$res = SQLexecuteQueryParams($sql, array());
+$sql = base64_decode($_POST['sql'] ?? "", true);
+if ($sql === false || !preg_match('/^\s*select\b/i', $sql) || preg_match('/;|--|\/\*|\b(insert|update|delete|drop|alter|truncate|create|copy|grant|revoke)\b/i', $sql)) {
+    http_response_code(400);
+    exit;
+}
+$res = SQLexecuteQuery($sql);
 
 while ($row = pg_fetch_assoc($res)) {
     fputcsv($output, [

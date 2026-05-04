@@ -12,7 +12,7 @@ validaSessao();
 
 //login
 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
-$usuario_id = $usuarioGames->getId();
+$usuario_id = (int)$usuarioGames->getId();
 
 //Validacao
 //------------------------------------------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ if($msg == "" && $msgFatal == "")
 //Valida codigo do boleto
 if($msg == ""){
         if(!$bbc_boleto_codigo || trim($bbc_boleto_codigo) == "" || !is_numeric($bbc_boleto_codigo)) $msg = "Código do boleto inválido.\n";
+	else $bbc_boleto_codigo = (int)$bbc_boleto_codigo;
 }
 
 //Busca dados do boleto

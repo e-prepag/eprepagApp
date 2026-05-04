@@ -10,6 +10,7 @@ validaSessao();
 
 	if(!$venda_id) $msg = "Código da venda não fornecido.\n";
 	elseif(!is_numeric($venda_id)) $msg = "Código da venda inválido.\n";
+	else $venda_id = (int)$venda_id;
 
 	//Processa acoes
 	//----------------------------------------------------------------------------------------------------------

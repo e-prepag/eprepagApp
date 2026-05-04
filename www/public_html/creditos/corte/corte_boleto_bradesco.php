@@ -13,7 +13,7 @@ validaSessao();
 
 //login
 $usuarioGames = unserialize($_SESSION['dist_usuarioGames_ser']);
-$usuario_id = $usuarioGames->getId();
+$usuario_id = (int)$usuarioGames->getId();
 
 //Validacao
 //------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,7 @@ if($msg == "" && $msgFatal == "")
 //Valida codigo do boleto
 if($msg == ""){
         if(!$bbc_boleto_codigo || trim($bbc_boleto_codigo) == "" || !is_numeric($bbc_boleto_codigo)) $msg = "Código do boleto inválido.\n";
+	else $bbc_boleto_codigo = (int)$bbc_boleto_codigo;
 }
 
 
@@ -134,9 +135,8 @@ if($msg == ""){
 
 //loga acesso
 if($msg == ""){
-        $sql = "insert into boleto_bancario_cortes_acessos(bbca_data_inclusao, bbca_ip,	bbca_ug_id, bbca_bbc_boleto_codigo) values (";
-        $sql .= "CURRENT_TIMESTAMP,'" . $_SERVER["REMOTE_ADDR"] . "', $usuario_id, $bbc_boleto_codigo)";
-        $ret = SQLexecuteQuery($sql);
+	        $sql = "insert into boleto_bancario_cortes_acessos(bbca_data_inclusao, bbca_ip,	bbca_ug_id, bbca_bbc_boleto_codigo) values (CURRENT_TIMESTAMP, $1, $2, $3)";
+	        $ret = SQLexecuteQueryParams($sql, array($_SERVER["REMOTE_ADDR"], (int)$usuario_id, (int)$bbc_boleto_codigo));
         if(!$ret) $msg = "";
 }
 
