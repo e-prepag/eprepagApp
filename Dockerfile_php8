@@ -64,11 +64,12 @@ RUN docker-php-ext-enable mysqli pgsql pdo_pgsql pdo_mysql gd zip intl opcache b
 # Copiar as dependências instaladas pelo Composer
 COPY --from=builder /app/vendor /www/vendor
 
-# No Estágio Final, o código também é copiado para a imagem (essencial para produção)
-COPY ./www /www/app
+# Removido: COPY ./www /www/app (O código será montado via volume)
 
 # Criar links simbólicos para compatibilidade com caminhos legados
-RUN ln -s /www/vendor /www/app/vendor && \
+# Note: /www/app deve existir para os links funcionarem, mesmo que vazia no build
+RUN mkdir -p /www/app && \
+    ln -s /www/vendor /www/app/vendor && \
     ln -s /www/app/class /www/class && \
     ln -s /www/app/includes /www/includes && \
     ln -s /www/app/api /www/api && \
