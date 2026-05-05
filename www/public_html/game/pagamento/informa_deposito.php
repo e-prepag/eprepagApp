@@ -47,8 +47,8 @@ $arr_venda_modelos = pg_fetch_all($rs_venda_modelos);
 $produto_idade_minima = "";
 foreach ($arr_venda_modelos as $modelo) {
     if (isset($modelo["vgm_ogp_id"])) {
-        $sql = "SELECT ogp_idade_minima FROM tb_operadora_games_produto WHERE ogp_id = " . $modelo["vgm_ogp_id"];
-        $rs_operadora = SQLexecuteQuery($sql);
+        $sql = "SELECT ogp_idade_minima FROM tb_operadora_games_produto WHERE ogp_id = $1";
+        $rs_operadora = SQLexecuteQueryParams($sql, array((int)$modelo["vgm_ogp_id"]));
         $rs_idade_minima = pg_fetch_all($rs_operadora)[0]["ogp_idade_minima"];
         if ($rs_idade_minima > $GLOBALS["IDADE_MINIMA"]) {
             $GLOBALS["IDADE_MINIMA"] = $rs_idade_minima;

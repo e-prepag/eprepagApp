@@ -386,13 +386,13 @@ if($vg_ultimo_status == 1){
                                                      ELSE pin_codigo
                                                 END AS case_serial
                                         from pins
-                                        where pin_codinterno = " . (($vgm_pin_codinternoAr[$i])?$vgm_pin_codinternoAr[$i]:0) . "";
+	                                        where pin_codinterno = $1";
 										
 									if($rs_venda_modelos_row["vgm_opr_codigo"] == 124 ){
 										$garena = true;
 									}
 									
-                                    $rs_pin = SQLexecuteQuery($sql);
+	                                    $rs_pin = SQLexecuteQueryParams($sql, array((int)(($vgm_pin_codinternoAr[$i]) ? $vgm_pin_codinternoAr[$i] : 0)));
                                     if(!$rs_pin || pg_num_rows($rs_pin) == 0) 
                                         $msg = "PIN não encontrado.\n";
                                     else {

@@ -93,12 +93,18 @@ if($FrmEnviar == 1)
     $where_opr = "";
     $where_estabelecimento = "";
     $where_ativo = "";
+	$estat_params = array();
+			$estat_params = array();
 
     if($tf_data_inicial && $tf_data_final) 
     {
             $data_inic = formata_data(trim($tf_data_inicial), 1);
             $data_fim = formata_data(trim($tf_data_final), 1); 
-            $where_data = " and ((vc_data >= '".trim($data_inic)." 00:00:00') and (vc_data <= '".trim($data_fim)." 23:59:59')) "; 
+            $estat_params[] = trim($data_inic) . " 00:00:00";
+				$where_data_ini_idx = "$" . count($estat_params);
+				$estat_params[] = trim($data_fim) . " 23:59:59";
+				$where_data_fim_idx = "$" . count($estat_params);
+				$where_data = " and ((vc_data >= $where_data_ini_idx) and (vc_data <= $where_data_fim_idx)) "; 
     }
 
     if($dd_operadora) 
@@ -132,18 +138,20 @@ if($FrmEnviar == 1)
 
     if($dd_ativo) 
     {
-            $where_ativo = " and (vc_ativo='$dd_ativo') ";
+            $estat_params[] = $dd_ativo;
+				$where_ativo = " and (vc_ativo=$" . count($estat_params) . ") ";
     }
     if($dd_estabelecimento) 
     {
-            $where_estabelecimento = " and (vc_ug_id=$dd_estabelecimento) ";
+            $estat_params[] = (int)$dd_estabelecimento;
+				$where_estabelecimento = " and (vc_ug_id=$" . count($estat_params) . ") ";
     }
 
     $estat  = "select vc.*, ug.ug_id, (CASE WHEN (ug.ug_tipo_cadastro='PJ') THEN upper(ug.ug_nome_fantasia) WHEN (ug.ug_tipo_cadastro='PF') THEN upper(ug.ug_nome)  END) as ug_nome_fantasia, ug.ug_tipo_cadastro, ug.ug_razao_social, (CASE WHEN (ug.ug_tipo_cadastro='PJ') THEN upper(ug.ug_cnpj) WHEN (ug.ug_tipo_cadastro='PF') THEN upper(ug.ug_cpf) END) as ug_cpf_cnpj, ug_tel_ddi, ug_tel_ddd, ug_tel, ug_email from dist_vendas_cartoes_tmp vc left join dist_usuarios_games ug on vc.vc_ug_id = ug.ug_id ";
     if($where_data||$where_valor||$where_opr)
         $estat  .= " where 1=1 ".$where_data." ".$where_valor." ".$where_opr." ".$where_estabelecimento." ".$where_ativo." ";		
 
-    $res_count = pg_query($estat);
+    $res_count = pg_query_params($estat, $estat_params);
     $total_table = (($res_count) ? pg_num_rows($res_count) : 0);
 
     if($ncamp=="vc_data") 
