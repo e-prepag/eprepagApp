@@ -28,16 +28,10 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     opcache \
     bcmath
 
-# Instalar Composer
+# Instalar Composer (opcional para o builder se não for usar, mas mantido para ferramentas)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
-
-# Copiar arquivos do composer primeiro para aproveitar o cache de camadas do Docker
-COPY ./www/composer.json ./www/composer.lock* ./
-
-# Instalar dependências (ignorando scripts para segurança e otimizando autoloader)
-RUN composer install --no-dev --no-scripts --no-interaction --optimize-autoloader
 
 # --- Estágio Final ---
 FROM php:8.4-fpm-alpine
@@ -53,30 +47,13 @@ RUN apk add --no-cache \
     icu-libs \
     oniguruma
 
-# Criar estrutura de diretórios antecipadamente
-RUN mkdir -p /www/vendor /www/app /www/arquivos_gerados /www/tmp
-
 # Copiar extensões do builder
 COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
 COPY --from=builder /usr/local/include/php/ext /usr/local/include/php/ext
 RUN docker-php-ext-enable mysqli pgsql pdo_pgsql pdo_mysql gd zip intl opcache bcmath
 
-# Copiar as dependências instaladas pelo Composer
-COPY --from=builder /app/vendor /www/vendor
-
-# Removido: COPY ./www /www/app (O código será montado via volume)
-
-# Criar links simbólicos para compatibilidade com caminhos legados
-# Note: /www/app deve existir para os links funcionarem, mesmo que vazia no build
-RUN mkdir -p /www/app && \
-    ln -s /www/vendor /www/app/vendor && \
-    ln -s /www/app/class /www/class && \
-    ln -s /www/app/includes /www/includes && \
-    ln -s /www/app/api /www/api && \
-    ln -s /www/app/banco /www/banco && \
-    ln -s /www/app/db /www/db
-
 # Configurações de Hardening do PHP
+
 RUN { \
     echo 'opcache.memory_consumption=128'; \
     echo 'opcache.interned_strings_buffer=8'; \
