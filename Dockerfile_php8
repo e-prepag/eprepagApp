@@ -31,6 +31,11 @@ RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appus
 # Pasta de logs
 RUN mkdir -p /var/log/php && chown appuser:appgroup /var/log/php
 
+# Configurar PHP-FPM para enviar logs para o stderr (Docker Logs)
+RUN sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/g' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;php_admin_value\[error_log\] = \/var\/log\/fpm-php.www.log/php_admin_value\[error_log\] = \/dev\/stderr/g' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;php_admin_flag\[log_errors\] = on/php_admin_flag\[log_errors\] = on/g' /usr/local/etc/php-fpm.d/www.conf
+
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=3s \
