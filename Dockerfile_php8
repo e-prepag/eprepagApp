@@ -1,59 +1,17 @@
-# --- Estágio de Dependências ---
-FROM php:8.4-fpm-alpine AS builder
-
-# Instalar dependências de sistema para compilação
-RUN apk add --no-cache \
-    libzip-dev \
-    libpq-dev \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libxml2-dev \
-    icu-dev \
-    oniguruma-dev \
-    linux-headers \
-    curl \
-    git
-
-# Instalar extensões PHP
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-    mysqli \
-    pgsql \
-    pdo_pgsql \
-    pdo_mysql \
-    gd \
-    zip \
-    intl \
-    opcache \
-    bcmath
-
-# Instalar Composer (opcional para o builder se não for usar, mas mantido para ferramentas)
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /app
-
-# --- Estágio Final ---
 FROM php:8.4-fpm-alpine
 
-# Instalar apenas libs runtime necessárias
+# Instalar dependências (Build e Runtime juntas para simplificação de estágio único)
 RUN apk add --no-cache \
-    libzip \
-    libpq \
-    libpng \
-    libjpeg-turbo \
-    freetype \
-    libxml2 \
-    icu-libs \
-    oniguruma
+    libzip-dev libpq-dev libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev icu-dev oniguruma-dev \
+    libzip libpq libpng libjpeg-turbo freetype libxml2 icu-libs oniguruma \
+    linux-headers curl git
 
-# Copiar extensões do builder
-COPY --from=builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
-COPY --from=builder /usr/local/include/php/ext /usr/local/include/php/ext
-RUN docker-php-ext-enable mysqli pgsql pdo_pgsql pdo_mysql gd zip intl opcache bcmath
+# Instalar e habilitar extensões PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+    mysqli pgsql pdo_pgsql pdo_mysql gd zip intl opcache bcmath
 
 # Configurações de Hardening do PHP
-
 RUN { \
     echo 'opcache.memory_consumption=128'; \
     echo 'opcache.interned_strings_buffer=8'; \
@@ -67,13 +25,11 @@ RUN { \
     echo 'disable_functions=system,exec,shell_exec,passthru,proc_open,popen,curl_multi_exec,parse_ini_file,show_source,symlink,link,pcntl_exec,pcntl_fork,pcntl_waitpid,pcntl_alarm,pcntl_signal,proc_get_status,apache_setenv,enable_dl,chown,chgrp,chmod,highlight_file,php_strip_whitespace,filegroup,fileowner,ini_restore,ini_set'; \
     } > /usr/local/etc/php/conf.d/security-hardened.ini
 
-# Criar usuário não-root para execução
+# Criar usuário para execução
 RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
 
-WORKDIR /www/app
-
-# Garantir permissões corretas
-RUN chown -R appuser:appgroup /www
+# Pasta de logs
+RUN mkdir -p /var/log/php && chown appuser:appgroup /var/log/php
 
 USER appuser
 
