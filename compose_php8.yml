@@ -9,7 +9,8 @@ services:
     container_name: eprepag-app-php8
     restart: unless-stopped
     volumes:
-      - ./www:/www:ro # Unificado: Tudo em /www para bater com o código legado
+      - ./www:/www:ro
+      - ./www/.env:/www/app/.env:ro # Mapeia o .env para o caminho fixo que o código procura
       - ./www/arquivos_gerados:/www/arquivos_gerados:rw
       - ./www/tmp:/www/tmp:rw
     networks:
