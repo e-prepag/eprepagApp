@@ -10,10 +10,11 @@ services:
     restart: unless-stopped
     volumes:
       - ./www:/www:ro
+      - ./www/.env:/www/app/.env:ro
       - ./www/arquivos_gerados:/www/arquivos_gerados:rw
       - ./www/tmp:/www/tmp:rw
     networks:
-      - backend_net
+      - eprepag_net
     env_file:
       - ./www/.env
     security_opt:
@@ -38,8 +39,7 @@ services:
       - ./docker-config/nginx/nginx_php8.conf:/etc/nginx/conf.d/default.conf:ro
       - ./docker-config/certs_local:/etc/nginx/certs:ro
     networks:
-      - frontend_net
-      - backend_net
+      - eprepag_net
     depends_on:
       app:
         condition: service_healthy
@@ -52,7 +52,7 @@ services:
     container_name: eprepag-assinador-php8
     restart: unless-stopped
     networks:
-      - backend_net
+      - eprepag_net
     volumes:
       - ./certs:/certs:ro
     environment:
@@ -61,9 +61,5 @@ services:
       - no-new-privileges:true
 
 networks:
-  frontend_net:
+  eprepag_net:
     driver: bridge
-    internal: false
-  backend_net:
-    driver: bridge
-    internal: false
