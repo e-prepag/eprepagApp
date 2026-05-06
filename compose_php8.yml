@@ -66,4 +66,4 @@ networks:
     internal: false
   backend_net:
     driver: bridge
-    internal: true
+    internal: false
