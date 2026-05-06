@@ -1,6 +1,6 @@
 <?php
 
-$raiz_do_projeto = "/www/app/";
+$raiz_do_projeto = "/www/";
 define("RAIZ_DO_PROJETO",$raiz_do_projeto);
 
 require_once __DIR__ . '/load_dotenv.php';

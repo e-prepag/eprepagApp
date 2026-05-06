@@ -9,9 +9,7 @@ services:
     container_name: eprepag-app-php8
     restart: unless-stopped
     volumes:
-      - ./www:/www/app:ro # Código fonte em /www/app
-      - ./www/vendor:/www/vendor:ro # Mapeia vendor para o caminho absoluto esperado pelo código
-      - ./www/public_html/imagens:/www/app/public_html/imagens:ro
+      - ./www:/www:ro # Unificado: Tudo em /www para bater com o código legado
       - ./www/arquivos_gerados:/www/arquivos_gerados:rw
       - ./www/tmp:/www/tmp:rw
     networks:
@@ -34,11 +32,11 @@ services:
     restart: unless-stopped
     ports:
       - "8080:80"
-      - "8443:443" # Mapeia a porta 443 do container para a 8443 no host
+      - "8443:443"
     volumes:
       - ./www:/www:ro
       - ./docker-config/nginx/nginx_php8.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./docker-config/certs_local:/etc/nginx/certs:ro # Volume para certificados auto-assinados
+      - ./docker-config/certs_local:/etc/nginx/certs:ro
     networks:
       - frontend_net
       - backend_net
@@ -48,13 +46,13 @@ services:
     security_opt:
       - no-new-privileges:true
 
-  # Serviço Assinador .NET (Auxiliar)
+  # Serviço Assinador .NET
   assinador:
     build: ./assinador-dotnet
     container_name: eprepag-assinador-php8
     restart: unless-stopped
     networks:
-      - backend_net # Isolado, não acessível pelo frontend/internet diretamente
+      - backend_net
     volumes:
       - ./certs:/certs:ro
     environment:
@@ -68,4 +66,4 @@ networks:
     internal: false
   backend_net:
     driver: bridge
-    internal: true # Esta rede é isolada da internet
+    internal: true
