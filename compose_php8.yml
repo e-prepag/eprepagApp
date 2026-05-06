@@ -9,8 +9,9 @@ services:
     container_name: eprepag-app-php8
     restart: unless-stopped
     volumes:
-      - ./www:/www/app:ro # Somente leitura para o código fonte
-      - ./www/public_html/imagens:/www/app/public_html/imagens:ro # Montagem direta das imagens
+      - ./www:/www/app:ro # Código fonte em /www/app
+      - ./www/vendor:/www/vendor:ro # Mapeia vendor para o caminho absoluto esperado pelo código
+      - ./www/public_html/imagens:/www/app/public_html/imagens:ro
       - ./www/arquivos_gerados:/www/arquivos_gerados:rw
       - ./www/tmp:/www/tmp:rw
     networks:
