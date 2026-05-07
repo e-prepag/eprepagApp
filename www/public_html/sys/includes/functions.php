@@ -40,7 +40,7 @@ function is_DateTime($dateTime)
 	$dateTime = trim($dateTime);
 
 	if (preg_match("'^(\d{2})[\-//](\d{2})[\-//](\d{4})\s(\d{2}):(\d{2})$'", $dateTime,  $matches)) {
-			return checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
+		return checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
@@ -65,8 +65,8 @@ function is_DateTimeEx($dateTime, $tipo)
 	$dateTime = trim($dateTime);
 
 	if (preg_match($pattern, $dateTime,  $matches)) {
-			if ($tipo == 1) return checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
-			else if ($tipo == 2) return checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1]) && is_hora($matches[4] . ":" . $matches[5]);
+		if ($tipo == 1) return checkdate((int) $matches[2], (int) $matches[1], (int) $matches[3]) && is_hora($matches[4] . ":" . $matches[5]);
+		else if ($tipo == 2) return checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1]) && is_hora($matches[4] . ":" . $matches[5]);
 	} else {
 		return false;
 	}
@@ -1151,9 +1151,9 @@ function verifica_data($data)
 					if ($alerta == 1) {
 						return  0;
 					} else {
-							$dia = (int) $dia;
-							$mes = (int) $mes;
-							$ano = (int) $ano;
+						$dia = (int) $dia;
+						$mes = (int) $mes;
+						$ano = (int) $ano;
 						if ($mes > 12 || $dia > 31) {
 							return 0;
 						} else {
@@ -1943,7 +1943,7 @@ function eprepag_getCharset()
 	$charset = $eprepag['charset'];
 	if (!empty($_POST['charset'])) {
 		if ($_POST['charset'] == 'UTF-8/') {
-			$charset = 'UTF-8/';
+			$charset = 'ISO-8859-1';
 		} else {
 			$charset = '';
 		}
@@ -1951,7 +1951,7 @@ function eprepag_getCharset()
 
 	if (!empty($eprepag['POST']['charset'])) {
 		if ($eprepag['POST']['charset'] == 'UTF-8/') {
-			$charset = 'UTF-8/';
+			$charset = 'ISO-8859-1';
 		} else {
 			$charset = '';
 		}
@@ -2009,13 +2009,13 @@ function theRealStripTags2($string)
 
 	for ($i = 0; $i < $tam; $i++) {
 		// If I found one '<', $tag++ and continue whithout copy
-			if ($string[$i] == '<') {
+		if ($string[$i] == '<') {
 			$tag++;
 			continue;
 		}
 
 		// if I found '>', decrease $tag and continue 
-			if ($string[$i] == '>') {
+		if ($string[$i] == '>') {
 			if ($tag) {
 				$tag--;
 			}
@@ -2027,7 +2027,7 @@ function theRealStripTags2($string)
 
 		// if $tag is 0, can copy 
 		if ($tag == 0) {
-				$newstring .= $string[$i]; // simple copy, only one car
+			$newstring .= $string[$i]; // simple copy, only one car
 		}
 	}
 	return $newstring;
