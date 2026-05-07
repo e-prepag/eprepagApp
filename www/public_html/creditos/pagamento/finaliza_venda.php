@@ -209,10 +209,10 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 		//echo "Erro: O número da compra deve conter apenas dígitos.";
 		//exit(); // Interrompe a execução do script se a validação falhar
 	}
-	$sql = "SELECT * FROM tb_pag_compras WHERE numCompra='" . $numOrder . "'";
+	$sql = "SELECT * FROM tb_pag_compras WHERE numCompra=$1";
 	writeIfPossible($ff, "sql usado: " . $sql . "\r\n");
 
-	$ret = SQLexecuteQuery($sql);
+	$ret = SQLexecuteQueryParams($sql, array($numOrder));
 	if (!$ret) {
 		echo "Erro ao recuperar transação de pagamento (1).\n";
 		die("Stop");
@@ -223,11 +223,11 @@ if ($usuarioGames->b_IsLogin_pagamento()) {
 
 		if (strlen($row['cesta']) == 0 && $row['status'] != 3) {
 			// Verifica se o status é diferente a 3
-			$sql = "UPDATE tb_pag_compras SET cliente_nome='" . str_replace("'", "''", $usuarioGames->getNome()) . "', idcliente=" . $usuarioGames->getId() . ", status=1, cesta='" . str_replace("'", "''", montaCesta_pag()) . "', total=" . (100 * ($total_carrinho + $taxas)) . " WHERE numcompra='" . $numOrder . "'";		// "iforma='".$_SESSION['pagamento.pagto']."', "
+			$sql = "UPDATE tb_pag_compras SET cliente_nome=$1, idcliente=$2, status=1, cesta=$3, total=$4 WHERE numcompra=$5";
 			writeIfPossible($ff, "sql tb_pag_compras: " . $sql . "\r\n");
 			writeIfPossible($ff, "***************************************************\r\n");
 			closeIfPossible($ff);
-			$ret = SQLexecuteQuery($sql);
+			$ret = SQLexecuteQueryParams($sql, array($usuarioGames->getNome(), (int)$usuarioGames->getId(), montaCesta_pag(), (100 * ($total_carrinho + $taxas)), $numOrder));
 			if (!$ret) {
 				echo "Erro ao atualizar transação de pagamento (2).\n";
 				die("Stop");
@@ -415,32 +415,34 @@ if ($msg == "") {
 	}
 	//Recupera o usuario do session
 	$usuario_RiscoClassif = $usuarioGames->getRiscoClassif();
+	$sql_params = array(
+		(int)$venda_id,
+		(int)$usuarioGames->getId(),
+		(int)$pagto,
+		(int)$STATUS_VENDA['AGUARDANDO_PROCESSAMENTO'],
+		""
+	);
 	$sql = "insert into tb_dist_venda_games (" .
 		"vg_id, vg_ug_id, vg_data_inclusao, vg_pagto_tipo, " .
 		"vg_ultimo_status, vg_ultimo_status_obs";
-	// Usuários Pré-pago cadastram vendas que não estarão no próximo corte
-	if ($usuario_RiscoClassif == 2)
+	// Usuï¿½rios Prï¿½-pago cadastram vendas que nï¿½o estarï¿½o no prï¿½ximo corte
+	if ($usuario_RiscoClassif == 2) {
 		$sql .= ", vg_cor_codigo";
-	$sql .= ") values (";
-
-	$sql .= SQLaddFields($venda_id, "") . ",";
-	$sql .= SQLaddFields($usuarioGames->getId(), "") . ",";
-	$sql .= SQLaddFields("CURRENT_TIMESTAMP", "") . ",";
-	$sql .= SQLaddFields($pagto, "") . ",";
-	$sql .= SQLaddFields($STATUS_VENDA['AGUARDANDO_PROCESSAMENTO'], "") . ",";
-	$sql .= SQLaddFields("", "s") . "";
-	// Usuários Pré-pago cadastram vendas que não estarão no próximo corte
-	if ($usuario_RiscoClassif == 2)
-		$sql .= ", 0";
+		$sql_params[] = 0;
+	}
+	$sql .= ") values ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5";
+	if ($usuario_RiscoClassif == 2) {
+		$sql .= ", $" . count($sql_params);
+	}
 	$sql .= ")";
 
-	$ret = SQLexecuteQuery($sql);
+	$ret = SQLexecuteQueryParams($sql, $sql_params);
 	if (!$ret) $msg = "Erro ao inserir venda.\n";
 	else {
 		$ret = ""; //limpa resourceId
 		if (isset($operador_id)) {
-			$sql = "INSERT INTO tb_dist_venda_games_operador (vg_id, ugo_id) VALUES (" . $venda_id . ", " . $operador_id . ")";
-			$ret = SQLexecuteQuery($sql);
+			$sql = "INSERT INTO tb_dist_venda_games_operador (vg_id, ugo_id) VALUES ($1, $2)";
+			$ret = SQLexecuteQueryParams($sql, array((int)$venda_id, (int)$operador_id));
 			if (!$ret) $msg = "Erro ao ligar operador a venda.\n";
 			else $ret = "";
 		}
@@ -453,8 +455,8 @@ if ($msg == "") {
 		if (($iforma == $FORMAS_PAGAMENTO['TRANSFERENCIA_ENTRE_CONTAS_BRADESCO']) || ($iforma == $FORMAS_PAGAMENTO['PAGAMENTO_FACIL_BRADESCO_DEBITO']) || ($iforma == $FORMAS_PAGAMENTO['PAGAMENTO_BB_DEBITO_SUA_CONTA']) || ($iforma == $PAGAMENTO_BANCO_ITAU_ONLINE_NUMERIC)) { //$FORMAS_PAGAMENTO['PAGAMENTO_BANCO_ITAU_ONLINE']
 			if ($usuarioGames->bIsLanPos()) {
 				// atualiza $venda_id
-				$sql = "UPDATE tb_pag_compras SET idvenda=" . $venda_id . " WHERE numcompra='" . $numOrder . "'";
-				$ret1 = SQLexecuteQuery($sql);
+				$sql = "UPDATE tb_pag_compras SET idvenda=$1 WHERE numcompra=$2";
+				$ret1 = SQLexecuteQueryParams($sql, array((int)$venda_id, $numOrder));
 				if (!$ret1) {
 					echo "Erro ao atualizar transação de pagamento (3).\n";
 					gravaLog_TMP("Erro ao atualizar transação de pagamento (3).\n");
@@ -524,21 +526,36 @@ if ($msg == "") {
 				//Verificando se exige CPF de cliente
 				$test_opr_need_cpf_lh = checkingNeedCPF_LH($opr_codigo);
 
-				$sql  = "insert into tb_dist_venda_games_modelo( ";
-				$sql .=	"		vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo, ";
-				$sql .=	"		vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor, vgm_perc_desconto, vgm_pin_request";
-				if ($test_opr_need_cpf_lh) {
-					$sql .= ", vgm_nome_cpf, vgm_cpf,vgm_cpf_data_nascimento";
-				} //end if($test_opr_need_cpf_lh)
-				$sql .=	" ) select " . $venda_id . ", ogp.ogp_id, ogp.ogp_nome, ogpm.ogpm_id, ogpm.ogpm_nome, ";
-				$sql .=	"		ogpm.ogpm_valor, " . $qtde . ", ogp.ogp_opr_codigo, ogpm.ogpm_pin_valor, $perc_desconto, ogp_pin_request ";
-				if ($test_opr_need_cpf_lh) {
-					$sql .= ", '" . $GLOBALS['_SESSION']['NOME_CPF'] . "', '" . $GLOBALS['_SESSION']['CPF_LH'] . "',to_date('" . $GLOBALS['_SESSION']['DATA_NASCIMENTO'] . "','DD/MM/YYYY')";
-				} //end if($test_opr_need_cpf_lh)
-				$sql .=	"from tb_dist_operadora_games_produto_modelo ogpm ";
-				$sql .=	"inner join tb_dist_operadora_games_produto ogp on ogp.ogp_id = ogpm.ogpm_ogp_id ";
-				$sql .=	"where ogpm.ogpm_id = " . $modeloId;
-				$ret = SQLexecuteQuery($sql);
+					$sql_params = array();
+					$sql_params[] = (int)$venda_id;
+					$ph_venda_id = "$" . count($sql_params);
+					$sql_params[] = (int)$qtde;
+					$ph_qtde = "$" . count($sql_params);
+					$sql_params[] = $perc_desconto;
+					$ph_perc_desconto = "$" . count($sql_params);
+
+					$sql  = "insert into tb_dist_venda_games_modelo( ";
+					$sql .=	"		vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo, ";
+					$sql .=	"		vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor, vgm_perc_desconto, vgm_pin_request";
+					if ($test_opr_need_cpf_lh) {
+						$sql .= ", vgm_nome_cpf, vgm_cpf,vgm_cpf_data_nascimento";
+					} //end if($test_opr_need_cpf_lh)
+					$sql .=	" ) select " . $ph_venda_id . ", ogp.ogp_id, ogp.ogp_nome, ogpm.ogpm_id, ogpm.ogpm_nome, ";
+					$sql .=	"		ogpm.ogpm_valor, " . $ph_qtde . ", ogp.ogp_opr_codigo, ogpm.ogpm_pin_valor, " . $ph_perc_desconto . ", ogp_pin_request ";
+					if ($test_opr_need_cpf_lh) {
+						$sql_params[] = $GLOBALS["_SESSION"]["NOME_CPF"];
+						$ph_nome_cpf = "$" . count($sql_params);
+						$sql_params[] = $GLOBALS["_SESSION"]["CPF_LH"];
+						$ph_cpf_lh = "$" . count($sql_params);
+						$sql_params[] = $GLOBALS["_SESSION"]["DATA_NASCIMENTO"];
+						$ph_data_nascimento = "$" . count($sql_params);
+						$sql .= ", " . $ph_nome_cpf . ", " . $ph_cpf_lh . ",to_date(" . $ph_data_nascimento . ",'DD/MM/YYYY')";
+					} //end if($test_opr_need_cpf_lh)
+					$sql .=	"from tb_dist_operadora_games_produto_modelo ogpm ";
+					$sql .=	"inner join tb_dist_operadora_games_produto ogp on ogp.ogp_id = ogpm.ogpm_ogp_id ";
+					$sql_params[] = (int)$modeloId;
+					$sql .=	"where ogpm.ogpm_id = $" . count($sql_params);
+					$ret = SQLexecuteQueryParams($sql, $sql_params);
 				if (!$ret) {
 					$msg = "Erro ao inserir modelo(s) na venda.\n";
 					break;
@@ -563,24 +580,43 @@ if ($msg == "") {
 						//Verificando se exige CPF de cliente
 						$test_opr_need_cpf_lh = checkingNeedCPF_LH($opr_codigo);
 
-						$sql  = "insert into tb_dist_venda_games_modelo( ";
-						$sql .=	"		vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo, ";
-						$sql .=	"		vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor, vgm_perc_desconto, vgm_pin_request";
+							$sql_params = array();
+							$sql_params[] = (int)$venda_id;
+							$sql_params[] = (int)$codeProd;
+							$sql_params[] = $rs_row["ogp_nome"];
+							$sql_params[] = (int)$codeProd;
+							$sql_params[] = (int)$codeProd;
+							$sql_params[] = $valor;
+							$sql_params[] = (int)$quantidade;
+							$sql_params[] = (int)$rs_row["ogp_opr_codigo"];
+							$sql_params[] = $valor;
+							$sql_params[] = $perc_desconto;
+							$sql_params[] = (int)$rs_row["ogp_pin_request"];
 
-						if ($test_opr_need_cpf_lh) {
-							$sql .= ", vgm_nome_cpf, vgm_cpf,vgm_cpf_data_nascimento";
-						} //end if($test_opr_need_cpf_lh)
-						$sql .=	") VALUES (" . $venda_id . ", " . $codeProd . ", '" . $rs_row['ogp_nome'] . "', (SELECT ogpm_id FROM tb_dist_operadora_games_produto_modelo WHERE ogpm_ogp_id = " . $codeProd . " AND ogpm_ativo = 1 LIMIT 1), (SELECT ogpm_nome FROM tb_dist_operadora_games_produto_modelo WHERE ogpm_ogp_id = " . $codeProd . " AND ogpm_ativo = 1 LIMIT 1), ";
-						$sql .=	"               " . $valor . ", " . $quantidade . ", " . $rs_row['ogp_opr_codigo'] . ", " . $valor . ", " . $perc_desconto . ", " . $rs_row['ogp_pin_request'] . " ";
-						if ($test_opr_need_cpf_lh) {
-							$sql .= ", '" . $GLOBALS['_SESSION']['NOME_CPF'] . "', '" . $GLOBALS['_SESSION']['CPF_LH'] . "',to_date('" . $GLOBALS['_SESSION']['DATA_NASCIMENTO'] . "','DD/MM/YYYY')";
-						} //end if($test_opr_need_cpf_lh)
-						$sql .= ");";
-						//die($sql);
+							$sql  = "insert into tb_dist_venda_games_modelo( ";
+							$sql .=	"		vgm_vg_id, vgm_ogp_id, vgm_nome_produto, vgm_ogpm_id, vgm_nome_modelo, ";
+							$sql .=	"		vgm_valor, vgm_qtde, vgm_opr_codigo, vgm_pin_valor, vgm_perc_desconto, vgm_pin_request";
+
+							if ($test_opr_need_cpf_lh) {
+								$sql .= ", vgm_nome_cpf, vgm_cpf,vgm_cpf_data_nascimento";
+							} //end if($test_opr_need_cpf_lh)
+							$sql .=	") VALUES ($1, $2, $3, (SELECT ogpm_id FROM tb_dist_operadora_games_produto_modelo WHERE ogpm_ogp_id = $4 AND ogpm_ativo = 1 LIMIT 1), (SELECT ogpm_nome FROM tb_dist_operadora_games_produto_modelo WHERE ogpm_ogp_id = $5 AND ogpm_ativo = 1 LIMIT 1), ";
+							$sql .=	"               $6, $7, $8, $9, $10, $11 ";
+							if ($test_opr_need_cpf_lh) {
+								$sql_params[] = $GLOBALS["_SESSION"]["NOME_CPF"];
+								$ph_nome_cpf = "$" . count($sql_params);
+								$sql_params[] = $GLOBALS["_SESSION"]["CPF_LH"];
+								$ph_cpf_lh = "$" . count($sql_params);
+								$sql_params[] = $GLOBALS["_SESSION"]["DATA_NASCIMENTO"];
+								$ph_data_nascimento = "$" . count($sql_params);
+								$sql .= ", " . $ph_nome_cpf . ", " . $ph_cpf_lh . ",to_date(" . $ph_data_nascimento . ",'DD/MM/YYYY')";
+							} //end if($test_opr_need_cpf_lh)
+							$sql .= ");";
+							//die($sql);
 
 
 
-						$ret = SQLexecuteQuery($sql);
+							$ret = SQLexecuteQueryParams($sql, $sql_params);
 
 						if (!$ret) {
 							$msg = "Erro ao inserir modelo(s) na venda.\n";
@@ -601,9 +637,9 @@ if ($msg == "") {
 //Adiciona agendamento
 if ($msg == "") {
 	$sql = "insert into tb_dist_agendamento_execucao (
-					ae_data_inclusao, ae_status, ae_tipo, ae_vg_ultimo_status_obs, ae_vg_id 
-				) values (CURRENT_TIMESTAMP, 1, 1, '$ultimo_status_obs', $venda_id); ";
-	$ret = SQLexecuteQuery($sql);
+					ae_data_inclusao, ae_status, ae_tipo, ae_vg_ultimo_status_obs, ae_vg_id
+				) values (CURRENT_TIMESTAMP, 1, 1, $1, $2); ";
+	$ret = SQLexecuteQueryParams($sql, array($ultimo_status_obs, (int)$venda_id));
 	if (!$ret) $msg = "Erro ao inserir agendamento.\n";
 }
 
