@@ -8,9 +8,9 @@ services:
       dockerfile: Dockerfile_php8
     container_name: eprepag-app-php8
     restart: unless-stopped
+    working_dir: /www
     volumes:
       - ./www:/www:ro
-      - ./www/.env:/www/app/.env:ro
       - ./www/arquivos_gerados:/www/arquivos_gerados:rw
       - ./www/tmp:/www/tmp:rw
     networks:
