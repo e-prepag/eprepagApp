@@ -19,7 +19,8 @@ function obtem_nfe_seq(int $opr_codigo): int
     }
 
     try {
-        $stmt = $pdo->query("SELECT nextval('{$sequenceName}')");
+        $stmt = $pdo->prepare("SELECT nextval(CAST(:sequenceName AS regclass))");
+        $stmt->execute(array(':sequenceName' => $sequenceName));
 
         if ($stmt) {
             return (int) $stmt->fetchColumn();
@@ -335,21 +336,31 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
         $n_trans++;
 
         $rps_id_max = 1;
-        $s_table = (($pg_fill['trn_code'] == '1') ? 'tb_dist_venda_games_modelo' : (($pg_fill['trn_code'] == '2') ? 'tb_venda_games_modelo' : (($pg_fill['trn_code'] == '3') ? 'dist_vendas_pos' : (($pg_fill['trn_code'] == '4') ? 'dist_vendas_cartoes_tmp' : '????'))));
-        $s_v_id = (($pg_fill['trn_code'] == '1') ? 'vgm_id' : (($pg_fill['trn_code'] == '2') ? 'vgm_id' : (($pg_fill['trn_code'] == '3') ? 've_id' : (($pg_fill['trn_code'] == '4') ? 'vc_id' : '????'))));
+        $nfeTables = array(
+            '1' => array('table' => 'tb_dist_venda_games_modelo', 'id' => 'vgm_id'),
+            '2' => array('table' => 'tb_venda_games_modelo', 'id' => 'vgm_id'),
+            '3' => array('table' => 'dist_vendas_pos', 'id' => 've_id'),
+            '4' => array('table' => 'dist_vendas_cartoes_tmp', 'id' => 'vc_id'),
+        );
+        if (!isset($nfeTables[$pg_fill['trn_code']])) {
+            continue;
+        }
+        $s_table = $nfeTables[$pg_fill['trn_code']]['table'];
+        $s_v_id = $nfeTables[$pg_fill['trn_code']]['id'];
+        $trn_vgm_id = (int)$pg_fill['trn_vgm_id'];
+        $nfe_seq = (int)obtem_nfe_seq($dd_operadora);
 
+        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = $1 where " . $s_v_id . " = $2;";
+        echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $trn_vgm_id . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
 
-        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = " . obtem_nfe_seq($dd_operadora) . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
-        echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $pg_fill['trn_vgm_id'] . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
-
-        $ret = SQLexecuteQueryParams($sql_update, array());
+        $ret = SQLexecuteQueryParams($sql_update, array($nfe_seq, $trn_vgm_id));
         if (!$ret) {
             $msg_error = "Erro ao atualizar registro ($sql_update).\n";
             echo $msg_error . "<br>";
         }
 
         // Obtem o nfe_rps_id retornado por obtem_nfe_seq(opr_codigo)
-        $sql_tmp = "select vgm_nfe_rps_id from " . $s_table . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
+        $sql_tmp = "select vgm_nfe_rps_id from " . $s_table . " where " . $s_v_id . "=" . $trn_vgm_id . ";";
         $trn_vgm_nfe_rps_id = getValue($sql_tmp);
         echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#000099'> [nfe_rps_id: " . $trn_vgm_nfe_rps_id . "] (" . $pg_fill['trn_data'] . ", " . $pg_fill['canal'] . ") " . $sql_tmp . "</font><br>";
 
