@@ -1814,9 +1814,14 @@ function insere_EstabelecimentoMovimentacao(
 
 	//Configura valores
 	//-----------------------------------------------------------------------------------------------
+	$var_est_codigo = (int)$var_est_codigo;
+	$var_origem = (int)$var_origem;
+	$var_mapeamento = (int)$var_mapeamento;
+	$var_tipo = strtoupper((string)$var_tipo);
+
 	//Verifica se o estabelecimento eh pre ou pos
-	$sql = "SELECT est_tipo_venda from estabelecimentos where est_codigo = " . $var_est_codigo;
-	$result = pg_exec($connid, $sql);
+	$sql = "SELECT est_tipo_venda from estabelecimentos where est_codigo = $1";
+	$result = pg_query_params($connid, $sql, array($var_est_codigo));
 	$pgresult = pg_fetch_array($result);
 	$est_tipo_venda = strtoupper(trim($pgresult['est_tipo_venda']));
 
@@ -1829,11 +1834,11 @@ function insere_EstabelecimentoMovimentacao(
 	if ($est_tipo_venda == 'POSPAGO') $tipo_operador = ($tipo_operador == '+') ? '-' : '+';
 
 	//Mapeamento
-	$var_mapeamento_aux = str_replace("'", "''", $var_mapeamento_aux);
+	$var_mapeamento_aux = (string)$var_mapeamento_aux;
 
 	//Valor
 	if (!isset($var_valor) || $var_valor == '' || !is_numeric($var_valor)) $var_valor = 0;
-	$var_valor = abs($var_valor);
+	$var_valor = abs((float)$var_valor);
 
 
 	//Insere na tabela
@@ -1844,11 +1849,19 @@ function insere_EstabelecimentoMovimentacao(
 					em_saldo_antes, 
 					em_saldo_depois
 			) values (
-					$var_est_codigo, '$var_tipo', $var_origem, $var_mapeamento, '$var_mapeamento_aux', $var_valor, '$var_descricao', 
-					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $var_est_codigo) $tipo_operador $var_valor,
-					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $var_est_codigo) 
+					$1, $2, $3, $4, $5, $6, $7, 
+					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $1) $tipo_operador $6,
+					(select quantidade_valor_vendas from estabelecimentos where est_codigo = $1) 
 			)";
-	pg_exec($connid, $sql);
+	pg_query_params($connid, $sql, array(
+		$var_est_codigo,
+		$var_tipo,
+		$var_origem,
+		$var_mapeamento,
+		$var_mapeamento_aux,
+		$var_valor,
+		$var_descricao
+	));
 
 	//Restaura o error handler
 	restore_error_handler();

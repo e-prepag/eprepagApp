@@ -14,9 +14,9 @@ function get_Campeonato_modelo($prod_id, &$params)
     FROM tb_operadora_games_produto ogp
     INNER JOIN tb_operadora_games_produto_modelo ogpm 
         ON ogp.ogp_id = ogpm.ogpm_ogp_id
-    WHERE ogp.ogp_id = ?
-      AND ogpm.ogpm_id = ?
-      AND ogp.ogp_opr_codigo = ?
+    WHERE ogp.ogp_id = $1
+      AND ogpm.ogpm_id = $2
+      AND ogp.ogp_opr_codigo = $3
 ";
 
 	$params = [
@@ -26,7 +26,7 @@ function get_Campeonato_modelo($prod_id, &$params)
 	];
 
 	if (!is_null($valor)) {
-		$sql .= " AND ogpm.ogpm_pin_valor = ? ";
+		$sql .= " AND ogpm.ogpm_pin_valor = $4 ";
 		$params[] = $valor;
 	}
 
@@ -69,9 +69,9 @@ function get_Campeonato_Pagto_Completo($ug_id, $prod_id, &$pagtos_valor)
     FROM tb_venda_games vg
     INNER JOIN tb_venda_games_modelo vgm 
         ON vg.vg_id = vgm.vgm_vg_id
-    WHERE vgm_opr_codigo = ?
-      AND vgm_ogp_id = ?
-      AND vg_ug_id = ?
+    WHERE vgm_opr_codigo = $1
+      AND vgm_ogp_id = $2
+      AND vg_ug_id = $3
       AND vg_ultimo_status = 5
     GROUP BY 
         vgm_opr_codigo,
@@ -106,7 +106,7 @@ function get_Campeonato_Dados_LH($ug_id)
 	$sql = "
     SELECT *
     FROM dist_usuarios_games
-    WHERE ug_id = ?
+    WHERE ug_id = $1
 ";
 
 	$params = [

@@ -529,9 +529,10 @@ function log_pin($acao, $query, $pin)
 function permite_tentativas($quantidade, $tempo, &$msg_ajax)
 {
 	$usuarioGames = unserialize($GLOBALS['_SESSION']['usuarioGames_ser']);
-	$sql = "select count(*) as total from pins_store_apl_historico where psah_autor=" . intval($usuarioGames->ug_id) . " and psah_ip_autor='" . retorna_ip_acesso_new() . "' and psah_acao='1' and psah_data >= (NOW()-'" . intval($tempo) . " minutes'::interval)";
+	$sql = "select count(*) as total from pins_store_apl_historico where psah_autor = $1 and psah_ip_autor = $2 and psah_acao = '1' and psah_data >= (NOW() - ($3::int || ' minutes')::interval)";
+	$params = array((int)$usuarioGames->ug_id, (string)retorna_ip_acesso_new(), (int)$tempo);
 	//echo $sql;
-	$rs_log = SQLexecuteQuery($sql);
+	$rs_log = SQLexecuteQueryParams($sql, $params);
 	if ($rs_log) {
 		$rs_log_row = pg_fetch_array($rs_log);
 		if ($rs_log_row['total'] >= $quantidade) {
@@ -952,8 +953,8 @@ function RedeemPIN_EPP_CASH($key, $value, &$msg, &$aux_valor_PINs_EPP, &$aux_val
  */
 function flag_user_test($ug_id)
 {
-	$sql = "update usuarios_games set ug_flag_usando_saldo = 1 where ug_id = $ug_id and ug_flag_usando_saldo = 0;";
-	$ret2 = SQLexecuteQuery($sql);
+	$sql = "update usuarios_games set ug_flag_usando_saldo = 1 where ug_id = $1 and ug_flag_usando_saldo = 0;";
+	$ret2 = SQLexecuteQueryParams($sql, array((int)$ug_id));
 
 	$cmdtuples = pg_affected_rows($ret2);
 	//	echo $cmdtuples . " tuples are affected.<br>\n";
@@ -968,10 +969,10 @@ function flag_user_test($ug_id)
 
 function flag_user_unblock($ug_id)
 {
-	$sql = "update usuarios_games set ug_flag_usando_saldo = 0 where ug_id = $ug_id;";
+	$sql = "update usuarios_games set ug_flag_usando_saldo = 0 where ug_id = $1;";
 	gravaLog_EPPCASH("Em flag_user_unblock($ug_id)\n   $sql");
 
-	$ret2 = SQLexecuteQuery($sql);
+	$ret2 = SQLexecuteQueryParams($sql, array((int)$ug_id));
 	//	if(!$ret2) echo "<font color='#FF0000'><b>Erro ao setar flag</b></font>\n<br><br>";
 }
 
@@ -1173,11 +1174,11 @@ function buscaIdLANHouse($venda_id)
 {
 	$sql = "select pspep_id
 			from pins_store_pag_epp_pin 
-			where tpc_idvenda IN (select case when idvenda_origem=0 then idvenda else idvenda_origem end as id from tb_pag_compras where idvenda=$venda_id)
+			where tpc_idvenda IN (select case when idvenda_origem=0 then idvenda else idvenda_origem end as id from tb_pag_compras where idvenda=$1)
 			and pspep_canal='L'
 			group by pspep_id; ";
 	gravaLog_EPPCASH("SQL que busca o ID da LAN House que Vendeu o PIN EPPCASH:\n$sql");
-	$rs_busca = SQLexecuteQuery($sql);
+	$rs_busca = SQLexecuteQueryParams($sql, array((int)$venda_id));
 	if (!$rs_busca) {
 		return 0;
 	} else {
@@ -1199,10 +1200,10 @@ function buscaCanalnaComposicaoSaldo(&$maior, $venda_id)
 				from saldo_composicao_fifo_utilizado scfu 
 				INNER JOIN saldo_composicao_fifo scf ON (scfu.scf_id=scf.scf_id) 
 			) scfu_int 
-			where vg_id=$venda_id
+			where vg_id=$1
 			group by scf_canal, scf_comissao, vg_id, vg_id_dep; ";
 	gravaLog_EPPCASH("SQL que busca a composição do Saldo:\n$sql");
-	$rs_busca = SQLexecuteQuery($sql);
+	$rs_busca = SQLexecuteQueryParams($sql, array((int)$venda_id));
 	if (!$rs_busca) {
 		return false;
 	} else {

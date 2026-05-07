@@ -796,15 +796,24 @@ function get_oprs_by_produto(mixed $ogpm_id): string
 		return "0";
 	}
 
+	$ogpm_ids = array_values(array_filter(array_map('intval', explode(',', (string)$ogpm_id))));
+	if (!$ogpm_ids) {
+		return "0";
+	}
+	$placeholders = [];
+	foreach ($ogpm_ids as $index => $value) {
+		$placeholders[] = '$' . ($index + 1);
+	}
+
 	$sql = "
     SELECT ogp_opr_codigo
     FROM tb_operadora_games_produto ogp
         INNER JOIN tb_operadora_games_produto_modelo ogpm 
             ON ogp.ogp_id = ogpm.ogpm_ogp_id
-    WHERE ogpm.ogpm_id IN ($ogpm_id)
+    WHERE ogpm.ogpm_id IN (" . implode(',', $placeholders) . ")
 ";
 
-	$rs = SQLexecuteQueryParams($sql, []);
+	$rs = SQLexecuteQueryParams($sql, $ogpm_ids);
 
 	$ogp_opr_codigo = "0";
 	if ($rs && pg_num_rows($rs) != 0) {

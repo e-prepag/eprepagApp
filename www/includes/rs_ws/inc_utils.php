@@ -401,9 +401,9 @@ function get_venda_id_by_transacao_id($trans_id) {
 
 	$vp_venda_id = 0;
 	// Obtem a primeira compra em aberto (ou seja a mais antiga em aberto)
-	$sql = "select vp_venda_id from dist_vendas_rede_buffer where vp_transacao_id=$trans_id;";
+	$sql = "select vp_venda_id from dist_vendas_rede_buffer where vp_transacao_id=$1;";
 //echo "$sql<br>";
-	$rs_last = SQLexecuteQuery($sql);
+	$rs_last = SQLexecuteQueryParams($sql, array((int)$trans_id));
 	if(!$rs_last || pg_num_rows($rs_last) == 0) {
 //		die("Não foi possivel obter dados última compra.<br>\nStop.");
 		$vp_transacao_id = 0;
@@ -434,10 +434,10 @@ function get_next_venda_id() {
 // ==============================================
 function is_valid_sale_open($transacao_id, $cod_rede, $cod_terminal) {
 	// tem vendas sem confirmar/cancelar com o transacao_id?
-	$sql = "select vp_id from dist_vendas_rede_buffer where vp_transacao_id=$transacao_id and vp_cod_rede = '$cod_rede' and vp_cod_terminal = '$cod_terminal' and vp_status_confirmado=0;";
+	$sql = "select vp_id from dist_vendas_rede_buffer where vp_transacao_id=$1 and vp_cod_rede = $2 and vp_cod_terminal = $3 and vp_status_confirmado=0;";
 //gravaLog_WS_processing("Em is_valid_sale_open (".date("Y-m-d H:i:s")."): \n$sql\n");
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, array((int)$transacao_id, (string)$cod_rede, (string)$cod_terminal));
 	if(!$rs || pg_num_rows($rs) == 0) {
 		return false;
 	} else {
@@ -589,11 +589,11 @@ function get_delay($ptr_identificacao) {
                                         limit 1		
                                 ) as delay
                         from dist_vendas_rede_transacao ptr 
-                        where 1=1 and substr(ptr_operacao, 1, 1) = 'E' and not ptr_identificacao = '' and ptr_identificacao = '$ptr_identificacao'
+                        where 1=1 and substr(ptr_operacao, 1, 1) = 'E' and not ptr_identificacao = '' and ptr_identificacao = $1
                         group by ptr_identificacao
                         order by delay ";
 //echo "delay :$sql<br>";
-        $rs_trans = SQLexecuteQuery($sql);
+        $rs_trans = SQLexecuteQueryParams($sql, array((string)$ptr_identificacao));
         if($rs_trans && pg_num_rows($rs_trans)>0) {
                 $rs_trans_row = pg_fetch_array($rs_trans);
                 $delay = $rs_trans_row['delay'];
@@ -857,8 +857,8 @@ function get_status_pedido($vg_id, &$recibo = null) {
 	if(!$vg_id) {
 		return -1;
 	}
-	$sql = "select * from tb_recarga_pedidos_rede_sim where rprs_vg_id = $vg_id order by rprs_data_inclusao desc limit 1";
-	$rs = SQLexecuteQuery($sql);
+	$sql = "select * from tb_recarga_pedidos_rede_sim where rprs_vg_id = $1 order by rprs_data_inclusao desc limit 1";
+	$rs = SQLexecuteQueryParams($sql, array((int)$vg_id));
 	if(!$rs || pg_num_rows($rs) == 0) {
 		echo "Nenhum produto encontrado ($sql).\n";
 		return -2;
@@ -887,8 +887,8 @@ function get_status_pedido_seguro($vg_id, &$recibo = null) {
 	if(!$vg_id) {
 		return -1;
 	}
-	$sql = "select * from tb_seguro_pedidos_rede_sim where sprs_vg_id = $vg_id order by sprs_data_inclusao desc limit 1";
-	$rs = SQLexecuteQuery($sql);
+	$sql = "select * from tb_seguro_pedidos_rede_sim where sprs_vg_id = $1 order by sprs_data_inclusao desc limit 1";
+	$rs = SQLexecuteQueryParams($sql, array((int)$vg_id));
 	if(!$rs || pg_num_rows($rs) == 0) {
 		echo "Nenhum produto encontrado ($sql).\n";
 		return -2;
@@ -914,9 +914,9 @@ function get_status_pedido_seguro($vg_id, &$recibo = null) {
 
 function get_dados_da_Lan($ug_id, &$params) {
 	$params = array();
-	$sql  = "select ug_ativo, ug_tipo_cadastro, ug_perfil_limite, ug_perfil_saldo, ug_risco_classif from dist_usuarios_games where ug_id = " . $ug_id;
+	$sql  = "select ug_ativo, ug_tipo_cadastro, ug_perfil_limite, ug_perfil_saldo, ug_risco_classif from dist_usuarios_games where ug_id = $1";
 //echo "$sql\n";
-	$rs_lan = SQLexecuteQuery($sql);
+	$rs_lan = SQLexecuteQueryParams($sql, array((int)$ug_id));
 	if(!$rs_lan || pg_num_rows($rs_lan) == 0) {
 	} else {
 		$rs_lan_row = pg_fetch_array($rs_lan);

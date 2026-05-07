@@ -1,8 +1,22 @@
 <?php
+$params = [];
+$addParam = function (mixed $value) use (&$params): string {
+	$params[] = $value;
+	return '$' . count($params);
+};
+$produtos_query = (string)($produtos_query ?? '');
+if (preg_match('/(;|--|\/\*|\*\/|\bunion\b|\bdrop\b|\binsert\b|\bupdate\b|\bdelete\b)/i', $produtos_query)) {
+	$produtos_query = '';
+}
 $sql  = "select ug.* ";
 if (is_array($a_lista_usuarios_VIP) && count($a_lista_usuarios_VIP) > 0) {
-	$s_list_vip_for_select = implode(",", $a_lista_usuarios_VIP);
-	$sql .= ", case when ug.ug_id in ($s_list_vip_for_select) then 1 else 0 end as ug_flag_vip ";
+	$vipIds = array_values(array_filter(array_map('intval', $a_lista_usuarios_VIP)));
+	$s_list_vip_for_select = implode(",", $vipIds);
+	if ($s_list_vip_for_select === "") {
+		$sql .= ", 0 as ug_flag_vip ";
+	} else {
+		$sql .= ", case when ug.ug_id in ($s_list_vip_for_select) then 1 else 0 end as ug_flag_vip ";
+	}
 } else {
 	$sql .= ", 0 as ug_flag_vip ";
 }
@@ -25,35 +39,42 @@ if ($tf_u_com_totais_vendas) {	//  && $dd_opr_codigo
 
 $sql  .= "where 1=1 ";
 if ($tf_u_codigo) {
-	$sql .= " and ug.ug_id ";
-	if ($tf_u_codigo_include == -1) {
-		$sql .= " not ";
+	$codigoIds = array_values(array_filter(array_map('intval', explode(',', (string)$tf_u_codigo))));
+	if ($codigoIds) {
+		$codigoPlaceholders = [];
+		foreach ($codigoIds as $codigoId) {
+			$codigoPlaceholders[] = $addParam($codigoId);
+		}
+		$sql .= " and ug.ug_id ";
+		if ($tf_u_codigo_include == -1) {
+			$sql .= " not ";
+		}
+		$sql .= " in (" . implode(',', $codigoPlaceholders) . ") ";
 	}
-	$sql .= " in (" . $tf_u_codigo . ") ";
 }
-if ($tf_u_status)	$sql .= " and ug.ug_ativo = " . $tf_u_status . " ";
-if ($tf_u_qtde_acessos_ini && $tf_u_qtde_acessos_fim) 			$sql .= " and ug.ug_qtde_acessos between " . ($tf_u_qtde_acessos_ini == -1 ? 0 : $tf_u_qtde_acessos_ini) . " and " . ($tf_u_qtde_acessos_fim == -1 ? 0 : $tf_u_qtde_acessos_fim);
-if ($tf_u_data_ultimo_acesso_ini && $tf_u_data_ultimo_acesso_fim) $sql .= " and ug.ug_data_ultimo_acesso between '" . formata_data($tf_u_data_ultimo_acesso_ini, 1) . "' and '" . formata_data($tf_u_data_ultimo_acesso_fim, 1) . "'";
-if ($tf_u_data_inclusao_ini && $tf_u_data_inclusao_fim) 			$sql .= " and ug.ug_data_inclusao between '" . formata_data($tf_u_data_inclusao_ini, 1) . "' and '" . formata_data($tf_u_data_inclusao_fim, 1) . "'";
-if ($ug_data_desativacao_ini && $ug_data_desativacao_fim) 			$sql .= " and ug.ug_data_encerramento_conta between '" . formata_data($ug_data_desativacao_ini, 1) . "' and '" . formata_data($ug_data_desativacao_fim, 1) . " 23:59:59'";
-if (trim($tf_u_nome ?? '') != '') 		$sql .= " and upper(ug.ug_nome) like '%" . strtoupper($tf_u_nome) . "%' ";
-if (trim($tf_u_email ?? '') != '')		$sql .= " and upper(ug.ug_email) like '%" . strtoupper($tf_u_email) . "%' ";
-if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cpf ?? '')) != '') 		$sql .= " and ug.ug_cpf like '%" . $tf_u_cpf . "%' ";
-if (trim($ug_login ?? '') != '') 		$sql .= " and upper(ug.ug_login) like '%" . strtoupper($ug_login) . "%' ";
-if ($tf_u_sexo) 		$sql .= " and upper(ug.ug_sexo) = '" . strtoupper($tf_u_sexo) . "' ";
-if ($tf_u_data_nascimento_ini && $tf_u_data_nascimento_fim) 			$sql .= " and ug.ug_data_nascimento between '" . formata_data($tf_u_data_nascimento_ini, 1) . "' and '" . formata_data($tf_u_data_nascimento_fim, 1) . "'";
-if ($tf_u_tel_ddi) 	$sql .= " and ug.ug_tel_ddi = '" . $tf_u_tel_ddi . "' ";
-if ($tf_u_tel_ddd) 	$sql .= " and ug.ug_tel_ddd = '" . $tf_u_tel_ddd . "' ";
-if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_tel ?? '')) != '') 		$sql .= " and ug.ug_tel like '%" . $tf_u_tel . "%' ";
-if ($tf_u_cel_ddi) 	$sql .= " and ug.ug_cel_ddi = '" . $tf_u_cel_ddi . "' ";
-if ($tf_u_cel_ddd) 	$sql .= " and ug.ug_cel_ddd = '" . $tf_u_cel_ddd . "' ";
-if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cel ?? '')) != '') 		$sql .= " and ug.ug_cel like '%" . $tf_u_cel . "%' ";
-if (trim($tf_u_endereco ?? '') != '') 	$sql .= " and upper(ug.ug_endereco) like '%" . strtoupper($tf_u_endereco) . "%' ";
-if (trim($tf_u_bairro ?? '') != '')	$sql .= " and lower(ug.ug_bairro) like '%" . strtolower($tf_u_bairro) . "%' ";
-if (trim($tf_u_cidade ?? '') != '')	$sql .= " and lower(ug.ug_cidade) like '%" . strtolower($tf_u_cidade) . "%' ";
-if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cep ?? '')) != '')		$sql .= " and ug.ug_cep like '%" . $tf_u_cep . "%' ";
-if ($tf_u_estado)	$sql .= " and upper(ug.ug_estado) = '" . strtoupper($tf_u_estado) . "' ";
-if ($ug_flag_usando_saldo) $sql .= " and ug.ug_flag_usando_saldo = " . $ug_flag_usando_saldo . " ";
+if ($tf_u_status)	$sql .= " and ug.ug_ativo = " . $addParam((int)$tf_u_status) . " ";
+if ($tf_u_qtde_acessos_ini && $tf_u_qtde_acessos_fim) 			$sql .= " and ug.ug_qtde_acessos between " . $addParam((int)($tf_u_qtde_acessos_ini == -1 ? 0 : $tf_u_qtde_acessos_ini)) . " and " . $addParam((int)($tf_u_qtde_acessos_fim == -1 ? 0 : $tf_u_qtde_acessos_fim));
+if ($tf_u_data_ultimo_acesso_ini && $tf_u_data_ultimo_acesso_fim) $sql .= " and ug.ug_data_ultimo_acesso between " . $addParam(formata_data($tf_u_data_ultimo_acesso_ini, 1)) . " and " . $addParam(formata_data($tf_u_data_ultimo_acesso_fim, 1));
+if ($tf_u_data_inclusao_ini && $tf_u_data_inclusao_fim) 			$sql .= " and ug.ug_data_inclusao between " . $addParam(formata_data($tf_u_data_inclusao_ini, 1)) . " and " . $addParam(formata_data($tf_u_data_inclusao_fim, 1));
+if ($ug_data_desativacao_ini && $ug_data_desativacao_fim) 			$sql .= " and ug.ug_data_encerramento_conta between " . $addParam(formata_data($ug_data_desativacao_ini, 1)) . " and " . $addParam(formata_data($ug_data_desativacao_fim, 1) . " 23:59:59");
+if (trim($tf_u_nome ?? '') != '') 		$sql .= " and upper(ug.ug_nome) like " . $addParam('%' . strtoupper($tf_u_nome) . '%') . " ";
+if (trim($tf_u_email ?? '') != '')		$sql .= " and upper(ug.ug_email) like " . $addParam('%' . strtoupper($tf_u_email) . '%') . " ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cpf ?? '')) != '') 		$sql .= " and ug.ug_cpf like " . $addParam('%' . $tf_u_cpf . '%') . " ";
+if (trim($ug_login ?? '') != '') 		$sql .= " and upper(ug.ug_login) like " . $addParam('%' . strtoupper($ug_login) . '%') . " ";
+if ($tf_u_sexo) 		$sql .= " and upper(ug.ug_sexo) = " . $addParam(strtoupper($tf_u_sexo)) . " ";
+if ($tf_u_data_nascimento_ini && $tf_u_data_nascimento_fim) 			$sql .= " and ug.ug_data_nascimento between " . $addParam(formata_data($tf_u_data_nascimento_ini, 1)) . " and " . $addParam(formata_data($tf_u_data_nascimento_fim, 1));
+if ($tf_u_tel_ddi) 	$sql .= " and ug.ug_tel_ddi = " . $addParam($tf_u_tel_ddi) . " ";
+if ($tf_u_tel_ddd) 	$sql .= " and ug.ug_tel_ddd = " . $addParam($tf_u_tel_ddd) . " ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_tel ?? '')) != '') 		$sql .= " and ug.ug_tel like " . $addParam('%' . $tf_u_tel . '%') . " ";
+if ($tf_u_cel_ddi) 	$sql .= " and ug.ug_cel_ddi = " . $addParam($tf_u_cel_ddi) . " ";
+if ($tf_u_cel_ddd) 	$sql .= " and ug.ug_cel_ddd = " . $addParam($tf_u_cel_ddd) . " ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cel ?? '')) != '') 		$sql .= " and ug.ug_cel like " . $addParam('%' . $tf_u_cel . '%') . " ";
+if (trim($tf_u_endereco ?? '') != '') 	$sql .= " and upper(ug.ug_endereco) like " . $addParam('%' . strtoupper($tf_u_endereco) . '%') . " ";
+if (trim($tf_u_bairro ?? '') != '')	$sql .= " and lower(ug.ug_bairro) like " . $addParam('%' . strtolower($tf_u_bairro) . '%') . " ";
+if (trim($tf_u_cidade ?? '') != '')	$sql .= " and lower(ug.ug_cidade) like " . $addParam('%' . strtolower($tf_u_cidade) . '%') . " ";
+if (trim(preg_replace('/[^a-zA-Z0-9]/', '', $tf_u_cep ?? '')) != '')		$sql .= " and ug.ug_cep like " . $addParam('%' . $tf_u_cep . '%') . " ";
+if ($tf_u_estado)	$sql .= " and upper(ug.ug_estado) = " . $addParam(strtoupper($tf_u_estado)) . " ";
+if ($ug_flag_usando_saldo) $sql .= " and ug.ug_flag_usando_saldo = " . $addParam((int)$ug_flag_usando_saldo) . " ";
 if ($ug_cadastro_completo == "1") $sql .= "and (ug.ug_cpf IS NOT NULL AND trim(ug.ug_cpf) <> '')"
 	. "and (upper(ug.ug_nome) IS NOT NULL AND trim(ug.ug_nome) <> '') "
 	. "and (ug.ug_data_nascimento IS NOT NULL) "
@@ -82,9 +103,9 @@ if ($ug_cadastro_completo == "2") $sql .= "and ((ug.ug_cpf IS NULL OR trim(ug.ug
 	. "OR (upper(ug.ug_estado) IS NULL OR trim(ug.ug_estado) = ''))";
 if ($tf_u_news) {
 	if ($tf_u_news == "n") {
-		$sql .= " and (upper(ug.ug_news) = '" . strtoupper($tf_u_news) . "' or ug.ug_news = ' ' or ug.ug_news = '') ";
+		$sql .= " and (upper(ug.ug_news) = " . $addParam(strtoupper($tf_u_news)) . " or ug.ug_news = ' ' or ug.ug_news = '') ";
 	} else {
-		$sql .= " and upper(ug.ug_news) = '" . strtoupper($tf_u_news) . "' ";
+		$sql .= " and upper(ug.ug_news) = " . $addParam(strtoupper($tf_u_news)) . " ";
 	}
 }
 
@@ -93,7 +114,7 @@ if ($tf_u_endereco_ip) {
         SELECT 1 
         FROM usuarios_games_log 
         WHERE ugl_ug_id = ug.ug_id 
-          AND ugl_ip = '$tf_u_endereco_ip'
+          AND ugl_ip = " . $addParam($tf_u_endereco_ip) . "
     ) ";
 }
 
@@ -102,7 +123,7 @@ if (trim($tf_u_observacoes ?? '') != '') {
         SELECT 1 
         FROM usuarios_games_obs obs
         WHERE obs.ug_id = ug.ug_id 
-          AND obs.ug_obs ilike '%" . trim($tf_u_observacoes) . "%' 
+          AND obs.ug_obs ilike " . $addParam('%' . trim($tf_u_observacoes) . '%') . " 
     ) ";
 }
 
@@ -126,7 +147,7 @@ if ($tf_u_integracao_origem) {
 	} elseif ($tf_u_integracao_origem == "-2") {
 		$sql .= " and (ug.ug_integracao_origem = '') ";
 	} else {
-		$sql .= " and (ug.ug_integracao_origem = '$tf_u_integracao_origem') ";
+		$sql .= " and (ug.ug_integracao_origem = " . $addParam($tf_u_integracao_origem) . ") ";
 	}
 }
 if ($tf_u_habilitado_cielo) {
@@ -140,7 +161,8 @@ if ($tf_u_habilitado_cielo) {
 
 if ($tf_u_usuario_vip) {
 	if (is_array($a_lista_usuarios_VIP) && (count($a_lista_usuarios_VIP) > 0)) {
-		$s_list_vip = implode(",", $a_lista_usuarios_VIP);
+		$vipIds = array_values(array_filter(array_map('intval', $a_lista_usuarios_VIP)));
+		$s_list_vip = implode(",", $vipIds);
 		if ($tf_u_usuario_vip == 1) {
 			$sql .= " and (ug_id in ($s_list_vip)) ";
 		} elseif ($tf_u_usuario_vip == -1) {
@@ -177,5 +199,5 @@ if (b_IsUsuarioWagner()) {
 }
 
 if (empty($somenteContar)) {
-	$rs_usuario = SQLexecuteQuery($sql);
+	$rs_usuario = SQLexecuteQueryParams($sql, $params);
 } // end if(empty($somenteContar))

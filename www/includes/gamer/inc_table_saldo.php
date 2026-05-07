@@ -15,8 +15,8 @@ function get_venda_pagto_com_pinsepp_composicao($venda_id)
         WHERE tpc_idpagto = (
             SELECT idpagto
             FROM tb_pag_compras
-            WHERE tipo_cliente = ?
-              AND idvenda = ?
+            WHERE tipo_cliente = $1
+              AND idvenda = $2
         )
     )
 ";
@@ -89,7 +89,7 @@ function get_venda_pagto_com_saldo_composicao($venda_id)
                 WHERE tpc_idpagto = (
                     SELECT idpagto
                     FROM tb_pag_compras tpc
-                    WHERE tpc.tipo_cliente = ?
+                    WHERE tpc.tipo_cliente = $1
                       AND tpc.idvenda = scf.vg_id
                 )
             )
@@ -99,7 +99,7 @@ function get_venda_pagto_com_saldo_composicao($venda_id)
     FROM saldo_composicao_fifo_utilizado scfu
         INNER JOIN saldo_composicao_fifo scf 
             ON (scfu.scf_id = scf.scf_id)
-    WHERE scfu.vg_id = ?
+    WHERE scfu.vg_id = $2
 ";
 
 	$params = [
@@ -122,8 +122,8 @@ function get_venda_pagto_com_saldo_composicao($venda_id)
 			$sql_origem = "
     SELECT idvenda_origem
     FROM tb_pag_compras
-    WHERE tipo_cliente = ?
-      AND idvenda = ?
+    WHERE tipo_cliente = $1
+      AND idvenda = $2
 ";
 
 			$params = [
@@ -131,10 +131,11 @@ function get_venda_pagto_com_saldo_composicao($venda_id)
 				$rs_saldo_utilizado_row['vg_id_deposito'],
 			];
 
-			$res = SQLexecuteQueryParams($sql_origem, $params);			
-			$idvenda_origem = $res
+			$res = SQLexecuteQueryParams($sql_origem, $params);
+			$idvenda_origem_row = $res ? pg_fetch_array($res) : false;
+			$idvenda_origem = is_array($idvenda_origem_row) ? (int)$idvenda_origem_row["idvenda_origem"] : 0;
 
-			$idvenda_origem_efetivo = (($idvenda_origem > 0) ? $idvenda_origem : $rs_saldo_utilizado_row['vg_id_deposito']);
+$idvenda_origem_efetivo = (($idvenda_origem > 0) ? $idvenda_origem : $rs_saldo_utilizado_row['vg_id_deposito']);
 			$distributor_codigo = 0;
 			//$sql_pin_deposito = "select distributor_codigo from pins_store inner join pins_store_pag_epp_pin ON (ps_pin_codinterno=pin_codinterno) where pin_codinterno in (select ps_pin_codinterno from pins_store_pag_epp_pin where tpc_idpagto = ( select idpagto from tb_pag_compras where tipo_cliente = 'M' and idvenda=".$idvenda_origem_efetivo." ) )";
 			//										$distributor_codigo = get_db_single_value($sql_pin_deposito);
