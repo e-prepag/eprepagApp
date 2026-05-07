@@ -10,9 +10,9 @@ services:
     restart: unless-stopped
     working_dir: /www
     volumes:
-      - ./www:/www:ro
-      - ./www/arquivos_gerados:/www/arquivos_gerados:rw
-      - ./www/tmp:/www/tmp:rw
+      - ./www:/www
+    # O hardening de Read-Only será aplicado via permissões de SO no servidor
+    # para garantir que o script imagens/index.php consiga usar realpath() sem conflitos de mount point.
     networks:
       - eprepag_net
     env_file:
