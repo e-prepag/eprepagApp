@@ -1136,9 +1136,9 @@ function verifica_data($data)
 					if ($alerta == 1) {
 						return  0;
 					} else {
-							$dia = (int) $dia;
-							$mes = (int) $mes;
-							$ano = (int) $ano;
+						$dia = (int) $dia;
+						$mes = (int) $mes;
+						$ano = (int) $ano;
 						if ($mes > 12 || $dia > 31) {
 							return 0;
 						} else {
@@ -1598,7 +1598,7 @@ function moeda_char($string)
 			$anterior = substr($dep_virg, 1, 1);
 			$significativo = substr($dep_virg, 0, 1);
 			if ($duvidoso > 5) {
-					$anterior = (int) $anterior + 1;
+				$anterior = (int) $anterior + 1;
 				$depois_format = $significativo . $anterior;
 			}
 			if ($duvidoso < 5) {
@@ -1606,7 +1606,7 @@ function moeda_char($string)
 			}
 			if ($duvidoso == 5) {
 				if ($anterior % 2 != 0) {
-						$anterior = (int) $anterior + 1;
+					$anterior = (int) $anterior + 1;
 				}
 				$depois_format = $significativo . $anterior;
 			}
@@ -1763,8 +1763,8 @@ function insere_EstabelecimentoMovimentacao(
 	//Configura valores
 	//-----------------------------------------------------------------------------------------------
 	//Verifica se o estabelecimento eh pre ou pos
-		$sql = "SELECT est_tipo_venda from estabelecimentos where est_codigo = $1";
-		$result = SQLexecuteQueryParams($sql, array((int)$var_est_codigo));
+	$sql = "SELECT est_tipo_venda from estabelecimentos where est_codigo = $1";
+	$result = SQLexecuteQueryParams($sql, array((int)$var_est_codigo));
 	$pgresult = pg_fetch_array($result);
 	$est_tipo_venda = strtoupper(trim($pgresult['est_tipo_venda']));
 
@@ -1787,7 +1787,7 @@ function insere_EstabelecimentoMovimentacao(
 	//Insere na tabela
 	//-----------------------------------------------------------------------------------------------
 	//Insert
-		$sql  = "insert into tb_estab_movimentacao (
+	$sql  = "insert into tb_estab_movimentacao (
 						em_est_codigo, em_tipo, em_emm_origem, em_emm_mapeamento, em_mapeamento_auxiliar, em_lancamento_valor, em_lancamento_descricao, 
 						em_saldo_antes, 
 						em_saldo_depois
@@ -1796,7 +1796,7 @@ function insere_EstabelecimentoMovimentacao(
 						(select quantidade_valor_vendas from estabelecimentos where est_codigo = $8) " . $tipo_operador . " $9,
 						(select quantidade_valor_vendas from estabelecimentos where est_codigo = $10) 
 				)";
-		SQLexecuteQueryParams($sql, array((int)$var_est_codigo, $var_tipo, (int)$var_origem, (int)$var_mapeamento, $var_mapeamento_aux, $var_valor, $var_descricao, (int)$var_est_codigo, $var_valor, (int)$var_est_codigo));
+	SQLexecuteQueryParams($sql, array((int)$var_est_codigo, $var_tipo, (int)$var_origem, (int)$var_mapeamento, $var_mapeamento_aux, $var_valor, $var_descricao, (int)$var_est_codigo, $var_valor, (int)$var_est_codigo));
 
 	//Restaura o error handler
 	restore_error_handler();

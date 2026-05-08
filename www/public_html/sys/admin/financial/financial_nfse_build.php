@@ -19,6 +19,11 @@ $valorNota             = $_POST['valorNota'] ?? [];
 $vinculoEmpresa        = $_POST['vinculoEmpresa'] ?? [];
 
 $nfes_periodo          = $_POST['nfes_periodo'] ?? null;
+$nfes_mes_ano = $_POST['nfes_mes_ano'] ?? date('Y-m', mktime(0, 0, 0, date("m") - 1, 1, date("Y")));
+if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', (string)$nfes_mes_ano)) {
+	$nfes_mes_ano = date('Y-m', mktime(0, 0, 0, date("m") - 1, 1, date("Y")));
+}
+$nfes_mes_ano_timestamp = mktime(0, 0, 0, (int)substr($nfes_mes_ano, 5, 2), 1, (int)substr($nfes_mes_ano, 0, 4));
 //error_reporting(E_ALL); 
 //ini_set("display_errors", 1); 
 set_time_limit(30000);
@@ -98,7 +103,7 @@ function gerarArquivo(varArquivo) {
 					//Setando variaveis para captura no mês referência
 					setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 					date_default_timezone_set('America/Fortaleza');
-					$mesFechamento = mktime(0, 0, 0, date("n") - 1, 1, date("Y"));
+					$mesFechamento = $nfes_mes_ano_timestamp;
 
 					// Para EPP PAGAMENTOS
 					if (empty($vinculoEmpresa[$line])) {

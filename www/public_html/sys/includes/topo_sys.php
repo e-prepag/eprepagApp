@@ -64,7 +64,7 @@ if (($_SESSION["tipo_acesso_pub"] != 'AD') && ($_SESSION["tipo_acesso_pub"] != '
           </div');
     }
 
-    header('Content-Type: text/html; charset=' . LANG_CHARSET);
+    header('Content-Type: text/html; charset=ISO-8859-1');
 
     $resusr = SQLexecuteQueryParams("select shn_nome, tipo_acesso, bko_datalogin, bko_horalogin from usuarios where id=$1", array($_SESSION["iduser_bko_pub"]));
     $pgusr = pg_fetch_array($resusr);
