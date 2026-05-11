@@ -398,6 +398,11 @@ if ($FrmEnviar == 1) {
     $where_canal_p = "";
     $where_canal_c = "";
 
+    $estat_params = array();
+    $estat_param_idx = 1;
+    $param_dd_operadora = '';
+    $param_dd_valor = '';
+
     if ($tf_data_inicial && $tf_data_final) {
         $data_inic = formata_data(trim($tf_data_inicial), 1);
         $data_fim = formata_data(trim($tf_data_final), 1);
@@ -694,6 +699,7 @@ if ($FrmEnviar == 1) {
     $estat .= " offset " . $inicial;
 } else {
     $estat = "select est_codigo from estabelecimentos where est_codigo = 0";
+    $estat_params = array();
 }
 
 $sql_transform = $estat;

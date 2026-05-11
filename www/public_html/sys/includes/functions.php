@@ -148,6 +148,7 @@ if (!function_exists("SQLexecuteQuery")) {
 	}
 	function SQLexecuteQueryParams($sql, $params)
 	{
+		if (is_null($params)) $params = array();
 		$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
 		if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
 			$message  = date("Y-m-d H:i:s") . " ";
@@ -162,6 +163,7 @@ if (!function_exists("SQLexecuteQuery")) {
 if (!function_exists("SQLexecuteQueryParams")) {
 	function SQLexecuteQueryParams($sql, $params)
 	{
+		if (is_null($params)) $params = array();
 		$ret = pg_query_params($GLOBALS['connid'], $sql, $params);
 		if (strlen($erro = pg_last_error($GLOBALS['connid']))) {
 			$message  = date("Y-m-d H:i:s") . " ";
