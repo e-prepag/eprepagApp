@@ -1307,7 +1307,7 @@ function formata_string($string, $caracter, $pos)
 	$aux_inic = substr($string, 0, $pos);
 	$aux_resto = substr($string, $pos, strlen($string) - $pos);
 
-	if (strlen($aux_resto) <= strlen(aux_inic))
+	if (strlen($aux_resto) <= strlen($aux_inic))
 		$aux_r = $aux_inic . $caracter . $aux_resto;
 	else {
 		$aux_for = $caracter;
