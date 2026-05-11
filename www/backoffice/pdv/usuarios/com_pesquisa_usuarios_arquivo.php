@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/../../../includes/pdv_encoding.php";
-header("Content-Type: text/html; charset=ISO-8859-1",true);
+header("Content-Type: text/plain; charset=ISO-8859-1", true);
 
 require_once '../../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo_bko_inc.php";
@@ -174,50 +174,17 @@ if(b_IsUsuarioReinaldo()||b_IsUsuarioWagner()) {
 //	echo "mensagem: ".$mensagem."<br>";
 //	die("Stop");
 }         
-$file_ret = grava_arquivo_emails_user($mensagem); 
+$filename = $tf_tipo . "_" . date("YmdHis") . ".txt";
 
-?>
-<a class="txt-branco" target="_blank" href="/includes/download/dld.php?f=<?php echo $file_ret; ?>&fc=<?php echo $tf_tipo."_".date("YmdHis").".txt"; ?>">Arquivo TXT com Todos os Registros da Sele&ccedil;&atilde;o</a>
-</html>
-<?php 
-// Tomado de CodeIgniter (ver POS lista_transacoes_gr.php)
-function grava_arquivo_emails_user($mensagem) {
-
-                global $raiz_do_projeto;
-		$file_path = $raiz_do_projeto . "arquivos_gerados/txts/txt/";
-		$expiration = 20;
-
-		// -----------------------------------
-		// Remove old files	
-		// -----------------------------------
-				
-		list($usec, $sec) = explode(" ", microtime());
-		$now = ((float)$usec + (float)$sec);
-		$current_dir = @opendir($file_path);
-                if(is_dir($file_path)) {
-                    while($filename = @readdir($current_dir)) {
-                            if ($filename != "." and $filename != ".." and $filename != "index.html") {
-                                    $name = str_replace(".txt", "", $filename);
-                                    if (($name + $expiration) < $now) {
-                                            @unlink($file_path.$filename);
-                                    }
-                            }
-                    }
-                    @closedir($current_dir);
-                }
-
-		//Arquivo
-		$file = $file_path.$now.".txt";
-	
-		//Grava mensagem no arquivo
-		if ($handle = fopen($file, 'a+')) {
-			fwrite($handle, $mensagem);
-			fclose($handle);
-		} 
-		
-//		$file_return = 'http://'.$_SERVER['HTTP_HOST'].$web_path.$now.".txt";
-		$file_return = $now.".txt";
-
-		return $file_return;
+if (ob_get_length()) {
+    ob_clean();
 }
-?>
+
+header("Content-Type: text/plain; charset=ISO-8859-1", true);
+header("Content-Disposition: attachment; filename=\"" . $filename . "\"");
+header("Content-Length: " . strlen($mensagem));
+header("Cache-Control: no-cache, must-revalidate");
+header("Pragma: public");
+
+echo $mensagem;
+exit;
