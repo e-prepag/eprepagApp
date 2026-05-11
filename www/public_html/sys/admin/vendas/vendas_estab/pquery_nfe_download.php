@@ -1,37 +1,3 @@
 <?php
-
-// Validação básica
-if (empty($_GET['file'])) {
-    http_response_code(400);
-    exit('Parâmetro inválido.');
-}
-
-// Segurança: evita path traversal
-$filename = basename($_GET['file']);
-
-// Caminho REAL do arquivo no servidor/container
-$baseDir  = '/www/arquivos_gerados/vendas_estab/';
-$filePath = $baseDir . $filename;
-
-// Verifica existência
-if (!file_exists($filePath) || !is_file($filePath)) {
-    http_response_code(404);
-    exit('Arquivo não encontrado.');
-}
-
-// Headers para forçar download
-header('Content-Description: File Transfer');
-header('Content-Type: text/plain; charset=UTF-8');
-header('Content-Disposition: attachment; filename="' . $filename . '"');
-header('Content-Length: ' . filesize($filePath));
-header('Cache-Control: no-cache, must-revalidate');
-header('Pragma: public');
-
-// Limpa buffers (evita corrupção do arquivo)
-if (ob_get_length()) {
-    ob_clean();
-}
-flush();
-
-readfile($filePath);
-exit;
+http_response_code(410);
+exit("Este endpoint nao gera mais o TXT. Use a opcao Gerar NFe em pquery_nfe.php.");
