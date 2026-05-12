@@ -227,7 +227,13 @@ class FilePosition
         $directory = $file;
         $file = strtolower($this->getFileName());
         $temporaryDirectory = $this->getDiretorioTemporarioWindows();
-        $temporaryFile = $temporaryDirectory . $file;
+        if (!is_writable($temporaryDirectory)) {
+            $temporaryDirectory = $directory;
+        }
+        if (!str_ends_with($temporaryDirectory, DIRECTORY_SEPARATOR)) {
+            $temporaryDirectory .= DIRECTORY_SEPARATOR;
+        }
+        $temporaryFile = $temporaryDirectory . uniqid('zip_', true) . '_' . $file;
 
         // Removendo arquivo anterior existente com mesmo nome
         if (file_exists($directory . $file)) {

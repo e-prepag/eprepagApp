@@ -995,8 +995,10 @@ if ($file->checkFile()) {
 
 //==================================  Início do trecho compactando arquivos Semestrais para serem enviados para Prefeitura
 $nomeArquivoSUREM10Zipado = "SUREM10_" . $mes . $ano . ".zip"; //Exemplo: SUREM10_122014.zip
-@$file = new FilePosition($nomeArquivoSUREM10Zipado, $diretorioLotesPrefeitura);
-$zipCriado = @$file->createZip($nomeArquivoSUREM10, false);
+$file = new FilePosition($nomeArquivoSUREM10Zipado, $diretorioLotesPrefeitura);
+$file->setDiretorioTemporarioWindows($diretorioLotesPrefeitura);
+$zipCriado = $file->createZip($nomeArquivoSUREM10, false);
+clearstatcache();
 
 if ($zipCriado && $file->checkFile()) {
     echo "Arquivo Mensal Zipado Criado com Sucesso:
@@ -1004,7 +1006,15 @@ if ($zipCriado && $file->checkFile()) {
             {$nomeArquivoSUREM10Zipado}
         </a><br><hr><br><br>";
 } else {
-    echo "Arquivo Mensal Zipado n&atilde;o foi gerado.<br><hr><br><br>";
+    $arquivoTxtEsperado = $diretorioLotesPrefeitura . strtolower((string)($nomeArquivoSUREM10[0] ?? ''));
+    $arquivoZipEsperado = $diretorioLotesPrefeitura . strtolower($nomeArquivoSUREM10Zipado);
+
+    echo "Arquivo Mensal Zipado n&atilde;o foi gerado.<br>";
+    echo "Diagn&oacute;stico:<br>";
+    echo "- ZipArchive: " . (class_exists('ZipArchive') ? "dispon&iacute;vel" : "indispon&iacute;vel") . "<br>";
+    echo "- Diret&oacute;rio dos lotes grav&aacute;vel: " . (is_writable($diretorioLotesPrefeitura) ? "sim" : "n&atilde;o") . "<br>";
+    echo "- Arquivo TXT origem: " . (file_exists($arquivoTxtEsperado) ? "encontrado" : "n&atilde;o encontrado") . " (" . htmlspecialchars($arquivoTxtEsperado, ENT_QUOTES, 'ISO-8859-1') . ")<br>";
+    echo "- Arquivo ZIP destino: " . (file_exists($arquivoZipEsperado) ? "encontrado" : "n&atilde;o encontrado") . " (" . htmlspecialchars($arquivoZipEsperado, ENT_QUOTES, 'ISO-8859-1') . ")<br><hr><br><br>";
 }
 
 //==================================  Fim do trecho compactando arquivos Semestrais para serem enviados para Prefeitura

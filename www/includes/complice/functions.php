@@ -663,12 +663,12 @@ function levantamentoPublisherOperantes(mixed $ano, mixed $mes, bool $variado = 
             opr_codigo,
             opr_nome
         from operadoras
-        where opr_vinculo_empresa = ?
+        where opr_vinculo_empresa = $1
           and opr_data_inicio_operacoes is not null
-          and opr_data_inicio_operacoes <= ?
+          and opr_data_inicio_operacoes <= $2
           and opr_internacional_alicota != 0
-          and opr_status = ?
-          and opr_ja_contabilizou = ?";
+          and opr_status = $3
+          and opr_ja_contabilizou = $4";
 
     /* =======================
    PARAMS BASE
@@ -686,7 +686,7 @@ function levantamentoPublisherOperantes(mixed $ano, mixed $mes, bool $variado = 
 ======================= */
 
     if ($variado) {
-        $sql .= " and opr_cotacao_dolar = ?";
+        $sql .= " and opr_cotacao_dolar = $5";
         $params[] = 1;
     }
 
@@ -706,15 +706,15 @@ function levantamentoPublisherOperantes(mixed $ano, mixed $mes, bool $variado = 
 
     //echo pg_num_rows($rs_operadoras_operantes)."<br>";
     if (!$rs_operadoras_operantes) {
-        echo "Erro na Query de Levantamento de Publishers INTERNacionais jÃ¡ em operaÃ§Ã£o(" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de Publishers INTERNacionais já em operação(" . $sql . ").<br>" . PHP_EOL;
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publisher INTERNacional foi considerado na elaboraÃ§Ã£o de arquivos de Complice BACEN em mÃªses anteriores</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publisher INTERNacional foi considerado na elaboração de arquivos de Complice BACEN em mêses anteriores</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
-        echo "<b>Publishers INTERNacionais que jÃ¡ foram considerados na elaboraÃ§Ã£o de arquivos de Complice BACEN em mÃªses anteriores:</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers INTERNacionais que já foram considerados na elaboração de arquivos de Complice BACEN em mêses anteriores:</b><br><br>" . PHP_EOL;
         while ($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
             $aux_retorno[] = $rs_operadoras_operantes_row['opr_codigo'];
             echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "]<br>" . PHP_EOL;
@@ -746,12 +746,12 @@ function levantamentoPublisherOperantesNacionais(mixed $ano, mixed $mes): array
             opr_codigo,
             opr_nome
         from operadoras
-        where opr_vinculo_empresa = ?
+        where opr_vinculo_empresa = $1
           and opr_data_inicio_operacoes is not null
-          and opr_data_inicio_operacoes <= ?
+          and opr_data_inicio_operacoes <= $2
           and opr_internacional_alicota = 0
-          and opr_status != ?
-          and opr_ja_contabilizou = ?
+          and opr_status != $3
+          and opr_ja_contabilizou = $4
         order by opr_nome";
 
     /* =======================
@@ -775,15 +775,15 @@ function levantamentoPublisherOperantesNacionais(mixed $ano, mixed $mes): array
 
     //echo pg_num_rows($rs_operadoras_operantes)."<br>";
     if (!$rs_operadoras_operantes) {
-        echo "Erro na Query de Levantamento de Publishers jÃ¡ em operaÃ§Ã£o NACIONAIS(" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de Publishers já em operação NACIONAIS(" . $sql . ").<br>" . PHP_EOL;
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publishers Nacional foi considerado na elaboraÃ§Ã£o de arquivos de Complice BACEN em mÃªses anteriores</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publishers Nacional foi considerado na elaboração de arquivos de Complice BACEN em mêses anteriores</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
-        echo "<b>Publishers NACIONAIS que jÃ¡ foram considerados na elaboraÃ§Ã£o de arquivos de Complice BACEN em mÃªses anteriores:</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers NACIONAIS que já foram considerados na elaboração de arquivos de Complice BACEN em mêses anteriores:</b><br><br>" . PHP_EOL;
         while ($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
             $aux_retorno[] = $rs_operadoras_operantes_row['opr_codigo'];
             echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "]<br>" . PHP_EOL;
@@ -814,14 +814,14 @@ function levantamentoPublisherOperantesMunicipais(mixed $ano, mixed $mes): array
             opr_codigo,
             opr_nome
         from operadoras
-        where opr_vinculo_empresa = ?
+        where opr_vinculo_empresa = $1
           and opr_data_inicio_operacoes is not null
-          and opr_data_inicio_operacoes <= ?
+          and opr_data_inicio_operacoes <= $2
           and opr_internacional_alicota = 0
-          and opr_status != ?
-          and UPPER(opr_estado) = ?
-          and TRIM(opr_cidade) ilike ?
-          and opr_ja_contabilizou = ?
+          and opr_status != $3
+          and UPPER(opr_estado) = $4
+          and TRIM(opr_cidade) ilike $5
+          and opr_ja_contabilizou = $6
         order by opr_nome";
 
     /* =======================
@@ -847,15 +847,15 @@ function levantamentoPublisherOperantesMunicipais(mixed $ano, mixed $mes): array
 
     //echo pg_num_rows($rs_operadoras_operantes)."<br>";
     if (!$rs_operadoras_operantes) {
-        echo "Erro na Query de Levantamento de Publishers jÃ¡ em operaÃ§Ã£o(" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de Publishers já em operação(" . $sql . ").<br>" . PHP_EOL;
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publishers foi considerado na elaboraÃ§Ã£o de arquivos de Complice Municipal em mÃªses anteriores</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publishers foi considerado na elaboração de arquivos de Complice Municipal em mêses anteriores</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
-        echo "<b>Publishers que jÃ¡ foram considerados na elaboraÃ§Ã£o de arquivos de Complice Municipal em mÃªses anteriores:</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers que já foram considerados na elaboração de arquivos de Complice Municipal em mêses anteriores:</b><br><br>" . PHP_EOL;
         while ($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
 
 
@@ -890,12 +890,12 @@ function levantamentoPublisherNovosOperantes(mixed $ano, mixed $mes, bool $varia
             opr_nome,
             to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') as data_inicio
         from operadoras
-        where opr_vinculo_empresa = ?
+        where opr_vinculo_empresa = $1
           and opr_data_inicio_operacoes is not null
-          and opr_data_inicio_operacoes <= ?
+          and opr_data_inicio_operacoes <= $2
           and opr_internacional_alicota != 0
-          and opr_status = ?
-          and opr_ja_contabilizou != ?";
+          and opr_status = $3
+          and opr_ja_contabilizou != $4";
 
     /* =======================
    PARAMS BASE
@@ -911,7 +911,7 @@ function levantamentoPublisherNovosOperantes(mixed $ano, mixed $mes, bool $varia
 ======================= */
 
     if ($variado) {
-        $sql .= " and opr_cotacao_dolar = ?";
+        $sql .= " and opr_cotacao_dolar = $5";
         $params[] = 1;
     }
 
@@ -935,16 +935,16 @@ function levantamentoPublisherNovosOperantes(mixed $ano, mixed $mes, bool $varia
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publisher INTERNacional NOVO iniciou operaÃ§Ãµes no MÃªs Anterior</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publisher INTERNacional NOVO iniciou operações no Mês Anterior</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
-        echo "<b>Publishers INTERNacionais NOVOs que serÃ£o considerados na elaboraÃ§Ã£o de arquivos:</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers INTERNacionais NOVOs que serão considerados na elaboração de arquivos:</b><br><br>" . PHP_EOL;
         while ($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
 
 
             $aux_retorno[] = $rs_operadoras_operantes_row['opr_codigo'];
-            echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "] => Data InÃ­cio das OperaÃ§Ãµes [<b style='color: red'>" . $rs_operadoras_operantes_row['data_inicio'] . "</b>]<br>" . PHP_EOL;
+            echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "] => Data Início das Operações [<b style='color: red'>" . $rs_operadoras_operantes_row['data_inicio'] . "</b>]<br>" . PHP_EOL;
         } //end while
         echo "<br><br>" . PHP_EOL;
         return $aux_retorno;
@@ -969,18 +969,18 @@ function levantamentoPublisherNovosOperantesNacionais(mixed $ano, mixed $mes): a
         to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') AS data_inicio
     FROM operadoras
     WHERE 
-        opr_vinculo_empresa = :empresa
+        opr_vinculo_empresa = $1
         AND opr_data_inicio_operacoes IS NOT NULL
-        AND opr_data_inicio_operacoes <= :data_final_mes
+        AND opr_data_inicio_operacoes <= $2
         AND opr_internacional_alicota = 0
-        AND opr_ja_contabilizou != :status_contabilizou
+        AND opr_ja_contabilizou != $3
     ORDER BY opr_nome
 ";
 
     $params = [
-        ':empresa'              => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
-        ':data_final_mes'       => $dataFinalMes,
-        ':status_contabilizou'  => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+        $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        $dataFinalMes,
+        $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
     ];
 
     $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
@@ -993,16 +993,16 @@ function levantamentoPublisherNovosOperantesNacionais(mixed $ano, mixed $mes): a
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publisher NACIONAL NOVO iniciou operaÃ§Ãµes no MÃªs Anterior</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publisher NACIONAL NOVO iniciou operações no Mês Anterior</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
-        echo "<b>Publishers NACIONAIS NOVOs que serÃ£o considerados na elaboraÃ§Ã£o de arquivos:</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers NACIONAIS NOVOs que serão considerados na elaboração de arquivos:</b><br><br>" . PHP_EOL;
         while ($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
 
 
             $aux_retorno[] = $rs_operadoras_operantes_row['opr_codigo'];
-            echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "] => Data InÃ­cio das OperaÃ§Ãµes [<b style='color: red'>" . $rs_operadoras_operantes_row['data_inicio'] . "</b>]<br>" . PHP_EOL;
+            echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "] => Data Início das Operações [<b style='color: red'>" . $rs_operadoras_operantes_row['data_inicio'] . "</b>]<br>" . PHP_EOL;
         } //end while
         echo "<br><br>" . PHP_EOL;
         return $aux_retorno;
@@ -1027,22 +1027,22 @@ function levantamentoPublisherNovosOperantesMunicipais(mixed $ano, mixed $mes): 
         to_char(opr_data_inicio_operacoes,'DD/MM/YYYY') AS data_inicio
     FROM operadoras
     WHERE 
-        opr_vinculo_empresa = :empresa
+        opr_vinculo_empresa = $1
         AND opr_data_inicio_operacoes IS NOT NULL
-        AND opr_data_inicio_operacoes <= :data_final_mes
+        AND opr_data_inicio_operacoes <= $2
         AND opr_internacional_alicota = 0
-        AND UPPER(opr_estado) = :estado
-        AND TRIM(opr_cidade) ILIKE :cidade
-        AND opr_ja_contabilizou != :status_contabilizou
+        AND UPPER(opr_estado) = $3
+        AND TRIM(opr_cidade) ILIKE $4
+        AND opr_ja_contabilizou != $5
     ORDER BY opr_nome
 ";
 
     $params = [
-        'empresa'             => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
-        'data_final_mes'      => $dataFinalMes,
-        'estado'              => 'SP',
-        'cidade'              => 's%o Paulo',
-        'status_contabilizou' => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+        $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+        $dataFinalMes,
+        'SP',
+        's%o Paulo',
+        $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
     ];
 
     $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
@@ -1051,20 +1051,20 @@ function levantamentoPublisherNovosOperantesMunicipais(mixed $ano, mixed $mes): 
 
     //echo pg_num_rows($rs_operadoras_operantes)."<br>";
     if (!$rs_operadoras_operantes) {
-        echo "Erro na Query de Levantamento de Publishers jÃ¡ em operaÃ§Ã£o(" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de Publishers já em operação(" . $sql . ").<br>" . PHP_EOL;
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publishers NOVO iniciou operaÃ§Ãµes no MÃªs Anterior</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publishers NOVO iniciou operações no Mês Anterior</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
-        echo "<b>Publishers NOVOs que serÃ£o considerados na elaboraÃ§Ã£o de arquivos:</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers NOVOs que serão considerados na elaboração de arquivos:</b><br><br>" . PHP_EOL;
         while ($rs_operadoras_operantes_row = pg_fetch_array($rs_operadoras_operantes)) {
 
 
             $aux_retorno[] = $rs_operadoras_operantes_row['opr_codigo'];
-            echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "] => Data InÃ­cio das OperaÃ§Ãµes [<b style='color: red'>" . $rs_operadoras_operantes_row['data_inicio'] . "</b>]<br>" . PHP_EOL;
+            echo " ID [" . $rs_operadoras_operantes_row['opr_codigo'] . "] => [" . $rs_operadoras_operantes_row['opr_nome'] . "] => Data Início das Operações [<b style='color: red'>" . $rs_operadoras_operantes_row['data_inicio'] . "</b>]<br>" . PHP_EOL;
         } //end while
         echo "<br><br>" . PHP_EOL;
         return $aux_retorno;
@@ -1076,38 +1076,47 @@ function levantamentoPublisherNovosOperantesMunicipais(mixed $ano, mixed $mes): 
 function alteracaoPublisherNovosJaArquivoBACEN(array $vetorPublisherNovos): bool
 {
 
-    // Buscando informaes 
+    // Buscando informaes
+    if (empty($vetorPublisherNovos)) {
+        return false;
+    }
+
+    $placeholdersPublisher = array_map(
+        fn($indice) => '$' . $indice,
+        range(4, count($vetorPublisherNovos) + 3)
+    );
+
     $sql = "
     UPDATE operadoras
-    SET opr_ja_contabilizou = :status_aguardando
-    WHERE 
-        opr_vinculo_empresa = :empresa
+    SET opr_ja_contabilizou = $1
+    WHERE
+        opr_vinculo_empresa = $2
         AND opr_data_inicio_operacoes IS NOT NULL
-        AND opr_ja_contabilizou != :status_contabilizou
+        AND opr_ja_contabilizou != $3
         AND opr_internacional_alicota != 0
-        AND opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisherNovos), '?')) . ")
+        AND opr_codigo IN (" . implode(',', $placeholdersPublisher) . ")
 ";
 
     $params = array_merge(
         [
-            'status_aguardando' => $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
-            'empresa'           => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
-            'status_contabilizou' => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+            $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
+            $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+            $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
         ],
         $vetorPublisherNovos
     );
 
     $rs_update = SQLexecuteQueryParams($sql, $params);
     if (!$rs_update) {
-        echo "Erro na Query de AlteraÃ§Ã£o de Publishers para jÃ¡ em arquivo do BACEN (" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Alteração de Publishers para já em arquivo do BACEN (" . $sql . ").<br>" . PHP_EOL;
         return false;
     }
     if (pg_affected_rows($rs_update) === 0) {
-        echo "<b>Nenhum Publishers NOVO foi alterado para jÃ¡ em arquivo do BACEN</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publishers NOVO foi alterado para já em arquivo do BACEN</b><br><br>" . PHP_EOL;
         return false;
     } //end if((($rs_update) ? pg_num_rows($rs_update) : 0) == 0)
     else {
-        echo "<b>Publishers NOVOs foram alterados para jÃ¡ em arquivo do BACEN [" . implode(",", $vetorPublisherNovos) . "]</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers NOVOs foram alterados para já em arquivo do BACEN [" . implode(",", $vetorPublisherNovos) . "]</b><br><br>" . PHP_EOL;
         return true;
     } //end else
 
@@ -1116,40 +1125,49 @@ function alteracaoPublisherNovosJaArquivoBACEN(array $vetorPublisherNovos): bool
 function alteracaoPublisherNovosJaArquivoMunicipais(array $vetorPublisherNovos): bool
 {
 
-    // Buscando informaes 
+    // Buscando informaes
+    if (empty($vetorPublisherNovos)) {
+        return false;
+    }
+
+    $placeholdersPublisher = array_map(
+        fn($indice) => '$' . $indice,
+        range(4, count($vetorPublisherNovos) + 3)
+    );
+
     $sql = "
     UPDATE operadoras
-    SET opr_ja_contabilizou = :status_aguardando
-    WHERE 
-        opr_vinculo_empresa = :empresa
+    SET opr_ja_contabilizou = $1
+    WHERE
+        opr_vinculo_empresa = $2
         AND opr_data_inicio_operacoes IS NOT NULL
-        AND opr_ja_contabilizou != :status_contabilizou
+        AND opr_ja_contabilizou != $3
         AND opr_internacional_alicota = 0
         AND UPPER(opr_estado) = 'SP'
         AND TRIM(opr_cidade) ILIKE 's%o Paulo'
-        AND opr_codigo IN (" . implode(',', array_fill(0, count($vetorPublisherNovos), '?')) . ")
+        AND opr_codigo IN (" . implode(',', $placeholdersPublisher) . ")
 ";
 
     $params = array_merge(
         [
-            'status_aguardando'  => $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
-            'empresa'            => $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
-            'status_contabilizou' => $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+            $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
+            $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+            $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
         ],
         $vetorPublisherNovos
     );
 
     $rs_update = SQLexecuteQueryParams($sql, $params);
     if (!$rs_update) {
-        echo "Erro na Query de AlteraÃ§Ã£o de Publishers para jÃ¡ em arquivo para Prefeitura (" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Alteração de Publishers para já em arquivo para Prefeitura (" . $sql . ").<br>" . PHP_EOL;
         return false;
     }
     if (pg_affected_rows($rs_update) === 0) {
-        echo "<b>Nenhum Publishers NOVO foi alterado para jÃ¡ em arquivo para Prefeitura</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publishers NOVO foi alterado para já em arquivo para Prefeitura</b><br><br>" . PHP_EOL;
         return false;
     } //end if((($rs_update) ? pg_num_rows($rs_update) : 0) == 0)
     else {
-        echo "<b>Publishers NOVOs foram alterados para jÃ¡ em arquivo para Prefeitura [" . implode(",", $vetorPublisherNovos) . "]</b><br><br>" . PHP_EOL;
+        echo "<b>Publishers NOVOs foram alterados para já em arquivo para Prefeitura [" . implode(",", $vetorPublisherNovos) . "]</b><br><br>" . PHP_EOL;
         return true;
     } //end else
 
@@ -1168,10 +1186,10 @@ function levantamentoPublisherEppPagamentosFacilitadora(mixed $ano, mixed $mes, 
         opr_nome
     FROM operadoras
     WHERE 
-        opr_vinculo_empresa = :empresa
+        opr_vinculo_empresa = $1
         AND opr_data_inicio_operacoes IS NOT NULL
-        AND opr_data_inicio_operacoes <= :data_limite
-        AND (opr_internacional_alicota = :aliquota_padrao OR opr_internacional_alicota = :iof)
+        AND opr_data_inicio_operacoes <= $2
+        AND (opr_internacional_alicota = $3 OR opr_internacional_alicota = $4)
         AND opr_status = '1'
 ";
 
@@ -1182,10 +1200,10 @@ function levantamentoPublisherEppPagamentosFacilitadora(mixed $ano, mixed $mes, 
     $sql .= " ORDER BY opr_nome";
 
     $params = [
-        'empresa'          => $GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS'],
-        'data_limite'      => $data_limite,
-        'aliquota_padrao'  => 0.38,
-        'iof'              => IOF,
+        $GLOBALS['IDENTIFICACAO_EMPRESA_PAGAMENTOS'],
+        $data_limite,
+        0.38,
+        IOF,
     ];
 
     $rs_operadoras_operantes = SQLexecuteQueryParams($sql, $params);
@@ -1194,11 +1212,11 @@ function levantamentoPublisherEppPagamentosFacilitadora(mixed $ano, mixed $mes, 
 
     //echo pg_num_rows($rs_operadoras_operantes)."<br>";
     if (!$rs_operadoras_operantes) {
-        echo "Erro na Query de Levantamento de Publishers Epp Pagamentos Facilitadora jÃ¡ em operaÃ§Ã£o(" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de Publishers Epp Pagamentos Facilitadora já em operação(" . $sql . ").<br>" . PHP_EOL;
         return array(0);
     }
     if ((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0) {
-        echo "<b>Nenhum Publisher Epp Pagamentos Facilitadora foi considerado em mÃªses anteriores</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publisher Epp Pagamentos Facilitadora foi considerado em mêses anteriores</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_operantes) ? pg_num_rows($rs_operadoras_operantes) : 0) == 0)
     else {
@@ -1818,11 +1836,11 @@ function levantamentoPublisherObrigatorioCPF(array &$vetorPublisherLegenda): arr
 
     //echo pg_num_rows($rs_operadoras_obrigatorio_cpf)."<br>";
     if (!$rs_operadoras_obrigatorio_cpf) {
-        echo "Erro na Query de Levantamento de Publishers Exigem CPF na operaÃ§Ã£o(" . $sql . ").<br>" . PHP_EOL;
+        echo "Erro na Query de Levantamento de Publishers Exigem CPF na operação(" . $sql . ").<br>" . PHP_EOL;
         return array(0);
     }
     if ((($rs_operadoras_obrigatorio_cpf) ? pg_num_rows($rs_operadoras_obrigatorio_cpf) : 0) == 0) {
-        echo "<b>Nenhum Publisher que Exige CPF foi considerado no seleÃ§Ã£o(" . $sql . ").</b><br><br>" . PHP_EOL;
+        echo "<b>Nenhum Publisher que Exige CPF foi considerado no seleção(" . $sql . ").</b><br><br>" . PHP_EOL;
         return array(0);
     } //end if((($rs_operadoras_obrigatorio_cpf) ? pg_num_rows($rs_operadoras_obrigatorio_cpf) : 0) == 0)
     else {
