@@ -216,9 +216,9 @@ function get_status_pedido($vg_id, &$recibo = null) {
 	if(!$vg_id) {
 		return -1;
 	}
-	$sql = "select * from tb_recarga_pedidos where rp_vg_id = $vg_id order by rp_data_inclusao desc limit 1";
+	$sql = "select * from tb_recarga_pedidos where rp_vg_id = $1 order by rp_data_inclusao desc limit 1";
 //echo "get_status_pedido: $vg_id <br>$sql<br>\n";
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, array((int)$vg_id));
 	if(!$rs || pg_num_rows($rs) == 0) {
 //echo "Nope<br>";
 		echo "Nenhum produto encontrado ($sql).\n";

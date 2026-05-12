@@ -11,8 +11,8 @@
                                             (select count(*) from tb_dist_venda_games_modelo_pins vgmp where (vgmp.vgmp_impressao_qtde is NULL or vgmp.vgmp_impressao_qtde = 0) and vgmp.vgmp_vgm_id = vgm_id) as nao_impresso
                                     from tb_dist_venda_games vg 
                                     inner join tb_dist_venda_games_modelo vgm on vgm.vgm_vg_id = vg.vg_id 
-                                    where vg.vg_id = " . $venda_id;
-                    $rs_pins = SQLexecuteQuery($sql);
+                                    where vg.vg_id = $1";
+                    $rs_pins = SQLexecuteQueryParams($sql, array((int)$venda_id));
                     if($rs_pins && pg_num_rows($rs_pins) > 0){
                 ?>
                         <tr bgcolor="F5F5FB">

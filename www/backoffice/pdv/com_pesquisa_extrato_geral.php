@@ -44,7 +44,7 @@ if(!isset($tf_v_data_inclusao_ini) || !$tf_v_data_inclusao_ini) {
 if(!isset($tf_v_data_inclusao_fim) || !$tf_v_data_inclusao_fim) $tf_v_data_inclusao_fim = $hoje;
 $tf_v_codigo = $_REQUEST['tf_v_codigo'] ?? '';
 $nome_fantasia = strtoupper($_REQUEST['nome_fantasia']);
-$codigo_lan = $_REQUEST['codigo_lan'] ?? '';
+$codigo_lan = (int)($_REQUEST['codigo_lan'] ?? 0);
 
 if (isset($tf_v_codigo)){
 	$varse1 .= "&tf_v_codigo=$tf_v_codigo";

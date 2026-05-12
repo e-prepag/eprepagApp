@@ -2,6 +2,10 @@
 require_once "../../../../../includes/constantes.php";
 require_once $raiz_do_projeto . "public_html/sys/includes/topo_sys.php";
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename=exportacao_dados.csv');
 
@@ -16,12 +20,12 @@ fputcsv($output, [
     'Valor de Venda ao Consumidor'
 ]);
 
-$sql = base64_decode($_POST['sql'] ?? "", true);
-if ($sql === false || !preg_match('/^\s*select\b/i', $sql) || preg_match('/;|--|\/\*|\b(insert|update|delete|drop|alter|truncate|create|copy|grant|revoke)\b/i', $sql)) {
+$sql = $_SESSION['sqldata'] ?? "";
+if (!is_string($sql) || !preg_match('/^\s*select\b/i', $sql) || preg_match('/;|--|\/\*|\b(insert|update|delete|drop|alter|truncate|create|copy|grant|revoke)\b/i', $sql)) {
     http_response_code(400);
     exit;
 }
-$res = SQLexecuteQuery($sql);
+$res = SQLexecuteQueryParams($sql, array());
 
 while ($row = pg_fetch_assoc($res)) {
     fputcsv($output, [

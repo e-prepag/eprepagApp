@@ -6,10 +6,19 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 
 
 	$filtro = array_map("strtoupper", $filtro);
+	$params = [];
+	$addParam = function (mixed $value) use (&$params): string {
+		$params[] = $value;
+		return '$' . count($params);
+	};
 
 	//$com ="";
 	//echo "<pre>".print_r($filtro, true)."</pre>";
 	$news_query = "";
+	$news_query_express_money = "";
+	$produtos_query = "";
+	$com = "";
+	$num_op = "";
 	if ($filtro['news'] == 'T' || $filtro['news'] == 'S' || $filtro['news'] == 'N' || $filtro['news'] == 'H') {
 		if ($filtro['news'] == 'S') {
 			$news_query = " and (upper(ug_news) = 'T' or upper(ug_news) = 'H') ";
@@ -37,7 +46,7 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 			$produtos_query .= " and  ( ";
 			while ($filtro['produto' . $s] != '') {
 				$com .= ", '" . $filtro['produto' . $s] . "' as produto" . $s . " ";
-				$produtos_query .= " upper(vgm_nome_produto) = '" . str_replace("'", "''", $filtro['produto' . $s]) . "' ";
+				$produtos_query .= " upper(vgm_nome_produto) = " . $addParam($filtro['produto' . $s]) . " ";
 				$s++;
 				if ($filtro['produto' . $s] != '') $produtos_query .= " or ";
 			}
@@ -56,7 +65,7 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 
 			while ($filtro['pin' . $s] != '') {
 				$com .= ", '" . $filtro['pin' . $s] . "' as pin" . $s . " ";
-				$produtos_query .= " vgm_valor = '" . $filtro['pin' . $s] . "' ";
+				$produtos_query .= " vgm_valor = " . $addParam($filtro['pin' . $s]) . " ";
 				$s++;
 				if ($filtro['pin' . $s] != '') $produtos_query .= " or ";
 			}
@@ -67,7 +76,7 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 
 	$op = "";
 	if ($num_op != '') {
-		$op = " and vgm_opr_codigo= '" . $num_op . "' ";
+		$op = " and vgm_opr_codigo = " . $addParam($num_op) . " ";
 	}
 
 	if ($filtro['data_inclusao_ini'] && $filtro['data_inclusao_fim']) {
@@ -92,7 +101,7 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 		//if($filtro['dd_opr_codigo'] != '') {
 		$sql .= " and vg.vg_ultimo_status='5' ";
 		if ($filtro['data_inclusao_ini'] && $filtro['data_inclusao_fim']) {
-			$sql .= " and (vg_data_inclusao between '$data_inclusao_ini' and '$data_inclusao_fim') ";
+			$sql .= " and (vg_data_inclusao between " . $addParam($data_inclusao_ini) . " and " . $addParam($data_inclusao_fim) . ") ";
 		}
 		//}
 		$sql .= "group by ug_email, ativo, ug_news ";
@@ -116,7 +125,7 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 		//if($filtro['dd_opr_codigo'] != '') {
 		$sql .= " and vg.vg_ultimo_status='5' ";
 		if ($filtro['data_inclusao_ini'] && $filtro['data_inclusao_fim']) {
-			$sql .= " and (vg_data_inclusao between '$data_inclusao_ini' and '$data_inclusao_fim') ";
+			$sql .= " and (vg_data_inclusao between " . $addParam($data_inclusao_ini) . " and " . $addParam($data_inclusao_fim) . ") ";
 		}
 		$sql .= PHP_EOL;
 		//}
@@ -146,7 +155,7 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 		}
 		$sql .= $op . " and (not vg_ex_email is null) " . $produtos_query . " " . $news_query_express_money . "";
 		if ($filtro['data_inclusao_ini'] && $filtro['data_inclusao_fim']) {
-			$sql .= " and (vg_data_inclusao between '$data_inclusao_ini' and '$data_inclusao_fim') ";
+			$sql .= " and (vg_data_inclusao between " . $addParam($data_inclusao_ini) . " and " . $addParam($data_inclusao_fim) . ") ";
 		}
 		$sql .= "group by vg_ex_email, vg_ultimo_status " . PHP_EOL;
 	}
@@ -158,10 +167,10 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 		$sql .= " where 1=1";
 
 		$sql .= " and (" . (is_null($filtro['tipo']) ? 1 : 0);
-		$sql .= "=1 or upper(tipo) = '" . SQLaddFields($filtro['tipo'], "") . "')";
+		$sql .= "=1 or upper(tipo) = " . $addParam($filtro['tipo']) . ")";
 
 		$sql .= " and (" . (is_null($filtro['email']) ? 1 : 0);
-		$sql .= "=1 or upper(email) = " . SQLaddFields($filtro['email'], "") . ")";
+		$sql .= "=1 or upper(email) = " . $addParam($filtro['email']) . ")";
 
 		$sql .= " and (" . (($filtro['ativo'] != '1' && $filtro['ativo'] != '2') ? 1 : 0);
 		$sql .= "=1 " . (($filtro['ativo'] == '1') ? " or ativo = 1" : (($filtro['ativo'] == '2') ? " or ativo = 2" : "")) . ") ";
@@ -174,11 +183,13 @@ function obter($filtro, $orderBy, $limitTo, &$rs)
 
 	}
 
-	if (!is_null($orderBy)) $sql .= $orderBy . " ";
+	if (!is_null($orderBy) && trim((string)$orderBy) === 'order by tipo, email') $sql .= " order by tipo, email ";
 
-	if (!is_null($limitTo) && !($limitTo == "")) $sql .= $limitTo . " ;";
+	if (!is_null($limitTo) && preg_match('/^\s*limit\s+([0-9]+)\s+offset\s+([0-9]+)\s*;?\s*$/i', (string)$limitTo, $m)) {
+		$sql .= " limit " . (int)$m[1] . " offset " . (int)$m[2] . " ;";
+	}
 
-	$rs = SQLexecuteQuery($sql);
+	$rs = SQLexecuteQueryParams($sql, $params);
 	if (!$rs) $ret = "Erro ao obter Newsletter(s)." . PHP_EOL;
 
 	return $ret;

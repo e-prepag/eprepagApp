@@ -989,13 +989,32 @@ require_once "/www/includes/bourls.php";
             beforeSend: function() {
                 $("#area").html("<img src='/images/ajax-loader.gif' />");
             },
-            success: function(html) {
-                //console.log(html);
-                $("#area").html(html);
-                //alert(html);
+            success: function(conteudo) {
+                var dataAtual = new Date();
+                var nomeArquivo = "UsuariosPDVs_" +
+                    dataAtual.getFullYear().toString() +
+                    (dataAtual.getMonth() + 1).toString().padStart(2, "0") +
+                    dataAtual.getDate().toString().padStart(2, "0") +
+                    dataAtual.getHours().toString().padStart(2, "0") +
+                    dataAtual.getMinutes().toString().padStart(2, "0") +
+                    dataAtual.getSeconds().toString().padStart(2, "0") +
+                    ".txt";
+                var blob = new Blob([conteudo], {
+                    type: "text/plain;charset=ISO-8859-1"
+                });
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement("a");
+                link.href = url;
+                link.download = nomeArquivo;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                $("#area").html('<span onclick="gerarArquivo();" class="txt-branco">Exportar Relat&oacute;rio</span>');
             },
             error: function() {
-                alert('erro ao carregar valores');
+                $("#area").html('<span onclick="gerarArquivo();" class="txt-branco">Exportar Relat&oacute;rio</span>');
+                alert("erro ao carregar valores");
             }
         });
     }

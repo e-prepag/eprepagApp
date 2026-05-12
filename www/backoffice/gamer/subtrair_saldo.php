@@ -10,11 +10,11 @@ require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once "/www/includes/bourls.php";
 
 if(isset($_POST["ug_id"]) && !empty($_POST["ug_id"]) && isset($_POST["valor"]) && !empty($_POST["valor"])) {
-	$ug_id = $_POST["ug_id"];
+	$ug_id = (int)$_POST["ug_id"];
     $valor = doubleval(str_replace(",",".",str_replace(".","",$_POST["valor"])));
 	
-	$sql = "SELECT ug_perfil_saldo, ug_login FROM usuarios_games WHERE ug_id = " . $ug_id;
-	$ret = SQLexecuteQuery($sql);
+	$sql = "SELECT ug_perfil_saldo, ug_login FROM usuarios_games WHERE ug_id = $1";
+	$ret = SQLexecuteQueryParams($sql, array($ug_id));
 	
 	if((($ret) ? pg_num_rows($ret) : 0) == 0) {
 		$msg = "Nenhum Usuário Encontrado";

@@ -3,6 +3,11 @@
     $sTiposup = $sTiposup ?? '';
     $varStatus = $varStatus ?? 0;
     $sPath = $sPath ?? '';
+    $sTiposupAllow = array(
+        '' => '',
+        ' AND ((tiposup=0) OR (tiposup=1)) ' => ' AND ((tiposup=0) OR (tiposup=1)) ',
+    );
+    $sTiposup = $sTiposupAllow[$sTiposup] ?? '';
 
 	// Mark origem from Habbo
 	$bHabbo = false;

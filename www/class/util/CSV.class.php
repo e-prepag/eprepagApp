@@ -90,7 +90,7 @@ class CSV {
 
                     $filename = $this->dir.$filename;
                     if(file_exists($filename) && date("Y-m-d", filemtime($filename)) < date("Y-m-d")){
-                        chmod($filename, 0777);
+                        if (function_exists("chmod")) { @chmod($filename, 0777); }
                         if(unlink ($filename) ===false)
                             throw new Exception($filename);
                     }

@@ -316,7 +316,7 @@ if (isset($BtnSearch)) {
                 // 1 => não executar a querie e montar o count(*)
                 $somenteContar = 1;
                 include $raiz_do_projeto . "includes/gamer/inc_pesquisa_usuarios_sql.php";
-                $rs_usuario = SQLexecuteQuery($sql);
+                $rs_usuario = SQLexecuteQueryParams($sql, $params);
                 $rs_usuario_total = $rs_usuario ? pg_fetch_array($rs_usuario) : false;
                 $total_table = $rs_usuario_total ? (int)$rs_usuario_total['total'] : 0;
                 // 2 => não executar a querie e montar o select completo
@@ -339,7 +339,7 @@ if (isset($BtnSearch)) {
                 if ($total_table == 0) {
                         $msg = "Nenhum usuário encontrado.\n";
                 } else {
-                        $rs_usuario = SQLexecuteQuery($sql);
+                        $rs_usuario = SQLexecuteQueryParams($sql, $params);
 
                         if ($max + $inicial > $total_table)
                                 $reg_ate = $total_table;

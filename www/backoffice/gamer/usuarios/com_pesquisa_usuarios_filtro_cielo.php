@@ -24,6 +24,12 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 	if($filtra_operadoras) {
 		$params['opr_codigo_lst'] = array('name' => 'Operadoras (lista)', 'value' =>  '38, 37, 34, 42', );
 	}
+	$oprCodigoList = array();
+	if (isset($params['opr_codigo_lst']['value'])) {
+		$oprCodigoList = array_values(array_filter(array_map('intval', explode(',', (string)$params['opr_codigo_lst']['value']))));
+		$params['opr_codigo_lst']['value'] = implode(',', $oprCodigoList);
+	}
+	$oprCodigoListSql = $oprCodigoList ? implode(',', $oprCodigoList) : '0';
 
 	$fields = array(
 		'ug_id' => 'ID', 
@@ -62,7 +68,7 @@ require_once $raiz_do_projeto."includes/gamer/main.php";
 							and vg_ultimo_status=5 ";
 	if($filtra_operadoras) {
 		$sql .= "
-							and vgm_opr_codigo in (".$params['opr_codigo_lst']['value'].")";
+							and vgm_opr_codigo in (".$oprCodigoListSql.")";
 	}
 	$sql .= "
 						group by vg_ug_id
@@ -153,7 +159,7 @@ function GP_popupConfirmMsg(msg) { //v1.0
 				<table border='1' cellpadding='0' cellspacing='1' bordercolor='#cccccc' style='border-collapse:collapse;'>
 					<tr align='center' class='texto'><td><b>Descrição</b></td><td><b>Valor</b></td></tr>
 					<?php
-						$sql_opr = "select opr_nome from operadoras where opr_codigo in (".$params['opr_codigo_lst']['value'].")";
+						$sql_opr = "select opr_nome from operadoras where opr_codigo in (".$oprCodigoListSql.")";
 						$rs_opr = SQLexecuteQuery($sql_opr);
 						$s_opr_lst = "";
 						if($rs_opr && pg_num_rows($rs_opr) != 0) {

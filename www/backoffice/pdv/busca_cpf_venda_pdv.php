@@ -62,6 +62,12 @@ if(isset($_POST["busca"])){
     }
     
     //Removendo espaço em branco e formatação
+    $vetorPublisher = array_values(array_filter(array_map('intval', (array)$vetorPublisher)));
+    if (empty($vetorPublisher)) {
+        $vetorPublisher = [0];
+    }
+    $publisherIn = implode(",", $vetorPublisher);
+
     $cpf = trim((string)($cpf ?? ""));
 	$cpfComFormatacao = $cpf;
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
@@ -86,8 +92,8 @@ if(isset($_POST["busca"])){
                             and vg.vg_data_inclusao >= '".Util::getData($dataClickIni, true)." 00:00:00'
                             and vg.vg_data_inclusao <= '".Util::getData($dataClickFim, true)." 23:59:59'
                             and vg.vg_ug_id != '".$GLOBALS['MONEY_EXPRESS_ID_USUARIO_MONEY']."'
-                            ".(!empty($no_cpf)?"-- ":"")."and vgm_opr_codigo IN (".implode(",", $vetorPublisher).")
-                            and replace(replace(ug_cpf, '.', ''), '-', '') = '".$cpf."' 
+                            ".(!empty($no_cpf)?"-- ":"")."and vgm_opr_codigo IN (".$publisherIn.")
+                            and replace(replace(ug_cpf, '.', ''), '-', '') = $1 
                     group by ug_id, ug_cpf, vg_id, tipo, ug_nome_cpf, vgm_opr_codigo, vg.vg_pagto_tipo, vg.vg_data_inclusao)
 
                 union all
@@ -107,8 +113,8 @@ if(isset($_POST["busca"])){
                     where vg.vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
                             and vg.vg_data_inclusao >= '".Util::getData($dataClickIni, true)." 00:00:00'
                             and vg.vg_data_inclusao <= '".Util::getData($dataClickFim, true)." 23:59:59'
-                            ".(!empty($no_cpf)?"-- ":"")."and vgm_opr_codigo IN (".implode(",", $vetorPublisher).") 
-                            and vgm_cpf in('".$cpf."', '".$cpfComFormatacao."') 
+                            ".(!empty($no_cpf)?"-- ":"")."and vgm_opr_codigo IN (".$publisherIn.") 
+                            and vgm_cpf in($2, $3) 
                     group by ug_id, vg_id, tipo, vgm_nome_cpf, vgm_cpf, vgm_opr_codigo, vg_pagto_tipo, vg_data_inclusao) 
 
                 union all
@@ -129,8 +135,8 @@ if(isset($_POST["busca"])){
                             and pih_codretepp = '2'
                             and pih_data >= '".Util::getData($dataClickIni, true)." 00:00:00'
                             and pih_data <= '".Util::getData($dataClickFim, true)." 23:59:59'
-                            ".(!empty($no_cpf)?"-- ":"")."and pih_id IN (".implode(",", $vetorPublisher).") 
-                            and replace(replace(picc_cpf, '.', ''), '-', '') = '".$cpf."' 
+                            ".(!empty($no_cpf)?"-- ":"")."and pih_id IN (".$publisherIn.") 
+                            and replace(replace(picc_cpf, '.', ''), '-', '') = $4 
                     group by ug_id, vg_id, tipo, picc_nome, picc_cpf, pih_id, vg_pagto_tipo, vg_data_inclusao)
 
                 union all
@@ -151,8 +157,8 @@ if(isset($_POST["busca"])){
                     where vg_ultimo_status='".$GLOBALS['STATUS_VENDA']['VENDA_REALIZADA']."' 
                             and vgcbe_data_inclusao >= '".Util::getData($dataClickIni, true)." 00:00:00'
                             and vgcbe_data_inclusao <= '".Util::getData($dataClickFim, true)." 23:59:59'
-                            ".(!empty($no_cpf)?"-- ":"")."and vgm_opr_codigo IN (".implode(",", $vetorPublisher).") 
-                            and replace(replace(vgcbe_cpf, '.', ''), '-', '') = '".$cpf."' 
+                            ".(!empty($no_cpf)?"-- ":"")."and vgm_opr_codigo IN (".$publisherIn.") 
+                            and replace(replace(vgcbe_cpf, '.', ''), '-', '') = $5 
                     group by ug_id, vg_id, tipo, vgcbe_nome_cpf, vgcbe_cpf,vgm_opr_codigo, vg_pagto_tipo, vg_data_inclusao)
         ) tabelaUnion 
                     group by ug_id, vg_id, ug_nome, tipo, ug_cpf, cod , vg_pagto_tipo, vg_data_inclusao 
@@ -160,7 +166,7 @@ if(isset($_POST["busca"])){
             ";
 
         //echo "SQL :<pre>".$sql."</pre><br>";
-        $rs = SQLexecuteQuery($sql);
+        $rs = SQLexecuteQueryParams($sql, array($cpf, $cpf, $cpfComFormatacao, $cpf, $cpf));
     }//end if(!empty($cpf)) 
     else {
         echo "<div>CPF não informado na pesquisa!</div>";

@@ -23,8 +23,8 @@ function getSondaPINsEPP($numcompra, &$dtPag)
 		$sql = "
     SELECT status, dataconfirma
     FROM tb_pag_compras
-    WHERE iforma = ?
-      AND numcompra = ?
+    WHERE iforma = $1
+      AND numcompra = $2
 ";
 
 		$params = [

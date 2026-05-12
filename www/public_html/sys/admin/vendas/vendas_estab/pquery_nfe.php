@@ -19,7 +19,8 @@ function obtem_nfe_seq(int $opr_codigo): int
     }
 
     try {
-        $stmt = $pdo->query("SELECT nextval('{$sequenceName}')");
+        $stmt = $pdo->prepare("SELECT nextval(CAST(:sequenceName AS regclass))");
+        $stmt->execute(array(':sequenceName' => $sequenceName));
 
         if ($stmt) {
             return (int) $stmt->fetchColumn();
@@ -335,21 +336,31 @@ if ($FrmPreencher && $_SESSION["tipo_acesso_pub"] == 'AT') {
         $n_trans++;
 
         $rps_id_max = 1;
-        $s_table = (($pg_fill['trn_code'] == '1') ? 'tb_dist_venda_games_modelo' : (($pg_fill['trn_code'] == '2') ? 'tb_venda_games_modelo' : (($pg_fill['trn_code'] == '3') ? 'dist_vendas_pos' : (($pg_fill['trn_code'] == '4') ? 'dist_vendas_cartoes_tmp' : '????'))));
-        $s_v_id = (($pg_fill['trn_code'] == '1') ? 'vgm_id' : (($pg_fill['trn_code'] == '2') ? 'vgm_id' : (($pg_fill['trn_code'] == '3') ? 've_id' : (($pg_fill['trn_code'] == '4') ? 'vc_id' : '????'))));
+        $nfeTables = array(
+            '1' => array('table' => 'tb_dist_venda_games_modelo', 'id' => 'vgm_id'),
+            '2' => array('table' => 'tb_venda_games_modelo', 'id' => 'vgm_id'),
+            '3' => array('table' => 'dist_vendas_pos', 'id' => 've_id'),
+            '4' => array('table' => 'dist_vendas_cartoes_tmp', 'id' => 'vc_id'),
+        );
+        if (!isset($nfeTables[$pg_fill['trn_code']])) {
+            continue;
+        }
+        $s_table = $nfeTables[$pg_fill['trn_code']]['table'];
+        $s_v_id = $nfeTables[$pg_fill['trn_code']]['id'];
+        $trn_vgm_id = (int)$pg_fill['trn_vgm_id'];
+        $nfe_seq = (int)obtem_nfe_seq($dd_operadora);
 
+        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = $1 where " . $s_v_id . " = $2;";
+        echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $trn_vgm_id . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
 
-        $sql_update = "update " . $s_table . " set vgm_nfe_rps_id = " . obtem_nfe_seq($dd_operadora) . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
-        echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#669933'>" . $n_trans . " - Venda de " . $pg_fill['canal'] . " (ID: " . $pg_fill['trn_vgm_id'] . ", data: " . $pg_fill['trn_data'] . ") RPS_ID: " . ($rps_id_max) . " <br>(" . $sql_update . ")<br></font>";
-
-        $ret = SQLexecuteQueryParams($sql_update, array());
+        $ret = SQLexecuteQueryParams($sql_update, array($nfe_seq, $trn_vgm_id));
         if (!$ret) {
             $msg_error = "Erro ao atualizar registro ($sql_update).\n";
             echo $msg_error . "<br>";
         }
 
         // Obtem o nfe_rps_id retornado por obtem_nfe_seq(opr_codigo)
-        $sql_tmp = "select vgm_nfe_rps_id from " . $s_table . " where " . $s_v_id . "=" . $pg_fill['trn_vgm_id'] . ";";
+        $sql_tmp = "select vgm_nfe_rps_id from " . $s_table . " where " . $s_v_id . "=" . $trn_vgm_id . ";";
         $trn_vgm_nfe_rps_id = getValue($sql_tmp);
         echo "<font face='Arial, Helvetica, sans-serif' size='1' color='#000099'> [nfe_rps_id: " . $trn_vgm_nfe_rps_id . "] (" . $pg_fill['trn_data'] . ", " . $pg_fill['canal'] . ") " . $sql_tmp . "</font><br>";
 
@@ -386,6 +397,11 @@ if ($FrmEnviar == 1) {
     $where_canal_s = "";
     $where_canal_p = "";
     $where_canal_c = "";
+
+    $estat_params = array();
+    $estat_param_idx = 1;
+    $param_dd_operadora = '';
+    $param_dd_valor = '';
 
     if ($tf_data_inicial && $tf_data_final) {
         $data_inic = formata_data(trim($tf_data_inicial), 1);
@@ -656,33 +672,13 @@ if ($FrmEnviar == 1) {
             }
         }
         $sNFe .= gera_rodape($n_linhas, $val_total);
-
-        if (false) {
-            // $varArquivo = "lotes/" . "nfesp_lote_" . date("Ymd") . "_" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . ".txt";
-            $path = $raiz_do_projeto . "arquivos_gerados";
-            $url  = "/vendas_estab/";
-            $file = date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT) . ".txt";
-
-            $arquivoCompleto = $path . $url . $file;
-            $varArquivo = $file;
-
-            $handle = fopen($varArquivo, "w+");
-            if (fwrite($handle, $sNFe) === FALSE) {
-                $msg = "Não foi possível gravar em '$varArquivo' (2).";
-                echo $msg;
-                die("Stop");
-            } else {
-                echo "<font color='#0000CC'>Arquivo de lote N" . str_pad($loteid, 4, "0", STR_PAD_LEFT) . " gravado com sucesso em " . $varArquivo . "</font>";
-            }
-            header("Location: pquery_nfe_download.php?file=" . urlencode($varArquivo));
-            fclose($handle);
-        }
     }
 
     $estat .= " limit " . $max;
     $estat .= " offset " . $inicial;
 } else {
     $estat = "select est_codigo from estabelecimentos where est_codigo = 0";
+    $estat_params = array();
 }
 
 $sql_transform = $estat;
@@ -749,9 +745,33 @@ function GP_popupConfirmMsg(msg) { //v1.0
     </script>
     <SCRIPT LANGUAGE=JAVASCRIPT>
         <!--
-        function ShowPopupWindowXY(fileName, x, y) {
-            myFloater = window.open('', 'myWindow', 'scrollbars=1,status=0,resizable=1,width=' + x + ',height=' + y)
-            myFloater.location.href = fileName;
+        function NFeTxtBlobUrl(base64Id) {
+            var base64 = document.getElementById(base64Id).value;
+            var binary = atob(base64);
+            var bytes = new Uint8Array(binary.length);
+            for (var i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return URL.createObjectURL(new Blob([bytes], { type: "text/plain;charset=ISO-8859-1" }));
+        }
+
+        function VisualizarNFeTxt(base64Id) {
+            var url = NFeTxtBlobUrl(base64Id);
+            window.open(url, "myWindow", "scrollbars=1,status=0,resizable=1,width=800,height=600");
+            setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+            return false;
+        }
+
+        function BaixarNFeTxt(base64Id, fileName) {
+            var url = NFeTxtBlobUrl(base64Id);
+            var link = document.createElement("a");
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+            return false;
         }
         //
         -->
@@ -779,64 +799,40 @@ function GP_popupConfirmMsg(msg) { //v1.0
                     </div>
                     <?php if ($sNFe) {
 
-                        // Deleta arquivos >2horas
-                        $now = mktime(date('H'), date('i'), date('s'), date('m'), date('d'), date('Y'));
-                        foreach (glob("lotes/*.txt") as $filename) {
-                            if (($now - filemtime($filename)) > 2 * 3600) {
-                                unlink($filename);
-                            }
-                        }
-
-
-                        // Arquivo
-                        $path = rtrim($raiz_do_projeto, '/') . '/arquivos_gerados';
-                        $url  = '/vendas_estab/';
                         $file = date("YmdHis") . str_pad(rand(0, 999), 3, "0", STR_PAD_LEFT) . ".txt";
-
-                        $fullPath = $path . $url;
-
-                        // garante que o diretório exista
-                        if (!is_dir($fullPath)) {
-                            mkdir($fullPath, 0775, true);
-                        }
-
-                        $arquivoCompleto = $fullPath . $file;
-
-                        if ($handle = fopen($arquivoCompleto, 'a+')) {
-                            fwrite($handle, $sNFe);
-                            fclose($handle);
-                        } else {
-                            error_log("Falha ao criar arquivo: " . $arquivoCompleto);
-                        }
+                        $nfeBase64 = base64_encode($sNFe);
 
                     ?>
                         <tr>
                             <td valign="center" bgcolor="#FFFFFF" width="903">
                                 <p>
                                     <font face="Arial, Helvetica, sans-serif" size="2" color="#000000">
-                                        <h3>NFe para registros listados.</h3>
-                                        <p>
-                                            Salvar arquivo
-                                            <a href="<?php echo '/sys/admin/vendas/vendas_estab/pquery_nfe_download.php?file=' . urlencode($file); ?>">
-                                                aqui
-                                            </a>.
-                                            (Tamanho do arquivo:
-                                            <?php
-                                            $f_size = strlen($sNFe);
-                                            echo ($f_size >= 1024 * 1024)
-                                                ? number_format($f_size / 1024 / 1024, 2, ',', '.') . " Mb"
-                                                : number_format($f_size / 1024, 2, ',', '.') . " kB";
-                                            ?>)
-                                        </p>
+	                                        <h3>NFe para registros listados.</h3>
+	                                        <textarea id="nfeTxtBase64" style="display:none"><?php echo $nfeBase64; ?></textarea>
+	                                        <p>
+	                                            Visualizar TXT
+	                                            <a href="#" onclick="return VisualizarNFeTxt(&quot;nfeTxtBase64&quot;);">
+	                                                aqui
+	                                            </a>
+	                                            ou baixar arquivo
+	                                            <a href="#" onclick="return BaixarNFeTxt(&quot;nfeTxtBase64&quot;, &quot;<?php echo $file; ?>&quot;);">
+	                                                aqui
+	                                            </a>.
+	                                            (Tamanho do arquivo:
+	                                            <?php
+	                                            $f_size = strlen($sNFe);
+	                                            echo ($f_size >= 1024 * 1024)
+	                                                ? number_format($f_size / 1024 / 1024, 2, ",", ".") . " Mb"
+	                                                : number_format($f_size / 1024, 2, ",", ".") . " kB";
+	                                            ?>)
+	                                        </p>
 
-                                        <SCRIPT LANGUAGE=JAVASCRIPT>
-                                            <!--
-                                            // Abre janela para pagamento no site do banco
-                                            ShowPopupWindowXY('<?php echo $url . $file; ?>', 800, 600);
-
-                                            //
-                                            -->
-                                        </SCRIPT>
+	                                        <SCRIPT LANGUAGE=JAVASCRIPT>
+	                                            <!--
+	                                            VisualizarNFeTxt("nfeTxtBase64");
+	                                            //
+	                                            -->
+	                                        </SCRIPT>
 
                                         <?php
                                         // Se tamanho do arquivo > 10Mb => avisa
