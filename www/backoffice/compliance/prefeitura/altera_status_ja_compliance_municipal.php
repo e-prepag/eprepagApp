@@ -8,103 +8,142 @@ require_once $raiz_do_projeto . "includes/complice/functions.php";
 //Variavel de verificação de sucesso
 $success = false;
 
-//Extensoes de arquivos do MUNICIPAL permitidos 
-$MUNICIPAL_EXTENSOES = array("jpg");
+//Extensoes de arquivos do MUNICIPAL permitidos
+$MUNICIPAL_EXTENSOES = array("jpg", "jpeg");
 //Diretório destino do arquivo do MUNICIPAL
-$DIR_MUNICIPAL_ARQ_RETORNO = $raiz_do_projeto . "backoffice/bacen/";
+$DIR_MUNICIPAL_ARQ_RETORNO = $raiz_do_projeto . "arquivos_gerados/lotes/prefeitura_retorno/";
+$DIR_MUNICIPAL_ARQ_RETORNO_TMP = $DIR_MUNICIPAL_ARQ_RETORNO . "tmp/";
+$erroDiretorioMunicipal = "";
+
+if (!is_dir($DIR_MUNICIPAL_ARQ_RETORNO) && !@mkdir($DIR_MUNICIPAL_ARQ_RETORNO, 0775, true) && !is_dir($DIR_MUNICIPAL_ARQ_RETORNO)) {
+    $erroDiretorioMunicipal = "Não foi possível criar o diretório: " . $DIR_MUNICIPAL_ARQ_RETORNO . PHP_EOL;
+}
+
+if ($erroDiretorioMunicipal == "" && !is_dir($DIR_MUNICIPAL_ARQ_RETORNO_TMP) && !@mkdir($DIR_MUNICIPAL_ARQ_RETORNO_TMP, 0775, true) && !is_dir($DIR_MUNICIPAL_ARQ_RETORNO_TMP)) {
+    $erroDiretorioMunicipal = "Não foi possível criar o diretório temporário: " . $DIR_MUNICIPAL_ARQ_RETORNO_TMP . PHP_EOL;
+}
 
 
 //Processa acoes
 //----------------------------------------------------------------------------------------------------------
-if(isset($BtnConcluir) && $BtnConcluir) {
-    
+if (isset($_POST['BtnConcluir'])) {
+
         //Validacao
-        $msg = "";
+        $msg = $erroDiretorioMunicipal;
+        $arquivo = $_FILES['arquivo'] ?? null;
 
         //Valida arquivo
-        $fileSource = $_FILES['arquivo']['tmp_name']; 
-        if (($fileSource == 'none') || ($fileSource == '' )) $msg = "Nenhum arquivo fornecido.".PHP_EOL;
+        $fileSource = (string)($arquivo['tmp_name'] ?? '');
+        if ($msg == "" && (
+            !is_array($arquivo)
+            || (($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK)
+            || $fileSource === ''
+            || !is_uploaded_file($fileSource)
+        )) {
+            $msg = "Nenhum arquivo fornecido.".PHP_EOL;
+        }
 
         //Valida extensao
         if($msg == ""){
-                $fileExtensao = strtolower(substr($_FILES['arquivo']['name'], -3)); 
+                $fileExtensao = strtolower(pathinfo((string)($arquivo['name'] ?? ''), PATHINFO_EXTENSION));
                 if (!in_array($fileExtensao, $GLOBALS['MUNICIPAL_EXTENSOES'])) $msg = "Extensão de arquivo inválida.".PHP_EOL;
+        }
+
+        if($msg == ""){
+                $imagemInfo = @getimagesize($fileSource);
+                if ($imagemInfo === false || (($imagemInfo[2] ?? null) !== IMAGETYPE_JPEG)) $msg = "Arquivo JPG inválido.".PHP_EOL;
+        }
+
+        if ($msg == "" && !is_writable($GLOBALS['DIR_MUNICIPAL_ARQ_RETORNO_TMP'])) {
+            $msg = "Diretório temporário sem permissão de escrita: " . $GLOBALS['DIR_MUNICIPAL_ARQ_RETORNO_TMP'] . PHP_EOL;
         }
 
         //Salva arquivo
         if($msg == ""){
 
-                $fileDest_nome = $_FILES['arquivo']['name']; 
+                $fileDest_nome = basename((string)$arquivo['name']);
+                $fileDest_nome = preg_replace('/[^A-Za-z0-9._-]/', '_', $fileDest_nome);
 
-                $fileDest = $GLOBALS['DIR_MUNICIPAL_ARQ_RETORNO'] ."tmp/". $fileDest_nome; 
+                $fileDest = $GLOBALS['DIR_MUNICIPAL_ARQ_RETORNO_TMP'] . $fileDest_nome;
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
+                if (!move_uploaded_file($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL;
                 else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
                 else @unlink($fileSource);
         }
 
         //Validações de arquivo por período, estrutura e conteudo
         if($msg == ""){
-            
+
             //capturando a data (YYYYMM) do arquivo gerado pelo MUNICIPAL
             $data_arquivo_bacen = date("Ym", filemtime($fileDest));
-            
+
             //teste se o arquivo percente ao mês vigente
             if(date("Ym") == $data_arquivo_bacen) {
-                
+
                 //echo "O arquivo corresponde ao Mês vigente<br>";
 
             }//end if(date("Ym") == date("Ym", $nome_arquivos[$POSICAO_ARQUIVO]['mtime']))
 
             else $msg = "O arquivo pertence a um período anterior ao atual".PHP_EOL;
-                
-            
+
+
             //verificando se ocorreu algum erro, se sim deleta arquivos
             if($msg != ""){
 
                 //Removendo o arquivo zipado
                 @unlink($fileDest);
-                
+
             }//end if($msg != "")
-            
+
         }//end if($msg == "")
-        
+
 
         //Movendo arquivos para o destino final
         if($msg == ""){
-                
+
                 //Alterando destinos
                 $fileSource = $fileDest;
-                $fileDest = $GLOBALS['DIR_MUNICIPAL_ARQ_RETORNO']."/".$data_arquivo_bacen."_PM/";
-                mkdir($fileDest, 0700);
-                $fileDest .= $fileDest_nome;
+                $fileDest = $GLOBALS['DIR_MUNICIPAL_ARQ_RETORNO'] . $data_arquivo_bacen . "_PM/";
+                if (!is_dir($fileDest) && !@mkdir($fileDest, 0775, true) && !is_dir($fileDest)) {
+                    $msg = "Não foi possível criar o diretório destino: " . $fileDest . PHP_EOL;
+                }
+                if ($msg == "") {
+                    $fileDest .= $fileDest_nome;
+                }
 
                 //echo "Arquivo carregado [".$fileSource."]<br>Arquivo destino [".$fileDest."]<br>";
-                if (!rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL; 
-                else if((!file_exists($fileDest)) || (filesize($fileDest)) == 0) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
-                else @unlink($fileSource);
-                
+                if ($msg == "" && !rename($fileSource, $fileDest)) $msg = "Não foi possivel copiar para o diretório destino.".PHP_EOL;
+                else if($msg == "" && ((!file_exists($fileDest)) || (filesize($fileDest)) == 0)) $msg = "Arquivo no destino esta vazio ou inválido.".PHP_EOL;
+                else if($msg == "") @unlink($fileSource);
+
                 //verificando se ocorreu algum erro, se sim deleta arquivos
                 if($msg != "") @unlink($fileSource);
 
         }
 
-        
+
         //atualiza base
         if($msg == ""){
 
-                //atualiza publisher de já em arquivos para 
-                $sql = "update operadoras set opr_ja_contabilizou = ".$GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU']." 
-                        where opr_ja_contabilizou = " . $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN']. "  
+                //atualiza publisher de já em arquivos para
+                $sql = "update operadoras set opr_ja_contabilizou = $1
+                        where opr_ja_contabilizou = $2
                         and opr_data_inicio_operacoes is not null
                         and opr_internacional_alicota = 0
-                        and UPPER(opr_estado) = 'SP'
-                        and UPPER(TRIM(opr_cidade)) = UPPER('São Paulo')
-                        and opr_vinculo_empresa = ".$GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO']."; ";
+                        and UPPER(opr_estado) = $3
+                        and TRIM(opr_cidade) ILIKE $4
+                        and opr_vinculo_empresa = $5; ";
+                $params = [
+                    $GLOBALS['STATUS_ARQUIVO_BACEN']['CONTABILIZOU'],
+                    $GLOBALS['STATUS_ARQUIVO_BACEN']['AGUARDANDO_RETORNO_BACEN'],
+                    'SP',
+                    's%o Paulo',
+                    $GLOBALS['IDENTIFICACAO_EMPRESA_ADMINISTRADORA_CARTAO'],
+                ];
                 //echo $sql;
                 //die("<br>POr favor, informe o Wagner da mensagema cima urgentemente!!");
-                $ret = SQLexecuteQuery($sql);
+                $ret = SQLexecuteQueryParams($sql, $params);
                 if(!$ret) $msg = "Erro ao atualizar Publisher.".PHP_EOL;
 
         }
@@ -112,7 +151,7 @@ if(isset($BtnConcluir) && $BtnConcluir) {
         //fecha janela
         if($msg == ""){
                 $success = true;
-                $msg = "Operação efetuada com sucesso!".PHP_EOL."Arquivos validados e salvos nos respectivos diretórios".PHP_EOL; 
+                $msg = "Operação efetuada com sucesso!".PHP_EOL."Arquivos validados e salvos nos respectivos diretórios".PHP_EOL;
         }
 
 }
@@ -205,13 +244,13 @@ if(isset($BtnConcluir) && $BtnConcluir) {
 <fieldset>
     <legend>Altera o Status de Publishers (Compliance Municipal)</legend>
     <br>
-    Selecionar o arquivo de retorno do MUNICIPAL (imagem scanneada - Formato JPG) para ser processado e alterar o status dos Publishers para já considerados anteriormente em arquivo para o compliance MUNICIPAL. 
+    Selecionar o arquivo de retorno do MUNICIPAL (imagem scanneada - Formato JPG) para ser processado e alterar o status dos Publishers para já considerados anteriormente em arquivo para o compliance MUNICIPAL.
     <form action="" enctype="multipart/form-data" method="post">
         <input type="file" name="arquivo" size="30"> <br> <input type="submit" name="BtnConcluir" value="Enviar" />
     </form>
     <br>
     <?php if(isset($msg) && $msg != ""){ ?>
-        <div class="msg <?php echo (!$success)?'error':'success';?>"><?php echo nl2br($msg);?></div>
+        <div class="msg <?php echo (!$success)?'error':'success';?>"><?php echo nl2br(htmlspecialchars($msg, ENT_QUOTES, 'ISO-8859-1'));?></div>
     <?php } ?>
 </fieldset>
 </body>
