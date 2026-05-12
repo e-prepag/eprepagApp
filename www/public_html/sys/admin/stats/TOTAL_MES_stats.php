@@ -538,8 +538,8 @@ if($_REQUEST['btnSubmit']) {
 				@$vendasPrj = ($aVendas_nestemes + ($aVendas[$aCanais[$j]][1]*($days_in_month-$iday)/$days_in_month_prev) );
 				@$nvendasPrj_nestemes = ($aNVendas_nestemes + ($aNVendas_nestemes*($days_in_month-$iday)/$iday) );
 				@$vendasPrj_nestemes = ($aVendas_nestemes + ($aVendas_nestemes*($days_in_month-$iday)/$iday) );
-				@$perc_NVendas_nesteMes = 100*($nvendasPrj_nestemes-$aNVendas[$aCanais[$j]][1])/$aNVendas[$aCanais[$j]][1];
-				@$perc_Vendas_nesteMes = 100*($vendasPrj_nestemes-$aVendas[$aCanais[$j]][1])/$aVendas[$aCanais[$j]][1];
+					$perc_NVendas_nesteMes = (!empty($aNVendas[$aCanais[$j]][1])) ? 100*($nvendasPrj_nestemes-$aNVendas[$aCanais[$j]][1])/$aNVendas[$aCanais[$j]][1] : 0;
+					$perc_Vendas_nesteMes = (!empty($aVendas[$aCanais[$j]][1])) ? 100*($vendasPrj_nestemes-$aVendas[$aCanais[$j]][1])/$aVendas[$aCanais[$j]][1] : 0;
 
 				$stitle_n = ($_SESSION["tipo_acesso_pub"]=='AT')?" title='Prj neste mês: ".number_format($nvendasPrj_nestemes, 2, ',', '.')." (".number_format($perc_NVendas_nesteMes, 2, ',', '.')."%)'":"";
 
