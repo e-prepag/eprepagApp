@@ -1,15 +1,21 @@
 <?php
 require_once "/www/includes/bourls.php";
-//error_reporting(E_ALL); 
-//ini_set("display_errors", 1); 
+//error_reporting(E_ALL);
+//ini_set("display_errors", 1);
 //header("Content-Type: text/html; charset=UTF-8",true);
 //header("Content-Type: text/html; charset=ISO-8859-1",true);
 
 $BtnSearch = $_POST['BtnSearch'] ?? null;
+$data_inicial = trim((string)($_POST['data_inicial'] ?? date('d/m/Y')));
+$data_final = trim((string)($_POST['data_final'] ?? date('d/m/Y')));
+
+function gerador_rps_taxas_h($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'ISO-8859-1');
+}
 
 function removerAcentos($array, $recursive = true) {
     $resultado = [];
-    
+
     foreach ($array as $chave => $valor) {
         if (is_array($valor) && $recursive) {
             $resultado[$chave] = removerAcentos($valor, $recursive);
@@ -19,7 +25,7 @@ function removerAcentos($array, $recursive = true) {
             $resultado[$chave] = $valor;
         }
     }
-    
+
     return $resultado;
 }
 
@@ -38,7 +44,7 @@ function removerAcentosString($texto) {
         chr(218) => 'U', chr(217) => 'U', chr(219) => 'U', chr(220) => 'U',
         chr(199) => 'C', chr(209) => 'N'
     ];
-    
+
     return strtr($texto, $acentos);
 }
 
@@ -69,10 +75,10 @@ function BuscaMaiorSequencialAdmnistradora() {
 
 //Função que retorna o valor do ISS para a Cidade informada
 function RetonaISSCidade($cidade,$estado,&$varAliquotaRPS,&$varSituacaoRPS) {
-    	if(trim($cidade) != "" && trim($estado) != "") {
-		//Teste existencia de alicota cadastrada
-		$sql = "SELECT iss_aliquota FROM iss_cidade WHERE iss_cidade = '".trim($cidade)."' AND iss_estado = '".trim($estado)."';";
-		$rs_iss = SQLexecuteQuery($sql);
+	if(trim($cidade) != "" && trim($estado) != "") {
+			//Teste existencia de alicota cadastrada
+			$sql = "SELECT iss_aliquota FROM iss_cidade WHERE iss_cidade = $1 AND iss_estado = $2";
+			$rs_iss = SQLexecuteQueryParams($sql, array(trim($cidade), trim($estado)));
 		if($rs_iss && pg_num_rows($rs_iss) > 0) {
                     $rs_iss_row = pg_fetch_array($rs_iss);
                     if(trim($cidade) != CIDADE_DEFAULT) {
@@ -82,13 +88,13 @@ function RetonaISSCidade($cidade,$estado,&$varAliquotaRPS,&$varSituacaoRPS) {
                     return true;
                 }
 		else {
-            		return false;
+		return false;
 		}
 	}
 	else {
-            	return false;
+	return false;
 	}
-}//end function RetonaISSCidade($cidade,$estado,&$varAliquotaRPS,&$varSituacaoRPS) 
+}//end function RetonaISSCidade($cidade,$estado,&$varAliquotaRPS,&$varSituacaoRPS)
 
 require_once '../../includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
@@ -98,31 +104,42 @@ set_time_limit(3600);
 define("CIDADE_DEFAULT","SAO PAULO");
 define("ESTADO_DEFAULT","SP");
 
-/* 
+/*
     CONTROLLER
  */
 if(isset($BtnSearch) && $BtnSearch) {
         //Variavel de OUTPUT
         $msg = "";
-        
+
+        if(verifica_data($data_inicial) == 0) {
+                $msg .= "ERRO: Data inicial invalida.<br>";
+        }
+
+        if(verifica_data($data_final) == 0) {
+                $msg .= "ERRO: Data final invalida.<br>";
+        }
+
         //Montando SQL para a Busca das Taxas Envolvidas na Geração do RPS
         $sql = "
-                SELECT * 
+                SELECT *
                 FROM tb_pag_taxa_anual pta
                     INNER JOIN usuarios_games ug ON ug.ug_id = pta.ug_id
-                WHERE 
-                    pta_data >= '".formata_data($_POST["data_inicial"],1)." 00:00:00' 
-                    AND  pta_data <= '".formata_data($_POST["data_final"],1)." 23:59:59'; 
+                WHERE
+                    pta_data >= $1::timestamp
+                    AND pta_data <= $2::timestamp;
                 ";
         //echo $sql."<br>";
-        $rs = SQLexecuteQuery($sql);
+        $rs = ($msg == "") ? SQLexecuteQueryParams($sql, array(
+                formata_data($data_inicial,1)." 00:00:00",
+                formata_data($data_final,1)." 23:59:59"
+        )) : false;
         if($rs) {
-            
+
                 //Setando variaveis para captura no mês referência
                 //setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
                 //date_default_timezone_set('America/Fortaleza');
                 $mesFechamento = mktime(0, 0, 0, date("n"), 1, date("Y")-1);
-                
+
                 //RPS EPP ADM
                 $sNFeADM = "";
                 $data = date("Ymd");
@@ -135,7 +152,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                 $varSerieRPS = "EPP";
                 $varNumLote = ""; //str_pad($loteid, 4, "0", STR_PAD_LEFT);
                 $varDataEmissaoRPS = $data;
-                $varCodigoServicoRPS = "05820"; 
+                $varCodigoServicoRPS = "05820";
                 $varISSRetido = "2";
 
                 //Alicota de IRRF para fins de cálculos
@@ -148,18 +165,18 @@ if(isset($BtnSearch) && $BtnSearch) {
                 $varNumeroRPSaux = BuscaMaiorSequencialAdmnistradora();
                 $varLoteAuxADM = $varNumeroRPSaux;
                 while ($rsRow_acento = pg_fetch_array($rs)) {
-                    
+
                         $rsRow = removerAcentos($rsRow_acento);
 
                         //Reset no laço as variaveis de Situação RPS e alíquota de ISS
                         $varSituacaoRPS = "T"; //Operação Normal
                         $varAliquotaRPS = "0200";
-                        
+
                         if(empty($rsRow['nfes_seq'])) {
                                 $varNumeroRPS = str_pad($varNumeroRPSaux, 12, "0", STR_PAD_LEFT);
-                                $sql = "UPDATE tb_pag_taxa_anual SET nfes_seq = ".$varNumeroRPSaux." WHERE pta_id = ".$rsRow['pta_id'].";";
+                                $sql = "UPDATE tb_pag_taxa_anual SET nfes_seq = $1 WHERE pta_id = $2;";
                                 //echo $sql."<br>";
-                                $rsUpdate = SQLexecuteQuery($sql);
+                                $rsUpdate = SQLexecuteQueryParams($sql, array((int)$varNumeroRPSaux, (int)$rsRow['pta_id']));
                                 if(!$rsUpdate) {
                                         $msg .= "ERRO: Erro ao salvar o número sequencial de RPS na tabela de taxas.<br>";
                                 }//end if(!$rsUpdate)
@@ -172,7 +189,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                                 // Número de RPS já salvo em execuções anteriores
                                 $varNumeroRPS = str_pad($rsRow['nfes_seq'], 12, "0", STR_PAD_LEFT);
                         }//end else do if(empty($rsRow['nfes_seq']))
-                        
+
                         $valor_reg_nfe = $rsRow['pta_valor']*100;
                         $varValorRPS = str_pad($valor_reg_nfe, 15, "0", STR_PAD_LEFT);
                         $varDeducaoRPS = str_pad(0, 15, "0", STR_PAD_LEFT);
@@ -181,11 +198,11 @@ if(isset($BtnSearch) && $BtnSearch) {
                         $CPF_aux = str_replace(".", "", $rsRow['ug_cpf']);
                         $CPF_aux = str_replace("-", "", $CPF_aux);
                         if(empty($CPF_aux) || strlen($CPF_aux)<11) {
-                                $varIndicadorCPF = "3"; 
+                                $varIndicadorCPF = "3";
                                 $CPF_aux = "";
                         }
                         else {
-                                $varIndicadorCPF = "1"; 
+                                $varIndicadorCPF = "1";
                         }
 
                         //Limpando CEP
@@ -195,7 +212,7 @@ if(isset($BtnSearch) && $BtnSearch) {
                         $varCPF		=	$CPF_aux;
                         $varIM		=	str_pad("", 8, "0", STR_PAD_LEFT);
                         $varIE		=	str_pad("", 12, "0", STR_PAD_LEFT);
-                        $varNome	=	str_pad(substr($rsRow['ug_nome_cpf'],0,75), 75, " ", STR_PAD_RIGHT);	
+                        $varNome	=	str_pad(substr($rsRow['ug_nome_cpf'],0,75), 75, " ", STR_PAD_RIGHT);
                         $varTipoEndereco=	str_pad(substr($rsRow['ug_endereco'],0,3), 3, " ", STR_PAD_RIGHT);
                         $varEndereco	=	str_pad(substr($rsRow['ug_endereco'],3,50), 50, " ", STR_PAD_RIGHT);
                         $varNumero	=	str_pad(substr($rsRow['ug_numero'],0,10), 10, " ", STR_PAD_RIGHT);
@@ -204,20 +221,20 @@ if(isset($BtnSearch) && $BtnSearch) {
                         $varCidade	=	str_pad(substr($rsRow['ug_cidade'],0,50), 50, " ", STR_PAD_RIGHT);
                         $varUF		=	str_pad(substr($rsRow['ug_estado'],0,2), 2, " ", STR_PAD_RIGHT);
                         $varCEP		=	str_pad(substr($CEP_aux,0,8), 8, " ", STR_PAD_RIGHT);
-                        $varEmail	=	""; //str_pad($rsRow['ug_email'], 75, " ", STR_PAD_RIGHT); 
+                        $varEmail	=	""; //str_pad($rsRow['ug_email'], 75, " ", STR_PAD_RIGHT);
 
                         $varDiscriminacao = "Tarifa de manutenção anual ".date("Y",$mesFechamento).".";
                         $totalIRRFaux = $rsRow['pta_valor']*$alicotaIRRF/100;
                         if($totalIRRFaux >= $limiteInformeIRRF) {
                                 $varDiscriminacao .=  "|"."|"."Valor Total NF: R$ ".  number_format($rsRow['pta_valor'], 2, ",", ".")."|"."IRRF (".$alicotaIRRF."%)...: R$ ".  number_format($totalIRRFaux, 2, ",", ".")."|"."Valor Líquido.: R$ ".number_format(($rsRow['pta_valor']-$totalIRRFaux), 2, ",", ".");
-                        }//end if($totalIRRFaux>=10) 
+                        }//end if($totalIRRFaux>=10)
 
                         if(!validaAlgoritimoCPF($rsRow['ug_cpf']) || trim($rsRow['ug_nome_cpf']) == "" || trim($rsRow['ug_cidade']) == "" || trim($rsRow['ug_estado']) == "") {
                                 $varCidade	= str_pad(CIDADE_DEFAULT, 50, " ", STR_PAD_RIGHT);
                                 $varUF		= str_pad(ESTADO_DEFAULT, 2, " ", STR_PAD_RIGHT);
                                 $varCEP		= str_pad("", 8, " ", STR_PAD_RIGHT);
                         }//end if(!validaAlgoritimoCPF($rsRow['ug_cep']) || trim($rsRow['ug_nome_cpf']) == "" || trim($rsRow['ug_cidade']) == "")
-                        
+
                         //Verificando se ISS está configurado por Cidade ou NÃO
                         if(ISS_CIDADE) {
                                 /*
@@ -229,38 +246,52 @@ if(isset($BtnSearch) && $BtnSearch) {
                                         $varCEP		= str_pad("", 8, " ", STR_PAD_RIGHT);
                                 }
                         }//end if(ISS_CIDADE)
-                        
+
                         //Gerando a linha RPS
-                        $sNFeADM .= gera_lote($varTipoRPS, $varSerieRPS, $varNumeroRPS, $varNumLote, $varDataEmissaoRPS, $varSituacaoRPS, $varValorRPS, $varDeducaoRPS, $varCodigoServicoRPS, $varAliquotaRPS, $varISSRetido, $varIndicadorCPF, $varCPF, $varIM, $varIE, $varNome, $varTipoEndereco, $varEndereco, $varNumero, $varComplemento, $varBairro, $varCidade, $varUF, $varCEP, $varEmail, $varDiscriminacao,""); 
+                        $sNFeADM .= gera_lote($varTipoRPS, $varSerieRPS, $varNumeroRPS, $varNumLote, $varDataEmissaoRPS, $varSituacaoRPS, $varValorRPS, $varDeducaoRPS, $varCodigoServicoRPS, $varAliquotaRPS, $varISSRetido, $varIndicadorCPF, $varCPF, $varIM, $varIE, $varNome, $varTipoEndereco, $varEndereco, $varNumero, $varComplemento, $varBairro, $varCidade, $varUF, $varCEP, $varEmail, $varDiscriminacao,"");
 
 
                         //Totalizando para o Rodapé do RPS
                         $total_geral_adm += $rsRow['pta_valor'];
                         $cont_nota_adm++;
-                        
+
                 }//end while
-                
+
                 //Gerando o Rodapé do arquivo RPS
                 $sNFeADM .= gera_rodape($cont_nota_adm, number_format($total_geral_adm, 2, ".", ""));
-                
+
                 //Salvando o Arquivo
                 if($cont_nota_adm > 0) {
-                        $varArquivo = $raiz_do_projeto . "arquivos_gerados/rps/rps_lote_".date("Ymd")."_".str_pad($varLoteAuxADM, 7, "0", STR_PAD_LEFT)."_ADMINISTRADORA.txt";
-                        $handle = fopen($varArquivo, "w+");
-                        if (fwrite($handle, $sNFeADM) === FALSE) {
-                                $msg .= "Não foi possível gravar em '$varArquivo'.";
+                        $diretorioRps = $raiz_do_projeto . "arquivos_gerados/rps";
+                        $nomeArquivoRps = "rps_lote_".date("Ymd")."_".str_pad($varLoteAuxADM, 7, "0", STR_PAD_LEFT)."_ADMINISTRADORA.txt";
+                        $varArquivo = $diretorioRps . "/" . $nomeArquivoRps;
+
+                        if(!is_dir($diretorioRps) && !mkdir($diretorioRps, 0775, true) && !is_dir($diretorioRps)) {
+                                $msg .= "Nao foi possivel criar o diretorio '$diretorioRps'.";
+                        } elseif(!is_writable($diretorioRps)) {
+                                $msg .= "Diretorio sem permissao de escrita: '$diretorioRps'.";
                         } else {
-                                $msg .= "<div id='download' class='c-pointer' onClick='gerarArquivo(\"".$varArquivo."\");'>EPP - Administradora => Arquivo de lote Nº ".str_pad($varLoteAuxADM, 7, "0", STR_PAD_LEFT)." gravado com sucesso.</div>";
+                                $handle = fopen($varArquivo, "wb");
+                                if($handle === false) {
+                                        $msg .= "Nao foi possivel abrir o arquivo '$varArquivo' para gravacao.";
+                                } elseif (fwrite($handle, $sNFeADM) === FALSE) {
+                                        $msg .= "Nao foi possivel gravar em '$varArquivo'.";
+                                        fclose($handle);
+                                } else {
+                                        fclose($handle);
+                                        $msg .= "<div id='download' class='c-pointer' onClick='gerarArquivo(\"".gerador_rps_taxas_h($varArquivo)."\");'>EPP - Administradora => Arquivo de lote Nº ".str_pad($varLoteAuxADM, 7, "0", STR_PAD_LEFT)." gravado com sucesso.</div>";
+                                }
                         }
-                        fclose($handle);
                 }
                 else {
                         $msg .= "O período selecionado não contém taxas para emissão de RPS.<br>";
                 }
-        }//end if($rs) 
+        }//end if($rs)
         else {
-                $msg .= "ERRO: Problema na seleção das Taxas Anuais.<br>";
-        }//end else do if($rs) 
+                if($msg == "") {
+                        $msg .= "ERRO: Problema na seleção das Taxas Anuais.<br>";
+                }
+        }//end else do if($rs)
 } // end if($BtnSearch)
 /*
     FIM CONTROLLER
@@ -271,7 +302,7 @@ if(isset($BtnSearch) && $BtnSearch) {
 <script src="<?php echo $server_url_complete; ?>/js/global.js"></script>
 <script>
 function gerarArquivo(varArquivo) {
-        window.location.href = '/includes/download/rps_download.php?varArquivo='+varArquivo;
+        window.location.href = '/includes/download/rps_download.php?varArquivo='+encodeURIComponent(varArquivo);
 }
 </script>
 <div class="col-md-12">
@@ -285,11 +316,11 @@ function gerarArquivo(varArquivo) {
     <form id="buscaBanner" name="buscaBanner" method="post">
         <div class="col-md-2 text-right">Data inicial:</div>
         <div class="col-md-2">
-            <input type="text" value="<?php if(isset($_POST["data_inicial"]))  echo $_POST["data_inicial"]; else echo date('d/m/Y'); ?>" id="data_inicial" name="data_inicial" char="10" class="form-control data w150">
+            <input type="text" value="<?php echo gerador_rps_taxas_h($data_inicial); ?>" id="data_inicial" name="data_inicial" char="10" class="form-control data w150">
         </div>
         <div class="col-md-2 text-right">Data final:</div>
         <div class="col-md-2">
-            <input type="text" value="<?php if(isset($_POST["data_final"])) echo $_POST["data_final"]; else echo date('d/m/Y'); ?>" id="data_final" name="data_final" char="10" class="form-control data w150">
+            <input type="text" value="<?php echo gerador_rps_taxas_h($data_final); ?>" id="data_final" name="data_final" char="10" class="form-control data w150">
         </div>
         <div class="col-md-2 pull-right">
             <button type="submit" name="BtnSearch" value="Gerar" class="btn pull-right btn-success">Gerar</button>
@@ -309,15 +340,15 @@ if(isset($msg)) echo $msg;
             optDate.minDate = "19/01/2016";
 
         setDateInterval('data_inicial','data_final',optDate);
-        
+
         $("#buscar").click(function(){
             var erro = [];
-            
+
             $(".form-control").each(function(){
                  if($(this).val().length < $(this).attr("char"))
                      erro.push($(this).attr("label"));
             });
-            
+
             if(erro.length > 4)
             {
                 var msgErro = "Nenhum campo foi preenchido";
