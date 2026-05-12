@@ -9,51 +9,94 @@ require_once '/www/includes/constantes.php';
 require_once $raiz_do_projeto."backoffice/includes/topo.php";
 require_once "/www/includes/bourls.php";
 
-if(isset($_POST["ug_id"]) && !empty($_POST["ug_id"]) && isset($_POST["valor"]) && !empty($_POST["valor"])) {
-	$ug_id = (int)$_POST["ug_id"];
-    $valor = doubleval(str_replace(",",".",str_replace(".","",$_POST["valor"])));
-	
-	$sql = "SELECT ug_perfil_saldo, ug_login FROM usuarios_games WHERE ug_id = $1";
-	$ret = SQLexecuteQueryParams($sql, array($ug_id));
-	
-	if((($ret) ? pg_num_rows($ret) : 0) == 0) {
-		$msg = "Nenhum Usuário Encontrado";
+function subtrair_saldo_parse_valor($valor) {
+	$valor = trim((string)$valor);
+	$valor = preg_replace('/[^0-9,.-]/', '', $valor);
+
+	if (strpos($valor, ',') !== false) {
+		$valor = str_replace('.', '', $valor);
+		$valor = str_replace(',', '.', $valor);
 	}
-	else {
-		$row = pg_fetch_assoc($ret);
-		$saldo_anterior = $row['ug_perfil_saldo'];
-		$ug_login = $row["ug_login"];
-		
-		$valor_novo = $saldo_anterior - $valor;
-		
-		if(($saldo_anterior - $valor) <= 0)  $valor_novo = 0;
-		
-		$sql = "INSERT INTO estorno_usuario (
-			id,
-			shn_id,
-			ug_id,
-			ug_saldo_anterior,
-			ug_saldo_atual,
-			ug_login
-		)
-		VALUES (
-			default,
-			$1,
-			$2,
-			$3,
-			$4, 
-			$5
-		);
-		";
-		
-		$ret = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko'], $ug_id, $saldo_anterior, $valor_novo, $ug_login));
-		
-		if(!$ret){
-			$msg = "Erro ao salvar as informações do estorno";
+
+	return (float)$valor;
+}
+
+function subtrair_saldo_h($value) {
+	return htmlspecialchars((string)$value, ENT_QUOTES, 'ISO-8859-1');
+}
+
+$ug_id_post = trim((string)($_POST["ug_id"] ?? ""));
+$valor_post = trim((string)($_POST["valor"] ?? ""));
+
+if($ug_id_post !== "" && $valor_post !== "") {
+	$ug_id = ctype_digit($ug_id_post) ? (int)$ug_id_post : 0;
+	$valor = subtrair_saldo_parse_valor($valor_post);
+
+	if($ug_id <= 0) {
+		$msg = "ID do usuário inválido.";
+	} elseif($valor <= 0) {
+		$msg = "Informe um valor maior que zero.";
+	} elseif($valor > MAX_VALOR) {
+		$msg = "O valor máximo permitido para estorno é de R$ " . number_format(MAX_VALOR, 2, ",", ".") . ".";
+	} else {
+		SQLexecuteQuery("BEGIN TRANSACTION");
+
+		$sql = "SELECT ug_perfil_saldo, ug_login FROM usuarios_games WHERE ug_id = $1 FOR UPDATE";
+		$ret = SQLexecuteQueryParams($sql, array($ug_id));
+
+		if((($ret) ? pg_num_rows($ret) : 0) == 0) {
+			$msg = "Nenhum usuário encontrado.";
+			SQLexecuteQuery("ROLLBACK TRANSACTION");
+		}
+		else {
+			$row = pg_fetch_assoc($ret);
+			$saldo_anterior = (float)$row['ug_perfil_saldo'];
+			$ug_login = $row["ug_login"];
+
+			$valor_novo = $saldo_anterior - $valor;
+
+			if($valor_novo <= 0)  $valor_novo = 0;
+
+			$sql = "UPDATE usuarios_games SET ug_perfil_saldo = $1 WHERE ug_id = $2";
+			$ret_update = SQLexecuteQueryParams($sql, array($valor_novo, $ug_id));
+
+			if(!$ret_update) {
+				$msg = "Erro ao atualizar o saldo do usuário.";
+				SQLexecuteQuery("ROLLBACK TRANSACTION");
+			} else {
+				$sql = "INSERT INTO estorno_usuario (
+					id,
+					shn_id,
+					ug_id,
+					ug_saldo_anterior,
+					ug_saldo_atual,
+					ug_login,
+					foi_aprovado
+				)
+				VALUES (
+					default,
+					$1,
+					$2,
+					$3,
+					$4,
+					$5,
+					1
+				);
+				";
+
+				$ret_insert = SQLexecuteQueryParams($sql, array($_SESSION['iduser_bko'], $ug_id, $saldo_anterior, $valor_novo, $ug_login));
+
+				if(!$ret_insert){
+					$msg = "Erro ao salvar as informações do estorno.";
+					SQLexecuteQuery("ROLLBACK TRANSACTION");
+				} else {
+					SQLexecuteQuery("COMMIT TRANSACTION");
+					$msg = "Saldo subtraído com sucesso. Saldo anterior: R$ " . number_format($saldo_anterior, 2, ",", ".") . ". Saldo atual: R$ " . number_format($valor_novo, 2, ",", ".") . ".";
+					$msg_tipo = "success";
+				}
+			}
 		}
 	}
-	
-	
 }
 ?>
 <link href="<?php echo $url; ?>:<?php echo $server_port; ?>/css/jquery-ui-1.9.2.custom.min.css" rel="stylesheet">
@@ -77,8 +120,8 @@ if(isset($msg)){
 ?>
 <div class="row">
     <div class="col-md-12">
-        <div class="alert alert-danger">
-            <?php echo $msg ?>
+        <div class="alert alert-<?php echo (isset($msg_tipo) && $msg_tipo == "success") ? "success" : "danger"; ?>">
+            <?php echo subtrair_saldo_h($msg); ?>
         </div>
     </div>
 </div>
@@ -96,15 +139,15 @@ if(isset($msg)){
         <form id="form-estorno" href="#" class="form-inline" method="POST">
             <div class="form-group">
                 <label for="exampleInputName2">ID do Usuário</label>
-                <input type="number" class="form-control" id="ug_id" name="ug_id" step="1" min="1" required>
+                <input type="number" class="form-control" id="ug_id" name="ug_id" step="1" min="1" value="<?php echo subtrair_saldo_h($ug_id_post); ?>" required>
                 <small id="validacao_ug_id" style="color: red;"></small>
             </div>
             <div class="form-group left20">
                 <label for="exampleInputEmail2">Valor a ser subtraído</label>
-                <input type="text" class="form-control" id="valor" name="valor" placeholder="Informe o ID do Usuário" maxlength="9" readonly required>
+                <input type="text" class="form-control" id="valor" name="valor" placeholder="Informe o ID do Usuário" maxlength="9" value="<?php echo subtrair_saldo_h($valor_post); ?>" readonly required>
                 <small id="validacao_valor" style="color: red;"></small>            
             </div>
-            <button id="confirma-estorno" class="btn btn-default left20">Subtrair</button>
+            <button id="confirma-estorno" type="submit" class="btn btn-default left20">Subtrair</button>
         </form>
         
     </div>
