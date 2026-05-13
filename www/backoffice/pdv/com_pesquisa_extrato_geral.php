@@ -29,7 +29,11 @@ $img_proxima  = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."
 $img_anterior = "https://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']."/images/anterior.gif";
 $max          = 2000; //$qtde_reg_tela;
 $range_qtde   = $qtde_range_tela;
-$registros	  = $max;
+$registros    = $max;
+$total_table  = 0;
+$max_reg      = 0;
+$dados        = [];
+$res          = false;
 
 $dd_balancos = $_REQUEST['dd_balancos'] ?? '';
 $dd_boletos = $_REQUEST['dd_boletos'] ?? '';
@@ -1038,7 +1042,7 @@ if ($total_table > 0) {
 	$total_comissao = 0;
 	$lista_ids = "";
 
-	while( $info = pg_fetch_array($res) ){
+	while( $res && ($info = pg_fetch_array($res)) ){
 	
 	
 	$dados[] = $info;
