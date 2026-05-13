@@ -13,7 +13,9 @@ require_once $raiz_do_projeto."includes/complice/functions.php";
 
 $dataClickIni = $_REQUEST['dataClickIni'] ?? null;
 $dataClickFim = $_REQUEST['dataClickFim'] ?? null;
-$publishers = $_REQUEST['publishers'] ?? null;
+$publishers = $_REQUEST['publishers'] ?? [];
+if (!is_array($publishers)) $publishers = [$publishers];
+$vetorPublisherLegenda = [];
 $cpf = $_REQUEST['cpf'] ?? null;
 $busca = $_REQUEST['busca'] ?? null;
 $buscar = $_REQUEST['buscar'] ?? null;

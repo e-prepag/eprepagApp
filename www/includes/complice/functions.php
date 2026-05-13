@@ -1810,8 +1810,11 @@ function verificaLimiteCOAF(mixed $limite, mixed &$rs): bool
     } //end else
 
 } //end function verificaLimiteCOAF
-function levantamentoPublisherObrigatorioCPF(array &$vetorPublisherLegenda): array
+function levantamentoPublisherObrigatorioCPF(?array &$vetorPublisherLegenda = null): array
 {
+    if (!is_array($vetorPublisherLegenda)) {
+        $vetorPublisherLegenda = [];
+    }
     // Buscando informaes 
     $sql = "
     SELECT 
@@ -1820,15 +1823,12 @@ function levantamentoPublisherObrigatorioCPF(array &$vetorPublisherLegenda): arr
     FROM operadoras
     WHERE
         opr_data_inicio_operacoes IS NOT NULL
-        AND opr_need_cpf_lh = :need_cpf
-        AND opr_status = :status
+        AND opr_need_cpf_lh = $1
+        AND opr_status = $2
     ORDER BY opr_nome
 ";
 
-    $params = [
-        'need_cpf' => 1,
-        'status'   => '1',
-    ];
+    $params = [1, '1'];
 
     $rs_operadoras_obrigatorio_cpf = SQLexecuteQueryParams($sql, $params);
 
