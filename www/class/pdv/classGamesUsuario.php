@@ -4743,7 +4743,7 @@ class UsuarioGames
             $usuarioGames->setContato01Cargo($rs_row['ug_contato01_cargo']);
 
             $sql_obs = "SELECT to_char(ugo_data,'DD/MM/YYYY HH24:MI:SS') as data,* FROM dist_usuarios_games_obs WHERE ug_id = $1 order by ugo_data ASC;";
-                $rs_usuario_obs = SQLexecuteQueryParams($sql_obs, array($objGamesUsuario->getId()));
+                $rs_usuario_obs = SQLexecuteQueryParams($sql_obs, array($usuarioGames->getId()));
             $ug_obs = NULL;
             if ($rs_usuario_obs && pg_num_rows($rs_usuario_obs) > 0) {
                 while ($rs_usuario_obs_row = pg_fetch_array($rs_usuario_obs)) {
