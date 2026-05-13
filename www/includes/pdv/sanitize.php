@@ -87,11 +87,15 @@ function sanitize_date_array(string $dateval): string
 }
 
 /**
- * @param string $strval
+ * @param ?string $strval
  * @return string
  */
-function sanitize_general_array(string $strval): string
+function sanitize_general_array(?string $strval): string
 {
+    if ($strval === null) {
+        return '';
+    }
+
     $outval = $strval;
     $replacements = [
         "DROP" => "d_r_o_p",

@@ -9,10 +9,13 @@ require_once "/www/includes/bourls.php";
 /* 
     CONTROLLER
  */
-//Inicializando a variável contendo o ano
-if(!isset($dd_ano))   $dd_ano      = date('Y');
+//Inicializando os valores recebidos do formulario
+$BtnSearch = $_POST['BtnSearch'] ?? $_GET['BtnSearch'] ?? null;
+$dd_ano = $_POST['dd_ano'] ?? $_GET['dd_ano'] ?? date('Y');
+$dd_ano = (int)$dd_ano;
+if ($dd_ano < 2014 || $dd_ano > (int)date('Y')) $dd_ano = (int)date('Y');
 
-//Verificando se executou o click no botão atualizar
+//Verificando se executou o click no botao atualizar
 if(isset($BtnSearch) && $BtnSearch) {
         //Variavel de OUTPUT
         $msg = "";

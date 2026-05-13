@@ -4324,6 +4324,8 @@ class UsuarioGames
     function existeLogin($login, $usuario_id_excessao)
     {
 
+        if (is_null($login) || trim((string)$login) == "") return false;
+
         $ret = true;
         $err_cod = "";
 
