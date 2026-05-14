@@ -11,6 +11,7 @@ require_once $raiz_do_projeto . "includes/complice/functions.php";
 require_once $raiz_do_projeto . "class/util/Util.class.php";
 
 $periodo = $_POST['periodo'] ?? null;
+$recalcularPeriodo = (isset($_POST["recalcularPeriodo"]) && $_POST["recalcularPeriodo"] == "1");
 $multiCotacao124 = $_POST['multiCotacao124'] ?? null;
 $multiCotacaoValor124 = $_POST['multiCotacaoValor124'] ?? null;
 $multiCotacaoInicio124 = $_POST['multiCotacaoInicio124'] ?? null;
@@ -24,6 +25,8 @@ $multiCotacao37 = $_POST['multiCotacao37'] ?? null;
 //Variavel para teste contendo o ultimo mês permitido
 $currentmonthVerify = Util::getTimeByMonth(-1);
 $lastMonth = Util::getTimeByMonth(0);
+$lastClosedMonth = $currentmonthVerify;
+$modoRecalculoPeriodo = false;
 
 //Variável de controle das mensagens de erro e sucesso nas execuções das querys
 $msg = "";
@@ -67,14 +70,26 @@ if (!isset($_POST['periodo']) || empty($_POST['periodo']) || $_POST['periodo'] =
     // Split ano/mes
     list($mes, $ano) = explode("/", $mesAno);
 
-    $sql = "select cd.opr_codigo from cotacao_dolar cd INNER JOIN operadoras o ON (cd.opr_codigo = o.opr_codigo) where cd_data = $1 ORDER BY opr_nome;";
-    $rs = SQLexecuteQueryParams($sql, array($ano . "-" . $mes . "-01 00:00:00"));
-    if ($rs && pg_num_rows($rs) > 0) {
-        while ($rs_row = pg_fetch_array($rs)) {
-            $vetor_tmp[] = $rs_row['opr_codigo'];
-        } //end while   
-    } //end if($rs)
-    else $vetor_tmp = NULL;
+    if ($recalcularPeriodo && (int)$periodo < -1) {
+        $currentmonthVerify = $currentmonth;
+        $modoRecalculoPeriodo = true;
+        $variado = false;
+
+        $vetorPublisher = levantamentoPublisherOperantes($ano, $mes, $variado);
+        $vetorPublisherNovos = levantamentoPublisherNovosOperantes($ano, $mes, $variado);
+        $vetorPublisherFacilitadora = levantamentoPublisherEppPagamentosFacilitadora($ano, $mes, $variado);
+
+        $vetor_tmp = array_merge($vetorPublisher, $vetorPublisherNovos, $vetorPublisherFacilitadora);
+    } else {
+        $sql = "select cd.opr_codigo from cotacao_dolar cd INNER JOIN operadoras o ON (cd.opr_codigo = o.opr_codigo) where cd_data = $1 ORDER BY opr_nome;";
+        $rs = SQLexecuteQueryParams($sql, array($ano . "-" . $mes . "-01 00:00:00"));
+        if ($rs && pg_num_rows($rs) > 0) {
+            while ($rs_row = pg_fetch_array($rs)) {
+                $vetor_tmp[] = $rs_row["opr_codigo"];
+            } //end while   
+        } //end if($rs)
+        else $vetor_tmp = NULL;
+    }
 } //else do if (empty($_POST['periodo']))
 
 //========= Variável contendo o Ano Mês inicio das operações para efeitos 
@@ -82,6 +97,7 @@ $dataInicioOperacao = 201407;
 
 //Data para testes
 $testeData = $ano . $mes;
+$edicaoPeriodo = ($testeData == date("Ym", $currentmonthVerify));
 
 //Limpando saida
 ob_clean();
@@ -145,11 +161,11 @@ require_once $raiz_do_projeto . "backoffice/includes/topo.php";
 $btSubmit = isset($_POST['btSubmit']) ? $_POST['btSubmit'] : false;
 
 //Teste para edição e alteração da cotação
-if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
+if ($edicaoPeriodo && $btSubmit) {
     $dias_mes = (int) date('t', $currentmonthVerify);
     $maior_data = null;
     $menor_data = null;
-    foreach ($vetor_tmp as $value) {
+    foreach ((array)$vetor_tmp as $value) {
 
         if (isset($_POST["maisdeuma"][$value])) {
             if (isset($_POST['multiCotacaoValor' . $value])) {
@@ -326,7 +342,7 @@ if ($testeData == date('Ym', $currentmonthVerify) && $btSubmit) {
         echo "<script> $('#modal-load').modal('show');</script>";
         echo "<script> $('.modal-backdrop').fadeOut(500);</script>";
     }
-} // end if($testeData == date('Ym',$currentmonthVerify) && $btSubmit)
+} // end if($edicaoPeriodo && $btSubmit)
 
 // Exibindo o Período de Apuração 
 echo "<fieldset><legend>Mês/Ano do período de apuração da cotação do dolar: <span class='glyphicon glyphicon-backward t0 c-pointer' aria-hidden='true' title='Volta um período para consulta' id='voltar'></span> <span style='color: red'> " . $mesAno . "</span> " . (($testeData >= date('Ym', $lastMonth)) ? "" : "<span class='glyphicon glyphicon-forward t0 c-pointer' aria-hidden='true' title='Avança um período para consulta' id='avancar'></span>");
@@ -366,12 +382,14 @@ else {
     $(function() {
         $("#avancar").click(function() {
             $("#periodo").val(parseInt($("#periodo").val()) + 1);
+            $("#recalcularPeriodo").val("0");
             document.form1.submit();
         });
     });
     $(function() {
         $("#voltar").click(function() {
             $("#periodo").val(parseInt($("#periodo").val()) - 1);
+            $("#recalcularPeriodo").val("0");
             document.form1.submit();
         });
     });
@@ -384,7 +402,7 @@ else {
             $("#divListagem" + value).addClass("corGrupo");
             $("input[name='cotacao[" + value + "]']").attr("readonly", "true");
             <?php
-            if ($testeData == date('Ym', $currentmonthVerify)) {
+            if ($edicaoPeriodo) {
             ?>
                 $("input[name='cotacao[" + value + "]']").val("Adicione as cotações abaixo");
             <?php
@@ -443,6 +461,19 @@ if ($currentmonthVerify == $lastMonth) {
 ?>
 <form id="form1" name="form1" method="post" action="">
     <input type="hidden" name="periodo" id="periodo" value="<?php echo (!isset($periodo)) ? "-1" : $periodo; ?>" />
+    <input type="hidden" name="recalcularPeriodo" id="recalcularPeriodo" value="<?php echo ($modoRecalculoPeriodo) ? "1" : "0"; ?>" />
+    <?php if ($testeData < date("Ym", $lastClosedMonth)) { ?>
+        <div class="row top10">
+            <div class="col-md-12 text-center">
+                <?php if ($modoRecalculoPeriodo) { ?>
+                    <span class="txt-verde"><b>Periodo recalculado para edicao.</b></span>
+                    <button type="submit" name="recalcularPeriodo" value="0" class="btn btn-default marginLado">Voltar para cotacoes salvas</button>
+                <?php } else { ?>
+                    <button type="submit" name="recalcularPeriodo" value="1" class="btn btn-warning">Recalcular periodo para edicao</button>
+                <?php } ?>
+            </div>
+        </div>
+    <?php } ?>
     <?php
     $totalPublisher = 0;
     $testeCongelamento =  false;
@@ -464,7 +495,7 @@ if ($currentmonthVerify == $lastMonth) {
                 echo "<div class='divListagem" . $value . "' id='divListagem" . $value . "'>
                 <div class='row trListagem margin10'>
                     <div class='col-md-3 text-right'><b>" . $vetorOperadoras[$value] . "</b></div>" . PHP_EOL;
-                if ($testeData == date('Ym', $currentmonthVerify) && isset($vetorCotacaoCongelada[$value]) && $vetorCotacaoCongelada[$value] == '0' || !isset($vetorCotacaoCongelada[$value]) || $vetorCotacaoMultipla[$value] == 1) {
+                if ($edicaoPeriodo && isset($vetorCotacaoCongelada[$value]) && $vetorCotacaoCongelada[$value] == '0' || !isset($vetorCotacaoCongelada[$value]) || $vetorCotacaoMultipla[$value] == 1) {
                     $multipla_cotacao = $vetorCotacaoMultipla[$value];
                     $testeCongelamento = true;
                     $readonly = "";
@@ -474,9 +505,9 @@ if ($currentmonthVerify == $lastMonth) {
 
                         $sql = "SELECT * FROM cotacao_dolar WHERE opr_codigo = $1 AND to_char(cd_data,'YYYY-MM')  = $2 ORDER BY cd_data";
                         $rs_cotacoes = SQLexecuteQueryParams($sql, array($value, date("Y-m", $currentmonth)));
-                        $rs_row = pg_fetch_array($rs_cotacoes);
-                        $cotacao_congelada = $rs_row["cd_freeze"];
-                        if ($rs_cotacoes && $rs_num_cotacoes && (($rs_cotacoes) ? pg_num_rows($rs_cotacoes) : 0) > 0 && ((($rs_num_cotacoes) ? pg_num_rows($rs_num_cotacoes) : 0) > 1 || $currentmonthVerify ==  $lastMonth)) {
+                        $rs_row = ($rs_cotacoes && pg_num_rows($rs_cotacoes) > 0) ? pg_fetch_array($rs_cotacoes) : false;
+                        $cotacao_congelada = ($rs_row && isset($rs_row["cd_freeze"])) ? $rs_row["cd_freeze"] : 0;
+                        if ($rs_row && $rs_cotacoes && $rs_num_cotacoes && (($rs_cotacoes) ? pg_num_rows($rs_cotacoes) : 0) > 0 && ((($rs_num_cotacoes) ? pg_num_rows($rs_num_cotacoes) : 0) > 1 || $currentmonthVerify ==  $lastMonth)) {
                             $checked = "checked";
                             $dataAtual = explode(" ", $rs_row["cd_data"])[0];
                             $valorAtual =  $rs_row["cd_cotacao"];
@@ -563,7 +594,7 @@ if ($currentmonthVerify == $lastMonth) {
                             }
                         }
                     }
-                    if ($checked != "" && $testeData == date('Ym', $currentmonthVerify)) {
+                    if ($checked != "" && $edicaoPeriodo) {
                         $valor = "Adicione as cotações abaixo";
                         $readonly = "readonly";
                     } elseif (isset($cotacao[$value])) {
@@ -626,7 +657,7 @@ if ($currentmonthVerify == $lastMonth) {
                                     <h5><b>Cadastro de multiplas cotações para $vetorOperadoras[$value]</b></h5>
                                 </div>
                                 <div class='col-md-2'>
-                                    " . ($testeData == date('Ym', $currentmonthVerify) ? "<a class='btn btn-success btnTamanho' onclick='addCotacao($value)'> + </a>" : "") . "
+                                    " . ($edicaoPeriodo ? "<a class='btn btn-success btnTamanho' onclick='addCotacao($value)'> + </a>" : "") . "
                                 </div>
                             </div>
                             $html
@@ -639,7 +670,7 @@ if ($currentmonthVerify == $lastMonth) {
         } //end foreach
     } //end if(!isset($vetor_tmp) || empty($vetor_tmp) || count($vetor_tmp) == 0)
 
-    if ($testeData == date('Ym', $currentmonthVerify) && $testeCongelamento) {
+    if ($edicaoPeriodo && $testeCongelamento) {
         echo "
         <div class='row top10' align='center'>             
                 <input type='submit' value='Salvar' id='btSubmit' name='btSubmit' class='btn btn-success btnSalvar'>           
