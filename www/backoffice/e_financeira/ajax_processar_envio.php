@@ -217,16 +217,16 @@ function etapa2_monitorarProcessamento($protocolo, $producao = false)
     $efinanceira = new GerarEFinanceira();
 
     $tentativa = 0;
-    $maxTentativas = 1; // 2 minutos (24 * 5s)
+    $maxTentativas = 24; // 2 minutos (24 * 5s)
     $xmlFinal = null;
     $statusLote = 1; // Começa assumindo '1 - Em Processamento'
 
     do {
         // Espera 5 segundos antes de consultar
-        //sleep(5);
+        sleep(5);
         $tentativa++;
 
-        //$xmlFinal = $efinanceira->consultarLoteEFinanceira($protocolo, $producao);
+        $xmlFinal = $efinanceira->consultarLoteEFinanceira($protocolo, $producao);
 
         // Remove namespaces para leitura rápida do status
         $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', (string)($xmlFinal ?? ''));
@@ -274,7 +274,7 @@ function etapa3_processarResultados($xmlProcessamento, $xmlEnvioAssinado, $proto
     $xmlLimpo = preg_replace('/xmlns[^=]*="[^"]*"/i', '', (string)($xmlProcessamento ?? ''));
     $xmlObj = simplexml_load_string($xmlLimpo);
 
-    if(!isset($xmlObj) || !$xmlObj) {
+    if (!isset($xmlObj) || !$xmlObj) {
         return [
             'status_lote' => 9,
             'mensagem_lote' => 'XML de retorno inválido ou corrompido.',

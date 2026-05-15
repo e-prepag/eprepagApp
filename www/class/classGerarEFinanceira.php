@@ -5,6 +5,7 @@ require_once '/www/includes/load_dotenv.php';
 
 class GerarEFinanceira
 {
+    private const RECIBO_CADASTRO_DECLARANTE_ANTERIOR = '45244-05-001-2510-45244';
 
     public $cnpjEPP;                            // CNPJ da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
     private $razaoEPP;  // Razão Social da empresa E-PREPAG ADMINISTRADORA DE CARTOES LTDA
@@ -1704,9 +1705,12 @@ class GerarEFinanceira
         return ['xml' => $dom, 'id' => $id_formatado];
     }
 
-    public function gerarCadastroDeclarante()
+    public function gerarCadastroDeclarante($retificar = false)
     {
-        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtCadDeclarante/v1_2_0';
+        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtCadDeclarante/v1_3_0';
+        $retificar = (bool)$retificar;
+        $indRetificacao = $retificar ? '2' : '1';
+        $nrRecibo = $retificar ? self::RECIBO_CADASTRO_DECLARANTE_ANTERIOR : '';
 
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = false;
@@ -1727,7 +1731,10 @@ class GerarEFinanceira
 
         // ideEvento
         $ideEvento = $dom->createElementNS($namespace, 'ideEvento');
-        $ideEvento->appendChild($dom->createElementNS($namespace, 'indRetificacao', '1'));
+        $ideEvento->appendChild($dom->createElementNS($namespace, 'indRetificacao', $indRetificacao));
+        if ($nrRecibo !== '') {
+            $ideEvento->appendChild($dom->createElementNS($namespace, 'nrRecibo', $nrRecibo));
+        }
         $ideEvento->appendChild($dom->createElementNS($namespace, 'tpAmb', '1'));
         $ideEvento->appendChild($dom->createElementNS($namespace, 'aplicEmi', '1'));
         $ideEvento->appendChild($dom->createElementNS($namespace, 'verAplic', $this->versao_aplicacao));
@@ -1740,6 +1747,9 @@ class GerarEFinanceira
 
         // infoCadastro
         $infoCadastro = $dom->createElementNS($namespace, 'infoCadastro');
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'inDeclaranteCRS', '2'));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'inDeclaranteFATCA', '2'));
+        $infoCadastro->appendChild($dom->createElementNS($namespace, 'tpEntidade', '1'));
         $infoCadastro->appendChild($dom->createElementNS($namespace, 'nome', $this->razaoEPP));
         $infoCadastro->appendChild($dom->createElementNS($namespace, 'enderecoLivre', $this->enderecoEPP));
         $infoCadastro->appendChild($dom->createElementNS($namespace, 'municipio', $this->codMunicipioEPP));
