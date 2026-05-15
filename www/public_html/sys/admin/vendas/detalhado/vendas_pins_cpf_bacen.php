@@ -958,6 +958,18 @@ if ($BtnSearch) {
                             } //end foreach
                         } //end if(is_array($cotacao_dolar))
 
+                        if ($dd_tipo != 'CPF' && is_array($cotacao_dolar) && $resid) {
+                            pg_result_seek($resid, 0);
+                            while ($rowCotacao = pg_fetch_array($resid)) {
+                                $dataCotacao = substr($rowCotacao['data'], 0, 10);
+                                if (empty($cotacao_dolar[$dataCotacao])) {
+                                    unset($cotacao_dolar);
+                                    break;
+                                }
+                            }
+                            pg_result_seek($resid, 0);
+                        }
+
                         if ($total_table > 0 && ($dd_tipo == 'CPF' || !empty($cotacao_dolar) || is_array($cotacao_dolar))) {
                             if ($dd_tipo == 'CPF') {
                                 $cabecalho = "'Nome do Cliente','CPF','Data Atualização CPF'";
