@@ -4,6 +4,87 @@ require_once "/www/class/classSecureEncryption.php";
 class UsuarioGames
 {
 
+    public function __construct(
+        $ug_id                 = null,
+        $ug_sSenha             = null,
+        $ug_blAtivo         = null,
+        $ug_dDataInclusao     = null,
+        $ug_dDataUltimoAcesso = null,
+        $ug_iQtdeAcessos    = null,
+
+        $ug_sEmail             = null,
+        $ug_sNome             = null,
+        $ug_sCPF             = null,
+        $ug_sRG             = null,
+        $ug_dDataNascimento = null,
+        $ug_cSexo             = null,
+        $ug_sTipoEnd         = null,
+        $ug_sEndereco         = null,
+        $ug_sNumero         = null,
+        $ug_sComplemento     = null,
+        $ug_sBairro         = null,
+        $ug_sCidade         = null,
+        $ug_sEstado         = null,
+        $ug_sCEP             = null,
+        $ug_sTelDDI         = null,
+        $ug_sTelDDD         = null,
+        $ug_sTel             = null,
+        $ug_sCelDDI         = null,
+        $ug_sCelDDD         = null,
+        $ug_sCel             = null,
+        $ug_sHabboId        = null,
+        $ug_NewsLetter        = null,
+
+        $ug_compet_lh_ug_id    = null,
+        $ug_compet_jogo        = null,
+        $ug_compet_aceito_regulamento    = null,
+        $ug_compet_aceito_data_aceito    = null,
+        $ug_use_cielo                    = null,
+
+        $ug_saldo_fidelizacao            = null,
+        $ug_categoria_fidelizacao        = null,
+        $login = null
+    ) {
+        $this->UsuarioGames(
+            $ug_id,
+            $ug_sSenha,
+            $ug_blAtivo,
+            $ug_dDataInclusao,
+            $ug_dDataUltimoAcesso,
+            $ug_iQtdeAcessos,
+            $ug_sEmail,
+            $ug_sNome,
+            $ug_sCPF,
+            $ug_sRG,
+            $ug_dDataNascimento,
+            $ug_cSexo,
+            $ug_sTipoEnd,
+            $ug_sEndereco,
+            $ug_sNumero,
+            $ug_sComplemento,
+            $ug_sBairro,
+            $ug_sCidade,
+            $ug_sEstado,
+            $ug_sCEP,
+            $ug_sTelDDI,
+            $ug_sTelDDD,
+            $ug_sTel,
+            $ug_sCelDDI,
+            $ug_sCelDDD,
+            $ug_sCel,
+            $ug_sHabboId,
+            $ug_NewsLetter,
+            $ug_compet_lh_ug_id,
+            $ug_compet_jogo,
+            $ug_compet_aceito_regulamento,
+            $ug_compet_aceito_data_aceito,
+            $ug_use_cielo,
+            $ug_saldo_fidelizacao,
+            $ug_categoria_fidelizacao,
+            $login
+        );
+    }
+
     var $ug_id;
     var $ug_sSenha;
     var $ug_blAtivo;
@@ -2860,7 +2941,7 @@ class UsuarioGames
             if (!is_null($objGamesUsuario->getNomeCPF())) $addSet("ug_nome_cpf", trim($objGamesUsuario->getNomeCPF()));
             if (!is_null($objGamesUsuario->getOBS())) {
                 if (trim($objGamesUsuario->getOBS()) != "") {
-                    $sql_insert_obs = "INSERT INTO usuarios_games_obs VALUES ($1, $2, $3);";
+                    $sql_insert_obs = "INSERT INTO usuarios_games_obs (ug_id, ug_obs, ugo_user_insert, ugo_data) VALUES ($1, $2, $3, NOW());";
                     $ret_insert_obs = SQLexecuteQueryParams($sql_insert_obs, array($objGamesUsuario->getId(), trim($objGamesUsuario->getOBS()), $GLOBALS['_SESSION']['userlogin_bko']));
                     if (!$ret_insert_obs) echo "Erro ao atualizar Observação do Usuário." . PHP_EOL;
                 }

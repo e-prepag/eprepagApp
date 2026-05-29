@@ -696,13 +696,13 @@ ob_end_flush();
                 ?>
                     <td class="txt-vermelho"><b>Usuário não está cadastrado como VIP</b></td>
                     <td>
-                        <form method="post">
+                        <div>
                             <input type="hidden" id="op_id" name="op_id" value="<?php echo $iduser_bko; ?>">
                             <input type="hidden" id="op_nome" name="op_nome" value="<?php echo $userlogin_bko; ?>">
 
                             <input type="hidden" id="ug_id" name="ug_id" value="<?php echo $ug_id; ?>">
-                            <button id="btnSetGamerVip" type="submit" class="btn btn-sm btn-info" name="ug_id">Cadastrar na categoria VIP</button>
-                        </form>
+                            <button id="btnSetGamerVip" type="button" class="btn btn-sm btn-info">Cadastrar na categoria VIP</button>
+                        </div>
                     </td>
                     <td></td>
                     <td></td>
