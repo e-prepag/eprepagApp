@@ -72,8 +72,8 @@ if(!empty($_POST)){
     $_POST["ec_valor"] = Util::getNumero($_POST["ec_valor"],true);
     if(isset($_POST['busca'])){
         if(!empty($_POST["cec_id"]))                $filtros["cec_id"] = "ec.cec_id = ".$_POST["cec_id"]; 
-        if(!empty($_POST["ec_data_devolucao"]))     $filtros["ec_data_devolucao"] = "ec_data_devolucao >= '".Util::getData($_POST["ec_data_devolucao"], true)." 00:00:00'";
-        if(!empty($_POST["ec_data_devolucao_fim"])) $filtros["ec_data_devolucao_fim"] = "ec_data_devolucao <= '".Util::getData($_POST["ec_data_devolucao_fim"], true)." 23:59:59'";
+        if(!empty($_POST["ec_data_devolucao"]))     $filtros["ec_data_devolucao"] = "ec_data_devolucao::date >= '".Util::getData($_POST["ec_data_devolucao"], true)."'";
+        if(!empty($_POST["ec_data_devolucao_fim"])) $filtros["ec_data_devolucao_fim"] = "ec_data_devolucao::date <= '".Util::getData($_POST["ec_data_devolucao_fim"], true)."'";
         if(!empty($_POST["ec_tipo"]))               $filtros["ec_tipo"] = "ec_tipo = ".$_POST["ec_tipo"]; 
         if(!empty($_POST["ec_tipo_usuario"]))       $filtros["ec_tipo_usuario"] = "ec_tipo_usuario = '".$_POST["ec_tipo_usuario"]."'"; 
         if(!empty($_POST["ec_forma_devolucao"]))    $filtros["ec_forma_devolucao"] = "ec_forma_devolucao = ".$_POST["ec_forma_devolucao"]; 

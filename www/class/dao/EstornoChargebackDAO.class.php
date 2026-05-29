@@ -64,6 +64,10 @@ class EstornoChargeBackDAO {
             $params[] = '%' . strtoupper($m[2]) . '%';
             return 'UPPER(' . $m[1] . ') like $' . count($params);
         }
+        if (preg_match("/^(ec_data_devolucao)::date\s*(=|>=|<=|>|<)\s*'(\d{4}-\d{2}-\d{2})'$/", $cond, $m)) {
+            $params[] = $m[3];
+            return $m[1] . '::date ' . $m[2] . ' $' . count($params) . '::date';
+        }
         if (preg_match("/^([a-zA-Z_][a-zA-Z0-9_.]*)\s*(=|>=|<=|>|<)\s*'([^']*)'$/", $cond, $m) && in_array($m[1], $allowed)) {
             $params[] = $m[3];
             return $m[1] . ' ' . $m[2] . ' $' . count($params);
