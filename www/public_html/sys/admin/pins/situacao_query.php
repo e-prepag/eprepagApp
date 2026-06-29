@@ -16,27 +16,35 @@ $inicial     = $_REQUEST["inicial"]     ?? "";
 $range       = $_REQUEST["range"]       ?? "";
 $total_table = $_REQUEST["total_table"] ?? "";
 $flistall    = $_REQUEST["flistall"]    ?? "";
+$flist_vg_id = $_REQUEST["flist_vg_id"] ?? "";
+$tf_pins     = $_REQUEST["tf_pins"]     ?? "";
+$dd_california = $_REQUEST["dd_california"] ?? "";
+$festab      = $_REQUEST["festab"]      ?? "";
 
 // Datas do período de busca
-$tf_data_inicial = $_POST["tf_data_inicial"] ?? "";
-$tf_data_final   = $_POST["tf_data_final"]   ?? "";
+$tf_data_inicial = $_REQUEST["tf_data_inicial"] ?? "";
+$tf_data_final   = $_REQUEST["tf_data_final"]   ?? "";
 
 // Filtros de identificação (Serial, PIN e Código Interno)
-$fserial         = $_POST["fserial"]         ?? "";
-$fpin            = $_POST["fpin"]            ?? "";
-$fcodinterno     = $_POST["fcodinterno"]     ?? "";
+$fserial         = $_REQUEST["fserial"]         ?? "";
+$fpin            = $_REQUEST["fpin"]            ?? "";
+$fcodinterno     = $_REQUEST["fcodinterno"]     ?? "";
 
 // Filtros de sistema
-$dd_opr_codigo   = $_POST["dd_opr_codigo"]   ?? "";
-$dd_pin_status   = $_POST["dd_pin_status"]   ?? "";
-$fcanal          = $_POST["fcanal"]          ?? "";
+$dd_opr_codigo   = $_REQUEST["dd_opr_codigo"]   ?? "";
+$dd_pin_status   = $_REQUEST["dd_pin_status"]   ?? "";
+$fcanal          = $_REQUEST["fcanal"]          ?? "";
 
 // Ação do formulário
-$BtnSearch      = $_POST["BtnSearch"]       ?? "";
+$BtnSearch      = $_REQUEST["BtnSearch"]       ?? "";
 
 if (!$ncamp) $ncamp = 'pin_codinterno';
-if (!$inicial)  $inicial     = 0;
-if (!$range)    $range       = 1;
+$ncamp = preg_replace("/[^a-zA-Z0-9_]/", "", (string)$ncamp);
+if (!$ncamp) $ncamp = 'pin_codinterno';
+$inicial = (isset($inicial) && is_numeric($inicial)) ? (int)$inicial : 0;
+$range = (isset($range) && is_numeric($range)) ? (int)$range : 1;
+if ($inicial < 0) $inicial = 0;
+if ($range < 1) $range = 1;
 
 if (isset($_POST['BtnSearch'])) {
     $inicial = 0;
@@ -47,6 +55,11 @@ if (isset($_POST['BtnSearch'])) {
 //if($BtnSearch) $inicial     = 0;
 //if($BtnSearch) $range       = 1;
 //if($BtnSearch) $total_table = 0;
+if ($_SESSION["tipo_acesso_pub"] != 'AT') {
+    $flistall = false;
+    $flist_vg_id = false;
+}
+
 if ($flistall) {
     $inicial     = 0;
     $range       = 1;
@@ -112,29 +125,49 @@ if (b_is_Publisher()) {
     $dd_opr_codigo = $_SESSION["opr_codigo_pub"];
 }
 
-$varsel = "&tf_data_inicial=$tf_data_inicial&tf_data_final=$tf_data_final&dd_opr_codigo=$dd_opr_codigo&tf_loteopr=$tf_loteopr&dd_status=$dd_status&tf_valor_total=$tf_valor_total&fserial=$fserial&fpin=$fpin&fcodinterno=$fcodinterno&fcanal=$fcanal&dd_pin_status=" . str_replace(" ", "", $dd_pin_status) . "&BtnSearch=" . $BtnSearch;
-
-if ($tf_pins && is_array($tf_pins)) {
-    if (count($tf_pins) == 1) {
-        $tf_pins = $tf_pins[0];
-    } else {
+$varsel_tf_pins = "";
+if (!empty($tf_pins)) {
+    if (is_array($tf_pins)) {
         $tf_pins = implode("|", $tf_pins);
     }
-}
-if ($tf_pins && $tf_pins != "") {
-    $tf_pins = explode("|", $tf_pins);
-}
-if ($tf_pins && is_array($tf_pins)) {
-    $varsel_tf_pins = "";
-    foreach ($tf_pins as $key => $val) {
-        $varsel_tf_pins .= "&tf_pins[]=$val";
-    }
-    $varsel .= $varsel_tf_pins;
+    $tf_pins = array_values(array_filter(explode("|", (string)$tf_pins), static function($pin_valor) {
+        return $pin_valor !== "" && is_numeric($pin_valor);
+    }));
+} else {
+    $tf_pins = array();
 }
 
-if ($flist_vg_id) {
-    $varsel .= "&flist_vg_id=1";
+foreach ($tf_pins as $val) {
+    $varsel_tf_pins .= "&tf_pins[]=" . rawurlencode($val);
 }
+
+$varsel_params = array(
+    "tf_data_inicial" => $tf_data_inicial,
+    "tf_data_final" => $tf_data_final,
+    "dd_opr_codigo" => $dd_opr_codigo,
+    "tf_loteopr" => $tf_loteopr ?? "",
+    "dd_status" => $dd_status ?? "",
+    "tf_valor_total" => $tf_valor_total ?? "",
+    "fserial" => $fserial,
+    "fpin" => $fpin,
+    "fcodinterno" => $fcodinterno,
+    "fcanal" => $fcanal,
+    "dd_pin_status" => $dd_pin_status,
+    "BtnSearch" => "Buscarpag",
+);
+if ($tf_pins) {
+    $varsel_params["tf_pins"] = $tf_pins;
+}
+if ($flist_vg_id) {
+    $varsel_params["flist_vg_id"] = 1;
+}
+if ($flistall) {
+    $varsel_params["flistall"] = 1;
+}
+if ($dd_california) {
+    $varsel_params["dd_california"] = 1;
+}
+$varsel = "&" . http_build_query($varsel_params);
 
 // Levanta lista de operadoras
 $sql  = "select opr_codigo, opr_nome from operadoras where opr_status='1' and opr_importa=1 order by opr_nome";
@@ -634,11 +667,11 @@ if (!isset($_POST['download'])) {
             }
 
             // reset the checkboxes with values 'tf_pins[]'
-            var chkObj = document.form1.elements.length;
+            var chkObj = document.form1.elements;
             var chkLength = chkObj.length;
             for (var i = 0; i < chkLength; i++) {
-                var type = document.form1.elements[i].type;
-                if (type == "checkbox" && document.form1.elements[i].checked) {
+                var type = chkObj[i].type;
+                if (type == "checkbox" && chkObj[i].checked) {
                     chkObj[i].checked = false;
                 }
             }
@@ -655,7 +688,7 @@ if (!isset($_POST['download'])) {
     </script>
 
     <script>
-        postdata = <?php echo json_encode($_POST) ?>;
+        postdata = <?php echo json_encode($_REQUEST) ?>;
         postdata.download = true;
 
         $(function() {

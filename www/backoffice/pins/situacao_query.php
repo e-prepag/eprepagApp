@@ -20,13 +20,20 @@ $fpin = $fpin ?? ($_REQUEST["fpin"] ?? null);
 $fserial = $fserial ?? ($_REQUEST["fserial"] ?? null);
 $festab = $festab ?? ($_REQUEST["festab"] ?? null);
 $fcanal = $fcanal ?? ($_REQUEST["fcanal"] ?? null);
-$total_table = $total_table ?? 0;
+$ncamp = $ncamp ?? ($_REQUEST["ncamp"] ?? null);
+$inicial = $inicial ?? ($_REQUEST["inicial"] ?? null);
+$range = $range ?? ($_REQUEST["range"] ?? null);
+$total_table = $total_table ?? ($_REQUEST["total_table"] ?? 0);
 $PHP_SELF = $PHP_SELF ?? ($_SERVER["PHP_SELF"] ?? "");
 	
 //echo "inicial: $inicial<br>";
 	if(!isset($ncamp) || !$ncamp) $ncamp = 'pin_codinterno';
-	if(!isset($inicial) || !$inicial)  $inicial     = 0;
-	if(!isset($range) || !$range)    $range       = 1;
+	$ncamp = preg_replace("/[^a-zA-Z0-9_]/", "", (string)$ncamp);
+	if(!$ncamp) $ncamp = 'pin_codinterno';
+	$inicial = (isset($inicial) && is_numeric($inicial)) ? (int)$inicial : 0;
+	$range = (isset($range) && is_numeric($range)) ? (int)$range : 1;
+	if($inicial < 0) $inicial = 0;
+	if($range < 1) $range = 1;
 //	if($BtnSearch) $inicial     = 0;
 //	if($BtnSearch) $range       = 1;
 //	if($BtnSearch) $total_table = 0;
@@ -52,15 +59,15 @@ $PHP_SELF = $PHP_SELF ?? ($_SERVER["PHP_SELF"] ?? "");
 
 	if(!isset($fcanal) || !$fcanal) $fcanal = 's';
         
-	if (!empty($tf_pins) && is_array($tf_pins)) {
-		if ((is_countable($tf_pins) ? count($tf_pins) : 0) == 1) {
-			$tf_pins = $tf_pins[0];
-		} else {
-			$tf_pins = implode("|",$tf_pins);
+	if (!empty($tf_pins)) {
+		if (is_array($tf_pins)) {
+			$tf_pins = implode("|", $tf_pins);
 		}
-	}
-	if (isset($tf_pins) && $tf_pins != "") {              
-		$tf_pins = explode("|", (string)($tf_pins ?? ""));	
+		$tf_pins = array_values(array_filter(explode("|", (string)$tf_pins), static function($pin_valor) {
+			return $pin_valor !== "" && is_numeric($pin_valor);
+		}));
+	} else {
+		$tf_pins = array();
 	}
 
 	// levanta operadoras
@@ -106,13 +113,8 @@ $PHP_SELF = $PHP_SELF ?? ($_SERVER["PHP_SELF"] ?? "");
 
 	if(isset($BtnSearch) && ($BtnSearch=="Buscar" || $BtnSearch=="Buscarpag")) {
 	
-	    if($BtnSearch!="Buscar"){
-	
-			if(isset($_GET["tf_pins"])){
-			   $tf_pins = array($_GET["tf_pins"]);
-			   $teste = true;
-			}
-	
+	    if($BtnSearch!="Buscar" && isset($_GET["tf_pins"])) {
+		   $teste = true;
 	    }
 	
 		$sql = "select t0.pin_codinterno, \n
@@ -195,10 +197,25 @@ echo "Elapsed time A4: ".number_format(getmicrotime() - $time_start_stats, 2, '.
 		else $reg_ate = $max + $inicial;
 	}
 //echo "$total_table - $reg_ate<br>";
-	@$varsel = "&tf_data_inicial=$tf_data_inicial&tf_data_final=$tf_data_final&dd_opr_codigo=$dd_opr_codigo&tf_loteopr=$tf_loteopr&dd_status=$dd_status&tf_valor_total=$tf_valor_total&fserial=$fserial&fpin=$fpin&fcodinterno=$fcodinterno&fcaracter=$fcaracter&fcanal=$fcanal&dd_pin_status=$dd_pin_status&BtnSearch=Buscarpag";
+	$varsel_params = array(
+		"tf_data_inicial" => $tf_data_inicial,
+		"tf_data_final" => $tf_data_final,
+		"dd_opr_codigo" => $dd_opr_codigo,
+		"tf_loteopr" => $tf_loteopr ?? "",
+		"dd_status" => $dd_status ?? "",
+		"tf_valor_total" => $tf_valor_total ?? "",
+		"fserial" => $fserial,
+		"fpin" => $fpin,
+		"fcodinterno" => $fcodinterno,
+		"fcaracter" => $fcaracter,
+		"fcanal" => $fcanal,
+		"dd_pin_status" => $dd_pin_status,
+		"BtnSearch" => "Buscarpag",
+	);
 	if(isset($tf_pins) && $tf_pins) {
-		$varsel .= "&tf_pins=".implode("|",$tf_pins);
+		$varsel_params["tf_pins"] = implode("|", $tf_pins);
 	}
+	$varsel = "&".http_build_query($varsel_params);
 //echo $varsel."<br>";
 require_once "/www/includes/bourls.php";
 ?>
@@ -356,11 +373,11 @@ function ResetCheckedValue() {
 	}
 
 	// reset the checkboxes with values 'tf_pins[]'
-	var chkObj = document.form1.elements.length;
+	var chkObj = document.form1.elements;
 	var chkLength = chkObj.length;
 	for(var i = 0; i < chkLength; i++) {
-		var type = document.form1.elements[i].type;
-		if(type=="checkbox" && document.form1.elements[i].checked) {
+		var type = chkObj[i].type;
+		if(type=="checkbox" && chkObj[i].checked) {
 			chkObj[i].checked = false;
 		}
 	}
@@ -379,7 +396,7 @@ function ResetCheckedValue() {
   <tr> 
     <td>	
 	<form name="form1" method="post" action="" onSubmit="return validade()">
-            <input type="hidden" name="tf_pins" id="tf_pins" value="<?php isset($tf_pins) && (is_array($tf_pins)) ? implode("|",$tf_pins) : "" ?>">
+            <input type="hidden" name="tf_pins" id="tf_pins" value="">
         <table class="table">
           <tr> 
             <td colspan="3"><strong>Pesquisa</strong></td>
