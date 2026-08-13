@@ -17,10 +17,15 @@ $pagina_atual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 $offset = ($pagina_atual - 1) * $limite_registros;
 
 $data_atual = date('Y-m');
+if (empty($_SESSION['csrf_efinanceira'])) {
+	$_SESSION['csrf_efinanceira'] = bin2hex(random_bytes(32));
+}
+$csrf_efinanceira = $_SESSION['csrf_efinanceira'];
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
 <link href="styles.css" rel="stylesheet" />
+<link href="processamento_interativo.css" rel="stylesheet" />
 
 <style>
 	#container_cpfcnpj {
@@ -100,13 +105,19 @@ $data_atual = date('Y-m');
 
 		<div class="d-flex top10 custom-justify">
 			<?php if (!empty($data_inicial) && !empty($data_final)) { ?>
+				<button id="btnGerarInterativo" type="button" class="btn btn-success" onclick="iniciarGeracaoInterativa()">
+					Baixar Lotes (novo)
+				</button>
+				<span class="help-icon">?
+					<span class="tooltiptext">Novo m&eacute;todo: processa os lotes nesta p&aacute;gina, sem depender do worker antigo.</span>
+				</span>
 				<button type="button" class="btn btn-success btn-info"
 					onclick="iniciarGeracaoBackground('<?= urlencode($data_inicial) ?>', '<?= urlencode($data_final) ?>', '<?= urlencode($tipo_doc) ?>', '<?= urlencode($cpfcnpj) ?>')">
-					Baixar Todos os Lotes
+					Baixar Lotes (antigo)
 				</button>
 				<span class="help-icon">?
 					<span class="tooltiptext">
-						Baixar um ZIP processado em segundo plano para evitar travamentos.
+						M&eacute;todo antigo: envia o pedido para a fila de processamento em segundo plano.
 					</span>
 				</span>
 			<?php } ?>
@@ -196,7 +207,7 @@ $data_atual = date('Y-m');
 				<span style="color: #666; font-size: 0.9em;">
 					<?php if ($pagina_atual == 1 && !$tem_proxima_pagina): ?>
 						(Exibindo todos os resultados)
-					<?php elseif(!isset($tem_proxima_pagina) || !$tem_proxima_pagina): ?>
+					<?php elseif (!isset($tem_proxima_pagina) || !$tem_proxima_pagina): ?>
 						(Última página - Fim dos resultados)
 					<?php else: ?>
 						(Mostrando até <?= $limite_registros ?> registros da base por arquivo gerado)
@@ -346,6 +357,13 @@ $data_atual = date('Y-m');
 		});
 	});
 </script>
+<script>
+	window.efinanceiraInterativaConfig = {
+		endpoint: 'processar_interativo.php',
+		csrfToken: <?= json_encode($csrf_efinanceira) ?>
+	};
+</script>
+<script src="processamento_interativo.js"></script>
 <?php
 require_once $raiz_do_projeto . "backoffice/includes/rodape_bko.php";
 ?>
