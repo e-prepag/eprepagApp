@@ -1659,6 +1659,13 @@ class GerarEFinanceira
             $infoConta->appendChild($numConta);
 
             // Data de abertura da conta: corresponde à data de inclusão do cadastro GM/PD.
+            // Para cadastros antigos sem essa informação, o Financeiro orientou utilizar
+            // o primeiro dia do semestre da competência que está sendo processada.
+            if ($data_abertura === null || trim((string) $data_abertura) === '') {
+                $mes_inicio_semestre = ((int) $mes <= 6) ? 1 : 7;
+                $data_abertura = sprintf('%04d-%02d-01', (int) $ano, $mes_inicio_semestre);
+            }
+
             $timestamp_abertura = strtotime($data_abertura);
             if ($timestamp_abertura === false) {
                 throw new Exception("Data de abertura invalida para a conta {$ug_id}.");
