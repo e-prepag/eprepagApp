@@ -153,6 +153,7 @@ class GerarEFinanceira
                             ug.ug_cep,
                             ug.ug_perfil_saldo,
                             ug.ug_ativo, 
+                            ug.ug_data_inclusao,
                             ug.ug_data_encerramento_conta,
                             TO_CHAR(ug.ug_data_encerramento_conta, 'YYYYMM') as mes_encerramento
                         FROM 
@@ -193,6 +194,7 @@ class GerarEFinanceira
                             COALESCE(m.saidas, 0) AS saidas_conta,
                             COALESCE(m.total_movimentado_mes, 0) AS total_movimentado_mes,
                             d.ug_ativo, 
+                            d.ug_data_inclusao,
                             d.ug_data_encerramento_conta,
                             d.mes_encerramento
                         FROM 
@@ -233,6 +235,7 @@ class GerarEFinanceira
                     f.saidas_conta,
                     f.total_movimentado_mes,
                     f.ug_ativo, 
+                    f.ug_data_inclusao,
                     f.ug_data_encerramento_conta,
                     COALESCE(
                         (
@@ -351,6 +354,7 @@ class GerarEFinanceira
                                     ug.ug_repr_venda_cpf,
                                     ug.ug_repr_legal_data_nascimento,
                                     ug.ug_ativo, 
+                                    ug.ug_data_inclusao,
                                     ug.ug_data_encerramento_conta,
                                     TO_CHAR(ug.ug_data_encerramento_conta, 'YYYYMM') as mes_encerramento
                                 FROM 
@@ -379,7 +383,8 @@ class GerarEFinanceira
                                         d.ug_id, d.ug_repr_legal_cpf, d.ug_repr_venda_cpf, d.ug_repr_legal_nome,
                                         d.ug_repr_legal_data_nascimento, d.ug_endereco, d.ug_numero,
                                         d.ug_complemento, d.ug_bairro, d.ug_cidade, d.ug_estado, d.ug_cep,
-                                        d.ug_nome_fantasia, d.ug_perfil_saldo, d.ug_ativo, d.ug_data_encerramento_conta,
+                                        d.ug_nome_fantasia, d.ug_perfil_saldo, d.ug_ativo, d.ug_data_inclusao,
+                                        d.ug_data_encerramento_conta,
                                         d.mes_encerramento, cal.ano_mes_caixa,
                                         COALESCE(m.entradas, 0) AS entradas_conta,
                                         COALESCE(m.saidas, 0) AS saidas_conta,
@@ -418,6 +423,7 @@ class GerarEFinanceira
                                 f.saidas_conta,
                                 f.total_movimentado_mes,
                                 f.ug_ativo, 
+                                f.ug_data_inclusao,
                                 f.ug_data_encerramento_conta,
                                 COALESCE(
                                     (
@@ -493,6 +499,7 @@ class GerarEFinanceira
                                     ug.ug_endereco, ug.ug_numero, ug.ug_complemento, ug.ug_bairro,
                                     ug.ug_cidade, ug.ug_estado, ug.ug_cep, ug.ug_perfil_saldo, 
                                     ug.ug_ativo, 
+                                    ug.ug_data_inclusao,
                                     ug.ug_data_encerramento_conta,
                                     TO_CHAR(ug.ug_data_encerramento_conta, 'YYYYMM') as mes_encerramento
                                 FROM 
@@ -520,7 +527,7 @@ class GerarEFinanceira
                                     d.ug_id, d.ug_cpf, d.ug_nome, d.ug_data_nascimento,
                                     d.ug_endereco, d.ug_numero, d.ug_complemento, d.ug_bairro,
                                     d.ug_cidade, d.ug_estado, d.ug_cep, d.ug_perfil_saldo, 
-                                    d.ug_ativo, d.ug_data_encerramento_conta, d.mes_encerramento,
+                                    d.ug_ativo, d.ug_data_inclusao, d.ug_data_encerramento_conta, d.mes_encerramento,
                                     cal.ano_mes_caixa,
                                     COALESCE(m.entradas, 0) AS entradas_conta,
                                     COALESCE(m.saidas, 0) AS saidas_conta,
@@ -554,6 +561,7 @@ class GerarEFinanceira
                             f.saidas_conta,
                             f.total_movimentado_conta,
                             f.ug_ativo, 
+                            f.ug_data_inclusao,
                             f.ug_data_encerramento_conta,
                             COALESCE(
                                 (
@@ -762,6 +770,7 @@ class GerarEFinanceira
                 'tipo_relacao'               => $registro['tp_relacao'],
                 'entradas'                   => $registro['entradas_conta'], // Nome padronizado
                 'saidas'                     => $registro['saidas_conta'],   // Nome padronizado
+                'ug_data_inclusao'           => $registro['ug_data_inclusao'],
                 'ug_data_encerramento_conta' => $registro['ug_data_encerramento_conta'],
                 'vlrUltDia'                  => $registro['vlrultdia'],
                 'ug_ativo'                   => $registro['ug_ativo'],
@@ -1418,7 +1427,7 @@ class GerarEFinanceira
         return $this->criarEnvioFinanceira($dadosParaCriar);
     }
 
-    private function buscar_fechamento(string $data_inicial, string $data_final): int
+    private function buscar_fechamento(string $data_inicial, string $data_final, string $versaoLayout): int
     {
         $periodo = $data_inicial . "_" . $data_final;
         $pdo = ConnectionPDO::getConnection()->getLink();
@@ -1426,6 +1435,7 @@ class GerarEFinanceira
         $sql = "SELECT id FROM public.envios_e_financeira 
             WHERE data_anomes = :anomes 
               AND tipo = 'FECHAMENTO'
+              AND versao_efin = :versao_efin
               AND status_envio <> 'ERRO'
               AND retificado = false
             LIMIT 1";
@@ -1433,6 +1443,7 @@ class GerarEFinanceira
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':anomes'  => $periodo,
+            ':versao_efin' => $versaoLayout,
         ]);
 
         $idEncontrado = $stmt->fetchColumn();
@@ -1449,7 +1460,7 @@ class GerarEFinanceira
         $dadosParaCriar = [
             'tipo'              => 'FECHAMENTO',
             'status_envio'      => 'PENDENTE',      // Valor padrão
-            'versao_efin'       => 'v1_2_2',         // Valor padrão obrigatório
+            'versao_efin'       => $versaoLayout,
             'versao_epp'        => $this->versao_aplicacao,         // Valor padrão obrigatório
             'nome_arquivo'      => "none",
             'data_anomes'       => $periodo,
@@ -1474,7 +1485,11 @@ class GerarEFinanceira
      *     ug_id: int|string,
      *     entradas: float|string|int,
      *     saidas: float|string|int,
-     *     tipo_relacao: string
+     *     tipo_relacao: string,
+     *     ug_data_inclusao: string,
+     *     ug_data_encerramento_conta: string|null,
+     *     vlrUltDia: float|string|int,
+     *     ug_ativo: int|string
      * } $contas_user
      */
     public function gerarMovimentacaoFinanceira($tipoNI, $cpfCnpj, $nomeDeclarado, $dataNascimento = '', $enderecoCliente, $ano, $mes, array $contas_user)
@@ -1484,7 +1499,7 @@ class GerarEFinanceira
         $dom->formatOutput = false; // Deixa o XML formatado (quebras de linha e identação)
         $dom->preserveWhiteSpace = true;
 
-        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtMovOpFin/v1_2_1';
+        $namespace = 'http://www.eFinanceira.gov.br/schemas/evtMovOpFin/v1_3_0';
         // Criar o elemento raiz com namespace
         $eFinanceira = $dom->createElementNS(
             $namespace, // namespace
@@ -1547,6 +1562,10 @@ class GerarEFinanceira
         $NIDeclarado = $dom->createElementNS($namespace, 'NIDeclarado', $cpfCnpjNum);
         $ideDeclarado->appendChild($NIDeclarado);
 
+        // A E-Prepag não coleta autodeclaração CRS, pois não opera com contas internacionais.
+        $inDeclaracaoPropriaCRS = $dom->createElementNS($namespace, 'inDeclaracaoPropriaCRS', 'CRS902');
+        $ideDeclarado->appendChild($inDeclaracaoPropriaCRS);
+
         // NomeDeclarado
         $NomeDeclarado = $dom->createElementNS(
             $namespace,
@@ -1563,27 +1582,27 @@ class GerarEFinanceira
             }
         }
 
+        // Endereco - grupo
+        $Endereco = $dom->createElementNS($namespace, 'Endereco');
+        $ideDeclarado->appendChild($Endereco);
+
+        if ($enderecoCliente == "Endereco cliente nao encontrado") {
+            // Tipo desconhecido, conforme codificação OECD aceita pela e-Financeira.
+            $tpEndereco = $dom->createElementNS($namespace, 'tpEndereco', 'OECD305');
+            $Endereco->appendChild($tpEndereco);
+        }
+
         // EnderecoLivre
         $EnderecoLivre = $dom->createElementNS(
             $namespace,
             'EnderecoLivre',
             $this->limparTextoSped($enderecoCliente, 200)
         );
-        $ideDeclarado->appendChild($EnderecoLivre);
+        $Endereco->appendChild($EnderecoLivre);
 
-        if ($enderecoCliente == "Endereco cliente nao encontrado") {
-            // tpEndereco
-            $tpEndereco = $dom->createElementNS($namespace, 'tpEndereco', 'OECD305');
-            $ideDeclarado->appendChild($tpEndereco);
-        }
-
-        //PaisEndereco - grupo
-        $PaisEndereco = $dom->createElementNS($namespace, 'PaisEndereco');
-        $ideDeclarado->appendChild($PaisEndereco);
-
-        //Pais
+        // Pais do endereço
         $Pais = $dom->createElementNS($namespace, 'Pais', 'BR');
-        $PaisEndereco->appendChild($Pais);
+        $Endereco->appendChild($Pais);
 
         //mesCaixa - grupo
         $mesCaixa = $dom->createElementNS($namespace, 'mesCaixa');
@@ -1603,6 +1622,7 @@ class GerarEFinanceira
             $entradas = $conta_user['entradas'];
             $saidas = $conta_user['saidas'];
             $tipo_relacao = $conta_user['tipo_relacao'];
+            $data_abertura = $conta_user['ug_data_inclusao'];
             $data_encerramento = $conta_user['ug_data_encerramento_conta'];
             $vlr_ult_dia = $conta_user['vlrUltDia'];
             $ug_ativo = $conta_user['ug_ativo'];
@@ -1637,6 +1657,22 @@ class GerarEFinanceira
             //numConta
             $numConta = $dom->createElementNS($namespace, 'numConta', $ug_id);
             $infoConta->appendChild($numConta);
+
+            // Data de abertura da conta: corresponde à data de inclusão do cadastro GM/PD.
+            $timestamp_abertura = strtotime($data_abertura);
+            if ($timestamp_abertura === false) {
+                throw new Exception("Data de abertura invalida para a conta {$ug_id}.");
+            }
+            $dtAberturaConta = $dom->createElementNS(
+                $namespace,
+                'dtAberturaConta',
+                date('Y-m-d', $timestamp_abertura)
+            );
+            $infoConta->appendChild($dtAberturaConta);
+
+            // Todas as contas GM e PD são abertas digitalmente.
+            $formaAberturaConta = $dom->createElementNS($namespace, 'formaAberturaConta', '2');
+            $infoConta->appendChild($formaAberturaConta);
 
             //tpRelacaoDeclarado
             $tpRelacaoDeclarado = $dom->createElementNS($namespace, 'tpRelacaoDeclarado', $tipo_relacao);
@@ -1958,18 +1994,37 @@ class GerarEFinanceira
     }
 
     /**
-     * Gera o XML de Fechamento (Versão 1.3.0)
+     * Gera o XML de Fechamento nas versões 1.4.0 (padrão) ou 1.3.0 (legado).
      * * @param string $dataInicioSemestre Formato YYYY-MM-DD
      * @param string $dataFimSemestre    Formato YYYY-MM-DD
      * @param bool   $temMovimento       true = Teve movimento, false = Sem movimento
+     * @param string $versaoLayout       v1_4_0 = atual, v1_3_0 = legado
+     * @param bool   $nadaADeclarar      Inclui o indicador da versão 1.4.0
      */
-    public function gerarFechamento($dataInicioSemestre, $dataFimSemestre, $temMovimento)
+    public function gerarFechamento(
+        $dataInicioSemestre,
+        $dataFimSemestre,
+        $temMovimento,
+        $versaoLayout = 'v1_4_0',
+        $nadaADeclarar = false
+    )
     {
-        // 1. Definição dos Namespaces (Versão 1.3.0)
-        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/v1_3_0';
+        $versoesPermitidas = ['v1_4_0', 'v1_3_0'];
+        if (!in_array($versaoLayout, $versoesPermitidas, true)) {
+            throw new InvalidArgumentException('Versao de layout de fechamento invalida.');
+        }
+
+        $ns = 'http://www.eFinanceira.gov.br/schemas/evtFechamentoeFinanceira/' . $versaoLayout;
+        $layoutAtual = $versaoLayout === 'v1_4_0';
+        $nadaADeclarar = $layoutAtual && (bool)$nadaADeclarar;
+
+        // Nada a declarar implica ausência de movimento no período.
+        if ($nadaADeclarar) {
+            $temMovimento = false;
+        }
 
         // 2. Busca ID e Formata
-        $idNovo = $this->buscar_fechamento($dataInicioSemestre, $dataFimSemestre);
+        $idNovo = $this->buscar_fechamento($dataInicioSemestre, $dataFimSemestre, $versaoLayout);
         $id_formatado = $this->gerarIdFormatado($idNovo);
 
         $ambiente = '1'; // 1 = Produção, 2 = Homologação
@@ -2010,6 +2065,9 @@ class GerarEFinanceira
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtInicio', $dataInicioSemestre));
         $infoFechamento->appendChild($doc->createElementNS($ns, 'dtFim', $dataFimSemestre));
         $infoFechamento->appendChild($doc->createElementNS($ns, 'sitEspecial', '0'));
+        if ($nadaADeclarar) {
+            $infoFechamento->appendChild($doc->createElementNS($ns, 'nadaADeclarar', '1'));
+        }
 
         // 10. Operações Financeiras (O seu módulo principal)
         $indicador = $temMovimento ? '1' : '0';
@@ -2017,6 +2075,12 @@ class GerarEFinanceira
         $evtFechamento->appendChild($fechamentoMovOpFinGroup);
 
         $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'FechamentoMovOpFin', $indicador));
+
+        if ($layoutAtual) {
+            // A E-Prepag não possui contas internacionais reportáveis por CRS ou FATCA.
+            $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'ContasAReportarCRS', '0'));
+            $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'ContasAReportarFATCA', '0'));
+        }
 
         return ['xml' => $doc, 'id' => $id_formatado];
     }

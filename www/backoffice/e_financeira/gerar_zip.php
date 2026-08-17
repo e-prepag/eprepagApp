@@ -29,10 +29,22 @@ if (($_REQUEST['acao'] ?? "") == "abertura") {
     $data_inicio = $_POST['data_inicio'] ?? '';
     $data_fim    = $_POST['data_fim'] ?? '';
     $tem_movimentacoes = $_POST['tem_movimentacoes'] ?? 0;
+    $versao_layout = $_POST['versao_layout'] ?? 'v1_4_0';
+    $nada_a_declarar = ($_POST['nada_a_declarar'] ?? '0') === '1';
+
+    if (!in_array($versao_layout, ['v1_4_0', 'v1_3_0'], true)) {
+        $versao_layout = 'v1_4_0';
+    }
 
     $efinanceira = new GerarEFinanceira();
     if ($data_inicio && $data_fim) {
-        $lotes = $efinanceira->gerarFechamento($data_inicio, $data_fim, $tem_movimentacoes);
+        $lotes = $efinanceira->gerarFechamento(
+            $data_inicio,
+            $data_fim,
+            $tem_movimentacoes == 1,
+            $versao_layout,
+            $nada_a_declarar
+        );
 
         if ($lotes) {
 
