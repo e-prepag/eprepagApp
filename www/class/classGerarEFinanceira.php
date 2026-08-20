@@ -81,7 +81,7 @@ class GerarEFinanceira
         $this->codMunicipioEPP = '3550308';
         $this->certificado = __DIR__ . '/../ssl/cert-eprepag.pfx';
         $this->senhaCertificado = getenv('senha_certificado_digital');
-        $this->caminhoCertificadoPublico = '/www/ssl/pre-efinanceira-receita-fazenda-gov-br-2025.cer';
+        $this->caminhoCertificadoPublico = '/www/ssl/efinanceira-producao-2025-2026.cer';
         $this->certificado_privado_epp = '/www/ssl/private-epp-cert.pem';
         $this->chave_privada_epp = '/www/ssl/key-epp-cert.pem';
         $this->versao_aplicacao = '00000000000000000001';
@@ -1050,7 +1050,7 @@ class GerarEFinanceira
                     if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                         continue;
                     }
-                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
+                    if (empty($registro['dadosDeclarado']['nome_declarado'])) {
                         continue;
                     }
                     // CRIA O XML (ou o objeto XML/Evento)
@@ -1088,7 +1088,7 @@ class GerarEFinanceira
                     if (!$this->validarCpfCnpj($registro['dadosDeclarado']['ni_declarado'])) {
                         continue;
                     }
-                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
+                    if (empty($registro['dadosDeclarado']['nome_declarado'])) {
                         continue;
                     }
                     // CRIA O XML (ou o objeto XML/Evento)
@@ -1171,7 +1171,7 @@ class GerarEFinanceira
                         continue;
                     }
 
-                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
+                    if (empty($registro['dadosDeclarado']['nome_declarado'])) {
                         continue;
                     }
 
@@ -1190,7 +1190,7 @@ class GerarEFinanceira
                         continue;
                     }
 
-                    if(empty($registro['dadosDeclarado']['nome_declarado'])){
+                    if (empty($registro['dadosDeclarado']['nome_declarado'])) {
                         continue;
                     }
 
@@ -2014,8 +2014,7 @@ class GerarEFinanceira
         $temMovimento,
         $versaoLayout = 'v1_4_0',
         $nadaADeclarar = false
-    )
-    {
+    ) {
         $versoesPermitidas = ['v1_4_0', 'v1_3_0'];
         if (!in_array($versaoLayout, $versoesPermitidas, true)) {
             throw new InvalidArgumentException('Versao de layout de fechamento invalida.');
@@ -2084,9 +2083,9 @@ class GerarEFinanceira
         $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'FechamentoMovOpFin', $indicador));
 
         if ($layoutAtual) {
-            // A E-Prepag não possui contas internacionais reportáveis por CRS ou FATCA.
-            $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'ContasAReportarCRS', '0'));
-            $fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'ContasAReportarFATCA', '0'));
+            // A E-Prepag não possui contas internacionais reportáveis por CRS.
+            // ContasAReportarFATCA deve ser omitido porque a empresa não é declarante FATCA.
+            //$fechamentoMovOpFinGroup->appendChild($doc->createElementNS($ns, 'ContasAReportarCRS', '0'));
         }
 
         return ['xml' => $doc, 'id' => $id_formatado];
